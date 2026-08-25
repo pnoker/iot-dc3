@@ -60,7 +60,7 @@ public final class JsonOptional {
     /**
      * Invoke exactly one branch according to whether the wrapped text is valid JSON.
      *
-     * @param action action that consumes valid JSON text
+     * @param action      action that consumes valid JSON text
      * @param emptyAction action to run for empty or invalid JSON
      */
     public void ifPresentOrElse(Consumer<String> action, Runnable emptyAction) {

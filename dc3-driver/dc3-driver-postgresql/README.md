@@ -37,8 +37,8 @@ JDBC URL `jdbc:postgresql://<host>:<port>/<database>` using the `org.postgresql.
 |---------------|--------------|--------|----------------------------------|
 | Execute Query | executeQuery | STRING | SQL query to execute for command |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

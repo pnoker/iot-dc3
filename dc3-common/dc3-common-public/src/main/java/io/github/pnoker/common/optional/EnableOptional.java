@@ -74,7 +74,7 @@ public final class EnableOptional {
     /**
      * Invoke exactly one branch according to whether the index resolves to a flag.
      *
-     * @param action action that consumes the resolved flag
+     * @param action      action that consumes the resolved flag
      * @param emptyAction action to run when the index is unknown
      */
     public void ifPresentOrElse(Consumer<EnableFlagEnum> action, Runnable emptyAction) {

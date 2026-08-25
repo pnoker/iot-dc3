@@ -37,12 +37,12 @@ public interface DriverLeaseService {
     /**
      * Renews one runtime instance and reconciles device ownership when the active membership or device revision changed.
      *
-     * @param tenantId              positive owning tenant ID
-     * @param driverId              positive logical driver ID
-     * @param node                  stable runtime node identifier used by the ownership algorithm
-     * @param client                runtime client identifier used for diagnostics
-     * @param host                  runtime host used for diagnostics
-     * @param leaseSeconds          requested lease duration, from 10 through 120 seconds
+     * @param tenantId               positive owning tenant ID
+     * @param driverId               positive logical driver ID
+     * @param node                   stable runtime node identifier used by the ownership algorithm
+     * @param client                 runtime client identifier used for diagnostics
+     * @param host                   runtime host used for diagnostics
+     * @param leaseSeconds           requested lease duration, from 10 through 120 seconds
      * @param knownAssignmentVersion assignment version already observed by the runtime
      * @return renewed lease expiry, current assignment version, and whether the runtime must reload assignments
      */
@@ -52,11 +52,11 @@ public interface DriverLeaseService {
     /**
      * Lists the active device assignments owned by one runtime node using an exclusive device-ID cursor.
      *
-     * @param tenantId     positive owning tenant ID
-     * @param driverId     positive logical driver ID
-     * @param node         runtime node whose assignments are requested
+     * @param tenantId      positive owning tenant ID
+     * @param driverId      positive logical driver ID
+     * @param node          runtime node whose assignments are requested
      * @param afterDeviceId exclusive cursor; zero starts the first page
-     * @param limit        page size from 1 through 2000
+     * @param limit         page size from 1 through 2000
      * @return assignments ordered by device ID
      */
     List<DeviceLeaseBO> listOwnedLeases(Long tenantId, Long driverId, String node,

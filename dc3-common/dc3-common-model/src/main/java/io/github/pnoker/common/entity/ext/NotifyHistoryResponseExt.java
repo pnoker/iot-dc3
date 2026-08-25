@@ -44,7 +44,9 @@ public class NotifyHistoryResponseExt extends BaseExt {
     @Schema(description = "Extended content describing the channel provider response of a notification delivery")
     private Content content;
 
-    /** Response payload schema extension for notify history calls. */
+    /**
+     * Response payload schema extension for notify history calls.
+     */
     @Getter
     @Setter
     @NoArgsConstructor

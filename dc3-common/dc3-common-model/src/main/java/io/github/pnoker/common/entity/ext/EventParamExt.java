@@ -42,7 +42,9 @@ public class EventParamExt extends BaseExt {
     @Schema(description = "Structured event param payload carrying the reserved keep field")
     private Content content;
 
-    /** Reserved event-param extension slot, currently a placeholder. */
+    /**
+     * Reserved event-param extension slot, currently a placeholder.
+     */
     @Schema(description = "Extended content payload of the event param")
     @Getter
     @Setter

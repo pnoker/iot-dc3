@@ -83,16 +83,24 @@ public class RequestConstant {
          */
         public static final String X_AUTH_SIGN = "X-Auth-Sign";
 
-        /** x internal caller constant. */
+        /**
+         * x internal caller constant.
+         */
         public static final String X_INTERNAL_CALLER = "X-Internal-Caller";
 
-        /** x internal timestamp constant. */
+        /**
+         * x internal timestamp constant.
+         */
         public static final String X_INTERNAL_TIMESTAMP = "X-Internal-Timestamp";
 
-        /** x internal nonce constant. */
+        /**
+         * x internal nonce constant.
+         */
         public static final String X_INTERNAL_NONCE = "X-Internal-Nonce";
 
-        /** x internal sign constant. */
+        /**
+         * x internal sign constant.
+         */
         public static final String X_INTERNAL_SIGN = "X-Internal-Sign";
 
         /**

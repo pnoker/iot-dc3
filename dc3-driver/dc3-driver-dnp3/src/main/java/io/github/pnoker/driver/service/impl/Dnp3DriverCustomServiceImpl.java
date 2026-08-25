@@ -175,7 +175,7 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
             CountDownLatch latch = new CountDownLatch(1);
             CacheReadHandler handler = new CacheReadHandler(connection.cache(), latch);
             connection.channel().readWithHandler(connection.associationId(),
-                    Request.classRequest(true, true, true, true), handler)
+                            Request.classRequest(true, true, true, true), handler)
                     .exceptionally(ex -> {
                         log.warn("DNP3 poll failed, protocol={}, deviceId={}",
                                 driverCode, device.getId(), ex);

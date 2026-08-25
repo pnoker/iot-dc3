@@ -68,7 +68,7 @@ public class NettyTcpServer {
      * Register device channel.
      *
      * @param deviceId device identifier
-     * @param channel channel
+     * @param channel  channel
      */
     public static void registerDeviceChannel(Long deviceId, Channel channel) {
         DEVICE_CHANNEL_MAP.put(deviceId, channel);

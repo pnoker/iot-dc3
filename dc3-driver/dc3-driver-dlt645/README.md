@@ -15,39 +15,39 @@ standard) according to a configurable data format.
 
 ## Driver Attributes (Device-level)
 
-| Attribute      | Code         | Type   | Default        | Description                                     |
-|----------------|--------------|--------|----------------|-------------------------------------------------|
-| Serial Port    | port         | STRING | /dev/ttyUSB0   | Serial port device path                         |
-| Baud Rate      | baudRate     | INT    | 2400           | Baud rate (1200, 2400, 4800, 9600)              |
-| Data Bits      | dataBits     | INT    | 8              | Data bits (7, 8)                                |
-| Stop Bits      | stopBits     | INT    | 1              | Stop bits (1, 2)                                |
-| Parity         | parity       | INT    | 2              | Parity (0=None, 1=Odd, 2=Even)                  |
-| Timeout        | timeout      | INT    | 1000           | Read timeout in milliseconds                    |
-| Meter Address  | meterAddress | STRING | 000000000000   | 12-digit meter address in BCD                   |
-| Write Password | password     | STRING | 00000000       | 8-char hexadecimal write password (4 bytes)     |
-| Operator Code  | operatorCode | STRING | 00000000       | 8-char hexadecimal operator code (4 bytes)      |
+| Attribute      | Code         | Type   | Default      | Description                                 |
+|----------------|--------------|--------|--------------|---------------------------------------------|
+| Serial Port    | port         | STRING | /dev/ttyUSB0 | Serial port device path                     |
+| Baud Rate      | baudRate     | INT    | 2400         | Baud rate (1200, 2400, 4800, 9600)          |
+| Data Bits      | dataBits     | INT    | 8            | Data bits (7, 8)                            |
+| Stop Bits      | stopBits     | INT    | 1            | Stop bits (1, 2)                            |
+| Parity         | parity       | INT    | 2            | Parity (0=None, 1=Odd, 2=Even)              |
+| Timeout        | timeout      | INT    | 1000         | Read timeout in milliseconds                |
+| Meter Address  | meterAddress | STRING | 000000000000 | 12-digit meter address in BCD               |
+| Write Password | password     | STRING | 00000000     | 8-char hexadecimal write password (4 bytes) |
+| Operator Code  | operatorCode | STRING | 00000000     | 8-char hexadecimal operator code (4 bytes)  |
 
 ## Point Attributes
 
-| Attribute       | Code       | Type   | Default  | Description                                                     |
-|-----------------|------------|--------|----------|-----------------------------------------------------------------|
-| Data Identifier | di         | STRING | 00010000 | 8-char hexadecimal DI0-DI3 (00010000 = total active energy)     |
-| Data Format     | dataFormat | STRING | HEX      | Data format: HEX, BCD, INT, FLOAT, ASCII                        |
+| Attribute       | Code       | Type   | Default  | Description                                                 |
+|-----------------|------------|--------|----------|-------------------------------------------------------------|
+| Data Identifier | di         | STRING | 00010000 | 8-char hexadecimal DI0-DI3 (00010000 = total active energy) |
+| Data Format     | dataFormat | STRING | HEX      | Data format: HEX, BCD, INT, FLOAT, ASCII                    |
 
 ## Command Attributes (write)
 
-| Attribute       | Code       | Type   | Default  | Description                                        |
-|-----------------|------------|--------|----------|----------------------------------------------------|
-| Data Identifier | di         | STRING | 00010000 | 8-char hexadecimal DI0-DI3                         |
-| Data Format     | dataFormat | STRING | HEX      | Format used to encode the written value            |
+| Attribute       | Code       | Type   | Default  | Description                             |
+|-----------------|------------|--------|----------|-----------------------------------------|
+| Data Identifier | di         | STRING | 00010000 | 8-char hexadecimal DI0-DI3              |
+| Data Format     | dataFormat | STRING | HEX      | Format used to encode the written value |
 
 The module `application.yml` is authoritative for attribute codes, types, defaults, scheduling, health, and local
 buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 
-A DL/T 645-2007 electricity meter connected over RS485 to a serial port reachable from the host running the driver
-(e.g. `/dev/ttyUSB0`), with baud rate, parity (typically even), and the 12-digit meter address configured.
+A DL/T 645-2007 electricity meter connected over RS485 to a serial port reachable from the host running the driver (e.g.
+`/dev/ttyUSB0`), with baud rate, parity (typically even), and the 12-digit meter address configured.
 
 ## Running Locally
 

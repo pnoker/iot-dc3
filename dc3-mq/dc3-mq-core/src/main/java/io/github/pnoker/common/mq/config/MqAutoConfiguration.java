@@ -44,7 +44,9 @@ import java.util.Objects;
 @EnableConfigurationProperties(BatchConsumerProperties.class)
 public class MqAutoConfiguration {
 
-    /** Publishing facade over the active adapter. */
+    /**
+     * Publishing facade over the active adapter.
+     */
     @Bean
     @ConditionalOnMissingBean(MessageSender.class)
     public MessageSender messageSender(ObjectProvider<BrokerAdapter> adapterProvider) {
@@ -64,7 +66,9 @@ public class MqAutoConfiguration {
         return new MessageSenderImpl(adapter);
     }
 
-    /** Registers beans carrying @Dc3Listener methods with the active adapter. */
+    /**
+     * Registers beans carrying @Dc3Listener methods with the active adapter.
+     */
     @Bean
     @ConditionalOnMissingBean
     public Dc3ListenerProcessor dc3ListenerProcessor(ObjectProvider<BrokerAdapter> adapterProvider) {

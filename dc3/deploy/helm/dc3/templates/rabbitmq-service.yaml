@@ -1,10 +1,10 @@
-{{- if .Values.rabbitmq.enabled }}
+{ { - if .Values.rabbitmq.enabled } }
 apiVersion: v1
 kind: Service
 metadata:
   name: dc3-rabbitmq
   labels:
-    {{- include "dc3.labels" . | nindent 4 }}
+    { { - include "dc3.labels" . | nindent 4 } }
 spec:
   type: ClusterIP
   clusterIP: None
@@ -17,4 +17,4 @@ spec:
     - name: mqtt
       port: 1883
       targetPort: mqtt
-{{- end }}
+  { { - end } }

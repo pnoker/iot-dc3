@@ -29,7 +29,9 @@
 
     <artifactId>dc3-tsdb-iotdb</artifactId>
     <name>${project.artifactId}</name>
-    <description>Apache IoTDB adapter of the TSDB port — tree paths root.dc3.* over the session API; requires timestamp_precision=us</description>
+    <description>Apache IoTDB adapter of the TSDB port — tree paths root.dc3.* over the session API; requires
+        timestamp_precision=us
+    </description>
 
     <dependencies>
         <dependency>

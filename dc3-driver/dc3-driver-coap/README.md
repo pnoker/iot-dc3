@@ -27,8 +27,8 @@ resource path and the write path performs CoAP PUT requests.
 | Write Path     | CoAP resource path for writing point data      |
 | Content Format | Content format: json, text, cbor, octet-stream |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

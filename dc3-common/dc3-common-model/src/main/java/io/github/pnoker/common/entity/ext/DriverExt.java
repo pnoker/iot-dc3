@@ -44,7 +44,9 @@ public class DriverExt extends BaseExt {
     @Schema(description = "Driver configuration content payload; a structured object carrying driver-specific settings, not a scalar value")
     private Content content;
 
-    /** Reserved driver extension slot for driver-specific hints. */
+    /**
+     * Reserved driver extension slot for driver-specific hints.
+     */
     @Schema(description = "Driver configuration content holding driver-specific settings")
     @Getter
     @Setter

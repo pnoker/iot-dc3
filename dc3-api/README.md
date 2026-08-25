@@ -5,12 +5,12 @@ business logic belongs in `dc3-common-*` implementations.
 
 ## Modules
 
-| Module | Contract surface | Primary consumers |
-|---|---|---|
-| `dc3-api-auth` | tenant, user, token, permission, resource registry, MCP runtime | gateway and center services |
-| `dc3-api-data` | point values, command history, event history | manager, drivers, and data clients |
-| `dc3-api-driver` | driver registration and driver-scoped device/point metadata | protocol drivers |
-| `dc3-api-manager` | manager-scoped driver, device, profile, point, command, and event metadata | data and other centers |
+| Module            | Contract surface                                                           | Primary consumers                  |
+|-------------------|----------------------------------------------------------------------------|------------------------------------|
+| `dc3-api-auth`    | tenant, user, token, permission, resource registry, MCP runtime            | gateway and center services        |
+| `dc3-api-data`    | point values, command history, event history                               | manager, drivers, and data clients |
+| `dc3-api-driver`  | driver registration and driver-scoped device/point metadata                | protocol drivers                   |
+| `dc3-api-manager` | manager-scoped driver, device, profile, point, command, and event metadata | data and other centers             |
 
 Proto sources live under each module's `src/main/protobuf/` directory. Generated Java sources are build artifacts and
 must not be edited directly.

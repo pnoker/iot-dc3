@@ -47,7 +47,9 @@ public class CommandAttributeExt extends BaseExt {
     @Schema(description = "Command attribute content, holding the detailed configuration of the attribute.")
     private Content content;
 
-    /** Attribute-value retention strategy hint. */
+    /**
+     * Attribute-value retention strategy hint.
+     */
     @Schema(description = "Command attribute content. Detailed configuration of a command attribute, grouped into retention, UI, validation, security and applicability sections.")
     @Getter
     @Setter
@@ -72,7 +74,9 @@ public class CommandAttributeExt extends BaseExt {
 
     }
 
-    /** Front-end rendering hints for the attribute input. */
+    /**
+     * Front-end rendering hints for the attribute input.
+     */
     @Schema(description = "UI rendering configuration. Describes how the command attribute is displayed and edited in the front-end form.", example = "form")
     @Getter
     @Setter
@@ -103,7 +107,9 @@ public class CommandAttributeExt extends BaseExt {
 
     }
 
-    /** Value constraints (min/max/range) for attribute input validation. */
+    /**
+     * Value constraints (min/max/range) for attribute input validation.
+     */
     @Schema(description = "Validation rules. Constraints applied to the command attribute value.", example = "standard")
     @Getter
     @Setter
@@ -122,7 +128,9 @@ public class CommandAttributeExt extends BaseExt {
 
     }
 
-    /** Access-control hints for the attribute. */
+    /**
+     * Access-control hints for the attribute.
+     */
     @Schema(description = "Security configuration. Security-related settings for the command attribute.", example = "basic")
     @Getter
     @Setter
@@ -135,7 +143,9 @@ public class CommandAttributeExt extends BaseExt {
 
     }
 
-    /** Applicability scoping of the attribute (which entities/contexts it targets). */
+    /**
+     * Applicability scoping of the attribute (which entities/contexts it targets).
+     */
     @Schema(description = "Applicability scope. Defines the command and call types the attribute applies to.", example = "READ")
     @Getter
     @Setter

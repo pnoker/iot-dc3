@@ -31,7 +31,9 @@
     <version>2026.5.22</version>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 RabbitMQ adapter for the broker-neutral messaging port; physical topology is byte-for-byte identical to the pre-port layout</description>
+    <description>IoT DC3 RabbitMQ adapter for the broker-neutral messaging port; physical topology is byte-for-byte
+        identical to the pre-port layout
+    </description>
 
     <dependencies>
         <dependency>

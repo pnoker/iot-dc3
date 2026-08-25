@@ -14,22 +14,22 @@ logical devices within one Redis instance.
 
 ## Driver Attributes (Device-level)
 
-| Attribute  | Code      | Type   | Default | Description                          |
-|------------|-----------|--------|---------|--------------------------------------|
-| Key Prefix | keyPrefix | STRING |         | Prefix prepended to every point key  |
+| Attribute  | Code      | Type   | Default | Description                         |
+|------------|-----------|--------|---------|-------------------------------------|
+| Key Prefix | keyPrefix | STRING |         | Prefix prepended to every point key |
 
 ## Point Attributes
 
-| Attribute | Code     | Type   | Default | Description                               |
-|-----------|----------|--------|---------|-------------------------------------------|
-| Key       | key      | STRING |         | Redis key (relative to the key prefix)    |
-| Data Type | dataType | STRING | STRING  | Redis data type: STRING or HASH           |
-| Field     | field    | STRING |         | Hash field, required when dataType=HASH   |
+| Attribute | Code     | Type   | Default | Description                             |
+|-----------|----------|--------|---------|-----------------------------------------|
+| Key       | key      | STRING |         | Redis key (relative to the key prefix)  |
+| Data Type | dataType | STRING | STRING  | Redis data type: STRING or HASH         |
+| Field     | field    | STRING |         | Hash field, required when dataType=HASH |
 
 ## Command Attributes (write)
 
-| Attribute | Code     | Type   | Default | Description                                    |
-|-----------|----------|--------|---------|------------------------------------------------|
+| Attribute | Code     | Type   | Default | Description                                        |
+|-----------|----------|--------|---------|----------------------------------------------------|
 | Data Type | dataType | STRING | STRING  | Redis data type of the written key: STRING or HASH |
 
 The module `application.yml` is authoritative for attribute codes, types, defaults, scheduling, health, and local
@@ -42,8 +42,8 @@ A reachable Redis instance. Point the `spring.data.redis.*` properties (or `REDI
 
 ## Connection
 
-The Redis connection is configured through Spring Boot `spring.data.redis.*` properties in `application.yml`, driven
-by the `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`, and `REDIS_DATABASE` environment variables.
+The Redis connection is configured through Spring Boot `spring.data.redis.*` properties in `application.yml`, driven by
+the `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`, and `REDIS_DATABASE` environment variables.
 
 ## Running Locally
 

@@ -29,7 +29,9 @@
 
     <artifactId>dc3-db-tck</artifactId>
     <name>${project.artifactId}</name>
-    <description>Dual-dialect relational contract suite — identical mapper-level assertions against PostgreSQL and MySQL 8, the acceptance bar for dialect forks (docs/design/storage-abstraction.md §3.3)</description>
+    <description>Dual-dialect relational contract suite — identical mapper-level assertions against PostgreSQL and MySQL
+        8, the acceptance bar for dialect forks (docs/design/storage-abstraction.md §3.3)
+    </description>
 
     <dependencies>
         <dependency>

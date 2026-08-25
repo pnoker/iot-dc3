@@ -22,7 +22,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Database projection for a single-owner device assignment. */
+/**
+ * Database projection for a single-owner device assignment.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

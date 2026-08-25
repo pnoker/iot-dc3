@@ -1,10 +1,10 @@
-{{- if .Values.rabbitmq.enabled }}
+{ { - if .Values.rabbitmq.enabled } }
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: dc3-rabbitmq
   labels:
-    {{- include "dc3.labels" . | nindent 4 }}
+    { { - include "dc3.labels" . | nindent 4 } }
 spec:
   serviceName: dc3-rabbitmq
   replicas: 1
@@ -22,7 +22,7 @@ spec:
       containers:
         - name: dc3-rabbitmq
           image: "{{ .Values.image.registry }}/{{ .Values.rabbitmq.image }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: { { .Values.image.pullPolicy } }
           env:
             - name: RABBITMQ_DEFAULT_VHOST
               valueFrom:
@@ -32,12 +32,12 @@ spec:
             - name: RABBITMQ_DEFAULT_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "dc3.secretName" . }}
+                  name: { { include "dc3.secretName" . } }
                   key: RABBITMQ_USERNAME
             - name: RABBITMQ_DEFAULT_PASS
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "dc3.secretName" . }}
+                  name: { { include "dc3.secretName" . } }
                   key: RABBITMQ_PASSWORD
           ports:
             - name: amqp
@@ -49,17 +49,17 @@ spec:
             - name: management
               containerPort: 15672
           resources:
-            {{- toYaml .Values.rabbitmq.resources | nindent 12 }}
+            { { - toYaml .Values.rabbitmq.resources | nindent 12 } }
           readinessProbe:
             exec:
-              command: ["rabbitmq-diagnostics", "-q", "ping"]
+              command: [ "rabbitmq-diagnostics", "-q", "ping" ]
             initialDelaySeconds: 20
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 10
           livenessProbe:
             exec:
-              command: ["rabbitmq-diagnostics", "-q", "ping"]
+              command: [ "rabbitmq-diagnostics", "-q", "ping" ]
             initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 5
@@ -71,11 +71,11 @@ spec:
     - metadata:
         name: data
       spec:
-        accessModes: ["ReadWriteOnce"]
-        {{- with .Values.rabbitmq.storageClass }}
-        storageClassName: {{ . }}
-        {{- end }}
+        accessModes: [ "ReadWriteOnce" ]
+        { { - with .Values.rabbitmq.storageClass } }
+        storageClassName: { { . } }
+        { { - end } }
         resources:
           requests:
-            storage: {{ .Values.rabbitmq.storage }}
-{{- end }}
+            storage: { { .Values.rabbitmq.storage } }
+  { { - end } }

@@ -44,7 +44,7 @@ public class AgenticMessageRecorder {
     /**
      * Persist user message.
      *
-     * @param prepared prepared
+     * @param prepared   prepared
      * @param userHeader user header
      */
     public void persistUserMessage(AgenticPreparedChatBO prepared, RequestHeader.PrincipalHeader userHeader) {
@@ -55,8 +55,8 @@ public class AgenticMessageRecorder {
     /**
      * Persist assistant message.
      *
-     * @param prepared prepared
-     * @param content content
+     * @param prepared   prepared
+     * @param content    content
      * @param userHeader user header
      */
     public void persistAssistantMessage(AgenticPreparedChatBO prepared, String content,

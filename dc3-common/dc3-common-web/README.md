@@ -17,10 +17,10 @@ REST-based center services.
 |-------------------------|--------------------------------------------------------------------------------------|
 | `WebFluxConfig`         | Global WebFlux configuration (codecs, CORS, message converters)                      |
 | `WebFluxSecurityConfig` | Security chain, public-path rules, and facade-backed authorization                   |
-| `RequestIdWebFilter`    | Adds and propagates request IDs for tracing                                           |
+| `RequestIdWebFilter`    | Adds and propagates request IDs for tracing                                          |
 | `ExceptionConfig`       | `@ControllerAdvice` global exception handler mapping exceptions to `R<T>` responses  |
 | `BaseController`        | Reactive controller helpers plus user/tenant context resolution                      |
-| `PrincipalHeaderUtil`   | Reads the signed principal headers injected by the gateway                            |
+| `PrincipalHeaderUtil`   | Reads the signed principal headers injected by the gateway                           |
 | `SpringDocConfig`       | Shared springdoc/OpenAPI group configuration                                         |
 | `ResponseUtil`          | Utilities for writing non-controller `ServerHttpResponse` bodies in reactive context |
 

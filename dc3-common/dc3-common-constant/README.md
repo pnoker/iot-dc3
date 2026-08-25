@@ -29,17 +29,17 @@ classes and top-level public enums are reserved for this module; local holders u
 
 `RabbitConstant` defines all exchange names, queue name prefixes, and routing key prefixes:
 
-| Constant                         | Base value                     |
-|----------------------------------|--------------------------------|
-| `TOPIC_EXCHANGE_POINT_COMMAND`   | `dc3.e.point_command`          |
-| `TOPIC_EXCHANGE_COMMAND`         | `dc3.e.command`                |
-| `TOPIC_EXCHANGE_METADATA`        | `dc3.e.metadata`               |
-| `TOPIC_EXCHANGE_VALUE`           | `dc3.e.value`                  |
-| `TOPIC_EXCHANGE_EVENT`           | `dc3.e.event`                  |
-| `ROUTING_POINT_COMMAND_PREFIX`   | `dc3.r.point_command.`         |
-| `ROUTING_COMMAND_PREFIX`         | `dc3.r.command.`               |
-| `ROUTING_DRIVER_METADATA_PREFIX` | `dc3.r.metadata.driver.`       |
-| `ROUTING_POINT_VALUE_PREFIX`     | `dc3.r.value.point.`           |
+| Constant                         | Base value               |
+|----------------------------------|--------------------------|
+| `TOPIC_EXCHANGE_POINT_COMMAND`   | `dc3.e.point_command`    |
+| `TOPIC_EXCHANGE_COMMAND`         | `dc3.e.command`          |
+| `TOPIC_EXCHANGE_METADATA`        | `dc3.e.metadata`         |
+| `TOPIC_EXCHANGE_VALUE`           | `dc3.e.value`            |
+| `TOPIC_EXCHANGE_EVENT`           | `dc3.e.event`            |
+| `ROUTING_POINT_COMMAND_PREFIX`   | `dc3.r.point_command.`   |
+| `ROUTING_COMMAND_PREFIX`         | `dc3.r.command.`         |
+| `ROUTING_DRIVER_METADATA_PREFIX` | `dc3.r.metadata.driver.` |
+| `ROUTING_POINT_VALUE_PREFIX`     | `dc3.r.value.point.`     |
 
 The runtime may prepend the `dc3.rabbit.tag` system-property value to exchange, queue, and selected routing constants.
 Point read/write operations use the point-command constants; `TOPIC_EXCHANGE_COMMAND` is reserved for custom commands.
@@ -58,8 +58,8 @@ consumer, and deployed queue migration.
 
 ### Enumerations
 
-Located in `io.github.pnoker.common.enums`. The list below is a selection of the most commonly referenced enums; see
-the package for the complete set (alarm, MCP, OAuth, notify, and other domain enums live there too):
+Located in `io.github.pnoker.common.enums`. The list below is a selection of the most commonly referenced enums; see the
+package for the complete set (alarm, MCP, OAuth, notify, and other domain enums live there too):
 
 - `EnableFlagEnum` — Boolean-like enable/disable state
 - `EntityStatusEnum` — Online, offline, maintenance, and fault states

@@ -72,7 +72,9 @@ public class OPCSERVERSTATUS {
         return struct;
     }
 
-    /** Decode the COM wire struct into the typed OPCSERVERSTATUS wrapper. */
+    /**
+     * Decode the COM wire struct into the typed OPCSERVERSTATUS wrapper.
+     */
     public static OPCSERVERSTATUS fromStruct(final JIStruct struct) {
         OPCSERVERSTATUS status = new OPCSERVERSTATUS();
 

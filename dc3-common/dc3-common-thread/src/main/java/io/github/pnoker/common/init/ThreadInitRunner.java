@@ -37,7 +37,9 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableConfigurationProperties({ThreadProperties.class})
 public class ThreadInitRunner implements ApplicationRunner {
 
-    /** Creates the thread init runner. */
+    /**
+     * Creates the thread init runner.
+     */
     public ThreadInitRunner() {
     }
 

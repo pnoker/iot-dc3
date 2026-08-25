@@ -64,7 +64,7 @@ spec:
               mountPath: /dc3-center/dc3-center-agentic/dc3/data
       volumes:
         - name: logs
-          emptyDir: {}
+          emptyDir: { }
         - name: data
           persistentVolumeClaim:
             claimName: dc3-agentic-data

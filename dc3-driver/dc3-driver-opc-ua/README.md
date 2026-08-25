@@ -13,11 +13,11 @@ servers to read and write node values from industrial automation systems using t
 
 ## Driver Attributes (Device-level)
 
-| Attribute | Description                          |
-|-----------|--------------------------------------|
-| Host      | OPC UA server hostname or IP         |
-| Port      | OPC UA server port (default 18600)   |
-| Path      | OPC UA endpoint path (default `/`)    |
+| Attribute | Description                        |
+|-----------|------------------------------------|
+| Host      | OPC UA server hostname or IP       |
+| Port      | OPC UA server port (default 18600) |
+| Path      | OPC UA endpoint path (default `/`) |
 
 ## Point Attributes
 
@@ -26,8 +26,8 @@ servers to read and write node values from industrial automation systems using t
 | Namespace | OPC UA node namespace index |
 | Tag       | OPC UA node identifier      |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

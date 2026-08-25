@@ -68,7 +68,7 @@ public interface GrpcCommandAttributeBuilder {
      * After process.
      *
      * @param entityGrpc entity grpc
-     * @param entityDTO transfer object
+     * @param entityDTO  transfer object
      */
     @AfterMapping
     default void afterProcess(GrpcCommandAttributeDTO entityGrpc, @MappingTarget CommandAttributeDTO entityDTO) {
@@ -108,7 +108,7 @@ public interface GrpcCommandAttributeBuilder {
     /**
      * After process.
      *
-     * @param entityDTO transfer object
+     * @param entityDTO  transfer object
      * @param entityGrpc entity grpc
      */
     @AfterMapping

@@ -31,7 +31,9 @@
     <version>2026.5.22</version>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 broker-neutral messaging port: logical topics, subscription model, envelope, capability negotiation</description>
+    <description>IoT DC3 broker-neutral messaging port: logical topics, subscription model, envelope, capability
+        negotiation
+    </description>
 
     <dependencies>
         <dependency>

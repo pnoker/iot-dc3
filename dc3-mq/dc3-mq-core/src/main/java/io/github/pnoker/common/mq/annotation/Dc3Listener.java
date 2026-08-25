@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
  * @Dc3Listener(topic = MqTopic.POINT_VALUE, profile = THROUGHPUT, delivery = BATCH)
  * public void onValues(List<MqReceived<PointValueBO>> messages, Acknowledgment ack) { ... }
  * }</pre>
- *
+ * <p>
  * Batch size, prefetch and the retry policy bind from configuration
  * ({@code dc3.data.point.batch.*}), not annotation literals.
  *
@@ -77,7 +77,7 @@ public @interface Dc3Listener {
 
     /**
      * @return consumer group / per-instance queue suffix, empty for the platform-shared
-     *         destination (drivers set their client id programmatically)
+     * destination (drivers set their client id programmatically)
      */
     String group() default "";
 

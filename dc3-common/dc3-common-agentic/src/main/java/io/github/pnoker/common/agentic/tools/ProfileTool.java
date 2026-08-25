@@ -54,7 +54,7 @@ public class ProfileTool {
     /**
      * Return profile by identifier.
      *
-     * @param profileId profile identifier
+     * @param profileId   profile identifier
      * @param toolContext tool context
      * @return lookup profile by identifier result
      */
@@ -80,7 +80,7 @@ public class ProfileTool {
     /**
      * Return profiles by identifiers.
      *
-     * @param profileIds profile identifiers
+     * @param profileIds  profile identifiers
      * @param toolContext tool context
      * @return lookup profiles by identifiers result
      */
@@ -112,8 +112,8 @@ public class ProfileTool {
      * @param profileName profile name
      * @param profileCode profile code
      * @param profileType profile type
-     * @param page page
-     * @param size size
+     * @param page        page
+     * @param size        size
      * @param toolContext tool context
      * @return search profiles result
      */
@@ -151,7 +151,7 @@ public class ProfileTool {
     /**
      * Return the matching profiles by device identifier.
      *
-     * @param deviceId device identifier
+     * @param deviceId    device identifier
      * @param toolContext tool context
      * @return list profiles by device identifier result
      */

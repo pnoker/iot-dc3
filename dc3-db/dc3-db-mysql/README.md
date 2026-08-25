@@ -9,9 +9,9 @@ Active when `dc3.db.type=mysql`.
 
 ## Key types
 
-| Type | Role |
-|---|---|
-| `MysqlDbAutoConfiguration` | adapter wiring selected by `dc3.db.type` |
+| Type                       | Role                                                       |
+|----------------------------|------------------------------------------------------------|
+| `MysqlDbAutoConfiguration` | adapter wiring selected by `dc3.db.type`                   |
 | `ActiveMysqlProfileConfig` | activates the MySQL profile (PostgreSQL stays the default) |
 
 `application-mysql.yml` registers the master datasource, driver, and the `jdbc-type-for-null` convention.

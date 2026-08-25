@@ -355,7 +355,7 @@ public abstract class AbstractTsdbContractTest {
 
         // COUNT via (possibly tiered) minute buckets must equal the raw count.
         long tierCount = store().bucketedAggregate(SeriesFilter.of(key), AggregateFunction.COUNT,
-                window, Duration.ofMinutes(1), null, DEADLINE)
+                        window, Duration.ofMinutes(1), null, DEADLINE)
                 .getOrDefault(key, List.of()).stream().mapToLong(BucketAggregate::sampleCount).sum();
         assertThat(tierCount).isEqualTo(store().count(SeriesFilter.of(key), window, DEADLINE));
 
@@ -384,7 +384,7 @@ public abstract class AbstractTsdbContractTest {
         // percentiles on the raw path without supertable-style failures.
         if (store().capabilities().percentile()) {
             List<BucketAggregate> p50 = store().bucketedAggregate(SeriesFilter.of(key),
-                    AggregateFunction.PERCENTILE, window, Duration.ofMinutes(1), 0.5, DEADLINE)
+                            AggregateFunction.PERCENTILE, window, Duration.ofMinutes(1), 0.5, DEADLINE)
                     .getOrDefault(key, List.of());
             assertThat(p50).hasSize(5);
             assertThat(p50).allSatisfy(bucket -> assertThat(bucket.value()).isNotNull());

@@ -50,7 +50,7 @@ public class PointTool {
     /**
      * Return point by identifier.
      *
-     * @param pointId point identifier
+     * @param pointId     point identifier
      * @param toolContext tool context
      * @return lookup point by identifier result
      */
@@ -71,7 +71,7 @@ public class PointTool {
     /**
      * Return points by identifiers.
      *
-     * @param pointIds point identifiers
+     * @param pointIds    point identifiers
      * @param toolContext tool context
      * @return lookup points by identifiers result
      */
@@ -96,10 +96,10 @@ public class PointTool {
     /**
      * Return the matching points.
      *
-     * @param pointName point name
-     * @param profileId profile identifier
-     * @param page page
-     * @param size size
+     * @param pointName   point name
+     * @param profileId   profile identifier
+     * @param page        page
+     * @param size        size
      * @param toolContext tool context
      * @return search points result
      */
@@ -131,9 +131,9 @@ public class PointTool {
     /**
      * Return the matching points by device identifier.
      *
-     * @param deviceId device identifier
-     * @param page page
-     * @param size size
+     * @param deviceId    device identifier
+     * @param page        page
+     * @param size        size
      * @param toolContext tool context
      * @return list points by device identifier result
      */
@@ -163,9 +163,9 @@ public class PointTool {
     /**
      * Return the matching points by profile identifier.
      *
-     * @param profileId profile identifier
-     * @param page page
-     * @param size size
+     * @param profileId   profile identifier
+     * @param page        page
+     * @param size        size
      * @param toolContext tool context
      * @return list points by profile identifier result
      */

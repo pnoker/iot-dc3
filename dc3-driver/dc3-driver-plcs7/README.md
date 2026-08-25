@@ -27,8 +27,8 @@
 | Byte Offset | Byte offset within the data block               |
 | Bit Offset  | Bit offset within the byte (for boolean points) |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

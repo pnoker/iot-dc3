@@ -68,7 +68,7 @@ public interface GrpcPointAttributeBuilder {
      * After process.
      *
      * @param entityGrpc entity grpc
-     * @param entityDTO transfer object
+     * @param entityDTO  transfer object
      */
     @AfterMapping
     default void afterProcess(GrpcPointAttributeDTO entityGrpc, @MappingTarget PointAttributeDTO entityDTO) {
@@ -108,7 +108,7 @@ public interface GrpcPointAttributeBuilder {
     /**
      * After process.
      *
-     * @param entityDTO transfer object
+     * @param entityDTO  transfer object
      * @param entityGrpc entity grpc
      */
     @AfterMapping

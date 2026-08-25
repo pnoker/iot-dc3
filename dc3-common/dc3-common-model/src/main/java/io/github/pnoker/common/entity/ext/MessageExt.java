@@ -49,7 +49,9 @@ public class MessageExt extends BaseExt {
     @Schema(description = "Extended content payload of the message; the concrete shape is selected by the inherited type and version fields")
     private Content content;
 
-    /** Message template core content (level, body text). */
+    /**
+     * Message template core content (level, body text).
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -71,7 +73,9 @@ public class MessageExt extends BaseExt {
 
     }
 
-    /** Per-channel rendering overrides keyed by channel type (FEISHU_BOT, WEBHOOK, EMAIL...). */
+    /**
+     * Per-channel rendering overrides keyed by channel type (FEISHU_BOT, WEBHOOK, EMAIL...).
+     */
     @Getter
     @Setter
     @NoArgsConstructor

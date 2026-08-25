@@ -38,79 +38,129 @@ public class DataConstant {
      */
     public static final String STATUS_UNKNOWN = "unknown";
 
-    /** URL prefix for the point-value controller. */
+    /**
+     * URL prefix for the point-value controller.
+     */
     public static final String POINT_VALUE_URL_PREFIX = "/point_value";
 
-    /** URL prefix for the point-command controller. */
+    /**
+     * URL prefix for the point-command controller.
+     */
     public static final String POINT_COMMAND_URL_PREFIX = "/point_command";
 
-    /** URL prefix for the point-command history controller. */
+    /**
+     * URL prefix for the point-command history controller.
+     */
     public static final String POINT_COMMAND_HISTORY_URL_PREFIX = "/point_command_history";
 
-    /** URL prefix for the dashboard controller. */
+    /**
+     * URL prefix for the dashboard controller.
+     */
     public static final String DASHBOARD_URL_PREFIX = "/dashboard";
 
-    /** URL prefix for the alarm-rule controller. */
+    /**
+     * URL prefix for the alarm-rule controller.
+     */
     public static final String RULE_URL_PREFIX = "/rule";
 
-    /** URL prefix for the rule-state controller. */
+    /**
+     * URL prefix for the rule-state controller.
+     */
     public static final String RULE_STATE_URL_PREFIX = "/rule/state";
 
-    /** URL prefix for the notify-policy controller. */
+    /**
+     * URL prefix for the notify-policy controller.
+     */
     public static final String NOTIFY_URL_PREFIX = "/notify";
 
-    /** URL prefix for the notify-channel controller. */
+    /**
+     * URL prefix for the notify-channel controller.
+     */
     public static final String NOTIFY_CHANNEL_URL_PREFIX = "/notify/channel";
 
-    /** URL prefix for the notify-channel bind controller. */
+    /**
+     * URL prefix for the notify-channel bind controller.
+     */
     public static final String NOTIFY_CHANNEL_BIND_URL_PREFIX = "/notify/channel/bind";
 
-    /** URL prefix for the notify-history controller. */
+    /**
+     * URL prefix for the notify-history controller.
+     */
     public static final String NOTIFY_HISTORY_URL_PREFIX = "/notify/history";
 
-    /** URL prefix for the message controller. */
+    /**
+     * URL prefix for the message controller.
+     */
     public static final String MESSAGE_URL_PREFIX = "/message";
 
-    /** URL prefix for the command-history controller. */
+    /**
+     * URL prefix for the command-history controller.
+     */
     public static final String COMMAND_HISTORY_URL_PREFIX = "/command_history";
 
-    /** URL prefix for the event-history controller. */
+    /**
+     * URL prefix for the event-history controller.
+     */
     public static final String EVENT_HISTORY_URL_PREFIX = "/event_history";
 
-    /** URL prefix for the driver-status controller. */
+    /**
+     * URL prefix for the driver-status controller.
+     */
     public static final String DRIVER_STATUS_URL_PREFIX = "/driver/status";
 
-    /** URL prefix for the driver-event controller. */
+    /**
+     * URL prefix for the driver-event controller.
+     */
     public static final String DRIVER_EVENT_URL_PREFIX = "/driver/event";
 
-    /** URL prefix for the device-status controller. */
+    /**
+     * URL prefix for the device-status controller.
+     */
     public static final String DEVICE_STATUS_URL_PREFIX = "/device/status";
 
-    /** URL prefix for the device-event controller. */
+    /**
+     * URL prefix for the device-event controller.
+     */
     public static final String DEVICE_EVENT_URL_PREFIX = "/device/event";
 
-    /** URL prefix for the RabbitMQ connection admin endpoint. */
+    /**
+     * URL prefix for the RabbitMQ connection admin endpoint.
+     */
     public static final String RABBITMQ_CONNECTION_URL_PREFIX = "/rabbitmq/connection";
 
-    /** URL prefix for the RabbitMQ message admin endpoint. */
+    /**
+     * URL prefix for the RabbitMQ message admin endpoint.
+     */
     public static final String RABBITMQ_MESSAGE_URL_PREFIX = "/rabbitmq/message";
 
-    /** URL prefix for the RabbitMQ publisher admin endpoint. */
+    /**
+     * URL prefix for the RabbitMQ publisher admin endpoint.
+     */
     public static final String RABBITMQ_PUBLISHER_URL_PREFIX = "/rabbitmq/publisher";
 
-    /** URL prefix for the RabbitMQ queue admin endpoint. */
+    /**
+     * URL prefix for the RabbitMQ queue admin endpoint.
+     */
     public static final String RABBITMQ_QUEUE_URL_PREFIX = "/rabbitmq/queue";
 
-    /** URL prefix for the RabbitMQ consumer admin endpoint. */
+    /**
+     * URL prefix for the RabbitMQ consumer admin endpoint.
+     */
     public static final String RABBITMQ_CONSUMER_URL_PREFIX = "/rabbitmq/consumer";
 
-    /** URL prefix for the RabbitMQ channel admin endpoint. */
+    /**
+     * URL prefix for the RabbitMQ channel admin endpoint.
+     */
     public static final String RABBITMQ_CHANNEL_URL_PREFIX = "/rabbitmq/channel";
 
-    /** URL prefix for the RabbitMQ node admin endpoint. */
+    /**
+     * URL prefix for the RabbitMQ node admin endpoint.
+     */
     public static final String RABBITMQ_NODE_URL_PREFIX = "/rabbitmq/node";
 
-    /** URL prefix for the RabbitMQ cluster admin endpoint. */
+    /**
+     * URL prefix for the RabbitMQ cluster admin endpoint.
+     */
     public static final String RABBITMQ_CLUSTER_URL_PREFIX = "/rabbitmq/cluster";
 
     private DataConstant() {

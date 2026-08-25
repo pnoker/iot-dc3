@@ -42,8 +42,8 @@ supports the D, W, H, and C memory areas. No external protocol library is used.
 | Address     | Word address within the area |
 | Data Type   | Value data type              |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

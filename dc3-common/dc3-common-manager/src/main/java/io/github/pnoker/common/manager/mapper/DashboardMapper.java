@@ -100,7 +100,7 @@ public interface DashboardMapper {
     /**
      * Topology devices by drivers.
      *
-     * @param tenantId tenant identifier
+     * @param tenantId  tenant identifier
      * @param driverIds driver identifiers
      * @return topology devices by drivers result
      */
@@ -110,7 +110,7 @@ public interface DashboardMapper {
     /**
      * Topology profile bindings.
      *
-     * @param tenantId tenant identifier
+     * @param tenantId  tenant identifier
      * @param deviceIds device identifiers
      * @return topology profile bindings result
      */
@@ -120,7 +120,7 @@ public interface DashboardMapper {
     /**
      * Topology profiles by identifiers.
      *
-     * @param tenantId tenant identifier
+     * @param tenantId   tenant identifier
      * @param profileIds profile identifiers
      * @return topology profiles by identifiers result
      */
@@ -130,7 +130,7 @@ public interface DashboardMapper {
     /**
      * Topology points by profiles.
      *
-     * @param tenantId tenant identifier
+     * @param tenantId   tenant identifier
      * @param profileIds profile identifiers
      * @return topology points by profiles result
      */

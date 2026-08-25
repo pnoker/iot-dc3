@@ -6,10 +6,10 @@ store-specific classes. The module has zero store dependencies.
 
 ## Key types
 
-| Type | Role |
-|---|---|
+| Type        | Role                                                                              |
+|-------------|-----------------------------------------------------------------------------------|
 | `TsdbStore` | SPI implemented by every time-series adapter (write, query, schema, capabilities) |
-| `TsdbModel` | sample model shared across adapters |
+| `TsdbModel` | sample model shared across adapters                                               |
 
 ## Build Instructions
 

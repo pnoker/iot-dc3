@@ -24,8 +24,8 @@ pnpm dev
 ```
 
 The development server uses the port and API proxy configured by `vite.config.ts` and `src/config/env/`. Its defaults
-are `http://localhost:8080` for the UI and `http://localhost:8000` for the gateway. The UI can start without the backend,
-but login and data requests require a running gateway and center services.
+are `http://localhost:8080` for the UI and `http://localhost:8000` for the gateway. The UI can start without the
+backend, but login and data requests require a running gateway and center services.
 
 ## Build and verify
 
@@ -37,14 +37,14 @@ pnpm test:ci
 pnpm build
 ```
 
-Run focused suites with `pnpm test:unit`, `pnpm test:api`, `pnpm test:component`, or `pnpm test:views`. Browser workflows
-use `pnpm test:e2e`; see [tests/README.md](./tests/README.md) for the test layers and fixture policy.
+Run focused suites with `pnpm test:unit`, `pnpm test:api`, `pnpm test:component`, or `pnpm test:views`. Browser
+workflows use `pnpm test:e2e`; see [tests/README.md](./tests/README.md) for the test layers and fixture policy.
 
 ## Project conventions
 
 - Vite environment files live under `src/config/env/` and use the `APP_` prefix.
-- Java 64-bit IDs are represented as strings. The backend emits identifiers as JSON strings on the HTTP contract,
-  so standard JSON parsing is sufficient.
+- Java 64-bit IDs are represented as strings. The backend emits identifiers as JSON strings on the HTTP contract, so
+  standard JSON parsing is sufficient.
 - Type-only imports must use `import type` because `verbatimModuleSyntax` is enabled.
 - API wrapper names mirror backend cardinality: `getXxx` for one result and `listXxx` for collections/pages/maps.
 - Every router-guard branch must settle navigation.

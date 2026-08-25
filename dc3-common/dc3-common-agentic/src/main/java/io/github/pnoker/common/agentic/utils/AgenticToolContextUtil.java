@@ -112,8 +112,8 @@ public class AgenticToolContextUtil {
      * Record tool invocation.
      *
      * @param toolContext tool context
-     * @param toolName tool name
-     * @param domain domain
+     * @param toolName    tool name
+     * @param domain      domain
      * @param description description
      */
     public static void recordToolInvocation(ToolContext toolContext, String toolName, String domain,
@@ -125,10 +125,10 @@ public class AgenticToolContextUtil {
      * Record tool result.
      *
      * @param toolContext tool context
-     * @param toolName tool name
-     * @param success success
-     * @param code code
-     * @param message message
+     * @param toolName    tool name
+     * @param success     success
+     * @param code        code
+     * @param message     message
      */
     public static void recordToolResult(ToolContext toolContext, String toolName, boolean success, String code,
                                         String message) {
@@ -139,8 +139,8 @@ public class AgenticToolContextUtil {
      * Record tool error.
      *
      * @param toolContext tool context
-     * @param toolName tool name
-     * @param message message
+     * @param toolName    tool name
+     * @param message     message
      */
     public static void recordToolError(ToolContext toolContext, String toolName, String message) {
         recordRunEvent(toolContext, AgenticRunEvent.toolError(toolName, message));
@@ -149,7 +149,7 @@ public class AgenticToolContextUtil {
     /**
      * Record visualizations.
      *
-     * @param toolContext tool context
+     * @param toolContext    tool context
      * @param visualizations visualizations
      */
     @SuppressWarnings("unchecked")
@@ -168,7 +168,7 @@ public class AgenticToolContextUtil {
      * Record run event.
      *
      * @param toolContext tool context
-     * @param event event
+     * @param event       event
      */
     @SuppressWarnings("unchecked")
     public static void recordRunEvent(ToolContext toolContext, AgenticRunEvent event) {

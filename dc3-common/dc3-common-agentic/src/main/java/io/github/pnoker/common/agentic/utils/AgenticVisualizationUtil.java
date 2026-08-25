@@ -74,12 +74,12 @@ public class AgenticVisualizationUtil {
     /**
      * Line.
      *
-     * @param id id
-     * @param title title
+     * @param id          id
+     * @param title       title
      * @param description description
-     * @param dataset dataset
-     * @param encode encode
-     * @param meta meta
+     * @param dataset     dataset
+     * @param encode      encode
+     * @param meta        meta
      * @param annotations annotations
      * @return line result
      */
@@ -107,11 +107,11 @@ public class AgenticVisualizationUtil {
     /**
      * Stat.
      *
-     * @param id id
-     * @param title title
+     * @param id          id
+     * @param title       title
      * @param description description
-     * @param row row
-     * @param meta meta
+     * @param row         row
+     * @param meta        meta
      * @return stat result
      */
     public static AgenticVisualizationSpec stat(String id, String title, String description,
@@ -145,8 +145,8 @@ public class AgenticVisualizationUtil {
     /**
      * Point history meta.
      *
-     * @param deviceId device identifier
-     * @param pointId point identifier
+     * @param deviceId    device identifier
+     * @param pointId     point identifier
      * @param valueSource value source
      * @return point history meta result
      */

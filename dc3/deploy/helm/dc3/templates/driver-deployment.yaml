@@ -1,14 +1,14 @@
-{{- range $name, $cfg := .Values.drivers }}
-{{- if $cfg.enabled }}
+{ { - range $name, $cfg := .Values.drivers } }
+  { { - if $cfg.enabled } }
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dc3-driver-{{ $name }}
   labels:
-    {{- include "dc3.labels" $ | nindent 4 }}
+    { { - include "dc3.labels" $ | nindent 4 } }
 spec:
-  replicas: {{ $cfg.replicas | default 1 }}
+  replicas: { { $cfg.replicas | default 1 } }
   selector:
     matchLabels:
       app: dc3-driver-{{ $name }}
@@ -17,37 +17,37 @@ spec:
       labels:
         app: dc3-driver-{{ $name }}
     spec:
-      serviceAccountName: {{ include "dc3.serviceAccountName" $ }}
+      serviceAccountName: { { include "dc3.serviceAccountName" $ } }
       terminationGracePeriodSeconds: 30
       containers:
         - name: dc3-driver-{{ $name }}
           image: "{{ $.Values.image.registry }}/dc3-driver-{{ $name }}:{{ $.Values.image.tag }}"
-          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          imagePullPolicy: { { $.Values.image.pullPolicy } }
           envFrom:
             - configMapRef:
                 name: dc3-config
             - secretRef:
-                name: {{ include "dc3.secretName" $ }}
-{{- if eq $name "listening-virtual" }}
-          ports:
-            - name: tcp
-              containerPort: 6270
-              protocol: TCP
-            - name: udp
-              containerPort: 6271
-              protocol: UDP
-{{- end }}
-          resources:
-            {{- toYaml $.Values.driverResources | nindent 12 }}
-          volumeMounts:
-            - name: logs
-              mountPath: /dc3-driver/dc3-driver-{{ $name }}/dc3/logs
-            - name: data
-              mountPath: /dc3-driver/dc3-driver-{{ $name }}/dc3/data
-      volumes:
-        - name: logs
-          emptyDir: {}
-        - name: data
-          emptyDir: {}
-{{- end }}
-{{- end }}
+                name: { { include "dc3.secretName" $ } }
+  { { - if eq $name "listening-virtual" } }
+ports:
+  - name: tcp
+    containerPort: 6270
+    protocol: TCP
+  - name: udp
+    containerPort: 6271
+    protocol: UDP
+  { { - end } }
+resources:
+  { { - toYaml $.Values.driverResources | nindent 12 } }
+volumeMounts:
+  - name: logs
+    mountPath: /dc3-driver/dc3-driver-{{ $name }}/dc3/logs
+  - name: data
+    mountPath: /dc3-driver/dc3-driver-{{ $name }}/dc3/data
+volumes:
+  - name: logs
+    emptyDir: { }
+  - name: data
+    emptyDir: { }
+  { { - end } }
+  { { - end } }

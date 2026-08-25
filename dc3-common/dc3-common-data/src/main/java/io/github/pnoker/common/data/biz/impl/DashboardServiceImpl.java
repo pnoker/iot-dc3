@@ -80,7 +80,9 @@ public class DashboardServiceImpl implements DashboardService {
 
     private static final TsdbDeadline DEADLINE = TsdbDeadline.ofSeconds(20);
 
-    /** UI layout of the latency histogram — six buckets, fixed edges. */
+    /**
+     * UI layout of the latency histogram — six buckets, fixed edges.
+     */
     private static final List<Long> LATENCY_EDGES_MS = List.of(100L, 500L, 1000L, 5000L, 30000L);
 
     /**

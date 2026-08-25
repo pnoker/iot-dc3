@@ -29,7 +29,9 @@
 
     <artifactId>dc3-db-core</artifactId>
     <name>${project.artifactId}</name>
-    <description>Dialect-neutral JDBC infrastructure: MyBatis-Plus wiring, tenant-line handler, generator utils — see docs/design/storage-abstraction.md §3</description>
+    <description>Dialect-neutral JDBC infrastructure: MyBatis-Plus wiring, tenant-line handler, generator utils — see
+        docs/design/storage-abstraction.md §3
+    </description>
 
     <dependencies>
         <dependency>

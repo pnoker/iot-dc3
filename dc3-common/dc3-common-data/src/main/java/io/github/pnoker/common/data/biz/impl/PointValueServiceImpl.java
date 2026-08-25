@@ -72,7 +72,9 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PointValueServiceImpl implements PointValueService {
 
-    /** Read deadline shared by the value-query paths (S18 runaway-scan guard). */
+    /**
+     * Read deadline shared by the value-query paths (S18 runaway-scan guard).
+     */
     private static final TsdbDeadline DEADLINE = TsdbDeadline.ofSeconds(30);
 
     /**

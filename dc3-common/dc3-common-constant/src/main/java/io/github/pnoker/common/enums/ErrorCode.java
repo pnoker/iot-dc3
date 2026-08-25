@@ -37,25 +37,45 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode implements ResponseCode {
 
-    /** Resource does not exist. */
+    /**
+     * Resource does not exist.
+     */
     NOT_FOUND(404, "R404", "Resource does not exist"),
-    /** Missing or invalid authentication. */
+    /**
+     * Missing or invalid authentication.
+     */
     UNAUTHORIZED(401, "R401", "Unauthorized"),
-    /** The presented token is invalid or expired. */
+    /**
+     * The presented token is invalid or expired.
+     */
     TOKEN_INVALID(401, "R401", "Token is invalid"),
-    /** The caller IP is not allowed. */
+    /**
+     * The caller IP is not allowed.
+     */
     IP_INVALID(401, "R401", "Invalid IP"),
-    /** Authenticated principal lacks access. */
+    /**
+     * Authenticated principal lacks access.
+     */
     FORBIDDEN(403, "R403", "Access denied"),
-    /** A password change is enforced before continuing. */
+    /**
+     * A password change is enforced before continuing.
+     */
     PASSWORD_CHANGE_REQUIRED(403, "R4031", "Password change required"),
-    /** The password has expired. */
+    /**
+     * The password has expired.
+     */
     PASSWORD_EXPIRED(403, "R4032", "Password expired"),
-    /** Request validation failed. */
+    /**
+     * Request validation failed.
+     */
     VALIDATION(422, "R422", "Validation failed"),
-    /** A numeric value is out of range. */
+    /**
+     * A numeric value is out of range.
+     */
     OUT_OF_RANGE(422, "R422", "Number out of range"),
-    /** Generic service failure. */
+    /**
+     * Generic service failure.
+     */
     FAILURE(500, "R500", "Service exception"),
     ;
 

@@ -1,17 +1,17 @@
 # DC3 DB Core
 
-`dc3-db-core` is the dialect-neutral JDBC infrastructure of the `dc3-db` family: dynamic-datasource wiring,
-MyBatis-Plus configuration, the automatic tenant-line handler, and code-generator utilities. Dialect adapters layer
-their driver and conventions on top.
+`dc3-db-core` is the dialect-neutral JDBC infrastructure of the `dc3-db` family: dynamic-datasource wiring, MyBatis-Plus
+configuration, the automatic tenant-line handler, and code-generator utilities. Dialect adapters layer their driver and
+conventions on top.
 
 ## Key types
 
-| Type | Role |
-|---|---|
-| `MybatisPlusConfig` | dynamic-datasource and MyBatis-Plus wiring |
-| `TenantLineHandlerImpl` | automatic tenant-scope line for tenant-owned tables |
-| `MybatisUtil` | code-generator utilities |
-| `ActiveJdbcProfileConfig` | activates the `jdbc` profile |
+| Type                      | Role                                                |
+|---------------------------|-----------------------------------------------------|
+| `MybatisPlusConfig`       | dynamic-datasource and MyBatis-Plus wiring          |
+| `TenantLineHandlerImpl`   | automatic tenant-scope line for tenant-owned tables |
+| `MybatisUtil`             | code-generator utilities                            |
+| `ActiveJdbcProfileConfig` | activates the `jdbc` profile                        |
 
 Shared datasource defaults live in `application-jdbc.yml`.
 

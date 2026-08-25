@@ -107,7 +107,7 @@ public class HmacAuthSigner {
      * Constant-time verification of a signature against a payload. Caller must check
      * {@link #isEnabled()} first if it wants to skip verification when signing is disabled.
      *
-     * @param payload UTF-8 payload whose signature is being verified
+     * @param payload     UTF-8 payload whose signature is being verified
      * @param expectedHex expected hexadecimal HMAC
      * @return {@code true} iff the supplied hex signature matches the computed HMAC.
      */

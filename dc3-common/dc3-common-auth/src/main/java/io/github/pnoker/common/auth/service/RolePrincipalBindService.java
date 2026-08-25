@@ -47,7 +47,7 @@ public interface RolePrincipalBindService extends BaseService<RolePrincipalBindB
     /**
      * Return the matching role by tenant identifier and principal identifier.
      *
-     * @param tenantId tenant identifier
+     * @param tenantId    tenant identifier
      * @param principalId principal identifier
      * @return list role by tenant identifier and principal identifier result
      */

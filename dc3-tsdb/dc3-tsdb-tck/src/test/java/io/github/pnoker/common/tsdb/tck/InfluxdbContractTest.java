@@ -64,7 +64,9 @@ class InfluxdbContractTest extends AbstractTsdbContractTest {
         INFLUX.stop();
     }
 
-    /** Any HTTP answer (even 401) means the node is serving; then mint a token. */
+    /**
+     * Any HTTP answer (even 401) means the node is serving; then mint a token.
+     */
     private static void awaitHttpUp() {
         String url = "http://" + INFLUX.getHost() + ":" + INFLUX.getMappedPort(8181) + "/health";
         long deadline = System.currentTimeMillis() + 5 * 60 * 1000;

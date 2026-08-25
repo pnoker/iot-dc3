@@ -59,13 +59,19 @@ public final class DriverMetadata {
      */
     private final Set<Long> deviceIds = ConcurrentHashMap.newKeySet();
 
-    /** Fencing tokens for devices currently owned by this runtime node. */
+    /**
+     * Fencing tokens for devices currently owned by this runtime node.
+     */
     private final Map<Long, Long> deviceFencingTokens = new ConcurrentHashMap<>();
 
-    /** Manager-issued instance lease deadline. */
+    /**
+     * Manager-issued instance lease deadline.
+     */
     private volatile long leaseUntilEpochMillis;
 
-    /** Manager assignment generation currently installed in this runtime. */
+    /**
+     * Manager assignment generation currently installed in this runtime.
+     */
     private volatile long assignmentVersion;
     /**
      * Driver attributes keyed by attribute identifier.
@@ -135,7 +141,9 @@ public final class DriverMetadata {
         return leaseValid() ? Collections.unmodifiableSet(deviceIds) : Collections.emptySet();
     }
 
-    /** Atomically replace owned devices and publish the new lease deadline. */
+    /**
+     * Atomically replace owned devices and publish the new lease deadline.
+     */
     public synchronized void setDeviceLeases(Map<Long, Long> leases, long leaseUntilEpochMillis,
                                              long assignmentVersion) {
         deviceFencingTokens.clear();
@@ -148,7 +156,9 @@ public final class DriverMetadata {
         this.assignmentVersion = assignmentVersion;
     }
 
-    /** Extend the instance deadline without retransmitting an unchanged assignment. */
+    /**
+     * Extend the instance deadline without retransmitting an unchanged assignment.
+     */
     public void renewLeaseDeadline(long leaseUntilEpochMillis) {
         this.leaseUntilEpochMillis = leaseUntilEpochMillis;
     }

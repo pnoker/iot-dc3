@@ -561,12 +561,16 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
         return rows;
     }
 
-    /** One result row: timestamp plus typed accessors over the fixed sample layout
-     *  or name-derived series/value views for aggregate shapes. */
+    /**
+     * One result row: timestamp plus typed accessors over the fixed sample layout
+     * or name-derived series/value views for aggregate shapes.
+     */
     static final class Row {
 
         private final long timestamp;
-        /** Result column names; IoTDB prefixes a "Time" entry the field list omits. */
+        /**
+         * Result column names; IoTDB prefixes a "Time" entry the field list omits.
+         */
         private final List<String> columns;
         private final List<String> fieldColumns;
         private final RowRecord record;
@@ -602,8 +606,10 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
             return Objects.isNull(value) ? null : value.doubleValue();
         }
 
-        /** Aggregate columns may come back typed differently per function; the
-         *  typed getters on Field throw when the backing slot is unset. */
+        /**
+         * Aggregate columns may come back typed differently per function; the
+         * typed getters on Field throw when the backing slot is unset.
+         */
         private Object valueAt(int index) {
             org.apache.tsfile.read.common.Field field = fieldAt(index);
             if (Objects.isNull(field)) {
@@ -624,7 +630,9 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
             return Objects.isNull(field) || field.getDataType() == TSDataType.UNKNOWN ? null : field;
         }
 
-        /** Measurement-name keyed view of a SELECT * row (last path segment). */
+        /**
+         * Measurement-name keyed view of a SELECT * row (last path segment).
+         */
         Map<String, org.apache.tsfile.read.common.Field> measurements() {
             Map<String, org.apache.tsfile.read.common.Field> out = new LinkedHashMap<>();
             for (int i = 0; i < fieldColumns.size() && i < record.getFields().size(); i++) {
@@ -675,7 +683,9 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
             return null;
         }
 
-        /** Series of the first field column, for aggregate result shapes. */
+        /**
+         * Series of the first field column, for aggregate result shapes.
+         */
         SeriesKey series() {
             return fieldColumns.isEmpty() ? null : seriesOfPath(fieldColumns.getFirst());
         }
@@ -684,7 +694,9 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
             return nullableDoubleAt(fieldIndex);
         }
 
-        /** Second column of the (value, count) aggregate pair, when selected. */
+        /**
+         * Second column of the (value, count) aggregate pair, when selected.
+         */
         long count() {
             return columns.size() > 1 ? longAt(1) : 1L;
         }
@@ -692,8 +704,10 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
         record Cell(Double value, long count, boolean countColumn) {
         }
 
-        /** Series-keyed cells for aggregate shapes; a series may carry one value
-         *  column and one count column. */
+        /**
+         * Series-keyed cells for aggregate shapes; a series may carry one value
+         * column and one count column.
+         */
         Map<SeriesKey, Cell> cells() {
             Map<SeriesKey, Cell> cells = new LinkedHashMap<>();
             for (int i = 0; i < fieldColumns.size() && i < record.getFields().size(); i++) {

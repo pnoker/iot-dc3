@@ -50,7 +50,8 @@ dc3:
         attribute-code: dataType
         attribute-type-flag: STRING
         default-value: STRING
-        remark: Redis data type: STRING or HASH
+        remark:
+          Redis data type: STRING or HASH
       - attribute-name: Field
         attribute-code: field
         attribute-type-flag: STRING
@@ -61,7 +62,8 @@ dc3:
         attribute-code: dataType
         attribute-type-flag: STRING
         default-value: STRING
-        remark: Redis data type: STRING or HASH
+        remark:
+          Redis data type: STRING or HASH
 
     buffer:
       db-path: dc3/data/driver/redis/buffer.db

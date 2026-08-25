@@ -28,16 +28,16 @@ import java.time.Duration;
  * Subscription declaration — replaces {@code @RabbitListener} plus the container-factory
  * choice. Physical destinations are derived by the adapter from topic + mode + keyPattern.
  *
- * @param topic           logical destination
- * @param mode            load-balanced or broadcast
- * @param profile         latency/throughput tuning preset
- * @param delivery        single or batch delivery
- * @param keyPattern      subscription key filter relative to the topic (empty = topic
- *                        default), e.g. {@code "driver.*"} on STATE vs {@code "device.*"}
- * @param group           consumer group / per-instance queue suffix (drivers use their
- *                        client id); empty = platform-shared destination
- * @param instanceTtl     per-instance queue/subscription expiry, null = never expire
- * @param payloadType     type the listener expects
+ * @param topic             logical destination
+ * @param mode              load-balanced or broadcast
+ * @param profile           latency/throughput tuning preset
+ * @param delivery          single or batch delivery
+ * @param keyPattern        subscription key filter relative to the topic (empty = topic
+ *                          default), e.g. {@code "driver.*"} on STATE vs {@code "device.*"}
+ * @param group             consumer group / per-instance queue suffix (drivers use their
+ *                          client id); empty = platform-shared destination
+ * @param instanceTtl       per-instance queue/subscription expiry, null = never expire
+ * @param payloadType       type the listener expects
  * @param deadLetterEnabled whether rejects route to the topic's dead-letter
  * @author pnoker
  * @since 2026.8.19

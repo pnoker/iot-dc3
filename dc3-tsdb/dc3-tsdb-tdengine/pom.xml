@@ -29,7 +29,8 @@
 
     <artifactId>dc3-tsdb-tdengine</artifactId>
     <name>${project.artifactId}</name>
-    <description>TDengine adapter of the TSDB port — supertable + per-series subtables over the REST/WS JDBC driver</description>
+    <description>TDengine adapter of the TSDB port — supertable + per-series subtables over the REST/WS JDBC driver
+    </description>
 
     <dependencies>
         <dependency>

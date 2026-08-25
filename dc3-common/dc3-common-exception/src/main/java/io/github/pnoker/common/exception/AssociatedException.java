@@ -48,7 +48,7 @@ public class AssociatedException extends BusinessException {
      * Exception with a failure detail and cause.
      *
      * @param template failure detail or underlying failure
-     * @param params failure detail or underlying failure
+     * @param params   failure detail or underlying failure
      */
     public AssociatedException(String template, Object... params) {
         super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));

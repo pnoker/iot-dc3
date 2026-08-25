@@ -52,7 +52,9 @@ public class EventConstant {
          */
         public static final String REGISTER = "driver_register";
 
-        /** Driver event type code for registration acknowledgments. */
+        /**
+         * Driver event type code for registration acknowledgments.
+         */
         public static final String REGISTER_BACK = "driver_register_back";
 
         private Driver() {

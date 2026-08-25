@@ -49,7 +49,7 @@ public interface LocalCredentialService extends BaseService<LocalCredentialBO, L
     /**
      * Verify password.
      *
-     * @param credential credential
+     * @param credential  credential
      * @param rawPassword raw password
      * @return {@code true} when the raw password matches the stored credential
      */
@@ -58,7 +58,7 @@ public interface LocalCredentialService extends BaseService<LocalCredentialBO, L
     /**
      * Reset password.
      *
-     * @param id id
+     * @param id          id
      * @param rawPassword raw password
      */
     void resetPassword(Long id, String rawPassword);

@@ -24,8 +24,8 @@ and query execution, so each database driver only supplies its dialect/connectio
 
 ## Connection Management
 
-One HikariCP pool is cached per device (`ConcurrentHashMap<Long, HikariDataSource>`), created lazily on first access
-and configured with a maximum of 5 connections and a minimum idle of 1. Pools are evicted when:
+One HikariCP pool is cached per device (`ConcurrentHashMap<Long, HikariDataSource>`), created lazily on first access and
+configured with a maximum of 5 connections and a minimum idle of 1. Pools are evicted when:
 
 - the device is deleted or updated (device metadata event),
 - the driver configuration is updated or the driver is deleted (driver metadata event — every pool is closed),
@@ -33,25 +33,25 @@ and configured with a maximum of 5 connections and a minimum idle of 1. Pools ar
 
 ## Driver Attributes
 
-| Attribute     | Default           | Semantics                                                                                |
-|---------------|-------------------|-------------------------------------------------------------------------------------------|
-| host          | `localhost`     | Database host                                                                             |
-| port          | dialect-specific  | Database port                                                                             |
-| database      | —                 | Database name (MySQL, PostgreSQL, SQL Server; Oracle uses SID/ServiceName instead)        |
-| username      | `root`          | Login name                                                                                |
-| password      | —                 | Login password                                                                            |
-| queryTimeout  | `30`            | SQL statement timeout in **seconds**, applied via `PreparedStatement.setQueryTimeout` to every read and write |
+| Attribute    | Default          | Semantics                                                                                                     |
+|--------------|------------------|---------------------------------------------------------------------------------------------------------------|
+| host         | `localhost`      | Database host                                                                                                 |
+| port         | dialect-specific | Database port                                                                                                 |
+| database     | —                | Database name (MySQL, PostgreSQL, SQL Server; Oracle uses SID/ServiceName instead)                            |
+| username     | `root`           | Login name                                                                                                    |
+| password     | —                | Login password                                                                                                |
+| queryTimeout | `30`             | SQL statement timeout in **seconds**, applied via `PreparedStatement.setQueryTimeout` to every read and write |
 
 ## Point Attributes
 
-| Attribute    | Semantics                                                                                                      |
-|--------------|-----------------------------------------------------------------------------------------------------------------|
-| `readQuery`  | SQL SELECT executed on read; must not contain `?` placeholders because reads bind no parameters                |
+| Attribute    | Semantics                                                                                                                                                 |
+|--------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `readQuery`  | SQL SELECT executed on read; must not contain `?` placeholders because reads bind no parameters                                                           |
 | `writeQuery` | SQL UPDATE/INSERT/DELETE executed on write; must contain exactly one `?` placeholder — the point value is bound via `setString`, preventing SQL injection |
 
 `validatePoint` derives which queries are required from the point's read/write flag: read-only points require
-`readQuery`, write-only points require `writeQuery`, and read-write points require both. A point with an unknown flag
-is treated as read-only.
+`readQuery`, write-only points require `writeQuery`, and read-write points require both. A point with an unknown flag is
+treated as read-only.
 
 ## Build Instructions
 

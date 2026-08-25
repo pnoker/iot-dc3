@@ -38,9 +38,9 @@ public final class RabbitTestHarness {
     /**
      * Send.
      *
-     * @param exchange exchange
+     * @param exchange   exchange
      * @param routingKey routing key
-     * @param payload payload
+     * @param payload    payload
      */
     public void send(String exchange, String routingKey, Object payload) {
         rabbitTemplate.convertAndSend(exchange, routingKey, payload);
@@ -49,7 +49,7 @@ public final class RabbitTestHarness {
     /**
      * Receive.
      *
-     * @param queue queue
+     * @param queue   queue
      * @param timeout timeout
      * @return receive result
      */

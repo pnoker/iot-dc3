@@ -64,7 +64,7 @@ const formatDateTime = (value: Date): string =>
 const shifted = (now: Date, millisecondsAgo: number): string =>
   formatDateTime(new Date(now.getTime() - millisecondsAgo));
 
-const sourceRows = (source: AlertSource): Array<Record<string, any> & {id: string}> => {
+const sourceRows = (source: AlertSource): Array<Record<string, any> & { id: string }> => {
   if (source === 'driver') return drivers;
   if (source === 'point') {
     return points.filter((point) => /温度|电压/.test(String(point.pointName)));
@@ -142,14 +142,22 @@ export const alertTrendRows = (days = 30, now = new Date()): AlertTrendRow[] => 
 
 export const alertTopSourceRows = (limit = 10): AlertTopSourceRow[] => {
   const candidates: AlertTopSourceRow[] = [
-    ...devices.slice(0, 5).map((row, index) => ({source: 'device' as const, sourceId: row.id, count: 186 - index * 19})),
-    ...drivers.slice(0, 4).map((row, index) => ({source: 'driver' as const, sourceId: row.id, count: 142 - index * 17})),
+    ...devices.slice(0, 5).map((row, index) => ({
+      source: 'device' as const,
+      sourceId: row.id,
+      count: 186 - index * 19
+    })),
+    ...drivers.slice(0, 4).map((row, index) => ({
+      source: 'driver' as const,
+      sourceId: row.id,
+      count: 142 - index * 17
+    })),
     ...points.slice(0, 4).map((row, index) => ({source: 'point' as const, sourceId: row.id, count: 118 - index * 13})),
   ];
   return candidates.sort((a, b) => b.count - a.count).slice(0, Math.max(1, limit));
 };
 
-export const alertActivityRows = (days = 7): Array<{dow: number; hour: number; count: number}> => {
+export const alertActivityRows = (days = 7): Array<{ dow: number; hour: number; count: number }> => {
   const factor = Math.max(0.4, Math.min(4, days / 7));
   return Array.from({length: 7}, (_, dow) =>
     Array.from({length: 24}, (_, hour) => {
@@ -203,23 +211,23 @@ export const alertCorrelationRows = (hours = 24, limit = 15): CorrelationPair[] 
     const point = points[(index * 3 + 2) % points.length]!;
     return index % 3 === 0
       ? {
-          aSource: 'driver',
-          aSourceId: driver.id,
-          aEventType: 2,
-          bSource: 'device',
-          bSourceId: device.id,
-          bEventType: 1,
-          coCount: Math.round((48 - index * 2) * factor),
-        }
+        aSource: 'driver',
+        aSourceId: driver.id,
+        aEventType: 2,
+        bSource: 'device',
+        bSourceId: device.id,
+        bEventType: 1,
+        coCount: Math.round((48 - index * 2) * factor),
+      }
       : {
-          aSource: 'device',
-          aSourceId: device.id,
-          aEventType: 1,
-          bSource: 'point',
-          bSourceId: point.id,
-          bEventType: 3,
-          coCount: Math.round((43 - index * 2) * factor),
-        };
+        aSource: 'device',
+        aSourceId: device.id,
+        aEventType: 1,
+        bSource: 'point',
+        bSourceId: point.id,
+        bEventType: 3,
+        coCount: Math.round((43 - index * 2) * factor),
+      };
   });
   return rows.slice(0, Math.max(1, limit));
 };

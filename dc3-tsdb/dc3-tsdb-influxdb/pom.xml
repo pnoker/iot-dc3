@@ -29,7 +29,9 @@
 
     <artifactId>dc3-tsdb-influxdb</artifactId>
     <name>${project.artifactId}</name>
-    <description>InfluxDB 3 adapter of the TSDB port — tags/fields over the documented v3 HTTP SQL and line-protocol APIs, zero client dependencies</description>
+    <description>InfluxDB 3 adapter of the TSDB port — tags/fields over the documented v3 HTTP SQL and line-protocol
+        APIs, zero client dependencies
+    </description>
 
     <dependencies>
         <dependency>

@@ -42,7 +42,9 @@ public class CommandParamExt extends BaseExt {
     @Schema(description = "Extended content of the command param")
     private Content content;
 
-    /** Extra command-param data not covered by typed fields. */
+    /**
+     * Extra command-param data not covered by typed fields.
+     */
     @Schema(description = "Extended content payload for the command param")
     @Getter
     @Setter

@@ -60,13 +60,31 @@ export const alertTypeDistribution = (days = 30) =>
   httpGet<R<AlertTypeRow[]>>(`${API_DATA_BASE}/dashboard/alert/type_distribution`, {params: {days}});
 
 export const alertStormSources = (hours = 1, minCount = 10, limit = 10) =>
-  httpGet<R<AlertStormRow[]>>(`${API_DATA_BASE}/dashboard/alert/storm_sources`, {params: {hours, min_count: minCount, limit}});
+  httpGet<R<AlertStormRow[]>>(`${API_DATA_BASE}/dashboard/alert/storm_sources`, {
+    params: {
+      hours,
+      min_count: minCount,
+      limit
+    }
+  });
 
 export const alertFlapping = (hours = 6, minCount = 5, limit = 20) =>
-  httpGet<R<FlappingSource[]>>(`${API_DATA_BASE}/dashboard/alert/flapping`, {params: {hours, min_count: minCount, limit}});
+  httpGet<R<FlappingSource[]>>(`${API_DATA_BASE}/dashboard/alert/flapping`, {
+    params: {
+      hours,
+      min_count: minCount,
+      limit
+    }
+  });
 
 export const alertCorrelation = (hours = 24, windowSec = 30, limit = 15) =>
-  httpGet<R<CorrelationPair[]>>(`${API_DATA_BASE}/dashboard/alert/correlation`, {params: {hours, window_sec: windowSec, limit}});
+  httpGet<R<CorrelationPair[]>>(`${API_DATA_BASE}/dashboard/alert/correlation`, {
+    params: {
+      hours,
+      window_sec: windowSec,
+      limit
+    }
+  });
 
 export const alertPeerDeviation = (days = 7) =>
   httpGet<R<PeerDeviation[]>>(`${API_DATA_BASE}/dashboard/alert/peer_deviation`, {params: {days}});

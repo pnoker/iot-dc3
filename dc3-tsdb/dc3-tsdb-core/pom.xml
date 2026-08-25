@@ -31,6 +31,8 @@
     <version>2026.5.22</version>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 store-neutral time-series port: sample model, TsdbStore SPI, capabilities. Zero store dependencies</description>
+    <description>IoT DC3 store-neutral time-series port: sample model, TsdbStore SPI, capabilities. Zero store
+        dependencies
+    </description>
 
 </project>

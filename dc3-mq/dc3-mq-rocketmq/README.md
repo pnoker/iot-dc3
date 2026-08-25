@@ -1,7 +1,7 @@
 # DC3 MQ RocketMQ
 
-`dc3-mq-rocketmq` adapts the broker-neutral port to Apache RocketMQ (`rocketmq-client`). Logical topics map to
-RocketMQ topics; publish and subscription use the standard producer/consumer APIs with the port's confirmation model.
+`dc3-mq-rocketmq` adapts the broker-neutral port to Apache RocketMQ (`rocketmq-client`). Logical topics map to RocketMQ
+topics; publish and subscription use the standard producer/consumer APIs with the port's confirmation model.
 
 ## Activation
 
@@ -9,8 +9,8 @@ Active when `dc3.mq.type=rocketmq`.
 
 ## Configuration
 
-| Key | Default | Meaning |
-|---|---|---|
+| Key                                   | Default          | Meaning            |
+|---------------------------------------|------------------|--------------------|
 | `dc3.mq.rocketmq.name-server-address` | `localhost:9876` | NameServer address |
 
 ## Dependencies

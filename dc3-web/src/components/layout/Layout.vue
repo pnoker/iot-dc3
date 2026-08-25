@@ -433,13 +433,11 @@ const handleCommand = async (command: string) => {
       overflow: hidden;
       border: 1px solid rgba(148, 216, 246, 0.34);
       border-radius: 20px;
-      background:
-        radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.82), transparent 38%),
-        linear-gradient(135deg, rgba(255, 255, 255, 0.54), rgba(115, 205, 241, 0.13) 52%, rgba(75, 88, 210, 0.08));
-      box-shadow:
-        0 10px 28px rgba(12, 89, 153, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.86),
-        inset 0 -8px 18px rgba(55, 131, 203, 0.05);
+      background: radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.82), transparent 38%),
+      linear-gradient(135deg, rgba(255, 255, 255, 0.54), rgba(115, 205, 241, 0.13) 52%, rgba(75, 88, 210, 0.08));
+      box-shadow: 0 10px 28px rgba(12, 89, 153, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.86),
+      inset 0 -8px 18px rgba(55, 131, 203, 0.05);
       backdrop-filter: blur(18px) saturate(1.45);
       -webkit-backdrop-filter: blur(18px) saturate(1.45);
       transition: transform 260ms ease, border-color 260ms ease, box-shadow 260ms ease;
@@ -460,10 +458,9 @@ const handleCommand = async (command: string) => {
 
       &:hover {
         border-color: rgba(61, 172, 224, 0.46);
-        box-shadow:
-          0 14px 34px rgba(12, 89, 153, 0.15),
-          inset 0 1px 0 rgba(255, 255, 255, 0.92),
-          inset 0 -8px 18px rgba(55, 131, 203, 0.07);
+        box-shadow: 0 14px 34px rgba(12, 89, 153, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.92),
+        inset 0 -8px 18px rgba(55, 131, 203, 0.07);
         transform: translateY(-1px);
       }
     }

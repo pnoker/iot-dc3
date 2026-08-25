@@ -47,8 +47,8 @@ attributes addressed by node IEEE address / endpoint / cluster / attribute, and 
 | Cluster ID        | clusterId       | INT    | 0       | Cluster ID for writing   |
 | Attribute ID      | attributeId     | INT    | 0       | Attribute ID for writing |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

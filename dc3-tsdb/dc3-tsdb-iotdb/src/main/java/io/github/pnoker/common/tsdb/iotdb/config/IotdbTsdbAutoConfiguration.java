@@ -39,7 +39,9 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "dc3.tsdb", name = "type", havingValue = "iotdb")
 public class IotdbTsdbAutoConfiguration {
 
-    /** The IoTDB adapter over the session API; closed with the context. */
+    /**
+     * The IoTDB adapter over the session API; closed with the context.
+     */
     @Bean(destroyMethod = "close")
     @ConditionalOnMissingBean(TsdbStore.class)
     public IotdbTsdbStore tsdbStore(IotdbTsdbProperties properties) {

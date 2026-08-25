@@ -535,7 +535,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
                 OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC),
                 limit};
         return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new DimensionCount(dimension,
-                        rs.getLong(1), rs.getLong(2)), args));
+                rs.getLong(1), rs.getLong(2)), args));
     }
 
     @Override
@@ -561,7 +561,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
                 OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC),
                 OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC)};
         return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new SeriesLastSeen(
-                        new SeriesKey(rs.getLong(1), rs.getLong(2), rs.getLong(3)), toInstant(rs, 4)), args));
+                new SeriesKey(rs.getLong(1), rs.getLong(2), rs.getLong(3)), toInstant(rs, 4)), args));
     }
 
     @Override
@@ -724,7 +724,9 @@ public final class TimescaleTsdbStore implements TsdbStore {
         return result;
     }
 
-    /** Exactly composable re-aggregation over the shared observability tiers. */
+    /**
+     * Exactly composable re-aggregation over the shared observability tiers.
+     */
     private static String tierExpression(AggregateFunction fn) {
         return switch (fn) {
             case AVG -> "SUM(num_sum) / NULLIF(SUM(num_count), 0)";

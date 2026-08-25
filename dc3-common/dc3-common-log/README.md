@@ -15,10 +15,10 @@ auto-configuration or provide `@Logs`, `LogsType`, or `LogsAspect` APIs.
 
 ## Resources
 
-| Resource | Purpose |
-|---|---|
-| `logback.xml` | Runtime console logging and size/time-based rolling JSON files |
-| `logback-test.xml` | Test logging defaults |
+| Resource                    | Purpose                                                             |
+|-----------------------------|---------------------------------------------------------------------|
+| `logback.xml`               | Runtime console logging and size/time-based rolling JSON files      |
+| `logback-test.xml`          | Test logging defaults                                               |
 | `AutoConfiguration.imports` | Intentionally empty; documents that no logging aspect is registered |
 
 Spring Boot discovers the shared `logback.xml` from the dependency classpath. Applications normally set
@@ -36,8 +36,8 @@ mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-log -am package
 
 ## Testing
 
-This module has no production Java implementation classes. Its tests verify the shared Logback configuration and
-logging policy (`LogbackConfigurationTest`, `LoggingPolicyTest`):
+This module has no production Java implementation classes. Its tests verify the shared Logback configuration and logging
+policy (`LogbackConfigurationTest`, `LoggingPolicyTest`):
 
 ```bash
 mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-log -am test

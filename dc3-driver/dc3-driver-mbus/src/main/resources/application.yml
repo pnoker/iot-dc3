@@ -80,7 +80,8 @@ dc3:
         attribute-code: dataFormat
         attribute-type-flag: STRING
         default-value: AUTO
-        remark: Data format: AUTO, HEX, BCD, INT, FLOAT
+        remark:
+          Data format: AUTO, HEX, BCD, INT, FLOAT
     command-attribute:
       - attribute-name: Data Format
         attribute-code: dataFormat

@@ -56,7 +56,7 @@ public interface FacadeUserBuilder {
     /**
      * After process.
      *
-     * @param authBO business object
+     * @param authBO   business object
      * @param facadeBO business object
      */
     @AfterMapping

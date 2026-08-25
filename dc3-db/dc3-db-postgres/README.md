@@ -9,11 +9,11 @@ Active when `dc3.db.type=postgres` — the default (`matchIfMissing = true`).
 
 ## Key types
 
-| Type | Role |
-|---|---|
-| `PostgresDbAutoConfiguration` | adapter wiring selected by `dc3.db.type` |
+| Type                                  | Role                                      |
+|---------------------------------------|-------------------------------------------|
+| `PostgresDbAutoConfiguration`         | adapter wiring selected by `dc3.db.type`  |
 | `TimestamptzLocalDateTimeTypeHandler` | `TIMESTAMPTZ` bridge into `LocalDateTime` |
-| `ActivePostgresProfileConfig` | activates the PostgreSQL profile |
+| `ActivePostgresProfileConfig`         | activates the PostgreSQL profile          |
 
 `application-postgres.yml` registers the master datasource, driver, and type-handler scanning.
 

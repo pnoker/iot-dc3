@@ -1,7 +1,7 @@
 # DC3 DB TCK
 
-`dc3-db-tck` is the relational contract suite of the `dc3-db` family: identical mapper-level assertions executed
-against every supported dialect, so a dialect adapter is certified by the same behaviour matrix.
+`dc3-db-tck` is the relational contract suite of the `dc3-db` family: identical mapper-level assertions executed against
+every supported dialect, so a dialect adapter is certified by the same behaviour matrix.
 
 ## Contract tests
 
@@ -9,11 +9,11 @@ against every supported dialect, so a dialect adapter is certified by the same b
 disposable Testcontainers container and runs the real mappers from `dc3-common-auth` / `dc3-common-data` /
 `dc3-common-manager`:
 
-| Test | Dialect |
-|---|---|
+| Test                          | Dialect    |
+|-------------------------------|------------|
 | `PostgresDialectContractTest` | PostgreSQL |
-| `MysqlDialectContractTest` | MySQL |
-| `MariadbDialectContractTest` | MariaDB |
+| `MysqlDialectContractTest`    | MySQL      |
+| `MariadbDialectContractTest`  | MariaDB    |
 
 ## Running
 

@@ -41,7 +41,7 @@
 
     <!-- MariaDB twin of the mysql fork above: identical shape, but
          MariaDB never adopted the AS-new row alias: VALUES(col) instead. -->
-<select id="advisoryLock" databaseId="mariadb" resultType="java.lang.String">
+    <select id="advisoryLock" databaseId="mariadb" resultType="java.lang.String">
         SELECT CAST(GET_LOCK(#{key}, 10) AS CHAR)
     </select>
 
@@ -55,7 +55,7 @@
 
     <!-- MariaDB twin of the mysql fork above: identical shape, but
          MariaDB never adopted the AS-new row alias: VALUES(col) instead. -->
-<select id="advisoryUnlock" databaseId="mariadb" resultType="java.lang.String">
+    <select id="advisoryUnlock" databaseId="mariadb" resultType="java.lang.String">
         SELECT CAST(RELEASE_LOCK(#{key}) AS CHAR)
     </select>
 

@@ -37,7 +37,7 @@ public interface DeviceMapper extends BaseMapper<DeviceDO> {
     /**
      * Select page with profile.
      *
-     * @param page page
+     * @param page    page
      * @param wrapper wrapper
      * @return paginated result
      */

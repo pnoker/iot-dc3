@@ -50,7 +50,7 @@ public class EventTool {
     /**
      * Return event by identifier.
      *
-     * @param eventId event identifier
+     * @param eventId     event identifier
      * @param toolContext tool context
      * @return lookup event by identifier result
      */
@@ -71,7 +71,7 @@ public class EventTool {
     /**
      * Return events by identifiers.
      *
-     * @param eventIds event identifiers
+     * @param eventIds    event identifiers
      * @param toolContext tool context
      * @return lookup events by identifiers result
      */
@@ -96,10 +96,10 @@ public class EventTool {
     /**
      * Return the matching events.
      *
-     * @param eventName event name
-     * @param profileId profile identifier
-     * @param page page
-     * @param size size
+     * @param eventName   event name
+     * @param profileId   profile identifier
+     * @param page        page
+     * @param size        size
      * @param toolContext tool context
      * @return search events result
      */
@@ -131,9 +131,9 @@ public class EventTool {
     /**
      * Return the matching events by device identifier.
      *
-     * @param deviceId device identifier
-     * @param page page
-     * @param size size
+     * @param deviceId    device identifier
+     * @param page        page
+     * @param size        size
      * @param toolContext tool context
      * @return list events by device identifier result
      */
@@ -163,9 +163,9 @@ public class EventTool {
     /**
      * Return the matching events by profile identifier.
      *
-     * @param profileId profile identifier
-     * @param page page
-     * @param size size
+     * @param profileId   profile identifier
+     * @param page        page
+     * @param size        size
      * @param toolContext tool context
      * @return list events by profile identifier result
      */

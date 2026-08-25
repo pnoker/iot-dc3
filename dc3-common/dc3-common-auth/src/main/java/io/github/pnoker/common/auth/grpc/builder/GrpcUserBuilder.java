@@ -67,7 +67,7 @@ public interface GrpcUserBuilder {
     /**
      * After process.
      *
-     * @param entityBO business object
+     * @param entityBO   business object
      * @param entityGrpc entity grpc
      */
     @AfterMapping

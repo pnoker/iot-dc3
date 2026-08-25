@@ -42,10 +42,14 @@ public class DefaultConstant {
      */
     public static final long DEFAULT_ID = 0L;
 
-    /** Numeric zero convenience constant. */
+    /**
+     * Numeric zero convenience constant.
+     */
     public static final Integer ZERO = 0;
 
-    /** Numeric one convenience constant. */
+    /**
+     * Numeric one convenience constant.
+     */
     public static final Integer ONE = 1;
 
     /**

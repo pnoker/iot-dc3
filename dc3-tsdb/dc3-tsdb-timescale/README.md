@@ -9,16 +9,16 @@ Active when `dc3.tsdb.type=timescale` — the default (`matchIfMissing = true`).
 
 ## Key types
 
-| Type | Role |
-|---|---|
-| `TimescaleTsdbStore` | `TsdbStore` implementation (hypertable writes, latest-value upserts, history queries) |
-| `TsdbTimescaleAutoConfiguration` | adapter wiring and rollup retention |
+| Type                             | Role                                                                                  |
+|----------------------------------|---------------------------------------------------------------------------------------|
+| `TimescaleTsdbStore`             | `TsdbStore` implementation (hypertable writes, latest-value upserts, history queries) |
+| `TsdbTimescaleAutoConfiguration` | adapter wiring and rollup retention                                                   |
 
 ## Configuration
 
-| Key | Default | Meaning |
-|---|---|---|
-| `dc3.tsdb.timescale.rollup.minute-keep-days` | `365` | minute-tier retention used by the rollup job |
+| Key                                          | Default | Meaning                                      |
+|----------------------------------------------|---------|----------------------------------------------|
+| `dc3.tsdb.timescale.rollup.minute-keep-days` | `365`   | minute-tier retention used by the rollup job |
 
 ## Dependencies
 

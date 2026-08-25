@@ -43,7 +43,9 @@ import java.util.Objects;
 @EnabledIfEnvironmentVariable(named = "DC3_TSDB_TCK", matches = "(?i)true|1|yes|on")
 class IotdbContractTest extends AbstractTsdbContractTest {
 
-    /** The minimal properties override: Java properties merge over code defaults. */
+    /**
+     * The minimal properties override: Java properties merge over code defaults.
+     */
     private static final GenericContainer<?> IOTDB = new GenericContainer<>(
             DockerImageName.parse("apache/iotdb:2.0.10-standalone"))
             .withExposedPorts(6667)

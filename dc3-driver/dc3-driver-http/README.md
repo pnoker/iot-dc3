@@ -37,8 +37,8 @@ via request body templates containing a `${value}` placeholder.
 | Path      | API path for command    |
 | Method    | HTTP method for command |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

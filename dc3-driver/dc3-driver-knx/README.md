@@ -2,9 +2,8 @@
 
 ## Overview
 
-`dc3-driver-knx` connects to KNX (ISO/IEC 14543-3) installations through a KNX IP gateway using Calimero. It
-maintains one tunneling link per gateway device and reads/writes group addresses as boolean, unsigned, float, or
-control values.
+`dc3-driver-knx` connects to KNX (ISO/IEC 14543-3) installations through a KNX IP gateway using Calimero. It maintains
+one tunneling link per gateway device and reads/writes group addresses as boolean, unsigned, float, or control values.
 
 ## Module Information
 
@@ -14,13 +13,13 @@ control values.
 
 ## Driver Attributes (Device-level)
 
-| Attribute      | Code          | Type    | Default | Description                              |
-|----------------|---------------|---------|---------|------------------------------------------|
-| Remote Host    | remoteHost    | STRING  |         | KNX IP gateway address (tunneling server)|
-| Remote Port    | remotePort    | INT     | 3671    | KNX IP gateway port                      |
-| Local Host     | localHost     | STRING  |         | Local bind address (optional)            |
-| Use NAT        | useNat        | BOOLEAN | false   | Enable NAT mode for tunneling            |
-| Device Address | deviceAddress | STRING  | 0.0.0   | Local KNX individual address             |
+| Attribute      | Code          | Type    | Default | Description                               |
+|----------------|---------------|---------|---------|-------------------------------------------|
+| Remote Host    | remoteHost    | STRING  |         | KNX IP gateway address (tunneling server) |
+| Remote Port    | remotePort    | INT     | 3671    | KNX IP gateway port                       |
+| Local Host     | localHost     | STRING  |         | Local bind address (optional)             |
+| Use NAT        | useNat        | BOOLEAN | false   | Enable NAT mode for tunneling             |
+| Device Address | deviceAddress | STRING  | 0.0.0   | Local KNX individual address              |
 
 ## Point Attributes
 
@@ -32,9 +31,9 @@ control values.
 
 ## Command Attributes (write)
 
-| Attribute     | Code         | Type   | Default | Description                          |
-|---------------|--------------|--------|---------|--------------------------------------|
-| Group Address | groupAddress | STRING |         | KNX group address to write to        |
+| Attribute     | Code         | Type   | Default | Description                   |
+|---------------|--------------|--------|---------|-------------------------------|
+| Group Address | groupAddress | STRING |         | KNX group address to write to |
 
 The module `application.yml` is authoritative for attribute codes, types, defaults, scheduling, health, and local
 buffering. Keep this README aligned when those user-facing settings change.

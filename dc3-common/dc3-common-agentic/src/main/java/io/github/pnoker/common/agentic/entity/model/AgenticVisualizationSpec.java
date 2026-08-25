@@ -62,7 +62,9 @@ public class AgenticVisualizationSpec implements Serializable {
 
     private List<Annotation> annotations;
 
-    /** Visual-channel bindings: which field maps to x/y/color/size. */
+    /**
+     * Visual-channel bindings: which field maps to x/y/color/size.
+     */
     @Getter
     @Setter
     @ToString
@@ -99,7 +101,9 @@ public class AgenticVisualizationSpec implements Serializable {
 
     }
 
-    /** One chart annotation (type, value, label). */
+    /**
+     * One chart annotation (type, value, label).
+     */
     @Getter
     @Setter
     @ToString

@@ -62,11 +62,15 @@ public class AlarmCacheProperties {
         @Min(value = 1, message = "Cache ttl-seconds must be at least 1")
         private long ttlSeconds;
 
-        /** Required by Spring property binding. */
+        /**
+         * Required by Spring property binding.
+         */
         public CacheTuning() {
         }
 
-        /** All-args constructor for programmatic tuning. */
+        /**
+         * All-args constructor for programmatic tuning.
+         */
         public CacheTuning(long maxSize, long ttlSeconds) {
             this.maxSize = maxSize;
             this.ttlSeconds = ttlSeconds;

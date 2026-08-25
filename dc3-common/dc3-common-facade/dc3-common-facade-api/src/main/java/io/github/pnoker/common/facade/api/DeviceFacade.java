@@ -52,7 +52,9 @@ public interface DeviceFacade {
      */
     FacadeDeviceBO getById(Long tenantId, Long id);
 
-    /** Resolve an active, fenced runtime owner or return {@code null}. */
+    /**
+     * Resolve an active, fenced runtime owner or return {@code null}.
+     */
     FacadeDeviceOwnerBO getActiveOwner(Long tenantId, Long deviceId);
 
     /**

@@ -1,10 +1,10 @@
-{{- if .Values.postgres.enabled }}
+{ { - if .Values.postgres.enabled } }
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: dc3-postgres
   labels:
-    {{- include "dc3.labels" . | nindent 4 }}
+    { { - include "dc3.labels" . | nindent 4 } }
 spec:
   serviceName: dc3-postgres
   replicas: 1
@@ -22,7 +22,7 @@ spec:
       containers:
         - name: dc3-postgres
           image: "{{ .Values.image.registry }}/{{ .Values.postgres.image }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: { { .Values.image.pullPolicy } }
           env:
             - name: POSTGRES_DB
               valueFrom:
@@ -32,28 +32,28 @@ spec:
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "dc3.secretName" . }}
+                  name: { { include "dc3.secretName" . } }
                   key: POSTGRES_USERNAME
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "dc3.secretName" . }}
+                  name: { { include "dc3.secretName" . } }
                   key: POSTGRES_PASSWORD
           ports:
             - name: postgres
               containerPort: 5432
           resources:
-            {{- toYaml .Values.postgres.resources | nindent 12 }}
+            { { - toYaml .Values.postgres.resources | nindent 12 } }
           readinessProbe:
             exec:
-              command: ["pg_isready", "-U", "dc3", "-d", "dc3"]
+              command: [ "pg_isready", "-U", "dc3", "-d", "dc3" ]
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 10
           livenessProbe:
             exec:
-              command: ["pg_isready", "-U", "dc3", "-d", "dc3"]
+              command: [ "pg_isready", "-U", "dc3", "-d", "dc3" ]
             initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 5
@@ -65,11 +65,11 @@ spec:
     - metadata:
         name: data
       spec:
-        accessModes: ["ReadWriteOnce"]
-        {{- with .Values.postgres.storageClass }}
-        storageClassName: {{ . }}
-        {{- end }}
+        accessModes: [ "ReadWriteOnce" ]
+        { { - with .Values.postgres.storageClass } }
+        storageClassName: { { . } }
+        { { - end } }
         resources:
           requests:
-            storage: {{ .Values.postgres.storage }}
-{{- end }}
+            storage: { { .Values.postgres.storage } }
+  { { - end } }

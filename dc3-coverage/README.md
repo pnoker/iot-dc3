@@ -27,8 +27,8 @@ Outputs:
 The minimum line and branch ratios are configured in this module's `pom.xml`. The verify phase passes the aggregate XML
 to `scripts/check_coverage.py`, which checks those absolute thresholds.
 
-There is currently no baseline-relative regression calculation. Do not describe the build as enforcing a percentage
-drop against a previous commit unless such a comparison is implemented.
+There is currently no baseline-relative regression calculation. Do not describe the build as enforcing a percentage drop
+against a previous commit unless such a comparison is implemented.
 
 Use `-Dcoverage.check.skip=true` only for local diagnosis; do not disable the gate in normal CI or release validation.
 

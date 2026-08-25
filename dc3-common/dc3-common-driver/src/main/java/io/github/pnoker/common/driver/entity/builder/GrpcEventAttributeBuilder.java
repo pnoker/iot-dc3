@@ -68,7 +68,7 @@ public interface GrpcEventAttributeBuilder {
      * After process.
      *
      * @param entityGrpc entity grpc
-     * @param entityDTO transfer object
+     * @param entityDTO  transfer object
      */
     @AfterMapping
     default void afterProcess(GrpcEventAttributeDTO entityGrpc, @MappingTarget EventAttributeDTO entityDTO) {
@@ -108,7 +108,7 @@ public interface GrpcEventAttributeBuilder {
     /**
      * After process.
      *
-     * @param entityDTO transfer object
+     * @param entityDTO  transfer object
      * @param entityGrpc entity grpc
      */
     @AfterMapping

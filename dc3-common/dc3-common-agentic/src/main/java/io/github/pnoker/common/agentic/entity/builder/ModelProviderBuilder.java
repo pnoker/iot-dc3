@@ -65,7 +65,7 @@ public interface ModelProviderBuilder {
      * After process.
      *
      * @param entityRequest entity request
-     * @param entityBO business object
+     * @param entityBO      business object
      */
     @Mapping(target = "providerType", ignore = true)
     @Mapping(target = "tenantId", ignore = true)

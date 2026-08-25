@@ -58,7 +58,9 @@ public class AlertBulkConfirmVO implements Serializable {
     @Schema(description = "Alert targets to apply the bulk operation to; each entry identifies a single alert row in the current tenant scope.")
     private List<Item> items;
 
-    /** One (source, id) pair in the bulk confirm/reject request body. */
+    /**
+     * One (source, id) pair in the bulk confirm/reject request body.
+     */
     @Getter
     @Setter
     @ToString

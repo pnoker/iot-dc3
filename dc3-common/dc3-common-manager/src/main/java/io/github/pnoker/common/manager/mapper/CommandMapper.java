@@ -35,8 +35,8 @@ public interface CommandMapper extends BaseMapper<CommandDO> {
     /**
      * Select page with device.
      *
-     * @param page page
-     * @param wrapper wrapper
+     * @param page     page
+     * @param wrapper  wrapper
      * @param deviceId device identifier
      * @return paginated result
      */

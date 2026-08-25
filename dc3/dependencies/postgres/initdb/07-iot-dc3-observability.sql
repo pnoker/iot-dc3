@@ -44,7 +44,8 @@ SET search_path TO dc3_history, public;
 -- ----------------------------
 -- One row per (tenant, driver, device, point, minute). Powers the
 -- per-point trend panel and the global ingest-rate panel.
-CREATE MATERIALIZED VIEW cagg_point_value_1m
+CREATE
+MATERIALIZED VIEW cagg_point_value_1m
     WITH (timescaledb.continuous = true) AS
 SELECT time_bucket(INTERVAL '1 minute', create_time) AS bucket,
        tenant_id,
@@ -68,15 +69,17 @@ CREATE INDEX idx_cagg_pv_1m_lookup
     ON cagg_point_value_1m (tenant_id, device_id, point_id, bucket DESC);
 
 -- Realtime aggregate: also read the raw tail not yet materialized.
-ALTER MATERIALIZED VIEW cagg_point_value_1m
-    SET (timescaledb.materialized_only = false);
+ALTER
+MATERIALIZED VIEW cagg_point_value_1m
+SET(timescaledb.materialized_only = false);
 
 -- ----------------------------
 -- 1-hour continuous aggregate (hierarchical)
 -- ----------------------------
 -- Built on the 1m cagg, so a 30-day range scans ~720 hourly rows per point
 -- instead of ~43k minute rows. One row per (tenant, driver, device, point, hour).
-CREATE MATERIALIZED VIEW cagg_point_value_1h
+CREATE
+MATERIALIZED VIEW cagg_point_value_1h
     WITH (timescaledb.continuous = true) AS
 SELECT time_bucket(INTERVAL '1 hour', bucket) AS bucket,
        tenant_id,
@@ -85,7 +88,7 @@ SELECT time_bucket(INTERVAL '1 hour', bucket) AS bucket,
        point_id,
        sum(sample_count)                      AS sample_count,
        sum(num_count)                         AS num_count,
-       sum(num_sum) / NULLIF(sum(num_count), 0)::DOUBLE PRECISION
+       sum(num_sum) / NULLIF(sum(num_count), 0) ::DOUBLE PRECISION
                                                  AS num_avg,
        min(num_min)                           AS num_min,
        max(num_max)                           AS num_max,
@@ -102,12 +105,15 @@ WITH NO DATA;
 CREATE INDEX idx_cagg_pv_1h_lookup
     ON cagg_point_value_1h (tenant_id, device_id, point_id, bucket DESC);
 
-ALTER MATERIALIZED VIEW cagg_point_value_1h
-    SET (timescaledb.materialized_only = false);
+ALTER
+MATERIALIZED VIEW cagg_point_value_1h
+SET(timescaledb.materialized_only = false);
 
 -- TimescaleDB exposes continuous aggregates as views in the PostgreSQL catalog.
-COMMENT ON VIEW cagg_point_value_1m IS 'One-minute point-value continuous aggregate';
-COMMENT ON VIEW cagg_point_value_1h IS 'One-hour hierarchical point-value continuous aggregate';
+COMMENT
+ON VIEW cagg_point_value_1m IS 'One-minute point-value continuous aggregate';
+COMMENT
+ON VIEW cagg_point_value_1h IS 'One-hour hierarchical point-value continuous aggregate';
 
 -- ----------------------------
 -- Refresh policies
@@ -118,14 +124,14 @@ COMMENT ON VIEW cagg_point_value_1h IS 'One-hour hierarchical point-value contin
 -- lifecycle); the refresh offsets predate that on purpose so rebuilding the
 -- materialized tiers after a drop still folds whatever raw history exists.
 SELECT add_continuous_aggregate_policy('cagg_point_value_1m',
-                                       start_offset => INTERVAL '7 days',
-                                       end_offset => INTERVAL '1 minute',
-                                       schedule_interval => INTERVAL '1 minute');
+                                       start_offset = > INTERVAL '7 days',
+                                       end_offset = > INTERVAL '1 minute',
+                                       schedule_interval = > INTERVAL '1 minute');
 
 SELECT add_continuous_aggregate_policy('cagg_point_value_1h',
-                                       start_offset => INTERVAL '180 days',
-                                       end_offset => INTERVAL '5 minutes',
-                                       schedule_interval => INTERVAL '5 minutes');
+                                       start_offset = > INTERVAL '180 days',
+                                       end_offset = > INTERVAL '5 minutes',
+                                       schedule_interval = > INTERVAL '5 minutes');
 
 -- S16 tiered lifecycle: the minute tier ages out after one year; the hour tier
 -- is kept forever. The timescale adapter registers the same policy with
@@ -158,4 +164,5 @@ FROM dc3_manager.dc3_device d
                        AND drv.deleted = 0
 WHERE d.deleted = 0;
 
-COMMENT ON VIEW v_device_metadata IS 'Tenant-scoped device and logical driver metadata for observability queries';
+COMMENT
+ON VIEW v_device_metadata IS 'Tenant-scoped device and logical driver metadata for observability queries';

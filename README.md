@@ -99,13 +99,13 @@ and API paths. Clear boundaries that scale across services and teams.
 IoT DC3 includes **36 access driver modules** for industrial automation, IoT communication, data bridging, basic
 communication, and simulation/debugging scenarios, reducing the cost of connecting common devices and data sources:
 
-| Category                                      | Driver Modules                                                                                                                                                                                      |
-|-----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Category                                      | Driver Modules                                                                                                                                                                               |
+|-----------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 🏭 **Industrial protocols**                   | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · IEC 61850 · DNP3 · DLMS · DLT645 · KNX · M-Bus · SL651 |
-| 📡 **IoT protocols**                          | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee · LoRaWAN                                                                                                                                                 |
-| 🗄️ **Data bridging**                          | MySQL · PostgreSQL · Oracle · SQL Server · Redis                                                                                                                                                    |
-| 🔧 **Basic communication, messaging and NMS** | TCP/UDP · Serial · SNMP · CAN · Kafka                                                                                                                                                               |
-| 🧪 **Simulation and debugging**               | Virtual · Listening Virtual                                                                                                                                                                         |
+| 📡 **IoT protocols**                          | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee · LoRaWAN                                                                                                                                          |
+| 🗄️ **Data bridging**                          | MySQL · PostgreSQL · Oracle · SQL Server · Redis                                                                                                                                             |
+| 🔧 **Basic communication, messaging and NMS** | TCP/UDP · Serial · SNMP · CAN · Kafka                                                                                                                                                        |
+| 🧪 **Simulation and debugging**               | Virtual · Listening Virtual                                                                                                                                                                  |
 
 The **Driver SDK** supports fast development of custom protocol drivers and registration into the runtime platform.
 
@@ -133,7 +133,9 @@ Distributed microservice architecture based on **Spring Boot 4 + Spring Cloud 20
 
 ### 📊 Real-Time Data Engine
 
-- **Data collection** - Drivers collect device telemetry and send it asynchronously through the internal message broker — pluggable per deployment: RabbitMQ (default), Kafka, RocketMQ, Pulsar, ActiveMQ or any MQTT 5 broker ([broker guide](docs/mq-brokers.md))
+- **Data collection** - Drivers collect device telemetry and send it asynchronously through the internal message
+  broker — pluggable per deployment: RabbitMQ (default), Kafka, RocketMQ, Pulsar, ActiveMQ or any MQTT 5 broker
+  ([broker guide](docs/mq-brokers.md))
 - **Time-series storage** - Efficient queries for real-time and historical data
 - **Rule engine** - Flexible alarm rules with multi-level alarms and notifications
 - **Event traceability** - Full command and event history
@@ -150,9 +152,8 @@ Distributed microservice architecture based on **Spring Boot 4 + Spring Cloud 20
 - **Driver SDK** - A complete driver development toolkit. See
   the [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring)
 - **Separated frontend and backend** - Vue 3 + TypeScript frontend, RESTful and gRPC APIs
-- **Containerized deployment** - One-command startup with Podman / Docker Compose, plus compose
-  scaling, Docker Swarm, Kubernetes and Helm deployment configs. See
-  the [Deployment Guide](dc3/doc/DEPLOYMENT.md).
+- **Containerized deployment** - One-command startup with Podman / Docker Compose, plus compose scaling, Docker Swarm,
+  Kubernetes and Helm deployment configs. See the [Deployment Guide](dc3/doc/DEPLOYMENT.md).
 - **Complete documentation** - Online docs, quickstart guide, and troubleshooting guide
 
 ## ⚡ Quick Start

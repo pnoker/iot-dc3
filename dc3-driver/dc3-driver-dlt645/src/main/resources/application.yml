@@ -90,7 +90,8 @@ dc3:
         attribute-code: dataFormat
         attribute-type-flag: STRING
         default-value: HEX
-        remark: Data format: HEX, BCD, INT, FLOAT, ASCII
+        remark:
+          Data format: HEX, BCD, INT, FLOAT, ASCII
     command-attribute:
       - attribute-name: Data Identifier
         attribute-code: di
@@ -101,7 +102,8 @@ dc3:
         attribute-code: dataFormat
         attribute-type-flag: STRING
         default-value: HEX
-        remark: Data format for encoding the value: HEX, BCD, INT, FLOAT, ASCII
+        remark:
+          Data format for encoding the value: HEX, BCD, INT, FLOAT, ASCII
 
     buffer:
       db-path: dc3/data/driver/dlt645/buffer.db

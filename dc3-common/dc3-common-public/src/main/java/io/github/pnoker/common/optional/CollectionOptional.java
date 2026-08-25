@@ -41,7 +41,7 @@ public final class CollectionOptional<T> {
      * Create a wrapper that treats {@code null} and empty collections as absent.
      *
      * @param value collection to wrap
-     * @param <T> collection element type
+     * @param <T>   collection element type
      * @return wrapper for the supplied collection
      */
     public static <T> CollectionOptional<T> ofNullable(Collection<T> value) {
@@ -62,7 +62,7 @@ public final class CollectionOptional<T> {
     /**
      * Invoke exactly one branch according to whether the wrapped collection is empty.
      *
-     * @param action action that consumes a present collection
+     * @param action      action that consumes a present collection
      * @param emptyAction action to run for a {@code null} or empty collection
      */
     public void ifPresentOrElse(Consumer<Collection<?>> action, Runnable emptyAction) {

@@ -25,9 +25,13 @@ package io.github.pnoker.common.constant.mq;
  */
 public enum OrderingGuarantee {
 
-    /** No ordering guarantee between deliveries. */
+    /**
+     * No ordering guarantee between deliveries.
+     */
     NONE,
 
-    /** Deliveries with the same partition key are ordered. */
+    /**
+     * Deliveries with the same partition key are ordered.
+     */
     PER_KEY
 }

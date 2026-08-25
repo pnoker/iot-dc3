@@ -31,8 +31,8 @@ using DCOM/J-Interop to read real-time process data from OPC-compliant industria
 | Group     | OPC DA item group name |
 | Tag       | OPC DA item tag name   |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

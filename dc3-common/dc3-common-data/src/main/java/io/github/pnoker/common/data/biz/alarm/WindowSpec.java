@@ -53,8 +53,8 @@ public record WindowSpec(WindowModeEnum mode, Duration duration, int minSamples,
     /**
      * Ok.
      *
-     * @param mode mode
-     * @param duration duration
+     * @param mode       mode
+     * @param duration   duration
      * @param minSamples min samples
      * @return ok result
      */

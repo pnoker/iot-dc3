@@ -83,7 +83,9 @@ public class AlertStatsVO implements Serializable {
     @Schema(description = "24-element hourly count series for the sparkline, oldest first, always length 24")
     private List<Long> sparkline24h;
 
-    /** Alert count for one alarm-type bucket of the byType distribution. */
+    /**
+     * Alert count for one alarm-type bucket of the byType distribution.
+     */
     @Getter
     @Setter
     @ToString

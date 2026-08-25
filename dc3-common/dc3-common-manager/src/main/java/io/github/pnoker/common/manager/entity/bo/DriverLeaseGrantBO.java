@@ -17,7 +17,9 @@
 
 package io.github.pnoker.common.manager.entity.bo;
 
-/** Lease response returned to a driver runtime instance. */
+/**
+ * Lease response returned to a driver runtime instance.
+ */
 public record DriverLeaseGrantBO(long leaseUntilEpochMillis,
                                  long assignmentVersion, boolean assignmentsChanged) {
 }

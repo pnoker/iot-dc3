@@ -42,7 +42,9 @@ public class EventExt extends BaseExt {
     @Schema(description = "Structured payload carrying the event's extension content; serialized as JSON inside the extension object")
     private Content content;
 
-    /** Reserved event extension slot, currently a placeholder. */
+    /**
+     * Reserved event extension slot, currently a placeholder.
+     */
     @Schema(description = "Extended content payload nested in the event extension object")
     @Getter
     @Setter

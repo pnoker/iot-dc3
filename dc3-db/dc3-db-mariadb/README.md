@@ -10,10 +10,10 @@ Active when `dc3.db.type=mariadb`.
 
 ## Key types
 
-| Type | Role |
-|---|---|
+| Type                         | Role                                     |
+|------------------------------|------------------------------------------|
 | `MariadbDbAutoConfiguration` | adapter wiring selected by `dc3.db.type` |
-| `ActiveMariadbProfileConfig` | activates the MariaDB profile |
+| `ActiveMariadbProfileConfig` | activates the MariaDB profile            |
 
 `application-mariadb.yml` registers the master datasource and driver.
 

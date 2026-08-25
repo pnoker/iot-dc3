@@ -135,7 +135,7 @@ describe('utils (services)', () => {
         `${key}:${args?.min ?? ''}:${args?.max ?? ''}`
       );
       type RuleValidator = (rule: unknown, value: unknown, callback: (error?: Error) => void) => void;
-      const validate = (rule: {validator?: unknown}, value: unknown): Promise<void> =>
+      const validate = (rule: { validator?: unknown }, value: unknown): Promise<void> =>
         new Promise((resolve, reject) => {
           const validator = rule.validator as RuleValidator;
           validator(rule, value, error => (error ? reject(error) : resolve()));

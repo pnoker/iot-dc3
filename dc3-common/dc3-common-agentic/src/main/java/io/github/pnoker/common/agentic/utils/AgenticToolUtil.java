@@ -59,7 +59,7 @@ public class AgenticToolUtil {
      * Page.
      *
      * @param current current
-     * @param size size
+     * @param size    size
      * @return page result
      */
     public static Pages page(int current, int size) {
@@ -73,8 +73,8 @@ public class AgenticToolUtil {
      * Clamp.
      *
      * @param value value
-     * @param min min
-     * @param max max
+     * @param min   min
+     * @param max   max
      * @return clamp result
      */
     public static int clamp(int value, int min, int max) {

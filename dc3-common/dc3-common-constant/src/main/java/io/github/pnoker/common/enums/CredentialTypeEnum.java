@@ -34,7 +34,9 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum CredentialTypeEnum {
 
-    /** Password-based local credential. */
+    /**
+     * Password-based local credential.
+     */
     PASSWORD("PASSWORD", "password", "Password credential"),
     ;
 

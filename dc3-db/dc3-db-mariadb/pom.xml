@@ -29,7 +29,9 @@
 
     <artifactId>dc3-db-mariadb</artifactId>
     <name>${project.artifactId}</name>
-    <description>MariaDB 10.6+ dialect adapter — MySQL-compatible surface except ODKU row aliases (uses VALUES()), verified against the dual-dialect contract suite</description>
+    <description>MariaDB 10.6+ dialect adapter — MySQL-compatible surface except ODKU row aliases (uses VALUES()),
+        verified against the dual-dialect contract suite
+    </description>
 
     <dependencies>
         <dependency>

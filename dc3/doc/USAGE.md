@@ -114,30 +114,30 @@ All images are built for multiple platforms:
 > command, the scaling semantics, and the production hardening checklist - lives in
 > [`dc3/doc/DEPLOYMENT.md`](https://github.com/pnoker/iot-dc3/blob/main/dc3/doc/DEPLOYMENT.md).
 
-| Mode | Files | Use for |
-|------|-------|---------|
-| Single host | `docker-compose-db.yml` + `docker-compose.yml` | evaluation, demo, small production |
+| Mode            | Files                                                | Use for                                     |
+|-----------------|------------------------------------------------------|---------------------------------------------|
+| Single host     | `docker-compose-db.yml` + `docker-compose.yml`       | evaluation, demo, small production          |
 | Compose scaling | `docker-compose-db.yml` + `docker-compose-scale.yml` | replicated services on one host (`--scale`) |
-| Docker Swarm | `docker-compose-swarm.yml` | multi-node swarm (`make stack-deploy`) |
-| Kubernetes | `dc3/deploy/k8s/` | production Kubernetes (`make k8s-apply`) |
-| Helm | `dc3/deploy/helm/dc3/` | GitOps installs (`make helm-install`) |
+| Docker Swarm    | `docker-compose-swarm.yml`                           | multi-node swarm (`make stack-deploy`)      |
+| Kubernetes      | `dc3/deploy/k8s/`                                    | production Kubernetes (`make k8s-apply`)    |
+| Helm            | `dc3/deploy/helm/dc3/`                               | GitOps installs (`make helm-install`)       |
 
 Facts that hold in every mode:
 
-- **Dependency images** (`dc3-postgres`, `dc3-rabbitmq`) are built locally by the `db` stack
-  and are **not published** by the release CI. For swarm/k8s/helm, build and push them first
-  (`DC3_IMAGE_REGISTRY=my.registry/dc3 ./dc3/deploy/k8s/scripts/push-images.sh`) or point the
-  stack at managed services instead.
+- **Dependency images** (`dc3-postgres`, `dc3-rabbitmq`) are built locally by the `db` stack and are **not published**
+  by the release CI. For swarm/k8s/helm, build and push them first
+  (`DC3_IMAGE_REGISTRY=my.registry/dc3 ./dc3/deploy/k8s/scripts/push-images.sh`) or point the stack at managed services
+  instead.
 - **`dc3-web` is tagged `latest` and full release versions only** - it has no series tag like
-  `2026.6`. Backend images (gateway, centers, drivers) carry `latest`, the series tag, and the
-  full version. The deployment configs account for this; pin a full release version for
+  `2026.6`. Backend images (gateway, centers, drivers) carry `latest`, the series tag, and the full version. The
+  deployment configs account for this; pin a full release version for
   `dc3-web` when you need reproducible rollouts.
 - **DNS names are the contract.** Keep the default service names (`dc3-postgres`,
-  `dc3-rabbitmq`, `dc3-center-*`, `dc3-gateway`, `dc3-web`) so the images resolve each other,
-  or override `POSTGRES_HOST`, `RABBITMQ_HOST`, `MQTT_BROKER_HOST`, `CENTER_*_HOST`, and
+  `dc3-rabbitmq`, `dc3-center-*`, `dc3-gateway`, `dc3-web`) so the images resolve each other, or override
+  `POSTGRES_HOST`, `RABBITMQ_HOST`, `MQTT_BROKER_HOST`, `CENTER_*_HOST`, and
   `APP_API_HOST` to point at services deployed differently.
-- **`NODE_ENV` selects the Spring profile** at runtime: `test` (the default in every
-  deployment config) or `pro` (hardened: OpenAPI/Swagger UI disabled, weak secrets rejected).
+- **`NODE_ENV` selects the Spring profile** at runtime: `test` (the default in every deployment config) or `pro`
+  (hardened: OpenAPI/Swagger UI disabled, weak secrets rejected).
 
 Mode-specific runbooks: `dc3/deploy/k8s/README.md`, `dc3/deploy/helm/dc3/README.md`, and the
 `stack-deploy` / `stack-rm` / `k8s-apply` / `k8s-delete` / `helm-install` / `helm-uninstall`

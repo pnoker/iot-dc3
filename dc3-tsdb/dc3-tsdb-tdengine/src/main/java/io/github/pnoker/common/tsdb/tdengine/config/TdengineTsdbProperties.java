@@ -33,14 +33,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "dc3.tsdb.tdengine")
 public class TdengineTsdbProperties {
 
-    /** REST/WS JDBC url without a database segment, e.g. {@code jdbc:TAOS-RS://dc3-tdengine:6041/}. */
+    /**
+     * REST/WS JDBC url without a database segment, e.g. {@code jdbc:TAOS-RS://dc3-tdengine:6041/}.
+     */
     private String url = "jdbc:TAOS-RS://localhost:6041/";
 
     private String username = "root";
 
     private String password = "taosdata";
 
-    /** Database the adapter creates and owns (PRECISION 'us'). */
+    /**
+     * Database the adapter creates and owns (PRECISION 'us').
+     */
     private String database = "dc3";
 
     private int maximumPoolSize = 8;

@@ -20,7 +20,9 @@ package io.github.pnoker.common.manager.entity.model;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Persisted driver assignment generation. */
+/**
+ * Persisted driver assignment generation.
+ */
 @Getter
 @Setter
 public class DriverLeaseStateDO {

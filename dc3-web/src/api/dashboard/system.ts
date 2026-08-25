@@ -17,7 +17,13 @@
 
 import {httpGet} from '@/api/common';
 import {API_DATA_BASE} from '@/config/constant/api';
-import type {AlertEventRow, AlertStatsSummary, CoverageGap, ProtocolHealth, SilentSource} from '@/config/types/dashboard';
+import type {
+  AlertEventRow,
+  AlertStatsSummary,
+  CoverageGap,
+  ProtocolHealth,
+  SilentSource
+} from '@/config/types/dashboard';
 
 export const alertStats = () => httpGet<R<AlertStatsSummary>>(`${API_DATA_BASE}/dashboard/alert/stats`);
 

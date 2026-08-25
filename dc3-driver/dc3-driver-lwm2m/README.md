@@ -37,8 +37,8 @@ Instance / Resource ID.
 | Resource ID        | LwM2M Resource ID (e.g. 5700=Sensor Value) |
 | Observe            | Enable LwM2M Observe: true, false          |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

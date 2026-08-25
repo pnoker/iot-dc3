@@ -58,7 +58,9 @@ public class ScheduleConstant {
      */
     public static final String BUFFER_REPUBLISH_SCHEDULE_JOB = "buffer-republish-schedule-job";
 
-    /** Driver runtime lease renewal job. */
+    /**
+     * Driver runtime lease renewal job.
+     */
     public static final String DRIVER_LEASE_RENEW_SCHEDULE_JOB = "driver-lease-renew-schedule-job";
 
     /**

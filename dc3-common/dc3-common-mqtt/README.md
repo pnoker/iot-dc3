@@ -24,8 +24,8 @@ the MQTT driver and any service requiring MQTT connectivity.
 
 ## Configuration Properties
 
-Configure in `application*.yml` under the `dc3.driver.mqtt` prefix. The shared `application-mqtt.yml` ships
-these defaults:
+Configure in `application*.yml` under the `dc3.driver.mqtt` prefix. The shared `application-mqtt.yml` ships these
+defaults:
 
 ```yaml
 dc3:
@@ -47,8 +47,8 @@ dc3:
 ```
 
 Connection settings such as `url` (dev default `tcp://${MQTT_BROKER_HOST:dc3-rabbitmq}:${MQTT_BROKER_PORT:2883}`),
-`auth-type` (`NONE` | `USERNAME` | `CLIENT`), `username`, `password`, and `receive-topics` are supplied by the
-consumer application (e.g. `dc3-driver-mqtt`).
+`auth-type` (`NONE` | `USERNAME` | `CLIENT`), `username`, `password`, and `receive-topics` are supplied by the consumer
+application (e.g. `dc3-driver-mqtt`).
 
 ## Usage
 

@@ -54,7 +54,7 @@ public interface McpAuditBuilder {
      * After process.
      *
      * @param entityRecord entity record
-     * @param entityVO view object
+     * @param entityVO     view object
      */
     @AfterMapping
     default void afterProcess(McpAuditCommand entityRecord, @MappingTarget McpAuditVO entityVO) {

@@ -197,7 +197,9 @@ public final class AnalyticsModel {
             @Schema(description = "Points per series, keyed by deviceName/pointName") Map<String, List<HistoryPoint>> series) {
     }
 
-    /** One history point — RAW carries {@code value}; M4 carries the first/min/max/last quadruple. */
+    /**
+     * One history point — RAW carries {@code value}; M4 carries the first/min/max/last quadruple.
+     */
     public record HistoryPoint(
             @Schema(description = "Sample time / bucket start, ISO-8601 instant") String time,
             @Schema(description = "Numeric value in RAW mode") Double value,

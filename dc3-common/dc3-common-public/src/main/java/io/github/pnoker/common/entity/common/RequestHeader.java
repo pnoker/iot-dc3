@@ -37,7 +37,9 @@ public class RequestHeader {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
-    /** X-Auth-Token envelope: cipher + salt the gateway re-validates per hop. */
+    /**
+     * X-Auth-Token envelope: cipher + salt the gateway re-validates per hop.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -56,7 +58,9 @@ public class RequestHeader {
 
     }
 
-    /** X-Auth-Principal envelope: authenticated identity (principal/tenant) for downstream authz and audit. */
+    /**
+     * X-Auth-Principal envelope: authenticated identity (principal/tenant) for downstream authz and audit.
+     */
     @Getter
     @Setter
     @NoArgsConstructor

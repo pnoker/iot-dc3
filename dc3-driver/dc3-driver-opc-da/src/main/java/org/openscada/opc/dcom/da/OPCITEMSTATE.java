@@ -52,7 +52,9 @@ public class OPCITEMSTATE {
         return struct;
     }
 
-    /** Decode the COM wire struct into the typed OPCITEMSTATE wrapper. */
+    /**
+     * Decode the COM wire struct into the typed OPCITEMSTATE wrapper.
+     */
     public static OPCITEMSTATE fromStruct(final JIStruct struct) {
         OPCITEMSTATE itemState = new OPCITEMSTATE();
 

@@ -57,7 +57,7 @@ public class DriverTool {
     /**
      * Return driver by identifier.
      *
-     * @param driverId driver identifier
+     * @param driverId    driver identifier
      * @param toolContext tool context
      * @return lookup driver by identifier result
      */
@@ -78,7 +78,7 @@ public class DriverTool {
     /**
      * Return drivers by identifiers.
      *
-     * @param driverIds driver identifiers
+     * @param driverIds   driver identifiers
      * @param toolContext tool context
      * @return lookup drivers by identifiers result
      */
@@ -103,7 +103,7 @@ public class DriverTool {
     /**
      * Return driver by device identifier.
      *
-     * @param deviceId device identifier
+     * @param deviceId    device identifier
      * @param toolContext tool context
      * @return lookup driver by device identifier result
      */
@@ -125,9 +125,9 @@ public class DriverTool {
     /**
      * Return the matching drivers.
      *
-     * @param driverName driver name
-     * @param page page
-     * @param size size
+     * @param driverName  driver name
+     * @param page        page
+     * @param size        size
      * @param toolContext tool context
      * @return search drivers result
      */
@@ -157,7 +157,7 @@ public class DriverTool {
     /**
      * Return driver statuses by identifiers.
      *
-     * @param driverIds driver identifiers
+     * @param driverIds   driver identifiers
      * @param toolContext tool context
      * @return get driver statuses by identifiers result
      */
@@ -186,7 +186,7 @@ public class DriverTool {
     /**
      * Return driver device status summary.
      *
-     * @param driverId driver identifier
+     * @param driverId    driver identifier
      * @param toolContext tool context
      * @return get driver device status summary result
      */

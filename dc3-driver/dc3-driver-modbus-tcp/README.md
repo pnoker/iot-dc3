@@ -35,8 +35,8 @@ devices, reads coil/register values periodically, and supports write commands fo
 | Offset         | Register/coil address offset    |
 | Value Template | Template for the value to write |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

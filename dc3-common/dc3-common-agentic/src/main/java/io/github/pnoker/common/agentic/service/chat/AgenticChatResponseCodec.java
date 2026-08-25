@@ -97,9 +97,9 @@ public class AgenticChatResponseCodec {
     /**
      * Format final chunk.
      *
-     * @param id id
-     * @param created created
-     * @param model model
+     * @param id           id
+     * @param created      created
+     * @param model        model
      * @param finishReason finish reason
      * @return format final chunk result
      */

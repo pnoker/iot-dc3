@@ -40,8 +40,8 @@ The listen port is exposed as a driver attribute (see below) and read at startup
 |---------------|-------|------|---------|-------------------------------------------------------|
 | Element Index | index | INT  | 0       | Zero-based index into the telemetry body element list |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

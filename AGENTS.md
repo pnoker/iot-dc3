@@ -13,22 +13,23 @@ Canonical engineering instructions for AI coding agents working in IoT DC3.
 
 Avoid copying volatile versions or generated state into documentation. Verify them at the source:
 
-| Concern | Source of truth |
-|---|---|
-| Java, Spring, Maven plugins and reactor modules | root `pom.xml` and affected module POMs |
-| Backend build commands | root `Makefile` |
-| Frontend dependencies and scripts | `dc3-web/package.json` and `dc3-web/pnpm-lock.yaml` |
-| Frontend build image/tool pins | `dc3-web/Dockerfile` |
-| Containers and registries | root `Makefile`, `.env.example`, and `dc3/docker-compose*.yml` |
-| CI behaviour | `.github/workflows/` |
-| Release notes | `dc3/bin/changelog.py` and generated `dc3/doc/CHANGE.md` |
+| Concern                                         | Source of truth                                                |
+|-------------------------------------------------|----------------------------------------------------------------|
+| Java, Spring, Maven plugins and reactor modules | root `pom.xml` and affected module POMs                        |
+| Backend build commands                          | root `Makefile`                                                |
+| Frontend dependencies and scripts               | `dc3-web/package.json` and `dc3-web/pnpm-lock.yaml`            |
+| Frontend build image/tool pins                  | `dc3-web/Dockerfile`                                           |
+| Containers and registries                       | root `Makefile`, `.env.example`, and `dc3/docker-compose*.yml` |
+| CI behaviour                                    | `.github/workflows/`                                           |
+| Release notes                                   | `dc3/bin/changelog.py` and generated `dc3/doc/CHANGE.md`       |
 
-If this file disagrees with executable configuration, treat the executable configuration as current and update this
-file as part of the same change when appropriate.
+If this file disagrees with executable configuration, treat the executable configuration as current and update this file
+as part of the same change when appropriate.
 
 ## Project overview
 
-IoT DC3 is a multi-protocol, cloud-native, open-source industrial IoT platform evolving toward AI agents. Its main runtime areas are:
+IoT DC3 is a multi-protocol, cloud-native, open-source industrial IoT platform evolving toward AI agents. Its main
+runtime areas are:
 
 - Gateway: HTTP entrypoint through Spring Cloud Gateway.
 - Auth Center: tenant, token, user, role, resource, and API authorization.
@@ -81,14 +82,14 @@ Controller (WebFlux) -> Service (BO) -> Manager (DO) -> Mapper (SQL)
 
 Common types:
 
-| Type | Module | Role |
-|---|---|---|
-| `BaseService<B,Q>` | `dc3-common-public` | base CRUD service contract |
-| `BaseController` | `dc3-common-web` | reactive controller helpers and user/tenant context |
-| `R<T>` | `dc3-common-public` | standard response envelope; use `R.ok(...)` and `R.fail(...)` |
-| `BaseBO`, `BaseVO`, `BaseDTO` | `dc3-common-model` | shared business, web, and transfer fields |
-| `BaseBuilder` | `dc3-common-model` | MapStruct conversion base |
-| `TenantOwned` | `dc3-common-public` | marker for tenant-scoped entities |
+| Type                          | Module              | Role                                                          |
+|-------------------------------|---------------------|---------------------------------------------------------------|
+| `BaseService<B,Q>`            | `dc3-common-public` | base CRUD service contract                                    |
+| `BaseController`              | `dc3-common-web`    | reactive controller helpers and user/tenant context           |
+| `R<T>`                        | `dc3-common-public` | standard response envelope; use `R.ok(...)` and `R.fail(...)` |
+| `BaseBO`, `BaseVO`, `BaseDTO` | `dc3-common-model`  | shared business, web, and transfer fields                     |
+| `BaseBuilder`                 | `dc3-common-model`  | MapStruct conversion base                                     |
+| `TenantOwned`                 | `dc3-common-public` | marker for tenant-scoped entities                             |
 
 ### Shared code placement
 
@@ -102,12 +103,12 @@ shared infrastructure.
   models may reference enums owned by `dc3-common-constant`.
 - Keep framework- or capability-specific public helpers in the narrowest owning module, such as gRPC conversion in
   `dc3-common-api`, WebFlux helpers in `dc3-common-web`, and RabbitMQ helpers in `dc3-common-rabbitmq`.
-- Keep constants and nested enums used by only one module, protocol, configuration object, or implementation beside
-  that owner. Reserve top-level `*Constant` classes and top-level public enums for `dc3-common-constant`; use a
+- Keep constants and nested enums used by only one module, protocol, configuration object, or implementation beside that
+  owner. Reserve top-level `*Constant` classes and top-level public enums for `dc3-common-constant`; use a
   concern-specific local name such as `*Limits`/`*Defaults`, a nested enum, or a private field until the concept becomes
   a stable cross-module contract.
-- Do not duplicate cross-module wire names, header names, routing identifiers, cache-key fragments, or persistence codes.
-  Define one canonical symbol in `dc3-common-constant` and migrate callers together.
+- Do not duplicate cross-module wire names, header names, routing identifiers, cache-key fragments, or persistence
+  codes. Define one canonical symbol in `dc3-common-constant` and migrate callers together.
 - Preserve the dependency floor: `dc3-common-constant` must not depend on other DC3 modules, and `dc3-common-public`
   must not depend on capability modules.
 
@@ -169,13 +170,13 @@ Driver `application.yml` metadata is user-facing:
 
 CRUD-shaped names reflect result cardinality across Service, Controller, Facade, gRPC server, and proto RPCs:
 
-| Action | Java | HTTP | gRPC |
-|---|---|---|---|
-| create one | `add(BO)` | `/add` | n/a |
-| delete by ID | `delete(Long)` | `/delete` | n/a |
-| update one | `update(BO)` | `/update` | n/a |
-| return one | `getXxx(...)` | `/get_xxx` | `GetXxx` |
-| return many | `listXxx(...)` | `/list_xxx` | `ListXxx` |
+| Action       | Java           | HTTP        | gRPC      |
+|--------------|----------------|-------------|-----------|
+| create one   | `add(BO)`      | `/add`      | n/a       |
+| delete by ID | `delete(Long)` | `/delete`   | n/a       |
+| update one   | `update(BO)`   | `/update`   | n/a       |
+| return one   | `getXxx(...)`  | `/get_xxx`  | `GetXxx`  |
+| return many  | `listXxx(...)` | `/list_xxx` | `ListXxx` |
 
 - Base CRUD comes from `BaseService<B,Q>`: `add`, `delete`, `update`, `getById`, and `list(Q)`.
 - Reserve `select*` for raw Mapper/Manager persistence operations.
@@ -195,8 +196,8 @@ CRUD-shaped names reflect result cardinality across Service, Controller, Facade,
 - `*FlagEnum` is for boolean-like toggles, `*StatusEnum` for state machines, and `*TypeEnum` for classifications.
 - Enum constants use descriptive `UPPER_SNAKE_CASE`; enum `code` values use lowercase tokens.
 - Do not introduce magic flag constants such as `private static final Byte DEFAULT = 1`.
-- Do not expose secrets in VOs. Exclude `apiKey`, `password`, `secret`, `token`, and credential fields from serialization
-  and Lombok `@ToString`.
+- Do not expose secrets in VOs. Exclude `apiKey`, `password`, `secret`, `token`, and credential fields from
+  serialization and Lombok `@ToString`.
 
 ### Web API and OpenAPI
 
@@ -238,7 +239,8 @@ Key rules:
 - `verbatimModuleSyntax` is enabled. Use `import type` for every type-only import; Vue components, functions, and icons
   remain normal value imports.
 - Use `<Entity>Form` for create/update payloads and `<Entity>Record` for read responses.
-- Represent Java 64-bit IDs as strings. The backend emits identifiers as JSON strings on the HTTP contract, so standard JSON parsing (no JSONBigInt) is sufficient.
+- Represent Java 64-bit IDs as strings. The backend emits identifiers as JSON strings on the HTTP contract, so standard
+  JSON parsing (no JSONBigInt) is sufficient.
 - API wrappers mirror backend cardinality: `getXxx` for one value, `listXxx` for collections/maps/pages, and
   `addXxx`/`updateXxx`/`deleteXxx` for mutations.
 - Reuse CRUD helpers from `src/api/common.ts` and API bases from `src/config/constant/api.ts`; keep API wrappers thin.
@@ -296,8 +298,8 @@ mvn -s .mvn/settings.xml test -pl dc3-common/dc3-common-public \
 When using `-am` together with `-Dtest`, add `-Dsurefire.failIfNoSpecifiedTests=false` so dependency modules without the
 selected test do not fail spuriously.
 
-GitHub Actions should normally use public Maven repositories rather than the local mirror settings unless a workflow
-is intentionally testing that mirror.
+GitHub Actions should normally use public Maven repositories rather than the local mirror settings unless a workflow is
+intentionally testing that mirror.
 
 ## Environment and Compose
 
@@ -322,8 +324,8 @@ Compose change, validate every touched stack with its corresponding `make config
 
 ### Test types
 
-- Unit tests (`*Test.java`, `*Tests.java`) run with Surefire, JUnit 5, Mockito, AssertJ, and Reactor `StepVerifier` where
-  appropriate. Do not start a Spring context for a test that can use direct construction.
+- Unit tests (`*Test.java`, `*Tests.java`) run with Surefire, JUnit 5, Mockito, AssertJ, and Reactor `StepVerifier`
+  where appropriate. Do not start a Spring context for a test that can use direct construction.
 - Integration tests (`*IT.java`) run with Failsafe and may use `dc3-common-test` Testcontainers and harnesses.
 - E2E tests live in `dc3-e2e/` and are gated by the `DC3_E2E` environment variable.
 
@@ -379,10 +381,10 @@ or create a GitHub Release directly. The `Docker Images` workflow owns release v
 GitHub Release creation. Keep its `release` environment protected with required reviewers and tag restrictions.
 
 If a version lands in `CHANGE.md` without a matching GitHub Release, backfill it with `make release-backfill`
-(dry-run) or `make release-backfill-apply`. The tool maps date-formatted versions to same-day commits, assembles
-the standard release body (TITLE.md + changelog block + RELEASE-FOOTER.md quick start that links docs.dc3.site),
-and creates tags through the API - no image publishing, no `latest` pointer change. After TITLE.md or
-RELEASE-FOOTER.md evolves, `make release-backfill-refresh` re-renders existing backfilled release bodies.
+(dry-run) or `make release-backfill-apply`. The tool maps date-formatted versions to same-day commits, assembles the
+standard release body (TITLE.md + changelog block + RELEASE-FOOTER.md quick start that links docs.dc3.site), and creates
+tags through the API - no image publishing, no `latest` pointer change. After TITLE.md or RELEASE-FOOTER.md evolves,
+`make release-backfill-refresh` re-renders existing backfilled release bodies.
 
 ## Commit rules
 

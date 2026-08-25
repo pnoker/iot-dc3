@@ -41,25 +41,39 @@ public class StrategyConstant {
      */
     public static class Storage {
 
-        /** Prefix of repository. */
+        /**
+         * Prefix of repository.
+         */
         public static final String REPOSITORY_PREFIX = "repository" + SymbolConstant.COLON;
 
-        /** postgres constant. */
+        /**
+         * postgres constant.
+         */
         public static final String POSTGRES = "postgres";
 
-        /** influxdb constant. */
+        /**
+         * influxdb constant.
+         */
         public static final String INFLUXDB = "influxdb";
 
-        /** tdengine constant. */
+        /**
+         * tdengine constant.
+         */
         public static final String TDENGINE = "tdengine";
 
-        /** opentsdb constant. */
+        /**
+         * opentsdb constant.
+         */
         public static final String OPENTSDB = "opentsdb";
 
-        /** mongodb constant. */
+        /**
+         * mongodb constant.
+         */
         public static final String MONGODB = "mongodb";
 
-        /** elasticsearch constant. */
+        /**
+         * elasticsearch constant.
+         */
         public static final String ELASTICSEARCH = "elasticsearch";
 
         private Storage() {

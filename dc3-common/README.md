@@ -5,39 +5,39 @@ center and driver applications.
 
 ## Domain modules
 
-| Module | Responsibility |
-|---|---|
-| `dc3-common-auth` | authentication, authorization, identity, OAuth2, and auth gRPC servers |
-| `dc3-common-manager` | driver/device/profile/point metadata and manager APIs |
-| `dc3-common-data` | values, commands, events, status, and data APIs |
-| `dc3-common-agentic` | AI models, sessions, tools, and assisted operations |
-| `dc3-common-driver` | driver SDK, registration, scheduling, metadata, command, and value runtime |
-| `dc3-common-gateway` | gateway routes, authentication filter, and ingress support |
+| Module               | Responsibility                                                             |
+|----------------------|----------------------------------------------------------------------------|
+| `dc3-common-auth`    | authentication, authorization, identity, OAuth2, and auth gRPC servers     |
+| `dc3-common-manager` | driver/device/profile/point metadata and manager APIs                      |
+| `dc3-common-data`    | values, commands, events, status, and data APIs                            |
+| `dc3-common-agentic` | AI models, sessions, tools, and assisted operations                        |
+| `dc3-common-driver`  | driver SDK, registration, scheduling, metadata, command, and value runtime |
+| `dc3-common-gateway` | gateway routes, authentication filter, and ingress support                 |
 
 ## Contracts and models
 
-| Module | Responsibility |
-|---|---|
-| `dc3-common-model` | shared BO/VO/DTO bases, builders, extension models, validation groups, and transport models |
-| `dc3-common-public` | response envelope, `BaseService`, shared entities/utilities, and tenant markers |
-| `dc3-common-api` | shared gRPC conversion helpers |
-| `dc3-common-facade` | cross-service facade contracts and implementations |
-| `dc3-common-constant` | stable platform-wide constants and shared domain/wire/persistence enums |
-| `dc3-common-exception` | shared exception hierarchy |
+| Module                 | Responsibility                                                                              |
+|------------------------|---------------------------------------------------------------------------------------------|
+| `dc3-common-model`     | shared BO/VO/DTO bases, builders, extension models, validation groups, and transport models |
+| `dc3-common-public`    | response envelope, `BaseService`, shared entities/utilities, and tenant markers             |
+| `dc3-common-api`       | shared gRPC conversion helpers                                                              |
+| `dc3-common-facade`    | cross-service facade contracts and implementations                                          |
+| `dc3-common-constant`  | stable platform-wide constants and shared domain/wire/persistence enums                     |
+| `dc3-common-exception` | shared exception hierarchy                                                                  |
 
 ## Infrastructure modules
 
-| Module | Responsibility |
-|---|---|
-| `dc3-common-dal` | shared label/group persistence |
-| `dc3-common-mqtt` | MQTT client configuration |
-| `dc3-common-quartz` | scheduling infrastructure |
-| `dc3-common-thread` | managed executors |
-| `dc3-common-web` | WebFlux, springdoc, security, and controller support |
-| `dc3-common-log` | logging defaults |
-| `dc3-common-sql` | SQL utilities |
+| Module                          | Responsibility                                        |
+|---------------------------------|-------------------------------------------------------|
+| `dc3-common-dal`                | shared label/group persistence                        |
+| `dc3-common-mqtt`               | MQTT client configuration                             |
+| `dc3-common-quartz`             | scheduling infrastructure                             |
+| `dc3-common-thread`             | managed executors                                     |
+| `dc3-common-web`                | WebFlux, springdoc, security, and controller support  |
+| `dc3-common-log`                | logging defaults                                      |
+| `dc3-common-sql`                | SQL utilities                                         |
 | `dc3-common-resource-registrar` | API/resource annotation discovery and synchronization |
-| `dc3-common-test` | shared tests, harnesses, and Testcontainers |
+| `dc3-common-test`               | shared tests, harnesses, and Testcontainers           |
 
 Datasource, messaging, and time-series storage were split into dedicated top-level families; business modules depend on
 them directly:

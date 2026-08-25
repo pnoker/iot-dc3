@@ -1,15 +1,14 @@
 # IoT DC3 on Kubernetes
 
-Production-oriented Kubernetes manifests for the IoT DC3 platform: gateway, the four
-centers (auth / manager / data / agentic), the web console, 36 protocol drivers, and
-the PostgreSQL + RabbitMQ stateful dependencies.
+Production-oriented Kubernetes manifests for the IoT DC3 platform: gateway, the four centers (auth / manager / data /
+agentic), the web console, 36 protocol drivers, and the PostgreSQL + RabbitMQ stateful dependencies.
 
-| What            | Where                                                              |
-|-----------------|--------------------------------------------------------------------|
-| Compose stacks  | `dc3/docker-compose*.yml` (single host, scale, swarm)            |
-| Kubernetes      | this directory (`kustomize`)                                       |
-| Helm            | `../helm/dc3` (equivalent chart)                                   |
-| Deployment doc  | `dc3/doc/DEPLOYMENT.md`                                            |
+| What           | Where                                                 |
+|----------------|-------------------------------------------------------|
+| Compose stacks | `dc3/docker-compose*.yml` (single host, scale, swarm) |
+| Kubernetes     | this directory (`kustomize`)                          |
+| Helm           | `../helm/dc3` (equivalent chart)                      |
+| Deployment doc | `dc3/doc/DEPLOYMENT.md`                               |
 
 ## Layout
 
@@ -34,10 +33,10 @@ dc3/deploy/k8s/
 ## Prerequisites
 
 - Kubernetes >= 1.25, an ingress controller (the bundled `ingress.yaml` targets
-  [ingress-nginx](https://kubernetes.github.io/ingress-nginx/)), and a StorageClass
-  that provisions volumes (the default class is used by the PVCs).
-- The release CI publishes all `pnoker/dc3-*` **app** images to Docker Hub and Aliyun.
-  The **dependency** images `pnoker/dc3-postgres` and `pnoker/dc3-rabbitmq` are *not*
+  [ingress-nginx](https://kubernetes.github.io/ingress-nginx/)), and a StorageClass that provisions volumes (the default
+  class is used by the PVCs).
+- The release CI publishes all `pnoker/dc3-*` **app** images to Docker Hub and Aliyun. The **dependency** images
+  `pnoker/dc3-postgres` and `pnoker/dc3-rabbitmq` are *not*
   published - build and push them once (see next step).
 
 ## Install
@@ -86,17 +85,16 @@ kubectl -n dc3 get hpa -n dc3                                        # gateway/w
 
 Scaling semantics (see `dc3/doc/DEPLOYMENT.md`; the compose-scale/swarm stacks differ for drivers):
 
-- **gateway / web**: stateless, load-balanced by the Service - safe to scale and
-  autoscale (HPA is enabled).
-- **centers**: safe for HA/rollouts. Traffic from the gateway is balanced by Spring
-  Cloud Gateway over HTTP; center-to-center gRPC uses static DNS targets, so a scaled
-  center serves as failover rather than request-level balancing.
-- **drivers**: safe to scale here - each pod gets its own `emptyDir` outbox, so replicas
-  never share a SQLite file (unlike compose-scale/swarm, where drivers must stay at 1
-  replica). Exception: `listening-virtual` pins inbound device sockets, keep
+- **gateway / web**: stateless, load-balanced by the Service - safe to scale and autoscale (HPA is enabled).
+- **centers**: safe for HA/rollouts. Traffic from the gateway is balanced by Spring Cloud Gateway over HTTP;
+  center-to-center gRPC uses static DNS targets, so a scaled center serves as failover rather than request-level
+  balancing.
+- **drivers**: safe to scale here - each pod gets its own `emptyDir` outbox, so replicas never share a SQLite file
+  (unlike compose-scale/swarm, where drivers must stay at 1 replica). Exception: `listening-virtual` pins inbound device
+  sockets, keep
   `replicas: 1`.
-- **postgres / rabbitmq**: singletons by design. Do not scale past 1 replica; for HA
-  run managed PostgreSQL/RabbitMQ and point the ConfigMap at them.
+- **postgres / rabbitmq**: singletons by design. Do not scale past 1 replica; for HA run managed PostgreSQL/RabbitMQ and
+  point the ConfigMap at them.
 
 ## Rolling upgrade
 
@@ -107,8 +105,8 @@ kubectl apply -k dc3/deploy/k8s
 kubectl -n dc3 rollout status deployment/dc3-gateway
 ```
 
-Stateful services upgrade in place (RollingUpdate on the StatefulSet). Back up the
-database before upgrading `dc3-postgres`:
+Stateful services upgrade in place (RollingUpdate on the StatefulSet). Back up the database before upgrading
+`dc3-postgres`:
 
 ```bash
 kubectl -n dc3 exec dc3-postgres-0 -- pg_dumpall -U dc3 > backup.sql
@@ -119,21 +117,18 @@ kubectl -n dc3 exec dc3-postgres-0 -- pg_dumpall -U dc3 > backup.sql
 - `dc3-postgres` -> 20Gi PVC (initdb seed SQL runs on first start of an empty volume).
 - `dc3-rabbitmq` -> 8Gi PVC.
 - `dc3-center-agentic` -> 5Gi PVC for attachments (Agentic memory/attachments).
-- Drivers mount `emptyDir` for protocol-local cache; promote to a PVC per driver if a
-  driver needs durable state.
-- On multi-node clusters make sure the default StorageClass is replicated (or use a
-  CSI driver with snapshots). Back up PostgreSQL regularly (pg_dump/pgBackRest).
+- Drivers mount `emptyDir` for protocol-local cache; promote to a PVC per driver if a driver needs durable state.
+- On multi-node clusters make sure the default StorageClass is replicated (or use a CSI driver with snapshots). Back up
+  PostgreSQL regularly (pg_dump/pgBackRest).
 
 ## Security hardening (before production)
 
 1. Replace every value in `secret.env` - especially `DC3_SECURITY_KEY` and
-   `AUTH_HMAC_SECRET` (the `pro` profile refuses to start with weak keys) - and do
-   not commit `secret.env`.
-2. Terminate TLS at the ingress (bundled annotations reference cert-manager) and remove
-   the placeholder `dc3.example.com`.
-3. Restrict egress with NetworkPolicies (only the centers need to reach the LLM
-   endpoint), and enable Pod Security Admission
-   (`kubectl label ns dc3 pod-security.kubernetes.io/enforce=baseline`).
+   `AUTH_HMAC_SECRET` (the `pro` profile refuses to start with weak keys) - and do not commit `secret.env`.
+2. Terminate TLS at the ingress (bundled annotations reference cert-manager) and remove the placeholder
+   `dc3.example.com`.
+3. Restrict egress with NetworkPolicies (only the centers need to reach the LLM endpoint), and enable Pod Security
+   Admission (`kubectl label ns dc3 pod-security.kubernetes.io/enforce=baseline`).
 4. Use a dedicated ServiceAccount per workload and pull images with
    `imagePullSecrets` from a private registry.
 5. Expose Swagger/OpenAPI only on dev-like profiles (already disabled for `pro`).

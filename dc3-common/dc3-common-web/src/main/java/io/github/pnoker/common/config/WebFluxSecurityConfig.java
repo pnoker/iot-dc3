@@ -130,7 +130,7 @@ public class WebFluxSecurityConfig {
     /**
      * Create and configure the application-managed gateway jwt converter.
      *
-     * @param hmacAuthSigner hmac auth signer
+     * @param hmacAuthSigner     hmac auth signer
      * @param permissionProvider permission provider
      * @return gateway jwt converter result
      */
@@ -144,13 +144,13 @@ public class WebFluxSecurityConfig {
     /**
      * Create and configure the application-managed security web filter chain.
      *
-     * @param http http
-     * @param converter converter
-     * @param hmacAuthSigner hmac auth signer
-     * @param environment environment
-     * @param docsPublicEnabled docs public enabled
+     * @param http                         http
+     * @param converter                    converter
+     * @param hmacAuthSigner               hmac auth signer
+     * @param environment                  environment
+     * @param docsPublicEnabled            docs public enabled
      * @param docsInternalSignatureEnabled docs internal signature enabled
-     * @param oauthDcrEnabled oauth dcr enabled
+     * @param oauthDcrEnabled              oauth dcr enabled
      * @return security web filter chain result
      */
     @Bean

@@ -35,13 +35,21 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum SuccessCode implements ResponseCode {
 
-    /** Success. */
+    /**
+     * Success.
+     */
     OK(200, "R200", "Success"),
-    /** Added successfully. */
+    /**
+     * Added successfully.
+     */
     ADD(201, "R201", "Added successfully"),
-    /** Deleted successfully. */
+    /**
+     * Deleted successfully.
+     */
     DELETE(200, "R200", "Deleted successfully"),
-    /** Updated successfully. */
+    /**
+     * Updated successfully.
+     */
     UPDATE(200, "R200", "Updated successfully"),
     ;
 

@@ -64,4 +64,4 @@ spec:
               mountPath: /dc3-center/dc3-center-auth/dc3/logs
       volumes:
         - name: logs
-          emptyDir: {}
+          emptyDir: { }

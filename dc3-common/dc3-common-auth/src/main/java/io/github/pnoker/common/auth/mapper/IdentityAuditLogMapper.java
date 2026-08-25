@@ -34,13 +34,13 @@ public interface IdentityAuditLogMapper extends BaseMapper<IdentityAuditLogDO> {
     /**
      * Return the matching identity audit.
      *
-     * @param tenantId tenant identifier
-     * @param principalId principal identifier
-     * @param action action to execute
+     * @param tenantId     tenant identifier
+     * @param principalId  principal identifier
+     * @param action       action to execute
      * @param resourceType resource type
-     * @param resourceId resource identifier
-     * @param status status
-     * @param limit limit
+     * @param resourceId   resource identifier
+     * @param status       status
+     * @param limit        limit
      * @return list identifierentity audit result
      */
     List<IdentityAuditLogDO> listIdentityAudit(@Param("tenantId") Long tenantId,

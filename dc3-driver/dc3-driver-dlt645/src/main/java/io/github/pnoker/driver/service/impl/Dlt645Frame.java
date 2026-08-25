@@ -34,21 +34,37 @@ import io.github.pnoker.common.exception.ConnectorException;
  */
 public final class Dlt645Frame {
 
-    /** Frame start byte. */
+    /**
+     * Frame start byte.
+     */
     public static final byte START = (byte) 0x68;
-    /** Frame end byte. */
+    /**
+     * Frame end byte.
+     */
     public static final byte END = (byte) 0x16;
-    /** Read data request control code. */
+    /**
+     * Read data request control code.
+     */
     public static final byte CONTROL_READ = 0x11;
-    /** Write data request control code. */
+    /**
+     * Write data request control code.
+     */
     public static final byte CONTROL_WRITE = 0x14;
-    /** Read response control code (no follow-up frame). */
+    /**
+     * Read response control code (no follow-up frame).
+     */
     public static final byte CONTROL_READ_RESPONSE = (byte) 0x91;
-    /** Read response control code (follow-up frame). */
+    /**
+     * Read response control code (follow-up frame).
+     */
     public static final byte CONTROL_READ_RESPONSE_MORE = (byte) 0xB1;
-    /** Write success response control code. */
+    /**
+     * Write success response control code.
+     */
     public static final byte CONTROL_WRITE_RESPONSE = (byte) 0x94;
-    /** Value each response data byte is offset by. */
+    /**
+     * Value each response data byte is offset by.
+     */
     public static final byte RESPONSE_OFFSET = 0x33;
 
     private Dlt645Frame() {
@@ -81,7 +97,7 @@ public final class Dlt645Frame {
      * @return complete request frame
      */
     public static byte[] buildReadRequest(byte[] address, int[] di) {
-        byte[] data = new byte[]{ (byte) di[0], (byte) di[1], (byte) di[2], (byte) di[3] };
+        byte[] data = new byte[]{(byte) di[0], (byte) di[1], (byte) di[2], (byte) di[3]};
         return build(address, CONTROL_READ, data);
     }
 

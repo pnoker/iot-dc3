@@ -79,7 +79,7 @@ public final class TimeRangeUtil {
      * Convenience overload that accepts the raw wire-format code.
      *
      * @param rangeKeyCode stable range-key code; unknown values fall back to {@code rangeHours}
-     * @param rangeHours legacy positive-hour fallback
+     * @param rangeHours   legacy positive-hour fallback
      * @return lower-bound timestamp, or {@code null} when no bound applies
      */
     public static LocalDateTime resolveFrom(String rangeKeyCode, Integer rangeHours) {
@@ -93,7 +93,7 @@ public final class TimeRangeUtil {
      * since local midnight rounded up to the next whole hour (minimum 1), which lines up
      * with sparkline bucketing.
      *
-     * @param rangeKey parsed range key; {@code null} falls back to {@code rangeHours}
+     * @param rangeKey   parsed range key; {@code null} falls back to {@code rangeHours}
      * @param rangeHours legacy positive-hour fallback
      * @return effective hour span, or {@code null} when no bound applies
      */
@@ -123,7 +123,7 @@ public final class TimeRangeUtil {
      * Convenience overload that accepts the raw wire-format code.
      *
      * @param rangeKeyCode stable range-key code; unknown values fall back to {@code rangeHours}
-     * @param rangeHours legacy positive-hour fallback
+     * @param rangeHours   legacy positive-hour fallback
      * @return effective hour span, or {@code null} when no bound applies
      */
     public static Integer resolveHours(String rangeKeyCode, Integer rangeHours) {
@@ -136,7 +136,7 @@ public final class TimeRangeUtil {
      * legacy {@code days} integer passes through.
      *
      * @param rangeKey parsed range key; {@code null} falls back to {@code days}
-     * @param days legacy positive-day fallback
+     * @param days     legacy positive-day fallback
      * @return effective day count, or {@code null} when no bound applies
      */
     public static Integer resolveDays(TimeRangeKeyEnum rangeKey, Integer days) {
@@ -157,7 +157,7 @@ public final class TimeRangeUtil {
      * Convenience overload that accepts the raw wire-format code.
      *
      * @param rangeKeyCode stable range-key code; unknown values fall back to {@code days}
-     * @param days legacy positive-day fallback
+     * @param days         legacy positive-day fallback
      * @return effective day count, or {@code null} when no bound applies
      */
     public static Integer resolveDays(String rangeKeyCode, Integer days) {

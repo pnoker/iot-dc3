@@ -67,7 +67,7 @@ public interface PointBuilder {
      * After process.
      *
      * @param entityGrpc entity grpc
-     * @param entityBO business object
+     * @param entityBO   business object
      */
     @AfterMapping
     default void afterProcess(GrpcPointDTO entityGrpc, @MappingTarget PointBO entityBO) {

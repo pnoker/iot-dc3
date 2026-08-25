@@ -35,8 +35,8 @@ public interface EventMapper extends BaseMapper<EventDO> {
     /**
      * Select page with device.
      *
-     * @param page page
-     * @param wrapper wrapper
+     * @param page     page
+     * @param wrapper  wrapper
      * @param deviceId device identifier
      * @return paginated result
      */

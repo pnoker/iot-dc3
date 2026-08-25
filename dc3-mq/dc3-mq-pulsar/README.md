@@ -1,7 +1,7 @@
 # DC3 MQ Pulsar
 
-`dc3-mq-pulsar` adapts the broker-neutral port to Apache Pulsar (`pulsar-client`). Logical topics map to Pulsar
-topics; publish and subscription use the standard client APIs with the port's confirmation model.
+`dc3-mq-pulsar` adapts the broker-neutral port to Apache Pulsar (`pulsar-client`). Logical topics map to Pulsar topics;
+publish and subscription use the standard client APIs with the port's confirmation model.
 
 ## Activation
 
@@ -9,8 +9,8 @@ Active when `dc3.mq.type=pulsar`.
 
 ## Configuration
 
-| Key | Default | Meaning |
-|---|---|---|
+| Key                         | Default                   | Meaning            |
+|-----------------------------|---------------------------|--------------------|
 | `dc3.mq.pulsar.service-url` | `pulsar://localhost:6650` | broker service URL |
 
 ## Dependencies

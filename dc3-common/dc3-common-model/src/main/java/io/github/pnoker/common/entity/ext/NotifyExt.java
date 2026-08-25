@@ -48,7 +48,9 @@ public class NotifyExt extends BaseExt {
     @Schema(description = "Extended notification content, distinguished by the type and version fields of the base extension")
     private Content content;
 
-    /** Notify-rule core content. */
+    /**
+     * Notify-rule core content.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -94,7 +96,9 @@ public class NotifyExt extends BaseExt {
 
     }
 
-    /** Duplicate suppression: enabled + grouping key (e.g. ruleId). */
+    /**
+     * Duplicate suppression: enabled + grouping key (e.g. ruleId).
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -110,7 +114,9 @@ public class NotifyExt extends BaseExt {
 
     }
 
-    /** Per-key send rate limiting. */
+    /**
+     * Per-key send rate limiting.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -126,7 +132,9 @@ public class NotifyExt extends BaseExt {
 
     }
 
-    /** Quiet-window suppression of notifications. */
+    /**
+     * Quiet-window suppression of notifications.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -142,7 +150,9 @@ public class NotifyExt extends BaseExt {
 
     }
 
-    /** Active sending window (timezone + HH:mm start/end) outside which sends are held. */
+    /**
+     * Active sending window (timezone + HH:mm start/end) outside which sends are held.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -164,7 +174,9 @@ public class NotifyExt extends BaseExt {
 
     }
 
-    /** Repeat-reminder policy while a condition stays true. */
+    /**
+     * Repeat-reminder policy while a condition stays true.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -183,7 +195,9 @@ public class NotifyExt extends BaseExt {
 
     }
 
-    /** Recovery-notification policy when a condition clears. */
+    /**
+     * Recovery-notification policy when a condition clears.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -202,7 +216,9 @@ public class NotifyExt extends BaseExt {
 
     }
 
-    /** Escalation policy when a condition stays unacknowledged. */
+    /**
+     * Escalation policy when a condition stays unacknowledged.
+     */
     @Getter
     @Setter
     @NoArgsConstructor

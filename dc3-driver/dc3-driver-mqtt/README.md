@@ -38,8 +38,8 @@ topics, parse incoming payloads as device point values, and forward commands to 
 | Event Code Path | Path to the event code in payload |
 | Payload Path    | Path to the event payload         |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

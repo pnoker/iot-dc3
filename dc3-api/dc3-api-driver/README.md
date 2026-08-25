@@ -5,15 +5,15 @@ driver-scoped device and point configuration. Generated Java types use `io.githu
 
 ## Services
 
-| Service | RPC | Response | Purpose |
-|---|---|---|---|
-| `DriverApi` | `DriverRegister` | `GrpcRDriverRegisterDTO` | register metadata and receive assigned configuration |
-| `DriverApi` | `GetById` | `GrpcRDriverRegisterDTO` | reload registered driver metadata |
-| `DriverApi` | `RenewLease` | stream of `GrpcRDriverLeaseDTO` | renew one runtime lease and stream its owned-device snapshot |
-| `DeviceApi` | `ListByPage` | `GrpcRPageDeviceDTO` | page through driver-owned devices |
-| `DeviceApi` | `GetById` | `GrpcRDeviceDTO` | get one device with attached attribute configuration |
-| `PointApi` | `ListByPage` | `GrpcRPagePointDTO` | page through driver-visible points |
-| `PointApi` | `GetById` | `GrpcRPointDTO` | get one point with attached configuration |
+| Service     | RPC              | Response                        | Purpose                                                      |
+|-------------|------------------|---------------------------------|--------------------------------------------------------------|
+| `DriverApi` | `DriverRegister` | `GrpcRDriverRegisterDTO`        | register metadata and receive assigned configuration         |
+| `DriverApi` | `GetById`        | `GrpcRDriverRegisterDTO`        | reload registered driver metadata                            |
+| `DriverApi` | `RenewLease`     | stream of `GrpcRDriverLeaseDTO` | renew one runtime lease and stream its owned-device snapshot |
+| `DeviceApi` | `ListByPage`     | `GrpcRPageDeviceDTO`            | page through driver-owned devices                            |
+| `DeviceApi` | `GetById`        | `GrpcRDeviceDTO`                | get one device with attached attribute configuration         |
+| `PointApi`  | `ListByPage`     | `GrpcRPagePointDTO`             | page through driver-visible points                           |
+| `PointApi`  | `GetById`        | `GrpcRPointDTO`                 | get one point with attached configuration                    |
 
 Proto sources live under `src/main/protobuf/api/common/driver/`. The `.proto` files are authoritative for fields and
 wrapper shapes.

@@ -35,7 +35,9 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "dc3.mq", name = "type", havingValue = "rocketmq")
 public class RocketMqAdapterConfiguration {
 
-    /** The port adapter bound to the RocketMQ producer/consumer. */
+    /**
+     * The port adapter bound to the RocketMQ producer/consumer.
+     */
     @Bean
     public RocketMqAdapter rocketMqAdapter(
             @Value("${dc3.mq.rocketmq.name-server-address:localhost:9876}") String namesrvAddr,

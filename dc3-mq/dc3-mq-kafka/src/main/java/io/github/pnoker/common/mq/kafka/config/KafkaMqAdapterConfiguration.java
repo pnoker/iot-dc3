@@ -40,7 +40,9 @@ import java.util.Map;
 @ConditionalOnProperty(prefix = "dc3.mq", name = "type", havingValue = "kafka")
 public class KafkaMqAdapterConfiguration {
 
-    /** Producer template on the adapter bootstrap servers; overridable by a user bean. */
+    /**
+     * Producer template on the adapter bootstrap servers; overridable by a user bean.
+     */
     @Bean
     @ConditionalOnMissingBean(KafkaTemplate.class)
     public KafkaTemplate<String, byte[]> kafkaMqTemplate(
@@ -48,7 +50,9 @@ public class KafkaMqAdapterConfiguration {
         return KafkaMqAdapter.template(bootstrapServers);
     }
 
-    /** The port adapter bound to the Kafka template. */
+    /**
+     * The port adapter bound to the Kafka template.
+     */
     @Bean
     public KafkaMqAdapter kafkaMqAdapter(KafkaTemplate<String, byte[]> kafkaTemplate,
                                          @Value("${dc3.mq.kafka.bootstrap-servers:${DC3_MQ_KAFKA_BOOTSTRAP:${spring.kafka.bootstrap-servers:localhost:9092}}}")

@@ -42,12 +42,16 @@ import java.util.Objects;
 @Component
 public class PointValueSampleConverter {
 
-    /** BO wall-clock → absolute instant, pinned to the platform zone. */
+    /**
+     * BO wall-clock → absolute instant, pinned to the platform zone.
+     */
     public Instant toInstant(LocalDateTime wallClock) {
         return Objects.isNull(wallClock) ? null : wallClock.atZone(TimeConstant.DEFAULT_ZONEID).toInstant();
     }
 
-    /** Absolute instant → BO wall-clock, pinned to the platform zone. */
+    /**
+     * Absolute instant → BO wall-clock, pinned to the platform zone.
+     */
     public LocalDateTime toWallClock(Instant instant) {
         return Objects.isNull(instant) ? null : LocalDateTime.ofInstant(instant, TimeConstant.DEFAULT_ZONEID);
     }
@@ -68,7 +72,9 @@ public class PointValueSampleConverter {
                 valueBO.getFencingToken(), valueBO.getDriverId());
     }
 
-    /** Port sample → business BO; timestamps return to wall-clock in the platform zone. */
+    /**
+     * Port sample → business BO; timestamps return to wall-clock in the platform zone.
+     */
     public PointValueBO toBO(PointValueSample sample) {
         return PointValueBO.builder()
                 .tenantId(sample.series().tenantId())
@@ -88,12 +94,16 @@ public class PointValueSampleConverter {
                 .build();
     }
 
-    /** Batch form of {@link #toSample(PointValueBO)}, order-preserving. */
+    /**
+     * Batch form of {@link #toSample(PointValueBO)}, order-preserving.
+     */
     public List<PointValueSample> toSamples(List<PointValueBO> values) {
         return values.stream().map(this::toSample).toList();
     }
 
-    /** Batch form of {@link #toBO(PointValueSample)}, order-preserving. */
+    /**
+     * Batch form of {@link #toBO(PointValueSample)}, order-preserving.
+     */
     public List<PointValueBO> toBOs(List<PointValueSample> samples) {
         return samples.stream().map(this::toBO).toList();
     }

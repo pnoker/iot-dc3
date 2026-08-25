@@ -46,8 +46,8 @@ with the `${value}` placeholder substituted.
 | Send Command | sendCommand | STRING | ${value} | HEX command template with ${value} placeholder |
 | Byte Order   | byteOrder   | STRING | BIG      | Byte order for encoding value: BIG, LITTLE     |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

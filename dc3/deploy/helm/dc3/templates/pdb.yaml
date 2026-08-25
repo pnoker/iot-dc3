@@ -1,16 +1,16 @@
-{{- if .Values.pdb.enabled }}
-{{- range .Values.pdb.targets }}
+{ { - if .Values.pdb.enabled } }
+  { { - range .Values.pdb.targets } }
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: dc3-{{ . }}
   labels:
-    {{- include "dc3.labels" $ | nindent 4 }}
+    { { - include "dc3.labels" $ | nindent 4 } }
 spec:
-  minAvailable: {{ $.Values.pdb.minAvailable }}
+  minAvailable: { { $.Values.pdb.minAvailable } }
   selector:
     matchLabels:
       app: dc3-{{ . }}
-{{- end }}
-{{- end }}
+  { { - end } }
+  { { - end } }

@@ -16,27 +16,27 @@ modules that own their database tables.
 
 ### Base Classes
 
-| Class         | Purpose                                                                                     |
-|---------------|---------------------------------------------------------------------------------------------|
-| `BaseBO`      | Base business object with ID, remark, and creator/operator audit fields                    |
-| `BaseVO`      | Base web view object with ID, remark, and creator/operator audit fields                     |
-| `BaseDTO`     | Base cross-process DTO with ID and audit timestamps                                         |
-| `BaseBuilder` | MapStruct conversion contract for `VO <-> BO <-> DTO`                                      |
-| `BaseExt`     | Base JSON extension model used by domain-specific `*Ext` classes                            |
+| Class         | Purpose                                                                 |
+|---------------|-------------------------------------------------------------------------|
+| `BaseBO`      | Base business object with ID, remark, and creator/operator audit fields |
+| `BaseVO`      | Base web view object with ID, remark, and creator/operator audit fields |
+| `BaseDTO`     | Base cross-process DTO with ID and audit timestamps                     |
+| `BaseBuilder` | MapStruct conversion contract for `VO <-> BO <-> DTO`                   |
+| `BaseExt`     | Base JSON extension model used by domain-specific `*Ext` classes        |
 
 ### Validation Groups
 
 Used with `@Validated(...)` in controllers:
 
-| Interface       | Usage                                                            |
-|-----------------|------------------------------------------------------------------|
-| `Add`           | Marks fields required only on creation (`@PostMapping("/add")`)  |
-| `Update`        | Marks fields required only on update (`@PostMapping("/update")`) |
-| `Select`        | Marks fields for query operations                                |
-| `Read`          | Read-path validation (e.g. `read` requests)                      |
-| `Write`         | Write-path validation (e.g. `write` requests)                    |
-| `Auth`          | Authentication-scoped validation                                 |
-| `Check` / `Parent` / `Upload` | Specialized validation groups                    |
+| Interface                     | Usage                                                            |
+|-------------------------------|------------------------------------------------------------------|
+| `Add`                         | Marks fields required only on creation (`@PostMapping("/add")`)  |
+| `Update`                      | Marks fields required only on update (`@PostMapping("/update")`) |
+| `Select`                      | Marks fields for query operations                                |
+| `Read`                        | Read-path validation (e.g. `read` requests)                      |
+| `Write`                       | Write-path validation (e.g. `write` requests)                    |
+| `Auth`                        | Authentication-scoped validation                                 |
+| `Check` / `Parent` / `Upload` | Specialized validation groups                                    |
 
 ### Shared DTOs and Extensions
 

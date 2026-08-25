@@ -39,7 +39,9 @@ import java.util.Map;
 @Order(Ordered.LOWEST_PRECEDENCE - 100)
 public class ThreadEnvironmentConfig implements EnvironmentPostProcessor {
 
-    /** Creates the environment post processor. */
+    /**
+     * Creates the environment post processor.
+     */
     public ThreadEnvironmentConfig() {
     }
 

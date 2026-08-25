@@ -51,7 +51,7 @@ public interface TenantMembershipService {
     /**
      * Find the membership that binds a principal to a tenant.
      *
-     * @param tenantId tenant identifier
+     * @param tenantId    tenant identifier
      * @param principalId principal identifier
      * @return the matching membership, or {@code null} when it does not exist
      */
@@ -84,7 +84,7 @@ public interface TenantMembershipService {
     /**
      * Determine whether a principal belongs to a tenant.
      *
-     * @param tenantId tenant identifier
+     * @param tenantId    tenant identifier
      * @param principalId principal identifier
      * @return {@code true} when the membership exists; otherwise {@code false}
      */
@@ -98,7 +98,7 @@ public interface TenantMembershipService {
     /**
      * Require a principal to belong to a tenant.
      *
-     * @param tenantId tenant identifier
+     * @param tenantId    tenant identifier
      * @param principalId principal identifier
      * @throws NotFoundException when the membership does not exist
      */

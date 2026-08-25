@@ -86,7 +86,7 @@ test.describe('three-terminal gate', () => {
     await waitForAppSettled(page);
 
     const unlabeled = await page.evaluate(() => {
-      const out: Array<{cls: string; text: string}> = [];
+      const out: Array<{ cls: string; text: string }> = [];
       document.querySelectorAll('button, [role="button"]').forEach((el) => {
         const node = el as HTMLElement;
         if (node.offsetParent === null) return; // hidden

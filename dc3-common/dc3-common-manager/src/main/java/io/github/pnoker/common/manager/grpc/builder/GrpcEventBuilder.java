@@ -61,7 +61,7 @@ public interface GrpcEventBuilder {
     /**
      * After process.
      *
-     * @param entityGrpc entity grpc
+     * @param entityGrpc  entity grpc
      * @param entityQuery entity query
      */
     @AfterMapping
@@ -103,7 +103,7 @@ public interface GrpcEventBuilder {
     /**
      * After process.
      *
-     * @param entityBO business object
+     * @param entityBO   business object
      * @param entityGrpc entity grpc
      */
     @AfterMapping

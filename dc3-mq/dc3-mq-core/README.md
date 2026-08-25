@@ -1,22 +1,22 @@
 # DC3 MQ Core
 
-`dc3-mq-core` defines the broker-neutral messaging port of IoT DC3. Business code depends on this module only —
-never on a broker-specific adapter. It owns the logical topics, subscription contracts, delivery envelopes, capability
+`dc3-mq-core` defines the broker-neutral messaging port of IoT DC3. Business code depends on this module only — never on
+a broker-specific adapter. It owns the logical topics, subscription contracts, delivery envelopes, capability
 negotiation, retry classification, and the batch-consumer configuration shared by the data path.
 
 ## Key types
 
-| Type | Role |
-|---|---|
-| `BrokerAdapter` | SPI implemented by every broker adapter |
-| `BrokerCapabilities` | negotiated broker feature set |
-| `Dc3Listener` / `MqListener` | listener annotations processed by `Dc3ListenerProcessor` |
-| `MessageSender` / `MessageSenderImpl` | publish path with per-message confirmations |
-| `MqMessage` / `MqReceived` | logical wire envelopes (`EnvelopeCodec`) |
-| `RetryPolicy` / `MqPoisonException` / `MqPublishException` | retry and failure classification |
-| `MqBatchListener` / `RawBatchListener` / `RawDeliveryListener` | batch-consumer contracts |
-| `BatchConsumerProperties` | binds `dc3.data.point.batch` (batch size, timeouts, concurrency, retries) |
-| `MqAutoConfiguration` | wires the shared messaging beans |
+| Type                                                           | Role                                                                      |
+|----------------------------------------------------------------|---------------------------------------------------------------------------|
+| `BrokerAdapter`                                                | SPI implemented by every broker adapter                                   |
+| `BrokerCapabilities`                                           | negotiated broker feature set                                             |
+| `Dc3Listener` / `MqListener`                                   | listener annotations processed by `Dc3ListenerProcessor`                  |
+| `MessageSender` / `MessageSenderImpl`                          | publish path with per-message confirmations                               |
+| `MqMessage` / `MqReceived`                                     | logical wire envelopes (`EnvelopeCodec`)                                  |
+| `RetryPolicy` / `MqPoisonException` / `MqPublishException`     | retry and failure classification                                          |
+| `MqBatchListener` / `RawBatchListener` / `RawDeliveryListener` | batch-consumer contracts                                                  |
+| `BatchConsumerProperties`                                      | binds `dc3.data.point.batch` (batch size, timeouts, concurrency, retries) |
+| `MqAutoConfiguration`                                          | wires the shared messaging beans                                          |
 
 ## Dependencies
 

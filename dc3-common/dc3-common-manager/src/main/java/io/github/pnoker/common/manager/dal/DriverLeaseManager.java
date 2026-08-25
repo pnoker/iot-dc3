@@ -34,41 +34,65 @@ import java.util.List;
  */
 public interface DriverLeaseManager {
 
-    /** Serializes membership and assignment changes for one logical driver. */
+    /**
+     * Serializes membership and assignment changes for one logical driver.
+     */
     void acquireDriverLock(Long driverId);
 
-    /** Creates or renews one tenant-owned runtime instance through the supplied expiry instant. */
+    /**
+     * Creates or renews one tenant-owned runtime instance through the supplied expiry instant.
+     */
     void renewInstance(Long tenantId, Long driverId, String node, String client,
                        String host, Instant leaseUntil);
 
-    /** Returns the stable, sorted identifiers of all unexpired runtime nodes for one logical driver. */
+    /**
+     * Returns the stable, sorted identifiers of all unexpired runtime nodes for one logical driver.
+     */
     List<String> listActiveNodes(Long tenantId, Long driverId);
 
-    /** Lists tenant-owned device IDs using an exclusive cursor and deterministic ascending order. */
+    /**
+     * Lists tenant-owned device IDs using an exclusive cursor and deterministic ascending order.
+     */
     List<Long> listDriverDeviceIds(Long tenantId, Long driverId, Long afterDeviceId, int limit);
 
-    /** Returns the current assignment state, or {@code null} before the first reconciliation. */
+    /**
+     * Returns the current assignment state, or {@code null} before the first reconciliation.
+     */
     DriverLeaseStateDO getLeaseState(Long tenantId, Long driverId);
 
-    /** Returns the current device-inventory revision, or zero when no revision exists. */
+    /**
+     * Returns the current device-inventory revision, or zero when no revision exists.
+     */
     long getDeviceRevision(Long tenantId, Long driverId);
 
-    /** Persists membership state and atomically advances the assignment fencing generation. */
+    /**
+     * Persists membership state and atomically advances the assignment fencing generation.
+     */
     long advanceAssignmentVersion(Long tenantId, Long driverId, String membershipHash, long deviceRevision);
 
-    /** Removes runtime-instance records whose leases expired before the retention cutoff. */
+    /**
+     * Removes runtime-instance records whose leases expired before the retention cutoff.
+     */
     void deleteExpiredInstances(Long tenantId, Long driverId, Instant expiredBefore);
 
-    /** Upserts the complete calculated assignment set in bounded batches. */
+    /**
+     * Upserts the complete calculated assignment set in bounded batches.
+     */
     void reconcileDeviceLeases(List<DeviceLeaseDO> leases);
 
-    /** Removes assignments for devices or owners that no longer belong to the active driver membership. */
+    /**
+     * Removes assignments for devices or owners that no longer belong to the active driver membership.
+     */
     void deleteOrphanedLeases(Long tenantId, Long driverId);
 
-    /** Lists unexpired assignments owned by one runtime node using an exclusive device-ID cursor. */
+    /**
+     * Lists unexpired assignments owned by one runtime node using an exclusive device-ID cursor.
+     */
     List<DeviceLeaseDO> listOwnedLeases(Long tenantId, Long driverId, String node,
                                         Long afterDeviceId, int limit);
 
-    /** Returns the unexpired assignment for one tenant-owned device, or {@code null} when none exists. */
+    /**
+     * Returns the unexpired assignment for one tenant-owned device, or {@code null} when none exists.
+     */
     DeviceLeaseDO getActiveLease(Long tenantId, Long deviceId);
 }

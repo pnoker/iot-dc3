@@ -50,12 +50,16 @@ public class IngestIdempotencyWindow {
                 .build();
     }
 
-    /** Return whether the message was already persisted inside the window. */
+    /**
+     * Return whether the message was already persisted inside the window.
+     */
     public boolean seen(String messageId) {
         return seen.getIfPresent(messageId) != null;
     }
 
-    /** Record a message as persisted. */
+    /**
+     * Record a message as persisted.
+     */
     public void mark(String messageId) {
         seen.put(messageId, Boolean.TRUE);
     }

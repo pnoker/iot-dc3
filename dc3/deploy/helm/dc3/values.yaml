@@ -349,4 +349,4 @@ pdb:
 serviceAccount:
   create: true
   name: ""
-  annotations: {}
+  annotations: { }

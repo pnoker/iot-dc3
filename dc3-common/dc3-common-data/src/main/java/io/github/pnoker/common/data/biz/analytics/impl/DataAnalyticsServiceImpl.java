@@ -317,7 +317,7 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
 
         String conclusion = "top " + ranked.size() + " by " + metric.toLowerCase() + ": "
                 + ranked.stream().map(item -> "%s (%s)".formatted(Objects.requireNonNullElse(item.label(),
-                item.entityId()), Objects.requireNonNullElse(item.metricValue(), item.count())))
+                        item.entityId()), Objects.requireNonNullElse(item.metricValue(), item.count())))
                 .collect(Collectors.joining(", "));
         return new AnalyticsModel.RankResponse(conclusion,
                 ranked.stream().mapToLong(AnalyticsModel.RankItem::count).sum(), null, ranked);
@@ -609,7 +609,9 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
         return matches.getFirst().getId();
     }
 
-    /** Bounded per-series sample pull inside the window, newest-first scan pages. */
+    /**
+     * Bounded per-series sample pull inside the window, newest-first scan pages.
+     */
     private Map<SeriesKey, List<PointValueSample>> pullPerSeries(List<SeriesKey> series, TimeWindow window) {
         Map<SeriesKey, List<PointValueSample>> out = new LinkedHashMap<>();
         for (SeriesKey key : series) {

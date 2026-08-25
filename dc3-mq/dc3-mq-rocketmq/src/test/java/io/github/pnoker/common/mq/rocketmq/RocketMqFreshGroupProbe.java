@@ -72,7 +72,7 @@ class RocketMqFreshGroupProbe {
     private List<String> subscribe(String group) {
         List<String> received = new CopyOnWriteArrayList<>();
         adapter.subscribe(new SubscriptionSpec(MqTopic.EVENT, SubscriptionMode.LOAD_BALANCE,
-                ConsumptionProfile.LATENCY, DeliveryMode.SINGLE, "", group, null, String.class, true),
+                        ConsumptionProfile.LATENCY, DeliveryMode.SINGLE, "", group, null, String.class, true),
                 delivery -> {
                     received.add(new String(delivery.body(), java.nio.charset.StandardCharsets.UTF_8));
                     delivery.acknowledgment().ack();

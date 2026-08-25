@@ -47,7 +47,9 @@ public class EventAttributeExt extends BaseExt {
     @Schema(description = "Event attribute configuration content")
     private Content content;
 
-    /** Attribute-value retention strategy hint. */
+    /**
+     * Attribute-value retention strategy hint.
+     */
     @Schema(description = "Event attribute configuration content")
     @Getter
     @Setter
@@ -72,7 +74,9 @@ public class EventAttributeExt extends BaseExt {
 
     }
 
-    /** Front-end rendering hints for the attribute input. */
+    /**
+     * Front-end rendering hints for the attribute input.
+     */
     @Schema(description = "UI rendering configuration for the attribute", example = "form")
     @Getter
     @Setter
@@ -103,7 +107,9 @@ public class EventAttributeExt extends BaseExt {
 
     }
 
-    /** Value constraints for attribute input validation. */
+    /**
+     * Value constraints for attribute input validation.
+     */
     @Schema(description = "Validation rules for the attribute value", example = "standard")
     @Getter
     @Setter
@@ -122,7 +128,9 @@ public class EventAttributeExt extends BaseExt {
 
     }
 
-    /** Access-control hints for the attribute. */
+    /**
+     * Access-control hints for the attribute.
+     */
     @Schema(description = "Security configuration for the attribute", example = "basic")
     @Getter
     @Setter
@@ -135,7 +143,9 @@ public class EventAttributeExt extends BaseExt {
 
     }
 
-    /** Applicability scoping of the attribute. */
+    /**
+     * Applicability scoping of the attribute.
+     */
     @Schema(description = "Scope to which the attribute applies")
     @Getter
     @Setter

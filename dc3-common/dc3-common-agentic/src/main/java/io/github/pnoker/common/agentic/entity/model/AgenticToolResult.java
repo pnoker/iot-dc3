@@ -39,9 +39,9 @@ public record AgenticToolResult<T>(boolean success, String code, String message,
     /**
      * Ok.
      *
-     * @param <T> generic type parameter
+     * @param <T>     generic type parameter
      * @param message message
-     * @param data data
+     * @param data    data
      * @return ok result
      */
     public static <T> AgenticToolResult<T> ok(String message, T data) {
@@ -51,9 +51,9 @@ public record AgenticToolResult<T>(boolean success, String code, String message,
     /**
      * Ok.
      *
-     * @param <T> generic type parameter
-     * @param message message
-     * @param data data
+     * @param <T>            generic type parameter
+     * @param message        message
+     * @param data           data
      * @param visualizations visualizations
      * @return ok result
      */
@@ -65,9 +65,9 @@ public record AgenticToolResult<T>(boolean success, String code, String message,
     /**
      * Empty.
      *
-     * @param <T> generic type parameter
+     * @param <T>     generic type parameter
      * @param message message
-     * @param data data
+     * @param data    data
      * @return empty result
      */
     public static <T> AgenticToolResult<T> empty(String message, T data) {
@@ -77,7 +77,7 @@ public record AgenticToolResult<T>(boolean success, String code, String message,
     /**
      * Invalid.
      *
-     * @param <T> generic type parameter
+     * @param <T>     generic type parameter
      * @param message message
      * @return invalid result
      */
@@ -89,7 +89,7 @@ public record AgenticToolResult<T>(boolean success, String code, String message,
     /**
      * Not found.
      *
-     * @param <T> generic type parameter
+     * @param <T>     generic type parameter
      * @param message message
      * @return not found result
      */
@@ -100,7 +100,7 @@ public record AgenticToolResult<T>(boolean success, String code, String message,
     /**
      * Unavailable.
      *
-     * @param <T> generic type parameter
+     * @param <T>     generic type parameter
      * @param message message
      * @return unavailable result
      */
@@ -111,7 +111,7 @@ public record AgenticToolResult<T>(boolean success, String code, String message,
     /**
      * Error.
      *
-     * @param <T> generic type parameter
+     * @param <T>     generic type parameter
      * @param message message
      * @return error result
      */

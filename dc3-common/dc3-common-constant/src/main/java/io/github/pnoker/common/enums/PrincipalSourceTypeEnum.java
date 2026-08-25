@@ -34,13 +34,19 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum PrincipalSourceTypeEnum {
 
-    /** Local identity. */
+    /**
+     * Local identity.
+     */
     LOCAL("LOCAL", "local", "Local identity"),
 
-    /** External identity provider. */
+    /**
+     * External identity provider.
+     */
     EXTERNAL("EXTERNAL", "external", "External identity provider"),
 
-    /** System identity. */
+    /**
+     * System identity.
+     */
     SYSTEM("SYSTEM", "system", "System identity"),
     ;
 

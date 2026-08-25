@@ -40,6 +40,6 @@ spec:
               mountPath: /dc3-driver/dc3-driver-modbus-rtu/dc3/data
       volumes:
         - name: logs
-          emptyDir: {}
+          emptyDir: { }
         - name: data
-          emptyDir: {}
+          emptyDir: { }

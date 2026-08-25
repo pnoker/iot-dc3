@@ -35,7 +35,9 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "dc3.db", name = "type", havingValue = "mysql")
 public class MysqlDbAutoConfiguration {
 
-    /** MyBatis-Plus pagination dialect for MySQL. */
+    /**
+     * MyBatis-Plus pagination dialect for MySQL.
+     */
     @Bean
     public DbType paginationDbType() {
         return DbType.MYSQL;

@@ -7,14 +7,14 @@ Testcontainers container.
 
 ## Contract tests
 
-| Test | Broker |
-|---|---|
+| Test                   | Broker                                       |
+|------------------------|----------------------------------------------|
 | `RabbitMqContractTest` | RabbitMQ (`rabbitmq:3.13-management-alpine`) |
-| `KafkaContractTest` | Apache Kafka (`apache/kafka:3.9.0`) |
-| `RocketMqContractTest` | RocketMQ |
-| `PulsarContractTest` | Pulsar |
-| `ActiveMqContractTest` | ActiveMQ |
-| `MqttContractTest` | HiveMQ CE |
+| `KafkaContractTest`    | Apache Kafka (`apache/kafka:3.9.0`)          |
+| `RocketMqContractTest` | RocketMQ                                     |
+| `PulsarContractTest`   | Pulsar                                       |
+| `ActiveMqContractTest` | ActiveMQ                                     |
+| `MqttContractTest`     | HiveMQ CE                                    |
 
 ## Running
 

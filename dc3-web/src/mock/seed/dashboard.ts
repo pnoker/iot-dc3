@@ -160,7 +160,11 @@ export const topology: TopologyResponse = (() => {
       name: `Others (${hidden.length})`,
       layer: 2,
       type: 'others',
-      hiddenChildren: hidden.map((device) => ({id: `device:${device.id}`, name: String(device.deviceName), type: 'device'})),
+      hiddenChildren: hidden.map((device) => ({
+        id: `device:${device.id}`,
+        name: String(device.deviceName),
+        type: 'device'
+      })),
     });
     links.push({source: `driver:${driver.id}`, target: id, value: hidden.length});
   }
@@ -288,7 +292,10 @@ const devicePointPairs = devices.flatMap((device) =>
     .map((point) => ({device, point})),
 );
 
-export const streamLatest = (now = new Date()): StreamRow[] => devicePointPairs.slice(0, 20).map(({device, point}, i) => {
+export const streamLatest = (now = new Date()): StreamRow[] => devicePointPairs.slice(0, 20).map(({
+                                                                                                    device,
+                                                                                                    point
+                                                                                                  }, i) => {
   const {valueType, rawValue} = streamValue(point.unit ?? '', i);
   return {
     deviceId: String(device.id),

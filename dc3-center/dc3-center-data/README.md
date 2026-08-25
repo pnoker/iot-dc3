@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-center-data` is the Data Center of the IoT DC3 platform. It consumes device point values from drivers over
-RabbitMQ (AMQP), stores them through the pluggable time-series port (`dc3-tsdb`, TimescaleDB by default), and exposes
-data query and command APIs.
+`dc3-center-data` is the Data Center of the IoT DC3 platform. It consumes device point values from drivers over RabbitMQ
+(AMQP), stores them through the pluggable time-series port (`dc3-tsdb`, TimescaleDB by default), and exposes data query
+and command APIs.
 
 ## Module Information
 
@@ -36,13 +36,13 @@ Accessible through the gateway at `/api/v3/data/**` (authentication required).
 
 ## Messaging Topics
 
-| Exchange              | Direction | Purpose                                 |
-|-----------------------|-----------|-----------------------------------------|
-| `dc3.e.value`         | Inbound   | Receive point values from drivers       |
-| `dc3.e.point_command` | Outbound  | Dispatch point read/write commands      |
-| `dc3.e.command`       | Outbound  | Dispatch custom device commands         |
-| `dc3.e.state`         | Inbound   | Receive driver/device state events      |
-| `dc3.e.event`         | Inbound   | Receive reported domain events          |
+| Exchange              | Direction | Purpose                            |
+|-----------------------|-----------|------------------------------------|
+| `dc3.e.value`         | Inbound   | Receive point values from drivers  |
+| `dc3.e.point_command` | Outbound  | Dispatch point read/write commands |
+| `dc3.e.command`       | Outbound  | Dispatch custom device commands    |
+| `dc3.e.state`         | Inbound   | Receive driver/device state events |
+| `dc3.e.event`         | Inbound   | Receive reported domain events     |
 
 ## Dependencies
 

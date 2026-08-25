@@ -48,7 +48,7 @@ public class AddException extends BusinessException {
      * Exception with a failure detail and cause.
      *
      * @param template failure detail or underlying failure
-     * @param params failure detail or underlying failure
+     * @param params   failure detail or underlying failure
      */
     public AddException(String template, Object... params) {
         super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));

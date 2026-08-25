@@ -48,7 +48,7 @@ public class AgenticVisualizationVO {
      * Of.
      *
      * @param visualization visualization
-     * @param created created
+     * @param created       created
      * @return of result
      */
     public static AgenticVisualizationVO of(AgenticVisualizationSpec visualization, long created) {

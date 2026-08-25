@@ -25,9 +25,13 @@ package io.github.pnoker.common.constant.mq;
  */
 public enum DeliveryMode {
 
-    /** One message per listener invocation. */
+    /**
+     * One message per listener invocation.
+     */
     SINGLE,
 
-    /** Broker batches per listener invocation (batch is the ack unit). */
+    /**
+     * Broker batches per listener invocation (batch is the ack unit).
+     */
     BATCH
 }

@@ -26,9 +26,13 @@ package io.github.pnoker.common.constant.mq;
  */
 public enum SubscriptionMode {
 
-    /** Competing consumers on a shared destination. */
+    /**
+     * Competing consumers on a shared destination.
+     */
     LOAD_BALANCE,
 
-    /** Every running instance receives its own copy. */
+    /**
+     * Every running instance receives its own copy.
+     */
     BROADCAST
 }

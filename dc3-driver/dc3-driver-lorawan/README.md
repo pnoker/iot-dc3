@@ -3,9 +3,9 @@
 ## Overview
 
 `dc3-driver-lorawan` ingests LoRaWAN uplinks by subscribing to ChirpStack MQTT topics
-(`application/+/device/+/event/up`). It decodes the JSON payload, caching the latest FRMPayload (base64) and Cayenne
-LPP object fields per DevEUI. Reads resolve a point against the cached DevEUI; writes publish a downlink command to
-the ChirpStack `command/down` topic.
+(`application/+/device/+/event/up`). It decodes the JSON payload, caching the latest FRMPayload (base64) and Cayenne LPP
+object fields per DevEUI. Reads resolve a point against the cached DevEUI; writes publish a downlink command to the
+ChirpStack `command/down` topic.
 
 ## Module Information
 
@@ -15,34 +15,33 @@ the ChirpStack `command/down` topic.
 
 ## Driver Attributes (Device-level)
 
-| Attribute       | Code          | Type   | Default                        | Description                            |
-|-----------------|---------------|--------|--------------------------------|----------------------------------------|
-| Application ID  | applicationId | STRING |                                | ChirpStack application ID for downlink |
-| Broker URI      | brokerUri     | STRING | tcp://dc3-mqtt:1883            | MQTT broker URI for ChirpStack events  |
-| Subscribe Topic | topic         | STRING | application/+/device/+/event/up| MQTT uplink topic filter               |
-| Username        | username      | STRING |                                | MQTT broker username (optional)        |
-| Password        | password      | STRING |                                | MQTT broker password (optional)        |
+| Attribute       | Code          | Type   | Default                         | Description                            |
+|-----------------|---------------|--------|---------------------------------|----------------------------------------|
+| Application ID  | applicationId | STRING |                                 | ChirpStack application ID for downlink |
+| Broker URI      | brokerUri     | STRING | tcp://dc3-mqtt:1883             | MQTT broker URI for ChirpStack events  |
+| Subscribe Topic | topic         | STRING | application/+/device/+/event/up | MQTT uplink topic filter               |
+| Username        | username      | STRING |                                 | MQTT broker username (optional)        |
+| Password        | password      | STRING |                                 | MQTT broker password (optional)        |
 
 ## Point Attributes
 
-| Attribute | Code   | Type   | Default | Description                                            |
-|-----------|--------|--------|---------|--------------------------------------------------------|
-| DevEUI    | devEui | STRING |         | LoRaWAN device EUI (16 hex characters)                 |
-| Field     | field  | STRING |         | Cayenne LPP object field; empty returns raw base64     |
+| Attribute | Code   | Type   | Default | Description                                        |
+|-----------|--------|--------|---------|----------------------------------------------------|
+| DevEUI    | devEui | STRING |         | LoRaWAN device EUI (16 hex characters)             |
+| Field     | field  | STRING |         | Cayenne LPP object field; empty returns raw base64 |
 
 ## Command Attributes (write)
 
-| Attribute | Code   | Type   | Default | Description                          |
-|-----------|--------|--------|---------|--------------------------------------|
-| DevEUI    | devEui | STRING |         | Target device EUI for the downlink   |
+| Attribute | Code   | Type   | Default | Description                        |
+|-----------|--------|--------|---------|------------------------------------|
+| DevEUI    | devEui | STRING |         | Target device EUI for the downlink |
 
 The module `application.yml` is authoritative for attribute codes, types, defaults, scheduling, health, and local
 buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 
-A ChirpStack instance publishing uplinks to the configured MQTT broker topic
-(`application/+/device/+/event/up`).
+A ChirpStack instance publishing uplinks to the configured MQTT broker topic (`application/+/device/+/event/up`).
 
 ## Running Locally
 

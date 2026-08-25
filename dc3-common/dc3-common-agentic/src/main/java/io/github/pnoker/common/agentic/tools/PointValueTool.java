@@ -62,8 +62,8 @@ public class PointValueTool {
     /**
      * Return latest point value.
      *
-     * @param deviceId device identifier
-     * @param pointId point identifier
+     * @param deviceId    device identifier
+     * @param pointId     point identifier
      * @param toolContext tool context
      * @return get latest point value result
      */
@@ -93,9 +93,9 @@ public class PointValueTool {
     /**
      * Return point value history.
      *
-     * @param deviceId device identifier
-     * @param pointId point identifier
-     * @param count count
+     * @param deviceId    device identifier
+     * @param pointId     point identifier
+     * @param count       count
      * @param toolContext tool context
      * @return get point value history result
      */
@@ -134,8 +134,8 @@ public class PointValueTool {
     /**
      * Read point value.
      *
-     * @param deviceId device identifier
-     * @param pointId point identifier
+     * @param deviceId    device identifier
+     * @param pointId     point identifier
      * @param toolContext tool context
      * @return read point value result
      */
@@ -165,9 +165,9 @@ public class PointValueTool {
     /**
      * Write point value.
      *
-     * @param deviceId device identifier
-     * @param pointId point identifier
-     * @param value value
+     * @param deviceId    device identifier
+     * @param pointId     point identifier
+     * @param value       value
      * @param toolContext tool context
      * @return write point value result
      */

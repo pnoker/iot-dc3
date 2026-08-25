@@ -281,7 +281,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
     }
 
     private GrpcRDriverLeaseDTO leaseResponse(DriverLeaseGrantBO grant, List<DeviceLeaseBO> leases,
-                                               boolean complete) {
+                                              boolean complete) {
         return GrpcRDriverLeaseDTO.newBuilder()
                 .setResult(GrpcRFactory.ok())
                 .addAllDeviceLeases(toGrpcLeases(leases))

@@ -35,7 +35,9 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "dc3.db", name = "type", havingValue = "postgres", matchIfMissing = true)
 public class PostgresDbAutoConfiguration {
 
-    /** MyBatis-Plus pagination dialect for PostgreSQL. */
+    /**
+     * MyBatis-Plus pagination dialect for PostgreSQL.
+     */
     @Bean
     public DbType paginationDbType() {
         return DbType.POSTGRE_SQL;

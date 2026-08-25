@@ -5,13 +5,13 @@ modules; center modules assemble dependencies, configuration, and process bounda
 
 ## Applications
 
-| Module | HTTP | gRPC | Base path | Purpose |
-|---|---:|---:|---|---|
-| `dc3-center-single` | 8100 | 9100 | `/single` | auth, manager, and data in one JVM |
-| `dc3-center-auth` | 8300 | 9300 | `/auth` | identity, authorization, OAuth2, and MCP authorization |
-| `dc3-center-manager` | 8400 | 9400 | `/manager` | device and metadata management |
-| `dc3-center-data` | 8500 | 9500 | `/data` | values, commands, events, and status |
-| `dc3-center-agentic` | 8600 | n/a | `/agentic` | AI-assisted operations |
+| Module               | HTTP | gRPC | Base path  | Purpose                                                |
+|----------------------|-----:|-----:|------------|--------------------------------------------------------|
+| `dc3-center-single`  | 8100 | 9100 | `/single`  | auth, manager, and data in one JVM                     |
+| `dc3-center-auth`    | 8300 | 9300 | `/auth`    | identity, authorization, OAuth2, and MCP authorization |
+| `dc3-center-manager` | 8400 | 9400 | `/manager` | device and metadata management                         |
+| `dc3-center-data`    | 8500 | 9500 | `/data`    | values, commands, events, and status                   |
+| `dc3-center-agentic` | 8600 |  n/a | `/agentic` | AI-assisted operations                                 |
 
 Ports are defaults; environment variables in each `application.yml` are authoritative. The distributed applications use
 static, environment-overridable gRPC addresses. They do not depend on Nacos service discovery.

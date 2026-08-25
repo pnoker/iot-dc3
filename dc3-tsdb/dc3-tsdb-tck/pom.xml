@@ -31,7 +31,8 @@
     <version>2026.5.22</version>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 store-neutral time-series contract suite: an adapter that passes these tests is compliant</description>
+    <description>IoT DC3 store-neutral time-series contract suite: an adapter that passes these tests is compliant
+    </description>
 
     <dependencies>
         <dependency>

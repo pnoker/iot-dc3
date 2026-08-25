@@ -10,8 +10,8 @@ Active when `dc3.mq.type=kafka`.
 
 ## Configuration
 
-| Key | Default | Meaning |
-|---|---|---|
+| Key                              | Default                                                                                | Meaning     |
+|----------------------------------|----------------------------------------------------------------------------------------|-------------|
 | `dc3.mq.kafka.bootstrap-servers` | `DC3_MQ_KAFKA_BOOTSTRAP`, then `spring.kafka.bootstrap-servers`, then `localhost:9092` | broker list |
 
 ## Dependencies

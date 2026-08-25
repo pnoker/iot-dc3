@@ -43,12 +43,16 @@ public final class RabbitAcknowledgment implements Acknowledgment {
         this.multiple = multiple;
     }
 
-    /** Ack exactly one delivery ({@code multiple=false}). */
+    /**
+     * Ack exactly one delivery ({@code multiple=false}).
+     */
     public static RabbitAcknowledgment single(Channel channel, long deliveryTag) {
         return new RabbitAcknowledgment(channel, deliveryTag, false);
     }
 
-    /** Ack everything up to the tag ({@code multiple=true}) — the broker-batch commit path. */
+    /**
+     * Ack everything up to the tag ({@code multiple=true}) — the broker-batch commit path.
+     */
     public static RabbitAcknowledgment batch(Channel channel, long lastDeliveryTag) {
         return new RabbitAcknowledgment(channel, lastDeliveryTag, true);
     }

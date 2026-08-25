@@ -41,8 +41,8 @@ and decode DLMS frames.
 | Logical Name | Object logical name / OBIS code (e.g. 1.0.1.8.0.255) |
 | Attribute ID | Attribute ID (2 = Present Value)                     |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

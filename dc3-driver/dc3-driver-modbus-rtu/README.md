@@ -39,8 +39,8 @@ values to coils and holding registers.
 | Offset         | Register or coil address offset             |
 | Value Template | Value template rendered with command params |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

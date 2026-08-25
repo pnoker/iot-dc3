@@ -37,13 +37,21 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum EntityStatusEnum {
 
-    /** Entity is online and healthy. */
+    /**
+     * Entity is online and healthy.
+     */
     ONLINE((byte) 0, "online", "Online"),
-    /** Entity is offline. */
+    /**
+     * Entity is offline.
+     */
     OFFLINE((byte) 1, "offline", "Offline"),
-    /** Entity is under maintenance. */
+    /**
+     * Entity is under maintenance.
+     */
     MAINTAIN((byte) 2, "maintain", "Maintain"),
-    /** Entity reported a fault. */
+    /**
+     * Entity reported a fault.
+     */
     FAULT((byte) 3, "fault", "Fault"),
     ;
 

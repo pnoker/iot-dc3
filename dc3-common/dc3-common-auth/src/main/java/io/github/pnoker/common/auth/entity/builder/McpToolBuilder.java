@@ -50,7 +50,7 @@ public interface McpToolBuilder {
      * After process.
      *
      * @param entityRecord entity record
-     * @param entityVO view object
+     * @param entityVO     view object
      */
     @AfterMapping
     default void afterProcess(McpToolRecord entityRecord, @MappingTarget McpToolVO entityVO) {

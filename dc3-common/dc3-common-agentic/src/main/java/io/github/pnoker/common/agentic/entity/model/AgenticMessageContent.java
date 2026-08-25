@@ -74,7 +74,9 @@ public class AgenticMessageContent implements Serializable {
         return content;
     }
 
-    /** Tool-call trace entry (type, title, detail) for the run timeline. */
+    /**
+     * Tool-call trace entry (type, title, detail) for the run timeline.
+     */
     @Getter
     @Setter
     @ToString
@@ -103,10 +105,10 @@ public class AgenticMessageContent implements Serializable {
         /**
          * Of.
          *
-         * @param type type
-         * @param title title
-         * @param detail detail
-         * @param name name
+         * @param type    type
+         * @param title   title
+         * @param detail  detail
+         * @param name    name
          * @param created created
          * @return of result
          */
@@ -117,14 +119,14 @@ public class AgenticMessageContent implements Serializable {
         /**
          * Of.
          *
-         * @param type type
-         * @param title title
-         * @param detail detail
-         * @param name name
+         * @param type    type
+         * @param title   title
+         * @param detail  detail
+         * @param name    name
          * @param created created
-         * @param phase phase
-         * @param status status
-         * @param code code
+         * @param phase   phase
+         * @param status  status
+         * @param code    code
          * @return of result
          */
         public static Trace of(String type, String title, String detail, String name, Long created, String phase,
@@ -143,7 +145,9 @@ public class AgenticMessageContent implements Serializable {
 
     }
 
-    /** One context block (type + content) fed to the model. */
+    /**
+     * One context block (type + content) fed to the model.
+     */
     @Getter
     @Setter
     @ToString
@@ -160,7 +164,7 @@ public class AgenticMessageContent implements Serializable {
         /**
          * Of.
          *
-         * @param type type
+         * @param type    type
          * @param content content
          * @return of result
          */
@@ -173,7 +177,9 @@ public class AgenticMessageContent implements Serializable {
 
     }
 
-    /** Token accounting: input/output/text/context counts of one message. */
+    /**
+     * Token accounting: input/output/text/context counts of one message.
+     */
     @Getter
     @Setter
     @ToString
@@ -198,12 +204,12 @@ public class AgenticMessageContent implements Serializable {
         /**
          * Of.
          *
-         * @param input input
-         * @param output output
-         * @param text text
+         * @param input   input
+         * @param output  output
+         * @param text    text
          * @param context context
-         * @param system system
-         * @param memory memory
+         * @param system  system
+         * @param memory  memory
          * @return of result
          */
         public static Tokens of(Integer input, Integer output, Integer text, Integer context, Integer system,

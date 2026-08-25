@@ -26,7 +26,9 @@ import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-/** Renews runtime membership. Expired local leases automatically stop device work. */
+/**
+ * Renews runtime membership. Expired local leases automatically stop device work.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

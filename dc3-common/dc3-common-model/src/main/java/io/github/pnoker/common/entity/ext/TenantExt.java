@@ -46,7 +46,9 @@ public class TenantExt extends BaseExt {
     @Schema(description = "Extended content payload for the tenant; structure is interpreted according to the type and version fields of the extension")
     private Content content;
 
-    /** Reserved tenant extension slot. */
+    /**
+     * Reserved tenant extension slot.
+     */
     @Getter
     @Setter
     @NoArgsConstructor

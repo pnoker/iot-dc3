@@ -13,14 +13,14 @@ Center. It is wired into `dc3-center-manager`.
 
 ## Key Components
 
-| Layer                         | Contents                                                                                            |
-|-------------------------------|-----------------------------------------------------------------------------------------------------|
-| Controllers                   | REST controllers for driver, device, profile, point, group, label, topic, etc.                      |
-| Services                      | `DriverService`, `DeviceService`, `ProfileService`, `PointService`, `DriverRegisterService`         |
-| gRPC Servers (Spring `@Service`) | `DriverDriverServer`, `DriverDeviceServer`, `DriverPointServer`, `ManagerPointServer`             |
-| DAL Managers                  | `DriverManager`, `DeviceManager`, `ProfileManager`, `PointManager` (MyBatis-Plus `IService`)        |
-| Metadata Events               | `MetadataEventPublisher`, `MetadataEventListener` — async metadata change notification via RabbitMQ |
-| Scheduled Jobs                | `ScheduleForManagerServiceImpl` — Quartz-based hourly maintenance job (`HourlyJobForManager`)     |
+| Layer                            | Contents                                                                                            |
+|----------------------------------|-----------------------------------------------------------------------------------------------------|
+| Controllers                      | REST controllers for driver, device, profile, point, group, label, topic, etc.                      |
+| Services                         | `DriverService`, `DeviceService`, `ProfileService`, `PointService`, `DriverRegisterService`         |
+| gRPC Servers (Spring `@Service`) | `DriverDriverServer`, `DriverDeviceServer`, `DriverPointServer`, `ManagerPointServer`               |
+| DAL Managers                     | `DriverManager`, `DeviceManager`, `ProfileManager`, `PointManager` (MyBatis-Plus `IService`)        |
+| Metadata Events                  | `MetadataEventPublisher`, `MetadataEventListener` — async metadata change notification via RabbitMQ |
+| Scheduled Jobs                   | `ScheduleForManagerServiceImpl` — Quartz-based hourly maintenance job (`HourlyJobForManager`)       |
 
 ## gRPC Services Exposed
 

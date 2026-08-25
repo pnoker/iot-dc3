@@ -5,14 +5,14 @@ in-process service classes.
 
 ## Modules
 
-| Module | Role |
-|---|---|
-| `dc3-common-facade-api` | transport-independent facade interfaces and request/result contracts |
-| `dc3-common-facade-grpc` | distributed implementations backed by shared gRPC stubs |
-| `dc3-common-facade-local-auth` | in-process auth facade implementation |
-| `dc3-common-facade-local-data` | in-process data facade implementation |
-| `dc3-common-facade-local-manager` | in-process manager facade implementation |
-| `dc3-common-facade-local` | convenience POM aggregating all local implementations |
+| Module                            | Role                                                                 |
+|-----------------------------------|----------------------------------------------------------------------|
+| `dc3-common-facade-api`           | transport-independent facade interfaces and request/result contracts |
+| `dc3-common-facade-grpc`          | distributed implementations backed by shared gRPC stubs              |
+| `dc3-common-facade-local-auth`    | in-process auth facade implementation                                |
+| `dc3-common-facade-local-data`    | in-process data facade implementation                                |
+| `dc3-common-facade-local-manager` | in-process manager facade implementation                             |
+| `dc3-common-facade-local`         | convenience POM aggregating all local implementations                |
 
 ## Selection
 

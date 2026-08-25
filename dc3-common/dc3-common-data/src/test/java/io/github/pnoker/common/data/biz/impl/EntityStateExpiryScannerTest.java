@@ -32,7 +32,9 @@ import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
 import io.github.pnoker.common.mq.sender.MessageSender;
+
 import java.util.Map;
+
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 

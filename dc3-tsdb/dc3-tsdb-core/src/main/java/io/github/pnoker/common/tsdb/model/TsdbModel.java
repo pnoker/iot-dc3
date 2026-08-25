@@ -155,21 +155,37 @@ public final class TsdbModel {
      * form the M4 rendering quadruple with MIN/MAX; PERCENTILE is capability-gated.
      */
     public enum AggregateFunction {
-        /** Arithmetic mean over the window. */
+        /**
+         * Arithmetic mean over the window.
+         */
         AVG,
-        /** Minimum value in the window. */
+        /**
+         * Minimum value in the window.
+         */
         MIN,
-        /** Maximum value in the window. */
+        /**
+         * Maximum value in the window.
+         */
         MAX,
-        /** Sum over the window. */
+        /**
+         * Sum over the window.
+         */
         SUM,
-        /** Row count over the window. */
+        /**
+         * Row count over the window.
+         */
         COUNT,
-        /** First sample in the window. */
+        /**
+         * First sample in the window.
+         */
         FIRST,
-        /** Last sample in the window. */
+        /**
+         * Last sample in the window.
+         */
         LAST,
-        /** Percentile, p supplied per call and capability-gated. */
+        /**
+         * Percentile, p supplied per call and capability-gated.
+         */
         PERCENTILE
     }
 
@@ -180,7 +196,9 @@ public final class TsdbModel {
      * @param toExclusive exclusive end
      */
     public record TimeWindow(Instant from, Instant toExclusive) {
-        /** Rejects empty or reversed windows. */
+        /**
+         * Rejects empty or reversed windows.
+         */
         public TimeWindow {
             if (!from.isBefore(toExclusive)) {
                 throw new IllegalArgumentException("window from must be before toExclusive");
@@ -253,11 +271,17 @@ public final class TsdbModel {
      * S13-② grouping dimensions (the dashboard's whitelisted set).
      */
     public enum GroupDimension {
-        /** Group by device. */
+        /**
+         * Group by device.
+         */
         DEVICE,
-        /** Group by point. */
+        /**
+         * Group by point.
+         */
         POINT,
-        /** Group by driver. */
+        /**
+         * Group by driver.
+         */
         DRIVER
     }
 
@@ -283,7 +307,7 @@ public final class TsdbModel {
     /**
      * S19 aligned-bucket Pearson correlation.
      *
-     * @param pearson       correlation coefficient in [-1,1]
+     * @param pearson        correlation coefficient in [-1,1]
      * @param alignedBuckets buckets used after alignment
      */
     public record CorrelationResult(double pearson, long alignedBuckets) {
@@ -307,7 +331,9 @@ public final class TsdbModel {
         }
     }
 
-    /** S18/S6 read timeout signal — the port's runaway-scan guard. */
+    /**
+     * S18/S6 read timeout signal — the port's runaway-scan guard.
+     */
     public static final class TsdbQueryTimeout extends RuntimeException {
 
         /**

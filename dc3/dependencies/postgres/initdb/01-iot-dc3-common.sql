@@ -64,22 +64,38 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_label IS 'Label table';
-COMMENT ON COLUMN dc3_label.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_label.label_name IS 'Label name';
-COMMENT ON COLUMN dc3_label.label_code IS 'Label code';
-COMMENT ON COLUMN dc3_label.label_color IS 'Label color';
-COMMENT ON COLUMN dc3_label.entity_type_flag IS 'Entity type flag';
-COMMENT ON COLUMN dc3_label.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_label.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_label.remark IS 'Description';
-COMMENT ON COLUMN dc3_label.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_label.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_label.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_label.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_label.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_label.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_label.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_label IS 'Label table';
+COMMENT
+ON COLUMN dc3_label.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_label.label_name IS 'Label name';
+COMMENT
+ON COLUMN dc3_label.label_code IS 'Label code';
+COMMENT
+ON COLUMN dc3_label.label_color IS 'Label color';
+COMMENT
+ON COLUMN dc3_label.entity_type_flag IS 'Entity type flag';
+COMMENT
+ON COLUMN dc3_label.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_label.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_label.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_label.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_label.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_label.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_label.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_label.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_label.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_label.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_label_bind
@@ -114,20 +130,34 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_label_bind IS 'Binding table between labels and entities';
-COMMENT ON COLUMN dc3_label_bind.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_label_bind.entity_type_flag IS 'Entity type flag';
-COMMENT ON COLUMN dc3_label_bind.label_id IS 'Label ID';
-COMMENT ON COLUMN dc3_label_bind.entity_id IS 'Entity ID';
-COMMENT ON COLUMN dc3_label_bind.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_label_bind.remark IS 'Description';
-COMMENT ON COLUMN dc3_label_bind.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_label_bind.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_label_bind.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_label_bind.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_label_bind.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_label_bind.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_label_bind.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_label_bind IS 'Binding table between labels and entities';
+COMMENT
+ON COLUMN dc3_label_bind.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_label_bind.entity_type_flag IS 'Entity type flag';
+COMMENT
+ON COLUMN dc3_label_bind.label_id IS 'Label ID';
+COMMENT
+ON COLUMN dc3_label_bind.entity_id IS 'Entity ID';
+COMMENT
+ON COLUMN dc3_label_bind.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_label_bind.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_label_bind.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_label_bind.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_label_bind.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_label_bind.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_label_bind.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_label_bind.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_label_bind.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_group
@@ -165,24 +195,42 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_group IS 'Group table';
-COMMENT ON COLUMN dc3_group.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_group.parent_group_id IS 'Parent group ID';
-COMMENT ON COLUMN dc3_group.group_name IS 'Group name';
-COMMENT ON COLUMN dc3_group.group_code IS 'Group code';
-COMMENT ON COLUMN dc3_group.group_level IS 'Group level';
-COMMENT ON COLUMN dc3_group.group_index IS 'Group order';
-COMMENT ON COLUMN dc3_group.entity_type_flag IS 'Entity type flag';
-COMMENT ON COLUMN dc3_group.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_group.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_group.remark IS 'Description';
-COMMENT ON COLUMN dc3_group.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_group.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_group.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_group.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_group.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_group.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_group.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_group IS 'Group table';
+COMMENT
+ON COLUMN dc3_group.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_group.parent_group_id IS 'Parent group ID';
+COMMENT
+ON COLUMN dc3_group.group_name IS 'Group name';
+COMMENT
+ON COLUMN dc3_group.group_code IS 'Group code';
+COMMENT
+ON COLUMN dc3_group.group_level IS 'Group level';
+COMMENT
+ON COLUMN dc3_group.group_index IS 'Group order';
+COMMENT
+ON COLUMN dc3_group.entity_type_flag IS 'Entity type flag';
+COMMENT
+ON COLUMN dc3_group.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_group.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_group.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_group.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_group.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_group.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_group.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_group.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_group.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_group.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_group_bind
@@ -215,17 +263,31 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_group_bind IS 'Binding table between groups and entities';
-COMMENT ON COLUMN dc3_group_bind.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_group_bind.entity_type_flag IS 'Entity type flag';
-COMMENT ON COLUMN dc3_group_bind.group_id IS 'Group ID';
-COMMENT ON COLUMN dc3_group_bind.entity_id IS 'Entity ID';
-COMMENT ON COLUMN dc3_group_bind.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_group_bind.remark IS 'Description';
-COMMENT ON COLUMN dc3_group_bind.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_group_bind.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_group_bind.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_group_bind.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_group_bind.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_group_bind.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_group_bind.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_group_bind IS 'Binding table between groups and entities';
+COMMENT
+ON COLUMN dc3_group_bind.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_group_bind.entity_type_flag IS 'Entity type flag';
+COMMENT
+ON COLUMN dc3_group_bind.group_id IS 'Group ID';
+COMMENT
+ON COLUMN dc3_group_bind.entity_id IS 'Entity ID';
+COMMENT
+ON COLUMN dc3_group_bind.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_group_bind.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_group_bind.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_group_bind.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_group_bind.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_group_bind.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_group_bind.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_group_bind.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_group_bind.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';

@@ -55,7 +55,7 @@ public interface OAuthClientBuilder {
      * After process.
      *
      * @param entityRecord entity record
-     * @param entityVO view object
+     * @param entityVO     view object
      */
     @AfterMapping
     default void afterProcess(OAuthRegisteredClientRecord entityRecord, @MappingTarget OAuthClientVO entityVO) {

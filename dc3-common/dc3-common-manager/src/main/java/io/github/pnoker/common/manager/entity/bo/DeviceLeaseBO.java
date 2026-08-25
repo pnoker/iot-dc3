@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.manager.entity.bo;
 
-/** A device owner and its monotonic fencing token. */
+/**
+ * A device owner and its monotonic fencing token.
+ */
 public record DeviceLeaseBO(Long driverId, Long deviceId, String ownerNode, Long fencingToken) {
 }

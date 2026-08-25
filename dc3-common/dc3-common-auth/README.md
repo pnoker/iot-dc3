@@ -17,21 +17,21 @@ functionality. It is wired directly into `dc3-center-auth`.
 |--------------|----------------------------------------------------------------------------|
 | Controllers  | REST controllers for user, tenant, token, dictionary endpoints             |
 | Services     | `TokenService`, `UserService`, `TenantService`, `DictionaryForAuthService` |
-| gRPC Servers | Spring `@Service` beans extending generated `*ImplBase` server classes      |
+| gRPC Servers | Spring `@Service` beans extending generated `*ImplBase` server classes     |
 | DAL          | MyBatis-Plus mappers and DAL managers for auth tables                      |
 | Init         | `AuthInitRunner` for startup checks                                        |
 
 ## gRPC Services Exposed
 
-| Service | Purpose |
-|---|---|
-| `TokenApi` | Validate login and token material for gateway authentication |
-| `TenantApi` | Resolve tenant metadata by code |
-| `UserApi` | Resolve users by ID or principal ID |
-| `LocalCredentialApi` | Resolve local credentials by login name |
-| `PermissionApi` | List effective permission codes |
-| `ResourceRegistryApi` | Synchronize discovered API and menu resources |
-| `McpRuntimeApi` | Introspect, authorize, resolve, and audit MCP tool calls |
+| Service               | Purpose                                                      |
+|-----------------------|--------------------------------------------------------------|
+| `TokenApi`            | Validate login and token material for gateway authentication |
+| `TenantApi`           | Resolve tenant metadata by code                              |
+| `UserApi`             | Resolve users by ID or principal ID                          |
+| `LocalCredentialApi`  | Resolve local credentials by login name                      |
+| `PermissionApi`       | List effective permission codes                              |
+| `ResourceRegistryApi` | Synchronize discovered API and menu resources                |
+| `McpRuntimeApi`       | Introspect, authorize, resolve, and audit MCP tool calls     |
 
 Distributed callers use the corresponding facade interfaces; they should not construct gRPC channels in business code.
 

@@ -5,18 +5,18 @@ types use `io.github.pnoker.api.center.data`; proto sources live under `src/main
 
 ## Services
 
-| Service | RPCs | Purpose |
-|---|---|---|
-| `PointValueApi` | `GetLastValue`, `ListHistoryValues`, `ListSeriesVolumes` | query point values and value-volume series |
-| `PointValueApi` | `ReadCommand`, `WriteCommand` | submit point read/write commands |
-| `CommandHistoryApi` | `CallCommand`, `GetByRecordId`, `ListByPage` | dispatch and query command history |
-| `EventHistoryApi` | `ReportEvent`, `GetByRecordId`, `ListByPage` | report and query event history |
-| `StatusHealthApi` | `DeviceStatusesByIds`, `DeviceStatusesByProfileId` | query device status snapshots |
-| `StatusHealthApi` | `DriverStatusesByIds`, `DriverDeviceStatusSummary` | query driver status snapshots and device summaries |
-| `StatusHealthApi` | `SystemHealth` | query the platform health snapshot |
+| Service             | RPCs                                                     | Purpose                                            |
+|---------------------|----------------------------------------------------------|----------------------------------------------------|
+| `PointValueApi`     | `GetLastValue`, `ListHistoryValues`, `ListSeriesVolumes` | query point values and value-volume series         |
+| `PointValueApi`     | `ReadCommand`, `WriteCommand`                            | submit point read/write commands                   |
+| `CommandHistoryApi` | `CallCommand`, `GetByRecordId`, `ListByPage`             | dispatch and query command history                 |
+| `EventHistoryApi`   | `ReportEvent`, `GetByRecordId`, `ListByPage`             | report and query event history                     |
+| `StatusHealthApi`   | `DeviceStatusesByIds`, `DeviceStatusesByProfileId`       | query device status snapshots                      |
+| `StatusHealthApi`   | `DriverStatusesByIds`, `DriverDeviceStatusSummary`       | query driver status snapshots and device summaries |
+| `StatusHealthApi`   | `SystemHealth`                                           | query the platform health snapshot                 |
 
-Single-result RPCs use `GetXxx`; collection/page results use `ListXxx` or an explicitly named status aggregation. Do
-not reintroduce legacy `SelectXxx` names.
+Single-result RPCs use `GetXxx`; collection/page results use `ListXxx` or an explicitly named status aggregation. Do not
+reintroduce legacy `SelectXxx` names.
 
 ## Consumers and implementation
 

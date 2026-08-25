@@ -15,15 +15,15 @@ queries and writes through configured `UPDATE`/`INSERT` queries. JDBC connection
 
 ## Driver Attributes (Device-level)
 
-| Attribute       | Description                               |
-|-----------------|-------------------------------------------|
-| Host            | Oracle host                               |
-| Port            | Oracle port                               |
-| Username        | Oracle username                           |
-| Password        | Oracle password                           |
-| Query Timeout   | SQL query timeout in seconds              |
-| Connection Type | Oracle connection type [SID, ServiceName] |
-| SID             | Oracle SID (used when Connection Type is SID)          |
+| Attribute       | Description                                                        |
+|-----------------|--------------------------------------------------------------------|
+| Host            | Oracle host                                                        |
+| Port            | Oracle port                                                        |
+| Username        | Oracle username                                                    |
+| Password        | Oracle password                                                    |
+| Query Timeout   | SQL query timeout in seconds                                       |
+| Connection Type | Oracle connection type [SID, ServiceName]                          |
+| SID             | Oracle SID (used when Connection Type is SID)                      |
 | Service Name    | Oracle service name (required when Connection Type is ServiceName) |
 
 ## Point Attributes
@@ -39,8 +39,8 @@ queries and writes through configured `UPDATE`/`INSERT` queries. JDBC connection
 |---------------|----------------------------------|
 | Execute Query | SQL query to execute for command |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

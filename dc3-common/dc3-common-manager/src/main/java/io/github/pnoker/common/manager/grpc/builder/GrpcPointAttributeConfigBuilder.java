@@ -61,7 +61,7 @@ public interface GrpcPointAttributeConfigBuilder {
     /**
      * After process.
      *
-     * @param entityBO business object
+     * @param entityBO   business object
      * @param entityGrpc entity grpc
      */
     @AfterMapping

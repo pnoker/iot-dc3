@@ -26,48 +26,78 @@ package io.github.pnoker.common.constant.mq;
  */
 public enum MqTopic {
 
-    /** Driver/device lifecycle states. */
+    /**
+     * Driver/device lifecycle states.
+     */
     STATE,
 
-    /** Driver/device alarms; also carries notify tasks. */
+    /**
+     * Driver/device alarms; also carries notify tasks.
+     */
     ALARM,
 
-    /** Driver metadata sync (broadcast to every driver instance). */
+    /**
+     * Driver metadata sync (broadcast to every driver instance).
+     */
     METADATA,
 
-    /** Point read/write commands, data center to driver. */
+    /**
+     * Point read/write commands, data center to driver.
+     */
     POINT_COMMAND,
 
-    /** Telemetry point values, driver to data center. */
+    /**
+     * Telemetry point values, driver to data center.
+     */
     POINT_VALUE,
 
-    /** Driver/device event reports. */
+    /**
+     * Driver/device event reports.
+     */
     EVENT,
 
-    /** Device-level custom commands, data center to driver. */
+    /**
+     * Device-level custom commands, data center to driver.
+     */
     COMMAND,
 
-    /** Custom command results, driver to data center. */
+    /**
+     * Custom command results, driver to data center.
+     */
     COMMAND_RESULT,
 
-    /** Point command results, driver to data center. */
+    /**
+     * Point command results, driver to data center.
+     */
     POINT_COMMAND_RESULT,
 
-    /** Outbound notification tasks. */
+    /**
+     * Outbound notification tasks.
+     */
     NOTIFY_TASK,
 
-    /** Driver lease timeout check (delayed trigger, DB lease is the source of truth). */
+    /**
+     * Driver lease timeout check (delayed trigger, DB lease is the source of truth).
+     */
     STATE_TIMEOUT,
 
-    /** Device scan tick (10 s delayed self-perpetuating cycle). */
+    /**
+     * Device scan tick (10 s delayed self-perpetuating cycle).
+     */
     DEVICE_SCAN,
 
-    /** Quarantine for point values (no consumer by design). */
+    /**
+     * Quarantine for point values (no consumer by design).
+     */
     POINT_VALUE_DEAD,
 
-    /** Dead letter for point commands. */
+    /**
+     * Dead letter for point commands.
+     */
     POINT_COMMAND_DEAD,
 
-    /** Dead letter for custom commands. */
+    /**
+     * Dead letter for custom commands.
+     */
     COMMAND_DEAD
 }

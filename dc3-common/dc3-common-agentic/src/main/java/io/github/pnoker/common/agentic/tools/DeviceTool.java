@@ -66,7 +66,7 @@ public class DeviceTool {
     /**
      * Return device by identifier.
      *
-     * @param deviceId device identifier
+     * @param deviceId    device identifier
      * @param toolContext tool context
      * @return lookup device by identifier result
      */
@@ -87,7 +87,7 @@ public class DeviceTool {
     /**
      * Return devices by identifiers.
      *
-     * @param deviceIds device identifiers
+     * @param deviceIds   device identifiers
      * @param toolContext tool context
      * @return lookup devices by identifiers result
      */
@@ -112,11 +112,11 @@ public class DeviceTool {
     /**
      * Return the matching devices.
      *
-     * @param deviceName device name
-     * @param deviceCode device code
-     * @param driverId driver identifier
-     * @param page page
-     * @param size size
+     * @param deviceName  device name
+     * @param deviceCode  device code
+     * @param driverId    driver identifier
+     * @param page        page
+     * @param size        size
      * @param toolContext tool context
      * @return search devices result
      */
@@ -151,7 +151,7 @@ public class DeviceTool {
     /**
      * Return the matching devices by driver identifier.
      *
-     * @param driverId driver identifier
+     * @param driverId    driver identifier
      * @param toolContext tool context
      * @return list devices by driver identifier result
      */
@@ -173,7 +173,7 @@ public class DeviceTool {
     /**
      * Return the matching devices by profile identifier.
      *
-     * @param profileId profile identifier
+     * @param profileId   profile identifier
      * @param toolContext tool context
      * @return list devices by profile identifier result
      */
@@ -195,8 +195,8 @@ public class DeviceTool {
     /**
      * Return device latest point values.
      *
-     * @param deviceId device identifier
-     * @param limit limit
+     * @param deviceId    device identifier
+     * @param limit       limit
      * @param toolContext tool context
      * @return get device latest point values result
      */
@@ -243,7 +243,7 @@ public class DeviceTool {
     /**
      * Return device statuses by identifiers.
      *
-     * @param deviceIds device identifiers
+     * @param deviceIds   device identifiers
      * @param toolContext tool context
      * @return get device statuses by identifiers result
      */
@@ -272,7 +272,7 @@ public class DeviceTool {
     /**
      * Return device statuses by profile identifier.
      *
-     * @param profileId profile identifier
+     * @param profileId   profile identifier
      * @param toolContext tool context
      * @return get device statuses by profile identifier result
      */

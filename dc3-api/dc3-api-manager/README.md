@@ -5,14 +5,14 @@ services. Generated Java types use `io.github.pnoker.api.center.manager`.
 
 ## Services
 
-| Service | Single-result RPCs | Collection/page RPCs |
-|---|---|---|
-| `DriverApi` | `GetByDriverId`, `GetByDeviceId` | `ListByPage`, `ListByDriverIds` |
-| `DeviceApi` | `GetByDeviceId`, `GetActiveOwner` | `ListByPage`, `ListByProfileId`, `ListByDriverId`, `ListByDeviceIds` |
-| `PointApi` | `GetById` | `ListByPage`, `ListByIds` |
-| `ProfileApi` | `GetByProfileId` | `ListByPage`, `ListByProfileIds`, `ListByDeviceId` |
-| `CommandApi` | `GetById` | `ListByPage`, `ListByIds` |
-| `EventApi` | `GetById` | `ListByPage`, `ListByIds` |
+| Service      | Single-result RPCs                | Collection/page RPCs                                                 |
+|--------------|-----------------------------------|----------------------------------------------------------------------|
+| `DriverApi`  | `GetByDriverId`, `GetByDeviceId`  | `ListByPage`, `ListByDriverIds`                                      |
+| `DeviceApi`  | `GetByDeviceId`, `GetActiveOwner` | `ListByPage`, `ListByProfileId`, `ListByDriverId`, `ListByDeviceIds` |
+| `PointApi`   | `GetById`                         | `ListByPage`, `ListByIds`                                            |
+| `ProfileApi` | `GetByProfileId`                  | `ListByPage`, `ListByProfileIds`, `ListByDeviceId`                   |
+| `CommandApi` | `GetById`                         | `ListByPage`, `ListByIds`                                            |
+| `EventApi`   | `GetById`                         | `ListByPage`, `ListByIds`                                            |
 
 Proto sources live under `src/main/protobuf/api/common/manager/`. Shared query and page messages are defined in
 `manager_query.proto` and `manager_query_page.proto`.

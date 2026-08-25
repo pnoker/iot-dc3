@@ -14,8 +14,8 @@ management, and command interfaces.
 
 ## Service Ports
 
-| Protocol  | Port   | Configuration variable |
-|-----------|--------|------------------------|
+| Protocol  | Port   | Configuration variable  |
+|-----------|--------|-------------------------|
 | HTTP REST | `8400` | `DC3_MANAGER_PORT`      |
 | gRPC      | `9400` | `DC3_MANAGER_GRPC_PORT` |
 
@@ -53,12 +53,12 @@ The complete prefix set (labels, dictionaries, attribute configs, dashboards, ba
 
 ## gRPC Services (consumed by drivers and data service)
 
-| Service                    | Used by                                         |
-|----------------------------|-------------------------------------------------|
-| `DriverApi.DriverRegister` | Drivers registering on startup                  |
-| `DeviceApi.GetById`        | Drivers fetching device configuration           |
-| `PointApi.GetById`         | Drivers fetching point configuration            |
-| `DriverApi.GetByDeviceId`  | Distributed facades resolving command routing   |
+| Service                    | Used by                                       |
+|----------------------------|-----------------------------------------------|
+| `DriverApi.DriverRegister` | Drivers registering on startup                |
+| `DeviceApi.GetById`        | Drivers fetching device configuration         |
+| `PointApi.GetById`         | Drivers fetching point configuration          |
+| `DriverApi.GetByDeviceId`  | Distributed facades resolving command routing |
 
 ## Dependencies
 

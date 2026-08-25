@@ -34,13 +34,19 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum RuleStatusEnum {
 
-    /** Normal. */
+    /**
+     * Normal.
+     */
     NORMAL((byte) 0, "normal", "Normal"),
 
-    /** Firing. */
+    /**
+     * Firing.
+     */
     FIRING((byte) 1, "firing", "Firing"),
 
-    /** Recovered. */
+    /**
+     * Recovered.
+     */
     RECOVERED((byte) 2, "recovered", "Recovered"),
     ;
 

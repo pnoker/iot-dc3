@@ -9,11 +9,11 @@ Active when `dc3.mq.type=activemq`.
 
 ## Configuration
 
-| Key | Default | Meaning |
-|---|---|---|
-| `dc3.mq.activemq.url` | `tcp://localhost:61616` | broker connection URL |
-| `dc3.mq.activemq.user` | *(empty)* | login name |
-| `dc3.mq.activemq.password` | *(empty)* | login password |
+| Key                        | Default                 | Meaning               |
+|----------------------------|-------------------------|-----------------------|
+| `dc3.mq.activemq.url`      | `tcp://localhost:61616` | broker connection URL |
+| `dc3.mq.activemq.user`     | *(empty)*               | login name            |
+| `dc3.mq.activemq.password` | *(empty)*               | login password        |
 
 ## Dependencies
 

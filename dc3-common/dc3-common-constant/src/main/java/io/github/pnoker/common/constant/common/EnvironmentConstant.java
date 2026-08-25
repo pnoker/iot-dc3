@@ -99,13 +99,19 @@ public class EnvironmentConstant {
      */
     public static final String JDBC_AUTO_PROFILE = "dc3.jdbc.auto-profile";
 
-    /** Configuration key selecting the relational dialect. */
+    /**
+     * Configuration key selecting the relational dialect.
+     */
     public static final String DB_TYPE = "dc3.db.type";
 
-    /** MySQL profile auto-activation configuration key. */
+    /**
+     * MySQL profile auto-activation configuration key.
+     */
     public static final String MYSQL_AUTO_PROFILE = "dc3.mysql.auto-profile";
 
-    /** PostgreSQL profile auto-activation configuration key. */
+    /**
+     * PostgreSQL profile auto-activation configuration key.
+     */
     public static final String POSTGRES_AUTO_PROFILE = "dc3.postgres.auto-profile";
 
     /**
@@ -113,13 +119,19 @@ public class EnvironmentConstant {
      */
     public static final String JDBC_PROFILE = "jdbc";
 
-    /** Spring profile name for PostgreSQL-enabled applications. */
+    /**
+     * Spring profile name for PostgreSQL-enabled applications.
+     */
     public static final String POSTGRES_PROFILE = "postgres";
 
-    /** Spring profile name for MySQL-enabled applications. */
+    /**
+     * Spring profile name for MySQL-enabled applications.
+     */
     public static final String MYSQL_PROFILE = "mysql";
 
-    /** Spring profile name for MariaDB-enabled applications. */
+    /**
+     * Spring profile name for MariaDB-enabled applications.
+     */
     public static final String MARIADB_PROFILE = "mariadb";
 
     /**

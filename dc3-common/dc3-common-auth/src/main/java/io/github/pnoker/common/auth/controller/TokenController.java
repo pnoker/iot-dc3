@@ -69,6 +69,7 @@ public class TokenController implements BaseController {
      */
     // Public endpoint: invoked before login, so no @PreAuthorize. Path is also
     // permitted in WebFluxSecurityConfig (POST /token/salt).
+
     /**
      * Handle the generate salt request.
      *
@@ -102,6 +103,7 @@ public class TokenController implements BaseController {
      */
     // Public endpoint: invoked during login (before a token exists), so no
     // @PreAuthorize. Path is also permitted in WebFluxSecurityConfig (POST /token/generate).
+
     /**
      * Handle the generate token request.
      *
@@ -145,6 +147,7 @@ public class TokenController implements BaseController {
      */
     // Public endpoint: invoked during login when no token can be issued yet, so no
     // @PreAuthorize. Path is also permitted in WebFluxSecurityConfig (POST /token/change_password).
+
     /**
      * Handle the change password request.
      *

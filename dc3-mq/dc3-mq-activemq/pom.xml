@@ -31,7 +31,8 @@
     <version>2026.5.22</version>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 ActiveMQ (Artemis / Classic, JMS 2.0) adapter for the broker-neutral messaging port</description>
+    <description>IoT DC3 ActiveMQ (Artemis / Classic, JMS 2.0) adapter for the broker-neutral messaging port
+    </description>
 
     <dependencies>
         <dependency>

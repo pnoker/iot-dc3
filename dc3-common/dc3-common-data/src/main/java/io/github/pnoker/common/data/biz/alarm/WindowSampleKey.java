@@ -33,9 +33,9 @@ public record WindowSampleKey(Long tenantId, AlarmTargetTypeEnum targetType, Lon
     /**
      * Of.
      *
-     * @param tenantId tenant identifier
+     * @param tenantId   tenant identifier
      * @param targetType target type
-     * @param entityId entity identifier
+     * @param entityId   entity identifier
      * @return of result
      */
     public static WindowSampleKey of(Long tenantId, AlarmTargetTypeEnum targetType, Long entityId) {

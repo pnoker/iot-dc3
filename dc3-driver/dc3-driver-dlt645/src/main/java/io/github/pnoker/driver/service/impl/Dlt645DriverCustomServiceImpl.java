@@ -202,7 +202,7 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
 
     private int[] parseDi(String di) {
         byte[] bytes = parseHex(di, 4);
-        return new int[]{ bytes[0] & 0xFF, bytes[1] & 0xFF, bytes[2] & 0xFF, bytes[3] & 0xFF };
+        return new int[]{bytes[0] & 0xFF, bytes[1] & 0xFF, bytes[2] & 0xFF, bytes[3] & 0xFF};
     }
 
     private byte[] parseHex(String hex, int expectedLength) {

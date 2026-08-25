@@ -59,7 +59,7 @@ public final class StringOptional {
     /**
      * Invoke exactly one branch according to whether the wrapped string is empty.
      *
-     * @param action action that consumes a present string
+     * @param action      action that consumes a present string
      * @param emptyAction action to run for a {@code null} or empty string
      */
     public void ifPresentOrElse(Consumer<String> action, Runnable emptyAction) {

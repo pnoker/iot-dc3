@@ -61,20 +61,34 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_tenant IS 'Tenant table';
-COMMENT ON COLUMN dc3_tenant.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_tenant.tenant_name IS 'Tenant name';
-COMMENT ON COLUMN dc3_tenant.tenant_code IS 'Tenant code';
-COMMENT ON COLUMN dc3_tenant.tenant_ext IS 'Tenant extension information';
-COMMENT ON COLUMN dc3_tenant.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_tenant.remark IS 'Description';
-COMMENT ON COLUMN dc3_tenant.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_tenant.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_tenant.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_tenant.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_tenant.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_tenant.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_tenant.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_tenant IS 'Tenant table';
+COMMENT
+ON COLUMN dc3_tenant.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_tenant.tenant_name IS 'Tenant name';
+COMMENT
+ON COLUMN dc3_tenant.tenant_code IS 'Tenant code';
+COMMENT
+ON COLUMN dc3_tenant.tenant_ext IS 'Tenant extension information';
+COMMENT
+ON COLUMN dc3_tenant.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_tenant.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_tenant.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_tenant.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_tenant.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_tenant.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_tenant.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_tenant.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_tenant.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_principal
@@ -115,24 +129,42 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_principal IS 'Unified principal table for users, service accounts and system identities';
-COMMENT ON COLUMN dc3_principal.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_principal.principal_type IS 'Principal type, USER: user, SERVICE_ACCOUNT: service account, SYSTEM: system principal';
-COMMENT ON COLUMN dc3_principal.principal_name IS 'Principal name';
-COMMENT ON COLUMN dc3_principal.display_name IS 'Principal display name';
-COMMENT ON COLUMN dc3_principal.source_type IS 'Principal source type, LOCAL: local, EXTERNAL: external, SYSTEM: system';
-COMMENT ON COLUMN dc3_principal.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_principal.locked_flag IS 'Locked flag, 0: unlocked, 1: locked';
-COMMENT ON COLUMN dc3_principal.last_login_time IS 'Last login time';
-COMMENT ON COLUMN dc3_principal.principal_ext IS 'Principal extension information';
-COMMENT ON COLUMN dc3_principal.remark IS 'Description';
-COMMENT ON COLUMN dc3_principal.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_principal.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_principal.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_principal.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_principal.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_principal.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_principal.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_principal IS 'Unified principal table for users, service accounts and system identities';
+COMMENT
+ON COLUMN dc3_principal.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_principal.principal_type IS 'Principal type, USER: user, SERVICE_ACCOUNT: service account, SYSTEM: system principal';
+COMMENT
+ON COLUMN dc3_principal.principal_name IS 'Principal name';
+COMMENT
+ON COLUMN dc3_principal.display_name IS 'Principal display name';
+COMMENT
+ON COLUMN dc3_principal.source_type IS 'Principal source type, LOCAL: local, EXTERNAL: external, SYSTEM: system';
+COMMENT
+ON COLUMN dc3_principal.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_principal.locked_flag IS 'Locked flag, 0: unlocked, 1: locked';
+COMMENT
+ON COLUMN dc3_principal.last_login_time IS 'Last login time';
+COMMENT
+ON COLUMN dc3_principal.principal_ext IS 'Principal extension information';
+COMMENT
+ON COLUMN dc3_principal.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_principal.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_principal.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_principal.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_principal.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_principal.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_principal.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_principal.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_user
@@ -172,24 +204,42 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_user IS 'User table';
-COMMENT ON COLUMN dc3_user.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_user.principal_id IS 'Principal ID';
-COMMENT ON COLUMN dc3_user.user_name IS 'Username';
-COMMENT ON COLUMN dc3_user.nick_name IS 'User nickname';
-COMMENT ON COLUMN dc3_user.phone IS 'Phone number';
-COMMENT ON COLUMN dc3_user.email IS 'Email';
-COMMENT ON COLUMN dc3_user.social_ext IS 'Social extension information';
-COMMENT ON COLUMN dc3_user.identity_ext IS 'Identity extension information';
-COMMENT ON COLUMN dc3_user.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_user.remark IS 'Description';
-COMMENT ON COLUMN dc3_user.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_user.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_user.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_user.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_user.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_user.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_user.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_user IS 'User table';
+COMMENT
+ON COLUMN dc3_user.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_user.principal_id IS 'Principal ID';
+COMMENT
+ON COLUMN dc3_user.user_name IS 'Username';
+COMMENT
+ON COLUMN dc3_user.nick_name IS 'User nickname';
+COMMENT
+ON COLUMN dc3_user.phone IS 'Phone number';
+COMMENT
+ON COLUMN dc3_user.email IS 'Email';
+COMMENT
+ON COLUMN dc3_user.social_ext IS 'Social extension information';
+COMMENT
+ON COLUMN dc3_user.identity_ext IS 'Identity extension information';
+COMMENT
+ON COLUMN dc3_user.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_user.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_user.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_user.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_user.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_user.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_user.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_user.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_user.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_local_credential
@@ -237,30 +287,54 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_local_credential IS 'Local password credential table';
-COMMENT ON COLUMN dc3_local_credential.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_local_credential.principal_id IS 'Principal ID';
-COMMENT ON COLUMN dc3_local_credential.login_name IS 'Login name';
-COMMENT ON COLUMN dc3_local_credential.login_name_normalized IS 'Normalized login name';
-COMMENT ON COLUMN dc3_local_credential.credential_type IS 'Credential type';
-COMMENT ON COLUMN dc3_local_credential.password_hash IS 'Password hash';
-COMMENT ON COLUMN dc3_local_credential.password_algorithm IS 'Password hash algorithm';
-COMMENT ON COLUMN dc3_local_credential.password_params IS 'Password hash parameters';
-COMMENT ON COLUMN dc3_local_credential.password_updated_time IS 'Password update time';
-COMMENT ON COLUMN dc3_local_credential.password_expire_time IS 'Password expiration time';
-COMMENT ON COLUMN dc3_local_credential.failed_attempts IS 'Failed login attempts';
-COMMENT ON COLUMN dc3_local_credential.locked_until IS 'Credential locked until time';
-COMMENT ON COLUMN dc3_local_credential.require_password_change IS 'Require password change flag, 0: no, 1: yes';
-COMMENT ON COLUMN dc3_local_credential.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_local_credential.credential_ext IS 'Credential extension information';
-COMMENT ON COLUMN dc3_local_credential.remark IS 'Description';
-COMMENT ON COLUMN dc3_local_credential.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_local_credential.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_local_credential.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_local_credential.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_local_credential.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_local_credential.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_local_credential.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_local_credential IS 'Local password credential table';
+COMMENT
+ON COLUMN dc3_local_credential.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_local_credential.principal_id IS 'Principal ID';
+COMMENT
+ON COLUMN dc3_local_credential.login_name IS 'Login name';
+COMMENT
+ON COLUMN dc3_local_credential.login_name_normalized IS 'Normalized login name';
+COMMENT
+ON COLUMN dc3_local_credential.credential_type IS 'Credential type';
+COMMENT
+ON COLUMN dc3_local_credential.password_hash IS 'Password hash';
+COMMENT
+ON COLUMN dc3_local_credential.password_algorithm IS 'Password hash algorithm';
+COMMENT
+ON COLUMN dc3_local_credential.password_params IS 'Password hash parameters';
+COMMENT
+ON COLUMN dc3_local_credential.password_updated_time IS 'Password update time';
+COMMENT
+ON COLUMN dc3_local_credential.password_expire_time IS 'Password expiration time';
+COMMENT
+ON COLUMN dc3_local_credential.failed_attempts IS 'Failed login attempts';
+COMMENT
+ON COLUMN dc3_local_credential.locked_until IS 'Credential locked until time';
+COMMENT
+ON COLUMN dc3_local_credential.require_password_change IS 'Require password change flag, 0: no, 1: yes';
+COMMENT
+ON COLUMN dc3_local_credential.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_local_credential.credential_ext IS 'Credential extension information';
+COMMENT
+ON COLUMN dc3_local_credential.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_local_credential.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_local_credential.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_local_credential.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_local_credential.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_local_credential.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_local_credential.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_local_credential.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_tenant_membership
@@ -298,22 +372,38 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_tenant_membership IS 'Tenant membership table for principals';
-COMMENT ON COLUMN dc3_tenant_membership.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_tenant_membership.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_tenant_membership.principal_id IS 'Principal ID';
-COMMENT ON COLUMN dc3_tenant_membership.principal_type IS 'Principal type';
-COMMENT ON COLUMN dc3_tenant_membership.membership_status IS 'Membership status';
-COMMENT ON COLUMN dc3_tenant_membership.joined_time IS 'Joined time';
-COMMENT ON COLUMN dc3_tenant_membership.membership_ext IS 'Membership extension information';
-COMMENT ON COLUMN dc3_tenant_membership.remark IS 'Description';
-COMMENT ON COLUMN dc3_tenant_membership.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_tenant_membership.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_tenant_membership.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_tenant_membership.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_tenant_membership.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_tenant_membership.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_tenant_membership.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_tenant_membership IS 'Tenant membership table for principals';
+COMMENT
+ON COLUMN dc3_tenant_membership.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_tenant_membership.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_tenant_membership.principal_id IS 'Principal ID';
+COMMENT
+ON COLUMN dc3_tenant_membership.principal_type IS 'Principal type';
+COMMENT
+ON COLUMN dc3_tenant_membership.membership_status IS 'Membership status';
+COMMENT
+ON COLUMN dc3_tenant_membership.joined_time IS 'Joined time';
+COMMENT
+ON COLUMN dc3_tenant_membership.membership_ext IS 'Membership extension information';
+COMMENT
+ON COLUMN dc3_tenant_membership.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_tenant_membership.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_tenant_membership.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_tenant_membership.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_tenant_membership.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_tenant_membership.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_tenant_membership.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_tenant_membership.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_service_account
@@ -353,25 +443,44 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_service_account IS 'Service account table';
-COMMENT ON COLUMN dc3_service_account.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_service_account.principal_id IS 'Principal ID';
-COMMENT ON COLUMN dc3_service_account.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_service_account.service_account_name IS 'Service account name';
-COMMENT ON COLUMN dc3_service_account.owner_principal_id IS 'Owner principal ID';
-COMMENT ON COLUMN dc3_service_account.purpose IS 'Service account purpose';
-COMMENT ON COLUMN dc3_service_account.expire_time IS 'Expiration time';
-COMMENT ON COLUMN dc3_service_account.last_used_time IS 'Last used time';
-COMMENT ON COLUMN dc3_service_account.credential_policy_ext IS 'Credential policy extension information';
-COMMENT ON COLUMN dc3_service_account.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_service_account.remark IS 'Description';
-COMMENT ON COLUMN dc3_service_account.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_service_account.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_service_account.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_service_account.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_service_account.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_service_account.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_service_account.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_service_account IS 'Service account table';
+COMMENT
+ON COLUMN dc3_service_account.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_service_account.principal_id IS 'Principal ID';
+COMMENT
+ON COLUMN dc3_service_account.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_service_account.service_account_name IS 'Service account name';
+COMMENT
+ON COLUMN dc3_service_account.owner_principal_id IS 'Owner principal ID';
+COMMENT
+ON COLUMN dc3_service_account.purpose IS 'Service account purpose';
+COMMENT
+ON COLUMN dc3_service_account.expire_time IS 'Expiration time';
+COMMENT
+ON COLUMN dc3_service_account.last_used_time IS 'Last used time';
+COMMENT
+ON COLUMN dc3_service_account.credential_policy_ext IS 'Credential policy extension information';
+COMMENT
+ON COLUMN dc3_service_account.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_service_account.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_service_account.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_service_account.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_service_account.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_service_account.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_service_account.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_service_account.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_service_account.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_identity_provider
@@ -423,37 +532,68 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_identity_provider IS 'External identity provider table';
-COMMENT ON COLUMN dc3_identity_provider.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_identity_provider.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_identity_provider.provider_code IS 'Identity provider code';
-COMMENT ON COLUMN dc3_identity_provider.provider_name IS 'Identity provider name';
-COMMENT ON COLUMN dc3_identity_provider.provider_type IS 'Identity provider type';
-COMMENT ON COLUMN dc3_identity_provider.issuer IS 'Issuer';
-COMMENT ON COLUMN dc3_identity_provider.discovery_url IS 'OIDC discovery URL';
-COMMENT ON COLUMN dc3_identity_provider.authorization_uri IS 'Authorization URI';
-COMMENT ON COLUMN dc3_identity_provider.token_uri IS 'Token URI';
-COMMENT ON COLUMN dc3_identity_provider.user_info_uri IS 'User info URI';
-COMMENT ON COLUMN dc3_identity_provider.jwks_uri IS 'JWKS URI';
-COMMENT ON COLUMN dc3_identity_provider.client_id IS 'OAuth client ID';
-COMMENT ON COLUMN dc3_identity_provider.client_secret_ref IS 'OAuth client secret reference';
-COMMENT ON COLUMN dc3_identity_provider.scopes IS 'Requested scopes';
-COMMENT ON COLUMN dc3_identity_provider.redirect_uri IS 'Redirect URI';
-COMMENT ON COLUMN dc3_identity_provider.subject_claim IS 'Subject claim name';
-COMMENT ON COLUMN dc3_identity_provider.username_claim IS 'Username claim name';
-COMMENT ON COLUMN dc3_identity_provider.email_claim IS 'Email claim name';
-COMMENT ON COLUMN dc3_identity_provider.attribute_mapping IS 'Attribute mapping';
-COMMENT ON COLUMN dc3_identity_provider.provisioning_mode IS 'Provisioning mode';
-COMMENT ON COLUMN dc3_identity_provider.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_identity_provider.provider_ext IS 'Provider extension information';
-COMMENT ON COLUMN dc3_identity_provider.remark IS 'Description';
-COMMENT ON COLUMN dc3_identity_provider.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_identity_provider.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_identity_provider.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_identity_provider.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_identity_provider.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_identity_provider.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_identity_provider.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_identity_provider IS 'External identity provider table';
+COMMENT
+ON COLUMN dc3_identity_provider.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_identity_provider.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_identity_provider.provider_code IS 'Identity provider code';
+COMMENT
+ON COLUMN dc3_identity_provider.provider_name IS 'Identity provider name';
+COMMENT
+ON COLUMN dc3_identity_provider.provider_type IS 'Identity provider type';
+COMMENT
+ON COLUMN dc3_identity_provider.issuer IS 'Issuer';
+COMMENT
+ON COLUMN dc3_identity_provider.discovery_url IS 'OIDC discovery URL';
+COMMENT
+ON COLUMN dc3_identity_provider.authorization_uri IS 'Authorization URI';
+COMMENT
+ON COLUMN dc3_identity_provider.token_uri IS 'Token URI';
+COMMENT
+ON COLUMN dc3_identity_provider.user_info_uri IS 'User info URI';
+COMMENT
+ON COLUMN dc3_identity_provider.jwks_uri IS 'JWKS URI';
+COMMENT
+ON COLUMN dc3_identity_provider.client_id IS 'OAuth client ID';
+COMMENT
+ON COLUMN dc3_identity_provider.client_secret_ref IS 'OAuth client secret reference';
+COMMENT
+ON COLUMN dc3_identity_provider.scopes IS 'Requested scopes';
+COMMENT
+ON COLUMN dc3_identity_provider.redirect_uri IS 'Redirect URI';
+COMMENT
+ON COLUMN dc3_identity_provider.subject_claim IS 'Subject claim name';
+COMMENT
+ON COLUMN dc3_identity_provider.username_claim IS 'Username claim name';
+COMMENT
+ON COLUMN dc3_identity_provider.email_claim IS 'Email claim name';
+COMMENT
+ON COLUMN dc3_identity_provider.attribute_mapping IS 'Attribute mapping';
+COMMENT
+ON COLUMN dc3_identity_provider.provisioning_mode IS 'Provisioning mode';
+COMMENT
+ON COLUMN dc3_identity_provider.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_identity_provider.provider_ext IS 'Provider extension information';
+COMMENT
+ON COLUMN dc3_identity_provider.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_identity_provider.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_identity_provider.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_identity_provider.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_identity_provider.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_identity_provider.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_identity_provider.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_identity_provider.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_external_identity
@@ -496,27 +636,48 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_external_identity IS 'External identity binding table';
-COMMENT ON COLUMN dc3_external_identity.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_external_identity.provider_id IS 'Identity provider ID';
-COMMENT ON COLUMN dc3_external_identity.principal_id IS 'Principal ID';
-COMMENT ON COLUMN dc3_external_identity.external_subject IS 'External identity subject';
-COMMENT ON COLUMN dc3_external_identity.external_username IS 'External username';
-COMMENT ON COLUMN dc3_external_identity.external_email IS 'External email';
-COMMENT ON COLUMN dc3_external_identity.email_verified IS 'Email verified flag, 0: no, 1: yes';
-COMMENT ON COLUMN dc3_external_identity.first_login_time IS 'First login time';
-COMMENT ON COLUMN dc3_external_identity.last_login_time IS 'Last login time';
-COMMENT ON COLUMN dc3_external_identity.last_claims_digest IS 'Last claims digest';
-COMMENT ON COLUMN dc3_external_identity.identity_ext IS 'External identity extension information';
-COMMENT ON COLUMN dc3_external_identity.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_external_identity.remark IS 'Description';
-COMMENT ON COLUMN dc3_external_identity.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_external_identity.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_external_identity.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_external_identity.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_external_identity.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_external_identity.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_external_identity.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_external_identity IS 'External identity binding table';
+COMMENT
+ON COLUMN dc3_external_identity.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_external_identity.provider_id IS 'Identity provider ID';
+COMMENT
+ON COLUMN dc3_external_identity.principal_id IS 'Principal ID';
+COMMENT
+ON COLUMN dc3_external_identity.external_subject IS 'External identity subject';
+COMMENT
+ON COLUMN dc3_external_identity.external_username IS 'External username';
+COMMENT
+ON COLUMN dc3_external_identity.external_email IS 'External email';
+COMMENT
+ON COLUMN dc3_external_identity.email_verified IS 'Email verified flag, 0: no, 1: yes';
+COMMENT
+ON COLUMN dc3_external_identity.first_login_time IS 'First login time';
+COMMENT
+ON COLUMN dc3_external_identity.last_login_time IS 'Last login time';
+COMMENT
+ON COLUMN dc3_external_identity.last_claims_digest IS 'Last claims digest';
+COMMENT
+ON COLUMN dc3_external_identity.identity_ext IS 'External identity extension information';
+COMMENT
+ON COLUMN dc3_external_identity.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_external_identity.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_external_identity.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_external_identity.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_external_identity.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_external_identity.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_external_identity.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_external_identity.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_external_identity.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_role
@@ -551,22 +712,38 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_role IS 'Role table';
-COMMENT ON COLUMN dc3_role.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_role.parent_role_id IS 'Parent role ID';
-COMMENT ON COLUMN dc3_role.role_name IS 'Role name';
-COMMENT ON COLUMN dc3_role.role_code IS 'Role code';
-COMMENT ON COLUMN dc3_role.role_ext IS 'Role extension information';
-COMMENT ON COLUMN dc3_role.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_role.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_role.remark IS 'Description';
-COMMENT ON COLUMN dc3_role.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_role.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_role.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_role.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_role.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_role.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_role.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_role IS 'Role table';
+COMMENT
+ON COLUMN dc3_role.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_role.parent_role_id IS 'Parent role ID';
+COMMENT
+ON COLUMN dc3_role.role_name IS 'Role name';
+COMMENT
+ON COLUMN dc3_role.role_code IS 'Role code';
+COMMENT
+ON COLUMN dc3_role.role_ext IS 'Role extension information';
+COMMENT
+ON COLUMN dc3_role.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_role.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_role.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_role.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_role.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_role.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_role.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_role.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_role.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_role.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_resource
@@ -607,25 +784,44 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_resource IS 'Resource table';
-COMMENT ON COLUMN dc3_resource.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_resource.parent_resource_id IS 'Parent resource ID';
-COMMENT ON COLUMN dc3_resource.resource_name IS 'Resource name';
-COMMENT ON COLUMN dc3_resource.resource_code IS 'Resource code';
-COMMENT ON COLUMN dc3_resource.service_name IS 'Owning service name; empty only for global resources';
-COMMENT ON COLUMN dc3_resource.resource_type_flag IS 'Resource type flag';
-COMMENT ON COLUMN dc3_resource.resource_scope_flag IS 'Resource scope flag';
-COMMENT ON COLUMN dc3_resource.entity_id IS 'Resource entity ID';
-COMMENT ON COLUMN dc3_resource.resource_ext IS 'Resource extension information';
-COMMENT ON COLUMN dc3_resource.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_resource.remark IS 'Description';
-COMMENT ON COLUMN dc3_resource.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_resource.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_resource.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_resource.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_resource.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_resource.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_resource.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_resource IS 'Resource table';
+COMMENT
+ON COLUMN dc3_resource.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_resource.parent_resource_id IS 'Parent resource ID';
+COMMENT
+ON COLUMN dc3_resource.resource_name IS 'Resource name';
+COMMENT
+ON COLUMN dc3_resource.resource_code IS 'Resource code';
+COMMENT
+ON COLUMN dc3_resource.service_name IS 'Owning service name; empty only for global resources';
+COMMENT
+ON COLUMN dc3_resource.resource_type_flag IS 'Resource type flag';
+COMMENT
+ON COLUMN dc3_resource.resource_scope_flag IS 'Resource scope flag';
+COMMENT
+ON COLUMN dc3_resource.entity_id IS 'Resource entity ID';
+COMMENT
+ON COLUMN dc3_resource.resource_ext IS 'Resource extension information';
+COMMENT
+ON COLUMN dc3_resource.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_resource.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_resource.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_resource.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_resource.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_resource.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_resource.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_resource.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_resource.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_role_principal_bind
@@ -660,20 +856,34 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_role_principal_bind IS 'Association table between roles and principals';
-COMMENT ON COLUMN dc3_role_principal_bind.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_role_principal_bind.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_role_principal_bind.role_id IS 'Role ID';
-COMMENT ON COLUMN dc3_role_principal_bind.principal_id IS 'Principal ID';
-COMMENT ON COLUMN dc3_role_principal_bind.principal_type IS 'Principal type';
-COMMENT ON COLUMN dc3_role_principal_bind.remark IS 'Description';
-COMMENT ON COLUMN dc3_role_principal_bind.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_role_principal_bind.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_role_principal_bind.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_role_principal_bind.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_role_principal_bind.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_role_principal_bind.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_role_principal_bind.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_role_principal_bind IS 'Association table between roles and principals';
+COMMENT
+ON COLUMN dc3_role_principal_bind.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_role_principal_bind.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_role_principal_bind.role_id IS 'Role ID';
+COMMENT
+ON COLUMN dc3_role_principal_bind.principal_id IS 'Principal ID';
+COMMENT
+ON COLUMN dc3_role_principal_bind.principal_type IS 'Principal type';
+COMMENT
+ON COLUMN dc3_role_principal_bind.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_role_principal_bind.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_role_principal_bind.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_role_principal_bind.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_role_principal_bind.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_role_principal_bind.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_role_principal_bind.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_role_principal_bind.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_role_resource_bind
@@ -703,18 +913,30 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_role_resource_bind IS 'Association table between roles and resources';
-COMMENT ON COLUMN dc3_role_resource_bind.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_role_resource_bind.role_id IS 'Role ID';
-COMMENT ON COLUMN dc3_role_resource_bind.resource_id IS 'Resource ID';
-COMMENT ON COLUMN dc3_role_resource_bind.remark IS 'Description';
-COMMENT ON COLUMN dc3_role_resource_bind.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_role_resource_bind.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_role_resource_bind.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_role_resource_bind.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_role_resource_bind.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_role_resource_bind.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_role_resource_bind.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_role_resource_bind IS 'Association table between roles and resources';
+COMMENT
+ON COLUMN dc3_role_resource_bind.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_role_resource_bind.role_id IS 'Role ID';
+COMMENT
+ON COLUMN dc3_role_resource_bind.resource_id IS 'Resource ID';
+COMMENT
+ON COLUMN dc3_role_resource_bind.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_role_resource_bind.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_role_resource_bind.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_role_resource_bind.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_role_resource_bind.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_role_resource_bind.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_role_resource_bind.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_role_resource_bind.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_driver_token
@@ -750,23 +972,40 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_driver_token IS 'Driver token table';
-COMMENT ON COLUMN dc3_driver_token.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_driver_token.driver_code IS 'Driver code';
-COMMENT ON COLUMN dc3_driver_token.driver_app_id IS 'Driver App ID';
-COMMENT ON COLUMN dc3_driver_token.driver_app_key IS 'Driver App Key';
-COMMENT ON COLUMN dc3_driver_token.expire_flag IS 'Expiration flag';
-COMMENT ON COLUMN dc3_driver_token.expire_time IS 'Expiration time';
-COMMENT ON COLUMN dc3_driver_token.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_driver_token.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_driver_token.remark IS 'Description';
-COMMENT ON COLUMN dc3_driver_token.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_driver_token.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_driver_token.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_driver_token.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_driver_token.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_driver_token.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_driver_token.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_driver_token IS 'Driver token table';
+COMMENT
+ON COLUMN dc3_driver_token.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_driver_token.driver_code IS 'Driver code';
+COMMENT
+ON COLUMN dc3_driver_token.driver_app_id IS 'Driver App ID';
+COMMENT
+ON COLUMN dc3_driver_token.driver_app_key IS 'Driver App Key';
+COMMENT
+ON COLUMN dc3_driver_token.expire_flag IS 'Expiration flag';
+COMMENT
+ON COLUMN dc3_driver_token.expire_time IS 'Expiration time';
+COMMENT
+ON COLUMN dc3_driver_token.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_driver_token.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_driver_token.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_driver_token.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_driver_token.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_driver_token.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_driver_token.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_driver_token.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_driver_token.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_driver_token.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_api
@@ -803,23 +1042,40 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_api IS 'API table';
-COMMENT ON COLUMN dc3_api.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_api.service_name IS 'Owning service name, populated by resource registrar';
-COMMENT ON COLUMN dc3_api.api_type_flag IS 'API type flag';
-COMMENT ON COLUMN dc3_api.api_name IS 'API name';
-COMMENT ON COLUMN dc3_api.api_code IS 'API code';
-COMMENT ON COLUMN dc3_api.api_group IS 'API grouping (controller simple name)';
-COMMENT ON COLUMN dc3_api.api_ext IS 'API extension information';
-COMMENT ON COLUMN dc3_api.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_api.remark IS 'Description';
-COMMENT ON COLUMN dc3_api.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_api.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_api.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_api.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_api.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_api.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_api.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_api IS 'API table';
+COMMENT
+ON COLUMN dc3_api.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_api.service_name IS 'Owning service name, populated by resource registrar';
+COMMENT
+ON COLUMN dc3_api.api_type_flag IS 'API type flag';
+COMMENT
+ON COLUMN dc3_api.api_name IS 'API name';
+COMMENT
+ON COLUMN dc3_api.api_code IS 'API code';
+COMMENT
+ON COLUMN dc3_api.api_group IS 'API grouping (controller simple name)';
+COMMENT
+ON COLUMN dc3_api.api_ext IS 'API extension information';
+COMMENT
+ON COLUMN dc3_api.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_api.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_api.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_api.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_api.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_api.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_api.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_api.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_api.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_oauth_registered_client
@@ -870,35 +1126,64 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_oauth_registered_client IS 'OAuth registered client table';
-COMMENT ON COLUMN dc3_oauth_registered_client.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_oauth_registered_client.client_id IS 'OAuth client ID';
-COMMENT ON COLUMN dc3_oauth_registered_client.client_name IS 'OAuth client name';
-COMMENT ON COLUMN dc3_oauth_registered_client.client_type IS 'OAuth client type, PUBLIC: public client, CONFIDENTIAL: confidential client';
-COMMENT ON COLUMN dc3_oauth_registered_client.owner_principal_id IS 'Owner principal ID';
-COMMENT ON COLUMN dc3_oauth_registered_client.service_account_principal_id IS 'Service account principal ID';
-COMMENT ON COLUMN dc3_oauth_registered_client.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_oauth_registered_client.client_secret_hash IS 'Client secret hash';
-COMMENT ON COLUMN dc3_oauth_registered_client.client_secret_expires_at IS 'Client secret expiration time';
-COMMENT ON COLUMN dc3_oauth_registered_client.client_auth_methods IS 'Client authentication methods';
-COMMENT ON COLUMN dc3_oauth_registered_client.authorization_grant_types IS 'Authorization grant types';
-COMMENT ON COLUMN dc3_oauth_registered_client.redirect_uris IS 'Redirect URIs';
-COMMENT ON COLUMN dc3_oauth_registered_client.scopes IS 'OAuth scopes';
-COMMENT ON COLUMN dc3_oauth_registered_client.jwks_uri IS 'Client JWKS URI';
-COMMENT ON COLUMN dc3_oauth_registered_client.jwk_set IS 'Client JWK set';
-COMMENT ON COLUMN dc3_oauth_registered_client.require_pkce IS 'Require PKCE flag, 0: no, 1: yes';
-COMMENT ON COLUMN dc3_oauth_registered_client.require_consent IS 'Require consent flag, 0: no, 1: yes';
-COMMENT ON COLUMN dc3_oauth_registered_client.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_oauth_registered_client.client_settings IS 'Client settings';
-COMMENT ON COLUMN dc3_oauth_registered_client.token_settings IS 'Token settings';
-COMMENT ON COLUMN dc3_oauth_registered_client.remark IS 'Description';
-COMMENT ON COLUMN dc3_oauth_registered_client.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_oauth_registered_client.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_oauth_registered_client.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_oauth_registered_client.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_oauth_registered_client.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_oauth_registered_client.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_oauth_registered_client.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_oauth_registered_client IS 'OAuth registered client table';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.client_id IS 'OAuth client ID';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.client_name IS 'OAuth client name';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.client_type IS 'OAuth client type, PUBLIC: public client, CONFIDENTIAL: confidential client';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.owner_principal_id IS 'Owner principal ID';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.service_account_principal_id IS 'Service account principal ID';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.client_secret_hash IS 'Client secret hash';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.client_secret_expires_at IS 'Client secret expiration time';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.client_auth_methods IS 'Client authentication methods';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.authorization_grant_types IS 'Authorization grant types';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.redirect_uris IS 'Redirect URIs';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.scopes IS 'OAuth scopes';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.jwks_uri IS 'Client JWKS URI';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.jwk_set IS 'Client JWK set';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.require_pkce IS 'Require PKCE flag, 0: no, 1: yes';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.require_consent IS 'Require consent flag, 0: no, 1: yes';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.client_settings IS 'Client settings';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.token_settings IS 'Token settings';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_oauth_registered_client.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_oauth_authorization
@@ -953,34 +1238,62 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_oauth_authorization IS 'OAuth authorization table';
-COMMENT ON COLUMN dc3_oauth_authorization.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_oauth_authorization.registered_client_id IS 'Registered client ID';
-COMMENT ON COLUMN dc3_oauth_authorization.client_id IS 'OAuth client ID';
-COMMENT ON COLUMN dc3_oauth_authorization.principal_id IS 'Principal ID';
-COMMENT ON COLUMN dc3_oauth_authorization.principal_type IS 'Principal type';
-COMMENT ON COLUMN dc3_oauth_authorization.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_oauth_authorization.mcp_connection_id IS 'MCP connection ID';
-COMMENT ON COLUMN dc3_oauth_authorization.authorization_grant_type IS 'Authorization grant type';
-COMMENT ON COLUMN dc3_oauth_authorization.authorized_scopes IS 'Authorized scopes';
-COMMENT ON COLUMN dc3_oauth_authorization.state_hash IS 'OAuth state hash';
-COMMENT ON COLUMN dc3_oauth_authorization.authorization_code_hash IS 'Authorization code hash';
-COMMENT ON COLUMN dc3_oauth_authorization.authorization_code_issued IS 'Authorization code issued time';
-COMMENT ON COLUMN dc3_oauth_authorization.authorization_code_expires IS 'Authorization code expiration time';
-COMMENT ON COLUMN dc3_oauth_authorization.access_token_jti IS 'Access token JWT ID';
-COMMENT ON COLUMN dc3_oauth_authorization.access_token_issued IS 'Access token issued time';
-COMMENT ON COLUMN dc3_oauth_authorization.access_token_expires IS 'Access token expiration time';
-COMMENT ON COLUMN dc3_oauth_authorization.refresh_token_hash IS 'Refresh token hash';
-COMMENT ON COLUMN dc3_oauth_authorization.previous_refresh_token_hash IS 'Previous (rotated) refresh token hash, used to detect replay';
-COMMENT ON COLUMN dc3_oauth_authorization.refresh_token_issued IS 'Refresh token issued time';
-COMMENT ON COLUMN dc3_oauth_authorization.refresh_token_expires IS 'Refresh token expiration time';
-COMMENT ON COLUMN dc3_oauth_authorization.token_claims IS 'Token claims';
-COMMENT ON COLUMN dc3_oauth_authorization.token_metadata IS 'Token metadata';
-COMMENT ON COLUMN dc3_oauth_authorization.revoked_time IS 'Revoked time';
-COMMENT ON COLUMN dc3_oauth_authorization.revoke_reason IS 'Revoke reason';
-COMMENT ON COLUMN dc3_oauth_authorization.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_oauth_authorization.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_oauth_authorization.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_oauth_authorization IS 'OAuth authorization table';
+COMMENT
+ON COLUMN dc3_oauth_authorization.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_oauth_authorization.registered_client_id IS 'Registered client ID';
+COMMENT
+ON COLUMN dc3_oauth_authorization.client_id IS 'OAuth client ID';
+COMMENT
+ON COLUMN dc3_oauth_authorization.principal_id IS 'Principal ID';
+COMMENT
+ON COLUMN dc3_oauth_authorization.principal_type IS 'Principal type';
+COMMENT
+ON COLUMN dc3_oauth_authorization.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_oauth_authorization.mcp_connection_id IS 'MCP connection ID';
+COMMENT
+ON COLUMN dc3_oauth_authorization.authorization_grant_type IS 'Authorization grant type';
+COMMENT
+ON COLUMN dc3_oauth_authorization.authorized_scopes IS 'Authorized scopes';
+COMMENT
+ON COLUMN dc3_oauth_authorization.state_hash IS 'OAuth state hash';
+COMMENT
+ON COLUMN dc3_oauth_authorization.authorization_code_hash IS 'Authorization code hash';
+COMMENT
+ON COLUMN dc3_oauth_authorization.authorization_code_issued IS 'Authorization code issued time';
+COMMENT
+ON COLUMN dc3_oauth_authorization.authorization_code_expires IS 'Authorization code expiration time';
+COMMENT
+ON COLUMN dc3_oauth_authorization.access_token_jti IS 'Access token JWT ID';
+COMMENT
+ON COLUMN dc3_oauth_authorization.access_token_issued IS 'Access token issued time';
+COMMENT
+ON COLUMN dc3_oauth_authorization.access_token_expires IS 'Access token expiration time';
+COMMENT
+ON COLUMN dc3_oauth_authorization.refresh_token_hash IS 'Refresh token hash';
+COMMENT
+ON COLUMN dc3_oauth_authorization.previous_refresh_token_hash IS 'Previous (rotated) refresh token hash, used to detect replay';
+COMMENT
+ON COLUMN dc3_oauth_authorization.refresh_token_issued IS 'Refresh token issued time';
+COMMENT
+ON COLUMN dc3_oauth_authorization.refresh_token_expires IS 'Refresh token expiration time';
+COMMENT
+ON COLUMN dc3_oauth_authorization.token_claims IS 'Token claims';
+COMMENT
+ON COLUMN dc3_oauth_authorization.token_metadata IS 'Token metadata';
+COMMENT
+ON COLUMN dc3_oauth_authorization.revoked_time IS 'Revoked time';
+COMMENT
+ON COLUMN dc3_oauth_authorization.revoke_reason IS 'Revoke reason';
+COMMENT
+ON COLUMN dc3_oauth_authorization.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_oauth_authorization.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_oauth_authorization.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_oauth_authorization_consent
@@ -1009,17 +1322,28 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_oauth_authorization_consent IS 'OAuth authorization consent table';
-COMMENT ON COLUMN dc3_oauth_authorization_consent.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_oauth_authorization_consent.registered_client_id IS 'Registered client ID';
-COMMENT ON COLUMN dc3_oauth_authorization_consent.client_id IS 'OAuth client ID';
-COMMENT ON COLUMN dc3_oauth_authorization_consent.principal_id IS 'Principal ID';
-COMMENT ON COLUMN dc3_oauth_authorization_consent.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_oauth_authorization_consent.scopes IS 'Consented scopes';
-COMMENT ON COLUMN dc3_oauth_authorization_consent.consent_ext IS 'Consent extension information';
-COMMENT ON COLUMN dc3_oauth_authorization_consent.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_oauth_authorization_consent.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_oauth_authorization_consent.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_oauth_authorization_consent IS 'OAuth authorization consent table';
+COMMENT
+ON COLUMN dc3_oauth_authorization_consent.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_oauth_authorization_consent.registered_client_id IS 'Registered client ID';
+COMMENT
+ON COLUMN dc3_oauth_authorization_consent.client_id IS 'OAuth client ID';
+COMMENT
+ON COLUMN dc3_oauth_authorization_consent.principal_id IS 'Principal ID';
+COMMENT
+ON COLUMN dc3_oauth_authorization_consent.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_oauth_authorization_consent.scopes IS 'Consented scopes';
+COMMENT
+ON COLUMN dc3_oauth_authorization_consent.consent_ext IS 'Consent extension information';
+COMMENT
+ON COLUMN dc3_oauth_authorization_consent.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_oauth_authorization_consent.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_oauth_authorization_consent.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_mcp_connection
@@ -1064,27 +1388,48 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_mcp_connection IS 'MCP OAuth connection table';
-COMMENT ON COLUMN dc3_mcp_connection.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_mcp_connection.connection_name IS 'MCP connection name';
-COMMENT ON COLUMN dc3_mcp_connection.client_id IS 'OAuth client ID';
-COMMENT ON COLUMN dc3_mcp_connection.principal_id IS 'Principal ID';
-COMMENT ON COLUMN dc3_mcp_connection.principal_type IS 'Principal type';
-COMMENT ON COLUMN dc3_mcp_connection.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_mcp_connection.grant_type IS 'OAuth grant type';
-COMMENT ON COLUMN dc3_mcp_connection.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_mcp_connection.expire_time IS 'Expiration time';
-COMMENT ON COLUMN dc3_mcp_connection.revoke_time IS 'Revoke time';
-COMMENT ON COLUMN dc3_mcp_connection.last_used_time IS 'Last used time';
-COMMENT ON COLUMN dc3_mcp_connection.connection_ext IS 'Connection extension information';
-COMMENT ON COLUMN dc3_mcp_connection.remark IS 'Description';
-COMMENT ON COLUMN dc3_mcp_connection.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_mcp_connection.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_mcp_connection.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_mcp_connection.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_mcp_connection.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_mcp_connection.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_mcp_connection.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_mcp_connection IS 'MCP OAuth connection table';
+COMMENT
+ON COLUMN dc3_mcp_connection.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_mcp_connection.connection_name IS 'MCP connection name';
+COMMENT
+ON COLUMN dc3_mcp_connection.client_id IS 'OAuth client ID';
+COMMENT
+ON COLUMN dc3_mcp_connection.principal_id IS 'Principal ID';
+COMMENT
+ON COLUMN dc3_mcp_connection.principal_type IS 'Principal type';
+COMMENT
+ON COLUMN dc3_mcp_connection.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_mcp_connection.grant_type IS 'OAuth grant type';
+COMMENT
+ON COLUMN dc3_mcp_connection.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_mcp_connection.expire_time IS 'Expiration time';
+COMMENT
+ON COLUMN dc3_mcp_connection.revoke_time IS 'Revoke time';
+COMMENT
+ON COLUMN dc3_mcp_connection.last_used_time IS 'Last used time';
+COMMENT
+ON COLUMN dc3_mcp_connection.connection_ext IS 'Connection extension information';
+COMMENT
+ON COLUMN dc3_mcp_connection.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_mcp_connection.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_mcp_connection.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_mcp_connection.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_mcp_connection.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_mcp_connection.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_mcp_connection.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_mcp_connection.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_mcp_tool_catalog
@@ -1139,33 +1484,60 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_mcp_tool_catalog IS 'MCP tool catalog table';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.tool_id IS 'MCP tool ID';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.tool_name IS 'MCP tool name';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.tool_title IS 'MCP tool title';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.tool_category IS 'MCP tool category';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.service_name IS 'Service name';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.api_code IS 'API resource code';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.permission_code IS 'Permission resource code';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.http_method IS 'HTTP method';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.api_path IS 'API path';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.schema_hash IS 'Tool schema hash';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.risk_level IS 'Risk level, LOW: low, MEDIUM: medium, HIGH: high';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.read_only_hint IS 'Read-only hint, 0: false, 1: true';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.destructive_hint IS 'Destructive hint, 0: false, 1: true';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.idempotent_hint IS 'Idempotent hint, 0: false, 1: true';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.open_world_hint IS 'Open-world hint, 0: false, 1: true';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.tool_ext IS 'Tool extension information';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.remark IS 'Description';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_mcp_tool_catalog.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_mcp_tool_catalog IS 'MCP tool catalog table';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.tool_id IS 'MCP tool ID';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.tool_name IS 'MCP tool name';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.tool_title IS 'MCP tool title';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.tool_category IS 'MCP tool category';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.service_name IS 'Service name';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.api_code IS 'API resource code';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.permission_code IS 'Permission resource code';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.http_method IS 'HTTP method';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.api_path IS 'API path';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.schema_hash IS 'Tool schema hash';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.risk_level IS 'Risk level, LOW: low, MEDIUM: medium, HIGH: high';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.read_only_hint IS 'Read-only hint, 0: false, 1: true';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.destructive_hint IS 'Destructive hint, 0: false, 1: true';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.idempotent_hint IS 'Idempotent hint, 0: false, 1: true';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.open_world_hint IS 'Open-world hint, 0: false, 1: true';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.tool_ext IS 'Tool extension information';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_mcp_tool_catalog.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_mcp_connection_tool
@@ -1199,19 +1571,32 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_mcp_connection_tool IS 'MCP connection tool whitelist table';
-COMMENT ON COLUMN dc3_mcp_connection_tool.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_mcp_connection_tool.connection_id IS 'MCP connection ID';
-COMMENT ON COLUMN dc3_mcp_connection_tool.tool_id IS 'MCP tool ID';
-COMMENT ON COLUMN dc3_mcp_connection_tool.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_mcp_connection_tool.remark IS 'Description';
-COMMENT ON COLUMN dc3_mcp_connection_tool.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_mcp_connection_tool.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_mcp_connection_tool.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_mcp_connection_tool.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_mcp_connection_tool.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_mcp_connection_tool.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_mcp_connection_tool.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_mcp_connection_tool IS 'MCP connection tool whitelist table';
+COMMENT
+ON COLUMN dc3_mcp_connection_tool.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_mcp_connection_tool.connection_id IS 'MCP connection ID';
+COMMENT
+ON COLUMN dc3_mcp_connection_tool.tool_id IS 'MCP tool ID';
+COMMENT
+ON COLUMN dc3_mcp_connection_tool.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_mcp_connection_tool.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_mcp_connection_tool.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_mcp_connection_tool.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_mcp_connection_tool.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_mcp_connection_tool.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_mcp_connection_tool.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_mcp_connection_tool.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_mcp_connection_tool.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_mcp_audit_log
@@ -1255,30 +1640,54 @@ CREATE INDEX idx_mcp_audit_log_connection
 CREATE INDEX idx_mcp_audit_log_tool
     ON dc3_mcp_audit_log (tool_id, create_time) WHERE deleted = 0;
 
-COMMENT ON TABLE dc3_mcp_audit_log IS 'MCP tool call audit log table';
-COMMENT ON COLUMN dc3_mcp_audit_log.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_mcp_audit_log.trace_id IS 'Trace ID';
-COMMENT ON COLUMN dc3_mcp_audit_log.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_mcp_audit_log.principal_id IS 'Principal ID';
-COMMENT ON COLUMN dc3_mcp_audit_log.principal_type IS 'Principal type';
-COMMENT ON COLUMN dc3_mcp_audit_log.client_id IS 'OAuth client ID';
-COMMENT ON COLUMN dc3_mcp_audit_log.connection_id IS 'MCP connection ID';
-COMMENT ON COLUMN dc3_mcp_audit_log.tool_id IS 'MCP tool ID';
-COMMENT ON COLUMN dc3_mcp_audit_log.tool_name IS 'MCP tool name';
-COMMENT ON COLUMN dc3_mcp_audit_log.permission_code IS 'Permission resource code';
-COMMENT ON COLUMN dc3_mcp_audit_log.risk_level IS 'Risk level';
-COMMENT ON COLUMN dc3_mcp_audit_log.confirm_id IS 'Confirmation ID';
-COMMENT ON COLUMN dc3_mcp_audit_log.idempotency_key IS 'Idempotency key';
-COMMENT ON COLUMN dc3_mcp_audit_log.argument_digest IS 'Argument digest';
-COMMENT ON COLUMN dc3_mcp_audit_log.status IS 'Tool call status';
-COMMENT ON COLUMN dc3_mcp_audit_log.error_code IS 'Error code';
-COMMENT ON COLUMN dc3_mcp_audit_log.duration_ms IS 'Duration in milliseconds';
-COMMENT ON COLUMN dc3_mcp_audit_log.client_name IS 'MCP client name';
-COMMENT ON COLUMN dc3_mcp_audit_log.client_version IS 'MCP client version';
-COMMENT ON COLUMN dc3_mcp_audit_log.remote_ip IS 'Remote IP address';
-COMMENT ON COLUMN dc3_mcp_audit_log.audit_ext IS 'Audit extension information';
-COMMENT ON COLUMN dc3_mcp_audit_log.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_mcp_audit_log.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_mcp_audit_log IS 'MCP tool call audit log table';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.trace_id IS 'Trace ID';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.principal_id IS 'Principal ID';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.principal_type IS 'Principal type';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.client_id IS 'OAuth client ID';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.connection_id IS 'MCP connection ID';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.tool_id IS 'MCP tool ID';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.tool_name IS 'MCP tool name';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.permission_code IS 'Permission resource code';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.risk_level IS 'Risk level';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.confirm_id IS 'Confirmation ID';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.idempotency_key IS 'Idempotency key';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.argument_digest IS 'Argument digest';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.status IS 'Tool call status';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.error_code IS 'Error code';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.duration_ms IS 'Duration in milliseconds';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.client_name IS 'MCP client name';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.client_version IS 'MCP client version';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.remote_ip IS 'Remote IP address';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.audit_ext IS 'Audit extension information';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_mcp_audit_log.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_mcp_tool_confirmation
@@ -1311,21 +1720,36 @@ CREATE INDEX idx_mcp_tool_confirmation_idempotency_key
 CREATE INDEX idx_mcp_tool_confirmation_principal
     ON dc3_mcp_tool_confirmation (tenant_id, principal_id, create_time) WHERE deleted = 0;
 
-COMMENT ON TABLE dc3_mcp_tool_confirmation IS 'MCP high-risk tool call confirmation ticket table';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.confirm_id IS 'Confirmation ticket ID';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.principal_id IS 'Principal ID';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.connection_id IS 'MCP connection ID';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.tool_id IS 'MCP tool ID';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.argument_digest IS 'Argument digest bound to the ticket';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.idempotency_key IS 'Idempotency key';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.risk_level IS 'Risk level';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.status IS 'Ticket status, PENDING/CONSUMED';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.expire_time IS 'Expiration time';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.consumed_time IS 'Consumed time';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_mcp_tool_confirmation.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_mcp_tool_confirmation IS 'MCP high-risk tool call confirmation ticket table';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.confirm_id IS 'Confirmation ticket ID';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.principal_id IS 'Principal ID';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.connection_id IS 'MCP connection ID';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.tool_id IS 'MCP tool ID';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.argument_digest IS 'Argument digest bound to the ticket';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.idempotency_key IS 'Idempotency key';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.risk_level IS 'Risk level';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.status IS 'Ticket status, PENDING/CONSUMED';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.expire_time IS 'Expiration time';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.consumed_time IS 'Consumed time';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_mcp_tool_confirmation.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_menu
@@ -1363,24 +1787,42 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT ON TABLE dc3_menu IS 'Menu table';
-COMMENT ON COLUMN dc3_menu.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_menu.parent_menu_id IS 'Parent menu ID';
-COMMENT ON COLUMN dc3_menu.menu_type_flag IS 'Menu type flag';
-COMMENT ON COLUMN dc3_menu.menu_name IS 'Menu name';
-COMMENT ON COLUMN dc3_menu.menu_code IS 'Menu code';
-COMMENT ON COLUMN dc3_menu.menu_level IS 'Menu level';
-COMMENT ON COLUMN dc3_menu.menu_index IS 'Menu order';
-COMMENT ON COLUMN dc3_menu.menu_ext IS 'Menu extension information';
-COMMENT ON COLUMN dc3_menu.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT ON COLUMN dc3_menu.remark IS 'Description';
-COMMENT ON COLUMN dc3_menu.creator_id IS 'Creator ID';
-COMMENT ON COLUMN dc3_menu.creator_name IS 'Creator name';
-COMMENT ON COLUMN dc3_menu.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_menu.operator_id IS 'Operator ID';
-COMMENT ON COLUMN dc3_menu.operator_name IS 'Operator name';
-COMMENT ON COLUMN dc3_menu.operate_time IS 'Operation time';
-COMMENT ON COLUMN dc3_menu.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_menu IS 'Menu table';
+COMMENT
+ON COLUMN dc3_menu.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_menu.parent_menu_id IS 'Parent menu ID';
+COMMENT
+ON COLUMN dc3_menu.menu_type_flag IS 'Menu type flag';
+COMMENT
+ON COLUMN dc3_menu.menu_name IS 'Menu name';
+COMMENT
+ON COLUMN dc3_menu.menu_code IS 'Menu code';
+COMMENT
+ON COLUMN dc3_menu.menu_level IS 'Menu level';
+COMMENT
+ON COLUMN dc3_menu.menu_index IS 'Menu order';
+COMMENT
+ON COLUMN dc3_menu.menu_ext IS 'Menu extension information';
+COMMENT
+ON COLUMN dc3_menu.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT
+ON COLUMN dc3_menu.remark IS 'Description';
+COMMENT
+ON COLUMN dc3_menu.creator_id IS 'Creator ID';
+COMMENT
+ON COLUMN dc3_menu.creator_name IS 'Creator name';
+COMMENT
+ON COLUMN dc3_menu.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_menu.operator_id IS 'Operator ID';
+COMMENT
+ON COLUMN dc3_menu.operator_name IS 'Operator name';
+COMMENT
+ON COLUMN dc3_menu.operate_time IS 'Operation time';
+COMMENT
+ON COLUMN dc3_menu.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Records of dc3_tenant
@@ -1736,19 +2178,19 @@ VALUES (1, 1, 20000, 'Default administrator wildcard permission binding', 1, 'dc
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS dc3_identity_audit_log
 (
-    id             BIGINT PRIMARY KEY NOT NULL,                  -- Primary key ID
-    tenant_id      BIGINT   DEFAULT 0 NOT NULL,                  -- Tenant ID
-    principal_id   BIGINT   DEFAULT 0 NOT NULL,                  -- Principal ID
-    principal_type TEXT     DEFAULT 'USER'::TEXT NOT NULL,       -- Principal type
-    action         TEXT     DEFAULT ''::TEXT     NOT NULL,       -- Audited action
-    resource_type  TEXT     DEFAULT ''::TEXT     NOT NULL,       -- Audited resource type
-    resource_id    BIGINT   DEFAULT 0 NOT NULL,                  -- Audited resource ID
-    resource_name  TEXT     DEFAULT ''::TEXT     NOT NULL,       -- Audited resource name
-    status         TEXT     DEFAULT ''::TEXT     NOT NULL,       -- Result status
-    error_code     TEXT     DEFAULT ''::TEXT     NOT NULL,       -- Stable error code
-    detail_ext     JSON     DEFAULT '{}'::JSON   NOT NULL,       -- Structured audit details
-    create_time    TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
-    deleted        SMALLINT DEFAULT 0 NOT NULL,                  -- Logical delete flag, 0: not deleted, 1: deleted
+    id             BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
+    tenant_id      BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
+    principal_id   BIGINT   DEFAULT 0 NOT NULL,                 -- Principal ID
+    principal_type TEXT     DEFAULT 'USER'::TEXT NOT NULL,      -- Principal type
+    action         TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Audited action
+    resource_type  TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Audited resource type
+    resource_id    BIGINT   DEFAULT 0 NOT NULL,                 -- Audited resource ID
+    resource_name  TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Audited resource name
+    status         TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Result status
+    error_code     TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Stable error code
+    detail_ext     JSON     DEFAULT '{}'::JSON   NOT NULL,      -- Structured audit details
+    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    deleted        SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_identity_audit_deleted CHECK (deleted IN (0, 1))
 );
 
@@ -1759,18 +2201,32 @@ CREATE INDEX IF NOT EXISTS idx_identity_audit_principal
 CREATE INDEX IF NOT EXISTS idx_identity_audit_resource
     ON dc3_identity_audit_log (resource_type, resource_id, create_time) WHERE deleted = 0;
 
-COMMENT ON TABLE dc3_identity_audit_log IS 'Identity and access management audit log';
-COMMENT ON COLUMN dc3_identity_audit_log.id IS 'Primary key ID';
-COMMENT ON COLUMN dc3_identity_audit_log.tenant_id IS 'Tenant ID';
-COMMENT ON COLUMN dc3_identity_audit_log.principal_id IS 'Principal ID';
-COMMENT ON COLUMN dc3_identity_audit_log.principal_type IS 'Principal type, for example USER, SERVICE_ACCOUNT, or SYSTEM';
-COMMENT ON COLUMN dc3_identity_audit_log.action IS 'Audited action, for example LOGIN, CREATE, UPDATE, GRANT, or REVOKE';
-COMMENT ON COLUMN dc3_identity_audit_log.resource_type IS 'Audited resource type';
-COMMENT ON COLUMN dc3_identity_audit_log.resource_id IS 'Audited resource ID';
-COMMENT ON COLUMN dc3_identity_audit_log.resource_name IS 'Audited resource name';
-COMMENT ON COLUMN dc3_identity_audit_log.status IS 'Result status, SUCCESS or FAILURE';
-COMMENT ON COLUMN dc3_identity_audit_log.error_code IS 'Stable error code when the action fails';
-COMMENT ON COLUMN dc3_identity_audit_log.detail_ext IS 'Structured audit details without credentials or secrets';
-COMMENT ON COLUMN dc3_identity_audit_log.create_time IS 'Creation time';
-COMMENT ON COLUMN dc3_identity_audit_log.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT
+ON TABLE dc3_identity_audit_log IS 'Identity and access management audit log';
+COMMENT
+ON COLUMN dc3_identity_audit_log.id IS 'Primary key ID';
+COMMENT
+ON COLUMN dc3_identity_audit_log.tenant_id IS 'Tenant ID';
+COMMENT
+ON COLUMN dc3_identity_audit_log.principal_id IS 'Principal ID';
+COMMENT
+ON COLUMN dc3_identity_audit_log.principal_type IS 'Principal type, for example USER, SERVICE_ACCOUNT, or SYSTEM';
+COMMENT
+ON COLUMN dc3_identity_audit_log.action IS 'Audited action, for example LOGIN, CREATE, UPDATE, GRANT, or REVOKE';
+COMMENT
+ON COLUMN dc3_identity_audit_log.resource_type IS 'Audited resource type';
+COMMENT
+ON COLUMN dc3_identity_audit_log.resource_id IS 'Audited resource ID';
+COMMENT
+ON COLUMN dc3_identity_audit_log.resource_name IS 'Audited resource name';
+COMMENT
+ON COLUMN dc3_identity_audit_log.status IS 'Result status, SUCCESS or FAILURE';
+COMMENT
+ON COLUMN dc3_identity_audit_log.error_code IS 'Stable error code when the action fails';
+COMMENT
+ON COLUMN dc3_identity_audit_log.detail_ext IS 'Structured audit details without credentials or secrets';
+COMMENT
+ON COLUMN dc3_identity_audit_log.create_time IS 'Creation time';
+COMMENT
+ON COLUMN dc3_identity_audit_log.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 

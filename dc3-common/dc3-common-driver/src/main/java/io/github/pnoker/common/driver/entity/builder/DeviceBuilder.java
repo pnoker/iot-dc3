@@ -68,7 +68,7 @@ public interface DeviceBuilder {
      * After process.
      *
      * @param entityGrpc entity grpc
-     * @param entityBO business object
+     * @param entityBO   business object
      */
     @AfterMapping
     default void afterProcess(GrpcDeviceDTO entityGrpc, @MappingTarget DeviceBO entityBO) {

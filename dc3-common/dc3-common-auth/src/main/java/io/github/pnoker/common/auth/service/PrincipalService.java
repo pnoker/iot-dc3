@@ -60,9 +60,9 @@ public interface PrincipalService {
     /**
      * Update enable flag.
      *
-     * @param id id
-     * @param target target
-     * @param operatorId operator identifier
+     * @param id           id
+     * @param target       target
+     * @param operatorId   operator identifier
      * @param operatorName operator name
      */
     void setEnableFlag(Long id, EnableFlagEnum target, Long operatorId, String operatorName);

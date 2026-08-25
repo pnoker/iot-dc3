@@ -164,7 +164,7 @@ const localizedName = (kind: MockEntityKind, id: string, fallback: string): stri
   return String(localized[`${kind}Name`] ?? fallback);
 };
 
-export const localizeAlertRows = <T extends {message?: string}>(rows: T[]): T[] => {
+export const localizeAlertRows = <T extends { message?: string }>(rows: T[]): T[] => {
   if (currentMockLocale() === 'zh') return rows.map((row) => ({...row}));
   return rows.map((row) => ({
     ...row,

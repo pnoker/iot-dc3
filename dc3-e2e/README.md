@@ -14,16 +14,16 @@ storage, RabbitMQ delivery, and TimescaleDB hypertables.
 
 ## Test Suites
 
-| IT                      | Verifies                                         |
-|-------------------------|--------------------------------------------------|
-| `HarnessSmokeIT`        | The E2E harness itself comes up                  |
-| `RestAssuredHarnessIT`  | REST Assured wiring against the gateway          |
-| `CommandCallE2eIT`      | Command call end-to-end                          |
-| `EventReportE2eIT`      | Event report end-to-end                          |
-| `RabbitDeliveryIT`      | RabbitMQ message delivery                        |
-| `PostgresHypertableIT`  | TimescaleDB hypertable behavior                  |
+| IT                       | Verifies                                         |
+|--------------------------|--------------------------------------------------|
+| `HarnessSmokeIT`         | The E2E harness itself comes up                  |
+| `RestAssuredHarnessIT`   | REST Assured wiring against the gateway          |
+| `CommandCallE2eIT`       | Command call end-to-end                          |
+| `EventReportE2eIT`       | Event report end-to-end                          |
+| `RabbitDeliveryIT`       | RabbitMQ message delivery                        |
+| `PostgresHypertableIT`   | TimescaleDB hypertable behavior                  |
 | `MqttVendorNeutralityIT` | Broker-neutral MQTT delivery across vendors      |
-| `E2eEnvironmentGuardIT` | Guards that the target environment is configured |
+| `E2eEnvironmentGuardIT`  | Guards that the target environment is configured |
 
 The harness (`E2eStack`, `BaseE2eIT`) lives under `src/test/java/io/github/pnoker/e2e/harness`.
 

@@ -60,10 +60,14 @@ public class RegisterBO implements Serializable {
      */
     private String client;
 
-    /** Runtime node identity. */
+    /**
+     * Runtime node identity.
+     */
     private String node;
 
-    /** Requested runtime lease duration in seconds. */
+    /**
+     * Requested runtime lease duration in seconds.
+     */
     private Integer leaseSeconds;
 
     /**

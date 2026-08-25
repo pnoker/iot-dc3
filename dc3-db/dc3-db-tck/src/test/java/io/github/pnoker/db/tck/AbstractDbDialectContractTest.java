@@ -54,17 +54,23 @@ abstract class AbstractDbDialectContractTest {
 
     private static long idSeq = System.currentTimeMillis();
 
-    /** JDBC url of the engine under test for the given database (seed loaded). */
+    /**
+     * JDBC url of the engine under test for the given database (seed loaded).
+     */
     protected abstract String jdbcUrl(String database);
 
     protected abstract String username();
 
     protected abstract String password();
 
-    /** MyBatis databaseId for the engine under test: "postgres" or "mysql". */
+    /**
+     * MyBatis databaseId for the engine under test: "postgres" or "mysql".
+     */
     protected abstract String databaseId();
 
-    /** JDBC driver class for the engine under test. */
+    /**
+     * JDBC driver class for the engine under test.
+     */
     protected abstract String driverClass();
 
     /**
@@ -106,7 +112,9 @@ abstract class AbstractDbDialectContractTest {
         });
     }
 
-    /** Engine-specific type handlers (e.g. PostgreSQL timestamptz bridging). */
+    /**
+     * Engine-specific type handlers (e.g. PostgreSQL timestamptz bridging).
+     */
     protected void registerDialectHandlers(org.apache.ibatis.session.Configuration configuration) {
     }
 
@@ -118,7 +126,9 @@ abstract class AbstractDbDialectContractTest {
         return ++idSeq;
     }
 
-    /** The platform time convention: DATETIME(6) stored and compared in UTC. */
+    /**
+     * The platform time convention: DATETIME(6) stored and compared in UTC.
+     */
     private static LocalDateTime nowUtc() {
         return LocalDateTime.now(java.time.ZoneOffset.UTC);
     }
@@ -192,7 +202,7 @@ abstract class AbstractDbDialectContractTest {
             var locked = mapper.selectExpiredForClaim((byte) 1, (byte) 2, (byte) 3, (byte) 0, 10);
             assertThat(locked).anyMatch(row -> row.getEntityId().equals(entity));
             mapper.markClaimedOffline(locked.stream().map(
-                    io.github.pnoker.common.data.entity.model.EntityStateDO::getId).toList(),
+                            io.github.pnoker.common.data.entity.model.EntityStateDO::getId).toList(),
                     (byte) 0, 120);
             var flipped = mapper.selectByUniqueKey(tenant, (byte) 1, entity);
             assertThat(flipped.getStateFlag()).isEqualTo((byte) 0);

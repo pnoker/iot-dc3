@@ -42,7 +42,9 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "dc3.thread")
 public class ThreadProperties {
 
-    /** Creates the thread properties with defaults. */
+    /**
+     * Creates the thread properties with defaults.
+     */
     public ThreadProperties() {
     }
 

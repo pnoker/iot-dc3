@@ -40,7 +40,9 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveThreadProfileConfig implements EnvironmentPostProcessor {
 
-    /** Creates the environment post processor. */
+    /**
+     * Creates the environment post processor.
+     */
     public ActiveThreadProfileConfig() {
     }
 

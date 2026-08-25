@@ -74,9 +74,9 @@ public class WebhookNotifyChannelAdapter implements NotifyChannelAdapter {
     /**
      * Post json.
      *
-     * @param target target
+     * @param target     target
      * @param credential credential
-     * @param body body
+     * @param body       body
      * @return post json result
      */
     protected NotifySendResult postJson(String target, NotifyCredential credential, Map<String, Object> body) {

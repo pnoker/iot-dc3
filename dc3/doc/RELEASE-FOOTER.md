@@ -14,8 +14,8 @@ make up-db-cn
 make up STACK=app REGISTRY=cn
 ```
 
-Pin this release by tag, e.g. `pnoker/dc3-gateway:${SERVICE_VERSION}` - see the full multi-arch image table
-and the standard usage guide at **<https://docs.dc3.site/en/guide/usage>**.
+Pin this release by tag, e.g. `pnoker/dc3-gateway:${SERVICE_VERSION}` - see the full multi-arch image table and the
+standard usage guide at **<https://docs.dc3.site/en/guide/usage>**.
 
 Scaling out (compose scale / Docker Swarm / Kubernetes / Helm) is covered in the
 **[Deployment Guide](https://docs.dc3.site/en/guide/deployment)**; environment variables in

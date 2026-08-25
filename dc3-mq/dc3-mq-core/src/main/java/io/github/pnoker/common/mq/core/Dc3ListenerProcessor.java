@@ -98,7 +98,7 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
         return listenerMethodCache.computeIfAbsent(targetClass, clazz -> {
             List<Method> methods = new ArrayList<>();
             for (Class<?> current = clazz; Objects.nonNull(current) && current != Object.class;
-                    current = current.getSuperclass()) {
+                 current = current.getSuperclass()) {
                 for (Method method : current.getDeclaredMethods()) {
                     if (method.isAnnotationPresent(Dc3Listener.class) && !Modifier.isStatic(method.getModifiers())) {
                         method.setAccessible(true);

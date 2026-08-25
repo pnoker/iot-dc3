@@ -41,7 +41,9 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(prefix = "dc3.tsdb", name = "type", havingValue = "tdengine")
 public class TdengineTsdbAutoConfiguration {
 
-    /** The TDengine adapter over the REST JDBC driver. */
+    /**
+     * The TDengine adapter over the REST JDBC driver.
+     */
     @Bean(destroyMethod = "close")
     @ConditionalOnMissingBean(TsdbStore.class)
     public TsdbStore tsdbStore(TdengineTsdbProperties properties) {

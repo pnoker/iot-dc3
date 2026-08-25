@@ -60,7 +60,7 @@ public final class IntegerOptional {
     /**
      * Invoke exactly one branch according to whether the wrapped integer is positive.
      *
-     * @param action action that consumes a positive integer
+     * @param action      action that consumes a positive integer
      * @param emptyAction action to run for a {@code null} or non-positive integer
      */
     public void ifPresentOrElse(IntConsumer action, Runnable emptyAction) {

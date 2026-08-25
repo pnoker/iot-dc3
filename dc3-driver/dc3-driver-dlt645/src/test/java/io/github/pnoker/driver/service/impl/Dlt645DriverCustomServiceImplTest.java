@@ -79,7 +79,7 @@ class Dlt645DriverCustomServiceImplTest {
     @Test
     void buildReadRequestHasValidStructureAndChecksum() {
         byte[] address = Dlt645Frame.encodeAddress("000000000001");
-        byte[] frame = Dlt645Frame.buildReadRequest(address, new int[]{ 0x00, 0x01, 0x00, 0x00 });
+        byte[] frame = Dlt645Frame.buildReadRequest(address, new int[]{0x00, 0x01, 0x00, 0x00});
         assertThat(frame[0] & 0xFF).isEqualTo(0x68);
         assertThat(frame[frame.length - 1] & 0xFF).isEqualTo(0x16);
         assertThat(Dlt645Frame.verifyChecksum(frame)).isTrue();

@@ -77,9 +77,9 @@ public final class EnvelopeCodec {
      * header is informational; the subscription's declared type wins, which also keeps
      * pre-migration messages (carrying only the legacy type header) consumable.
      *
-     * @param delivery     the raw delivery
-     * @param payloadType  the declared payload type
-     * @param <T>          payload type
+     * @param delivery    the raw delivery
+     * @param payloadType the declared payload type
+     * @param <T>         payload type
      * @return the deserialized payload
      */
     public static <T> T deserialize(WireMqDelivery delivery, Class<T> payloadType) {

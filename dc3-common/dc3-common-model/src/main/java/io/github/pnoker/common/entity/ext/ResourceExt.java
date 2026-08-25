@@ -46,7 +46,9 @@ public class ResourceExt extends BaseExt {
     @Schema(description = "Extended content, distinguished by the type and version fields inherited from the base extension")
     private Content content;
 
-    /** Resource extension slot (permission metadata beyond the typed resource fields). */
+    /**
+     * Resource extension slot (permission metadata beyond the typed resource fields).
+     */
     @Getter
     @Setter
     @NoArgsConstructor

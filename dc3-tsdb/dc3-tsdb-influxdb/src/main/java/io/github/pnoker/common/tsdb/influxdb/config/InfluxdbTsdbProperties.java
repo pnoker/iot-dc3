@@ -33,12 +33,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "dc3.tsdb.influxdb")
 public class InfluxdbTsdbProperties {
 
-    /** Base url of the InfluxDB 3 node, e.g. {@code http://dc3-influxdb:8181}. */
+    /**
+     * Base url of the InfluxDB 3 node, e.g. {@code http://dc3-influxdb:8181}.
+     */
     private String url = "http://localhost:8181";
 
-    /** Bearer token with write+query permissions. */
+    /**
+     * Bearer token with write+query permissions.
+     */
     private String token = "";
 
-    /** Database (auto-created on first write). */
+    /**
+     * Database (auto-created on first write).
+     */
     private String database = "dc3";
 }

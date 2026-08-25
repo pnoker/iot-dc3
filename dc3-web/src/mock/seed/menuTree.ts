@@ -82,7 +82,11 @@ export const menuTree: MenuNode[] = [
   mk('settings', {
     menuName: 'Settings', titles: {zh: '设置', en: 'Settings'}, icon: 'Setting', menuIndex: 6, children: [
       mk('settingsIdentity', {
-        menuName: 'Accounts & Identity', titles: {zh: '账户与身份', en: 'Accounts & Identity'}, icon: 'User', menuIndex: 1, children: [
+        menuName: 'Accounts & Identity',
+        titles: {zh: '账户与身份', en: 'Accounts & Identity'},
+        icon: 'User',
+        menuIndex: 1,
+        children: [
           mk('settingsUser', {
             menuName: 'User',
             titles: {zh: '用户管理', en: 'User'},
@@ -121,7 +125,11 @@ export const menuTree: MenuNode[] = [
         ]
       }),
       mk('settingsAccess', {
-        menuName: 'Roles & Permissions', titles: {zh: '角色与权限', en: 'Roles & Permissions'}, icon: 'Stamp', menuIndex: 2, children: [
+        menuName: 'Roles & Permissions',
+        titles: {zh: '角色与权限', en: 'Roles & Permissions'},
+        icon: 'Stamp',
+        menuIndex: 2,
+        children: [
           mk('settingsRole', {
             menuName: 'Role',
             titles: {zh: '角色管理', en: 'Role'},
@@ -196,7 +204,11 @@ export const menuTree: MenuNode[] = [
         ]
       }),
       mk('settingsIntegration', {
-        menuName: 'MCP Integration', titles: {zh: 'MCP 集成', en: 'MCP Integration'}, icon: 'Share', menuIndex: 5, children: [
+        menuName: 'MCP Integration',
+        titles: {zh: 'MCP 集成', en: 'MCP Integration'},
+        icon: 'Share',
+        menuIndex: 5,
+        children: [
           mk('settingsMcpServer', {
             menuName: 'MCP Service',
             titles: {zh: 'MCP 服务', en: 'MCP Service'},
@@ -228,7 +240,11 @@ export const menuTree: MenuNode[] = [
         ]
       }),
       mk('settingsAlarm', {
-        menuName: 'Alarm Configuration', titles: {zh: '告警配置', en: 'Alarm Configuration'}, icon: 'AlarmClock', menuIndex: 6, children: [
+        menuName: 'Alarm Configuration',
+        titles: {zh: '告警配置', en: 'Alarm Configuration'},
+        icon: 'AlarmClock',
+        menuIndex: 6,
+        children: [
           mk('settingsAlarmRule', {
             menuName: 'Alarm Rules',
             titles: {zh: '告警规则', en: 'Alarm Rules'},

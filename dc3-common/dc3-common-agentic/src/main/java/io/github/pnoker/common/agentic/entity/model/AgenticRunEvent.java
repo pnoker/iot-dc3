@@ -45,8 +45,8 @@ public record AgenticRunEvent(String type, String name, String title, String det
      * Tool start.
      *
      * @param toolName tool name
-     * @param domain domain
-     * @param title title
+     * @param domain   domain
+     * @param title    title
      * @return tool start result
      */
     public static AgenticRunEvent toolStart(String toolName, String domain, String title) {
@@ -58,9 +58,9 @@ public record AgenticRunEvent(String type, String name, String title, String det
      * Tool result.
      *
      * @param toolName tool name
-     * @param success success
-     * @param code code
-     * @param message message
+     * @param success  success
+     * @param code     code
+     * @param message  message
      * @return tool result result
      */
     public static AgenticRunEvent toolResult(String toolName, boolean success, String code, String message) {
@@ -79,7 +79,7 @@ public record AgenticRunEvent(String type, String name, String title, String det
      * Tool error.
      *
      * @param toolName tool name
-     * @param message message
+     * @param message  message
      * @return tool error result
      */
     public static AgenticRunEvent toolError(String toolName, String message) {

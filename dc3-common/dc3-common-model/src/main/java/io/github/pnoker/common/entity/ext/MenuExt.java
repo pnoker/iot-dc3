@@ -48,7 +48,9 @@ public class MenuExt extends BaseExt {
     @Schema(description = "Extended content, distinguished by Type and Version")
     private Content content;
 
-    /** Menu display metadata: localized titles (authoritative), icon and route URL — drives the settings sidebar rendering. */
+    /**
+     * Menu display metadata: localized titles (authoritative), icon and route URL — drives the settings sidebar rendering.
+     */
     @Schema(description = "Extended content of the menu, carrying localized titles, icon, link and description")
     @Getter
     @Setter

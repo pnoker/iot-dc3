@@ -50,7 +50,7 @@ public class CommandTool {
     /**
      * Return command by identifier.
      *
-     * @param commandId command identifier
+     * @param commandId   command identifier
      * @param toolContext tool context
      * @return lookup command by identifier result
      */
@@ -71,7 +71,7 @@ public class CommandTool {
     /**
      * Return commands by identifiers.
      *
-     * @param commandIds command identifiers
+     * @param commandIds  command identifiers
      * @param toolContext tool context
      * @return lookup commands by identifiers result
      */
@@ -97,9 +97,9 @@ public class CommandTool {
      * Return the matching commands.
      *
      * @param commandName command name
-     * @param profileId profile identifier
-     * @param page page
-     * @param size size
+     * @param profileId   profile identifier
+     * @param page        page
+     * @param size        size
      * @param toolContext tool context
      * @return search commands result
      */
@@ -131,9 +131,9 @@ public class CommandTool {
     /**
      * Return the matching commands by device identifier.
      *
-     * @param deviceId device identifier
-     * @param page page
-     * @param size size
+     * @param deviceId    device identifier
+     * @param page        page
+     * @param size        size
      * @param toolContext tool context
      * @return list commands by device identifier result
      */
@@ -163,9 +163,9 @@ public class CommandTool {
     /**
      * Return the matching commands by profile identifier.
      *
-     * @param profileId profile identifier
-     * @param page page
-     * @param size size
+     * @param profileId   profile identifier
+     * @param page        page
+     * @param size        size
      * @param toolContext tool context
      * @return list commands by profile identifier result
      */

@@ -28,7 +28,9 @@ package io.github.pnoker.common.constant.common;
  */
 public class QueryWrapperConstant {
 
-    /** limit one constant. */
+    /**
+     * limit one constant.
+     */
     public static final String LIMIT_ONE = "LIMIT 1";
 
     private QueryWrapperConstant() {

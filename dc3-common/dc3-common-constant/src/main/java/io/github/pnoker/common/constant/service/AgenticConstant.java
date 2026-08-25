@@ -81,22 +81,34 @@ public class AgenticConstant {
      */
     public static class ToolContextKey {
 
-        /** Tool-context key carrying the authenticated tenant id. */
+        /**
+         * Tool-context key carrying the authenticated tenant id.
+         */
         public static final String TENANT_ID = "dc3.agentic.tenantId";
 
-        /** Tool-context key carrying the authenticated user id. */
+        /**
+         * Tool-context key carrying the authenticated user id.
+         */
         public static final String USER_ID = "dc3.agentic.userId";
 
-        /** Tool-context key carrying the authenticated principal header. */
+        /**
+         * Tool-context key carrying the authenticated principal header.
+         */
         public static final String USER_HEADER = "dc3.agentic.userHeader";
 
-        /** Tool-context key carrying the conversation id. */
+        /**
+         * Tool-context key carrying the conversation id.
+         */
         public static final String CONVERSATION_ID = "dc3.agentic.conversationId";
 
-        /** Tool-context key accumulating runtime events of the current run. */
+        /**
+         * Tool-context key accumulating runtime events of the current run.
+         */
         public static final String RUN_EVENTS = "dc3.agentic.runEvents";
 
-        /** Tool-context key accumulating structured visualizations of the current run. */
+        /**
+         * Tool-context key accumulating structured visualizations of the current run.
+         */
         public static final String VISUALIZATIONS = "dc3.agentic.visualizations";
 
         private ToolContextKey() {
@@ -113,34 +125,54 @@ public class AgenticConstant {
      */
     public static class Chat {
 
-        /** SSE object for a full completion response. */
+        /**
+         * SSE object for a full completion response.
+         */
         public static final String COMPLETION_OBJECT = "chat.completion";
 
-        /** SSE object for a completion stream chunk. */
+        /**
+         * SSE object for a completion stream chunk.
+         */
         public static final String COMPLETION_CHUNK_OBJECT = "chat.completion.chunk";
 
-        /** Prefix used to synthesize OpenAI-compatible response ids. */
+        /**
+         * Prefix used to synthesize OpenAI-compatible response ids.
+         */
         public static final String ID_PREFIX = "chatcmpl-";
 
-        /** Sentinel terminating an OpenAI-compatible completion stream. */
+        /**
+         * Sentinel terminating an OpenAI-compatible completion stream.
+         */
         public static final String STREAM_DONE = "[DONE]";
 
-        /** Chat role of the system message. */
+        /**
+         * Chat role of the system message.
+         */
         public static final String ROLE_SYSTEM = "system";
 
-        /** Chat role of user messages. */
+        /**
+         * Chat role of user messages.
+         */
         public static final String ROLE_USER = "user";
 
-        /** Chat role of assistant messages. */
+        /**
+         * Chat role of assistant messages.
+         */
         public static final String ROLE_ASSISTANT = "assistant";
 
-        /** Chat role of tool results. */
+        /**
+         * Chat role of tool results.
+         */
         public static final String ROLE_TOOL = "tool";
 
-        /** Finish reason for a normally completed response. */
+        /**
+         * Finish reason for a normally completed response.
+         */
         public static final String FINISH_REASON_STOP = "stop";
 
-        /** Finish reason for an errored response. */
+        /**
+         * Finish reason for an errored response.
+         */
         public static final String FINISH_REASON_ERROR = "error";
 
         private Chat() {
@@ -157,41 +189,63 @@ public class AgenticConstant {
      */
     public static class Visualization {
 
-        /** SSE object identifying structured visualizations. */
+        /**
+         * SSE object identifying structured visualizations.
+         */
         public static final String OBJECT = "agentic.visualization";
 
         private Visualization() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
 
-        /** Chart type codes the visualization channel accepts (line/area/column/bar/pie/donut/heatmap/scatter/stat). */
+        /**
+         * Chart type codes the visualization channel accepts (line/area/column/bar/pie/donut/heatmap/scatter/stat).
+         */
         public static class Type {
 
-            /** Line chart type code. */
+            /**
+             * Line chart type code.
+             */
             public static final String LINE = "line";
 
-            /** Area chart type code. */
+            /**
+             * Area chart type code.
+             */
             public static final String AREA = "area";
 
-            /** Column chart type code. */
+            /**
+             * Column chart type code.
+             */
             public static final String COLUMN = "column";
 
-            /** Bar chart type code. */
+            /**
+             * Bar chart type code.
+             */
             public static final String BAR = "bar";
 
-            /** Pie chart type code. */
+            /**
+             * Pie chart type code.
+             */
             public static final String PIE = "pie";
 
-            /** Donut chart type code. */
+            /**
+             * Donut chart type code.
+             */
             public static final String DONUT = "donut";
 
-            /** Heatmap chart type code. */
+            /**
+             * Heatmap chart type code.
+             */
             public static final String HEATMAP = "heatmap";
 
-            /** Scatter chart type code. */
+            /**
+             * Scatter chart type code.
+             */
             public static final String SCATTER = "scatter";
 
-            /** Stat card type code. */
+            /**
+             * Stat card type code.
+             */
             public static final String STAT = "stat";
 
             private Type() {
@@ -200,13 +254,19 @@ public class AgenticConstant {
 
         }
 
-        /** Axis scale kinds: linear or time. */
+        /**
+         * Axis scale kinds: linear or time.
+         */
         public static class Scale {
 
-            /** Linear axis scale kind. */
+            /**
+             * Linear axis scale kind.
+             */
             public static final String LINEAR = "linear";
 
-            /** Time axis scale kind. */
+            /**
+             * Time axis scale kind.
+             */
             public static final String TIME = "time";
 
             private Scale() {
@@ -225,7 +285,9 @@ public class AgenticConstant {
      */
     public static class Session {
 
-        /** Title assigned to sessions without a user-provided title. */
+        /**
+         * Title assigned to sessions without a user-provided title.
+         */
         public static final String DEFAULT_TITLE = "New Conversation";
 
         private Session() {
@@ -242,43 +304,69 @@ public class AgenticConstant {
      */
     public static class RunEvent {
 
-        /** SSE object identifying structured visualizations. */
+        /**
+         * SSE object identifying structured visualizations.
+         */
         public static final String OBJECT = "agentic.event";
 
-        /** Run-event type for plain lifecycle events. */
+        /**
+         * Run-event type for plain lifecycle events.
+         */
         public static final String TYPE_EVENT = "event";
 
-        /** Run-event type for tool invocations. */
+        /**
+         * Run-event type for tool invocations.
+         */
         public static final String TYPE_TOOL = "tool";
 
-        /** Run-event type for reasoning steps. */
+        /**
+         * Run-event type for reasoning steps.
+         */
         public static final String TYPE_REASONING = "reasoning";
 
-        /** Run-event type for failures. */
+        /**
+         * Run-event type for failures.
+         */
         public static final String TYPE_ERROR = "error";
 
-        /** Emitter name shared by all agentic run events. */
+        /**
+         * Emitter name shared by all agentic run events.
+         */
         public static final String NAME_AGENTIC = "agentic";
 
-        /** Run-event phase marking the start of a step. */
+        /**
+         * Run-event phase marking the start of a step.
+         */
         public static final String PHASE_START = "start";
 
-        /** Run-event phase marking the result of a step. */
+        /**
+         * Run-event phase marking the result of a step.
+         */
         public static final String PHASE_RESULT = "result";
 
-        /** Run-event phase marking a failed step. */
+        /**
+         * Run-event phase marking a failed step.
+         */
         public static final String PHASE_ERROR = "error";
 
-        /** Run-event status for in-flight steps. */
+        /**
+         * Run-event status for in-flight steps.
+         */
         public static final String STATUS_RUNNING = "running";
 
-        /** Run-event status for completed steps. */
+        /**
+         * Run-event status for completed steps.
+         */
         public static final String STATUS_SUCCESS = "success";
 
-        /** Run-event status for steps with no data. */
+        /**
+         * Run-event status for steps with no data.
+         */
         public static final String STATUS_EMPTY = "empty";
 
-        /** Run-event status for failed steps. */
+        /**
+         * Run-event status for failed steps.
+         */
         public static final String STATUS_FAILED = "failed";
 
         private RunEvent() {
@@ -295,31 +383,49 @@ public class AgenticConstant {
      */
     public static class ToolResult {
 
-        /** Tool-result field carrying structured visualizations. */
+        /**
+         * Tool-result field carrying structured visualizations.
+         */
         public static final String FIELD_VISUALIZATIONS = "visualizations";
 
-        /** Tool result code for success. */
+        /**
+         * Tool result code for success.
+         */
         public static final String CODE_OK = "OK";
 
-        /** Tool result code for empty results. */
+        /**
+         * Tool result code for empty results.
+         */
         public static final String CODE_EMPTY = "EMPTY";
 
-        /** Tool result code for invalid arguments. */
+        /**
+         * Tool result code for invalid arguments.
+         */
         public static final String CODE_INVALID_ARGUMENT = "INVALID_ARGUMENT";
 
-        /** Tool result code for missing resources. */
+        /**
+         * Tool result code for missing resources.
+         */
         public static final String CODE_NOT_FOUND = "NOT_FOUND";
 
-        /** Tool result code for unavailable capabilities. */
+        /**
+         * Tool result code for unavailable capabilities.
+         */
         public static final String CODE_UNAVAILABLE = "UNAVAILABLE";
 
-        /** Tool result code for failures. */
+        /**
+         * Tool result code for failures.
+         */
         public static final String CODE_ERROR = "ERROR";
 
-        /** Default success message for tool results. */
+        /**
+         * Default success message for tool results.
+         */
         public static final String MESSAGE_COMPLETED = "Tool completed";
 
-        /** Default failure message for tool results. */
+        /**
+         * Default failure message for tool results.
+         */
         public static final String MESSAGE_EXECUTION_FAILED = "Tool execution failed";
 
         private ToolResult() {
@@ -336,13 +442,19 @@ public class AgenticConstant {
      */
     public static class ToolLimit {
 
-        /** Maximum ids accepted per tool call. */
+        /**
+         * Maximum ids accepted per tool call.
+         */
         public static final int MAX_IDS = 50;
 
-        /** Maximum history records returned per tool call. */
+        /**
+         * Maximum history records returned per tool call.
+         */
         public static final int MAX_HISTORY_RECORDS = 200;
 
-        /** Maximum agentic loop rounds per conversation turn. */
+        /**
+         * Maximum agentic loop rounds per conversation turn.
+         */
         public static final int MAX_AGENT_LOOP_ROUNDS = 8;
 
         private ToolLimit() {
@@ -359,17 +471,25 @@ public class AgenticConstant {
      */
     public static class ToolMessage {
 
-        /** Tool message when status/health tools are unavailable in the deployment mode. */
+        /**
+         * Tool message when status/health tools are unavailable in the deployment mode.
+         */
         public static final String STATUS_HEALTH_UNAVAILABLE =
                 "Status and health tools are not available in this deployment mode.";
 
-        /** Tool message when profile tools are unavailable in the deployment mode. */
+        /**
+         * Tool message when profile tools are unavailable in the deployment mode.
+         */
         public static final String PROFILE_UNAVAILABLE = "Profile tools are not available in this deployment mode.";
 
-        /** Tool message when the system health snapshot is unavailable. */
+        /**
+         * Tool message when the system health snapshot is unavailable.
+         */
         public static final String SYSTEM_HEALTH_UNAVAILABLE = "System health snapshot is unavailable.";
 
-        /** Generic tool request failure message. */
+        /**
+         * Generic tool request failure message.
+         */
         public static final String REQUEST_FAILED = "Request failed";
 
         private ToolMessage() {

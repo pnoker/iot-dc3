@@ -40,8 +40,8 @@ issue an SNMP SET, with one SNMP session cached per device.
 | OID       | oid      | STRING |              |             |
 | SNMP Type | snmpType | STRING | OCTET_STRING |             |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

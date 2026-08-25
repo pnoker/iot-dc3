@@ -66,7 +66,9 @@ public class PointValueDO implements Serializable {
     @TableField("sequence")
     private Long sequence;
 
-    /** Manager-issued device ownership fencing token. */
+    /**
+     * Manager-issued device ownership fencing token.
+     */
     @TableField("fencing_token")
     private Long fencingToken;
 

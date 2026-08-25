@@ -29,7 +29,9 @@
 
     <artifactId>dc3-db-mysql</artifactId>
     <name>${project.artifactId}</name>
-    <description>MySQL 8 dialect adapter: driver, DATETIME(6) UTC conventions — selected by dc3.db.type=mysql; requires MySQL 8.0+ (window functions, CTEs, SKIP LOCKED)</description>
+    <description>MySQL 8 dialect adapter: driver, DATETIME(6) UTC conventions — selected by dc3.db.type=mysql; requires
+        MySQL 8.0+ (window functions, CTEs, SKIP LOCKED)
+    </description>
 
     <dependencies>
         <dependency>

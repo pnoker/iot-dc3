@@ -100,8 +100,8 @@ public class LocalCacheImpl {
     /**
      * Update key.
      *
-     * @param <T> generic type parameter
-     * @param key key
+     * @param <T>   generic type parameter
+     * @param key   key
      * @param value value
      */
     public <T> void setKey(String key, T value) {
@@ -111,11 +111,11 @@ public class LocalCacheImpl {
     /**
      * Update key.
      *
-     * @param <T> generic type parameter
-     * @param key key
+     * @param <T>   generic type parameter
+     * @param key   key
      * @param value value
-     * @param time time
-     * @param unit unit
+     * @param time  time
+     * @param unit  unit
      */
     public <T> void setKey(String key, T value, long time, TimeUnit unit) {
         long ttl = time > 0 ? unit.toNanos(time) : Long.MAX_VALUE;
@@ -125,7 +125,7 @@ public class LocalCacheImpl {
     /**
      * Update key.
      *
-     * @param <T> generic type parameter
+     * @param <T>       generic type parameter
      * @param valuesMap values map
      */
     public <T> void setKey(Map<String, T> valuesMap) {
@@ -151,7 +151,7 @@ public class LocalCacheImpl {
     /**
      * Return key.
      *
-     * @param <T> generic type parameter
+     * @param <T>  generic type parameter
      * @param keys keys
      * @return get key result
      */
@@ -176,7 +176,9 @@ public class LocalCacheImpl {
             expireListeners.add(listener);
     }
 
-    /** Callback fired (best-effort, on the eviction path) when a TTL-bound entry expires. */
+    /**
+     * Callback fired (best-effort, on the eviction path) when a TTL-bound entry expires.
+     */
     @FunctionalInterface
     public interface ExpireListener {
 
@@ -184,7 +186,7 @@ public class LocalCacheImpl {
          * React to one expired entry. Exceptions here are logged and swallowed —
          * an eviction listener must never break the cache itself.
          *
-         * @param key the expired cache key
+         * @param key       the expired cache key
          * @param lastValue the entry's value as of eviction
          */
         void onExpire(String key, Object lastValue);

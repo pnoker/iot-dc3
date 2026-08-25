@@ -75,7 +75,9 @@ public class CoverageGapVO implements Serializable {
         items.add(item);
     }
 
-    /** One point that has never reported any sample (missing coverage item). */
+    /**
+     * One point that has never reported any sample (missing coverage item).
+     */
     @Getter
     @Setter
     @ToString

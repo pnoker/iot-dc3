@@ -57,17 +57,17 @@ public interface EntityStateMapper extends BaseMapper<EntityStateDO> {
      * INSERT ... RETURNING, so the portable shape is upsert + same-tx re-select
      */
     int upsertEntityState(@Param("id") Long id,
-                                    @Param("tenantId") Long tenantId,
-                                    @Param("entityTypeFlag") Byte entityTypeFlag,
-                                    @Param("entityId") Long entityId,
-                                    @Param("parentEntityId") Long parentEntityId,
-                                    @Param("stateFlag") Byte stateFlag,
-                                    @Param("initialLastStateFlag") Byte initialLastStateFlag,
-                                    @Param("expireTime") java.time.LocalDateTime expireTime,
-                                    @Param("timeoutSeconds") int timeoutSeconds,
-                                    @Param("timeoutSourceFlag") Byte timeoutSourceFlag,
-                                    @Param("stateExtType") String stateExtType,
-                                    @Param("stateDescription") String stateDescription);
+                          @Param("tenantId") Long tenantId,
+                          @Param("entityTypeFlag") Byte entityTypeFlag,
+                          @Param("entityId") Long entityId,
+                          @Param("parentEntityId") Long parentEntityId,
+                          @Param("stateFlag") Byte stateFlag,
+                          @Param("initialLastStateFlag") Byte initialLastStateFlag,
+                          @Param("expireTime") java.time.LocalDateTime expireTime,
+                          @Param("timeoutSeconds") int timeoutSeconds,
+                          @Param("timeoutSourceFlag") Byte timeoutSourceFlag,
+                          @Param("stateExtType") String stateExtType,
+                          @Param("stateDescription") String stateDescription);
 
     /**
      * Step 1 of the expired-lease claim: lock-and-read a batch of expired
@@ -93,9 +93,9 @@ public interface EntityStateMapper extends BaseMapper<EntityStateDO> {
      * Step 2 of the claim: flip the locked rows offline with a renewed expiry.
      * Bumped per row: lease_version + 1, last_state_flag = previous flag.
      *
-     * @param ids                  locked row ids from step 1
-     * @param offlineFlag          offline state flag
-     * @param offlineRenewSeconds  renewal window for already-offline state rows
+     * @param ids                 locked row ids from step 1
+     * @param offlineFlag         offline state flag
+     * @param offlineRenewSeconds renewal window for already-offline state rows
      * @return updated row count
      */
     int markClaimedOffline(@Param("ids") List<Long> ids,

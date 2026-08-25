@@ -238,10 +238,24 @@ const localizedChart = (spec: AgenticVisualizationSpec): AgenticVisualizationSpe
     const statuses: Record<string, string> = {'在线': 'Online', '离线': 'Offline', '告警': 'Alarm'};
     dataset = dataset.map((row) => ({...row, status: statuses[String(row.status)] || row.status}));
   } else if (spec.id === 'point-values') {
-    const points: Record<string, string> = {'温度': 'Temperature', '湿度': 'Humidity', '电压': 'Voltage', '电流': 'Current', '功率': 'Power'};
+    const points: Record<string, string> = {
+      '温度': 'Temperature',
+      '湿度': 'Humidity',
+      '电压': 'Voltage',
+      '电流': 'Current',
+      '功率': 'Power'
+    };
     dataset = dataset.map((row) => ({...row, point: points[String(row.point)] || row.point}));
   } else if (spec.id === 'energy-week') {
-    const days: Record<string, string> = {'周一': 'Mon', '周二': 'Tue', '周三': 'Wed', '周四': 'Thu', '周五': 'Fri', '周六': 'Sat', '周日': 'Sun'};
+    const days: Record<string, string> = {
+      '周一': 'Mon',
+      '周二': 'Tue',
+      '周三': 'Wed',
+      '周四': 'Thu',
+      '周五': 'Fri',
+      '周六': 'Sat',
+      '周日': 'Sun'
+    };
     dataset = dataset.map((row) => ({...row, day: days[String(row.day)] || row.day}));
   } else if (spec.id === 'alarm-summary') {
     dataset = [{total: 17, P0: 1, P1: 4, P2: 12, recovered: 9}];
@@ -288,7 +302,7 @@ const mockResponse = (prompt: string, stream: boolean): Response => {
 interface MockChatRequest {
   conversationId?: string;
   model?: string;
-  messages?: Array<{role?: string; content?: string}>;
+  messages?: Array<{ role?: string; content?: string }>;
 }
 
 const persistMockTurn = (db: MockDb, request: MockChatRequest, prompt: string): void => {
@@ -301,7 +315,16 @@ const persistMockTurn = (db: MockDb, request: MockChatRequest, prompt: string): 
     ? '需要进一步下钻某个设备或时段，告诉我即可。'
     : 'Tell me if you want to drill into a specific asset or time range.';
   db.agenticMessages.push(
-    {id: `mock-user-${Date.now()}`, conversationId: request.conversationId, role: 'user', content: prompt, messageIndex: nextIndex, status: 2, streaming: false, createTime: created},
+    {
+      id: `mock-user-${Date.now()}`,
+      conversationId: request.conversationId,
+      role: 'user',
+      content: prompt,
+      messageIndex: nextIndex,
+      status: 2,
+      streaming: false,
+      createTime: created
+    },
     {
       id: `mock-assistant-${Date.now()}`,
       conversationId: request.conversationId,
@@ -336,8 +359,8 @@ export function installAgenticFetchMock(db: MockDb): void {
       let prompt = '';
       let request: MockChatRequest = {};
       try {
-        request = JSON.parse(String(init?.body ?? '{}')) as MockChatRequest & {stream?: boolean};
-        stream = (request as MockChatRequest & {stream?: boolean}).stream !== false;
+        request = JSON.parse(String(init?.body ?? '{}')) as MockChatRequest & { stream?: boolean };
+        stream = (request as MockChatRequest & { stream?: boolean }).stream !== false;
         const msgs = Array.isArray(request.messages) ? request.messages : [];
         prompt = String(msgs[msgs.length - 1]?.content ?? '');
       } catch {

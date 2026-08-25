@@ -63,7 +63,7 @@ public interface GrpcDriverBuilder {
     /**
      * After process.
      *
-     * @param entityGrpc entity grpc
+     * @param entityGrpc  entity grpc
      * @param entityQuery entity query
      */
     @AfterMapping
@@ -105,7 +105,7 @@ public interface GrpcDriverBuilder {
     /**
      * After process.
      *
-     * @param entityBO business object
+     * @param entityBO   business object
      * @param entityGrpc entity grpc
      */
     @AfterMapping
@@ -146,7 +146,7 @@ public interface GrpcDriverBuilder {
      * After process.
      *
      * @param entityGrpc entity grpc
-     * @param entityBO business object
+     * @param entityBO   business object
      */
     @AfterMapping
     default void afterProcess(GrpcDriverDTO entityGrpc, @MappingTarget DriverBO entityBO) {

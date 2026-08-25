@@ -34,19 +34,29 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum NotifyHistoryStatusEnum {
 
-    /** Pending. */
+    /**
+     * Pending.
+     */
     PENDING((byte) 0, "pending", "Pending"),
 
-    /** Success. */
+    /**
+     * Success.
+     */
     SUCCESS((byte) 1, "success", "Success"),
 
-    /** Failed. */
+    /**
+     * Failed.
+     */
     FAILED((byte) 2, "failed", "Failed"),
 
-    /** Retrying. */
+    /**
+     * Retrying.
+     */
     RETRYING((byte) 3, "retrying", "Retrying"),
 
-    /** Skipped. */
+    /**
+     * Skipped.
+     */
     SKIPPED((byte) 4, "skipped", "Skipped"),
     ;
 

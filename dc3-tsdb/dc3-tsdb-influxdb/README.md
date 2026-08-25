@@ -1,7 +1,7 @@
 # DC3 TSDB InfluxDB
 
-`dc3-tsdb-influxdb` adapts the store-neutral port to InfluxDB 3 over the documented v3 HTTP SQL and line-protocol
-APIs. Points map to tag/field columns; no InfluxDB-specific JDBC or client SDK is required.
+`dc3-tsdb-influxdb` adapts the store-neutral port to InfluxDB 3 over the documented v3 HTTP SQL and line-protocol APIs.
+Points map to tag/field columns; no InfluxDB-specific JDBC or client SDK is required.
 
 ## Activation
 
@@ -11,11 +11,11 @@ Active when `dc3.tsdb.type=influxdb`.
 
 `InfluxdbTsdbProperties` binds the `dc3.tsdb.influxdb` prefix:
 
-| Key | Default | Meaning |
-|---|---|---|
-| `dc3.tsdb.influxdb.url` | `http://localhost:8181` | InfluxDB 3 HTTP endpoint |
-| `dc3.tsdb.influxdb.token` | *(empty)* | auth token |
-| `dc3.tsdb.influxdb.database` | `dc3` | target database |
+| Key                          | Default                 | Meaning                  |
+|------------------------------|-------------------------|--------------------------|
+| `dc3.tsdb.influxdb.url`      | `http://localhost:8181` | InfluxDB 3 HTTP endpoint |
+| `dc3.tsdb.influxdb.token`    | *(empty)*               | auth token               |
+| `dc3.tsdb.influxdb.database` | `dc3`                   | target database          |
 
 ## Dependencies
 

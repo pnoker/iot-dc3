@@ -46,7 +46,9 @@ public class UserIdentityExt extends BaseExt {
     @Schema(description = "Extended content payload, distinguished by the type and version fields")
     private Content content;
 
-    /** User identity extension slot (credential/profile metadata per identity). */
+    /**
+     * User identity extension slot (credential/profile metadata per identity).
+     */
     @Getter
     @Setter
     @NoArgsConstructor

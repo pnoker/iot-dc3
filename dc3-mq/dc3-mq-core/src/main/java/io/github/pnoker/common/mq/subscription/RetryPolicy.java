@@ -21,10 +21,10 @@ package io.github.pnoker.common.mq.subscription;
  * Bounded redelivery with exponential backoff; exhaustion routes to the dead-letter
  * instead of dropping. Defaults mirror the point-value batch consumer configuration.
  *
- * @param maxAttempts           maximum delivery attempts before dead-lettering
- * @param initialBackoffMillis  first retry delay
- * @param multiplier            backoff multiplier
- * @param maxBackoffMillis      backoff ceiling
+ * @param maxAttempts          maximum delivery attempts before dead-lettering
+ * @param initialBackoffMillis first retry delay
+ * @param multiplier           backoff multiplier
+ * @param maxBackoffMillis     backoff ceiling
  * @author pnoker
  * @since 2026.8.19
  */

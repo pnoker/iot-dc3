@@ -41,7 +41,6 @@ class NotifyTaskSenderTest {
     private MessageSender messageSender;
 
 
-
     @InjectMocks
     private NotifyTaskSender sender;
 

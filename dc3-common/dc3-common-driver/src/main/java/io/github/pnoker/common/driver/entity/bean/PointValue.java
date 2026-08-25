@@ -74,7 +74,9 @@ public class PointValue implements Serializable {
      */
     private Long sequence;
 
-    /** Manager-issued device ownership fencing token. */
+    /**
+     * Manager-issued device ownership fencing token.
+     */
     private Long fencingToken;
 
     /**

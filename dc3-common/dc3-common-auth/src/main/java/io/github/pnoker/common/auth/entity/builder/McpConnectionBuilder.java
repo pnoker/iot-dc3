@@ -54,7 +54,7 @@ public interface McpConnectionBuilder {
      * After process.
      *
      * @param entityRecord entity record
-     * @param entityVO view object
+     * @param entityVO     view object
      */
     @AfterMapping
     default void afterProcess(McpConnectionRecord entityRecord, @MappingTarget McpConnectionVO entityVO) {

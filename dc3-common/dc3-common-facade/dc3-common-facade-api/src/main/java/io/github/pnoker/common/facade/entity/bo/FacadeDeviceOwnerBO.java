@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.facade.entity.bo;
 
-/** Active driver runtime owner used for targeted, fenced commands. */
+/**
+ * Active driver runtime owner used for targeted, fenced commands.
+ */
 public record FacadeDeviceOwnerBO(Long driverId, String ownerNode, Long fencingToken) {
 }

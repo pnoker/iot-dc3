@@ -23,26 +23,26 @@ one native `Runtime` + TCP `MasterChannel` + association per outstation, class 0
 
 ## Driver Attributes (Device-level)
 
-| Attribute | Code | Type | Default | Description |
-|-----------|------|------|---------|-------------|
-| Host | host | STRING | | DNP3 outstation address |
-| Port | port | INT | 20000 | DNP3 TCP service port |
-| Master Address | masterAddress | INT | 1 | Master link-layer address |
-| Outstation Address | outstationAddress | INT | 1 | Outstation link-layer address |
+| Attribute          | Code              | Type   | Default | Description                   |
+|--------------------|-------------------|--------|---------|-------------------------------|
+| Host               | host              | STRING |         | DNP3 outstation address       |
+| Port               | port              | INT    | 20000   | DNP3 TCP service port         |
+| Master Address     | masterAddress     | INT    | 1       | Master link-layer address     |
+| Outstation Address | outstationAddress | INT    | 1       | Outstation link-layer address |
 
 ## Point Attributes
 
-| Attribute | Code | Type | Default | Description |
-|-----------|------|------|---------|-------------|
-| Point Index | pointIndex | INT | 0 | DNP3 point index within the selected point type |
-| Point Type | pointType | STRING | BINARY_INPUT | BINARY_INPUT, ANALOG_INPUT, COUNTER, DOUBLE_BIT_BINARY_INPUT, BINARY_OUTPUT, or ANALOG_OUTPUT |
+| Attribute   | Code       | Type   | Default      | Description                                                                                   |
+|-------------|------------|--------|--------------|-----------------------------------------------------------------------------------------------|
+| Point Index | pointIndex | INT    | 0            | DNP3 point index within the selected point type                                               |
+| Point Type  | pointType  | STRING | BINARY_INPUT | BINARY_INPUT, ANALOG_INPUT, COUNTER, DOUBLE_BIT_BINARY_INPUT, BINARY_OUTPUT, or ANALOG_OUTPUT |
 
 ## Command Attributes (write)
 
-| Attribute | Code | Type | Default | Description |
-|-----------|------|------|---------|-------------|
-| Point Index | pointIndex | INT | 0 | DNP3 point index within the selected output point type |
-| Point Type | pointType | STRING | BINARY_OUTPUT | BINARY_OUTPUT or ANALOG_OUTPUT |
+| Attribute   | Code       | Type   | Default       | Description                                            |
+|-------------|------------|--------|---------------|--------------------------------------------------------|
+| Point Index | pointIndex | INT    | 0             | DNP3 point index within the selected output point type |
+| Point Type  | pointType  | STRING | BINARY_OUTPUT | BINARY_OUTPUT or ANALOG_OUTPUT                         |
 
 The module `application.yml` is authoritative for attribute codes, types, defaults, scheduling, health, and local
 buffering. Keep this README aligned when those user-facing settings change.

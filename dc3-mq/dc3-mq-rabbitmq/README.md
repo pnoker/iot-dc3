@@ -10,12 +10,12 @@ Active when `dc3.mq.type=rabbitmq` — the default (`matchIfMissing = true`).
 
 ## Key types
 
-| Type | Role |
-|---|---|
-| `RabbitMqAdapter` | `BrokerAdapter` implementation (exchanges, queues, listeners, confirms) |
-| `RabbitNames` / `RabbitTopology` | canonical exchange/queue/routing names and bindings |
-| `RabbitAcknowledgment` | publisher-confirm handling |
-| `ActiveRabbitProfileConfig` / `RabbitEnvironmentConfig` | profile wiring and environment defaults |
+| Type                                                    | Role                                                                    |
+|---------------------------------------------------------|-------------------------------------------------------------------------|
+| `RabbitMqAdapter`                                       | `BrokerAdapter` implementation (exchanges, queues, listeners, confirms) |
+| `RabbitNames` / `RabbitTopology`                        | canonical exchange/queue/routing names and bindings                     |
+| `RabbitAcknowledgment`                                  | publisher-confirm handling                                              |
+| `ActiveRabbitProfileConfig` / `RabbitEnvironmentConfig` | profile wiring and environment defaults                                 |
 
 ## Configuration
 

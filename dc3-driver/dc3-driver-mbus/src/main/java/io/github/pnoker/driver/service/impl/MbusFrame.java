@@ -37,25 +37,45 @@ import java.util.List;
  */
 public final class MbusFrame {
 
-    /** Long frame start byte. */
+    /**
+     * Long frame start byte.
+     */
     public static final byte START = (byte) 0x68;
-    /** Short frame start byte. */
+    /**
+     * Short frame start byte.
+     */
     public static final byte SHORT_START = 0x10;
-    /** Frame end byte. */
+    /**
+     * Frame end byte.
+     */
     public static final byte END = (byte) 0x16;
-    /** SND_UD2 control code (master request for user data). */
+    /**
+     * SND_UD2 control code (master request for user data).
+     */
     public static final byte CONTROL_SND_UD2 = 0x5B;
-    /** RSP_UD control code (slave user-data response). */
+    /**
+     * RSP_UD control code (slave user-data response).
+     */
     public static final byte CONTROL_RSP_UD = 0x08;
-    /** REQ_UD2 control-information code. */
+    /**
+     * REQ_UD2 control-information code.
+     */
     public static final byte CI_REQ_UD2 = 0x7A;
-    /** SND_UD control code (master send user data). */
+    /**
+     * SND_UD control code (master send user data).
+     */
     public static final byte CONTROL_SND_UD = 0x53;
-    /** SND_UD control-information code. */
+    /**
+     * SND_UD control-information code.
+     */
     public static final byte CI_SND_UD = 0x51;
-    /** Single-byte ACK response. */
+    /**
+     * Single-byte ACK response.
+     */
     public static final byte ACK = (byte) 0xE5;
-    /** RSP_UD control-information code. */
+    /**
+     * RSP_UD control-information code.
+     */
     public static final byte CI_RSP_UD = 0x72;
 
     private MbusFrame() {

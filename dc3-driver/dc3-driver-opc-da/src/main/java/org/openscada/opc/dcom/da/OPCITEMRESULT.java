@@ -53,7 +53,9 @@ public class OPCITEMRESULT {
         return struct;
     }
 
-    /** Decode the COM wire struct into the typed OPCITEMRESULT wrapper. */
+    /**
+     * Decode the COM wire struct into the typed OPCITEMRESULT wrapper.
+     */
     public static OPCITEMRESULT fromStruct(final JIStruct struct) {
         OPCITEMRESULT result = new OPCITEMRESULT();
 

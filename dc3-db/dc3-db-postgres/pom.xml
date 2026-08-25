@@ -29,7 +29,9 @@
 
     <artifactId>dc3-db-postgres</artifactId>
     <name>${project.artifactId}</name>
-    <description>PostgreSQL dialect adapter: driver, timestamptz type handler, pagination DbType — selected by dc3.db.type=postgres (default)</description>
+    <description>PostgreSQL dialect adapter: driver, timestamptz type handler, pagination DbType — selected by
+        dc3.db.type=postgres (default)
+    </description>
 
     <dependencies>
         <dependency>

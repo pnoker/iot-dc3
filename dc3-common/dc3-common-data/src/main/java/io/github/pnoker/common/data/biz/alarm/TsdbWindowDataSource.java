@@ -61,7 +61,9 @@ public class TsdbWindowDataSource implements WindowDataSource {
 
     private static final TsdbDeadline DEADLINE = TsdbDeadline.ofSeconds(30);
 
-    /** Pull page for the ALL/ANY sample path — window scans stay bounded. */
+    /**
+     * Pull page for the ALL/ANY sample path — window scans stay bounded.
+     */
     private static final int SAMPLE_PAGE_SIZE = 5000;
 
     private final TsdbStore tsdbStore;

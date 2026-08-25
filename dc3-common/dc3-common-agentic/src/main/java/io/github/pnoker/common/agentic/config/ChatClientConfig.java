@@ -74,7 +74,7 @@ public class ChatClientConfig {
      * Create and configure the application-managed agentic chat memory repository.
      *
      * @param messageService message service
-     * @param properties properties
+     * @param properties     properties
      * @return agentic chat memory repository result
      */
     @Bean
@@ -88,7 +88,7 @@ public class ChatClientConfig {
      * Create and configure the application-managed agentic chat memory.
      *
      * @param chatMemoryRepository chat memory repository
-     * @param properties properties
+     * @param properties           properties
      * @return agentic chat memory result
      */
     @Bean
@@ -129,15 +129,15 @@ public class ChatClientConfig {
     /**
      * Create and configure the application-managed agentic tool callback provider.
      *
-     * @param tenantTool tenant tool
-     * @param userTool user tool
-     * @param deviceTool device tool
-     * @param driverTool driver tool
-     * @param profileTool profile tool
-     * @param pointTool point tool
+     * @param tenantTool     tenant tool
+     * @param userTool       user tool
+     * @param deviceTool     device tool
+     * @param driverTool     driver tool
+     * @param profileTool    profile tool
+     * @param pointTool      point tool
      * @param pointValueTool point value tool
-     * @param systemTool system tool
-     * @param objectMapper object mapper
+     * @param systemTool     system tool
+     * @param objectMapper   object mapper
      * @return agentic tool callback provider result
      */
     @Bean
@@ -157,7 +157,7 @@ public class ChatClientConfig {
     /**
      * Create and configure the application-managed agentic chat client builder.
      *
-     * @param chatModel chat model
+     * @param chatModel     chat model
      * @param memoryAdvisor memory advisor
      * @return agentic chat client builder result
      */

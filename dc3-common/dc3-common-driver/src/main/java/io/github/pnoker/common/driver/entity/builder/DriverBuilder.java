@@ -68,7 +68,7 @@ public interface DriverBuilder {
      * After process.
      *
      * @param entityGrpc entity grpc
-     * @param entityBO business object
+     * @param entityBO   business object
      */
     @AfterMapping
     default void afterProcess(GrpcDriverDTO entityGrpc, @MappingTarget DriverBO entityBO) {
@@ -109,7 +109,7 @@ public interface DriverBuilder {
     /**
      * After process.
      *
-     * @param entityDTO transfer object
+     * @param entityDTO  transfer object
      * @param entityGrpc entity grpc
      */
     @AfterMapping

@@ -45,12 +45,12 @@ Fields: `ok` (boolean), `code` (String), `message` (String), `data` (T)
 
 ### Utilities
 
-| Utility               | Purpose                                                  |
-|-----------------------|----------------------------------------------------------|
-| `JsonUtil`            | Jackson JSON serialization/deserialization helpers       |
-| `HostUtil`            | Resolves host/IP information                             |
-| `PageUtil`            | Converts and normalizes pagination objects               |
-| `HmacAuthSigner`      | Signs and verifies trusted gateway principal headers     |
+| Utility          | Purpose                                              |
+|------------------|------------------------------------------------------|
+| `JsonUtil`       | Jackson JSON serialization/deserialization helpers   |
+| `HostUtil`       | Resolves host/IP information                         |
+| `PageUtil`       | Converts and normalizes pagination objects           |
+| `HmacAuthSigner` | Signs and verifies trusted gateway principal headers |
 
 WebFlux-specific `BaseController`, `PrincipalHeaderUtil`, and `ResponseUtil` belong to `dc3-common-web`.
 

@@ -102,13 +102,13 @@ IoT DC3 incluye **36 módulos de controladores de acceso** para automatización 
 datos, comunicaciones básicas y escenarios de simulación/depuración, reduciendo el costo de conectar dispositivos y
 fuentes de datos comunes:
 
-| Categoría                                      | Módulos de controladores                                                                                                                                                                              |
-|------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Categoría                                      | Módulos de controladores                                                                                                                                                                     |
+|------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 🏭 **Protocolos industriales**                 | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · IEC 61850 · DNP3 · DLMS · DLT645 · KNX · M-Bus · SL651 |
-| 📡 **Protocolos IoT**                          | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee · LoRaWAN                                                                                                                                                    |
-| 🗄️ **Puenteo de datos**                        | MySQL · PostgreSQL · Oracle · SQL Server · Redis                                                                                                                                                       |
-| 🔧 **Comunicaciones básicas y gestión de red** | TCP/UDP · Serial · SNMP · CAN · Kafka                                                                                                                                                                  |
-| 🧪 **Simulación y depuración**                 | Virtual · Listening Virtual                                                                                                                                                                            |
+| 📡 **Protocolos IoT**                          | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee · LoRaWAN                                                                                                                                          |
+| 🗄️ **Puenteo de datos**                        | MySQL · PostgreSQL · Oracle · SQL Server · Redis                                                                                                                                             |
+| 🔧 **Comunicaciones básicas y gestión de red** | TCP/UDP · Serial · SNMP · CAN · Kafka                                                                                                                                                        |
+| 🧪 **Simulación y depuración**                 | Virtual · Listening Virtual                                                                                                                                                                  |
 
 El **Driver SDK** permite el desarrollo rápido de controladores de protocolo personalizados y su registro en la
 plataforma de ejecución.

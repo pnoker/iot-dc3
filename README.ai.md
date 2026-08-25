@@ -9,8 +9,9 @@ If you are an AI assistant being asked to modify this repository, read [AGENTS.m
 
 ## What Is IoT DC3?
 
-IoT DC3 is a multi-protocol, cloud-native, open-source industrial IoT platform evolving toward AI agents. It helps teams connect devices, collect telemetry,
-manage device metadata, query data, dispatch commands, and run AI-assisted operations as a native platform capability.
+IoT DC3 is a multi-protocol, cloud-native, open-source industrial IoT platform evolving toward AI agents. It helps teams
+connect devices, collect telemetry, manage device metadata, query data, dispatch commands, and run AI-assisted
+operations as a native platform capability.
 
 The project is designed for industrial IoT and operational technology scenarios where many device types, protocols,
 services, data flows, and intelligent workflows need to be coordinated.
@@ -67,13 +68,13 @@ IoT DC3 helps teams build the core capabilities needed for industrial IoT system
 
 IoT DC3 includes 36 access driver modules:
 
-| Category                                               | Driver Modules                                                                                                                                                                                                       |
-|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Industrial protocols                                   | Modbus TCP, Modbus RTU, OPC UA, OPC DA, Siemens S7, BACnet/IP, EtherNet/IP, Omron FINS, Mitsubishi MELSEC, IEC 60870-5-104, IEC 61850, DNP3, DLMS, DLT645, KNX, M-Bus, SL651 |
-| IoT protocols                                          | MQTT, CoAP, LwM2M, HTTP, BLE, Zigbee, LoRaWAN                                                                                                                                                                       |
-| Data bridging                                          | MySQL, PostgreSQL, Oracle, SQL Server, Redis                                                                                                                                                                         |
-| Basic communication, messaging and network management  | TCP/UDP, Serial, SNMP, CAN, Kafka                                                                                                                                                                                    |
-| Simulation and debugging                               | Virtual, Listening Virtual                                                                                                                                                                                           |
+| Category                                              | Driver Modules                                                                                                                                                               |
+|-------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Industrial protocols                                  | Modbus TCP, Modbus RTU, OPC UA, OPC DA, Siemens S7, BACnet/IP, EtherNet/IP, Omron FINS, Mitsubishi MELSEC, IEC 60870-5-104, IEC 61850, DNP3, DLMS, DLT645, KNX, M-Bus, SL651 |
+| IoT protocols                                         | MQTT, CoAP, LwM2M, HTTP, BLE, Zigbee, LoRaWAN                                                                                                                                |
+| Data bridging                                         | MySQL, PostgreSQL, Oracle, SQL Server, Redis                                                                                                                                 |
+| Basic communication, messaging and network management | TCP/UDP, Serial, SNMP, CAN, Kafka                                                                                                                                            |
+| Simulation and debugging                              | Virtual, Listening Virtual                                                                                                                                                   |
 
 ## Architecture in One Paragraph
 

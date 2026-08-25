@@ -1,7 +1,7 @@
 # DC3 TSDB TDengine
 
-`dc3-tsdb-tdengine` adapts the store-neutral port to TDengine over its REST/WS JDBC driver
-(`taos-jdbcdriver`). Points are written to a supertable with per-series subtables.
+`dc3-tsdb-tdengine` adapts the store-neutral port to TDengine over its REST/WS JDBC driver (`taos-jdbcdriver`). Points
+are written to a supertable with per-series subtables.
 
 ## Activation
 
@@ -11,13 +11,13 @@ Active when `dc3.tsdb.type=tdengine`.
 
 `TdengineTsdbProperties` binds the `dc3.tsdb.tdengine` prefix:
 
-| Key | Default | Meaning |
-|---|---|---|
-| `dc3.tsdb.tdengine.url` | `jdbc:TAOS-RS://localhost:6041/` | JDBC URL |
-| `dc3.tsdb.tdengine.username` | `root` | login name |
-| `dc3.tsdb.tdengine.password` | `taosdata` | login password |
-| `dc3.tsdb.tdengine.database` | `dc3` | target database |
-| `dc3.tsdb.tdengine.maximum-pool-size` | `8` | connection pool size |
+| Key                                   | Default                          | Meaning              |
+|---------------------------------------|----------------------------------|----------------------|
+| `dc3.tsdb.tdengine.url`               | `jdbc:TAOS-RS://localhost:6041/` | JDBC URL             |
+| `dc3.tsdb.tdengine.username`          | `root`                           | login name           |
+| `dc3.tsdb.tdengine.password`          | `taosdata`                       | login password       |
+| `dc3.tsdb.tdengine.database`          | `dc3`                            | target database      |
+| `dc3.tsdb.tdengine.maximum-pool-size` | `8`                              | connection pool size |
 
 ## Dependencies
 

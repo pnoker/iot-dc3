@@ -6,13 +6,13 @@ dc3.db.type property.
 
 ## Modules
 
-| Module | Role |
-|---|---|
-| dc3-db-core | dialect-neutral JDBC infrastructure: MybatisPlusConfig, TenantLineHandlerImpl, MybatisUtil, profile wiring |
-| dc3-db-postgres | PostgreSQL dialect adapter (default): driver, timestamptz type handler, pagination DbType |
-| dc3-db-mysql | MySQL 8 dialect adapter: driver, DATETIME(6) UTC conventions |
-| dc3-db-mariadb | MariaDB 10.6+ dialect adapter — MySQL-compatible surface except ODKU row aliases (uses VALUES()) |
-| dc3-db-tck | dual-dialect relational contract suite — identical mapper-level assertions against PostgreSQL and MySQL |
+| Module          | Role                                                                                                       |
+|-----------------|------------------------------------------------------------------------------------------------------------|
+| dc3-db-core     | dialect-neutral JDBC infrastructure: MybatisPlusConfig, TenantLineHandlerImpl, MybatisUtil, profile wiring |
+| dc3-db-postgres | PostgreSQL dialect adapter (default): driver, timestamptz type handler, pagination DbType                  |
+| dc3-db-mysql    | MySQL 8 dialect adapter: driver, DATETIME(6) UTC conventions                                               |
+| dc3-db-mariadb  | MariaDB 10.6+ dialect adapter — MySQL-compatible surface except ODKU row aliases (uses VALUES())           |
+| dc3-db-tck      | dual-dialect relational contract suite — identical mapper-level assertions against PostgreSQL and MySQL    |
 
 ## Selection
 

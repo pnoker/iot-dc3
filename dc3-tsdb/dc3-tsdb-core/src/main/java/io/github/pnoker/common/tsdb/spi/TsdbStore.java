@@ -249,18 +249,18 @@ public interface TsdbStore {
      * Adapter capability declaration (§8 of the design). The startup negotiation log
      * prints this row, mirroring the MQ port.
      *
-     * @param gapFill               zero-fill empty buckets
-     * @param tenantWideScan        series-empty history/aggregate/count/last
-     * @param tenantWideAnalytics   S13 facet
-     * @param latencyHistogram      S13-④ store-side
-     * @param percentile            S15 PERCENTILE
-     * @param rollupSupport         S16 tiered-rollup mode
-     * @param maxAppendBatch        S18 chunking threshold
-     * @param deleteRange           S10
-     * @param ordering              NONE | PER_SERIES
-     * @param precision             native timestamp precision
-     * @param backfill              out-of-order/late writes accepted
-     * @param correlation           S19 store-side correlation
+     * @param gapFill             zero-fill empty buckets
+     * @param tenantWideScan      series-empty history/aggregate/count/last
+     * @param tenantWideAnalytics S13 facet
+     * @param latencyHistogram    S13-④ store-side
+     * @param percentile          S15 PERCENTILE
+     * @param rollupSupport       S16 tiered-rollup mode
+     * @param maxAppendBatch      S18 chunking threshold
+     * @param deleteRange         S10
+     * @param ordering            NONE | PER_SERIES
+     * @param precision           native timestamp precision
+     * @param backfill            out-of-order/late writes accepted
+     * @param correlation         S19 store-side correlation
      */
     record TsdbCapabilities(
             boolean gapFill,
@@ -277,31 +277,53 @@ public interface TsdbStore {
             boolean correlation) {
     }
 
-    /** S16 tiered-rollup support levels. */
+    /**
+     * S16 tiered-rollup support levels.
+     */
     enum RollupSupport {
-        /** Store-side rollup tiers. */
+        /**
+         * Store-side rollup tiers.
+         */
         NATIVE,
-        /** Rollup maintained by the platform on top of the store. */
+        /**
+         * Rollup maintained by the platform on top of the store.
+         */
         MANUAL,
-        /** No rollup support. */
+        /**
+         * No rollup support.
+         */
         NONE
     }
 
-    /** S2/S8 result ordering guarantees. */
+    /**
+     * S2/S8 result ordering guarantees.
+     */
     enum OrderingGuarantee {
-        /** No ordering guarantee. */
+        /**
+         * No ordering guarantee.
+         */
         NONE,
-        /** Samples ordered within each series. */
+        /**
+         * Samples ordered within each series.
+         */
         PER_SERIES
     }
 
-    /** Native timestamp precision of the store. */
+    /**
+     * Native timestamp precision of the store.
+     */
     enum Precision {
-        /** Microsecond precision. */
+        /**
+         * Microsecond precision.
+         */
         MICRO,
-        /** Millisecond precision. */
+        /**
+         * Millisecond precision.
+         */
         MILLI,
-        /** Nanosecond precision. */
+        /**
+         * Nanosecond precision.
+         */
         NANO
     }
 }

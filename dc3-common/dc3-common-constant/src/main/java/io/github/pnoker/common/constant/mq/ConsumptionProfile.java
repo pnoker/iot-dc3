@@ -25,9 +25,13 @@ package io.github.pnoker.common.constant.mq;
  */
 public enum ConsumptionProfile {
 
-    /** Low latency, low volume (commands, metadata, control streams). */
+    /**
+     * Low latency, low volume (commands, metadata, control streams).
+     */
     LATENCY,
 
-    /** High throughput fan-in (point values and similar firehoses). */
+    /**
+     * High throughput fan-in (point values and similar firehoses).
+     */
     THROUGHPUT
 }

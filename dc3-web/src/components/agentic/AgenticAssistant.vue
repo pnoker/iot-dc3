@@ -269,7 +269,9 @@
                 <div v-else class="agentic-user-content">
                   <div v-if="userMessageParts(message.content).quote" class="agentic-user-quote">
                     <div class="agentic-user-quote__header">
-                      <el-icon><ChatLineSquare/></el-icon>
+                      <el-icon>
+                        <ChatLineSquare/>
+                      </el-icon>
                       <span>{{ userMessageParts(message.content).label }}</span>
                     </div>
                     <p>{{ userMessageParts(message.content).quote }}</p>
@@ -442,7 +444,9 @@
               type="button"
               @click="quotedMessage = undefined"
             >
-              <el-icon><Close/></el-icon>
+              <el-icon>
+                <Close/>
+              </el-icon>
             </button>
           </div>
 
@@ -1480,13 +1484,40 @@ const formatFileSize = (size = 0) => {
   background: #eff6ff;
   border-radius: 9px;
 
-  &.is-warning { color: #dc2626; background: #fef2f2; }
-  &.is-trend { color: #059669; background: #ecfdf5; }
-  &.is-connection { color: #7c3aed; background: #f5f3ff; }
-  &.is-odometer { color: #0891b2; background: #ecfeff; }
-  &.is-tools { color: #d97706; background: #fffbeb; }
-  &.is-operation { color: #4f46e5; background: #eef2ff; }
-  &.is-lightning { color: #c2410c; background: #fff7ed; }
+  &.is-warning {
+    color: #dc2626;
+    background: #fef2f2;
+  }
+
+  &.is-trend {
+    color: #059669;
+    background: #ecfdf5;
+  }
+
+  &.is-connection {
+    color: #7c3aed;
+    background: #f5f3ff;
+  }
+
+  &.is-odometer {
+    color: #0891b2;
+    background: #ecfeff;
+  }
+
+  &.is-tools {
+    color: #d97706;
+    background: #fffbeb;
+  }
+
+  &.is-operation {
+    color: #4f46e5;
+    background: #eef2ff;
+  }
+
+  &.is-lightning {
+    color: #c2410c;
+    background: #fff7ed;
+  }
 }
 
 .agentic-body {

@@ -15,8 +15,8 @@ management services into a single deployable module for simplified single-node o
 
 | Protocol  | Port   | Configuration variable |
 |-----------|--------|------------------------|
-| HTTP REST | `8100` | `DC3_SINGLE_PORT`       |
-| gRPC      | `9100` | `DC3_SINGLE_GRPC_PORT`  |
+| HTTP REST | `8100` | `DC3_SINGLE_PORT`      |
+| gRPC      | `9100` | `DC3_SINGLE_GRPC_PORT` |
 
 ## Key Responsibilities
 

@@ -62,4 +62,4 @@ spec:
               mountPath: /dc3-gateway/dc3/logs
       volumes:
         - name: logs
-          emptyDir: {}
+          emptyDir: { }

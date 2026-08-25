@@ -27,8 +27,8 @@ the MC protocol using the `iot-communication` library, reading and writing devic
 | Device Address | Device memory address (D100, M0, X10, W200 etc.) |
 | String Length  | String read length (0 for non-string types)      |
 
-The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and
-local buffering. Keep this README aligned when those user-facing settings change.
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
 
 ## Prerequisites
 

@@ -437,7 +437,9 @@ public final class InfluxdbTsdbStore implements TsdbStore {
         return "date_bin(%s, time, TIMESTAMP '1970-01-01T00:00:00Z')".formatted(intervalLiteral(bucketWidth));
     }
 
-    /** Largest exactly-dividing unit; DataFusion intervals lack a generic millisecond form. */
+    /**
+     * Largest exactly-dividing unit; DataFusion intervals lack a generic millisecond form.
+     */
     private static String intervalLiteral(Duration width) {
         long nanos = width.toNanos();
         if (nanos % 3_600_000_000_000L == 0) {
@@ -452,7 +454,9 @@ public final class InfluxdbTsdbStore implements TsdbStore {
         return "INTERVAL '" + (nanos / 1_000_000L) + " millisecond'";
     }
 
-    /** RFC3339 literal — InfluxDB 3 compares timestamps against string literals. */
+    /**
+     * RFC3339 literal — InfluxDB 3 compares timestamps against string literals.
+     */
     private static String literal(Instant instant) {
         return "TIMESTAMP '" + instant + "'";
     }
@@ -506,7 +510,9 @@ public final class InfluxdbTsdbStore implements TsdbStore {
         }
     }
 
-    /** CSV response: header row then data rows, RFC-4180 quoting. */
+    /**
+     * CSV response: header row then data rows, RFC-4180 quoting.
+     */
     private List<CsvRow> query(String sql, TsdbDeadline deadline) {
         String body = "{\"db\":\"" + database + "\",\"q\":"
                 + com.fasterxml.jackson.databind.node.JsonNodeFactory.instance.textNode(sql).toString()
@@ -537,7 +543,9 @@ public final class InfluxdbTsdbStore implements TsdbStore {
         return CsvRows.parse(response);
     }
 
-    /** Minimal CSV row with typed accessors; values arrive as text and parse on demand. */
+    /**
+     * Minimal CSV row with typed accessors; values arrive as text and parse on demand.
+     */
     static final class CsvRow {
 
         private final Map<String, String> values;

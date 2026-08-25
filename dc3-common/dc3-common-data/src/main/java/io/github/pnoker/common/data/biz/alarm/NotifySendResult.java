@@ -56,9 +56,9 @@ public class NotifySendResult {
     /**
      * Success.
      *
-     * @param target target
-     * @param statusCode status code
-     * @param statusMessage status message
+     * @param target          target
+     * @param statusCode      status code
+     * @param statusMessage   status message
      * @param responsePayload response payload
      * @return success result
      */
@@ -71,7 +71,7 @@ public class NotifySendResult {
     /**
      * Failed.
      *
-     * @param target target
+     * @param target       target
      * @param errorMessage error message
      * @return failed result
      */

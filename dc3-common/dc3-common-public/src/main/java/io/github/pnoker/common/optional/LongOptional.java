@@ -60,7 +60,7 @@ public final class LongOptional {
     /**
      * Invoke exactly one branch according to whether the wrapped long is positive.
      *
-     * @param action action that consumes a positive long
+     * @param action      action that consumes a positive long
      * @param emptyAction action to run for a {@code null} or non-positive long
      */
     public void ifPresentOrElse(LongConsumer action, Runnable emptyAction) {

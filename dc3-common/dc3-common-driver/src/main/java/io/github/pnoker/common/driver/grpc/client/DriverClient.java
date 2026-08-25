@@ -158,7 +158,9 @@ public class DriverClient {
         applyMetadata(rDriverRegisterDTO);
     }
 
-    /** Renew runtime membership and replace the locally owned device set. */
+    /**
+     * Renew runtime membership and replace the locally owned device set.
+     */
     public void renewLease() {
         DriverBO driver = driverMetadata.getDriver();
         if (Objects.isNull(driver)) {

@@ -17,20 +17,20 @@ USE dc3_history;
 
 CREATE TABLE dc3_point_latest
 (
-    tenant_id      BIGINT          NOT NULL,
-    device_id      BIGINT          NOT NULL,
-    point_id       BIGINT          NOT NULL,
-    message_id     TEXT            NOT NULL,
-    schema_version INTEGER         NOT NULL,
-    driver_node    TEXT            NOT NULL,
-    sequence       BIGINT          NOT NULL,
-    fencing_token  BIGINT          NOT NULL,
-    raw_value      TEXT            DEFAULT ('') NOT NULL,
-    cal_value      TEXT            DEFAULT ('') NOT NULL,
+    tenant_id      BIGINT              NOT NULL,
+    device_id      BIGINT              NOT NULL,
+    point_id       BIGINT              NOT NULL,
+    message_id     TEXT                NOT NULL,
+    schema_version INTEGER             NOT NULL,
+    driver_node    TEXT                NOT NULL,
+    sequence       BIGINT              NOT NULL,
+    fencing_token  BIGINT              NOT NULL,
+    raw_value      TEXT   DEFAULT ('') NOT NULL,
+    cal_value      TEXT   DEFAULT ('') NOT NULL,
     num_value      DOUBLE PRECISION,
-    driver_id      BIGINT          DEFAULT 0 NOT NULL,
-    create_time    DATETIME(6)     NOT NULL,
-    operate_time   DATETIME(6)     NOT NULL,
+    driver_id      BIGINT DEFAULT 0    NOT NULL,
+    create_time    DATETIME(6)         NOT NULL,
+    operate_time   DATETIME(6)         NOT NULL,
     PRIMARY KEY (tenant_id, device_id, point_id)
 );
 

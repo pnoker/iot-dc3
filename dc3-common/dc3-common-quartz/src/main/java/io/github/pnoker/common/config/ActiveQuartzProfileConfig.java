@@ -41,7 +41,9 @@ import org.springframework.core.env.ConfigurableEnvironment;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class ActiveQuartzProfileConfig implements EnvironmentPostProcessor {
 
-    /** Creates the environment post processor. */
+    /**
+     * Creates the environment post processor.
+     */
     public ActiveQuartzProfileConfig() {
     }
 

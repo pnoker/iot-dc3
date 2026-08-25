@@ -55,12 +55,12 @@ public final class RabbitTopology {
     /**
      * Descriptor of a platform-shared queue.
      *
-     * @param queueName     queue name
-     * @param exchangeName  source exchange
-     * @param routingKey    binding routing key (pattern)
-     * @param ttlMillis     per-queue message TTL, 0 = none
-     * @param deadExchange  dead-letter exchange, null = none
-     * @param deadRouting   dead-letter routing key
+     * @param queueName       queue name
+     * @param exchangeName    source exchange
+     * @param routingKey      binding routing key (pattern)
+     * @param ttlMillis       per-queue message TTL, 0 = none
+     * @param deadExchange    dead-letter exchange, null = none
+     * @param deadRouting     dead-letter routing key
      * @param bindingArgument whether the binding carries the x-auto-delete argument
      */
     private record SharedQueue(String queueName, String exchangeName, String routingKey, int ttlMillis,
@@ -147,8 +147,8 @@ public final class RabbitTopology {
     /**
      * Declare the driver-side metadata broadcast queue (auto-delete, 30 s TTL).
      *
-     * @param admin  rabbit admin
-     * @param client driver client id
+     * @param admin      rabbit admin
+     * @param client     driver client id
      * @param routingKey exact routing key (service name)
      */
     public static void declareMetadataQueue(RabbitAdmin admin, String client, String routingKey) {
