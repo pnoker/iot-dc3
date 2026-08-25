@@ -64,6 +64,8 @@ public enum WindowAggregateFunction {
     /**
      * Resolves a free-form string ({@code "AVG"}, {@code "avg"}, whitespace ok)
      * to the corresponding function, returning {@code null} when unrecognized.
+     * @param function free-form function name
+     * @return the matching function, or {@code null} when unrecognized
      */
     public static WindowAggregateFunction ofCode(String function) {
         if (StringUtils.isBlank(function)) {

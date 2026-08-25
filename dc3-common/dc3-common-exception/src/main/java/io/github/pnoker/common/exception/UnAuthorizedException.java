@@ -27,14 +27,29 @@ import io.github.pnoker.common.enums.ErrorCode;
  */
 public class UnAuthorizedException extends BusinessException {
 
+    /**
+     * Exception with a failure detail and cause.
+     *
+     */
     public UnAuthorizedException() {
         this(null);
     }
 
+    /**
+     * Exception with a plain failure cause.
+     *
+     * @param cause underlying failure
+     */
     public UnAuthorizedException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Exception with a failure detail and cause.
+     *
+     * @param template failure detail or underlying failure
+     * @param params failure detail or underlying failure
+     */
     public UnAuthorizedException(String template, Object... params) {
         super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }

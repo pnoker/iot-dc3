@@ -33,6 +33,7 @@ public class DriverConstant {
      */
     public static final String SERVICE_NAME = "dc3-driver";
 
+    /** URL prefix for the driver command endpoints. */
     public static final String COMMAND_URL_PREFIX = "/command";
 
     private DriverConstant() {

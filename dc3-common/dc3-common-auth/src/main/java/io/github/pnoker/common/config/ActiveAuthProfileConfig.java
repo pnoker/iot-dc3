@@ -26,7 +26,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Environment Config
+ * Activates the {@code auth} Spring profile at startup so auth modules pick up their
+ * profile-specific configuration.
  *
  * @author pnoker
  * @since 2016.10.1

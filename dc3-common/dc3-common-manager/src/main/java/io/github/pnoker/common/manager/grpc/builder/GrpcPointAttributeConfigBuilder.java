@@ -31,7 +31,7 @@ import org.mapstruct.MappingTarget;
 import java.util.Optional;
 
 /**
- * GrpcPointAttributeConfig Builder
+ * MapStruct builder for point-attribute config gRPC message conversion.
  *
  * @author pnoker
  * @since 2016.10.1

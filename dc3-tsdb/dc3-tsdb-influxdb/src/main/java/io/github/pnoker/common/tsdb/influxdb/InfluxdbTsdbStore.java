@@ -121,7 +121,7 @@ public final class InfluxdbTsdbStore implements TsdbStore {
                 false, OrderingGuarantee.PER_SERIES, Precision.NANO, true, false);
     }
 
-    // ===== 写入 =====
+    // ===== writes =====
 
     @Override
     public int append(List<PointValueSample> samples) {
@@ -168,7 +168,7 @@ public final class InfluxdbTsdbStore implements TsdbStore {
         return '"' + value.replace("\\", "\\\\").replace("\"", "\\\"") + '"';
     }
 
-    // ===== 读取 =====
+    // ===== reads =====
 
     private static final String SAMPLE_COLUMNS = "tenant_id, device_id, point_id, raw, cal, num, quality, "
             + "message_id, schema_version, driver_node, sequence, fencing_token, driver_id, "
@@ -273,7 +273,7 @@ public final class InfluxdbTsdbStore implements TsdbStore {
         return rows.isEmpty() ? 0 : rows.getFirst().getLong("c");
     }
 
-    // ===== S13：租户级分析面 =====
+    // ===== S13: tenant-level analytics =====
 
     @Override
     public List<BucketAggregate> bucketedCount(long tenantId, TimeWindow window,
@@ -374,7 +374,7 @@ public final class InfluxdbTsdbStore implements TsdbStore {
         return result;
     }
 
-    // ===== 运维 =====
+    // ===== operations =====
 
     @Override
     public List<SeriesKey> listSeries(long tenantId, TimeWindow window, TsdbDeadline deadline) {
@@ -402,7 +402,7 @@ public final class InfluxdbTsdbStore implements TsdbStore {
                 + "facades compute from bucketed pulls");
     }
 
-    // ===== SQL 装配 =====
+    // ===== SQL assembly =====
 
     private String seriesWhere(SeriesFilter filter) {
         if (filter.tenantWide()) {

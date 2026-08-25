@@ -90,8 +90,16 @@ public abstract class AbstractMqContractTest {
      */
     protected static final String RUN = UUID.randomUUID().toString().substring(0, 8);
 
+    /**
+     * The adapter under test, wired against the suite's disposable broker.
+     *
+     * @return the adapter harness provided by the concrete test
+     */
     protected abstract BrokerAdapter adapter();
 
+    /**
+     * Hook to release broker resources between cases; the default is a no-op.
+     */
     protected void shutdownAdapter() {
     }
 
@@ -101,35 +109,59 @@ public abstract class AbstractMqContractTest {
         MDC.remove(io.github.pnoker.common.constant.common.RequestIdConstant.MDC_KEY);
     }
 
+    /**
+     * Sender bound to the adapter under test.
+     *
+     * @return a fresh sender instance
+     */
     protected final MessageSender sender() {
         return new MessageSenderImpl(adapter());
     }
 
+    /**
+     * Load-balanced single-delivery subscription on a run-unique group.
+     */
     protected final SubscriptionSpec loadBalance(MqTopic topic, String group) {
         return new SubscriptionSpec(topic, SubscriptionMode.LOAD_BALANCE, ConsumptionProfile.LATENCY,
                 DeliveryMode.SINGLE, "", group + "-" + RUN, null, TestPayload.class, true);
     }
 
+    /**
+     * Load-balanced subscription with a key filter and no per-instance TTL.
+     */
     protected final SubscriptionSpec loadBalancePattern(MqTopic topic, String group, String keyPattern) {
         return loadBalancePattern(topic, group, keyPattern, null);
     }
 
+    /**
+     * Load-balanced subscription with a key filter and an optional per-instance TTL.
+     */
     protected final SubscriptionSpec loadBalancePattern(MqTopic topic, String group, String keyPattern,
                                                         java.time.Duration instanceTtl) {
         return new SubscriptionSpec(topic, SubscriptionMode.LOAD_BALANCE, ConsumptionProfile.LATENCY,
                 DeliveryMode.SINGLE, keyPattern, group + "-" + RUN, instanceTtl, TestPayload.class, true);
     }
 
+    /**
+     * Broadcast single-delivery subscription with a run-unique group.
+     */
     protected final SubscriptionSpec broadcast(MqTopic topic, String group) {
         return new SubscriptionSpec(topic, SubscriptionMode.BROADCAST, ConsumptionProfile.LATENCY,
                 DeliveryMode.SINGLE, "tckbroadcast", group + "-" + RUN, null, TestPayload.class, true);
     }
 
+    /**
+     * Throughput-profile batch subscription on a run-unique group.
+     */
     protected final SubscriptionSpec batchSpec(MqTopic topic) {
         return new SubscriptionSpec(topic, SubscriptionMode.LOAD_BALANCE, ConsumptionProfile.THROUGHPUT,
                 DeliveryMode.BATCH, "", "tck-batch-" + RUN, null, TestPayload.class, true);
     }
 
+    /**
+     * Subscribe and collect received deliveries. When {@code each} is null, deliveries are
+     * acknowledged immediately and recorded; otherwise the callback owns the acknowledgment.
+     */
     protected final List<Received> subscribeCollector(SubscriptionSpec spec, Consumer<WireMqDelivery> each) {
         List<Received> received = new CopyOnWriteArrayList<>();
         adapter().subscribe(spec, delivery -> {
@@ -144,6 +176,10 @@ public abstract class AbstractMqContractTest {
         return received;
     }
 
+    /**
+     * Batch subscribe and collect received deliveries. When {@code batch} is null, the
+     * first delivery's acknowledgment is used to ack the batch; otherwise the callback owns it.
+     */
     protected final List<Received> subscribeBatchCollector(SubscriptionSpec spec,
                                                            java.util.function.BiConsumer<List<Received>,
                                                                    io.github.pnoker.common.mq.listener.Acknowledgment> batch) {
@@ -173,10 +209,16 @@ public abstract class AbstractMqContractTest {
         }
     }
 
+    /**
+     * Uniquely identified payload for correlation across broker round-trips.
+     */
     protected final TestPayload payload(String text) {
         return new TestPayload(UUID.randomUUID().toString(), text);
     }
 
+    /**
+     * Awaitility shorthand with the suite's default 15s timeout.
+     */
     protected final void await(String description, java.util.function.BooleanSupplier condition) {
         Awaitility.await(description).atMost(Duration.ofSeconds(15)).pollInterval(Duration.ofMillis(100))
                 .until(condition::getAsBoolean);

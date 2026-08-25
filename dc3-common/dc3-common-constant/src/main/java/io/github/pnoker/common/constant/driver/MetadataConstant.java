@@ -42,10 +42,13 @@ public class MetadataConstant {
      */
     public static class Profile {
 
+        /** add constant. */
         public static final String ADD = PrefixConstant.ADD + SuffixConstant.PROFILE;
 
+        /** delete constant. */
         public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.PROFILE;
 
+        /** update constant. */
         public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.PROFILE;
 
         private Profile() {
@@ -62,10 +65,13 @@ public class MetadataConstant {
      */
     public static class Point {
 
+        /** add constant. */
         public static final String ADD = PrefixConstant.ADD + SuffixConstant.POINT;
 
+        /** delete constant. */
         public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.POINT;
 
+        /** update constant. */
         public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.POINT;
 
         private Point() {
@@ -82,10 +88,13 @@ public class MetadataConstant {
      */
     public static class Device {
 
+        /** add constant. */
         public static final String ADD = PrefixConstant.ADD + SuffixConstant.DEVICE;
 
+        /** delete constant. */
         public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.DEVICE;
 
+        /** update constant. */
         public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.DEVICE;
 
         private Device() {
@@ -102,10 +111,13 @@ public class MetadataConstant {
      */
     public static class DriverConfig {
 
+        /** add constant. */
         public static final String ADD = PrefixConstant.ADD + SuffixConstant.DRIVER_ATTRIBUTE_CONFIG;
 
+        /** delete constant. */
         public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.DRIVER_ATTRIBUTE_CONFIG;
 
+        /** update constant. */
         public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.DRIVER_ATTRIBUTE_CONFIG;
 
         private DriverConfig() {
@@ -122,10 +134,13 @@ public class MetadataConstant {
      */
     public static class PointConfig {
 
+        /** add constant. */
         public static final String ADD = PrefixConstant.ADD + SuffixConstant.POINT_ATTRIBUTE_CONFIG;
 
+        /** delete constant. */
         public static final String DELETE = PrefixConstant.DELETE + SuffixConstant.POINT_ATTRIBUTE_CONFIG;
 
+        /** update constant. */
         public static final String UPDATE = PrefixConstant.UPDATE + SuffixConstant.POINT_ATTRIBUTE_CONFIG;
 
         private PointConfig() {

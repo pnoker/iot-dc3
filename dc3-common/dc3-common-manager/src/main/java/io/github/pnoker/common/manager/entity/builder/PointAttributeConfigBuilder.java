@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * PointAttributeConfig Builder
+ * MapStruct builder converting between point attribute config BO, VO, and DO.
  *
  * @author pnoker
  * @since 2016.10.1

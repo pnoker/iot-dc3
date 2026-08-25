@@ -5,12 +5,12 @@
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * ~
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * ~
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -49,11 +49,21 @@ import java.util.Map;
  */
 public interface TsdbStore {
 
+    /**
+     * Store identifier matching the {@code dc3.tsdb.type} selection value.
+     *
+     * @return the selection value this adapter binds to
+     */
     String type();
 
+    /**
+     * Adapter capability declaration (§8 of the design); printed by the startup negotiation log.
+     *
+     * @return the declared capability set
+     */
     TsdbCapabilities capabilities();
 
-    // ===== 写入 =====
+    // ===== writes =====
 
     /**
      * S2/S3: batch append; store-level upsert on (series, deviceTime) with the
@@ -67,12 +77,15 @@ public interface TsdbStore {
      */
     int append(List<PointValueSample> samples);
 
-    // ===== 读取（统一过滤器：单序列 / 多序列 / 全租户） =====
+    // ===== reads (unified filter: single series / multi series / tenant-wide) =====
 
     /**
      * S4/S14: per series the newest {@code limit} samples, newest first. Tenant-wide
      * filters are supported only when {@code capabilities().tenantWideScan()}.
      *
+     * @param filter   series selection
+     * @param limit    samples per series, newest first
+     * @param deadline read deadline
      * @return samples grouped by series
      */
     Map<SeriesKey, List<PointValueSample>> last(SeriesFilter filter, int limit, TsdbDeadline deadline);
@@ -81,6 +94,13 @@ public interface TsdbStore {
      * S5/S14: one descending cursor page over the filter's series inside the window;
      * {@code cursor == null} starts from the newest. Cursor is the global
      * (deviceTime, messageId) tuple across the whole series set.
+     *
+     * @param filter   series selection
+     * @param window   half-open time window
+     * @param cursor   page anchor, null starts from the newest
+     * @param pageSize page size
+     * @param deadline read deadline
+     * @return one descending page
      */
     CursorPage<PointValueSample> history(SeriesFilter filter, TimeWindow window,
                                          Cursor cursor, int pageSize, TsdbDeadline deadline);
@@ -90,6 +110,11 @@ public interface TsdbStore {
      * COUNT counts every row). {@code percentile} is the p in [0,1] for
      * {@code AggregateFunction.PERCENTILE}, null otherwise.
      *
+     * @param filter     series selection
+     * @param fn         aggregate function
+     * @param window     half-open time window
+     * @param percentile the p in [0,1] for PERCENTILE, null otherwise
+     * @param deadline   read deadline
      * @return aggregate grouped by series
      */
     Map<SeriesKey, WindowAggregate> aggregate(SeriesFilter filter, AggregateFunction fn,
@@ -100,52 +125,123 @@ public interface TsdbStore {
      * Empty buckets are zero-filled when {@code capabilities().gapFill()} else omitted.
      * Rollup-transparent: adapters serve from the coarsest materialized tier whose
      * width satisfies {@code bucketWidth} when {@code rollupSupport} is not NONE.
+     *
+     * @param filter      series selection
+     * @param fn          aggregate function
+     * @param window      half-open time window
+     * @param bucketWidth bucket width
+     * @param percentile  the p in [0,1] for PERCENTILE, null otherwise
+     * @param deadline    read deadline
+     * @return per-bucket aggregates, buckets ascending, per series
      */
     Map<SeriesKey, List<BucketAggregate>> bucketedAggregate(SeriesFilter filter,
                                                             AggregateFunction fn, TimeWindow window,
                                                             Duration bucketWidth, Double percentile,
                                                             TsdbDeadline deadline);
 
-    /** S8: sample count inside the window for the filter (all three scopes). */
+    /**
+     * S8: sample count inside the window for the filter (all three scopes).
+     *
+     * @param filter   series selection
+     * @param window   half-open time window
+     * @param deadline read deadline
+     * @return sample count inside the window
+     */
     long count(SeriesFilter filter, TimeWindow window, TsdbDeadline deadline);
 
-    // ===== S13：租户级分析面（tenantWideAnalytics 能力门控） =====
+    // ===== S13: tenant-level analytics (gated by the tenantWideAnalytics capability) =====
 
-    /** S13-①: tenant-wide time-bucketed COUNT, single stream, buckets ascending. */
+    /**
+     * S13-①: tenant-wide time-bucketed COUNT, single stream, buckets ascending.
+     *
+     * @param tenantId    tenant scope
+     * @param window      half-open time window
+     * @param bucketWidth bucket width
+     * @param deadline    read deadline
+     * @return time-bucketed counts, buckets ascending
+     */
     List<BucketAggregate> bucketedCount(long tenantId, TimeWindow window,
                                         Duration bucketWidth, TsdbDeadline deadline);
 
-    /** S13-②: tenant-wide grouped counts, descending, top {@code limit}. */
+    /**
+     * S13-②: tenant-wide grouped counts, descending, top {@code limit}.
+     *
+     * @param tenantId  tenant scope
+     * @param window    half-open time window
+     * @param dimension grouping dimension
+     * @param limit     top-N
+     * @param deadline  read deadline
+     * @return grouped counts, descending
+     */
     List<DimensionCount> countByDimension(long tenantId, TimeWindow window,
                                           GroupDimension dimension, int limit, TsdbDeadline deadline);
 
     /**
      * S13-⑤: per-series counts (grouped by tenant, device, point) inside the
      * window — the exact grain the manager topology volume view needs.
+     *
+     * @param tenantId tenant scope
+     * @param window   half-open time window
+     * @param deadline read deadline
+     * @return per-series counts
      */
     List<SeriesCount> seriesCounts(long tenantId, TimeWindow window, TsdbDeadline deadline);
 
-    /** S13-③: every series with samples in the window plus its newest sample time. */
+    /**
+     * S13-③: every series with samples in the window plus its newest sample time.
+     *
+     * @param tenantId tenant scope
+     * @param window   half-open time window
+     * @param deadline read deadline
+     * @return one row per series with samples in the window
+     */
     List<SeriesLastSeen> lastSeenPerSeries(long tenantId, TimeWindow window, TsdbDeadline deadline);
 
     /**
      * S13-④: receive-latency histogram over {@code receiveTime − deviceTime}
      * milliseconds using the caller's bin edges (capability {@code latencyHistogram}).
+     *
+     * @param tenantId   tenant scope
+     * @param window     half-open time window
+     * @param binEdgesMs caller-supplied bin edges in milliseconds
+     * @param deadline   read deadline
+     * @return latency histogram bins
      */
     List<LatencyBin> latencyHistogram(long tenantId, TimeWindow window,
                                       List<Long> binEdgesMs, TsdbDeadline deadline);
 
-    // ===== 运维 =====
+    // ===== operations =====
 
-    /** S18: series with samples in the window (migration CLI, coverage audits). */
+    /**
+     * S18: series with samples in the window (migration CLI, coverage audits).
+     *
+     * @param tenantId tenant scope
+     * @param window   half-open time window
+     * @param deadline read deadline
+     * @return series with samples in the window
+     */
     List<SeriesKey> listSeries(long tenantId, TimeWindow window, TsdbDeadline deadline);
 
-    /** S10: capability-gated time-range delete (tenant offboarding). */
+    /**
+     * S10: capability-gated time-range delete (tenant offboarding).
+     *
+     * @param series target series
+     * @param window half-open time window
+     */
     void deleteRange(SeriesKey series, TimeWindow window);
 
-    /** S19: aligned-bucket Pearson correlation between two series
-     *  (capability {@code correlation}); facades without store support compute from
-     *  bucketed pulls themselves. */
+    /**
+     * S19: aligned-bucket Pearson correlation between two series
+     * (capability {@code correlation}); facades without store support compute from
+     * bucketed pulls themselves.
+     *
+     * @param a           first series
+     * @param b           second series
+     * @param window      half-open time window
+     * @param alignBucket alignment bucket width
+     * @param deadline    read deadline
+     * @return aligned-bucket Pearson correlation
+     */
     CorrelationResult correlation(SeriesKey a, SeriesKey b, TimeWindow window,
                                   Duration alignBucket, TsdbDeadline deadline);
 
@@ -181,9 +277,31 @@ public interface TsdbStore {
             boolean correlation) {
     }
 
-    enum RollupSupport {NATIVE, MANUAL, NONE}
+    /** S16 tiered-rollup support levels. */
+    enum RollupSupport {
+        /** Store-side rollup tiers. */
+        NATIVE,
+        /** Rollup maintained by the platform on top of the store. */
+        MANUAL,
+        /** No rollup support. */
+        NONE
+    }
 
-    enum OrderingGuarantee {NONE, PER_SERIES}
+    /** S2/S8 result ordering guarantees. */
+    enum OrderingGuarantee {
+        /** No ordering guarantee. */
+        NONE,
+        /** Samples ordered within each series. */
+        PER_SERIES
+    }
 
-    enum Precision {MICRO, MILLI, NANO}
+    /** Native timestamp precision of the store. */
+    enum Precision {
+        /** Microsecond precision. */
+        MICRO,
+        /** Millisecond precision. */
+        MILLI,
+        /** Nanosecond precision. */
+        NANO
+    }
 }

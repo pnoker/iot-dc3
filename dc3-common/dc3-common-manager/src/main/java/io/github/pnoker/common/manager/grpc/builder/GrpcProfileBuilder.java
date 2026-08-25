@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * GrpcProfile Builder.
+ * MapStruct builder for profile gRPC message conversion.
  *
  * @author pnoker
  * @since 2016.10.1

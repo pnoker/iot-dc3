@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.quartz;
 
-import lombok.RequiredArgsConstructor;
 import org.quartz.CronExpression;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.DateBuilder;
@@ -46,8 +45,16 @@ import java.util.concurrent.TimeUnit;
  * @author pnoker
  * @since 2016.10.1
  */
-@RequiredArgsConstructor
 public class QuartzService {
+
+    /**
+     * Create the scheduler service.
+     *
+     * @param scheduler quartz scheduler
+     */
+    public QuartzService(Scheduler scheduler) {
+        this.scheduler = scheduler;
+    }
 
     private final Scheduler scheduler;
 

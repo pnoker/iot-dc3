@@ -50,21 +50,75 @@ import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.TrendResp
  */
 public interface DataAnalyticsService {
 
+    /**
+     * Latest values for the requested points.
+     *
+     * @param tenantId tenant scope; results never cross tenants
+     * @param request  point selection plus freshness/degradation budget
+     */
     LatestValuesResponse queryLatest(Long tenantId, QueryLatestRequest request);
 
+    /**
+     * Time-windowed history for the requested points.
+     *
+     * @param tenantId tenant scope; results never cross tenants
+     * @param request  window, sampling, and budget constraints
+     */
     HistoryResponse queryHistory(Long tenantId, QueryHistoryRequest request);
 
+    /**
+     * Aggregate statistics (min/max/avg/count and friends) over a window.
+     *
+     * @param tenantId tenant scope; results never cross tenants
+     * @param request  aggregation target and window
+     */
     StatsResponse computeStats(Long tenantId, ComputeStatsRequest request);
 
+    /**
+     * Compare two windows of the same point set.
+     *
+     * @param tenantId tenant scope; results never cross tenants
+     * @param request  the baseline and comparison windows
+     */
     CompareResponse comparePeriods(Long tenantId, ComparePeriodsRequest request);
 
+    /**
+     * Rank entities (points/devices) by the requested metric.
+     *
+     * @param tenantId tenant scope; results never cross tenants
+     * @param request  metric, window, and result limit
+     */
     RankResponse rankEntities(Long tenantId, RankEntitiesRequest request);
 
+    /**
+     * Trend detection over a window (slope, seasonality, outliers).
+     *
+     * @param tenantId tenant scope; results never cross tenants
+     * @param request  analysis window and sensitivity
+     */
     TrendResponse trendAnalysis(Long tenantId, TrendAnalysisRequest request);
 
+    /**
+     * Threshold-breach report for the requested points.
+     *
+     * @param tenantId tenant scope; results never cross tenants
+     * @param request  thresholds and observation window
+     */
     ThresholdResponse thresholdReport(Long tenantId, ThresholdReportRequest request);
 
+    /**
+     * Correlation between two point series over a window.
+     *
+     * @param tenantId tenant scope; results never cross tenants
+     * @param request  the two series and the window
+     */
     CorrelationResponse correlate(Long tenantId, CorrelateRequest request);
 
+    /**
+     * Data-quality report (gaps, staleness, duplicates) for the requested points.
+     *
+     * @param tenantId tenant scope; results never cross tenants
+     * @param request  quality dimensions and window
+     */
     QualityResponse qualityReport(Long tenantId, QualityReportRequest request);
 }

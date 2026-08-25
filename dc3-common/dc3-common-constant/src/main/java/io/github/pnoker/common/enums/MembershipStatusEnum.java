@@ -34,10 +34,13 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum MembershipStatusEnum {
 
+    /** Active member. */
     ACTIVE("ACTIVE", "active", "Active member"),
 
+    /** Suspended member. */
     SUSPENDED("SUSPENDED", "suspended", "Suspended member"),
 
+    /** Invited member. */
     INVITED("INVITED", "invited", "Invited member"),
     ;
 

@@ -28,22 +28,31 @@ package io.github.pnoker.common.constant.common;
  */
 public class SymbolConstant {
 
+    /** dot constant. */
     public static final String DOT = ".";
 
+    /** underscore constant. */
     public static final String UNDERSCORE = "_";
 
+    /** hyphen constant. */
     public static final String HYPHEN = "-";
 
+    /** asterisk constant. */
     public static final String ASTERISK = "*";
 
+    /** hashtag constant. */
     public static final String HASHTAG = "#";
 
+    /** colon constant. */
     public static final String COLON = ":";
 
+    /** double colon constant. */
     public static final String DOUBLE_COLON = "::";
 
+    /** slash constant. */
     public static final String SLASH = "/";
 
+    /** double slash constant. */
     public static final String DOUBLE_SLASH = "//";
 
     private SymbolConstant() {

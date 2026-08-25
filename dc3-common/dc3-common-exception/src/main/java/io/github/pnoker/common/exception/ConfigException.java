@@ -27,14 +27,29 @@ import io.github.pnoker.common.enums.ErrorCode;
  */
 public class ConfigException extends BusinessException {
 
+    /**
+     * Exception with a failure detail and cause.
+     *
+     */
     public ConfigException() {
         this(null);
     }
 
+    /**
+     * Exception with a plain failure cause.
+     *
+     * @param cause underlying failure
+     */
     public ConfigException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Exception with a failure detail and cause.
+     *
+     * @param template failure detail or underlying failure
+     * @param params failure detail or underlying failure
+     */
     public ConfigException(String template, Object... params) {
         super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }

@@ -27,10 +27,21 @@ import io.github.pnoker.common.enums.ErrorCode;
  */
 public class AccessDeniedException extends ServiceException {
 
+    /**
+     * Exception with a plain failure detail.
+     *
+     * @param message failure detail
+     */
     public AccessDeniedException(String message) {
         super(message);
     }
 
+    /**
+     * Exception with a failure detail and cause.
+     *
+     * @param message failure detail or underlying failure
+     * @param cause failure detail or underlying failure
+     */
     public AccessDeniedException(String message, Throwable cause) {
         super(message, cause);
     }

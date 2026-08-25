@@ -34,8 +34,10 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum PasswordAlgorithmEnum {
 
+    /** Argon2id. */
     ARGON2ID("ARGON2ID", "argon2id", "Argon2id"),
 
+    /** BCrypt. */
     BCRYPT("BCRYPT", "bcrypt", "BCrypt"),
     ;
 

@@ -38,6 +38,15 @@ import javax.sql.DataSource;
 @Configuration
 public class TsdbDataSourceConfig {
 
+    /**
+     * Resolve the datasource the TSDB port adapter runs on.
+     *
+     * <p>With dynamic routing, returns the {@code history} entry so unqualified table names resolve against the
+     * {@code dc3_history} schema; otherwise returns the single application datasource unchanged.
+     *
+     * @param dataSource the primary application datasource
+     * @return the history-scoped datasource when routing is active, the primary datasource otherwise
+     */
     @Bean
     public DataSource tsdbDataSource(DataSource dataSource) {
         if (dataSource instanceof DynamicRoutingDataSource routing) {

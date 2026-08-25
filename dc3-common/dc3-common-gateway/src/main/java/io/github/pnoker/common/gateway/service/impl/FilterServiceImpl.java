@@ -45,7 +45,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Gateway filter service implementation.
+ * Resolves tenant, local credential, and principal from the incoming request and
+ * validates bearer tokens through the auth facade before the gateway forwards it.
  *
  * @author pnoker
  * @since 2016.10.1

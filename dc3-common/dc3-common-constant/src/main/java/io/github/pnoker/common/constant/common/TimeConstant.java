@@ -42,10 +42,13 @@ public class TimeConstant {
      */
     public static final String DAY_DATE_FORMAT1 = "yyyy.MM.dd";
 
+    /** day date format2 constant. */
     public static final String DAY_DATE_FORMAT2 = "yyyy-MM-dd";
 
+    /** default date format constant. */
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+    /** complete date format constant. */
     public static final String COMPLETE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
     private TimeConstant() {

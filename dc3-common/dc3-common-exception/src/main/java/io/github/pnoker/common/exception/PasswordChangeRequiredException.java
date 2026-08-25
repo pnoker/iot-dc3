@@ -34,6 +34,11 @@ public class PasswordChangeRequiredException extends BusinessException {
 
     private final ErrorCode errorCode;
 
+    /**
+     * Exception with a failure detail and cause.
+     *
+     * @param errorCode failure detail or underlying failure
+     */
     public PasswordChangeRequiredException(ErrorCode errorCode) {
         super(errorCode.getRemark(), null);
         this.errorCode = errorCode;

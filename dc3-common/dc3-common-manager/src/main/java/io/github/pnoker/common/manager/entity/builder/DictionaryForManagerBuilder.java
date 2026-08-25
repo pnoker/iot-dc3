@@ -29,7 +29,8 @@ import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.Mapper;
 
 /**
- * Dictionary For Manager Builder
+ * MapStruct builder extending {@code DictionaryBuilder} with manager-specific
+ * dictionary conversions (driver and page projections).
  *
  * @author pnoker
  * @since 2016.10.1

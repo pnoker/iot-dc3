@@ -25,6 +25,11 @@ package io.github.pnoker.common.exception;
  */
 public class TenantNotScopedException extends RuntimeException {
 
+    /**
+     * Signal a missing tenant scope with a failure detail.
+     *
+     * @param message failure detail
+     */
     public TenantNotScopedException(String message) {
         super(message);
     }

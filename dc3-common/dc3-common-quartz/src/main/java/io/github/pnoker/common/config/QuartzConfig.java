@@ -34,6 +34,10 @@ import org.springframework.context.annotation.Bean;
 @AutoConfiguration(after = QuartzAutoConfiguration.class)
 public class QuartzConfig {
 
+    /** Creates the quartz configuration. */
+    public QuartzConfig() {
+    }
+
     /**
      * Quartz scheduler service.
      *

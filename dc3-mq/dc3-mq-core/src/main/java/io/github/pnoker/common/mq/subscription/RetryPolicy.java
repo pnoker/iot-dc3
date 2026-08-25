@@ -30,6 +30,12 @@ package io.github.pnoker.common.mq.subscription;
  */
 public record RetryPolicy(int maxAttempts, long initialBackoffMillis, double multiplier, long maxBackoffMillis) {
 
+    /**
+     * The platform default: 3 attempts, 1s initial delay, 2x multiplier, 10s ceiling —
+     * mirroring the point-value batch consumer settings.
+     *
+     * @return the default retry policy
+     */
     public static RetryPolicy defaults() {
         return new RetryPolicy(3, 1000, 2, 10000);
     }

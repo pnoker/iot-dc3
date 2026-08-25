@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Metadata event.
+ * Metadata-change event published to drivers so they refresh their cached configuration.
  *
  * @author zhangzi
  * @since 2016.10.1

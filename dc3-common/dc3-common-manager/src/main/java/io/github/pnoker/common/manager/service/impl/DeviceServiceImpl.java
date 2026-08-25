@@ -478,8 +478,10 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     /**
-     * @param id Device ID
-     * @return
+     * Whether a device row exists for the given ID.
+     *
+     * @param id device ID
+     * @return true when the device exists
      */
     private boolean checkExist(Long id) {
         DeviceDO entityDO = deviceManager.getById(id);

@@ -66,6 +66,8 @@ public enum TimeRangeKeyEnum {
     /**
      * Resolve an enum instance by its wire-format code (e.g. {@code "today"}). Matching
      * is case-insensitive; {@code null} / blank input returns {@code null}.
+     * @param code wire-format code, e.g. {@code "today"}
+     * @return the matching instance, or {@code null} when unrecognized
      */
     public static TimeRangeKeyEnum ofCode(String code) {
         if (Objects.isNull(code) || code.isBlank()) {

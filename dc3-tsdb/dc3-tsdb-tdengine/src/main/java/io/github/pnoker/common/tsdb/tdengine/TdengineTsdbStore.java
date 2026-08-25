@@ -143,7 +143,7 @@ public final class TdengineTsdbStore implements TsdbStore {
                 true, OrderingGuarantee.PER_SERIES, Precision.MICRO, true, false);
     }
 
-    // ===== 写入 =====
+    // ===== writes =====
 
     @Override
     public int append(List<PointValueSample> samples) {
@@ -213,7 +213,7 @@ public final class TdengineTsdbStore implements TsdbStore {
         return written;
     }
 
-    // ===== 读取 =====
+    // ===== reads =====
 
     @Override
     public Map<SeriesKey, List<PointValueSample>> last(SeriesFilter filter, int limit, TsdbDeadline deadline) {
@@ -376,7 +376,7 @@ public final class TdengineTsdbStore implements TsdbStore {
         return Objects.requireNonNullElse(value, 0L);
     }
 
-    // ===== S13：租户级分析面 =====
+    // ===== S13: tenant-level analytics =====
 
     @Override
     public List<BucketAggregate> bucketedCount(long tenantId, TimeWindow window,
@@ -444,7 +444,7 @@ public final class TdengineTsdbStore implements TsdbStore {
                 "TDengine adapter declares latencyHistogram=false; facades degrade to zero-filled bins");
     }
 
-    // ===== 运维 =====
+    // ===== operations =====
 
     @Override
     public List<SeriesKey> listSeries(long tenantId, TimeWindow window, TsdbDeadline deadline) {

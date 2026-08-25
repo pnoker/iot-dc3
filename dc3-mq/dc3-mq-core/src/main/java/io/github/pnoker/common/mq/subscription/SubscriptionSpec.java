@@ -54,6 +54,14 @@ public record SubscriptionSpec(
         boolean deadLetterEnabled
 ) {
 
+    /**
+     * Convenience factory: load-balanced, latency-profile, single delivery on the
+     * platform-shared destination with no key filter and dead-letter enabled.
+     *
+     * @param topic       logical destination
+     * @param payloadType type the listener expects
+     * @return a ready subscription declaration
+     */
     public static SubscriptionSpec of(MqTopic topic, Class<?> payloadType) {
         return new SubscriptionSpec(topic, SubscriptionMode.LOAD_BALANCE, ConsumptionProfile.LATENCY,
                 DeliveryMode.SINGLE, "", "", null, payloadType, true);

@@ -31,7 +31,7 @@ import org.mapstruct.MappingTarget;
 import java.util.Optional;
 
 /**
- * GrpcEventAttributeConfig Builder
+ * MapStruct builder for event-attribute config gRPC message conversion.
  *
  * @author pnoker
  * @since 2016.10.1

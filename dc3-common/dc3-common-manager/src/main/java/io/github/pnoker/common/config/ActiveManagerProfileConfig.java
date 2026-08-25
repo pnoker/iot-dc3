@@ -26,7 +26,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 
 /**
- * Environment Config
+ * Activates the {@code manager} Spring profile at startup so manager modules pick up
+ * their profile-specific configuration.
  *
  * @author pnoker
  * @since 2016.10.1

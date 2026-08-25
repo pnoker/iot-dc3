@@ -93,8 +93,10 @@ public class MetadataEventListener {
     }
 
     /**
-     * @param service
-     * @param entityDTO DriverTransferMetadataDTO
+     * Publish the metadata-change payload to the affected driver's queue.
+     *
+     * @param service   driver service name (routing key)
+     * @param entityDTO transfer payload
      */
     private void notifyDriver(String service, MetadataEventDTO entityDTO) {
         if (Objects.isNull(service) || service.isBlank()) {

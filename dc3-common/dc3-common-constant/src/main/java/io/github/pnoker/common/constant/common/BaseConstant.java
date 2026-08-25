@@ -25,6 +25,7 @@ package io.github.pnoker.common.constant.common;
  */
 public class BaseConstant {
 
+    /** Exception message thrown by utility-class private constructors. */
     public static final String UTILITY_CLASS = "Utility class";
 
     private BaseConstant() {

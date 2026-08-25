@@ -18,7 +18,6 @@
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.thread.entity.property.ThreadProperties;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -46,8 +45,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Slf4j
 @AutoConfiguration
-@RequiredArgsConstructor
 public class ThreadPoolConfig {
+
+    /**
+     * Create the pool config with the shared thread properties.
+     *
+     * @param thread thread pool settings
+     */
+    public ThreadPoolConfig(ThreadProperties thread) {
+        this.thread = thread;
+    }
 
     private final AtomicInteger threadPoolAtomic = new AtomicInteger(1);
 

@@ -45,10 +45,10 @@ public interface RoleResourceBindService extends BaseService<RoleResourceBindBO,
     Page<RoleResourceBindBO> list(RoleResourceBindQuery entityQuery, Long tenantId);
 
     /**
-     * TenantIdUserId
+     * Resources bound to the given role.
      *
-     * @param roleId id
-     * @return
+     * @param roleId role ID
+     * @return bound resources, empty list when the role has none
      */
     List<ResourceBO> listResourceByRoleId(Long roleId);
 
