@@ -2617,7 +2617,7 @@ const formatFileSize = (size = 0) => {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: $breakpoint-sm-max) {
   .agentic-panel {
     width: min(420px, 40vw) !important;
   }

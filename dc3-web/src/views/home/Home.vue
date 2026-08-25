@@ -417,11 +417,12 @@ const cards = computed<CardModel[]>(() => [
   // screens the cols sit side-by-side so they don't need a bottom margin
   // of their own — adding one stacked with .home__row margin-bottom,
   // blowing the gap out to 16px. Only the narrow-screen breakpoint where
-  // cols collapse into a single column actually needs the extra spacer.
+  // cols collapse into a single column (:md=24, i.e. tablet and below)
+  // actually needs the extra spacer.
   .home__col {
     margin-bottom: 0;
 
-    @media (max-width: 1024px) {
+    @media (max-width: $breakpoint-sm-max) {
       margin-bottom: 8px;
 
       &:last-child {
@@ -439,20 +440,20 @@ const cards = computed<CardModel[]>(() => [
   }
 
   // Stat indicators: always fit the strip on one line, regardless of how
-  // many cards the cards computed property ends up with. Below 1280px
-  // (tablet / mobile) fall back to 2 cols so cards don't squeeze below
-  // their minimum usable width.
+  // many cards the cards computed property ends up with. Below the lg
+  // tier (tablet / mobile) fall back to 3 cols, and to a single column on
+  // mobile, so cards don't squeeze below their minimum usable width.
   .home__stats {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 8px;
     margin-bottom: 8px;
 
-    @media (max-width: 1280px) {
+    @media (max-width: $breakpoint-md-max) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: $breakpoint-xs-max) {
       grid-template-columns: 1fr;
     }
   }
