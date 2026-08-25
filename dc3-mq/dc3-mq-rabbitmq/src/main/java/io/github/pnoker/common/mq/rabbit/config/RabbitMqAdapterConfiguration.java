@@ -28,6 +28,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.amqp.autoconfigure.RabbitTemplateCustomizer;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -39,6 +40,13 @@ import org.springframework.context.annotation.Bean;
  * returns logging, publisher-confirm callback, persistent delivery — and the Jackson
  * converter is retained for rolling-upgrade and test-harness compatibility.
  *
+ * <p>The mandatory flag and the confirm/returns callbacks are applied through a
+ * {@link RabbitTemplateCustomizer} on the template Boot itself creates, instead of a
+ * {@code @ConditionalOnMissingBean} template bean racing Boot's
+ * {@code RabbitAutoConfiguration}: whichever bean won the race previously decided
+ * whether unroutable publishes were reported, and when Boot's template won the
+ * adapter's confirmation logic silently reported every publish as routed.
+ *
  * @author pnoker
  * @since 2026.8.19
  */
@@ -48,7 +56,8 @@ import org.springframework.context.annotation.Bean;
 public class RabbitMqAdapterConfiguration {
 
     /**
-     * JSON converter with typed envelope headers.
+     * JSON converter with typed envelope headers; applied to the Boot template through
+     * its configurer.
      */
     @Bean
     @ConditionalOnMissingBean
@@ -57,32 +66,31 @@ public class RabbitMqAdapterConfiguration {
     }
 
     /**
-     * Publisher-confirms template with mandatory returns.
+     * Mandatory publishes with returns logging and a publisher-confirm callback,
+     * applied to whichever template instance Boot auto-configures.
      */
-    @Bean(name = "rabbitTemplate")
-    @ConditionalOnMissingBean(RabbitTemplate.class)
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter) {
-        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(messageConverter);
-        rabbitTemplate.setMandatory(true);
-        rabbitTemplate.setReturnsCallback(returned -> {
-            // Returned messages mean the broker accepted the publish but no queue was
-            // bound to the routing key — almost always a deployment misconfiguration.
-            // Never render the body: it can contain telemetry, commands or credentials.
-            Message returnedMessage = returned.getMessage();
-            int bodyLength = returnedMessage != null && returnedMessage.getBody() != null
-                    ? returnedMessage.getBody().length : 0;
-            log.error("RabbitMQ message returned, exchange={}, routingKey={}, replyCode={}, replyText={}, bodyLength={}",
-                    returned.getExchange(), returned.getRoutingKey(), returned.getReplyCode(), returned.getReplyText(),
-                    bodyLength);
-        });
-        rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
-            if (!ack) {
-                log.error("RabbitMQ publisher confirm NACK, correlationId={}, cause={}",
-                        correlationData != null ? correlationData.getId() : null, cause);
-            }
-        });
-        return rabbitTemplate;
+    @Bean
+    public RabbitTemplateCustomizer dc3RabbitTemplateCustomizer() {
+        return rabbitTemplate -> {
+            rabbitTemplate.setMandatory(true);
+            rabbitTemplate.setReturnsCallback(returned -> {
+                // Returned messages mean the broker accepted the publish but no queue was
+                // bound to the routing key — almost always a deployment misconfiguration.
+                // Never render the body: it can contain telemetry, commands or credentials.
+                Message returnedMessage = returned.getMessage();
+                int bodyLength = returnedMessage != null && returnedMessage.getBody() != null
+                        ? returnedMessage.getBody().length : 0;
+                log.error("RabbitMQ message returned, exchange={}, routingKey={}, replyCode={}, replyText={}, bodyLength={}",
+                        returned.getExchange(), returned.getRoutingKey(), returned.getReplyCode(),
+                        returned.getReplyText(), bodyLength);
+            });
+            rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
+                if (!ack) {
+                    log.error("RabbitMQ publisher confirm NACK, correlationId={}, cause={}",
+                            correlationData != null ? correlationData.getId() : null, cause);
+                }
+            });
+        };
     }
 
     /**
@@ -95,9 +103,10 @@ public class RabbitMqAdapterConfiguration {
     }
 
     /**
-     * The port adapter bound to the template and admin.
+     * The port adapter bound to the template and admin; its {@code stop()} releases
+     * every listener container it registered on context shutdown.
      */
-    @Bean
+    @Bean(destroyMethod = "stop")
     public RabbitMqAdapter rabbitMqAdapter(RabbitTemplate rabbitTemplate, RabbitAdmin rabbitAdmin,
                                            ConnectionFactory connectionFactory, BatchConsumerProperties batchProperties,
                                            @Value("${dc3.driver.lease.queue-expires-millis:300000}")

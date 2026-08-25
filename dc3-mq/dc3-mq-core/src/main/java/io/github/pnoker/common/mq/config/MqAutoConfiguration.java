@@ -53,7 +53,7 @@ public class MqAutoConfiguration {
         BrokerAdapter adapter = adapterProvider.getIfAvailable();
         if (Objects.isNull(adapter)) {
             throw new IllegalStateException(
-                    "No BrokerAdapter bean found: add exactly one dc3-common-mq-* adapter dependency "
+                    "No BrokerAdapter bean found: add exactly one dc3-mq-* adapter dependency "
                             + "(selected by dc3.mq.type, default rabbitmq)");
         }
         log.info("MQ port negotiated, broker={}, capabilities={}", adapter.type(), adapter.capabilities());
@@ -75,7 +75,7 @@ public class MqAutoConfiguration {
         BrokerAdapter adapter = adapterProvider.getIfAvailable();
         if (Objects.isNull(adapter)) {
             throw new IllegalStateException(
-                    "No BrokerAdapter bean found: add exactly one dc3-common-mq-* adapter dependency");
+                    "No BrokerAdapter bean found: add exactly one dc3-mq-* adapter dependency");
         }
         return new Dc3ListenerProcessor(adapter);
     }

@@ -13,7 +13,8 @@ negotiation, retry classification, and the batch-consumer configuration shared b
 | `Dc3Listener` / `MqListener`                                   | listener annotations processed by `Dc3ListenerProcessor`                  |
 | `MessageSender` / `MessageSenderImpl`                          | publish path with per-message confirmations                               |
 | `MqMessage` / `MqReceived`                                     | logical wire envelopes (`EnvelopeCodec`)                                  |
-| `RetryPolicy` / `MqPoisonException` / `MqPublishException`     | retry and failure classification                                          |
+| `MqPoisonException` / `MqPublishException`                     | failure classification                                                    |
+| `KeyMatcher` / `KeyRoutes`                                     | key-pattern matching and the client-side topic router for adapters whose broker has no binding-level key filter |
 | `MqBatchListener` / `RawBatchListener` / `RawDeliveryListener` | batch-consumer contracts                                                  |
 | `BatchConsumerProperties`                                      | binds `dc3.data.point.batch` (batch size, timeouts, concurrency, retries) |
 | `MqAutoConfiguration`                                          | wires the shared messaging beans                                          |
@@ -30,10 +31,12 @@ mvn -s .mvn/settings.xml -pl dc3-mq/dc3-mq-core -am package
 
 ## Testing
 
-This module has no tests of its own; the port contract is verified against every adapter in `dc3-mq-tck`:
+Unit tests cover the pure port logic (e.g. `KeyMatcher` wildcard semantics); the port contract is verified against
+every adapter in `dc3-mq-tck`:
 
 ```bash
 mvn -s .mvn/settings.xml -q -pl dc3-mq/dc3-mq-core -am -DskipTests compile
+mvn -s .mvn/settings.xml -q -f dc3-mq/pom.xml -pl dc3-mq-core test
 ```
 
 ## Related Modules

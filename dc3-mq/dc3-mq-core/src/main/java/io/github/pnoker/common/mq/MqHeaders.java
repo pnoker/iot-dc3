@@ -51,6 +51,14 @@ public final class MqHeaders {
      */
     public static final String CORRELATION_ID = "dc3-correlation-id";
 
+    /**
+     * Partition key mirror for brokers with no native key field (MQTT user property,
+     * JMS string property). Adapters whose broker carries the key natively (rabbit
+     * routing key, kafka record key, rocketmq keys, pulsar key) do not stamp it; the
+     * adapters' client-side topic routers read whichever field their broker uses.
+     */
+    public static final String PARTITION_KEY = "dc3-partition-key";
+
     private MqHeaders() {
         throw new IllegalStateException("Utility class");
     }

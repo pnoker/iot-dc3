@@ -26,7 +26,9 @@ import org.springframework.context.annotation.Bean;
 
 /**
  * Activates the RocketMQ adapter when {@code dc3.mq.type=rocketmq}. Name server
- * address comes from {@code dc3.mq.rocketmq.name-server-address}.
+ * address comes from {@code dc3.mq.rocketmq.name-server-address} / the
+ * {@code DC3_MQ_ROCKETMQ_NAMESRV} environment variable (the name the compose stack
+ * publishes).
  *
  * @author pnoker
  * @since 2026.8.19
@@ -36,11 +38,13 @@ import org.springframework.context.annotation.Bean;
 public class RocketMqAdapterConfiguration {
 
     /**
-     * The port adapter bound to the RocketMQ producer/consumer.
+     * The port adapter bound to the RocketMQ producer/consumer; its {@code stop()}
+     * shuts down every consumer and the producer on context shutdown.
      */
-    @Bean
+    @Bean(destroyMethod = "stop")
     public RocketMqAdapter rocketMqAdapter(
-            @Value("${dc3.mq.rocketmq.name-server-address:localhost:9876}") String namesrvAddr,
+            @Value("${dc3.mq.rocketmq.name-server-address:${DC3_MQ_ROCKETMQ_NAMESRV:localhost:9876}}")
+            String namesrvAddr,
             BatchConsumerProperties batchProperties) {
         return new RocketMqAdapter(namesrvAddr, batchProperties);
     }

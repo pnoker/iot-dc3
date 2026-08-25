@@ -25,6 +25,7 @@ import com.hivemq.client.mqtt.mqtt5.message.subscribe.Mqtt5Subscribe;
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.OrderingGuarantee;
 import io.github.pnoker.common.constant.mq.SubscriptionMode;
+import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.adapter.BrokerCapabilities;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
@@ -35,19 +36,21 @@ import io.github.pnoker.common.mq.config.BatchConsumerProperties;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqPoisonException;
 import io.github.pnoker.common.mq.message.WireMqMessage;
+import io.github.pnoker.common.mq.subscription.KeyRoutes;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -58,9 +61,21 @@ import java.util.concurrent.TimeUnit;
  * ({@code $share/<group>/...}), BROADCAST rides a plain subscription — every
  * subscription gets its own client session, so broadcast instances are independent.
  * QoS 1 gives per-message ack and PUBACK publisher confirmation. MQTT has no server
- * nack: reject(true) is approximated by client-side bounded redelivery; reject(false)
- * republishes to the {@code /dlq} topic and acknowledges. Delayed delivery and batch
- * are the port fallback / synthesized (capabilities false).
+ * nack: reject(true) is approximated by client-side bounded redelivery (the attempt
+ * number rides the internal queue, so a permanently-rejecting listener is capped at
+ * the batch path's attempt bound and dead-lettered, never looped); reject(false)
+ * republishes to the {@code /dlq} topic and acknowledges only when the republish
+ * succeeded. Delayed delivery and batch are the port fallback / synthesized
+ * (capabilities false).
+ *
+ * <p>Key routing (MQTT has no binding-level key filter): the partition key rides the
+ * wire as the {@code dc3-partition-key} user property, and LOAD_BALANCE specs sharing
+ * a (topic, share group) share ONE client whose deliveries are routed by
+ * {@link KeyRoutes} — a blank pattern matches everything, several matching listeners
+ * round-robin, and a key matching no listener in this JVM is acknowledged and skipped
+ * (Rabbit unroutable-drop semantics; the message's home, if any, is a matching
+ * listener on another JVM). BROADCAST specs keep an independent client each.
+ * {@code redelivered} reflects the internal attempt counter (attempt &gt; 1).
  *
  * <p>Known broker variance (design §13.8): MQTT 5 is silent on retention for a shared
  * subscription while no member is online — messages may be dropped. Deployers relying
@@ -78,12 +93,22 @@ public class MqttMqAdapter implements BrokerAdapter {
      */
     private static final String DEFAULT_SHARE = "dc3-mq";
 
+    /**
+     * How long the HiveMQ callback waits for queue space before giving up on the
+     * enqueue; a full wait would stall the client's netty threads, no wait would drop
+     * QoS-1 messages under bursts.
+     */
+    private static final long ENQUEUE_TIMEOUT_MILLIS = 200;
+
     private final String host;
     private final int port;
     private final BatchConsumerProperties retryProperties;
 
     private final Mqtt5AsyncClient publishClient;
+    private final Map<String, KeyRoutes<RawDeliveryListener>> singleRoutes = new ConcurrentHashMap<>();
+    private final Map<String, KeyRoutes<RawBatchListener>> batchRoutes = new ConcurrentHashMap<>();
     private final List<Subscription> subscriptions = new CopyOnWriteArrayList<>();
+    private volatile boolean stopped;
 
     public MqttMqAdapter(String host, int port, BatchConsumerProperties retryProperties) {
         this.host = host;
@@ -130,9 +155,18 @@ public class MqttMqAdapter implements BrokerAdapter {
 
     @Override
     public void subscribe(SubscriptionSpec spec, RawDeliveryListener listener) {
+        String routeKey = routeKey(spec);
+        KeyRoutes<RawDeliveryListener> routes =
+                singleRoutes.computeIfAbsent(routeKey, key -> new KeyRoutes<>());
+        routes.add(spec.keyPattern(), listener);
+        if (subscriptions.stream().anyMatch(subscription -> subscription.routeKey().equals(routeKey))) {
+            log.info("MQTT subscription joined shared session, topic={}, mode={}, delivery={}, filter={}",
+                    spec.topic(), spec.mode(), spec.delivery(), filterOf(spec));
+            return;
+        }
         Mqtt5AsyncClient client = client("dc3-mq-sub-" + UUID.randomUUID());
-        Dispatcher dispatcher = new Dispatcher(spec, listener, null);
-        subscriptions.add(new Subscription(client, dispatcher));
+        Dispatcher dispatcher = new Dispatcher(spec, routes, null, routeKey);
+        subscriptions.add(new Subscription(client, dispatcher, routeKey));
         client.subscribe(subscribeOf(spec), dispatcher::accept, true);
         dispatcher.start();
         log.info("MQTT subscription started, topic={}, mode={}, filter={}",
@@ -141,9 +175,17 @@ public class MqttMqAdapter implements BrokerAdapter {
 
     @Override
     public void subscribeBatch(SubscriptionSpec spec, RawBatchListener listener) {
+        String routeKey = routeKey(spec);
+        KeyRoutes<RawBatchListener> routes = batchRoutes.computeIfAbsent(routeKey, key -> new KeyRoutes<>());
+        routes.add(spec.keyPattern(), listener);
+        if (subscriptions.stream().anyMatch(subscription -> subscription.routeKey().equals(routeKey))) {
+            log.info("MQTT batch subscription joined shared session, topic={}, mode={}, delivery={}, filter={}",
+                    spec.topic(), spec.mode(), spec.delivery(), filterOf(spec));
+            return;
+        }
         Mqtt5AsyncClient client = client("dc3-mq-sub-" + UUID.randomUUID());
-        Dispatcher dispatcher = new Dispatcher(spec, null, listener);
-        subscriptions.add(new Subscription(client, dispatcher));
+        Dispatcher dispatcher = new Dispatcher(spec, null, routes, routeKey);
+        subscriptions.add(new Subscription(client, dispatcher, routeKey));
         client.subscribe(subscribeOf(spec), dispatcher::accept, true);
         dispatcher.start();
         log.info("MQTT batch subscription started, topic={}, mode={}, filter={}",
@@ -151,9 +193,15 @@ public class MqttMqAdapter implements BrokerAdapter {
     }
 
     /**
-     * Disconnect every subscription session and the publisher.
+     * Disconnect every subscription session and the publisher. Idempotent.
      */
     public void stop() {
+        if (stopped) {
+            return;
+        }
+        stopped = true;
+        singleRoutes.clear();
+        batchRoutes.clear();
         subscriptions.forEach(subscription -> {
             subscription.dispatcher().halt();
             subscription.client().disconnect();
@@ -163,29 +211,35 @@ public class MqttMqAdapter implements BrokerAdapter {
     }
 
     /**
-     * Per-subscription dispatch: single deliveries invoke the listener directly with
-     * bounded client-side redelivery for reject(true); batch subscriptions drain the
-     * incoming queue into windowed batches with the shared synchronous bounded-retry
-     * semantics. Poison and exhausted messages are republished to the dead-letter
-     * topic and acknowledged.
+     * Per-session dispatch: single deliveries route each publish by key pattern with
+     * bounded client-side redelivery for reject(true) — the attempt number rides the
+     * internal queue so a permanently-rejecting listener dead-letters after the
+     * bounded attempts instead of looping forever; batch subscriptions drain the
+     * incoming queue into windowed, key-routed sub-batches with the shared synchronous
+     * bounded-retry semantics. Poison and exhausted messages are republished to the
+     * dead-letter topic and acknowledged only when the republish succeeded.
      */
     private final class Dispatcher implements Runnable {
 
         private final SubscriptionSpec spec;
-        private final RawDeliveryListener single;
-        private final RawBatchListener batch;
-        private final BlockingQueue<Mqtt5Publish> incoming = new ArrayBlockingQueue<>(10_000);
+        private final KeyRoutes<RawDeliveryListener> singleRoutesOfSession;
+        private final KeyRoutes<RawBatchListener> batchRoutesOfSession;
+        private final String routeKey;
+        private final BlockingQueue<Pending> incoming = new ArrayBlockingQueue<>(10_000);
         private volatile boolean halted;
         private Thread thread;
 
-        private Dispatcher(SubscriptionSpec spec, RawDeliveryListener single, RawBatchListener batch) {
+        private Dispatcher(SubscriptionSpec spec, KeyRoutes<RawDeliveryListener> singleRoutesOfSession,
+                           KeyRoutes<RawBatchListener> batchRoutesOfSession, String routeKey) {
             this.spec = spec;
-            this.single = single;
-            this.batch = batch;
+            this.singleRoutesOfSession = singleRoutesOfSession;
+            this.batchRoutesOfSession = batchRoutesOfSession;
+            this.routeKey = routeKey;
         }
 
         void start() {
             thread = new Thread(this, "dc3-mq-mqtt-" + spec.topic());
+            thread.setDaemon(true);
             thread.start();
         }
 
@@ -194,19 +248,31 @@ public class MqttMqAdapter implements BrokerAdapter {
         }
 
         void accept(Mqtt5Publish publish) {
-            incoming.add(publish);
+            try {
+                // bounded wait instead of add(): add() throws IllegalStateException on a
+                // full queue, which would drop the QoS-1 publish; on timeout the publish
+                // is left UNACKNOWLEDGED so the broker redelivers it
+                if (!incoming.offer(new Pending(publish, 1), ENQUEUE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
+                    log.error("MQTT dispatch queue full, leaving publish unacknowledged for broker redelivery, topic={}",
+                            publish.getTopic());
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("MQTT dispatch enqueue interrupted, leaving publish unacknowledged for broker redelivery, topic={}",
+                        publish.getTopic(), e);
+            }
         }
 
         @Override
         public void run() {
             while (!halted) {
                 try {
-                    if (Objects.nonNull(batch)) {
+                    if (Objects.nonNull(batchRoutesOfSession)) {
                         pumpBatch();
                     } else {
-                        Mqtt5Publish publish = incoming.poll(200, TimeUnit.MILLISECONDS);
-                        if (Objects.nonNull(publish)) {
-                            deliverSingle(publish, 1);
+                        Pending pending = incoming.poll(200, TimeUnit.MILLISECONDS);
+                        if (Objects.nonNull(pending)) {
+                            deliverSingle(pending);
                         }
                     }
                 } catch (InterruptedException e) {
@@ -217,39 +283,56 @@ public class MqttMqAdapter implements BrokerAdapter {
         }
 
         private void pumpBatch() throws InterruptedException {
-            Mqtt5Publish first = incoming.poll(200, TimeUnit.MILLISECONDS);
+            Pending first = incoming.poll(200, TimeUnit.MILLISECONDS);
             if (Objects.isNull(first)) {
                 return;
             }
-            List<Mqtt5Publish> publishes = new ArrayList<>(List.of(first));
+            List<Pending> pendings = new ArrayList<>(List.of(first));
             long deadline = System.currentTimeMillis() + retryProperties.getReceiveTimeoutMillis();
-            while (publishes.size() < retryProperties.getBatchSize()
+            while (pendings.size() < retryProperties.getBatchSize()
                     && System.currentTimeMillis() < deadline) {
-                Mqtt5Publish next = incoming.poll(10, TimeUnit.MILLISECONDS);
+                Pending next = incoming.poll(10, TimeUnit.MILLISECONDS);
                 if (Objects.isNull(next)) {
                     break;
                 }
-                publishes.add(next);
+                pendings.add(next);
             }
-            Acknowledgment ack = batchAck(publishes);
+            Map<RawBatchListener, List<Pending>> grouped = new LinkedHashMap<>();
+            for (Pending pending : pendings) {
+                RawBatchListener listener = batchRoutesOfSession.next(keyOf(pending.publish()));
+                if (Objects.isNull(listener)) {
+                    log.debug("MQTT batch message matched no listener in this JVM, acknowledging and skipping, topic={}, key={}",
+                            spec.topic(), keyOf(pending.publish()));
+                    pending.publish().acknowledge();
+                    continue;
+                }
+                grouped.computeIfAbsent(listener, key -> new ArrayList<>()).add(pending);
+            }
+            for (Map.Entry<RawBatchListener, List<Pending>> entry : grouped.entrySet()) {
+                deliverSubBatch(entry.getKey(), entry.getValue());
+            }
+        }
+
+        private void deliverSubBatch(RawBatchListener listener, List<Pending> pendings) {
+            Acknowledgment ack = batchAck(pendings);
             int maxAttempts = Math.max(1, retryProperties.getMaxRetries()) + 1;
             for (int attempt = 1; ; attempt++) {
                 try {
-                    List<WireMqDelivery> deliveries = new ArrayList<>(publishes.size());
-                    for (Mqtt5Publish publish : publishes) {
-                        deliveries.add(deliveryOf(publish, ack));
+                    List<WireMqDelivery> deliveries = new ArrayList<>(pendings.size());
+                    for (Pending pending : pendings) {
+                        deliveries.add(deliveryOf(pending, ack));
                     }
-                    batch.onBatch(deliveries);
+                    listener.onBatch(deliveries);
                     return;
                 } catch (MqPoisonException e) {
-                    log.warn("MQTT poison batch dead-lettered, size={}", publishes.size(), e);
-                    publishes.forEach(this::deadLetter);
+                    log.warn("MQTT poison batch dead-lettered, size={}", pendings.size(), e);
+                    pendings.forEach(pending -> deadLetter(pending.publish()));
                     return;
                 } catch (Exception e) {
                     if (attempt >= maxAttempts) {
                         log.error("MQTT batch exhausted retries, dead-lettering, size={}",
-                                publishes.size(), e);
-                        publishes.forEach(this::deadLetter);
+                                pendings.size(), e);
+                        pendings.forEach(pending -> deadLetter(pending.publish()));
                         return;
                     }
                     sleepBackoff(attempt);
@@ -257,42 +340,81 @@ public class MqttMqAdapter implements BrokerAdapter {
             }
         }
 
-        private void deliverSingle(Mqtt5Publish publish, int attempt) {
-            Acknowledgment ack = new MqttAcknowledgment(publish, this, attempt);
+        private void deliverSingle(Pending pending) {
+            RawDeliveryListener listener = singleRoutesOfSession.next(keyOf(pending.publish()));
+            if (Objects.isNull(listener)) {
+                log.debug("MQTT message matched no listener in this JVM, acknowledging and skipping, topic={}, key={}",
+                        spec.topic(), keyOf(pending.publish()));
+                pending.publish().acknowledge();
+                return;
+            }
+            Acknowledgment ack = new MqttAcknowledgment(pending, this);
             try {
-                single.onDelivery(deliveryOf(publish, ack));
+                listener.onDelivery(deliveryOf(pending, ack));
             } catch (MqPoisonException e) {
-                deadLetter(publish);
+                deadLetter(pending.publish());
             } catch (Exception e) {
-                if (attempt >= Math.max(1, retryProperties.getMaxRetries()) + 1) {
+                if (pending.attempt() >= maxAttempts()) {
                     log.error("MQTT delivery exhausted retries, dead-lettering, topic={}",
-                            publish.getTopic(), e);
-                    deadLetter(publish);
+                            pending.publish().getTopic(), e);
+                    deadLetter(pending.publish());
                 } else {
-                    sleepBackoff(attempt);
-                    deliverSingle(publish, attempt + 1);
+                    sleepBackoff(pending.attempt());
                 }
             }
         }
 
-        private Acknowledgment batchAck(List<Mqtt5Publish> publishes) {
+        /**
+         * Re-enqueue for another bounded client-side attempt (MQTT has no server
+         * nack); past the attempt cap the publish is dead-lettered.
+         */
+        void requeue(Pending pending) {
+            if (pending.attempt() >= maxAttempts()) {
+                log.error("MQTT reject(requeue) exhausted attempts, dead-lettering, topic={}",
+                        pending.publish().getTopic());
+                deadLetter(pending.publish());
+                return;
+            }
+            Pending next = new Pending(pending.publish(), pending.attempt() + 1);
+            try {
+                if (!incoming.offer(next, ENQUEUE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
+                    log.error("MQTT dispatch queue full on requeue, dead-lettering, topic={}",
+                            pending.publish().getTopic());
+                    deadLetter(pending.publish());
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                deadLetter(pending.publish());
+            }
+        }
+
+        private int maxAttempts() {
+            return Math.max(1, retryProperties.getMaxRetries()) + 1;
+        }
+
+        private Acknowledgment batchAck(List<Pending> pendings) {
             return new Acknowledgment() {
                 @Override
                 public void ack() {
-                    publishes.forEach(Mqtt5Publish::acknowledge);
+                    pendings.forEach(pending -> pending.publish().acknowledge());
                 }
 
                 @Override
                 public void reject(boolean requeue) {
                     if (requeue) {
-                        publishes.forEach(incoming::add);
+                        pendings.forEach(Dispatcher.this::requeue);
                     } else {
-                        publishes.forEach(Dispatcher.this::deadLetter);
+                        pendings.forEach(pending -> deadLetter(pending.publish()));
                     }
                 }
             };
         }
 
+        /**
+         * Republish to the dead-letter topic and acknowledge only when the republish
+         * was accepted — a failed dead-letter publish leaves the message unacknowledged
+         * so the broker redelivers it instead of losing it silently.
+         */
         private void deadLetter(Mqtt5Publish publish) {
             try {
                 publishClient.publish(Mqtt5Publish.builder()
@@ -301,10 +423,11 @@ public class MqttMqAdapter implements BrokerAdapter {
                         .payload(publish.getPayload().orElse(null))
                         .userProperties(publish.getUserProperties())
                         .build()).join();
+                publish.acknowledge();
             } catch (Exception e) {
-                log.error("MQTT dead-letter publish failed, topic={}", spec.topic(), e);
+                log.error("MQTT dead-letter publish failed, message left unacknowledged for redelivery, topic={}",
+                        spec.topic(), e);
             }
-            publish.acknowledge();
         }
 
         private void sleepBackoff(int attempt) {
@@ -321,33 +444,43 @@ public class MqttMqAdapter implements BrokerAdapter {
     }
 
     /**
-     * ack acknowledges the publish (QoS 1); reject(true) re-enqueues for bounded
-     * client-side redelivery (MQTT has no server nack); reject(false) dead-letters.
+     * A publish in flight through the internal queue together with its attempt number
+     * (bounded client-side redelivery).
      */
-    private record MqttAcknowledgment(Mqtt5Publish publish, Dispatcher dispatcher, int attempt)
-            implements Acknowledgment {
+    private record Pending(Mqtt5Publish publish, int attempt) {
+    }
+
+    /**
+     * ack acknowledges the publish (QoS 1); reject(true) re-enqueues for bounded
+     * client-side redelivery with the carried attempt counter (MQTT has no server
+     * nack, exhaustion dead-letters); reject(false) dead-letters.
+     */
+    private record MqttAcknowledgment(Pending pending, Dispatcher dispatcher) implements Acknowledgment {
 
         @Override
         public void ack() {
-            publish.acknowledge();
+            pending.publish().acknowledge();
         }
 
         @Override
         public void reject(boolean requeue) {
             if (requeue) {
-                dispatcher.accept(publish);
+                dispatcher.requeue(pending);
                 return;
             }
-            dispatcher.deadLetter(publish);
+            dispatcher.deadLetter(pending.publish());
         }
     }
 
-    private record Subscription(Mqtt5AsyncClient client, Dispatcher dispatcher) {
+    /**
+     * One broker session: the shared (or broadcast) client plus its dispatcher.
+     */
+    private record Subscription(Mqtt5AsyncClient client, Dispatcher dispatcher, String routeKey) {
     }
 
-    private WireMqDelivery deliveryOf(Mqtt5Publish publish, Acknowledgment acknowledgment) {
-        byte[] body = publish.getPayload().map(MqttMqAdapter::bytesOf).orElse(new byte[0]);
-        return new WireMqDelivery(body, headersOf(publish), false, acknowledgment);
+    private WireMqDelivery deliveryOf(Pending pending, Acknowledgment acknowledgment) {
+        byte[] body = pending.publish().getPayload().map(MqttMqAdapter::bytesOf).orElse(new byte[0]);
+        return new WireMqDelivery(body, headersOf(pending.publish()), pending.attempt() > 1, acknowledgment);
     }
 
     private static byte[] bytesOf(ByteBuffer buffer) {
@@ -364,6 +497,14 @@ public class MqttMqAdapter implements BrokerAdapter {
         return headers;
     }
 
+    /**
+     * The partition key for routing: MQTT has no native key field, so it rides the
+     * wire as the {@code dc3-partition-key} user property.
+     */
+    private static String keyOf(Mqtt5Publish publish) {
+        return headersOf(publish).get(MqHeaders.PARTITION_KEY);
+    }
+
     private Mqtt5Publish publishOf(WireMqMessage wire) {
         com.hivemq.client.mqtt.mqtt5.datatypes.Mqtt5UserPropertiesBuilder properties =
                 com.hivemq.client.mqtt.mqtt5.datatypes.Mqtt5UserProperties.builder();
@@ -372,6 +513,9 @@ public class MqttMqAdapter implements BrokerAdapter {
                 properties.add(key, value);
             }
         });
+        if (Objects.nonNull(wire.partitionKey()) && !wire.partitionKey().isBlank()) {
+            properties.add(MqHeaders.PARTITION_KEY, wire.partitionKey());
+        }
         return Mqtt5Publish.builder()
                 .topic(topicName(wire.topic()))
                 .qos(MqttQos.AT_LEAST_ONCE)
@@ -398,6 +542,17 @@ public class MqttMqAdapter implements BrokerAdapter {
         }
         String share = spec.group().isBlank() ? DEFAULT_SHARE : spec.group();
         return "$share/" + share + "/" + filter;
+    }
+
+    /**
+     * Router key for one shared session: topic + share group + delivery mode; a
+     * BROADCAST spec always gets its own per-instance key.
+     */
+    private static String routeKey(SubscriptionSpec spec) {
+        String share = spec.mode() == SubscriptionMode.BROADCAST || isDeadLetterTopic(spec.topic())
+                ? "broadcast-" + UUID.randomUUID()
+                : (spec.group().isBlank() ? DEFAULT_SHARE : spec.group());
+        return spec.topic() + "|" + share + "|" + spec.delivery();
     }
 
     private static boolean isDeadLetterTopic(MqTopic topic) {

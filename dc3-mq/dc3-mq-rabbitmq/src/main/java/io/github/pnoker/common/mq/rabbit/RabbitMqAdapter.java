@@ -28,6 +28,7 @@ import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireConfirmation;
 import io.github.pnoker.common.mq.adapter.WireMqDelivery;
 import io.github.pnoker.common.mq.config.BatchConsumerProperties;
+import io.github.pnoker.common.mq.listener.MqBatchListener;
 import io.github.pnoker.common.mq.listener.MqPoisonException;
 import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.constant.mq.ConsumptionProfile;
@@ -81,6 +82,7 @@ public class RabbitMqAdapter implements BrokerAdapter {
     private final int driverQueueExpiresMillis;
 
     private final List<SimpleMessageListenerContainer> containers = new CopyOnWriteArrayList<>();
+    private volatile boolean stopped;
 
     public RabbitMqAdapter(RabbitTemplate rabbitTemplate, RabbitAdmin rabbitAdmin, ConnectionFactory connectionFactory,
                            BatchConsumerProperties batchProperties, int driverQueueExpiresMillis) {
@@ -129,6 +131,7 @@ public class RabbitMqAdapter implements BrokerAdapter {
         container.setQueueNames(queue);
         container.setAcknowledgeMode(org.springframework.amqp.core.AcknowledgeMode.MANUAL);
         applyProfile(container, spec.profile());
+        container.setAdviceChain(singleRetryAdvice());
         container.setMessageListener((ChannelAwareMessageListener) (message, channel) -> {
             try {
                 listener.onDelivery(deliveryOf(message, channel));
@@ -176,9 +179,14 @@ public class RabbitMqAdapter implements BrokerAdapter {
 
     /**
      * Stop every container this adapter started (driver per-instance queues expire with
-     * the lease; center-side queues survive restarts untouched).
+     * the lease; center-side queues survive restarts untouched). Idempotent; the
+     * shared template/admin/connection factory are Spring beans and stay open.
      */
     public void stop() {
+        if (stopped) {
+            return;
+        }
+        stopped = true;
         containers.forEach(SimpleMessageListenerContainer::stop);
         containers.clear();
     }
@@ -205,6 +213,39 @@ public class RabbitMqAdapter implements BrokerAdapter {
                 .maxRetries(batchProperties.getMaxRetries())
                 .backOffOptions(batchProperties.getRetryInitialIntervalMillis(),
                         batchProperties.getRetryMultiplier(), batchProperties.getRetryMaxIntervalMillis())
+                .recoverer(recoverer)
+                .build();
+    }
+
+    /**
+     * Bounded redelivery for single deliveries — the single-delivery twin of
+     * {@link #batchRetryAdvice()}, honoring the {@link MqBatchListener} contract
+     * (bounded attempts, exhaustion dead-letters, poison dead-letters immediately).
+     *
+     * <p>Implemented as an in-process stateless retry rather than the requeue-based
+     * stateful interceptor: stateful retry keys redelivery state off the AMQP
+     * {@code messageId}, and this port publishes no message ids — with a null key the
+     * stateful interceptor bypasses retry entirely, so every attempt would look like
+     * the first and unbounded requeue loops would return. In-process bounded retry with
+     * a dead-lettering recoverer is deterministic and matches the batch path.
+     * {@code AmqpRejectAndDontRequeueException} (how poison surfaces) is excluded from
+     * retrying so poison dead-letters on the first attempt.
+     */
+    private Advice singleRetryAdvice() {
+        org.springframework.amqp.rabbit.retry.MessageRecoverer recoverer = (message, cause) -> {
+            log.error("RabbitMQ delivery exhausted retries, rejecting to dead-letter, routingKey={}",
+                    Objects.nonNull(message) ? message.getMessageProperties().getReceivedRoutingKey() : null, cause);
+            throw new AmqpRejectAndDontRequeueException("RabbitMQ delivery exhausted retries", true, cause);
+        };
+        org.springframework.core.retry.RetryPolicy policy = org.springframework.core.retry.RetryPolicy.builder()
+                .maxRetries(batchProperties.getMaxRetries())
+                .delay(java.time.Duration.ofMillis(batchProperties.getRetryInitialIntervalMillis()))
+                .multiplier(batchProperties.getRetryMultiplier())
+                .maxDelay(java.time.Duration.ofMillis(batchProperties.getRetryMaxIntervalMillis()))
+                .excludes(AmqpRejectAndDontRequeueException.class)
+                .build();
+        return RetryInterceptorBuilder.stateless()
+                .retryPolicy(policy)
                 .recoverer(recoverer)
                 .build();
     }

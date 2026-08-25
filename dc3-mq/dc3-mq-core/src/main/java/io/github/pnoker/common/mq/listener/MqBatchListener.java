@@ -22,8 +22,9 @@ import java.util.List;
 /**
  * Batch listener for the highest-throughput paths (point values). The batch is the unit
  * of delivery and of acknowledgement: ack after the local transaction commits, reject
- * to requeue or dead-letter the batch as a whole. Bounded redelivery (RetryPolicy)
- * wraps failed invocations; exhaustion dead-letters rather than drops.
+ * to requeue or dead-letter the batch as a whole. Bounded redelivery (the batch
+ * consumer retry settings) wraps failed invocations; exhaustion dead-letters rather
+ * than drops.
  *
  * @author pnoker
  * @since 2026.8.19

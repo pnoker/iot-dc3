@@ -29,7 +29,8 @@ import org.springframework.context.annotation.Bean;
 
 /**
  * Activates the Pulsar adapter when {@code dc3.mq.type=pulsar}. Service URL comes
- * from {@code dc3.mq.pulsar.service-url}.
+ * from {@code dc3.mq.pulsar.service-url} / the {@code DC3_MQ_PULSAR_URL} environment
+ * variable (the name the compose stack publishes).
  *
  * @author pnoker
  * @since 2026.8.20
@@ -44,15 +45,16 @@ public class PulsarMqAdapterConfiguration {
     @Bean(destroyMethod = "close")
     @ConditionalOnMissingBean(PulsarClient.class)
     public PulsarClient pulsarClient(
-            @Value("${dc3.mq.pulsar.service-url:pulsar://localhost:6650}") String serviceUrl)
+            @Value("${dc3.mq.pulsar.service-url:${DC3_MQ_PULSAR_URL:pulsar://localhost:6650}}") String serviceUrl)
             throws PulsarClientException {
         return PulsarClient.builder().serviceUrl(serviceUrl).build();
     }
 
     /**
-     * The port adapter bound to the shared client.
+     * The port adapter bound to the shared client; its {@code stop()} closes the
+     * consumers, batch pumps and producers it owns before the shared client closes.
      */
-    @Bean
+    @Bean(destroyMethod = "stop")
     public PulsarMqAdapter pulsarMqAdapter(PulsarClient pulsarClient, BatchConsumerProperties batchProperties) {
         return new PulsarMqAdapter(pulsarClient, batchProperties);
     }

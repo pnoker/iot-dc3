@@ -38,12 +38,19 @@ class PulsarContractTest extends AbstractMqContractTest {
 
     private static final String EXTERNAL_URL = System.getenv("TCK_PULSAR_URL");
 
-    // started manually (not via the extension) so TCK_PULSAR_URL fully bypasses it
+    // started manually (not via the extension) so TCK_PULSAR_URL fully bypasses it.
+    // The broker accepts TCP connections on 6650 BEFORE it finishes creating the
+    // public/default namespace — subscribing in that window fails with
+    // "Namespace not found" — so readiness waits on the admin API instead.
     private static final org.testcontainers.containers.GenericContainer<?> PULSAR =
             new org.testcontainers.containers.GenericContainer<>(
                     org.testcontainers.utility.DockerImageName.parse("apachepulsar/pulsar:4.1.3"))
                     .withCommand("bin/pulsar", "standalone", "-nfw")
-                    .withExposedPorts(6650);
+                    .withExposedPorts(6650, 8080)
+                    .waitingFor(org.testcontainers.containers.wait.strategy.Wait
+                            .forHttp("/admin/v2/namespaces/public/default")
+                            .forPort(8080)
+                            .withStartupTimeout(java.time.Duration.ofMinutes(5)));
 
     private static String serviceUrl() {
         if (Objects.nonNull(EXTERNAL_URL)) {

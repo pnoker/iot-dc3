@@ -51,9 +51,10 @@ public class KafkaMqAdapterConfiguration {
     }
 
     /**
-     * The port adapter bound to the Kafka template.
+     * The port adapter bound to the Kafka template; its {@code stop()} releases every
+     * listener container it registered on context shutdown.
      */
-    @Bean
+    @Bean(destroyMethod = "stop")
     public KafkaMqAdapter kafkaMqAdapter(KafkaTemplate<String, byte[]> kafkaTemplate,
                                          @Value("${dc3.mq.kafka.bootstrap-servers:${DC3_MQ_KAFKA_BOOTSTRAP:${spring.kafka.bootstrap-servers:localhost:9092}}}")
                                          String bootstrapServers, BatchConsumerProperties batchProperties) {

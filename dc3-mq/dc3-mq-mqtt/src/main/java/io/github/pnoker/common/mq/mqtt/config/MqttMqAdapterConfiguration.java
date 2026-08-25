@@ -37,9 +37,10 @@ import org.springframework.context.annotation.Bean;
 public class MqttMqAdapterConfiguration {
 
     /**
-     * The port adapter over the HiveMQ MQTT5 client.
+     * The port adapter over the HiveMQ MQTT5 client; its {@code stop()} disconnects
+     * every subscription session and the publisher on context shutdown.
      */
-    @Bean
+    @Bean(destroyMethod = "stop")
     public MqttMqAdapter mqttMqAdapter(@Value("${dc3.mq.mqtt.host:localhost}") String host,
                                        @Value("${dc3.mq.mqtt.port:1883}") int port,
                                        BatchConsumerProperties batchProperties) {

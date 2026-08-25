@@ -51,9 +51,11 @@ public class ActiveMqAdapterConfiguration {
     }
 
     /**
-     * The port adapter bound to this broker's connection factory.
+     * The port adapter bound to this broker's connection factory; its {@code stop()}
+     * closes every subscription connection, batch pump and the publish context on
+     * context shutdown.
      */
-    @Bean
+    @Bean(destroyMethod = "stop")
     public ActiveMqAdapter activeMqAdapter(jakarta.jms.ConnectionFactory connectionFactory,
                                            BatchConsumerProperties batchProperties) {
         return new ActiveMqAdapter(connectionFactory, batchProperties);
