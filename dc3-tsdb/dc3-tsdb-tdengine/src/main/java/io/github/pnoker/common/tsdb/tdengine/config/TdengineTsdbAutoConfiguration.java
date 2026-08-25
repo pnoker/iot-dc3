@@ -42,7 +42,8 @@ import org.springframework.context.annotation.Bean;
 public class TdengineTsdbAutoConfiguration {
 
     /**
-     * The TDengine adapter over the REST JDBC driver.
+     * The TDengine adapter over the REST JDBC driver; the store closes the
+     * pooled datasource (this destroyMethod) on shutdown.
      */
     @Bean(destroyMethod = "close")
     @ConditionalOnMissingBean(TsdbStore.class)
@@ -53,7 +54,8 @@ public class TdengineTsdbAutoConfiguration {
         dataSource.setPassword(properties.getPassword());
         dataSource.setMaximumPoolSize(properties.getMaximumPoolSize());
         dataSource.setDriverClassName("com.taosdata.jdbc.rs.RestfulDriver");
-        TsdbStore store = new TdengineTsdbStore(dataSource, properties.getDatabase());
+        TsdbStore store = new TdengineTsdbStore(dataSource, properties.getDatabase(),
+                properties.getRetentionDays());
         log.info("TSDB port negotiated, store={}, capabilities={}", store.type(), store.capabilities());
         return store;
     }

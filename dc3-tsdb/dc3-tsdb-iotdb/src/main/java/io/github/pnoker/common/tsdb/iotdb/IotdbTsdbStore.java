@@ -38,8 +38,8 @@ import io.github.pnoker.common.tsdb.spi.TsdbStore;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.iotdb.rpc.IoTDBConnectionException;
 import org.apache.iotdb.rpc.StatementExecutionException;
-import org.apache.iotdb.session.Session;
-import org.apache.iotdb.isession.SessionDataSet;
+import org.apache.iotdb.isession.pool.SessionDataSetWrapper;
+import org.apache.iotdb.session.pool.SessionPool;
 import org.apache.tsfile.enums.TSDataType;
 import org.apache.tsfile.read.common.RowRecord;
 
@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -89,7 +90,11 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
 
     private static final int APPEND_CHUNK = 2000;
 
-    private static final long TTL_MS = Duration.ofDays(180).toMillis();
+    /**
+     * Default raw retention (days) of {@code SET TTL TO} when the caller does
+     * not configure one.
+     */
+    private static final int DEFAULT_TTL_DAYS = 180;
 
     private static final String ROOT = "root.dc3";
 
@@ -104,11 +109,33 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
     private static final Pattern SERIES_IN_COLUMN = Pattern.compile(
             "root\\.dc3\\.t(\\d+)(?:\\.d(\\d+))?(?:\\.p(\\d+))?");
 
-    private final Session session;
+    /**
+     * Pooled sessions instead of one shared {@code Session}: the single session
+     * is not thread-safe while callers include ingest appends, dashboard,
+     * analytics and alarm windows; the pool serves each call from its own
+     * session over the same endpoint.
+     */
+    private final SessionPool session;
+
+    private final long ttlMs;
 
     public IotdbTsdbStore(String host, int port, String username, String password) {
-        this.session = new Session.Builder().host(host).port(port)
-                .username(username).password(password)
+        this(host, port, username, password, DEFAULT_TTL_DAYS);
+    }
+
+    /**
+     * @param host     IoTDB host
+     * @param port     IoTDB rpc port
+     * @param username IoTDB user
+     * @param password IoTDB password
+     * @param ttlDays  raw retention in days applied to the whole dc3 subtree
+     */
+    public IotdbTsdbStore(String host, int port, String username, String password, int ttlDays) {
+        this.ttlMs = Duration.ofDays(ttlDays).toMillis();
+        this.session = new SessionPool.Builder()
+                .host(host).port(port)
+                .user(username).password(password)
+                .maxSize(8)
                 .fetchSize(10000)
                 // pinned to the given endpoint: IoTDB 2.x node discovery hands
                 // out internal cluster addresses, which breaks behind port
@@ -116,11 +143,11 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
                 .enableRedirection(false)
                 .build();
         try {
-            session.open();
-            // Idempotent: raw retention 180 days on the whole dc3 subtree; the
-            // adapter has no rollup tiers, so raw is all there is.
-            session.executeNonQueryStatement("SET TTL TO " + ROOT + " " + TTL_MS);
-        } catch (Exception e) {
+            // Idempotent: raw retention on the whole dc3 subtree; the adapter
+            // has no rollup tiers, so raw is all there is. The pool opens its
+            // sessions lazily — this first statement forces the handshake.
+            session.executeNonQueryStatement("SET TTL TO " + ROOT + " " + ttlMs);
+        } catch (IoTDBConnectionException | StatementExecutionException e) {
             throw new IllegalStateException("IoTDB session setup failed: " + e.getMessage(), e);
         }
         log.info("IoTDB store ready ({}:{})", host, port);
@@ -128,11 +155,8 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
 
     @Override
     public void close() {
-        try {
-            session.close();
-        } catch (IoTDBConnectionException e) {
-            log.warn("IoTDB session close failed: {}", e.getMessage());
-        }
+        // SessionPool.close() declares no checked exception.
+        session.close();
     }
 
     @Override
@@ -200,7 +224,7 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
     @Override
     public Map<SeriesKey, List<PointValueSample>> last(SeriesFilter filter, int limit, TsdbDeadline deadline) {
         Map<SeriesKey, List<PointValueSample>> result = new LinkedHashMap<>();
-        for (SeriesKey series : seriesOf(filter)) {
+        for (SeriesKey series : seriesOf(filter, deadline)) {
             String sql = "SELECT * FROM " + path(series) + " ORDER BY TIME DESC LIMIT " + limit;
             for (Row row : query(sql, deadline)) {
                 result.computeIfAbsent(series, key -> new ArrayList<>()).add(sampleOf(series, row));
@@ -216,7 +240,7 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
         // timestamps across paths, so the merge is by time only.
         List<PointValueSample> merged = new ArrayList<>();
         long cutoff = Objects.nonNull(cursor) ? microsOf(cursor.deviceTime()) : Long.MAX_VALUE;
-        for (SeriesKey series : seriesOf(filter)) {
+        for (SeriesKey series : seriesOf(filter, deadline)) {
             String sql = "SELECT * FROM " + path(series)
                     + " WHERE time >= " + timeLiteral(window.from())
                     + " AND time < " + timeLiteral(window.toExclusive())
@@ -240,6 +264,7 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
     public Map<SeriesKey, WindowAggregate> aggregate(SeriesFilter filter, AggregateFunction fn,
                                                      TimeWindow window, Double percentile,
                                                      TsdbDeadline deadline) {
+        TsdbStore.validatePercentile(fn, percentile);
         String expr = switch (fn) {
             case AVG -> "AVG(num)";
             case MIN -> "MIN_VALUE(num)";
@@ -278,6 +303,7 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
     public Map<SeriesKey, List<BucketAggregate>> bucketedAggregate(SeriesFilter filter, AggregateFunction fn,
                                                                    TimeWindow window, Duration bucketWidth,
                                                                    Double percentile, TsdbDeadline deadline) {
+        TsdbStore.validatePercentile(fn, percentile);
         if (fn == AggregateFunction.PERCENTILE) {
             throw new UnsupportedOperationException("IoTDB has no percentile");
         }
@@ -338,9 +364,13 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
                                                Duration bucketWidth, TsdbDeadline deadline) {
         long width = bucketWidth.toMillis();
         long alignedFrom = alignDown(microsOf(window.from()), width * 1000);
+        // WHERE bounds carry the ISO literal form — bare epoch numbers are parsed
+        // as milliseconds by IoTDB regardless of the db precision (see
+        // timeLiteral) — while the GROUP BY window bounds follow the server
+        // precision (micros here) and stay numeric.
         String sql = "SELECT COUNT(quality) FROM " + tenantRoot(tenantId)
-                + " WHERE time >= " + alignedFrom
-                + " AND time < " + microsOf(window.toExclusive())
+                + " WHERE time >= " + timeLiteral(instantOfMicros(alignedFrom))
+                + " AND time < " + timeLiteral(window.toExclusive())
                 + " GROUP BY ([" + alignedFrom + ", " + microsOf(window.toExclusive()) + "), " + width + "ms)";
         Map<Long, Long> perBucket = new LinkedHashMap<>();
         for (Row row : query(sql, deadline)) {
@@ -483,8 +513,29 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
         return out.toString();
     }
 
-    private static List<SeriesKey> seriesOf(SeriesFilter filter) {
-        return filter.tenantWide() ? List.of() : filter.series();
+    /**
+     * Series the per-series read paths (last/history) iterate: the explicit
+     * list, or — for tenant-wide filters, honoring the declared
+     * {@code tenantWideScan} capability — the series discovered under the
+     * tenant wildcard. Discovery counts {@code message_id} (never null) per
+     * path and maps each column's embedded {@code root.dc3.t*.d*.p*} path back
+     * to a SeriesKey; paths without samples stay absent, which is exactly the
+     * semantics of a per-series newest-samples read.
+     */
+    private List<SeriesKey> seriesOf(SeriesFilter filter, TsdbDeadline deadline) {
+        if (!filter.tenantWide()) {
+            return filter.series();
+        }
+        String sql = "SELECT COUNT(message_id) FROM " + pathsOf(filter);
+        List<SeriesKey> series = new ArrayList<>();
+        for (Row row : query(sql, deadline)) {
+            row.cells().forEach((key, cell) -> {
+                if (cell.count() > 0) {
+                    series.add(key);
+                }
+            });
+        }
+        return series;
     }
 
     private static long alignDown(long value, long unit) {
@@ -539,26 +590,36 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
      * rows keyed by the series embedded in the column name. IoTDB returns one
      * column per (path, aggregate); the sample-shaped SELECT * layout is fixed
      * by the adapter, so index-based access is safe there.
+     *
+     * <p>The deadline is checked BEFORE executing (with the per-call server-side
+     * query timeout keeping a stalled execution from hanging the call outright)
+     * and between rows while draining the dataset.
      */
     private List<Row> query(String sql, TsdbDeadline deadline) {
         long deadlineAt = System.nanoTime() + deadline.maxWait().toNanos();
+        checkDeadline(deadlineAt, deadline);
         List<Row> rows = new ArrayList<>();
-        try (SessionDataSet dataset = session.executeQueryStatement(sql)) {
+        try (SessionDataSetWrapper dataset =
+                     session.executeQueryStatement(sql, deadline.maxWait().toMillis())) {
             List<String> columns = dataset.getColumnNames();
             while (dataset.hasNext()) {
-                if (System.nanoTime() > deadlineAt) {
-                    throw new TsdbQueryTimeout("iotdb query exceeded " + deadline.maxWait());
-                }
+                checkDeadline(deadlineAt, deadline);
                 RowRecord record = dataset.next();
                 rows.add(new Row(record.getTimestamp(), columns, record));
             }
         } catch (IoTDBConnectionException | StatementExecutionException e) {
-            throw new IllegalStateException("IoTDB query failed: " + e.getMessage(), e);
-        } catch (Exception e) {
-            // hasNext/next declare Exception on the 2.x dataset interface
+            if (String.valueOf(e.getMessage()).toLowerCase(Locale.ROOT).contains("timeout")) {
+                throw new TsdbQueryTimeout("iotdb query exceeded " + deadline.maxWait(), e);
+            }
             throw new IllegalStateException("IoTDB query failed: " + e.getMessage(), e);
         }
         return rows;
+    }
+
+    private static void checkDeadline(long deadlineAt, TsdbDeadline deadline) {
+        if (System.nanoTime() > deadlineAt) {
+            throw new TsdbQueryTimeout("iotdb query exceeded " + deadline.maxWait());
+        }
     }
 
     /**

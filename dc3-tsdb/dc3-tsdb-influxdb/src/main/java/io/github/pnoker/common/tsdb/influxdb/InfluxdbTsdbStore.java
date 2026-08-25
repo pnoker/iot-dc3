@@ -81,7 +81,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2026.8.21
  */
 @Slf4j
-public final class InfluxdbTsdbStore implements TsdbStore {
+public final class InfluxdbTsdbStore implements TsdbStore, AutoCloseable {
 
     private static final int APPEND_CHUNK = 2000;
 
@@ -164,8 +164,30 @@ public final class InfluxdbTsdbStore implements TsdbStore {
         return written;
     }
 
+    /**
+     * Line-protocol quoted-string field value. Backslash and double-quote are
+     * the dialect's escapes; a raw newline or carriage return would terminate
+     * the line prematurely and corrupt the whole chunk write, so both are
+     * escaped as their two-character forms. The measurement and tags of this
+     * adapter are constants/numeric ids — this is the only string context that
+     * reaches the wire.
+     */
     private static String escape(String value) {
-        return '"' + value.replace("\\", "\\\\").replace("\"", "\\\"") + '"';
+        return '"' + value.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r") + '"';
+    }
+
+    /**
+     * Releases the HTTP client's resources (Java 21 {@link HttpClient} is
+     * AutoCloseable; close waits briefly for in-flight requests); registered as
+     * the bean destroy method so the selector thread does not outlive the
+     * context.
+     */
+    @Override
+    public void close() {
+        http.close();
     }
 
     // ===== reads =====
@@ -222,6 +244,7 @@ public final class InfluxdbTsdbStore implements TsdbStore {
     public Map<SeriesKey, WindowAggregate> aggregate(SeriesFilter filter, AggregateFunction fn,
                                                      TimeWindow window, Double percentile,
                                                      TsdbDeadline deadline) {
+        TsdbStore.validatePercentile(fn, percentile);
         if (fn == AggregateFunction.PERCENTILE) {
             throw new UnsupportedOperationException("InfluxDB 3 has approximate percentiles only; "
                     + "the facade computes exact ones from bounded pulls");
@@ -244,6 +267,7 @@ public final class InfluxdbTsdbStore implements TsdbStore {
     public Map<SeriesKey, List<BucketAggregate>> bucketedAggregate(SeriesFilter filter, AggregateFunction fn,
                                                                    TimeWindow window, Duration bucketWidth,
                                                                    Double percentile, TsdbDeadline deadline) {
+        TsdbStore.validatePercentile(fn, percentile);
         if (fn == AggregateFunction.PERCENTILE) {
             throw new UnsupportedOperationException("InfluxDB 3 has approximate percentiles only");
         }

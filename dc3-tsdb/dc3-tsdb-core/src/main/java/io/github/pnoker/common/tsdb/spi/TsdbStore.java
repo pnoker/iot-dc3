@@ -37,6 +37,7 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.WindowAggregate;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * S19-final store SPI (docs/design/tsdb-abstraction.md §6). One implementation per
@@ -48,6 +49,34 @@ import java.util.Map;
  * @since 2026.8.20
  */
 public interface TsdbStore {
+
+    /**
+     * Port-level entry validation of the {@code percentile} argument of
+     * {@link #aggregate} and {@link #bucketedAggregate}: PERCENTILE requires a
+     * finite p in [0, 1] (adapters inline p into store SQL and must never see
+     * NaN or infinities); every other function requires null. Adapters call
+     * this first so the guarantee holds regardless of the caller.
+     *
+     * @param fn         aggregate function of the call
+     * @param percentile the p in [0, 1] for PERCENTILE, null otherwise
+     * @return the validated percentile, null unless {@code fn} is PERCENTILE
+     * @throws IllegalArgumentException when the contract above is violated
+     */
+    static Double validatePercentile(AggregateFunction fn, Double percentile) {
+        if (Objects.isNull(percentile)) {
+            if (fn == AggregateFunction.PERCENTILE) {
+                throw new IllegalArgumentException("percentile p in [0,1] is required for " + fn);
+            }
+            return null;
+        }
+        if (fn != AggregateFunction.PERCENTILE) {
+            throw new IllegalArgumentException("percentile must be null for " + fn);
+        }
+        if (percentile.isNaN() || Double.isInfinite(percentile) || percentile < 0d || percentile > 1d) {
+            throw new IllegalArgumentException("percentile p must be a finite value in [0,1], got: " + percentile);
+        }
+        return percentile;
+    }
 
     /**
      * Store identifier matching the {@code dc3.tsdb.type} selection value.

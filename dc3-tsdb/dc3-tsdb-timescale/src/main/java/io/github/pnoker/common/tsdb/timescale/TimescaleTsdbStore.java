@@ -37,6 +37,7 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.WindowAggregate;
 import io.github.pnoker.common.tsdb.spi.TsdbStore;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.QueryTimeoutException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -51,6 +52,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,8 +70,10 @@ import java.util.Objects;
  *       {@code array_agg}; PERCENTILE via {@code percentile_cont}
  *   <li>S13 analytics: SQL GROUP BY expressions, latency histogram via CASE bins over
  *       {@code EXTRACT(EPOCH FROM (operate_time - create_time)) * 1000}
- *   <li>rollups: capability NONE in this extraction (Phase 1); continuous aggregates
- *       arrive with S16 in a later phase
+ *   <li>rollups: negotiated at bootstrap — NATIVE when the S16 continuous-aggregate
+ *       tiers could be ensured (timescaledb extension present), NONE on plain
+ *       PostgreSQL deployments where reads stay on the raw path; {@code gapFill}
+ *       is declared false: empty buckets are omitted, consumers zero-fill
  * </ul>
  *
  * <p>Timestamps travel as UTC {@code OffsetDateTime}; the port's epoch-micro Instants
@@ -104,6 +108,15 @@ public final class TimescaleTsdbStore implements TsdbStore {
             + "driver_id, create_time, operate_time";
 
     private final int minuteTierKeepDays;
+
+    /**
+     * Effective rollup support, negotiated once at bootstrap: NATIVE when the
+     * continuous-aggregate tiers could be ensured and verified, NONE otherwise
+     * (plain PostgreSQL without the timescaledb extension). Reads consult this
+     * field before routing to a tier so plain-PG deployments fall back to raw
+     * aggregation instead of failing at read time.
+     */
+    private volatile RollupSupport rollupSupport = RollupSupport.NONE;
 
     private final JdbcTemplate jdbc;
 
@@ -231,10 +244,16 @@ public final class TimescaleTsdbStore implements TsdbStore {
                     SELECT add_retention_policy('%s', INTERVAL '%d days', if_not_exists => TRUE)"""
                     .formatted(ROLLUP_1M, minuteTierKeepDays));
             // The hour tier is kept forever — no retention policy.
+            this.rollupSupport = RollupSupport.NATIVE;
+            log.info("Rollup tiers ensured and verified, rollup support negotiated to NATIVE ({}, {})",
+                    ROLLUP_1M, ROLLUP_1H);
         } catch (DataAccessException e) {
             // Plain-PG deployments (no timescaledb extension) skip the tiers; reads
-            // stay correct on the raw path.
-            log.warn("Rollup tiers not created, reads stay on the raw path: {}", e.getMessage());
+            // stay correct on the raw path — declare NONE so tier routing never
+            // sends a read to a nonexistent cagg.
+            this.rollupSupport = RollupSupport.NONE;
+            log.warn("Rollup tiers not created, rollup support negotiated to NONE, reads stay on the raw path: {}",
+                    e.getMessage());
         }
     }
 
@@ -268,8 +287,11 @@ public final class TimescaleTsdbStore implements TsdbStore {
     @Override
     public TsdbCapabilities capabilities() {
         return new TsdbCapabilities(
-                true, true, true, true, true,
-                RollupSupport.NATIVE, 5000,
+                // gapFill=false: no code path zero-fills empty buckets (plain
+                // GROUP BY / tier reads omit them) and the capability must not
+                // promise what reads do not deliver.
+                false, true, true, true, true,
+                rollupSupport, 5000,
                 true, OrderingGuarantee.PER_SERIES, Precision.MICRO, true, true);
     }
 
@@ -280,8 +302,14 @@ public final class TimescaleTsdbStore implements TsdbStore {
         if (samples.isEmpty()) {
             return 0;
         }
+        // One INSERT ... SELECT unnest(...) ON CONFLICT statement cannot affect
+        // the same row twice — an in-batch duplicate on the natural key
+        // (tenant, device, point, deviceTime) would fail the whole chunk with
+        // "cannot affect row a second time". Collapse before chunking, keeping
+        // the last occurrence (last-write-wins, same as cross-batch upserts).
+        List<PointValueSample> collapsed = collapseNaturalKeyDuplicates(samples);
         int total = 0;
-        for (List<PointValueSample> chunk : chunk(samples, capabilities().maxAppendBatch())) {
+        for (List<PointValueSample> chunk : chunk(collapsed, capabilities().maxAppendBatch())) {
             // TimescaleDB creates the initial chunk keyed off the FIRST row of a
             // multi-row insert; when the earliest timestamp leads, that row can land
             // outside the chunk's final range and become invisible to index scans.
@@ -294,6 +322,39 @@ public final class TimescaleTsdbStore implements TsdbStore {
             total += appendChunk(ordered);
         }
         return total;
+    }
+
+    /**
+     * Natural upsert key of a sample — mirrors the
+     * {@code uk_point_value_series_time} unique index.
+     */
+    private record NaturalKey(long tenantId, long deviceId, long pointId, Instant deviceTime) {
+    }
+
+    /**
+     * Collapses samples sharing the natural key (tenant, device, point,
+     * deviceTime) to their LAST occurrence in input order, keeping the relative
+     * order of distinct keys stable. Pure function: no store access, safe to
+     * unit-test in isolation.
+     *
+     * @param samples input samples, unmodified
+     * @return new list with at most one sample per natural key, last write wins
+     */
+    static List<PointValueSample> collapseNaturalKeyDuplicates(List<PointValueSample> samples) {
+        List<PointValueSample> out = new ArrayList<>(samples.size());
+        Map<NaturalKey, Integer> positionOfKey = new HashMap<>();
+        for (PointValueSample sample : samples) {
+            NaturalKey key = new NaturalKey(sample.series().tenantId(), sample.series().deviceId(),
+                    sample.series().pointId(), sample.deviceTime());
+            Integer previous = positionOfKey.get(key);
+            if (Objects.nonNull(previous)) {
+                out.set(previous, sample);
+            } else {
+                positionOfKey.put(key, out.size());
+                out.add(sample);
+            }
+        }
+        return out;
     }
 
     /**
@@ -378,7 +439,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
         List<Object> args = new ArrayList<>(seriesArgs(filter));
         args.add(limit);
         Map<SeriesKey, List<PointValueSample>> result = new LinkedHashMap<>();
-        for (PointValueSample sample : timed(deadline, () -> jdbc.query(sql, SAMPLE_MAPPER, args.toArray()))) {
+        for (PointValueSample sample : timed(deadline, template -> template.query(sql, SAMPLE_MAPPER, args.toArray()))) {
             result.computeIfAbsent(sample.series(), k -> new ArrayList<>()).add(sample);
         }
         return result;
@@ -402,7 +463,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
         sql.append(" ORDER BY v.create_time DESC, v.message_id DESC LIMIT ?");
         args.add(pageSize + 1);
         List<PointValueSample> page = timed(deadline,
-                () -> jdbc.query(sql.toString(), SAMPLE_MAPPER, args.toArray()));
+                template -> template.query(sql.toString(), SAMPLE_MAPPER, args.toArray()));
         Cursor next = null;
         if (page.size() > pageSize) {
             page = new ArrayList<>(page.subList(0, pageSize));
@@ -416,6 +477,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
     public Map<SeriesKey, WindowAggregate> aggregate(SeriesFilter filter, AggregateFunction fn,
                                                      TimeWindow window, Double percentile,
                                                      TsdbDeadline deadline) {
+        TsdbStore.validatePercentile(fn, percentile);
         String expr = aggregateExpression(fn, percentile);
         String sql = """
                 SELECT tenant_id, device_id, point_id, %s AS value, COUNT(*) AS sample_count
@@ -426,8 +488,8 @@ public final class TimescaleTsdbStore implements TsdbStore {
         args.add(OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC));
         args.add(OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC));
         Map<SeriesKey, WindowAggregate> result = new LinkedHashMap<>();
-        timedVoid(deadline, () -> {
-            List<Map<String, Object>> rows = jdbc.queryForList(sql, args.toArray());
+        timedVoid(deadline, template -> {
+            List<Map<String, Object>> rows = template.queryForList(sql, args.toArray());
             for (Map<String, Object> row : rows) {
                 result.put(new SeriesKey(((Number) row.get("tenant_id")).longValue(),
                                 ((Number) row.get("device_id")).longValue(),
@@ -443,6 +505,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
     public Map<SeriesKey, List<BucketAggregate>> bucketedAggregate(SeriesFilter filter, AggregateFunction fn,
                                                                    TimeWindow window, Duration bucketWidth,
                                                                    Double percentile, TsdbDeadline deadline) {
+        TsdbStore.validatePercentile(fn, percentile);
         String tier = rollupTierFor(fn, bucketWidth);
         if (Objects.nonNull(tier)) {
             return bucketedAggregateFromTier(tier, filter, fn, window, bucketWidth, deadline);
@@ -460,8 +523,8 @@ public final class TimescaleTsdbStore implements TsdbStore {
         args.add(OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC));
         args.add(OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC));
         Map<SeriesKey, List<BucketAggregate>> result = new LinkedHashMap<>();
-        timedVoid(deadline, () -> {
-            List<Map<String, Object>> rows = jdbc.queryForList(sql, args.toArray());
+        timedVoid(deadline, template -> {
+            List<Map<String, Object>> rows = template.queryForList(sql, args.toArray());
             for (Map<String, Object> row : rows) {
                 result.computeIfAbsent(new SeriesKey(((Number) row.get("tenant_id")).longValue(),
                                 ((Number) row.get("device_id")).longValue(),
@@ -482,7 +545,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
         List<Object> args = new ArrayList<>(seriesArgs(filter));
         args.add(OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC));
         args.add(OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC));
-        Long value = timed(deadline, () -> jdbc.queryForObject(sql, Long.class, args.toArray()));
+        Long value = timed(deadline, template -> template.queryForObject(sql, Long.class, args.toArray()));
         return Objects.requireNonNullElse(value, 0L);
     }
 
@@ -502,7 +565,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
             Object[] args = {bucketWidth.toMillis() + " milliseconds", tenantId,
                     OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC),
                     OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC)};
-            return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new BucketAggregate(
+            return timed(deadline, template -> template.query(sql, (rs, i) -> new BucketAggregate(
                     toInstant(rs, 1).truncatedTo(java.time.temporal.ChronoUnit.MILLIS),
                     null, rs.getLong(2)), args));
         }
@@ -513,7 +576,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
         Object[] args = {bucketWidth.toMillis() + " milliseconds", tenantId,
                 OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC),
                 OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC)};
-        return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new BucketAggregate(
+        return timed(deadline, template -> template.query(sql, (rs, i) -> new BucketAggregate(
                 toInstant(rs, 1).truncatedTo(java.time.temporal.ChronoUnit.MILLIS),
                 null, rs.getLong(2)), args));
     }
@@ -534,7 +597,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
                 OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC),
                 OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC),
                 limit};
-        return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new DimensionCount(dimension,
+        return timed(deadline, template -> template.query(sql, (rs, i) -> new DimensionCount(dimension,
                 rs.getLong(1), rs.getLong(2)), args));
     }
 
@@ -547,7 +610,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
         Object[] args = {tenantId,
                 OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC),
                 OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC)};
-        return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new SeriesCount(
+        return timed(deadline, template -> template.query(sql, (rs, i) -> new SeriesCount(
                 new SeriesKey(rs.getLong(1), rs.getLong(2), rs.getLong(3)), rs.getLong(4)), args));
     }
 
@@ -560,7 +623,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
         Object[] args = {tenantId,
                 OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC),
                 OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC)};
-        return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new SeriesLastSeen(
+        return timed(deadline, template -> template.query(sql, (rs, i) -> new SeriesLastSeen(
                 new SeriesKey(rs.getLong(1), rs.getLong(2), rs.getLong(3)), toInstant(rs, 4)), args));
     }
 
@@ -589,7 +652,11 @@ public final class TimescaleTsdbStore implements TsdbStore {
         args.add(OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC));
         args.add(OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC));
         Map<Integer, Long> counts = new LinkedHashMap<>();
-        for (Map<String, Object> row : jdbc.queryForList(sql, args.toArray())) {
+        // The aggregation query itself rides the deadline like every other read;
+        // only the client-side bin folding happens outside.
+        List<Map<String, Object>> rows = timed(deadline,
+                template -> template.queryForList(sql, args.toArray()));
+        for (Map<String, Object> row : rows) {
             counts.put(((Number) row.get("bin")).intValue(), ((Number) row.get("count")).longValue());
         }
         List<LatencyBin> result = new ArrayList<>();
@@ -610,7 +677,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
         String sql = """
                 SELECT DISTINCT tenant_id, device_id, point_id FROM %s
                 WHERE tenant_id = ? AND create_time >= ? AND create_time < ?""".formatted(TABLE);
-        return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new SeriesKey(
+        return timed(deadline, template -> template.query(sql, (rs, i) -> new SeriesKey(
                         rs.getLong(1), rs.getLong(2), rs.getLong(3)),
                 tenantId,
                 OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC),
@@ -632,12 +699,15 @@ public final class TimescaleTsdbStore implements TsdbStore {
         // so the stored tier rows converge too (tenant offboarding is rare).
         try {
             for (String tier : new String[]{ROLLUP_1M, ROLLUP_1H}) {
-                jdbc.query("CALL refresh_continuous_aggregate(?, ?, ?)",
+                // refresh_continuous_aggregate is a void procedure: pgjdbc raises
+                // "No results were returned by the query" on the executeQuery
+                // path, so the call must ride executeUpdate (JdbcTemplate.update).
+                jdbc.update("CALL refresh_continuous_aggregate(?, ?, ?)",
                         ps -> {
                             ps.setString(1, tier);
                             ps.setObject(2, OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC));
                             ps.setObject(3, OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC));
-                        }, rs -> null);
+                        });
             }
         } catch (DataAccessException e) {
             log.warn("Rollup refresh after deleteRange failed; background policies will converge: {}",
@@ -665,7 +735,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
                 b.tenantId(), b.deviceId(), b.pointId(),
                 OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC),
                 OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC)};
-        return timed(deadline, () -> jdbc.queryForObject(sql, (rs, i) -> new CorrelationResult(
+        return timed(deadline, template -> template.queryForObject(sql, (rs, i) -> new CorrelationResult(
                 rs.getDouble(1), rs.getLong(2)), args));
     }
 
@@ -675,8 +745,13 @@ public final class TimescaleTsdbStore implements TsdbStore {
      * S16 read transparency: bucket widths at or above a materialized tier's
      * granularity are served from that tier (PERCENTILE never — it is not
      * materialized). Tier reads cover whole tier granules inside the window.
+     * Routing consults the negotiated {@link #rollupSupport} — plain-PG
+     * deployments (NONE) always aggregate over raw rows.
      */
     private String rollupTierFor(AggregateFunction fn, Duration bucketWidth) {
+        if (rollupSupport != RollupSupport.NATIVE) {
+            return null;
+        }
         // FIRST/LAST stay raw: the shared observability caggs carry first/last of
         // the textual cal_value only, and serving numeric first/last from tiers
         // would version-skew deployments created before that shape existed.
@@ -709,8 +784,8 @@ public final class TimescaleTsdbStore implements TsdbStore {
         args.add(OffsetDateTime.ofInstant(window.from(), ZoneOffset.UTC));
         args.add(OffsetDateTime.ofInstant(window.toExclusive(), ZoneOffset.UTC));
         Map<SeriesKey, List<BucketAggregate>> result = new LinkedHashMap<>();
-        timedVoid(deadline, () -> {
-            List<Map<String, Object>> rows = jdbc.queryForList(sql, args.toArray());
+        timedVoid(deadline, template -> {
+            List<Map<String, Object>> rows = template.queryForList(sql, args.toArray());
             for (Map<String, Object> row : rows) {
                 result.computeIfAbsent(new SeriesKey(((Number) row.get("tenant_id")).longValue(),
                                 ((Number) row.get("device_id")).longValue(),
@@ -821,27 +896,47 @@ public final class TimescaleTsdbStore implements TsdbStore {
         return chunks;
     }
 
-    private void timedVoid(TsdbDeadline deadline, Runnable query) {
-        timed(deadline, () -> {
-            query.run();
+    private void timedVoid(TsdbDeadline deadline, java.util.function.Consumer<JdbcTemplate> query) {
+        timed(deadline, template -> {
+            query.accept(template);
             return null;
         });
     }
 
-    private <T> T timed(TsdbDeadline deadline, java.util.function.Supplier<T> query) {
+    private <T> T timed(TsdbDeadline deadline, java.util.function.Function<JdbcTemplate, T> query) {
         int seconds = (int) Math.max(1, deadline.maxWait().toSeconds());
-        Integer previous = jdbc.getQueryTimeout();
-        jdbc.setQueryTimeout(seconds);
+        // Per-call template over the same pooled DataSource: mutating the shared
+        // template's queryTimeout races between concurrent reads with different
+        // deadlines (one query inherits another's timeout or observes a mid-flight
+        // restore); a local template carries the timeout per call and constructing
+        // one is cheap.
+        JdbcTemplate local = new JdbcTemplate(Objects.requireNonNull(jdbc.getDataSource(),
+                "dataSource required for deadline-scoped queries"));
+        local.setQueryTimeout(seconds);
         try {
-            return query.get();
+            return query.apply(local);
         } catch (DataAccessException e) {
-            if (Objects.nonNull(e.getCause()) && String.valueOf(e.getCause().getClass().getName())
-                    .contains("QueryTimeout")) {
+            if (isQueryTimeout(e)) {
                 throw new TsdbQueryTimeout("timescale query exceeded " + deadline.maxWait(), e);
             }
             throw e;
-        } finally {
-            jdbc.setQueryTimeout(previous);
         }
+    }
+
+    /**
+     * Timeout classification over the ENTIRE cause chain: pgjdbc surfaces a
+     * statement cancellation either as Spring's translated
+     * {@link QueryTimeoutException} or as a PSQLException whose message carries
+     * "canceling statement" — neither is guaranteed to sit at the first cause
+     * level (driver wrappers nest arbitrarily deep).
+     */
+    private static boolean isQueryTimeout(Throwable error) {
+        for (Throwable cause = error; Objects.nonNull(cause); cause = cause.getCause()) {
+            if (cause instanceof QueryTimeoutException
+                    || String.valueOf(cause.getMessage()).contains("canceling statement")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

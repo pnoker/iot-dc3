@@ -47,5 +47,11 @@ public class TdengineTsdbProperties {
      */
     private String database = "dc3";
 
+    /**
+     * Raw retention in days wired into {@code CREATE DATABASE ... KEEP}; affects
+     * freshly created databases only — existing ones keep their KEEP.
+     */
+    private int retentionDays = 180;
+
     private int maximumPoolSize = 8;
 }

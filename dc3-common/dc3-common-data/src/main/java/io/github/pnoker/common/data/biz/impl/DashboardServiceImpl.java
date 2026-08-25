@@ -128,7 +128,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<LatencyBucketVO> latencyHistogram(Long tenantId, int rangeHours) {
         int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
-        LocalDateTime to = LocalDateTime.now();
+        LocalDateTime to = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
         LocalDateTime from = to.minusHours(hours);
         // Capability-gated op: stores without store-side binning (e.g. TDengine)
         // degrade to zero-filled bins instead of failing the dashboard.
@@ -149,7 +149,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<ActivityCellVO> hourlyActivity(Long tenantId, int rangeHours) {
         int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
-        LocalDateTime to = LocalDateTime.now();
+        LocalDateTime to = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
         LocalDateTime from = to.minusHours(hours);
         List<BucketAggregate> buckets = tsdbStore.bucketedCount(tenantId, windowSince(from),
                 Duration.ofHours(1), DEADLINE);
@@ -267,7 +267,7 @@ public class DashboardServiceImpl implements DashboardService {
     public List<TimeseriesPointVO> timeseries(Long tenantId, String granularity, int rangeHours) {
         String g = GRANULARITY.contains(granularity) ? granularity : "hour";
         int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
-        LocalDateTime to = LocalDateTime.now();
+        LocalDateTime to = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
         LocalDateTime from = to.minusHours(hours);
 
         List<BucketAggregate> buckets = tsdbStore.bucketedCount(tenantId, windowSince(from),
@@ -290,11 +290,19 @@ public class DashboardServiceImpl implements DashboardService {
         }
         int clampedLimit = Math.clamp(limit, 1, MAX_LIMIT);
         int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
-        LocalDateTime to = LocalDateTime.now();
+        LocalDateTime to = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
         LocalDateTime from = to.minusHours(hours);
 
-        List<DimensionCount> rows = tsdbStore.countByDimension(tenantId, windowSince(from),
-                groupDimension, clampedLimit, DEADLINE);
+        List<DimensionCount> rows;
+        try {
+            rows = tsdbStore.countByDimension(tenantId, windowSince(from), groupDimension, clampedLimit, DEADLINE);
+        } catch (UnsupportedOperationException e) {
+            // Capability-honest degradation (e.g. IoTDB cannot group by driver):
+            // an empty panel beats a 500 for a dimension the store declares out.
+            log.warn("countByDimension unsupported by the selected tsdb store: dimension={}, reason={}",
+                    groupDimension, e.getMessage());
+            return List.of();
+        }
         List<TopEntityVO> out = new ArrayList<>(rows.size());
         for (DimensionCount row : rows) {
             TopEntityVO vo = new TopEntityVO();
@@ -389,7 +397,7 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         // Today's ALARM counts per source
-        LocalDateTime todayStart = LocalDate.now().atStartOfDay();
+        LocalDateTime todayStart = LocalDate.now(TimeConstant.DEFAULT_ZONEID).atStartOfDay();
         for (var row : alertMapper.todayBySource(tenantId, todayStart)) {
             String src = row.getSource();
             long srcTotal = row.getTotal();
@@ -404,7 +412,7 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         // 24-hour hourly sparkline, anchored to top-of-hour now-23.
-        LocalDateTime anchor = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0).minusHours(23);
+        LocalDateTime anchor = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).withMinute(0).withSecond(0).withNano(0).minusHours(23);
         long[] series = new long[24];
         for (var row : alertMapper.hourlyCounts(tenantId, anchor)) {
             LocalDateTime bucket = row.getBucket();
@@ -446,7 +454,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<AlertTrendVO> alertTrend(Long tenantId, int days) {
         int clamped = Math.clamp(days, 1, MAX_DAYS);
-        LocalDateTime from = LocalDate.now().minusDays(clamped).atTime(LocalTime.MIN);
+        LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(clamped).atTime(LocalTime.MIN);
         var rows = alertMapper.dailyTrend(tenantId, from);
         List<AlertTrendVO> out = new ArrayList<>(rows.size());
         for (var row : rows) {
@@ -463,7 +471,7 @@ public class DashboardServiceImpl implements DashboardService {
     public List<AlertTopSourceVO> alertTopSources(Long tenantId, int days, int limit) {
         int clampedDays = Math.clamp(days, 1, MAX_DAYS);
         int clampedLimit = Math.clamp(limit, 1, MAX_LIMIT);
-        LocalDateTime from = LocalDate.now().minusDays(clampedDays).atTime(LocalTime.MIN);
+        LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(clampedDays).atTime(LocalTime.MIN);
         var rows = alertMapper.topSources(tenantId, from, clampedLimit);
         List<AlertTopSourceVO> out = new ArrayList<>(rows.size());
         for (var row : rows) {
@@ -479,7 +487,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<AlertActivityCellVO> alertActivity(Long tenantId, int days) {
         int clampedDays = Math.clamp(days, 1, MAX_DAYS);
-        LocalDateTime from = LocalDate.now().minusDays(clampedDays).atTime(LocalTime.MIN);
+        LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(clampedDays).atTime(LocalTime.MIN);
         var rows = alertMapper.activityHeatmap(tenantId, from);
         long[][] grid = new long[7][24];
         for (var row : rows) {
@@ -506,7 +514,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<AlertTypeBucketVO> alertTypeDistribution(Long tenantId, int days) {
         int clampedDays = Math.clamp(days, 1, MAX_DAYS);
-        LocalDateTime from = LocalDate.now().minusDays(clampedDays).atTime(LocalTime.MIN);
+        LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(clampedDays).atTime(LocalTime.MIN);
         var rows = alertMapper.typeDistribution(tenantId, from);
         List<AlertTypeBucketVO> out = new ArrayList<>(rows.size());
         for (var row : rows) {
@@ -523,7 +531,7 @@ public class DashboardServiceImpl implements DashboardService {
         int clampedHours = Math.clamp(hours, 1, MAX_HOURS_30D);
         int clampedMin = Math.max(1, minCount);
         int clampedLimit = Math.clamp(limit, 1, MAX_LIMIT);
-        LocalDateTime from = LocalDateTime.now().minusHours(clampedHours);
+        LocalDateTime from = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).minusHours(clampedHours);
         var rows = alertMapper.stormSources(tenantId, from, clampedMin, clampedLimit);
         List<AlertTopSourceVO> out = new ArrayList<>(rows.size());
         for (var row : rows) {
@@ -545,7 +553,7 @@ public class DashboardServiceImpl implements DashboardService {
         int h = Math.clamp(hours, 1, MAX_HOURS_7D);
         int min = Math.max(MIN_FLAPPING_COUNT, minCount);
         int lim = Math.clamp(limit, 1, MAX_LIMIT);
-        LocalDateTime from = LocalDateTime.now().minusHours(h);
+        LocalDateTime from = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).minusHours(h);
         var rows = alertMapper.flappingSources(tenantId, from, min, lim);
         List<FlappingSourceVO> out = new ArrayList<>(rows.size());
         for (var r : rows) {
@@ -564,7 +572,7 @@ public class DashboardServiceImpl implements DashboardService {
         int h = Math.clamp(hours, 1, MAX_HOURS_7D);
         int w = Math.clamp(windowSec, MIN_CORRELATION_WINDOW_SEC, MAX_CORRELATION_WINDOW_SEC);
         int lim = Math.clamp(limit, 1, MAX_CORRELATION_PAIRS);
-        LocalDateTime from = LocalDateTime.now().minusHours(h);
+        LocalDateTime from = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).minusHours(h);
         var rows = alertMapper.correlationPairs(tenantId, from, w, lim);
         List<CorrelationPairVO> out = new ArrayList<>(rows.size());
         for (var r : rows) {
@@ -584,7 +592,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<PeerDeviationVO> alertPeerDeviation(Long tenantId, int days) {
         int d = Math.clamp(days, 1, MAX_PEER_DAYS);
-        LocalDateTime from = LocalDate.now().minusDays(d).atTime(LocalTime.MIN);
+        LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(d).atTime(LocalTime.MIN);
         var rows = alertMapper.peerAlarmCounts(tenantId, from);
 
         // Group by profile → list of (device, alarmCount); then pick median
@@ -642,7 +650,7 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<MttaTrendVO> alertMtta(Long tenantId, int days) {
         int d = Math.clamp(days, 1, MAX_DAYS);
-        LocalDateTime from = LocalDate.now().minusDays(d).atTime(LocalTime.MIN);
+        LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(d).atTime(LocalTime.MIN);
         var rows = alertMapper.mttaByDay(tenantId, from);
         List<MttaTrendVO> out = new ArrayList<>(rows.size());
         for (var r : rows) {
@@ -675,7 +683,7 @@ public class DashboardServiceImpl implements DashboardService {
     public List<ChangeImpactVO> changeImpact(Long tenantId, int days, int limit) {
         int d = Math.clamp(days, 1, MAX_DAYS);
         int lim = Math.clamp(limit, 1, MAX_LIMIT);
-        LocalDateTime from = LocalDate.now().minusDays(d).atTime(LocalTime.MIN);
+        LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(d).atTime(LocalTime.MIN);
         var rows = alertMapper.recentChanges(tenantId, from, lim);
         List<ChangeImpactVO> out = new ArrayList<>(rows.size());
         for (var r : rows) {
@@ -694,7 +702,7 @@ public class DashboardServiceImpl implements DashboardService {
         int silent = Math.clamp(silentMinutes, 5, 60 * 24);
         int lim = Math.clamp(limit, 1, MAX_COVERAGE_GAP_LIMIT);
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
         LocalDateTime from = now.minusDays(baseline);
         LocalDateTime silentThreshold = now.minusMinutes(silent);
 

@@ -289,7 +289,15 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
 
         List<AnalyticsModel.RankItem> ranked;
         if ("ACTIVITY".equals(metric)) {
-            List<DimensionCount> counts = tsdbStore.countByDimension(tenantId, window, dimension, limit, DEADLINE);
+            List<DimensionCount> counts;
+            try {
+                counts = tsdbStore.countByDimension(tenantId, window, dimension, limit, DEADLINE);
+            } catch (UnsupportedOperationException e) {
+                // Structured refusal the caller (MCP tool) can act on — a raw
+                // 500 hides the store capability gap behind a stack trace.
+                throw new ServiceException("The selected tsdb store cannot group by " + dimension
+                        + " — pick another dimension", e);
+            }
             ranked = counts.stream().map(count -> new AnalyticsModel.RankItem(
                     String.valueOf(count.entityId()), labelOfEntity(tenantId, dimension, count.entityId()),
                     count.count(), null)).toList();

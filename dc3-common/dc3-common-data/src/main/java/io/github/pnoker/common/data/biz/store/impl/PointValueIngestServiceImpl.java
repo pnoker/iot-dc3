@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -111,7 +112,17 @@ public class PointValueIngestServiceImpl implements PointValueIngestService {
             return List.of();
         }
 
-        List<PointValueBO> acceptedValues = new ArrayList<>(accepted.values());
+        // One entry per natural key (tenant/device/point/createTime): a batch
+        // holding two samples with the same natural key but different message
+        // ids would poison stores whose batch upsert cannot affect the same
+        // row twice (timescale ON CONFLICT). Last occurrence wins — the same
+        // last-write-wins rule the stores apply on replay.
+        Map<List<Object>, PointValueBO> byNaturalKey = new LinkedHashMap<>();
+        for (PointValueBO value : accepted.values()) {
+            byNaturalKey.put(Arrays.asList(value.getTenantId(), value.getDeviceId(),
+                    value.getPointId(), value.getCreateTime()), value);
+        }
+        List<PointValueBO> acceptedValues = new ArrayList<>(byNaturalKey.values());
         // Persistence runs in INGEST_ORDER; the caller gets its own input order.
         List<PointValueBO> ordered = new ArrayList<>(acceptedValues);
         ordered.sort(INGEST_ORDER);

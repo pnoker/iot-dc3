@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -145,7 +146,10 @@ class TsdbWindowDataSourceTest {
     }
 
     @Test
-    void portFailureDegradesToEmptyResults() {
+    void portFailurePropagatesInsteadOfPretendingEmptyWindows() {
+        // A store outage must fail the evaluation visibly: swallowing it here
+        // would read as "no data in window" and the rule engine would silently
+        // skip alarms on exactly the monitored series.
         RuleFact fact = pointFact();
         fact.setValues(Map.of("deviceId", 10L));
         fact.setFactTime(LocalDateTime.parse("2026-08-20T12:00:00"));
@@ -154,9 +158,12 @@ class TsdbWindowDataSourceTest {
         when(tsdbStore.history(any(), (TimeWindow) any(), any(), org.mockito.ArgumentMatchers.anyInt(), any()))
                 .thenThrow(new IllegalStateException("store down"));
 
-        assertThat(dataSource.aggregate(specOf(java.time.Duration.ofMinutes(5)), fact, WindowModeEnum.AVG).sampleCount())
-                .isZero();
-        assertThat(dataSource.samples(specOf(java.time.Duration.ofMinutes(5)), fact)).isEmpty();
+        assertThatThrownBy(() -> dataSource.aggregate(specOf(java.time.Duration.ofMinutes(5)), fact, WindowModeEnum.AVG))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("store down");
+        assertThatThrownBy(() -> dataSource.samples(specOf(java.time.Duration.ofMinutes(5)), fact))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("store down");
     }
 
 }

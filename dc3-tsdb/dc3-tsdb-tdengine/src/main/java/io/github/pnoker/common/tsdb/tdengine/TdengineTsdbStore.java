@@ -47,6 +47,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -81,12 +82,28 @@ import java.util.Objects;
  * @since 2026.8.21
  */
 @Slf4j
-public final class TdengineTsdbStore implements TsdbStore {
+public final class TdengineTsdbStore implements TsdbStore, AutoCloseable {
 
     private static final int APPEND_CHUNK = 1000;
 
+    /**
+     * Series predicates per parenthesized OR group — mirrors the timescale
+     * adapter's chunking so very large explicit series lists stay parseable.
+     */
+    private static final int SERIES_IN_CHUNK = 500;
+
+    /**
+     * Default raw retention (days) of {@code CREATE DATABASE ... KEEP} when the
+     * caller does not configure one.
+     */
+    private static final int DEFAULT_RETENTION_DAYS = 180;
+
+    private final DataSource dataSource;
+
     private final String database;
+
     private final String stable;
+
     private final JdbcTemplate jdbc;
 
     private static final RowMapper<PointValueSample> SAMPLE_MAPPER = (rs, i) -> new PointValueSample(
@@ -100,14 +117,25 @@ public final class TdengineTsdbStore implements TsdbStore {
             rs.getLong("fencing_token"), rs.getLong("driver_id"));
 
     public TdengineTsdbStore(DataSource dataSource, String database) {
+        this(dataSource, database, DEFAULT_RETENTION_DAYS);
+    }
+
+    /**
+     * @param dataSource   pooled TDengine REST datasource owned by this store
+     * @param database     database the adapter creates and owns
+     * @param retentionDays raw retention in days ({@code KEEP}); affects freshly
+     *                     created databases only — existing ones keep their KEEP
+     */
+    public TdengineTsdbStore(DataSource dataSource, String database, int retentionDays) {
+        this.dataSource = dataSource;
         this.database = database;
         this.stable = database + ".point_value";
         this.jdbc = new JdbcTemplate(dataSource);
-        bootstrap();
+        bootstrap(retentionDays);
     }
 
-    private void bootstrap() {
-        jdbc.execute("CREATE DATABASE IF NOT EXISTS " + database + " PRECISION 'us' KEEP 180");
+    private void bootstrap(int retentionDays) {
+        jdbc.execute("CREATE DATABASE IF NOT EXISTS " + database + " PRECISION 'us' KEEP " + retentionDays);
         jdbc.execute("""
                 CREATE STABLE IF NOT EXISTS %s (
                     ts             TIMESTAMP,
@@ -128,6 +156,21 @@ public final class TdengineTsdbStore implements TsdbStore {
                     point_id  BIGINT
                 )""".formatted(stable));
         log.info("TDengine store ready (stable {})", stable);
+    }
+
+    /**
+     * Closes the owned pooled datasource — registered as the bean destroy method
+     * so the Hikari pool does not leak on context shutdown.
+     */
+    @Override
+    public void close() {
+        if (dataSource instanceof AutoCloseable closeable) {
+            try {
+                closeable.close();
+            } catch (Exception e) {
+                log.warn("TDengine datasource close failed: {}", e.getMessage());
+            }
+        }
     }
 
     @Override
@@ -227,7 +270,7 @@ public final class TdengineTsdbStore implements TsdbStore {
         List<Object> args = new ArrayList<>(seriesArgs(filter));
         args.add(limit);
         Map<SeriesKey, List<PointValueSample>> result = new LinkedHashMap<>();
-        for (PointValueSample sample : timed(deadline, () -> jdbc.query(sql, SAMPLE_MAPPER, args.toArray()))) {
+        for (PointValueSample sample : timed(deadline, t -> t.query(sql, SAMPLE_MAPPER, args.toArray()))) {
             result.computeIfAbsent(sample.series(), key -> new ArrayList<>()).add(sample);
         }
         return result;
@@ -253,7 +296,7 @@ public final class TdengineTsdbStore implements TsdbStore {
         sql.append(" ORDER BY ts DESC, message_id DESC LIMIT ?");
         args.add(pageSize + 1);
         List<PointValueSample> page = timed(deadline,
-                () -> jdbc.query(sql.toString(), SAMPLE_MAPPER, args.toArray()));
+                t -> t.query(sql.toString(), SAMPLE_MAPPER, args.toArray()));
         Cursor next = null;
         if (page.size() > pageSize) {
             page = new ArrayList<>(page.subList(0, pageSize));
@@ -267,6 +310,7 @@ public final class TdengineTsdbStore implements TsdbStore {
     public Map<SeriesKey, WindowAggregate> aggregate(SeriesFilter filter, AggregateFunction fn,
                                                      TimeWindow window, Double percentile,
                                                      TsdbDeadline deadline) {
+        TsdbStore.validatePercentile(fn, percentile);
         // TDengine's PERCENTILE refuses supertable queries; the deterministic
         // subtable name lets single-series percentiles run table-direct.
         if (fn == AggregateFunction.PERCENTILE) {
@@ -280,8 +324,8 @@ public final class TdengineTsdbStore implements TsdbStore {
                         microsOf(window.from()), microsOf(window.toExclusive()));
         List<Object> args = new ArrayList<>(seriesArgs(filter));
         Map<SeriesKey, WindowAggregate> result = new LinkedHashMap<>();
-        timedVoid(deadline, () -> {
-            List<Map<String, Object>> rows = jdbc.queryForList(sql, args.toArray());
+        timedVoid(deadline, t -> {
+            List<Map<String, Object>> rows = t.queryForList(sql, args.toArray());
             for (Map<String, Object> row : rows) {
                 Number value = (Number) row.get("agg_value");
                 result.put(seriesOf(row),
@@ -303,12 +347,22 @@ public final class TdengineTsdbStore implements TsdbStore {
             String sql = "SELECT %s AS agg_value, COUNT(*) AS sample_count FROM %s WHERE ts >= %d AND ts < %d"
                     .formatted(aggregateExpression(AggregateFunction.PERCENTILE, percentile), subtable(series),
                             microsOf(window.from()), microsOf(window.toExclusive()));
-            timedVoid(deadline, () -> {
-                Map<String, Object> row = jdbc.queryForMap(sql);
-                Number value = (Number) row.get("agg_value");
-                result.put(series, new WindowAggregate(Objects.isNull(value) ? null : value.doubleValue(),
-                        ((Number) row.get("sample_count")).longValue()));
-            });
+            try {
+                timedVoid(deadline, t -> {
+                    Map<String, Object> row = t.queryForMap(sql);
+                    Number value = (Number) row.get("agg_value");
+                    result.put(series, new WindowAggregate(Objects.isNull(value) ? null : value.doubleValue(),
+                            ((Number) row.get("sample_count")).longValue()));
+                });
+            } catch (DataAccessException e) {
+                // subtables only exist after the first insert: an absent table is
+                // an empty series, not a failure
+                if (missingSubtable(e)) {
+                    result.put(series, new WindowAggregate(null, 0));
+                    continue;
+                }
+                throw e;
+            }
         }
         return result;
     }
@@ -317,6 +371,7 @@ public final class TdengineTsdbStore implements TsdbStore {
     public Map<SeriesKey, List<BucketAggregate>> bucketedAggregate(SeriesFilter filter, AggregateFunction fn,
                                                                    TimeWindow window, Duration bucketWidth,
                                                                    Double percentile, TsdbDeadline deadline) {
+        TsdbStore.validatePercentile(fn, percentile);
         // TDengine PERCENTILE refuses supertable queries (including INTERVAL
         // windows); per-series subtable scans keep it exact on the raw path —
         // this store declares rollupSupport=NONE, so tier reads never apply.
@@ -331,18 +386,27 @@ public final class TdengineTsdbStore implements TsdbStore {
                         .formatted(aggregateExpression(fn, percentile), subtable(key),
                                 microsOf(window.from()), microsOf(window.toExclusive()),
                                 bucketWidth.toNanos() / 1000);
-                timedVoid(deadline, () -> {
-                    List<Map<String, Object>> rows = jdbc.queryForList(sql);
-                    List<BucketAggregate> buckets = new ArrayList<>();
-                    for (Map<String, Object> row : rows) {
-                        buckets.add(new BucketAggregate(instantOfMicros(((Number) row.get("bucket")).longValue()),
-                                Objects.nonNull(row.get("agg_value")) ? ((Number) row.get("agg_value")).doubleValue() : null,
-                                ((Number) row.get("sample_count")).longValue()));
+                try {
+                    timedVoid(deadline, t -> {
+                        List<Map<String, Object>> rows = t.queryForList(sql);
+                        List<BucketAggregate> buckets = new ArrayList<>();
+                        for (Map<String, Object> row : rows) {
+                            buckets.add(new BucketAggregate(instantOfMicros(((Number) row.get("bucket")).longValue()),
+                                    Objects.nonNull(row.get("agg_value")) ? ((Number) row.get("agg_value")).doubleValue() : null,
+                                    ((Number) row.get("sample_count")).longValue()));
+                        }
+                        if (!buckets.isEmpty()) {
+                            result.put(key, buckets);
+                        }
+                    });
+                } catch (DataAccessException e) {
+                    // subtables only exist after the first insert: an absent
+                    // table contributes no buckets, not a failure
+                    if (missingSubtable(e)) {
+                        continue;
                     }
-                    if (!buckets.isEmpty()) {
-                        result.put(key, buckets);
-                    }
-                });
+                    throw e;
+                }
             }
             return result;
         }
@@ -355,8 +419,8 @@ public final class TdengineTsdbStore implements TsdbStore {
                         microsOf(window.from()), microsOf(window.toExclusive()), bucketWidth.toNanos() / 1000);
         List<Object> args = new ArrayList<>(seriesArgs(filter));
         Map<SeriesKey, List<BucketAggregate>> result = new LinkedHashMap<>();
-        timedVoid(deadline, () -> {
-            List<Map<String, Object>> rows = jdbc.queryForList(sql, args.toArray());
+        timedVoid(deadline, t -> {
+            List<Map<String, Object>> rows = t.queryForList(sql, args.toArray());
             for (Map<String, Object> row : rows) {
                 result.computeIfAbsent(seriesOf(row), key -> new ArrayList<>())
                         .add(new BucketAggregate(instantOfMicros(((Number) row.get("bucket")).longValue()),
@@ -372,7 +436,7 @@ public final class TdengineTsdbStore implements TsdbStore {
         String sql = "SELECT COUNT(*) FROM " + stable + " WHERE " + seriesWhere(filter)
                 + " AND ts >= " + microsOf(window.from()) + " AND ts < " + microsOf(window.toExclusive());
         List<Object> args = new ArrayList<>(seriesArgs(filter));
-        Long value = timed(deadline, () -> jdbc.queryForObject(sql, Long.class, args.toArray()));
+        Long value = timed(deadline, t -> t.queryForObject(sql, Long.class, args.toArray()));
         return Objects.requireNonNullElse(value, 0L);
     }
 
@@ -387,7 +451,7 @@ public final class TdengineTsdbStore implements TsdbStore {
                 .formatted(stable, microsOf(window.from()), microsOf(window.toExclusive()),
                         bucketWidth.toNanos() / 1000);
         Object[] args = {tenantId};
-        return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new BucketAggregate(
+        return timed(deadline, t -> t.query(sql, (rs, i) -> new BucketAggregate(
                 instantOfMicros(rs.getLong(1)), null, rs.getLong(2)), args));
     }
 
@@ -405,7 +469,7 @@ public final class TdengineTsdbStore implements TsdbStore {
                 GROUP BY %s ORDER BY sample_count DESC LIMIT ?"""
                 .formatted(column, stable, microsOf(window.from()), microsOf(window.toExclusive()), column);
         Object[] args = {tenantId, limit};
-        return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new DimensionCount(dimension,
+        return timed(deadline, t -> t.query(sql, (rs, i) -> new DimensionCount(dimension,
                 rs.getLong(1), rs.getLong(2)), args));
     }
 
@@ -417,7 +481,7 @@ public final class TdengineTsdbStore implements TsdbStore {
                 GROUP BY tenant_id, device_id, point_id"""
                 .formatted(stable, microsOf(window.from()), microsOf(window.toExclusive()));
         Object[] args = {tenantId};
-        return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new SeriesCount(
+        return timed(deadline, t -> t.query(sql, (rs, i) -> new SeriesCount(
                 new SeriesKey(rs.getLong(1), rs.getLong(2), rs.getLong(3)), rs.getLong(4)), args));
     }
 
@@ -429,7 +493,7 @@ public final class TdengineTsdbStore implements TsdbStore {
                 GROUP BY tenant_id, device_id, point_id"""
                 .formatted(stable, microsOf(window.from()), microsOf(window.toExclusive()));
         Object[] args = {tenantId};
-        List<SeriesLastSeen> rows = timed(deadline, () -> jdbc.query(sql, (rs, i) -> new SeriesLastSeen(
+        List<SeriesLastSeen> rows = timed(deadline, t -> t.query(sql, (rs, i) -> new SeriesLastSeen(
                 new SeriesKey(rs.getLong(1), rs.getLong(2), rs.getLong(3)), instantOfMicros(rs.getLong(4))), args));
         // The port contract orders by recency; TDengine cannot ORDER BY an aggregate
         // across partitions, so fold it here.
@@ -452,7 +516,7 @@ public final class TdengineTsdbStore implements TsdbStore {
                 SELECT DISTINCT tenant_id, device_id, point_id FROM %s
                 WHERE tenant_id = ? AND ts >= %d AND ts < %d""".formatted(stable,
                 microsOf(window.from()), microsOf(window.toExclusive()));
-        return timed(deadline, () -> jdbc.query(sql, (rs, i) -> new SeriesKey(
+        return timed(deadline, t -> t.query(sql, (rs, i) -> new SeriesKey(
                 rs.getLong(1), rs.getLong(2), rs.getLong(3)), tenantId));
     }
 
@@ -460,9 +524,20 @@ public final class TdengineTsdbStore implements TsdbStore {
     public void deleteRange(SeriesKey series, TimeWindow window) {
         // DELETE bounds in TDengine are inclusive; emulate [from, toExclusive) by
         // pulling the upper bound back one microsecond (the database precision).
-        jdbc.update("DELETE FROM " + subtable(series)
+        String sql = "DELETE FROM " + subtable(series)
                 + " WHERE ts >= " + microsOf(window.from())
-                + " AND ts <= " + microsOf(window.toExclusive().minusNanos(1000)));
+                + " AND ts <= " + microsOf(window.toExclusive().minusNanos(1000));
+        try {
+            jdbc.update(sql);
+        } catch (DataAccessException e) {
+            // subtables only exist after the first insert: nothing to delete in
+            // a series that never wrote samples
+            if (missingSubtable(e)) {
+                log.debug("deleteRange skipped, subtable absent (no samples yet): {}", subtable(series));
+                return;
+            }
+            throw e;
+        }
     }
 
     @Override
@@ -476,6 +551,23 @@ public final class TdengineTsdbStore implements TsdbStore {
 
     private String subtable(SeriesKey series) {
         return database + ".pv_" + series.tenantId() + "_" + series.deviceId() + "_" + series.pointId();
+    }
+
+    /**
+     * Whether the error chain reports a missing (sub)table. Subtables only
+     * materialize on first INSERT, so a series with no samples yet makes every
+     * table-direct path fail with "table does not exist" — that is an empty
+     * series, not an error. Database-level "not exist" must NOT match (the
+     * bootstrap owns the database).
+     */
+    private static boolean missingSubtable(Throwable error) {
+        for (Throwable cause = error; Objects.nonNull(cause); cause = cause.getCause()) {
+            String message = String.valueOf(cause.getMessage()).toLowerCase(Locale.ROOT);
+            if (message.contains("table") && message.contains("not exist")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static SeriesKey seriesOf(Map<String, Object> row) {
@@ -503,11 +595,24 @@ public final class TdengineTsdbStore implements TsdbStore {
         if (filter.tenantWide()) {
             return "tenant_id = ?";
         }
+        // One giant flat OR chain overflows TDengine's parser on large explicit
+        // series lists; chunk the pairs into parenthesized groups of 500 joined
+        // by OR — same shape as the timescale adapter, one query, groups union
+        // their partial matches.
         StringBuilder out = new StringBuilder("tenant_id = ? AND (");
-        for (int i = 0; i < filter.series().size(); i++) {
-            out.append(i > 0 ? " OR " : "").append("(device_id = ? AND point_id = ?)");
+        int emitted = 0;
+        for (int start = 0; start < filter.series().size(); start += SERIES_IN_CHUNK) {
+            if (emitted > 0) {
+                out.append(" OR ");
+            }
+            out.append('(');
+            for (int i = start; i < Math.min(start + SERIES_IN_CHUNK, filter.series().size()); i++) {
+                out.append(i > start ? " OR " : "").append("(device_id = ? AND point_id = ?)");
+            }
+            out.append(')');
+            emitted = start + SERIES_IN_CHUNK;
         }
-        return out.append(")").toString();
+        return out.append(')').toString();
     }
 
     private List<Object> seriesArgs(SeriesFilter filter) {
@@ -536,27 +641,38 @@ public final class TdengineTsdbStore implements TsdbStore {
         };
     }
 
-    private void timedVoid(TsdbDeadline deadline, Runnable query) {
-        timed(deadline, () -> {
-            query.run();
+    private void timedVoid(TsdbDeadline deadline, java.util.function.Consumer<JdbcTemplate> query) {
+        timed(deadline, template -> {
+            query.accept(template);
             return null;
         });
     }
 
-    private <T> T timed(TsdbDeadline deadline, java.util.function.Supplier<T> query) {
+    private <T> T timed(TsdbDeadline deadline, java.util.function.Function<JdbcTemplate, T> query) {
+        // per-call template: mutating the shared instance's queryTimeout races
+        // concurrent queries with different deadlines. The local template shares
+        // the pooled DataSource, so construction is cheap. The REST driver may
+        // ignore the statement timeout entirely — enforcement here is
+        // best-effort, honestly bounded only when the driver honors
+        // setQueryTimeout.
+        JdbcTemplate local = new JdbcTemplate(dataSource);
+        local.setQueryTimeout((int) Math.max(1, deadline.maxWait().toSeconds()));
         try {
-            jdbc.setQueryTimeout((int) Math.max(1, deadline.maxWait().toSeconds()));
-        } catch (DataAccessException ignored) {
-            // the REST statement path may not support server-side timeouts; the
-            // deadline contract stays wall-clock bounded
-        }
-        try {
-            return query.get();
+            return query.apply(local);
         } catch (DataAccessException e) {
-            if (Objects.nonNull(e.getCause()) && String.valueOf(e.getCause()).toLowerCase().contains("timeout")) {
+            if (isTimeout(e)) {
                 throw new TsdbQueryTimeout("tdengine query exceeded " + deadline.maxWait(), e);
             }
             throw e;
         }
+    }
+
+    private boolean isTimeout(Throwable error) {
+        for (Throwable cause = error; Objects.nonNull(cause); cause = cause.getCause()) {
+            if (String.valueOf(cause).toLowerCase().contains("timeout")) {
+                return true;
+            }
+        }
+        return false;
     }
 }

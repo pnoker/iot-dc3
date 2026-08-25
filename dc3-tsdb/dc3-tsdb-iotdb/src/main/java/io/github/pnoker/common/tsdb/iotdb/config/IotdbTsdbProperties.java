@@ -40,4 +40,10 @@ public class IotdbTsdbProperties {
     private String username = "root";
 
     private String password = "root";
+
+    /**
+     * Raw retention in days applied to the whole {@code root.dc3} subtree via
+     * {@code SET TTL TO}.
+     */
+    private int ttlDays = 180;
 }

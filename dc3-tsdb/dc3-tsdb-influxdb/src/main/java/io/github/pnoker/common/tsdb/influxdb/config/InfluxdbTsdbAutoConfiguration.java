@@ -40,9 +40,10 @@ import org.springframework.context.annotation.Bean;
 public class InfluxdbTsdbAutoConfiguration {
 
     /**
-     * The InfluxDB 3 adapter over the v3 HTTP APIs.
+     * The InfluxDB 3 adapter over the v3 HTTP APIs; the store closes its HTTP
+     * client (this destroy method) on shutdown.
      */
-    @Bean
+    @Bean(destroyMethod = "close")
     @ConditionalOnMissingBean(TsdbStore.class)
     public TsdbStore tsdbStore(InfluxdbTsdbProperties properties) {
         TsdbStore store = new InfluxdbTsdbStore(properties.getUrl(), properties.getToken(),

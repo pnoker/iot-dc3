@@ -40,13 +40,13 @@ import org.springframework.context.annotation.Bean;
 public class IotdbTsdbAutoConfiguration {
 
     /**
-     * The IoTDB adapter over the session API; closed with the context.
+     * The IoTDB adapter over the pooled session API; closed with the context.
      */
     @Bean(destroyMethod = "close")
     @ConditionalOnMissingBean(TsdbStore.class)
     public IotdbTsdbStore tsdbStore(IotdbTsdbProperties properties) {
         IotdbTsdbStore store = new IotdbTsdbStore(properties.getHost(), properties.getPort(),
-                properties.getUsername(), properties.getPassword());
+                properties.getUsername(), properties.getPassword(), properties.getTtlDays());
         log.info("TSDB port negotiated, store={}, capabilities={}", store.type(), store.capabilities());
         return store;
     }
