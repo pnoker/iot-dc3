@@ -47,6 +47,29 @@ test.describe('three-terminal gate', () => {
     await expectNoHorizontalOverflow(page, 'settings');
   });
 
+  // L4 template sweep: one representative route per page template family
+  // (monitor / list / detail / history), gated on every terminal viewport.
+  const TEMPLATE_ROUTES: Array<{template: string; hash: string}> = [
+    {template: 'monitor', hash: '/#/settings/alarm/overview'},
+    {template: 'list', hash: '/#/device'},
+    {template: 'list', hash: '/#/driver'},
+    {template: 'list', hash: '/#/profile'},
+    {template: 'list', hash: '/#/settings/label'},
+    {template: 'detail', hash: '/#/point_value'},
+    {template: 'detail', hash: '/#/settings/alarm/point'},
+    {template: 'history', hash: '/#/settings/event/history'},
+    {template: 'history', hash: '/#/settings/command/history'}
+  ];
+
+  for (const {template, hash} of TEMPLATE_ROUTES) {
+    test(`template ${template} ${hash} keeps zero page-level overflow`, async ({page}) => {
+      await login(page);
+      await page.goto(hash, {waitUntil: 'domcontentloaded'});
+      await waitForAppSettled(page);
+      await expectNoHorizontalOverflow(page, `${template} ${hash}`);
+    });
+  }
+
   test('shell adapts to the viewport (menu strip vs drawer, aside vs drawer)', async ({page}) => {
     await login(page);
     const mobile = isMobileViewport(page);
@@ -80,8 +103,7 @@ test.describe('three-terminal gate', () => {
     }
   });
 
-  test('a11y smoke: visible interactive controls expose accessible names', async ({page}) => {
-    await login(page);
+  test('a11y smoke: visible interactive controls expose accessible names', async ({page}) => {    await login(page);
     await page.goto('/#/settings/user', {waitUntil: 'domcontentloaded'});
     await waitForAppSettled(page);
 
@@ -99,5 +121,27 @@ test.describe('three-terminal gate', () => {
     });
 
     expect(unlabeled, 'visible controls without an accessible name').toEqual([]);
+  });
+
+  // A3 acceptance: dialogs go (near) full-screen below 768px, so a fixed
+  // 640px dialog width never overflows a mobile viewport. Gated on mobile
+  // only — desktop/tablet keep the centered width contract.
+  test('dialogs fit the mobile viewport below 768px', async ({page}) => {
+    test.skip(!isMobileViewport(page), 'mobile-only dialog shape contract');
+    await login(page);
+
+    await page.goto('/#/settings/label', {waitUntil: 'domcontentloaded'});
+    await waitForAppSettled(page);
+    await page.getByRole('button', {name: /Add|新增/}).first().click();
+    const dialog = page.locator('.el-dialog:visible').last();
+    await expect(dialog).toBeVisible();
+
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+    );
+    expect(overflow, 'open dialog causes page-level horizontal overflow').toBeLessThanOrEqual(0);
+    const dialogWidth = await dialog.boundingBox();
+    const viewportWidth = page.viewportSize()?.width ?? 393;
+    expect(dialogWidth?.width, 'dialog wider than viewport').toBeLessThanOrEqual(viewportWidth);
   });
 });
