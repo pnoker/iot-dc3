@@ -43,7 +43,8 @@ use `pnpm test:e2e`; see [tests/README.md](./tests/README.md) for the test layer
 ## Project conventions
 
 - Vite environment files live under `src/config/env/` and use the `APP_` prefix.
-- Java 64-bit IDs are represented as strings and decoded with the existing JSONBigInt support.
+- Java 64-bit IDs are represented as strings. The backend emits identifiers as JSON strings on the HTTP contract,
+  so standard JSON parsing is sufficient.
 - Type-only imports must use `import type` because `verbatimModuleSyntax` is enabled.
 - API wrapper names mirror backend cardinality: `getXxx` for one result and `listXxx` for collections/pages/maps.
 - Every router-guard branch must settle navigation.
