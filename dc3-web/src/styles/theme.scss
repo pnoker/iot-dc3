@@ -26,6 +26,10 @@
 // Components read --dc3-* at runtime and the SCSS constants in tokens.scss
 // at compile time.
 
+// Standalone module loaded via @use from global.scss: additionalData
+// injection does not reach it, so import the breakpoint contract explicitly.
+@use '@/styles/tokens.scss' as *;
+
 :root {
   // Brand override for Element Plus (moved from global.scss to keep every
   // color mutation in one file).
@@ -95,5 +99,27 @@ html.dark {
     --dc3-duration-fast: 0ms;
     --dc3-duration-base: 0ms;
     --dc3-duration-slow: 0ms;
+  }
+}
+
+// A3 acceptance: dialogs go (near) full-screen below the xs tier so a
+// 640px-wide dialog never overflows a 390px viewport. Element Plus writes
+// the width prop as an inline style, so !important is required to override
+// it per device class. things-dialog keeps its own max-height contract;
+// this rule only re-shapes width/height on mobile.
+@media (max-width: $breakpoint-xs-max) {
+  .el-overlay-dialog .el-dialog:not(.is-fullscreen) {
+    --el-dialog-width: 100%;
+    width: calc(100vw - 16px) !important;
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+    max-height: calc(100vh - 32px);
+    display: flex;
+    flex-direction: column;
+
+    .el-dialog__body {
+      flex: 1 1 auto;
+      overflow-y: auto;
+    }
   }
 }
