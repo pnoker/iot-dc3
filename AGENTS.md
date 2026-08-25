@@ -58,7 +58,7 @@ iot-dc3/
 ├── dc3-mq/               top-level MQ family aggregator (port=dc3-mq-core + 6 adapters + tck)
 ├── dc3-tsdb/             top-level TSDB family aggregator (port=dc3-tsdb-core + 4 adapters + tck)
 ├── dc3-db/               top-level relational family aggregator (core=dc3-db-core + 3 dialect adapters + tck)
-├── docs/                 selection guides (`mq-brokers.md`, `tsdb-stores.md`) and design docs under `design/`
+├── docs/                 selection guides (`mq-brokers.md`, `tsdb-stores.md`, `db-dialects.md`) and design docs under `design/`
 ├── Makefile              preferred backend/container command entrypoint
 └── .mvn/settings.xml     local Maven mirror configuration
 ```
@@ -102,7 +102,7 @@ shared infrastructure.
 - Put BO/VO/DTO bases, builders, validation groups, extensions, and shared transport models in `dc3-common-model`; those
   models may reference enums owned by `dc3-common-constant`.
 - Keep framework- or capability-specific public helpers in the narrowest owning module, such as gRPC conversion in
-  `dc3-common-api`, WebFlux helpers in `dc3-common-web`, and RabbitMQ helpers in `dc3-common-rabbitmq`.
+  `dc3-common-api`, WebFlux helpers in `dc3-common-web`, and broker adapters in the `dc3-mq-*` family.
 - Keep constants and nested enums used by only one module, protocol, configuration object, or implementation beside that
   owner. Reserve top-level `*Constant` classes and top-level public enums for `dc3-common-constant`; use a
   concern-specific local name such as `*Limits`/`*Defaults`, a nested enum, or a private field until the concept becomes

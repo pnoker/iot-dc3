@@ -29,6 +29,9 @@ export POSTGRES_DB=dc3
 # Message broker selection (docs/mq-brokers.md); rabbitmq is the default
 export DC3_MQ_TYPE=rabbitmq
 
+# Relational dialect selection (docs/db-dialects.md); postgres is the default
+export DC3_DB_TYPE=postgres
+
 # Time-series store selection (docs/design/tsdb-abstraction.md); timescale is the default
 export DC3_TSDB_TYPE=timescale
 

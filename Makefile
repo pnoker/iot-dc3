@@ -272,6 +272,8 @@ deploy: package
 	&& $(MVN_SUB) clean deploy -P deploy \
 	&& cd ../dc3-common \
 	&& $(MVN_SUB) clean deploy -P deploy \
+	&& cd ../dc3-db \
+	&& $(MVN_SUB) clean deploy -P deploy \
 	&& cd ../dc3-mq \
 	&& $(MVN_SUB) clean deploy -P deploy \
 	&& cd ../dc3-tsdb \
