@@ -1,7 +1,24 @@
-<!-- DC3 品牌 banner 模板(V4 液态玻璃锁标款):
-     修改设计只改本文件,然后运行 gen-banners.mjs 重新生成全部语言 svg+png。
-     占位符:Multi-protocol · Cloud-native · Open-source Industrial IoT Platform 定位语 / 28+ PROTOCOL DRIVERS · EDGE-CLOUD · SENSE–DECIDE–ACT 技术标签(各语言文案在 gen-banners.mjs 的 LANGS 表维护)。
-     品牌标题与 social-preview.svg 使用相同的 Segoe UI Variable Display 字体栈。 -->
+<!--
+  - Copyright 2016-present the IoT DC3 original author or authors.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<!-- DC3 brand banner template (V4 liquid-glass lockup):
+     Edit only this file for design changes, then run gen-banners.mjs to regenerate every language's svg+png.
+     Placeholders: Multi-protocol · Cloud-native · Open-source Industrial IoT Platform tagline / 28+ PROTOCOL DRIVERS · EDGE-CLOUD · SENSE–DECIDE–ACT tech tags (per-language copy lives in the LANGS table of gen-banners.mjs).
+     The brand title shares the Segoe UI Variable Display font stack with social-preview.svg. -->
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="420" viewBox="0 0 1600 420"
      font-family="'Segoe UI','PingFang SC','Hiragino Sans','Apple SD Gothic Neo','Microsoft YaHei',Roboto,Arial,sans-serif">
     <defs>
@@ -65,7 +82,7 @@
     <rect width="1600" height="420" fill="url(#bg)"/>
     <rect width="1600" height="420" fill="url(#glow1)"/>
     <rect width="1600" height="420" fill="url(#glow2)"/>
-    <!-- DC3 Protocol Mesh(浅色版,底部横贯带) -->
+    <!-- DC3 Protocol Mesh (light version, bottom running band) -->
     <g id="dc3-protocol-mesh">
         <path d="M56 406 C 300 398, 560 384, 760 378 C 940 374, 1160 352, 1544 276" fill="none" stroke="#4a90c9"
               stroke-opacity="0.20" stroke-width="1.1"/>

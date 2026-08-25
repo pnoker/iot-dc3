@@ -1,12 +1,29 @@
-// DC3 品牌图片生成器:
-//   svg/banner.template.svg(设计源,占位符 {{TAGLINE}}/{{TECHTAGS}}) × LANGS 语言表
-//   → svg/banner.<lang>.svg + png/banner.<lang>.png(@2x,3200×840,retina 锐利)
-//   svg/social-preview.svg → png/social-preview.png(1200×600)
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// DC3 brand image generator:
+//   svg/banner.template.svg (design source, {{TAGLINE}}/{{TECHTAGS}} placeholders) x LANGS language table
+//   -> svg/banner.<lang>.svg + png/banner.<lang>.png (@2x, 3200x840, retina sharp)
+//   svg/social-preview.svg -> png/social-preview.png (1200x600)
 //
-// 运行: node .github/brand/gen-banners.mjs
-// 依赖 playwright:本仓库是 Java 工程、无 JS 依赖,脚本会尝试从兄弟仓库
-//   ../iot-dc3-online/node_modules 解析(iot-dc3-online 的 devDependencies 已含 playwright);
-//   也可用 BANNER_PLAYWRIGHT_DIR 环境变量指定其他 node_modules 路径。
+// Run: node .github/brand/gen-banners.mjs
+// Playwright dependency: this repo is a Java project with no JS deps, so the script
+//   resolves from the sibling ../iot-dc3-online/node_modules (its devDependencies include playwright);
+//   or point BANNER_PLAYWRIGHT_DIR at another node_modules path.
 import {createRequire} from 'node:module'
 import {existsSync} from 'node:fs'
 import {fileURLToPath} from 'node:url'

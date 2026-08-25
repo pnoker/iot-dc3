@@ -1,3 +1,20 @@
+<!--
+  - Copyright 2016-present the IoT DC3 original author or authors.
+  -
+  - This program is free software: you can redistribute it and/or modify
+  - it under the terms of the GNU Affero General Public License as
+  - published by the Free Software Foundation, either version 3 of the
+  - License, or (at your option) any later version.
+  -
+  - This program is distributed in the hope that it will be useful,
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
+  - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  - GNU Affero General Public License for more details.
+  -
+  - You should have received a copy of the GNU Affero General Public License
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600"
      font-family="'Segoe UI','PingFang SC',Roboto,Arial,sans-serif">
     <defs>
@@ -72,7 +89,7 @@
     <rect width="1200" height="600" fill="url(#bg-violet)"/>
     <circle cx="163" cy="130" r="92" fill="#4bc4ed" fill-opacity="0.18" filter="url(#soft-blur)"/>
     <circle cx="1035" cy="454" r="116" fill="#817cf0" fill-opacity="0.15" filter="url(#soft-blur)"/>
-    <!-- DC3 Protocol Mesh(派生自 og-image,横向穿过居中 logo) -->
+    <!-- DC3 Protocol Mesh (derived from og-image, runs horizontally through the centered logo) -->
     <g id="dc3-protocol-mesh">
         <path d="M56 434 C 220 420, 400 400, 560 372 C 640 358, 700 346, 780 330 C 880 310, 980 260, 1146 178"
               fill="none" stroke="#7db8dd" stroke-opacity="0.09" stroke-width="1.1"/>
