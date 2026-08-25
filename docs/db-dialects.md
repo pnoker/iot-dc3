@@ -20,16 +20,17 @@ DC3 的关系核心（认证/元数据/告警/命令与事件历史/可观测性
 | latest 投影       | `ON CONFLICT DO UPDATE` + 行值元组守卫                         | `ON DUPLICATE KEY UPDATE` + 行别名 `AS new` + IF 链                    | 同形，但 `VALUES(col)` 引用待插行——**MariaDB 从未采纳 AS new 行别名**（实证 10.11 语法错误） |
 | RETURNING         | 支持，但为可移植已弃用（upsert→同事务 re-select）              | 无——re-select 是唯一路径                                               | 同 MySQL                                                                                     |
 | 序列              | 已退役——版本/围栏令牌行内 `+1`（见下）                         | 无序列对象，同款行内 `+1`                                              | 同                                                                                           |
-| 咨询锁            | `pg_advisory_xact_lock`（事务级，免释放）                      | `GET_LOCK` 会话级，调用方 try/finally `advisoryUnlock`（PG 版 no-op）  | 同 MySQL                                                                                     |
+| 咨询锁            | `pg_advisory_xact_lock`（事务级，免释放）                      | `GET_LOCK` 会话级，调用方 try/finally `advisoryUnlock` + 返回值校验（'0'/NULL = 锁忙即失败重试） | 同 MySQL                                                                                     |
 | operate_time 维护 | BEFORE UPDATE 触发器                                           | `ON UPDATE CURRENT_TIMESTAMP(6)` 列属性（显式 SET 优先）               | 同 MySQL                                                                                     |
 | 修订触发器        | 行级 `track_driver_device_revision_change()`                   | 行级三触发器（DELIMITER 体），同构语义                                 | 同                                                                                           |
 | 契约套件          | 8/8                                                            | 8/8                                                                    | 8/8                                                                                          |
 
 ## 换型操作
 
-1. `make up STACK=optional SERVICES="mysql"` 启动 MySQL 或 MariaDB（utf8mb4，种子自动灌入）。
+1. `make up STACK=optional SERVICES="mysql"`（或 `mariadb`）启动引擎（utf8mb4，种子自动灌入；`99-grants.sql` 把应用用户授权扩到全部五个库——entrypoint 默认只授 `MYSQL_DATABASE` 一个库）。
 2. 主栈环境：`DC3_DB_TYPE=mysql`（或 `mariadb`；默认 `postgres`）。
-3. Maven 侧：默认只打包 `dc3-db-postgres`——MySQL 部署把消费模块依赖换成
+3. **每服务覆写 JDBC URL**：各中心库不同（auth→`dc3_auth`、data→`dc3_data`+`DC3_DB_HISTORY_URL`、manager→`dc3_manager`、agentic→`dc3_agentic`）。源码运行为对应服务导出 `DC3_DB_URL`；容器部署用 `docker-compose.override.yml` 按服务注入。只改 `DC3_DB_TYPE` 不改 URL 会静默继续连 PostgreSQL（`application-*.yml` 的 URL 默认值是逐服务写死的 PG 形态）。漏装适配器 jar 时启动即 fail-fast（`MybatisPlusConfig` 守卫）。
+4. Maven 侧：默认只打包 `dc3-db-postgres`——MySQL 部署把消费模块依赖换成
    `dc3-db-mysql`（与 MQ/TSDB 家族同款约定）。
 
 > MySQL 核心 + 时序库：TimescaleDB 只存在于 PostgreSQL 内——MySQL 部署必须
@@ -45,6 +46,8 @@ DC3 的关系核心（认证/元数据/告警/命令与事件历史/可观测性
   **之前**。双库契约 套件对此有专项断言。
 - **JSON 文本进 MySQL 必须参数化**（或 `NO_BACKSLASH_ESCAPES` 会话）：默认 反斜杠转义会把内嵌转义 JSON 的 `\"` 吃掉（PG
   不转义）——seed 文件头已设 会话模式，应用侧一律参数绑定。
+- **部分唯一索引用生成列守卫保真**：PostgreSQL 的 `CREATE UNIQUE INDEX ... WHERE deleted = 0`
+  翻译为 MySQL 存储生成列（`CASE WHEN <谓词> THEN 1 ELSE NULL END STORED`）+ 复合唯一索引——NULL 不参与唯一性，删除行不受约束，与 PG 部分索引语义一致（`pg2mysql_seed.py` 自动生成，41 条全覆盖；非唯一部分索引按纯性能优化省略）。
 
 ## 认证复跑
 

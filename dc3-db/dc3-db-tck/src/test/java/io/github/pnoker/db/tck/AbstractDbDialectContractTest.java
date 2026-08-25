@@ -17,7 +17,12 @@
 
 package io.github.pnoker.db.tck;
 
+import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
+import io.github.pnoker.common.data.entity.bo.dashboard.AgingBucketRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.CorrelationPairRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow;
+import io.github.pnoker.common.data.mapper.AlertMapper;
 import io.github.pnoker.common.data.mapper.EntityStateMapper;
 import io.github.pnoker.common.data.mapper.PointValueMapper;
 import io.github.pnoker.common.manager.mapper.DriverLeaseMapper;
@@ -33,18 +38,20 @@ import org.junit.jupiter.api.TestInstance;
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Dialect-neutral relational contract suite (docs/design/storage-abstraction.md
- * §3.3): one set of mapper-level assertions runs against PostgreSQL and MySQL 8
- * with identical fixtures. The suite exercises the real mapper XML — including
- * the databaseId-routed forks — so passing it certifies that both dialects
- * deliver the same behavior on the forked statements: the fenced latest-value
- * upsert, the state upsert + re-select shape, the three-step expired-lease
- * claim, the lease upserts' row-local increments, the revision triggers, and
- * the tool-catalog JSON extraction.
+ * §3.3): one set of mapper-level assertions runs against PostgreSQL, MySQL 8 and
+ * MariaDB with identical fixtures. The suite exercises the real mapper XML — including
+ * the databaseId-routed forks — so passing it certifies that the dialects deliver
+ * the same behavior on the forked statements: the fenced latest-value upsert, the
+ * state upsert + re-select shape, the three-step expired-lease claim, the lease
+ * upserts' row-local increments, the revision triggers, the tool-catalog JSON
+ * extraction and CRUD twins, and the alert analytics twins (aging buckets,
+ * interpolated percentile MTTA, correlation pairs).
  *
  * @author pnoker
  * @since 2026.8.24
@@ -95,7 +102,7 @@ abstract class AbstractDbDialectContractTest {
             configuration.setMapUnderscoreToCamelCase(true);
             registerDialectHandlers(configuration);
             for (String xml : List.of("mapping/EntityStateMapper.xml", "mapping/PointValueMapper.xml",
-                    "mapping/DriverLeaseMapper.xml", "mapping/OAuthMcpMapper.xml")) {
+                    "mapping/DriverLeaseMapper.xml", "mapping/OAuthMcpMapper.xml", "mapping/AlertMapper.xml")) {
                 try {
                     // affectData is a mybatis-plus DTD extension (cache eviction hint);
                     // the vanilla parser rejects it and the TCK does not depend on it
@@ -317,6 +324,136 @@ abstract class AbstractDbDialectContractTest {
             ps.executeUpdate();
         } catch (Exception e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    // ===== 7) tool-catalog CRUD twins (keyword filter + JSON defaults) =====
+
+    @Test
+    void toolCatalogKeywordFilterAndJsonDefaultsSurviveTheDialectTwins() {
+        try (SqlSession session = open("dc3_auth")) {
+            OAuthMcpMapper mapper = session.getMapper(OAuthMcpMapper.class);
+            McpToolRecord plain = tool(freshId(), "tck-center:GET:/tck/plain", "plain", null);
+            McpToolRecord rich = tool(freshId(), "tck-center:GET:/tck/rich", "tckneedle-rich",
+                    "{\"title\":\"Rich\"}");
+            assertThat(mapper.insertTool(plain)).isEqualTo(1);
+            assertThat(mapper.insertTool(rich)).isEqualTo(1);
+
+            List<McpToolRecord> all = mapper.listToolCatalog(null, null, 10);
+            assertThat(all).extracting(McpToolRecord::getToolId)
+                    .contains("tck-center:GET:/tck/plain", "tck-center:GET:/tck/rich");
+            assertThat(all).allSatisfy(tool -> assertThat(tool.getToolExt()).isNotBlank());
+
+            List<McpToolRecord> byKeyword = mapper.listToolCatalog("tckneedle", null, 10);
+            assertThat(byKeyword).hasSize(1);
+            assertThat(byKeyword.getFirst().getToolId()).isEqualTo("tck-center:GET:/tck/rich");
+            // MySQL normalizes stored JSON (insertion of spaces after colons);
+            // compare ignoring insignificant whitespace
+            assertThat(byKeyword.getFirst().getToolExt().replace(" ", ""))
+                    .isEqualTo("{\"title\":\"Rich\"}");
+
+            rich.setToolTitle("renamed");
+            assertThat(mapper.updateTool(rich)).isEqualTo(1);
+            assertThat(mapper.listToolCatalog("tckneedle", null, 10).getFirst().getToolTitle())
+                    .isEqualTo("renamed");
+        }
+    }
+
+    private McpToolRecord tool(long id, String toolId, String toolName, String toolExt) {
+        McpToolRecord tool = new McpToolRecord();
+        tool.setId(id);
+        tool.setToolId(toolId);
+        tool.setToolName(toolName);
+        tool.setToolTitle(toolName);
+        tool.setToolCategory("tck");
+        tool.setServiceName("tck-center");
+        tool.setApiCode(toolId);
+        tool.setPermissionCode(toolId);
+        tool.setHttpMethod("GET");
+        tool.setApiPath("/tck");
+        tool.setSchemaHash("hash");
+        tool.setRiskLevel("LOW");
+        tool.setReadOnlyHint((byte) 1);
+        tool.setDestructiveHint((byte) 0);
+        tool.setIdempotentHint((byte) 1);
+        tool.setOpenWorldHint((byte) 0);
+        tool.setEnableFlag((byte) 0);
+        tool.setToolExt(toolExt);
+        tool.setRemark("");
+        return tool;
+    }
+
+    // ===== 8) alert analytics twins (aging buckets / percentile MTTA / correlation pairs) =====
+
+    @Test
+    void alertAnalyticsTwinsBucketAgeInterpolatePercentilesAndPairCorrelations() throws Exception {
+        // separate tenants per concern so one statement's fixtures never feed another's
+        long agingTenant = freshId();
+        long mttaTenant = freshId();
+        long correlationTenant = freshId();
+        // Fixed historical base: 2026-01-02 12:00 wall clock — 12:00 UTC and 20:00
+        // Asia/Shanghai share the same calendar date, so both engines bucket the
+        // day identically regardless of session time zone.
+        LocalDateTime mttaBase = LocalDateTime.of(2026, 1, 2, 12, 0, 0);
+        try (SqlSession session = open("dc3_data")) {
+            var jdbc = session.getConnection();
+            // aging fixtures — wall clock of the engine's session zone so the
+            // age deltas line up with the server's NOW()
+            LocalDateTime wallNow = "postgres".equals(databaseId())
+                    ? LocalDateTime.now() : LocalDateTime.now(java.time.ZoneOffset.UTC);
+            insertAlarm(jdbc, freshId(), agingTenant, 0, 101, 0, wallNow.minusMinutes(10), null);
+            insertAlarm(jdbc, freshId(), agingTenant, 1, 102, 0, wallNow.minusHours(30), null);
+            insertAlarm(jdbc, freshId(), agingTenant, 0, 103, 0, wallNow.minusHours(30), null);
+            // mtta fixtures: confirmed with 1s / 2s / 10s acknowledge latencies →
+            // PERCENTILE_CONT(0.5) = 2000ms, PERCENTILE_CONT(0.95) = 2000 + 0.9*(10000-2000) = 9200ms
+            insertAlarm(jdbc, freshId(), mttaTenant, 0, 201, 1, mttaBase, mttaBase.plusSeconds(1));
+            insertAlarm(jdbc, freshId(), mttaTenant, 0, 202, 1, mttaBase, mttaBase.plusSeconds(2));
+            insertAlarm(jdbc, freshId(), mttaTenant, 0, 203, 1, mttaBase, mttaBase.plusSeconds(10));
+            // correlation fixtures: point and device alarms at the same instant pair once;
+            // the far-away one stays out of the window
+            insertAlarm(jdbc, freshId(), correlationTenant, 0, 301, 0, mttaBase, null);
+            insertAlarm(jdbc, freshId(), correlationTenant, 1, 302, 0, mttaBase, null);
+            insertAlarm(jdbc, freshId(), correlationTenant, 2, 303, 0, mttaBase.plusHours(2), null);
+        }
+        try (SqlSession session = open("dc3_data")) {
+            AlertMapper mapper = session.getMapper(AlertMapper.class);
+
+            AgingBucketRow aging = mapper.agingBuckets(agingTenant);
+            assertThat(aging.getUnder1h()).isEqualTo(1);
+            assertThat(aging.getOver24h()).isEqualTo(2);
+            assertThat(aging.getTotal()).isEqualTo(3);
+
+            List<MttaTrendRow> trend = mapper.mttaByDay(mttaTenant, mttaBase.minusDays(1));
+            assertThat(trend).hasSize(1);
+            assertThat(trend.getFirst().getDate()).isEqualTo("2026-01-02");
+            assertThat(trend.getFirst().getConfirmedCount()).isEqualTo(3);
+            assertThat(trend.getFirst().getP50Ms()).isEqualTo(2000L);
+            assertThat(trend.getFirst().getP95Ms()).isEqualTo(9200L);
+
+            List<CorrelationPairRow> pairs = mapper.correlationPairs(correlationTenant, mttaBase.minusDays(1), 60, 10);
+            assertThat(pairs).hasSize(1);
+            assertThat(pairs.getFirst().getCoCount()).isEqualTo(1);
+        }
+    }
+
+    private void insertAlarm(java.sql.Connection connection, long id, long tenant, int targetTypeFlag,
+                             long entityId, int confirmFlag, LocalDateTime createTime,
+                             LocalDateTime operateTime) throws Exception {
+        // alarm_ext stays on its '{}' default: binding JSON text through a varchar
+        // parameter is engine-divergent (PG rejects, MySQL needs plain string) and
+        // none of the analytics statements read it
+        try (var ps = connection.prepareStatement(
+                "INSERT INTO dc3_entity_alarm (id, alarm_target_type_flag, entity_id, alarm_type_flag, "
+                        + "confirm_flag, tenant_id, create_time, operate_time) VALUES (?,?,?,?,?,?,?,?)")) {
+            ps.setLong(1, id);
+            ps.setInt(2, targetTypeFlag);
+            ps.setLong(3, entityId);
+            ps.setInt(4, 0);
+            ps.setInt(5, confirmFlag);
+            ps.setLong(6, tenant);
+            ps.setObject(7, createTime);
+            ps.setObject(8, Objects.requireNonNullElseGet(operateTime, () -> createTime));
+            ps.executeUpdate();
         }
     }
 

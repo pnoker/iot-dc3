@@ -39,21 +39,21 @@ USE dc3_manager;
 -- ----------------------------
 CREATE TABLE dc3_label
 (
-    id               BIGINT PRIMARY KEY                                                      NOT NULL, -- Primary key ID
-    label_name       TEXT        DEFAULT ('')                                                NOT NULL, -- Label name
-    label_code       TEXT        DEFAULT ('')                                                NOT NULL, -- Label code
-    label_color      TEXT        DEFAULT ('#F4F4F5')                                         NOT NULL, -- Label color
-    entity_type_flag SMALLINT    DEFAULT 0                                                   NOT NULL, -- Entity type flag
-    enable_flag      SMALLINT    DEFAULT 0                                                   NOT NULL, -- Enable flag, 0: enabled, 1: disabled
-    tenant_id        BIGINT      DEFAULT 0                                                   NOT NULL, -- Tenant ID
-    remark           TEXT        DEFAULT ('')                                                NOT NULL, -- Description
-    creator_id       BIGINT      DEFAULT 0                                                   NOT NULL, -- Creator ID
-    creator_name     TEXT        DEFAULT ('')                                                NOT NULL, -- Creator name
-    create_time      DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)                                NOT NULL, -- Creation time
-    operator_id      BIGINT      DEFAULT 0                                                   NOT NULL, -- Operator ID
-    operator_name    TEXT        DEFAULT ('')                                                NOT NULL, -- Operator name
-    operate_time     DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) NOT NULL, -- Operation time
-    deleted          SMALLINT    DEFAULT 0                                                   NOT NULL, -- Logical delete flag, 0: not deleted, 1: deleted
+    id               BIGINT PRIMARY KEY         NOT NULL,         -- Primary key ID
+    label_name       VARCHAR(191)     DEFAULT ''          NOT NULL, -- Label name
+    label_code       TEXT     DEFAULT ('')          NOT NULL, -- Label code
+    label_color      TEXT     DEFAULT ('#F4F4F5') NOT NULL,         -- Label color
+    entity_type_flag SMALLINT DEFAULT 0         NOT NULL,         -- Entity type flag
+    enable_flag      SMALLINT DEFAULT 0         NOT NULL,         -- Enable flag, 0: enabled, 1: disabled
+    tenant_id        BIGINT   DEFAULT 0         NOT NULL,         -- Tenant ID
+    remark           TEXT     DEFAULT ('')          NOT NULL, -- Description
+    creator_id       BIGINT   DEFAULT 0         NOT NULL,         -- Creator ID
+    creator_name     TEXT     DEFAULT ('')          NOT NULL, -- Creator name
+    create_time DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,   -- Creation time
+    operator_id      BIGINT   DEFAULT 0         NOT NULL,         -- Operator ID
+    operator_name    TEXT     DEFAULT ('')          NOT NULL, -- Operator name
+    operate_time DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) NOT NULL,  -- Operation time
+    deleted          SMALLINT DEFAULT 0         NOT NULL,         -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_label_entity_type_flag CHECK (entity_type_flag BETWEEN 0 AND 8),
     CONSTRAINT chk_label_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_label_deleted CHECK (deleted IN (0, 1))
@@ -66,26 +66,26 @@ CREATE TABLE dc3_label
 -- ----------------------------
 CREATE TABLE dc3_label_bind
 (
-    id               BIGINT PRIMARY KEY                                                      NOT NULL, -- Primary key ID
-    entity_type_flag SMALLINT    DEFAULT 0                                                   NOT NULL, -- Entity type flag
-    label_id         BIGINT      DEFAULT 0                                                   NOT NULL, -- Label ID
-    entity_id        BIGINT      DEFAULT 0                                                   NOT NULL, -- Entity ID
-    tenant_id        BIGINT      DEFAULT 0                                                   NOT NULL, -- Tenant ID
-    remark           TEXT        DEFAULT ('')                                                NOT NULL, -- Description
-    creator_id       BIGINT      DEFAULT 0                                                   NOT NULL, -- Creator ID
-    creator_name     TEXT        DEFAULT ('')                                                NOT NULL, -- Creator name
-    create_time      DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)                                NOT NULL, -- Creation time
-    operator_id      BIGINT      DEFAULT 0                                                   NOT NULL, -- Operator ID
-    operator_name    TEXT        DEFAULT ('')                                                NOT NULL, -- Operator name
-    operate_time     DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) NOT NULL, -- Operation time
-    deleted          SMALLINT    DEFAULT 0                                                   NOT NULL, -- Logical delete flag, 0: not deleted, 1: deleted
+    id               BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
+    entity_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Entity type flag
+    label_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Label ID
+    entity_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Entity ID
+    tenant_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark           TEXT     DEFAULT ('')          NOT NULL, -- Description
+    creator_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name     TEXT     DEFAULT ('')          NOT NULL, -- Creator name
+    create_time DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,   -- Creation time
+    operator_id      BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name    TEXT     DEFAULT ('')          NOT NULL, -- Operator name
+    operate_time DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) NOT NULL,  -- Operation time
+    deleted          SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_label_bind_entity_type_flag CHECK (entity_type_flag BETWEEN 0 AND 8),
     CONSTRAINT chk_label_bind_deleted CHECK (deleted IN (0, 1))
 );
 
 
-
 -- Delete guards and label detail paths check whether a label is still bound.
+
 
 
 -- ----------------------------
@@ -93,27 +93,28 @@ CREATE TABLE dc3_label_bind
 -- ----------------------------
 CREATE TABLE dc3_group
 (
-    id               BIGINT PRIMARY KEY                                                      NOT NULL, -- Primary key ID
-    parent_group_id  BIGINT      DEFAULT 0                                                   NOT NULL, -- Parent group ID
-    group_name       TEXT        DEFAULT ('')                                                NOT NULL, -- Group name
-    group_code       TEXT        DEFAULT ('')                                                NOT NULL, -- Group code
-    group_level      SMALLINT    DEFAULT 0                                                   NOT NULL, -- Group level
-    group_index      SMALLINT    DEFAULT 0                                                   NOT NULL, -- Group order
-    entity_type_flag SMALLINT    DEFAULT 0                                                   NOT NULL, -- Entity type flag
-    enable_flag      SMALLINT    DEFAULT 0                                                   NOT NULL, -- Enable flag, 0: enabled, 1: disabled
-    tenant_id        BIGINT      DEFAULT 0                                                   NOT NULL, -- Tenant ID
-    remark           TEXT        DEFAULT ('')                                                NOT NULL, -- Description
-    creator_id       BIGINT      DEFAULT 0                                                   NOT NULL, -- Creator ID
-    creator_name     TEXT        DEFAULT ('')                                                NOT NULL, -- Creator name
-    create_time      DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)                                NOT NULL, -- Creation time
-    operator_id      BIGINT      DEFAULT 0                                                   NOT NULL, -- Operator ID
-    operator_name    TEXT        DEFAULT ('')                                                NOT NULL, -- Operator name
-    operate_time     DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) NOT NULL, -- Operation time
-    deleted          SMALLINT    DEFAULT 0                                                   NOT NULL, -- Logical delete flag, 0: not deleted, 1: deleted
+    id               BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
+    parent_group_id  BIGINT   DEFAULT 0 NOT NULL,                 -- Parent group ID
+    group_name       VARCHAR(191)     DEFAULT ''          NOT NULL, -- Group name
+    group_code       TEXT     DEFAULT ('')          NOT NULL, -- Group code
+    group_level      SMALLINT DEFAULT 0 NOT NULL,                 -- Group level
+    group_index      SMALLINT DEFAULT 0 NOT NULL,                 -- Group order
+    entity_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Entity type flag
+    enable_flag      SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark           TEXT     DEFAULT ('')          NOT NULL, -- Description
+    creator_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name     TEXT     DEFAULT ('')          NOT NULL, -- Creator name
+    create_time DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,   -- Creation time
+    operator_id      BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name    TEXT     DEFAULT ('')          NOT NULL, -- Operator name
+    operate_time DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) NOT NULL,  -- Operation time
+    deleted          SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_group_entity_type_flag CHECK (entity_type_flag BETWEEN 0 AND 8),
     CONSTRAINT chk_group_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_group_deleted CHECK (deleted IN (0, 1))
 );
+
 
 
 
@@ -122,24 +123,28 @@ CREATE TABLE dc3_group
 -- ----------------------------
 CREATE TABLE dc3_group_bind
 (
-    id               BIGINT PRIMARY KEY                                                      NOT NULL, -- Primary key ID
-    entity_type_flag SMALLINT    DEFAULT 0                                                   NOT NULL, -- Entity type flag
-    group_id         BIGINT      DEFAULT 0                                                   NOT NULL, -- Group ID
-    entity_id        BIGINT      DEFAULT 0                                                   NOT NULL, -- Entity ID
-    tenant_id        BIGINT      DEFAULT 0                                                   NOT NULL, -- Tenant ID
-    remark           TEXT        DEFAULT ('')                                                NOT NULL, -- Description
-    creator_id       BIGINT      DEFAULT 0                                                   NOT NULL, -- Creator ID
-    creator_name     TEXT        DEFAULT ('')                                                NOT NULL, -- Creator name
-    create_time      DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)                                NOT NULL, -- Creation time
-    operator_id      BIGINT      DEFAULT 0                                                   NOT NULL, -- Operator ID
-    operator_name    TEXT        DEFAULT ('')                                                NOT NULL, -- Operator name
-    operate_time     DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) NOT NULL, -- Operation time
-    deleted          SMALLINT    DEFAULT 0                                                   NOT NULL, -- Logical delete flag, 0: not deleted, 1: deleted
+    id               BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
+    entity_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Entity type flag
+    group_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Group ID
+    entity_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Entity ID
+    tenant_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark           TEXT     DEFAULT ('')          NOT NULL, -- Description
+    creator_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name     TEXT     DEFAULT ('')          NOT NULL, -- Creator name
+    create_time DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) NOT NULL,   -- Creation time
+    operator_id      BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name    TEXT     DEFAULT ('')          NOT NULL, -- Operator name
+    operate_time DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) NOT NULL,  -- Operation time
+    deleted          SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_group_bind_entity_type_flag CHECK (entity_type_flag BETWEEN 0 AND 8),
     CONSTRAINT chk_group_bind_deleted CHECK (deleted IN (0, 1))
 );
 
-
-
-
-
+ALTER TABLE dc3_label ADD COLUMN idx_label_active_unique_guard TINYINT GENERATED ALWAYS AS (CASE WHEN deleted = 0 AND label_name <> '' THEN 1 ELSE NULL END) STORED;
+CREATE UNIQUE INDEX idx_label_active_unique ON dc3_label (tenant_id, entity_type_flag, label_name, idx_label_active_unique_guard);
+ALTER TABLE dc3_label_bind ADD COLUMN idx_label_bind_active_unique_guard TINYINT GENERATED ALWAYS AS (CASE WHEN deleted = 0 THEN 1 ELSE NULL END) STORED;
+CREATE UNIQUE INDEX idx_label_bind_active_unique ON dc3_label_bind (tenant_id, entity_type_flag, label_id, entity_id, idx_label_bind_active_unique_guard);
+ALTER TABLE dc3_group ADD COLUMN idx_group_active_unique_guard TINYINT GENERATED ALWAYS AS (CASE WHEN deleted = 0 AND group_name <> '' THEN 1 ELSE NULL END) STORED;
+CREATE UNIQUE INDEX idx_group_active_unique ON dc3_group (tenant_id, entity_type_flag, parent_group_id, group_name, idx_group_active_unique_guard);
+ALTER TABLE dc3_group_bind ADD COLUMN idx_group_bind_entity_unique_guard TINYINT GENERATED ALWAYS AS (CASE WHEN deleted = 0 THEN 1 ELSE NULL END) STORED;
+CREATE UNIQUE INDEX idx_group_bind_entity_unique ON dc3_group_bind (tenant_id, entity_type_flag, entity_id, idx_group_bind_entity_unique_guard);

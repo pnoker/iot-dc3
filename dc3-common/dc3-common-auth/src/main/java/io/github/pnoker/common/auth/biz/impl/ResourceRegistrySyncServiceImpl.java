@@ -35,6 +35,7 @@ import io.github.pnoker.common.enums.ApiTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ResourceScopeTypeEnum;
 import io.github.pnoker.common.enums.ResourceTypeEnum;
+import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -174,7 +175,14 @@ public class ResourceRegistrySyncServiceImpl implements ResourceRegistrySyncServ
         String serviceName = command.getServiceName();
         List<ResourceRegistryScannedApi> scanned = Objects.requireNonNullElse(command.getApis(), List.of());
 
-        resourceRegistryLockMapper.advisoryLock(serviceName);
+        String lockResult = resourceRegistryLockMapper.advisoryLock(serviceName);
+        // PostgreSQL renders the void xact lock as '' (always acquired). A non-blank
+        // verdict is MySQL/MariaDB GET_LOCK output: '1' acquired, '0' timed out,
+        // NULL errored — proceeding without the lock would duplicate registry rows.
+        if (StringUtils.isNotBlank(lockResult) && !"1".equals(lockResult.trim())) {
+            throw new ServiceException("Resource registry lock busy for service " + serviceName
+                    + ", retry the sync later");
+        }
         try {
             return syncLocked(command, serviceName, scanned);
         } finally {

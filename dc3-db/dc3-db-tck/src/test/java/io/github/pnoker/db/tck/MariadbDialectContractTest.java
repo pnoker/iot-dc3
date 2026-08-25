@@ -43,6 +43,8 @@ class MariadbDialectContractTest extends AbstractDbDialectContractTest {
     private static final GenericContainer<?> MARIADB =
             new GenericContainer<>("mariadb:10.11")
                     .withEnv("MARIADB_ROOT_PASSWORD", "dc3")
+                    .withEnv("MARIADB_USER", "dc3")
+                    .withEnv("MARIADB_PASSWORD", "dc3")
                     .withEnv("MARIADB_DATABASE", "dc3_data")
                     .withExposedPorts(3306)
                     .withCopyFileToContainer(

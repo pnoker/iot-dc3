@@ -442,6 +442,75 @@
         LIMIT #{limit}
     </select>
 
+    <!--
+        MySQL fork: EXTRACT(EPOCH FROM interval) does not exist — TIMESTAMPDIFF
+        in microseconds carries the window comparison; the row-value comparison
+        is native MySQL syntax.
+    -->
+    <select id="correlationPairs" databaseId="mysql"
+            resultType="io.github.pnoker.common.data.entity.bo.dashboard.CorrelationPairRow">
+        WITH ev AS (SELECT CASE alarm_target_type_flag
+        WHEN 0 THEN 'point'
+        WHEN 1 THEN 'device'
+        ELSE 'driver'
+        END AS source,
+        entity_id AS source_id,
+        alarm_type_flag AS alarm_type_flag,
+        create_time,
+        id
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+        AND create_time &gt;= #{from})
+        SELECT e1.source AS a_source,
+        e1.source_id AS a_source_id,
+        e1.alarm_type_flag AS a_event_type,
+        e2.source AS b_source,
+        e2.source_id AS b_source_id,
+        e2.alarm_type_flag AS b_event_type,
+        COUNT(*) AS co_count
+        FROM ev e1
+        JOIN ev e2 ON ABS(TIMESTAMPDIFF(MICROSECOND, e2.create_time, e1.create_time)) &lt;= #{windowSec} * 1000000
+        AND (e1.source &lt;&gt; e2.source OR e1.source_id &lt;&gt; e2.source_id)
+        AND (e1.source, e1.source_id, e1.alarm_type_flag) &lt; (e2.source, e2.source_id, e2.alarm_type_flag)
+        GROUP BY e1.source, e1.source_id, e1.alarm_type_flag,
+        e2.source, e2.source_id, e2.alarm_type_flag
+        ORDER BY co_count DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- MariaDB twin of the mysql fork above: identical shape (no ODKU in this
+         statement, so the AS-new/VALUES(col) difference does not apply). -->
+    <select id="correlationPairs" databaseId="mariadb"
+            resultType="io.github.pnoker.common.data.entity.bo.dashboard.CorrelationPairRow">
+        WITH ev AS (SELECT CASE alarm_target_type_flag
+        WHEN 0 THEN 'point'
+        WHEN 1 THEN 'device'
+        ELSE 'driver'
+        END AS source,
+        entity_id AS source_id,
+        alarm_type_flag AS alarm_type_flag,
+        create_time,
+        id
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+        AND create_time &gt;= #{from})
+        SELECT e1.source AS a_source,
+        e1.source_id AS a_source_id,
+        e1.alarm_type_flag AS a_event_type,
+        e2.source AS b_source,
+        e2.source_id AS b_source_id,
+        e2.alarm_type_flag AS b_event_type,
+        COUNT(*) AS co_count
+        FROM ev e1
+        JOIN ev e2 ON ABS(TIMESTAMPDIFF(MICROSECOND, e2.create_time, e1.create_time)) &lt;= #{windowSec} * 1000000
+        AND (e1.source &lt;&gt; e2.source OR e1.source_id &lt;&gt; e2.source_id)
+        AND (e1.source, e1.source_id, e1.alarm_type_flag) &lt; (e2.source, e2.source_id, e2.alarm_type_flag)
+        GROUP BY e1.source, e1.source_id, e1.alarm_type_flag,
+        e2.source, e2.source_id, e2.alarm_type_flag
+        ORDER BY co_count DESC
+        LIMIT #{limit}
+    </select>
+
     <select id="peerAlarmCounts" resultType="io.github.pnoker.common.data.entity.bo.dashboard.PeerAlarmRow">
         SELECT d.profile_id AS profile_id,
         ea.device_id AS device_id,
@@ -471,6 +540,39 @@
         AND confirm_flag = 0) ages
     </select>
 
+    <!--
+        MySQL fork: datetime subtraction is numeric coercion, not an interval —
+        TIMESTAMPDIFF(SECOND, ...) replaces NOW() - create_time and the bucket
+        bounds become plain second counts.
+    -->
+    <select id="agingBuckets" databaseId="mysql"
+            resultType="io.github.pnoker.common.data.entity.bo.dashboard.AgingBucketRow">
+        SELECT COALESCE(SUM(CASE WHEN age &lt; 3600 THEN 1 ELSE 0 END), 0) AS under_1h,
+        COALESCE(SUM(CASE WHEN age &gt;= 3600 AND age &lt; 21600 THEN 1 ELSE 0 END), 0) AS h1_to_6,
+        COALESCE(SUM(CASE WHEN age &gt;= 21600 AND age &lt; 86400 THEN 1 ELSE 0 END), 0) AS h6_to_24,
+        COALESCE(SUM(CASE WHEN age &gt;= 86400 THEN 1 ELSE 0 END), 0) AS over_24h,
+        COUNT(*) AS total
+        FROM (SELECT TIMESTAMPDIFF(SECOND, create_time, NOW()) AS age
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+        AND confirm_flag = 0) ages
+    </select>
+
+    <!-- MariaDB twin of the mysql fork above: identical shape (no ODKU in this
+         statement, so the AS-new/VALUES(col) difference does not apply). -->
+    <select id="agingBuckets" databaseId="mariadb"
+            resultType="io.github.pnoker.common.data.entity.bo.dashboard.AgingBucketRow">
+        SELECT COALESCE(SUM(CASE WHEN age &lt; 3600 THEN 1 ELSE 0 END), 0) AS under_1h,
+        COALESCE(SUM(CASE WHEN age &gt;= 3600 AND age &lt; 21600 THEN 1 ELSE 0 END), 0) AS h1_to_6,
+        COALESCE(SUM(CASE WHEN age &gt;= 21600 AND age &lt; 86400 THEN 1 ELSE 0 END), 0) AS h6_to_24,
+        COALESCE(SUM(CASE WHEN age &gt;= 86400 THEN 1 ELSE 0 END), 0) AS over_24h,
+        COUNT(*) AS total
+        FROM (SELECT TIMESTAMPDIFF(SECOND, create_time, NOW()) AS age
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+        AND confirm_flag = 0) ages
+    </select>
+
     <select id="mttaByDay" resultType="io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow">
         SELECT to_char(DATE(create_time), 'YYYY-MM-DD') AS date,
         PERCENTILE_CONT(0.5)
@@ -483,6 +585,66 @@
         AND confirm_flag = 1
         AND create_time &gt;= #{from}
         GROUP BY DATE(create_time)
+        ORDER BY date ASC
+    </select>
+
+    <!--
+        MySQL fork: no to_char and no ordered-set PERCENTILE_CONT. DATE_FORMAT
+        renders the day; the p50/p95 follow PERCENTILE_CONT semantics expressed
+        with ROW_NUMBER/COUNT windows — rank index idx = p * (n - 1) + 1, value
+        interpolated between the FLOOR and CEIL ranks.
+    -->
+    <select id="mttaByDay" databaseId="mysql"
+            resultType="io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow">
+        WITH q AS (SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS date,
+        TIMESTAMPDIFF(MICROSECOND, create_time, operate_time) / 1000.0 AS latency_ms,
+        ROW_NUMBER() OVER (PARTITION BY DATE_FORMAT(create_time, '%Y-%m-%d')
+        ORDER BY TIMESTAMPDIFF(MICROSECOND, create_time, operate_time)) AS rn,
+        COUNT(*) OVER (PARTITION BY DATE_FORMAT(create_time, '%Y-%m-%d')) AS cnt
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+        AND confirm_flag = 1
+        AND create_time &gt;= #{from})
+        SELECT date,
+        ROUND(MAX(CASE WHEN rn = FLOOR(0.50 * (cnt - 1) + 1) THEN latency_ms END)
+        + MAX(0.50 * (cnt - 1) + 1 - FLOOR(0.50 * (cnt - 1) + 1)) *
+        (MAX(CASE WHEN rn = CEIL(0.50 * (cnt - 1) + 1) THEN latency_ms END)
+        - MAX(CASE WHEN rn = FLOOR(0.50 * (cnt - 1) + 1) THEN latency_ms END)), 3) AS p50_ms,
+        ROUND(MAX(CASE WHEN rn = FLOOR(0.95 * (cnt - 1) + 1) THEN latency_ms END)
+        + MAX(0.95 * (cnt - 1) + 1 - FLOOR(0.95 * (cnt - 1) + 1)) *
+        (MAX(CASE WHEN rn = CEIL(0.95 * (cnt - 1) + 1) THEN latency_ms END)
+        - MAX(CASE WHEN rn = FLOOR(0.95 * (cnt - 1) + 1) THEN latency_ms END)), 3) AS p95_ms,
+        MAX(cnt) AS confirmed_count
+        FROM q
+        GROUP BY date
+        ORDER BY date ASC
+    </select>
+
+    <!-- MariaDB twin of the mysql fork above: identical shape (window functions
+         and CTEs are native on MariaDB 10.11; no ODKU applies here). -->
+    <select id="mttaByDay" databaseId="mariadb"
+            resultType="io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow">
+        WITH q AS (SELECT DATE_FORMAT(create_time, '%Y-%m-%d') AS date,
+        TIMESTAMPDIFF(MICROSECOND, create_time, operate_time) / 1000.0 AS latency_ms,
+        ROW_NUMBER() OVER (PARTITION BY DATE_FORMAT(create_time, '%Y-%m-%d')
+        ORDER BY TIMESTAMPDIFF(MICROSECOND, create_time, operate_time)) AS rn,
+        COUNT(*) OVER (PARTITION BY DATE_FORMAT(create_time, '%Y-%m-%d')) AS cnt
+        FROM dc3_entity_alarm
+        WHERE tenant_id = #{tenantId}
+        AND confirm_flag = 1
+        AND create_time &gt;= #{from})
+        SELECT date,
+        ROUND(MAX(CASE WHEN rn = FLOOR(0.50 * (cnt - 1) + 1) THEN latency_ms END)
+        + MAX(0.50 * (cnt - 1) + 1 - FLOOR(0.50 * (cnt - 1) + 1)) *
+        (MAX(CASE WHEN rn = CEIL(0.50 * (cnt - 1) + 1) THEN latency_ms END)
+        - MAX(CASE WHEN rn = FLOOR(0.50 * (cnt - 1) + 1) THEN latency_ms END)), 3) AS p50_ms,
+        ROUND(MAX(CASE WHEN rn = FLOOR(0.95 * (cnt - 1) + 1) THEN latency_ms END)
+        + MAX(0.95 * (cnt - 1) + 1 - FLOOR(0.95 * (cnt - 1) + 1)) *
+        (MAX(CASE WHEN rn = CEIL(0.95 * (cnt - 1) + 1) THEN latency_ms END)
+        - MAX(CASE WHEN rn = FLOOR(0.95 * (cnt - 1) + 1) THEN latency_ms END)), 3) AS p95_ms,
+        MAX(cnt) AS confirmed_count
+        FROM q
+        GROUP BY date
         ORDER BY date ASC
     </select>
 

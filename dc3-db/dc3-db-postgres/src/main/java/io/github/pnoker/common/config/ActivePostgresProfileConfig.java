@@ -48,8 +48,9 @@ public class ActivePostgresProfileConfig implements EnvironmentPostProcessor {
      */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        if ("mysql".equals(environment.getProperty(EnvironmentConstant.DB_TYPE))) {
-            log.debug("Skipping postgres profile activation, {}=mysql", EnvironmentConstant.DB_TYPE);
+        String dbType = environment.getProperty(EnvironmentConstant.DB_TYPE);
+        if ("mysql".equals(dbType) || "mariadb".equals(dbType)) {
+            log.debug("Skipping postgres profile activation, {}={}", EnvironmentConstant.DB_TYPE, dbType);
             return;
         }
         if (Boolean.FALSE.equals(environment.getProperty(EnvironmentConstant.POSTGRES_AUTO_PROFILE, Boolean.class,

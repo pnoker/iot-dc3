@@ -19,6 +19,7 @@ package io.github.pnoker.common.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.springframework.beans.factory.ObjectProvider;
@@ -28,7 +29,9 @@ import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerIntercept
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.util.StringUtils;
 
 /**
  * MyBatis-Plus Configuration Class
@@ -79,15 +82,30 @@ public class MybatisPlusConfig {
     }
 
     /**
-     * Tenant-line before pagination; dialect pagination DbType injected by the db adapter.
+     * Tenant-line before pagination; the pagination dialect comes from the selected
+     * db adapter — every {@code dc3-db-*} auto-configuration contributes its
+     * {@link DbType} bean. Falls back to PostgreSQL when no adapter participates
+     * (default deployment) and fails fast when a non-default {@code dc3.db.type}
+     * is requested without its adapter jar on the classpath.
      */
     @Bean
     @ConditionalOnMissingBean
-    public MybatisPlusInterceptor mybatisPlusInterceptor(TenantLineHandler tenantLineHandler) {
+    public MybatisPlusInterceptor mybatisPlusInterceptor(TenantLineHandler tenantLineHandler,
+                                                         ObjectProvider<DbType> paginationDbType,
+                                                         Environment environment) {
+        String selected = environment.getProperty(EnvironmentConstant.DB_TYPE);
+        if (StringUtils.hasText(selected) && !"postgres".equals(selected)
+                && paginationDbType.getIfAvailable() == null) {
+            throw new IllegalStateException(String.format(
+                    "%s=%s but no matching dc3-db adapter is on the classpath: add the dc3-db-%s "
+                            + "dependency or unset the DC3_DB_TYPE variable",
+                    EnvironmentConstant.DB_TYPE, selected, selected));
+        }
+        DbType dialect = paginationDbType.getIfUnique(() -> DbType.POSTGRE_SQL);
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         // Order matters: tenant-line MUST be added before pagination.
         interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(tenantLineHandler));
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.POSTGRE_SQL));
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(dialect));
         return interceptor;
     }
 

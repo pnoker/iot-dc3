@@ -212,6 +212,22 @@
         CAST(#{tokenMetadata} AS JSON))
     </insert>
 
+<!--
+    MariaDB fork: MariaDB never implemented CAST AS JSON — the JSON column is
+    LONGTEXT + json_valid, so the plain parameter binding satisfies the check.
+-->
+    <insert id="insertAuthorization" databaseId="mariadb"
+            parameterType="io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord">
+        INSERT INTO dc3_oauth_authorization
+        (id, registered_client_id, client_id, principal_id, principal_type, tenant_id, mcp_connection_id,
+        authorization_grant_type, authorized_scopes, state_hash, authorization_code_hash,
+        authorization_code_issued, authorization_code_expires, token_claims, token_metadata)
+        VALUES (#{id}, #{registeredClientId}, #{clientId}, #{principalId}, #{principalType}, #{tenantId},
+        #{mcpConnectionId}, #{authorizationGrantType}, #{authorizedScopes}, #{stateHash},
+        #{authorizationCodeHash}, #{authorizationCodeIssued}, #{authorizationCodeExpires}, '{}',
+        #{tokenMetadata})
+    </insert>
+
     <update id="activateAuthorizationTokens">
         UPDATE dc3_oauth_authorization
         SET authorization_code_hash = #{codeHash},
@@ -223,6 +239,26 @@
         refresh_token_issued = #{refreshIssued},
         refresh_token_expires = #{refreshExpires},
         token_claims = CAST(#{tokenClaims} AS JSON),
+        operate_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+        AND deleted = 0
+    </update>
+
+<!--
+    MariaDB fork: MariaDB never implemented CAST AS JSON — plain parameter
+    binding into the LONGTEXT json_valid column instead.
+-->
+<update id="activateAuthorizationTokens" databaseId="mariadb">
+        UPDATE dc3_oauth_authorization
+        SET authorization_code_hash = #{codeHash},
+        access_token_jti = #{accessTokenJti},
+        access_token_issued = #{accessIssued},
+        access_token_expires = #{accessExpires},
+        refresh_token_hash = #{refreshHash},
+        previous_refresh_token_hash = #{previousRefreshHash},
+        refresh_token_issued = #{refreshIssued},
+        refresh_token_expires = #{refreshExpires},
+        token_claims = #{tokenClaims},
         operate_time = CURRENT_TIMESTAMP
         WHERE id = #{id}
         AND deleted = 0
@@ -478,14 +514,58 @@
         FROM dc3_mcp_tool_catalog
         WHERE deleted = 0
         AND enable_flag = 0
-        AND (#{riskLevel} IS NULL OR #{riskLevel} = ''
-        OR risk_level = #{riskLevel})
+        AND (#{riskLevel,jdbcType=VARCHAR} IS NULL OR #{riskLevel,jdbcType=VARCHAR} = ''
+        OR risk_level = #{riskLevel,jdbcType=VARCHAR})
         AND (
         #{keyword}::text IS NULL
         OR #{keyword}::text = ''
         OR lower(tool_name) LIKE concat('%', lower(#{keyword}::text), '%')
         OR lower(tool_title) LIKE concat('%', lower(#{keyword}::text), '%')
         OR lower(permission_code) LIKE concat('%', lower(#{keyword}::text), '%')
+        )
+        ORDER BY tool_category, tool_name
+        LIMIT #{limit}
+    </select>
+
+    <!--
+        MySQL fork: the ?::text parameter casts are Postgres-only syntax — the
+        plain bind parameters compare identically.
+    -->
+    <select id="listToolCatalog" databaseId="mysql"
+            resultType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
+        SELECT *
+        FROM dc3_mcp_tool_catalog
+        WHERE deleted = 0
+        AND enable_flag = 0
+        AND (#{riskLevel,jdbcType=VARCHAR} IS NULL OR #{riskLevel,jdbcType=VARCHAR} = ''
+        OR risk_level = #{riskLevel,jdbcType=VARCHAR})
+        AND (
+        #{keyword} IS NULL
+        OR #{keyword} = ''
+        OR lower(tool_name) LIKE concat('%', lower(#{keyword}), '%')
+        OR lower(tool_title) LIKE concat('%', lower(#{keyword}), '%')
+        OR lower(permission_code) LIKE concat('%', lower(#{keyword}), '%')
+        )
+        ORDER BY tool_category, tool_name
+        LIMIT #{limit}
+    </select>
+
+    <!-- MariaDB twin of the mysql fork above: identical shape (no ODKU in this
+         statement, so the AS-new/VALUES(col) difference does not apply). -->
+    <select id="listToolCatalog" databaseId="mariadb"
+            resultType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
+        SELECT *
+        FROM dc3_mcp_tool_catalog
+        WHERE deleted = 0
+        AND enable_flag = 0
+        AND (#{riskLevel,jdbcType=VARCHAR} IS NULL OR #{riskLevel,jdbcType=VARCHAR} = ''
+        OR risk_level = #{riskLevel,jdbcType=VARCHAR})
+        AND (
+        #{keyword} IS NULL
+        OR #{keyword} = ''
+        OR lower(tool_name) LIKE concat('%', lower(#{keyword}), '%')
+        OR lower(tool_title) LIKE concat('%', lower(#{keyword}), '%')
+        OR lower(permission_code) LIKE concat('%', lower(#{keyword}), '%')
         )
         ORDER BY tool_category, tool_name
         LIMIT #{limit}
@@ -501,6 +581,38 @@
         #{permissionCode}, #{httpMethod}, #{apiPath}, #{schemaHash}, #{riskLevel}, #{readOnlyHint},
         #{destructiveHint}, #{idempotentHint}, #{openWorldHint}, #{enableFlag},
         COALESCE(NULLIF(#{toolExt}, '')::json, '{}'::json), #{remark},
+        0, 'system', 0, 'system')
+    </insert>
+
+    <!--
+        MySQL fork: ::json casts are Postgres-only — CAST(... AS JSON) is the
+        portable spelling (same form insertAuthorization already uses).
+    -->
+    <insert id="insertTool" databaseId="mysql"
+            parameterType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
+        INSERT INTO dc3_mcp_tool_catalog
+        (id, tool_id, tool_name, tool_title, tool_category, service_name, api_code, permission_code,
+        http_method, api_path, schema_hash, risk_level, read_only_hint, destructive_hint, idempotent_hint,
+        open_world_hint, enable_flag, tool_ext, remark, creator_id, creator_name, operator_id, operator_name)
+        VALUES (#{id}, #{toolId}, #{toolName}, #{toolTitle}, #{toolCategory}, #{serviceName}, #{apiCode},
+        #{permissionCode}, #{httpMethod}, #{apiPath}, #{schemaHash}, #{riskLevel}, #{readOnlyHint},
+        #{destructiveHint}, #{idempotentHint}, #{openWorldHint}, #{enableFlag},
+        CAST(COALESCE(NULLIF(#{toolExt}, ''), '{}') AS JSON), #{remark},
+        0, 'system', 0, 'system')
+    </insert>
+
+    <!-- MariaDB twin of the mysql fork above: identical shape (no ODKU in this
+         statement, so the AS-new/VALUES(col) difference does not apply). -->
+    <insert id="insertTool" databaseId="mariadb"
+            parameterType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
+        INSERT INTO dc3_mcp_tool_catalog
+        (id, tool_id, tool_name, tool_title, tool_category, service_name, api_code, permission_code,
+        http_method, api_path, schema_hash, risk_level, read_only_hint, destructive_hint, idempotent_hint,
+        open_world_hint, enable_flag, tool_ext, remark, creator_id, creator_name, operator_id, operator_name)
+        VALUES (#{id}, #{toolId}, #{toolName}, #{toolTitle}, #{toolCategory}, #{serviceName}, #{apiCode},
+        #{permissionCode}, #{httpMethod}, #{apiPath}, #{schemaHash}, #{riskLevel}, #{readOnlyHint},
+        #{destructiveHint}, #{idempotentHint}, #{openWorldHint}, #{enableFlag},
+        COALESCE(NULLIF(#{toolExt}, ''), '{}'), #{remark},
         0, 'system', 0, 'system')
     </insert>
 
@@ -523,6 +635,62 @@
         open_world_hint = #{openWorldHint},
         enable_flag = #{enableFlag},
         tool_ext = COALESCE(NULLIF(#{toolExt}, '')::json, '{}'::json),
+        remark = #{remark},
+        operate_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+        AND deleted = 0
+    </update>
+
+    <!--
+        MySQL fork: ::json casts are Postgres-only — CAST(... AS JSON) is the
+        portable spelling (same form insertAuthorization already uses).
+    -->
+    <update id="updateTool" databaseId="mysql"
+            parameterType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
+        UPDATE dc3_mcp_tool_catalog
+        SET tool_name = #{toolName},
+        tool_title = #{toolTitle},
+        tool_category = #{toolCategory},
+        service_name = #{serviceName},
+        api_code = #{apiCode},
+        permission_code = #{permissionCode},
+        http_method = #{httpMethod},
+        api_path = #{apiPath},
+        schema_hash = #{schemaHash},
+        risk_level = #{riskLevel},
+        read_only_hint = #{readOnlyHint},
+        destructive_hint = #{destructiveHint},
+        idempotent_hint = #{idempotentHint},
+        open_world_hint = #{openWorldHint},
+        enable_flag = #{enableFlag},
+        tool_ext = CAST(COALESCE(NULLIF(#{toolExt}, ''), '{}') AS JSON),
+        remark = #{remark},
+        operate_time = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+        AND deleted = 0
+    </update>
+
+    <!-- MariaDB twin of the mysql fork above: identical shape (no ODKU in this
+         statement, so the AS-new/VALUES(col) difference does not apply). -->
+    <update id="updateTool" databaseId="mariadb"
+            parameterType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
+        UPDATE dc3_mcp_tool_catalog
+        SET tool_name = #{toolName},
+        tool_title = #{toolTitle},
+        tool_category = #{toolCategory},
+        service_name = #{serviceName},
+        api_code = #{apiCode},
+        permission_code = #{permissionCode},
+        http_method = #{httpMethod},
+        api_path = #{apiPath},
+        schema_hash = #{schemaHash},
+        risk_level = #{riskLevel},
+        read_only_hint = #{readOnlyHint},
+        destructive_hint = #{destructiveHint},
+        idempotent_hint = #{idempotentHint},
+        open_world_hint = #{openWorldHint},
+        enable_flag = #{enableFlag},
+        tool_ext = COALESCE(NULLIF(#{toolExt}, ''), '{}'),
         remark = #{remark},
         operate_time = CURRENT_TIMESTAMP
         WHERE id = #{id}

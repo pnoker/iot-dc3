@@ -9,18 +9,21 @@
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 --
--- MySQL 8 seed for IoT DC3 — extensions placeholder.
+-- Grants for the composed application user. The MySQL entrypoint only grants
+-- MYSQL_USER rights on MYSQL_DATABASE (dc3_data); the seed splits the platform
+-- across five databases, so the application user needs the same set or the
+-- cross-database queries (alert dashboards join dc3_manager) fail with
+-- permission errors. The username must match MYSQL_USERNAME (default dc3).
 --
--- The PostgreSQL seed loads timescaledb / vector / age here. MySQL has no
--- extension mechanism and the MySQL core needs none: time-series lives in an
--- external store (docs/tsdb-stores.md); vector search remains a PostgreSQL-only
--- capability per the storage design (§5).
---
-SELECT 1;
+GRANT ALL PRIVILEGES ON dc3_manager.* TO 'dc3'@'%';
+GRANT ALL PRIVILEGES ON dc3_auth.* TO 'dc3'@'%';
+GRANT ALL PRIVILEGES ON dc3_data.* TO 'dc3'@'%';
+GRANT ALL PRIVILEGES ON dc3_history.* TO 'dc3'@'%';
+GRANT ALL PRIVILEGES ON dc3_agentic.* TO 'dc3'@'%';

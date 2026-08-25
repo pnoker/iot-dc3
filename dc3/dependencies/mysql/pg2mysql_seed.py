@@ -100,6 +100,45 @@ def strip_operate_time_triggers(s):
     return s
 
 
+def convert_partial_unique_indexes(s):
+    """MySQL has no partial indexes. Each PostgreSQL partial UNIQUE index
+    (active-row uniqueness) becomes a stored generated guard column — 1 for
+    rows matching the predicate, NULL otherwise — folded into a composite
+    unique index: NULL escapes uniqueness, so inactive rows stay unconstrained
+    exactly like the PostgreSQL WHERE predicate. Non-unique partial indexes
+    stay dropped (performance-only, see drop_pg_specific)."""
+    # the repository formatter wraps DDL across lines — every token boundary
+    # must be \s+ under DOTALL
+    pattern = re.compile(r"CREATE\s+UNIQUE\s+INDEX\s+(\w+)\s+ON\s+(\w+)\s*\(([^)]*)\)\s*WHERE\s+([^;]*);", re.S)
+
+    def repl(m):  # noqa: scoped by move_guard_statements below
+        name, table, cols, cond = m.groups()
+        # collapse the wrapped DDL back to single lines for the emitted MySQL
+        cols = " ".join(cols.split())
+        cond = " ".join(cond.split())
+        return (f"ALTER TABLE {table} ADD COLUMN {name}_guard TINYINT GENERATED ALWAYS AS "
+                f"(CASE WHEN {cond} THEN 1 ELSE NULL END) STORED;\n"
+                f"CREATE UNIQUE INDEX {name} ON {table} ({cols}, {name}_guard);")
+
+    return pattern.sub(repl, s)
+
+
+def move_guard_statements(s):
+    """Guard ALTER+INDEX pairs are emitted at the source index position, which
+    sits BEFORE the seed data inserts; column-less INSERT ... VALUES statements
+    would then mismatch the widened tables. Move every pair to the file end —
+    the unique constraint still governs the seeded rows, just enforced after
+    the load."""
+    pair = re.compile(
+        r"(ALTER TABLE \w+ ADD COLUMN \w+_guard TINYINT GENERATED ALWAYS AS \(CASE WHEN [^;]*\) STORED;\n"
+        r"CREATE UNIQUE INDEX \w+ ON \w+ \([^)]*\);)\n?", re.S)
+    found = pair.findall(s)
+    if not found:
+        return s
+    s = pair.sub("", s).rstrip() + "\n\n"
+    return s + "\n".join(found) + "\n"
+
+
 def drop_pg_specific(s):
     s = re.sub(r"CREATE EXTENSION IF NOT EXISTS \w+;\n?", "", s)
     s = re.sub(r"LOAD '[^']*';\n?", "", s)
@@ -109,14 +148,16 @@ def drop_pg_specific(s):
     s = re.sub(r"SELECT \* FROM public\.add_dimension\(.*?\);\n?", "", s, flags=re.S)
     s = re.sub(r"ALTER TABLE \w+\s*\n?\s*SET \(\s*timescaledb[^\)]*\);\n?", "", s, flags=re.S)
     s = re.sub(r"SELECT public\.add_(compression|retention)_policy\(.*?\);\n?", "", s, flags=re.S)
-    s = re.sub(r"CREATE (UNIQUE )?INDEX [^;]*\bWHERE\b[^;]*;", "", s, flags=re.S)
+    s = re.sub(r"CREATE\s+INDEX\s+[^;]*\bWHERE\b[^;]*;", "", s, flags=re.S)
     return s
 
 
 def drop_comments(s):
-    s = re.sub(r"COMMENT ON TABLE \w+ IS '(?:[^']|'')*';\n?", "", s)
-    s = re.sub(r"COMMENT ON COLUMN \w+\.\w+ IS '(?:[^']|'')*';\n?", "", s)
-    s = re.sub(r"COMMENT ON SEQUENCE \w+ IS '(?:[^']|'')*';\n?", "", s)
+    # the repository formatter wraps COMMENT statements across lines, so every
+    # token boundary must match \s+ under DOTALL
+    s = re.sub(r"COMMENT\s+ON\s+TABLE\s+\S+\s+IS\s+'(?:[^']|'')*';\s*", "", s, flags=re.S)
+    s = re.sub(r"COMMENT\s+ON\s+COLUMN\s+\S+\s+IS\s+'(?:[^']|'')*';\s*", "", s, flags=re.S)
+    s = re.sub(r"COMMENT\s+ON\s+SEQUENCE\s+\S+\s+IS\s+'(?:[^']|'')*';\s*", "", s, flags=re.S)
     return s
 
 
@@ -192,6 +233,7 @@ def translate_types(s):
 def main(src_path, dst_path, database):
     s = open(src_path).read()
     s = strip_operate_time_triggers(s)
+    s = convert_partial_unique_indexes(s)
     s = drop_pg_specific(s)
     s = drop_comments(s)
     s = convert_revision_triggers(s)
@@ -199,7 +241,7 @@ def main(src_path, dst_path, database):
     s = widen_keyed_text(s)
     s = re.sub(r"CREATE SCHEMA IF NOT EXISTS \w+;", f"CREATE DATABASE IF NOT EXISTS {database}\n    CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", s)
     s = re.sub(r"SET search_path TO [\w, ]+;", f"USE {database};", s)
-    s = re.sub(r"\n?\s*INCLUDE \([^)]*\)", "", s)
+    s = re.sub(r"\s*INCLUDE\s*\([^)]*\)", "", s, flags=re.S)
     s = re.sub(r"'(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d+)?) \+00:00'", r"'\1'", s)
     # TEXT/JSON columns need expression defaults on MySQL 8 (no literal defaults)
     s = re.sub(r"(TEXT\s+)DEFAULT ('[^']*')", r"\1DEFAULT (\2)", s)
@@ -209,6 +251,7 @@ def main(src_path, dst_path, database):
     # seed's embedded-JSON values rely on \" surviving to the JSON parser, so
     # this session disables backslash escaping for the whole (dedicated) load.
     s = "SET sql_mode = CONCAT(@@sql_mode, ',NO_BACKSLASH_ESCAPES');\n\n" + s
+    s = move_guard_statements(s)
     open(dst_path, 'w').write(HEADER + s)
     print(f"{src_path} -> {dst_path} ({database})")
 

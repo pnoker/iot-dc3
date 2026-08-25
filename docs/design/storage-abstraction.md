@@ -39,7 +39,7 @@ but the dashboard read surface still bypasses it. The work is therefore:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ Relational core            dc3.db.type: postgres | mysql        │
+│ Relational core            dc3.db.type: postgres | mysql | mariadb        │
 │ auth, manager, alarms, command/event history, observability     │
 │ → MyBatis dialect profiles (§3)                                 │
 ├─────────────────────────────────────────────────────────────────┤
@@ -250,7 +250,7 @@ dc3:
   facade:
     mode: grpc          # exists today
   db:
-    type: postgres      # postgres | mysql                     (§3)
+    type: postgres      # postgres | mysql | mariadb                     (§3)
   repository:
     type: timescale     # timescale | tdengine | influxdb | iotdb  (§4)
   mq:
