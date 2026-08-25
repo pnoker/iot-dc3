@@ -38,16 +38,18 @@ x-logging: &default-logging
 #
 #   docker compose -f dc3/docker-compose-db.yml up -d
 #   docker compose -f dc3/docker-compose-scale.yml up -d \
-#       --scale gateway=2 --scale modbus-tcp=2 --scale data=2
+#       --scale gateway=2 --scale data=2
 #
 # Scaling semantics (see dc3/doc/DEPLOYMENT.md for details):
 #   * web        - keep replicas at 1 (publishes host ports 8080/8443); put your
 #                  own LB in front if you need more capacity.
 #   * gateway    - the nginx in dc3-web resolves dc3-gateway to every replica and
 #                  round-robins between them (restart web after scaling).
-#   * drivers    - stateless workers: replicas consume the same RabbitMQ queues
-#                  and share manager metadata. Exception: listening-virtual must
-#                  stay at 1 replica (inbound device sockets are connection-pinned).
+#   * drivers    - keep replicas at 1: every replica would open the same SQLite
+#                  outbox file on the shared driver_data volume. Scale drivers on
+#                  Kubernetes instead (each pod gets its own emptyDir outbox).
+#                  listening-virtual must stay at 1 replica regardless (inbound
+#                  device sockets are connection-pinned).
 #   * centers    - replicas give HA / rolling-update safety. HTTP traffic from the
 #                  gateway is load-balanced by Spring Cloud Gateway; center-to-center
 #                  gRPC uses static DNS targets (one channel per client), so a
@@ -317,8 +319,8 @@ services:
           - dc3-driver-listening-virtual
 
   modbus-tcp:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -344,8 +346,8 @@ services:
           - dc3-driver-modbus-tcp
 
   modbus-rtu:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -371,8 +373,8 @@ services:
           - dc3-driver-modbus-rtu
 
   mqtt:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -398,8 +400,8 @@ services:
           - dc3-driver-mqtt
 
   opc-da:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -425,8 +427,8 @@ services:
           - dc3-driver-opc-da
 
   opc-ua:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -452,8 +454,8 @@ services:
           - dc3-driver-opc-ua
 
   plcs7:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -479,8 +481,8 @@ services:
           - dc3-driver-plcs7
 
   virtual:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -506,8 +508,8 @@ services:
           - dc3-driver-virtual
 
   bacnet-ip:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-bacnet-ip:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -533,8 +535,8 @@ services:
           - dc3-driver-bacnet-ip
 
   fins:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-fins:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -560,8 +562,8 @@ services:
           - dc3-driver-fins
 
   melsec:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-melsec:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -587,8 +589,8 @@ services:
           - dc3-driver-melsec
 
   ethernet-ip:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ethernet-ip:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -614,8 +616,8 @@ services:
           - dc3-driver-ethernet-ip
 
   iec104:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec104:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -641,8 +643,8 @@ services:
           - dc3-driver-iec104
 
   sl651:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sl651:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -668,8 +670,8 @@ services:
           - dc3-driver-sl651
 
   snmp:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-snmp:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -695,8 +697,8 @@ services:
           - dc3-driver-snmp
 
   dlms:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlms:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -722,8 +724,8 @@ services:
           - dc3-driver-dlms
 
   coap:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-coap:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -749,8 +751,8 @@ services:
           - dc3-driver-coap
 
   lwm2m:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lwm2m:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -776,8 +778,8 @@ services:
           - dc3-driver-lwm2m
 
   http:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-http:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -803,8 +805,8 @@ services:
           - dc3-driver-http
 
   serial:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-serial:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -830,8 +832,8 @@ services:
           - dc3-driver-serial
 
   tcp-udp:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-tcp-udp:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -857,8 +859,8 @@ services:
           - dc3-driver-tcp-udp
 
   mysql:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mysql:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -884,8 +886,8 @@ services:
           - dc3-driver-mysql
 
   postgresql:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-postgresql:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -911,8 +913,8 @@ services:
           - dc3-driver-postgresql
 
   oracle:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-oracle:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -938,8 +940,8 @@ services:
           - dc3-driver-oracle
 
   sqlserver:
-    # Protocol adapter, stateless: safe to scale (replicas share RabbitMQ
-    # queues and the manager metadata).
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sqlserver:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     depends_on:
@@ -963,6 +965,303 @@ services:
       dc3net:
         aliases:
           - dc3-driver-sqlserver
+
+  ble:
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ble:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-ble/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-ble/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-ble
+
+  can:
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-can:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-can/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-can/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-can
+
+  dlt645:
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlt645:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dlt645/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-dlt645/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-dlt645
+
+  dnp3:
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dnp3:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dnp3/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-dnp3/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-dnp3
+
+  iec61850:
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec61850:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-iec61850/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-iec61850/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-iec61850
+
+  kafka:
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-kafka:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-kafka/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-kafka/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-kafka
+
+  knx:
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-knx:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-knx/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-knx/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-knx
+
+  lorawan:
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lorawan:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-lorawan/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-lorawan/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-lorawan
+
+  mbus:
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mbus:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mbus/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-mbus/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mbus
+
+  redis:
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-redis:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-redis/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-redis/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-redis
+
+  zigbee:
+    # Protocol adapter. Keep replicas at 1: every replica mounts the same
+    # driver_data volume and would open the same SQLite outbox file.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-zigbee:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-zigbee/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-zigbee/dc3/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-zigbee
 
 volumes:
   logs:

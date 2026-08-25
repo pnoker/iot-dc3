@@ -60,6 +60,17 @@ resources:
   - drivers/driver-postgresql.yaml
   - drivers/driver-oracle.yaml
   - drivers/driver-sqlserver.yaml
+  - drivers/driver-ble.yaml
+  - drivers/driver-can.yaml
+  - drivers/driver-dlt645.yaml
+  - drivers/driver-dnp3.yaml
+  - drivers/driver-iec61850.yaml
+  - drivers/driver-kafka.yaml
+  - drivers/driver-knx.yaml
+  - drivers/driver-lorawan.yaml
+  - drivers/driver-mbus.yaml
+  - drivers/driver-redis.yaml
+  - drivers/driver-zigbee.yaml
   - drivers/service-listening-virtual.yaml
   - ingress.yaml
   - hpa.yaml
@@ -138,4 +149,26 @@ images:
   - name: pnoker/dc3-driver-oracle
     newTag: 2026.6
   - name: pnoker/dc3-driver-sqlserver
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-ble
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-can
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-dlt645
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-dnp3
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-iec61850
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-kafka
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-knx
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-lorawan
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-mbus
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-redis
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-zigbee
     newTag: 2026.6

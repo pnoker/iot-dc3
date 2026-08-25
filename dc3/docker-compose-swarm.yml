@@ -44,7 +44,9 @@ x-logging: &default-logging
 #     manager node. On a multi-node swarm change the constraint to a dedicated
 #     stateful node label (node.labels.dc3-stateful==true) and put the volumes on
 #     shared storage (NFS/Ceph) - see dc3/doc/DEPLOYMENT.md.
-#   * Scale with:  docker service scale dc3_gateway=2 dc3_modbus-tcp=2
+#   * Scale with:  docker service scale dc3_gateway=2
+#     Drivers stay at 1 replica (every replica would open the same SQLite outbox
+#     file on the shared driver_data volume; scale drivers on Kubernetes instead).
 #     Web (80/443) and listening-virtual (6270/6271) are the only published ports;
 #     the ingress network load-balances web, listening-virtual stays at 1 replica.
 # =============================================================================
@@ -1184,6 +1186,358 @@ services:
     volumes:
       - logs:/dc3-driver/dc3-driver-sqlserver/dc3/logs
       - driver_data:/dc3-driver/dc3-driver-sqlserver/dc3/data
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    networks:
+      - dc3net
+
+  ble:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ble:${DC3_IMAGE_TAG:-2026.6}
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-ble/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-ble/dc3/data
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    networks:
+      - dc3net
+
+  can:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-can:${DC3_IMAGE_TAG:-2026.6}
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-can/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-can/dc3/data
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    networks:
+      - dc3net
+
+  dlt645:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlt645:${DC3_IMAGE_TAG:-2026.6}
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dlt645/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-dlt645/dc3/data
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    networks:
+      - dc3net
+
+  dnp3:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dnp3:${DC3_IMAGE_TAG:-2026.6}
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dnp3/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-dnp3/dc3/data
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    networks:
+      - dc3net
+
+  iec61850:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec61850:${DC3_IMAGE_TAG:-2026.6}
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-iec61850/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-iec61850/dc3/data
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    networks:
+      - dc3net
+
+  kafka:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-kafka:${DC3_IMAGE_TAG:-2026.6}
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-kafka/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-kafka/dc3/data
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    networks:
+      - dc3net
+
+  knx:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-knx:${DC3_IMAGE_TAG:-2026.6}
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-knx/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-knx/dc3/data
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    networks:
+      - dc3net
+
+  lorawan:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lorawan:${DC3_IMAGE_TAG:-2026.6}
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-lorawan/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-lorawan/dc3/data
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    networks:
+      - dc3net
+
+  mbus:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mbus:${DC3_IMAGE_TAG:-2026.6}
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mbus/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-mbus/dc3/data
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    networks:
+      - dc3net
+
+  redis:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-redis:${DC3_IMAGE_TAG:-2026.6}
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-redis/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-redis/dc3/data
+    deploy:
+      replicas: 1
+      update_config:
+        order: start-first
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.05'
+          memory: 64M
+    networks:
+      - dc3net
+
+  zigbee:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-zigbee:${DC3_IMAGE_TAG:-2026.6}
+    environment:
+      <<: *app-runtime-env
+    volumes:
+      - logs:/dc3-driver/dc3-driver-zigbee/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-zigbee/dc3/data
     deploy:
       replicas: 1
       update_config:

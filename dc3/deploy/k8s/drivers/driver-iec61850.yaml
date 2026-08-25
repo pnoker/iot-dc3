@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dc3-driver-iec61850
+  namespace: dc3
+  labels:
+    app.kubernetes.io/name: dc3-driver-iec61850
+    app.kubernetes.io/part-of: iot-dc3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dc3-driver-iec61850
+  template:
+    metadata:
+      labels:
+        app: dc3-driver-iec61850
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: dc3-driver-iec61850
+          image: pnoker/dc3-driver-iec61850:2026.6
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: dc3-config
+            - secretRef:
+                name: dc3-secrets
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: "0.5"
+              memory: 512Mi
+          volumeMounts:
+            - name: logs
+              mountPath: /dc3-driver/dc3-driver-iec61850/dc3/logs
+            - name: data
+              mountPath: /dc3-driver/dc3-driver-iec61850/dc3/data
+      volumes:
+        - name: logs
+          emptyDir: {}
+        - name: data
+          emptyDir: {}

@@ -182,8 +182,9 @@ driverResources:
 
 # -----------------------------------------------------------------------------
 # Protocol drivers (Deployment each; listening-virtual also gets a NodePort
-# Service for inbound device TCP/UDP). All are stateless workers except
-# listening-virtual, which must stay at replicas: 1.
+# Service for inbound device TCP/UDP). Each driver pod owns an emptyDir outbox,
+# so replicas may scale freely; listening-virtual must stay at replicas: 1
+# (inbound device sockets are connection-pinned).
 # -----------------------------------------------------------------------------
 drivers:
   listening-virtual:
@@ -260,6 +261,39 @@ drivers:
     enabled: true
     replicas: 1
   sqlserver:
+    enabled: true
+    replicas: 1
+  ble:
+    enabled: true
+    replicas: 1
+  can:
+    enabled: true
+    replicas: 1
+  dlt645:
+    enabled: true
+    replicas: 1
+  dnp3:
+    enabled: true
+    replicas: 1
+  iec61850:
+    enabled: true
+    replicas: 1
+  kafka:
+    enabled: true
+    replicas: 1
+  knx:
+    enabled: true
+    replicas: 1
+  lorawan:
+    enabled: true
+    replicas: 1
+  mbus:
+    enabled: true
+    replicas: 1
+  redis:
+    enabled: true
+    replicas: 1
+  zigbee:
     enabled: true
     replicas: 1
 

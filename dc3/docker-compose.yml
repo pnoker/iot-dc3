@@ -268,7 +268,7 @@ services:
     hostname: dc3-driver-listening-virtual
     volumes:
       - logs:/dc3-driver/dc3-driver-listening-virtual/dc3/logs
-      - driver_listening_virtual_data:/dc3-driver/dc3-driver-listening-virtual/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-listening-virtual/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -287,7 +287,7 @@ services:
     hostname: dc3-driver-modbus-tcp
     volumes:
       - logs:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs
-      - driver_modbus_tcp_data:/dc3-driver/dc3-driver-modbus-tcp/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-modbus-tcp/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -306,7 +306,7 @@ services:
     hostname: dc3-driver-modbus-rtu
     volumes:
       - logs:/dc3-driver/dc3-driver-modbus-rtu/dc3/logs
-      - driver_modbus_rtu_data:/dc3-driver/dc3-driver-modbus-rtu/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-modbus-rtu/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -325,7 +325,7 @@ services:
     hostname: dc3-driver-mqtt
     volumes:
       - logs:/dc3-driver/dc3-driver-mqtt/dc3/logs
-      - driver_mqtt_data:/dc3-driver/dc3-driver-mqtt/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-mqtt/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -344,7 +344,7 @@ services:
     hostname: dc3-driver-opc-da
     volumes:
       - logs:/dc3-driver/dc3-driver-opc-da/dc3/logs
-      - driver_opc_da_data:/dc3-driver/dc3-driver-opc-da/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-opc-da/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -363,7 +363,7 @@ services:
     hostname: dc3-driver-opc-ua
     volumes:
       - logs:/dc3-driver/dc3-driver-opc-ua/dc3/logs
-      - driver_opc_ua_data:/dc3-driver/dc3-driver-opc-ua/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-opc-ua/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -382,7 +382,7 @@ services:
     hostname: dc3-driver-plcs7
     volumes:
       - logs:/dc3-driver/dc3-driver-plcs7/dc3/logs
-      - driver_plcs7_data:/dc3-driver/dc3-driver-plcs7/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-plcs7/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -401,7 +401,7 @@ services:
     hostname: dc3-driver-virtual
     volumes:
       - logs:/dc3-driver/dc3-driver-virtual/dc3/logs
-      - driver_virtual_data:/dc3-driver/dc3-driver-virtual/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-virtual/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -420,7 +420,7 @@ services:
     hostname: dc3-driver-bacnet-ip
     volumes:
       - logs:/dc3-driver/dc3-driver-bacnet-ip/dc3/logs
-      - driver_bacnet_ip_data:/dc3-driver/dc3-driver-bacnet-ip/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-bacnet-ip/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -439,7 +439,7 @@ services:
     hostname: dc3-driver-fins
     volumes:
       - logs:/dc3-driver/dc3-driver-fins/dc3/logs
-      - driver_fins_data:/dc3-driver/dc3-driver-fins/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-fins/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -458,7 +458,7 @@ services:
     hostname: dc3-driver-melsec
     volumes:
       - logs:/dc3-driver/dc3-driver-melsec/dc3/logs
-      - driver_melsec_data:/dc3-driver/dc3-driver-melsec/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-melsec/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -477,7 +477,7 @@ services:
     hostname: dc3-driver-ethernet-ip
     volumes:
       - logs:/dc3-driver/dc3-driver-ethernet-ip/dc3/logs
-      - driver_ethernet_ip_data:/dc3-driver/dc3-driver-ethernet-ip/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-ethernet-ip/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -496,7 +496,7 @@ services:
     hostname: dc3-driver-iec104
     volumes:
       - logs:/dc3-driver/dc3-driver-iec104/dc3/logs
-      - driver_iec104_data:/dc3-driver/dc3-driver-iec104/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-iec104/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -515,7 +515,7 @@ services:
     hostname: dc3-driver-sl651
     volumes:
       - logs:/dc3-driver/dc3-driver-sl651/dc3/logs
-      - driver_sl651_data:/dc3-driver/dc3-driver-sl651/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-sl651/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -534,7 +534,7 @@ services:
     hostname: dc3-driver-snmp
     volumes:
       - logs:/dc3-driver/dc3-driver-snmp/dc3/logs
-      - driver_snmp_data:/dc3-driver/dc3-driver-snmp/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-snmp/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -553,7 +553,7 @@ services:
     hostname: dc3-driver-dlms
     volumes:
       - logs:/dc3-driver/dc3-driver-dlms/dc3/logs
-      - driver_dlms_data:/dc3-driver/dc3-driver-dlms/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-dlms/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -572,7 +572,7 @@ services:
     hostname: dc3-driver-coap
     volumes:
       - logs:/dc3-driver/dc3-driver-coap/dc3/logs
-      - driver_coap_data:/dc3-driver/dc3-driver-coap/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-coap/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -591,7 +591,7 @@ services:
     hostname: dc3-driver-lwm2m
     volumes:
       - logs:/dc3-driver/dc3-driver-lwm2m/dc3/logs
-      - driver_lwm2m_data:/dc3-driver/dc3-driver-lwm2m/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-lwm2m/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -610,7 +610,7 @@ services:
     hostname: dc3-driver-http
     volumes:
       - logs:/dc3-driver/dc3-driver-http/dc3/logs
-      - driver_http_data:/dc3-driver/dc3-driver-http/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-http/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -629,7 +629,7 @@ services:
     hostname: dc3-driver-serial
     volumes:
       - logs:/dc3-driver/dc3-driver-serial/dc3/logs
-      - driver_serial_data:/dc3-driver/dc3-driver-serial/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-serial/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -648,7 +648,7 @@ services:
     hostname: dc3-driver-tcp-udp
     volumes:
       - logs:/dc3-driver/dc3-driver-tcp-udp/dc3/logs
-      - driver_tcp_udp_data:/dc3-driver/dc3-driver-tcp-udp/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-tcp-udp/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -667,7 +667,7 @@ services:
     hostname: dc3-driver-mysql
     volumes:
       - logs:/dc3-driver/dc3-driver-mysql/dc3/logs
-      - driver_mysql_data:/dc3-driver/dc3-driver-mysql/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-mysql/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -686,7 +686,7 @@ services:
     hostname: dc3-driver-postgresql
     volumes:
       - logs:/dc3-driver/dc3-driver-postgresql/dc3/logs
-      - driver_postgresql_data:/dc3-driver/dc3-driver-postgresql/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-postgresql/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -705,7 +705,7 @@ services:
     hostname: dc3-driver-oracle
     volumes:
       - logs:/dc3-driver/dc3-driver-oracle/dc3/logs
-      - driver_oracle_data:/dc3-driver/dc3-driver-oracle/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-oracle/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -724,40 +724,225 @@ services:
     hostname: dc3-driver-sqlserver
     volumes:
       - logs:/dc3-driver/dc3-driver-sqlserver/dc3/logs
-      - driver_sqlserver_data:/dc3-driver/dc3-driver-sqlserver/dc3/data
+      - driver_data:/dc3-driver/dc3-driver-sqlserver/dc3/data
     logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-driver-sqlserver
 
+  ble:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ble:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-ble
+    hostname: dc3-driver-ble
+    volumes:
+      - logs:/dc3-driver/dc3-driver-ble/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-ble/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-ble
+
+  can:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-can:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-can
+    hostname: dc3-driver-can
+    volumes:
+      - logs:/dc3-driver/dc3-driver-can/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-can/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-can
+
+  dlt645:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlt645:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-dlt645
+    hostname: dc3-driver-dlt645
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dlt645/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-dlt645/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-dlt645
+
+  dnp3:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dnp3:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-dnp3
+    hostname: dc3-driver-dnp3
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dnp3/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-dnp3/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-dnp3
+
+  iec61850:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec61850:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-iec61850
+    hostname: dc3-driver-iec61850
+    volumes:
+      - logs:/dc3-driver/dc3-driver-iec61850/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-iec61850/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-iec61850
+
+  kafka:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-kafka:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-kafka
+    hostname: dc3-driver-kafka
+    volumes:
+      - logs:/dc3-driver/dc3-driver-kafka/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-kafka/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-kafka
+
+  knx:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-knx:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-knx
+    hostname: dc3-driver-knx
+    volumes:
+      - logs:/dc3-driver/dc3-driver-knx/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-knx/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-knx
+
+  lorawan:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lorawan:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-lorawan
+    hostname: dc3-driver-lorawan
+    volumes:
+      - logs:/dc3-driver/dc3-driver-lorawan/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-lorawan/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-lorawan
+
+  mbus:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mbus:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-mbus
+    hostname: dc3-driver-mbus
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mbus/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-mbus/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mbus
+
+  redis:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-redis:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-redis
+    hostname: dc3-driver-redis
+    volumes:
+      - logs:/dc3-driver/dc3-driver-redis/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-redis/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-redis
+
+  zigbee:
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-zigbee:${DC3_IMAGE_TAG:-2026.6}
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-zigbee
+    hostname: dc3-driver-zigbee
+    volumes:
+      - logs:/dc3-driver/dc3-driver-zigbee/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-zigbee/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-zigbee
+
 volumes:
   logs:
-  driver_listening_virtual_data:
-  driver_modbus_tcp_data:
-  driver_modbus_rtu_data:
-  driver_mqtt_data:
-  driver_opc_da_data:
-  driver_opc_ua_data:
-  driver_plcs7_data:
-  driver_virtual_data:
-  driver_bacnet_ip_data:
-  driver_fins_data:
-  driver_melsec_data:
-  driver_ethernet_ip_data:
-  driver_iec104_data:
-  driver_sl651_data:
-  driver_snmp_data:
-  driver_dlms_data:
-  driver_coap_data:
-  driver_lwm2m_data:
-  driver_http_data:
-  driver_serial_data:
-  driver_tcp_udp_data:
-  driver_mysql_data:
-  driver_postgresql_data:
-  driver_oracle_data:
-  driver_sqlserver_data:
+  driver_data:
   nginx:
 
 networks:

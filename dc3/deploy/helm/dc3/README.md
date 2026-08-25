@@ -1,7 +1,7 @@
 # IoT DC3 Helm Chart
 
 Helm chart for deploying the IoT DC3 platform: HTTP gateway, the four centers
-(auth / manager / data / agentic), the Vue web console, 25 protocol drivers, and
+(auth / manager / data / agentic), the Vue web console, 36 protocol drivers, and
 the PostgreSQL + RabbitMQ stateful dependencies.
 
 > Kubernetes manifests (kustomize) live in `../../k8s`; the compose stacks live in
@@ -60,6 +60,8 @@ helm rollback dc3 1
 helm uninstall dc3     # PVCs survive by default
 ```
 
-Scaling semantics match the kustomize manifests and the compose-scale stack:
-gateway/web/centers/drivers are safe to scale (except `listening-virtual` which pins
+Scaling semantics match the kustomize manifests: gateway/web/centers/drivers are safe
+to scale (each driver pod gets its own `emptyDir` outbox; `listening-virtual` also pins
 inbound device sockets and must stay at 1 replica); postgres/rabbitmq are singletons.
+The compose-scale/swarm stacks differ for drivers: there every replica would open the
+same SQLite outbox file, so drivers stay at 1 replica.

@@ -1,7 +1,7 @@
 # IoT DC3 on Kubernetes
 
 Production-oriented Kubernetes manifests for the IoT DC3 platform: gateway, the four
-centers (auth / manager / data / agentic), the web console, 25 protocol drivers, and
+centers (auth / manager / data / agentic), the web console, 36 protocol drivers, and
 the PostgreSQL + RabbitMQ stateful dependencies.
 
 | What            | Where                                                              |
@@ -80,19 +80,21 @@ kubectl -n dc3 get svc,ingress
 
 ```bash
 kubectl -n dc3 scale deployment dc3-gateway --replicas=3
-kubectl -n dc3 scale deployment dc3-driver-modbus-tcp --replicas=2   # stateless drivers
+kubectl -n dc3 scale deployment dc3-driver-modbus-tcp --replicas=2   # safe: per-pod emptyDir outbox
 kubectl -n dc3 get hpa -n dc3                                        # gateway/web autoscale
 ```
 
-Scaling semantics (same as the compose-scale stack, see `dc3/doc/DEPLOYMENT.md`):
+Scaling semantics (see `dc3/doc/DEPLOYMENT.md`; the compose-scale/swarm stacks differ for drivers):
 
 - **gateway / web**: stateless, load-balanced by the Service - safe to scale and
   autoscale (HPA is enabled).
 - **centers**: safe for HA/rollouts. Traffic from the gateway is balanced by Spring
   Cloud Gateway over HTTP; center-to-center gRPC uses static DNS targets, so a scaled
   center serves as failover rather than request-level balancing.
-- **drivers**: stateless workers sharing the same RabbitMQ queues - safe to scale.
-  Exception: `listening-virtual` pins inbound device sockets, keep `replicas: 1`.
+- **drivers**: safe to scale here - each pod gets its own `emptyDir` outbox, so replicas
+  never share a SQLite file (unlike compose-scale/swarm, where drivers must stay at 1
+  replica). Exception: `listening-virtual` pins inbound device sockets, keep
+  `replicas: 1`.
 - **postgres / rabbitmq**: singletons by design. Do not scale past 1 replica; for HA
   run managed PostgreSQL/RabbitMQ and point the ConfigMap at them.
 

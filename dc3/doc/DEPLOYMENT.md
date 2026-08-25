@@ -80,7 +80,7 @@ separate `db` stack (both files share the `dc3net` project network).
 ```bash
 docker compose -f dc3/docker-compose-db.yml up -d
 docker compose -f dc3/docker-compose-scale.yml up -d \
-    --scale gateway=2 --scale data=2 --scale modbus-tcp=2
+    --scale gateway=2 --scale data=2
 ```
 
 ### What can scale, and how traffic is balanced
@@ -90,7 +90,7 @@ docker compose -f dc3/docker-compose-scale.yml up -d \
 | web | 1 replica | publishes 8080/8443 - put your own LB in front for more |
 | gateway | yes | the nginx in `dc3-web` resolves `dc3-gateway` to every replica and round-robins (restart `web` after scaling gateway to refresh addresses) |
 | centers | yes (HA) | HTTP routes from the gateway are balanced by Spring Cloud Gateway; center-to-center gRPC uses static DNS targets - a replica restart fails over the channel, but the channel is not request-balanced |
-| drivers | yes | replicas consume the same RabbitMQ queues; a message goes to exactly one replica |
+| drivers | **1 replica** | every replica mounts the shared `driver_data` volume and would open the same SQLite outbox file; scale drivers on Kubernetes (per-pod `emptyDir`) instead |
 | listening-virtual | **1 replica** | inbound device sockets are pinned to one container |
 | postgres / rabbitmq | **1 replica** | stateful singletons by design |
 
@@ -119,7 +119,7 @@ docker stack deploy -c dc3/docker-compose-swarm.yml dc3
 
 # 4. operate
 docker service ls
-docker service scale dc3_gateway=3 dc3_modbus-tcp=2
+docker service scale dc3_gateway=3
 docker service logs -f dc3_gateway
 docker stack rm dc3
 ```
@@ -130,6 +130,9 @@ docker stack rm dc3
   replicas automatically (`docker service scale dc3_web=2` is safe).
 - `listening-virtual` publishes 6270/6271 with `mode: host` and must stay at 1
   replica (connection affinity).
+- Protocol drivers stay at 1 replica: every replica would open the same SQLite outbox
+  file on the shared `driver_data` volume. Scale drivers on Kubernetes instead (each
+  pod gets its own `emptyDir`).
 - Stateful services are constrained to `node.role == manager` so their local volumes
   stay on one node. On a multi-node swarm change the constraint to a dedicated label
   (e.g. `node.labels.dc3-stateful==true`) and place the volumes on shared storage
@@ -160,8 +163,9 @@ kubectl -n dc3 get pods -w
   switch the Service to `LoadBalancer` if you prefer.
 - Ingress routes `/api/` to `dc3-gateway:8000` and `/` to `dc3-web:80`; set the host and
   TLS (cert-manager example annotation provided) before production.
-- Scaling semantics are identical to Mode 1: gateway/web/centers/drivers scale,
-  `listening-virtual` stays at 1, postgres/rabbitmq are singletons. The k8s Service
+- Scaling semantics: gateway/web/centers/drivers scale - driver pods each get a
+  per-pod `emptyDir` outbox, unlike Mode 1/2 where drivers stay at 1 replica;
+  `listening-virtual` stays at 1; postgres/rabbitmq are singletons. The k8s Service
   (kube-proxy) additionally load-balances per TCP connection, so scaled centers also
   get connection-level distribution for HTTP.
 

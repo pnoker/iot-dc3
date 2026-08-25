@@ -65,9 +65,12 @@ the authoritative definitions.
   capped exponential backoff; there is no retry-count or size-based data eviction.
 - List-based reports are inserted in one SQLite transaction before the first RabbitMQ publish, preserving durability
   while amortizing FULL-synchronous fsync cost for high-volume protocol frames.
-- Every driver runtime must own an exclusive persistent volume for its outbox directory. Do not mount the same SQLite
-  file into multiple driver processes or replicas. The supplied Compose stacks use a separate named volume per driver
-  service; an orchestrator must provide equivalent per-pod persistent storage.
+- Every driver runtime must own an exclusive outbox directory on persistent storage. Do not mount the same SQLite
+  file into multiple driver processes or replicas. The supplied Compose stacks mount one shared `driver_data` volume
+  and isolate drivers by mount path (`/dc3-driver/dc3-driver-<name>/dc3/data`), so each driver's outbox lives in its own
+  service-name-scoped subdirectory; an orchestrator must provide equivalent per-pod persistent storage. This means the
+  compose scale/swarm stacks keep drivers at one replica each (two replicas of one driver would open the same outbox
+  file); Kubernetes/Helm pods each get their own `emptyDir`, so drivers may scale there.
 - A driver stops reads, writes, and telemetry immediately when its local lease expires. Manager and Data Center also
   reject stale owners by node and fencing token, so a paused or partitioned process cannot resume as an owner.
 - Command execution is at-least-once across process crashes. Protocol implementations should use the command ID when the

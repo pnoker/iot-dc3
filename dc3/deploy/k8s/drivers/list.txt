@@ -23,3 +23,14 @@ mysql
 postgresql
 oracle
 sqlserver
+ble
+can
+dlt645
+dnp3
+iec61850
+kafka
+knx
+lorawan
+mbus
+redis
+zigbee
