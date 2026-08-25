@@ -17,28 +17,12 @@
 
 package io.github.pnoker.common.tsdb.iotdb;
 
-import io.github.pnoker.common.tsdb.model.TsdbModel.AggregateFunction;
-import io.github.pnoker.common.tsdb.model.TsdbModel.BucketAggregate;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CorrelationResult;
-import io.github.pnoker.common.tsdb.model.TsdbModel.Cursor;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CursorPage;
-import io.github.pnoker.common.tsdb.model.TsdbModel.DimensionCount;
-import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
-import io.github.pnoker.common.tsdb.model.TsdbModel.LatencyBin;
-import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbQueryTimeout;
-import io.github.pnoker.common.tsdb.model.TsdbModel.WindowAggregate;
+import io.github.pnoker.common.tsdb.model.TsdbModel.*;
 import io.github.pnoker.common.tsdb.spi.TsdbStore;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.iotdb.isession.pool.SessionDataSetWrapper;
 import org.apache.iotdb.rpc.IoTDBConnectionException;
 import org.apache.iotdb.rpc.StatementExecutionException;
-import org.apache.iotdb.isession.pool.SessionDataSetWrapper;
 import org.apache.iotdb.session.pool.SessionPool;
 import org.apache.tsfile.enums.TSDataType;
 import org.apache.tsfile.read.common.RowRecord;
@@ -52,7 +36,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -153,11 +136,63 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
         log.info("IoTDB store ready ({}:{})", host, port);
     }
 
+    private static String path(SeriesKey series) {
+        return ROOT + ".t" + series.tenantId() + ".d" + series.deviceId() + ".p" + series.pointId();
+    }
+
+    private static String tenantRoot(long tenantId) {
+        return ROOT + ".t" + tenantId + ".**";
+    }
+
+    private static long alignDown(long value, long unit) {
+        return Math.floorDiv(value, unit) * unit;
+    }
+
+    // ===== writes =====
+
+    private static long microsOf(Instant instant) {
+        return instant.getEpochSecond() * 1_000_000L + instant.getNano() / 1_000L;
+    }
+
+    // ===== reads =====
+
+    /**
+     * WHERE time literal. A bare epoch number is parsed by IoTDB as milliseconds
+     * regardless of the server's timestamp precision — verified against
+     * 2.0.10-standalone: a microsecond literal in a WHERE clause silently
+     * matches nothing. The offset-qualified ISO form carries the exact instant.
+     */
+    private static String timeLiteral(Instant instant) {
+        return instant.toString().replace("Z", "+00:00");
+    }
+
+    private static Instant instantOfMicros(long micros) {
+        return Instant.ofEpochSecond(Math.floorDiv(micros, 1_000_000L),
+                Math.floorMod(micros, 1_000_000L) * 1000L);
+    }
+
+    private static SeriesKey seriesOfPath(String path) {
+        Matcher matcher = SERIES_IN_COLUMN.matcher(path);
+        if (!matcher.find()) {
+            return null;
+        }
+        return new SeriesKey(Long.parseLong(matcher.group(1)), Long.parseLong(matcher.group(2)),
+                Long.parseLong(matcher.group(3)));
+    }
+
+    private static void checkDeadline(long deadlineAt, TsdbDeadline deadline) {
+        if (System.nanoTime() > deadlineAt) {
+            throw new TsdbQueryTimeout("iotdb query exceeded " + deadline.maxWait());
+        }
+    }
+
     @Override
     public void close() {
         // SessionPool.close() declares no checked exception.
         session.close();
     }
+
+    // ===== S13: tenant-level analytics =====
 
     @Override
     public String type() {
@@ -171,8 +206,6 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
                 RollupSupport.NONE, APPEND_CHUNK,
                 true, OrderingGuarantee.PER_SERIES, Precision.MICRO, true, false);
     }
-
-    // ===== writes =====
 
     @Override
     public int append(List<PointValueSample> samples) {
@@ -219,8 +252,6 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
         return written;
     }
 
-    // ===== reads =====
-
     @Override
     public Map<SeriesKey, List<PointValueSample>> last(SeriesFilter filter, int limit, TsdbDeadline deadline) {
         Map<SeriesKey, List<PointValueSample>> result = new LinkedHashMap<>();
@@ -259,6 +290,8 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
         return new CursorPage<>(merged.size() > pageSize
                 ? new ArrayList<>(merged.subList(0, pageSize)) : merged, next);
     }
+
+    // ===== operations =====
 
     @Override
     public Map<SeriesKey, WindowAggregate> aggregate(SeriesFilter filter, AggregateFunction fn,
@@ -357,7 +390,7 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
         return total;
     }
 
-    // ===== S13: tenant-level analytics =====
+    // ===== helpers =====
 
     @Override
     public List<BucketAggregate> bucketedCount(long tenantId, TimeWindow window,
@@ -463,8 +496,6 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
                 + "facades degrade to zero-filled bins");
     }
 
-    // ===== operations =====
-
     @Override
     public List<SeriesKey> listSeries(long tenantId, TimeWindow window, TsdbDeadline deadline) {
         return lastSeenPerSeries(tenantId, window, deadline).stream().map(SeriesLastSeen::series).toList();
@@ -487,16 +518,6 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
                                          Duration alignBucket, TsdbDeadline deadline) {
         throw new UnsupportedOperationException("IoTDB adapter declares correlation=false; "
                 + "facades compute from bucketed pulls");
-    }
-
-    // ===== helpers =====
-
-    private static String path(SeriesKey series) {
-        return ROOT + ".t" + series.tenantId() + ".d" + series.deviceId() + ".p" + series.pointId();
-    }
-
-    private static String tenantRoot(long tenantId) {
-        return ROOT + ".t" + tenantId + ".**";
     }
 
     private String pathsOf(SeriesFilter filter) {
@@ -536,38 +557,6 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
             });
         }
         return series;
-    }
-
-    private static long alignDown(long value, long unit) {
-        return Math.floorDiv(value, unit) * unit;
-    }
-
-    private static long microsOf(Instant instant) {
-        return instant.getEpochSecond() * 1_000_000L + instant.getNano() / 1_000L;
-    }
-
-    /**
-     * WHERE time literal. A bare epoch number is parsed by IoTDB as milliseconds
-     * regardless of the server's timestamp precision — verified against
-     * 2.0.10-standalone: a microsecond literal in a WHERE clause silently
-     * matches nothing. The offset-qualified ISO form carries the exact instant.
-     */
-    private static String timeLiteral(Instant instant) {
-        return instant.toString().replace("Z", "+00:00");
-    }
-
-    private static Instant instantOfMicros(long micros) {
-        return Instant.ofEpochSecond(Math.floorDiv(micros, 1_000_000L),
-                Math.floorMod(micros, 1_000_000L) * 1000L);
-    }
-
-    private static SeriesKey seriesOfPath(String path) {
-        Matcher matcher = SERIES_IN_COLUMN.matcher(path);
-        if (!matcher.find()) {
-            return null;
-        }
-        return new SeriesKey(Long.parseLong(matcher.group(1)), Long.parseLong(matcher.group(2)),
-                Long.parseLong(matcher.group(3)));
     }
 
     /**
@@ -616,12 +605,6 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
         return rows;
     }
 
-    private static void checkDeadline(long deadlineAt, TsdbDeadline deadline) {
-        if (System.nanoTime() > deadlineAt) {
-            throw new TsdbQueryTimeout("iotdb query exceeded " + deadline.maxWait());
-        }
-    }
-
     /**
      * One result row: timestamp plus typed accessors over the fixed sample layout
      * or name-derived series/value views for aggregate shapes.
@@ -642,6 +625,16 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
             this.fieldColumns = !columns.isEmpty() && "Time".equals(columns.getFirst())
                     ? columns.subList(1, columns.size()) : columns;
             this.record = record;
+        }
+
+        private static Number numberOf(Object value) {
+            if (value instanceof Number number) {
+                return number;
+            }
+            if (value instanceof String text && text.matches("-?\\d+(\\.\\d+)?")) {
+                return new java.math.BigDecimal(text);
+            }
+            return null;
         }
 
         long timestamp() {
@@ -734,16 +727,6 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
             }
         }
 
-        private static Number numberOf(Object value) {
-            if (value instanceof Number number) {
-                return number;
-            }
-            if (value instanceof String text && text.matches("-?\\d+(\\.\\d+)?")) {
-                return new java.math.BigDecimal(text);
-            }
-            return null;
-        }
-
         /**
          * Series of the first field column, for aggregate result shapes.
          */
@@ -760,9 +743,6 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
          */
         long count() {
             return columns.size() > 1 ? longAt(1) : 1L;
-        }
-
-        record Cell(Double value, long count, boolean countColumn) {
         }
 
         /**
@@ -829,6 +809,9 @@ public final class IotdbTsdbStore implements TsdbStore, AutoCloseable {
                 }
             }
             return 0;
+        }
+
+        record Cell(Double value, long count, boolean countColumn) {
         }
     }
 }

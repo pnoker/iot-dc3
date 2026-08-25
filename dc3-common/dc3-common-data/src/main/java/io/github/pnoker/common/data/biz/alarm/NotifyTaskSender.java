@@ -17,9 +17,9 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
-import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.mq.message.MqMessage;
 import io.github.pnoker.common.mq.sender.MessageSender;
 import lombok.RequiredArgsConstructor;

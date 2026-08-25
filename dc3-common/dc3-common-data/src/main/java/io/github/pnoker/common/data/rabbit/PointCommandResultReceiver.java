@@ -17,10 +17,10 @@
 
 package io.github.pnoker.common.data.rabbit;
 
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
 import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
-import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;

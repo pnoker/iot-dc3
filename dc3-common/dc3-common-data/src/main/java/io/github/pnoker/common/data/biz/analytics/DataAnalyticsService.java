@@ -17,24 +17,7 @@
 
 package io.github.pnoker.common.data.biz.analytics;
 
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.ComparePeriodsRequest;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.CompareResponse;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.ComputeStatsRequest;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.CorrelateRequest;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.CorrelationResponse;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.HistoryResponse;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.LatestValuesResponse;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.QueryHistoryRequest;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.QueryLatestRequest;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.QualityReportRequest;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.QualityResponse;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.RankEntitiesRequest;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.RankResponse;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.StatsResponse;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.ThresholdReportRequest;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.ThresholdResponse;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.TrendAnalysisRequest;
-import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.TrendResponse;
+import io.github.pnoker.common.data.entity.vo.analytics.AnalyticsModel.*;
 
 /**
  * AI analytics query facade (docs/design/tsdb-abstraction.md §9.7, S19): nine

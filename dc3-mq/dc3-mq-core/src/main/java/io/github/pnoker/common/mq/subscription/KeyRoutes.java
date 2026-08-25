@@ -45,9 +45,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class KeyRoutes<L> {
 
-    private record Route<L>(String keyPattern, L listener) {
-    }
-
     private final List<Route<L>> routes = new CopyOnWriteArrayList<>();
     private final AtomicInteger cursor = new AtomicInteger();
 
@@ -98,5 +95,8 @@ public final class KeyRoutes<L> {
             }
         }
         return null;
+    }
+
+    private record Route<L>(String keyPattern, L listener) {
     }
 }

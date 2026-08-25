@@ -25,8 +25,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Objects;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * MyBatis-backed {@link DriverLeaseManager} implementation with bounded assignment writes.

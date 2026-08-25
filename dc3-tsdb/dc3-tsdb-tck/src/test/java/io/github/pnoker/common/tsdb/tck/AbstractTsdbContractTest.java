@@ -17,22 +17,7 @@
 
 package io.github.pnoker.common.tsdb.tck;
 
-import io.github.pnoker.common.tsdb.model.TsdbModel.AggregateFunction;
-import io.github.pnoker.common.tsdb.model.TsdbModel.BucketAggregate;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CorrelationResult;
-import io.github.pnoker.common.tsdb.model.TsdbModel.Cursor;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CursorPage;
-import io.github.pnoker.common.tsdb.model.TsdbModel.DimensionCount;
-import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
-import io.github.pnoker.common.tsdb.model.TsdbModel.LatencyBin;
-import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
-import io.github.pnoker.common.tsdb.model.TsdbModel.WindowAggregate;
+import io.github.pnoker.common.tsdb.model.TsdbModel.*;
 import io.github.pnoker.common.tsdb.spi.TsdbStore;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Assumptions;
@@ -49,7 +34,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Store-neutral time-series contract suite (docs/design/tsdb-abstraction.md §10).

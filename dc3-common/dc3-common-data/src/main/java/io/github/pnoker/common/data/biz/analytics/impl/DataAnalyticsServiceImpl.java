@@ -27,7 +27,6 @@ import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
@@ -39,7 +38,6 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.CursorPage;
 import io.github.pnoker.common.tsdb.model.TsdbModel.DimensionCount;
 import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
 import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
@@ -103,6 +101,111 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
 
     // ===== query_latest =====
 
+    private static void requireTenant(Long tenantId) {
+        if (Objects.isNull(tenantId) || tenantId <= 0) {
+            throw new ServiceException("Analytics requires an authenticated tenant context");
+        }
+    }
+
+    // ===== query_history =====
+
+    private static int clamp(int value, int min, int max) {
+        return Math.clamp(value, min, max);
+    }
+
+    // ===== compute_stats =====
+
+    private static long clamp(Long value, long min, long max) {
+        return Objects.isNull(value) ? min : Math.clamp(value, min, max);
+    }
+
+    // ===== compare_periods =====
+
+    private static Duration windowLength(TimeWindow window) {
+        return Duration.between(window.from(), window.toExclusive());
+    }
+
+    // ===== rank_entities =====
+
+    private static Double value(Map<SeriesKey, List<BucketAggregate>> buckets, SeriesKey key, int index) {
+        List<BucketAggregate> list = buckets.get(key);
+        return Objects.isNull(list) || index >= list.size() ? null : list.get(index).value();
+    }
+
+    // ===== trend_analysis =====
+
+    private static double percentile(List<Double> sorted, double p) {
+        if (sorted.isEmpty()) {
+            return Double.NaN;
+        }
+        double position = p * (sorted.size() - 1);
+        int lower = (int) Math.floor(position);
+        int upper = Math.min(lower + 1, sorted.size() - 1);
+        double fraction = position - lower;
+        return round(sorted.get(lower) + (sorted.get(upper) - sorted.get(lower)) * fraction);
+    }
+
+    // ===== threshold_report =====
+
+    private static double leastSquaresSlope(List<Double> values) {
+        int n = values.size();
+        double meanX = (n - 1) / 2.0;
+        double meanY = values.stream().mapToDouble(Double::doubleValue).average().orElse(0);
+        double num = 0;
+        double den = 0;
+        for (int i = 0; i < n; i++) {
+            num += (i - meanX) * (values.get(i) - meanY);
+            den += (i - meanX) * (i - meanX);
+        }
+        return den == 0 ? 0 : num / den;
+    }
+
+    // ===== correlate =====
+
+    private static double pearson(List<double[]> pairs) {
+        if (pairs.size() < 2) {
+            return 0;
+        }
+        double meanX = pairs.stream().mapToDouble(p -> p[0]).average().orElse(0);
+        double meanY = pairs.stream().mapToDouble(p -> p[1]).average().orElse(0);
+        double num = 0;
+        double dx = 0;
+        double dy = 0;
+        for (double[] pair : pairs) {
+            num += (pair[0] - meanX) * (pair[1] - meanY);
+            dx += (pair[0] - meanX) * (pair[0] - meanX);
+            dy += (pair[1] - meanY) * (pair[1] - meanY);
+        }
+        return dx == 0 || dy == 0 ? 0 : num / Math.sqrt(dx * dy);
+    }
+
+    // ===== data_quality_report =====
+
+    private static double round(double value) {
+        return Math.round(value * 10000.0) / 10000.0;
+    }
+
+    // ===== shared plumbing =====
+
+    private static Double round(Double value) {
+        return Objects.isNull(value) ? null : round(value.doubleValue());
+    }
+
+    private static String label(AnalyticsModel.SeriesRef ref) {
+        return ref.label();
+    }
+
+    private static GroupDimension dimensionOf(String dimension) {
+        if (Objects.isNull(dimension)) {
+            return GroupDimension.DEVICE;
+        }
+        try {
+            return GroupDimension.valueOf(dimension.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new ServiceException("Unsupported dimension: " + dimension + " (expect DEVICE / POINT / DRIVER)");
+        }
+    }
+
     @Override
     public AnalyticsModel.LatestValuesResponse queryLatest(Long tenantId, AnalyticsModel.QueryLatestRequest request) {
         requireTenant(tenantId);
@@ -135,8 +238,6 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
                 .collect(Collectors.joining("; ", "Latest values: ", ""));
         return new AnalyticsModel.LatestValuesResponse(conclusion, items.size(), null, List.copyOf(byLabel.values()));
     }
-
-    // ===== query_history =====
 
     @Override
     public AnalyticsModel.HistoryResponse queryHistory(Long tenantId, AnalyticsModel.QueryHistoryRequest request) {
@@ -192,8 +293,6 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
         return new AnalyticsModel.HistoryResponse(conclusion, sampleCount, degradation, out);
     }
 
-    // ===== compute_stats =====
-
     @Override
     public AnalyticsModel.StatsResponse computeStats(Long tenantId, AnalyticsModel.ComputeStatsRequest request) {
         requireTenant(tenantId);
@@ -236,8 +335,6 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
         return new AnalyticsModel.StatsResponse(conclusion, total, degradation, stats);
     }
 
-    // ===== compare_periods =====
-
     @Override
     public AnalyticsModel.CompareResponse comparePeriods(Long tenantId, AnalyticsModel.ComparePeriodsRequest request) {
         requireTenant(tenantId);
@@ -275,8 +372,6 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
                 comparisons.values().stream().mapToLong(c -> c.currentCount() + c.baselineCount()).sum(),
                 null, comparisons);
     }
-
-    // ===== rank_entities =====
 
     @Override
     public AnalyticsModel.RankResponse rankEntities(Long tenantId, AnalyticsModel.RankEntitiesRequest request) {
@@ -331,8 +426,6 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
                 ranked.stream().mapToLong(AnalyticsModel.RankItem::count).sum(), null, ranked);
     }
 
-    // ===== trend_analysis =====
-
     @Override
     public AnalyticsModel.TrendResponse trendAnalysis(Long tenantId, AnalyticsModel.TrendAnalysisRequest request) {
         requireTenant(tenantId);
@@ -370,8 +463,6 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
         return new AnalyticsModel.TrendResponse(conclusion,
                 trends.values().stream().mapToLong(AnalyticsModel.TrendItem::bucketCount).sum(), null, trends);
     }
-
-    // ===== threshold_report =====
 
     @Override
     public AnalyticsModel.ThresholdResponse thresholdReport(Long tenantId, AnalyticsModel.ThresholdReportRequest request) {
@@ -437,8 +528,6 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
                 degradation, report);
     }
 
-    // ===== correlate =====
-
     @Override
     public AnalyticsModel.CorrelationResponse correlate(Long tenantId, AnalyticsModel.CorrelateRequest request) {
         requireTenant(tenantId);
@@ -482,8 +571,6 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
                 round(pearson), alignedBuckets, method);
     }
 
-    // ===== data_quality_report =====
-
     @Override
     public AnalyticsModel.QualityResponse qualityReport(Long tenantId, AnalyticsModel.QualityReportRequest request) {
         requireTenant(tenantId);
@@ -517,22 +604,6 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
                 seen.size(), totalPoints, coverage, silent, quality);
     }
 
-    // ===== shared plumbing =====
-
-    private static void requireTenant(Long tenantId) {
-        if (Objects.isNull(tenantId) || tenantId <= 0) {
-            throw new ServiceException("Analytics requires an authenticated tenant context");
-        }
-    }
-
-    private static int clamp(int value, int min, int max) {
-        return Math.clamp(value, min, max);
-    }
-
-    private static long clamp(Long value, long min, long max) {
-        return Objects.isNull(value) ? min : Math.clamp(value, min, max);
-    }
-
     private TimeWindow resolveWindow(AnalyticsModel.TimeRange range) {
         Instant to = Objects.nonNull(range) && Objects.nonNull(range.toIso()) ? Instant.parse(range.toIso())
                 : Instant.now();
@@ -547,10 +618,6 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
                     .formatted(MAX_WINDOW_HOURS));
         }
         return new TimeWindow(from, to);
-    }
-
-    private static Duration windowLength(TimeWindow window) {
-        return Duration.between(window.from(), window.toExclusive());
     }
 
     /**
@@ -685,74 +752,5 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
         FacadePage<FacadePointBO> page = pointFacade.listByPage(
                 FacadePointQuery.builder().tenantId(tenantId).page(pages).build());
         return page.getTotal();
-    }
-
-    private static Double value(Map<SeriesKey, List<BucketAggregate>> buckets, SeriesKey key, int index) {
-        List<BucketAggregate> list = buckets.get(key);
-        return Objects.isNull(list) || index >= list.size() ? null : list.get(index).value();
-    }
-
-    private static double percentile(List<Double> sorted, double p) {
-        if (sorted.isEmpty()) {
-            return Double.NaN;
-        }
-        double position = p * (sorted.size() - 1);
-        int lower = (int) Math.floor(position);
-        int upper = Math.min(lower + 1, sorted.size() - 1);
-        double fraction = position - lower;
-        return round(sorted.get(lower) + (sorted.get(upper) - sorted.get(lower)) * fraction);
-    }
-
-    private static double leastSquaresSlope(List<Double> values) {
-        int n = values.size();
-        double meanX = (n - 1) / 2.0;
-        double meanY = values.stream().mapToDouble(Double::doubleValue).average().orElse(0);
-        double num = 0;
-        double den = 0;
-        for (int i = 0; i < n; i++) {
-            num += (i - meanX) * (values.get(i) - meanY);
-            den += (i - meanX) * (i - meanX);
-        }
-        return den == 0 ? 0 : num / den;
-    }
-
-    private static double pearson(List<double[]> pairs) {
-        if (pairs.size() < 2) {
-            return 0;
-        }
-        double meanX = pairs.stream().mapToDouble(p -> p[0]).average().orElse(0);
-        double meanY = pairs.stream().mapToDouble(p -> p[1]).average().orElse(0);
-        double num = 0;
-        double dx = 0;
-        double dy = 0;
-        for (double[] pair : pairs) {
-            num += (pair[0] - meanX) * (pair[1] - meanY);
-            dx += (pair[0] - meanX) * (pair[0] - meanX);
-            dy += (pair[1] - meanY) * (pair[1] - meanY);
-        }
-        return dx == 0 || dy == 0 ? 0 : num / Math.sqrt(dx * dy);
-    }
-
-    private static double round(double value) {
-        return Math.round(value * 10000.0) / 10000.0;
-    }
-
-    private static Double round(Double value) {
-        return Objects.isNull(value) ? null : round(value.doubleValue());
-    }
-
-    private static String label(AnalyticsModel.SeriesRef ref) {
-        return ref.label();
-    }
-
-    private static GroupDimension dimensionOf(String dimension) {
-        if (Objects.isNull(dimension)) {
-            return GroupDimension.DEVICE;
-        }
-        try {
-            return GroupDimension.valueOf(dimension.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new ServiceException("Unsupported dimension: " + dimension + " (expect DEVICE / POINT / DRIVER)");
-        }
     }
 }

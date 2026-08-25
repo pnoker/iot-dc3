@@ -19,7 +19,6 @@ package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.data.GrpcPointValueHistoryQuery;
 import io.github.pnoker.api.center.data.GrpcPointValueQuery;
-import io.github.pnoker.api.center.data.GrpcPointVolumeDTO;
 import io.github.pnoker.api.center.data.GrpcPointVolumeQuery;
 import io.github.pnoker.api.center.data.GrpcRPointValueDTO;
 import io.github.pnoker.api.center.data.GrpcRPointValueStringList;

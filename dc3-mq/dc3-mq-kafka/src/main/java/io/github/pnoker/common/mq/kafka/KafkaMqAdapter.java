@@ -44,11 +44,11 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.listener.BatchAcknowledgingMessageListener;
 import org.springframework.kafka.listener.AcknowledgingMessageListener;
-import org.springframework.kafka.listener.MessageListenerContainer;
+import org.springframework.kafka.listener.BatchAcknowledgingMessageListener;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.Acknowledgment;
 
 import java.nio.charset.StandardCharsets;
@@ -156,6 +156,31 @@ public class KafkaMqAdapter implements BrokerAdapter {
         // messages published after it joins, instead of replaying the topic backlog.
         config.put(org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         return config;
+    }
+
+    /**
+     * Router key for one shared container: topic + group + delivery mode — specs with a
+     * different delivery mode keep their own container even on the same group.
+     */
+    private static String routeKey(SubscriptionSpec spec, String groupId) {
+        return spec.topic() + "|" + groupId + "|" + spec.delivery();
+    }
+
+    private static String deadLetterTopic(String topic) {
+        return topic + ".dlq";
+    }
+
+    /**
+     * Physical topic for a logical destination; logical dead topics map to the
+     * {@code .dlq} form so rejects and dead-letter subscriptions land on the same topic.
+     */
+    public static String topicName(MqTopic topic) {
+        return switch (topic) {
+            case POINT_VALUE_DEAD -> TOPIC_PREFIX + "point_value.dlq";
+            case POINT_COMMAND_DEAD -> TOPIC_PREFIX + "point_command.dlq";
+            case COMMAND_DEAD -> TOPIC_PREFIX + "command.dlq";
+            default -> TOPIC_PREFIX + topic.name().toLowerCase();
+        };
     }
 
     @Override
@@ -408,14 +433,6 @@ public class KafkaMqAdapter implements BrokerAdapter {
         return base;
     }
 
-    /**
-     * Router key for one shared container: topic + group + delivery mode — specs with a
-     * different delivery mode keep their own container even on the same group.
-     */
-    private static String routeKey(SubscriptionSpec spec, String groupId) {
-        return spec.topic() + "|" + groupId + "|" + spec.delivery();
-    }
-
     private WireMqDelivery deliveryOf(ConsumerRecord<String, byte[]> record, Acknowledgment springAck, boolean batch) {
         return new WireMqDelivery(record.value(), headersOf(record), false,
                 new KafkaAcknowledgment(springAck, List.of(record), batch));
@@ -457,23 +474,6 @@ public class KafkaMqAdapter implements BrokerAdapter {
             log.error("Kafka dead-letter publish failed, topic={}, offset={}", record.topic(), record.offset(), e);
             return false;
         }
-    }
-
-    private static String deadLetterTopic(String topic) {
-        return topic + ".dlq";
-    }
-
-    /**
-     * Physical topic for a logical destination; logical dead topics map to the
-     * {@code .dlq} form so rejects and dead-letter subscriptions land on the same topic.
-     */
-    public static String topicName(MqTopic topic) {
-        return switch (topic) {
-            case POINT_VALUE_DEAD -> TOPIC_PREFIX + "point_value.dlq";
-            case POINT_COMMAND_DEAD -> TOPIC_PREFIX + "point_command.dlq";
-            case COMMAND_DEAD -> TOPIC_PREFIX + "command.dlq";
-            default -> TOPIC_PREFIX + topic.name().toLowerCase();
-        };
     }
 
     /**

@@ -23,5 +23,5 @@ metadata:
     { { - include "dc3.labels" . | nindent 4 } }
 data:
   { { - range $k, $v := .Values.config } }
-  { { $k } }: { { $v | quote } }
-  { { - end } }
+    { { $k } }: { { $v | quote } }
+    { { - end } }

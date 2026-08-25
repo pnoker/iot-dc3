@@ -63,16 +63,6 @@ public final class DriverMetadata {
      * Fencing tokens for devices currently owned by this runtime node.
      */
     private final Map<Long, Long> deviceFencingTokens = new ConcurrentHashMap<>();
-
-    /**
-     * Manager-issued instance lease deadline.
-     */
-    private volatile long leaseUntilEpochMillis;
-
-    /**
-     * Manager assignment generation currently installed in this runtime.
-     */
-    private volatile long assignmentVersion;
     /**
      * Driver attributes keyed by attribute identifier.
      */
@@ -105,6 +95,14 @@ public final class DriverMetadata {
      * Event attributes keyed by attribute code.
      */
     private final Map<String, EventAttributeDTO> eventAttributeNameMap = new ConcurrentHashMap<>();
+    /**
+     * Manager-issued instance lease deadline.
+     */
+    private volatile long leaseUntilEpochMillis;
+    /**
+     * Manager assignment generation currently installed in this runtime.
+     */
+    private volatile long assignmentVersion;
     /**
      * Current driver status.
      */

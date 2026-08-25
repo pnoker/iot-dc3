@@ -19,10 +19,16 @@
 // this for conditional rendering (e.g. table vs card list); layout that only
 // needs CSS keeps using el-col responsive props / media queries.
 
-import {computed, type ComputedRef, type Ref} from 'vue';
+import { computed, type ComputedRef, type Ref } from "vue";
 
-import {BREAKPOINTS, deviceClassOf, downQuery, type Breakpoint, type DeviceClass} from '@/config/constant/breakpoints';
-import {useMediaQuery} from '@/composables/useMediaQuery';
+import {
+  type Breakpoint,
+  BREAKPOINTS,
+  type DeviceClass,
+  deviceClassOf,
+  downQuery,
+} from "@/config/constant/breakpoints";
+import { useMediaQuery } from "@/composables/useMediaQuery";
 
 export interface BreakpointState {
   /** Current tier — tiers are mutually exclusive (xs < sm < md < lg < xl). */
@@ -45,18 +51,24 @@ export interface BreakpointState {
  * lg/xl=desktop.
  */
 export const useBreakpoint = (): BreakpointState => {
-  const isXs = useMediaQuery(downQuery('sm'));
-  const isSm = useMediaQuery(`(min-width: ${BREAKPOINTS.sm}px) and ${downQuery('md')}`);
-  const isMd = useMediaQuery(`(min-width: ${BREAKPOINTS.md}px) and ${downQuery('lg')}`);
-  const isLg = useMediaQuery(`(min-width: ${BREAKPOINTS.lg}px) and ${downQuery('xl')}`);
+  const isXs = useMediaQuery(downQuery("sm"));
+  const isSm = useMediaQuery(
+    `(min-width: ${BREAKPOINTS.sm}px) and ${downQuery("md")}`,
+  );
+  const isMd = useMediaQuery(
+    `(min-width: ${BREAKPOINTS.md}px) and ${downQuery("lg")}`,
+  );
+  const isLg = useMediaQuery(
+    `(min-width: ${BREAKPOINTS.lg}px) and ${downQuery("xl")}`,
+  );
   const isXl = useMediaQuery(`(min-width: ${BREAKPOINTS.xl}px)`);
 
   const current = computed<Breakpoint>(() => {
-    if (isXl.value) return 'xl';
-    if (isLg.value) return 'lg';
-    if (isMd.value) return 'md';
-    if (isSm.value) return 'sm';
-    return 'xs';
+    if (isXl.value) return "xl";
+    if (isLg.value) return "lg";
+    if (isMd.value) return "md";
+    if (isSm.value) return "sm";
+    return "xs";
   });
 
   const device = computed<DeviceClass>(() => deviceClassOf(current.value));
@@ -64,9 +76,9 @@ export const useBreakpoint = (): BreakpointState => {
   return {
     current,
     device,
-    is: {xs: isXs, sm: isSm, md: isMd, lg: isLg, xl: isXl},
-    isMobile: computed(() => device.value === 'mobile'),
-    isTablet: computed(() => device.value === 'tablet'),
-    isDesktop: computed(() => device.value === 'desktop'),
+    is: { xs: isXs, sm: isSm, md: isMd, lg: isLg, xl: isXl },
+    isMobile: computed(() => device.value === "mobile"),
+    isTablet: computed(() => device.value === "tablet"),
+    isDesktop: computed(() => device.value === "desktop"),
   };
 };

@@ -17,23 +17,7 @@
 
 package io.github.pnoker.common.tsdb.tdengine;
 
-import io.github.pnoker.common.tsdb.model.TsdbModel.AggregateFunction;
-import io.github.pnoker.common.tsdb.model.TsdbModel.BucketAggregate;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CorrelationResult;
-import io.github.pnoker.common.tsdb.model.TsdbModel.Cursor;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CursorPage;
-import io.github.pnoker.common.tsdb.model.TsdbModel.DimensionCount;
-import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
-import io.github.pnoker.common.tsdb.model.TsdbModel.LatencyBin;
-import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbQueryTimeout;
-import io.github.pnoker.common.tsdb.model.TsdbModel.WindowAggregate;
+import io.github.pnoker.common.tsdb.model.TsdbModel.*;
 import io.github.pnoker.common.tsdb.spi.TsdbStore;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -97,15 +81,6 @@ public final class TdengineTsdbStore implements TsdbStore, AutoCloseable {
      * caller does not configure one.
      */
     private static final int DEFAULT_RETENTION_DAYS = 180;
-
-    private final DataSource dataSource;
-
-    private final String database;
-
-    private final String stable;
-
-    private final JdbcTemplate jdbc;
-
     private static final RowMapper<PointValueSample> SAMPLE_MAPPER = (rs, i) -> new PointValueSample(
             new SeriesKey(rs.getLong("tenant_id"), rs.getLong("device_id"), rs.getLong("point_id")),
             instantOfMicros(rs.getLong("create_time")), instantOfMicros(rs.getLong("operate_time")),
@@ -115,16 +90,20 @@ public final class TdengineTsdbStore implements TsdbStore, AutoCloseable {
             rs.getString("message_id"), rs.getInt("schema_version"),
             rs.getString("driver_node"), rs.getLong("sequence"),
             rs.getLong("fencing_token"), rs.getLong("driver_id"));
+    private final DataSource dataSource;
+    private final String database;
+    private final String stable;
+    private final JdbcTemplate jdbc;
 
     public TdengineTsdbStore(DataSource dataSource, String database) {
         this(dataSource, database, DEFAULT_RETENTION_DAYS);
     }
 
     /**
-     * @param dataSource   pooled TDengine REST datasource owned by this store
-     * @param database     database the adapter creates and owns
+     * @param dataSource    pooled TDengine REST datasource owned by this store
+     * @param database      database the adapter creates and owns
      * @param retentionDays raw retention in days ({@code KEEP}); affects freshly
-     *                     created databases only — existing ones keep their KEEP
+     *                      created databases only — existing ones keep their KEEP
      */
     public TdengineTsdbStore(DataSource dataSource, String database, int retentionDays) {
         this.dataSource = dataSource;
@@ -133,6 +112,40 @@ public final class TdengineTsdbStore implements TsdbStore, AutoCloseable {
         this.jdbc = new JdbcTemplate(dataSource);
         bootstrap(retentionDays);
     }
+
+    /**
+     * Whether the error chain reports a missing (sub)table. Subtables only
+     * materialize on first INSERT, so a series with no samples yet makes every
+     * table-direct path fail with "table does not exist" — that is an empty
+     * series, not an error. Database-level "not exist" must NOT match (the
+     * bootstrap owns the database).
+     */
+    private static boolean missingSubtable(Throwable error) {
+        for (Throwable cause = error; Objects.nonNull(cause); cause = cause.getCause()) {
+            String message = String.valueOf(cause.getMessage()).toLowerCase(Locale.ROOT);
+            if (message.contains("table") && message.contains("not exist")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static SeriesKey seriesOf(Map<String, Object> row) {
+        return new SeriesKey(((Number) row.get("tenant_id")).longValue(),
+                ((Number) row.get("device_id")).longValue(),
+                ((Number) row.get("point_id")).longValue());
+    }
+
+    private static long microsOf(Instant instant) {
+        return instant.getEpochSecond() * 1_000_000L + instant.getNano() / 1_000L;
+    }
+
+    private static Instant instantOfMicros(long micros) {
+        return Instant.ofEpochSecond(Math.floorDiv(micros, 1_000_000L),
+                Math.floorMod(micros, 1_000_000L) * 1000L);
+    }
+
+    // ===== writes =====
 
     private void bootstrap(int retentionDays) {
         jdbc.execute("CREATE DATABASE IF NOT EXISTS " + database + " PRECISION 'us' KEEP " + retentionDays);
@@ -173,6 +186,8 @@ public final class TdengineTsdbStore implements TsdbStore, AutoCloseable {
         }
     }
 
+    // ===== reads =====
+
     @Override
     public String type() {
         return "tdengine";
@@ -185,8 +200,6 @@ public final class TdengineTsdbStore implements TsdbStore, AutoCloseable {
                 RollupSupport.NONE, APPEND_CHUNK,
                 true, OrderingGuarantee.PER_SERIES, Precision.MICRO, true, false);
     }
-
-    // ===== writes =====
 
     @Override
     public int append(List<PointValueSample> samples) {
@@ -256,8 +269,6 @@ public final class TdengineTsdbStore implements TsdbStore, AutoCloseable {
         return written;
     }
 
-    // ===== reads =====
-
     @Override
     public Map<SeriesKey, List<PointValueSample>> last(SeriesFilter filter, int limit, TsdbDeadline deadline) {
         requireSeriesOrScan(filter);
@@ -305,6 +316,8 @@ public final class TdengineTsdbStore implements TsdbStore, AutoCloseable {
         }
         return new CursorPage<>(page, next);
     }
+
+    // ===== S13: tenant-level analytics =====
 
     @Override
     public Map<SeriesKey, WindowAggregate> aggregate(SeriesFilter filter, AggregateFunction fn,
@@ -440,8 +453,6 @@ public final class TdengineTsdbStore implements TsdbStore, AutoCloseable {
         return Objects.requireNonNullElse(value, 0L);
     }
 
-    // ===== S13: tenant-level analytics =====
-
     @Override
     public List<BucketAggregate> bucketedCount(long tenantId, TimeWindow window,
                                                Duration bucketWidth, TsdbDeadline deadline) {
@@ -454,6 +465,8 @@ public final class TdengineTsdbStore implements TsdbStore, AutoCloseable {
         return timed(deadline, t -> t.query(sql, (rs, i) -> new BucketAggregate(
                 instantOfMicros(rs.getLong(1)), null, rs.getLong(2)), args));
     }
+
+    // ===== operations =====
 
     @Override
     public List<DimensionCount> countByDimension(long tenantId, TimeWindow window,
@@ -501,14 +514,14 @@ public final class TdengineTsdbStore implements TsdbStore, AutoCloseable {
         return rows;
     }
 
+    // ===== helpers =====
+
     @Override
     public List<LatencyBin> latencyHistogram(long tenantId, TimeWindow window,
                                              List<Long> binEdgesMs, TsdbDeadline deadline) {
         throw new UnsupportedOperationException(
                 "TDengine adapter declares latencyHistogram=false; facades degrade to zero-filled bins");
     }
-
-    // ===== operations =====
 
     @Override
     public List<SeriesKey> listSeries(long tenantId, TimeWindow window, TsdbDeadline deadline) {
@@ -547,42 +560,8 @@ public final class TdengineTsdbStore implements TsdbStore, AutoCloseable {
                 "TDengine adapter declares correlation=false; facades compute from bucketed pulls");
     }
 
-    // ===== helpers =====
-
     private String subtable(SeriesKey series) {
         return database + ".pv_" + series.tenantId() + "_" + series.deviceId() + "_" + series.pointId();
-    }
-
-    /**
-     * Whether the error chain reports a missing (sub)table. Subtables only
-     * materialize on first INSERT, so a series with no samples yet makes every
-     * table-direct path fail with "table does not exist" — that is an empty
-     * series, not an error. Database-level "not exist" must NOT match (the
-     * bootstrap owns the database).
-     */
-    private static boolean missingSubtable(Throwable error) {
-        for (Throwable cause = error; Objects.nonNull(cause); cause = cause.getCause()) {
-            String message = String.valueOf(cause.getMessage()).toLowerCase(Locale.ROOT);
-            if (message.contains("table") && message.contains("not exist")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static SeriesKey seriesOf(Map<String, Object> row) {
-        return new SeriesKey(((Number) row.get("tenant_id")).longValue(),
-                ((Number) row.get("device_id")).longValue(),
-                ((Number) row.get("point_id")).longValue());
-    }
-
-    private static long microsOf(Instant instant) {
-        return instant.getEpochSecond() * 1_000_000L + instant.getNano() / 1_000L;
-    }
-
-    private static Instant instantOfMicros(long micros) {
-        return Instant.ofEpochSecond(Math.floorDiv(micros, 1_000_000L),
-                Math.floorMod(micros, 1_000_000L) * 1000L);
     }
 
     private void requireSeriesOrScan(SeriesFilter filter) {

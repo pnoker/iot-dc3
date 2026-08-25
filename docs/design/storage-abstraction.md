@@ -214,7 +214,7 @@ mappers portable or explicitly forked.
    preserved):
 
    | Concept | Timescale | TDengine 3 | InfluxDB 3 | IoTDB |
-      |---------|-----------|------------|------------|-------|
+         |---------|-----------|------------|------------|-------|
    | series identity | (tenant_id, device_id, point_id) PK | super table + tags `tenant/device/point` | measurement + tags | path `tenant.device.point` |
    | tenant scoping | WHERE tenant_id | tag filter (indexed) | tag filter | path prefix filter |
    | latest value | index / `DISTINCT ON` | `LAST()` | `last()` / SQL | `last` query |

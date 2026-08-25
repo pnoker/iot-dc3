@@ -17,22 +17,7 @@
 
 package io.github.pnoker.common.tsdb.spi;
 
-import io.github.pnoker.common.tsdb.model.TsdbModel.AggregateFunction;
-import io.github.pnoker.common.tsdb.model.TsdbModel.BucketAggregate;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CorrelationResult;
-import io.github.pnoker.common.tsdb.model.TsdbModel.Cursor;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CursorPage;
-import io.github.pnoker.common.tsdb.model.TsdbModel.DimensionCount;
-import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
-import io.github.pnoker.common.tsdb.model.TsdbModel.LatencyBin;
-import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
-import io.github.pnoker.common.tsdb.model.TsdbModel.WindowAggregate;
+import io.github.pnoker.common.tsdb.model.TsdbModel.*;
 
 import java.time.Duration;
 import java.util.List;
@@ -275,38 +260,6 @@ public interface TsdbStore {
                                   Duration alignBucket, TsdbDeadline deadline);
 
     /**
-     * Adapter capability declaration (§8 of the design). The startup negotiation log
-     * prints this row, mirroring the MQ port.
-     *
-     * @param gapFill             zero-fill empty buckets
-     * @param tenantWideScan      series-empty history/aggregate/count/last
-     * @param tenantWideAnalytics S13 facet
-     * @param latencyHistogram    S13-④ store-side
-     * @param percentile          S15 PERCENTILE
-     * @param rollupSupport       S16 tiered-rollup mode
-     * @param maxAppendBatch      S18 chunking threshold
-     * @param deleteRange         S10
-     * @param ordering            NONE | PER_SERIES
-     * @param precision           native timestamp precision
-     * @param backfill            out-of-order/late writes accepted
-     * @param correlation         S19 store-side correlation
-     */
-    record TsdbCapabilities(
-            boolean gapFill,
-            boolean tenantWideScan,
-            boolean tenantWideAnalytics,
-            boolean latencyHistogram,
-            boolean percentile,
-            RollupSupport rollupSupport,
-            int maxAppendBatch,
-            boolean deleteRange,
-            OrderingGuarantee ordering,
-            Precision precision,
-            boolean backfill,
-            boolean correlation) {
-    }
-
-    /**
      * S16 tiered-rollup support levels.
      */
     enum RollupSupport {
@@ -354,5 +307,37 @@ public interface TsdbStore {
          * Nanosecond precision.
          */
         NANO
+    }
+
+    /**
+     * Adapter capability declaration (§8 of the design). The startup negotiation log
+     * prints this row, mirroring the MQ port.
+     *
+     * @param gapFill             zero-fill empty buckets
+     * @param tenantWideScan      series-empty history/aggregate/count/last
+     * @param tenantWideAnalytics S13 facet
+     * @param latencyHistogram    S13-④ store-side
+     * @param percentile          S15 PERCENTILE
+     * @param rollupSupport       S16 tiered-rollup mode
+     * @param maxAppendBatch      S18 chunking threshold
+     * @param deleteRange         S10
+     * @param ordering            NONE | PER_SERIES
+     * @param precision           native timestamp precision
+     * @param backfill            out-of-order/late writes accepted
+     * @param correlation         S19 store-side correlation
+     */
+    record TsdbCapabilities(
+            boolean gapFill,
+            boolean tenantWideScan,
+            boolean tenantWideAnalytics,
+            boolean latencyHistogram,
+            boolean percentile,
+            RollupSupport rollupSupport,
+            int maxAppendBatch,
+            boolean deleteRange,
+            OrderingGuarantee ordering,
+            Precision precision,
+            boolean backfill,
+            boolean correlation) {
     }
 }

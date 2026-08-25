@@ -104,6 +104,69 @@ public abstract class AbstractJdbcDriverCustomService implements DriverCustomSer
     }
 
     /**
+     * Record a required-attribute error in the shared validation report shape.
+     *
+     * @param config attribute configuration map
+     * @param code   attribute code to require
+     * @param issues mutable issue list to append to
+     */
+    protected static void checkRequired(Map<String, AttributeBO> config, String code,
+                                        List<ValidationReport.AttributeIssue> issues) {
+        AttributeBO attr = config.get(code);
+        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+            issues.add(issue(code, "Missing required attribute: " + code));
+        }
+    }
+
+    /**
+     * Build an error-level attribute issue.
+     *
+     * @param code    attribute code
+     * @param message human-readable description
+     * @return error issue
+     */
+    protected static ValidationReport.AttributeIssue issue(String code, String message) {
+        return ValidationReport.AttributeIssue.builder()
+                .attributeCode(code)
+                .level(ValidationReport.IssueLevel.ERROR)
+                .message(message)
+                .build();
+    }
+
+    /**
+     * Count {@code ?} placeholder occurrences in SQL text.
+     * <p>
+     * The count is textual: a {@code ?} inside a string literal or comment is still counted,
+     * which is acceptable for configuration validation.
+     * </p>
+     *
+     * @param sql SQL text
+     * @return placeholder count
+     */
+    protected static int countPlaceholders(String sql) {
+        int count = 0;
+        for (int index = sql.indexOf('?'); index >= 0; index = sql.indexOf('?', index + 1)) {
+            count++;
+        }
+        return count;
+    }
+
+    /**
+     * Return the raw string value of an optional attribute, or {@code null} when absent or empty.
+     *
+     * @param config attribute configuration map
+     * @param code   attribute code
+     * @return raw value or {@code null}
+     */
+    protected static String getRawValue(Map<String, AttributeBO> config, String code) {
+        AttributeBO attr = config.get(code);
+        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+            return null;
+        }
+        return attr.getValue(String.class);
+    }
+
+    /**
      * Build the JDBC URL from driver configuration attributes.
      *
      * @param driverConfig driver attribute configuration map
@@ -474,68 +537,5 @@ public abstract class AbstractJdbcDriverCustomService implements DriverCustomSer
             throw new ConnectorException("Invalid integer driver attribute '{}', value={}",
                     code, attr.getValue(), e);
         }
-    }
-
-    /**
-     * Record a required-attribute error in the shared validation report shape.
-     *
-     * @param config attribute configuration map
-     * @param code   attribute code to require
-     * @param issues mutable issue list to append to
-     */
-    protected static void checkRequired(Map<String, AttributeBO> config, String code,
-                                        List<ValidationReport.AttributeIssue> issues) {
-        AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
-            issues.add(issue(code, "Missing required attribute: " + code));
-        }
-    }
-
-    /**
-     * Build an error-level attribute issue.
-     *
-     * @param code    attribute code
-     * @param message human-readable description
-     * @return error issue
-     */
-    protected static ValidationReport.AttributeIssue issue(String code, String message) {
-        return ValidationReport.AttributeIssue.builder()
-                .attributeCode(code)
-                .level(ValidationReport.IssueLevel.ERROR)
-                .message(message)
-                .build();
-    }
-
-    /**
-     * Count {@code ?} placeholder occurrences in SQL text.
-     * <p>
-     * The count is textual: a {@code ?} inside a string literal or comment is still counted,
-     * which is acceptable for configuration validation.
-     * </p>
-     *
-     * @param sql SQL text
-     * @return placeholder count
-     */
-    protected static int countPlaceholders(String sql) {
-        int count = 0;
-        for (int index = sql.indexOf('?'); index >= 0; index = sql.indexOf('?', index + 1)) {
-            count++;
-        }
-        return count;
-    }
-
-    /**
-     * Return the raw string value of an optional attribute, or {@code null} when absent or empty.
-     *
-     * @param config attribute configuration map
-     * @param code   attribute code
-     * @return raw value or {@code null}
-     */
-    protected static String getRawValue(Map<String, AttributeBO> config, String code) {
-        AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
-            return null;
-        }
-        return attr.getValue(String.class);
     }
 }

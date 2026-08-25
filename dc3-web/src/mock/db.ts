@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {devices, drivers, points, profiles} from './seed/entities';
+import { devices, drivers, points, profiles } from "./seed/entities";
 import {
   identityAudits,
   localCredentials,
@@ -26,7 +26,7 @@ import {
   serviceAccounts,
   tenantMemberships,
   users,
-} from './seed/auth';
+} from "./seed/auth";
 import {
   apis,
   attributeConfigs,
@@ -38,7 +38,7 @@ import {
   groups,
   labels,
   resources,
-} from './seed/manager';
+} from "./seed/manager";
 import {
   alarmChannelBinds,
   alarmChannels,
@@ -47,7 +47,7 @@ import {
   alarmNotifies,
   alarmRules,
   alarmRuleStates,
-} from './seed/data';
+} from "./seed/data";
 import {
   agenticModelConfigs,
   agenticProviders,
@@ -55,13 +55,13 @@ import {
   mcpClients,
   mcpConnections,
   mcpTools,
-} from './seed/agentic';
+} from "./seed/agentic";
 import {
   agenticActions,
   agenticAttachments,
   agenticMessages,
   agenticSessions,
-} from './seed/agentic-conversations';
+} from "./seed/agentic-conversations";
 
 /**
  * Mutable in-memory store. add/update/delete handlers mutate these arrays so a
@@ -111,7 +111,7 @@ export interface MockDb {
   mcpAudits: Record<string, unknown>[];
 }
 
-const copy = <T>(rows: T[]): T[] => rows.map((r) => ({...r}));
+const copy = <T>(rows: T[]): T[] => rows.map((r) => ({ ...r }));
 
 export const db: MockDb = {
   drivers: copy(drivers),

@@ -47,6 +47,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class QuartzService {
 
+    private final Scheduler scheduler;
+
     /**
      * Create the scheduler service.
      *
@@ -55,8 +57,6 @@ public class QuartzService {
     public QuartzService(Scheduler scheduler) {
         this.scheduler = scheduler;
     }
-
-    private final Scheduler scheduler;
 
     private static void validateIdentity(String group, String name, Class<? extends Job> jobClass) {
         if (Objects.isNull(group) || group.isBlank()) {

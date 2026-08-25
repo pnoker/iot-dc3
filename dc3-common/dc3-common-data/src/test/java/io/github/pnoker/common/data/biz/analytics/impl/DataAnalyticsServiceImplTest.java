@@ -56,10 +56,9 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
@@ -96,16 +95,6 @@ class DataAnalyticsServiceImplTest {
     @InjectMocks
     private DataAnalyticsServiceImpl service;
 
-    @BeforeEach
-    void stubCapabilities() {
-        lenient().when(tsdbStore.capabilities()).thenReturn(new TsdbStore.TsdbCapabilities(
-                false, true, true, true, true,
-                TsdbStore.RollupSupport.NONE, 5000, true,
-                TsdbStore.OrderingGuarantee.PER_SERIES, TsdbStore.Precision.MICRO, true, true));
-        lenient().when(deviceFacade.getById(TENANT, 10L)).thenReturn(device(10L, "boiler-1"));
-        lenient().when(pointFacade.getById(TENANT, 20L)).thenReturn(point(20L, "temp"));
-    }
-
     private static FacadeDeviceBO device(Long id, String name) {
         FacadeDeviceBO device = new FacadeDeviceBO();
         device.setId(id);
@@ -122,6 +111,16 @@ class DataAnalyticsServiceImplTest {
 
     private static PointValueSample sample(SeriesKey series, Instant time, double value) {
         return PointValueSample.simple(series, time, value);
+    }
+
+    @BeforeEach
+    void stubCapabilities() {
+        lenient().when(tsdbStore.capabilities()).thenReturn(new TsdbStore.TsdbCapabilities(
+                false, true, true, true, true,
+                TsdbStore.RollupSupport.NONE, 5000, true,
+                TsdbStore.OrderingGuarantee.PER_SERIES, TsdbStore.Precision.MICRO, true, true));
+        lenient().when(deviceFacade.getById(TENANT, 10L)).thenReturn(device(10L, "boiler-1"));
+        lenient().when(pointFacade.getById(TENANT, 20L)).thenReturn(point(20L, "temp"));
     }
 
     @Test

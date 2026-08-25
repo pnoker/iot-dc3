@@ -74,12 +74,10 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    @Value("${dc3.driver.code}")
-    private String driverCode;
-
     private final Map<String, String> dataByDevEui = new ConcurrentHashMap<>();
     private final Map<String, Map<String, String>> objectByDevEui = new ConcurrentHashMap<>();
-
+    @Value("${dc3.driver.code}")
+    private String driverCode;
     private MqttClient mqttClient;
     private volatile boolean connected;
 

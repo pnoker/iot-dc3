@@ -19,44 +19,46 @@
 // contract of docs/design/frontend-three-terminal-ux.md. Hand-rolled px
 // thresholds reintroduce desktop-first drift one patch at a time.
 
-import {readdirSync, readFileSync, statSync} from 'node:fs';
-import {join, relative} from 'node:path';
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join, relative } from "node:path";
 
-import {describe, expect, it} from 'vitest';
+import { describe, expect, it } from "vitest";
 
 const root = process.cwd();
-const srcDir = join(root, 'src');
+const srcDir = join(root, "src");
 
 // Media features that are width thresholds (allowed: prefers-*,
 // prefers-reduced-motion, print, and any non-width query).
 const WIDTH_MEDIA = /@media[^{]*\((?:max|min)-width\s*:\s*([^)]+)\)/g;
 
 function walk(dir: string): string[] {
-    return readdirSync(dir).flatMap((entry) => {
-        const path = join(dir, entry);
-        if (statSync(path).isDirectory()) return walk(path);
-        return /\.(vue|scss)$/.test(path) ? [path] : [];
-    });
+  return readdirSync(dir).flatMap((entry) => {
+    const path = join(dir, entry);
+    if (statSync(path).isDirectory()) return walk(path);
+    return /\.(vue|scss)$/.test(path) ? [path] : [];
+  });
 }
 
 function findViolations(): string[] {
-    const violations: string[] = [];
-    for (const path of walk(srcDir)) {
-        const content = readFileSync(path, 'utf8');
-        for (const match of content.matchAll(WIDTH_MEDIA)) {
-            const value = match[1].trim();
-            if (!value.startsWith('$breakpoint-')) {
-                const line = content.slice(0, match.index).split('\n').length;
-                violations.push(`${relative(root, path)}:${line} — @media width "${value}" is not a $breakpoint-* token`);
-            }
-        }
+  const violations: string[] = [];
+  for (const path of walk(srcDir)) {
+    const content = readFileSync(path, "utf8");
+    for (const match of content.matchAll(WIDTH_MEDIA)) {
+      const value = match[1].trim();
+      if (!value.startsWith("$breakpoint-")) {
+        const line = content.slice(0, match.index).split("\n").length;
+        violations.push(
+          `${relative(root, path)}:${line} — @media width "${value}" is not a $breakpoint-* token`,
+        );
+      }
     }
-    return violations;
+  }
+  return violations;
 }
 
-describe('three-terminal breakpoint contract (A5)', () => {
-    it('all @media width breakpoints use $breakpoint-* tokens', () => {
-        const violations = findViolations();
-        expect(violations, violations.join('\n')).toEqual([]);
-    });
+describe("three-terminal breakpoint contract (A5)", () => {
+  it("all @media width breakpoints use $breakpoint-* tokens", () => {
+    const violations = findViolations();
+    expect(violations, violations.join("\n")).toEqual([]);
+  });
 });

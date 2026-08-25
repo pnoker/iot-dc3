@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.driver.service.impl;
 
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.driver.buffer.BufferService;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
@@ -32,7 +33,6 @@ import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.mq.message.MqMessage;
-import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.mq.sender.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,8 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Implements point-value dispatch to the data center via RabbitMQ.

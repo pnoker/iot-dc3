@@ -117,6 +117,70 @@ public class MqttMqAdapter implements BrokerAdapter {
         this.publishClient = client("dc3-mq-publisher-" + UUID.randomUUID());
     }
 
+    private static byte[] bytesOf(ByteBuffer buffer) {
+        byte[] bytes = new byte[buffer.remaining()];
+        buffer.get(bytes);
+        return bytes;
+    }
+
+    private static Map<String, String> headersOf(Mqtt5Publish publish) {
+        Map<String, String> headers = new HashMap<>();
+        publish.getUserProperties().asList()
+                .forEach(property -> headers.put(property.getName().toString(),
+                        property.getValue().toString()));
+        return headers;
+    }
+
+    /**
+     * The partition key for routing: MQTT has no native key field, so it rides the
+     * wire as the {@code dc3-partition-key} user property.
+     */
+    private static String keyOf(Mqtt5Publish publish) {
+        return headersOf(publish).get(MqHeaders.PARTITION_KEY);
+    }
+
+    /**
+     * LOAD_BALANCE rides a shared subscription (dead-letter destinations are plain —
+     * they are point-to-point sinks); BROADCAST rides a plain filter.
+     */
+    private static String filterOf(SubscriptionSpec spec) {
+        String filter = topicName(spec.topic());
+        if (isDeadLetterTopic(spec.topic()) || spec.mode() == SubscriptionMode.BROADCAST) {
+            return filter;
+        }
+        String share = spec.group().isBlank() ? DEFAULT_SHARE : spec.group();
+        return "$share/" + share + "/" + filter;
+    }
+
+    /**
+     * Router key for one shared session: topic + share group + delivery mode; a
+     * BROADCAST spec always gets its own per-instance key.
+     */
+    private static String routeKey(SubscriptionSpec spec) {
+        String share = spec.mode() == SubscriptionMode.BROADCAST || isDeadLetterTopic(spec.topic())
+                ? "broadcast-" + UUID.randomUUID()
+                : (spec.group().isBlank() ? DEFAULT_SHARE : spec.group());
+        return spec.topic() + "|" + share + "|" + spec.delivery();
+    }
+
+    private static boolean isDeadLetterTopic(MqTopic topic) {
+        return topic == MqTopic.POINT_VALUE_DEAD || topic == MqTopic.POINT_COMMAND_DEAD
+                || topic == MqTopic.COMMAND_DEAD;
+    }
+
+    private static String topicName(MqTopic topic) {
+        return switch (topic) {
+            case POINT_VALUE_DEAD -> "dc3/point_value/dlq";
+            case POINT_COMMAND_DEAD -> "dc3/point_command/dlq";
+            case COMMAND_DEAD -> "dc3/command/dlq";
+            default -> "dc3/" + topic.name().toLowerCase();
+        };
+    }
+
+    private static String deadLetterTopic(MqTopic topic) {
+        return topicName(topic) + "/dlq";
+    }
+
     /**
      * Client factory shared by the publisher and every subscription session.
      */
@@ -208,6 +272,72 @@ public class MqttMqAdapter implements BrokerAdapter {
         });
         subscriptions.clear();
         publishClient.disconnect();
+    }
+
+    private WireMqDelivery deliveryOf(Pending pending, Acknowledgment acknowledgment) {
+        byte[] body = pending.publish().getPayload().map(MqttMqAdapter::bytesOf).orElse(new byte[0]);
+        return new WireMqDelivery(body, headersOf(pending.publish()), pending.attempt() > 1, acknowledgment);
+    }
+
+    private Mqtt5Publish publishOf(WireMqMessage wire) {
+        com.hivemq.client.mqtt.mqtt5.datatypes.Mqtt5UserPropertiesBuilder properties =
+                com.hivemq.client.mqtt.mqtt5.datatypes.Mqtt5UserProperties.builder();
+        wire.headers().forEach((key, value) -> {
+            if (Objects.nonNull(value)) {
+                properties.add(key, value);
+            }
+        });
+        if (Objects.nonNull(wire.partitionKey()) && !wire.partitionKey().isBlank()) {
+            properties.add(MqHeaders.PARTITION_KEY, wire.partitionKey());
+        }
+        return Mqtt5Publish.builder()
+                .topic(topicName(wire.topic()))
+                .qos(MqttQos.AT_LEAST_ONCE)
+                .payload(ByteBuffer.wrap(wire.body()))
+                .userProperties(properties.build())
+                .build();
+    }
+
+    private Mqtt5Subscribe subscribeOf(SubscriptionSpec spec) {
+        return Mqtt5Subscribe.builder()
+                .topicFilter(filterOf(spec))
+                .qos(MqttQos.AT_LEAST_ONCE)
+                .build();
+    }
+
+    /**
+     * A publish in flight through the internal queue together with its attempt number
+     * (bounded client-side redelivery).
+     */
+    private record Pending(Mqtt5Publish publish, int attempt) {
+    }
+
+    /**
+     * ack acknowledges the publish (QoS 1); reject(true) re-enqueues for bounded
+     * client-side redelivery with the carried attempt counter (MQTT has no server
+     * nack, exhaustion dead-letters); reject(false) dead-letters.
+     */
+    private record MqttAcknowledgment(Pending pending, Dispatcher dispatcher) implements Acknowledgment {
+
+        @Override
+        public void ack() {
+            pending.publish().acknowledge();
+        }
+
+        @Override
+        public void reject(boolean requeue) {
+            if (requeue) {
+                dispatcher.requeue(pending);
+                return;
+            }
+            dispatcher.deadLetter(pending.publish());
+        }
+    }
+
+    /**
+     * One broker session: the shared (or broadcast) client plus its dispatcher.
+     */
+    private record Subscription(Mqtt5AsyncClient client, Dispatcher dispatcher, String routeKey) {
     }
 
     /**
@@ -441,135 +571,5 @@ public class MqttMqAdapter implements BrokerAdapter {
                 Thread.currentThread().interrupt();
             }
         }
-    }
-
-    /**
-     * A publish in flight through the internal queue together with its attempt number
-     * (bounded client-side redelivery).
-     */
-    private record Pending(Mqtt5Publish publish, int attempt) {
-    }
-
-    /**
-     * ack acknowledges the publish (QoS 1); reject(true) re-enqueues for bounded
-     * client-side redelivery with the carried attempt counter (MQTT has no server
-     * nack, exhaustion dead-letters); reject(false) dead-letters.
-     */
-    private record MqttAcknowledgment(Pending pending, Dispatcher dispatcher) implements Acknowledgment {
-
-        @Override
-        public void ack() {
-            pending.publish().acknowledge();
-        }
-
-        @Override
-        public void reject(boolean requeue) {
-            if (requeue) {
-                dispatcher.requeue(pending);
-                return;
-            }
-            dispatcher.deadLetter(pending.publish());
-        }
-    }
-
-    /**
-     * One broker session: the shared (or broadcast) client plus its dispatcher.
-     */
-    private record Subscription(Mqtt5AsyncClient client, Dispatcher dispatcher, String routeKey) {
-    }
-
-    private WireMqDelivery deliveryOf(Pending pending, Acknowledgment acknowledgment) {
-        byte[] body = pending.publish().getPayload().map(MqttMqAdapter::bytesOf).orElse(new byte[0]);
-        return new WireMqDelivery(body, headersOf(pending.publish()), pending.attempt() > 1, acknowledgment);
-    }
-
-    private static byte[] bytesOf(ByteBuffer buffer) {
-        byte[] bytes = new byte[buffer.remaining()];
-        buffer.get(bytes);
-        return bytes;
-    }
-
-    private static Map<String, String> headersOf(Mqtt5Publish publish) {
-        Map<String, String> headers = new HashMap<>();
-        publish.getUserProperties().asList()
-                .forEach(property -> headers.put(property.getName().toString(),
-                        property.getValue().toString()));
-        return headers;
-    }
-
-    /**
-     * The partition key for routing: MQTT has no native key field, so it rides the
-     * wire as the {@code dc3-partition-key} user property.
-     */
-    private static String keyOf(Mqtt5Publish publish) {
-        return headersOf(publish).get(MqHeaders.PARTITION_KEY);
-    }
-
-    private Mqtt5Publish publishOf(WireMqMessage wire) {
-        com.hivemq.client.mqtt.mqtt5.datatypes.Mqtt5UserPropertiesBuilder properties =
-                com.hivemq.client.mqtt.mqtt5.datatypes.Mqtt5UserProperties.builder();
-        wire.headers().forEach((key, value) -> {
-            if (Objects.nonNull(value)) {
-                properties.add(key, value);
-            }
-        });
-        if (Objects.nonNull(wire.partitionKey()) && !wire.partitionKey().isBlank()) {
-            properties.add(MqHeaders.PARTITION_KEY, wire.partitionKey());
-        }
-        return Mqtt5Publish.builder()
-                .topic(topicName(wire.topic()))
-                .qos(MqttQos.AT_LEAST_ONCE)
-                .payload(ByteBuffer.wrap(wire.body()))
-                .userProperties(properties.build())
-                .build();
-    }
-
-    private Mqtt5Subscribe subscribeOf(SubscriptionSpec spec) {
-        return Mqtt5Subscribe.builder()
-                .topicFilter(filterOf(spec))
-                .qos(MqttQos.AT_LEAST_ONCE)
-                .build();
-    }
-
-    /**
-     * LOAD_BALANCE rides a shared subscription (dead-letter destinations are plain —
-     * they are point-to-point sinks); BROADCAST rides a plain filter.
-     */
-    private static String filterOf(SubscriptionSpec spec) {
-        String filter = topicName(spec.topic());
-        if (isDeadLetterTopic(spec.topic()) || spec.mode() == SubscriptionMode.BROADCAST) {
-            return filter;
-        }
-        String share = spec.group().isBlank() ? DEFAULT_SHARE : spec.group();
-        return "$share/" + share + "/" + filter;
-    }
-
-    /**
-     * Router key for one shared session: topic + share group + delivery mode; a
-     * BROADCAST spec always gets its own per-instance key.
-     */
-    private static String routeKey(SubscriptionSpec spec) {
-        String share = spec.mode() == SubscriptionMode.BROADCAST || isDeadLetterTopic(spec.topic())
-                ? "broadcast-" + UUID.randomUUID()
-                : (spec.group().isBlank() ? DEFAULT_SHARE : spec.group());
-        return spec.topic() + "|" + share + "|" + spec.delivery();
-    }
-
-    private static boolean isDeadLetterTopic(MqTopic topic) {
-        return topic == MqTopic.POINT_VALUE_DEAD || topic == MqTopic.POINT_COMMAND_DEAD
-                || topic == MqTopic.COMMAND_DEAD;
-    }
-
-    private static String topicName(MqTopic topic) {
-        return switch (topic) {
-            case POINT_VALUE_DEAD -> "dc3/point_value/dlq";
-            case POINT_COMMAND_DEAD -> "dc3/point_command/dlq";
-            case COMMAND_DEAD -> "dc3/command/dlq";
-            default -> "dc3/" + topic.name().toLowerCase();
-        };
-    }
-
-    private static String deadLetterTopic(MqTopic topic) {
-        return topicName(topic) + "/dlq";
     }
 }

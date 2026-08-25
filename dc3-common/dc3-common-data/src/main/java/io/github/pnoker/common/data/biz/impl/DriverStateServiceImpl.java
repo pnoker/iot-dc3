@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DriverAlarmService;
 import io.github.pnoker.common.data.biz.DriverStateService;
@@ -29,7 +30,6 @@ import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.TimeoutSourceTypeEnum;
-import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.mq.message.MqMessage;
 import io.github.pnoker.common.mq.sender.MessageSender;
 import lombok.RequiredArgsConstructor;

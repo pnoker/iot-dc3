@@ -21,7 +21,6 @@ import io.github.pnoker.common.data.biz.store.IngestIdempotencyWindow;
 import io.github.pnoker.common.data.biz.store.PointValueIngestService;
 import io.github.pnoker.common.data.biz.store.PointValueSampleConverter;
 import io.github.pnoker.common.data.entity.builder.PointValueBuilder;
-import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.data.mapper.PointValueMapper;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.facade.api.DeviceFacade;
@@ -35,12 +34,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Default ingest orchestration (docs/design/tsdb-abstraction.md §9.1/§9.2).

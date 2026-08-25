@@ -31,11 +31,9 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
-import javax.sql.DataSource;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -60,6 +58,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 abstract class AbstractDbDialectContractTest {
 
     private static long idSeq = System.currentTimeMillis();
+    /**
+     * One factory per database, mirroring the production @DS wiring: the mappers
+     * under test span four databases (dc3_data state, dc3_history latest,
+     * dc3_manager leases, dc3_auth catalog); table names stay unqualified and
+     * resolve against the connection's selected database/schema.
+     */
+    private final java.util.Map<String, SqlSessionFactory> factories = new java.util.HashMap<>();
+
+    private static long freshId() {
+        return ++idSeq;
+    }
+
+    /**
+     * The platform time convention: DATETIME(6) stored and compared in UTC.
+     */
+    private static LocalDateTime nowUtc() {
+        return LocalDateTime.now(java.time.ZoneOffset.UTC);
+    }
 
     /**
      * JDBC url of the engine under test for the given database (seed loaded).
@@ -79,14 +95,6 @@ abstract class AbstractDbDialectContractTest {
      * JDBC driver class for the engine under test.
      */
     protected abstract String driverClass();
-
-    /**
-     * One factory per database, mirroring the production @DS wiring: the mappers
-     * under test span four databases (dc3_data state, dc3_history latest,
-     * dc3_manager leases, dc3_auth catalog); table names stay unqualified and
-     * resolve against the connection's selected database/schema.
-     */
-    private final java.util.Map<String, SqlSessionFactory> factories = new java.util.HashMap<>();
 
     private SqlSessionFactory factoryFor(String database) {
         return factories.computeIfAbsent(database, name -> {
@@ -127,17 +135,6 @@ abstract class AbstractDbDialectContractTest {
 
     private SqlSession open(String database) {
         return factoryFor(database).openSession(true);
-    }
-
-    private static long freshId() {
-        return ++idSeq;
-    }
-
-    /**
-     * The platform time convention: DATETIME(6) stored and compared in UTC.
-     */
-    private static LocalDateTime nowUtc() {
-        return LocalDateTime.now(java.time.ZoneOffset.UTC);
     }
 
     // ===== 1) fenced latest-value upsert (PointValueMapper.upsertLatestBatch) =====
@@ -487,9 +484,6 @@ abstract class AbstractDbDialectContractTest {
         return valueDO;
     }
 
-    private record LeaseRow(long driverId, long fencingToken) {
-    }
-
     private LeaseRow leaseRow(SqlSession session, long tenant, long device) {
         try (var ps = session.getConnection().prepareStatement(
                 "SELECT driver_id, fencing_token FROM dc3_device_lease WHERE tenant_id=? AND device_id=?")) {
@@ -555,5 +549,8 @@ abstract class AbstractDbDialectContractTest {
                 return rs.next() ? rs.getLong(1) : -1L;
             }
         }
+    }
+
+    private record LeaseRow(long driverId, long fencingToken) {
     }
 }

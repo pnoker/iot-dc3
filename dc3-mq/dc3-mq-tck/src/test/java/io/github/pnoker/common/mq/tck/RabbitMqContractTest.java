@@ -52,20 +52,6 @@ class RabbitMqContractTest extends AbstractMqContractTest {
     private CachingConnectionFactory connectionFactory;
     private RabbitMqAdapter rabbitAdapter;
 
-    @Override
-    protected BrokerAdapter adapter() {
-        if (Objects.isNull(rabbitAdapter)) {
-            connectionFactory = new CachingConnectionFactory(java.net.URI.create(RABBIT.getAmqpUrl()));
-            connectionFactory.setPublisherConfirmType(CachingConnectionFactory.ConfirmType.CORRELATED);
-            connectionFactory.setPublisherReturns(true);
-            RabbitTemplate template = new RabbitTemplate(connectionFactory);
-            template.setMandatory(true);
-            RabbitAdmin admin = new RabbitAdmin(connectionFactory);
-            rabbitAdapter = new RabbitMqAdapter(template, admin, connectionFactory, fastProperties(), 300_000);
-        }
-        return rabbitAdapter;
-    }
-
     private static BatchConsumerProperties fastProperties() {
         BatchConsumerProperties properties = new BatchConsumerProperties();
         properties.setBatchSize(10);
@@ -78,6 +64,20 @@ class RabbitMqContractTest extends AbstractMqContractTest {
         properties.setRetryMultiplier(2);
         properties.setRetryMaxIntervalMillis(200);
         return properties;
+    }
+
+    @Override
+    protected BrokerAdapter adapter() {
+        if (Objects.isNull(rabbitAdapter)) {
+            connectionFactory = new CachingConnectionFactory(java.net.URI.create(RABBIT.getAmqpUrl()));
+            connectionFactory.setPublisherConfirmType(CachingConnectionFactory.ConfirmType.CORRELATED);
+            connectionFactory.setPublisherReturns(true);
+            RabbitTemplate template = new RabbitTemplate(connectionFactory);
+            template.setMandatory(true);
+            RabbitAdmin admin = new RabbitAdmin(connectionFactory);
+            rabbitAdapter = new RabbitMqAdapter(template, admin, connectionFactory, fastProperties(), 300_000);
+        }
+        return rabbitAdapter;
     }
 
     @Override

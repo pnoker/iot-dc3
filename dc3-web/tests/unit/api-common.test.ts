@@ -15,37 +15,63 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  crudAdd,
+  crudDelete,
+  crudGetById,
+  crudList,
+  crudUpdate,
+  httpGet,
+  httpPost,
+} from "@/api/common";
 
-const {requestMock} = vi.hoisted(() => ({requestMock: vi.fn()}));
+const { requestMock } = vi.hoisted(() => ({ requestMock: vi.fn() }));
 
-vi.mock('@/config/axios', () => ({default: requestMock}));
+vi.mock("@/config/axios", () => ({ default: requestMock }));
 
-import {crudAdd, crudDelete, crudGetById, crudList, crudUpdate, httpGet, httpPost} from '@/api/common';
-
-describe('shared API transport helpers', () => {
+describe("shared API transport helpers", () => {
   beforeEach(() => {
     requestMock.mockReset();
-    requestMock.mockResolvedValue({ok: true});
+    requestMock.mockResolvedValue({ ok: true });
   });
 
-  it('maps HTTP and CRUD helpers to the expected Axios request shape', async () => {
-    await httpGet('/health', {params: {verbose: true}});
-    await httpPost('/command', {value: 42}, {timeout: 1000});
-    await crudAdd('/device', {name: 'pump'});
-    await crudUpdate('/device', {id: '7', name: 'pump-2'});
-    await crudDelete('/device', '7');
-    await crudGetById('/device', '7');
-    await crudList('/device', {page: {current: 1, size: 20}});
+  it("maps HTTP and CRUD helpers to the expected Axios request shape", async () => {
+    await httpGet("/health", { params: { verbose: true } });
+    await httpPost("/command", { value: 42 }, { timeout: 1000 });
+    await crudAdd("/device", { name: "pump" });
+    await crudUpdate("/device", { id: "7", name: "pump-2" });
+    await crudDelete("/device", "7");
+    await crudGetById("/device", "7");
+    await crudList("/device", { page: { current: 1, size: 20 } });
 
     expect(requestMock.mock.calls).toEqual([
-      [{params: {verbose: true}, url: '/health', method: 'get'}],
-      [{timeout: 1000, url: '/command', method: 'post', data: {value: 42}}],
-      [{url: '/device/add', method: 'post', data: {name: 'pump'}}],
-      [{url: '/device/update', method: 'post', data: {id: '7', name: 'pump-2'}}],
-      [{params: {id: '7'}, url: '/device/delete', method: 'post', data: undefined}],
-      [{params: {id: '7'}, url: '/device/get_by_id', method: 'get'}],
-      [{url: '/device/list', method: 'post', data: {page: {current: 1, size: 20}}}],
+      [{ params: { verbose: true }, url: "/health", method: "get" }],
+      [{ timeout: 1000, url: "/command", method: "post", data: { value: 42 } }],
+      [{ url: "/device/add", method: "post", data: { name: "pump" } }],
+      [
+        {
+          url: "/device/update",
+          method: "post",
+          data: { id: "7", name: "pump-2" },
+        },
+      ],
+      [
+        {
+          params: { id: "7" },
+          url: "/device/delete",
+          method: "post",
+          data: undefined,
+        },
+      ],
+      [{ params: { id: "7" }, url: "/device/get_by_id", method: "get" }],
+      [
+        {
+          url: "/device/list",
+          method: "post",
+          data: { page: { current: 1, size: 20 } },
+        },
+      ],
     ]);
   });
 });

@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.data.rabbit;
 
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.dal.EntityStateManager;
@@ -31,7 +32,6 @@ import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
-import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;

@@ -111,6 +111,126 @@ public class ActiveMqAdapter implements BrokerAdapter {
         this.publishContext = connectionFactory.createContext(JMSContext.CLIENT_ACKNOWLEDGE);
     }
 
+    /**
+     * Consumer for a subscription: dead-letter destinations are queues; live topics are
+     * JMS topics where LOAD_BALANCE rides a shared durable subscription named after the
+     * consumer group and BROADCAST rides a plain per-instance consumer.
+     */
+    private static MessageConsumer consumerOf(SubscriptionSpec spec, Session session) throws JMSException {
+        if (isDeadLetterTopic(spec.topic())) {
+            return session.createConsumer(session.createQueue(destinationName(spec.topic())));
+        }
+        Topic topic = session.createTopic(destinationName(spec.topic()));
+        if (spec.mode() == SubscriptionMode.BROADCAST) {
+            return session.createConsumer(topic);
+        }
+        String subscription = spec.group().isBlank() ? DEFAULT_SUBSCRIPTION : spec.group();
+        return session.createSharedDurableConsumer(topic, subscription);
+    }
+
+    private static String subscriptionSuffix(SubscriptionSpec spec) {
+        if (spec.mode() != SubscriptionMode.LOAD_BALANCE || spec.group().isBlank()) {
+            return "";
+        }
+        return " (" + spec.group() + ")";
+    }
+
+    /**
+     * Router key for one shared consumer: topic + subscription + delivery mode; a
+     * BROADCAST spec always gets its own per-instance key (plain consumer, no shared
+     * durable subscription).
+     */
+    private static String routeKey(SubscriptionSpec spec) {
+        String subscription = spec.mode() == SubscriptionMode.BROADCAST
+                ? "broadcast-" + UUID.randomUUID()
+                : (spec.group().isBlank() ? DEFAULT_SUBSCRIPTION : spec.group());
+        return spec.topic() + "|" + subscription + "|" + spec.delivery();
+    }
+
+    /**
+     * The partition key rides the wire as the {@code dc3-partition-key} JMS property.
+     */
+    private static String keyOf(Message message) {
+        try {
+            return message.getStringProperty(jmsHeaderName(MqHeaders.PARTITION_KEY));
+        } catch (JMSException e) {
+            return null;
+        }
+    }
+
+    private static boolean redeliveredOf(Message message) {
+        try {
+            return message.getJMSRedelivered();
+        } catch (JMSException e) {
+            return false;
+        }
+    }
+
+    private static byte[] bodyOf(Message message) {
+        try {
+            if (message instanceof BytesMessage bytes) {
+                byte[] body = new byte[(int) bytes.getBodyLength()];
+                bytes.readBytes(body);
+                return body;
+            }
+            return new byte[0];
+        } catch (JMSException e) {
+            return new byte[0];
+        }
+    }
+
+    private static Map<String, String> headersOf(Message message) {
+        Map<String, String> headers = new HashMap<>();
+        try {
+            Enumeration<String> names = message.getPropertyNames();
+            while (names.hasMoreElements()) {
+                String name = names.nextElement();
+                Object value = message.getObjectProperty(name);
+                headers.put(portHeaderName(name), Objects.isNull(value) ? null : String.valueOf(value));
+            }
+        } catch (JMSException e) {
+            log.debug("ActiveMQ header read failed", e);
+        }
+        return headers;
+    }
+
+    /**
+     * JMS property names must be valid java identifiers; the standard envelope headers
+     * use dashes, so they ride the wire underscored.
+     */
+    private static String jmsHeaderName(String name) {
+        return name.replace('-', '_');
+    }
+
+    private static String portHeaderName(String jmsName) {
+        return switch (jmsName) {
+            case "dc3_type" -> "dc3-type";
+            case "X_Request_Id" -> "X-Request-Id";
+            case "dc3_correlation_id" -> "dc3-correlation-id";
+            case "tenant_id" -> "tenant-id";
+            case "dc3_partition_key" -> "dc3-partition-key";
+            default -> jmsName;
+        };
+    }
+
+    private static boolean isDeadLetterTopic(MqTopic topic) {
+        return topic == MqTopic.POINT_VALUE_DEAD || topic == MqTopic.POINT_COMMAND_DEAD
+                || topic == MqTopic.COMMAND_DEAD;
+    }
+
+    private static String destinationName(MqTopic topic) {
+        return switch (topic) {
+            case POINT_VALUE_DEAD -> "dc3.point_value.dlq";
+            case POINT_COMMAND_DEAD -> "dc3.point_command.dlq";
+            case COMMAND_DEAD -> "dc3.command.dlq";
+            default -> "dc3." + topic.name().toLowerCase();
+        };
+    }
+
+    private static String deadLetterQueue(MqTopic topic) {
+        return destinationName(topic) + ".dlq";
+    }
+
     @Override
     public String type() {
         return "activemq";
@@ -273,6 +393,60 @@ public class ActiveMqAdapter implements BrokerAdapter {
         }
     }
 
+    private WireMqDelivery deliveryOf(Message message, Acknowledgment acknowledgment) {
+        return new WireMqDelivery(bodyOf(message), headersOf(message), redeliveredOf(message), acknowledgment);
+    }
+
+    private Message jmsMessage(JMSContext context, WireMqMessage wire) throws JMSException {
+        BytesMessage message = context.createBytesMessage();
+        message.writeBytes(wire.body());
+        for (Map.Entry<String, String> header : wire.headers().entrySet()) {
+            if (Objects.nonNull(header.getValue())) {
+                message.setStringProperty(jmsHeaderName(header.getKey()), header.getValue());
+            }
+        }
+        if (Objects.nonNull(wire.partitionKey()) && !wire.partitionKey().isBlank()) {
+            // JMS has no native key field: mirror the partition key as a property for
+            // the client-side topic router
+            message.setStringProperty(jmsHeaderName(MqHeaders.PARTITION_KEY), wire.partitionKey());
+        }
+        return message;
+    }
+
+    private Destination destinationOf(MqTopic topic) {
+        if (isDeadLetterTopic(topic)) {
+            return publishContext.createQueue(destinationName(topic));
+        }
+        return publishContext.createTopic(destinationName(topic));
+    }
+
+    /**
+     * ack acknowledges the session's consumed messages (batch-granular by design);
+     * reject(true) recovers the session for redelivery; reject(false) dead-letters the
+     * delivery's topic then acknowledges everything consumed.
+     */
+    private record ActiveMqAcknowledgment(Message message, Session session, MqTopic topic,
+                                          ActiveMqAdapter adapter) implements Acknowledgment {
+
+        @Override
+        public void ack() {
+            try {
+                message.acknowledge();
+            } catch (JMSException e) {
+                log.warn("ActiveMQ acknowledge failed", e);
+            }
+        }
+
+        @Override
+        public void reject(boolean requeue) {
+            if (requeue) {
+                adapter.recover(session);
+                return;
+            }
+            adapter.deadLetter(message, topic);
+        }
+    }
+
     /**
      * Synthesized batch consumer: block for the first message, drain up to batchSize
      * within the receive window, then route the drained messages to the listener whose
@@ -380,179 +554,5 @@ public class ActiveMqAdapter implements BrokerAdapter {
                 Thread.currentThread().interrupt();
             }
         }
-    }
-
-    /**
-     * ack acknowledges the session's consumed messages (batch-granular by design);
-     * reject(true) recovers the session for redelivery; reject(false) dead-letters the
-     * delivery's topic then acknowledges everything consumed.
-     */
-    private record ActiveMqAcknowledgment(Message message, Session session, MqTopic topic,
-                                          ActiveMqAdapter adapter) implements Acknowledgment {
-
-        @Override
-        public void ack() {
-            try {
-                message.acknowledge();
-            } catch (JMSException e) {
-                log.warn("ActiveMQ acknowledge failed", e);
-            }
-        }
-
-        @Override
-        public void reject(boolean requeue) {
-            if (requeue) {
-                adapter.recover(session);
-                return;
-            }
-            adapter.deadLetter(message, topic);
-        }
-    }
-
-    /**
-     * Consumer for a subscription: dead-letter destinations are queues; live topics are
-     * JMS topics where LOAD_BALANCE rides a shared durable subscription named after the
-     * consumer group and BROADCAST rides a plain per-instance consumer.
-     */
-    private static MessageConsumer consumerOf(SubscriptionSpec spec, Session session) throws JMSException {
-        if (isDeadLetterTopic(spec.topic())) {
-            return session.createConsumer(session.createQueue(destinationName(spec.topic())));
-        }
-        Topic topic = session.createTopic(destinationName(spec.topic()));
-        if (spec.mode() == SubscriptionMode.BROADCAST) {
-            return session.createConsumer(topic);
-        }
-        String subscription = spec.group().isBlank() ? DEFAULT_SUBSCRIPTION : spec.group();
-        return session.createSharedDurableConsumer(topic, subscription);
-    }
-
-    private static String subscriptionSuffix(SubscriptionSpec spec) {
-        if (spec.mode() != SubscriptionMode.LOAD_BALANCE || spec.group().isBlank()) {
-            return "";
-        }
-        return " (" + spec.group() + ")";
-    }
-
-    /**
-     * Router key for one shared consumer: topic + subscription + delivery mode; a
-     * BROADCAST spec always gets its own per-instance key (plain consumer, no shared
-     * durable subscription).
-     */
-    private static String routeKey(SubscriptionSpec spec) {
-        String subscription = spec.mode() == SubscriptionMode.BROADCAST
-                ? "broadcast-" + UUID.randomUUID()
-                : (spec.group().isBlank() ? DEFAULT_SUBSCRIPTION : spec.group());
-        return spec.topic() + "|" + subscription + "|" + spec.delivery();
-    }
-
-    /**
-     * The partition key rides the wire as the {@code dc3-partition-key} JMS property.
-     */
-    private static String keyOf(Message message) {
-        try {
-            return message.getStringProperty(jmsHeaderName(MqHeaders.PARTITION_KEY));
-        } catch (JMSException e) {
-            return null;
-        }
-    }
-
-    private WireMqDelivery deliveryOf(Message message, Acknowledgment acknowledgment) {
-        return new WireMqDelivery(bodyOf(message), headersOf(message), redeliveredOf(message), acknowledgment);
-    }
-
-    private static boolean redeliveredOf(Message message) {
-        try {
-            return message.getJMSRedelivered();
-        } catch (JMSException e) {
-            return false;
-        }
-    }
-
-    private static byte[] bodyOf(Message message) {
-        try {
-            if (message instanceof BytesMessage bytes) {
-                byte[] body = new byte[(int) bytes.getBodyLength()];
-                bytes.readBytes(body);
-                return body;
-            }
-            return new byte[0];
-        } catch (JMSException e) {
-            return new byte[0];
-        }
-    }
-
-    private static Map<String, String> headersOf(Message message) {
-        Map<String, String> headers = new HashMap<>();
-        try {
-            Enumeration<String> names = message.getPropertyNames();
-            while (names.hasMoreElements()) {
-                String name = names.nextElement();
-                Object value = message.getObjectProperty(name);
-                headers.put(portHeaderName(name), Objects.isNull(value) ? null : String.valueOf(value));
-            }
-        } catch (JMSException e) {
-            log.debug("ActiveMQ header read failed", e);
-        }
-        return headers;
-    }
-
-    private Message jmsMessage(JMSContext context, WireMqMessage wire) throws JMSException {
-        BytesMessage message = context.createBytesMessage();
-        message.writeBytes(wire.body());
-        for (Map.Entry<String, String> header : wire.headers().entrySet()) {
-            if (Objects.nonNull(header.getValue())) {
-                message.setStringProperty(jmsHeaderName(header.getKey()), header.getValue());
-            }
-        }
-        if (Objects.nonNull(wire.partitionKey()) && !wire.partitionKey().isBlank()) {
-            // JMS has no native key field: mirror the partition key as a property for
-            // the client-side topic router
-            message.setStringProperty(jmsHeaderName(MqHeaders.PARTITION_KEY), wire.partitionKey());
-        }
-        return message;
-    }
-
-    /**
-     * JMS property names must be valid java identifiers; the standard envelope headers
-     * use dashes, so they ride the wire underscored.
-     */
-    private static String jmsHeaderName(String name) {
-        return name.replace('-', '_');
-    }
-
-    private static String portHeaderName(String jmsName) {
-        return switch (jmsName) {
-            case "dc3_type" -> "dc3-type";
-            case "X_Request_Id" -> "X-Request-Id";
-            case "dc3_correlation_id" -> "dc3-correlation-id";
-            case "tenant_id" -> "tenant-id";
-            case "dc3_partition_key" -> "dc3-partition-key";
-            default -> jmsName;
-        };
-    }
-
-    private Destination destinationOf(MqTopic topic) {
-        if (isDeadLetterTopic(topic)) {
-            return publishContext.createQueue(destinationName(topic));
-        }
-        return publishContext.createTopic(destinationName(topic));
-    }
-
-    private static boolean isDeadLetterTopic(MqTopic topic) {
-        return topic == MqTopic.POINT_VALUE_DEAD || topic == MqTopic.POINT_COMMAND_DEAD
-                || topic == MqTopic.COMMAND_DEAD;
-    }
-
-    private static String destinationName(MqTopic topic) {
-        return switch (topic) {
-            case POINT_VALUE_DEAD -> "dc3.point_value.dlq";
-            case POINT_COMMAND_DEAD -> "dc3.point_command.dlq";
-            case COMMAND_DEAD -> "dc3.command.dlq";
-            default -> "dc3." + topic.name().toLowerCase();
-        };
-    }
-
-    private static String deadLetterQueue(MqTopic topic) {
-        return destinationName(topic) + ".dlq";
     }
 }

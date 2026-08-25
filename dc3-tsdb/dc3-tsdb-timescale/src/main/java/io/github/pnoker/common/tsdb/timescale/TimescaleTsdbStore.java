@@ -17,28 +17,11 @@
 
 package io.github.pnoker.common.tsdb.timescale;
 
-import io.github.pnoker.common.tsdb.model.TsdbModel.AggregateFunction;
-import io.github.pnoker.common.tsdb.model.TsdbModel.BucketAggregate;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CorrelationResult;
-import io.github.pnoker.common.tsdb.model.TsdbModel.Cursor;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CursorPage;
-import io.github.pnoker.common.tsdb.model.TsdbModel.DimensionCount;
-import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
-import io.github.pnoker.common.tsdb.model.TsdbModel.LatencyBin;
-import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbQueryTimeout;
-import io.github.pnoker.common.tsdb.model.TsdbModel.WindowAggregate;
+import io.github.pnoker.common.tsdb.model.TsdbModel.*;
 import io.github.pnoker.common.tsdb.spi.TsdbStore;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.QueryTimeoutException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -106,20 +89,6 @@ public final class TimescaleTsdbStore implements TsdbStore {
     private static final String COLUMNS = "tenant_id, device_id, point_id, message_id, schema_version, "
             + "driver_node, sequence, fencing_token, raw_value, cal_value, num_value, quality, "
             + "driver_id, create_time, operate_time";
-
-    private final int minuteTierKeepDays;
-
-    /**
-     * Effective rollup support, negotiated once at bootstrap: NATIVE when the
-     * continuous-aggregate tiers could be ensured and verified, NONE otherwise
-     * (plain PostgreSQL without the timescaledb extension). Reads consult this
-     * field before routing to a tier so plain-PG deployments fall back to raw
-     * aggregation instead of failing at read time.
-     */
-    private volatile RollupSupport rollupSupport = RollupSupport.NONE;
-
-    private final JdbcTemplate jdbc;
-
     private static final RowMapper<PointValueSample> SAMPLE_MAPPER = (rs, i) -> new PointValueSample(
             new SeriesKey(rs.getLong("tenant_id"), rs.getLong("device_id"), rs.getLong("point_id")),
             toInstant(rs, "create_time"), toInstant(rs, "operate_time"),
@@ -129,6 +98,16 @@ public final class TimescaleTsdbStore implements TsdbStore {
             rs.getString("message_id"), rs.getInt("schema_version"),
             rs.getString("driver_node"), rs.getLong("sequence"),
             rs.getLong("fencing_token"), rs.getLong("driver_id"));
+    private final int minuteTierKeepDays;
+    private final JdbcTemplate jdbc;
+    /**
+     * Effective rollup support, negotiated once at bootstrap: NATIVE when the
+     * continuous-aggregate tiers could be ensured and verified, NONE otherwise
+     * (plain PostgreSQL without the timescaledb extension). Reads consult this
+     * field before routing to a tier so plain-PG deployments fall back to raw
+     * aggregation instead of failing at read time.
+     */
+    private volatile RollupSupport rollupSupport = RollupSupport.NONE;
 
     public TimescaleTsdbStore(DataSource dataSource) {
         this(dataSource, 365);
@@ -138,6 +117,88 @@ public final class TimescaleTsdbStore implements TsdbStore {
         this.minuteTierKeepDays = minuteTierKeepDays;
         this.jdbc = new JdbcTemplate(dataSource);
         bootstrap();
+    }
+
+    /**
+     * Collapses samples sharing the natural key (tenant, device, point,
+     * deviceTime) to their LAST occurrence in input order, keeping the relative
+     * order of distinct keys stable. Pure function: no store access, safe to
+     * unit-test in isolation.
+     *
+     * @param samples input samples, unmodified
+     * @return new list with at most one sample per natural key, last write wins
+     */
+    static List<PointValueSample> collapseNaturalKeyDuplicates(List<PointValueSample> samples) {
+        List<PointValueSample> out = new ArrayList<>(samples.size());
+        Map<NaturalKey, Integer> positionOfKey = new HashMap<>();
+        for (PointValueSample sample : samples) {
+            NaturalKey key = new NaturalKey(sample.series().tenantId(), sample.series().deviceId(),
+                    sample.series().pointId(), sample.deviceTime());
+            Integer previous = positionOfKey.get(key);
+            if (Objects.nonNull(previous)) {
+                out.set(previous, sample);
+            } else {
+                positionOfKey.put(key, out.size());
+                out.add(sample);
+            }
+        }
+        return out;
+    }
+
+    private static Long[] longs(List<PointValueSample> chunk,
+                                java.util.function.ToLongFunction<PointValueSample> extractor) {
+        return chunk.stream().mapToLong(extractor).boxed().toArray(Long[]::new);
+    }
+
+    /**
+     * Exactly composable re-aggregation over the shared observability tiers.
+     */
+    private static String tierExpression(AggregateFunction fn) {
+        return switch (fn) {
+            case AVG -> "SUM(num_sum) / NULLIF(SUM(num_count), 0)";
+            case MIN -> "MIN(num_min)";
+            case MAX -> "MAX(num_max)";
+            case SUM -> "SUM(num_sum)";
+            case COUNT -> "CAST(SUM(sample_count) AS DOUBLE PRECISION)";
+            case FIRST, LAST, PERCENTILE -> throw new IllegalArgumentException("never tiered: " + fn);
+        };
+    }
+
+    private static Instant toInstant(ResultSet rs, String column) throws SQLException {
+        Timestamp ts = rs.getTimestamp(column);
+        return Objects.isNull(ts) ? null : ts.toInstant();
+    }
+
+    private static Instant toInstant(ResultSet rs, int column) throws SQLException {
+        Timestamp ts = rs.getTimestamp(column);
+        return Objects.isNull(ts) ? null : ts.toInstant();
+    }
+
+    // ===== writes =====
+
+    private static <T> List<List<T>> chunk(List<T> list, int size) {
+        List<List<T>> chunks = new ArrayList<>();
+        for (int i = 0; i < list.size(); i += size) {
+            chunks.add(list.subList(i, Math.min(i + size, list.size())));
+        }
+        return chunks;
+    }
+
+    /**
+     * Timeout classification over the ENTIRE cause chain: pgjdbc surfaces a
+     * statement cancellation either as Spring's translated
+     * {@link QueryTimeoutException} or as a PSQLException whose message carries
+     * "canceling statement" — neither is guaranteed to sit at the first cause
+     * level (driver wrappers nest arbitrarily deep).
+     */
+    private static boolean isQueryTimeout(Throwable error) {
+        for (Throwable cause = error; Objects.nonNull(cause); cause = cause.getCause()) {
+            if (cause instanceof QueryTimeoutException
+                    || String.valueOf(cause.getMessage()).contains("canceling statement")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void bootstrap() {
@@ -279,6 +340,8 @@ public final class TimescaleTsdbStore implements TsdbStore {
         }
     }
 
+    // ===== reads =====
+
     @Override
     public String type() {
         return "timescale";
@@ -294,8 +357,6 @@ public final class TimescaleTsdbStore implements TsdbStore {
                 rollupSupport, 5000,
                 true, OrderingGuarantee.PER_SERIES, Precision.MICRO, true, true);
     }
-
-    // ===== writes =====
 
     @Override
     public int append(List<PointValueSample> samples) {
@@ -322,39 +383,6 @@ public final class TimescaleTsdbStore implements TsdbStore {
             total += appendChunk(ordered);
         }
         return total;
-    }
-
-    /**
-     * Natural upsert key of a sample — mirrors the
-     * {@code uk_point_value_series_time} unique index.
-     */
-    private record NaturalKey(long tenantId, long deviceId, long pointId, Instant deviceTime) {
-    }
-
-    /**
-     * Collapses samples sharing the natural key (tenant, device, point,
-     * deviceTime) to their LAST occurrence in input order, keeping the relative
-     * order of distinct keys stable. Pure function: no store access, safe to
-     * unit-test in isolation.
-     *
-     * @param samples input samples, unmodified
-     * @return new list with at most one sample per natural key, last write wins
-     */
-    static List<PointValueSample> collapseNaturalKeyDuplicates(List<PointValueSample> samples) {
-        List<PointValueSample> out = new ArrayList<>(samples.size());
-        Map<NaturalKey, Integer> positionOfKey = new HashMap<>();
-        for (PointValueSample sample : samples) {
-            NaturalKey key = new NaturalKey(sample.series().tenantId(), sample.series().deviceId(),
-                    sample.series().pointId(), sample.deviceTime());
-            Integer previous = positionOfKey.get(key);
-            if (Objects.nonNull(previous)) {
-                out.set(previous, sample);
-            } else {
-                positionOfKey.put(key, out.size());
-                out.add(sample);
-            }
-        }
-        return out;
     }
 
     /**
@@ -418,13 +446,6 @@ public final class TimescaleTsdbStore implements TsdbStore {
         });
     }
 
-    private static Long[] longs(List<PointValueSample> chunk,
-                                java.util.function.ToLongFunction<PointValueSample> extractor) {
-        return chunk.stream().mapToLong(extractor).boxed().toArray(Long[]::new);
-    }
-
-    // ===== reads =====
-
     @Override
     public Map<SeriesKey, List<PointValueSample>> last(SeriesFilter filter, int limit, TsdbDeadline deadline) {
         requireSeriesOrScan(filter);
@@ -444,6 +465,8 @@ public final class TimescaleTsdbStore implements TsdbStore {
         }
         return result;
     }
+
+    // ===== S13: tenant-level analytics =====
 
     @Override
     public CursorPage<PointValueSample> history(SeriesFilter filter, TimeWindow window,
@@ -549,8 +572,6 @@ public final class TimescaleTsdbStore implements TsdbStore {
         return Objects.requireNonNullElse(value, 0L);
     }
 
-    // ===== S13: tenant-level analytics =====
-
     @Override
     public List<BucketAggregate> bucketedCount(long tenantId, TimeWindow window,
                                                Duration bucketWidth, TsdbDeadline deadline) {
@@ -580,6 +601,8 @@ public final class TimescaleTsdbStore implements TsdbStore {
                 toInstant(rs, 1).truncatedTo(java.time.temporal.ChronoUnit.MILLIS),
                 null, rs.getLong(2)), args));
     }
+
+    // ===== operations =====
 
     @Override
     public List<DimensionCount> countByDimension(long tenantId, TimeWindow window,
@@ -670,7 +693,7 @@ public final class TimescaleTsdbStore implements TsdbStore {
         return result;
     }
 
-    // ===== operations =====
+    // ===== helpers =====
 
     @Override
     public List<SeriesKey> listSeries(long tenantId, TimeWindow window, TsdbDeadline deadline) {
@@ -739,8 +762,6 @@ public final class TimescaleTsdbStore implements TsdbStore {
                 rs.getDouble(1), rs.getLong(2)), args));
     }
 
-    // ===== helpers =====
-
     /**
      * S16 read transparency: bucket widths at or above a materialized tier's
      * granularity are served from that tier (PERCENTILE never — it is not
@@ -797,30 +818,6 @@ public final class TimescaleTsdbStore implements TsdbStore {
             }
         });
         return result;
-    }
-
-    /**
-     * Exactly composable re-aggregation over the shared observability tiers.
-     */
-    private static String tierExpression(AggregateFunction fn) {
-        return switch (fn) {
-            case AVG -> "SUM(num_sum) / NULLIF(SUM(num_count), 0)";
-            case MIN -> "MIN(num_min)";
-            case MAX -> "MAX(num_max)";
-            case SUM -> "SUM(num_sum)";
-            case COUNT -> "CAST(SUM(sample_count) AS DOUBLE PRECISION)";
-            case FIRST, LAST, PERCENTILE -> throw new IllegalArgumentException("never tiered: " + fn);
-        };
-    }
-
-    private static Instant toInstant(ResultSet rs, String column) throws SQLException {
-        Timestamp ts = rs.getTimestamp(column);
-        return Objects.isNull(ts) ? null : ts.toInstant();
-    }
-
-    private static Instant toInstant(ResultSet rs, int column) throws SQLException {
-        Timestamp ts = rs.getTimestamp(column);
-        return Objects.isNull(ts) ? null : ts.toInstant();
     }
 
     private void requireSeriesOrScan(SeriesFilter filter) {
@@ -888,14 +885,6 @@ public final class TimescaleTsdbStore implements TsdbStore {
         return out.toString();
     }
 
-    private static <T> List<List<T>> chunk(List<T> list, int size) {
-        List<List<T>> chunks = new ArrayList<>();
-        for (int i = 0; i < list.size(); i += size) {
-            chunks.add(list.subList(i, Math.min(i + size, list.size())));
-        }
-        return chunks;
-    }
-
     private void timedVoid(TsdbDeadline deadline, java.util.function.Consumer<JdbcTemplate> query) {
         timed(deadline, template -> {
             query.accept(template);
@@ -924,19 +913,9 @@ public final class TimescaleTsdbStore implements TsdbStore {
     }
 
     /**
-     * Timeout classification over the ENTIRE cause chain: pgjdbc surfaces a
-     * statement cancellation either as Spring's translated
-     * {@link QueryTimeoutException} or as a PSQLException whose message carries
-     * "canceling statement" — neither is guaranteed to sit at the first cause
-     * level (driver wrappers nest arbitrarily deep).
+     * Natural upsert key of a sample — mirrors the
+     * {@code uk_point_value_series_time} unique index.
      */
-    private static boolean isQueryTimeout(Throwable error) {
-        for (Throwable cause = error; Objects.nonNull(cause); cause = cause.getCause()) {
-            if (cause instanceof QueryTimeoutException
-                    || String.valueOf(cause.getMessage()).contains("canceling statement")) {
-                return true;
-            }
-        }
-        return false;
+    private record NaturalKey(long tenantId, long deviceId, long pointId, Instant deviceTime) {
     }
 }

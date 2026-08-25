@@ -17,22 +17,19 @@
 
 package io.github.pnoker.common.data.biz.alarm;
 
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import io.github.pnoker.common.mq.sender.MessageSender;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import io.github.pnoker.common.constant.mq.MqTopic;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class NotifyTaskSenderTest {

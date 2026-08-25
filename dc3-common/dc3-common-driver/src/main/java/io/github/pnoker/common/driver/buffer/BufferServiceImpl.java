@@ -17,10 +17,10 @@
 
 package io.github.pnoker.common.driver.buffer;
 
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.mq.message.MqMessage;
-import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.mq.sender.MessageSender;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.PreDestroy;

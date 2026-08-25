@@ -119,6 +119,56 @@ public class PulsarMqAdapter implements BrokerAdapter {
         this.retryProperties = retryProperties;
     }
 
+    private static void acknowledge(Consumer<byte[]> consumer, List<Message<byte[]>> messages) {
+        try {
+            consumer.acknowledge(messages.stream().map(Message::getMessageId).toList());
+        } catch (PulsarClientException e) {
+            log.warn("Pulsar acknowledge failed", e);
+        }
+    }
+
+    private static Map<String, String> headersOf(Message<byte[]> message) {
+        Map<String, String> headers = new HashMap<>(message.getProperties());
+        return headers;
+    }
+
+    private static String subscriptionName(SubscriptionSpec spec) {
+        if (spec.mode() == SubscriptionMode.BROADCAST) {
+            // per-instance subscription: every instance receives its own copy
+            return (spec.group().isBlank() ? DEFAULT_SUBSCRIPTION : spec.group()) + "-" + UUID.randomUUID();
+        }
+        return spec.group().isBlank() ? DEFAULT_SUBSCRIPTION : spec.group();
+    }
+
+    /**
+     * Router key for one shared consumer: topic + subscription + delivery mode.
+     */
+    private static String routeKey(SubscriptionSpec spec, String subscription) {
+        return spec.topic() + "|" + subscription + "|" + spec.delivery();
+    }
+
+    private static String topicName(MqTopic topic) {
+        return "persistent://public/default/" + physicalName(topic);
+    }
+
+    /**
+     * Dead-letter destination: the live topic's physical name plus {@code .dlq}; the
+     * logical dead-letter enum variants resolve to exactly the same name, so producers
+     * and dead-letter subscriptions land on one topic.
+     */
+    private static String deadLetterTopicName(MqTopic topic) {
+        return "persistent://public/default/" + physicalName(topic) + ".dlq";
+    }
+
+    private static String physicalName(MqTopic topic) {
+        return switch (topic) {
+            case POINT_VALUE_DEAD -> "dc3-point_value.dlq";
+            case POINT_COMMAND_DEAD -> "dc3-point_command.dlq";
+            case COMMAND_DEAD -> "dc3-command.dlq";
+            default -> "dc3-" + topic.name().toLowerCase();
+        };
+    }
+
     @Override
     public String type() {
         return "pulsar";
@@ -304,6 +354,79 @@ public class PulsarMqAdapter implements BrokerAdapter {
         }
     }
 
+    private void sleepBackoff(int attempt) {
+        long initial = retryProperties.getRetryInitialIntervalMillis();
+        long cap = retryProperties.getRetryMaxIntervalMillis();
+        long exponent = Math.min(Math.max(attempt - 1, 0), 30);
+        long delay = initial >= cap ? cap : Math.min(initial * (1L << exponent), cap);
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private void deadLetter(MqTopic topic, Consumer<byte[]> consumer, List<Message<byte[]>> messages) {
+        try {
+            // ALWAYS the live topic plus .dlq — including topics without a logical
+            // dead-letter enum variant (Pulsar auto-creates the topic); routing the
+            // dead letter back onto the live topic would loop the failure forever
+            Producer<byte[]> producer = producer(deadLetterTopicName(topic));
+            List<CompletableFuture<MessageId>> sends = new ArrayList<>(messages.size());
+            for (Message<byte[]> message : messages) {
+                sends.add(producer.newMessage()
+                        .value(message.getData())
+                        .key(Objects.requireNonNullElse(message.getKey(), ""))
+                        .properties(message.getProperties())
+                        .sendAsync());
+            }
+            CompletableFuture.allOf(sends.toArray(CompletableFuture[]::new)).join();
+            acknowledge(consumer, messages);
+        } catch (Exception e) {
+            log.error("Pulsar dead-letter publish failed, topic={}", topic, e);
+        }
+    }
+
+    private Producer<byte[]> producer(String topic) {
+        return producers.computeIfAbsent(topic, key -> {
+            try {
+                return client.newProducer()
+                        .topic(key)
+                        .enableBatching(false)
+                        .create();
+            } catch (PulsarClientException e) {
+                throw new IllegalStateException("Pulsar producer create failed, topic=" + key, e);
+            }
+        });
+    }
+
+    private WireMqDelivery deliveryOf(Message<byte[]> message, Acknowledgment acknowledgment) {
+        return new WireMqDelivery(message.getData(), headersOf(message),
+                message.getRedeliveryCount() > 0, acknowledgment);
+    }
+
+    /**
+     * ack acknowledges the message(s); reject(true) negative-acks each for near
+     * immediate redelivery; reject(false) dead-letters the whole delivery batch.
+     */
+    private record PulsarAcknowledgment(Consumer<byte[]> consumer, List<Message<byte[]>> messages,
+                                        MqTopic topic, PulsarMqAdapter adapter) implements Acknowledgment {
+
+        @Override
+        public void ack() {
+            acknowledge(consumer, messages);
+        }
+
+        @Override
+        public void reject(boolean requeue) {
+            if (requeue) {
+                messages.forEach(consumer::negativeAcknowledge);
+                return;
+            }
+            adapter.deadLetter(topic, consumer, messages);
+        }
+    }
+
     /**
      * Batch drain: route each message to the listener whose pattern matches its key,
      * then apply the shared synchronous bounded-retry semantics per routed sub-batch;
@@ -393,128 +516,5 @@ public class PulsarMqAdapter implements BrokerAdapter {
                 }
             }
         }
-    }
-
-    private void sleepBackoff(int attempt) {
-        long initial = retryProperties.getRetryInitialIntervalMillis();
-        long cap = retryProperties.getRetryMaxIntervalMillis();
-        long exponent = Math.min(Math.max(attempt - 1, 0), 30);
-        long delay = initial >= cap ? cap : Math.min(initial * (1L << exponent), cap);
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    private void deadLetter(MqTopic topic, Consumer<byte[]> consumer, List<Message<byte[]>> messages) {
-        try {
-            // ALWAYS the live topic plus .dlq — including topics without a logical
-            // dead-letter enum variant (Pulsar auto-creates the topic); routing the
-            // dead letter back onto the live topic would loop the failure forever
-            Producer<byte[]> producer = producer(deadLetterTopicName(topic));
-            List<CompletableFuture<MessageId>> sends = new ArrayList<>(messages.size());
-            for (Message<byte[]> message : messages) {
-                sends.add(producer.newMessage()
-                        .value(message.getData())
-                        .key(Objects.requireNonNullElse(message.getKey(), ""))
-                        .properties(message.getProperties())
-                        .sendAsync());
-            }
-            CompletableFuture.allOf(sends.toArray(CompletableFuture[]::new)).join();
-            acknowledge(consumer, messages);
-        } catch (Exception e) {
-            log.error("Pulsar dead-letter publish failed, topic={}", topic, e);
-        }
-    }
-
-    /**
-     * ack acknowledges the message(s); reject(true) negative-acks each for near
-     * immediate redelivery; reject(false) dead-letters the whole delivery batch.
-     */
-    private record PulsarAcknowledgment(Consumer<byte[]> consumer, List<Message<byte[]>> messages,
-                                        MqTopic topic, PulsarMqAdapter adapter) implements Acknowledgment {
-
-        @Override
-        public void ack() {
-            acknowledge(consumer, messages);
-        }
-
-        @Override
-        public void reject(boolean requeue) {
-            if (requeue) {
-                messages.forEach(consumer::negativeAcknowledge);
-                return;
-            }
-            adapter.deadLetter(topic, consumer, messages);
-        }
-    }
-
-    private static void acknowledge(Consumer<byte[]> consumer, List<Message<byte[]>> messages) {
-        try {
-            consumer.acknowledge(messages.stream().map(Message::getMessageId).toList());
-        } catch (PulsarClientException e) {
-            log.warn("Pulsar acknowledge failed", e);
-        }
-    }
-
-    private Producer<byte[]> producer(String topic) {
-        return producers.computeIfAbsent(topic, key -> {
-            try {
-                return client.newProducer()
-                        .topic(key)
-                        .enableBatching(false)
-                        .create();
-            } catch (PulsarClientException e) {
-                throw new IllegalStateException("Pulsar producer create failed, topic=" + key, e);
-            }
-        });
-    }
-
-    private WireMqDelivery deliveryOf(Message<byte[]> message, Acknowledgment acknowledgment) {
-        return new WireMqDelivery(message.getData(), headersOf(message),
-                message.getRedeliveryCount() > 0, acknowledgment);
-    }
-
-    private static Map<String, String> headersOf(Message<byte[]> message) {
-        Map<String, String> headers = new HashMap<>(message.getProperties());
-        return headers;
-    }
-
-    private static String subscriptionName(SubscriptionSpec spec) {
-        if (spec.mode() == SubscriptionMode.BROADCAST) {
-            // per-instance subscription: every instance receives its own copy
-            return (spec.group().isBlank() ? DEFAULT_SUBSCRIPTION : spec.group()) + "-" + UUID.randomUUID();
-        }
-        return spec.group().isBlank() ? DEFAULT_SUBSCRIPTION : spec.group();
-    }
-
-    /**
-     * Router key for one shared consumer: topic + subscription + delivery mode.
-     */
-    private static String routeKey(SubscriptionSpec spec, String subscription) {
-        return spec.topic() + "|" + subscription + "|" + spec.delivery();
-    }
-
-    private static String topicName(MqTopic topic) {
-        return "persistent://public/default/" + physicalName(topic);
-    }
-
-    /**
-     * Dead-letter destination: the live topic's physical name plus {@code .dlq}; the
-     * logical dead-letter enum variants resolve to exactly the same name, so producers
-     * and dead-letter subscriptions land on one topic.
-     */
-    private static String deadLetterTopicName(MqTopic topic) {
-        return "persistent://public/default/" + physicalName(topic) + ".dlq";
-    }
-
-    private static String physicalName(MqTopic topic) {
-        return switch (topic) {
-            case POINT_VALUE_DEAD -> "dc3-point_value.dlq";
-            case POINT_COMMAND_DEAD -> "dc3-point_command.dlq";
-            case COMMAND_DEAD -> "dc3-command.dlq";
-            default -> "dc3-" + topic.name().toLowerCase();
-        };
     }
 }

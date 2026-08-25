@@ -22,89 +22,104 @@
 // aside vs drawer), and an A7 smoke probe (interactive controls expose
 // accessible names). Run: pnpm exec playwright test responsive.spec.ts
 
-import {expect, test, type Page} from '@playwright/test';
+import { expect, type Page, test } from "@playwright/test";
 
-import {login, waitForAppSettled} from '../fixtures/app';
+import { login, waitForAppSettled } from "../fixtures/app";
 
 /** Page-level overflow must not exceed the viewport (A2 acceptance line). */
 const expectNoHorizontalOverflow = async (page: Page, label: string) => {
   const overflow = await page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+    () =>
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
   );
-  expect(overflow, label + ': page-level horizontal overflow').toBeLessThanOrEqual(0);
+  expect(
+    overflow,
+    label + ": page-level horizontal overflow",
+  ).toBeLessThanOrEqual(0);
 };
 
-const isMobileViewport = (page: Page) => (page.viewportSize()?.width ?? 1440) < 768;
+const isMobileViewport = (page: Page) =>
+  (page.viewportSize()?.width ?? 1440) < 768;
 
-test.describe('three-terminal gate', () => {
-  test('login, home, and settings keep zero page-level overflow', async ({page}) => {
-    await expectNoHorizontalOverflow(page, 'login');
+test.describe("three-terminal gate", () => {
+  test("login, home, and settings keep zero page-level overflow", async ({
+    page,
+  }) => {
+    await expectNoHorizontalOverflow(page, "login");
     await login(page);
-    await expectNoHorizontalOverflow(page, 'home');
+    await expectNoHorizontalOverflow(page, "home");
 
-    await page.goto('/#/settings/user', {waitUntil: 'domcontentloaded'});
+    await page.goto("/#/settings/user", { waitUntil: "domcontentloaded" });
     await waitForAppSettled(page);
-    await expectNoHorizontalOverflow(page, 'settings');
+    await expectNoHorizontalOverflow(page, "settings");
   });
 
   // L4 template sweep: one representative route per page template family
   // (monitor / list / detail / history), gated on every terminal viewport.
-  const TEMPLATE_ROUTES: Array<{template: string; hash: string}> = [
-    {template: 'monitor', hash: '/#/settings/alarm/overview'},
-    {template: 'list', hash: '/#/device'},
-    {template: 'list', hash: '/#/driver'},
-    {template: 'list', hash: '/#/profile'},
-    {template: 'list', hash: '/#/settings/label'},
-    {template: 'detail', hash: '/#/point_value'},
-    {template: 'detail', hash: '/#/settings/alarm/point'},
-    {template: 'history', hash: '/#/settings/event/history'},
-    {template: 'history', hash: '/#/settings/command/history'}
+  const TEMPLATE_ROUTES: Array<{ template: string; hash: string }> = [
+    { template: "monitor", hash: "/#/settings/alarm/overview" },
+    { template: "list", hash: "/#/device" },
+    { template: "list", hash: "/#/driver" },
+    { template: "list", hash: "/#/profile" },
+    { template: "list", hash: "/#/settings/label" },
+    { template: "detail", hash: "/#/point_value" },
+    { template: "detail", hash: "/#/settings/alarm/point" },
+    { template: "history", hash: "/#/settings/event/history" },
+    { template: "history", hash: "/#/settings/command/history" },
   ];
 
-  for (const {template, hash} of TEMPLATE_ROUTES) {
-    test(`template ${template} ${hash} keeps zero page-level overflow`, async ({page}) => {
+  for (const { template, hash } of TEMPLATE_ROUTES) {
+    test(`template ${template} ${hash} keeps zero page-level overflow`, async ({
+      page,
+    }) => {
       await login(page);
-      await page.goto(hash, {waitUntil: 'domcontentloaded'});
+      await page.goto(hash, { waitUntil: "domcontentloaded" });
       await waitForAppSettled(page);
       await expectNoHorizontalOverflow(page, `${template} ${hash}`);
     });
   }
 
-  test('shell adapts to the viewport (menu strip vs drawer, aside vs drawer)', async ({page}) => {
+  test("shell adapts to the viewport (menu strip vs drawer, aside vs drawer)", async ({
+    page,
+  }) => {
     await login(page);
     const mobile = isMobileViewport(page);
 
     if (mobile) {
       // Hamburger replaces the horizontal menu strip.
-      await expect(page.locator('.header_menu_toggle')).toBeVisible();
-      await expect(page.locator('.header_menu_wrap')).toHaveCount(0);
+      await expect(page.locator(".header_menu_toggle")).toBeVisible();
+      await expect(page.locator(".header_menu_wrap")).toHaveCount(0);
 
       // Drawer opens and carries the navigation tree.
-      await page.locator('.header_menu_toggle').click();
-      await expect(page.locator('.nav-drawer')).toBeVisible();
-      await expect(page.locator('.nav-drawer')).toContainText('Home');
-      await page.keyboard.press('Escape');
+      await page.locator(".header_menu_toggle").click();
+      await expect(page.locator(".nav-drawer")).toBeVisible();
+      await expect(page.locator(".nav-drawer")).toContainText("Home");
+      await page.keyboard.press("Escape");
 
       // Settings: floating toggle + drawer replace the fixed aside.
-      await page.goto('/#/settings/user', {waitUntil: 'domcontentloaded'});
+      await page.goto("/#/settings/user", { waitUntil: "domcontentloaded" });
       await waitForAppSettled(page);
-      await expect(page.locator('.settings-aside')).toHaveCount(0);
-      await expect(page.locator('.settings-aside-toggle')).toBeVisible();
-      await page.locator('.settings-aside-toggle').click();
-      await expect(page.locator('.settings-drawer')).toBeVisible();
+      await expect(page.locator(".settings-aside")).toHaveCount(0);
+      await expect(page.locator(".settings-aside-toggle")).toBeVisible();
+      await page.locator(".settings-aside-toggle").click();
+      await expect(page.locator(".settings-drawer")).toBeVisible();
     } else {
       // Desktop/tablet keep the horizontal menu strip (ellipsis mode).
-      await expect(page.locator('.header_menu_toggle')).toBeHidden();
-      await expect(page.locator('.header_menu_wrap')).toBeVisible();
+      await expect(page.locator(".header_menu_toggle")).toBeHidden();
+      await expect(page.locator(".header_menu_wrap")).toBeVisible();
 
-      await page.goto('/#/settings/user', {waitUntil: 'domcontentloaded'});
+      await page.goto("/#/settings/user", { waitUntil: "domcontentloaded" });
       await waitForAppSettled(page);
-      await expect(page.locator('.settings-aside')).toBeVisible();
+      await expect(page.locator(".settings-aside")).toBeVisible();
     }
   });
 
-  test('a11y smoke: visible interactive controls expose accessible names', async ({page}) => {    await login(page);
-    await page.goto('/#/settings/user', {waitUntil: 'domcontentloaded'});
+  test("a11y smoke: visible interactive controls expose accessible names", async ({
+    page,
+  }) => {
+    await login(page);
+    await page.goto("/#/settings/user", { waitUntil: "domcontentloaded" });
     await waitForAppSettled(page);
 
     const unlabeled = await page.evaluate(() => {
@@ -112,36 +127,56 @@ test.describe('three-terminal gate', () => {
       document.querySelectorAll('button, [role="button"]').forEach((el) => {
         const node = el as HTMLElement;
         if (node.offsetParent === null) return; // hidden
-        const name = node.getAttribute('aria-label') || node.getAttribute('title') || node.textContent?.trim() || '';
+        const name =
+          node.getAttribute("aria-label") ||
+          node.getAttribute("title") ||
+          node.textContent?.trim() ||
+          "";
         if (!name) {
-          out.push({cls: String(node.className).slice(0, 80), text: (node.textContent || '').slice(0, 60)});
+          out.push({
+            cls: String(node.className).slice(0, 80),
+            text: (node.textContent || "").slice(0, 60),
+          });
         }
       });
       return out;
     });
 
-    expect(unlabeled, 'visible controls without an accessible name').toEqual([]);
+    expect(unlabeled, "visible controls without an accessible name").toEqual(
+      [],
+    );
   });
 
   // A3 acceptance: dialogs go (near) full-screen below 768px, so a fixed
   // 640px dialog width never overflows a mobile viewport. Gated on mobile
   // only — desktop/tablet keep the centered width contract.
-  test('dialogs fit the mobile viewport below 768px', async ({page}) => {
-    test.skip(!isMobileViewport(page), 'mobile-only dialog shape contract');
+  test("dialogs fit the mobile viewport below 768px", async ({ page }) => {
+    test.skip(!isMobileViewport(page), "mobile-only dialog shape contract");
     await login(page);
 
-    await page.goto('/#/settings/label', {waitUntil: 'domcontentloaded'});
+    await page.goto("/#/settings/label", { waitUntil: "domcontentloaded" });
     await waitForAppSettled(page);
-    await page.getByRole('button', {name: /Add|新增/}).first().click();
-    const dialog = page.locator('.el-dialog:visible').last();
+    await page
+      .getByRole("button", { name: /Add|新增/ })
+      .first()
+      .click();
+    const dialog = page.locator(".el-dialog:visible").last();
     await expect(dialog).toBeVisible();
 
     const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
     );
-    expect(overflow, 'open dialog causes page-level horizontal overflow').toBeLessThanOrEqual(0);
+    expect(
+      overflow,
+      "open dialog causes page-level horizontal overflow",
+    ).toBeLessThanOrEqual(0);
     const dialogWidth = await dialog.boundingBox();
     const viewportWidth = page.viewportSize()?.width ?? 393;
-    expect(dialogWidth?.width, 'dialog wider than viewport').toBeLessThanOrEqual(viewportWidth);
+    expect(
+      dialogWidth?.width,
+      "dialog wider than viewport",
+    ).toBeLessThanOrEqual(viewportWidth);
   });
 });

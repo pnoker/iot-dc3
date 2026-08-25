@@ -19,7 +19,6 @@ package io.github.pnoker.db.tck;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
@@ -69,11 +68,6 @@ class PostgresDialectContractTest extends AbstractDbDialectContractTest {
                     .waitingFor(org.testcontainers.containers.wait.strategy.Wait.forListeningPort()
                             .withStartupTimeout(java.time.Duration.ofMinutes(5)));
 
-    @Override
-    protected String jdbcUrl(String database) {
-        return POSTGRES.getJdbcUrl() + "&currentSchema=" + database;
-    }
-
     /**
      * The hypertable/cagg half of 05 needs the production base image's
      * TimescaleDB function set; the dialect contract only exercises the
@@ -94,6 +88,11 @@ class PostgresDialectContractTest extends AbstractDbDialectContractTest {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @Override
+    protected String jdbcUrl(String database) {
+        return POSTGRES.getJdbcUrl() + "&currentSchema=" + database;
     }
 
     @Override

@@ -17,23 +17,7 @@
 
 package io.github.pnoker.common.tsdb.influxdb;
 
-import io.github.pnoker.common.tsdb.model.TsdbModel.AggregateFunction;
-import io.github.pnoker.common.tsdb.model.TsdbModel.BucketAggregate;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CorrelationResult;
-import io.github.pnoker.common.tsdb.model.TsdbModel.Cursor;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CursorPage;
-import io.github.pnoker.common.tsdb.model.TsdbModel.DimensionCount;
-import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
-import io.github.pnoker.common.tsdb.model.TsdbModel.LatencyBin;
-import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbQueryTimeout;
-import io.github.pnoker.common.tsdb.model.TsdbModel.WindowAggregate;
+import io.github.pnoker.common.tsdb.model.TsdbModel.*;
 import io.github.pnoker.common.tsdb.spi.TsdbStore;
 import lombok.extern.slf4j.Slf4j;
 
@@ -84,7 +68,9 @@ import java.util.concurrent.TimeUnit;
 public final class InfluxdbTsdbStore implements TsdbStore, AutoCloseable {
 
     private static final int APPEND_CHUNK = 2000;
-
+    private static final String SAMPLE_COLUMNS = "tenant_id, device_id, point_id, raw, cal, num, quality, "
+            + "message_id, schema_version, driver_node, sequence, fencing_token, driver_id, "
+            + "CAST(time AS BIGINT) AS create_time_ns, operate_time";
     private final String baseUrl;
     private final String token;
     private final String database;
@@ -97,6 +83,62 @@ public final class InfluxdbTsdbStore implements TsdbStore, AutoCloseable {
         this.http = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
         health();
         log.info("InfluxDB 3 store ready ({} db {})", baseUrl, database);
+    }
+
+    /**
+     * Line-protocol quoted-string field value. Backslash and double-quote are
+     * the dialect's escapes; a raw newline or carriage return would terminate
+     * the line prematurely and corrupt the whole chunk write, so both are
+     * escaped as their two-character forms. The measurement and tags of this
+     * adapter are constants/numeric ids — this is the only string context that
+     * reaches the wire.
+     */
+    private static String escape(String value) {
+        return '"' + value.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r") + '"';
+    }
+
+    private static String bucketExpression(Duration bucketWidth) {
+        return "date_bin(%s, time, TIMESTAMP '1970-01-01T00:00:00Z')".formatted(intervalLiteral(bucketWidth));
+    }
+
+    // ===== writes =====
+
+    /**
+     * Largest exactly-dividing unit; DataFusion intervals lack a generic millisecond form.
+     */
+    private static String intervalLiteral(Duration width) {
+        long nanos = width.toNanos();
+        if (nanos % 3_600_000_000_000L == 0) {
+            return "INTERVAL '" + (nanos / 3_600_000_000_000L) + " hour'";
+        }
+        if (nanos % 60_000_000_000L == 0) {
+            return "INTERVAL '" + (nanos / 60_000_000_000L) + " minute'";
+        }
+        if (nanos % 1_000_000_000L == 0) {
+            return "INTERVAL '" + (nanos / 1_000_000_000L) + " second'";
+        }
+        return "INTERVAL '" + (nanos / 1_000_000L) + " millisecond'";
+    }
+
+    /**
+     * RFC3339 literal — InfluxDB 3 compares timestamps against string literals.
+     */
+    private static String literal(Instant instant) {
+        return "TIMESTAMP '" + instant + "'";
+    }
+
+    private static long nanosOf(Instant instant) {
+        return TimeUnit.SECONDS.toNanos(instant.getEpochSecond()) + instant.getNano();
+    }
+
+    // ===== reads =====
+
+    private static Instant instantOfNanos(long nanos) {
+        return Instant.ofEpochSecond(Math.floorDiv(nanos, 1_000_000_000L),
+                Math.floorMod(nanos, 1_000_000_000L));
     }
 
     private void health() {
@@ -120,8 +162,6 @@ public final class InfluxdbTsdbStore implements TsdbStore, AutoCloseable {
                 RollupSupport.NONE, APPEND_CHUNK,
                 false, OrderingGuarantee.PER_SERIES, Precision.NANO, true, false);
     }
-
-    // ===== writes =====
 
     @Override
     public int append(List<PointValueSample> samples) {
@@ -165,21 +205,6 @@ public final class InfluxdbTsdbStore implements TsdbStore, AutoCloseable {
     }
 
     /**
-     * Line-protocol quoted-string field value. Backslash and double-quote are
-     * the dialect's escapes; a raw newline or carriage return would terminate
-     * the line prematurely and corrupt the whole chunk write, so both are
-     * escaped as their two-character forms. The measurement and tags of this
-     * adapter are constants/numeric ids — this is the only string context that
-     * reaches the wire.
-     */
-    private static String escape(String value) {
-        return '"' + value.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r") + '"';
-    }
-
-    /**
      * Releases the HTTP client's resources (Java 21 {@link HttpClient} is
      * AutoCloseable; close waits briefly for in-flight requests); registered as
      * the bean destroy method so the selector thread does not outlive the
@@ -190,11 +215,7 @@ public final class InfluxdbTsdbStore implements TsdbStore, AutoCloseable {
         http.close();
     }
 
-    // ===== reads =====
-
-    private static final String SAMPLE_COLUMNS = "tenant_id, device_id, point_id, raw, cal, num, quality, "
-            + "message_id, schema_version, driver_node, sequence, fencing_token, driver_id, "
-            + "CAST(time AS BIGINT) AS create_time_ns, operate_time";
+    // ===== S13: tenant-level analytics =====
 
     @Override
     public Map<SeriesKey, List<PointValueSample>> last(SeriesFilter filter, int limit, TsdbDeadline deadline) {
@@ -297,7 +318,7 @@ public final class InfluxdbTsdbStore implements TsdbStore, AutoCloseable {
         return rows.isEmpty() ? 0 : rows.getFirst().getLong("c");
     }
 
-    // ===== S13: tenant-level analytics =====
+    // ===== operations =====
 
     @Override
     public List<BucketAggregate> bucketedCount(long tenantId, TimeWindow window,
@@ -351,6 +372,8 @@ public final class InfluxdbTsdbStore implements TsdbStore, AutoCloseable {
         return result;
     }
 
+    // ===== SQL assembly =====
+
     @Override
     public List<SeriesLastSeen> lastSeenPerSeries(long tenantId, TimeWindow window, TsdbDeadline deadline) {
         String sql = """
@@ -398,8 +421,6 @@ public final class InfluxdbTsdbStore implements TsdbStore, AutoCloseable {
         return result;
     }
 
-    // ===== operations =====
-
     @Override
     public List<SeriesKey> listSeries(long tenantId, TimeWindow window, TsdbDeadline deadline) {
         String sql = """
@@ -425,8 +446,6 @@ public final class InfluxdbTsdbStore implements TsdbStore, AutoCloseable {
         throw new UnsupportedOperationException("InfluxDB 3 adapter declares correlation=false; "
                 + "facades compute from bucketed pulls");
     }
-
-    // ===== SQL assembly =====
 
     private String seriesWhere(SeriesFilter filter) {
         if (filter.tenantWide()) {
@@ -455,43 +474,6 @@ public final class InfluxdbTsdbStore implements TsdbStore, AutoCloseable {
             case LAST -> "(array_agg(num ORDER BY time DESC))[1]";
             case PERCENTILE -> throw new IllegalArgumentException("percentile unsupported on influxdb");
         };
-    }
-
-    private static String bucketExpression(Duration bucketWidth) {
-        return "date_bin(%s, time, TIMESTAMP '1970-01-01T00:00:00Z')".formatted(intervalLiteral(bucketWidth));
-    }
-
-    /**
-     * Largest exactly-dividing unit; DataFusion intervals lack a generic millisecond form.
-     */
-    private static String intervalLiteral(Duration width) {
-        long nanos = width.toNanos();
-        if (nanos % 3_600_000_000_000L == 0) {
-            return "INTERVAL '" + (nanos / 3_600_000_000_000L) + " hour'";
-        }
-        if (nanos % 60_000_000_000L == 0) {
-            return "INTERVAL '" + (nanos / 60_000_000_000L) + " minute'";
-        }
-        if (nanos % 1_000_000_000L == 0) {
-            return "INTERVAL '" + (nanos / 1_000_000_000L) + " second'";
-        }
-        return "INTERVAL '" + (nanos / 1_000_000L) + " millisecond'";
-    }
-
-    /**
-     * RFC3339 literal — InfluxDB 3 compares timestamps against string literals.
-     */
-    private static String literal(Instant instant) {
-        return "TIMESTAMP '" + instant + "'";
-    }
-
-    private static long nanosOf(Instant instant) {
-        return TimeUnit.SECONDS.toNanos(instant.getEpochSecond()) + instant.getNano();
-    }
-
-    private static Instant instantOfNanos(long nanos) {
-        return Instant.ofEpochSecond(Math.floorDiv(nanos, 1_000_000_000L),
-                Math.floorMod(nanos, 1_000_000_000L));
     }
 
     private PointValueSample sampleOf(CsvRow row) {

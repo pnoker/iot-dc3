@@ -17,8 +17,8 @@
 
 package io.github.pnoker.driver.service.impl;
 
-import com.zsmartsystems.zigbee.IeeeAddress;
 import com.zsmartsystems.zigbee.CommandResult;
+import com.zsmartsystems.zigbee.IeeeAddress;
 import com.zsmartsystems.zigbee.ZigBeeEndpoint;
 import com.zsmartsystems.zigbee.ZigBeeNetworkManager;
 import com.zsmartsystems.zigbee.ZigBeeNode;

@@ -57,42 +57,6 @@ class RepositoryTestQualityGateTest {
     private static final Set<String> REQUIRED_CROSS_CUTTING_COVERAGE = Set.of(
             "dc3-common-api", "dc3-common-facade-grpc", "dc3-common-sql");
 
-    @Test
-    void javaTestsMustVerifyObservableBehaviour() throws IOException {
-        Path repository = findRepositoryRoot();
-        List<String> violations = new ArrayList<>();
-
-        try (Stream<Path> paths = Files.walk(repository)) {
-            paths.filter(Files::isRegularFile)
-                    .filter(path -> normalized(path).contains(TEST_JAVA))
-                    .filter(path -> path.toString().endsWith("Test.java") || path.toString().endsWith("Tests.java"))
-                    .filter(path -> !path.getFileName().toString().equals(THIS_FILE))
-                    .forEach(path -> inspect(repository, path, violations));
-        }
-
-        assertThat(violations)
-                .as("Tests must fail when production behaviour is wrong")
-                .isEmpty();
-    }
-
-    @Test
-    void aggregateCoverageMustIncludeEveryDriverAndCrossCuttingRuntimeModule() throws Exception {
-        Path repository = findRepositoryRoot();
-        Set<String> driverModules = childTexts(
-                repository.resolve("dc3-driver/pom.xml"), "modules", "module");
-        Set<String> coveredModules = childTexts(
-                repository.resolve("dc3-coverage/pom.xml"), "dependencies", "artifactId");
-
-        assertThat(driverModules).as("Driver reactor must not be empty").isNotEmpty();
-        assertThat(coveredModules)
-                .as("Aggregate coverage dependencies")
-                .containsAll(driverModules)
-                .containsAll(REQUIRED_CROSS_CUTTING_COVERAGE);
-        assertThat(Files.readString(repository.resolve("dc3-coverage/pom.xml")))
-                .as("Generated MapStruct implementations must not dilute coverage")
-                .contains("**/entity/builder/*BuilderImpl.class");
-    }
-
     private static void inspect(Path repository, Path path, List<String> violations) {
         try {
             String source = Files.readString(path);
@@ -140,6 +104,42 @@ class RepositoryTestQualityGateTest {
 
     private static String normalized(Path path) {
         return path.toString().replace('\\', '/');
+    }
+
+    @Test
+    void javaTestsMustVerifyObservableBehaviour() throws IOException {
+        Path repository = findRepositoryRoot();
+        List<String> violations = new ArrayList<>();
+
+        try (Stream<Path> paths = Files.walk(repository)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(path -> normalized(path).contains(TEST_JAVA))
+                    .filter(path -> path.toString().endsWith("Test.java") || path.toString().endsWith("Tests.java"))
+                    .filter(path -> !path.getFileName().toString().equals(THIS_FILE))
+                    .forEach(path -> inspect(repository, path, violations));
+        }
+
+        assertThat(violations)
+                .as("Tests must fail when production behaviour is wrong")
+                .isEmpty();
+    }
+
+    @Test
+    void aggregateCoverageMustIncludeEveryDriverAndCrossCuttingRuntimeModule() throws Exception {
+        Path repository = findRepositoryRoot();
+        Set<String> driverModules = childTexts(
+                repository.resolve("dc3-driver/pom.xml"), "modules", "module");
+        Set<String> coveredModules = childTexts(
+                repository.resolve("dc3-coverage/pom.xml"), "dependencies", "artifactId");
+
+        assertThat(driverModules).as("Driver reactor must not be empty").isNotEmpty();
+        assertThat(coveredModules)
+                .as("Aggregate coverage dependencies")
+                .containsAll(driverModules)
+                .containsAll(REQUIRED_CROSS_CUTTING_COVERAGE);
+        assertThat(Files.readString(repository.resolve("dc3-coverage/pom.xml")))
+                .as("Generated MapStruct implementations must not dilute coverage")
+                .contains("**/entity/builder/*BuilderImpl.class");
     }
 
     private record ForbiddenPattern(String reason, Pattern pattern) {

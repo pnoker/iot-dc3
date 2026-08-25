@@ -17,12 +17,12 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
 import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.data.entity.builder.PointCommandHistoryBuilder;
 import io.github.pnoker.common.data.validator.PointCommandValidator;
-import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.exception.NotFoundException;
@@ -35,23 +35,20 @@ import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import io.github.pnoker.common.constant.mq.MqTopic;
-import io.github.pnoker.common.mq.sender.MessageSender;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class PointCommandServiceImplTest {

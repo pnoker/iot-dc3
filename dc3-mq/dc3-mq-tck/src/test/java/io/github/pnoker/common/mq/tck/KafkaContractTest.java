@@ -45,6 +45,7 @@ class KafkaContractTest extends AbstractMqContractTest {
     // testcontainers 2.0.5 configures apache/kafka 3.9.0 with a nonroutable advertised
     // listener the broker rejects, so some runtimes need an externally managed broker.
     private static final KafkaContainer KAFKA = new KafkaContainer(DockerImageName.parse("apache/kafka:3.9.0"));
+    private KafkaMqAdapter kafkaAdapter;
 
     private static String bootstrap() {
         if (Objects.nonNull(EXTERNAL_BOOTSTRAP)) {
@@ -55,8 +56,6 @@ class KafkaContractTest extends AbstractMqContractTest {
         }
         return KAFKA.getBootstrapServers();
     }
-
-    private KafkaMqAdapter kafkaAdapter;
 
     @Override
     protected BrokerAdapter adapter() {

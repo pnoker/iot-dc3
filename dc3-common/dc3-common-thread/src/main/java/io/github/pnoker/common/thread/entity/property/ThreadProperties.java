@@ -43,34 +43,31 @@ import org.springframework.validation.annotation.Validated;
 public class ThreadProperties {
 
     /**
-     * Creates the thread properties with defaults.
-     */
-    public ThreadProperties() {
-    }
-
-    /**
      * Thread name prefix
      */
     @NotBlank(message = "Thread name prefix can't be empty")
     private String prefix = "dc3-thread-";
-
     /**
      * Number of thread pool core threads
      */
     @Min(value = 1, message = "Core pool size must be greater than 0")
     private int corePoolSize = 4;
-
     /**
      * Maximum number of thread pool threads
      */
     @Min(value = 1, message = "Maximum pool size must be greater than 0")
     private int maximumPoolSize = 32;
-
     /**
      * Idle thread waiting time, unit: seconds
      */
     @Min(value = 1, message = "Keep alive time must be greater than 0")
     private int keepAliveTime = 15;
+
+    /**
+     * Creates the thread properties with defaults.
+     */
+    public ThreadProperties() {
+    }
 
     /**
      * Validate that the maximum pool size is not smaller than the core pool size.

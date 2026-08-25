@@ -17,9 +17,9 @@
 
 package io.github.pnoker.common.mq.annotation;
 
-import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.ConsumptionProfile;
 import io.github.pnoker.common.constant.mq.DeliveryMode;
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.SubscriptionMode;
 
 import java.lang.annotation.Documented;

@@ -46,6 +46,7 @@ class ActiveMqContractTest extends AbstractMqContractTest {
                     .withExposedPorts(61616)
                     .withEnv("ARTEMIS_USER", "artemis")
                     .withEnv("ARTEMIS_PASSWORD", "artemis");
+    private ActiveMqAdapter activeMqAdapter;
 
     private static String brokerUrl() {
         if (Objects.nonNull(EXTERNAL_URL)) {
@@ -56,8 +57,6 @@ class ActiveMqContractTest extends AbstractMqContractTest {
         }
         return "tcp://" + ARTEMIS.getHost() + ":" + ARTEMIS.getMappedPort(61616);
     }
-
-    private ActiveMqAdapter activeMqAdapter;
 
     @Override
     protected BrokerAdapter adapter() {

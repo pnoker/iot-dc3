@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.common.SymbolConstant;
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.data.dal.NotifyChannelManager;
 import io.github.pnoker.common.data.dal.NotifyHistoryManager;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
@@ -30,7 +31,6 @@ import io.github.pnoker.common.entity.ext.NotifyHistoryResponseExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
-import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;

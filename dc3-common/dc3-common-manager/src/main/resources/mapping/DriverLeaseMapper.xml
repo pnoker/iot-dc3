@@ -32,7 +32,8 @@
         SELECT id
         FROM dc3_driver
         WHERE id = #{driverId}
-        FOR UPDATE
+            FOR
+        UPDATE
     </select>
 
     <!-- MariaDB twin of the mysql fork above: identical shape, but
@@ -41,15 +42,17 @@
         SELECT id
         FROM dc3_driver
         WHERE id = #{driverId}
-        FOR UPDATE
+            FOR
+        UPDATE
     </select>
 
     <insert id="upsertInstance">
         INSERT INTO dc3_driver_instance
-        (tenant_id, driver_id, node_id, client_id, service_host, lease_until)
-        VALUES
-        (#{tenantId}, #{driverId}, #{node}, #{client}, #{host}, #{leaseUntil})
-        ON CONFLICT (tenant_id, driver_id, node_id) DO UPDATE SET
+            (tenant_id, driver_id, node_id, client_id, service_host, lease_until)
+        VALUES (#{tenantId}, #{driverId}, #{node}, #{client}, #{host}, #{leaseUntil})
+        ON CONFLICT
+            (tenant_id, driver_id, node_id)
+            DO UPDATE SET
         client_id = EXCLUDED.client_id,
         service_host = EXCLUDED.service_host,
         last_heartbeat = CURRENT_TIMESTAMP,
@@ -58,36 +61,32 @@
 
     <insert id="upsertInstance" databaseId="mysql">
         INSERT INTO dc3_driver_instance
-        (tenant_id, driver_id, node_id, client_id, service_host, lease_until)
-        VALUES
-        (#{tenantId}, #{driverId}, #{node}, #{client}, #{host}, #{leaseUntil}) AS new
-        ON DUPLICATE KEY UPDATE
-        client_id = new.client_id,
-        service_host = new.service_host,
-        last_heartbeat = CURRENT_TIMESTAMP(6),
-        lease_until = new.lease_until
+            (tenant_id, driver_id, node_id, client_id, service_host, lease_until)
+            VALUES (#{tenantId}, #{driverId}, #{node}, #{client}, #{host}, #{leaseUntil}) AS new
+        ON DUPLICATE KEY UPDATE client_id      = new.client_id,
+                                service_host   = new.service_host,
+                                last_heartbeat = CURRENT_TIMESTAMP(6),
+                                lease_until    = new.lease_until
     </insert>
 
     <!-- MariaDB twin of the mysql fork above: identical shape, but
          MariaDB never adopted the AS-new row alias: VALUES(col) instead. -->
     <insert id="upsertInstance" databaseId="mariadb">
         INSERT INTO dc3_driver_instance
-        (tenant_id, driver_id, node_id, client_id, service_host, lease_until)
-        VALUES
-        (#{tenantId}, #{driverId}, #{node}, #{client}, #{host}, #{leaseUntil})
-        ON DUPLICATE KEY UPDATE
-        client_id = VALUES(client_id),
-        service_host = VALUES(service_host),
-        last_heartbeat = CURRENT_TIMESTAMP(6),
-        lease_until = VALUES(lease_until)
+            (tenant_id, driver_id, node_id, client_id, service_host, lease_until)
+        VALUES (#{tenantId}, #{driverId}, #{node}, #{client}, #{host}, #{leaseUntil})
+        ON DUPLICATE KEY UPDATE client_id      = VALUES(client_id),
+                                service_host   = VALUES(service_host),
+                                last_heartbeat = CURRENT_TIMESTAMP(6),
+                                lease_until    = VALUES(lease_until)
     </insert>
 
     <select id="listActiveNodes" resultType="string">
         SELECT node_id
         FROM dc3_driver_instance
         WHERE tenant_id = #{tenantId}
-        AND driver_id = #{driverId}
-        AND lease_until &gt; CURRENT_TIMESTAMP
+          AND driver_id = #{driverId}
+          AND lease_until &gt; CURRENT_TIMESTAMP
         ORDER BY node_id
     </select>
 
@@ -95,10 +94,10 @@
         SELECT id
         FROM dc3_device
         WHERE tenant_id = #{tenantId}
-        AND driver_id = #{driverId}
-        AND deleted = 0
-        AND enable_flag = 0
-        AND id &gt; #{afterDeviceId}
+          AND driver_id = #{driverId}
+          AND deleted = 0
+          AND enable_flag = 0
+          AND id &gt; #{afterDeviceId}
         ORDER BY id
         LIMIT #{limit}
     </select>
@@ -108,14 +107,14 @@
         SELECT tenant_id, driver_id, membership_hash, device_revision, assignment_version
         FROM dc3_driver_lease_state
         WHERE tenant_id = #{tenantId}
-        AND driver_id = #{driverId}
+          AND driver_id = #{driverId}
     </select>
 
     <select id="selectDeviceRevision" resultType="long">
         SELECT revision
         FROM dc3_driver_device_revision
         WHERE tenant_id = #{tenantId}
-        AND driver_id = #{driverId}
+          AND driver_id = #{driverId}
     </select>
 
     <!--
@@ -127,10 +126,11 @@
     -->
     <insert id="upsertLeaseState" affectData="true" flushCache="true">
         INSERT INTO dc3_driver_lease_state
-        (tenant_id, driver_id, membership_hash, device_revision)
-        VALUES
-        (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision})
-        ON CONFLICT (tenant_id, driver_id) DO UPDATE SET
+            (tenant_id, driver_id, membership_hash, device_revision)
+        VALUES (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision})
+        ON CONFLICT
+            (tenant_id, driver_id)
+            DO UPDATE SET
         membership_hash = EXCLUDED.membership_hash,
         device_revision = EXCLUDED.device_revision,
         assignment_version = dc3_driver_lease_state.assignment_version + 1,
@@ -139,35 +139,32 @@
 
     <insert id="upsertLeaseState" databaseId="mysql" affectData="true" flushCache="true">
         INSERT INTO dc3_driver_lease_state
-        (tenant_id, driver_id, membership_hash, device_revision)
-        VALUES
-        (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision}) AS new
-        ON DUPLICATE KEY UPDATE
-        membership_hash = new.membership_hash,
-        device_revision = new.device_revision,
-        assignment_version = dc3_driver_lease_state.assignment_version + 1,
-        operate_time = CURRENT_TIMESTAMP(6)
+            (tenant_id, driver_id, membership_hash, device_revision)
+            VALUES (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision}) AS new
+        ON DUPLICATE KEY UPDATE membership_hash    = new.membership_hash,
+                                device_revision    = new.device_revision,
+                                assignment_version = dc3_driver_lease_state.assignment_version + 1,
+                                operate_time       = CURRENT_TIMESTAMP(6)
     </insert>
 
     <!-- MariaDB twin of the mysql fork above: identical shape, but
          MariaDB never adopted the AS-new row alias: VALUES(col) instead. -->
     <insert id="upsertLeaseState" databaseId="mariadb" affectData="true" flushCache="true">
         INSERT INTO dc3_driver_lease_state
-        (tenant_id, driver_id, membership_hash, device_revision)
-        VALUES
-        (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision})
-        ON DUPLICATE KEY UPDATE
-        membership_hash = VALUES(membership_hash),
-        device_revision = VALUES(device_revision),
-        assignment_version = dc3_driver_lease_state.assignment_version + 1,
-        operate_time = CURRENT_TIMESTAMP(6)
+            (tenant_id, driver_id, membership_hash, device_revision)
+        VALUES (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision})
+        ON DUPLICATE KEY UPDATE membership_hash    = VALUES(membership_hash),
+                                device_revision    = VALUES(device_revision),
+                                assignment_version = dc3_driver_lease_state.assignment_version + 1,
+                                operate_time       = CURRENT_TIMESTAMP(6)
     </insert>
 
     <delete id="deleteExpiredInstances">
-        DELETE FROM dc3_driver_instance
+        DELETE
+        FROM dc3_driver_instance
         WHERE tenant_id = #{tenantId}
-        AND driver_id = #{driverId}
-        AND lease_until &lt; #{expiredBefore}
+          AND driver_id = #{driverId}
+          AND lease_until &lt; #{expiredBefore}
     </delete>
 
     <insert id="upsertDeviceLeases">
@@ -251,41 +248,44 @@
     </insert>
 
     <delete id="deleteOrphanedLeases">
-        DELETE FROM dc3_device_lease lease
+        DELETE
+        FROM dc3_device_lease lease
         WHERE lease.tenant_id = #{tenantId}
-        AND lease.driver_id = #{driverId}
-        AND NOT EXISTS (
-        SELECT 1 FROM dc3_device device
-        WHERE device.tenant_id = lease.tenant_id
-        AND device.id = lease.device_id
-        AND device.driver_id = lease.driver_id
-        AND device.deleted = 0
-        AND device.enable_flag = 0
-        )
+          AND lease.driver_id = #{driverId}
+          AND NOT EXISTS (SELECT 1
+                          FROM dc3_device device
+                          WHERE device.tenant_id = lease.tenant_id
+                            AND device.id = lease.device_id
+                            AND device.driver_id = lease.driver_id
+                            AND device.deleted = 0
+                            AND device.enable_flag = 0)
     </delete>
 
     <select id="listOwnedLeases" resultType="io.github.pnoker.common.manager.entity.model.DeviceLeaseDO">
         SELECT tenant_id, driver_id, device_id, owner_node, fencing_token
         FROM dc3_device_lease
         WHERE tenant_id = #{tenantId}
-        AND driver_id = #{driverId}
-        AND owner_node = #{node}
-        AND device_id &gt; #{afterDeviceId}
+          AND driver_id = #{driverId}
+          AND owner_node = #{node}
+          AND device_id &gt; #{afterDeviceId}
         ORDER BY device_id
         LIMIT #{limit}
     </select>
 
     <select id="selectActiveLease" resultType="io.github.pnoker.common.manager.entity.model.DeviceLeaseDO">
-        SELECT lease.tenant_id, lease.driver_id, lease.device_id,
-        lease.owner_node, lease.fencing_token
+        SELECT lease.tenant_id,
+               lease.driver_id,
+               lease.device_id,
+               lease.owner_node,
+               lease.fencing_token
         FROM dc3_device_lease lease
-        JOIN dc3_driver_instance instance
-        ON instance.tenant_id = lease.tenant_id
-        AND instance.driver_id = lease.driver_id
-        AND instance.node_id = lease.owner_node
+                 JOIN dc3_driver_instance instance
+                      ON instance.tenant_id = lease.tenant_id
+                          AND instance.driver_id = lease.driver_id
+                          AND instance.node_id = lease.owner_node
         WHERE lease.tenant_id = #{tenantId}
-        AND lease.device_id = #{deviceId}
-        AND instance.lease_until &gt; CURRENT_TIMESTAMP
+          AND lease.device_id = #{deviceId}
+          AND instance.lease_until &gt; CURRENT_TIMESTAMP
     </select>
 
 </mapper>

@@ -58,6 +58,13 @@ class LocalCredentialServiceImplTest {
 
     private LocalCredentialServiceImpl service;
 
+    private static LocalCredentialDO credentialDO(int failedAttempts) {
+        LocalCredentialDO credential = new LocalCredentialDO();
+        credential.setFailedAttempts(failedAttempts);
+        credential.setOperateTime(LocalDateTime.now());
+        return credential;
+    }
+
     @BeforeEach
     void setUp() {
         service = new LocalCredentialServiceImpl(
@@ -165,12 +172,5 @@ class LocalCredentialServiceImplTest {
         assertThat(updated.getFailedAttempts()).isZero();
         assertThat(updated.getLockedUntil()).isNull();
         assertThat(updated.getOperateTime()).isNull();
-    }
-
-    private static LocalCredentialDO credentialDO(int failedAttempts) {
-        LocalCredentialDO credential = new LocalCredentialDO();
-        credential.setFailedAttempts(failedAttempts);
-        credential.setOperateTime(LocalDateTime.now());
-        return credential;
     }
 }

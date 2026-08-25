@@ -18,11 +18,12 @@
 package io.github.pnoker.common.mq.rabbit;
 
 import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.mq.MqHeaders;
+import io.github.pnoker.common.constant.mq.ConsumptionProfile;
 import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.constant.mq.OrderingGuarantee;
+import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.adapter.BrokerCapabilities;
-import io.github.pnoker.common.constant.mq.OrderingGuarantee;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
 import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireConfirmation;
@@ -31,9 +32,9 @@ import io.github.pnoker.common.mq.config.BatchConsumerProperties;
 import io.github.pnoker.common.mq.listener.MqBatchListener;
 import io.github.pnoker.common.mq.listener.MqPoisonException;
 import io.github.pnoker.common.mq.message.WireMqMessage;
-import io.github.pnoker.common.constant.mq.ConsumptionProfile;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
 import lombok.extern.slf4j.Slf4j;
+import org.aopalliance.aop.Advice;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageDeliveryMode;
@@ -46,7 +47,6 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareBatchMessageListener;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
 import org.springframework.amqp.rabbit.retry.MessageBatchRecoverer;
-import org.aopalliance.aop.Advice;
 
 import java.util.ArrayList;
 import java.util.HashMap;

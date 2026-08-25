@@ -1,13 +1,13 @@
 # Design: Pluggable Message Broker Abstraction (MQ Port)
 
-|                |                                                                                                                                |
-|----------------|--------------------------------------------------------------------------------------------------------------------------------|
+|                |                                                                                                                                                            |
+|----------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Status**     | Delivered: port + five adapters (rabbitmq / kafka / activemq / mqtt / pulsar) TCK-certified; rocketmq adapter experimental (opt-in TCK, not yet certified) |
-| **Date**       | 2026-08-17, revised 2026-08-19 (re-verified after commit `956de3dd3`; MQTT decoupling)                                         |
-| **Scope**      | `dc3-common-*` messaging layer (center ↔ driver async plane)                                                                   |
-| **Target**     | RabbitMQ (default), Kafka, RocketMQ, Pulsar, ActiveMQ (Artemis / Classic), MQTT 5 (EMQX / HiveMQ / NanoMQ / …)                 |
-| **Related**    | [`storage-abstraction.md`](./storage-abstraction.md) — relational + time-series pluggability, same profile/TCK mechanism       |
-| **Discussion** | open for review before Phase 1 starts                                                                                          |
+| **Date**       | 2026-08-17, revised 2026-08-19 (re-verified after commit `956de3dd3`; MQTT decoupling)                                                                     |
+| **Scope**      | `dc3-common-*` messaging layer (center ↔ driver async plane)                                                                                               |
+| **Target**     | RabbitMQ (default), Kafka, RocketMQ, Pulsar, ActiveMQ (Artemis / Classic), MQTT 5 (EMQX / HiveMQ / NanoMQ / …)                                             |
+| **Related**    | [`storage-abstraction.md`](./storage-abstraction.md) — relational + time-series pluggability, same profile/TCK mechanism                                   |
+| **Discussion** | open for review before Phase 1 starts                                                                                                                      |
 
 ## 1. Summary
 
@@ -321,15 +321,15 @@ The two subscription modes are the central modeling decision:
 
 Physical mapping per broker (namespace = today's `dc3.rabbit.tag` environment prefix):
 
-| Semantic        | RabbitMQ (adapter keeps current names)                    | Kafka                                          | RocketMQ                                      | Pulsar                               | ActiveMQ (JMS)                                     | MQTT 5                                               |
-|-----------------|-----------------------------------------------------------|------------------------------------------------|-----------------------------------------------|--------------------------------------|----------------------------------------------------|------------------------------------------------------|
-| LOAD_BALANCE    | shared durable queue bound `rk.*`                         | consumer group on topic `dc3.<topic>`          | CLUSTERING consume mode                       | Shared subscription `dc3-<topic>`    | JMS Queue                                          | shared subscription `$share/<group>/dc3/<topic>`     |
-| BROADCAST       | per-instance auto-delete queue (current design)           | per-instance `groupId = group + instanceId`    | BROADCASTING consume mode                     | Exclusive subscription per instance  | JMS Topic, unshared durable subscriber             | normal subscription, persistent session per instance |
-| Partition key   | routing-key suffix `.<service>`                           | record key → partition                         | message key (routing only, no ordering)       | key (routing only, shared sub)       | `dc3-partition-key` property                        | `dc3-partition-key` user property                    |
-| Key-pattern routing | broker topic bindings                                  | client-side router (`KeyMatcher`/`KeyRoutes`)  | client-side router                            | client-side router                   | client-side router                                 | client-side router                                   |
-| Batch           | consumer batch (`setBatchListener`, prefetch ≥ batchSize) | poll loop (`max.poll.records`)                 | batch consumption (`consumeMessageBatchSize`) | batch receive API                    | adapter drains within a short window (synthesized) | adapter drains within a short window (synthesized)   |
-| Instance expiry | `x-expires` / auto-delete + TTL (§8.8)                    | ❌ offsets persist — documented cleanup policy | subscription group config                     | subscription expiry policy           | no direct equivalent — documented cleanup policy   | session expiry interval ⚠️ (§13.8)                   |
-| Namespace       | name prefix (today)                                       | topic prefix                                   | namespace                                     | Pulsar tenant/namespace (native fit) | destination prefix                                 | topic prefix (`dc3/<topic>`, slash-separated)        |
+| Semantic            | RabbitMQ (adapter keeps current names)                    | Kafka                                          | RocketMQ                                      | Pulsar                               | ActiveMQ (JMS)                                     | MQTT 5                                               |
+|---------------------|-----------------------------------------------------------|------------------------------------------------|-----------------------------------------------|--------------------------------------|----------------------------------------------------|------------------------------------------------------|
+| LOAD_BALANCE        | shared durable queue bound `rk.*`                         | consumer group on topic `dc3.<topic>`          | CLUSTERING consume mode                       | Shared subscription `dc3-<topic>`    | JMS Queue                                          | shared subscription `$share/<group>/dc3/<topic>`     |
+| BROADCAST           | per-instance auto-delete queue (current design)           | per-instance `groupId = group + instanceId`    | BROADCASTING consume mode                     | Exclusive subscription per instance  | JMS Topic, unshared durable subscriber             | normal subscription, persistent session per instance |
+| Partition key       | routing-key suffix `.<service>`                           | record key → partition                         | message key (routing only, no ordering)       | key (routing only, shared sub)       | `dc3-partition-key` property                       | `dc3-partition-key` user property                    |
+| Key-pattern routing | broker topic bindings                                     | client-side router (`KeyMatcher`/`KeyRoutes`)  | client-side router                            | client-side router                   | client-side router                                 | client-side router                                   |
+| Batch               | consumer batch (`setBatchListener`, prefetch ≥ batchSize) | poll loop (`max.poll.records`)                 | batch consumption (`consumeMessageBatchSize`) | batch receive API                    | adapter drains within a short window (synthesized) | adapter drains within a short window (synthesized)   |
+| Instance expiry     | `x-expires` / auto-delete + TTL (§8.8)                    | ❌ offsets persist — documented cleanup policy | subscription group config                     | subscription expiry policy           | no direct equivalent — documented cleanup policy   | session expiry interval ⚠️ (§13.8)                   |
+| Namespace           | name prefix (today)                                       | topic prefix                                   | namespace                                     | Pulsar tenant/namespace (native fit) | destination prefix                                 | topic prefix (`dc3/<topic>`, slash-separated)        |
 
 Ordering note (documented, not hidden): RabbitMQ today guarantees nothing; Kafka with
 `partitionKey = driver service` gives per-driver ordering — strictly stronger than the current semantics, and it matters
@@ -353,7 +353,7 @@ same principle as the rest of this design:
    confirmation (§8.4). This lets a deployment consolidate: one MQTT broker serving both planes, or a smaller stack
    without RabbitMQ at all. The gaps fall back through the standard mechanisms (delay → local scheduler, DLQ → explicit
    topic, batch → synthesized windowing), and the TCK — including group durability with all instances down (§11 case
-   13) — is the acceptance bar, because shared-subscription retention semantics vary between brokers (§13.8).
+    13) — is the acceptance bar, because shared-subscription retention semantics vary between brokers (§13.8).
 
 The two planes stay independent: running the internal plane over MQTT changes nothing for the device-access drivers, and
 swapping the device-access broker changes nothing for the internal plane.
@@ -396,13 +396,13 @@ retention policy attribute — see §8.6.
 
 ### 8.3 Acknowledgement, retry and back-pressure
 
-| Operation                   | RabbitMQ                                                   | Kafka                             | RocketMQ                    | Pulsar                    | ActiveMQ              | MQTT 5                                        |
-|-----------------------------|------------------------------------------------------------|-----------------------------------|-----------------------------|---------------------------|-----------------------|-----------------------------------------------|
-| `ack()`                     | basicAck (single or batch-multiple)                        | offset commit (batched)           | CONSUME_SUCCESS             | ack                       | acknowledge           | PUBACK (QoS 1)                                |
-| `reject(true)`              | basicNack requeue                                          | seek back, no commit              | RECONSUME_LATER             | negative ack / redelivery | rollback              | adapter-level retry loop (broker has no nack) |
-| `reject(false)`             | basicReject → DLX                                          | write to `.dlq` topic             | built-in retry→DLQ          | DLQ policy                | redelivery-policy DLQ | publish to `.dlq` topic                       |
+| Operation                            | RabbitMQ                                                   | Kafka                             | RocketMQ                    | Pulsar                    | ActiveMQ              | MQTT 5                                        |
+|--------------------------------------|------------------------------------------------------------|-----------------------------------|-----------------------------|---------------------------|-----------------------|-----------------------------------------------|
+| `ack()`                              | basicAck (single or batch-multiple)                        | offset commit (batched)           | CONSUME_SUCCESS             | ack                       | acknowledge           | PUBACK (QoS 1)                                |
+| `reject(true)`                       | basicNack requeue                                          | seek back, no commit              | RECONSUME_LATER             | negative ack / redelivery | rollback              | adapter-level retry loop (broker has no nack) |
+| `reject(false)`                      | basicReject → DLX                                          | write to `.dlq` topic             | built-in retry→DLQ          | DLQ policy                | redelivery-policy DLQ | publish to `.dlq` topic                       |
 | bounded retry (batch retry settings) | stateless retry advice + recoverer (today's batch factory) | in-memory retry loop, then `.dlq` | `%RETRY%group` (native fit) | redelivery backoff + DLQ  | redelivery policy     | adapter in-memory loop                        |
-| back-pressure               | prefetch ≥ batchSize, broker as durable buffer             | consumer `pause()`/`resume()`     | suspend current queue       | flow control / queue size | session recover       | receive maximum (MQTT 5 flow control)         |
+| back-pressure                        | prefetch ≥ batchSize, broker as durable buffer             | consumer `pause()`/`resume()`     | suspend current queue       | flow control / queue size | session recover       | receive maximum (MQTT 5 flow control)         |
 
 The bounded-retry row matters: since `956de3dd3` the point-value factory wraps delivery in a stateless retry advice with
 exponential backoff, and exhaustion rejects the whole batch to the DLX. The shared batch-consumer retry settings
@@ -478,8 +478,9 @@ The point-value path — the platform's highest-volume stream — runs on consum
 | ActiveMQ | no native consumer batch → adapter drains available messages within a short window (synthesized, capability `batchDelivery=false`) |
 | MQTT     | no native consumer batch → same adapter-side windowing (synthesized, `batchDelivery=false`)                                        |
 
-Port model: `DeliveryMode.BATCH` + `MqBatchListener` + the shared batch retry settings. The TCK verifies that `ack()` after batch
-processing commits every message in the batch and that retry exhaustion dead-letters rather than drops (§11).
+Port model: `DeliveryMode.BATCH` + `MqBatchListener` + the shared batch retry settings. The TCK verifies that `ack()`
+after batch processing commits every message in the batch and that retry exhaustion dead-letters rather than drops
+(§11).
 
 Known trade-off (documented, not hidden): one poison message retries and dead-letters the **whole batch** today.
 Batch-level granularity is the Spring default and keeps the cross-broker story simple; per-message extraction is open
@@ -501,29 +502,29 @@ command senders already validate driver lease/ownership before dispatch.
 
 ## 9. Capability matrix (published, per adapter)
 
-Implementation status (revised 2026-08-25): five adapters — rabbitmq, kafka, activemq (Artemis), mqtt 5 and pulsar —
-are implemented and certified by the TCK against live brokers. The **rocketmq adapter is experimental and not yet
-certified**: its contract suite is opt-in (`TCK_ROCKETMQ_NAMESRV`) and self-describes as not-yet-certified, so it
-ships for evaluation, not as a production selection. Certified columns reflect the implemented behavior (e.g. rabbit
-delays arbitrary messages through the port fallback, rocketmq delay levels would quantize; the rocketmq classic client
-replays topic backlog for brand-new consumer groups regardless of consumeFromWhere, so that adapter seeds fresh groups
-to the latest offset and warms up not-yet-created topics on subscribe — the warm-up probe carries a marker property no
-business listener ever sees; pulsar subscriptions start at the latest position natively, which matches the
-fresh-queue semantics without seeding).
+Implementation status (revised 2026-08-25): five adapters — rabbitmq, kafka, activemq (Artemis), mqtt 5 and pulsar — are
+implemented and certified by the TCK against live brokers. The **rocketmq adapter is experimental and not yet
+certified**: its contract suite is opt-in (`TCK_ROCKETMQ_NAMESRV`) and self-describes as not-yet-certified, so it ships
+for evaluation, not as a production selection. Certified columns reflect the implemented behavior (e.g. rabbit delays
+arbitrary messages through the port fallback, rocketmq delay levels would quantize; the rocketmq classic client replays
+topic backlog for brand-new consumer groups regardless of consumeFromWhere, so that adapter seeds fresh groups to the
+latest offset and warms up not-yet-created topics on subscribe — the warm-up probe carries a marker property no business
+listener ever sees; pulsar subscriptions start at the latest position natively, which matches the fresh-queue semantics
+without seeding).
 
-| Capability               | RabbitMQ ✅           | Kafka ✅             | ActiveMQ ✅                             | MQTT 5 ✅                   | RocketMQ ⚠️ experimental   | Pulsar ✅        |
-|--------------------------|-----------------------|----------------------|-----------------------------------------|-----------------------------|----------------------------|------------------|
-| Delayed message          | fallback*             | ❌ → local fallback  | ✅ JMS scheduled                        | ❌ → local fallback         | fallback (levels quantize) | ✅ native        |
-| Native DLQ               | DLX + quarantine      | adapter `.dlq` topic | adapter `.dlq` queue                    | adapter `/dlq` topic        | adapter `-dlq` topic       | adapter `.dlq` topic |
-| Broadcast                | ✅ per-instance queue | ✅ (instance groups) | ✅ topic consumer                       | ✅ plain filter             | ✅ BROADCASTING            | ✅               |
-| Per-message ack          | ✅                    | offset (approx)      | ✅ client ack                           | ✅ QoS 1                    | ✅                         | ✅               |
-| Publisher confirm        | ✅ confirms           | ✅ (acks=all)        | ❌ best-effort (outbox covers it, §8.4) | ✅ (PUBACK)                 | ✅ sync send               | ✅               |
-| Batch delivery           | ✅ native             | ✅ native            | ⚠️ synthesized                          | ⚠️ synthesized              | ✅ consumer batch          | ✅ batch receive |
-| Per-key ordering         | ❌                    | ✅                   | ❌                                      | ❌                          | ❌ (keys carried for routing only) | ❌ (shared sub) |
-| Key-pattern routing      | ✅ broker bindings    | ✅ client-side router | ✅ client-side router                  | ✅ client-side router        | ✅ client-side router      | ✅ client-side router |
-| Subscription expiry      | ✅ x-expires          | ❌ documented        | ❌ documented                           | ⚠️ session expiry           | ❌ documented              | ❌ documented    |
-| Group durability offline | ✅ durable queue      | ✅ log retention     | ✅ durable subscription                 | ⚠️ broker-dependent (§13.8) | ✅ offsets                 | ✅               |
-| Retention                | queue TTL             | retention config     | subscription retention                  | broker-dependent            | retention                  | retention/TTL    |
+| Capability               | RabbitMQ ✅           | Kafka ✅              | ActiveMQ ✅                             | MQTT 5 ✅                   | RocketMQ ⚠️ experimental           | Pulsar ✅             |
+|--------------------------|-----------------------|-----------------------|-----------------------------------------|-----------------------------|------------------------------------|-----------------------|
+| Delayed message          | fallback*             | ❌ → local fallback   | ✅ JMS scheduled                        | ❌ → local fallback         | fallback (levels quantize)         | ✅ native             |
+| Native DLQ               | DLX + quarantine      | adapter `.dlq` topic  | adapter `.dlq` queue                    | adapter `/dlq` topic        | adapter `-dlq` topic               | adapter `.dlq` topic  |
+| Broadcast                | ✅ per-instance queue | ✅ (instance groups)  | ✅ topic consumer                       | ✅ plain filter             | ✅ BROADCASTING                    | ✅                    |
+| Per-message ack          | ✅                    | offset (approx)       | ✅ client ack                           | ✅ QoS 1                    | ✅                                 | ✅                    |
+| Publisher confirm        | ✅ confirms           | ✅ (acks=all)         | ❌ best-effort (outbox covers it, §8.4) | ✅ (PUBACK)                 | ✅ sync send                       | ✅                    |
+| Batch delivery           | ✅ native             | ✅ native             | ⚠️ synthesized                          | ⚠️ synthesized              | ✅ consumer batch                  | ✅ batch receive      |
+| Per-key ordering         | ❌                    | ✅                    | ❌                                      | ❌                          | ❌ (keys carried for routing only) | ❌ (shared sub)       |
+| Key-pattern routing      | ✅ broker bindings    | ✅ client-side router | ✅ client-side router                   | ✅ client-side router       | ✅ client-side router              | ✅ client-side router |
+| Subscription expiry      | ✅ x-expires          | ❌ documented         | ❌ documented                           | ⚠️ session expiry           | ❌ documented                      | ❌ documented         |
+| Group durability offline | ✅ durable queue      | ✅ log retention      | ✅ durable subscription                 | ⚠️ broker-dependent (§13.8) | ✅ offsets                         | ✅                    |
+| Retention                | queue TTL             | retention config      | subscription retention                  | broker-dependent            | retention                          | retention/TTL         |
 
 \* rabbit intrinsic TTL+DLX delays (STATE_TIMEOUT / DEVICE_SCAN) work server-side as before; arbitrary per-message
 delays use the port fallback (capability false).

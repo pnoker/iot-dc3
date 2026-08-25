@@ -6,18 +6,18 @@ negotiation, retry classification, and the batch-consumer configuration shared b
 
 ## Key types
 
-| Type                                                           | Role                                                                      |
-|----------------------------------------------------------------|---------------------------------------------------------------------------|
-| `BrokerAdapter`                                                | SPI implemented by every broker adapter                                   |
-| `BrokerCapabilities`                                           | negotiated broker feature set                                             |
-| `Dc3Listener` / `MqListener`                                   | listener annotations processed by `Dc3ListenerProcessor`                  |
-| `MessageSender` / `MessageSenderImpl`                          | publish path with per-message confirmations                               |
-| `MqMessage` / `MqReceived`                                     | logical wire envelopes (`EnvelopeCodec`)                                  |
-| `MqPoisonException` / `MqPublishException`                     | failure classification                                                    |
+| Type                                                           | Role                                                                                                            |
+|----------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| `BrokerAdapter`                                                | SPI implemented by every broker adapter                                                                         |
+| `BrokerCapabilities`                                           | negotiated broker feature set                                                                                   |
+| `Dc3Listener` / `MqListener`                                   | listener annotations processed by `Dc3ListenerProcessor`                                                        |
+| `MessageSender` / `MessageSenderImpl`                          | publish path with per-message confirmations                                                                     |
+| `MqMessage` / `MqReceived`                                     | logical wire envelopes (`EnvelopeCodec`)                                                                        |
+| `MqPoisonException` / `MqPublishException`                     | failure classification                                                                                          |
 | `KeyMatcher` / `KeyRoutes`                                     | key-pattern matching and the client-side topic router for adapters whose broker has no binding-level key filter |
-| `MqBatchListener` / `RawBatchListener` / `RawDeliveryListener` | batch-consumer contracts                                                  |
-| `BatchConsumerProperties`                                      | binds `dc3.data.point.batch` (batch size, timeouts, concurrency, retries) |
-| `MqAutoConfiguration`                                          | wires the shared messaging beans                                          |
+| `MqBatchListener` / `RawBatchListener` / `RawDeliveryListener` | batch-consumer contracts                                                                                        |
+| `BatchConsumerProperties`                                      | binds `dc3.data.point.batch` (batch size, timeouts, concurrency, retries)                                       |
+| `MqAutoConfiguration`                                          | wires the shared messaging beans                                                                                |
 
 ## Dependencies
 
@@ -31,8 +31,8 @@ mvn -s .mvn/settings.xml -pl dc3-mq/dc3-mq-core -am package
 
 ## Testing
 
-Unit tests cover the pure port logic (e.g. `KeyMatcher` wildcard semantics); the port contract is verified against
-every adapter in `dc3-mq-tck`:
+Unit tests cover the pure port logic (e.g. `KeyMatcher` wildcard semantics); the port contract is verified against every
+adapter in `dc3-mq-tck`:
 
 ```bash
 mvn -s .mvn/settings.xml -q -pl dc3-mq/dc3-mq-core -am -DskipTests compile

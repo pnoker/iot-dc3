@@ -28,8 +28,25 @@ package io.github.pnoker.common.mq.rabbit;
  */
 public final class RabbitNames {
 
+    // ===== Routing prefixes (publish side composes prefix + semantic partition key) =====
+    // The tag situation deliberately mirrors the pre-port constants byte-for-byte: most
+    // routing-key prefixes were declared WITHOUT the environment tag while command,
+    // command_result and event were declared WITH it. Bindings and publish routing keys
+    // always matched within each pair, so the inconsistency was invisible on the wire —
+    // and must now be preserved exactly.
+    public static final String ROUTING_STATE_PREFIX = "dc3.r.state.";
+    public static final String ROUTING_ALARM_PREFIX = "dc3.r.alarm.";
+    public static final String ROUTING_DRIVER_METADATA_PREFIX = "dc3.r.metadata.driver.";
+    public static final String ROUTING_POINT_COMMAND_PREFIX = "dc3.r.point_command.";
+    public static final String ROUTING_POINT_VALUE_PREFIX = "dc3.r.value.point.";
+    public static final String ROUTING_NOTIFY_TASK_PREFIX = "dc3.r.notify.task.";
+    public static final String ROUTING_POINT_COMMAND_RESULT_PREFIX = "dc3.r.point_command_result.";
+    // ===== Fixed routing keys for the TTL + DLX delay queues (untagged, as before) =====
+    public static final String ROUTING_DRIVER_TIMEOUT_DELAY = "state.timeout.driver.45s";
+    public static final String ROUTING_DRIVER_TIMEOUT_CHECK = "state.timeout.driver.check";
+    public static final String ROUTING_DEVICE_SCAN_TICK = "state.timeout.device.scan.tick";
+    public static final String ROUTING_DEVICE_SCAN = "state.timeout.device.scan";
     private static final String TAG = System.getProperty("dc3.rabbit.tag", "");
-
     // ===== Exchanges =====
     public static final String EXCHANGE_STATE = TAG + "dc3.e.state";
     public static final String EXCHANGE_ALARM = TAG + "dc3.e.alarm";
@@ -45,7 +62,6 @@ public final class RabbitNames {
     public static final String EXCHANGE_POINT_VALUE_DEAD = TAG + "dc3.e.point_value_dead";
     public static final String EXCHANGE_POINT_COMMAND_DEAD = TAG + "dc3.e.point_command_dead";
     public static final String EXCHANGE_POINT_COMMAND_RESULT = TAG + "dc3.e.point_command_result";
-
     // ===== Queues (center-side, platform-shared) =====
     public static final String QUEUE_DRIVER_STATE = TAG + "dc3.q.state.driver";
     public static final String QUEUE_DEVICE_STATE = TAG + "dc3.q.state.device";
@@ -63,34 +79,13 @@ public final class RabbitNames {
     public static final String QUEUE_COMMAND_DEAD = TAG + "dc3.q.command_dead";
     public static final String QUEUE_COMMAND_RESULT = TAG + "dc3.q.command_result";
     public static final String QUEUE_EVENT_REPORT = TAG + "dc3.q.event.report";
-
     // ===== Queue name templates (driver-side, per instance) =====
     public static final String QUEUE_DRIVER_METADATA_PREFIX = TAG + "dc3.q.metadata.driver.";
     public static final String QUEUE_POINT_COMMAND_PREFIX = TAG + "dc3.q.point_command.";
     public static final String QUEUE_COMMAND_PREFIX = TAG + "dc3.q.command.";
-
-    // ===== Routing prefixes (publish side composes prefix + semantic partition key) =====
-    // The tag situation deliberately mirrors the pre-port constants byte-for-byte: most
-    // routing-key prefixes were declared WITHOUT the environment tag while command,
-    // command_result and event were declared WITH it. Bindings and publish routing keys
-    // always matched within each pair, so the inconsistency was invisible on the wire —
-    // and must now be preserved exactly.
-    public static final String ROUTING_STATE_PREFIX = "dc3.r.state.";
-    public static final String ROUTING_ALARM_PREFIX = "dc3.r.alarm.";
-    public static final String ROUTING_DRIVER_METADATA_PREFIX = "dc3.r.metadata.driver.";
-    public static final String ROUTING_POINT_COMMAND_PREFIX = "dc3.r.point_command.";
-    public static final String ROUTING_POINT_VALUE_PREFIX = "dc3.r.value.point.";
-    public static final String ROUTING_NOTIFY_TASK_PREFIX = "dc3.r.notify.task.";
-    public static final String ROUTING_POINT_COMMAND_RESULT_PREFIX = "dc3.r.point_command_result.";
     public static final String ROUTING_EVENT_PREFIX = TAG + "dc3.r.event.";
     public static final String ROUTING_COMMAND_PREFIX = TAG + "dc3.r.command.";
     public static final String ROUTING_COMMAND_RESULT_PREFIX = TAG + "dc3.r.command_result.";
-
-    // ===== Fixed routing keys for the TTL + DLX delay queues (untagged, as before) =====
-    public static final String ROUTING_DRIVER_TIMEOUT_DELAY = "state.timeout.driver.45s";
-    public static final String ROUTING_DRIVER_TIMEOUT_CHECK = "state.timeout.driver.check";
-    public static final String ROUTING_DEVICE_SCAN_TICK = "state.timeout.device.scan.tick";
-    public static final String ROUTING_DEVICE_SCAN = "state.timeout.device.scan";
 
     private RabbitNames() {
         throw new IllegalStateException("Utility class");

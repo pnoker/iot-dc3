@@ -44,23 +44,6 @@ class LoggingPolicyTest {
     private static final Pattern RAW_SENSITIVE_FIELD = Pattern.compile(
             "(?i)\\b(?:payload|body|response|headers|principalHeader)\\s*=\\s*\\{\\}");
 
-    @Test
-    void productionJavaSourcesFollowLoggingPolicy() throws IOException {
-        Path repository = findRepositoryRoot();
-        List<String> violations = new ArrayList<>();
-
-        try (Stream<Path> paths = Files.walk(repository)) {
-            paths.filter(Files::isRegularFile)
-                    .filter(path -> path.toString().endsWith(".java"))
-                    .filter(path -> path.toString().replace('\\', '/').contains("/src/main/java/"))
-                    .forEach(path -> inspect(repository, path, violations));
-        }
-
-        assertThat(violations)
-                .as("Logging policy violations")
-                .isEmpty();
-    }
-
     private static void inspect(Path repository, Path path, List<String> violations) {
         try {
             String source = Files.readString(path);
@@ -197,5 +180,22 @@ class LoggingPolicyTest {
     private static String location(Path repository, Path path, String source, int offset) {
         long line = source.substring(0, offset).lines().count() + 1;
         return repository.relativize(path).toString().replace('\\', '/') + ':' + line;
+    }
+
+    @Test
+    void productionJavaSourcesFollowLoggingPolicy() throws IOException {
+        Path repository = findRepositoryRoot();
+        List<String> violations = new ArrayList<>();
+
+        try (Stream<Path> paths = Files.walk(repository)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .filter(path -> path.toString().replace('\\', '/').contains("/src/main/java/"))
+                    .forEach(path -> inspect(repository, path, violations));
+        }
+
+        assertThat(violations)
+                .as("Logging policy violations")
+                .isEmpty();
     }
 }

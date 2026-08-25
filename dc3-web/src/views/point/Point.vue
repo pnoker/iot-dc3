@@ -36,15 +36,31 @@
     <blank-card>
       <el-row>
         <template v-if="reactiveData.loading">
-          <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-            <skeleton-card :footer="true" :loading="true"/>
+          <el-col
+            v-for="data in 12"
+            :key="data"
+            :lg="6"
+            :md="12"
+            :sm="12"
+            :xl="6"
+            :xs="24"
+          >
+            <skeleton-card :footer="true" :loading="true" />
           </el-col>
         </template>
         <template v-else>
           <el-col v-if="reactiveData.listData.length < 1">
-            <el-empty :description="$t('point.empty')"/>
+            <el-empty :description="$t('point.empty')" />
           </el-col>
-          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+          <el-col
+            v-for="data in reactiveData.listData"
+            :key="data.id"
+            :lg="6"
+            :md="12"
+            :sm="12"
+            :xl="6"
+            :xs="24"
+          >
             <point-card
               :data="data"
               :embedded="embedded === 'profile' || embedded === 'device'"
@@ -60,9 +76,13 @@
       </el-row>
     </blank-card>
 
-    <point-edit-form ref="editRef" @add="onAdd" @update="onUpdate"/>
+    <point-edit-form ref="editRef" @add="onAdd" @update="onUpdate" />
 
-    <el-drawer v-model="reactiveData.detailVisible" :title="$t('point.detail.pointInfo')" size="520px">
+    <el-drawer
+      v-model="reactiveData.detailVisible"
+      :title="$t('point.detail.pointInfo')"
+      size="520px"
+    >
       <el-descriptions v-if="reactiveData.detailRecord" :column="1" border>
         <el-descriptions-item :label="$t('point.detail.pointName')">
           {{ reactiveData.detailRecord.pointName }}
@@ -74,7 +94,7 @@
           {{ $t(rwFlagKey(reactiveData.detailRecord.rwFlag)) }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('point.card.unit')">
-          {{ reactiveData.detailRecord.unit || '-' }}
+          {{ reactiveData.detailRecord.unit || "-" }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('point.card.ratio')">
           {{ reactiveData.detailRecord.multiple }}
@@ -87,42 +107,49 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('point.card.profile')">
           {{
-          reactiveData.detailRecord.profileId
-          ? reactiveData.profileTable[reactiveData.detailRecord.profileId]?.profileName || '-'
-          : '-'
+            reactiveData.detailRecord.profileId
+              ? reactiveData.profileTable[reactiveData.detailRecord.profileId]
+                  ?.profileName || "-"
+              : "-"
           }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('point.detail.relatedDevices')" :span="2">
+        <el-descriptions-item
+          :label="$t('point.detail.relatedDevices')"
+          :span="2"
+        >
           {{ reactiveData.detailRecord.deviceCount || 0 }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('point.add.description')" :span="2">
-          {{ reactiveData.detailRecord.remark || '-' }}
+          {{ reactiveData.detailRecord.remark || "-" }}
         </el-descriptions-item>
       </el-descriptions>
-      <el-empty v-else :description="$t('common.description')"/>
+      <el-empty v-else :description="$t('common.description')" />
     </el-drawer>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue';
+import { computed, ref, watch } from "vue";
 
-import {addPoint, deletePoint, listPoint, updatePoint} from '@/api/point';
-import {listProfileByIds} from '@/api/profile';
-import {usePagedList} from '@/composables/usePagedList';
-import {successMessage} from '@/utils/notificationUtil';
-import {isNull} from '@/utils/validationUtil';
-import {pointTypeKey, rwFlagKey} from '@/utils/pointFormatUtil';
+import { addPoint, deletePoint, listPoint, updatePoint } from "@/api/point";
+import { listProfileByIds } from "@/api/profile";
+import { usePagedList } from "@/composables/usePagedList";
+import { successMessage } from "@/utils/notificationUtil";
+import { isNull } from "@/utils/validationUtil";
+import { pointTypeKey, rwFlagKey } from "@/utils/pointFormatUtil";
 
-import type {PointRecord} from '@/config/types/manager';
+import type { PointRecord } from "@/config/types/manager";
 
-import BlankCard from '@/components/card/blank/BlankCard.vue';
-import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
-import PointEditForm from './add/PointEditForm.vue';
-import PointCard from './card/PointCard.vue';
-import PointTool from './tool/PointTool.vue';
+import BlankCard from "@/components/card/blank/BlankCard.vue";
+import SkeletonCard from "@/components/card/skeleton/SkeletonCard.vue";
+import PointEditForm from "./add/PointEditForm.vue";
+import PointCard from "./card/PointCard.vue";
+import PointTool from "./tool/PointTool.vue";
 
-type EditFormInstance = { show: (profileId: string) => void; showEdit: (row: PointRecord) => void };
+type EditFormInstance = {
+  show: (profileId: string) => void;
+  showEdit: (row: PointRecord) => void;
+};
 
 const props = withDefaults(
   defineProps<{
@@ -133,17 +160,17 @@ const props = withDefaults(
     deviceId?: string;
   }>(),
   {
-    embedded: '',
+    embedded: "",
     pre: false,
     next: false,
-    profileId: '',
-    deviceId: '',
-  }
+    profileId: "",
+    deviceId: "",
+  },
 );
 
 const emit = defineEmits<{
-  (e: 'pre-handle'): void;
-  (e: 'next-handle'): void;
+  (e: "pre-handle"): void;
+  (e: "next-handle"): void;
 }>();
 
 const editRef = ref<EditFormInstance | null>(null);
@@ -157,7 +184,7 @@ const {
   currentChange,
 } = usePagedList<PointRecord>({
   pageSize: 12,
-  sortColumn: 'create_time',
+  sortColumn: "create_time",
   request: (query) => listPoint(query),
 });
 
@@ -178,7 +205,7 @@ const basePointQuery = computed(() => {
 });
 
 const search = (params: Record<string, unknown>) => {
-  _search({...basePointQuery.value, ...params});
+  _search({ ...basePointQuery.value, ...params });
 };
 
 const reset = () => {
@@ -204,8 +231,7 @@ const onAdd = (form: unknown, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -217,34 +243,31 @@ const onUpdate = (form: unknown, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
 };
 
 const onDisable = (id: string, profileId: string, done: () => void) => {
-  updatePoint({id, profileId, enableFlag: 'DISABLE'})
+  updatePoint({ id, profileId, enableFlag: "DISABLE" })
     .then(() => {
       successMessage();
       load();
     })
-    .catch(() => {
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
 };
 
 const onEnable = (id: string, profileId: string, done: () => void) => {
-  updatePoint({id, profileId, enableFlag: 'ENABLE'})
+  updatePoint({ id, profileId, enableFlag: "ENABLE" })
     .then(() => {
       successMessage();
       load();
     })
-    .catch(() => {
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -256,8 +279,7 @@ const onDelete = (id: string, done: () => void) => {
       successMessage();
       load();
     })
-    .catch(() => {
-    })
+    .catch(() => {})
     .finally(() => {
       done();
     });
@@ -265,28 +287,35 @@ const onDelete = (id: string, done: () => void) => {
 
 const refresh = () => load();
 
-const preHandle = () => emit('pre-handle');
-const nextHandle = () => emit('next-handle');
+const preHandle = () => emit("pre-handle");
+const nextHandle = () => emit("next-handle");
 
 watch(
   () => reactiveData.listData,
   (points) => {
-    const profileIds = Array.from(new Set(points.map((p) => p.profileId).filter((id): id is string => !!id)));
+    const profileIds = Array.from(
+      new Set(
+        points.map((p) => p.profileId).filter((id): id is string => !!id),
+      ),
+    );
     if (profileIds.length === 0) {
       reactiveData.profileTable = {};
       return;
     }
     listProfileByIds(profileIds)
       .then((res) => {
-        reactiveData.profileTable = (res.data || {}) as Record<string, Record<string, any>>;
+        reactiveData.profileTable = (res.data || {}) as Record<
+          string,
+          Record<string, any>
+        >;
       })
       .catch(() => {
         // handled globally
       });
-  }
+  },
 );
 
-defineExpose({reactiveData, refresh});
+defineExpose({ reactiveData, refresh });
 
 load();
 </script>

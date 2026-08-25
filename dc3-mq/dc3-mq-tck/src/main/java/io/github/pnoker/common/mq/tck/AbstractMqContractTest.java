@@ -23,8 +23,6 @@ import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.SubscriptionMode;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
-import io.github.pnoker.common.mq.adapter.RawBatchListener;
-import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireMqDelivery;
 import io.github.pnoker.common.mq.core.EnvelopeCodec;
 import io.github.pnoker.common.mq.core.MessageSenderImpl;
@@ -39,8 +37,8 @@ import org.slf4j.MDC;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -62,27 +60,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 2026.8.19
  */
 public abstract class AbstractMqContractTest {
-
-    /**
-     * Simple wire payload with a unique marker per message.
-     */
-    public record TestPayload(String id, String text) {
-    }
-
-    /**
-     * Collector pairing received payloads with their headers.
-     */
-    protected static final class Received {
-        final TestPayload payload;
-        final Map<String, String> headers;
-        final boolean redelivered;
-
-        Received(WireMqDelivery delivery) {
-            this.payload = EnvelopeCodec.deserialize(delivery, TestPayload.class);
-            this.headers = delivery.headers();
-            this.redelivered = delivery.redelivered();
-        }
-    }
 
     /**
      * Unique suffix per suite run so repeated runs against a long-lived broker never
@@ -392,4 +369,25 @@ public abstract class AbstractMqContractTest {
      */
     @Test
     public abstract void perInstanceSubscriptionExpiresAfterInstanceStops();
+
+    /**
+     * Simple wire payload with a unique marker per message.
+     */
+    public record TestPayload(String id, String text) {
+    }
+
+    /**
+     * Collector pairing received payloads with their headers.
+     */
+    protected static final class Received {
+        final TestPayload payload;
+        final Map<String, String> headers;
+        final boolean redelivered;
+
+        Received(WireMqDelivery delivery) {
+            this.payload = EnvelopeCodec.deserialize(delivery, TestPayload.class);
+            this.headers = delivery.headers();
+            this.redelivered = delivery.redelivered();
+        }
+    }
 }

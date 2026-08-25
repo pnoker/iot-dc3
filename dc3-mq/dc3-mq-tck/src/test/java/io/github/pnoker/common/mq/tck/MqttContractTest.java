@@ -49,6 +49,7 @@ class MqttContractTest extends AbstractMqContractTest {
     private static final GenericContainer<?> HIVEMQ =
             new GenericContainer<>(DockerImageName.parse("hivemq/hivemq-ce:latest"))
                     .withExposedPorts(1883);
+    private MqttMqAdapter mqttAdapter;
 
     private static String host() {
         if (Objects.nonNull(EXTERNAL_HOST)) {
@@ -66,8 +67,6 @@ class MqttContractTest extends AbstractMqContractTest {
         }
         return HIVEMQ.getMappedPort(1883);
     }
-
-    private MqttMqAdapter mqttAdapter;
 
     @Override
     protected BrokerAdapter adapter() {

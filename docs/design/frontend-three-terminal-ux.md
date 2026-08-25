@@ -138,12 +138,11 @@ automatically via pnpm test:e2e with chromium only. Fixes recorded: playwright 1
 
 2026-08: v5 — contract hardening + first acceptance gaps closed. (1) Breakpoint contract now literal-free: the last
 hand-rolled width thresholds (Home 1024/1280/640, alarm Overview 1024/1280/640, AgenticAssistant 900) replaced with
-$breakpoint-* tokens, mapping single-column collapses to sm-max, 3-col stat grids to md-max, and 1-col to xs-max.
-tests/guardrails/breakpoint-contract.test.ts enforces A5: any @media (min/max-width) in src must reference a
-$breakpoint-* token. (2) A3 dialog criterion shipped: theme.scss re-shapes .el-dialog to the viewport (calc(100vw - 16px),
-capped height, scrolling body) below xs-max, overriding Element Plus inline widths; gated by a mobile-only Playwright
-test (dialog never wider than viewport, zero page overflow). (3) A2 gate coverage extended beyond the shell: nine
-template-sweep routes (monitor/list/detail/history families — alarm overview, device, driver, profile, label,
+$breakpoint-* tokens, mapping single-column collapses to sm-max, 3-col stat grids to md-max, and 1-col to xs-max. tests/guardrails/breakpoint-contract.test.ts enforces A5: any @media (min/max-width) in src must reference a
+$breakpoint-* token. (2) A3 dialog criterion shipped: theme.scss re-shapes .el-dialog to the viewport (calc (100vw -
+16px), capped height, scrolling body) below xs-max, overriding Element Plus inline widths; gated by a mobile-only
+Playwright test (dialog never wider than viewport, zero page overflow). (3) A2 gate coverage extended beyond the shell:
+nine template-sweep routes (monitor/list/detail/history families — alarm overview, device, driver, profile, label,
 point_value, alarm/point, event/command history) now gated on every terminal, 48 gate tests total. Still open: L4
 template rollout to the remaining ~100 views (mobile summary-card lists blocked on the L1 summary schema decision),
 Lighthouse budget + axe-core in CI, token lint.

@@ -119,6 +119,65 @@ public class RocketMqAdapter implements BrokerAdapter {
         }
     }
 
+    private static String groupOf(SubscriptionSpec spec) {
+        return spec.group().isBlank() ? DEFAULT_GROUP : spec.group();
+    }
+
+    /**
+     * Router key for one shared consumer: topic + group + delivery mode; a BROADCAST
+     * spec always gets its own per-instance key (BROADCASTING consumers must not
+     * compete for messages).
+     */
+    private static String routeKey(SubscriptionSpec spec) {
+        String group = spec.mode() == SubscriptionMode.BROADCAST
+                ? groupOf(spec) + "-broadcast-" + UUID.randomUUID()
+                : groupOf(spec);
+        return spec.topic() + "|" + group + "|" + spec.delivery();
+    }
+
+    /**
+     * The partition key rides the wire as the RocketMQ message key.
+     */
+    private static String keyOf(MessageExt message) {
+        return message.getKeys();
+    }
+
+    /**
+     * The warm-up probe (topic auto-creation) is stamped with a marker property and a
+     * {@code dc3-type} no business listener claims; every delivery path skips it.
+     */
+    private static boolean isWarmup(MessageExt message) {
+        return "1".equals(message.getUserProperty(WARMUP_MARKER));
+    }
+
+    /**
+     * Business headers only: the broker/client stamp a set of system properties
+     * (UNIQ_KEY, CONSUME_START_TIME, CLUSTER, ...) into the same properties map, and
+     * those must not leak into the port envelope.
+     */
+    private static Map<String, String> headersOf(MessageExt message) {
+        Map<String, String> headers = new HashMap<>();
+        message.getProperties().forEach((key, value) -> {
+            if (!MessageConst.STRING_HASH_SET.contains(key)) {
+                headers.put(key, value);
+            }
+        });
+        return headers;
+    }
+
+    private static String topicName(MqTopic topic) {
+        return switch (topic) {
+            case POINT_VALUE_DEAD -> "dc3-point_value-dlq";
+            case POINT_COMMAND_DEAD -> "dc3-point_command-dlq";
+            case COMMAND_DEAD -> "dc3-command-dlq";
+            default -> "dc3-" + topic.name().toLowerCase();
+        };
+    }
+
+    private static String deadLetterTopic(MqTopic topic) {
+        return topicName(topic) + "-dlq";
+    }
+
     @Override
     public String type() {
         return "rocketmq";
@@ -342,37 +401,6 @@ public class RocketMqAdapter implements BrokerAdapter {
         return consumer;
     }
 
-    private static String groupOf(SubscriptionSpec spec) {
-        return spec.group().isBlank() ? DEFAULT_GROUP : spec.group();
-    }
-
-    /**
-     * Router key for one shared consumer: topic + group + delivery mode; a BROADCAST
-     * spec always gets its own per-instance key (BROADCASTING consumers must not
-     * compete for messages).
-     */
-    private static String routeKey(SubscriptionSpec spec) {
-        String group = spec.mode() == SubscriptionMode.BROADCAST
-                ? groupOf(spec) + "-broadcast-" + UUID.randomUUID()
-                : groupOf(spec);
-        return spec.topic() + "|" + group + "|" + spec.delivery();
-    }
-
-    /**
-     * The partition key rides the wire as the RocketMQ message key.
-     */
-    private static String keyOf(MessageExt message) {
-        return message.getKeys();
-    }
-
-    /**
-     * The warm-up probe (topic auto-creation) is stamped with a marker property and a
-     * {@code dc3-type} no business listener claims; every delivery path skips it.
-     */
-    private static boolean isWarmup(MessageExt message) {
-        return "1".equals(message.getUserProperty(WARMUP_MARKER));
-    }
-
     /**
      * The 5.x classic client replays the topic backlog for brand-new consumer groups
      * regardless of consumeFromWhere, so fresh groups are seeded explicitly: every
@@ -457,21 +485,6 @@ public class RocketMqAdapter implements BrokerAdapter {
                 message.getReconsumeTimes() > 0, acknowledgment);
     }
 
-    /**
-     * Business headers only: the broker/client stamp a set of system properties
-     * (UNIQ_KEY, CONSUME_START_TIME, CLUSTER, ...) into the same properties map, and
-     * those must not leak into the port envelope.
-     */
-    private static Map<String, String> headersOf(MessageExt message) {
-        Map<String, String> headers = new HashMap<>();
-        message.getProperties().forEach((key, value) -> {
-            if (!MessageConst.STRING_HASH_SET.contains(key)) {
-                headers.put(key, value);
-            }
-        });
-        return headers;
-    }
-
     private Message rocketMessage(WireMqMessage wire) {
         Message message = new Message(topicName(wire.topic()), wire.body());
         if (Objects.nonNull(wire.partitionKey()) && !wire.partitionKey().isBlank()) {
@@ -535,18 +548,5 @@ public class RocketMqAdapter implements BrokerAdapter {
                 }
             });
         }
-    }
-
-    private static String topicName(MqTopic topic) {
-        return switch (topic) {
-            case POINT_VALUE_DEAD -> "dc3-point_value-dlq";
-            case POINT_COMMAND_DEAD -> "dc3-point_command-dlq";
-            case COMMAND_DEAD -> "dc3-command-dlq";
-            default -> "dc3-" + topic.name().toLowerCase();
-        };
-    }
-
-    private static String deadLetterTopic(MqTopic topic) {
-        return topicName(topic) + "-dlq";
     }
 }

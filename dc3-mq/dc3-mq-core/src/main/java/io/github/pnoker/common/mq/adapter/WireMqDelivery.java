@@ -18,10 +18,7 @@
 package io.github.pnoker.common.mq.adapter;
 
 import io.github.pnoker.common.mq.listener.Acknowledgment;
-import io.github.pnoker.common.mq.message.WireMqMessage;
-import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
 
-import java.util.List;
 import java.util.Map;
 
 /**

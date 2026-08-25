@@ -47,6 +47,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 @AutoConfiguration
 public class ThreadPoolConfig {
 
+    private final AtomicInteger threadPoolAtomic = new AtomicInteger(1);
+    private final AtomicInteger scheduledThreadPoolAtomic = new AtomicInteger(1);
+    private final ThreadProperties thread;
+
     /**
      * Create the pool config with the shared thread properties.
      *
@@ -55,12 +59,6 @@ public class ThreadPoolConfig {
     public ThreadPoolConfig(ThreadProperties thread) {
         this.thread = thread;
     }
-
-    private final AtomicInteger threadPoolAtomic = new AtomicInteger(1);
-
-    private final AtomicInteger scheduledThreadPoolAtomic = new AtomicInteger(1);
-
-    private final ThreadProperties thread;
 
     /**
      * Create ThreadPoolExecutor with LinkedBlockingQueue

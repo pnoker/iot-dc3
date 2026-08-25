@@ -157,9 +157,20 @@
         latest-value read off the time-series store (§9.4).
     -->
     <select id="selectLatestStream" resultType="io.github.pnoker.common.data.entity.model.PointValueDO">
-        SELECT tenant_id, device_id, point_id, message_id, schema_version,
-        driver_node, sequence, fencing_token, raw_value, cal_value, num_value,
-        driver_id, create_time, operate_time
+        SELECT tenant_id,
+               device_id,
+               point_id,
+               message_id,
+               schema_version,
+               driver_node,
+               sequence,
+               fencing_token,
+               raw_value,
+               cal_value,
+               num_value,
+               driver_id,
+               create_time,
+               operate_time
         FROM dc3_point_latest
         WHERE tenant_id = #{tenantId}
         ORDER BY create_time DESC

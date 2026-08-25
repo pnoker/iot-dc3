@@ -31,13 +31,13 @@
           <el-button
             :aria-label="asideCollapseLabel"
             :icon="appStore.settingsCollapsed ? Expand : Fold"
-            text
             circle
+            text
             @click="appStore.toggleSettingsCollapsed()"
           />
         </div>
         <el-scrollbar>
-          <settings-sidebar-menu :collapsed="appStore.settingsCollapsed"/>
+          <settings-sidebar-menu :collapsed="appStore.settingsCollapsed" />
         </el-scrollbar>
       </el-card>
     </el-aside>
@@ -50,7 +50,7 @@
       class="settings-drawer"
       direction="ltr"
     >
-      <settings-sidebar-menu @select="asideDrawerVisible = false"/>
+      <settings-sidebar-menu @select="asideDrawerVisible = false" />
     </el-drawer>
 
     <el-main class="settings-main">
@@ -58,38 +58,44 @@
         v-if="isMobile"
         :aria-label="t('layout.settings')"
         :icon="Setting"
-        class="settings-aside-toggle"
         circle
+        class="settings-aside-toggle"
         @click="asideDrawerVisible = true"
       />
       <el-scrollbar>
-        <router-view/>
+        <router-view />
       </el-scrollbar>
     </el-main>
   </el-container>
 </template>
 
 <script lang="ts" setup>
-import {Expand, Fold, Setting} from '@element-plus/icons-vue';
-import {computed, ref} from 'vue';
-import {useI18n} from 'vue-i18n';
+import { Expand, Fold, Setting } from "@element-plus/icons-vue";
+import { computed, ref } from "vue";
+import { useI18n } from "vue-i18n";
 
-import {useBreakpoint} from '@/composables/useBreakpoint';
-import {useAppStore} from '@/store';
-import SettingsSidebarMenu from '@/views/settings/components/SettingsSidebarMenu.vue';
+import { useBreakpoint } from "@/composables/useBreakpoint";
+import { useAppStore } from "@/store";
+import SettingsSidebarMenu from "@/views/settings/components/SettingsSidebarMenu.vue";
 
-const {t} = useI18n();
-const {isMobile} = useBreakpoint();
+const { t } = useI18n();
+const { isMobile } = useBreakpoint();
 const appStore = useAppStore();
 
 const asideDrawerVisible = ref(false);
 
 // Desktop aside width follows the L2 layout tokens; collapsed rail is
 // icon-only (64px) on tablet.
-const asideWidth = computed(() => (appStore.settingsCollapsed ? '64px' : '220px'));
+const asideWidth = computed(() =>
+  appStore.settingsCollapsed ? "64px" : "220px",
+);
 
 const asideCollapseLabel = computed(() =>
-  t(appStore.settingsCollapsed ? 'layout.expandSettings' : 'layout.collapseSettings'),
+  t(
+    appStore.settingsCollapsed
+      ? "layout.expandSettings"
+      : "layout.collapseSettings",
+  ),
 );
 </script>
 

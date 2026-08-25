@@ -27,8 +27,6 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import java.util.List;
 import java.util.Objects;
 
-import java.util.List;
-
 /**
  * Declares the physical RabbitMQ topology (exchanges, queues, bindings) with arguments
  * byte-for-byte identical to the pre-port {@code ExchangeConfig}/{@code DataTopicConfig}
@@ -51,22 +49,6 @@ public final class RabbitTopology {
      * Binding argument carried over from the pre-port layout; kept for wire identity.
      */
     private static final String BINDING_AUTO_DELETE = "x-auto-delete";
-
-    /**
-     * Descriptor of a platform-shared queue.
-     *
-     * @param queueName       queue name
-     * @param exchangeName    source exchange
-     * @param routingKey      binding routing key (pattern)
-     * @param ttlMillis       per-queue message TTL, 0 = none
-     * @param deadExchange    dead-letter exchange, null = none
-     * @param deadRouting     dead-letter routing key
-     * @param bindingArgument whether the binding carries the x-auto-delete argument
-     */
-    private record SharedQueue(String queueName, String exchangeName, String routingKey, int ttlMillis,
-                               String deadExchange, String deadRouting, boolean bindingArgument) {
-    }
-
     private static final List<SharedQueue> SHARED_QUEUES = List.of(
             new SharedQueue(RabbitNames.QUEUE_DRIVER_STATE, RabbitNames.EXCHANGE_STATE,
                     "dc3.r.state.driver.*", 30_000, null, null, true),
@@ -208,5 +190,20 @@ public final class RabbitTopology {
         }
         admin.declareQueue(queue);
         admin.declareBinding(binding);
+    }
+
+    /**
+     * Descriptor of a platform-shared queue.
+     *
+     * @param queueName       queue name
+     * @param exchangeName    source exchange
+     * @param routingKey      binding routing key (pattern)
+     * @param ttlMillis       per-queue message TTL, 0 = none
+     * @param deadExchange    dead-letter exchange, null = none
+     * @param deadRouting     dead-letter routing key
+     * @param bindingArgument whether the binding carries the x-auto-delete argument
+     */
+    private record SharedQueue(String queueName, String exchangeName, String routingKey, int ttlMillis,
+                               String deadExchange, String deadRouting, boolean bindingArgument) {
     }
 }

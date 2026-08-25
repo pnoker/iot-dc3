@@ -19,8 +19,8 @@ package io.github.pnoker.common.driver.receiver.rabbit;
 
 import io.github.pnoker.common.driver.command.CommandDedupCache;
 import io.github.pnoker.common.driver.command.DeviceLockManager;
-import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.service.DriverWriteService;

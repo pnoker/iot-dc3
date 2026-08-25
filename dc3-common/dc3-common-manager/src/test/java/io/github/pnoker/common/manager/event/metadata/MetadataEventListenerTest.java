@@ -17,18 +17,17 @@
 
 package io.github.pnoker.common.manager.event.metadata;
 
-import io.github.pnoker.common.entity.dto.MetadataEventDTO;
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import io.github.pnoker.common.constant.mq.MqTopic;
-import io.github.pnoker.common.mq.sender.MessageSender;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -37,7 +36,6 @@ import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;

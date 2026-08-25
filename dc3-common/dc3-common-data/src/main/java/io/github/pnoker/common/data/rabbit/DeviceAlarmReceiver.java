@@ -17,9 +17,9 @@
 
 package io.github.pnoker.common.data.rabbit;
 
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
-import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;

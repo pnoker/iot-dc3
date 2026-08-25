@@ -4027,7 +4027,7 @@ _Generated on 2026-08-19._
 
 - Generated from `551911de2` to `1ff4ee428`.
 - Included 90 commits across 6 categories: Features 1, Bug Fixes 6, Documentation 1, Build 2, Chores 1, Other Changes
-  79.
+    79.
 - Most active scopes: dc3-driver (2), maven (1), dc3-rtmp (1), dc3-gateway (1), dc3-manager (1), dc3-data (1).
 - Highlights: dc3-driver: adjust driver and point attributes.
 

@@ -50,35 +50,6 @@ class CommonModuleBoundaryTest {
             "(?m)^public\\s+(?:enum\\s+[A-Za-z_$][A-Za-z0-9_$]*"
                     + "|(?:final\\s+)?class\\s+[A-Za-z_$][A-Za-z0-9_$]*Constant)\\b");
 
-    @Test
-    void sharedTopLevelEnumsAndConstantClassesStayInCommonConstant() throws IOException {
-        Path repository = findRepositoryRoot();
-        List<String> violations = new ArrayList<>();
-
-        try (Stream<Path> paths = Files.walk(repository)) {
-            paths.filter(Files::isRegularFile)
-                    .filter(path -> normalized(path).contains(MAIN_JAVA))
-                    .filter(path -> path.toString().endsWith(".java"))
-                    .forEach(path -> inspectSharedTypePlacement(repository, path, violations));
-        }
-
-        assertThat(violations)
-                .as("Shared type placement violations")
-                .isEmpty();
-    }
-
-    @Test
-    void foundationModulesKeepTheirDependencyFloor() throws Exception {
-        Path common = findRepositoryRoot().resolve("dc3-common");
-
-        assertInternalDependencies(
-                common.resolve("dc3-common-constant/pom.xml"),
-                Set.of());
-        assertInternalDependencies(
-                common.resolve("dc3-common-public/pom.xml"),
-                Set.of("dc3-common-constant", "dc3-common-exception"));
-    }
-
     private static void inspectSharedTypePlacement(Path repository, Path path, List<String> violations) {
         try {
             String source = Files.readString(path);
@@ -155,6 +126,35 @@ class CommonModuleBoundaryTest {
 
     private static String normalized(Path path) {
         return path.toString().replace('\\', '/');
+    }
+
+    @Test
+    void sharedTopLevelEnumsAndConstantClassesStayInCommonConstant() throws IOException {
+        Path repository = findRepositoryRoot();
+        List<String> violations = new ArrayList<>();
+
+        try (Stream<Path> paths = Files.walk(repository)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(path -> normalized(path).contains(MAIN_JAVA))
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .forEach(path -> inspectSharedTypePlacement(repository, path, violations));
+        }
+
+        assertThat(violations)
+                .as("Shared type placement violations")
+                .isEmpty();
+    }
+
+    @Test
+    void foundationModulesKeepTheirDependencyFloor() throws Exception {
+        Path common = findRepositoryRoot().resolve("dc3-common");
+
+        assertInternalDependencies(
+                common.resolve("dc3-common-constant/pom.xml"),
+                Set.of());
+        assertInternalDependencies(
+                common.resolve("dc3-common-public/pom.xml"),
+                Set.of("dc3-common-constant", "dc3-common-exception"));
     }
 
 }

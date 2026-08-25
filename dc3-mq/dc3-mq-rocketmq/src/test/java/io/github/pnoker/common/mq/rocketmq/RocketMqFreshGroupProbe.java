@@ -21,9 +21,7 @@ import io.github.pnoker.common.constant.mq.ConsumptionProfile;
 import io.github.pnoker.common.constant.mq.DeliveryMode;
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.SubscriptionMode;
-import io.github.pnoker.common.mq.adapter.WireMqDelivery;
 import io.github.pnoker.common.mq.config.BatchConsumerProperties;
-import io.github.pnoker.common.mq.core.EnvelopeCodec;
 import io.github.pnoker.common.mq.core.MessageSenderImpl;
 import io.github.pnoker.common.mq.message.MqMessage;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
@@ -31,9 +29,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -55,6 +51,25 @@ class RocketMqFreshGroupProbe {
 
     private RocketMqAdapter adapter;
     private MessageSenderImpl sender;
+
+    private static void settle() {
+        try {
+            Thread.sleep(800);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private static void await(String what, java.util.function.BooleanSupplier condition) {
+        long deadline = System.currentTimeMillis() + 15_000;
+        while (System.currentTimeMillis() < deadline) {
+            if (condition.getAsBoolean()) {
+                return;
+            }
+            settle();
+        }
+        throw new IllegalStateException("timeout waiting for: " + what);
+    }
 
     @BeforeEach
     void requireBroker() {
@@ -79,14 +94,6 @@ class RocketMqFreshGroupProbe {
                 });
         settle();
         return received;
-    }
-
-    private static void settle() {
-        try {
-            Thread.sleep(800);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 
     @Test
@@ -134,16 +141,5 @@ class RocketMqFreshGroupProbe {
         await("late group got its own message", () -> late.stream().anyMatch(m -> m.contains("late-1")));
         System.err.println("[PROBE] late group received: " + late);
         assertThat(late).noneMatch(m -> m.contains("pre-"));
-    }
-
-    private static void await(String what, java.util.function.BooleanSupplier condition) {
-        long deadline = System.currentTimeMillis() + 15_000;
-        while (System.currentTimeMillis() < deadline) {
-            if (condition.getAsBoolean()) {
-                return;
-            }
-            settle();
-        }
-        throw new IllegalStateException("timeout waiting for: " + what);
     }
 }

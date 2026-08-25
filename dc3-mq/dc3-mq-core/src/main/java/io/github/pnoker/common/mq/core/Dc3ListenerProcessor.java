@@ -18,6 +18,7 @@
 package io.github.pnoker.common.mq.core;
 
 import io.github.pnoker.common.constant.common.RequestIdConstant;
+import io.github.pnoker.common.constant.mq.DeliveryMode;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
@@ -26,7 +27,6 @@ import io.github.pnoker.common.mq.adapter.WireMqDelivery;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
-import io.github.pnoker.common.constant.mq.DeliveryMode;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,13 +63,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Dc3ListenerProcessor implements SmartInitializingSingleton, ApplicationContextAware {
 
     private final BrokerAdapter adapter;
-
-    private ApplicationContext applicationContext;
-
     /**
      * Cache of classes already scanned for listener methods.
      */
     private final Map<Class<?>, List<Method>> listenerMethodCache = new ConcurrentHashMap<>();
+    private ApplicationContext applicationContext;
+
+    private static String firstRequestId(WireMqDelivery delivery) {
+        return Objects.nonNull(delivery.headers()) ? delivery.headers().get(MqHeaders.REQUEST_ID) : null;
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
@@ -197,9 +199,5 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
                 MDC.remove(RequestIdConstant.MDC_KEY);
             }
         }
-    }
-
-    private static String firstRequestId(WireMqDelivery delivery) {
-        return Objects.nonNull(delivery.headers()) ? delivery.headers().get(MqHeaders.REQUEST_ID) : null;
     }
 }

@@ -34,6 +34,63 @@ public final class TsdbModel {
     }
 
     /**
+     * S6/S15 aggregate functions. AVG/MIN/MAX/SUM/COUNT skip NULL numerics; FIRST/LAST
+     * form the M4 rendering quadruple with MIN/MAX; PERCENTILE is capability-gated.
+     */
+    public enum AggregateFunction {
+        /**
+         * Arithmetic mean over the window.
+         */
+        AVG,
+        /**
+         * Minimum value in the window.
+         */
+        MIN,
+        /**
+         * Maximum value in the window.
+         */
+        MAX,
+        /**
+         * Sum over the window.
+         */
+        SUM,
+        /**
+         * Row count over the window.
+         */
+        COUNT,
+        /**
+         * First sample in the window.
+         */
+        FIRST,
+        /**
+         * Last sample in the window.
+         */
+        LAST,
+        /**
+         * Percentile, p supplied per call and capability-gated.
+         */
+        PERCENTILE
+    }
+
+    /**
+     * S13-② grouping dimensions (the dashboard's whitelisted set).
+     */
+    public enum GroupDimension {
+        /**
+         * Group by device.
+         */
+        DEVICE,
+        /**
+         * Group by point.
+         */
+        POINT,
+        /**
+         * Group by driver.
+         */
+        DRIVER
+    }
+
+    /**
      * S1: series identity — platform numeric IDs; names enriched at the app layer.
      *
      * @param tenantId tenant scope of the series
@@ -151,45 +208,6 @@ public final class TsdbModel {
     }
 
     /**
-     * S6/S15 aggregate functions. AVG/MIN/MAX/SUM/COUNT skip NULL numerics; FIRST/LAST
-     * form the M4 rendering quadruple with MIN/MAX; PERCENTILE is capability-gated.
-     */
-    public enum AggregateFunction {
-        /**
-         * Arithmetic mean over the window.
-         */
-        AVG,
-        /**
-         * Minimum value in the window.
-         */
-        MIN,
-        /**
-         * Maximum value in the window.
-         */
-        MAX,
-        /**
-         * Sum over the window.
-         */
-        SUM,
-        /**
-         * Row count over the window.
-         */
-        COUNT,
-        /**
-         * First sample in the window.
-         */
-        FIRST,
-        /**
-         * Last sample in the window.
-         */
-        LAST,
-        /**
-         * Percentile, p supplied per call and capability-gated.
-         */
-        PERCENTILE
-    }
-
-    /**
      * Half-open time window [from, toExclusive).
      *
      * @param from        inclusive start
@@ -265,24 +283,6 @@ public final class TsdbModel {
      * @param count  sample count
      */
     public record SeriesCount(SeriesKey series, long count) {
-    }
-
-    /**
-     * S13-② grouping dimensions (the dashboard's whitelisted set).
-     */
-    public enum GroupDimension {
-        /**
-         * Group by device.
-         */
-        DEVICE,
-        /**
-         * Group by point.
-         */
-        POINT,
-        /**
-         * Group by driver.
-         */
-        DRIVER
     }
 
     /**

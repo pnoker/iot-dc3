@@ -15,10 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
-import {API_DATA_BASE} from '@/config/constant/api';
-import type {PageResult} from '@/config/types';
+import { httpGet, httpPost } from "@/api/common";
+import { API_DATA_BASE } from "@/config/constant/api";
+import type { PageResult } from "@/config/types";
 import type {
+  AgingBacklog,
   AlertActivityRow,
   AlertEventRow,
   AlertPageQuery,
@@ -27,72 +28,108 @@ import type {
   AlertTopSourceRow,
   AlertTrendRow,
   AlertTypeRow,
-  AgingBacklog,
   ChangeImpact,
   CorrelationPair,
   FlappingSource,
   MttaTrend,
   PeerDeviation,
-} from '@/config/types/dashboard';
+} from "@/config/types/dashboard";
 
 export const alertPage = (body: AlertPageQuery = {}) =>
-  httpPost<R<PageResult<AlertEventRow>>>(`${API_DATA_BASE}/dashboard/alert/page`, body);
+  httpPost<R<PageResult<AlertEventRow>>>(
+    `${API_DATA_BASE}/dashboard/alert/page`,
+    body,
+  );
 
 export const alertConfirm = (source: AlertSource, id: string) =>
-  httpPost<R<string>>(`${API_DATA_BASE}/dashboard/alert/confirm`, undefined, {params: {source, id}});
+  httpPost<R<string>>(`${API_DATA_BASE}/dashboard/alert/confirm`, undefined, {
+    params: { source, id },
+  });
 
 export const alertUnconfirm = (source: AlertSource, id: string) =>
-  httpPost<R<string>>(`${API_DATA_BASE}/dashboard/alert/unconfirm`, undefined, {params: {source, id}});
+  httpPost<R<string>>(`${API_DATA_BASE}/dashboard/alert/unconfirm`, undefined, {
+    params: { source, id },
+  });
 
-export const alertBulkConfirm = (items: Array<{ source: AlertSource; id: string }>, confirm: boolean) =>
-  httpPost<R<string>>(`${API_DATA_BASE}/dashboard/alert/bulk_confirm`, {items, confirm});
+export const alertBulkConfirm = (
+  items: Array<{ source: AlertSource; id: string }>,
+  confirm: boolean,
+) =>
+  httpPost<R<string>>(`${API_DATA_BASE}/dashboard/alert/bulk_confirm`, {
+    items,
+    confirm,
+  });
 
 export const alertTrend = (days = 30) =>
-  httpGet<R<AlertTrendRow[]>>(`${API_DATA_BASE}/dashboard/alert/trend`, {params: {days}});
+  httpGet<R<AlertTrendRow[]>>(`${API_DATA_BASE}/dashboard/alert/trend`, {
+    params: { days },
+  });
 
 export const alertTopSources = (days = 30, limit = 10) =>
-  httpGet<R<AlertTopSourceRow[]>>(`${API_DATA_BASE}/dashboard/alert/top_sources`, {params: {days, limit}});
+  httpGet<R<AlertTopSourceRow[]>>(
+    `${API_DATA_BASE}/dashboard/alert/top_sources`,
+    { params: { days, limit } },
+  );
 
 export const alertActivity = (days = 7) =>
-  httpGet<R<AlertActivityRow[]>>(`${API_DATA_BASE}/dashboard/alert/activity`, {params: {days}});
+  httpGet<R<AlertActivityRow[]>>(`${API_DATA_BASE}/dashboard/alert/activity`, {
+    params: { days },
+  });
 
 export const alertTypeDistribution = (days = 30) =>
-  httpGet<R<AlertTypeRow[]>>(`${API_DATA_BASE}/dashboard/alert/type_distribution`, {params: {days}});
+  httpGet<R<AlertTypeRow[]>>(
+    `${API_DATA_BASE}/dashboard/alert/type_distribution`,
+    { params: { days } },
+  );
 
 export const alertStormSources = (hours = 1, minCount = 10, limit = 10) =>
-  httpGet<R<AlertStormRow[]>>(`${API_DATA_BASE}/dashboard/alert/storm_sources`, {
-    params: {
-      hours,
-      min_count: minCount,
-      limit
-    }
-  });
+  httpGet<R<AlertStormRow[]>>(
+    `${API_DATA_BASE}/dashboard/alert/storm_sources`,
+    {
+      params: {
+        hours,
+        min_count: minCount,
+        limit,
+      },
+    },
+  );
 
 export const alertFlapping = (hours = 6, minCount = 5, limit = 20) =>
   httpGet<R<FlappingSource[]>>(`${API_DATA_BASE}/dashboard/alert/flapping`, {
     params: {
       hours,
       min_count: minCount,
-      limit
-    }
+      limit,
+    },
   });
 
 export const alertCorrelation = (hours = 24, windowSec = 30, limit = 15) =>
-  httpGet<R<CorrelationPair[]>>(`${API_DATA_BASE}/dashboard/alert/correlation`, {
-    params: {
-      hours,
-      window_sec: windowSec,
-      limit
-    }
-  });
+  httpGet<R<CorrelationPair[]>>(
+    `${API_DATA_BASE}/dashboard/alert/correlation`,
+    {
+      params: {
+        hours,
+        window_sec: windowSec,
+        limit,
+      },
+    },
+  );
 
 export const alertPeerDeviation = (days = 7) =>
-  httpGet<R<PeerDeviation[]>>(`${API_DATA_BASE}/dashboard/alert/peer_deviation`, {params: {days}});
+  httpGet<R<PeerDeviation[]>>(
+    `${API_DATA_BASE}/dashboard/alert/peer_deviation`,
+    { params: { days } },
+  );
 
-export const alertAging = () => httpGet<R<AgingBacklog>>(`${API_DATA_BASE}/dashboard/alert/aging`);
+export const alertAging = () =>
+  httpGet<R<AgingBacklog>>(`${API_DATA_BASE}/dashboard/alert/aging`);
 
 export const alertMtta = (days = 30) =>
-  httpGet<R<MttaTrend[]>>(`${API_DATA_BASE}/dashboard/alert/mtta`, {params: {days}});
+  httpGet<R<MttaTrend[]>>(`${API_DATA_BASE}/dashboard/alert/mtta`, {
+    params: { days },
+  });
 
 export const alertChangeImpact = (days = 30, limit = 30) =>
-  httpGet<R<ChangeImpact[]>>(`${API_DATA_BASE}/dashboard/alert/change_impact`, {params: {days, limit}});
+  httpGet<R<ChangeImpact[]>>(`${API_DATA_BASE}/dashboard/alert/change_impact`, {
+    params: { days, limit },
+  });

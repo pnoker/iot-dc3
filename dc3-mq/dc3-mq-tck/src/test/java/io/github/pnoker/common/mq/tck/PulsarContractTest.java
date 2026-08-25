@@ -51,6 +51,7 @@ class PulsarContractTest extends AbstractMqContractTest {
                             .forHttp("/admin/v2/namespaces/public/default")
                             .forPort(8080)
                             .withStartupTimeout(java.time.Duration.ofMinutes(5)));
+    private PulsarMqAdapter pulsarAdapter;
 
     private static String serviceUrl() {
         if (Objects.nonNull(EXTERNAL_URL)) {
@@ -61,8 +62,6 @@ class PulsarContractTest extends AbstractMqContractTest {
         }
         return "pulsar://" + PULSAR.getHost() + ":" + PULSAR.getMappedPort(6650);
     }
-
-    private PulsarMqAdapter pulsarAdapter;
 
     @Override
     protected BrokerAdapter adapter() {

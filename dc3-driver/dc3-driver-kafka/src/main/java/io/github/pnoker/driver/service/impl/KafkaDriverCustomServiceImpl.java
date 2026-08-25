@@ -61,10 +61,9 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     private final KafkaTemplate<String, String> kafkaTemplate;
+    private final Map<String, String> latestByKey = new ConcurrentHashMap<>();
     @Value("${dc3.driver.code}")
     private String driverCode;
-
-    private final Map<String, String> latestByKey = new ConcurrentHashMap<>();
 
     private static void checkRequired(Map<String, AttributeBO> config, String code,
                                       List<ValidationReport.AttributeIssue> issues) {
