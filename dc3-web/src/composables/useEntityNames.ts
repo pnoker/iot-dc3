@@ -149,6 +149,10 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string>): Promise<vo
 
 export type AlertSourceKind = 'point' | 'device' | 'driver';
 
+/**
+ * Cross-component reactive cache resolving entity ids to display names
+ * (device / driver / profile / point), locale-aware and inflight-deduped.
+ */
 export const useEntityNames = () => {
   const cachedName = (kind: EntityKind, id: string): string =>
     cache[kind][`${String(i18n.global.locale.value)}:${String(id)}`] ?? String(id);

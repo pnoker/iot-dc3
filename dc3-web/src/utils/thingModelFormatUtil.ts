@@ -81,6 +81,7 @@ function normalizeFormFlag(value: FlagValue, indexMap: Record<string, string>, f
   return normalized === '-' ? fallback : normalized;
 }
 
+/** Whether a backend enable flag (ENABLE/0/true forms) means enabled. */
 export function isEnabledFlag(value: FlagValue): boolean {
   if (value === true) return true;
   if (value === false || value === null || value === undefined || value === '') return false;
@@ -89,50 +90,62 @@ export function isEnabledFlag(value: FlagValue): boolean {
   return normalized === 'ENABLE' || normalized === 'ENABLED' || normalized === 'TRUE' || normalized === '0';
 }
 
+/** Normalize an enable flag to the ENABLE/DISABLE wire token. */
 export function enableFlagValue(value: FlagValue, fallback = 'ENABLE'): string {
   return normalizeFormFlag(value, ENABLE_FLAG_BY_INDEX, fallback);
 }
 
+/** Display token for a command type flag, or dash when absent. */
 export function commandTypeLabel(value: FlagValue): string {
   return normalizeFlag(value, COMMAND_TYPE_BY_INDEX);
 }
 
+/** Normalize a command type flag to its wire token. */
 export function commandTypeValue(value: FlagValue, fallback = 'CUSTOM'): string {
   return normalizeFormFlag(value, COMMAND_TYPE_BY_INDEX, fallback);
 }
 
+/** Display token for a call type flag, or dash when absent. */
 export function callTypeLabel(value: FlagValue): string {
   return normalizeFlag(value, CALL_TYPE_BY_INDEX);
 }
 
+/** Normalize a call type flag to its wire token. */
 export function callTypeValue(value: FlagValue, fallback = 'SYNC'): string {
   return normalizeFormFlag(value, CALL_TYPE_BY_INDEX, fallback);
 }
 
+/** Normalize a param direction flag to its wire token. */
 export function paramDirectionValue(value: FlagValue, fallback = 'INPUT'): string {
   return normalizeFormFlag(value, PARAM_DIRECTION_BY_INDEX, fallback);
 }
 
+/** Normalize a point type flag to its wire token. */
 export function pointTypeValue(value: FlagValue, fallback = 'STRING'): string {
   return normalizeFormFlag(value, POINT_TYPE_BY_INDEX, fallback);
 }
 
+/** Display token for an event type flag, or dash when absent. */
 export function eventTypeLabel(value: FlagValue): string {
   return normalizeFlag(value, EVENT_TYPE_BY_INDEX);
 }
 
+/** Normalize an event type flag to its wire token. */
 export function eventTypeValue(value: FlagValue, fallback = 'INFO'): string {
   return normalizeFormFlag(value, EVENT_TYPE_BY_INDEX, fallback);
 }
 
+/** Display token for an event level flag, or dash when absent. */
 export function eventLevelLabel(value: FlagValue): string {
   return normalizeFlag(value, EVENT_LEVEL_BY_INDEX);
 }
 
+/** Normalize an event level flag to its wire token. */
 export function eventLevelValue(value: FlagValue, fallback = 'LOW'): string {
   return normalizeFormFlag(value, EVENT_LEVEL_BY_INDEX, fallback);
 }
 
+/** Element Plus tag type for an event level. */
 export function eventLevelTag(value: FlagValue): 'success' | 'warning' | 'danger' | 'info' {
   const level = eventLevelLabel(value);
   if (level === 'CRITICAL') return 'danger';
@@ -141,6 +154,7 @@ export function eventLevelTag(value: FlagValue): 'success' | 'warning' | 'danger
   return 'info';
 }
 
+/** Normalize a command timeout to seconds, migrating legacy millisecond values. */
 export function normalizeCommandTimeoutSeconds(value: TimeoutValue): number | undefined {
   if (value === null || value === undefined || value === '') {
     return undefined;
@@ -158,6 +172,7 @@ export function normalizeCommandTimeoutSeconds(value: TimeoutValue): number | un
   return timeout;
 }
 
+/** Human label for a command timeout, or dash when unset. */
 export function commandTimeoutLabel(value: TimeoutValue): string {
   return normalizeCommandTimeoutSeconds(value)?.toString() ?? '-';
 }
@@ -196,6 +211,7 @@ const ALARM_LEVEL_TAG_BY_INDEX: Record<number, 'info' | 'success' | 'warning' | 
   3: 'success',
 };
 
+/** Select options for alarm types. */
 export const ALARM_TYPE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
   {value: 0, label: 'RULE'},
   {value: 1, label: 'OFFLINE'},
@@ -204,22 +220,27 @@ export const ALARM_TYPE_OPTIONS: ReadonlyArray<{ value: number; label: string }>
   {value: 4, label: 'REPORT'},
 ];
 
+/** Display token for an alarm type index. */
 export function alarmTypeLabel(flag: number | null | undefined): string {
   if (flag === null || flag === undefined) return '-';
   return ALARM_TYPE_LABEL_BY_INDEX[flag] ?? String(flag);
 }
 
+/** Element Plus tag type for an alarm type index. */
 export function alarmTypeTag(flag: number | null | undefined): 'info' | 'warning' | 'danger' {
   if (flag === null || flag === undefined) return 'info';
   return ALARM_TYPE_TAG_BY_INDEX[flag] ?? 'info';
 }
 
+/** Priority label (P0..P3) for an alarm level index. */
 export function alarmLevelLabel(flag: number | null | undefined): string {
   if (flag === null || flag === undefined) return '—';
   return ALARM_LEVEL_LABEL_BY_INDEX[flag] ?? '—';
 }
 
+/** Element Plus tag type for an alarm level index. */
 export function alarmLevelTag(flag: number | null | undefined): 'info' | 'success' | 'warning' | 'danger' {
   if (flag === null || flag === undefined) return 'info';
   return ALARM_LEVEL_TAG_BY_INDEX[flag] ?? 'info';
 }
+

@@ -64,6 +64,7 @@ const walk = (nodes: MenuNode[], predicate: (node: MenuNode) => boolean): MenuNo
   return undefined;
 };
 
+/** Pinia store for the backend menu tree with code-based lookup helpers. */
 export const useMenuStore = defineStore('menu', {
   state: (): MenuState => ({
     tree: [],

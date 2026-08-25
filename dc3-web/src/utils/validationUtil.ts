@@ -15,20 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** Whether the value is an http(s) URL. */
 export function isUrl(url: string): boolean {
   return /^https?:\/\/.*/.test(url);
 }
 
+/** Whether the value looks like an email address. */
 export function isEmail(email: string): boolean {
   return /^([a-zA-Z0-9_.-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(email);
 }
 
 // Chinese mobile phone prefixes as of 2024+
 // 13x, 14x, 15x, 16x, 17x, 18x, 19x
+/** Whether the value is a mainland Chinese mobile number. */
 export function isPhone(phone: string): boolean {
   return /^1[3-9]\d{9}$/.test(phone);
 }
 
+/** Whether the value is a number (type 1: decimal, 2: integer, other: always true). */
 export function isNum(num: unknown, type: number): boolean {
   if (type === 1) {
     return /^\d*\.?\d+$/.test(String(num));
@@ -39,6 +43,7 @@ export function isNum(num: unknown, type: number): boolean {
   return true;
 }
 
+/** Whether the value is empty for business purposes (null/blank/empty array/object/string). */
 export function isNull(val: unknown): boolean {
   if (typeof val === 'boolean') return false;
   if (typeof val === 'number') return false;
@@ -50,3 +55,4 @@ export function isNull(val: unknown): boolean {
   }
   return val === 'null' || val == null || val === 'undefined' || val === '';
 }
+

@@ -17,6 +17,7 @@
 
 export type SearchFormData = Record<string, any>;
 
+/** Drop empty/null/blank entries so list requests stay clean. */
 export const cleanSearchParams = <T extends SearchFormData>(data: T): Partial<T> => {
   const params = {...data};
   Object.keys(params).forEach((key) => {
@@ -32,7 +33,9 @@ export const cleanSearchParams = <T extends SearchFormData>(data: T): Partial<T>
   return params;
 };
 
+/** Clear a search form and re-apply the given defaults. */
 export const resetSearchForm = (formData: SearchFormData, defaults: SearchFormData = {}) => {
   Object.keys(formData).forEach((key) => delete formData[key]);
   Object.assign(formData, defaults);
 };
+

@@ -43,6 +43,7 @@ function empty(value: unknown): boolean {
   return value === undefined || value === null || value === '';
 }
 
+/** Validation rules for entity names (required, length, pattern). */
 export function nameRules(t: Translator, entityName: string): FormItemRule[] {
   return [
     {required: true, whitespace: true, message: t('common.nameRequired', {name: entityName}), trigger: 'blur'},
@@ -51,6 +52,7 @@ export function nameRules(t: Translator, entityName: string): FormItemRule[] {
   ];
 }
 
+/** Validation rules for auth names (ASCII-only pattern). */
 export function authNameRules(t: Translator, entityName: string): FormItemRule[] {
   return [
     {required: true, whitespace: true, message: t('common.nameRequired', {name: entityName}), trigger: 'blur'},
@@ -59,18 +61,22 @@ export function authNameRules(t: Translator, entityName: string): FormItemRule[]
   ];
 }
 
+/** Validation rules for remark fields (max length only). */
 export function remarkRules(t: Translator): FormItemRule[] {
   return [{max: REMARK_MAX_LENGTH, message: t('common.remarkLength'), trigger: 'blur'}];
 }
 
+/** Required + whitespace-trimmed rule for text inputs. */
 export function requiredStringRule(message: string, trigger: 'blur' | 'change' = 'blur'): FormItemRule[] {
   return [{required: true, whitespace: true, message, trigger}];
 }
 
+/** Required rule for select inputs. */
 export function requiredSelectRule(message: string): FormItemRule[] {
   return [{required: true, message, trigger: 'change'}];
 }
 
+/** Optional decimal validation rule (up to three fraction digits). */
 export function decimalRules(message: string, requiredMessage?: string): FormItemRule[] {
   const rules: FormItemRule[] = requiredMessage ? requiredStringRule(requiredMessage) : [];
   rules.push({
@@ -90,6 +96,7 @@ export function decimalRules(message: string, requiredMessage?: string): FormIte
   return rules;
 }
 
+/** Required rule plus 0-127 byte range validation. */
 export function byteRules(t: Translator, requiredMessage: string): FormItemRule[] {
   return [
     {required: true, message: requiredMessage, trigger: 'blur'},
@@ -113,6 +120,7 @@ export function byteRules(t: Translator, requiredMessage: string): FormItemRule[
   ];
 }
 
+/** Required rule plus positive-integer validation. */
 export function positiveIntegerRules(t: Translator, requiredMessage: string): FormItemRule[] {
   return [
     {required: true, message: requiredMessage, trigger: 'blur'},

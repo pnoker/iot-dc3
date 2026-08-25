@@ -56,6 +56,7 @@ const DEFAULT_MODEL: AgenticModel = {
   reasoning: false,
 };
 
+/** Pinia store for the agentic chat panel: sessions, messages, attachments, models, and streaming state. */
 export const useAgenticStore = defineStore('agentic', () => {
   const visible = ref(false);
   const bootstrapped = ref(false);

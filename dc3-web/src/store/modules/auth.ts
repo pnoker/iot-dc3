@@ -36,6 +36,7 @@ interface LoginForm {
   password: string;
 }
 
+/** Pinia store for auth state: tenant/login names plus login, logout, and token refresh flows. */
 export const useAuthStore = defineStore('auth', () => {
   // State
   const tenantRef = ref('default');

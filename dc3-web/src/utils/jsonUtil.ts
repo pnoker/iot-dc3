@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** Pretty-print JSON-ish input; unparseable strings pass through unchanged. */
 export const prettyJson = (value: unknown, fallback = '-'): string => {
   if (value == null || value === '') return fallback;
   if (typeof value === 'string') {
@@ -26,3 +27,4 @@ export const prettyJson = (value: unknown, fallback = '-'): string => {
   }
   return JSON.stringify(value, null, 2);
 };
+

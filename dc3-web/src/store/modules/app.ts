@@ -41,6 +41,7 @@ const readDensity = (): Density => {
   return getStorage(DENSITY_KEY) === 'compact' ? 'compact' : 'comfortable';
 };
 
+/** Pinia store for app-wide UI state: theme mode, density, and settings-sidebar collapse. */
 export const useAppStore = defineStore('app', () => {
   // State
   const themeMode = ref<ThemeMode>(readTheme());

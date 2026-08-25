@@ -43,6 +43,12 @@ export interface UsePagedListOptions<T, Q extends Record<string, any> = Record<s
   sortValue?: (row: T) => string | number | null | undefined;
 }
 
+/**
+ * Client-side paged list state: filtering, sorting, and server-backed loading
+ * through the configured request.
+ *
+ * @param options paging, sorting, request, and filter hooks
+ */
 export const usePagedList = <T, Q extends Record<string, any> = Record<string, any>>(
   options: UsePagedListOptions<T, Q> = {}
 ) => {

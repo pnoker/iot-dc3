@@ -29,6 +29,12 @@ import {logger} from '@/utils/log';
 import {successMessage} from '@/utils/notificationUtil';
 import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
+/**
+ * Reusable entity-list page state: search form, pagination, and dialog CRUD wiring
+ * driven by an {@link EntityListConfig}.
+ *
+ * @param rawConfig column/search/dialog configuration of the page
+ */
 export const useEntityListPage = (rawConfig: EntityListConfig) => {
   const {t} = useI18n();
   const router = useRouter();
