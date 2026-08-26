@@ -65,7 +65,9 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 10px 12px;
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--el-border-color-lighter);
+  margin-top: var(--dc3-space-4);
+  padding: var(--dc3-space-3);
+  border: 1px solid var(--dc3-border-base);
+  border-radius: var(--dc3-radius-lg);
+  background: var(--dc3-bg-muted);
 }

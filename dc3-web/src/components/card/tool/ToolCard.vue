@@ -59,7 +59,7 @@
             :page-size="+page.size"
             :page-sizes="pageSizes"
             :pager-count="isMobile ? 5 : 7"
-            :small="isMobile"
+            :size="isMobile ? 'small' : 'default'"
             :total="+page.total"
             background
             @size-change="onSizeChange"
@@ -251,7 +251,7 @@ defineExpose({search, reset});
   }
 
   :deep(.el-card) {
-    border: 0;
+    border-color: var(--dc3-border-base);
   }
 }
 </style>

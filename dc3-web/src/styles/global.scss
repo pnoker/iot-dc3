@@ -28,6 +28,64 @@
 // any viewport width (docs/design/frontend-three-terminal-ux.md, A2).
 body {
   margin: 0;
+  background: var(--dc3-bg-body);
+  color: var(--dc3-text-primary);
+}
+
+// The authenticated workspace shares one visual grammar: atmospheric canvas,
+// translucent functional surfaces, soft separators, and an explicit focus
+// state. This scopes Element Plus refinements to page content, leaving Login
+// and teleported overlays free to use their own presentation.
+.body-main,
+.settings-main {
+  .el-card {
+    border-color: var(--dc3-border-base);
+    border-radius: var(--dc3-radius-xl);
+    background: var(--dc3-bg-elevated);
+    box-shadow: var(--dc3-shadow-sm);
+    transition:
+      border-color var(--dc3-duration-base) var(--dc3-ease-standard),
+      box-shadow var(--dc3-duration-base) var(--dc3-ease-standard),
+      transform var(--dc3-duration-base) var(--dc3-ease-standard);
+  }
+
+  .el-card.is-hover-shadow:hover {
+    border-color: var(--dc3-border-strong);
+    box-shadow: var(--dc3-shadow-hover);
+  }
+
+  .el-card__header {
+    border-bottom-color: var(--dc3-border-base);
+  }
+
+  .el-input__wrapper,
+  .el-select__wrapper,
+  .el-textarea__inner,
+  .el-segmented {
+    border-radius: var(--dc3-radius-md);
+    box-shadow: inset 0 0 0 1px var(--dc3-border-base);
+    transition:
+      box-shadow var(--dc3-duration-fast) var(--dc3-ease-standard),
+      background-color var(--dc3-duration-fast) var(--dc3-ease-standard);
+  }
+
+  .el-input__wrapper.is-focus,
+  .el-select__wrapper.is-focused,
+  .el-textarea__inner:focus {
+    box-shadow: inset 0 0 0 1px var(--el-color-primary), var(--dc3-focus-ring);
+  }
+
+  .el-button:not(.is-circle) {
+    border-radius: var(--dc3-radius-md);
+  }
+
+  .el-table {
+    --el-table-border-color: var(--dc3-border-base);
+    --el-table-header-bg-color: var(--dc3-bg-muted);
+    --el-table-row-hover-bg-color: var(--dc3-bg-interactive);
+    border-radius: var(--dc3-radius-lg);
+    overflow: hidden;
+  }
 }
 
 // Form width helper classes are real CSS, so they live in the one-time global
@@ -56,8 +114,8 @@ body {
 }
 
 .settings-table {
-  margin-top: 1px;
-  border-radius: 4px;
+  margin-top: var(--dc3-space-2);
+  border-radius: var(--dc3-radius-lg);
 }
 
 .json-preview {

@@ -16,60 +16,95 @@
   -->
 
 <template>
-  <div class="login-container">
-    <div class="login-wrapper-left animated bounce-in-down">
-      <div class="login-left">
-        <img :src="assetUrl('images/logo/logo-white.svg')" class="img"/>
-      </div>
-    </div>
+  <main class="login-container">
     <Particles/>
-    <div class="login-wrapper-right animated bounce-in-down">
-      <div class="login-right">
-        <div class="login-main">
-          <h4 class="login-title">{{ t('login.title') }}</h4>
-          <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" class="login-form" status-icon>
-            <el-form-item prop="tenant">
-              <el-input
-                v-model="reactiveData.formData.tenant"
-                :placeholder="t('login.tenantPlaceholder')"
-                :prefix-icon="Box"
-                auto-complete="off"
-                @keyup.enter="handleLogin"
-              >
-              </el-input>
-            </el-form-item>
-            <el-form-item prop="name">
-              <el-input
-                v-model="reactiveData.formData.name"
-                :placeholder="t('login.usernamePlaceholder')"
-                :prefix-icon="User"
-                auto-complete="off"
-                @keyup.enter="handleLogin"
-              ></el-input>
-            </el-form-item>
-            <el-form-item prop="password">
-              <el-input
-                v-model="reactiveData.formData.password"
-                :placeholder="t('login.passwordPlaceholder')"
-                :prefix-icon="Lock"
-                :type="reactiveData.passwordType"
-                auto-complete="off"
-                @keyup.enter="handleLogin"
-              >
-                <template #append>
-                  <el-button :icon="reactiveData.isHide" @click="showPassword"/>
-                </template>
-              </el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button :loading="loading" class="login-submit" type="primary" @click.prevent="handleLogin">
-                {{ t('login.submit') }}
-              </el-button>
-            </el-form-item>
-          </el-form>
+    <div class="login-orb login-orb-primary" aria-hidden="true"/>
+    <div class="login-orb login-orb-accent" aria-hidden="true"/>
+
+    <section class="login-shell">
+      <div class="login-story">
+        <div class="login-brand-pill">
+          <img :src="assetUrl('images/logo/logo.svg')" alt="" class="login-brand-logo"/>
+          <span>IoT DC3</span>
+        </div>
+
+        <div class="login-story-copy">
+          <span class="login-kicker">PHYSICAL AI RUNTIME</span>
+          <h1>{{ t('login.heroTitle') }}</h1>
+          <p>{{ t('login.heroDescription') }}</p>
+          <div class="login-capabilities" :aria-label="t('login.capabilities')">
+            <span>{{ t('login.capabilityConnect') }}</span>
+            <span>{{ t('login.capabilityGovern') }}</span>
+            <span>{{ t('login.capabilityAct') }}</span>
+          </div>
+        </div>
+
+        <div class="login-runtime-flow" aria-hidden="true">
+          <span>AI Agent</span>
+          <i>→</i>
+          <strong>IoT DC3</strong>
+          <i>→</i>
+          <span>{{ t('login.physicalWorld') }}</span>
         </div>
       </div>
-    </div>
+
+      <div class="login-card-wrap">
+        <div class="login-card">
+          <div class="login-card-brand">
+            <img :src="assetUrl('images/logo/logo.svg')" alt=""/>
+            <span>IoT DC3</span>
+          </div>
+          <div class="login-main">
+            <span class="login-card-kicker">{{ t('login.console') }}</span>
+            <h2 class="login-title">{{ t('login.welcome') }}</h2>
+            <p class="login-subtitle">{{ t('login.subtitle') }}</p>
+            <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" class="login-form" status-icon>
+              <el-form-item prop="tenant">
+                <el-input
+                  v-model="reactiveData.formData.tenant"
+                  :placeholder="t('login.tenantPlaceholder')"
+                  :prefix-icon="Box"
+                  auto-complete="off"
+                  @keyup.enter="handleLogin"
+                />
+              </el-form-item>
+              <el-form-item prop="name">
+                <el-input
+                  v-model="reactiveData.formData.name"
+                  :placeholder="t('login.usernamePlaceholder')"
+                  :prefix-icon="User"
+                  auto-complete="off"
+                  @keyup.enter="handleLogin"
+                />
+              </el-form-item>
+              <el-form-item prop="password">
+                <el-input
+                  v-model="reactiveData.formData.password"
+                  :placeholder="t('login.passwordPlaceholder')"
+                  :prefix-icon="Lock"
+                  :type="reactiveData.passwordType"
+                  auto-complete="off"
+                  @keyup.enter="handleLogin"
+                >
+                  <template #append>
+                    <el-button
+                      :aria-label="t('login.togglePassword')"
+                      :icon="reactiveData.isHide"
+                      @click="showPassword"
+                    />
+                  </template>
+                </el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button :loading="loading" class="login-submit" type="primary" @click.prevent="handleLogin">
+                  {{ t('login.submit') }}
+                </el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <el-dialog v-model="changePasswordVisible" :title="t('login.changePasswordTitle')" width="420px">
       <el-alert :closable="false" :title="changePasswordHint" class="mb-4" show-icon type="warning"/>
@@ -97,7 +132,7 @@
         </el-button>
       </template>
     </el-dialog>
-  </div>
+  </main>
 </template>
 
 <script lang="ts" setup>

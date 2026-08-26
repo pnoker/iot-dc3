@@ -122,7 +122,7 @@ const TONE_ACCENT: Record<string, string> = {
   blue: 'var(--el-color-primary)',
   green: 'var(--el-color-success)',
   orange: 'var(--el-color-warning)',
-  purple: '#9059f6',
+  purple: 'var(--dc3-color-purple)',
   red: 'var(--el-color-danger)',
 };
 const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
@@ -132,12 +132,43 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
 .stat-card {
   --stat-card-accent: var(--el-color-primary);
   --stat-card-bg: var(--el-color-primary-light-9);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   cursor: pointer;
-  transition: transform 0.15s ease;
+  transition:
+    transform var(--dc3-duration-base) var(--dc3-ease-standard),
+    border-color var(--dc3-duration-base) var(--dc3-ease-standard),
+    box-shadow var(--dc3-duration-base) var(--dc3-ease-standard);
   height: 100%;
   min-height: 132px;
   display: flex;
   flex-direction: column;
+
+  &::before {
+    position: absolute;
+    z-index: -1;
+    top: -46px;
+    right: -42px;
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    background: var(--stat-card-bg);
+    content: '';
+    filter: blur(2px);
+  }
+
+  &::after {
+    position: absolute;
+    top: 0;
+    right: var(--dc3-space-4);
+    left: var(--dc3-space-4);
+    height: 2px;
+    border-radius: 0 0 var(--dc3-radius-full) var(--dc3-radius-full);
+    background: linear-gradient(90deg, transparent, var(--stat-card-accent), transparent);
+    opacity: 0.7;
+    content: '';
+  }
 
   :deep(.el-card__body) {
     flex: 1;
@@ -146,7 +177,8 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
   }
 
   &:hover {
-    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--stat-card-accent) 30%, transparent);
+    transform: translateY(-3px);
   }
 
   &--blue {
@@ -165,8 +197,8 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
   }
 
   &--purple {
-    --stat-card-accent: #9059f6;
-    --stat-card-bg: rgba(144, 89, 246, 0.1);
+    --stat-card-accent: var(--dc3-color-purple);
+    --stat-card-bg: var(--dc3-color-purple-soft);
   }
 
   &--red {
@@ -175,7 +207,7 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
   }
 
   :deep(.el-card__body) {
-    padding: 16px;
+    padding: var(--dc3-space-4);
   }
 
   .stat-card__row {
@@ -198,9 +230,10 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
   }
 
   .stat-card__icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 4px;
+    width: 44px;
+    height: 44px;
+    border: 1px solid color-mix(in srgb, var(--stat-card-accent) 18%, transparent);
+    border-radius: var(--dc3-radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -216,7 +249,7 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
 
   .stat-card__title {
     font-size: 13px;
-    color: var(--el-text-color-secondary);
+    color: var(--dc3-text-muted);
     margin-bottom: 2px;
   }
 
@@ -228,9 +261,10 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
   }
 
   .stat-card__value-text {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--el-text-color-primary);
+    font-size: 25px;
+    font-weight: 680;
+    color: var(--dc3-text-primary);
+    letter-spacing: -0.025em;
   }
 
   .stat-card__trend {
@@ -254,7 +288,7 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
 
   .stat-card__subtitle {
     font-size: 12px;
-    color: var(--el-text-color-secondary);
+    color: var(--dc3-text-muted);
     margin-top: 4px;
   }
 

@@ -41,12 +41,36 @@
   --el-color-primary-light-9: #e7f5fb;
   --el-color-primary-dark-2: #0e78af;
 
-  // dc3 surfaces / text (light)
-  --dc3-bg-body: #f6f7f9;
-  --dc3-bg-elevated: #ffffff;
+  // Canvas -> surface -> emphasis. Pages should communicate hierarchy with
+  // these layers instead of accumulating borders around every region.
+  --dc3-bg-body: #f2f7fa;
+  --dc3-bg-canvas:
+    radial-gradient(circle at 10% 0%, rgba(18, 150, 219, 0.11), transparent 30%),
+    radial-gradient(circle at 92% 10%, rgba(81, 86, 199, 0.08), transparent 26%),
+    linear-gradient(180deg, #f5fafc 0%, #eef4f7 100%);
+  --dc3-bg-elevated: rgba(255, 255, 255, 0.88);
+  --dc3-bg-elevated-strong: #ffffff;
+  --dc3-bg-muted: rgba(237, 246, 250, 0.76);
+  --dc3-bg-interactive: rgba(18, 150, 219, 0.07);
+  --dc3-bg-interactive-active: rgba(18, 150, 219, 0.13);
+  --dc3-ambient-primary: rgba(18, 150, 219, 0.17);
+  --dc3-ambient-secondary: rgba(85, 88, 201, 0.2);
+  --dc3-highlight-sheen: rgba(255, 255, 255, 0.62);
   --dc3-text-primary: #2c3e50;
   --dc3-text-regular: #606266;
-  --dc3-border-base: #dcdfe6;
+  --dc3-text-muted: #78909f;
+  --dc3-text-brand: #087fbd;
+  --dc3-border-base: rgba(100, 148, 174, 0.2);
+  --dc3-border-strong: rgba(62, 143, 184, 0.3);
+  --dc3-brand-gradient: linear-gradient(118deg, #087fbd 0%, #15a3d8 48%, #5558c9 100%);
+  --dc3-brand-gradient-soft: linear-gradient(118deg, rgba(18, 150, 219, 0.14), rgba(85, 88, 201, 0.1));
+  --dc3-color-purple: #7457d8;
+  --dc3-color-purple-soft: rgba(116, 87, 216, 0.11);
+  --dc3-focus-ring: 0 0 0 3px rgba(18, 150, 219, 0.18);
+  --dc3-shadow-sm: 0 4px 14px rgba(25, 78, 105, 0.06);
+  --dc3-shadow-md: 0 12px 34px rgba(25, 78, 105, 0.09);
+  --dc3-shadow-hover: 0 16px 40px rgba(22, 87, 120, 0.13);
+  --dc3-shadow-active: 0 5px 14px rgba(18, 121, 178, 0.1);
 
   // Spacing scale (4px grid)
   --dc3-space-1: 4px;
@@ -62,6 +86,8 @@
   --dc3-radius-sm: 4px;
   --dc3-radius-md: 8px;
   --dc3-radius-lg: 12px;
+  --dc3-radius-xl: 16px;
+  --dc3-radius-2xl: 20px;
   --dc3-radius-full: 999px;
 
   // Motion (A4/A7: durations collapse to 0ms under prefers-reduced-motion)
@@ -85,11 +111,31 @@
 
 html.dark {
   // Element Plus handles its own dark vars; dc3 custom tokens follow.
-  --dc3-bg-body: #141414;
-  --dc3-bg-elevated: #1d1e1f;
+  --dc3-bg-body: #10171c;
+  --dc3-bg-canvas:
+    radial-gradient(circle at 10% 0%, rgba(18, 150, 219, 0.12), transparent 30%),
+    radial-gradient(circle at 92% 10%, rgba(91, 95, 214, 0.1), transparent 26%),
+    linear-gradient(180deg, #121b21 0%, #0e151a 100%);
+  --dc3-bg-elevated: rgba(27, 38, 45, 0.9);
+  --dc3-bg-elevated-strong: #1b262d;
+  --dc3-bg-muted: rgba(43, 59, 68, 0.72);
+  --dc3-bg-interactive: rgba(60, 178, 229, 0.1);
+  --dc3-bg-interactive-active: rgba(60, 178, 229, 0.17);
+  --dc3-ambient-primary: rgba(18, 150, 219, 0.18);
+  --dc3-ambient-secondary: rgba(91, 95, 214, 0.2);
+  --dc3-highlight-sheen: rgba(255, 255, 255, 0.1);
   --dc3-text-primary: #e5eaf3;
   --dc3-text-regular: #a3a6ad;
-  --dc3-border-base: #4c4d4f;
+  --dc3-text-muted: #8295a1;
+  --dc3-text-brand: #55bde9;
+  --dc3-border-base: rgba(139, 184, 207, 0.16);
+  --dc3-border-strong: rgba(72, 178, 226, 0.28);
+  --dc3-brand-gradient-soft: linear-gradient(118deg, rgba(18, 150, 219, 0.2), rgba(85, 88, 201, 0.16));
+  --dc3-shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.16);
+  --dc3-shadow-md: 0 14px 36px rgba(0, 0, 0, 0.22);
+  --dc3-shadow-hover: 0 18px 44px rgba(0, 0, 0, 0.3);
+  --dc3-shadow-active: 0 6px 18px rgba(0, 0, 0, 0.2);
+  --dc3-color-purple-soft: rgba(135, 111, 224, 0.16);
 
   color-scheme: dark;
 }

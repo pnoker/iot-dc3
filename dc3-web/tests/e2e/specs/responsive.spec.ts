@@ -42,6 +42,11 @@ const expectNoHorizontalOverflow = async (page: Page, label: string) => {
 const isMobileViewport = (page: Page) =>
   (page.viewportSize()?.width ?? 1440) < 768;
 
+const isTabletViewport = (page: Page) => {
+  const width = page.viewportSize()?.width ?? 1440;
+  return width >= 768 && width < 1200;
+};
+
 test.describe("three-terminal gate", () => {
   test("login, home, and settings keep zero page-level overflow", async ({
     page,
@@ -86,6 +91,12 @@ test.describe("three-terminal gate", () => {
     await login(page);
     const mobile = isMobileViewport(page);
 
+    await expect(page.locator('.header_brand_glass')).toHaveCount(1);
+    await expect(page.locator('.header_actions_glass')).toHaveCount(1);
+    await expect(page.locator('.header_language_switch')).toBeVisible();
+    await expect(page.locator('.header_settings_button')).toBeVisible();
+    await expect(page.locator('.user_trigger')).toBeVisible();
+
     if (mobile) {
       // Hamburger replaces the horizontal menu strip.
       await expect(page.locator(".header_menu_toggle")).toBeVisible();
@@ -105,9 +116,13 @@ test.describe("three-terminal gate", () => {
       await page.locator(".settings-aside-toggle").click();
       await expect(page.locator(".settings-drawer")).toBeVisible();
     } else {
-      // Desktop/tablet keep the horizontal menu strip (ellipsis mode).
+      // Desktop keeps labels; tablet uses icon-compact navigation. Neither
+      // mode falls back to Element Plus's three-dot overflow item.
       await expect(page.locator(".header_menu_toggle")).toBeHidden();
       await expect(page.locator(".header_menu_wrap")).toBeVisible();
+      await expect(page.locator('.nav-menu--compact')).toHaveCount(
+        isTabletViewport(page) ? 1 : 0,
+      );
 
       await page.goto("/#/settings/user", { waitUntil: "domcontentloaded" });
       await waitForAppSettled(page);
@@ -151,7 +166,9 @@ test.describe("three-terminal gate", () => {
   // 640px dialog width never overflows a mobile viewport. Gated on mobile
   // only — desktop/tablet keep the centered width contract.
   test("dialogs fit the mobile viewport below 768px", async ({ page }) => {
-    test.skip(!isMobileViewport(page), "mobile-only dialog shape contract");
+    if (!isMobileViewport(page)) {
+      return;
+    }
     await login(page);
 
     await page.goto("/#/settings/label", { waitUntil: "domcontentloaded" });

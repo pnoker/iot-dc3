@@ -74,6 +74,7 @@ const props = withDefaults(
     width: 100%;
     box-sizing: border-box;
     min-width: 0;
+    border-color: var(--dc3-border-base);
   }
 
   &.is-borderless :deep(.el-card.card-shell__body) {
@@ -81,11 +82,11 @@ const props = withDefaults(
   }
 
   :deep(.el-card__header) {
-    padding: 12px 16px;
+    padding: var(--dc3-space-3) var(--dc3-space-4);
   }
 
   :deep(.el-card__body) {
-    padding: 16px;
+    padding: var(--dc3-space-4);
   }
 
   :deep(.el-tabs__nav) {
@@ -97,7 +98,8 @@ const props = withDefaults(
 
     .card-shell__header {
       font-size: 14px;
-      font-weight: bold;
+      font-weight: 650;
+      color: var(--dc3-text-primary);
     }
 
     &:first-child {
@@ -114,7 +116,8 @@ const props = withDefaults(
     }
 
     :deep(.el-tab-pane) {
-      background: #f6f7f9;
+      background: var(--dc3-bg-muted);
+      border-radius: var(--dc3-radius-lg);
     }
   }
 }

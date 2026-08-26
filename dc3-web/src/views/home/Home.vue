@@ -403,17 +403,18 @@ const cards = computed<CardModel[]>(() => [
 
 <style lang="scss" scoped>
 .home {
-  padding: 0 4px;
+  padding: 0;
 
   .home__row {
-    margin-bottom: 8px;
+    margin-bottom: var(--dc3-space-3);
 
     &:last-child {
       margin-bottom: 0;
     }
   }
 
-  // el-row already carries the 8px vertical rhythm between rows. On wide
+  // el-row carries the horizontal gutter while the page token owns vertical
+  // rhythm. On wide
   // screens the cols sit side-by-side so they don't need a bottom margin
   // of their own — adding one stacked with .home__row margin-bottom,
   // blowing the gap out to 16px. Only the narrow-screen breakpoint where
@@ -433,10 +434,10 @@ const cards = computed<CardModel[]>(() => [
 
   // SlaBadge is conditionally rendered between the banner row and the
   // stat grid. Neither neighbour sets a top margin, so by default the
-  // badge sits flush against the stats. Restore the page's 8px rhythm
+  // badge sits flush against the stats. Restore the page rhythm
   // so it reads as its own strip, not as a banner appendage.
   .sla-badge {
-    margin-bottom: 8px;
+    margin-bottom: var(--dc3-space-3);
   }
 
   // Stat indicators: always fit the strip on one line, regardless of how
@@ -446,8 +447,8 @@ const cards = computed<CardModel[]>(() => [
   .home__stats {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: var(--dc3-space-3);
+    margin-bottom: var(--dc3-space-3);
 
     @media (max-width: $breakpoint-md-max) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -455,6 +456,7 @@ const cards = computed<CardModel[]>(() => [
 
     @media (max-width: $breakpoint-xs-max) {
       grid-template-columns: 1fr;
+      gap: var(--dc3-space-2);
     }
   }
 }

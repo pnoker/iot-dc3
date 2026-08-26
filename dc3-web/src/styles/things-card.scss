@@ -30,7 +30,7 @@
   // visual spacing between cards. 4px on each side collapses with its
   // neighbour to 8px horizontal gap, matching the 8px row gap below
   // (the same rhythm the home / event overview grids use).
-  margin: 0 4px 8px;
+  margin: 0 var(--dc3-space-1) var(--dc3-space-3);
   box-sizing: border-box;
 
   .things-card-content {
@@ -57,7 +57,7 @@
     .things-card-body-content {
       display: flex;
       justify-content: space-around;
-      gap: 8px;
+      gap: var(--dc3-space-2);
       min-width: 0;
 
       p.nowrap-description {
@@ -98,6 +98,6 @@
   }
 
   .el-card__body {
-    padding: 16px;
+    padding: var(--dc3-space-4);
   }
 }

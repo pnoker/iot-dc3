@@ -179,7 +179,7 @@ defineExpose({formRef});
   }
 
   :deep(.el-card) {
-    border: 0;
+    border-color: var(--dc3-border-base);
   }
 }
 </style>

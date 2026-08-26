@@ -35,6 +35,11 @@ vi.mock('@/config/router', () => ({
   default: {push: layoutMocks.routerPush, currentRoute: {value: {path: '/home'}}},
 }));
 
+vi.mock('@/composables/useBreakpoint', async () => {
+  const {ref} = await import('vue');
+  return {useBreakpoint: () => ({isDesktop: ref(true), isMobile: ref(false), isTablet: ref(false)})};
+});
+
 vi.mock('@/components/agentic/AgenticAssistant.vue', () => ({
   default: {name: 'AgenticAssistant', template: '<div class="agentic-stub" />'},
 }));
@@ -90,6 +95,15 @@ describe('Layout', () => {
   it('renders the top nav with the home menu and the menu store tree', async () => {
     const wrapper = await mountLayout();
     await flushPromises();
+
+    // The fixed shell has exactly two glass capsules: brand on the left,
+    // menu + user controls on the right.
+    expect(wrapper.findAll('.header_brand_glass')).toHaveLength(1);
+    expect(wrapper.findAll('.header_actions_glass')).toHaveLength(1);
+    expect(wrapper.find('.header_actions_glass .header_menu_wrap').exists()).toBe(true);
+    expect(wrapper.find('.header_actions_glass .header_language_switch').exists()).toBe(true);
+    expect(wrapper.find('.header_actions_glass .header_user').exists()).toBe(true);
+    expect(wrapper.find('.header_actions_glass .user_trigger').exists()).toBe(true);
 
     // Home item is always present.
     expect(wrapper.text()).toContain('Home');

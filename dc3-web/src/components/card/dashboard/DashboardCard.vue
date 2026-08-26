@@ -214,9 +214,11 @@ defineExpose({
 .dashboard-card {
   display: flex;
   flex-direction: column;
+  border-color: var(--dc3-border-base);
 
   :deep(.el-card__header) {
-    padding: 12px 16px;
+    padding: var(--dc3-space-3) var(--dc3-space-4);
+    background: linear-gradient(180deg, var(--dc3-bg-elevated-strong), transparent);
   }
 
   // Body holds both the content region and (if present) the footer. We use
@@ -247,14 +249,28 @@ defineExpose({
   }
 
   .dashboard-card__title-text {
-    font-weight: 600;
-    color: var(--el-text-color-primary);
+    position: relative;
+    padding-left: 11px;
+    font-weight: 650;
+    color: var(--dc3-text-primary);
+
+    &::before {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 4px;
+      height: 14px;
+      border-radius: var(--dc3-radius-full);
+      background: var(--dc3-brand-gradient);
+      content: '';
+      transform: translateY(-50%);
+    }
   }
 
   .dashboard-card__subtitle {
     font-size: 12px;
     font-weight: normal;
-    color: var(--el-text-color-secondary);
+    color: var(--dc3-text-muted);
   }
 
   // Badge sits inline with the title — override the default floating
@@ -344,9 +360,9 @@ defineExpose({
     gap: 8px;
     padding: 8px 16px;
     font-size: 12px;
-    color: var(--el-text-color-secondary);
-    border-top: 1px solid var(--el-border-color-lighter);
-    background: var(--el-fill-color-lighter);
+    color: var(--dc3-text-muted);
+    border-top: 1px solid var(--dc3-border-base);
+    background: var(--dc3-bg-muted);
     flex-shrink: 0;
   }
 

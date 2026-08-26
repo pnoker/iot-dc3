@@ -162,12 +162,64 @@ const onSelect = (name: string) => {
 <style lang="scss" scoped>
 .settings-sidebar-menu {
   border-right: none;
+  padding: var(--dc3-space-2);
+  background: transparent;
 
   :deep(.el-menu-item),
   :deep(.el-sub-menu__title) {
     display: flex;
     align-items: center;
     gap: 8px;
+    height: 42px;
+    margin: 2px 0;
+    border-radius: var(--dc3-radius-lg);
+    color: var(--dc3-text-regular);
+    transition:
+      color var(--dc3-duration-fast) var(--dc3-ease-standard),
+      background-color var(--dc3-duration-fast) var(--dc3-ease-standard),
+      box-shadow var(--dc3-duration-fast) var(--dc3-ease-standard);
+  }
+
+  :deep(.el-menu-item:hover),
+  :deep(.el-sub-menu__title:hover) {
+    background: var(--dc3-bg-interactive);
+    color: var(--el-color-primary);
+  }
+
+  :deep(.el-menu-item.is-active) {
+    position: relative;
+    background: var(--dc3-brand-gradient-soft);
+    box-shadow: inset 0 0 0 1px var(--dc3-border-strong);
+    color: var(--el-color-primary);
+    font-weight: 650;
+
+    &::before {
+      position: absolute;
+      top: 50%;
+      left: 5px;
+      width: 3px;
+      height: 18px;
+      border-radius: var(--dc3-radius-full);
+      background: var(--dc3-brand-gradient);
+      content: '';
+      transform: translateY(-50%);
+    }
+  }
+
+  :deep(.el-menu-item:focus-visible),
+  :deep(.el-sub-menu__title:focus-visible) {
+    outline: none;
+    box-shadow: var(--dc3-focus-ring);
+  }
+
+  &.el-menu--collapse {
+    padding: var(--dc3-space-2) var(--dc3-space-1);
+
+    :deep(.el-menu-item),
+    :deep(.el-sub-menu__title) {
+      justify-content: center;
+      padding: 0;
+    }
   }
 }
 </style>

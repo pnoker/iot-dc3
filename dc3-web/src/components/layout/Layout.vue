@@ -17,8 +17,8 @@
 
 <template>
   <div class="container">
-    <div class="header">
-      <div class="header_item header_brand">
+    <header class="header">
+      <div class="header_brand_glass">
         <!-- Thumb terminals get a hamburger instead of the horizontal menu
              strip (A3: drawer navigation, docs/design/frontend-three-terminal-ux.md). -->
         <el-button
@@ -29,55 +29,66 @@
           text
           @click="navDrawerVisible = true"
         />
-        <div class="header_brand_glass">
-          <img :src="assetUrl('images/logo/logo.svg')" class="header_logo" />
-          <span class="header_title">IoT DC3</span>
+        <img :src="assetUrl('images/logo/logo.svg')" class="header_logo" />
+        <span class="header_title">IoT DC3</span>
+      </div>
+      <div class="header_actions_glass">
+        <div v-if="!isMobile" class="header_menu_wrap">
+          <nav-menu :compact="isTablet" mode="horizontal" />
+        </div>
+        <span v-if="!isMobile" class="header_actions_divider" aria-hidden="true" />
+        <div class="header_utilities">
+          <div :aria-label="t('layout.language')" class="header_language_switch" role="group">
+            <button
+              :aria-pressed="langModel === 'en'"
+              :class="{active: langModel === 'en'}"
+              type="button"
+              @click="langModel = 'en'"
+            >
+              EN
+            </button>
+            <button
+              :aria-pressed="langModel === 'zh'"
+              :class="{active: langModel === 'zh'}"
+              type="button"
+              @click="langModel = 'zh'"
+            >
+              中
+            </button>
+          </div>
+          <el-tooltip v-if="settingsEntryName" :content="t('layout.settings')" placement="bottom">
+            <el-button
+              :aria-label="t('layout.settings')"
+              :icon="Setting"
+              circle
+              class="header_settings_button"
+              text
+              @click="handleCommand('settings')"
+            />
+          </el-tooltip>
+        </div>
+        <span class="header_actions_divider" aria-hidden="true" />
+        <div class="header_user">
+          <el-dropdown trigger="click" @command="handleCommand">
+            <button :aria-label="t('layout.account')" class="user_trigger" type="button">
+              <span class="user_initial" aria-hidden="true">{{ currentInitial }}</span>
+              <span v-if="isDesktop" class="user_name">{{ currentLogin }}</span>
+              <el-icon v-if="isDesktop" class="user_chevron"><ArrowDown/></el-icon>
+            </button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item :icon="QuestionFilled" command="help">{{
+                  t("layout.about")
+                }}</el-dropdown-item>
+                <el-dropdown-item :icon="SwitchButton" command="logout" divided>{{
+                  t("layout.logout")
+                }}</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </div>
       </div>
-      <div v-if="!isMobile" class="header_item header_menu_wrap">
-        <nav-menu mode="horizontal" />
-      </div>
-      <div class="header_item header_user">
-        <el-dropdown trigger="click" @command="handleCommand">
-          <span class="user_avatar">
-            <el-avatar>
-              <img :src="assetUrl('images/common/avatar.png')" />
-            </el-avatar>
-            <span class="user_name">{{ currentLogin }}</span>
-          </span>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <!-- Inline language switch. @click.stop keeps the dropdown
-                   open while the user toggles locales; the native
-                   <el-dropdown-item> variants would close the menu on
-                   every click. -->
-              <li class="user_lang_row" @click.stop>
-                <el-segmented
-                  v-model="langModel"
-                  :options="langOptions"
-                  class="user_lang_seg"
-                  size="small"
-                />
-              </li>
-              <el-dropdown-item
-                v-if="settingsEntryName"
-                :icon="Setting"
-                command="settings"
-                divided
-              >
-                {{ t("layout.settings") }}
-              </el-dropdown-item>
-              <el-dropdown-item :icon="QuestionFilled" command="help">{{
-                t("layout.about")
-              }}</el-dropdown-item>
-              <el-dropdown-item :icon="SwitchButton" command="logout">{{
-                t("layout.logout")
-              }}</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </div>
-    </div>
+    </header>
     <!-- Mobile navigation drawer: the same NavMenu component, vertical mode. -->
     <el-drawer
       v-model="navDrawerVisible"
@@ -132,6 +143,7 @@ import NavMenu from "@/components/layout/NavMenu.vue";
 import { useBreakpoint } from "@/composables/useBreakpoint";
 import router from "@/config/router";
 import {
+  ArrowDown,
   Menu,
   QuestionFilled,
   Setting,
@@ -154,11 +166,12 @@ const route = useRoute();
 const authStore = useAuthStore();
 const menuStore = useMenuStore();
 const agenticStore = useAgenticStore();
-const { isMobile } = useBreakpoint();
+const { isDesktop, isMobile, isTablet } = useBreakpoint();
 const navDrawerVisible = ref(false);
 const currentLogin = computed(() =>
   String(authStore.getName || authStore.name || "dc3"),
 );
+const currentInitial = computed(() => Array.from(currentLogin.value.trim())[0]?.toUpperCase() || "D");
 
 // Close the mobile navigation drawer once navigation actually happens.
 watch(
@@ -171,10 +184,6 @@ watch(
 // The AI assistant is shown in every build; in mock builds the fetch
 // interceptor (src/mock/fetch.ts) answers its chat completions.
 
-const langOptions = [
-  { label: "EN", value: "en" },
-  { label: "中", value: "zh" },
-];
 const langModel = computed({
   get: () => locale.value,
   set: (val: string) => {
@@ -463,48 +472,34 @@ const handleCommand = async (command: string) => {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
 
   .header {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--dc3-space-3);
+    box-sizing: border-box;
     width: 100%;
     height: var(--dc3-header-height);
-    display: flex;
-    border-bottom: 1px solid var(--dc3-border-base);
+    padding: 9px clamp(10px, 2vw, 24px);
+    border-bottom: 1px solid rgba(148, 203, 229, 0.22);
+    background:
+      radial-gradient(circle at 12% -80%, rgba(92, 215, 244, 0.2), transparent 36%),
+      color-mix(in srgb, var(--dc3-bg-body) 88%, transparent);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
 
-    // 1:4:1 flex split mirrors the legacy el-col 4/16/4 grid so the
-    // desktop layout is unchanged; the menu wrap disappears on mobile
-    // and the two side cells absorb the space.
-    .header_item {
-      height: 100%;
-    }
-
-    .header_brand {
-      flex: 1 1 0;
-      display: flex;
-      align-items: center;
-      gap: var(--dc3-space-2);
-      padding-left: 10px;
-    }
-
-    .header_menu_wrap {
-      flex: 4 1 0;
-      display: flex;
-      justify-content: center;
-    }
-
-    .header_menu_toggle {
-      display: none;
-    }
-
-    .header_brand_glass {
+    .header_brand_glass,
+    .header_actions_glass {
       position: relative;
       isolation: isolate;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       box-sizing: border-box;
-      width: fit-content;
-      height: 40px;
-      padding: 5px 13px 5px 6px;
+      height: 42px;
       overflow: hidden;
       border: 1px solid rgba(148, 216, 246, 0.34);
-      border-radius: 20px;
+      border-radius: 21px;
       background:
         radial-gradient(
           circle at 18% 0%,
@@ -524,7 +519,6 @@ const handleCommand = async (command: string) => {
       backdrop-filter: blur(18px) saturate(1.45);
       -webkit-backdrop-filter: blur(18px) saturate(1.45);
       transition:
-        transform 260ms ease,
         border-color 260ms ease,
         box-shadow 260ms ease;
 
@@ -552,8 +546,32 @@ const handleCommand = async (command: string) => {
           0 14px 34px rgba(12, 89, 153, 0.15),
           inset 0 1px 0 rgba(255, 255, 255, 0.92),
           inset 0 -8px 18px rgba(55, 131, 203, 0.07);
-        transform: translateY(-1px);
       }
+    }
+
+    .header_brand_glass {
+      flex: 0 0 auto;
+      padding: 5px 13px 5px 6px;
+    }
+
+    .header_actions_glass {
+      flex: 0 1 auto;
+      min-width: 0;
+      max-width: calc(100% - 178px);
+      padding: 3px 5px 3px 7px;
+    }
+
+    .header_menu_wrap {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .header_menu_toggle {
+      display: none;
+      flex: 0 0 auto;
+      margin-right: 2px;
     }
 
     .header_logo {
@@ -578,47 +596,187 @@ const handleCommand = async (command: string) => {
     }
 
     .header_user {
-      flex: 1 1 0;
+      flex: 0 0 auto;
       display: flex;
-      justify-content: flex-end;
       align-items: center;
-      padding-right: 20px;
+    }
 
-      .user_avatar {
-        display: flex;
-        align-items: center;
-        gap: 8px;
+    .header_utilities {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .header_language_switch {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      box-sizing: border-box;
+      width: 68px;
+      height: 30px;
+      padding: 2px;
+      border: 1px solid rgba(88, 161, 199, 0.16);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.34);
+
+      button {
+        display: grid;
+        place-items: center;
+        min-width: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 12px;
+        background: transparent;
+        color: #637b8b;
         cursor: pointer;
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 680;
+        line-height: 24px;
+        transition: color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
 
-        .el-avatar {
-          background: #ffffff;
+        &:hover,
+        &:focus-visible {
+          outline: none;
+          color: #0878b8;
         }
 
-        .user_name {
-          color: #303133;
-          font-size: 14px;
-          font-weight: 500;
+        &.active {
+          background: rgba(255, 255, 255, 0.92);
+          box-shadow:
+            0 3px 9px rgba(12, 89, 153, 0.13),
+            inset 0 0 0 1px rgba(18, 150, 219, 0.08);
+          color: #0878b8;
         }
       }
     }
 
-    // Thumb-terminal header (A3): hamburger replaces the menu strip,
-    // brand and user cells shrink to icon-only.
+    .header_settings_button {
+      width: 32px;
+      height: 32px;
+      border: 1px solid rgba(88, 161, 199, 0.12);
+      background: rgba(255, 255, 255, 0.28);
+      color: #456578;
+      font-size: 16px;
+      transition: color 180ms ease, background-color 180ms ease, transform 180ms ease;
+
+      &:hover,
+      &:focus-visible {
+        background: rgba(18, 150, 219, 0.1);
+        color: #0878b8;
+        transform: rotate(18deg);
+      }
+    }
+
+    .user_trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 32px;
+      padding: 2px 7px 2px 2px;
+      border: 0;
+      border-radius: 16px;
+      background: transparent;
+      color: #2d4658;
+      cursor: pointer;
+      font: inherit;
+      transition: background-color 180ms ease, box-shadow 180ms ease;
+
+      &:hover,
+      &:focus-visible {
+        outline: none;
+        background: rgba(18, 150, 219, 0.09);
+        box-shadow: inset 0 0 0 1px rgba(18, 150, 219, 0.1);
+      }
+
+      .user_initial {
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #119bd6, #5558c9);
+        box-shadow:
+          0 5px 12px rgba(23, 130, 191, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.34);
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 760;
+        line-height: 1;
+      }
+
+      .user_name {
+        max-width: 100px;
+        overflow: hidden;
+        color: #304b5d;
+        font-size: 13px;
+        font-weight: 620;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .user_chevron {
+        color: #78909f;
+        font-size: 11px;
+      }
+    }
+
+    .header_actions_divider {
+      flex: 0 0 1px;
+      width: 1px;
+      height: 22px;
+      margin: 0 3px;
+      background: rgba(94, 155, 188, 0.22);
+    }
+
+    // Tablet keeps navigation visible as accessible icon buttons. Language,
+    // settings, and account remain first-class actions in the same capsule.
+    @media (max-width: $breakpoint-sm-max) {
+      .header_actions_glass {
+        max-width: calc(100% - 164px);
+      }
+    }
+
+    // Phone keeps exactly two capsules: menu + brand on the left, user on
+    // the right. The drawer remains the navigation surface.
     @media (max-width: $breakpoint-xs-max) {
-      .header_brand {
-        padding-left: var(--dc3-space-2);
+      gap: var(--dc3-space-2);
+      padding-right: var(--dc3-space-2);
+      padding-left: var(--dc3-space-2);
+
+      .header_brand_glass {
+        min-width: 0;
+        padding-right: 11px;
       }
 
       .header_menu_toggle {
         display: inline-flex;
       }
 
-      .header_user {
-        padding-right: var(--dc3-space-3);
+      .header_title {
+        margin-left: 6px;
+        font-size: 18px;
+      }
 
-        .user_name {
-          display: none;
-        }
+      .header_actions_glass {
+        flex: 0 0 auto;
+        max-width: none;
+        padding: 3px 5px;
+      }
+
+      .header_language_switch {
+        width: 66px;
+      }
+
+      .header_settings_button {
+        width: 30px;
+        height: 30px;
+      }
+
+      .user_trigger {
+        padding-right: 2px;
       }
     }
   }
@@ -640,10 +798,10 @@ const handleCommand = async (command: string) => {
     left: 0;
     bottom: 0;
     display: flex;
-    padding: 1px 0 5px 0;
+    padding: var(--dc3-space-2);
     overflow: hidden;
     position: absolute;
-    background: var(--dc3-bg-body);
+    background: var(--dc3-bg-canvas);
 
     .body-main {
       display: flex;
@@ -655,6 +813,10 @@ const handleCommand = async (command: string) => {
       > .el-scrollbar {
         flex: 1;
         min-height: 0;
+
+        :deep(.el-scrollbar__view) {
+          min-height: 100%;
+        }
       }
 
       .fixed-viewport {
@@ -665,11 +827,14 @@ const handleCommand = async (command: string) => {
     }
 
     .breadcrumb {
-      padding: var(--dc3-space-3) var(--dc3-space-5);
-      margin-bottom: 1px;
+      padding: 10px var(--dc3-space-4);
+      margin-bottom: var(--dc3-space-2);
+      border: 1px solid var(--dc3-border-base);
       background: var(--dc3-bg-elevated);
-      border-radius: var(--dc3-radius-sm);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      border-radius: var(--dc3-radius-lg);
+      box-shadow: var(--dc3-shadow-sm);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
 
       .breadcrumb__item {
         display: inline-flex;
@@ -681,26 +846,15 @@ const handleCommand = async (command: string) => {
         font-size: 14px;
       }
     }
-  }
-}
-</style>
 
-<!--
-  Element Plus teleports el-dropdown's popper to <body>, which puts it
-  outside this component's scoped-CSS boundary. The language-switch row
-  lives inside that popper, so its styles need to be non-scoped to
-  actually land on the rendered DOM.
--->
-<style lang="scss">
-.user_lang_row {
-  list-style: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 16px 8px;
+    @media (max-width: $breakpoint-xs-max) {
+      padding: var(--dc3-space-1);
 
-  .user_lang_seg {
-    width: 100%;
+      .breadcrumb {
+        padding: 9px var(--dc3-space-3);
+        margin-bottom: var(--dc3-space-1);
+      }
+    }
   }
 }
 </style>

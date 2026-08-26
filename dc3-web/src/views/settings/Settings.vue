@@ -102,7 +102,7 @@ const asideCollapseLabel = computed(() =>
 <style lang="scss" scoped>
 .settings-container {
   align-items: stretch;
-  gap: 4px;
+  gap: var(--dc3-space-2);
   height: 100%;
   min-width: 0;
 }
@@ -110,7 +110,10 @@ const asideCollapseLabel = computed(() =>
 .settings-aside {
   .settings-aside-card {
     height: 100%;
-    border: 0;
+    border: 1px solid var(--dc3-border-base);
+    border-radius: var(--dc3-radius-xl);
+    background: var(--dc3-bg-elevated);
+    box-shadow: var(--dc3-shadow-sm);
     display: flex;
     flex-direction: column;
 
@@ -145,15 +148,29 @@ const asideCollapseLabel = computed(() =>
 
   > .el-scrollbar {
     height: 100%;
+
+    :deep(.el-scrollbar__view) {
+      min-height: 100%;
+    }
   }
 
   // Floating menu trigger for thumb terminals: keeps the content area
   // free of a permanent bar (A3 thumb-zone ergonomics).
   .settings-aside-toggle {
-    position: absolute;
-    top: var(--dc3-space-3);
+    position: fixed;
+    bottom: var(--dc3-space-5);
     left: var(--dc3-space-3);
     z-index: 10;
+    border-color: var(--dc3-border-strong);
+    background: var(--dc3-bg-elevated-strong);
+    box-shadow: var(--dc3-shadow-md);
+  }
+
+  @media (max-width: $breakpoint-xs-max) {
+    .settings-aside-toggle {
+      left: var(--dc3-space-2);
+      bottom: var(--dc3-space-4);
+    }
   }
 }
 
