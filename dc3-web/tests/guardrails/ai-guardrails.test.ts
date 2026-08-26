@@ -94,6 +94,18 @@ describe('AI coding guardrails', () => {
     );
   });
 
+  it('installs runtime adapters and stores before initial router navigation', () => {
+    const entrypoint = readProjectFile('src/main.ts');
+    const mockInstall = entrypoint.indexOf("await import('@/mock')");
+    const piniaInstall = entrypoint.indexOf('app.use(pinia)');
+    const routerInstall = entrypoint.indexOf('app.use(router)');
+
+    expect(mockInstall).toBeGreaterThan(-1);
+    expect(piniaInstall).toBeGreaterThan(mockInstall);
+    expect(routerInstall).toBeGreaterThan(piniaInstall);
+    expect(entrypoint.indexOf('await router.isReady()')).toBeGreaterThan(routerInstall);
+  });
+
   it('forbids direct wrapper.vm.<method>() calls in component/view tests', () => {
     // Driving a component through wrapper.vm internals couples the test to
     // API that churns whenever <script setup> details change. Tests should
