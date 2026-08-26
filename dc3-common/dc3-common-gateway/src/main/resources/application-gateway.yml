@@ -26,12 +26,13 @@ spring:
   # gRPC client configuration
   grpc:
     client:
-      channels:
+      channel:
         dc3-center-auth:
-          address: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:9300'
-          enable-keep-alive: true
-          keep-alive-without-calls: true
-          negotiation-type: PLAINTEXT
+          target: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:9300'
+          keepalive:
+            time: 5m
+            timeout: 20s
+            without-calls: true
   # Spring Cloud Gateway WebFlux configuration
   cloud:
     gateway:

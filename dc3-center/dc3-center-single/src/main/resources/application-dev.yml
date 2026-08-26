@@ -34,22 +34,25 @@ spring:
     password: ${RABBITMQ_PASSWORD:}
   grpc:
     client:
-      channels:
+      channel:
         dc3-center-auth:
-          address: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:9100'
-          enable-keep-alive: true
-          keep-alive-without-calls: true
-          negotiation-type: PLAINTEXT
+          target: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:9100'
+          keepalive:
+            time: 5m
+            timeout: 20s
+            without-calls: true
         dc3-center-data:
-          address: 'static://${CENTER_DATA_HOST:dc3-center-data}:9100'
-          enable-keep-alive: true
-          keep-alive-without-calls: true
-          negotiation-type: PLAINTEXT
+          target: 'static://${CENTER_DATA_HOST:dc3-center-data}:9100'
+          keepalive:
+            time: 5m
+            timeout: 20s
+            without-calls: true
         dc3-center-manager:
-          address: 'static://${CENTER_MANAGER_HOST:dc3-center-manager}:9100'
-          enable-keep-alive: true
-          keep-alive-without-calls: true
-          negotiation-type: PLAINTEXT
+          target: 'static://${CENTER_MANAGER_HOST:dc3-center-manager}:9100'
+          keepalive:
+            time: 5m
+            timeout: 20s
+            without-calls: true
 
 dc3:
   driver:

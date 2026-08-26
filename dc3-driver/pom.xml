@@ -34,8 +34,8 @@
 
     <properties>
         <!-- Modbus -->
-        <modbus4j.version>3.0.3</modbus4j.version>
-        <jserialcomm.version>2.11.0</jserialcomm.version>
+        <modbus4j.version>3.1.0</modbus4j.version>
+        <jserialcomm.version>2.11.4</jserialcomm.version>
 
         <!-- OPC UA -->
         <milo.version>0.6.16</milo.version>
@@ -47,10 +47,10 @@
         <leshan.version>2.0.0-M14</leshan.version>
 
         <!-- BACnet -->
-        <bacnet4j.version>6.1.0</bacnet4j.version>
+        <bacnet4j.version>6.1.1</bacnet4j.version>
 
         <!-- DLMS/COSEM -->
-        <gurux.dlms.version>4.0.79</gurux.dlms.version>
+        <gurux.dlms.version>4.0.96</gurux.dlms.version>
 
         <!-- Bluetooth LE -->
         <bluetooth.manager.version>1.5.3</bluetooth.manager.version>
@@ -60,10 +60,10 @@
         <zigbee.version>1.4.16.1</zigbee.version>
 
         <!-- IEC 104 -->
-        <j60870.version>1.7.2</j60870.version>
+        <j60870.version>1.8.0</j60870.version>
 
         <!-- SNMP -->
-        <snmp4j.version>3.12.2</snmp4j.version>
+        <snmp4j.version>3.13.1</snmp4j.version>
 
         <!-- KNX -->
         <calimero.version>2.6</calimero.version>

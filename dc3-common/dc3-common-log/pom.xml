@@ -67,7 +67,7 @@
     </scm>
 
     <properties>
-        <logstash.logback.version>8.1</logstash.logback.version>
+        <logstash.logback.version>9.0</logstash.logback.version>
     </properties>
 
     <dependencies>

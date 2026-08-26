@@ -46,8 +46,12 @@
 
         <!-- gRPC Related -->
         <dependency>
-            <groupId>org.springframework.grpc</groupId>
-            <artifactId>spring-grpc-spring-boot-starter</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-grpc-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-grpc-client</artifactId>
         </dependency>
 
         <!-- Utility Libraries -->

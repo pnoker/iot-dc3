@@ -27,19 +27,22 @@ spring:
           password: ${POSTGRES_PASSWORD:}
   grpc:
     client:
-      channels:
+      channel:
         dc3-center-auth:
-          address: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:9300'
-          enable-keep-alive: true
-          keep-alive-without-calls: true
-          negotiation-type: PLAINTEXT
+          target: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:9300'
+          keepalive:
+            time: 5m
+            timeout: 20s
+            without-calls: true
         dc3-center-manager:
-          address: 'static://${CENTER_MANAGER_HOST:dc3-center-manager}:9400'
-          enable-keep-alive: true
-          keep-alive-without-calls: true
-          negotiation-type: PLAINTEXT
+          target: 'static://${CENTER_MANAGER_HOST:dc3-center-manager}:9400'
+          keepalive:
+            time: 5m
+            timeout: 20s
+            without-calls: true
         dc3-center-data:
-          address: 'static://${CENTER_DATA_HOST:dc3-center-data}:9500'
-          enable-keep-alive: true
-          keep-alive-without-calls: true
-          negotiation-type: PLAINTEXT
+          target: 'static://${CENTER_DATA_HOST:dc3-center-data}:9500'
+          keepalive:
+            time: 5m
+            timeout: 20s
+            without-calls: true
