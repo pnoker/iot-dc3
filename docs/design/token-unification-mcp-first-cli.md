@@ -2,7 +2,7 @@
 
 |                |                                                                                                                                                     |
 |----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Status**     | Proposed — discussion draft, no implementation started                                                                                              |
+| **Status**     | Phase 0 decided (Q1–Q4 resolved 2026-08-27) — §8 Q5 threshold pending; no implementation started                                     |
 | **Date**       | 2026-08-27                                                                                                                                          |
 | **Scope**      | Gateway authentication plane (`AuthenticGatewayFilter`, `FilterService`), auth center (`TokenServiceImpl`, `OAuthMcpRuntimeServiceImpl`), dc3-cli    |
 | **Target**     | One permission truth source (RBAC), one verdict point (gateway), two interchangeable bearer tokens; CLI rebuilt around the MCP/OAuth credential model |
@@ -175,18 +175,25 @@ per-domain CLI command files again.
   mechanism here instead of SDK-wrapped salt/generate/cancel. SDK `TokenStore`
   contract should target "RS256 access/refresh pairs" when CLI (§4B) lands.
 
-## 8. Open questions (blockers for implementation)
+## 8. Open questions
 
-1. Does `tools_call` remain a distinct grant, or collapse to plain RBAC bindings with
-   risk being purely an attribute check? (Affects whether non-agent users can hold
-   CLI tokens with zero tool rights.)
-2. Step-up UX for `call_high` from a human terminal: interactive confirm via web UI,
-   TTY prompt, or pre-approved window?
-3. Do we mint RS256 directly at the gateway edge from a cached JWKS (latency-optimal,
-   revocation lag) or introspect per request through the (post-overhaul) single-round-trip
-   facade (consistent, adds a hop)? Recommendation: cached JWKS + short TTL —
-   revocation lag is bounded by ≤15 min lifetime by design.
-4. Should the web app adopt OAuth too in Phase 3, unifying to a single flow, or is
-   cookie-based session (httpOnly + CSRF) deliberately retained for browsers?
-5. Target ratio of MCP-tool coverage before CLI Phase 3 regenerates commands from
-   catalogs (proposal: manager CRUD tools ≥80% of device/driver/profile/point domains).
+**Decisions taken 2026-08-27 (Q1–Q4):**
+
+1. **Scope vocabulary retained.** The four scopes stay as the external contract; internally they are computed as a
+  projection of RBAC bindings (§3.1 unchanged). Rationale: pre-flight capability discovery for AI clients and MCP
+   ecosystem compatibility outweigh the extra projection logic.
+2. **Step-up channels: all three, layered.** Default channel is the web approval surface (agentic action
+   confirm/reject, one audit chain for humans and agents); CLI TTY second-prompt binding a step-up ticket is supported
+   for single-operator flows; `--approve-window <duration>` exists as an explicit, audit-hardened escape hatch for
+   batch scripts.
+3. **Cached-JWKS local verification at the gateway.** No per-request introspection hop; revocation lag stays bounded
+   by the ≤15 min access-ticket lifetime. The auth center's availability no longer gates every `/api/v3` request.
+4. **Web keeps cookie sessions.** Browser auth remains httpOnly + CSRF; only the shared RS256 verifier and RBAC truth
+   source are reused, not the flow. Re-evaluation is allowed if dual-track maintenance ever becomes a real cost.
+
+5. **Phase-3 regeneration threshold — proposed, still open:** manager-domain (device/driver/profile/point) tool
+   coverage ≥80%. Percentage-based gating may be swapped for the P0 capability list (analytics nine tools, alert deep
+   analysis, agentic session plane) once that backlog lands; final call pending.
+
+> Status after this revision: **Phase 0 complete. Phase 1 (gateway TokenResolver chain + configurable platform TTL +
+> OAuth-flagged CLI login) is cleared for implementation planning.**
