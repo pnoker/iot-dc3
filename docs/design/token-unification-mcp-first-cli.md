@@ -236,4 +236,7 @@ for principals without bindings, toggle `dc3.oauth.rbac-scoped-scopes`); risk-la
 landed (`readOnlyAccessTokenTtl` = 1 h vs 15 min call-capable default). Still open in this
 phase: step-up tickets bound to confirmation records and `X_AUTH_PRINCIPAL`-based API-level
 enforcement — both need a live-stack harness before they can be verified honestly. Phase 3
-remains gated on Q5.
+remains gated on Q5. **First Phase-3 slice landed 2026-08-27:** `dc3 tools list/call` give the CLI a live
+  read of the tool catalog over JSON-RPC using the same ticket as REST — the dual-transport
+  contract of §4 Option B is now complete at the transport level; command regeneration from
+  the catalog still waits on Q5 and catalog coverage.
