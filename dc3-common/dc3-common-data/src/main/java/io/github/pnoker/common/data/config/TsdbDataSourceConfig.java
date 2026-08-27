@@ -31,6 +31,16 @@ import javax.sql.DataSource;
  * instead would resolve its unqualified table names against the wrong
  * search_path and every statement would fail.
  *
+ * <p>The published bean is excluded from type-based autowiring candidates
+ * ({@code defaultCandidate = false}). The dynamic datasource's own
+ * {@code dataSource} bean carries no {@code @Primary}, so a candidate-eligible
+ * second {@code DataSource} breaks every by-type injection that cannot carry a
+ * qualifier — MyBatis-Plus' {@code sqlSessionFactory(DataSource)}, Quartz, the
+ * health check — with {@code NoUniqueBeanDefinitionException}. Excluded here,
+ * those consumers see exactly one candidate again, while the TSDB adapter
+ * keeps resolving this bean through its explicit
+ * {@code @Qualifier("tsdbDataSource")}.
+ *
  * @author pnoker
  * @since 2026.8.20
  */
@@ -44,10 +54,13 @@ public class TsdbDataSourceConfig {
      * <p>With dynamic routing, returns the {@code history} entry so unqualified table names resolve against the
      * {@code dc3_history} schema; otherwise returns the single application datasource unchanged.
      *
+     * <p>Not a default autowire candidate: consumers must ask for it by name, leaving the routing
+     * {@code dataSource} as the only by-type candidate for injection points that cannot carry a qualifier.
+     *
      * @param dataSource the primary application datasource
      * @return the history-scoped datasource when routing is active, the primary datasource otherwise
      */
-    @Bean
+    @Bean(defaultCandidate = false)
     public DataSource tsdbDataSource(DataSource dataSource) {
         if (dataSource instanceof DynamicRoutingDataSource routing) {
             DataSource history = routing.getDataSource("history");
