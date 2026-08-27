@@ -890,6 +890,9 @@ export default {
     mcp: {
       title: 'MCP 服务',
       agentConfig: 'Agent 配置',
+      cliConfig: '命令行接入',
+      cliHint: '安装 DC3 命令行工具,指向本网关并登录。同一套凭据未来可直接访问 MCP 端点。',
+      copyCommand: '复制命令',
       connections: '连接',
       clients: 'OAuth Client',
       tools: '工具目录',

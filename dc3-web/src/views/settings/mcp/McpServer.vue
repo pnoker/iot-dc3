@@ -62,6 +62,22 @@
         <pre class="mcp-overview__snippet-code">{{ agent.config }}</pre>
       </div>
     </el-card>
+
+    <el-card shadow="never">
+      <template #header>
+        <span class="mcp-overview__title">{{ t('settings.mcp.cliConfig') }}</span>
+      </template>
+      <div class="mcp-overview__hint">{{ t('settings.mcp.cliHint') }}</div>
+      <div class="mcp-overview__snippet">
+        <div class="mcp-overview__snippet-head">
+          <span class="mcp-overview__snippet-name">dc3-cli</span>
+          <el-button :icon="DocumentCopy" link type="primary" @click="copy(cliCommands, t('settings.mcp.copied'))">
+            {{ t('settings.mcp.copyCommand') }}
+          </el-button>
+        </div>
+        <pre class="mcp-overview__snippet-code">{{ cliCommands }}</pre>
+      </div>
+    </el-card>
   </div>
 </template>
 
@@ -89,6 +105,19 @@ const agentSnippets = computed(() => {
     {name: 'Cursor', config: JSON.stringify({mcpServers: {dc3: server}}, null, 2)},
     {name: 'VS Code', config: JSON.stringify({servers: {dc3: server}}, null, 2)},
   ];
+});
+
+// Same setup as a shell one-liner block for the CLI audience.
+const cliCommands = computed(() => {
+  const gateway = new URL(mcpServerUrl.value).origin;
+  return [
+    '# install',
+    'npm install -g iot-dc3-cli',
+    '',
+    '# point at this gateway and log in',
+    `dc3 config set gateway ${gateway}`,
+    'dc3 auth login',
+  ].join('\n');
 });
 
 const loadMetadata = async () => {
@@ -134,6 +163,11 @@ loadMetadata();
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.mcp-overview__hint {
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
 }
 
 .mcp-overview__snippet {
