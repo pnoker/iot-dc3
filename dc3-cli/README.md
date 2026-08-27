@@ -139,6 +139,21 @@ dc3 alert trend [--days 30]           # Trend analysis
 dc3 alert top-sources [--days 30]     # Top alert sources
 ```
 
+### Sessions & approvals (`dc3 session`, `dc3 action`)
+
+Conversation lifecycle plus the high-risk tool-call approval loop:
+
+```bash
+dc3 session list
+dc3 session messages conv-abc123
+dc3 session rename conv-abc123 --name "boiler watch"
+dc3 session delete conv-abc123
+
+dc3 action pending --conversation-id conv-abc123   # tool calls awaiting approval
+dc3 action confirm action-xyz789
+dc3 action reject  action-xyz789
+```
+
 ### Analytics (`dc3 analytics`) — AI data-analysis surface
 
 Nine coarse-grained statistical reads over point time series (S19 agent face); each op posts

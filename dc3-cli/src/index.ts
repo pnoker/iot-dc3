@@ -13,6 +13,7 @@ import { registerTopicCommand } from './commands/topic.js';
 import { registerChatCommand } from './commands/chat.js';
 import { registerToolCommand } from './commands/tool.js';
 import { registerAnalyticsCommand } from './commands/analytics.js';
+import { registerSessionCommand, registerActionCommand } from './commands/session.js';
 import { registerGroupCommand } from './commands/group.js';
 import { registerLabelCommand } from './commands/label.js';
 
@@ -44,6 +45,8 @@ registerTopicCommand(program);
 registerChatCommand(program);
 registerToolCommand(program);
 registerAnalyticsCommand(program);
+registerSessionCommand(program);
+registerActionCommand(program);
 
 // Parse and handle errors
 program.parseAsync(process.argv).catch((err: Error) => {
