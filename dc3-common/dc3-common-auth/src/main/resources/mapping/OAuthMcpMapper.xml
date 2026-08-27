@@ -519,65 +519,28 @@
         LIMIT 1
     </select>
 
+    <!--
+        Optional filters are folded with dynamic SQL instead of the previous
+        "(? IS NULL OR ? = '' OR ...)" shape: with stringtype=unspecified,
+        Postgres cannot determine the type of a bind parameter used bare in
+        "IS NULL" context ("could not determine data type of parameter $1").
+        The dynamic form is also dialect-neutral, so the former mysql/mariadb
+        forks exist no longer.
+    -->
     <select id="listToolCatalog"
             resultType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
         SELECT *
         FROM dc3_mcp_tool_catalog
         WHERE deleted = 0
           AND enable_flag = 0
-          AND (#{riskLevel,jdbcType=VARCHAR} IS NULL OR #{riskLevel,jdbcType=VARCHAR} = ''
-            OR risk_level = #{riskLevel,jdbcType=VARCHAR})
-          AND (
-            #{keyword}::text IS NULL
-            OR #{keyword}::text = ''
-            OR lower(tool_name) LIKE concat('%', lower(#{keyword}::text), '%')
-            OR lower(tool_title) LIKE concat('%', lower(#{keyword}::text), '%')
-            OR lower(permission_code) LIKE concat('%', lower(#{keyword}::text), '%')
-            )
-        ORDER BY tool_category, tool_name
-        LIMIT #{limit}
-    </select>
-
-    <!--
-        MySQL fork: the ?::text parameter casts are Postgres-only syntax — the
-        plain bind parameters compare identically.
-    -->
-    <select id="listToolCatalog" databaseId="mysql"
-            resultType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
-        SELECT *
-        FROM dc3_mcp_tool_catalog
-        WHERE deleted = 0
-          AND enable_flag = 0
-          AND (#{riskLevel,jdbcType=VARCHAR} IS NULL OR #{riskLevel,jdbcType=VARCHAR} = ''
-            OR risk_level = #{riskLevel,jdbcType=VARCHAR})
-          AND (
-            #{keyword} IS NULL
-                OR #{keyword} = ''
-                OR lower(tool_name) LIKE concat('%', lower(#{keyword}), '%')
-                OR lower(tool_title) LIKE concat('%', lower(#{keyword}), '%')
-                OR lower(permission_code) LIKE concat('%', lower(#{keyword}), '%')
-            )
-        ORDER BY tool_category, tool_name
-        LIMIT #{limit}
-    </select>
-
-    <!-- MariaDB twin of the mysql fork above: identical shape (no ODKU in this
-         statement, so the AS-new/VALUES(col) difference does not apply). -->
-    <select id="listToolCatalog" databaseId="mariadb"
-            resultType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
-        SELECT *
-        FROM dc3_mcp_tool_catalog
-        WHERE deleted = 0
-          AND enable_flag = 0
-          AND (#{riskLevel,jdbcType=VARCHAR} IS NULL OR #{riskLevel,jdbcType=VARCHAR} = ''
-            OR risk_level = #{riskLevel,jdbcType=VARCHAR})
-          AND (
-            #{keyword} IS NULL
-                OR #{keyword} = ''
-                OR lower(tool_name) LIKE concat('%', lower(#{keyword}), '%')
-                OR lower(tool_title) LIKE concat('%', lower(#{keyword}), '%')
-                OR lower(permission_code) LIKE concat('%', lower(#{keyword}), '%')
-            )
+        <if test="riskLevel != null and riskLevel != ''">
+            AND risk_level = #{riskLevel}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            AND (lower(tool_name) LIKE concat('%', lower(#{keyword}), '%')
+            OR lower(tool_title) LIKE concat('%', lower(#{keyword}), '%')
+            OR lower(permission_code) LIKE concat('%', lower(#{keyword}), '%'))
+        </if>
         ORDER BY tool_category, tool_name
         LIMIT #{limit}
     </select>
