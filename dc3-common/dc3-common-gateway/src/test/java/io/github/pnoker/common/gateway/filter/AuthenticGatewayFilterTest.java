@@ -38,6 +38,7 @@ import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.net.ConnectException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -144,6 +145,28 @@ class AuthenticGatewayFilterTest {
 
         assertThat(ex.getResponse().getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
         assertThat(capture.get()).isNull();
+    }
+
+    @Test
+    void responsesAreServiceUnavailableWhenRouteConnectFailsAfterAuthentication() {
+        when(filterService.getTenant(any())).thenReturn(tenant);
+        when(filterService.getLocalCredential(any())).thenReturn(credential);
+        when(filterService.getUser(credential, tenant)).thenReturn(user);
+
+        // Authentication succeeds, then the routed backend (e.g. a center that is not
+        // running) refuses the connection; the failure must surface as 503, not as an
+        // authentication error answered with 500.
+        AtomicReference<ServerWebExchange> capture = new AtomicReference<>();
+        GatewayFilterChain unreachableChain = ex -> {
+            capture.set(ex);
+            return Mono.error(new ConnectException("Connection refused: localhost/127.0.0.1:8600"));
+        };
+
+        MockServerWebExchange ex = exchange();
+        filter(false).filter(ex, unreachableChain).block();
+
+        assertThat(ex.getResponse().getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+        assertThat(capture.get()).isNotNull();
     }
 
     @Test

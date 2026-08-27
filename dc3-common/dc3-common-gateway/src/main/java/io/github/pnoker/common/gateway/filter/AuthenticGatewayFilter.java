@@ -18,6 +18,7 @@
 package io.github.pnoker.common.gateway.filter;
 
 import io.github.pnoker.common.constant.common.RequestConstant;
+import io.netty.channel.ConnectTimeoutException;
 import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
@@ -40,6 +41,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+
+import java.net.ConnectException;
 
 /**
  * Gateway filter that validates authentication headers.
@@ -80,11 +83,34 @@ public class AuthenticGatewayFilter implements GatewayFilter {
                 }).onErrorResume(UnAuthorizedException.class, e -> {
                     log.warn("Gateway request unauthorized, path={}", request.getURI().getRawPath(), e);
                     return writeErrorResponse(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
+                }).onErrorResume(AuthenticGatewayFilter::isDownstreamUnreachable, e -> {
+                    log.error("Gateway route unreachable, path={}", request.getURI().getRawPath(), e);
+                    return writeErrorResponse(exchange, HttpStatus.SERVICE_UNAVAILABLE, "Service Unavailable");
                 }).onErrorResume(e -> {
                     log.error("Gateway authentication failed unexpectedly, path={}",
                             request.getURI().getRawPath(), e);
                     return writeErrorResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
                 });
+    }
+
+    /**
+     * Whether the failure comes from the routed backend (TCP connect refused or timed
+     * out) rather than from the authentication chain. Connect failures propagate up
+     * through {@code chain.filter(...)} because this filter sits in front of the routing
+     * chain; without this classification a down backend masquerades as an authentication
+     * failure answered with 500 instead of 503.
+     *
+     * @param error the propagated error, possibly wrapped
+     * @return true when the error chain contains a connect failure
+     */
+    private static boolean isDownstreamUnreachable(Throwable error) {
+        while (error != null) {
+            if (error instanceof ConnectException || error instanceof ConnectTimeoutException) {
+                return true;
+            }
+            error = error.getCause();
+        }
+        return false;
     }
 
     /**
