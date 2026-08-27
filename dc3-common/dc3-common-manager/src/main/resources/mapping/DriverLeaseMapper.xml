@@ -124,7 +124,7 @@
         No RETURNING: the manager re-selects in the same transaction (MySQL
         has no INSERT ... RETURNING).
     -->
-    <insert id="upsertLeaseState" affectData="true" flushCache="true">
+    <insert id="upsertLeaseState" flushCache="true">
         INSERT INTO dc3_driver_lease_state
             (tenant_id, driver_id, membership_hash, device_revision)
         VALUES (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision})
@@ -137,7 +137,7 @@
         operate_time = CURRENT_TIMESTAMP
     </insert>
 
-    <insert id="upsertLeaseState" databaseId="mysql" affectData="true" flushCache="true">
+    <insert id="upsertLeaseState" databaseId="mysql" flushCache="true">
         INSERT INTO dc3_driver_lease_state
             (tenant_id, driver_id, membership_hash, device_revision)
             VALUES (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision}) AS new
@@ -149,7 +149,7 @@
 
     <!-- MariaDB twin of the mysql fork above: identical shape, but
          MariaDB never adopted the AS-new row alias: VALUES(col) instead. -->
-    <insert id="upsertLeaseState" databaseId="mariadb" affectData="true" flushCache="true">
+    <insert id="upsertLeaseState" databaseId="mariadb" flushCache="true">
         INSERT INTO dc3_driver_lease_state
             (tenant_id, driver_id, membership_hash, device_revision)
         VALUES (#{tenantId}, #{driverId}, #{membershipHash}, #{deviceRevision})

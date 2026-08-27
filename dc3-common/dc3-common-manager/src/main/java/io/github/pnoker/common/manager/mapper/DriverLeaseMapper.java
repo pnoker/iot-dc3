@@ -79,7 +79,8 @@ public interface DriverLeaseMapper {
                               @Param("driverId") Long driverId);
 
     /**
-     * Upserts reconciliation state and returns the atomically advanced assignment version.
+     * Upserts reconciliation state. The atomically advanced assignment version is not part of the return value;
+     * callers re-select it inside the same transaction, so the affected-row count carries no lease semantics.
      */
     int upsertLeaseState(@Param("tenantId") Long tenantId,
                          @Param("driverId") Long driverId,
