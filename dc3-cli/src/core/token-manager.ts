@@ -14,6 +14,10 @@ export interface TokenState {
   username: string;
   issuedAt: number;   // epoch seconds
   expiresAt: number;  // epoch seconds
+  /** 'oauth' tickets travel as Authorization: Bearer; classic login uses X-Auth-* headers */
+  authType?: 'login' | 'oauth';
+  /** scopes granted to an oauth ticket */
+  scope?: string[];
 }
 
 export interface TokenStates {
@@ -126,6 +130,12 @@ export class TokenManager {
    * Build the X-Auth-* headers from token state.
    */
   buildHeaders(state: TokenState): Record<string, string> {
+    if (state.authType === 'oauth') {
+      return {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${state.token}`,
+      };
+    }
     return {
       'Content-Type': 'application/json',
       'X-Auth-Tenant': state.tenant,

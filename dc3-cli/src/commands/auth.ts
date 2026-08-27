@@ -1,4 +1,4 @@
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import { configManager } from '../core/config-manager.js';
 import { tokenManager } from '../core/token-manager.js';
 import { dc3Client, AuthError } from '../core/client.js';
@@ -23,14 +23,24 @@ export function registerAuthCommand(program: Command): void {
     .option('-p, --password <password>', 'Password (not recommended — use interactive mode)')
     .option('--store <type>', 'Credential store type: keychain, encrypted, env, prompt', 'keychain')
     .option('--no-save', 'Do not save password (token expiry will require manual re-login)')
+    .addOption(
+      new Option('--oauth', 'OAuth client_credentials login (requires a registered MCP client)').hideHelp(),
+    )
+    .option('--client-id <id>', 'Registered OAuth client id (with --oauth)')
+    .option('--client-secret <secret>', 'Registered OAuth client secret (with --oauth)')
+    .option('--scope <scope>', 'Requested scopes, space-separated (with --oauth)')
     .option('--format <format>', 'Output format: json, table, yaml')
     .action(async (options) => {
+      const format = detectFormat(options.format);
       try {
+        if (options.oauth) {
+          await loginOAuthAction(options, format);
+          return;
+        }
         const profileName = (await configManager.load()).current_profile;
         const tenant = options.tenant || (await prompt('Tenant: '));
         const username = options.username || (await prompt('Username: '));
         const password = options.password || (await passwordPrompt('Password: '));
-        const format = detectFormat(options.format);
 
         const token = await dc3Client.login(
           tenant.trim(),
@@ -81,6 +91,39 @@ export function registerAuthCommand(program: Command): void {
         throw err;
       }
     });
+
+  /**
+   * OAuth client_credentials flow (hidden behind --oauth until gateway-side RS256
+   * verification is enabled in deployments; see token-unification-mcp-first-cli.md).
+   */
+  async function loginOAuthAction(
+    options: { clientId?: string; clientSecret?: string; scope?: string },
+    format: ReturnType<typeof detectFormat>,
+  ): Promise<void> {
+    const profileName = (await configManager.load()).current_profile;
+    const clientId = options.clientId || (await prompt('Client id: '));
+    const clientSecret = options.clientSecret || (await passwordPrompt('Client secret: '));
+    if (!clientId?.trim() || !clientSecret) {
+      printAndExit({ ok: false, message: 'client id and secret are required' }, 'json', 1);
+    }
+    const result = await dc3Client.loginOAuth(
+      clientId.trim(),
+      clientSecret,
+      options.scope,
+      profileName,
+    );
+    printAndExit(
+      {
+        ok: true,
+        auth_type: 'oauth',
+        client_id: clientId.trim(),
+        scope: result.scope ?? [],
+        expires_at: new Date(result.expiresAt * 1000).toLocaleString(),
+        message: `OAuth login successful. Token expires at ${new Date(result.expiresAt * 1000).toLocaleString()}`,
+      },
+      format,
+    );
+  }
 
   // dc3 auth logout
   auth

@@ -111,6 +111,12 @@ export class Dc3Client {
     tenant: string,
     username: string,
   ): Promise<boolean> {
+    const current = await tokenManager.getState(profileName);
+    if (current?.authType === 'oauth') {
+      // OAuth tickets cannot be silently renewed without the client secret; expiry
+      // is short by design — surface a clean auth error instead.
+      return false;
+    }
     const password = await resolvePassword(`${username}@${tenant}`);
     if (!password) {
       return false;
@@ -165,6 +171,61 @@ export class Dc3Client {
       // Silent failure — the 401 retry will surface the error
       return false;
     }
+  }
+
+  /**
+   * OAuth client_credentials login against the gateway token endpoint.
+   *
+   * The client must be pre-registered on the console (settings/mcp) with the
+   * client_credentials grant bound to a service account; tenant and principal come
+   * from that registration. Stores an 'oauth'-type state whose requests travel as
+   * Authorization: Bearer and are verified at the gateway via JWKS when enabled.
+   */
+  async loginOAuth(
+    clientId: string,
+    clientSecret: string,
+    scope: string | undefined,
+    profileName: string,
+  ): Promise<{ token: string; expiresAt: number; scope?: string[] }> {
+    const gateway = await this.getGateway();
+    const form = new URLSearchParams({ grant_type: 'client_credentials' });
+    if (scope && scope.trim()) {
+      form.set('scope', scope.trim());
+    }
+    const res = await fetch(`${gateway}/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`,
+      },
+      body: form.toString(),
+    });
+    const payload = (await res.json()) as Record<string, unknown>;
+    if (!res.ok || typeof payload.access_token !== 'string') {
+      throw new AuthError(
+        `OAuth token request failed (${res.status}): ${String(payload.error_description ?? payload.error ?? 'unknown')}`,
+      );
+    }
+    const token = String(payload.access_token);
+    const jwtPayload = decodeJwt(token);
+    const scopes =
+      typeof payload.scope === 'string'
+        ? payload.scope.split(/\s+/).filter(Boolean)
+        : undefined;
+    await tokenManager.saveState(
+      {
+        token,
+        salt: '',
+        tenant: '',
+        username: clientId,
+        issuedAt: jwtPayload.iat,
+        expiresAt: jwtPayload.exp,
+        authType: 'oauth',
+        scope: scopes,
+      },
+      profileName,
+    );
+    return { token, expiresAt: jwtPayload.exp, scope: scopes };
   }
 
   /**
