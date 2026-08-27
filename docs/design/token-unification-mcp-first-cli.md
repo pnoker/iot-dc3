@@ -256,3 +256,20 @@ remains gated on Q5. **First Phase-3 slice landed 2026-08-27:** `dc3 tools list/
 - Contract drift found: legacy login now returns `{data:"ok"}` + `dc3-token` cookie, while the
   June-era CLI still parses `data` as the token string — legacy CLI login needs an update or
   removal when Phase-3 regeneration lands.
+
+**Round two, root-caused and closed (same day):** the `/mcp` UNAVAILABLE was never a network
+problem — `~/.m2` held June-era installed artifacts whose invalid POMs silently dropped ALL
+transitive dependencies for bare consumers (facade-grpc still referenced the retired
+`spring-grpc-spring-boot-starter`; auth referenced unmanaged `mybatis-plus-spring`). A full
+repository `install -DskipTests` refreshed every artifact; afterwards:
+
+- introspect/listTools gRPC round-trips succeed from the gateway to auth on loopback;
+- P2 projection visibly narrowed scopes when catalog∩bindings was empty and granted
+  scopes once a wildcard-bound tool row existed — both branches verified live;
+- `/mcp` tools/list returns a protocol-valid result; REST route with the same ticket = 200.
+
+**Verdict: `dc3.gateway.oauth.enabled=true` is proven safe to enable** in deployments built
+from this tree. Follow-ups recorded: wildcard-bound principals (`resource_code='*'`) do not
+expand into concrete tool permissionCodes — admin connections see an empty catalog until the
+projection learns wildcard expansion or consoles bind concrete codes; connection-level tool
+whitelists explain per-connection filtering of tools/list.
