@@ -72,6 +72,8 @@ import io.github.pnoker.common.utils.PasswordUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.github.pnoker.common.utils.OAuthJwtVerifier;
+import io.github.pnoker.common.auth.entity.bo.ResourceBO;
+import io.github.pnoker.common.auth.service.RoleResourceBindService;
 import io.jsonwebtoken.security.InvalidKeyException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -134,6 +136,7 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     private final ServiceAccountManager serviceAccountManager;
     private final McpOpenApiAggregator openApiAggregator;
     private final OAuthProperties oauthProperties;
+    private final RoleResourceBindService roleResourceBindService;
     private final OAuthClientBuilder oauthClientBuilder;
     private final McpConnectionBuilder mcpConnectionBuilder;
     private final McpToolBuilder mcpToolBuilder;
@@ -391,6 +394,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
             if (tenantId == null || !tenantMembershipService.isTenantMember(tenantId, principalHeader.getPrincipalId())) {
                 throw oauthError(BAD_REQUEST.value(), "invalid_request", "principal is not a member of the tenant");
             }
+            // Tenant context resolved; narrow the scopes to the principal's RBAC reality.
+            scopes = capScopesByRbac(scopes, tenantId, principalHeader.getPrincipalId());
 
             Long connectionId = longValue(params.get(McpConstant.Field.MCP_CONNECTION_ID));
             McpConnectionRecord connection = connectionId == null || connectionId == 0
@@ -899,7 +904,8 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
                 OAuthGrantTypeEnum.CLIENT_CREDENTIALS.getValue());
         validateConnection(connection, client.getClientId(), client.getServiceAccountPrincipalId(),
                 client.getTenantId(), OAuthGrantTypeEnum.CLIENT_CREDENTIALS.getValue());
-        Set<String> scopes = requestedScopes(form.get(McpConstant.Field.SCOPE), client);
+        Set<String> scopes = capScopesByRbac(requestedScopes(form.get(McpConstant.Field.SCOPE), client),
+                client.getTenantId(), client.getServiceAccountPrincipalId());
 
         OAuthAuthorizationRecord authorization = new OAuthAuthorizationRecord();
         authorization.setId(IdWorker.getId());
@@ -977,7 +983,13 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
         }
         Set<String> scopes = splitValues(authorization.getAuthorizedScopes());
         LocalDateTime issued = LocalDateTime.now();
-        LocalDateTime accessExpires = issued.plus(oauthProperties.getAccessTokenTtl());
+        // Risk-ladder lifetime: only call-capable tickets get the short default;
+        // read-only tickets may live longer (docs/design §3.2).
+        Duration accessTtl = scopes.contains(McpConstant.Scope.TOOLS_CALL)
+                || scopes.contains(McpConstant.Scope.TOOLS_CALL_HIGH)
+                ? oauthProperties.getAccessTokenTtl()
+                : oauthProperties.getReadOnlyAccessTokenTtl();
+        LocalDateTime accessExpires = issued.plus(accessTtl);
         String jti = UUID.randomUUID().toString();
         Map<String, Object> claims = orderedMap(
                 McpConstant.Field.PRINCIPAL_TYPE, authorization.getPrincipalType(),
@@ -1180,6 +1192,66 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
      * @param client    the registered client
      * @return the resolved scope set
      */
+    /**
+     * Narrow a requested scope set down to what the principal's RBAC bindings cover
+     * (docs/design/token-unification-mcp-first-cli.md §3.1). Never widens: the result is
+     * always a subset of the input. When {@code dc3.oauth.rbac-scoped-scopes} is off, or
+     * when the principal has no resource bindings at all (incomplete RBAC setup), the
+     * request passes through unchanged so behaviour degrades to the pre-Phase-2 model.
+     *
+     * @param requested   scopes already validated against the client registration
+     * @param tenantId    tenant scope of the future ticket
+     * @param principalId ticket principal
+     * @return effective scopes, never null; may be empty when nothing is authorized
+     */
+    private Set<String> capScopesByRbac(Set<String> requested, Long tenantId, Long principalId) {
+        if (!oauthProperties.isRbacScopedScopes() || requested.isEmpty()
+                || tenantId == null || principalId == null) {
+            return requested;
+        }
+        java.util.Set<String> boundCodes = roleResourceBindService.listResourceByPrincipalId(principalId, tenantId)
+                .stream()
+                .map(ResourceBO::getResourceCode)
+                .filter(code -> StringUtils.isNotBlank(code))
+                .collect(java.util.stream.Collectors.toSet());
+        if (boundCodes.isEmpty()) {
+            log.warn("RBAC scope projection skipped: principal {} has no resource bindings in tenant {}", principalId, tenantId);
+            return requested;
+        }
+        List<McpToolRecord> tools = oauthMcpMapper.listEnabledToolsByPermissionCodes(boundCodes);
+        boolean anyTool = false;
+        boolean readable = false;
+        boolean callable = false;
+        boolean highRisk = false;
+        for (McpToolRecord tool : tools) {
+            anyTool = true;
+            String risk = StringUtils.defaultString(tool.getRiskLevel());
+            if (McpConstant.RiskLevel.HIGH.equalsIgnoreCase(risk)) {
+                highRisk = true;
+            } else {
+                callable = true;
+            }
+            Byte readOnly = tool.getReadOnlyHint();
+            readable |= readOnly != null && readOnly == 1;
+        }
+        Set<String> allowed = new java.util.HashSet<>();
+        if (readable) {
+            allowed.add(McpConstant.Scope.RESOURCES_READ);
+        }
+        if (anyTool) {
+            allowed.add(McpConstant.Scope.TOOLS_LIST);
+        }
+        if (callable) {
+            allowed.add(McpConstant.Scope.TOOLS_CALL);
+        }
+        if (highRisk) {
+            allowed.add(McpConstant.Scope.TOOLS_CALL_HIGH);
+        }
+        Set<String> capped = new java.util.HashSet<>(requested);
+        capped.retainAll(allowed);
+        return capped;
+    }
+
     private Set<String> requestedScopes(String rawScopes, OAuthRegisteredClientRecord client) {
         Set<String> allowed = splitValues(client.getScopes());
         Set<String> requested = StringUtils.isBlank(rawScopes) ? allowed : splitValues(rawScopes);

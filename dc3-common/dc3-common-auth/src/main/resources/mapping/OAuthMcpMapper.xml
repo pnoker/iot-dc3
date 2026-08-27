@@ -539,6 +539,21 @@
             OR lower(permission_code) LIKE concat('%', lower(#{keyword}), '%'))
         </if>
     </sql>
+    <!-- Dialect-neutral: plain IN over bound parameters, no string/JSON syntax.
+         Projection input only — columns kept minimal on purpose. -->
+    <select id="listEnabledToolsByPermissionCodes"
+            resultType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
+        SELECT permission_code AS permission_code,
+               risk_level      AS risk_level,
+               read_only_hint  AS read_only_hint
+        FROM dc3_mcp_tool_catalog
+        WHERE deleted = 0
+          AND enable_flag = 0
+          AND permission_code IN
+        <foreach collection="permissionCodes" item="code" open="(" separator="," close=")">
+            #{code}
+        </foreach>
+    </select>
 
     <select id="listToolCatalog"
             resultType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">

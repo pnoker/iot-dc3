@@ -54,9 +54,24 @@ public class OAuthProperties {
     private Duration authorizationCodeTtl = Duration.ofMinutes(5);
 
     /**
-     * Lifetime of an issued access token.
+     * Lifetime of an issued access token that carries a call-capable scope
+     * (mcp:tools:call or mcp:tools:call_high).
      */
     private Duration accessTokenTtl = Duration.ofMinutes(15);
+
+    /**
+     * Lifetime of an access token whose scopes are read-only (list / resources_read) —
+     * the risk-ladder top step: less capable tickets may live longer.
+     */
+    private Duration readOnlyAccessTokenTtl = Duration.ofHours(1);
+
+    /**
+     * Cap granted scopes at what the principal's RBAC bindings actually cover
+     * (tool-catalog join, narrow-only: never widens a request; principals with no
+     * bindings keep legacy behaviour so an incomplete RBAC setup cannot silently
+     * zero out every client).
+     */
+    private boolean rbacScopedScopes = true;
 
     /**
      * Lifetime of an issued refresh token.

@@ -242,6 +242,15 @@ public interface OAuthMcpMapper {
     List<McpToolRecord> listRegistryToolCandidates();
 
     /**
+     * Enabled catalog tools whose permission code is one of the given principal-bound codes.
+     *
+     * @param permissionCodes non-empty set of bound permission codes
+     * @return minimal tool rows for scope projection (never null)
+     */
+    List<McpToolRecord> listEnabledToolsByPermissionCodes(@org.apache.ibatis.annotations.Param("permissionCodes")
+                                                          java.util.Collection<String> permissionCodes);
+
+    /**
      * Look up a catalog tool by its stable tool id.
      *
      * @param toolId the tool id
