@@ -72,14 +72,17 @@ request → AuthenticGatewayFilter → TokenResolver chain (first success wins)
 
 Today's four scopes stay as the external vocabulary, but they stop being an
 independent configuration axis. On authorization, the server computes them from the
-client principal's RBAC bindings:
+client principal's RBAC bindings. Risk is three-valued today (`McpRiskLevelEnum`:
+LOW visible, MEDIUM hidden-until-enabled, HIGH confirmation-gated), and the projection
+must be **additive per class, never all-or-nothing** — a principal mixing LOW and HIGH
+bindings must not lose access to its own ordinary tools:
 
 ```text
 effectiveScopes(principal) =
-    resources_read : has any read-permissionCode binding
-    tools_list     : has any API the principal may see
-    tools_call     : all bound APIs are LOW risk
-    tools_call_high: ≥1 HIGH-risk API bound
+    resources_read : has ≥1 read-permissionCode binding
+    tools_list     : has ≥1 API the principal may see
+    tools_call     : has ≥1 callable binding at LOW or (enabled) MEDIUM risk
+    tools_call_high: has ≥1 HIGH-risk binding
 ```
 
 The RS256 ticket signs the computed result; per-request enforcement keeps using the
@@ -93,7 +96,7 @@ connection draw from the same well and can never disagree.
 |----------------------------|---------------|--------------------------------------------|
 | read-only (`resources_read`, dashboards) | 1 h           | silent refresh                             |
 | write (`tools_call`, manager mutations)  | 15 min        | refresh rotation (reuse current mechanism) |
-| high-risk (`tools_call_high`)            | step-up only: minutes-lived ticket minted on confirmation of the specific call | no standing grant |
+| high-risk (`tools_call_high`)            | step-up by default: minutes-lived ticket minted on confirmation of the specific call (the explicit `--approve-window` escape hatch from Q2 grants a bounded standing exception, audit-hardened) | no standing grant in the default path |
 
 The platform-side 12 h constant moves to configuration in the same change
 (some consumer — batch jobs — will eventually need longer); refresh-rotation theft
@@ -185,7 +188,11 @@ before implementation starts.
   legacy salt/generate flow deprecated (not removed until web also offers OAuth).
 
 Each phase is independently shippable; nothing before Phase 3 requires touching the
-per-domain CLI command files again.
+per-domain CLI command files again. Note one ordering subtlety inside Phase 1:
+`dc3 auth login --oauth` itself works against endpoints that already exist, so it can
+land first — but CLI commands are only usable with it once the gateway resolver chain
+accepts RS256 tickets on `/api/v3`. The feature flag should hide the subcommand until
+then to avoid shipping a login that cannot do anything.
 
 ## 7. Relationship to prior docs
 
