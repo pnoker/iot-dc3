@@ -265,7 +265,7 @@ public class KeyUtil {
                 .subject(securityKey + SymbolConstant.COLON + subject)
                 .issuedAt(new Date())
                 .signWith(key, Jwts.SIG.HS256)
-                .expiration(TimeUtil.expireTime(TimeoutConstant.TOKEN_CACHE_TIMEOUT, Calendar.HOUR));
+                .expiration(TimeUtil.expireTime(TokenTtl.hours(), Calendar.HOUR));
         return builder.compact();
     }
 

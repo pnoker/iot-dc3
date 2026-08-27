@@ -112,3 +112,15 @@ dc3:
         dc3-center-manager: ${GATEWAY_ROUTE_MANAGER_URI:http://${CENTER_MANAGER_HOST:dc3-center-manager}:8400}/manager
         dc3-center-data: ${GATEWAY_ROUTE_DATA_URI:http://${CENTER_DATA_HOST:dc3-center-data}:8500}/data
         dc3-center-agentic: ${GATEWAY_ROUTE_AGENTIC_URI:http://${CENTER_AGENTIC_HOST:dc3-center-agentic}:8600}/agentic
+
+  # OAuth RS256 ticket verification on Authentic-filtered routes (Phase 1 of
+  # docs/design/token-unification-mcp-first-cli.md). Keep enabled=false until the
+  # auth center's issuer/jwks values are production-stable; when disabled the
+  # gateway accepts only classic login tickets and behaviour is unchanged.
+  # issuer/audience must match dc3.common.oauth in the auth center configuration.
+  gateway:
+    oauth:
+      enabled: ${DC3_GATEWAY_OAUTH_ENABLED:false}
+      jwks-url: ${DC3_GATEWAY_OAUTH_JWKS_URL:http://${CENTER_AUTH_HOST:dc3-center-auth}:8300/auth/oauth2/jwks}
+      issuer: ${DC3_OAUTH_ISSUER:http://localhost:8300/auth}
+      audience: ${DC3_OAUTH_AUDIENCE:dc3-mcp}

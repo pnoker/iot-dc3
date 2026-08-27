@@ -24,11 +24,13 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
+import io.github.pnoker.common.gateway.security.OAuthTokenResolver;
 import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.HmacAuthSigner;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -58,6 +60,12 @@ public class AuthenticGatewayFilter implements GatewayFilter {
     private final FilterService filterService;
 
     private final HmacAuthSigner hmacAuthSigner;
+
+    /**
+     * Present only when {@code dc3.gateway.oauth.enabled=true}; empty otherwise, which
+     * keeps the filter on the classic login-ticket path exclusively.
+     */
+    private final ObjectProvider<OAuthTokenResolver> oauthTokenResolver;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -121,6 +129,13 @@ public class AuthenticGatewayFilter implements GatewayFilter {
      * @return the resolved principal header
      */
     private RequestHeader.PrincipalHeader resolvePrincipalHeader(ServerHttpRequest request) {
+        // OAuth bearer tickets take precedence when the resolver is enabled: one verified
+        // RS256 ticket becomes the same principal header a login ticket would produce.
+        String authorization = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        OAuthTokenResolver resolver = oauthTokenResolver.getIfAvailable();
+        if (resolver != null && OAuthTokenResolver.isBearer(authorization)) {
+            return resolver.resolve(authorization.substring(OAuthTokenResolver.BEARER_PREFIX.length()).trim());
+        }
         FacadeTenantBO tenant = filterService.getTenant(request);
         FacadeLocalCredentialBO credential = filterService.getLocalCredential(request);
         filterService.checkValid(request, tenant, credential);

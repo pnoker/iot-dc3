@@ -18,8 +18,12 @@
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.gateway.mcp.McpGatewayProperties;
+import io.github.pnoker.common.gateway.security.GatewayOAuthProperties;
+import io.github.pnoker.common.gateway.security.OAuthTokenResolver;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -30,8 +34,21 @@ import org.springframework.context.annotation.ComponentScan;
  * @since 2016.10.1
  */
 @AutoConfiguration
-@EnableConfigurationProperties(McpGatewayProperties.class)
+@EnableConfigurationProperties({McpGatewayProperties.class, GatewayOAuthProperties.class})
 @ComponentScan(basePackages = {"io.github.pnoker.common.gateway"})
 public class GatewayInitRunner {
+
+    /**
+     * OAuth RS256 ticket resolver, instantiated only when {@code dc3.gateway.oauth.enabled}
+     * is true; when absent, the Authentic filter falls through to classic login tickets.
+     *
+     * @param properties gateway-side OAuth verification configuration
+     * @return the resolver
+     */
+    @Bean
+    @ConditionalOnProperty(prefix = "dc3.gateway.oauth", name = "enabled", havingValue = "true")
+    public OAuthTokenResolver oauthTokenResolver(GatewayOAuthProperties properties) {
+        return new OAuthTokenResolver(properties);
+    }
 
 }

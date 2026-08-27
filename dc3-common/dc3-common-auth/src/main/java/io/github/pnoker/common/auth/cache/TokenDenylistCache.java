@@ -19,8 +19,8 @@ package io.github.pnoker.common.auth.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import io.github.pnoker.common.constant.cache.TimeoutConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
+import io.github.pnoker.common.utils.TokenTtl;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  * </p>
  *
  * <p>
- * Entries expire after {@link TimeoutConstant#TOKEN_CACHE_TIMEOUT} hours so the cache
+ * Entries expire one hour after {@link TokenTtl#hours()} so the cache
  * cannot grow without bound: by then every JWT issued before the logout has already
  * exceeded its own {@code exp} claim and would be rejected anyway.
  * </p>
@@ -59,7 +59,7 @@ public class TokenDenylistCache {
     public void init() {
         this.cache = Caffeine.newBuilder()
                 .maximumSize(100_000L)
-                .expireAfterWrite(TimeoutConstant.TOKEN_CACHE_TIMEOUT, TimeUnit.HOURS)
+                .expireAfterWrite(TokenTtl.hours() + 1L, TimeUnit.HOURS)
                 .build();
     }
 

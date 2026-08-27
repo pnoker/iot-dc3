@@ -103,6 +103,12 @@ public class RequestHeader {
         private Long connectionId;
 
         /**
+         * Granted OAuth scopes when the ticket is an OAuth/MCP access token; null for
+         * classic login tickets. Consumers must ignore what they do not understand.
+         */
+        private java.util.List<String> scopes;
+
+        /**
          * Audit accessor. The value is the principal ID, not dc3_user.id.
          *
          * @return principal ID

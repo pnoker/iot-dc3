@@ -71,6 +71,7 @@ import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.PasswordUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.github.pnoker.common.utils.OAuthJwtVerifier;
 import io.jsonwebtoken.security.InvalidKeyException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -1024,13 +1025,11 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
      * @return the verified JWT claims
      */
     private Claims parseAccessToken(String token) {
-        return Jwts.parser()
-                .requireIssuer(oauthProperties.getIssuer())
-                .requireAudience(oauthProperties.getAudience())
-                .verifyWith(keyMaterial().publicKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        // Shared verifier; kid is intentionally not pinned here because tokens are always
+        // minted with the current in-process key.
+        return new OAuthJwtVerifier(oauthProperties.getIssuer(), oauthProperties.getAudience(),
+                kid -> keyMaterial().publicKey() instanceof RSAPublicKey rsa ? rsa : null)
+                .verify(token);
     }
 
     /**
