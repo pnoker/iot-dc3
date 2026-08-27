@@ -125,4 +125,124 @@ export function registerAlertCommand(program: Command): void {
       );
       printAndExit(result, format);
     });
+
+  // ---- Deep-analysis surface (added 2026-08): generic day/limit + kv passthrough ----
+
+  const appendQuery = (base: string, opts: Record<string, unknown>): string => {
+    const qs: string[] = [];
+    if (opts.days !== undefined) qs.push(`days=${opts.days}`);
+    if (opts.limit !== undefined) qs.push(`limit=${opts.limit}`);
+    if (opts.baselineDays !== undefined) qs.push(`baseline_days=${opts.baselineDays}`);
+    if (opts.silentMinutes !== undefined) qs.push(`silent_minutes=${opts.silentMinutes}`);
+    // --query may arrive as one string or several values depending on usage.
+    const kvs: string[] = Array.isArray(opts.query)
+      ? (opts.query as string[])
+      : typeof opts.query === 'string' && opts.query
+        ? [opts.query]
+        : [];
+    for (const kv of kvs) {
+      const eq = kv.indexOf('=');
+      if (eq > 0) {
+        qs.push(`${encodeURIComponent(kv.slice(0, eq))}=${encodeURIComponent(kv.slice(eq + 1))}`);
+      }
+    }
+    return qs.length ? `${base}?${qs.join('&')}` : base;
+  };
+
+  const addGetAnalysis = (
+    name: string,
+    sub: string,
+    description: string,
+  ): void => {
+    alert
+      .command(name)
+      .description(description)
+      .option('--days <n>', 'Look-back window in days')
+      .option('--limit <n>', 'Maximum rows to return')
+      .option('--query <k=v>', 'Extra server query param (repeatable)')
+      .option('--format <format>', 'Output format')
+      .action(async (opts) => {
+        const format = detectFormat(opts.format);
+        const result = await dc3Client.get(
+          appendQuery(`/api/v3/data/dashboard/alert/${sub}`, opts),
+        );
+        printAndExit(result, format);
+      });
+  };
+
+  addGetAnalysis('activity', 'activity', 'Alert activity timeline');
+  addGetAnalysis('storm-sources', 'storm_sources', 'Alert storm sources');
+  addGetAnalysis('flapping', 'flapping', 'Flapping alerts analysis');
+  addGetAnalysis('correlation', 'correlation', 'Correlated alert pairs');
+  addGetAnalysis('peer-deviation', 'peer_deviation', 'Peer-deviation anomalies');
+  addGetAnalysis('aging', 'aging', 'Unresolved alert ageing');
+  addGetAnalysis('mtta', 'mtta', 'Mean-time-to-acknowledge metrics');
+
+  // Non-alert-prefix variants
+  alert
+    .command('change-impact')
+    .description('Change-impact analysis before/after config changes')
+    .option('--days <n>', 'Look-back window in days')
+    .option('--format <format>', 'Output format')
+    .action(async (opts) => {
+      const format = detectFormat(opts.format);
+      const result = await dc3Client.get(appendQuery('/api/v3/data/dashboard/alert/change_impact', opts));
+      printAndExit(result, format);
+    });
+
+  alert
+    .command('latency')
+    .description('Point-write latency histogram')
+    .option('--format <format>', 'Output format')
+    .action(async (opts) => {
+      const format = detectFormat(opts.format);
+      const result = await dc3Client.get('/api/v3/data/dashboard/stats/latency');
+      printAndExit(result, format);
+    });
+
+  alert
+    .command('silent-sources')
+    .description('Data sources silent beyond a threshold')
+    .option('--baseline-days <n>', 'Baseline window in days')
+    .option('--silent-minutes <n>', 'Silence threshold in minutes')
+    .option('--limit <n>', 'Maximum rows to return', '50')
+    .option('--format <format>', 'Output format')
+    .action(async (opts) => {
+      const format = detectFormat(opts.format);
+      const result = await dc3Client.get(
+        appendQuery('/api/v3/data/dashboard/silent/sources', opts),
+      );
+      printAndExit(result, format);
+    });
+
+  alert
+    .command('coverage-gap')
+    .description('Collection coverage gaps for points and devices')
+    .option('--limit <n>', 'Maximum rows to return', '100')
+    .option('--format <format>', 'Output format')
+    .action(async (opts) => {
+      const format = detectFormat(opts.format);
+      const result = await dc3Client.get(
+        `/api/v3/data/dashboard/coverage/gap?limit=${opts.limit}`,
+      );
+      printAndExit(result, format);
+    });
+
+  alert
+    .command('bulk-confirm')
+    .description('Confirm many alerts at once')
+    .requiredOption('--args <json>', 'Body as JSON, e.g. {"items":[{"source":"device","id":789}]}')
+    .option('--format <format>', 'Output format')
+    .action(async (opts) => {
+      const format = detectFormat(opts.format);
+      let body: unknown;
+      try {
+        body = JSON.parse(opts.args);
+      } catch {
+        printAndExit({ ok: false, message: '--args is not valid JSON' }, 'json', 1);
+        return;
+      }
+      const result = await dc3Client.post('/api/v3/data/dashboard/alert/bulk_confirm', body);
+      printAndExit(result, format);
+    });
 }

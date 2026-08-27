@@ -12,6 +12,7 @@ import { registerDashboardCommand } from './commands/dashboard.js';
 import { registerTopicCommand } from './commands/topic.js';
 import { registerChatCommand } from './commands/chat.js';
 import { registerToolCommand } from './commands/tool.js';
+import { registerAnalyticsCommand } from './commands/analytics.js';
 import { registerGroupCommand } from './commands/group.js';
 import { registerLabelCommand } from './commands/label.js';
 
@@ -42,6 +43,7 @@ registerDashboardCommand(program);
 registerTopicCommand(program);
 registerChatCommand(program);
 registerToolCommand(program);
+registerAnalyticsCommand(program);
 
 // Parse and handle errors
 program.parseAsync(process.argv).catch((err: Error) => {
