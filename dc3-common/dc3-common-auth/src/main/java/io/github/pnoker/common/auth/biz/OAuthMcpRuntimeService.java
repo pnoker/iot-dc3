@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.biz;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.McpConnectionAddBO;
 import io.github.pnoker.common.auth.entity.bo.OAuthClientRegistrationBO;
 import io.github.pnoker.common.auth.entity.vo.McpAuditVO;
@@ -139,15 +140,16 @@ public interface OAuthMcpRuntimeService {
     int refreshToolCatalog();
 
     /**
-     * List the MCP tool catalog with optional keyword and risk-level filters. The result
-     * limit is bounded to a safe maximum.
+     * Page the MCP tool catalog with optional keyword and risk-level filters. The page
+     * size is bounded to a safe maximum.
      *
      * @param keyword   optional keyword filter applied to tool name and description
      * @param riskLevel optional risk-level filter
-     * @param limit     maximum number of results (bounded to 1-500, defaults to 200)
-     * @return the matching tool catalog entries
+     * @param current   one-based page number (defaults to 1 when non-positive)
+     * @param size      page size (bounded to 1-500, defaults to 200)
+     * @return the requested tool catalog page with the filtered total
      */
-    List<McpToolVO> listToolCatalog(String keyword, String riskLevel, int limit);
+    Page<McpToolVO> pageToolCatalog(String keyword, String riskLevel, long current, long size);
 
     /**
      * List MCP connections owned by the authenticated caller, scoped to the caller's tenant.
@@ -246,18 +248,19 @@ public interface OAuthMcpRuntimeService {
     void audit(McpAuditCommandDTO command);
 
     /**
-     * List MCP tool-call audit entries filtered by tenant, principal, tool, status, and
-     * risk level. The result limit is bounded to a safe maximum.
+     * Page MCP tool-call audit entries filtered by tenant, principal, tool, status, and
+     * risk level. The page size is bounded to a safe maximum.
      *
      * @param tenantId    tenant scope
      * @param principalId optional principal filter
      * @param toolId      optional tool filter
      * @param status      optional status filter
      * @param riskLevel   optional risk-level filter
-     * @param limit       maximum number of results (bounded to 1-500, defaults to 200)
-     * @return the matching audit entries
+     * @param current     one-based page number (defaults to 1 when non-positive)
+     * @param size        page size (bounded to 1-500, defaults to 200)
+     * @return the requested audit page with the filtered total
      */
-    List<McpAuditVO> listAudit(Long tenantId, Long principalId, String toolId, String status,
-                               String riskLevel, int limit);
+    Page<McpAuditVO> pageAudit(Long tenantId, Long principalId, String toolId, String status,
+                               String riskLevel, long current, long size);
 
 }

@@ -18,6 +18,7 @@
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -46,13 +47,16 @@ public class McpToolCatalogQueryVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Pagination parameters; when absent the first page sized by the service default is returned.")
+    private Pages page;
+
     @Schema(description = "Fuzzy keyword over tool id, name and title.", example = "device")
     private String keyword;
 
     @Schema(description = "Filter by tool risk level: LOW, MEDIUM or HIGH.", example = "LOW")
     private String riskLevel;
 
-    @Schema(description = "Maximum number of records to return.", example = "200")
+    @Schema(description = "Page size override kept for backward compatibility; ignored when {@code page} is present.", example = "200")
     private Integer limit;
 
 }

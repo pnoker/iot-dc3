@@ -69,10 +69,10 @@ export const createMcpAuditConfig = (t: Translator): EntityListConfig => ({
       toolId: p.toolId,
       status: p.status,
       riskLevel: p.riskLevel,
-      limit: 200,
+      current: p.page?.current,
+      size: p.page?.size,
     });
-    const records = Array.isArray(res?.data) ? res.data : [];
-    return {data: {records, total: records.length}} as R;
+    return {data: {records: res?.data?.records ?? [], total: res?.data?.total ?? 0}} as R;
   },
   emptyText: t('settings.mcpAudit.empty'),
 });

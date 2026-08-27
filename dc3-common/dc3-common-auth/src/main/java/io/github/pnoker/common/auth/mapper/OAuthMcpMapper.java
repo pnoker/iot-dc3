@@ -250,16 +250,28 @@ public interface OAuthMcpMapper {
     McpToolRecord selectToolByToolId(@Param("toolId") String toolId);
 
     /**
-     * List the published tool catalog with optional keyword and risk-level filters.
+     * List one page of the published tool catalog with optional keyword and risk-level filters.
      *
      * @param keyword   keyword filter applied to tool name and description
      * @param riskLevel risk-level filter
-     * @param limit     maximum number of results
+     * @param limit     page size
+     * @param offset    zero-based row offset of the page
      * @return the matching tool records
      */
     List<McpToolRecord> listToolCatalog(@Param("keyword") String keyword,
                                         @Param("riskLevel") String riskLevel,
-                                        @Param("limit") int limit);
+                                        @Param("limit") int limit,
+                                        @Param("offset") long offset);
+
+    /**
+     * Count the published tool catalog rows matching the same optional filters.
+     *
+     * @param keyword   keyword filter applied to tool name and description
+     * @param riskLevel risk-level filter
+     * @return the number of matching rows
+     */
+    long countToolCatalog(@Param("keyword") String keyword,
+                          @Param("riskLevel") String riskLevel);
 
     /**
      * Insert a new catalog tool.
@@ -282,15 +294,16 @@ public interface OAuthMcpMapper {
     // ------------------------------------------------------------------
 
     /**
-     * List MCP tool-call audit entries filtered by tenant, principal, tool, status, and
-     * risk level. Always scoped to one tenant.
+     * List one page of MCP tool-call audit entries filtered by tenant, principal, tool,
+     * status, and risk level. Always scoped to one tenant.
      *
      * @param tenantId    the tenant scope
      * @param principalId optional principal filter
      * @param toolId      optional tool filter
      * @param status      optional status filter
      * @param riskLevel   optional risk-level filter
-     * @param limit       maximum number of results
+     * @param limit       page size
+     * @param offset      zero-based row offset of the page
      * @return the matching audit entries
      */
     List<McpAuditCommand> listAudit(@Param("tenantId") Long tenantId,
@@ -298,7 +311,24 @@ public interface OAuthMcpMapper {
                                     @Param("toolId") String toolId,
                                     @Param("status") String status,
                                     @Param("riskLevel") String riskLevel,
-                                    @Param("limit") int limit);
+                                    @Param("limit") int limit,
+                                    @Param("offset") long offset);
+
+    /**
+     * Count MCP tool-call audit entries matching the same tenant-scoped filters.
+     *
+     * @param tenantId    the tenant scope
+     * @param principalId optional principal filter
+     * @param toolId      optional tool filter
+     * @param status      optional status filter
+     * @param riskLevel   optional risk-level filter
+     * @return the number of matching rows
+     */
+    long countAudit(@Param("tenantId") Long tenantId,
+                    @Param("principalId") Long principalId,
+                    @Param("toolId") String toolId,
+                    @Param("status") String status,
+                    @Param("riskLevel") String riskLevel);
 
     /**
      * Insert a tool-call audit entry.

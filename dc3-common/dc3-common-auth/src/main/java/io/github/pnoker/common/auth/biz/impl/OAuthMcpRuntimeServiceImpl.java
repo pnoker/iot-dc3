@@ -19,6 +19,7 @@ package io.github.pnoker.common.auth.biz.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -545,20 +546,44 @@ public class OAuthMcpRuntimeServiceImpl implements OAuthMcpRuntimeService {
     }
 
     @Override
-    public List<McpToolVO> listToolCatalog(String keyword, String riskLevel, int limit) {
-        int boundedLimit = Math.max(1, Math.min(limit <= 0 ? 200 : limit, 500));
-        return mcpToolBuilder.buildVOListByRecordList(
-                oauthMcpMapper.listToolCatalog(StringUtils.trimToEmpty(keyword), StringUtils.trimToEmpty(riskLevel),
-                        boundedLimit));
+    public Page<McpToolVO> pageToolCatalog(String keyword, String riskLevel, long current, long size) {
+        long boundedSize = boundedPageSize(size);
+        long boundedCurrent = Math.max(1, current);
+        String trimmedKeyword = StringUtils.trimToEmpty(keyword);
+        String trimmedRiskLevel = StringUtils.trimToEmpty(riskLevel);
+        long total = oauthMcpMapper.countToolCatalog(trimmedKeyword, trimmedRiskLevel);
+        Page<McpToolVO> page = new Page<>(boundedCurrent, boundedSize, total);
+        page.setRecords(mcpToolBuilder.buildVOListByRecordList(
+                oauthMcpMapper.listToolCatalog(trimmedKeyword, trimmedRiskLevel,
+                        (int) boundedSize, (boundedCurrent - 1) * boundedSize)));
+        return page;
     }
 
     @Override
-    public List<McpAuditVO> listAudit(Long tenantId, Long principalId, String toolId, String status,
-                                      String riskLevel, int limit) {
-        int boundedLimit = Math.max(1, Math.min(limit <= 0 ? 200 : limit, 500));
-        return mcpAuditBuilder.buildVOListByRecordList(
-                oauthMcpMapper.listAudit(tenantId, principalId, StringUtils.trimToEmpty(toolId),
-                        StringUtils.trimToEmpty(status), StringUtils.trimToEmpty(riskLevel), boundedLimit));
+    public Page<McpAuditVO> pageAudit(Long tenantId, Long principalId, String toolId, String status,
+                                      String riskLevel, long current, long size) {
+        long boundedSize = boundedPageSize(size);
+        long boundedCurrent = Math.max(1, current);
+        String trimmedToolId = StringUtils.trimToEmpty(toolId);
+        String trimmedStatus = StringUtils.trimToEmpty(status);
+        String trimmedRiskLevel = StringUtils.trimToEmpty(riskLevel);
+        long total = oauthMcpMapper.countAudit(tenantId, principalId, trimmedToolId, trimmedStatus, trimmedRiskLevel);
+        Page<McpAuditVO> page = new Page<>(boundedCurrent, boundedSize, total);
+        page.setRecords(mcpAuditBuilder.buildVOListByRecordList(
+                oauthMcpMapper.listAudit(tenantId, principalId, trimmedToolId, trimmedStatus, trimmedRiskLevel,
+                        (int) boundedSize, (boundedCurrent - 1) * boundedSize)));
+        return page;
+    }
+
+    /**
+     * Clamp a requested page size to the 1-500 window, applying the 200 default when the
+     * caller passes zero or a negative value.
+     *
+     * @param size the requested page size
+     * @return the bounded page size
+     */
+    private static long boundedPageSize(long size) {
+        return Math.max(1, Math.min(size <= 0 ? 200 : size, 500));
     }
 
     @Override

@@ -527,10 +527,7 @@
         The dynamic form is also dialect-neutral, so the former mysql/mariadb
         forks exist no longer.
     -->
-    <select id="listToolCatalog"
-            resultType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
-        SELECT *
-        FROM dc3_mcp_tool_catalog
+    <sql id="toolCatalogFilters">
         WHERE deleted = 0
           AND enable_flag = 0
         <if test="riskLevel != null and riskLevel != ''">
@@ -541,8 +538,21 @@
             OR lower(tool_title) LIKE concat('%', lower(#{keyword}), '%')
             OR lower(permission_code) LIKE concat('%', lower(#{keyword}), '%'))
         </if>
+    </sql>
+
+    <select id="listToolCatalog"
+            resultType="io.github.pnoker.common.auth.entity.oauth.McpToolRecord">
+        SELECT *
+        FROM dc3_mcp_tool_catalog
+        <include refid="toolCatalogFilters"/>
         ORDER BY tool_category, tool_name
-        LIMIT #{limit}
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countToolCatalog" resultType="long">
+        SELECT COUNT(*)
+        FROM dc3_mcp_tool_catalog
+        <include refid="toolCatalogFilters"/>
     </select>
 
     <insert id="insertTool"
@@ -798,6 +808,21 @@
                 #{remoteIp}, '{}')
     </insert>
 
+    <!--
+        Tenant-scoped audit filters shared by the page and count queries; the
+        optional filters stay dynamic so blank bind parameters never reach SQL.
+    -->
+    <sql id="auditFilters">
+        <where>
+            deleted = 0
+            AND tenant_id = #{tenantId}
+            <if test="principalId != null and principalId != 0">AND principal_id = #{principalId}</if>
+            <if test="toolId != null and toolId != ''">AND tool_id = #{toolId}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+            <if test="riskLevel != null and riskLevel != ''">AND risk_level = #{riskLevel}</if>
+        </where>
+    </sql>
+
     <select id="listAudit"
             resultType="io.github.pnoker.common.auth.entity.oauth.McpAuditCommand">
         SELECT id,
@@ -822,16 +847,15 @@
         remote_ip,
         create_time
         FROM dc3_mcp_audit_log
-        <where>
-            deleted = 0
-            AND tenant_id = #{tenantId}
-            <if test="principalId != null and principalId != 0">AND principal_id = #{principalId}</if>
-            <if test="toolId != null and toolId != ''">AND tool_id = #{toolId}</if>
-            <if test="status != null and status != ''">AND status = #{status}</if>
-            <if test="riskLevel != null and riskLevel != ''">AND risk_level = #{riskLevel}</if>
-        </where>
+        <include refid="auditFilters"/>
         ORDER BY create_time DESC
-        LIMIT #{limit}
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countAudit" resultType="long">
+        SELECT COUNT(*)
+        FROM dc3_mcp_audit_log
+        <include refid="auditFilters"/>
     </select>
 
     <insert id="insertConfirmation"

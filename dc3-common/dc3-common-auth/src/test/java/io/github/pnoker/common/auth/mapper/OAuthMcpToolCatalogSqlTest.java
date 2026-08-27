@@ -38,6 +38,10 @@ class OAuthMcpToolCatalogSqlTest {
 
     private static final String STATEMENT_ID = "io.github.pnoker.common.auth.mapper.OAuthMcpMapper.listToolCatalog";
 
+    private static final String AUDIT_STATEMENT_ID = "io.github.pnoker.common.auth.mapper.OAuthMcpMapper.listAudit";
+
+    private static final String AUDIT_COUNT_ID = "io.github.pnoker.common.auth.mapper.OAuthMcpMapper.countAudit";
+
     private Configuration parseMapper() throws Exception {
         Configuration configuration = new Configuration();
         try (InputStream in = OAuthMcpToolCatalogSqlTest.class.getResourceAsStream("/mapping/OAuthMcpMapper.xml")) {
@@ -65,5 +69,25 @@ class OAuthMcpToolCatalogSqlTest {
         params.put("limit", 500);
         String sql = parseMapper().getMappedStatement(STATEMENT_ID).getBoundSql(params).getSql();
         assertThat(sql).contains("risk_level =").contains("LIKE");
+    }
+
+    @Test
+    void auditPageAndCountShareTheSameFilterShape() throws Exception {
+        Map<String, Object> blank = new HashMap<>();
+        blank.put("tenantId", 1L);
+        blank.put("principalId", null);
+        blank.put("toolId", "");
+        blank.put("status", "");
+        blank.put("riskLevel", "");
+        blank.put("limit", 12);
+        blank.put("offset", 12L);
+
+        String page = parseMapper().getMappedStatement(AUDIT_STATEMENT_ID).getBoundSql(blank).getSql();
+        assertThat(page).contains("tenant_id =").contains("LIMIT ? OFFSET ?")
+                .doesNotContain("principal_id =").doesNotContain("risk_level =");
+
+        String count = parseMapper().getMappedStatement(AUDIT_COUNT_ID).getBoundSql(blank).getSql();
+        assertThat(count).startsWith("SELECT COUNT(*)").contains("tenant_id =")
+                .doesNotContain("LIMIT");
     }
 }

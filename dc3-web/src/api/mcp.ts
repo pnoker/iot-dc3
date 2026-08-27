@@ -17,6 +17,7 @@
 
 import {httpGet, httpPost} from '@/api/common';
 import {API_MCP_BASE} from '@/config/constant/api';
+import type {PageResult} from '@/config/types';
 import type {
   McpAuditRecord,
   McpClientRegistrationForm,
@@ -52,8 +53,11 @@ export const listMcpConnectionTool = (id: string) =>
 
 export const refreshMcpToolCatalog = () => httpPost<R<number>>(`${API_MCP_BASE}/tool/catalog/refresh`);
 
-export const listMcpTool = (query: { keyword?: string; riskLevel?: string; limit?: number } = {}) =>
-  httpPost<R<McpToolRecord[]>>(`${API_MCP_BASE}/tool/list`, query);
+export const listMcpTool = (query: {
+  keyword?: string;
+  riskLevel?: string;
+  page?: {current?: number; size?: number};
+} = {}) => httpPost<R<PageResult<McpToolRecord>>>(`${API_MCP_BASE}/tool/list`, query);
 
 export const listMcpAudit = (
   params: {
@@ -61,10 +65,11 @@ export const listMcpAudit = (
     toolId?: string;
     status?: string;
     riskLevel?: string;
-    limit?: number;
+    current?: number;
+    size?: number;
   } = {}
 ) =>
-  httpPost<R<McpAuditRecord[]>>(`${API_MCP_BASE}/audit/list`, undefined, {
+  httpPost<R<PageResult<McpAuditRecord>>>(`${API_MCP_BASE}/audit/list`, undefined, {
     // Wire params follow the platform snake_case query convention; the camelCase
     // signature is kept for callers. Undefined keys are dropped by the transport.
     params: {
@@ -72,6 +77,7 @@ export const listMcpAudit = (
       tool_id: params.toolId,
       status: params.status,
       risk_level: params.riskLevel,
-      limit: params.limit,
+      current: params.current,
+      size: params.size,
     },
   });

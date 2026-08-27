@@ -17,6 +17,7 @@
 
 package io.github.pnoker.common.auth.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
 import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthProtocolException;
 import io.github.pnoker.common.auth.entity.builder.McpConnectionBuilder;
@@ -277,12 +278,12 @@ public class McpManagementController implements BaseController {
     /**
      * Page the MCP tool catalog with optional keyword, risk level and limit filters.
      *
-     * @param request optional catalog filter payload; an empty request lists all tools
-     * @return tool records exposing each tool's schema
+     * @param request optional catalog filter and pagination payload; an empty request lists the first page of all tools
+     * @return one page of tool records exposing each tool's schema
      */
     @PreAuthorize("@perm.can('mcp', 'list')")
-    @Operation(summary = "List MCP Tool Catalog", description = "Page the MCP tool catalog with optional keyword, risk level and limit filters. "
-            + "Returns tool records exposing each tool's schema; use to browse tools before whitelisting them on a connection.",
+    @Operation(summary = "List MCP Tool Catalog", description = "Page the MCP tool catalog with optional keyword and risk level filters. "
+            + "Returns one page of tool records exposing each tool's schema; use to browse tools before whitelisting them on a connection.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "LOW"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -290,28 +291,31 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/tool/list")
-    public Mono<R<List<McpToolVO>>> listToolCatalog(
+    public Mono<R<Page<McpToolVO>>> listToolCatalog(
             @RequestBody(required = false) McpToolCatalogQueryVO request) {
         McpToolCatalogQueryVO body = request == null ? new McpToolCatalogQueryVO() : request;
-        return async(() -> R.ok(oauthMcpRuntimeService.listToolCatalog(
+        return async(() -> R.ok(oauthMcpRuntimeService.pageToolCatalog(
                 StringUtils.defaultString(body.getKeyword()),
                 StringUtils.defaultString(body.getRiskLevel()),
-                intValue(body.getLimit())
+                body.getPage() == null ? 1L : body.getPage().getCurrent(),
+                body.getPage() == null ? intValue(body.getLimit()) : body.getPage().getSize()
         )));
     }
 
     /**
-     * List MCP tool-call audit entries scoped to the caller's tenant.
+     * Page MCP tool-call audit entries scoped to the caller's tenant.
      *
      * @param principalId optional filter by owning principal id
      * @param toolId      optional filter by MCP tool id
      * @param status      optional filter by invocation outcome (SUCCESS, DENIED, POLICY_DENIED, ERROR, UNKNOWN)
      * @param riskLevel   optional filter by tool risk level (LOW, MEDIUM, HIGH)
-     * @param limit       optional cap on the number of records returned
-     * @return append-only audit records matching the filters
+     * @param limit       optional page size kept for backward compatibility; ignored when {@code size} is present
+     * @param current     optional one-based page number
+     * @param size        optional page size (bounded to 1-500, defaults to 200)
+     * @return one page of append-only audit records matching the filters
      */
     @PreAuthorize("@perm.can('mcp', 'list')")
-    @Operation(summary = "List MCP Audit Log", description = "List MCP tool-call audit entries scoped to the caller's tenant, "
+    @Operation(summary = "List MCP Audit Log", description = "Page MCP tool-call audit entries scoped to the caller's tenant, "
             + "filterable by principal, tool, status and risk level. Returns append-only records kept for compliance review.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "LOW"),
@@ -320,15 +324,19 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/audit/list")
-    public Mono<R<List<McpAuditVO>>> listAuditLog(
+    public Mono<R<Page<McpAuditVO>>> listAuditLog(
             @Parameter(description = "Filter by owning principal ID.", example = "2048") @RequestParam(value = "principal_id", required = false) Long principalId,
             @Parameter(description = "Filter by MCP tool ID.", example = "tool_read_device") @RequestParam(value = "tool_id", required = false) String toolId,
             @Parameter(description = "Filter by audit invocation outcome: SUCCESS, DENIED, POLICY_DENIED, ERROR, or UNKNOWN.", example = "SUCCESS") @RequestParam(value = "status", required = false) String status,
             @Parameter(description = "Filter by tool risk level: LOW, MEDIUM, or HIGH.", example = "LOW") @RequestParam(value = "risk_level", required = false) String riskLevel,
-            @Parameter(description = "Maximum number of records to return.", example = "20") @RequestParam(value = "limit", required = false) Integer limit) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(oauthMcpRuntimeService.listAudit(
+            @Parameter(description = "Page size kept for backward compatibility; ignored when size is present.", example = "20") @RequestParam(value = "limit", required = false) Integer limit,
+            @Parameter(description = "One-based page number.", example = "1") @RequestParam(value = "current", required = false) Long current,
+            @Parameter(description = "Page size, bounded to 1-500.", example = "12") @RequestParam(value = "size", required = false) Integer size) {
+        return getTenantId().flatMap(tenantId -> async(() -> R.ok(oauthMcpRuntimeService.pageAudit(
                 tenantId, principalId, StringUtils.defaultString(toolId), StringUtils.defaultString(status),
-                StringUtils.defaultString(riskLevel), intValue(limit)
+                StringUtils.defaultString(riskLevel),
+                current == null ? 1L : current,
+                size == null ? intValue(limit) : size
         ))));
     }
 
