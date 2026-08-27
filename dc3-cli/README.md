@@ -158,6 +158,17 @@ dc3 dashboard device-stats [--top-n 10]
 dc3 topic list [--page]
 ```
 
+### Tool Catalog (`dc3 tools`)
+
+MCP transport over the same OAuth ticket as REST (dual-transport design):
+
+```bash
+dc3 tools list                          # catalog visible to the ticket's scopes
+dc3 tools call read_device --args '{"deviceId":456789}'
+```
+
+Requires `dc3 auth login --oauth`; classic login tickets are not accepted at `/mcp`.
+
 ### Chat — AI Agent (`dc3 chat`)
 
 ```bash

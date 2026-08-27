@@ -11,6 +11,7 @@ import { registerAlertCommand } from './commands/alert.js';
 import { registerDashboardCommand } from './commands/dashboard.js';
 import { registerTopicCommand } from './commands/topic.js';
 import { registerChatCommand } from './commands/chat.js';
+import { registerToolCommand } from './commands/tool.js';
 import { registerGroupCommand } from './commands/group.js';
 import { registerLabelCommand } from './commands/label.js';
 
@@ -40,6 +41,7 @@ registerAlertCommand(program);
 registerDashboardCommand(program);
 registerTopicCommand(program);
 registerChatCommand(program);
+registerToolCommand(program);
 
 // Parse and handle errors
 program.parseAsync(process.argv).catch((err: Error) => {
