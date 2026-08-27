@@ -94,7 +94,9 @@ interface SdkOptions {
 3. **Phase 2**：移植 30 个 API 封装模块；针对后端 OpenAPI 规范（或录制的 fixture）做契约测试。
 4. **Phase 3**：dc3-web 接入 SDK——删除 `src/api`，保留 axios 适配器 + 拦截器作为宿主粘合层；删除任何内容之前
    先跑完整 e2e（608 个单元测试 + Playwright）。
-5. **Phase 4**：dc3-cli 用 SDK 替换其手写的 fetch 认证（移除重复的 salt/generate/cancel 流程）。
+5. **Phase 4（已被 [`token-unification-mcp-first-cli.md`](./token-unification-mcp-first-cli.md) 取代）**：dc3-cli
+   认证迁移到 OAuth/MCP 凭证机制（RS256 + scope + 刷新轮换），而非 SDK 包装的 salt/generate/cancel；SDK 仍是
+   web/app 与 REST 类型的契约层。
 6. **Phase 5**：app 客户端通过 fetch/Keychain 适配器消费 SDK。
 
 ## 验证
