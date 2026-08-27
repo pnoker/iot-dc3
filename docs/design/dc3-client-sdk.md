@@ -1,26 +1,25 @@
-# dc3-sdk: Framework-Agnostic Client SDK (Design)
+# dc3-sdk：框架无关的客户端 SDK（设计）
 
-Status: proposed (phase 0 landed) · Scope: web / cli / future app · Drivers: A1 (device-independent semantics), boundary
-discipline in docs/design/frontend-three-terminal-ux.md
+状态：提案（phase 0 已落地） · 范围：web / cli / 未来 app · 驱动因素：A1（设备无关语义）、
+docs/design/frontend-three-terminal-ux.md 中的边界纪律
 
-## Problem
+## 问题
 
-The HTTP gateway contract is currently implemented twice:
+HTTP 网关契约目前被实现了两次：
 
-- dc3-web/src/api/ (30 modules) — thin axios wrappers, coupled to
-  `@/config/axios` (Element Plus notifications, router-guard 401 flow) and Vite `@/` aliases.
-- dc3-cli/src/core/client.ts — hand-rolled fetch calls for auth (token/salt, token/generate, token/cancel).
+- dc3-web/src/api/（30 个模块）——薄 axios 封装，与
+  `@/config/axios`（Element Plus 通知、路由守卫 401 流程）及 Vite `@/` 别名耦合。
+- dc3-cli/src/core/client.ts——为认证（token/salt、token/generate、token/cancel）手写的 fetch 调用。
 
-A native app (React Native) would need a third implementation. Every new endpoint, header, and error-code interpretation
-must be re-implemented per client — a standing violation of A1.
+原生 app（React Native）则需要第三套实现。每个新端点、请求头与错误码解释都必须逐客户端重复实现——
+这是对 A1 的持续性违反。
 
-## Goal
+## 目标
 
-One TypeScript SDK that implements the gateway contract exactly once and is consumed by web, CLI, and future app
-clients. The SDK is framework-agnostic:
-no Vue, no Element Plus, no vue-i18n, no axios hard-dependency.
+一个 TypeScript SDK，将网关契约精确实现一次，供 web、CLI 与未来的 app 客户端共同消费。该 SDK 框架无关：
+无 Vue、无 Element Plus、无 vue-i18n、不硬依赖 axios。
 
-## Package layout
+## 包结构
 
 ```text
 dc3-sdk/
@@ -36,7 +35,7 @@ dc3-sdk/
 └── package.json
 ```
 
-### Core contracts
+### 核心契约
 
 ```ts
 // HTTP transport abstraction — web injects axios, RN/node injects fetch.
@@ -60,53 +59,51 @@ interface SdkOptions {
 }
 ```
 
-Auth/session: SDK exposes salt/generate/cancel/change-password and a
-`TokenStore` abstraction (web: httpOnly cookie — no-op; CLI: memory/file; app: Keychain via host adapter). The SDK never
-decides storage policy.
+认证/会话：SDK 暴露 salt/generate/cancel/change-password 以及
+`TokenStore` 抽象（web：httpOnly cookie——空实现；CLI：内存/文件；app：经宿主适配器访问 Keychain）。存储策略
+永远不由 SDK 决定。
 
-### Semantic layer (L1) portability
+### 语义层（L1）可移植性
 
-Entity schemas already became framework-free in this iteration:
+实体 schema 在本次迭代中已经去框架化：
 
-- `EntityListConfig` and friends carry labels as translated strings produced by a
-  `Translator = (key, params?) => string` — Vue's ComposerTranslation satisfies it structurally; 16 config modules no
-  longer import vue-i18n.
-- Next step: move `EntityListConfig` type into the SDK's types layer so web and app render the same schema (configs stay
-  in the host apps; the shape is shared).
+- `EntityListConfig` 及相关类型以翻译后的字符串承载标签，字符串由
+  `Translator = (key, params?) => string` 生成——Vue 的 ComposerTranslation 在结构上满足该签名；16 个配置模块
+  不再 import vue-i18n。
+- 下一步：把 `EntityListConfig` 类型移入 SDK 的 types 层，使 web 与 app 渲染同一份 schema
+  （配置仍留在宿主应用中，共享的是形状）。
 
-Future option: backend-served JSON schemas via the OpenAPI export (`make openapi`) replace hand-authored configs without
-client changes.
+未来选项：通过 OpenAPI 导出（`make openapi`）由后端下发 JSON schema，在不改动客户端的前提下取代手写配置。
 
-## Boundary rules (lint-enforceable)
+## 边界规则（可用 lint 强制）
 
-Inside dc3-sdk, imports of the following are forbidden:
+在 dc3-sdk 内部，禁止 import 以下内容：
 
 - vue / vue-router / pinia / element-plus / vue-i18n
-- `@/config/*` host infrastructure
-- any browser-only global except behind `typeof window` guards
+- `@/config/*` 宿主基础设施
+- 任何仅浏览器才有的全局对象，除非位于 `typeof window` 守卫之后
 
-Enforce with eslint `no-restricted-imports` / `import/no-extraneous-dependencies`
-rules in the SDK package config.
+在 SDK 包配置中用 eslint `no-restricted-imports` / `import/no-extraneous-dependencies`
+规则强制执行。
 
-## Migration plan
+## 迁移计划
 
-1. **Phase 0 (landed)**: de-framework L1 configs — `Translator` type, zero vue-i18n imports in the 16 entity config
-   modules.
-2. **Phase 1**: scaffold `dc3-sdk` package (pnpm workspace), port
-   `PageQuery/PageResult`, `R<T>` envelope, error taxonomy; vitest with mock adapter.
-3. **Phase 2**: port the 30 API wrapper modules; contract tests against the backend OpenAPI spec (or recorded fixtures).
-4. **Phase 3**: dc3-web consumes the SDK — delete `src/api`, keep the axios adapter + interceptors as the host glue; run
-   full e2e (608 unit tests + Playwright) before removing anything.
-5. **Phase 4**: dc3-cli swaps its hand-rolled fetch auth for the SDK (removes the duplicated salt/generate/cancel flow).
-6. **Phase 5**: app client consumes the SDK with a fetch/Keychain adapter.
+1. **Phase 0（已落地）**：L1 配置去框架化——引入 `Translator` 类型，16 个实体配置模块零 vue-i18n import。
+2. **Phase 1**：搭建 `dc3-sdk` 包（pnpm workspace），移植
+   `PageQuery/PageResult`、`R<T>` 信封、错误分类体系；使用 mock 适配器的 vitest。
+3. **Phase 2**：移植 30 个 API 封装模块；针对后端 OpenAPI 规范（或录制的 fixture）做契约测试。
+4. **Phase 3**：dc3-web 接入 SDK——删除 `src/api`，保留 axios 适配器 + 拦截器作为宿主粘合层；删除任何内容之前
+   先跑完整 e2e（608 个单元测试 + Playwright）。
+5. **Phase 4**：dc3-cli 用 SDK 替换其手写的 fetch 认证（移除重复的 salt/generate/cancel 流程）。
+6. **Phase 5**：app 客户端通过 fetch/Keychain 适配器消费 SDK。
 
-## Verification
+## 验证
 
-- SDK unit tests run in node with zero DOM/Vue imports (CI assertion:
-  `import ... from 'vue'` absent in SDK source).
-- Web regression gate: pnpm check + lint + full vitest + Playwright e2e.
-- CLI gate: dc3-cli vitest suites keep passing against a mock adapter.
+- SDK 单元测试在 node 中运行，零 DOM/Vue import（CI 断言：
+  SDK 源码中不存在 `import ... from 'vue'`）。
+- Web 回归门禁：pnpm check + lint + 完整 vitest + Playwright e2e。
+- CLI 门禁：dc3-cli 的 vitest 套件针对 mock 适配器保持通过。
 
-## Revision
+## 修订记录
 
-2026-08: v1 — proposal with Phase 0 landed (Translator de-frameworking, 16 modules).
+2026-08：v1——提案，Phase 0 已落地（Translator 去框架化，16 个模块）。

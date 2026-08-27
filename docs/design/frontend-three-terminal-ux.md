@@ -1,63 +1,56 @@
-# Frontend Three-Terminal UX Architecture (ADR)
+# 前端三终端 UX 架构（ADR）
 
-Status: accepted · Scope: dc3-web (and future dc3 app client) · Drivers: first-principles UX engineering
+状态：已接受 · 范围：dc3-web（以及未来的 dc3 app 客户端）· 驱动因素：第一性原理 UX 工程
 
-## Context
+## 背景
 
-dc3-web is a Vue 3 management console for IoT operators. Its experience targets three device classes (desktop, tablet,
-mobile) and must later accommodate a native app as a fourth host of the mobile experience. The legacy codebase was
-desktop-first: a hard `min-width: 1280px` floor on
-`body` and the layout shell, fixed header columns, a fixed 220px settings aside, and no JavaScript breakpoint system.
+dc3-web 是面向 IoT 运维人员的 Vue 3 管理控制台。其体验面向三类设备（桌面、平板、移动），并且后续必须容纳一个原生 app，
+作为移动体验的第四个宿主。遗留代码库是桌面优先的：`body` 与布局壳上硬性的 `min-width: 1280px` 下限、固定的表头列、
+固定的 220px 设置侧栏（aside），而且没有 JavaScript 断点系统。
 
-Ad hoc responsive fixes (a few `@media` blocks, `el-col` responsive props on ten pages) proved that patches do not
-scale: every new page reintroduces the desktop assumptions. This ADR replaces patching with an architecture derived from
-first principles.
+临时性的响应式修补（少量 `@media` 块、十个页面上的 `el-col` 响应式属性）已经证明补丁不可扩展：每个新页面都会重新引入
+桌面假设。本 ADR 用一套从第一性原理推导出的架构取代打补丁。
 
-## First principles
+## 第一性原理
 
-Experience quality reduces to four physical quantities, valid on every device:
+体验质量可以归结为四个物理量，在任何设备上都成立：
 
-| Element    | Question                                               | Budget            |
+| 要素       | 问题                                                   | 预算              |
 |------------|--------------------------------------------------------|-------------------|
-| Perceive   | Does the user notice key state instantly?              | < 100ms           |
-| Understand | Is the information hierarchy readable at first glance? | first screen < 3s |
-| Act        | Can the user complete a task with minimal motor cost?  | fewest steps      |
-| Feedback   | Does every action answer visibly and predictably?      | < 300ms           |
+| 感知       | 用户能否即刻注意到关键状态？                            | < 100ms           |
+| 理解       | 信息层级是否一眼可读？                                  | 首屏 < 3s         |
+| 操作       | 用户能否以最小的动作成本完成任务？                      | 步骤最少          |
+| 反馈       | 每个操作是否可见且可预期地得到回应？                    | < 300ms           |
 
-Devices differ in exactly four variables: input modality (mouse vs thumb), viewport geometry, usage context (long
-sessions vs alarm response), and compute/bandwidth. The product is an operations console: state monitoring plus
-high-consequence actions over long sessions.
+设备之间的差异恰好落在四个变量上：输入模态（鼠标 vs 拇指）、视口几何、使用情境（长时间会话 vs 告警响应），以及算力/带宽。
+这个产品是一个运维管理控制台：长时间会话中的状态监控，加上高后果操作。
 
-From these, the architecture derives seven axioms. Every axiom is a rule with a falsifiable violation signature so it
-can be enforced in review and CI.
+由此，该架构推导出七条公理。每条公理都是一条带有可证伪违反特征的规则，从而可以在评审与 CI 中加以强制。
 
-## Axioms
+## 公理
 
-**A1. Content semantics are device-independent.** Entity models, operation models, and schemas are authored once and
-consumed by every presentation host. *Violation signature:* a second copy of a field definition for a different device.
+**A1. 内容语义与设备无关。**实体模型、操作模型与 schema 只编写一次，由每个呈现宿主消费。*违反特征：*为另一台设备复制出
+第二份字段定义。
 
-**A2. Presentation is rebuilt per device class, not shrunk.** Layout follows container geometry via fluid primitives
-(`minmax`, `auto-fit`, wrapping flex); coarse device-class switches are the only job of breakpoints. *Violation
-signature:* a growing pile of one-off `@media` patches.
+**A2. 呈现按设备类重建，而不是缩放。**布局经流式原语（`minmax`、`auto-fit`、可换行 flex）跟随容器几何；粗糙的设备类切换
+才是断点的唯一职责。*违反特征：*一次性 `@media` 补丁越堆越多。
 
-**A3. Input capability decides interaction mode.** Hover, right-click, and inline editing are mouse language; 44x44
-targets, bottom sheets, and swipes are thumb language. Pointer capability (fine/coarse, hover) is a runtime property,
-not a media-query guess — a tablet with a keyboard still deserves mouse interactions. *Violation signature:* hover-only
-actions, or touch targets below 44px.
+**A3. 输入能力决定交互模式。**悬停、右键与行内编辑是鼠标语言；44x44 目标、底部抽屉与滑动是拇指语言。指针能力
+（fine/coarse、悬停）是运行期属性，不是媒体查询的猜测——带键盘的平板仍然配得上鼠标交互。*违反特征：*只有悬停才能触发的
+操作，或低于 44px 的触控目标。
 
-**A4. Feedback latency is the perceived product.** 100ms synchronous feedback, <1s skeletons, optimistic updates beyond
-that. *Violation signature:* a button that does nothing until the network answers.
+**A4. 反馈时延就是被感知的产品。**100ms 同步反馈、<1s 骨架屏，再往上是乐观更新。*违反特征：*在网络应答之前毫无反应的
+按钮。
 
-**A5. Consistency carries the user's memory.** Tokens -> components -> page templates, each with a single source of
-truth; no hardcoded colors, radii, or magic widths. *Violation signature:* non-token color/spacing literals in SCSS.
+**A5. 一致性承载用户的记忆。**Token -> 组件 -> 页面模板，各自拥有单一事实来源；没有硬编码颜色、圆角或魔法宽度。*违反
+特征：*SCSS 中非 token 的颜色/间距字面量。
 
-**A6. State is part of the experience.** Preferences (theme, density, locale), navigation position, and draft forms
-survive device and session boundaries. *Violation signature:* user context reset on device switch or refresh.
+**A6. 状态是体验的一部分。**偏好（主题、密度、语言）、导航位置与草稿表单要跨越设备与会话边界存活。*违反特征：*切换设备或
+刷新后用户上下文被重置。
 
-**A7. Accessibility is the quality baseline.** Contrast, keyboard focus, reduced motion, and zoom are non-negotiable —
-they double as the spec for outdoor/site inspection scenarios.
+**A7. 无障碍是质量基线。**对比度、键盘焦点、减弱动效与缩放没有商量余地——它们同时也是户外/现场巡检场景的规格。
 
-## Layer model
+## 分层模型
 
 ```text
 L1 Semantic   entity model + operation model + schemas (summary/detail)   device-independent, single truth
@@ -67,82 +60,76 @@ L4 Patterns   4 page templates: monitor / list / detail / edit — three physica
 L5 Quality    measurement -> gates -> regression -> revision (closed loop)
 ```
 
-Each layer depends only on the one below it. Changes propagate downward, never sideways.
+每一层只依赖紧邻的下一层。变更只向下传播，绝不横向扩散。
 
-## Boundary discipline (reuse contract)
+## 边界纪律（复用契约）
 
-The web UI shell (L3/L4) is not reusable by a native app; the layers below the rendering boundary are. To keep that
-reuse real, the following are forbidden in L1/L2 and in a future shared `dc3-sdk` package:
+Web UI 壳（L3/L4）对原生 app 不可复用；渲染边界之下的层则可以复用。为了让这种复用真实成立，以下内容在 L1/L2 以及未来
+共享的 `dc3-sdk` 包中一律禁止：
 
-- imports of `@/config/*` Vue/Element Plus infrastructure (axios instance,
-  `ElMessage`, vue-i18n `ComposerTranslation`);
-- Element Plus or Vue types in entity schema definitions (labels are i18n keys, not translation functions);
-- device-specific values in token sources (tokens are host-independent values; SCSS/CSS are one rendering of them).
+- 导入 `@/config/*` 的 Vue/Element Plus 基础设施（axios 实例、`ElMessage`、vue-i18n `ComposerTranslation`）；
+- 实体 schema 定义中出现 Element Plus 或 Vue 类型（label 是 i18n 键，不是翻译函数）；
+- token 源中出现设备特定值（token 是与宿主无关的值；SCSS/CSS 只是它们的一种渲染）。
 
-Enforcement: ADR review + lint rules (no non-token literals in SCSS, no framework imports below L2).
+强制手段：ADR 评审 + lint 规则（SCSS 中不得出现非 token 字面量，L2 之下不得导入框架）。
 
-## Breakpoint contract
+## 断点契约
 
-Single contract, aligned with Element Plus `el-col` semantics (A5):
+单一契约，与 Element Plus `el-col` 语义对齐（A5）：
 
-| Tier | Range         | Terminal               |
-|------|---------------|------------------------|
-| xs   | < 768px       | mobile                 |
-| sm   | 768 - 991px   | tablet                 |
-| md   | 992 - 1199px  | tablet / small desktop |
-| lg   | 1200 - 1919px | desktop                |
-| xl   | >= 1920px     | wide desktop           |
+| 档位 | 范围          | 终端                    |
+|------|---------------|-------------------------|
+| xs   | < 768px       | 手机                    |
+| sm   | 768 - 991px   | 平板                    |
+| md   | 992 - 1199px  | 平板 / 小桌面           |
+| lg   | 1200 - 1919px | 桌面                    |
+| xl   | >= 1920px     | 宽屏桌面                |
 
-JavaScript (`useBreakpoint`) and CSS must both read this contract — no second, hand-rolled breakpoint set anywhere.
+JavaScript（`useBreakpoint`）与 CSS 必须都读取这一契约——任何地方都不允许出现第二套手搓断点。
 
-## Decisions (derived, not chosen)
+## 决策（推导而得，而非任意挑选）
 
-1. Mobile navigation: drawer menu, not bottom tabs — the task distribution is long-tail (home/alarms frequent, 40+
-   settings pages rare), which bottom tabs model badly.
-2. Mobile tables: summary card lists driven by the L1 summary schema, not horizontal scrolling. Cross-row comparison —
-   the table's purpose — is destroyed by horizontal panning; a sticky first column is the accepted interim state.
-3. Dark mode: in scope, as a product of L2 tokens, for long-session eye load and sharper alarm contrast, not as
-   decoration.
-4. Visual layer: tokenized Element Plus, no bespoke component library — bespoke UI violates A5 economics (maintenance
-   grows with component count).
+1. 移动端导航：抽屉菜单，而非底部标签——任务分布是长尾的（首页/告警高频，40+ 个设置页面低频），底部标签对这种分布建模
+   很差。
+2. 移动端表格：由 L1 摘要 schema 驱动的摘要卡片列表，而非横向滚动。跨行比较——表格的本意——会被横向平移摧毁；粘性首列
+   是被接受的过渡状态。
+3. 深色模式：在范围内，作为 L2 token 的产物，为的是长会话的眼部负担与更锐利的告警对比，而非装饰。
+4. 视觉层：token 化的 Element Plus，不做专属组件库——专属 UI 违背 A5 的经济学（维护成本随组件数量增长）。
 
-## Acceptance criteria
+## 验收标准
 
-- No page-level horizontal scroll from 360px to 2560px (table containers exempt);
-  `document.documentElement.scrollWidth <= window.innerWidth`.
-- Lighthouse mobile: perf >= 90, CLS <= 0.1, LCP <= 2.5s.
-- 100% touch targets >= 44x44; dialogs full-screen below 768px.
-- Zero hardcoded color/spacing literals in SCSS (token lint gate).
-- Playwright runs desktop, tablet, and mobile viewport projects; axe scan clean; visual regression on critical pages.
+- 360px 到 2560px 之间无页面级横向滚动（表格容器豁免）；
+  `document.documentElement.scrollWidth <= window.innerWidth`。
+- Lighthouse 移动端：perf >= 90、CLS <= 0.1、LCP <= 2.5s。
+- 100% 的触控目标 >= 44x44；768px 以下对话框全屏。
+- SCSS 中零硬编码颜色/间距字面量（token lint 闸门）。
+- Playwright 运行桌面、平板与移动视口项目；axe 扫描干净；关键页面执行视觉回归。
 
-## Revision
+## 修订记录
 
-2026-08: v1 — adopted with the L2 token/breakpoint/theme foundation (dc3-web src/styles/tokens.scss, theme.scss,
-src/composables/useBreakpoint.ts, src/store/modules/app.ts).
+2026-08：v1 —— 随 L2 token/断点/主题基座一起采纳（dc3-web src/styles/tokens.scss、theme.scss、
+src/composables/useBreakpoint.ts、src/store/modules/app.ts）。
 
-2026-08: v2 — shell three-terminal forms shipped: shared NavMenu (horizontal ellipsis / vertical drawer), Settings
-sidebar menu extracted and hosted in aside (desktop) / collapsed rail (tablet) / drawer (mobile), responsive login
-panels, compact mobile pagination in ToolCard. Verified via artifacts/viewport-check.mjs: zero page-level overflow and
-correct per-terminal DOM at 1440/834/390px viewports against the mock build.
+2026-08：v2 —— 布局壳三终端形态发布：共享 NavMenu（水平省略 / 垂直抽屉）、Settings 侧栏菜单抽取出来并托管为
+aside（桌面）/ 折叠栏（平板）/ 抽屉（移动）、响应式登录面板、ToolCard 内的移动端紧凑分页。经 artifacts/viewport-check.mjs
+验证：在 1440/834/390px 视口下对照 mock 构建零页面级溢出，且各终端 DOM 正确。
 
-2026-08: v3 — L1 de-frameworking (dc3-client-sdk Phase 0): Translator contract replaces vue-i18n ComposerTranslation
-across all 16 entity config modules; dc3-sdk extraction design documented in docs/design/dc3-client-sdk.md.
+2026-08：v3 —— L1 去框架化（dc3-client-sdk Phase 0）：全部 16 个实体配置模块中 Translator 契约取代 vue-i18n
+ComposerTranslation；dc3-sdk 抽取设计记录于 docs/design/dc3-client-sdk.md。
 
-2026-08: v4 — measurement gate shipped: Playwright gains chromium-desktop (1440x900), chromium-tablet (834x1112, touch),
-and chromium-mobile (393x851, touch) projects; tests/e2e/specs/responsive.spec.ts gates the A2 overflow criterion
-(scrollWidth <= clientWidth on login/home/settings), A3 shell adaptation (menu strip vs drawer, aside vs drawer), and an
-A7 accessible-name smoke probe. All 12 gate tests green against the mock build. CI (ci-web.yml) runs the gate
-automatically via pnpm test:e2e with chromium only. Fixes recorded: playwright 1.61.1/1.62.0 version split aligned to
-1.62.0; ToolCard refresh/sort icon buttons gained aria-labels. Lighthouse budget and axe-core scans remain CI follow-ups
-(no new deps this iteration).
+2026-08：v4 —— 度量闸门发布：Playwright 新增 chromium-desktop（1440x900）、chromium-tablet（834x1112，触控）与
+chromium-mobile（393x851，触控）项目；tests/e2e/specs/responsive.spec.ts 为以下内容设闸：A2 溢出判据
+（login/home/settings 上 scrollWidth <= clientWidth）、A3 布局壳适配（菜单条 vs 抽屉、aside vs 抽屉），以及 A7 可访问名称
+冒烟探测。对照 mock 构建全部 12 个闸门测试通过。CI（ci-web.yml）经 pnpm test:e2e 且仅用 chromium 自动运行该闸门。已记录
+修复：playwright 1.61.1/1.62.0 的版本分裂对齐到 1.62.0；ToolCard 刷新/排序图标按钮补上 aria-label。Lighthouse 预算与
+axe-core 扫描仍是 CI 后续事项（本轮不新增依赖）。
 
-2026-08: v5 — contract hardening + first acceptance gaps closed. (1) Breakpoint contract now literal-free: the last
-hand-rolled width thresholds (Home 1024/1280/640, alarm Overview 1024/1280/640, AgenticAssistant 900) replaced with
-$breakpoint-* tokens, mapping single-column collapses to sm-max, 3-col stat grids to md-max, and 1-col to xs-max. tests/guardrails/breakpoint-contract.test.ts enforces A5: any @media (min/max-width) in src must reference a
-$breakpoint-* token. (2) A3 dialog criterion shipped: theme.scss re-shapes .el-dialog to the viewport (calc (100vw -
-16px), capped height, scrolling body) below xs-max, overriding Element Plus inline widths; gated by a mobile-only
-Playwright test (dialog never wider than viewport, zero page overflow). (3) A2 gate coverage extended beyond the shell:
-nine template-sweep routes (monitor/list/detail/history families — alarm overview, device, driver, profile, label,
-point_value, alarm/point, event/command history) now gated on every terminal, 48 gate tests total. Still open: L4
-template rollout to the remaining ~100 views (mobile summary-card lists blocked on the L1 summary schema decision),
-Lighthouse budget + axe-core in CI, token lint.
+2026-08：v5 —— 契约加固 + 首批验收缺口闭合。(1) 断点契约现已去字面量：最后一批手搓宽度阈值（Home 1024/1280/640、告警
+Overview 1024/1280/640、AgenticAssistant 900）替换为 $breakpoint-* token，把单列折叠映射到 sm-max、3 列统计网格映射到
+md-max、1 列映射到 xs-max。tests/guardrails/breakpoint-contract.test.ts 强制 A5：src 中任何 @media (min/max-width) 必须
+引用 $breakpoint-* token。(2) A3 对话框判据落地：theme.scss 在 xs-max 以下将 .el-dialog 重塑为贴合视口
+（calc (100vw - 16px)、限高、主体滚动），覆盖 Element Plus 的内联宽度；由一个仅移动端的 Playwright 测试设闸（对话框永不
+宽于视口、页面零溢出）。(3) A2 闸门覆盖扩展到布局壳之外：九条模板横扫路由（monitor/list/detail/history 家族——告警概览、
+设备、驱动、profile、label、point_value、alarm/point、事件/命令历史）现已在每个终端设闸，闸门测试合计 48 个。仍待解决：
+L4 模板推广到其余约 100 个视图（移动端摘要卡片列表受阻于 L1 摘要 schema 决策）、CI 中的 Lighthouse 预算 + axe-core、
+token lint。

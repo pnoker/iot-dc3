@@ -1,125 +1,122 @@
-# Design: MCP Runtime Overhaul — Cohesive Authorization Contract
+# 设计：MCP 运行时全面重构 —— 内聚的授权契约
 
 |                |                                                                                                                                                 |
 |----------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Status**     | Proposed — not yet implemented                                                                                                                  |
-| **Date**       | 2026-08-18                                                                                                                                      |
-| **Scope**      | MCP runtime plane: `mcp_runtime.proto`, `McpRuntimeFacade`, `McpGatewayController`, auth-side `OAuthMcpRuntimeServiceImpl` + `McpRuntimeServer` |
-| **Target**     | One cohesive gateway→auth round-trip per MCP method; reactive, non-blocking; real input schemas; async audit                                    |
-| **Related**    | [`mq-abstraction.md`](./mq-abstraction.md) — broker port used for the async audit channel, if adopted                                           |
-| **Discussion** | open for review before implementation starts                                                                                                    |
+| **状态**       | 提案 —— 尚未实施                                                                                                                                |
+| **日期**       | 2026-08-18                                                                                                                                      |
+| **范围**       | MCP 运行时平面：`mcp_runtime.proto`、`McpRuntimeFacade`、`McpGatewayController`，auth 侧的 `OAuthMcpRuntimeServiceImpl` + `McpRuntimeServer`    |
+| **目标**       | 每个 MCP 方法一次内聚的 gateway→auth 往返；响应式、非阻塞；真实 input schema；异步审计                                                          |
+| **相关**       | [`mq-abstraction.md`](./mq-abstraction.md) —— 异步审计通道（若采用）所用的 broker port                                                          |
+| **讨论**       | 实施启动前开放评审                                                                                                                              |
 
-## 1. Summary
+## 1. 摘要
 
-The MCP runtime that sits behind `McpGatewayController` (the gateway's MCP JSON-RPC resource server) currently reaches
-the auth center through a **synchronous facade with five fine-grained RPCs**, which forces the gateway to behave like a
-remote database client: it first calls
-`Introspect` to recover the token context, then spreads `tenantId` / `principalId` /
-`connectionId` across `ResolveTool` and `AuthorizeToolCall`, and finally calls `Audit`. One `tools/call` therefore costs
-**4 gRPC round-trips, ~8–10 DB queries, one blocking-thread hop per call**, and — as a correctness gap — returns tools
-whose `inputSchema` is a static empty envelope instead of the real JSON schema.
+位于 `McpGatewayController`（网关的 MCP JSON-RPC 资源服务器）背后的 MCP 运行时，目前通过一个**带有五个细粒度 RPC 的
+同步 Facade** 访问 auth 中心，这迫使网关表现得像一个远程数据库客户端：它先调用
+`Introspect` 取回令牌上下文，再把 `tenantId` / `principalId` /
+`connectionId` 摊到 `ResolveTool` 和 `AuthorizeToolCall` 两个调用里，最后调用 `Audit`。因此一次 `tools/call` 的代价是
+**4 次 gRPC 往返、约 8–10 次 DB 查询、每次调用一次阻塞线程跳转**，并且——作为一个正确性缺口——返回的工具
+`inputSchema` 是静态的空壳信封，而不是真实的 JSON schema。
 
-This document proposes a **breaking, non-compatible overhaul** of that runtime contract:
+本文档提出对这一运行时契约进行**破坏性、不兼容的全面重构**：
 
-- **3 RPCs instead of 5**: `ListTools`, `CallTool`, `Audit`.
-- **The bearer token is the only input** for `ListTools` / `CallTool`; the auth center is the single place that
-  understands a token, so it does verification + visibility + authorization in one decision inside the same call.
-- `CallTool` returns the **decision, the resolved tool, and the principal context** together, so the gateway no longer
-  needs a separate introspection round-trip before forwarding to a backend.
-- The facade becomes **reactive** (`Mono`/future stubs); the `blocking() + boundedElastic` hop disappears.
-- `inputSchema` is carried end-to-end so external agents see real tool parameters.
-- `Audit` is decoupled from the call path (fire-and-forget or broker event).
+- **3 个 RPC 取代 5 个**：`ListTools`、`CallTool`、`Audit`。
+- `ListTools` / `CallTool` **以 bearer token 作为唯一输入**；auth 中心是唯一理解令牌的地方，
+  因此它在同一次调用内部以一个决策完成校验 + 可见性 + 授权。
+- `CallTool` 一次性返回**决策、解析出的工具与主体上下文**，网关在转发给后端之前不再需要单独的自省往返。
+- Facade 变为**响应式**（`Mono`/future stub）；`blocking() + boundedElastic` 跳转消失。
+- `inputSchema` 端到端透传，外部 agent 看到的是真实的工具参数。
+- `Audit` 与调用路径解耦（fire-and-forget 或 broker 事件）。
 
-## 2. Background — how the MCP runtime works today
+## 2. 背景 —— MCP 运行时今天如何工作
 
-Verified against the tree on 2026-08-18. File references are exact.
+已对照 2026-08-18 的代码树核实。文件引用均为确切路径。
 
-### 2.1 The contract today
+### 2.1 现行契约
 
-`dc3-api/dc3-api-auth/src/main/protobuf/api/common/auth/mcp_runtime.proto` declares five RPCs:
+`dc3-api/dc3-api-auth/src/main/protobuf/api/common/auth/mcp_runtime.proto` 声明了五个 RPC：
 
-| RPC                 | Purpose                                                                     | Called per tools/call? |
+| RPC                 | 用途                                                                         | 每次 tools/call 都调用？ |
 |---------------------|-----------------------------------------------------------------------------|------------------------|
-| `Introspect`        | Validate the OAuth bearer token, return tenant/principal/connection context | yes (every request)    |
-| `ListTools`         | List tools visible to the connection                                        | no (tools/list only)   |
-| `ResolveTool`       | Resolve one tool to its backend invocation metadata                         | yes                    |
-| `AuthorizeToolCall` | Enforce high-risk confirmation + idempotency, return a decision             | yes                    |
-| `Audit`             | Store one audit record                                                      | yes                    |
+| `Introspect`        | 校验 OAuth bearer token，返回租户/主体/连接上下文                            | 是（每个请求）          |
+| `ListTools`         | 列出该连接可见的工具                                                         | 否（仅 tools/list）     |
+| `ResolveTool`       | 把一个工具解析为其后端调用元数据                                             | 是                      |
+| `AuthorizeToolCall` | 强制高风险确认 + 幂等，返回决策                                              | 是                      |
+| `Audit`             | 存储一条审计记录                                                             | 是                      |
 
-`McpRuntimeFacade` (`dc3-common-facade-api`) mirrors this as **synchronous** methods:
-`introspect(String)`, `listTools(...)`, `resolveTool(...)`, `authorizeToolCall(...)`,
-`audit(...)`. Its gRPC implementation (`McpRuntimeGrpcFacade`) uses an injected blocking stub;
-`GrpcFacadeSupport.call` only adds a deadline. Connection reuse is fine — the stub is a shared bean — the problem is
-*what* is called and *how often*.
+`McpRuntimeFacade`（`dc3-common-facade-api`）以**同步**方法镜像这一契约：
+`introspect(String)`、`listTools(...)`、`resolveTool(...)`、`authorizeToolCall(...)`、
+`audit(...)`。它的 gRPC 实现（`McpRuntimeGrpcFacade`）使用注入的阻塞 stub；
+`GrpcFacadeSupport.call` 只增加了一个 deadline。连接复用没有问题——stub 是共享 bean——问题在于
+*调用的是什么*以及*调用频率*。
 
-### 2.2 One `tools/call`, step by step
+### 2.2 一次 `tools/call` 的逐步分解
 
-The gateway path is `McpGatewayController.mcp(...)` → `dispatch(...)` →
-`McpGatewayClient.callTool(...)`. Each hop and its verified cost:
+网关路径是 `McpGatewayController.mcp(...)` → `dispatch(...)` →
+`McpGatewayClient.callTool(...)`。每一跳及其核实过的成本：
 
-| Step                | Where                                              | Cost                                                                                                                                                                                                    |
+| 步骤                | 位置                                               | 成本                                                                                                                                                                                                    |
 |---------------------|----------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ① introspect        | `OAuthMcpRuntimeServiceImpl.introspect`            | 1× local JWT verify (`verifyWith(publicKey())`) + **4 DB queries**: `selectAuthorizationByAccessTokenJti`, `selectConnectionById`, `principalManager.getById`, `tenantMembershipService.isTenantMember` |
-| ② resolveTool       | `resolveVisibleTool`                               | `selectVisibleToolByName` (1) + `updateConnectionLastUsed` (1)                                                                                                                                          |
-| ③ authorizeToolCall | `authorizeToolCall` → re-runs `resolveVisibleTool` | **repeats** `selectVisibleToolByName` + `updateConnectionLastUsed` (2 more); only HIGH risk then queries the confirmation ticket                                                                        |
-| ④ invokeBackend     | gateway `WebClient`                                | 1 HTTP forward (the actual business call)                                                                                                                                                               |
-| ⑤ audit             | `audit` → `insert`                                 | 1 DB write (post-hoc, failure swallowed)                                                                                                                                                                |
+| ① introspect        | `OAuthMcpRuntimeServiceImpl.introspect`            | 1× 本地 JWT 校验（`verifyWith(publicKey())`）+ **4 次 DB 查询**：`selectAuthorizationByAccessTokenJti`、`selectConnectionById`、`principalManager.getById`、`tenantMembershipService.isTenantMember` |
+| ② resolveTool       | `resolveVisibleTool`                               | `selectVisibleToolByName`（1 次）+ `updateConnectionLastUsed`（1 次）                                                                                                                                          |
+| ③ authorizeToolCall | `authorizeToolCall` → 重新执行 `resolveVisibleTool` | **重复执行** `selectVisibleToolByName` + `updateConnectionLastUsed`（再多 2 次）；仅 HIGH 风险随后查询确认票据                                                                                        |
+| ④ invokeBackend     | 网关 `WebClient`                                | 1 次 HTTP 转发（真正的业务调用）                                                                                                                                                                       |
+| ⑤ audit             | `audit` → `insert`                                 | 1 次 DB 写入（事后执行，失败被吞掉）                                                                                                                                                                    |
 
-Plus **4 gateway→auth gRPC round-trips** (`Introspect`, `ResolveTool`, `AuthorizeToolCall`,
-`Audit`), each wrapped in `blocking(...)` which subscribes on `boundedElastic` — one blocking thread per in-flight call.
+再加上 **4 次 gateway→auth gRPC 往返**（`Introspect`、`ResolveTool`、`AuthorizeToolCall`、
+`Audit`），每次都包在 `blocking(...)` 里并在 `boundedElastic` 上订阅——每个在途调用占用一个阻塞线程。
 
-### 2.3 Three redundancies and one correctness gap
+### 2.3 三处冗余与一个正确性缺口
 
-1. **Introspection is fully re-run on every request, with no cache.** The four DB queries cannot be dropped (OAuth
-   introspection must check revocation, principal enablement, and tenant membership), but the same token pays them again
-   on every tool call in an agent loop.
-2. **Resolve and authorize duplicate the visibility query.** `authorizeToolCall` explicitly re-runs `resolveVisibleTool`
-   ("Re-run the full visibility/whitelist/scope check"). The result is identical; `selectVisibleToolByName` and
-   `updateConnectionLastUsed` each execute twice.
-3. **`updateConnectionLastUsed` is non-critical telemetry executed synchronously — twice.**
-4. **Correctness gap: `inputSchema` is lost.** `GrpcMcpToolDefinitionDTO` has **no**
-   `input_schema` field (the proto comment says "excluding the static JSON schema envelope"), and
-   `McpRuntimeGrpcFacade.toDTO` hard-codes `DEFAULT_INPUT_SCHEMA`. An external agent therefore receives an empty schema
-   envelope for every tool instead of the real parameters that
-   `McpOpenApiAggregator` already computed and `OAuthMcpRuntimeServiceImpl.inputSchemaOf` already reads from `tool_ext`.
+1. **自省在每个请求上完整重跑，没有任何缓存。** 这四次 DB 查询不能省略（OAuth
+   自省必须检查吊销、主体启用状态与租户成员关系），但在 agent 循环里，同一个令牌在每次工具调用时都要再付一遍。
+2. **resolve 与 authorize 重复执行可见性查询。** `authorizeToolCall` 显式重跑 `resolveVisibleTool`
+   （"重新执行完整的可见性/白名单/scope 检查"）。结果完全相同；`selectVisibleToolByName` 与
+   `updateConnectionLastUsed` 各执行两次。
+3. **`updateConnectionLastUsed` 是非关键遥测，却同步执行——而且执行两次。**
+4. **正确性缺口：`inputSchema` 丢失。** `GrpcMcpToolDefinitionDTO` **没有**
+   `input_schema` 字段（proto 注释写明"不含静态 JSON schema 信封"），并且
+   `McpRuntimeGrpcFacade.toDTO` 硬编码了 `DEFAULT_INPUT_SCHEMA`。因此外部 agent 对每个工具收到的都是空的 schema
+   信封，而不是 `McpOpenApiAggregator` 已经算出、`OAuthMcpRuntimeServiceImpl.inputSchemaOf` 已经从 `tool_ext`
+   读出的真实参数。
 
-## 3. Goals / Non-Goals
+## 3. 目标 / 非目标
 
-**Goals**
+**目标**
 
-- Reduce one `tools/call` to **2 gateway→auth round-trips** (`CallTool` + async `Audit`).
-- Make the token the single input to `ListTools` / `CallTool`; auth is the only token authority.
-- Eliminate the duplicate visibility query (`selectVisibleToolByName` once, not twice).
-- Make the runtime **reactive end-to-end**; remove `blocking()` + `boundedElastic`.
-- Carry the **real `inputSchema`** through `tools/list` so external agents see true parameters.
-- Decouple audit from the call path.
-- Drop `Introspect`, `ResolveTool`, `AuthorizeToolCall` as gateway-facing RPCs — **no backward compatibility**, no
-  dual-mode shim.
+- 把一次 `tools/call` 降为 **2 次 gateway→auth 往返**（`CallTool` + 异步 `Audit`）。
+- 让令牌成为 `ListTools` / `CallTool` 的唯一输入；auth 是唯一的令牌权威。
+- 消除重复的可见性查询（`selectVisibleToolByName` 一次，而非两次）。
+- 让运行时**端到端响应式**；移除 `blocking()` + `boundedElastic`。
+- 让**真实 `inputSchema`** 随 `tools/list` 透传，外部 agent 看到真实参数。
+- 将审计与调用路径解耦。
+- 移除面向网关的 `Introspect`、`ResolveTool`、`AuthorizeToolCall` RPC——**不保留向后兼容**，也不做
+  双模式 shim。
 
-**Non-Goals**
+**非目标**
 
-- No change to the MCP wire protocol the client sees (still JSON-RPC 2.0 + OAuth bearer).
-- No change to the management plane (`McpManagementController`) or the frontend MCP settings pages.
-- No change to `McpOpenApiAggregator` / `dc3_api` tool-catalog generation.
-- No change to how backend services authenticate downstream principal headers (HMAC + JSON header stay as-is).
+- 客户端看到的 MCP 线上协议不变（仍是 JSON-RPC 2.0 + OAuth bearer）。
+- 管理平面（`McpManagementController`）与前端 MCP 设置页不变。
+- `McpOpenApiAggregator` / `dc3_api` 工具目录的生成方式不变。
+- 后端服务认证下游 principal 头的方式不变（HMAC + JSON header 维持原样）。
 
-## 4. Design principles
+## 4. 设计原则
 
-1. **Decision, not lookup.** The gateway asks "may this token call this tool, and where does it go?"
-   in one request; it does not assemble the answer from three lookups.
-2. **Auth owns the token.** `ListTools` and `CallTool` take the raw token; auth parses, verifies, and resolves context
-   internally. The gateway never reconstructs tenant/principal context from claims.
-3. **One authoritative visibility check.** Visibility + risk + confirmation + idempotency are decided in one place,
-   once, inside `CallTool`.
-4. **Reactive throughout.** Facade returns `Mono`; gRPC uses future/async stubs; gateway stays on the WebFlux event
-   loop.
-5. **Telemetry is off-path.** Audit is fire-and-forget (or a broker event); it can never delay or fail a call.
+1. **要决策，不是查询。** 网关在一个请求里问"这个令牌能否调用这个工具、它该转发到哪里"；
+   而不是从三次查询拼出答案。
+2. **auth 拥有令牌。** `ListTools` 与 `CallTool` 接收原始令牌；auth 在内部解析、校验并还原上下文。
+   网关绝不从 claims 重建租户/主体上下文。
+3. **唯一一次权威可见性检查。** 可见性 + 风险 + 确认 + 幂等在同一处、只此一次、于 `CallTool`
+   内部裁决。
+4. **全程响应式。** Facade 返回 `Mono`；gRPC 使用 future/异步 stub；网关留在 WebFlux 事件
+   循环上。
+5. **遥测在路径之外。** 审计是 fire-and-forget（或 broker 事件）；它永远不能延迟或使一次调用失败。
 
-## 5. Target contract
+## 5. 目标契约
 
 ### 5.1 Protobuf
 
-`mcp_runtime.proto` shrinks to three RPCs. Message names keep the existing `Grpc` convention.
+`mcp_runtime.proto` 收缩为三个 RPC。消息名沿用既有的 `Grpc` 命名约定。
 
 ```proto
 service McpRuntimeApi {
@@ -135,14 +132,14 @@ service McpRuntimeApi {
 }
 ```
 
-Removed: `Introspect`, `ResolveTool`, `AuthorizeToolCall` and their request/response messages
-(`GrpcMcpIntrospectRequest`, `GrpcRMcpIntrospectDTO`, `GrpcMcpIntrospectDTO`,
-`GrpcMcpToolListRequest`, `GrpcMcpToolResolveRequest`, `GrpcRMcpToolResolveDTO`,
-`GrpcMcpToolResolveDTO`, `GrpcMcpToolAuthorizeRequest`, `GrpcRMcpToolAuthorizeDTO`). The shared enums
-(`GrpcMcpRiskLevel`, `GrpcMcpDecision`, `GrpcMcpPrincipalType`,
-`GrpcMcpAuditStatus`) stay.
+移除：`Introspect`、`ResolveTool`、`AuthorizeToolCall` 及其请求/响应消息
+（`GrpcMcpIntrospectRequest`、`GrpcRMcpIntrospectDTO`、`GrpcMcpIntrospectDTO`、
+`GrpcMcpToolListRequest`、`GrpcMcpToolResolveRequest`、`GrpcRMcpToolResolveDTO`、
+`GrpcMcpToolResolveDTO`、`GrpcMcpToolAuthorizeRequest`、`GrpcRMcpToolAuthorizeDTO`）。共享枚举
+（`GrpcMcpRiskLevel`、`GrpcMcpDecision`、`GrpcMcpPrincipalType`、
+`GrpcMcpAuditStatus`）保留。
 
-New / changed messages:
+新增 / 变更的消息：
 
 ```proto
 message GrpcMcpListToolsRequest {
@@ -193,9 +190,8 @@ message GrpcMcpCallToolDTO {
 }
 ```
 
-`GrpcMcpToolResolveDTO` is retained (it is still the `tool` sub-message inside
-`GrpcMcpCallToolDTO`) and gains `input_schema` so the gateway can forward a tool's schema to a backend when a future
-backend needs it.
+`GrpcMcpToolResolveDTO` 保留（它仍是 `GrpcMcpCallToolDTO` 内部的 `tool` 子消息），并新增
+`input_schema`，以便未来的后端需要时，网关可以把工具的 schema 转发给后端。
 
 ### 5.2 Facade
 
@@ -207,41 +203,40 @@ public interface McpRuntimeFacade {
 }
 ```
 
-- `McpRuntimeGrpcFacade` switches from `McpRuntimeApiBlockingStub` to the async
-  `McpRuntimeApiStub` (future→`Mono`) and drops `GrpcFacadeSupport.call` in favor of reactive error translation.
-- New DTOs `McpCallToolRequestDTO` / `McpCallToolResponseDTO` mirror the proto; the response carries
-  `McpPrincipalContextDTO` in place of the old `McpIntrospectResponseDTO`.
+- `McpRuntimeGrpcFacade` 从 `McpRuntimeApiBlockingStub` 切换到异步的
+  `McpRuntimeApiStub`（future→`Mono`），并去掉 `GrpcFacadeSupport.call`，改用响应式错误转换。
+- 新 DTO `McpCallToolRequestDTO` / `McpCallToolResponseDTO` 与 proto 一一对应；响应以
+  `McpPrincipalContextDTO` 取代旧的 `McpIntrospectResponseDTO`。
 
-### 5.3 Auth service
+### 5.3 Auth 服务
 
-`OAuthMcpRuntimeServiceImpl` replaces `introspect` + `resolveVisibleTool` +
-`authorizeToolCall` with two cohesive operations:
+`OAuthMcpRuntimeServiceImpl` 用两个内聚操作取代 `introspect` + `resolveVisibleTool` +
+`authorizeToolCall`：
 
-- `listTools(token)`: `parseAccessToken` → active-authorization check → connection/principal/ membership checks →
-  `listVisibleTools` → `toolToMcp` (now with real `inputSchema`).
-- `callTool(request)`: same token verification, then **one** `selectVisibleToolByName` + visibility/scope/risk decision,
-  then the confirmation/idempotency gate (HIGH risk only), returning decision + resolved tool + principal context.
+- `listTools(token)`：`parseAccessToken` → 有效授权检查 → 连接/主体/成员关系检查 →
+  `listVisibleTools` → `toolToMcp`（现在带真实 `inputSchema`）。
+- `callTool(request)`：同样的令牌校验，然后**一次** `selectVisibleToolByName` + 可见性/scope/风险决策，
+  随后是确认/幂等闸门（仅 HIGH 风险），返回决策 + 解析出的工具 + 主体上下文。
 
-`McpRuntimeServer` mirrors this: three gRPC methods, `toGrpc` builders for the new messages, and
-`inputSchema` serialization out of `tool_ext` (reusing the existing `inputSchemaOf` logic).
+`McpRuntimeServer` 与之对应：三个 gRPC 方法、为新消息准备的
+`toGrpc` 构建器，以及从 `tool_ext` 序列化 `inputSchema`（复用既有的 `inputSchemaOf` 逻辑）。
 
-### 5.4 Gateway
+### 5.4 网关
 
-`McpGatewayController` dispatch simplifies to:
+`McpGatewayController` 的分发简化为：
 
-- `tools/list` → `mcpRuntimeFacade.listTools(token)` → JSON-RPC result.
-- `tools/call` → `mcpRuntimeFacade.callTool(request(token, toolName, digest, confirmId,
-  idempotencyKey, client meta))`; on `AUTHORIZED`, forward to the backend using
-  `tool.serviceName/apiPath/httpMethod` and build `X_AUTH_PRINCIPAL` from `principal`; on
-  `CONFIRM_REQUIRED`, return the confirm prompt; on `REJECTED`, return the denial.
-- `audit` → fire-and-forget (no longer awaited before returning).
+- `tools/list` → `mcpRuntimeFacade.listTools(token)` → JSON-RPC 结果。
+- `tools/call` → `mcpRuntimeFacade.callTool(request(token, toolName, digest, confirmId, idempotencyKey, client meta))`；
+  `AUTHORIZED` 时使用
+  `tool.serviceName/apiPath/httpMethod` 转发到后端，并由 `principal` 构建 `X_AUTH_PRINCIPAL`；
+  `CONFIRM_REQUIRED` 时返回确认提示；`REJECTED` 时返回拒绝。
+- `audit` → fire-and-forget（返回前不再等待）。
 
-The `blocking(...)` helper, the `toLong(context.getTenantId())` scattering, and the standalone introspection call all
-disappear.
+`blocking(...)` 辅助方法、`toLong(context.getTenantId())` 的四处散布，以及独立的自省调用全部消失。
 
-## 6. Request flows
+## 6. 请求流程
 
-### 6.1 Before (today, one tools/call)
+### 6.1 之前（今天，一次 tools/call）
 
 ```text
 client → gateway ─ Introspect ──────────────→ auth  (JWT + 4 DB)
@@ -252,7 +247,7 @@ client → gateway ─ Introspect ──────────────→ 
         gateway ←─ decision / tool / context ── (assembled from 3 responses)
 ```
 
-### 6.2 After (target, one tools/call)
+### 6.2 之后（目标，一次 tools/call）
 
 ```text
 client → gateway ─ CallTool(token, tool, digest, confirm, key, client meta) ─→ auth
@@ -263,64 +258,63 @@ client → gateway ─ CallTool(token, tool, digest, confirm, key, client meta) 
         gateway ←─ decision + tool + principal ── (one response)
 ```
 
-## 7. Migration plan
+## 7. 迁移计划
 
-Breaking, no compatibility shim. Each phase must leave the tree compiling and tests green.
+破坏性变更，无兼容 shim。每个阶段结束时代码树必须可编译、测试保持绿色。
 
-| Phase | Change                                                                                                    | Files                                                                                              |
+| 阶段  | 变更                                                                                                       | 文件                                                                                                |
 |-------|-----------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| 1     | Rewrite `mcp_runtime.proto` (3 RPCs, new messages, `input_schema`), regenerate stubs                      | `dc3-api/dc3-api-auth/.../mcp_runtime.proto`                                                       |
-| 2     | Reactive facade + gRPC impl (`Mono`, async stub)                                                          | `McpRuntimeFacade`, `McpRuntimeGrpcFacade`, new request/response DTOs                              |
-| 3     | Auth service + server: merge introspect/resolve/authorize into `listTools`/`callTool`; real `inputSchema` | `OAuthMcpRuntimeServiceImpl`, `McpRuntimeServer`                                                   |
-| 4     | Gateway: token-direct dispatch, drop `blocking()`, async audit                                            | `McpGatewayController`                                                                             |
-| 5     | Rewrite affected tests                                                                                    | `McpRuntimeServerTest`, `McpGatewayControllerTest`, `OAuthMcpRuntimeServiceImplTest`, facade tests |
+| 1     | 重写 `mcp_runtime.proto`（3 个 RPC、新消息、`input_schema`），重新生成 stub                                | `dc3-api/dc3-api-auth/.../mcp_runtime.proto`                                                        |
+| 2     | 响应式 Facade + gRPC 实现（`Mono`、异步 stub）                                                            | `McpRuntimeFacade`、`McpRuntimeGrpcFacade`、新的请求/响应 DTO                                        |
+| 3     | Auth 服务 + 服务端：把 introspect/resolve/authorize 合并进 `listTools`/`callTool`；真实 `inputSchema`     | `OAuthMcpRuntimeServiceImpl`、`McpRuntimeServer`                                                    |
+| 4     | 网关：凭令牌直接分发，去掉 `blocking()`，异步审计                                                          | `McpGatewayController`                                                                              |
+| 5     | 重写受影响的测试                                                                                          | `McpRuntimeServerTest`、`McpGatewayControllerTest`、`OAuthMcpRuntimeServiceImplTest`、Facade 测试   |
 
-Frontend is **untouched** (the MCP settings pages use `McpManagementController`, not this gateway runtime).
+前端**完全不动**（MCP 设置页使用的是 `McpManagementController`，不是这个网关运行时）。
 
-## 8. Verification
+## 8. 验证
 
-- `mvn -s .mvn/settings.xml -q -DskipTests compile` after each phase.
-- `mvn -s .mvn/settings.xml test -pl dc3-common/dc3-common-auth -am` and
-  `-pl dc3-common/dc3-common-gateway -am` for the rewritten tests.
-- Contract assertions to preserve:
-    - one `tools/call` = one `CallTool` RPC + one async `Audit` (assert via test doubles),
-    - `selectVisibleToolByName` invoked exactly once per call,
-    - `tools/list` returns non-default `inputSchema` for a fixture tool,
-    - HIGH-risk still issues `CONFIRM_REQUIRED` + confirmId, idempotency key still deduplicates.
-- `pnpm check` in `dc3-web` to confirm no frontend regression.
+- 每个阶段之后运行 `mvn -s .mvn/settings.xml -q -DskipTests compile`。
+- 用 `mvn -s .mvn/settings.xml test -pl dc3-common/dc3-common-auth -am` 与
+  `-pl dc3-common/dc3-common-gateway -am` 运行重写后的测试。
+- 需要保留的契约断言：
+    - 一次 `tools/call` = 一次 `CallTool` RPC + 一次异步 `Audit`（通过测试替身断言），
+    - `selectVisibleToolByName` 每次调用恰好执行一次，
+    - `tools/list` 为夹具工具返回非默认 `inputSchema`，
+    - HIGH 风险仍产生 `CONFIRM_REQUIRED` + confirmId，幂等键仍去重。
+- 在 `dc3-web` 中运行 `pnpm check`，确认前端无回归。
 
-## 9. Alternatives considered
+## 9. 已考虑的备选方案
 
-1. **Cache introspection instead of reshaping the contract** (keeps 5 RPCs). Rejected: it papers over the synchronous
-   facade, the duplicate visibility query, and the missing schema; the round-trip count and the gateway's
-   context-scattering remain.
-2. **Local JWT verification in the gateway + short-TTL jti deny-list.** Removes the introspection round-trip entirely,
-   but moves token authority into the gateway and adds a revocation-propagation channel. Rejected as the primary design
-   because it blurs the auth boundary; it can be layered later as a pure optimization on top of the 3-RPC contract.
-3. **Keep `ResolveTool` and only merge the rest.** Rejected: resolve is a sub-step of the call decision, not an
-   independent operation; returning the tool inside `CallTool` is strictly simpler.
+1. **缓存自省结果而不重塑契约**（保留 5 个 RPC）。已否决：它只是掩盖同步
+   Facade、重复的可见性查询和缺失的 schema；往返次数与网关的上下文散布依然存在。
+2. **网关本地 JWT 校验 + 短 TTL jti 拒绝列表。** 彻底消除自省往返，
+   但把令牌权威移进了网关，并引入一条吊销传播通道。因其模糊 auth 边界而否决作为主设计；
+   日后可以作为纯优化叠加在 3-RPC 契约之上。
+3. **保留 `ResolveTool`，只合并其余部分。** 已否决：resolve 是调用决策的一个子步骤，不是独立操作；
+   把工具放进 `CallTool` 的返回里严格更简单。
 
-## 10. Open questions
+## 10. 开放问题
 
-1. **Audit transport.** Fire-and-forget `Mono` (smaller change) vs a RabbitMQ event through the MQ abstraction (fully
-   off-path, but depends on broker availability). Leaning broker event, to be confirmed.
-2. **`inputSchema` in `GrpcMcpToolResolveDTO`.** Should the forwarded backend ever need the schema, or is schema only a
-   `tools/list` concern? Current proposal adds it defensively.
-3. **Token verification cost.** With 5→3 RPCs, the 4 introspection DB queries still run once per
-   `CallTool`. A short-TTL `jti → context` cache inside auth (invalidated on revoke/disable) is a follow-up, not part of
-   this contract overhaul.
+1. **审计传输。** fire-and-forget 的 `Mono`（改动更小）还是通过 MQ 抽象发 RabbitMQ 事件（完全在路径之外，
+   但依赖 broker 可用性）。倾向 broker 事件，待确认。
+2. **`GrpcMcpToolResolveDTO` 中的 `inputSchema`。** 被转发的后端是否终究需要 schema，
+   还是 schema 只是 `tools/list` 的关注点？当前提案防御性地加上了它。
+3. **令牌校验成本。** RPC 从 5 收敛到 3 之后，4 次自省 DB 查询在每次
+   `CallTool` 时仍会执行。auth 内部的短 TTL `jti → context` 缓存（在吊销/禁用时失效）是后续工作，
+   不属于本次契约重构。
 
-## 11. Appendix — current call-site inventory
+## 11. 附录 —— 现有调用点盘点
 
-Verified 2026-08-18.
+已于 2026-08-18 核实。
 
-| Artifact      | Location                                                                             | Notes                                                                    |
+| 构件          | 位置                                                                                 | 说明                                                                     |
 |---------------|--------------------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| Proto         | `dc3-api/dc3-api-auth/src/main/protobuf/api/common/auth/mcp_runtime.proto`           | 5 RPCs, 260 lines                                                        |
-| Facade        | `dc3-common-facade-api/.../McpRuntimeFacade.java`                                    | 5 synchronous methods                                                    |
-| gRPC impl     | `dc3-common-facade-grpc/.../McpRuntimeGrpcFacade.java`                               | blocking stub + `GrpcFacadeSupport`                                      |
-| Gateway       | `dc3-common-gateway/.../McpGatewayController.java`                                   | JSON-RPC dispatch, `blocking()`+boundedElastic, `invokeBackend`, `audit` |
-| Auth service  | `dc3-common-auth/.../OAuthMcpRuntimeServiceImpl.java`                                | `introspect`, `resolveVisibleTool`, `authorizeToolCall`                  |
-| gRPC server   | `dc3-common-auth/.../McpRuntimeServer.java`                                          | 5 server methods                                                         |
-| Schema source | `dc3-common-auth/.../tool/McpOpenApiAggregator.java`                                 | `inputSchema` computed but not carried over gRPC                         |
-| Tests         | `McpRuntimeServerTest`, `McpGatewayControllerTest`, `OAuthMcpRuntimeServiceImplTest` | rewrite in Phase 5                                                       |
+| Proto         | `dc3-api/dc3-api-auth/src/main/protobuf/api/common/auth/mcp_runtime.proto`           | 5 个 RPC，260 行                                                         |
+| Facade        | `dc3-common-facade-api/.../McpRuntimeFacade.java`                                    | 5 个同步方法                                                             |
+| gRPC 实现     | `dc3-common-facade-grpc/.../McpRuntimeGrpcFacade.java`                               | 阻塞 stub + `GrpcFacadeSupport`                                          |
+| 网关          | `dc3-common-gateway/.../McpGatewayController.java`                                   | JSON-RPC 分发、`blocking()`+boundedElastic、`invokeBackend`、`audit`     |
+| Auth 服务     | `dc3-common-auth/.../OAuthMcpRuntimeServiceImpl.java`                                | `introspect`、`resolveVisibleTool`、`authorizeToolCall`                  |
+| gRPC 服务端   | `dc3-common-auth/.../McpRuntimeServer.java`                                          | 5 个服务端方法                                                           |
+| Schema 来源   | `dc3-common-auth/.../tool/McpOpenApiAggregator.java`                                 | 已计算 `inputSchema` 但未随 gRPC 传递                                    |
+| 测试          | `McpRuntimeServerTest`、`McpGatewayControllerTest`、`OAuthMcpRuntimeServiceImplTest` | 在第 5 阶段重写                                                          |
