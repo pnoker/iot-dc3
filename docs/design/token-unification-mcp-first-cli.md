@@ -224,5 +224,8 @@ then to avoid shipping a login that cannot do anything.
    coverage ≥80%. Percentage-based gating may be swapped for the P0 capability list (analytics nine tools, alert deep
    analysis, agentic session plane) once that backlog lands; final call pending.
 
-> Status after this revision: **Phase 0 complete. Phase 1 (gateway TokenResolver chain + configurable platform TTL +
-> OAuth-flagged CLI login) is cleared for implementation planning.**
+> Status after this revision: **Phase 0 complete. Phase 1 implemented 2026-08-27** — shared `OAuthJwtVerifier`,
+> gateway `OAuthTokenResolver` behind `dc3.gateway.oauth.enabled` (default off), configurable
+> `DC3_TOKEN_TTL_HOURS` (denylist follows ttl+1h), hidden CLI `auth login --oauth`. Full-repo compile + existing
+> suites green; live-stack regression (gateway accepting a real ticket end-to-end) still pending before flipping
+> the flag on.
