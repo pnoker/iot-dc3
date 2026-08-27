@@ -139,6 +139,30 @@ dc3 alert trend [--days 30]           # Trend analysis
 dc3 alert top-sources [--days 30]     # Top alert sources
 ```
 
+### Analytics (`dc3 analytics`) — AI data-analysis surface
+
+Nine coarse-grained statistical reads over point time series (S19 agent face); each op posts
+one JSON body and returns a self-contained conclusion:
+
+```bash
+dc3 analytics list
+dc3 analytics run query_history --args '{"pointId":456789,"days":7}'
+dc3 analytics run trend_analysis --args '{"pointId":456789}'
+```
+
+### Alert deep analysis (`dc3 alert …`)
+
+Beyond stats/list/confirm, the alert group exposes the diagnosis surface:
+activity, storm-sources, flapping, correlation, peer-deviation, aging, mtta, change-impact,
+latency (histogram), silent-sources, coverage-gap, and bulk-confirm. Generic flags:
+
+```bash
+dc3 alert aging --days 7
+dc3 alert silent-sources --baseline-days 3 --limit 50
+dc3 alert storm-sources --query source=device      # extra k=v passthrough
+dc3 alert bulk-confirm --args '{"items":[{"source":"device","id":789}]}'
+```
+
 ### Dashboard (`dc3 dashboard`)
 
 ```bash
