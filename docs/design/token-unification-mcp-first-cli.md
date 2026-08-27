@@ -139,6 +139,28 @@ dc3 ask "…"                   # same token on POST /mcp (tools/call)
 Option A remains available for machine agents that prefer native MCP; the CLI never
 becomes a required wrapper around it.
 
+### 4.1 Console onboarding & help (planned, ships with Phase 1)
+
+The MCP Service settings page (`dc3-web/src/views/settings/mcp/McpServer.vue`) already offers
+copy-to-clipboard for the server URL and ready-to-paste client snippets for Claude Desktop,
+Cursor, and VS Code. Onboarding for the CLI is missing; when it is added (together with
+Phase 1, because the final login command shape depends on it), it should cover:
+
+1. **CLI setup card** beside the agent snippets — one copyable block, gateway origin taken
+   from `window.location.origin` (never hand-typed):
+   - interim form: install + `dc3 config set gateway <origin>` + `dc3 auth login`;
+   - final form after Phase 1: collapse to a single `dc3 auth login --oauth <server-url>`
+     covering registration, authorization and scope grant in one step.
+2. **Bilingual help copy** (`en`/`zh` locale keys) explaining what the granted scopes mean
+   before the user approves them — scope names alone are not self-explanatory.
+3. **A docs link / first-run walkthrough** from both the agent card and the CLI card, so the
+   page answers "what do I do with this snippet" without leaving the console.
+4. The CLI card should mirror whatever appears here so console and README never diverge:
+   the block above becomes the canonical text referenced by `dc3-cli/README.md`.
+
+No code has been written for this section yet — recorded here so the UX contract is agreed
+before implementation starts.
+
 ## 5. Security considerations
 
 - **Downstream trust is unchanged but gains risk data**: `X_AUTH_PRINCIPAL` gets
