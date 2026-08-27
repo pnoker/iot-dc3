@@ -97,6 +97,9 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GATEWAY_PORT:-8000}:8000"
     environment:
       <<: *app-runtime-env
+      # RS256 ticket verification on API routes (token-unification-mcp-first-cli.md)
+      DC3_GATEWAY_OAUTH_ENABLED: ${DC3_GATEWAY_OAUTH_ENABLED:-false}
+      DC3_GATEWAY_OAUTH_JWKS_URL: ${DC3_GATEWAY_OAUTH_JWKS_URL:-http://dc3-center-auth:8300/auth/oauth2/jwks}
     container_name: dc3-gateway
     hostname: dc3-gateway
     volumes:

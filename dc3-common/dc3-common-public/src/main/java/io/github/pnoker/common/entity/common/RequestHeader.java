@@ -93,6 +93,20 @@ public class RequestHeader {
         private Long tenantId;
 
         /**
+         * Legacy 7-arg shape kept for the many existing callers; scopes default null.
+         */
+        public PrincipalHeader(Long principalId, String principalType, String displayName,
+                               String principalName, Long tenantId, String clientId, Long connectionId) {
+            this.principalId = principalId;
+            this.principalType = principalType;
+            this.displayName = displayName;
+            this.principalName = principalName;
+            this.tenantId = tenantId;
+            this.clientId = clientId;
+            this.connectionId = connectionId;
+        }
+
+        /**
          * OAuth client ID when the request is delegated through OAuth or MCP.
          */
         private String clientId;
