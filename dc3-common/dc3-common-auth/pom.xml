@@ -38,6 +38,13 @@
 
     <dependencies>
 
+        <!-- mybatis-plus relocated its spring service/impl classes here in 3.5.17;
+             auth managers import them directly, so the dependency is explicit. -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring</artifactId>
+        </dependency>
+
         <!-- Process-local cache for the token denylist -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
