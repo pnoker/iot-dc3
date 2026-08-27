@@ -240,3 +240,19 @@ remains gated on Q5. **First Phase-3 slice landed 2026-08-27:** `dc3 tools list/
   read of the tool catalog over JSON-RPC using the same ticket as REST — the dual-transport
   contract of §4 Option B is now complete at the transport level; command regeneration from
   the catalog still waits on Q5 and catalog coverage.
+
+**Live-stack regression 2026-08-27 (auth center + gateway processes, seeded DB):**
+
+- Proven end-to-end: classic login through the gateway; console-path client registration
+  (`/api/v3/auth/mcp/client/register`) + active connection; `client_credentials` exchange at
+  `/oauth2/token` (RS256 ticket, kid dc3-oauth-rsa, expires_in 900 = call-capable TTL rung);
+  **the gateway resolver accepted the RS256 ticket and forwarded it** — no-ticket 401,
+  forged-ticket 401, valid-ticket reached the backend (method-mismatch 405 then `200` with
+  tenant-scoped data); CLI `auth login --oauth` succeeded against this stack.
+- Blocked locally, not by design: `POST /mcp` tools/list fails at
+  `McpRuntimeFacade.introspect [UNAVAILABLE] io exception` — gRPC loopback between two locally
+  spawned processes. Pre-existing transport wiring untouched by phases 1–3; to be re-verified in
+  a compose network before flipping `dc3.gateway.oauth.enabled`.
+- Contract drift found: legacy login now returns `{data:"ok"}` + `dc3-token` cookie, while the
+  June-era CLI still parses `data` as the token string — legacy CLI login needs an update or
+  removal when Phase-3 regeneration lands.
