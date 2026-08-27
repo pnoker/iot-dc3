@@ -905,9 +905,6 @@ export default {
     mcp: {
       title: 'MCP Service',
       agentConfig: 'Agent Config',
-      cliConfig: 'CLI Setup',
-      cliHint: 'Install the DC3 CLI, point it at this gateway, and log in. The same credentials will work against the MCP endpoint.',
-      copyCommand: 'Copy commands',
       connections: 'Connections',
       clients: 'OAuth Clients',
       tools: 'Tool Catalog',
