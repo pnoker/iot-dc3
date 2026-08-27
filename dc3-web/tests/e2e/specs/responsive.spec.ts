@@ -93,7 +93,8 @@ test.describe("three-terminal gate", () => {
 
     await expect(page.locator('.header_brand_glass')).toHaveCount(1);
     await expect(page.locator('.header_actions_glass')).toHaveCount(1);
-    await expect(page.locator('.header_language_switch')).toBeVisible();
+    await expect(page.locator('.header_actions_glass .app-preferences')).toBeVisible();
+    await expect(page.locator('.header_actions_glass .app-preferences__theme')).toBeVisible();
     await expect(page.locator('.header_settings_button')).toBeVisible();
     await expect(page.locator('.user_trigger')).toBeVisible();
 

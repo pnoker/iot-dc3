@@ -64,6 +64,20 @@ test.describe('login form validation', () => {
     await expect(page.locator('.login-form .el-form-item.is-error')).toHaveCount(1);
   });
 
+  test('persists language and theme preferences before authentication', async ({page}) => {
+    await page.getByRole('button', {name: '中', exact: true}).click();
+    await expect(page.getByRole('heading', {name: '欢迎回来'})).toBeVisible();
+
+    await page.getByRole('button', {name: '深色主题'}).click();
+    await expect(page.locator('html')).toHaveClass(/dark/);
+
+    await page.reload();
+    await waitForAppSettled(page);
+    await expect(page.getByRole('heading', {name: '欢迎回来'})).toBeVisible();
+    await expect(page.locator('html')).toHaveClass(/dark/);
+    await expect(page.getByRole('button', {name: '深色主题'})).toHaveAttribute('aria-pressed', 'true');
+  });
+
   test('keeps the user on /login when the backend rejects the credentials', async ({page}) => {
     // Stub the auth API at the network layer so this test stays
     // deterministic regardless of backend health. We intercept *before*

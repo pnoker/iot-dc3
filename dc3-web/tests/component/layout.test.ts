@@ -101,7 +101,8 @@ describe('Layout', () => {
     expect(wrapper.findAll('.header_brand_glass')).toHaveLength(1);
     expect(wrapper.findAll('.header_actions_glass')).toHaveLength(1);
     expect(wrapper.find('.header_actions_glass .header_menu_wrap').exists()).toBe(true);
-    expect(wrapper.find('.header_actions_glass .header_language_switch').exists()).toBe(true);
+    expect(wrapper.find('.header_actions_glass .app-preferences').exists()).toBe(true);
+    expect(wrapper.find('.header_actions_glass .app-preferences__theme').exists()).toBe(true);
     expect(wrapper.find('.header_actions_glass .header_user').exists()).toBe(true);
     expect(wrapper.find('.header_actions_glass .user_trigger').exists()).toBe(true);
 

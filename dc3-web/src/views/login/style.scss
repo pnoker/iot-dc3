@@ -30,12 +30,14 @@
   padding: clamp(24px, 5vh, 56px) clamp(24px, 6vw, 88px);
   overflow: hidden;
   background:
-    linear-gradient(rgba(18, 150, 219, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(18, 150, 219, 0.045) 1px, transparent 1px),
-    radial-gradient(circle at 16% 14%, rgba(69, 207, 241, 0.24), transparent 34%),
-    radial-gradient(circle at 86% 10%, rgba(116, 102, 221, 0.16), transparent 30%),
-    linear-gradient(145deg, #f8fdff 0%, #ffffff 48%, #f5f7ff 100%);
+    linear-gradient(var(--dc3-login-grid-color) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dc3-login-grid-color) 1px, transparent 1px),
+    radial-gradient(circle at 16% 14%, var(--dc3-ambient-primary), transparent 34%),
+    radial-gradient(circle at 86% 10%, var(--dc3-ambient-secondary), transparent 30%),
+    var(--dc3-bg-canvas);
   background-size: 48px 48px, 48px 48px, auto, auto, auto;
+  color: var(--dc3-text-primary);
+  transition: background var(--dc3-duration-slow) var(--dc3-ease-standard);
 
   :deep(.waves) {
     z-index: -2;
@@ -56,29 +58,37 @@
 .login-orb-primary {
   left: -120px;
   bottom: -140px;
-  background: rgba(23, 164, 220, 0.17);
+  background: var(--dc3-ambient-primary);
 }
 
 .login-orb-accent {
   top: -160px;
   right: -100px;
-  background: rgba(92, 86, 202, 0.14);
+  background: var(--dc3-ambient-secondary);
 }
 
 .login-shell {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1.16fr) minmax(420px, 0.84fr);
   width: min(1180px, 100%);
   min-height: min(660px, calc(100vh - 72px));
   overflow: hidden;
-  border: 1px solid rgba(150, 205, 230, 0.42);
+  border: 1px solid var(--dc3-border-strong);
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.38);
+  background: var(--dc3-login-shell-bg);
   box-shadow:
-    0 32px 80px rgba(18, 73, 123, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    var(--dc3-login-shell-shadow),
+    inset 0 1px 0 var(--dc3-highlight-sheen);
   backdrop-filter: blur(22px) saturate(1.32);
   -webkit-backdrop-filter: blur(22px) saturate(1.32);
+}
+
+.login-preferences {
+  position: absolute;
+  z-index: 4;
+  top: 16px;
+  right: 16px;
 }
 
 .login-story {
@@ -87,10 +97,8 @@
   flex-direction: column;
   padding: clamp(32px, 4vw, 58px);
   overflow: hidden;
-  border-right: 1px solid rgba(148, 203, 229, 0.28);
-  background:
-    radial-gradient(circle at 16% 4%, rgba(255, 255, 255, 0.88), transparent 32%),
-    linear-gradient(145deg, rgba(225, 249, 255, 0.72), rgba(236, 241, 255, 0.6));
+  border-right: 1px solid var(--dc3-border-base);
+  background: var(--dc3-login-story-bg);
 
   &::after {
     position: absolute;
@@ -112,7 +120,7 @@
   display: inline-flex;
   align-items: center;
   width: fit-content;
-  color: #07549a;
+  color: var(--dc3-text-brand);
   font-weight: 740;
   letter-spacing: -0.01em;
 }
@@ -120,14 +128,14 @@
 .login-brand-pill {
   height: 42px;
   padding: 4px 14px 4px 6px;
-  border: 1px solid rgba(148, 216, 246, 0.46);
+  border: 1px solid var(--dc3-border-strong);
   border-radius: 21px;
   background:
-    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.9), transparent 38%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.64), rgba(115, 205, 241, 0.15) 52%, rgba(75, 88, 210, 0.08));
+    radial-gradient(circle at 18% 0%, var(--dc3-highlight-sheen), transparent 38%),
+    var(--dc3-brand-gradient-soft);
   box-shadow:
-    0 12px 30px rgba(12, 89, 153, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    var(--dc3-shadow-md),
+    inset 0 1px 0 var(--dc3-highlight-sheen);
   font-size: 20px;
 }
 
@@ -147,7 +155,7 @@
   h1 {
     max-width: 590px;
     margin: 18px 0 22px;
-    background: linear-gradient(112deg, #102b3c 5%, #07549a 38%, #149ed7 62%, #5154c4 96%);
+    background: var(--dc3-login-title-gradient);
     background-clip: text;
     color: transparent;
     font-size: clamp(42px, 4vw, 66px);
@@ -161,7 +169,7 @@
   p {
     max-width: 540px;
     margin: 0;
-    color: #526575;
+    color: var(--dc3-text-regular);
     font-size: 17px;
     line-height: 1.8;
   }
@@ -169,7 +177,7 @@
 
 .login-kicker,
 .login-card-kicker {
-  color: #1183c9;
+  color: var(--dc3-text-brand);
   font-size: 12px;
   font-weight: 750;
   letter-spacing: 0.18em;
@@ -183,12 +191,12 @@
 
   span {
     padding: 8px 13px;
-    border: 1px solid rgba(74, 158, 205, 0.2);
+    border: 1px solid var(--dc3-border-base);
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.56);
-    color: #36566c;
+    background: var(--dc3-login-chip-bg);
+    color: var(--dc3-text-regular);
     font-size: 13px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.88);
+    box-shadow: inset 0 1px 0 var(--dc3-highlight-sheen);
   }
 }
 
@@ -199,16 +207,16 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  color: #607788;
+  color: var(--dc3-text-muted);
   font-size: 12px;
   letter-spacing: 0.04em;
 
   strong {
-    color: #0a6cb2;
+    color: var(--dc3-text-brand);
   }
 
   i {
-    color: #22a5d7;
+    color: var(--el-color-primary);
     font-style: normal;
   }
 }
@@ -217,7 +225,7 @@
   display: grid;
   place-items: center;
   padding: clamp(30px, 4vw, 54px);
-  background: rgba(255, 255, 255, 0.66);
+  background: var(--dc3-login-card-bg);
 }
 
 .login-card {
@@ -241,7 +249,7 @@
 
 .login-title {
   margin: 10px 0 8px;
-  color: #182c3b;
+  color: var(--dc3-text-primary);
   font-size: 32px;
   font-weight: 760;
   letter-spacing: -0.035em;
@@ -250,7 +258,7 @@
 
 .login-subtitle {
   margin: 0 0 30px;
-  color: #778896;
+  color: var(--dc3-text-muted);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -292,12 +300,12 @@
   :deep(.el-input__wrapper) {
     min-height: 48px;
     border-radius: 13px;
-    background: rgba(248, 251, 253, 0.88);
-    box-shadow: 0 0 0 1px rgba(113, 153, 178, 0.2) inset;
+    background: var(--dc3-login-input-bg);
+    box-shadow: 0 0 0 1px var(--dc3-border-base) inset;
     transition: box-shadow 220ms ease, background-color 220ms ease;
 
     &.is-focus {
-      background: #ffffff;
+      background: var(--dc3-login-input-focus-bg);
       box-shadow:
         0 0 0 1px rgba(18, 150, 219, 0.72) inset,
         0 8px 22px rgba(18, 150, 219, 0.08);
@@ -307,8 +315,8 @@
   :deep(.el-input-group__append) {
     border: none;
     border-radius: 0 13px 13px 0;
-    background: rgba(248, 251, 253, 0.88);
-    box-shadow: 0 0 0 1px rgba(113, 153, 178, 0.2) inset;
+    background: var(--dc3-login-input-bg);
+    box-shadow: 0 0 0 1px var(--dc3-border-base) inset;
   }
 }
 
@@ -357,7 +365,7 @@
     min-height: 178px;
     padding: 22px 22px 26px;
     border-right: none;
-    border-bottom: 1px solid rgba(148, 203, 229, 0.28);
+    border-bottom: 1px solid var(--dc3-border-base);
   }
 
   .login-brand-pill,

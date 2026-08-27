@@ -22,6 +22,8 @@
     <div class="login-orb login-orb-accent" aria-hidden="true"/>
 
     <section class="login-shell">
+      <app-preferences class="login-preferences" surface />
+
       <div class="login-story">
         <div class="login-brand-pill">
           <img :src="assetUrl('images/logo/logo.svg')" alt="" class="login-brand-logo"/>
@@ -145,6 +147,7 @@ import {useAuthStore} from '@/store';
 import {PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
 import {failMessage, successMessage} from '@/utils/notificationUtil';
 
+import AppPreferences from '@/components/layout/AppPreferences.vue';
 import Particles from '@/components/particles/Particles.vue';
 import {assetUrl} from '@/utils/assetUrl';
 
@@ -180,14 +183,14 @@ const reactiveData = reactive<LoginViewState>({
   },
 });
 
-const formRule = reactive<FormRules>({
+const formRule = computed<FormRules>(() => ({
   tenant: [{required: true, message: t('login.tenantRequired'), trigger: 'blur'}],
   name: [{required: true, message: t('login.usernameRequired'), trigger: 'blur'}],
   password: [
     {required: true, message: t('login.passwordRequired'), trigger: 'blur'},
     {min: 6, message: t('login.passwordMin'), trigger: 'blur'},
   ],
-});
+}));
 
 const showPassword = () => {
   reactiveData.passwordType === '' ? (reactiveData.passwordType = 'password') : (reactiveData.passwordType = '');
@@ -232,7 +235,7 @@ const changePasswordHint = computed(() =>
   changePasswordCode.value === 'R4032' ? t('login.passwordExpired') : t('login.changePasswordRequired')
 );
 
-const changePasswordRule = reactive<FormRules>({
+const changePasswordRule = computed<FormRules>(() => ({
   newPassword: [
     {required: true, message: t('login.passwordRequired'), trigger: 'blur'},
     {min: 6, message: t('login.passwordMin'), trigger: 'blur'},
@@ -246,7 +249,7 @@ const changePasswordRule = reactive<FormRules>({
       trigger: 'blur',
     },
   ],
-});
+}));
 
 const openChangePassword = (code: string) => {
   changePasswordCode.value = code;

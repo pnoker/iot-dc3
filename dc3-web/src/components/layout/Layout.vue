@@ -38,24 +38,7 @@
         </div>
         <span v-if="!isMobile" class="header_actions_divider" aria-hidden="true" />
         <div class="header_utilities">
-          <div :aria-label="t('layout.language')" class="header_language_switch" role="group">
-            <button
-              :aria-pressed="langModel === 'en'"
-              :class="{active: langModel === 'en'}"
-              type="button"
-              @click="langModel = 'en'"
-            >
-              EN
-            </button>
-            <button
-              :aria-pressed="langModel === 'zh'"
-              :class="{active: langModel === 'zh'}"
-              type="button"
-              @click="langModel = 'zh'"
-            >
-              中
-            </button>
-          </div>
+          <app-preferences compact />
           <el-tooltip v-if="settingsEntryName" :content="t('layout.settings')" placement="bottom">
             <el-button
               :aria-label="t('layout.settings')"
@@ -161,7 +144,9 @@ import { useAgenticStore, useAuthStore, useMenuStore } from "@/store";
 import type { MenuNode } from "@/store/modules/menu";
 import { assetUrl } from "@/utils/assetUrl";
 
-const { t, locale } = useI18n();
+import AppPreferences from "@/components/layout/AppPreferences.vue";
+
+const { t } = useI18n();
 const route = useRoute();
 const authStore = useAuthStore();
 const menuStore = useMenuStore();
@@ -183,14 +168,6 @@ watch(
 
 // The AI assistant is shown in every build; in mock builds the fetch
 // interceptor (src/mock/fetch.ts) answers its chat completions.
-
-const langModel = computed({
-  get: () => locale.value,
-  set: (val: string) => {
-    locale.value = val;
-    localStorage.setItem("locale", val);
-  },
-});
 
 onMounted(() => {
   menuStore.fetchTree();
@@ -482,9 +459,9 @@ const handleCommand = async (command: string) => {
     width: 100%;
     height: var(--dc3-header-height);
     padding: 9px clamp(10px, 2vw, 24px);
-    border-bottom: 1px solid rgba(148, 203, 229, 0.22);
+    border-bottom: 1px solid var(--dc3-border-base);
     background:
-      radial-gradient(circle at 12% -80%, rgba(92, 215, 244, 0.2), transparent 36%),
+      radial-gradient(circle at 12% -80%, var(--dc3-ambient-primary), transparent 36%),
       color-mix(in srgb, var(--dc3-bg-body) 88%, transparent);
     backdrop-filter: blur(16px) saturate(1.2);
     -webkit-backdrop-filter: blur(16px) saturate(1.2);
@@ -498,24 +475,15 @@ const handleCommand = async (command: string) => {
       box-sizing: border-box;
       height: 42px;
       overflow: hidden;
-      border: 1px solid rgba(148, 216, 246, 0.34);
+      border: 1px solid var(--dc3-border-strong);
       border-radius: 21px;
       background:
-        radial-gradient(
-          circle at 18% 0%,
-          rgba(255, 255, 255, 0.82),
-          transparent 38%
-        ),
-        linear-gradient(
-          135deg,
-          rgba(255, 255, 255, 0.54),
-          rgba(115, 205, 241, 0.13) 52%,
-          rgba(75, 88, 210, 0.08)
-        );
+        radial-gradient(circle at 18% 0%, var(--dc3-highlight-sheen), transparent 38%),
+        var(--dc3-brand-gradient-soft),
+        color-mix(in srgb, var(--dc3-bg-elevated) 82%, transparent);
       box-shadow:
-        0 10px 28px rgba(12, 89, 153, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.86),
-        inset 0 -8px 18px rgba(55, 131, 203, 0.05);
+        var(--dc3-shadow-md),
+        inset 0 1px 0 var(--dc3-highlight-sheen);
       backdrop-filter: blur(18px) saturate(1.45);
       -webkit-backdrop-filter: blur(18px) saturate(1.45);
       transition:
@@ -530,22 +498,17 @@ const handleCommand = async (command: string) => {
         left: 12px;
         height: 42%;
         border-radius: 999px;
-        background: linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 0.48),
-          transparent
-        );
+        background: linear-gradient(180deg, var(--dc3-highlight-sheen), transparent);
         opacity: 0.72;
         pointer-events: none;
         content: "";
       }
 
       &:hover {
-        border-color: rgba(61, 172, 224, 0.46);
+        border-color: var(--dc3-border-strong);
         box-shadow:
-          0 14px 34px rgba(12, 89, 153, 0.15),
-          inset 0 1px 0 rgba(255, 255, 255, 0.92),
-          inset 0 -8px 18px rgba(55, 131, 203, 0.07);
+          var(--dc3-shadow-hover),
+          inset 0 1px 0 var(--dc3-highlight-sheen);
       }
     }
 
@@ -608,63 +571,19 @@ const handleCommand = async (command: string) => {
       gap: 3px;
     }
 
-    .header_language_switch {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2px;
-      box-sizing: border-box;
-      width: 68px;
-      height: 30px;
-      padding: 2px;
-      border: 1px solid rgba(88, 161, 199, 0.16);
-      border-radius: 15px;
-      background: rgba(255, 255, 255, 0.34);
-
-      button {
-        display: grid;
-        place-items: center;
-        min-width: 0;
-        padding: 0;
-        border: 0;
-        border-radius: 12px;
-        background: transparent;
-        color: #637b8b;
-        cursor: pointer;
-        font-family: inherit;
-        font-size: 11px;
-        font-weight: 680;
-        line-height: 24px;
-        transition: color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
-
-        &:hover,
-        &:focus-visible {
-          outline: none;
-          color: #0878b8;
-        }
-
-        &.active {
-          background: rgba(255, 255, 255, 0.92);
-          box-shadow:
-            0 3px 9px rgba(12, 89, 153, 0.13),
-            inset 0 0 0 1px rgba(18, 150, 219, 0.08);
-          color: #0878b8;
-        }
-      }
-    }
-
     .header_settings_button {
       width: 32px;
       height: 32px;
-      border: 1px solid rgba(88, 161, 199, 0.12);
-      background: rgba(255, 255, 255, 0.28);
-      color: #456578;
+      border: 1px solid var(--dc3-border-base);
+      background: var(--dc3-bg-interactive);
+      color: var(--dc3-text-regular);
       font-size: 16px;
       transition: color 180ms ease, background-color 180ms ease, transform 180ms ease;
 
       &:hover,
       &:focus-visible {
-        background: rgba(18, 150, 219, 0.1);
-        color: #0878b8;
+        background: var(--dc3-bg-interactive-active);
+        color: var(--dc3-text-brand);
         transform: rotate(18deg);
       }
     }
@@ -678,7 +597,7 @@ const handleCommand = async (command: string) => {
       border: 0;
       border-radius: 16px;
       background: transparent;
-      color: #2d4658;
+      color: var(--dc3-text-primary);
       cursor: pointer;
       font: inherit;
       transition: background-color 180ms ease, box-shadow 180ms ease;
@@ -686,8 +605,8 @@ const handleCommand = async (command: string) => {
       &:hover,
       &:focus-visible {
         outline: none;
-        background: rgba(18, 150, 219, 0.09);
-        box-shadow: inset 0 0 0 1px rgba(18, 150, 219, 0.1);
+        background: var(--dc3-bg-interactive);
+        box-shadow: inset 0 0 0 1px var(--dc3-border-base);
       }
 
       .user_initial {
@@ -710,7 +629,7 @@ const handleCommand = async (command: string) => {
       .user_name {
         max-width: 100px;
         overflow: hidden;
-        color: #304b5d;
+        color: var(--dc3-text-primary);
         font-size: 13px;
         font-weight: 620;
         text-overflow: ellipsis;
@@ -718,7 +637,7 @@ const handleCommand = async (command: string) => {
       }
 
       .user_chevron {
-        color: #78909f;
+        color: var(--dc3-text-muted);
         font-size: 11px;
       }
     }
@@ -728,7 +647,7 @@ const handleCommand = async (command: string) => {
       width: 1px;
       height: 22px;
       margin: 0 3px;
-      background: rgba(94, 155, 188, 0.22);
+      background: var(--dc3-border-base);
     }
 
     // Tablet keeps navigation visible as accessible icon buttons. Language,
@@ -756,18 +675,13 @@ const handleCommand = async (command: string) => {
       }
 
       .header_title {
-        margin-left: 6px;
-        font-size: 18px;
+        display: none;
       }
 
       .header_actions_glass {
         flex: 0 0 auto;
         max-width: none;
         padding: 3px 5px;
-      }
-
-      .header_language_switch {
-        width: 66px;
       }
 
       .header_settings_button {
@@ -778,6 +692,7 @@ const handleCommand = async (command: string) => {
       .user_trigger {
         padding-right: 2px;
       }
+
     }
   }
 

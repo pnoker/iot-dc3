@@ -72,6 +72,20 @@
   --dc3-shadow-hover: 0 16px 40px rgba(22, 87, 120, 0.13);
   --dc3-shadow-active: 0 5px 14px rgba(18, 121, 178, 0.1);
 
+  // Login-specific surfaces remain tokens because the public page must obey
+  // the same persisted theme contract as the authenticated workspace.
+  --dc3-login-grid-color: rgba(18, 150, 219, 0.045);
+  --dc3-login-shell-bg: rgba(255, 255, 255, 0.38);
+  --dc3-login-story-bg:
+    radial-gradient(circle at 16% 4%, rgba(255, 255, 255, 0.88), transparent 32%),
+    linear-gradient(145deg, rgba(225, 249, 255, 0.72), rgba(236, 241, 255, 0.6));
+  --dc3-login-card-bg: rgba(255, 255, 255, 0.66);
+  --dc3-login-chip-bg: rgba(255, 255, 255, 0.56);
+  --dc3-login-input-bg: rgba(248, 251, 253, 0.88);
+  --dc3-login-input-focus-bg: #ffffff;
+  --dc3-login-title-gradient: linear-gradient(112deg, #102b3c 5%, #07549a 38%, #149ed7 62%, #5154c4 96%);
+  --dc3-login-shell-shadow: 0 32px 80px rgba(18, 73, 123, 0.14);
+
   // Spacing scale (4px grid)
   --dc3-space-1: 4px;
   --dc3-space-2: 8px;
@@ -136,6 +150,17 @@ html.dark {
   --dc3-shadow-hover: 0 18px 44px rgba(0, 0, 0, 0.3);
   --dc3-shadow-active: 0 6px 18px rgba(0, 0, 0, 0.2);
   --dc3-color-purple-soft: rgba(135, 111, 224, 0.16);
+  --dc3-login-grid-color: rgba(76, 188, 232, 0.055);
+  --dc3-login-shell-bg: rgba(14, 23, 29, 0.66);
+  --dc3-login-story-bg:
+    radial-gradient(circle at 16% 4%, rgba(57, 135, 169, 0.18), transparent 34%),
+    linear-gradient(145deg, rgba(21, 43, 53, 0.92), rgba(27, 31, 57, 0.86));
+  --dc3-login-card-bg: rgba(18, 27, 34, 0.82);
+  --dc3-login-chip-bg: rgba(44, 62, 72, 0.58);
+  --dc3-login-input-bg: rgba(31, 45, 54, 0.86);
+  --dc3-login-input-focus-bg: #263943;
+  --dc3-login-title-gradient: linear-gradient(112deg, #f1fbff 4%, #73cff1 42%, #43b8e8 65%, #aaa8ff 96%);
+  --dc3-login-shell-shadow: 0 34px 90px rgba(0, 0, 0, 0.38);
 
   color-scheme: dark;
 }
