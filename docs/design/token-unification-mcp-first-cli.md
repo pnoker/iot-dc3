@@ -229,3 +229,11 @@ then to avoid shipping a login that cannot do anything.
 > `DC3_TOKEN_TTL_HOURS` (denylist follows ttl+1h), hidden CLI `auth login --oauth`. Full-repo compile + existing
 > suites green; live-stack regression (gateway accepting a real ticket end-to-end) still pending before flipping
 > the flag on.
+
+**Phase 2 implemented 2026-08-27 (partial, honestly scoped):** scope-as-projection landed at
+authorization time (`capScopesByRbac`, additive per risk class, narrow-only, degradation guard
+for principals without bindings, toggle `dc3.oauth.rbac-scoped-scopes`); risk-ladder lifetime
+landed (`readOnlyAccessTokenTtl` = 1 h vs 15 min call-capable default). Still open in this
+phase: step-up tickets bound to confirmation records and `X_AUTH_PRINCIPAL`-based API-level
+enforcement — both need a live-stack harness before they can be verified honestly. Phase 3
+remains gated on Q5.
