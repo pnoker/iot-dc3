@@ -137,11 +137,12 @@ export class ConfigManager {
   async setProfile(profileName: string, partial: Partial<ProfileConfig>): Promise<void> {
     const config = await this.load();
     const existing = config.profiles[profileName] || {};
-    config.profiles[profileName] = {
-      ...ProfileConfigSchema.parse({}),
+    // Validate the MERGED profile, not a blank template: fields without schema
+    // defaults (username) only need to be present after the merge.
+    config.profiles[profileName] = ProfileConfigSchema.parse({
       ...existing,
       ...partial,
-    };
+    });
     await writeConfig(config);
     this.config = config;
   }

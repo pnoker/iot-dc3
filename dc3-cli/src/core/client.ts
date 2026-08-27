@@ -272,11 +272,14 @@ export class Dc3Client {
       );
     }
 
-    // Step 3: persist
-    const jwtPayload = decodeJwt(tokenData.data);
+    // Current backends deliver the ticket via the dc3-token cookie and an
+    // acknowledgement body (data:"ok"); June-era builds returned the JWT in data.
+    // Support both shapes so the CLI works against either.
+    const token = extractTicket(tokenRes, tokenData.data);
+    const jwtPayload = decodeJwt(token);
     await tokenManager.saveState(
       {
-        token: tokenData.data,
+        token,
         salt: saltData.data,
         tenant,
         username,
@@ -286,7 +289,7 @@ export class Dc3Client {
       profileName,
     );
 
-    return tokenData.data;
+    return token;
   }
 
   /**
@@ -353,6 +356,24 @@ export class ApiError extends Error {
     this.name = 'ApiError';
     this.statusCode = statusCode;
   }
+}
+
+
+/**
+ * Pull the login ticket out of a generate response: prefer a dc3-token cookie
+ * (current contract), fall back to a JWT-shaped body value (legacy contract).
+ */
+export function extractTicket(res: Response, bodyData: unknown): string {
+  const asString = typeof bodyData === 'string' ? bodyData : '';
+  if (/^eyJ[\w-]*\.[\w-]*\.[\w-]*$/.test(asString)) {
+    return asString;
+  }
+  const setCookie = res.headers.get('set-cookie') ?? '';
+  const match = setCookie.match(/dc3-token=([^;\s]+)/u);
+  if (match?.[1]) {
+    return decodeURIComponent(match[1]);
+  }
+  throw new Error('Login succeeded but no dc3-token was found in the response');
 }
 
 /** Singleton instance */
