@@ -52,6 +52,7 @@ iot-dc3/
 ├── dc3-driver/           protocol driver implementations
 ├── dc3-gateway/          HTTP gateway
 ├── dc3-web/              Vue/TypeScript frontend
+├── dc3-cli/              standalone TypeScript CLI (`dc3`), AI-ready client over the HTTP gateway
 ├── dc3-coverage/         aggregate JaCoCo report and absolute coverage gate
 ├── dc3-e2e/              Testcontainers-backed end-to-end tests
 ├── dc3/                  compose files, environment files, scripts, and generated release notes
@@ -338,6 +339,24 @@ Reusable test infrastructure includes `GrpcInProcessExtension`, `RabbitTestHarne
 `make coverage` generates the aggregate report under `dc3-coverage/target/site/jacoco-aggregate/`. The current gate is
 an absolute minimum configured in `dc3-coverage/pom.xml`; `dc3-coverage/scripts/check_coverage.py` validates the
 aggregate XML. Do not claim a relative regression gate unless the build implements one.
+
+## CLI conventions (`dc3-cli/`)
+
+Standalone TypeScript package (pnpm + tsup + vitest, binary name `dc3`). It has no Java/build coupling to the Maven
+build; it talks to the running backend through the HTTP gateway only.
+
+```bash
+pnpm --dir dc3-cli install            # deps (esbuild build script is pre-approved in pnpm-workspace.yaml)
+pnpm --dir dc3-cli build              # tsup → dist/ (bin: dc3)
+pnpm --dir dc3-cli test               # vitest run
+pnpm --dir dc3-cli lint               # eslint src --fix
+```
+
+- The CLI mirrors backend CRUD verb conventions: command surfaces use `get/list/add/update/delete`; list endpoints that
+  call manager APIs use POST with a paging body.
+- Output contract: `--format json|table|yaml`, TTY defaults to table, pipes default to json; exit codes 0 ok / 1
+  business error / 2 network error / 3 auth error.
+- When adding or changing a gateway HTTP API, check whether `dc3-cli/src/commands/*` needs the matching subcommand.
 
 ### Proportional validation
 

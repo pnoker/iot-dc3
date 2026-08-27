@@ -1,0 +1,56 @@
+{
+  "name": "iot-dc3-cli",
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.24.0",
+  "description": "IoT DC3 Platform CLI — AI-ready command-line interface for the DC3 IoT platform",
+  "keywords": [
+    "iot",
+    "dc3",
+    "cli",
+    "ai-agent",
+    "mcp",
+    "industrial-iot"
+  ],
+  "license": "MIT",
+  "author": "pnoker",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "dc3": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint": "eslint src --fix",
+    "format": "prettier --write src",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "chalk": "^5.4.0",
+    "commander": "^12.1.0",
+    "ora": "^8.1.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/parser": "^8.68.0",
+    "eslint": "^9.0.0",
+    "globals": "^17.11.0",
+    "prettier": "^3.4.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
