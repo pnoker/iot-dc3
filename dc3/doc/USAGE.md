@@ -137,7 +137,7 @@ Facts that hold in every mode:
   `POSTGRES_HOST`, `RABBITMQ_HOST`, `MQTT_BROKER_HOST`, `CENTER_*_HOST`, and
   `APP_API_HOST` to point at services deployed differently.
 - **`NODE_ENV` selects the Spring profile** at runtime: `test` (the default in every deployment config) or `pro`
-  (hardened: OpenAPI/Swagger UI disabled, weak secrets rejected).
+  (hardened: OpenAPI/Swagger UI disabled, weak `AUTH_HMAC_SECRET` rejected at startup).
 
 Mode-specific runbooks: `dc3/deploy/k8s/README.md`, `dc3/deploy/helm/dc3/README.md`, and the
 `stack-deploy` / `stack-rm` / `k8s-apply` / `k8s-delete` / `helm-install` / `helm-uninstall`

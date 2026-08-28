@@ -31,9 +31,11 @@ identically elsewhere. The runtime differences are only about *where* replicas l
 | postgres       | `dc3-postgres`         | -                     | -    | PostgreSQL + AGE/TimescaleDB/pgvector, seeded |
 | rabbitmq       | `dc3-rabbitmq`         | -                     | -    | AMQP + embedded MQTT broker, TLS-capable      |
 
-> Ingress discipline: only `web` (80/443) and `listening-virtual` (device TCP 6270 /
-> UDP 6271) are ever published to the outside. Every backend port stays on the
-> internal network. Do not map center or database ports to the host in production.
+> Ingress discipline: only `web` (80/443) and `listening-virtual` (device TCP 6270) are ever published to the
+> outside. Every backend port stays on the internal network. Do not map center or database ports to the host in
+> production. Note on 6271: it is intended as the device UDP channel, but every publish site today (Compose, scale,
+> swarm, the k8s Service) omits `/udp` / `protocol: UDP`, so it currently publishes as TCP - add the protocol
+> declaration before relying on UDP.
 
 ## 2. Image availability
 
@@ -107,7 +109,7 @@ blocks for replicas/updates/restarts/resources).
 # 1. one-time: a single-node swarm is enough to start
 docker swarm init
 
-# 2. build + push dependency images (not published by CI)
+# 2. build + push dependency images (not published by CI; a local build is fine on a single node)
 DC3_IMAGE_REGISTRY=my.registry/dc3 ./dc3/deploy/k8s/scripts/push-images.sh
 
 # 3. deploy (run from the repo root so .env is interpolated)
@@ -158,7 +160,9 @@ kubectl -n dc3 get pods -w
 - Scaling semantics: gateway/web/centers/drivers scale - driver pods each get a per-pod `emptyDir` outbox, unlike Mode
   1/2 where drivers stay at 1 replica;
   `listening-virtual` stays at 1; postgres/rabbitmq are singletons. The k8s Service (kube-proxy) additionally
-  load-balances per TCP connection, so scaled centers also get connection-level distribution for HTTP.
+  load-balances per TCP connection, so scaled centers also get connection-level distribution for HTTP. Note that a
+  scaled driver's replicas are independent nodes with separate command queues (see the FAQ), not one shared worker
+  pool.
 
 ## 7. Mode 4 - Helm
 
@@ -186,7 +190,9 @@ helm uninstall dc3
 Apply every item before connecting real devices:
 
 1. **Secrets** - replace `DC3_SECURITY_KEY`, `AUTH_HMAC_SECRET`, all database/broker passwords and the LLM API key with
-   strong random values. The `pro` profile **refuses to start** with weak `DC3_SECURITY_KEY`/`AUTH_HMAC_SECRET`. Never
+   strong random values. The fail-fast gate covers `AUTH_HMAC_SECRET` only: on the `pre`/`pro` profile an empty or
+   still-default value refuses to start; `DC3_SECURITY_KEY` is checked for non-empty only, so a known weak default
+   still boots. Never
    commit
    `secret.env` / `values-production.yaml` with real values.
 2. **TLS** - terminate TLS at the edge (web nginx already ships a hardened TLS config; k8s: ingress + cert-manager;
@@ -211,8 +217,12 @@ Apply every item before connecting real devices:
   (`static://host:port`) with one channel per client. Replicas provide failover and rollout safety; true gRPC request
   balancing needs client-side LB or k8s (per-connection round-robin via ClusterIP). HTTP traffic is balanced at every
   tier (nginx -> Spring Cloud Gateway -> centers).
-- **Can I run drivers at 2 replicas?** Yes for outbound protocol drivers (they are workers over shared RabbitMQ queues).
-  No for `listening-virtual`, which owns inbound device sockets - keep it at 1 replica.
+- **Can I run drivers at 2 replicas?** On Compose/Swarm, no - keep protocol drivers at 1 replica (they share the
+  `driver_data` volume and would open the same SQLite outbox file). On Kubernetes you can scale them (per-pod
+  `emptyDir`), but understand the mechanics: every replica registers as its own node with its own RabbitMQ command
+  queue (`group="${dc3.driver.client}"`, routing key `service.node`, node = per-instance UUID) - replicas are not
+  competing consumers of one shared queue, so scaling adds independent driver instances rather than splitting work
+  per message. `listening-virtual` always stays at 1 replica (it owns inbound device sockets).
 - **PostgreSQL/RabbitMQ replicas?** Not supported by these configs - they are stateful singletons. For HA run managed
   services (or your own cluster) and override the host variables: `POSTGRES_HOST`, `RABBITMQ_HOST`, `MQTT_BROKER_HOST`
   (plus
