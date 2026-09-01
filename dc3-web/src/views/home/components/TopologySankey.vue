@@ -469,7 +469,7 @@ onUnmounted(() => chart?.destroy());
   .topology-sankey__footer-right {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--dc3-space-2);
   }
 
   .topology-sankey__range {

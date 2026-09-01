@@ -126,9 +126,9 @@ const activeIndex = computed(() => {
     :deep(> .el-sub-menu .el-sub-menu__title) {
       position: relative;
       height: 36px;
-      padding: 0 13px;
+      padding: 0 var(--dc3-space-3);
       border: 1px solid transparent;
-      border-radius: 18px;
+      border-radius: var(--dc3-radius-lg);
       color: var(--dc3-text-regular);
       line-height: 36px;
       transition:

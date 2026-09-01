@@ -400,7 +400,7 @@ defineExpose({show});
   flex-direction: column;
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 4px;
-  padding: 10px;
+  padding: var(--dc3-space-3);
   background: var(--el-bg-color);
 }
 
@@ -430,7 +430,7 @@ defineExpose({show});
 
   :deep(.el-tabs__item) {
     font-size: 12px;
-    padding: 0 10px;
+    padding: 0 var(--dc3-space-3);
     height: 32px;
     line-height: 32px;
   }

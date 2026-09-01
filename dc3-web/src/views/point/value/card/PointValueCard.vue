@@ -286,7 +286,7 @@ onMounted(() => {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 6px;
+    gap: var(--dc3-space-2);
 
     :deep(.el-tag) {
       vertical-align: middle;

@@ -418,7 +418,7 @@ defineExpose({reload: load});
   &__color-cell {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--dc3-space-1);
   }
 
   &__swatch {

@@ -250,7 +250,7 @@ defineExpose({
 
   .dashboard-card__title-text {
     position: relative;
-    padding-left: 11px;
+    padding-left: var(--dc3-space-3);
     font-weight: 650;
     color: var(--dc3-text-primary);
 

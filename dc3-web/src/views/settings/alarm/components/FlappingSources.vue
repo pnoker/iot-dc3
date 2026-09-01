@@ -119,8 +119,8 @@ defineExpose({refresh: load});
   .flapping-sources__item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
+    gap: var(--dc3-space-2);
+    padding: var(--dc3-space-2) var(--dc3-space-4);
     border-bottom: 1px solid var(--el-border-color-lighter);
     cursor: pointer;
     transition: background-color 0.12s ease;

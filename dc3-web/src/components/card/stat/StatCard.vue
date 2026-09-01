@@ -213,7 +213,7 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
   .stat-card__row {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
+    gap: var(--dc3-space-3);
     position: relative;
   }
 

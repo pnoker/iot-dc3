@@ -281,7 +281,7 @@ onUnmounted(() => {
   .home-banner__service {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--dc3-space-2);
     color: var(--dc3-text-regular);
     min-width: 64px;
   }

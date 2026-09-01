@@ -603,7 +603,7 @@ const handleCommand = async (command: string) => {
 
       .header_brand_glass {
         min-width: 0;
-        padding-right: 11px;
+        padding-right: var(--dc3-space-3);
       }
 
       .header_menu_toggle {
@@ -693,7 +693,7 @@ const handleCommand = async (command: string) => {
       padding: var(--dc3-space-1);
 
       .breadcrumb {
-        padding: 9px var(--dc3-space-3);
+        padding: var(--dc3-space-2) var(--dc3-space-3);
         margin-bottom: var(--dc3-space-1);
       }
     }

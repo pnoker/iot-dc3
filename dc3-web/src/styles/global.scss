@@ -136,11 +136,11 @@ body {
 // width and vertical space for the title and actions, separate adjacent buttons, and
 // emphasize the irreversible primary danger action.
 .el-popover.el-popper.el-popconfirm {
-  --el-popover-padding: 14px 16px;
+  --el-popover-padding: var(--dc3-space-3) var(--dc3-space-4);
 
   .el-popconfirm__main {
     min-width: 240px;
-    padding: 2px 0 10px;
+    padding: 2px 0 var(--dc3-space-2);
     line-height: 1.5;
     align-items: flex-start;
 
@@ -205,14 +205,14 @@ body {
 
   .el-dropdown-menu {
     min-width: 150px;
-    padding: 5px;
+    padding: var(--dc3-space-1);
     background: transparent;
   }
 
   // Identity header: who is signed in, split from the actions by a rule.
   .user_dropdown_identity {
-    padding: 9px 12px 11px;
-    margin-bottom: 5px;
+    padding: var(--dc3-space-2) var(--dc3-space-3) var(--dc3-space-3);
+    margin-bottom: var(--dc3-space-1);
     border-bottom: 1px solid var(--dc3-border-base);
 
     .user_dropdown_name {

@@ -19,7 +19,7 @@
 
 .edit-form-item {
   display: flex;
-  margin: 10px 0;
+  margin: var(--dc3-space-2) 0;
   justify-content: center;
 
   :deep(.el-row) {
@@ -27,7 +27,7 @@
   }
 
   :deep(.el-alert) {
-    margin-bottom: 10px;
+    margin-bottom: var(--dc3-space-2);
   }
 
   :deep(.el-textarea__inner) {
@@ -37,7 +37,7 @@
 
 .edit-form-button {
   display: flex;
-  margin-top: 10px;
+  margin-top: var(--dc3-space-2);
 
   :deep(.el-form-item__content) {
     justify-content: center;

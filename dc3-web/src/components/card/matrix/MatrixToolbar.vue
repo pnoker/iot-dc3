@@ -124,9 +124,9 @@ const {t} = useI18n();
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px 12px;
-    margin-top: 16px;
-    padding-top: 12px;
+    gap: var(--dc3-space-2) var(--dc3-space-3);
+    margin-top: var(--dc3-space-4);
+    padding-top: var(--dc3-space-3);
     border-top: 1px solid var(--el-border-color-lighter);
 
     // Primary actions on the left — mirrors ToolCard's button cluster.

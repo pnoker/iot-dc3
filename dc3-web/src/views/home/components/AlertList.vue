@@ -174,10 +174,10 @@ defineExpose({refresh});
 <style lang="scss" scoped>
 .alert-list {
   .alert-list__group {
-    padding: 10px 20px 0;
+    padding: var(--dc3-space-2) var(--dc3-space-4) 0;
 
     &:last-child {
-      padding-bottom: 10px;
+      padding-bottom: var(--dc3-space-2);
     }
   }
 
@@ -209,7 +209,7 @@ defineExpose({refresh});
   .alert-list__tags {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--dc3-space-2);
     flex-wrap: wrap;
   }
 

@@ -134,7 +134,7 @@ defineExpose({refresh: load});
   .coverage-gap__num {
     display: flex;
     align-items: baseline;
-    gap: 10px;
+    gap: var(--dc3-space-2);
     font-size: 13px;
 
     &--gap .coverage-gap__value {

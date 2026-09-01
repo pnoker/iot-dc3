@@ -327,7 +327,7 @@ onUnmounted(() => disposeChart());
   .analytics-tabs__caption {
     font-size: 12px;
     color: #909399;
-    padding: 10px 16px 4px;
+    padding: var(--dc3-space-2) var(--dc3-space-4) var(--dc3-space-1);
   }
 
   .analytics-tabs__chart-wrap {

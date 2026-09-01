@@ -185,7 +185,7 @@ watch(locale, refresh);
     text-overflow: ellipsis;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--dc3-space-2);
   }
 
   // Per-dimension accent colours so the driver / device / point

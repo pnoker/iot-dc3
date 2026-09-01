@@ -35,7 +35,7 @@
 
   .el-dialog__body {
     flex: 1 1 auto;
-    padding: 30px 30px 15px 30px;
+    padding: var(--dc3-space-6) var(--dc3-space-6) var(--dc3-space-4) var(--dc3-space-6);
     overflow-y: auto;
 
     pre {
@@ -59,7 +59,7 @@
     column-gap: 16px;
 
     .el-form-item {
-      margin-bottom: 18px;
+      margin-bottom: var(--dc3-space-4);
     }
 
     .things-form-grid__span-2 {
@@ -102,7 +102,7 @@
   }
 
   .things-dialog-form-alert {
-    margin-bottom: 10px;
+    margin-bottom: var(--dc3-space-2);
   }
 
   .param-editor {

@@ -126,7 +126,7 @@ loadMetadata();
 .mcp-overview__copy-line {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--dc3-space-2);
   min-width: 0;
 }
 
@@ -157,7 +157,7 @@ loadMetadata();
 
 .mcp-overview__snippet-code {
   margin: 0;
-  padding: 10px 12px;
+  padding: var(--dc3-space-2) var(--dc3-space-3);
   max-height: 180px;
   overflow: auto;
   background: var(--el-fill-color-light);

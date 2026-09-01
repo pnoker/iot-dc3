@@ -121,7 +121,7 @@ defineExpose({open});
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--dc3-space-2);
   margin-bottom: 12px;
 }
 </style>
