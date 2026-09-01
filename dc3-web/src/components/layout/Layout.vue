@@ -669,7 +669,7 @@ const handleCommand = async (command: string) => {
     }
 
     .breadcrumb {
-      padding: 10px var(--dc3-space-4);
+      padding: var(--dc3-space-2) var(--dc3-space-4);
       margin-bottom: var(--dc3-space-2);
       border: 1px solid var(--dc3-border-base);
       background: var(--dc3-bg-elevated);

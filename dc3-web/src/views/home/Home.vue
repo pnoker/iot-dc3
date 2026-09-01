@@ -402,11 +402,15 @@ const cards = computed<CardModel[]>(() => [
 </script>
 
 <style lang="scss" scoped>
+// One gutter everywhere: 8px (--dc3-space-2) horizontally (el-row gutter
+// and grid gap) and vertically (block rhythm). Header-to-content uses the
+// same 8px via .body padding, so every edge and every gap sits on the
+// same grid.
 .home {
   padding: 0;
 
   .home__row {
-    margin-bottom: var(--dc3-space-3);
+    margin-bottom: var(--dc3-space-2);
 
     &:last-child {
       margin-bottom: 0;
@@ -424,7 +428,7 @@ const cards = computed<CardModel[]>(() => [
     margin-bottom: 0;
 
     @media (max-width: $breakpoint-sm-max) {
-      margin-bottom: 8px;
+      margin-bottom: var(--dc3-space-2);
 
       &:last-child {
         margin-bottom: 0;
@@ -437,7 +441,7 @@ const cards = computed<CardModel[]>(() => [
   // badge sits flush against the stats. Restore the page rhythm
   // so it reads as its own strip, not as a banner appendage.
   .sla-badge {
-    margin-bottom: var(--dc3-space-3);
+    margin-bottom: var(--dc3-space-2);
   }
 
   // Stat indicators: always fit the strip on one line, regardless of how
@@ -447,8 +451,8 @@ const cards = computed<CardModel[]>(() => [
   .home__stats {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: var(--dc3-space-3);
-    margin-bottom: var(--dc3-space-3);
+    gap: var(--dc3-space-2);
+    margin-bottom: var(--dc3-space-2);
 
     @media (max-width: $breakpoint-md-max) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -456,7 +460,6 @@ const cards = computed<CardModel[]>(() => [
 
     @media (max-width: $breakpoint-xs-max) {
       grid-template-columns: 1fr;
-      gap: var(--dc3-space-2);
     }
   }
 }

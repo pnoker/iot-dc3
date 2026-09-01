@@ -28,9 +28,10 @@
 .things-card {
   // Each card sits inside an el-col grid cell; the margin paints the
   // visual spacing between cards. 4px on each side collapses with its
-  // neighbour to 8px horizontal gap, matching the 8px row gap below
-  // (the same rhythm the home / event overview grids use).
-  margin: 0 var(--dc3-space-1) var(--dc3-space-3);
+  // neighbour to the 8px page gutter (--dc3-space-2), so the horizontal
+  // and vertical gaps between cards are the same 8px rhythm used by the
+  // home grid and the el-row gutters.
+  margin: 0 var(--dc3-space-1) var(--dc3-space-2);
   box-sizing: border-box;
 
   .things-card-content {

@@ -81,9 +81,9 @@ defineExpose({refresh: load});
 .sla-badge {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
-  border-radius: 6px;
+  gap: var(--dc3-space-2);
+  padding: var(--dc3-space-2) var(--dc3-space-4);
+  border-radius: var(--dc3-radius-md);
   background: #fdf6ec;
   border: 1px solid #faecd8;
   color: #e6a23c;
@@ -102,9 +102,9 @@ defineExpose({refresh: load});
   .sla-badge__chip {
     display: inline-flex;
     align-items: baseline;
-    gap: 6px;
-    padding: 2px 10px;
-    border-radius: 10px;
+    gap: var(--dc3-space-1);
+    padding: 2px var(--dc3-space-2);
+    border-radius: 999px;
     background: rgba(255, 255, 255, 0.5);
     cursor: pointer;
     transition: background-color 0.12s ease;

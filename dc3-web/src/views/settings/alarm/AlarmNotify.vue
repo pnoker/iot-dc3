@@ -112,7 +112,7 @@
       width="880px"
     >
       <el-form :ref="setFormRef" :model="formModel" :rules="formRules" class="alarm-notify__form" label-position="top">
-        <el-row :gutter="12">
+        <el-row :gutter="8">
           <el-col v-for="field in activeConfig.fields" :key="field.prop" :span="field.span || 12">
             <el-form-item :label="field.label" :prop="field.prop">
               <el-select

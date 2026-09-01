@@ -191,9 +191,11 @@ onUnmounted(() => {
     display: grid;
     grid-template-columns: minmax(210px, 1fr) auto minmax(420px, 1.55fr);
     align-items: center;
-    gap: clamp(16px, 2vw, 28px);
+    // Same 8px scale as the page gutter: 16px between the three banner
+    // areas, 16px padding around the card body.
+    gap: var(--dc3-space-4);
     min-height: 108px;
-    padding: var(--dc3-space-4) clamp(18px, 2vw, 28px);
+    padding: var(--dc3-space-4);
   }
 
   .home-banner__left {
@@ -226,7 +228,7 @@ onUnmounted(() => {
 
   .home-banner__middle {
     text-align: center;
-    padding: 10px var(--dc3-space-5);
+    padding: var(--dc3-space-2) var(--dc3-space-4);
     border: 1px solid var(--dc3-border-base);
     border-radius: var(--dc3-radius-lg);
     background: var(--dc3-bg-muted);
@@ -263,7 +265,7 @@ onUnmounted(() => {
     gap: var(--dc3-space-2);
     flex-wrap: wrap;
     min-width: 0;
-    padding: 7px 9px;
+    padding: var(--dc3-space-2) var(--dc3-space-3);
     border: 1px solid var(--dc3-border-base);
     border-radius: var(--dc3-radius-md);
     background: color-mix(in srgb, var(--dc3-bg-elevated-strong) 62%, transparent);
@@ -331,7 +333,7 @@ onUnmounted(() => {
   @media (max-width: $breakpoint-xs-max) {
     :deep(.el-card__body) {
       grid-template-columns: minmax(0, 1fr);
-      gap: var(--dc3-space-3);
+      gap: var(--dc3-space-2);
       padding: var(--dc3-space-4);
     }
 
@@ -345,7 +347,7 @@ onUnmounted(() => {
       align-items: center;
       justify-content: space-between;
       gap: var(--dc3-space-3);
-      padding: 9px var(--dc3-space-3);
+      padding: var(--dc3-space-2) var(--dc3-space-3);
       text-align: left;
     }
 
