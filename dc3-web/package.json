@@ -25,6 +25,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host --mode dev",
+    "dev:mock": "vite --host --mode mock",
     "dev:prod": "vite --host --mode production",
     "serve:e2e": "vite build --mode dev && node scripts/testing/e2e-server.mjs",
     "build": "vite build",
