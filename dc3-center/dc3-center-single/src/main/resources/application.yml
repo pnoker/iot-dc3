@@ -19,6 +19,8 @@ server:
   port: ${DC3_SINGLE_PORT:8100}
 
 spring:
+  config:
+    import: classpath:application-r2dbc.yml
   application:
     name: @project.artifactId@
   webflux:
@@ -44,7 +46,12 @@ dc3:
         retry-multiplier: ${POINT_RETRY_MULTIPLIER:2}
         retry-max-interval-millis: ${POINT_RETRY_MAX_INTERVAL_MILLIS:10000}
   facade:
-    mode: ${DC3_FACADE_MODE:local}
+    auth:
+      mode: local
+    manager:
+      mode: local
+    data:
+      mode: local
 
 logging:
   file:

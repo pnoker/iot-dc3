@@ -22,7 +22,9 @@ etc. `GrpcFacadeSupport` holds shared response-unwrapping / error-mapping helper
 
 ## Activation
 
-Active when `dc3.facade.mode=grpc` (`DC3_FACADE_MODE`, the default). gRPC channels are configured per service (e.g. the
+Each facade domain is selected independently through `dc3.facade.<domain>.mode`; omitted domain modes default to `grpc`.
+Domain owners use `disabled` rather than creating a self-referential client.
+gRPC channels are configured per service (e.g. the
 auth channel points at `dc3-center-auth:9300`).
 
 ## Dependencies

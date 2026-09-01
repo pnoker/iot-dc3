@@ -28,7 +28,7 @@ import java.util.Map;
  * @author pnoker
  * @since 2016.10.1
  */
-public record AgenticPreparedChatBO(String userMessage, String scopedConversationId,
+public record AgenticPreparedChatBO(String userMessage, String conversationId,
                                     String requestSystemContext, String model,
                                     Map<String, Object> toolContext, Double temperature,
                                     Integer maxTokens,

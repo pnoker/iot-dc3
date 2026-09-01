@@ -1,52 +1,33 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.manager.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.manager.entity.bo.DeviceBO;
-import io.github.pnoker.common.manager.entity.bo.EventAttributeBO;
 import io.github.pnoker.common.manager.entity.bo.EventAttributeConfigBO;
-import io.github.pnoker.common.manager.entity.bo.EventBO;
 import io.github.pnoker.common.manager.entity.builder.EventAttributeConfigBuilder;
-import io.github.pnoker.common.manager.entity.query.EventAttributeConfigQuery;
+import io.github.pnoker.common.manager.entity.query.EventAttributeConfigOffsetRequest;
 import io.github.pnoker.common.manager.entity.vo.EventAttributeConfigVO;
-import io.github.pnoker.common.manager.service.DeviceService;
-import io.github.pnoker.common.manager.service.EventAttributeConfigService;
-import io.github.pnoker.common.manager.service.EventAttributeService;
-import io.github.pnoker.common.manager.service.EventService;
+import io.github.pnoker.common.manager.repository.EventAttributeConfigFilter;
+import io.github.pnoker.common.manager.service.ReactiveDeviceService;
+import io.github.pnoker.common.manager.service.ReactiveEventAttributeConfigService;
+import io.github.pnoker.common.manager.service.ReactiveEventAttributeService;
+import io.github.pnoker.common.manager.service.ReactiveEventService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,262 +38,135 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Manages per-device event attribute configuration values that override the defaults declared on a profile template's event attributes.
- *
- * @author pnoker
- * @since 2016.10.1
- */
-@Tag(name = "event_attribute_config", description = "Event attribute configuration values: set and update per-device customization values for event properties inherited from event attribute definitions")
-@Slf4j
+@Tag(name = "event_attribute_config", description = "Per-device event attribute configuration")
 @RestController
 @RequestMapping(ManagerConstant.EVENT_ATTRIBUTE_CONFIG_URL_PREFIX)
 @RequiredArgsConstructor
 public class EventAttributeConfigController implements BaseController {
+    private final EventAttributeConfigBuilder builder;
+    private final ReactiveEventAttributeConfigService configService;
+    private final ReactiveEventAttributeService attributeService;
+    private final ReactiveEventService eventService;
+    private final ReactiveDeviceService deviceService;
 
-    private final EventAttributeConfigBuilder eventAttributeConfigBuilder;
-
-    private final EventAttributeConfigService eventAttributeConfigService;
-
-    private final DeviceService deviceService;
-
-    private final EventService eventService;
-
-    private final EventAttributeService eventAttributeService;
-
-    /**
-     * Set the configured value of one event attribute field for a specific device and event, overriding the profile template default.
-     *
-     * @param entityVO event attribute config payload to create (attribute, device, event and configured value)
-     * @return add-success status
-     */
     @PreAuthorize("@perm.can('event_attribute_config', 'add')")
-    @Operation(summary = "Add Event Attribute Configuration", description = "Set the configured value of one event attribute field for a specific device and event under the current tenant. Use to override the attribute definition declared on the profile template for that device instance; returns the new config ID.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "false"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(summary = "Add Event Attribute Configuration", description = "Set an event attribute value for one device and event in the current tenant.", extensions = @Extension(name = "x-dc3-ai", properties = {
+            @ExtensionProperty(name = "riskLevel", value = "MEDIUM"), @ExtensionProperty(name = "destructive", value = "false"), @ExtensionProperty(name = "idempotent", value = "false"), @ExtensionProperty(name = "openWorld", value = "false")
+    }))
     @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody EventAttributeConfigVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            EventAttributeConfigBO entityBO = eventAttributeConfigBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(tenantId);
-            eventAttributeConfigService.add(entityBO);
-            return R.ok(SuccessCode.ADD);
-        }));
+    public Mono<EventAttributeConfigVO> add(@Validated(Add.class) @RequestBody EventAttributeConfigVO request) {
+        return principal().zipWith(getTenantId()).map(tuple -> {
+            EventAttributeConfigBO value = builder.buildBOByVO(request);
+            value.setTenantId(tuple.getT2());
+            value.setCreatorId(tuple.getT1().id());
+            value.setCreatorName(tuple.getT1().name());
+            value.setOperatorId(tuple.getT1().id());
+            value.setOperatorName(tuple.getT1().name());
+            return value;
+        }).flatMap(configService::add).map(builder::buildVOByBO);
     }
 
-    /**
-     * Permanently delete one event attribute configuration by ID, scoped to the current tenant.
-     *
-     * @param id id of the event attribute config to delete; must belong to the current tenant
-     * @return delete-success status
-     */
     @PreAuthorize("@perm.can('event_attribute_config', 'delete')")
-    @Operation(summary = "Delete Event Attribute Configuration", description = "Permanently delete one event attribute configuration by ID (tenant-scoped). Removes the device's configured value for that attribute while leaving the attribute definition on the profile template intact; the action cannot be undone.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
-                    @ExtensionProperty(name = "destructive", value = "true"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
-    @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, eventAttributeConfigService.getById(id));
-            eventAttributeConfigService.delete(id);
-            return R.ok(SuccessCode.DELETE);
-        }));
+    @Operation(summary = "Delete Event Attribute Configuration", description = "Delete one event attribute configuration in the current tenant.", extensions = @Extension(name = "x-dc3-ai", properties = {
+            @ExtensionProperty(name = "riskLevel", value = "HIGH"), @ExtensionProperty(name = "destructive", value = "true"), @ExtensionProperty(name = "idempotent", value = "true"), @ExtensionProperty(name = "openWorld", value = "false")
+    }))
+    @DeleteMapping("/delete")
+    public Mono<Void> delete(@Parameter(description = "Configuration identifier scoped to the current tenant.") @NotNull @RequestParam("id") Long id,
+                             @Parameter(description = "Current optimistic-lock version required as a deletion precondition.", example = "0") @NotNull @Min(0) @RequestParam("version") Integer version) {
+        return principal().zipWith(getTenantId()).flatMap(tuple -> configService.delete(tuple.getT2(), id, version, tuple.getT1().id(), tuple.getT1().name()).then());
     }
 
-    /**
-     * Change the configured value of an existing event attribute field for a specific device and event, scoped to the current tenant.
-     *
-     * @param entityVO event attribute config payload carrying the updated value; ownership is verified before applying
-     * @return update-success status
-     */
     @PreAuthorize("@perm.can('event_attribute_config', 'update')")
-    @Operation(summary = "Update Event Attribute Configuration", description = "Change the configured value of an existing event attribute field for a specific device and event under the current tenant. Tenant ownership of the record is verified before applying the update.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
-    @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody EventAttributeConfigVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            EventAttributeConfigBO entityBO = eventAttributeConfigBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, eventAttributeConfigService.getById(entityBO.getId()));
-            eventAttributeConfigService.update(entityBO);
-            return R.ok(SuccessCode.UPDATE);
-        }));
+    @Operation(summary = "Update Event Attribute Configuration", description = "Update a event attribute value with optimistic locking in the current tenant.", extensions = @Extension(name = "x-dc3-ai", properties = {
+            @ExtensionProperty(name = "riskLevel", value = "MEDIUM"), @ExtensionProperty(name = "destructive", value = "false"), @ExtensionProperty(name = "idempotent", value = "true"), @ExtensionProperty(name = "openWorld", value = "false")
+    }))
+    @PatchMapping("/update")
+    public Mono<EventAttributeConfigVO> update(@Validated(Update.class) @RequestBody EventAttributeConfigVO request) {
+        return principal().zipWith(getTenantId()).map(tuple -> {
+            EventAttributeConfigBO value = builder.buildBOByVO(request);
+            value.setTenantId(tuple.getT2());
+            value.setOperatorId(tuple.getT1().id());
+            value.setOperatorName(tuple.getT1().name());
+            return value;
+        }).flatMap(configService::update).map(builder::buildVOByBO);
     }
 
-    /**
-     * Fetch one event attribute configuration by its record ID, scoped to the current tenant.
-     *
-     * @param id id of the event attribute config to fetch; must belong to the current tenant
-     * @return the matched EventAttributeConfigVO; fails if not found or not tenant-owned
-     */
     @PreAuthorize("@perm.can('event_attribute_config', 'get')")
-    @Operation(summary = "Get Event Attribute Configuration by ID", description = "Fetch one event attribute configuration by its record ID (tenant-scoped). Use to inspect the configured value a device uses for a single event attribute field.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(summary = "Get Event Attribute Configuration", description = "Fetch one event attribute configuration by identifier in the current tenant.", extensions = @Extension(name = "x-dc3-ai", properties = {
+            @ExtensionProperty(name = "riskLevel", value = "LOW"), @ExtensionProperty(name = "destructive", value = "false"), @ExtensionProperty(name = "idempotent", value = "true"), @ExtensionProperty(name = "openWorld", value = "false")
+    }))
     @GetMapping("/get_by_id")
-    public Mono<R<EventAttributeConfigVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            EventAttributeConfigBO entityBO = requireTenant(tenantId, eventAttributeConfigService.getById(id));
-            EventAttributeConfigVO entityVO = eventAttributeConfigBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
-        }));
+    public Mono<EventAttributeConfigVO> getById(@Parameter(description = "Configuration identifier scoped to the current tenant.") @NotNull @RequestParam("id") Long id) {
+        return getTenantId().flatMap(tenantId -> configService.getById(tenantId, id).map(builder::buildVOByBO));
     }
 
-    /**
-     * Fetch the configured value of one event attribute field by its attribute, device and event IDs, scoped to the current tenant.
-     *
-     * @param attributeId id of the event attribute whose configured value is being fetched; its driver must match the device's driver
-     * @param deviceId    id of the device whose configured value is being fetched; its profile must match the event's profile
-     * @param eventId     id of the event whose attribute value is being fetched
-     * @return the matched EventAttributeConfigVO; fails if the device/event/attribute triple is invalid or not tenant-owned
-     */
     @PreAuthorize("@perm.can('event_attribute_config', 'get')")
-    @Operation(summary = "Get Event Attribute Configuration by Attribute, Device, and Event IDs",
-            description = "Fetch the configured value of one event attribute field for a specific device, event, " +
-                    "and attribute. Validates that the device's profile matches the event and its driver matches " +
-                    "the attribute before returning; use when you need a single attribute's device-specific override.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(summary = "Get Event Attribute Configuration by Device and Event", description = "Fetch a event attribute configuration by device, event, and attribute identifiers in the current tenant.", extensions = @Extension(name = "x-dc3-ai", properties = {
+            @ExtensionProperty(name = "riskLevel", value = "LOW"), @ExtensionProperty(name = "destructive", value = "false"), @ExtensionProperty(name = "idempotent", value = "true"), @ExtensionProperty(name = "openWorld", value = "false")
+    }))
     @GetMapping("/get_by_attribute_id_and_device_id_and_event_id")
-    public Mono<R<EventAttributeConfigVO>> getByAttributeIdAndDeviceIdAndEventId(
-            @Parameter(description = "Identifier of the event attribute whose configured value is being fetched; its driver must match the device's driver.", example = "1024") @NotNull @RequestParam(value = "attribute_id") Long attributeId,
-            @Parameter(description = "Identifier of the device whose configured value is being fetched; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId,
-            @Parameter(description = "Identifier of the event whose attribute value is being fetched; its profile must match the device's profile.", example = "1024") @NotNull @RequestParam(value = "event_id") Long eventId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireEventConfigRelations(tenantId, deviceId, eventId, attributeId);
-            EventAttributeConfigBO entityBO = eventAttributeConfigService
-                    .getByAttributeIdAndDeviceIdAndEventId(attributeId, deviceId, eventId);
-            requireTenant(tenantId, entityBO);
-            EventAttributeConfigVO entityVO = eventAttributeConfigBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
-        }));
+    public Mono<EventAttributeConfigVO> getByTuple(
+            @Parameter(description = "Event attribute identifier scoped to the current tenant.") @RequestParam("attribute_id") Long attributeId,
+            @Parameter(description = "Device identifier scoped to the current tenant.") @RequestParam("device_id") Long deviceId,
+            @Parameter(description = "Event identifier scoped to the current tenant.") @RequestParam("event_id") Long eventId) {
+        return getTenantId().flatMap(tenantId -> validateRelations(tenantId, deviceId, eventId, attributeId)
+                .then(configService.getByAttributeIdAndDeviceIdAndEventId(tenantId, attributeId, deviceId, eventId))
+                .map(builder::buildVOByBO));
     }
 
-    /**
-     * Return every event attribute configuration for one device and one event, scoped to the current tenant.
-     *
-     * @param deviceId id of the device whose configurations are listed; its profile must match the event's profile
-     * @param eventId  id of the event whose configurations are listed
-     * @return a list of EventAttributeConfigVO for the device-event pair
-     */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
-    @Operation(summary = "List Event Attribute Configurations by Device and Event IDs", description = "Return every event attribute configuration for one device and one event (tenant-scoped). Use to read all configured values the device supplies for that event's attributes; the device's profile must match the event.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
-    @GetMapping("/list_by_device_id_and_event_id")
-    public Mono<R<List<EventAttributeConfigVO>>> listByDeviceIdAndEventId(
-            @Parameter(description = "Identifier of the device whose configurations are listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId,
-            @Parameter(description = "Identifier of the event whose configurations are listed; its profile must match the device's profile.", example = "1024") @NotNull @RequestParam(value = "event_id") Long eventId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireEventConfigRelations(tenantId, deviceId, eventId, null);
-            List<EventAttributeConfigBO> entityBOList = filterTenant(tenantId,
-                    eventAttributeConfigService.listByDeviceIdAndEventId(deviceId, eventId));
-            List<EventAttributeConfigVO> entityVOList = eventAttributeConfigBuilder.buildVOListByBOList(entityBOList);
-            return R.ok(entityVOList);
-        }));
-    }
-
-    /**
-     * Return every event attribute configuration for one device across all of its events, scoped to the current tenant.
-     *
-     * @param deviceId id of the device whose configurations are listed; must belong to the current tenant
-     * @return a list of EventAttributeConfigVO set on the device
-     */
-    @PreAuthorize("@perm.can('event_attribute_config', 'list')")
-    @Operation(summary = "List Event Attribute Configurations by Device ID", description = "Return every event attribute configuration for one device across all of its events (tenant-scoped). Use to read the full set of configured event-attribute values a device uses.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(summary = "List Event Attribute Configurations by Device", description = "List configurations attached to one device in the current tenant.", extensions = @Extension(name = "x-dc3-ai", properties = {
+            @ExtensionProperty(name = "riskLevel", value = "LOW"), @ExtensionProperty(name = "destructive", value = "false"), @ExtensionProperty(name = "idempotent", value = "true"), @ExtensionProperty(name = "openWorld", value = "false")
+    }))
     @GetMapping("/list_by_device_id")
-    public Mono<R<List<EventAttributeConfigVO>>> listByDeviceId(
-            @Parameter(description = "Identifier of the device whose configurations are listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, deviceService.getById(deviceId));
-            List<EventAttributeConfigBO> entityBOList = filterTenant(tenantId,
-                    eventAttributeConfigService.listByDeviceId(deviceId));
-            List<EventAttributeConfigVO> entityVOList = eventAttributeConfigBuilder.buildVOListByBOList(entityBOList);
-            return R.ok(entityVOList);
-        }));
+    public Mono<List<EventAttributeConfigVO>> listByDeviceId(
+            @Parameter(description = "Device identifier scoped to the current tenant.") @RequestParam("device_id") Long deviceId) {
+        return getTenantId().flatMap(tenantId -> deviceService.getById(tenantId, deviceId)
+                .thenMany(configService.listByDeviceId(tenantId, deviceId)).map(builder::buildVOByBO).collectList());
     }
 
-    /**
-     * Page through event attribute configurations for the current tenant with filters from the query body.
-     *
-     * @param entityQuery optional query filters; null treated as empty
-     * @return a page of EventAttributeConfigVO matching the query
-     */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
-    @Operation(summary = "List Event Attribute Configurations", description = "Page through event attribute configurations for the current tenant with filters from the query body. Returns a page of configurations; use for browsing or selecting a target configuration.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(summary = "List Event Attribute Configurations by Device and Event", description = "List configurations attached to one device and event in the current tenant.", extensions = @Extension(name = "x-dc3-ai", properties = {
+            @ExtensionProperty(name = "riskLevel", value = "LOW"), @ExtensionProperty(name = "destructive", value = "false"), @ExtensionProperty(name = "idempotent", value = "true"), @ExtensionProperty(name = "openWorld", value = "false")
+    }))
+    @GetMapping("/list_by_device_id_and_event_id")
+    public Mono<List<EventAttributeConfigVO>> listByDeviceIdAndEventId(
+            @Parameter(description = "Device identifier scoped to the current tenant.") @RequestParam("device_id") Long deviceId,
+            @Parameter(description = "Event identifier scoped to the current tenant.") @RequestParam("event_id") Long eventId) {
+        return getTenantId().flatMap(tenantId -> validateDeviceEvent(tenantId, deviceId, eventId)
+                .thenMany(configService.listByDeviceIdAndEventId(tenantId, deviceId, eventId)).map(builder::buildVOByBO).collectList());
+    }
+
+    @PreAuthorize("@perm.can('event_attribute_config', 'list')")
+    @Operation(summary = "List Event Attribute Configurations", description = "Page through event attribute configurations using offset and limit in the current tenant.", extensions = @Extension(name = "x-dc3-ai", properties = {
+            @ExtensionProperty(name = "riskLevel", value = "LOW"), @ExtensionProperty(name = "destructive", value = "false"), @ExtensionProperty(name = "idempotent", value = "true"), @ExtensionProperty(name = "openWorld", value = "false")
+    }))
     @PostMapping("/list")
-    public Mono<R<Page<EventAttributeConfigVO>>> list(
-            @RequestBody(required = false) EventAttributeConfigQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            EventAttributeConfigQuery query = Objects.isNull(entityQuery) ? new EventAttributeConfigQuery()
-                    : entityQuery;
-            query.setTenantId(tenantId);
-            Page<EventAttributeConfigBO> entityPageBO = eventAttributeConfigService.list(query);
-            Page<EventAttributeConfigVO> entityPageVO = eventAttributeConfigBuilder
-                    .buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
-        }));
+    public Mono<OffsetPage<EventAttributeConfigVO>> list(@RequestBody(required = false) EventAttributeConfigOffsetRequest request) {
+        EventAttributeConfigOffsetRequest query = request == null ? new EventAttributeConfigOffsetRequest() : request;
+        return getTenantId().flatMap(tenantId -> configService.list(new EventAttributeConfigFilter(tenantId, query.attributeId(), query.deviceId(), query.eventId(), query.enableFlag(), query.version(), query.offset(), query.limit(), query.sort()))
+                .map(page -> OffsetPage.of(page.items().stream().map(builder::buildVOByBO).toList(), page.offset(), page.limit(), page.total())));
     }
 
-    /**
-     * Validate that device, event, and (optional) attribute belong to the tenant,
-     * share a profile, and that the attribute's driver matches the device's driver.
-     *
-     * @param tenantId    tenant scope
-     * @param deviceId    the device to validate
-     * @param eventId     the event to validate
-     * @param attributeId the attribute to validate, may be null to skip
-     */
-    private void requireEventConfigRelations(Long tenantId, Long deviceId, Long eventId, Long attributeId) {
-        DeviceBO deviceBO = requireTenant(tenantId, deviceService.getById(deviceId));
-        EventBO eventBO = requireTenant(tenantId, eventService.getById(eventId));
-        if (Objects.isNull(deviceBO.getProfileId()) || !Objects.equals(deviceBO.getProfileId(), eventBO.getProfileId())) {
-            throw new NotFoundException("Resource does not exist");
-        }
-
-        if (Objects.nonNull(attributeId)) {
-            EventAttributeBO attributeBO = requireTenant(tenantId, eventAttributeService.getById(attributeId));
-            if (!Objects.equals(deviceBO.getDriverId(), attributeBO.getDriverId())) {
-                throw new NotFoundException("Resource does not exist");
-            }
-        }
+    private Mono<Void> validateRelations(Long tenantId, Long deviceId, Long eventId, Long attributeId) {
+        return Mono.defer(() -> Mono.zip(deviceService.getById(tenantId, deviceId), eventService.getById(tenantId, eventId)))
+                .switchIfEmpty(Mono.error(new NotFoundException("Resource does not exist")))
+                .flatMap(tuple -> {
+                    DeviceEvent relation = new DeviceEvent(tuple.getT1(), tuple.getT2());
+                    if (!Objects.equals(relation.device().getProfileId(), relation.event().getProfileId())) return Mono.error(new NotFoundException("Resource does not exist"));
+                    return attributeService.getById(tenantId, attributeId)
+                            .switchIfEmpty(Mono.error(new NotFoundException("Resource does not exist")))
+                            .flatMap(attribute -> Objects.equals(attribute.getDriverId(), relation.device().getDriverId()) ? Mono.empty() : Mono.error(new NotFoundException("Resource does not exist")));
+                });
     }
 
+    private Mono<Void> validateDeviceEvent(Long tenantId, Long deviceId, Long eventId) {
+        return Mono.defer(() -> Mono.zip(deviceService.getById(tenantId, deviceId), eventService.getById(tenantId, eventId)))
+                .switchIfEmpty(Mono.error(new NotFoundException("Resource does not exist")))
+                .flatMap(tuple -> Objects.equals(tuple.getT1().getProfileId(), tuple.getT2().getProfileId()) ? Mono.empty() : Mono.error(new NotFoundException("Resource does not exist")));
+    }
+
+    private Mono<Principal> principal() { return Mono.zip(getUserId().defaultIfEmpty(0L), getUserName().defaultIfEmpty(""), Principal::new); }
+    private record Principal(Long id, String name) { }
+    private record DeviceEvent(io.github.pnoker.common.manager.entity.bo.DeviceBO device, io.github.pnoker.common.manager.entity.bo.EventBO event) { }
 }

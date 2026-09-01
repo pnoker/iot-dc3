@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
+import reactor.core.publisher.Mono;
 
 /**
  * Persists driver alarm events to {@code dc3_entity_alarm} and feeds the rule pipeline.
@@ -32,6 +33,6 @@ public interface DriverAlarmService {
      *
      * @param entityDTO DriverAlarmDTO
      */
-    void alarm(DriverAlarmDTO entityDTO);
+    Mono<Void> alarm(DriverAlarmDTO entityDTO);
 
 }

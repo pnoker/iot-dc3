@@ -17,14 +17,13 @@
 
 package io.github.pnoker.common.data.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.CursorPage;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.data.entity.builder.PointValueBuilder;
 import io.github.pnoker.common.data.entity.vo.PointValueVO;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,7 +42,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -79,14 +77,14 @@ public class PointValueController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/latest")
-    public Mono<R<Page<PointValueVO>>> latest(@RequestBody PointValueQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<OffsetPage<PointValueVO>> latest(@RequestBody(required = false) PointValueQuery entityQuery) {
+        return getTenantId().flatMap(tenantId -> {
             PointValueQuery query = Objects.isNull(entityQuery) ? new PointValueQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<PointValueBO> entityPageBO = pointValueService.latest(query);
-            Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
-        }));
+            return pointValueService.latest(query)
+                    .map(page -> OffsetPage.of(page.items().stream().map(pointValueBuilder::buildVOByBO).toList(),
+                            page.offset(), page.limit(), page.total()));
+        });
     }
 
     /**
@@ -105,14 +103,14 @@ public class PointValueController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<PointValueVO>>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<CursorPage<PointValueVO>> list(@RequestBody(required = false) PointValueQuery entityQuery) {
+        return getTenantId().flatMap(tenantId -> {
             PointValueQuery query = Objects.isNull(entityQuery) ? new PointValueQuery() : entityQuery;
             query.setTenantId(tenantId);
-            Page<PointValueBO> entityPageBO = pointValueService.page(query);
-            Page<PointValueVO> entityPageVO = pointValueBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
-        }));
+            return pointValueService.page(query)
+                    .map(page -> CursorPage.of(page.items().stream().map(pointValueBuilder::buildVOByBO).toList(),
+                            page.nextCursor()));
+        });
     }
 
     /**
@@ -132,15 +130,19 @@ public class PointValueController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @GetMapping("/list_history_by_device_id_and_point_id")
-    public Mono<R<List<PointValueBO>>> history(@Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024") @NotNull @RequestParam(name = "device_id") Long deviceId,
-                                               @Parameter(description = "Identifier of the point whose history is being queried; must belong to a profile attached to the device", example = "2048") @NotNull @RequestParam(name = "point_id") Long pointId,
-                                               @Parameter(description = "Maximum number of historical values to return; defaults to 100 when omitted", example = "100")
-                                               @RequestParam(name = "count", required = false, defaultValue = "100") Integer count) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            List<PointValueBO> history = pointValueService.history(tenantId, deviceId, pointId, count);
-            return R.ok(history);
-        }));
+    @GetMapping("/history")
+    public Mono<CursorPage<PointValueVO>> history(
+            @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
+            @NotNull @RequestParam(name = "device_id") Long deviceId,
+            @Parameter(description = "Identifier of the point; must belong to the device profile", example = "2048")
+            @NotNull @RequestParam(name = "point_id") Long pointId,
+            @Parameter(description = "Opaque cursor returned by the previous page")
+            @RequestParam(name = "cursor", required = false) String cursor,
+            @Parameter(description = "Page size from 1 through 500", example = "100")
+            @RequestParam(name = "limit", required = false, defaultValue = "100") Integer limit) {
+        return getTenantId().flatMap(tenantId -> pointValueService.history(tenantId, deviceId, pointId, cursor, limit)
+                .map(page -> CursorPage.of(page.items().stream().map(pointValueBuilder::buildVOByBO).toList(),
+                        page.nextCursor())));
     }
 
 }

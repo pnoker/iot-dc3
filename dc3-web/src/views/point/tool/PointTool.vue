@@ -139,11 +139,11 @@ const profileLoading = ref(false);
 const profileDictionary = (query?: string) => {
   profileLoading.value = true;
   listProfileDictionary({
-    page: {size: 50, current: 1},
+    offset: 0, limit: 50,
     label: query || '',
   })
     .then((res) => {
-      profileDictionaries.value = res.data.records;
+      profileDictionaries.value = res.items;
     })
     .catch(() => {
       // nothing to do

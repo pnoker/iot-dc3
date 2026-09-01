@@ -27,7 +27,7 @@ import {ref} from 'vue';
  *   const { loading, run } = useAsyncLoader();
  *   const load = () => run(async () => {
  *     const res = await someApi();
- *     rows.value = res.data;
+ *     rows.value = res;
  *   });
  * </pre>
  *

@@ -66,9 +66,9 @@ describe('auth store', () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
 
-    tokenMocks.generateSalt.mockResolvedValue({data: 'salt-abc'});
-    tokenMocks.generateToken.mockResolvedValue({data: 'token-xyz'});
-    tokenMocks.cancelToken.mockResolvedValue({data: true});
+    tokenMocks.generateSalt.mockResolvedValue('salt-abc');
+    tokenMocks.generateToken.mockResolvedValue('token-xyz');
+    tokenMocks.cancelToken.mockResolvedValue(true);
   });
 
   describe('login', () => {

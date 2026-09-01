@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.CommandAttributeExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
@@ -27,7 +26,6 @@ import io.github.pnoker.common.manager.entity.model.CommandAttributeDO;
 import io.github.pnoker.common.manager.entity.vo.CommandAttributeVO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -174,24 +172,6 @@ public interface CommandAttributeBuilder {
      */
     List<CommandAttributeVO> buildVOListByBOList(List<CommandAttributeBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    default Page<CommandAttributeBO> buildBOPageByDOPage(Page<CommandAttributeDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<CommandAttributeVO> buildVOPageByBOPage(Page<CommandAttributeBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
 }

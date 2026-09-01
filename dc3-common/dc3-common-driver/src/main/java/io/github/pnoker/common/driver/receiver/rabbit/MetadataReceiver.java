@@ -34,6 +34,7 @@ import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -62,17 +63,13 @@ public class MetadataReceiver {
     /**
      * Receive and process metadata events from RabbitMQ queue
      *
-     * @param channel   RabbitMQ channel
-     * @param message   RabbitMQ message
-     * @param entityDTO Metadata event data transfer object
+     * @param message broker-neutral metadata delivery
+     * @param ack     poison-message disposition selector
      */
     @Dc3Listener(topic = MqTopic.METADATA, mode = SubscriptionMode.BROADCAST, group = "${dc3.driver.client}", keyPattern = "${dc3.driver.service}")
-    public void metadataReceive(MqReceived<MetadataEventDTO> message, Acknowledgment ack) {
+    public Mono<Void> metadataReceive(MqReceived<MetadataEventDTO> message, Acknowledgment ack) {
         MetadataEventDTO entityDTO = message.payload();
-        try {
-            // Validate metadata event first: the debug log below dereferences entityDTO,
-            // so a null payload must be rejected before logging to avoid an NPE that
-            // would otherwise fall through to the nack(requeue) path and requeue garbage.
+        return Mono.defer(() -> {
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getId())
                     || Objects.isNull(entityDTO.getMetadataType())
                     || Objects.isNull(entityDTO.getOperateType())) {
@@ -81,81 +78,94 @@ public class MetadataReceiver {
                         Objects.nonNull(entityDTO) ? entityDTO.getMetadataType() : null,
                         Objects.nonNull(entityDTO) ? entityDTO.getOperateType() : null);
                 ack.reject(false);
-                return;
+                return Mono.empty();
             }
 
             log.debug("Receive driver metadata: id={}, type={}, operate={}",
                     entityDTO.getId(), entityDTO.getMetadataType(), entityDTO.getOperateType());
 
-            // Handle device metadata events
             if (MetadataTypeEnum.DEVICE.equals(entityDTO.getMetadataType())) {
-                if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
-                        || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
-                    log.debug("Device metadata upserted, deviceId={}", entityDTO.getId());
-                    // Metadata events invalidate/load data only. Ownership is assigned by
-                    // the Manager lease service and is never inferred from an ADD event.
-                    deviceMetadata.loadCache(entityDTO.getId());
-                } else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
-                    log.debug("Device metadata deleted, deviceId={}", entityDTO.getId());
-                    // Remove the id before invalidating the cache so a Quartz scan
-                    // hitting the cache between the two operations does not re-fetch
-                    // the doomed device through the loader.
-                    driverMetadata.removeDeviceId(entityDTO.getId());
-                    deviceMetadata.removeCache(entityDTO.getId());
-                }
-
-                // Publish device metadata event
-                metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.DEVICE,
-                        entityDTO.getOperateType()));
+                return processDevice(entityDTO);
             }
-            // Handle point metadata events
-            else if (MetadataTypeEnum.POINT.equals(entityDTO.getMetadataType())) {
-                if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
-                        || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
-                    log.debug("Point metadata upserted, pointId={}", entityDTO.getId());
-                    pointMetadata.loadCache(entityDTO.getId());
-                } else if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
-                    log.debug("Point metadata deleted, pointId={}", entityDTO.getId());
-                    pointMetadata.removeCache(entityDTO.getId());
-                }
-
-                // Publish point metadata event
-                metadataEventPublisher.publishEvent(
-                        new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.POINT, entityDTO.getOperateType()));
-            } else if (MetadataTypeEnum.DRIVER.equals(entityDTO.getMetadataType())) {
-                if (MetadataOperateTypeEnum.DELETE.equals(entityDTO.getOperateType())) {
-                    log.debug("Driver metadata deleted, driverId={}", entityDTO.getId());
-                    driverMetadata.clear();
-                    deviceMetadata.clearCache();
-                    pointMetadata.clearCache();
-                } else if (MetadataOperateTypeEnum.ADD.equals(entityDTO.getOperateType())
-                        || MetadataOperateTypeEnum.UPDATE.equals(entityDTO.getOperateType())) {
-                    log.debug("Driver metadata refreshed, driverId={}", entityDTO.getId());
-                    driverClient.refreshMetadata(entityDTO.getId());
-                }
-
-                metadataEventPublisher.publishEvent(
-                        new MetadataEvent(this, entityDTO.getId(), MetadataTypeEnum.DRIVER, entityDTO.getOperateType()));
-            } else if (MetadataTypeEnum.COMMAND.equals(entityDTO.getMetadataType())
+            if (MetadataTypeEnum.POINT.equals(entityDTO.getMetadataType())) {
+                return processPoint(entityDTO);
+            }
+            if (MetadataTypeEnum.DRIVER.equals(entityDTO.getMetadataType())) {
+                return processDriver(entityDTO);
+            }
+            if (MetadataTypeEnum.COMMAND.equals(entityDTO.getMetadataType())
                     || MetadataTypeEnum.EVENT.equals(entityDTO.getMetadataType())) {
                 log.debug("Driver metadata event forwarded, type={}, id={}",
                         entityDTO.getMetadataType(), entityDTO.getId());
-                metadataEventPublisher.publishEvent(new MetadataEvent(this, entityDTO.getId(), entityDTO.getMetadataType(),
-                        entityDTO.getOperateType()));
-            } else {
-                log.error("Driver metadata event rejected, reason=unsupportedType, type={}",
-                        entityDTO.getMetadataType());
-                ack.reject(false);
-                return;
+                return publishEvent(entityDTO);
             }
-            ack.ack();
-        } catch (Exception e) {
-            log.error("Driver metadata consume failed, metadataType={}, operateType={}, id={}",
-                    Objects.nonNull(entityDTO) ? entityDTO.getMetadataType() : null,
-                    Objects.nonNull(entityDTO) ? entityDTO.getOperateType() : null,
-                    Objects.nonNull(entityDTO) ? entityDTO.getId() : null, e);
-            ack.reject(true);
+            log.error("Driver metadata event rejected, reason=unsupportedType, type={}",
+                    entityDTO.getMetadataType());
+            ack.reject(false);
+            return Mono.empty();
+        }).doOnError(error -> log.error("Driver metadata consume failed, metadataType={}, operateType={}, id={}",
+                Objects.nonNull(entityDTO) ? entityDTO.getMetadataType() : null,
+                Objects.nonNull(entityDTO) ? entityDTO.getOperateType() : null,
+                Objects.nonNull(entityDTO) ? entityDTO.getId() : null, error));
+    }
+
+    private Mono<Void> processDevice(MetadataEventDTO event) {
+        Mono<?> operation;
+        if (MetadataOperateTypeEnum.ADD.equals(event.getOperateType())
+                || MetadataOperateTypeEnum.UPDATE.equals(event.getOperateType())) {
+            log.debug("Device metadata upserted, deviceId={}", event.getId());
+            operation = deviceMetadata.refreshCache(event.getId());
+        } else if (MetadataOperateTypeEnum.DELETE.equals(event.getOperateType())) {
+            operation = Mono.fromRunnable(() -> {
+                log.debug("Device metadata deleted, deviceId={}", event.getId());
+                driverMetadata.removeDeviceId(event.getId());
+                deviceMetadata.removeCache(event.getId());
+            });
+        } else {
+            operation = Mono.empty();
         }
+        return operation.then(publishEvent(event));
+    }
+
+    private Mono<Void> processPoint(MetadataEventDTO event) {
+        Mono<?> operation;
+        if (MetadataOperateTypeEnum.ADD.equals(event.getOperateType())
+                || MetadataOperateTypeEnum.UPDATE.equals(event.getOperateType())) {
+            log.debug("Point metadata upserted, pointId={}", event.getId());
+            operation = pointMetadata.refreshCache(event.getId());
+        } else if (MetadataOperateTypeEnum.DELETE.equals(event.getOperateType())) {
+            operation = Mono.fromRunnable(() -> {
+                log.debug("Point metadata deleted, pointId={}", event.getId());
+                pointMetadata.removeCache(event.getId());
+            });
+        } else {
+            operation = Mono.empty();
+        }
+        return operation.then(publishEvent(event));
+    }
+
+    private Mono<Void> processDriver(MetadataEventDTO event) {
+        Mono<Void> operation;
+        if (MetadataOperateTypeEnum.DELETE.equals(event.getOperateType())) {
+            operation = Mono.fromRunnable(() -> {
+                log.debug("Driver metadata deleted, driverId={}", event.getId());
+                driverMetadata.clear();
+                deviceMetadata.clearCache();
+                pointMetadata.clearCache();
+            });
+        } else if (MetadataOperateTypeEnum.ADD.equals(event.getOperateType())
+                || MetadataOperateTypeEnum.UPDATE.equals(event.getOperateType())) {
+            log.debug("Driver metadata refreshed, driverId={}", event.getId());
+            operation = driverClient.refreshMetadata(event.getId());
+        } else {
+            operation = Mono.empty();
+        }
+        return operation.then(publishEvent(event));
+    }
+
+    private Mono<Void> publishEvent(MetadataEventDTO event) {
+        return Mono.fromRunnable(() -> metadataEventPublisher.publishEvent(
+                new MetadataEvent(this, event.getTenantId(), event.getId(), event.getMetadataType(), event.getOperateType())));
     }
 
 }

@@ -113,11 +113,9 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     const config = activeConfig.value;
     const params = cleanSearchParams(searchForm);
     const result: PageQuery = {
-      page: {
-        current: state.page.current,
-        size: state.page.size,
-        orders: state.page.orders,
-      },
+      offset: (state.page.current - 1) * state.page.size,
+      limit: state.page.size,
+      sort: state.page.orders.map((order) => ({field: order.column, direction: order.asc ? 'ASC' : 'DESC'})),
     };
     if (config.searchProp && params.keyword) {
       result[config.searchProp] = String(params.keyword).trim();
@@ -132,10 +130,9 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     state.loading = true;
     activeConfig.value
       .list(query())
-      .then((res: R) => {
-        const page = (res.data ?? {}) as { records?: AlarmEntity[]; total?: number };
-        state.rows = page.records || [];
-        state.page.total = Number(page.total || 0);
+      .then((page: {items: AlarmEntity[]; total: number}) => {
+        state.rows = page.items;
+        state.page.total = page.total;
       })
       .catch(() => {
         // handled globally

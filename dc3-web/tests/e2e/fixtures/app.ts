@@ -27,12 +27,7 @@ export interface PageHealth {
 
 interface ApiResult<T = unknown> {
   status: number;
-  data: {
-    ok?: boolean;
-    code?: number;
-    message?: string;
-    data?: T;
-  };
+  data: T;
 }
 
 interface EntitySeed {
@@ -41,6 +36,7 @@ interface EntitySeed {
   deleteUrl: string;
   nameField: string;
   body: Record<string, unknown>;
+  versioned?: boolean;
 }
 
 interface MenuSeed {
@@ -250,6 +246,55 @@ export async function apiGet<T = unknown>(
   return {status: response.status, data} as ApiResult<T>;
 }
 
+export async function apiDelete<T = unknown>(
+  page: Page,
+  url: string,
+  params: Record<string, string | number | boolean | undefined> = {}
+) {
+  const response = await page.evaluate(
+    async ({requestUrl, requestParams}) => {
+      const decodeStorage = (key: string) => {
+        const raw = localStorage.getItem(key);
+        if (!raw) return undefined;
+        return JSON.parse(atob(raw)).content;
+      };
+      const target = new URL(requestUrl, window.location.origin);
+      Object.entries(requestParams).forEach(([key, value]) => {
+        if (value !== undefined) target.searchParams.set(key, String(value));
+      });
+      const targetUrl =
+        target.origin === window.location.origin ? `${target.pathname}${target.search}` : target.toString();
+      const headers: Record<string, string> = {Accept: 'application/json'};
+      const tenant = decodeStorage('X-Auth-Tenant');
+      const login = decodeStorage('X-Auth-Login');
+      const token = decodeStorage('X-Auth-Token');
+      if (tenant) headers['X-Auth-Tenant'] = tenant;
+      if (login) headers['X-Auth-Login'] = login;
+      if (token) headers['X-Auth-Token'] = JSON.stringify(token);
+      const result = await fetch(targetUrl, {method: 'DELETE', headers});
+      return {status: result.status, text: await result.text()};
+    },
+    {requestUrl: url, requestParams: params}
+  );
+
+  let data: unknown;
+  try {
+    data = JSON.parse(response.text);
+  } catch {
+    data = response.text;
+  }
+  return {status: response.status, data} as ApiResult<T>;
+}
+
+export async function deleteVersionedEntity(page: Page, baseUrl: string, id: string) {
+  const current = await apiGet<{version?: unknown}>(page, `${baseUrl}/get_by_id`, {id});
+  const version = Number(current.data?.version);
+  if (!Number.isInteger(version) || version < 0) {
+    throw new Error(`Cannot delete ${baseUrl}/${id}: current version is missing`);
+  }
+  return apiDelete(page, `${baseUrl}/delete`, {id, version});
+}
+
 function idOf(record: unknown) {
   if (!record || typeof record !== 'object' || !('id' in record)) return undefined;
   const id = (record as { id?: unknown }).id;
@@ -257,33 +302,27 @@ function idOf(record: unknown) {
 }
 
 async function firstRecord(page: Page, url: string) {
-  const response = await apiPost(page, url, {page: {current: 1, size: 1}});
-  const payload = response.data as { ok?: boolean; data?: { records?: unknown[] } };
-  if (!payload?.ok) return undefined;
-  return payload.data?.records?.[0];
+  const response = await apiPost<{items?: unknown[]}>(page, url, {offset: 0, limit: 1});
+  return response.status < 300 ? response.data?.items?.[0] : undefined;
 }
 
 async function firstArrayRecord(page: Page, url: string) {
   const response = await apiGet<unknown[]>(page, url);
-  const payload = response.data as { ok?: boolean; data?: unknown[] };
-  if (!payload?.ok) return undefined;
-  return payload.data?.[0];
+  return response.status < 300 ? response.data?.[0] : undefined;
 }
 
 async function listByName(page: Page, url: string, nameField: string, name: string) {
-  const response = await apiPost<{ records?: unknown[] }>(page, url, {
-    page: {current: 1, size: 1},
+  const response = await apiPost<{items?: unknown[]}>(page, url, {
+    offset: 0, limit: 1,
     [nameField]: name,
   });
-  if (!response.data?.ok) return undefined;
-  return response.data.data?.records?.[0];
+  return response.status < 300 ? response.data?.items?.[0] : undefined;
 }
 
 async function arrayRecordByName(page: Page, url: string, nameField: string, name: string) {
   const response = await apiGet<unknown[]>(page, url);
-  const payload = response.data as { ok?: boolean; data?: unknown[] };
-  if (!payload?.ok) return undefined;
-  return payload.data?.find((record) => {
+  if (response.status >= 300) return undefined;
+  return response.data?.find((record) => {
     if (!record || typeof record !== 'object') return false;
     return String((record as Record<string, unknown>)[nameField] ?? '') === name;
   });
@@ -299,17 +338,22 @@ async function createEntity(page: Page, seed: EntitySeed, cleanupStack: Array<()
   if (idOf(existing)) return idOf(existing);
 
   const add = await apiPost(page, seed.addUrl, seed.body);
-  if (!add.data?.ok) {
+  if (add.status >= 300) {
     throw new Error(`Failed to seed ${seed.addUrl}: ${JSON.stringify(add.data)}`);
   }
 
-  const createdId = idOf(add.data.data) || idOf(await listByName(page, seed.listUrl, seed.nameField, name));
+  const createdId = idOf(add.data) || idOf(await listByName(page, seed.listUrl, seed.nameField, name));
   if (!createdId) {
     throw new Error(`Seeded ${seed.addUrl} but could not resolve created id for ${name}`);
   }
 
   cleanupStack.push(async () => {
-    await apiPost(page, seed.deleteUrl, {}, {id: createdId}).catch(() => undefined);
+    const baseUrl = seed.deleteUrl.replace(/\/delete$/, '');
+    if (seed.versioned) {
+      await deleteVersionedEntity(page, baseUrl, createdId).catch(() => undefined);
+    } else {
+      await apiDelete(page, seed.deleteUrl, {id: createdId}).catch(() => undefined);
+    }
   });
 
   return createdId;
@@ -321,17 +365,17 @@ async function createArrayEntity(page: Page, seed: EntitySeed, cleanupStack: Arr
   if (idOf(existing)) return idOf(existing);
 
   const add = await apiPost(page, seed.addUrl, seed.body);
-  if (!add.data?.ok) {
+  if (add.status >= 300) {
     throw new Error(`Failed to seed ${seed.addUrl}: ${JSON.stringify(add.data)}`);
   }
 
-  const createdId = idOf(add.data.data) || idOf(await arrayRecordByName(page, seed.listUrl, seed.nameField, name));
+  const createdId = idOf(add.data) || idOf(await arrayRecordByName(page, seed.listUrl, seed.nameField, name));
   if (!createdId) {
     throw new Error(`Seeded ${seed.addUrl} but could not resolve created id for ${name}`);
   }
 
   cleanupStack.push(async () => {
-    await apiPost(page, seed.deleteUrl, {}, {id: createdId}).catch(() => undefined);
+    await apiDelete(page, seed.deleteUrl, {id: createdId}).catch(() => undefined);
   });
 
   return createdId;
@@ -547,7 +591,7 @@ async function ensureMenuSeed(page: Page, seed: MenuSeed, cleanupStack: Array<()
       (existing as { remark?: unknown }).remark === 'created by e2e route fixture'
     ) {
       cleanupStack.push(async () => {
-        await apiPost(page, '/api/v3/auth/menu/delete', {}, {id: existingId}).catch(() => undefined);
+        await apiDelete(page, '/api/v3/auth/menu/delete', {id: existingId}).catch(() => undefined);
       });
     }
     return {id: existingId, created: false};
@@ -576,18 +620,18 @@ async function ensureMenuSeed(page: Page, seed: MenuSeed, cleanupStack: Array<()
       },
     },
   });
-  if (!add.data?.ok) {
+  if (add.status >= 300) {
     throw new Error(`Failed to seed menu ${seed.code}: ${JSON.stringify(add.data)}`);
   }
 
   const createdId =
-    idOf(add.data.data) || idOf(await listByName(page, '/api/v3/auth/menu/list', 'menuCode', seed.code));
+    idOf(add.data) || idOf(await listByName(page, '/api/v3/auth/menu/list', 'menuCode', seed.code));
   if (!createdId) {
     throw new Error(`Seeded menu ${seed.code} but could not resolve created id`);
   }
 
   cleanupStack.push(async () => {
-    await apiPost(page, '/api/v3/auth/menu/delete', {}, {id: createdId}).catch(() => undefined);
+    await apiDelete(page, '/api/v3/auth/menu/delete', {id: createdId}).catch(() => undefined);
   });
 
   return {id: createdId, created: true};
@@ -694,6 +738,7 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
         listUrl: '/api/v3/manager/driver/list',
         addUrl: '/api/v3/manager/driver/add',
         deleteUrl: '/api/v3/manager/driver/delete',
+        versioned: true,
         nameField: 'driverName',
         body: {
           driverName: suffix,
@@ -711,10 +756,7 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
   const driverAttributeResponse = await apiGet<unknown[]>(page, '/api/v3/manager/driver_attribute/list_by_driver_id', {
     driver_id: driverId,
   });
-  const driverAttributes =
-    (driverAttributeResponse.data as { ok?: boolean; data?: unknown[] })?.ok === true
-      ? ((driverAttributeResponse.data as { data?: unknown[] }).data ?? [])
-      : [];
+  const driverAttributes = driverAttributeResponse.status < 300 ? driverAttributeResponse.data : [];
   if (driverAttributes.length === 0) {
     const attributeName = `e2e_attr_${Date.now().toString(36).slice(-6)}`;
     await createEntity(
@@ -723,6 +765,7 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
         listUrl: '/api/v3/manager/driver_attribute/list',
         addUrl: '/api/v3/manager/driver_attribute/add',
         deleteUrl: '/api/v3/manager/driver_attribute/delete',
+        versioned: true,
         nameField: 'attributeName',
         body: {
           attributeName,
@@ -746,6 +789,7 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
         listUrl: '/api/v3/manager/profile/list',
         addUrl: '/api/v3/manager/profile/add',
         deleteUrl: '/api/v3/manager/profile/delete',
+        versioned: true,
         nameField: 'profileName',
         body: {
           profileName: suffix,
@@ -767,6 +811,7 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
         listUrl: '/api/v3/manager/device/list',
         addUrl: '/api/v3/manager/device/add',
         deleteUrl: '/api/v3/manager/device/delete',
+        versioned: true,
         nameField: 'deviceName',
         body: {
           deviceName: suffix,
@@ -788,6 +833,7 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
         listUrl: '/api/v3/manager/point/list',
         addUrl: '/api/v3/manager/point/add',
         deleteUrl: '/api/v3/manager/point/delete',
+        versioned: true,
         nameField: 'pointName',
         body: {
           pointName: suffix,

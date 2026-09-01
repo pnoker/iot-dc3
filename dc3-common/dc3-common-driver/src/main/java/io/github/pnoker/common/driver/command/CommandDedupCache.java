@@ -22,6 +22,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.Optional;
 
 /**
  * Idempotent deduplication cache for point commands.
@@ -36,7 +37,9 @@ public class CommandDedupCache {
     /**
      * Recently-seen command keys with bounded size and 5-minute expiry, used to suppress duplicate command processing.
      */
-    private final Cache<String, Boolean> cache = Caffeine.newBuilder()
+    private static final Object IN_PROGRESS = new Object();
+
+    private final Cache<String, Object> cache = Caffeine.newBuilder()
             .expireAfterWrite(Duration.ofMinutes(5))
             .maximumSize(50_000)
             .build();
@@ -49,7 +52,34 @@ public class CommandDedupCache {
      * @return true if the commandId was newly acquired, false if duplicate
      */
     public boolean tryAcquire(String commandId) {
-        return cache.asMap().putIfAbsent(commandId, Boolean.TRUE) == null;
+        return cache.asMap().putIfAbsent(commandId, IN_PROGRESS) == null;
+    }
+
+    /**
+     * Save the immutable terminal result before attempting broker publication. A
+     * redelivery can then republish the original receipt without executing the device
+     * operation a second time.
+     *
+     * @param commandId unique command identifier
+     * @param result terminal command result
+     */
+    public void complete(String commandId, Object result) {
+        if (commandId != null && result != null) {
+            cache.put(commandId, result);
+        }
+    }
+
+    /**
+     * Return a previously completed result of the requested type.
+     *
+     * @param commandId unique command identifier
+     * @param resultType expected result type
+     * @param <T> result type
+     * @return cached terminal result, or empty while the command is still in progress
+     */
+    public <T> Optional<T> result(String commandId, Class<T> resultType) {
+        Object value = commandId == null ? null : cache.getIfPresent(commandId);
+        return resultType.isInstance(value) ? Optional.of(resultType.cast(value)) : Optional.empty();
     }
 
     /**

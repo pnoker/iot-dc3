@@ -20,6 +20,7 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * Email channel placeholder adapter.
@@ -39,8 +40,8 @@ public class EmailNotifyChannelAdapter implements NotifyChannelAdapter {
     }
 
     @Override
-    public NotifySendResult send(NotifyChannelBO channel, MessagePayload payload) {
-        return NotifySendResult.skipped(channel.getCredentialRef(), "Email channel sender is not configured");
+    public Mono<NotifySendResult> send(NotifyChannelBO channel, MessagePayload payload) {
+        return Mono.just(NotifySendResult.skipped(channel.getCredentialRef(), "Email channel sender is not configured"));
     }
 
 }

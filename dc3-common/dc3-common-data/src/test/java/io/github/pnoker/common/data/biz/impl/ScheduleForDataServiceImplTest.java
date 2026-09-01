@@ -64,6 +64,12 @@ class ScheduleForDataServiceImplTest {
                 eq("hourly-job"),
                 eq("0 0 0/1 * * ?"),
                 eq(HourlyJobForData.class));
+        verify(quartzService).createJobWithInterval(
+                eq(ScheduleConstant.DATA_SCHEDULE_GROUP),
+                eq("point-value-ingest-replay"),
+                eq(5),
+                eq(org.quartz.DateBuilder.IntervalUnit.SECOND),
+                eq(io.github.pnoker.common.data.job.PointValueIngestReplayJob.class));
         verify(quartzService).startScheduler();
     }
 

@@ -32,6 +32,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -187,8 +188,8 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
         try {
             ZoneId zoneId = StringUtils.isNotBlank(window.getTimezone())
                     ? ZoneId.of(window.getTimezone())
-                    : ZoneId.systemDefault();
-            ZonedDateTime zonedNow = now.atZone(ZoneId.systemDefault()).withZoneSameInstant(zoneId);
+                    : ZoneOffset.UTC;
+            ZonedDateTime zonedNow = now.atZone(ZoneOffset.UTC).withZoneSameInstant(zoneId);
             if (!dayAllowed(window.getDaysOfWeek(), zonedNow.getDayOfWeek())) {
                 return false;
             }

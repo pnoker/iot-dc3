@@ -17,9 +17,10 @@
 
 package io.github.pnoker.common.data.service;
 
-import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
 import io.github.pnoker.common.data.entity.query.NotifyQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
 /**
  * Business service for alarm notification template operations.
@@ -27,6 +28,12 @@ import io.github.pnoker.common.data.entity.query.NotifyQuery;
  * @author pnoker
  * @since 2016.10.1
  */
-public interface NotifyService extends BaseService<NotifyBO, NotifyQuery> {
+public interface NotifyService {
+
+    Mono<NotifyBO> add(NotifyBO value);
+    Mono<Boolean> delete(Long tenantId, Long id);
+    Mono<NotifyBO> update(NotifyBO value);
+    Mono<NotifyBO> getById(Long tenantId, Long id);
+    Mono<OffsetPage<NotifyBO>> list(Long tenantId, NotifyQuery query);
 
 }

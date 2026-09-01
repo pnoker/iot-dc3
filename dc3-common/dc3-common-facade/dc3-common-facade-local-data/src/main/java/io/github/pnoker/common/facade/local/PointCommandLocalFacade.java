@@ -21,15 +21,17 @@ import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
 import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.facade.api.PointCommandFacade;
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
  * In-process implementation: routes command calls straight into
  * {@link PointCommandService}.
  * <p>
- * Selected when {@code dc3.facade.mode=local}. Carries zero serialization cost — the same
+ * Selected when {@code dc3.facade.data.mode=local}. Carries zero serialization cost — the same
  * JVM handles both caller and service.
  *
  * @author pnoker
@@ -43,22 +45,33 @@ public class PointCommandLocalFacade implements PointCommandFacade {
     private final PointCommandService pointCommandService;
 
     @Override
-    public boolean submitRead(Long tenantId, Long deviceId, Long pointId) {
-        PointCommandReadBO readBO = new PointCommandReadBO();
-        readBO.setDeviceId(deviceId);
-        readBO.setPointId(pointId);
-        pointCommandService.read(tenantId, readBO);
-        return true;
+    public Mono<String> submitRead(Long tenantId, Long deviceId, Long pointId) {
+        return submitRead(tenantId, deviceId, pointId, PointCommandSourceEnum.HTTP);
     }
 
     @Override
-    public boolean submitWrite(Long tenantId, Long deviceId, Long pointId, String value) {
+    public Mono<String> submitRead(Long tenantId, Long deviceId, Long pointId, PointCommandSourceEnum source) {
+        PointCommandReadBO readBO = new PointCommandReadBO();
+        readBO.setDeviceId(deviceId);
+        readBO.setPointId(pointId);
+        readBO.setSource(source);
+        return pointCommandService.read(tenantId, readBO);
+    }
+
+    @Override
+    public Mono<String> submitWrite(Long tenantId, Long deviceId, Long pointId, String value) {
+        return submitWrite(tenantId, deviceId, pointId, value, PointCommandSourceEnum.HTTP);
+    }
+
+    @Override
+    public Mono<String> submitWrite(Long tenantId, Long deviceId, Long pointId, String value,
+                                    PointCommandSourceEnum source) {
         PointCommandWriteBO writeBO = new PointCommandWriteBO();
         writeBO.setDeviceId(deviceId);
         writeBO.setPointId(pointId);
         writeBO.setValue(value);
-        pointCommandService.write(tenantId, writeBO);
-        return true;
+        writeBO.setSource(source);
+        return pointCommandService.write(tenantId, writeBO);
     }
 
 }

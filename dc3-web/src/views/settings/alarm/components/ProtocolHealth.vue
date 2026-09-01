@@ -74,8 +74,8 @@ const rows = ref<ProtocolHealth[]>([]);
 
 const load = () =>
   run(async () => {
-    const res: { data?: ProtocolHealth[] } = await protocolHealth();
-    rows.value = res?.data ?? [];
+    const res: ProtocolHealth[] = await protocolHealth();
+    rows.value = res ?? [];
   });
 
 // Backend keeps the raw `dc3-driver-*` service name; strip the prefix

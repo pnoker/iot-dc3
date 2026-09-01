@@ -18,9 +18,7 @@
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
-import io.github.pnoker.common.facade.entity.query.FacadeEventQuery;
 import io.github.pnoker.common.manager.entity.bo.EventBO;
-import io.github.pnoker.common.manager.entity.query.EventQuery;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 
@@ -32,14 +30,6 @@ import org.mapstruct.Mapper;
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeEventBuilder {
-
-    /**
-     * To manager query.
-     *
-     * @param facadeQuery facade query
-     * @return to manager query result
-     */
-    EventQuery toManagerQuery(FacadeEventQuery facadeQuery);
 
     /**
      * To facade business object.

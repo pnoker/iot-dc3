@@ -17,6 +17,9 @@
 
 package io.github.pnoker.common.mq.adapter;
 
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
+import reactor.core.publisher.Mono;
+
 import java.util.List;
 
 /**
@@ -33,6 +36,7 @@ public interface RawBatchListener {
      * Handle one raw batch.
      *
      * @param batch the raw batch, never empty
+     * @return one terminal broker action for the whole batch
      */
-    void onBatch(List<WireMqDelivery> batch);
+    Mono<DeliveryDisposition> onBatch(List<WireMqDelivery> batch);
 }

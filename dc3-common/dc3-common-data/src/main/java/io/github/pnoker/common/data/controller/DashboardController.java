@@ -17,14 +17,14 @@
 
 package io.github.pnoker.common.data.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DashboardService;
 import io.github.pnoker.common.data.entity.query.AlertPageQuery;
 import io.github.pnoker.common.data.entity.vo.dashboard.*;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.utils.TimeRangeUtil;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -57,9 +57,9 @@ import java.util.Objects;
  * <li>{@code /stats/today} — today total + yesterday total for delta</li>
  * <li>{@code /stats/timeseries?granularity=hour|day&rangeHours=24}</li>
  * <li>{@code /top?dimension=device|point|driver&rangeHours=24&limit=10}</li>
- * <li>{@code /stream?size=20} — most recent rows (user-triggered refresh)</li>
+ * <li>{@code /stream?limit=20} — most recent rows (user-triggered refresh)</li>
  * <li>{@code /alert/stats} — total + unconfirmed + by-type breakdown</li>
- * <li>{@code /alert/latest?size=10} — most recent alerts</li>
+ * <li>{@code /alert/latest?limit=10} — most recent alerts</li>
  * </ul>
  *
  * @author pnoker
@@ -67,7 +67,7 @@ import java.util.Objects;
  */
 @Tag(name = "dashboard", description = "Data monitoring dashboard configuration: manage data-side dashboard layouts, widgets, and visualization preferences for device data monitoring")
 @Slf4j
-@RestController
+@RestController("dataDashboardController")
 @RequestMapping(DataConstant.DASHBOARD_URL_PREFIX)
 @RequiredArgsConstructor
 public class DashboardController implements BaseController {
@@ -91,17 +91,17 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/stats/today")
-    public Mono<R<TodayStatsVO>> today() {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            long today = dashboardService.countToday(tenantId);
-            long yesterday = dashboardService.countYesterday(tenantId);
-            long total = dashboardService.countTotal(tenantId);
-            // Convenience delta for the UI: +12% (positive) / -3% (negative) / 0.
-            long percentChange = yesterday > 0
-                    ? Math.round(((double) (today - yesterday) * 100.0) / yesterday)
-                    : today > 0 ? 100 : 0;
-            return R.ok(new TodayStatsVO(today, yesterday, total, percentChange));
-        }));
+    public Mono<TodayStatsVO> today() {
+        return getTenantId().flatMap(tenantId -> Mono.zip(dashboardService.countToday(tenantId),
+                        dashboardService.countYesterday(tenantId), dashboardService.countTotal(tenantId))
+                .map(values -> {
+                    long today = values.getT1();
+                    long yesterday = values.getT2();
+                    long total = values.getT3();
+                    long percentChange = yesterday > 0 ? Math.round(((double) (today - yesterday) * 100.0) / yesterday)
+                            : today > 0 ? 100 : 0;
+                    return new TodayStatsVO(today, yesterday, total, percentChange);
+                }));
     }
 
     /**
@@ -122,7 +122,7 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/stats/timeseries")
-    public Mono<R<List<TimeseriesPointVO>>> timeseries(
+    public Mono<List<TimeseriesPointVO>> timeseries(
             @Parameter(description = "Time bucket granularity for the trend chart; hour groups by hour-of-day, day groups by calendar date", example = "hour")
             @RequestParam(value = "granularity", defaultValue = "hour") String granularity,
             @Parameter(description = "Rolling time window length in hours; used only when range_key is omitted", example = "24")
@@ -130,7 +130,7 @@ public class DashboardController implements BaseController {
             @Parameter(description = "Preset time range key overriding range_hours; one of today, 24h, 7d, or 30d", example = "24h")
             @RequestParam(value = "range_key", required = false) String rangeKey) {
         int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.timeseries(tenantId, granularity, effectiveHours))));
+        return getTenantId().flatMap(tenantId -> dashboardService.timeseries(tenantId, granularity, effectiveHours));
     }
 
     /**
@@ -152,7 +152,7 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/top")
-    public Mono<R<List<TopEntityVO>>> top(@Parameter(description = "Ranking dimension defining what kind of entity to rank; one of device, point, or driver", example = "device") @RequestParam(value = "dimension", defaultValue = "device") String dimension,
+    public Mono<List<TopEntityVO>> top(@Parameter(description = "Ranking dimension defining what kind of entity to rank; one of device, point, or driver", example = "device") @RequestParam(value = "dimension", defaultValue = "device") String dimension,
                                           @Parameter(description = "Rolling time window length in hours; used only when range_key is omitted", example = "24")
                                           @RequestParam(value = "range_hours", defaultValue = "24") int rangeHours,
                                           @Parameter(description = "Preset time range key overriding range_hours; one of today, 24h, 7d, or 30d", example = "7d")
@@ -160,13 +160,13 @@ public class DashboardController implements BaseController {
                                           @Parameter(description = "Maximum number of ranked entries to return", example = "10")
                                           @RequestParam(value = "limit", defaultValue = "10") int limit) {
         int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.top(tenantId, dimension, effectiveHours, limit))));
+        return getTenantId().flatMap(tenantId -> dashboardService.top(tenantId, dimension, effectiveHours, limit));
     }
 
     /**
      * Return the N most recent point-value readings across the tenant's points, newest first.
      *
-     * @param size maximum number of recent readings to return, newest first
+     * @param limit maximum number of recent readings to return, newest first
      * @return the most recent point-value readings for the live feed panel
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
@@ -178,8 +178,8 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/stream")
-    public Mono<R<List<LatestPointValueVO>>> stream(@Parameter(description = "Maximum number of recent readings to return, newest first", example = "20") @RequestParam(value = "size", defaultValue = "20") int size) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.latestStream(tenantId, size))));
+    public Mono<List<LatestPointValueVO>> stream(@Parameter(description = "Maximum number of recent readings to return, newest first", example = "20") @RequestParam(value = "limit", defaultValue = "20") int limit) {
+        return getTenantId().flatMap(tenantId -> dashboardService.latestStream(tenantId, limit));
     }
 
     /**
@@ -197,14 +197,14 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/stats")
-    public Mono<R<AlertStatsVO>> alertStats() {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertStats(tenantId))));
+    public Mono<AlertStatsVO> alertStats() {
+        return getTenantId().flatMap(dashboardService::alertStats);
     }
 
     /**
      * Return the N most recent alerts for the current tenant, newest first.
      *
-     * @param size maximum number of recent alerts to return, newest first
+     * @param limit maximum number of recent alerts to return, newest first
      * @return the most recent alerts with source, alarm type, message and confirm state
      */
     @PreAuthorize("@perm.can('dashboard', 'get')")
@@ -216,8 +216,8 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/latest")
-    public Mono<R<List<AlertItemVO>>> alertLatest(@Parameter(description = "Maximum number of recent alerts to return, newest first", example = "10") @RequestParam(value = "size", defaultValue = "10") int size) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertLatest(tenantId, size))));
+    public Mono<List<AlertItemVO>> alertLatest(@Parameter(description = "Maximum number of recent alerts to return, newest first", example = "10") @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        return getTenantId().flatMap(tenantId -> dashboardService.alertLatest(tenantId, limit));
     }
 
     /**
@@ -237,13 +237,13 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/stats/latency")
-    public Mono<R<List<LatencyBucketVO>>> latencyHistogram(
+    public Mono<List<LatencyBucketVO>> latencyHistogram(
             @Parameter(description = "Rolling time window length in hours; used only when range_key is omitted", example = "24")
             @RequestParam(value = "range_hours", defaultValue = "24") int rangeHours,
             @Parameter(description = "Preset time range key overriding range_hours; one of today, 24h, 7d, or 30d", example = "24h")
             @RequestParam(value = "range_key", required = false) String rangeKey) {
         int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.latencyHistogram(tenantId, effectiveHours))));
+        return getTenantId().flatMap(tenantId -> dashboardService.latencyHistogram(tenantId, effectiveHours));
     }
 
     /**
@@ -263,13 +263,13 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/stats/activity")
-    public Mono<R<List<ActivityCellVO>>> hourlyActivity(
+    public Mono<List<ActivityCellVO>> hourlyActivity(
             @Parameter(description = "Rolling time window length in hours; default 168 (one week). Used only when range_key is omitted", example = "168")
             @RequestParam(value = "range_hours", defaultValue = "168") int rangeHours,
             @Parameter(description = "Preset time range key overriding range_hours; one of today, 24h, 7d, or 30d", example = "7d")
             @RequestParam(value = "range_key", required = false) String rangeKey) {
         int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.hourlyActivity(tenantId, effectiveHours))));
+        return getTenantId().flatMap(tenantId -> dashboardService.hourlyActivity(tenantId, effectiveHours));
     }
 
     /**
@@ -288,8 +288,8 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/system/health")
-    public Mono<R<SystemHealthVO>> systemHealth() {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(systemHealthService.snapshot(tenantId))));
+    public Mono<SystemHealthVO> systemHealth() {
+        return getTenantId().flatMap(systemHealthService::snapshot);
     }
 
     /**
@@ -308,17 +308,14 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/alert/page")
-    public Mono<R<Page<AlertItemVO>>> alertPage(
+    public Mono<OffsetPage<AlertItemVO>> alertPage(
             @RequestBody(required = false) AlertPageQuery query) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            AlertPageQuery q = Objects.isNull(query)
-                    ? new AlertPageQuery() : query;
-            LocalDateTime from = TimeRangeUtil.resolveFrom(q.getRangeKey(), q.getRangeHours());
-            long current = Objects.isNull(q.getCurrent()) ? 1L : q.getCurrent();
-            long size = Objects.isNull(q.getSize()) ? 20L : q.getSize();
-            return R.ok(dashboardService.alertPage(tenantId, q.getSource(), q.getAlarmTypeFlag(),
-                    q.getConfirmFlag(), from, current, size));
-        }));
+        return getTenantId().flatMap(tenantId -> {
+            AlertPageQuery q = Objects.isNull(query) ? new AlertPageQuery() : query;
+            LocalDateTime from = TimeRangeUtil.resolveFrom(q.getRangeKey(), null);
+            PageRequest page = new PageRequest(q.getOffset(), q.getLimit(), q.getSort());
+            return dashboardService.alertPage(tenantId, q.getSource(), q.getAlarmTypeFlag(), q.getConfirmFlag(), from, page);
+        });
     }
 
     /**
@@ -337,9 +334,9 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/alert/confirm")
-    public Mono<R<Boolean>> alertConfirm(@Parameter(description = "Alert source scope; one of driver, device, or point", example = "device") @RequestParam String source,
+    public Mono<Boolean> alertConfirm(@Parameter(description = "Alert source scope; one of driver, device, or point", example = "device") @RequestParam String source,
                                          @Parameter(description = "Identifier of the alert record within the given source; must belong to the current tenant", example = "1024") @RequestParam Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.confirmAlert(tenantId, source, id))));
+        return getTenantId().flatMap(tenantId -> dashboardService.confirmAlert(tenantId, source, id));
     }
 
     /**
@@ -359,9 +356,9 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/alert/unconfirm")
-    public Mono<R<Boolean>> alertUnconfirm(@Parameter(description = "Alert source scope; one of driver, device, or point", example = "device") @RequestParam String source,
+    public Mono<Boolean> alertUnconfirm(@Parameter(description = "Alert source scope; one of driver, device, or point", example = "device") @RequestParam String source,
                                            @Parameter(description = "Identifier of the alert record within the given source; must belong to the current tenant", example = "1024") @RequestParam Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.unconfirmAlert(tenantId, source, id))));
+        return getTenantId().flatMap(tenantId -> dashboardService.unconfirmAlert(tenantId, source, id));
     }
 
     /**
@@ -380,15 +377,12 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/alert/bulk_confirm")
-    public Mono<R<Integer>> alertBulkConfirm(
+    public Mono<Integer> alertBulkConfirm(
             @RequestBody AlertBulkConfirmVO body) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            List<AlertBulkConfirmVO.Item> items = Objects.isNull(body) || Objects.isNull(body.getItems())
-                    ? Collections.emptyList()
-                    : body.getItems();
-            boolean confirm = Objects.isNull(body) || Objects.isNull(body.getConfirm()) || body.getConfirm();
-            return R.ok(dashboardService.bulkConfirmAlert(tenantId, items, confirm));
-        }));
+        List<AlertBulkConfirmVO.Item> items = Objects.isNull(body) || Objects.isNull(body.getItems())
+                ? Collections.emptyList() : body.getItems();
+        boolean confirm = Objects.isNull(body) || Objects.isNull(body.getConfirm()) || body.getConfirm();
+        return getTenantId().flatMap(tenantId -> dashboardService.bulkConfirmAlert(tenantId, items, confirm));
     }
 
     /**
@@ -409,11 +403,11 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/trend")
-    public Mono<R<List<AlertTrendVO>>> alertTrend(@Parameter(description = "Rolling day range for the trend; one point per day is returned", example = "30") @RequestParam(value = "days", defaultValue = "30") int days,
+    public Mono<List<AlertTrendVO>> alertTrend(@Parameter(description = "Rolling day range for the trend; one point per day is returned", example = "30") @RequestParam(value = "days", defaultValue = "30") int days,
                                                   @Parameter(description = "Preset time range key overriding days; one of today, 24h, 7d, or 30d", example = "30d")
                                                   @RequestParam(value = "range_key", required = false) String rangeKey) {
         int effectiveDays = resolveEffectiveDays(rangeKey, days);
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertTrend(tenantId, effectiveDays))));
+        return getTenantId().flatMap(tenantId -> dashboardService.alertTrend(tenantId, effectiveDays));
     }
 
     /**
@@ -434,13 +428,13 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/top_sources")
-    public Mono<R<List<AlertTopSourceVO>>> alertTopSources(@Parameter(description = "Rolling day range over which alert volume is counted", example = "30") @RequestParam(value = "days", defaultValue = "30") int days,
+    public Mono<List<AlertTopSourceVO>> alertTopSources(@Parameter(description = "Rolling day range over which alert volume is counted", example = "30") @RequestParam(value = "days", defaultValue = "30") int days,
                                                            @Parameter(description = "Preset time range key overriding days; one of today, 24h, 7d, or 30d", example = "30d")
                                                            @RequestParam(value = "range_key", required = false) String rangeKey,
                                                            @Parameter(description = "Maximum number of top sources to return", example = "10")
                                                            @RequestParam(value = "limit", defaultValue = "10") int limit) {
         int effectiveDays = resolveEffectiveDays(rangeKey, days);
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertTopSources(tenantId, effectiveDays, limit))));
+        return getTenantId().flatMap(tenantId -> dashboardService.alertTopSources(tenantId, effectiveDays, limit));
     }
 
     /**
@@ -480,11 +474,11 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/activity")
-    public Mono<R<List<AlertActivityCellVO>>> alertActivity(@Parameter(description = "Rolling day range spanning the heatmap's day axis", example = "7") @RequestParam(value = "days", defaultValue = "7") int days,
+    public Mono<List<AlertActivityCellVO>> alertActivity(@Parameter(description = "Rolling day range spanning the heatmap's day axis", example = "7") @RequestParam(value = "days", defaultValue = "7") int days,
                                                             @Parameter(description = "Preset time range key overriding days; one of today, 24h, 7d, or 30d", example = "7d")
                                                             @RequestParam(value = "range_key", required = false) String rangeKey) {
         int effectiveDays = resolveEffectiveDays(rangeKey, days);
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertActivity(tenantId, effectiveDays))));
+        return getTenantId().flatMap(tenantId -> dashboardService.alertActivity(tenantId, effectiveDays));
     }
 
     /**
@@ -504,13 +498,13 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/type_distribution")
-    public Mono<R<List<AlertTypeBucketVO>>> alertTypeDistribution(
+    public Mono<List<AlertTypeBucketVO>> alertTypeDistribution(
             @Parameter(description = "Rolling day range over which alerts are bucketed by alarm type", example = "30")
             @RequestParam(value = "days", defaultValue = "30") int days,
             @Parameter(description = "Preset time range key overriding days; one of today, 24h, 7d, or 30d", example = "30d")
             @RequestParam(value = "range_key", required = false) String rangeKey) {
         int effectiveDays = resolveEffectiveDays(rangeKey, days);
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertTypeDistribution(tenantId, effectiveDays))));
+        return getTenantId().flatMap(tenantId -> dashboardService.alertTypeDistribution(tenantId, effectiveDays));
     }
 
     /**
@@ -531,14 +525,14 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/storm_sources")
-    public Mono<R<List<AlertTopSourceVO>>> alertStormSources(
+    public Mono<List<AlertTopSourceVO>> alertStormSources(
             @Parameter(description = "Rolling detection window length in hours", example = "1")
             @RequestParam(value = "hours", defaultValue = "1") int hours,
             @Parameter(description = "Minimum alert count within the window for a source to be flagged as a storm", example = "10")
             @RequestParam(value = "min_count", defaultValue = "10") int minCount,
             @Parameter(description = "Maximum number of storm sources to return", example = "10")
             @RequestParam(value = "limit", defaultValue = "10") int limit) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertStormSources(tenantId, hours, minCount, limit))));
+        return getTenantId().flatMap(tenantId -> dashboardService.alertStormSources(tenantId, hours, minCount, limit));
     }
 
     // ===== Phase-2 insights =====================================================
@@ -561,12 +555,12 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/flapping")
-    public Mono<R<List<FlappingSourceVO>>> alertFlapping(@Parameter(description = "Rolling detection window length in hours", example = "6") @RequestParam(value = "hours", defaultValue = "6") int hours,
+    public Mono<List<FlappingSourceVO>> alertFlapping(@Parameter(description = "Rolling detection window length in hours", example = "6") @RequestParam(value = "hours", defaultValue = "6") int hours,
                                                          @Parameter(description = "Minimum confirm/recovery toggle count within the window for a source to be flagged as flapping", example = "5")
                                                          @RequestParam(value = "min_count", defaultValue = "5") int minCount,
                                                          @Parameter(description = "Maximum number of flapping sources to return", example = "20")
                                                          @RequestParam(value = "limit", defaultValue = "20") int limit) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertFlapping(tenantId, hours, minCount, limit))));
+        return getTenantId().flatMap(tenantId -> dashboardService.alertFlapping(tenantId, hours, minCount, limit));
     }
 
     /**
@@ -587,14 +581,14 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/correlation")
-    public Mono<R<List<CorrelationPairVO>>> alertCorrelation(
+    public Mono<List<CorrelationPairVO>> alertCorrelation(
             @Parameter(description = "Rolling detection window length in hours", example = "24")
             @RequestParam(value = "hours", defaultValue = "24") int hours,
             @Parameter(description = "Maximum gap in seconds between two alerts to count them as co-occurring", example = "30")
             @RequestParam(value = "window_sec", defaultValue = "30") int windowSec,
             @Parameter(description = "Maximum number of correlated source pairs to return", example = "15")
             @RequestParam(value = "limit", defaultValue = "15") int limit) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertCorrelation(tenantId, hours, windowSec, limit))));
+        return getTenantId().flatMap(tenantId -> dashboardService.alertCorrelation(tenantId, hours, windowSec, limit));
     }
 
     /**
@@ -613,10 +607,10 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/peer_deviation")
-    public Mono<R<List<PeerDeviationVO>>> alertPeerDeviation(
+    public Mono<List<PeerDeviationVO>> alertPeerDeviation(
             @Parameter(description = "Rolling day range used to build the cohort baseline and measure each peer's alert rate", example = "7")
             @RequestParam(value = "days", defaultValue = "7") int days) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertPeerDeviation(tenantId, days))));
+        return getTenantId().flatMap(tenantId -> dashboardService.alertPeerDeviation(tenantId, days));
     }
 
     /**
@@ -634,8 +628,8 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/aging")
-    public Mono<R<AgingBacklogVO>> alertAging() {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertAgingBacklog(tenantId))));
+    public Mono<AgingBacklogVO> alertAging() {
+        return getTenantId().flatMap(dashboardService::alertAgingBacklog);
     }
 
     /**
@@ -654,8 +648,8 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/mtta")
-    public Mono<R<List<MttaTrendVO>>> alertMtta(@Parameter(description = "Rolling day range for the MTTA trend; one mean-time value per day is returned", example = "30") @RequestParam(value = "days", defaultValue = "30") int days) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.alertMtta(tenantId, days))));
+    public Mono<List<MttaTrendVO>> alertMtta(@Parameter(description = "Rolling day range for the MTTA trend; one mean-time value per day is returned", example = "30") @RequestParam(value = "days", defaultValue = "30") int days) {
+        return getTenantId().flatMap(tenantId -> dashboardService.alertMtta(tenantId, days));
     }
 
     /**
@@ -672,8 +666,8 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/protocol/health")
-    public Mono<R<List<ProtocolHealthVO>>> protocolHealth() {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.protocolHealth(tenantId))));
+    public Mono<List<ProtocolHealthVO>> protocolHealth() {
+        return getTenantId().flatMap(dashboardService::protocolHealth);
     }
 
     /**
@@ -693,10 +687,10 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/alert/change_impact")
-    public Mono<R<List<ChangeImpactVO>>> changeImpact(@Parameter(description = "Rolling day range over which config changes are correlated with alert-volume shifts", example = "30") @RequestParam(value = "days", defaultValue = "30") int days,
+    public Mono<List<ChangeImpactVO>> changeImpact(@Parameter(description = "Rolling day range over which config changes are correlated with alert-volume shifts", example = "30") @RequestParam(value = "days", defaultValue = "30") int days,
                                                       @Parameter(description = "Maximum number of impacted items to return", example = "30")
                                                       @RequestParam(value = "limit", defaultValue = "30") int limit) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.changeImpact(tenantId, days, limit))));
+        return getTenantId().flatMap(tenantId -> dashboardService.changeImpact(tenantId, days, limit));
     }
 
     /**
@@ -717,14 +711,14 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/silent/sources")
-    public Mono<R<List<SilentSourceVO>>> silentSources(
+    public Mono<List<SilentSourceVO>> silentSources(
             @Parameter(description = "Baseline rolling day range used to learn each entity's expected reporting cadence", example = "7")
             @RequestParam(value = "baseline_days", defaultValue = "7") int baselineDays,
             @Parameter(description = "Silence threshold in minutes; an entity with no reading for this long is flagged silent", example = "15")
             @RequestParam(value = "silent_minutes", defaultValue = "15") int silentMinutes,
             @Parameter(description = "Maximum number of silent sources to return", example = "50")
             @RequestParam(value = "limit", defaultValue = "50") int limit) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.silentSources(tenantId, baselineDays, silentMinutes, limit))));
+        return getTenantId().flatMap(tenantId -> dashboardService.silentSources(tenantId, baselineDays, silentMinutes, limit));
     }
 
     /**
@@ -743,8 +737,8 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/coverage/gap")
-    public Mono<R<CoverageGapVO>> coverageGap(@Parameter(description = "Maximum number of points or devices missing expected readings to include in the gap summary", example = "100") @RequestParam(value = "limit", defaultValue = "100") int limit) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.coverageGap(tenantId, limit))));
+    public Mono<CoverageGapVO> coverageGap(@Parameter(description = "Maximum number of points or devices missing expected readings to include in the gap summary", example = "100") @RequestParam(value = "limit", defaultValue = "100") int limit) {
+        return getTenantId().flatMap(tenantId -> dashboardService.coverageGap(tenantId, limit));
     }
 
 }

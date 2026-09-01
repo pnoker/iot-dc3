@@ -46,21 +46,27 @@ export interface TimeRangeParams {
 /** Config-change subjects used by the Change Impact card. */
 export type ChangeKind = 'driver' | 'device' | 'profile';
 
+export interface SystemHealth {
+  center: Record<string, 'up' | 'down'>;
+  infra: Record<string, 'up' | 'down'>;
+  drivers: {total: number; online: number};
+  devices: {total: number; online: number};
+}
+
 // ---- Alert list / pagination -----------------------------------------
 
 export interface AlertPageQuery {
   source?: AlertSource | null;
-  eventTypeFlag?: number | null;
+  alarmTypeFlag?: number | null;
   confirmFlag?: number | null;
-  rangeHours?: number | null;
   /**
-   * Preferred time-range selector. Backend TimeRangeUtil turns this into a
-   * concrete `from` timestamp (TODAY maps to local-midnight; 24h/7d/30d are
-   * rolling windows). When both rangeKey and rangeHours are set, rangeKey wins.
+   * Preset time-range selector. Backend TimeRangeUtil turns this into a
+   * concrete `from` timestamp (TODAY maps to local-midnight; 24h/7d/30d are rolling windows).
    */
   rangeKey?: string | null;
-  current?: number;
-  size?: number;
+  offset?: number;
+  limit?: number;
+  sort?: Array<{field: string; direction: 'ASC' | 'DESC'}>;
 }
 
 // ---- Topology Sankey -------------------------------------------------
@@ -217,6 +223,9 @@ export interface AlertEventRow {
   id: string;
   source: AlertSource;
   sourceId: string;
+  pointId?: string;
+  alarmTypeFlag: number;
+  confirmFlag: string;
   createTime: string;
   message?: string;
 }

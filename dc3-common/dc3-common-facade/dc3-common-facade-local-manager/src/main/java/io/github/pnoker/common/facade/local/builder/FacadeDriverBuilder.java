@@ -18,12 +18,9 @@
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
-import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
-import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 /**
  * FacadeDriver ↔ manager DriverBO/Query mapper. Field sets are aligned.
@@ -33,16 +30,6 @@ import org.mapstruct.Mapping;
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeDriverBuilder {
-
-    /**
-     * To manager query.
-     *
-     * @param facadeQuery facade query
-     * @return to manager query result
-     */
-    @Mapping(target = "groupId", ignore = true)
-    @Mapping(target = "labelId", ignore = true)
-    DriverQuery toManagerQuery(FacadeDriverQuery facadeQuery);
 
     /**
      * To facade business object.

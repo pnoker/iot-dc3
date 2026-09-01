@@ -23,6 +23,7 @@ import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
+import reactor.core.publisher.Mono;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 
 import java.util.List;
@@ -115,14 +116,14 @@ public interface DriverSenderService {
      *
      * @param resultDTO command result payload
      */
-    void pointCommandResultSender(PointCommandResultDTO resultDTO);
+    Mono<Void> pointCommandResultSender(PointCommandResultDTO resultDTO);
 
     /**
      * Publishes a custom command result receipt back to the data center.
      *
      * @param resultDTO command call result payload
      */
-    void commandResultSender(CommandCallResultDTO resultDTO);
+    Mono<Void> commandResultSender(CommandCallResultDTO resultDTO);
 
     /**
      * Publishes an event report to the data center.

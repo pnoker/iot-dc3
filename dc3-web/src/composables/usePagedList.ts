@@ -17,7 +17,7 @@
 
 import {reactive} from 'vue';
 
-import type {Order, PageQuery, PageResult} from '@/config/types';
+import type {Order, PageQuery, PageResult, SortSpec} from '@/config/types';
 
 export interface PagedListPage {
   total: number;
@@ -38,7 +38,7 @@ export interface PagedListState<T, Q extends Record<string, any> = Record<string
 export interface UsePagedListOptions<T, Q extends Record<string, any> = Record<string, any>> {
   pageSize?: number;
   sortColumn?: string;
-  request?: (query: PageQuery & Partial<Q>) => Promise<R<PageResult<T>>>;
+  request?: (query: PageQuery & Partial<Q>) => Promise<PageResult<T>>;
   filter?: (rows: T[], query: Partial<Q>) => T[];
   sortValue?: (row: T) => string | number | null | undefined;
 }
@@ -65,6 +65,7 @@ export const usePagedList = <T, Q extends Record<string, any> = Record<string, a
       orders: [] as Order[],
     },
   }) as PagedListState<T, Q>;
+  let latestLoadId = 0;
 
   const applyFilters = () => {
     const filtered = options.filter ? options.filter([...state.allData], state.query) : [...state.allData];
@@ -84,16 +85,26 @@ export const usePagedList = <T, Q extends Record<string, any> = Record<string, a
       return;
     }
 
+    const loadId = ++latestLoadId;
     state.loading = true;
     try {
-      const response = await options.request({page: state.page, ...state.query} as PageQuery & Partial<Q>);
-      const data = response.data || ({records: [], total: 0} as PageResult<T>);
-      state.listData = data.records || [];
-      state.page.total = data.total || 0;
+      const sort: SortSpec[] = state.page.orders.map((order) => ({
+        field: order.column,
+        direction: order.asc ? 'ASC' : 'DESC',
+      }));
+      const data = await options.request({
+        offset: (state.page.current - 1) * state.page.size,
+        limit: state.page.size,
+        sort,
+        ...state.query,
+      } as PageQuery & Partial<Q>);
+      if (loadId !== latestLoadId) return;
+      state.listData = data.items;
+      state.page.total = data.total;
     } catch {
       // handled globally
     } finally {
-      state.loading = false;
+      if (loadId === latestLoadId) state.loading = false;
     }
   };
 

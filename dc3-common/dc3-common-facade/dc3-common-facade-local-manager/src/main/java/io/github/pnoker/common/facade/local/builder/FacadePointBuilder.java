@@ -18,12 +18,9 @@
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
-import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 /**
  * FacadePoint ↔ manager PointBO/Query mapper.
@@ -33,16 +30,6 @@ import org.mapstruct.Mapping;
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadePointBuilder {
-
-    /**
-     * To manager query.
-     *
-     * @param facadeQuery facade query
-     * @return to manager query result
-     */
-    @Mapping(target = "groupId", ignore = true)
-    @Mapping(target = "labelId", ignore = true)
-    PointQuery toManagerQuery(FacadePointQuery facadeQuery);
 
     /**
      * To facade business object.

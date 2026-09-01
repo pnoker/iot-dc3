@@ -19,11 +19,8 @@ package io.github.pnoker.common.gateway.filter;
 
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.netty.channel.ConnectTimeoutException;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
-import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.gateway.security.OAuthTokenResolver;
 import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.HmacAuthSigner;
@@ -39,10 +36,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.net.ConnectException;
 
@@ -71,10 +68,7 @@ public class AuthenticGatewayFilter implements GatewayFilter {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
-        // The auth lookups (tenant / user / token) are blocking gRPC calls. Run the whole
-        // synchronous block on boundedElastic so the Netty event loop stays free to accept
-        // new connections under load. FilterServiceImpl caches the lookups for ~60s.
-        return Mono.fromCallable(() -> resolvePrincipalHeader(request)).subscribeOn(Schedulers.boundedElastic())
+        return resolvePrincipalHeader(request)
                 .flatMap(userHeader -> {
                     String principalJson = JsonUtil.toJsonString(userHeader);
                     ServerHttpRequest mutated = request.mutate().headers(headers -> {
@@ -128,18 +122,19 @@ public class AuthenticGatewayFilter implements GatewayFilter {
      * @param request the incoming request
      * @return the resolved principal header
      */
-    private RequestHeader.PrincipalHeader resolvePrincipalHeader(ServerHttpRequest request) {
+    private Mono<RequestHeader.PrincipalHeader> resolvePrincipalHeader(ServerHttpRequest request) {
         // OAuth bearer tickets take precedence when the resolver is enabled: one verified
         // RS256 ticket becomes the same principal header a login ticket would produce.
         String authorization = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         OAuthTokenResolver resolver = oauthTokenResolver.getIfAvailable();
         if (resolver != null && OAuthTokenResolver.isBearer(authorization)) {
-            return resolver.resolve(authorization.substring(OAuthTokenResolver.BEARER_PREFIX.length()).trim());
+            return Mono.defer(() -> Mono.just(resolver.resolve(
+                    authorization.substring(OAuthTokenResolver.BEARER_PREFIX.length()).trim())));
         }
-        FacadeTenantBO tenant = filterService.getTenant(request);
-        FacadeLocalCredentialBO credential = filterService.getLocalCredential(request);
-        filterService.checkValid(request, tenant, credential);
-        return filterService.getUser(credential, tenant);
+        return filterService.getTenantReactive(request)
+                .flatMap(tenant -> filterService.getLocalCredentialReactive(request, tenant.getId())
+                        .flatMap(credential -> filterService.checkValidReactive(request, tenant, credential)
+                                .then(Mono.defer(() -> filterService.getUserReactive(credential, tenant)))));
     }
 
     /**
@@ -152,9 +147,10 @@ public class AuthenticGatewayFilter implements GatewayFilter {
      */
     private Mono<Void> writeErrorResponse(ServerWebExchange exchange, HttpStatus status, String message) {
         ServerHttpResponse response = exchange.getResponse();
-        response.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        response.getHeaders().setContentType(MediaType.APPLICATION_PROBLEM_JSON);
         response.setStatusCode(status);
-        DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(R.fail(message)));
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, message);
+        DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(problem));
         return response.writeWith(Mono.just(dataBuffer));
     }
 

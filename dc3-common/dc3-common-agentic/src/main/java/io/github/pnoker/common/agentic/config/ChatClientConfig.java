@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.config;
 
-import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.agentic.service.runtime.AgenticToolTracingCallbackProvider;
 import io.github.pnoker.common.agentic.tools.DeviceTool;
 import io.github.pnoker.common.agentic.tools.DriverTool;
@@ -27,12 +26,8 @@ import io.github.pnoker.common.agentic.tools.SystemTool;
 import io.github.pnoker.common.agentic.tools.TenantTool;
 import io.github.pnoker.common.agentic.tools.UserTool;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
-import org.springframework.ai.chat.memory.ChatMemory;
-import org.springframework.ai.chat.memory.ChatMemoryRepository;
-import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -41,14 +36,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * Configures Spring AI chat memory backed by the {@code dc3_message} business table
- * via {@link MessageChatMemoryRepository}. The {@link ChatClient} instances are
- * created dynamically per provider by {@link ChatClientFactory} and wired with the
- * {@link MessageChatMemoryAdvisor} bean defined here.
+ * Configures Spring AI tools and model clients. Conversation history is loaded and
+ * persisted by the agentic orchestration pipeline; synchronous Spring AI chat-memory
+ * adapters are intentionally not registered.
  *
  * @author pnoker
  * @since 2016.10.1
@@ -69,48 +62,6 @@ public class ChatClientConfig {
             - Point-value read, history, read-command, and pending write action preparation.
             - System health lookup.
             """;
-
-    /**
-     * Create and configure the application-managed agentic chat memory repository.
-     *
-     * @param messageService message service
-     * @param properties     properties
-     * @return agentic chat memory repository result
-     */
-    @Bean
-    @Primary
-    public ChatMemoryRepository agenticChatMemoryRepository(MessageService messageService,
-                                                            AgenticProperties properties) {
-        return new MessageChatMemoryRepository(messageService, properties);
-    }
-
-    /**
-     * Create and configure the application-managed agentic chat memory.
-     *
-     * @param chatMemoryRepository chat memory repository
-     * @param properties           properties
-     * @return agentic chat memory result
-     */
-    @Bean
-    @Primary
-    public ChatMemory agenticChatMemory(@Qualifier("agenticChatMemoryRepository") ChatMemoryRepository chatMemoryRepository,
-                                        AgenticProperties properties) {
-        return MessageWindowChatMemory.builder()
-                .chatMemoryRepository(chatMemoryRepository)
-                .maxMessages(properties.getMemoryMaxMessages())
-                .build();
-    }
-
-    /**
-     * Create and configure the application-managed agentic chat memory advisor.
-     *
-     * @param chatMemory chat memory
-     * @return agentic chat memory advisor result
-     */
-    @Bean
-    public Advisor agenticChatMemoryAdvisor(@Qualifier("agenticChatMemory") ChatMemory chatMemory) {
-        return MessageChatMemoryAdvisor.builder(chatMemory).build();
-    }
 
     /**
      * Create and configure the application-managed agentic tool call advisor.
@@ -147,25 +98,20 @@ public class ChatClientConfig {
                                                             PointValueTool pointValueTool, SystemTool systemTool,
                                                             ObjectMapper objectMapper) {
         ToolCallbackProvider provider = MethodToolCallbackProvider.builder()
-                .toolObjects(tenantTool, userTool, deviceTool, driverTool, profileTool, pointTool, pointValueTool,
-                        systemTool)
+                .toolObjects(tenantTool, userTool, systemTool)
                 .build();
-        return new AgenticToolTracingCallbackProvider(provider, objectMapper, tenantTool, userTool, deviceTool,
-                driverTool, profileTool, pointTool, pointValueTool, systemTool);
+        return new AgenticToolTracingCallbackProvider(provider, objectMapper, tenantTool, userTool, systemTool);
     }
 
     /**
      * Create and configure the application-managed agentic chat client builder.
      *
      * @param chatModel     chat model
-     * @param memoryAdvisor memory advisor
      * @return agentic chat client builder result
      */
     @Bean
-    @Primary
-    public ChatClient.Builder agenticChatClientBuilder(@Qualifier("openAiChatModel") ChatModel chatModel,
-                                                       @Qualifier("agenticChatMemoryAdvisor") Advisor memoryAdvisor) {
-        return ChatClient.builder(chatModel).defaultAdvisors(memoryAdvisor);
+    public ChatClient.Builder agenticChatClientBuilder(@Qualifier("openAiChatModel") ChatModel chatModel) {
+        return ChatClient.builder(chatModel);
     }
 
 }

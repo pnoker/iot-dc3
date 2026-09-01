@@ -1,260 +1,118 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.manager.grpc.server.driver;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcPointDTO;
-import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.api.common.GrpcRFactory;
-import io.github.pnoker.api.common.driver.GrpcPagePointDTO;
-import io.github.pnoker.api.common.driver.GrpcPagePointQuery;
+import io.github.pnoker.api.common.driver.GrpcOffsetPagePointDTO;
+import io.github.pnoker.api.common.driver.GrpcOffsetPointQuery;
 import io.github.pnoker.api.common.driver.GrpcPointQuery;
-import io.github.pnoker.api.common.driver.GrpcRPagePointDTO;
-import io.github.pnoker.api.common.driver.GrpcRPointDTO;
 import io.github.pnoker.api.common.driver.PointApiGrpc;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
-import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointBuilder;
-import io.github.pnoker.common.manager.service.DeviceService;
-import io.github.pnoker.common.manager.service.DriverService;
-import io.github.pnoker.common.manager.service.PointService;
-import io.github.pnoker.common.tenant.TenantContextHolder;
+import io.github.pnoker.common.manager.grpc.GrpcPageUtil;
+import io.github.pnoker.common.manager.grpc.server.manager.ReactiveGrpcServerSupport;
+import io.github.pnoker.common.manager.service.ReactiveDeviceService;
+import io.github.pnoker.common.manager.service.ReactiveDriverService;
+import io.github.pnoker.common.manager.service.ReactivePointService;
 import io.grpc.stub.StreamObserver;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * gRPC server handling driver-to-manager point requests.
- *
- * @author pnoker
- * @since 2016.10.1
- */
-@Slf4j
+/** Reactive gRPC server handling driver-to-manager point requests. */
 @Service
-@RequiredArgsConstructor
 public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
 
     private final GrpcPointBuilder grpcPointBuilder;
+    private final ReactivePointService reactivePointService;
+    private final ReactiveDriverService reactiveDriverService;
+    private final ReactiveDeviceService reactiveDeviceService;
 
-    private final PointService pointService;
-
-    private final DriverService driverService;
-
-    private final DeviceService deviceService;
-
-    @Override
-    public void listByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
-            GrpcR result;
-
-            PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
-
-            Page<PointBO> entityPage = selectDriverScopedPage(request, query);
-            if (Objects.isNull(entityPage)) {
-                result = GrpcRFactory.notFound();
-            } else {
-                result = GrpcRFactory.ok();
-
-                GrpcPagePointDTO.Builder pageBuilder = GrpcPagePointDTO.newBuilder();
-                GrpcPage.Builder page = GrpcPage.newBuilder();
-                page.setCurrent(entityPage.getCurrent());
-                page.setSize(entityPage.getSize());
-                page.setPages(entityPage.getPages());
-                page.setTotal(entityPage.getTotal());
-                pageBuilder.setPage(page);
-
-                List<GrpcPointDTO> entityGrpcDTOList = entityPage.getRecords()
-                        .stream()
-                        .map(grpcPointBuilder::buildGrpcDTOByBO)
-                        .toList();
-                pageBuilder.addAllData(entityGrpcDTOList);
-
-                builder.setData(pageBuilder);
-            }
-
-            builder.setResult(result);
-            responseObserver.onNext(builder.build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    @Autowired
+    public DriverPointServer(GrpcPointBuilder grpcPointBuilder,
+                             ReactivePointService reactivePointService,
+                             ReactiveDriverService reactiveDriverService,
+                             ReactiveDeviceService reactiveDeviceService) {
+        this.grpcPointBuilder = grpcPointBuilder;
+        this.reactivePointService = reactivePointService;
+        this.reactiveDriverService = reactiveDriverService;
+        this.reactiveDeviceService = reactiveDeviceService;
     }
 
     @Override
-    public void getById(GrpcPointQuery request, StreamObserver<GrpcRPointDTO> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
-            GrpcR result;
-
-            DriverBO driverBO = selectDriver(request.getDriverId());
-            PointBO entityBO = selectPoint(request.getPointId());
-            if (Objects.isNull(entityBO) || Objects.isNull(driverBO)
-                    || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())
-                    || !driverHasPoint(driverBO, entityBO)) {
-                result = GrpcRFactory.notFound();
-            } else {
-                result = GrpcRFactory.ok();
-
-                builder.setData(grpcPointBuilder.buildGrpcDTOByBO(entityBO));
-            }
-
-            builder.setResult(result);
-            responseObserver.onNext(builder.build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public void list(GrpcOffsetPointQuery request, StreamObserver<GrpcOffsetPagePointDTO> responseObserver) {
+        Mono<GrpcOffsetPagePointDTO> response = Mono.defer(() -> {
+            var page = GrpcPageUtil.require(request.hasPage() ? request.getPage() : null);
+            long offset = page.offset();
+            int limit = page.limit();
+            return reactiveDriverService.getById(request.getTenantId(), request.getDriverId())
+                .flatMapMany(driver -> resolveProfileIds(request, driver)
+                        .flatMapMany(profileIds -> Flux.fromIterable(profileIds)
+                                .flatMap(profileId -> reactivePointService.listByProfileId(request.getTenantId(), profileId), 8))
+                        .filter(point -> Objects.equals(point.getTenantId(), driver.getTenantId()))
+                        .distinct(PointBO::getId)
+                        .sort(Comparator.comparing(PointBO::getId, Comparator.nullsLast(Long::compareTo))))
+                .collectList()
+                .map(points -> {
+                    int from = (int) Math.min(offset, points.size());
+                    long endExclusive = offset > Long.MAX_VALUE - limit ? Long.MAX_VALUE : offset + limit;
+                    long end = Math.min((long) points.size(), endExclusive);
+                    int to = (int) Math.max(from, end);
+                    List<GrpcPointDTO> items = points.subList(from, to).stream()
+                            .map(grpcPointBuilder::buildGrpcDTOByBO).toList();
+                    return GrpcOffsetPagePointDTO.newBuilder()
+                            .setPage(io.github.pnoker.api.common.OffsetPage.newBuilder()
+                                    .setOffset(offset).setLimit(limit).setTotal(points.size())
+                                    .setHasNext(to < points.size()))
+                            .addAllItems(items)
+                            .build();
+                })
+                .onErrorResume(NotFoundException.class, ignored -> Mono.error(new NotFoundException("driver does not exist")));
+        });
+        ReactiveGrpcServerSupport.subscribe(response, responseObserver);
     }
 
-    /**
-     * Page points scoped to a driver: resolve the driver's profiles, load and filter the
-     * points by tenant and optional point-id, then paginate in memory.
-     *
-     * @param request the gRPC query request (driver/device/profile/point filters)
-     * @param query   the internal point query carrying tenant and page
-     * @return the paginated points, or null when the driver is missing or cross-tenant
-     */
-    private Page<PointBO> selectDriverScopedPage(GrpcPagePointQuery request, PointQuery query) {
-        Page<PointBO> page = new Page<>(query.getPage().getCurrent(), query.getPage().getSize());
-        DriverBO driverBO = selectDriver(request.getDriverId());
-        if (Objects.isNull(driverBO) || !Objects.equals(query.getTenantId(), driverBO.getTenantId())) {
-            return null;
-        }
-
-        Set<Long> profileIds = resolveDriverProfileIds(request, driverBO);
-        if (profileIds.isEmpty()) {
-            page.setRecords(Collections.emptyList());
-            return page;
-        }
-
-        List<PointBO> points = pointService.listByProfileIds(profileIds.stream().toList())
-                .stream()
-                .filter(point -> Objects.equals(driverBO.getTenantId(), point.getTenantId()))
-                .filter(point -> request.getPointId() <= 0 || Objects.equals(point.getId(), request.getPointId()))
-                .toList();
-
-        long total = points.size();
-        long current = page.getCurrent();
-        long size = page.getSize();
-        int from = (int) Math.min((current - 1) * size, total);
-        int to = (int) Math.min(from + size, total);
-
-        page.setTotal(total);
-        page.setRecords(points.subList(from, to));
-        return page;
+    @Override
+    public void getById(GrpcPointQuery request, StreamObserver<GrpcPointDTO> responseObserver) {
+        Mono<GrpcPointDTO> response = reactiveDriverService.getById(request.getTenantId(), request.getDriverId())
+                .flatMap(driver -> reactivePointService.getById(request.getTenantId(), request.getPointId())
+                        .filter(point -> Objects.equals(point.getTenantId(), driver.getTenantId()))
+                        .flatMap(point -> driverHasPoint(driver, point).filter(Boolean.TRUE::equals)
+                                .map(ignored -> grpcPointBuilder.buildGrpcDTOByBO(point))))
+                .switchIfEmpty(Mono.error(new NotFoundException("point does not exist")));
+        ReactiveGrpcServerSupport.subscribe(response, responseObserver);
     }
 
-    /**
-     * Resolve the profile ids a driver can access: when a device is requested, use its
-     * profile; otherwise collect profiles from all of the driver's devices.
-     *
-     * @param request  the gRPC query request
-     * @param driverBO the driver
-     * @return the accessible profile ids, filtered by the optional profile-id filter
-     */
-    private Set<Long> resolveDriverProfileIds(GrpcPagePointQuery request, DriverBO driverBO) {
-        if (request.getDeviceId() > 0) {
-            DeviceBO deviceBO = selectDevice(request.getDeviceId());
-            if (Objects.isNull(deviceBO) || !Objects.equals(deviceBO.getDriverId(), driverBO.getId())
-                    || !Objects.equals(deviceBO.getTenantId(), driverBO.getTenantId())) {
-                return Collections.emptySet();
-            }
-            return filterProfileId(request, deviceBO.getProfileId());
+    private Mono<Set<Long>> resolveProfileIds(GrpcOffsetPointQuery request, DriverBO driver) {
+        if (request.hasDeviceId()) {
+            return reactiveDeviceService.getById(request.getTenantId(), request.getDeviceId())
+                    .filter(device -> Objects.equals(device.getDriverId(), driver.getId()))
+                    .map(DeviceBO::getProfileId)
+                    .filter(Objects::nonNull)
+                    .filter(profileId -> !request.hasProfileId() || Objects.equals(profileId, request.getProfileId()))
+                    .map(Set::of)
+                    .defaultIfEmpty(Set.of());
         }
-
-        Set<Long> profileIds = deviceService.listByDriverId(driverBO.getId(), driverBO.getTenantId())
-                .stream()
-                .filter(device -> Objects.equals(driverBO.getTenantId(), device.getTenantId()))
+        return reactiveDeviceService.listByDriverId(request.getTenantId(), driver.getId())
                 .map(DeviceBO::getProfileId)
                 .filter(Objects::nonNull)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-        return filterProfileId(request, profileIds);
+                .filter(profileId -> !request.hasProfileId() || Objects.equals(profileId, request.getProfileId()))
+                .collect(Collectors.toSet());
     }
 
-    private Set<Long> filterProfileId(GrpcPagePointQuery request, Long profileId) {
-        if (Objects.isNull(profileId)) {
-            return Collections.emptySet();
-        }
-        if (request.getProfileId() <= 0) {
-            return Set.of(profileId);
-        }
-        return Objects.equals(profileId, request.getProfileId()) ? Set.of(profileId) : Collections.emptySet();
-    }
-
-    private Set<Long> filterProfileId(GrpcPagePointQuery request, Set<Long> profileIds) {
-        if (request.getProfileId() <= 0) {
-            return profileIds;
-        }
-        return profileIds.contains(request.getProfileId()) ? Set.of(request.getProfileId()) : Collections.emptySet();
-    }
-
-    /**
-     * Return whether a driver serves the profile that owns a point.
-     *
-     * @param driverBO the driver
-     * @param pointBO  the point
-     * @return true if the driver has a device sharing the point's profile
-     */
-    private boolean driverHasPoint(DriverBO driverBO, PointBO pointBO) {
-        return deviceService.listByDriverId(driverBO.getId(), driverBO.getTenantId())
-                .stream()
-                .filter(device -> Objects.equals(driverBO.getTenantId(), device.getTenantId()))
+    private Mono<Boolean> driverHasPoint(DriverBO driver, PointBO point) {
+        return reactiveDeviceService.listByDriverId(driver.getTenantId(), driver.getId())
                 .map(DeviceBO::getProfileId)
                 .filter(Objects::nonNull)
-                .anyMatch(profileId -> Objects.equals(profileId, pointBO.getProfileId()));
-    }
-
-    private DriverBO selectDriver(Long driverId) {
-        try {
-            return driverService.getById(driverId);
-        } catch (Exception ignored) {
-            return null;
-        }
-    }
-
-    private DeviceBO selectDevice(Long deviceId) {
-        try {
-            return deviceService.getById(deviceId);
-        } catch (Exception ignored) {
-            return null;
-        }
-    }
-
-    private PointBO selectPoint(Long pointId) {
-        try {
-            return pointService.getById(pointId);
-        } catch (Exception ignored) {
-            return null;
-        }
+                .any(profileId -> Objects.equals(profileId, point.getProfileId()));
     }
 
 }

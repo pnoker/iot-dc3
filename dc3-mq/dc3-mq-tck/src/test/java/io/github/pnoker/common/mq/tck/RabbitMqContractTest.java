@@ -84,6 +84,7 @@ class RabbitMqContractTest extends AbstractMqContractTest {
     protected void shutdownAdapter() {
         if (Objects.nonNull(rabbitAdapter)) {
             rabbitAdapter.stop();
+            rabbitAdapter = null;
         }
     }
 
@@ -100,7 +101,7 @@ class RabbitMqContractTest extends AbstractMqContractTest {
 
         String group = "tck-ttl";
         subscribeCollector(loadBalancePattern(MqTopic.POINT_COMMAND, group, "tck.*", Duration.ofMillis(600)),
-                delivery -> delivery.acknowledgment().ack());
+                delivery -> io.github.pnoker.common.constant.mq.DeliveryDisposition.ACK);
         shutdownAdapter();
 
         RabbitAdmin admin = new RabbitAdmin(connectionFactory);

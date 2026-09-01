@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 /**
  * S19-final store SPI (docs/design/tsdb-abstraction.md §6). One implementation per
  * store behind {@code dc3.tsdb.type}; the write orchestration (schema validation,
@@ -89,7 +92,7 @@ public interface TsdbStore {
      * @param samples samples to append, never empty
      * @return accepted sample count (best-effort per store)
      */
-    int append(List<PointValueSample> samples);
+    Mono<Integer> append(List<PointValueSample> samples);
 
     // ===== reads (unified filter: single series / multi series / tenant-wide) =====
 
@@ -102,12 +105,12 @@ public interface TsdbStore {
      * @param deadline read deadline
      * @return samples grouped by series
      */
-    Map<SeriesKey, List<PointValueSample>> last(SeriesFilter filter, int limit, TsdbDeadline deadline);
+    Mono<Map<SeriesKey, List<PointValueSample>>> last(SeriesFilter filter, int limit, TsdbDeadline deadline);
 
     /**
      * S5/S14: one descending cursor page over the filter's series inside the window;
      * {@code cursor == null} starts from the newest. Cursor is the global
-     * (deviceTime, messageId) tuple across the whole series set.
+     * (deviceTime, series, messageId) tuple across the whole series set.
      *
      * @param filter   series selection
      * @param window   half-open time window
@@ -116,8 +119,8 @@ public interface TsdbStore {
      * @param deadline read deadline
      * @return one descending page
      */
-    CursorPage<PointValueSample> history(SeriesFilter filter, TimeWindow window,
-                                         Cursor cursor, int pageSize, TsdbDeadline deadline);
+    Mono<CursorPage<PointValueSample>> history(SeriesFilter filter, TimeWindow window,
+                                               Cursor cursor, int pageSize, TsdbDeadline deadline);
 
     /**
      * S6/S15: single-window aggregate per series (NULL-skipping for AVG/MIN/MAX/SUM;
@@ -131,8 +134,8 @@ public interface TsdbStore {
      * @param deadline   read deadline
      * @return aggregate grouped by series
      */
-    Map<SeriesKey, WindowAggregate> aggregate(SeriesFilter filter, AggregateFunction fn,
-                                              TimeWindow window, Double percentile, TsdbDeadline deadline);
+    Mono<Map<SeriesKey, WindowAggregate>> aggregate(SeriesFilter filter, AggregateFunction fn,
+                                                    TimeWindow window, Double percentile, TsdbDeadline deadline);
 
     /**
      * S7/S15/S16: per-bucket aggregates over the window, buckets ascending, per series.
@@ -148,10 +151,10 @@ public interface TsdbStore {
      * @param deadline    read deadline
      * @return per-bucket aggregates, buckets ascending, per series
      */
-    Map<SeriesKey, List<BucketAggregate>> bucketedAggregate(SeriesFilter filter,
-                                                            AggregateFunction fn, TimeWindow window,
-                                                            Duration bucketWidth, Double percentile,
-                                                            TsdbDeadline deadline);
+    Mono<Map<SeriesKey, List<BucketAggregate>>> bucketedAggregate(SeriesFilter filter,
+                                                                  AggregateFunction fn, TimeWindow window,
+                                                                  Duration bucketWidth, Double percentile,
+                                                                  TsdbDeadline deadline);
 
     /**
      * S8: sample count inside the window for the filter (all three scopes).
@@ -161,7 +164,7 @@ public interface TsdbStore {
      * @param deadline read deadline
      * @return sample count inside the window
      */
-    long count(SeriesFilter filter, TimeWindow window, TsdbDeadline deadline);
+    Mono<Long> count(SeriesFilter filter, TimeWindow window, TsdbDeadline deadline);
 
     // ===== S13: tenant-level analytics (gated by the tenantWideAnalytics capability) =====
 
@@ -174,8 +177,8 @@ public interface TsdbStore {
      * @param deadline    read deadline
      * @return time-bucketed counts, buckets ascending
      */
-    List<BucketAggregate> bucketedCount(long tenantId, TimeWindow window,
-                                        Duration bucketWidth, TsdbDeadline deadline);
+    Mono<List<BucketAggregate>> bucketedCount(long tenantId, TimeWindow window,
+                                               Duration bucketWidth, TsdbDeadline deadline);
 
     /**
      * S13-②: tenant-wide grouped counts, descending, top {@code limit}.
@@ -187,8 +190,8 @@ public interface TsdbStore {
      * @param deadline  read deadline
      * @return grouped counts, descending
      */
-    List<DimensionCount> countByDimension(long tenantId, TimeWindow window,
-                                          GroupDimension dimension, int limit, TsdbDeadline deadline);
+    Mono<List<DimensionCount>> countByDimension(long tenantId, TimeWindow window,
+                                                GroupDimension dimension, int limit, TsdbDeadline deadline);
 
     /**
      * S13-⑤: per-series counts (grouped by tenant, device, point) inside the
@@ -199,7 +202,7 @@ public interface TsdbStore {
      * @param deadline read deadline
      * @return per-series counts
      */
-    List<SeriesCount> seriesCounts(long tenantId, TimeWindow window, TsdbDeadline deadline);
+    Flux<SeriesCount> seriesCounts(long tenantId, TimeWindow window, TsdbDeadline deadline);
 
     /**
      * S13-③: every series with samples in the window plus its newest sample time.
@@ -209,7 +212,7 @@ public interface TsdbStore {
      * @param deadline read deadline
      * @return one row per series with samples in the window
      */
-    List<SeriesLastSeen> lastSeenPerSeries(long tenantId, TimeWindow window, TsdbDeadline deadline);
+    Mono<List<SeriesLastSeen>> lastSeenPerSeries(long tenantId, TimeWindow window, TsdbDeadline deadline);
 
     /**
      * S13-④: receive-latency histogram over {@code receiveTime − deviceTime}
@@ -221,8 +224,8 @@ public interface TsdbStore {
      * @param deadline   read deadline
      * @return latency histogram bins
      */
-    List<LatencyBin> latencyHistogram(long tenantId, TimeWindow window,
-                                      List<Long> binEdgesMs, TsdbDeadline deadline);
+    Mono<List<LatencyBin>> latencyHistogram(long tenantId, TimeWindow window,
+                                             List<Long> binEdgesMs, TsdbDeadline deadline);
 
     // ===== operations =====
 
@@ -234,7 +237,7 @@ public interface TsdbStore {
      * @param deadline read deadline
      * @return series with samples in the window
      */
-    List<SeriesKey> listSeries(long tenantId, TimeWindow window, TsdbDeadline deadline);
+    Mono<List<SeriesKey>> listSeries(long tenantId, TimeWindow window, TsdbDeadline deadline);
 
     /**
      * S10: capability-gated time-range delete (tenant offboarding).
@@ -242,7 +245,7 @@ public interface TsdbStore {
      * @param series target series
      * @param window half-open time window
      */
-    void deleteRange(SeriesKey series, TimeWindow window);
+    Mono<Void> deleteRange(SeriesKey series, TimeWindow window);
 
     /**
      * S19: aligned-bucket Pearson correlation between two series
@@ -256,8 +259,8 @@ public interface TsdbStore {
      * @param deadline    read deadline
      * @return aligned-bucket Pearson correlation
      */
-    CorrelationResult correlation(SeriesKey a, SeriesKey b, TimeWindow window,
-                                  Duration alignBucket, TsdbDeadline deadline);
+    Mono<CorrelationResult> correlation(SeriesKey a, SeriesKey b, TimeWindow window,
+                                        Duration alignBucket, TsdbDeadline deadline);
 
     /**
      * S16 tiered-rollup support levels.

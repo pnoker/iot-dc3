@@ -68,17 +68,7 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-mq-activemq</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-mq-mqtt</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-mq-rocketmq</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

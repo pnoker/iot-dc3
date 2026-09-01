@@ -25,6 +25,7 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Renews runtime membership. Expired local leases automatically stop device work.
@@ -37,14 +38,18 @@ public class DriverLeaseRenewScheduleJob extends QuartzJobBean {
 
     private final DriverClient driverClient;
     private final DriverMetadata driverMetadata;
+    private final AtomicBoolean renewalInFlight = new AtomicBoolean();
 
     @Override
     protected void executeInternal(JobExecutionContext context) {
-        try {
-            driverClient.renewLease();
-        } catch (Exception e) {
-            log.error("Driver lease renewal failed, leaseValid={}, leaseUntilEpochMillis={}",
-                    driverMetadata.leaseValid(), driverMetadata.getLeaseUntilEpochMillis(), e);
+        if (!renewalInFlight.compareAndSet(false, true)) {
+            log.debug("Skip overlapping driver lease renewal");
+            return;
         }
+        driverClient.renewLease()
+                .doOnError(error -> log.error("Driver lease renewal failed, leaseValid={}, leaseUntilEpochMillis={}",
+                        driverMetadata.leaseValid(), driverMetadata.getLeaseUntilEpochMillis(), error))
+                .doFinally(signal -> renewalInFlight.set(false))
+                .subscribe();
     }
 }

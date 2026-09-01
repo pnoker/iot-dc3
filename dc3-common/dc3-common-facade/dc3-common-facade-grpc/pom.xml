@@ -33,7 +33,7 @@
     <inceptionYear>2016</inceptionYear>
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
-        gRPC implementation of the Facade API, selected when dc3.facade.mode=grpc (default).
+        gRPC implementation of the Facade API, selected independently for auth, manager, and data domains.
         Holds BlockingStubs and translates between Facade BO/Query and protobuf DTOs.
     </description>
 

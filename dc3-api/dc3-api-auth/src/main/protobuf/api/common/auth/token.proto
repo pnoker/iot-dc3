@@ -19,7 +19,6 @@ syntax = "proto3";
 
 package api.common.auth;
 
-import "api/common/r.proto";
 
 // Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.auth";
@@ -30,7 +29,7 @@ option java_multiple_files = true;
 // Service interface defining token-related RPC calls
 service TokenApi {
   // Validate token
-  rpc CheckValid (GrpcLoginQuery) returns (GrpcRTokenDTO);
+  rpc CheckValid (GrpcLoginQuery) returns (GrpcTokenValidationDTO);
 }
 
 // Request message for validating login information
@@ -45,11 +44,8 @@ message GrpcLoginQuery {
   string token = 3;
 }
 
-// Response wrapper for token validation result
-message GrpcRTokenDTO {
-  // Common result wrapper with status code, message, etc.
-  GrpcR result = 1;
-
-  // Returned data, typically a token or expiration time, etc.
-  string data = 2;
+// Token validation payload.
+message GrpcTokenValidationDTO {
+  bool valid = 1;
+  string expire_time = 2;
 }

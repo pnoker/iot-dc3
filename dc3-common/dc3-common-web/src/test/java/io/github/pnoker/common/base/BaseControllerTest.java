@@ -17,11 +17,9 @@
 
 package io.github.pnoker.common.base;
 
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
-import reactor.test.StepVerifier;
 
 import java.util.List;
 
@@ -76,26 +74,6 @@ class BaseControllerTest {
         entities.add(null);
         entities.add(new TenantEntity(1L));
         assertThat(controller.filterTenant(1L, entities)).hasSize(2);
-    }
-
-    @Test
-    void asyncWrapsSupplierIntoMono() {
-        StepVerifier.create(controller.async(() -> R.ok("hello")))
-                .assertNext(response -> {
-                    assertThat(response.isOk()).isTrue();
-                    assertThat(response.getMessage()).isEqualTo("hello");
-                })
-                .verifyComplete();
-    }
-
-    @Test
-    void asyncPropagatesSupplierExceptionAsMonoError() {
-        StepVerifier.create(controller.async(() -> {
-                    throw new IllegalStateException("supplier failed");
-                }))
-                .expectErrorMatches(throwable -> throwable instanceof IllegalStateException
-                        && "supplier failed".equals(throwable.getMessage()))
-                .verify();
     }
 
     private record TenantEntity(Long tenantId) implements TenantOwned {

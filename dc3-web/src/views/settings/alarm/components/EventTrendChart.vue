@@ -64,7 +64,7 @@ const load = async () => {
   loading.value = true;
   try {
     const res: any = await alertTrend(props.days ?? 30);
-    const rows: any[] = res?.data ?? [];
+    const rows: any[] = res ?? [];
     const flat: { date: string; source: string; count: number }[] = [];
     for (const r of rows) {
       flat.push({date: r.date, source: t('settings.event.sourceDevice'), count: r.deviceCount ?? 0});

@@ -25,15 +25,13 @@ export POSTGRES_PORT=35432
 export POSTGRES_USERNAME=dc3
 export POSTGRES_PASSWORD=dc3dc3dc3
 export POSTGRES_DB=dc3
+export DC3_R2DBC_URL=r2dbc:postgresql://localhost:35432/dc3
+export DC3_SCHEMA_FINGERPRINT=c0f7f2264a1169469d44dc2e72dd439477a0f1f4a3369002e0a0572a386c96fa
+export DC3_SCHEMA_CONTRACT=r2dbc-flag-day-v1
 
 # Message broker selection (docs/mq-brokers.md); rabbitmq is the default
 export DC3_MQ_TYPE=rabbitmq
 
-# Relational dialect selection (docs/db-dialects.md); postgres is the default
-export DC3_DB_TYPE=postgres
-
-# Time-series store selection (docs/design/tsdb-abstraction.md); timescale is the default
-export DC3_TSDB_TYPE=timescale
 
 # RabbitMQ
 export RABBITMQ_VIRTUAL_HOST=dc3
@@ -60,7 +58,6 @@ export CENTER_AGENTIC_HOST=localhost
 
 # Runtime
 export NODE_ENV=dev
-export DC3_FACADE_MODE=grpc
 export DC3_FACADE_GRPC_DEADLINE_MS=3000
 export DC3_SECURITY_KEY=dc3.security.key.2026.io.github.pnoker
 export AUTH_HMAC_SECRET=io.github.pnoker.dc3

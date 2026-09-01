@@ -19,7 +19,6 @@ package io.github.pnoker.common.entity.dto;
 
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,7 +35,6 @@ import java.io.Serializable;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class MetadataEventDTO implements Serializable {
 
     @Serial
@@ -47,6 +45,8 @@ public class MetadataEventDTO implements Serializable {
      */
     private Long id;
 
+    private Long tenantId;
+
     /**
      * Type
      */
@@ -56,5 +56,17 @@ public class MetadataEventDTO implements Serializable {
      * Type, , ,
      */
     private MetadataOperateTypeEnum operateType;
+
+    public MetadataEventDTO(Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType) {
+        this(null, id, metadataType, operateType);
+    }
+
+    public MetadataEventDTO(Long tenantId, Long id, MetadataTypeEnum metadataType,
+                            MetadataOperateTypeEnum operateType) {
+        this.tenantId = tenantId;
+        this.id = id;
+        this.metadataType = metadataType;
+        this.operateType = operateType;
+    }
 
 }

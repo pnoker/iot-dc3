@@ -37,7 +37,7 @@ const onRefresh = async () => {
   refreshing.value = true;
   try {
     const res = await refreshMcpToolCatalog();
-    successMessage(t('settings.mcp.refreshed', {count: res.data || 0}));
+    successMessage(t('settings.mcp.refreshed', {count: res || 0}));
     listRef.value?.reload();
   } finally {
     refreshing.value = false;

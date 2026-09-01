@@ -20,7 +20,6 @@ package io.github.pnoker.common.security;
 import io.github.pnoker.common.facade.api.PermissionFacade;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.Set;
 
@@ -49,8 +48,7 @@ public class FacadePermissionProvider implements PermissionProvider {
         if (tenantId == null || principalId == null) {
             return Mono.just(Set.of());
         }
-        return Mono.fromCallable(() -> permissionFacade.listPermissionCodes(tenantId, principalId))
-                .subscribeOn(Schedulers.boundedElastic());
+        return permissionFacade.listPermissionCodes(tenantId, principalId);
     }
 
 }

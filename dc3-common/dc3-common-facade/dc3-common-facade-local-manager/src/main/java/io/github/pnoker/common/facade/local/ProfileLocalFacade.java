@@ -17,17 +17,13 @@
 
 package io.github.pnoker.common.facade.local;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.facade.api.ProfileFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeProfileQuery;
+import io.github.pnoker.common.facade.entity.query.FacadeProfileOffsetQuery;
 import io.github.pnoker.common.facade.local.builder.FacadeProfileBuilder;
-import io.github.pnoker.common.manager.entity.bo.ProfileBO;
-import io.github.pnoker.common.manager.entity.query.ProfileQuery;
-import io.github.pnoker.common.manager.service.ProfileService;
-import io.github.pnoker.common.tenant.TenantContextHolder;
-import lombok.RequiredArgsConstructor;
+import io.github.pnoker.common.manager.repository.ProfileFilter;
+import io.github.pnoker.common.manager.service.ReactiveProfileService;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +32,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * In-process ProfileFacade implementation.
@@ -45,70 +43,46 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class ProfileLocalFacade implements ProfileFacade {
 
-    private final ProfileService profileService;
+
+    private final ReactiveProfileService reactiveProfileService;
 
     private final FacadeProfileBuilder facadeProfileBuilder;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    public ProfileLocalFacade(ReactiveProfileService reactiveProfileService, FacadeProfileBuilder facadeProfileBuilder) {
+        this.reactiveProfileService = reactiveProfileService;
+        this.facadeProfileBuilder = facadeProfileBuilder;
+    }
+
+
     @Override
-    public FacadeProfileBO getById(Long tenantId, Long id) {
-        TenantContextHolder.setTenantId(tenantId);
-        try {
-            ProfileBO managerBO = profileService.getById(id);
-            return Objects.isNull(managerBO) ? null : facadeProfileBuilder.toFacadeBO(managerBO);
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Mono<FacadeProfileBO> getByIdReactive(Long tenantId, Long id) {
+        return reactiveProfileService.getById(tenantId, id).map(facadeProfileBuilder::toFacadeBO);
     }
 
     @Override
-    public List<FacadeProfileBO> listByIds(Long tenantId, Collection<Long> ids) {
-        TenantContextHolder.setTenantId(tenantId);
-        try {
-            if (Objects.isNull(ids) || ids.isEmpty()) {
-                return Collections.emptyList();
-            }
-            List<ProfileBO> list = profileService.listByIds(new HashSet<>(ids));
-            if (Objects.isNull(list) || list.isEmpty()) {
-                return Collections.emptyList();
-            }
-            return list.stream().map(facadeProfileBuilder::toFacadeBO).toList();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Flux<FacadeProfileBO> listByIdsReactive(Long tenantId, Collection<Long> ids) {
+        List<Long> normalized = ids == null ? List.of() : ids.stream()
+                .filter(value -> value != null && value > 0).distinct().toList();
+        return reactiveProfileService.listByIds(tenantId, normalized).map(facadeProfileBuilder::toFacadeBO);
     }
 
     @Override
-    public FacadePage<FacadeProfileBO> listByPage(FacadeProfileQuery query) {
-        TenantContextHolder.setTenantId(query.getTenantId());
-        try {
-            ProfileQuery managerQuery = facadeProfileBuilder.toManagerQuery(query);
-            Page<ProfileBO> page = profileService.list(managerQuery);
-            if (Objects.isNull(page)) {
-                return FacadePage.empty();
-            }
-
-            List<FacadeProfileBO> records = page.getRecords().stream().map(facadeProfileBuilder::toFacadeBO).toList();
-            return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Flux<FacadeProfileBO> listByDeviceIdReactive(Long tenantId, Long deviceId) {
+        return reactiveProfileService.listByDeviceId(tenantId, deviceId).map(facadeProfileBuilder::toFacadeBO);
     }
 
     @Override
-    public List<FacadeProfileBO> listByDeviceId(Long tenantId, Long deviceId) {
-        TenantContextHolder.setTenantId(tenantId);
-        try {
-            List<ProfileBO> list = profileService.listByDeviceId(deviceId);
-            if (Objects.isNull(list) || list.isEmpty()) {
-                return Collections.emptyList();
-            }
-            return list.stream().map(facadeProfileBuilder::toFacadeBO).toList();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Mono<OffsetPage<FacadeProfileBO>> listReactive(FacadeProfileOffsetQuery query) {
+        ProfileFilter filter = new ProfileFilter(query.tenantId(), query.profileName(), query.profileCode(),
+                query.profileShareFlag(), query.profileTypeFlag(), query.enableFlag(), query.groupId(),
+                query.labelId(), query.version(), query.deviceId(), query.offset(), query.limit(), query.sort());
+        return reactiveProfileService.list(filter)
+                .map(page -> OffsetPage.of(page.items().stream().map(facadeProfileBuilder::toFacadeBO).toList(),
+                        page.offset(), page.limit(), page.total()));
     }
+
 
 }

@@ -119,11 +119,11 @@ const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing', 'edit
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const emitToggle = (name: 'disable-thing' | 'enable-thing') => {
-  emit(name, props.data.id, props.data.profileId, () => successMessage());
+  emit(name, props.data, () => successMessage());
 };
 
 const emitDelete = () => {
-  emit('delete-thing', props.data.id, () => successMessage());
+  emit('delete-thing', props.data, () => successMessage());
 };
 </script>
 

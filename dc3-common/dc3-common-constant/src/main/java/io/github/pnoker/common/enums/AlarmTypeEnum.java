@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -60,7 +59,6 @@ public enum AlarmTypeEnum {
     REPORT((byte) 4, "report", "Report alarm"),
     ;
 
-    @EnumValue
     private final Byte index;
 
     private final String code;

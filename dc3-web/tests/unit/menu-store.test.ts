@@ -31,8 +31,8 @@ vi.mock('@/api/menu', () => menuMocks);
 describe('menu store', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
-    vi.clearAllMocks();
-    menuMocks.listMenuTree.mockResolvedValue({data: sampleMenuTree});
+    vi.resetAllMocks();
+    menuMocks.listMenuTree.mockResolvedValue(sampleMenuTree);
   });
 
   describe('fetchTree', () => {
@@ -71,7 +71,7 @@ describe('menu store', () => {
     });
 
     it('coerces non-array payloads to an empty tree', async () => {
-      menuMocks.listMenuTree.mockResolvedValueOnce({data: {not: 'an array'}});
+      menuMocks.listMenuTree.mockResolvedValueOnce({not: 'an array'});
       const store = useMenuStore();
 
       await store.fetchTree();
@@ -119,3 +119,5 @@ describe('menu store', () => {
     });
   });
 });
+    menuMocks.listMenuTree.mockResolvedValue(sampleMenuTree);
+      menuMocks.listMenuTree.mockResolvedValueOnce({not: 'an array'});

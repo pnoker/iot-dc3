@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.RuleStateBO;
 import io.github.pnoker.common.data.entity.model.RuleStateDO;
 import io.github.pnoker.common.data.entity.vo.RuleStateVO;
@@ -27,7 +26,6 @@ import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.RuleStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -167,25 +165,5 @@ public interface RuleStateBuilder {
      * @return converted value
      */
     List<RuleStateVO> buildVOListByBOList(List<RuleStateBO> entityBOList);
-
-    /**
-     * Convert do page to bo page.
-     *
-     * @param entityPageDO persistence object
-     * @return converted value
-     */
-    default Page<RuleStateBO> buildBOPageByDOPage(Page<RuleStateDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    /**
-     * Convert bo page to vo page.
-     *
-     * @param entityPageBO business object
-     * @return converted value
-     */
-    default Page<RuleStateVO> buildVOPageByBOPage(Page<RuleStateBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
 }

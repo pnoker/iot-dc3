@@ -17,12 +17,10 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.common.auth.entity.model.RoleResourceBindDO;
 import io.github.pnoker.common.auth.entity.vo.RoleResourceBindVO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -102,24 +100,6 @@ public interface RoleResourceBindBuilder {
      */
     List<RoleResourceBindVO> buildVOListByBOList(List<RoleResourceBindBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    default Page<RoleResourceBindBO> buildBOPageByDOPage(Page<RoleResourceBindDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<RoleResourceBindVO> buildVOPageByBOPage(Page<RoleResourceBindBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
 }

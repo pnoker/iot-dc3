@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
+import reactor.core.publisher.Mono;
 
 /**
  * Persists device alarm events to {@code dc3_entity_alarm} and feeds the rule pipeline.
@@ -32,6 +33,6 @@ public interface DeviceAlarmService {
      *
      * @param entityDTO DeviceAlarmDTO
      */
-    void alarm(DeviceAlarmDTO entityDTO);
+    Mono<Void> alarm(DeviceAlarmDTO entityDTO);
 
 }

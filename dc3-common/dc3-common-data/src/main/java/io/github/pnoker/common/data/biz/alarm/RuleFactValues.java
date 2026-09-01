@@ -23,7 +23,7 @@ import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Objects;
 
@@ -40,6 +40,7 @@ final class RuleFactValues {
 
     static Map<String, Object> point(PointValueBO pointValue) {
         return RuleValueMap.from(new PointSnapshot(
+                pointValue.getMessageId(),
                 pointValue.getDeviceId(),
                 pointValue.getPointId(),
                 pointValue.getDriverId(),
@@ -74,8 +75,8 @@ final class RuleFactValues {
 
     static Map<String, Object> eventReport(EventReportDTO dto) {
         LocalDateTime ts = Objects.nonNull(dto.occurTime())
-                ? LocalDateTime.ofInstant(dto.occurTime(), ZoneId.systemDefault())
-                : LocalDateTime.now();
+                ? LocalDateTime.ofInstant(dto.occurTime(), ZoneOffset.UTC)
+                : LocalDateTime.now(ZoneOffset.UTC);
         return RuleValueMap.from(new EventReportSnapshot(
                 dto.deviceId(),
                 dto.eventId(),
@@ -99,6 +100,7 @@ final class RuleFactValues {
     }
 
     private record PointSnapshot(
+            String messageId,
             Long deviceId,
             Long pointId,
             Long driverId,

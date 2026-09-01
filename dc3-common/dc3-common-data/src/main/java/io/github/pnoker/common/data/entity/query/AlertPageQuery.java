@@ -17,6 +17,9 @@
 
 package io.github.pnoker.common.data.entity.query;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,6 +39,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @Schema(description = "Alert Page query parameters")
 public class AlertPageQuery implements Serializable {
 
@@ -58,24 +62,18 @@ public class AlertPageQuery implements Serializable {
     private Integer confirmFlag;
 
     /**
-     * Legacy integer window; {@code rangeKey} wins when both set.
-     */
-    @Schema(description = "Fallback rolling time range in hours", example = "24")
-    private Integer rangeHours;
-
-    /**
      * Preset time-range key — resolved server-side via TimeRangeUtil.
      */
     @Schema(description = "Preset time range key: today, 24h, 7d, or 30d", example = "24h")
     private String rangeKey;
 
-    /**
-     * 1-based page index. Defaults to 1 if null or less.
-     */
-    @Schema(description = "Current page number", example = "1")
-    private Long current;
+    @Schema(description = "Zero-based row offset", example = "0")
+    private long offset;
 
-    @Schema(description = "Page size", example = "20")
-    private Long size;
+    @Schema(description = "Maximum rows to return", example = "50")
+    private int limit = PageRequest.DEFAULT_LIMIT;
+
+    @Schema(description = "Whitelisted sort fields")
+    private java.util.List<SortSpec> sort = java.util.List.of();
 
 }

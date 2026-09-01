@@ -116,10 +116,10 @@ interface DeviceAddFormData {
 }
 
 interface DictionaryPage {
-  records: Dictionary[];
+  items: Dictionary[];
 }
 
-type DictionaryResponse = R<DictionaryPage>;
+type DictionaryResponse = DictionaryPage;
 
 const emit = defineEmits<{
   (e: 'add', formData: DeviceAddFormData, done: () => void): void;
@@ -165,10 +165,11 @@ const driverDictionary = async (query = '') => {
   reactiveData.driverLoading = true;
   try {
     const res = await listDriverDictionary<DictionaryResponse>({
-      page: {size: 50, current: 1},
+      offset: 0,
+      limit: 50,
       label: query,
     });
-    reactiveData.driverDictionary = res.data.records ?? [];
+    reactiveData.driverDictionary = res.items ?? [];
   } catch {
     // nothing to do
   } finally {
@@ -186,10 +187,11 @@ const profileDictionary = async (query = '') => {
   reactiveData.profileLoading = true;
   try {
     const res = await listProfileDictionary<DictionaryResponse>({
-      page: {size: 50, current: 1},
+      offset: 0,
+      limit: 50,
       label: query,
     });
-    reactiveData.profileDictionary = res.data.records ?? [];
+    reactiveData.profileDictionary = res.items ?? [];
   } catch {
     // nothing to do
   } finally {

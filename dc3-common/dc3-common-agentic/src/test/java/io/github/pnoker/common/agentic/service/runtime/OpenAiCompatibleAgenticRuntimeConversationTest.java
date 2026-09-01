@@ -40,6 +40,7 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.definition.DefaultToolDefinition;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import reactor.test.StepVerifier;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -123,7 +124,7 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
             RecordingToolCallback callback = new RecordingToolCallback(scenario.toolName(), scenario.toolResult());
             OpenAiCompatibleAgenticRuntime runtime = runtime(server, callback);
 
-            AgenticRuntimeResult result = runtime.call(prepared(scenario.userMessage()));
+            AgenticRuntimeResult result = await(runtime.call(prepared(scenario.userMessage())));
 
             assertThat(result.content()).isEqualTo(scenario.finalAnswer());
             assertThat(result.finishReason()).isEqualTo(AgenticConstant.Chat.FINISH_REASON_STOP);
@@ -151,7 +152,7 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
                     "{\"success\":true,\"code\":\"OK\",\"message\":\"Device page loaded\",\"data\":{}}");
             OpenAiCompatibleAgenticRuntime runtime = runtime(server, callback);
 
-            AgenticRuntimeResult result = runtime.call(prepared("你好"));
+            AgenticRuntimeResult result = await(runtime.call(prepared("你好")));
 
             assertThat(result.content()).isEqualTo("你好，我是 IoT DC3 平台助手。");
             assertThat(callback.calls()).hasValue(0);
@@ -165,19 +166,25 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
         provider.setProviderType(AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE);
         provider.setBaseUrl(server.baseUrl());
         provider.setApiKey("test-api-key");
-        when(chatClientFactory.resolveProviderForModel(MODEL)).thenReturn(provider);
+        when(chatClientFactory.resolveProviderForModel(MODEL, 11L)).thenReturn(provider);
         when(promptBuilder.buildSystemPrompt(any(AgenticPreparedChatBO.class)))
                 .thenReturn("You are the IoT DC3 platform assistant.");
         return new OpenAiCompatibleAgenticRuntime(chatClientFactory, promptBuilder,
-                ToolCallbackProvider.from(callback));
+                ToolCallbackProvider.from(callback), new ReactiveAgenticToolRegistry(null, null));
+    }
+
+    private AgenticRuntimeResult await(reactor.core.publisher.Mono<AgenticRuntimeResult> result) {
+        java.util.concurrent.atomic.AtomicReference<AgenticRuntimeResult> value = new java.util.concurrent.atomic.AtomicReference<>();
+        StepVerifier.create(result).assertNext(value::set).verifyComplete();
+        return value.get();
     }
 
     private AgenticPreparedChatBO prepared(String userMessage) {
-        return new AgenticPreparedChatBO(userMessage, "11:22:conv-1", null, MODEL,
+        return new AgenticPreparedChatBO(userMessage, "conv-1", null, MODEL,
                 Map.of(
                         AgenticConstant.ToolContextKey.TENANT_ID, 11L,
                         AgenticConstant.ToolContextKey.USER_ID, 22L,
-                        AgenticConstant.ToolContextKey.CONVERSATION_ID, "11:22:conv-1"),
+                        AgenticConstant.ToolContextKey.CONVERSATION_ID, "conv-1"),
                 null, null, new AgenticRunTrace(), true, true, List.of(), List.of(),
                 AgenticMessageContent.Tokens.of(10, 0, 10, 0, 0, 0), List.of());
     }

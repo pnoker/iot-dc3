@@ -218,13 +218,13 @@ const load = async () => {
   try {
     const principalId = String(reactiveData.user.principalId || '');
     const [allRes, ownRes, bindsRes] = await Promise.all([
-      listRole({page: {size: 1000, current: 1}}) as Promise<any>,
+      listRole({offset: 0, limit: 200}) as Promise<any>,
       listRoleByPrincipalId(principalId) as Promise<any>,
-      listRolePrincipalBind({page: {size: 1000, current: 1}, principalId}) as Promise<any>,
+      listRolePrincipalBind({offset: 0, limit: 200, principalId}) as Promise<any>,
     ]);
 
-    const allRoles: RoleRow[] = ((allRes.data?.records as any[]) || []).map(toRow);
-    const ownRoles: RoleRow[] = ((ownRes.data as any[]) || []).map(toRow);
+    const allRoles: RoleRow[] = ((allRes?.items as any[]) || []).map(toRow);
+    const ownRoles: RoleRow[] = ((ownRes as any[]) || []).map(toRow);
     const ownIds = new Set(ownRoles.map((r) => r.id));
 
     reactiveData.assigned = ownRoles;
@@ -232,7 +232,7 @@ const load = async () => {
     reactiveData.originalRoleIds = ownRoles.map((r) => r.id);
 
     const bindMap = new Map<string, string>();
-    for (const bind of (bindsRes.data?.records as any[]) || []) {
+    for (const bind of (bindsRes?.items as any[]) || []) {
       bindMap.set(String(bind.roleId), String(bind.id));
     }
     reactiveData.bindIdByRoleId = bindMap;

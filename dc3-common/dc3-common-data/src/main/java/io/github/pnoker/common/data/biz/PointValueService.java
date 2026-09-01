@@ -17,13 +17,15 @@
 
 package io.github.pnoker.common.data.biz;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.bo.PointValueVolumeBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 
 import java.time.Instant;
 import java.util.List;
+import reactor.core.publisher.Mono;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.CursorPage;
 
 /**
  * Business service for point value operations.
@@ -38,14 +40,14 @@ public interface PointValueService {
      *
      * @param pointValueBO PointValue
      */
-    void save(PointValueBO pointValueBO);
+    Mono<Void> save(PointValueBO pointValueBO);
 
     /**
      * Batch save point values
      *
      * @param pointValueBOList Array
      */
-    void save(List<PointValueBO> pointValueBOList);
+    Mono<Void> save(List<PointValueBO> pointValueBOList);
 
     /**
      * Get historical point values within the tenant scope.
@@ -56,7 +58,8 @@ public interface PointValueService {
      * @param count    Number of values to retrieve
      * @return History values (each with create_time), newest first
      */
-    List<PointValueBO> history(Long tenantId, Long deviceId, Long pointId, int count);
+    Mono<CursorPage<PointValueBO>> history(Long tenantId, Long deviceId, Long pointId,
+                                           String cursor, int limit);
 
     /**
      * Get latest point values with pagination and sorting
@@ -64,7 +67,7 @@ public interface PointValueService {
      * @param pointValueQuery Entry of Query
      * @return Entity of BO Page
      */
-    Page<PointValueBO> latest(PointValueQuery pointValueQuery);
+    Mono<OffsetPage<PointValueBO>> latest(PointValueQuery pointValueQuery);
 
     /**
      * Get point values with pagination and sorting
@@ -72,7 +75,7 @@ public interface PointValueService {
      * @param pointValueQuery Entry of Query
      * @return Entity of BO Page
      */
-    Page<PointValueBO> page(PointValueQuery pointValueQuery);
+    Mono<CursorPage<PointValueBO>> page(PointValueQuery pointValueQuery);
 
     /**
      * Per-series sample volumes since a lower bound (dashboard topology
@@ -82,6 +85,6 @@ public interface PointValueService {
      * @param from     inclusive lower bound, absolute instant
      * @return the volume rows, never {@code null}
      */
-    List<PointValueVolumeBO> seriesVolumes(Long tenantId, Instant from);
+    Mono<List<PointValueVolumeBO>> seriesVolumes(Long tenantId, Instant from);
 
 }

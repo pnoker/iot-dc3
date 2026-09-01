@@ -118,11 +118,11 @@ const onReset = () => {
 const driverDictionary = (query?: string) => {
   driverLoading.value = true;
   listDriverDictionary({
-    page: {size: 50, current: 1},
+    offset: 0, limit: 50,
     label: query || '',
   })
     .then((res) => {
-      driverDictionaries.value = res.data.records;
+      driverDictionaries.value = res.items;
     })
     .catch(() => {
       // nothing to do

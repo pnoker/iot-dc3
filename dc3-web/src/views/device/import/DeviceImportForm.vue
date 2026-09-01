@@ -77,28 +77,39 @@
           />
         </el-select>
       </el-form-item>
-      <el-upload
-        ref="formUploadRef"
-        :auto-upload="false"
-        :http-request="uploadRequest"
-        :limit="1"
-        :on-exceed="handleExceed"
-        accept=".xlsx"
-        class="things-dialog-upload"
-        drag
-      >
-        <el-icon class="el-upload__icon">
-          <UploadFilled/>
-        </el-icon>
-        <div class="el-upload__text" v-html="$t('device.import.upload')"></div>
-      </el-upload>
+      <el-form-item :label="$t('device.import.file')" prop="file">
+        <el-upload
+          ref="formUploadRef"
+          :auto-upload="false"
+          :http-request="uploadRequest"
+          :limit="1"
+          :on-change="handleChange"
+          :on-exceed="handleExceed"
+          :on-remove="handleRemove"
+          accept=".xlsx"
+          class="things-dialog-upload"
+          drag
+        >
+          <el-icon class="el-upload__icon">
+            <UploadFilled/>
+          </el-icon>
+          <div class="el-upload__text" v-html="$t('device.import.upload')"></div>
+        </el-upload>
+      </el-form-item>
+      <el-alert
+        v-if="reactiveData.importStatus"
+        :closable="false"
+        :title="$t(`device.import.status.${reactiveData.importStatus.toLowerCase()}`)"
+        :type="reactiveData.importStatus === 'FAILED' || reactiveData.importStatus === 'REQUEST_ERROR' || reactiveData.importStatus === 'EXPIRED' || reactiveData.importStatus === 'CANCELLED' ? 'error' : 'info'"
+        show-icon
+      />
     </el-form>
     <div class="things-dialog-footer">
       <slot name="footer">
-        <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-        <el-button plain @click="reset">{{ $t('common.reset') }}</el-button>
-        <el-button plain type="warning" @click="importTemplate">{{ $t('device.import.template') }}</el-button>
-        <el-button type="primary" @click="importThing">{{ $t('common.confirm') }}</el-button>
+        <el-button :disabled="reactiveData.formLoading" @click="cancel">{{ $t('common.cancel') }}</el-button>
+        <el-button :disabled="reactiveData.formLoading" plain @click="reset">{{ $t('common.reset') }}</el-button>
+        <el-button :disabled="reactiveData.formLoading" plain type="warning" @click="importTemplate">{{ $t('device.import.template') }}</el-button>
+        <el-button :disabled="reactiveData.formLoading" type="primary" @click="importThing">{{ $t('common.confirm') }}</el-button>
       </slot>
     </div>
   </el-dialog>
@@ -121,10 +132,11 @@ import {useI18n} from 'vue-i18n';
 import type {Dictionary} from '@/config/types';
 
 import {listDriverDictionary, listProfileDictionary} from '@/api/dictionary';
+import type {OperationUiStatus} from '@/config/types/operation';
 import {successMessage} from '@/utils/notificationUtil';
 
 interface DictionaryPage {
-  records: Dictionary[];
+  items: Dictionary[];
 }
 
 interface DeviceImportFormData {
@@ -133,16 +145,18 @@ interface DeviceImportFormData {
   file?: UploadRawFile;
 }
 
-type DictionaryResponse = R<DictionaryPage>;
+type DictionaryResponse = DictionaryPage;
 
 const emit = defineEmits<{
-  (e: 'import-template', formData: DeviceImportFormData, done: () => void): void;
-  (e: 'import', formData: DeviceImportFormData, file: File, done: () => void): void;
+  (e: 'import-template', formData: DeviceImportFormData, done: (successful: boolean) => void): void;
+  (e: 'import', formData: DeviceImportFormData, file: File, idempotencyKey: string,
+    report: (status: OperationUiStatus) => void): void;
 }>();
 
 const {t} = useI18n();
 const formDataRef = ref<FormInstance>();
 const formUploadRef = ref<UploadInstance>();
+const idempotencyKey = ref('');
 
 const reactiveData = reactive({
   formData: {
@@ -151,6 +165,7 @@ const reactiveData = reactive({
   } as DeviceImportFormData,
   formVisible: false,
   formLoading: false,
+  importStatus: null as OperationUiStatus | null,
   driverDictionary: [] as Dictionary[],
   driverLoading: false,
   profileDictionary: [] as Dictionary[],
@@ -172,16 +187,24 @@ const formRule = reactive<FormRules>({
       trigger: 'change',
     },
   ],
+  file: [
+    {
+      required: true,
+      message: () => t('device.import.fileRequired'),
+      trigger: 'change',
+    },
+  ],
 });
 
 const driverDictionary = async (query = '') => {
   reactiveData.driverLoading = true;
   try {
     const res = await listDriverDictionary<DictionaryResponse>({
-      page: {size: 50, current: 1},
+      offset: 0,
+      limit: 50,
       label: query,
     });
-    reactiveData.driverDictionary = res.data.records ?? [];
+    reactiveData.driverDictionary = res.items ?? [];
   } catch {
     // nothing to do
   } finally {
@@ -199,10 +222,11 @@ const profileDictionary = async (query = '') => {
   reactiveData.profileLoading = true;
   try {
     const res = await listProfileDictionary<DictionaryResponse>({
-      page: {size: 50, current: 1},
+      offset: 0,
+      limit: 50,
       label: query,
     });
-    reactiveData.profileDictionary = res.data.records ?? [];
+    reactiveData.profileDictionary = res.items ?? [];
   } catch {
     // nothing to do
   } finally {
@@ -219,6 +243,7 @@ const profileDictionaryVisible = (visible: boolean) => {
 const show = () => {
   reactiveData.formVisible = true;
   reactiveData.formLoading = false;
+  reactiveData.importStatus = null;
 };
 
 const cancel = () => {
@@ -230,6 +255,9 @@ const reset = () => {
   const form = unref(formDataRef);
   form?.resetFields();
   formUploadRef.value?.clearFiles();
+  reactiveData.formData.file = undefined;
+  reactiveData.importStatus = null;
+  idempotencyKey.value = '';
 };
 
 const importTemplate = async () => {
@@ -239,9 +267,11 @@ const importTemplate = async () => {
   }
 
   try {
-    await form.validate();
-    emit('import-template', {...reactiveData.formData}, () => {
-      successMessage(t('device.import.templateSuccess'));
+    await form.validateField(['driverId', 'profileId']);
+    reactiveData.formLoading = true;
+    emit('import-template', {...reactiveData.formData}, (successful) => {
+      reactiveData.formLoading = false;
+      if (successful) successMessage(t('device.import.templateSuccess'));
     });
   } catch {
     // validation errors are displayed by Element Plus
@@ -249,10 +279,19 @@ const importTemplate = async () => {
 };
 
 const uploadRequest = (param: UploadRequestOptions): Promise<unknown> => {
-  emit('import', reactiveData.formData, param.file as File, () => {
-    cancel();
-    reset();
-    successMessage(t('device.import.importSuccess'));
+  emit('import', reactiveData.formData, param.file as File, idempotencyKey.value, (status) => {
+    reactiveData.importStatus = status;
+    if (status === 'SUCCEEDED') {
+      reactiveData.formLoading = false;
+      cancel();
+      reset();
+      successMessage(t('device.import.importSuccess'));
+    } else if (status === 'FAILED' || status === 'CANCELLED' || status === 'EXPIRED') {
+      reactiveData.formLoading = false;
+      idempotencyKey.value = '';
+    } else if (status === 'REQUEST_ERROR') {
+      reactiveData.formLoading = false;
+    }
   });
   return Promise.resolve();
 };
@@ -265,11 +304,27 @@ const importThing = async () => {
 
   try {
     await form.validate();
-    formUploadRef.value?.submit();
     reactiveData.formLoading = true;
+    reactiveData.importStatus = 'PENDING';
+    if (!idempotencyKey.value) idempotencyKey.value = crypto.randomUUID();
+    formUploadRef.value?.submit();
   } catch {
     // validation errors are displayed by Element Plus
   }
+};
+
+const handleChange: UploadProps['onChange'] = (file) => {
+  if (file.status !== 'ready') return;
+  reactiveData.formData.file = file.raw;
+  reactiveData.importStatus = null;
+  idempotencyKey.value = '';
+  void formDataRef.value?.validateField('file');
+};
+
+const handleRemove: UploadProps['onRemove'] = () => {
+  reactiveData.formData.file = undefined;
+  reactiveData.importStatus = null;
+  idempotencyKey.value = '';
 };
 
 const handleExceed: UploadProps['onExceed'] = (files) => {

@@ -27,7 +27,7 @@ class OpenAiCompatibleAgenticRuntimeTest {
 
     @Test
     void assistantToolCallMessagePreservesReasoningContentForProviderContinuation() {
-        OpenAiCompatibleAgenticRuntime runtime = new OpenAiCompatibleAgenticRuntime(null, null, null);
+        OpenAiCompatibleAgenticRuntime runtime = new OpenAiCompatibleAgenticRuntime(null, null, null, null);
 
         ChatCompletionMessageParam message = runtime.assistantToolCallMessage(null, "real reasoning",
                 List.of(new OpenAiCompatibleAgenticRuntime.ToolCall("call_1", "searchDrivers",

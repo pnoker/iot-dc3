@@ -17,27 +17,25 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.biz.store.PointValueIngestService;
 import io.github.pnoker.common.data.biz.store.PointValueLatestService;
 import io.github.pnoker.common.data.biz.store.PointValueSampleConverter;
+import io.github.pnoker.common.data.repository.ReactiveTsdbStore;
+import io.github.pnoker.common.data.support.PointValueCursorCodec;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.bo.PointValueVolumeBO;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
 import io.github.pnoker.common.tsdb.model.TsdbModel.CursorPage;
 import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
-import io.github.pnoker.common.tsdb.spi.TsdbStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,6 +44,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.test.StepVerifier;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -55,11 +56,13 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -89,7 +92,10 @@ class PointValueServiceImplTest {
     private PointValueSampleConverter converter = new PointValueSampleConverter();
 
     @Mock
-    private TsdbStore tsdbStore;
+    private ReactiveTsdbStore reactiveTsdbStore;
+
+    @Mock
+    private PointValueCursorCodec pointValueCursorCodec;
 
     @InjectMocks
     private PointValueServiceImpl service;
@@ -112,15 +118,6 @@ class PointValueServiceImplTest {
         return point;
     }
 
-    private static FacadePage<FacadePointBO> pageOf(List<FacadePointBO> records) {
-        FacadePage<FacadePointBO> page = new FacadePage<>();
-        page.setRecords(records);
-        page.setTotal(records.size());
-        page.setCurrent(1);
-        page.setSize(records.size());
-        return page;
-    }
-
     private static Instant at(String wallClock) {
         return LocalDateTime.parse(wallClock).atZone(PLATFORM_ZONE).toInstant();
     }
@@ -133,92 +130,109 @@ class PointValueServiceImplTest {
                 .pointId(20L)
                 .messageId("m-1")
                 .build();
+        lenient().when(pointValueCursorCodec.encode(anyLong(), anyString(), any())).thenAnswer(invocation -> "cursor");
+        lenient().when(pointValueCursorCodec.decode(anyString(), anyLong(), anyString()))
+                .thenReturn(new io.github.pnoker.common.tsdb.model.TsdbModel.Cursor(at("2026-08-20T10:00:01"), "m-previous",
+                        new SeriesKey(1L, 10L, 20L)));
     }
 
     @Test
     void singleSaveIgnoresNullPayload() {
-        assertThatNoException().isThrownBy(() -> service.save((PointValueBO) null));
+        StepVerifier.create(service.save((PointValueBO) null)).verifyComplete();
         verify(pointValueIngestService, never()).saveValue(any());
     }
 
     @Test
     void batchSaveIgnoresNullAndEmptyList() {
-        assertThatNoException().isThrownBy(() -> service.save((List<PointValueBO>) null));
-        assertThatNoException().isThrownBy(() -> service.save(List.of()));
+        StepVerifier.create(service.save((List<PointValueBO>) null)).verifyComplete();
+        StepVerifier.create(service.save(List.of())).verifyComplete();
         verify(pointValueIngestService, never()).saveValues(any());
     }
 
     @Test
     void singleSaveStampsTimestampsPersistsAndTriggersAlarm() {
-        when(pointValueIngestService.saveValue(pv)).thenReturn(true);
+        when(pointValueIngestService.saveValue(pv)).thenReturn(Mono.just(true));
+        when(alarmRuleTriggerService.processPointValue(pv)).thenReturn(Mono.empty());
 
-        service.save(pv);
+        StepVerifier.create(service.save(pv)).verifyComplete();
 
         assertThat(pv.getCreateTime()).isNotNull();
         assertThat(pv.getOperateTime()).isNotNull();
         verify(pointValueIngestService).saveValue(pv);
         verify(alarmRuleTriggerService).processPointValue(pv);
+        verify(pointValueIngestService).markProcessed(List.of(pv));
     }
 
     @Test
     void singleSaveSkipsAlarmWhenIngestRejects() {
-        when(pointValueIngestService.saveValue(pv)).thenReturn(false);
+        when(pointValueIngestService.saveValue(pv)).thenReturn(Mono.just(false));
 
-        service.save(pv);
+        StepVerifier.create(service.save(pv)).verifyComplete();
 
         verify(alarmRuleTriggerService, never()).processPointValue(any());
+        verify(pointValueIngestService, never()).markProcessed(any());
     }
 
     @Test
     void batchSaveTriggersAlarmOnlyForAcceptedValues() {
         PointValueBO accepted = PointValueBO.builder().tenantId(1L).deviceId(10L).pointId(21L).messageId("m-2").build();
-        when(pointValueIngestService.saveValues(any())).thenReturn(List.of(accepted));
+        when(pointValueIngestService.saveValues(any())).thenReturn(Mono.just(List.of(accepted)));
+        when(alarmRuleTriggerService.processPointValues(List.of(accepted))).thenReturn(Mono.empty());
 
-        service.save(List.of(pv, accepted));
+        StepVerifier.create(service.save(List.of(pv, accepted))).verifyComplete();
 
         verify(alarmRuleTriggerService).processPointValues(List.of(accepted));
         verify(alarmRuleTriggerService, never()).processPointValue(any());
+        verify(pointValueIngestService).markProcessed(List.of(accepted));
     }
 
     @Test
-    void batchAlarmFailureIsSwallowedAfterPersistence() {
+    void batchAlarmFailurePropagatesWithoutMarkingProcessed() {
         PointValueBO accepted = PointValueBO.builder().tenantId(1L).deviceId(10L).pointId(21L).messageId("m-2").build();
-        when(pointValueIngestService.saveValues(any())).thenReturn(List.of(accepted));
-        org.mockito.Mockito.doThrow(new IllegalStateException("boom"))
-                .when(alarmRuleTriggerService).processPointValues(any());
+        when(pointValueIngestService.saveValues(any())).thenReturn(Mono.just(List.of(accepted)));
+        when(alarmRuleTriggerService.processPointValues(any()))
+                .thenReturn(Mono.error(new IllegalStateException("boom")));
 
-        assertThatNoException().isThrownBy(() -> service.save(List.of(accepted)));
+        StepVerifier.create(service.save(List.of(accepted)))
+                .expectErrorMessage("boom")
+                .verify();
         verify(pointValueIngestService).saveValues(any());
+        verify(pointValueIngestService, never()).markProcessed(any());
     }
 
     @Test
     void historyRequiresCompleteSeriesKey() {
-        assertThat(service.history(1L, null, 20L, 10)).isEmpty();
-        assertThat(service.history(null, 10L, 20L, 10)).isEmpty();
+        assertThatThrownBy(() -> service.history(1L, null, 20L, null, 10).block())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("tenantId, deviceId and pointId must be positive");
+        assertThatThrownBy(() -> service.history(null, 10L, 20L, null, 10).block())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("tenantId, deviceId and pointId must be positive");
         verifyNoTsdbReads();
     }
 
     @Test
     void historyValidatesScopeBeforeReading() {
-        when(deviceFacade.getById(1L, 10L)).thenReturn(null);
+        when(deviceFacade.getByIdReactive(1L, 10L)).thenReturn(Mono.empty());
 
-        assertThatThrownBy(() -> service.history(1L, 10L, 20L, 10))
+        assertThatThrownBy(() -> service.history(1L, 10L, 20L, null, 10).block())
                 .isInstanceOf(NotFoundException.class);
         verifyNoTsdbReads();
     }
 
     @Test
-    void historyClampsCountAndMapsSamplesToBO() {
+    void historyValidatesLimitAndMapsSamplesToBO() {
         FacadeDeviceBO device = stubDevice(10L, 1L, 100L);
         FacadePointBO point = stubPoint(20L, 1L, 100L);
-        lenient().when(deviceFacade.getById(1L, 10L)).thenReturn(device);
-        lenient().when(pointFacade.getById(1L, 20L)).thenReturn(point);
+        lenient().when(deviceFacade.getByIdReactive(1L, 10L)).thenReturn(Mono.just(device));
+        lenient().when(pointFacade.getByIdReactive(1L, 20L)).thenReturn(Mono.just(point));
         SeriesKey series = new SeriesKey(1L, 10L, 20L);
         PointValueSample sample = new PointValueSample(series, at("2026-08-20T10:00:00"),
                 at("2026-08-20T10:00:01"), "raw", "2.5", 2.5d, 0, "m-1", 1, "node", 1L, 1L, 5L);
-        when(tsdbStore.last(eq(SeriesFilter.of(series)), eq(100), any())).thenReturn(Map.of(series, List.of(sample)));
+        when(reactiveTsdbStore.history(eq(SeriesFilter.of(series)), any(), isNull(), eq(1), any()))
+                .thenReturn(Mono.just(new CursorPage<>(List.of(sample), null)));
 
-        List<PointValueBO> result = service.history(1L, 10L, 20L, 0);
+        List<PointValueBO> result = service.history(1L, 10L, 20L, null, 1).block().items();
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getCalValue()).isEqualTo("2.5");
@@ -227,97 +241,121 @@ class PointValueServiceImplTest {
 
     @Test
     void latestKeepsPointOrderAndFillsMissingWithPlaceholder() {
-        lenient().when(deviceFacade.getById(1L, 10L)).thenReturn(stubDevice(10L, 1L, 100L));
-        FacadePointBO known = stubPoint(20L, 1L, 100L);
+                FacadePointBO known = stubPoint(20L, 1L, 100L);
         FacadePointBO missing = stubPoint(21L, 1L, 100L);
-        when(pointFacade.listByPage(any())).thenReturn(pageOf(List.of(known, missing)));
+        when(pointFacade.listReactive(any())).thenReturn(Mono.just(OffsetPage.of(List.of(known, missing), 0, 50, 2)));
+        when(deviceFacade.getByIdReactive(eq(1L), eq(10L))).thenReturn(Mono.just(stubDevice(10L, 1L, 100L)));
         PointValueBO existing = PointValueBO.builder().tenantId(1L).deviceId(10L).pointId(20L).build();
-        when(pointValueLatestService.listLatest(eq(1L), eq(10L), any())).thenReturn(List.of(existing));
+        when(pointValueLatestService.listLatest(eq(1L), eq(10L), any())).thenReturn(reactor.core.publisher.Flux.just(existing));
 
-        PointValueQuery query = PointValueQuery.builder().tenantId(1L).deviceId(10L).page(new Pages()).build();
-        Page<PointValueBO> page = service.latest(query);
+        PointValueQuery query = PointValueQuery.builder().tenantId(1L).deviceId(10L).build();
+        OffsetPage<PointValueBO> page = service.latest(query).block();
 
-        assertThat(page.getRecords()).hasSize(2);
-        assertThat(page.getRecords().getFirst().getHasLatestValue()).isTrue();
-        assertThat(page.getRecords().get(1).getHasLatestValue()).isFalse();
+        assertThat(page.items()).hasSize(2);
+        assertThat(page.items().getFirst().getHasLatestValue()).isTrue();
+        assertThat(page.items().get(1).getHasLatestValue()).isFalse();
     }
 
     @Test
     void pageUnfilteredUsesTenantWideSeries() {
-        when(tsdbStore.count(any(), any(), any())).thenReturn(2L);
         SeriesKey series = new SeriesKey(1L, 10L, 20L);
         PointValueSample newest = PointValueSample.simple(series, at("2026-08-20T10:00:01"), 2);
         PointValueSample older = PointValueSample.simple(series, at("2026-08-20T10:00:00"), 1);
-        when(tsdbStore.history(any(), any(), any(), anyInt(), any()))
-                .thenReturn(new CursorPage<>(List.of(newest, older), null));
+        when(reactiveTsdbStore.history(any(), any(), any(), anyInt(), any()))
+                .thenReturn(Mono.just(new CursorPage<>(List.of(newest, older), null)));
 
-        PointValueQuery query = PointValueQuery.builder().tenantId(1L).page(new Pages()).build();
-        Page<PointValueBO> page = service.page(query);
+        PointValueQuery query = PointValueQuery.builder().tenantId(1L).build();
+        io.github.pnoker.db.r2dbc.core.page.CursorPage<PointValueBO> page = service.page(query).block();
 
         ArgumentCaptor<SeriesFilter> filter = ArgumentCaptor.forClass(SeriesFilter.class);
-        verify(tsdbStore).count(filter.capture(), any(), any());
+        verify(reactiveTsdbStore).history(filter.capture(), any(), isNull(), anyInt(), any());
         assertThat(filter.getValue().tenantWide()).isTrue();
-        assertThat(page.getTotal()).isEqualTo(2L);
-        assertThat(page.getRecords()).hasSize(2);
-        assertThat(page.getRecords().getFirst().getMessageId()).isEqualTo(newest.messageId());
+        assertThat(page.items()).hasSize(2);
+        assertThat(page.items().getFirst().getMessageId()).isEqualTo(newest.messageId());
     }
 
     @Test
-    void pageSlicesTheSecondWindow() {
-        when(tsdbStore.count(any(), any(), any())).thenReturn(30L);
+    void pageUsesSignedCursorForSubsequentWindow() {
         SeriesKey series = new SeriesKey(1L, 10L, 20L);
-        List<PointValueSample> samples = new ArrayList<>();
-        for (int i = 0; i < 30; i++) {
-            samples.add(PointValueSample.simple(series, at("2026-08-20T10:00:00").plusSeconds(i), i));
-        }
-        java.util.Collections.reverse(samples);
-        when(tsdbStore.history(any(), any(), any(), eq(20), any()))
-                .thenReturn(new CursorPage<>(samples, null));
+        PointValueSample sample = PointValueSample.simple(series, at("2026-08-20T10:00:00"), 19);
+        when(reactiveTsdbStore.history(any(), any(), any(), eq(20), any()))
+                .thenReturn(Mono.just(new CursorPage<>(List.of(sample), null)));
 
-        Pages pages = new Pages();
-        pages.setCurrent(2);
-        pages.setSize(10);
-        PointValueQuery query = PointValueQuery.builder().tenantId(1L).page(pages).build();
-        Page<PointValueBO> page = service.page(query);
+        String fingerprint = "tenant=1;series=*;rangeKey=;rangeHours=0;from=;sort=create_time.desc,tenant_id.desc,device_id.desc,point_id.desc,message_id.desc";
+        String cursor = pointValueCursorCodec.encode(1L, fingerprint,
+                new io.github.pnoker.common.tsdb.model.TsdbModel.Cursor(at("2026-08-20T10:00:01"), "m-previous", series));
+        PointValueQuery query = PointValueQuery.builder().tenantId(1L).limit(20).cursor(cursor).build();
+        io.github.pnoker.db.r2dbc.core.page.CursorPage<PointValueBO> page = service.page(query).block();
 
-        assertThat(page.getRecords()).hasSize(10);
-        // offset 10 over the descending list — eleventh newest
-        assertThat(page.getRecords().getFirst().getNumValue()).isEqualTo(19d);
+        assertThat(page.items()).hasSize(1);
+        assertThat(page.items().getFirst().getNumValue()).isEqualTo(19d);
+        verify(reactiveTsdbStore).history(any(), any(), any(), eq(20), any());
+    }
+
+    @Test
+    void pageSignsStableSeriesAndSnapshotWindow() {
+        SeriesKey series = new SeriesKey(1L, 10L, 20L);
+        PointValueSample sample = PointValueSample.simple(series, at("2026-08-20T10:00:00"), 19);
+        io.github.pnoker.common.tsdb.model.TsdbModel.Cursor next =
+                new io.github.pnoker.common.tsdb.model.TsdbModel.Cursor(
+                        sample.deviceTime(), sample.messageId(), series);
+        when(reactiveTsdbStore.history(any(), any(), isNull(), eq(20), any()))
+                .thenReturn(Mono.just(new CursorPage<>(List.of(sample), next)));
+
+        PointValueQuery query = PointValueQuery.builder().tenantId(1L).limit(20)
+                .createTimeFrom(LocalDateTime.parse("2026-08-20T00:00:00"))
+                .build();
+        service.page(query).block();
+
+        ArgumentCaptor<io.github.pnoker.common.tsdb.model.TsdbModel.Cursor> cursor =
+                ArgumentCaptor.forClass(io.github.pnoker.common.tsdb.model.TsdbModel.Cursor.class);
+        verify(pointValueCursorCodec).encode(eq(1L), anyString(), cursor.capture());
+        assertThat(cursor.getValue().series()).isEqualTo(series);
+        assertThat(cursor.getValue().windowFrom()).isEqualTo(at("2026-08-20T00:00:00"));
+        assertThat(cursor.getValue().windowTo()).isAfter(cursor.getValue().windowFrom());
+    }
+
+    @Test
+    void pageRejectsOffsetPagination() {
+        PointValueQuery query = PointValueQuery.builder().tenantId(1L).offset(1).build();
+        assertThatThrownBy(() -> service.page(query).block())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("offset is not supported for point-value history; use cursor");
+        verifyNoTsdbReads();
     }
 
     @Test
     void pageResolvesSeriesThroughProfileBindingsWhenOnlyPointFiltered() {
-        when(pointFacade.listByPage(any())).thenReturn(pageOf(List.of(stubPoint(20L, 1L, 100L))));
-        when(deviceFacade.listByProfileId(1L, 100L)).thenReturn(List.of(stubDevice(10L, 1L, 100L)));
-        when(tsdbStore.count(any(), any(), any())).thenReturn(0L);
-        when(tsdbStore.history(any(), any(), any(), anyInt(), any())).thenReturn(new CursorPage<>(List.of(), null));
+        when(pointFacade.listReactive(any())).thenReturn(Mono.just(OffsetPage.of(List.of(stubPoint(20L, 1L, 100L)), 0, 200, 1)));
+        when(deviceFacade.listByProfileIdReactive(1L, 100L)).thenReturn(reactor.core.publisher.Flux.just(stubDevice(10L, 1L, 100L)));
+        when(reactiveTsdbStore.history(any(), any(), any(), anyInt(), any())).thenReturn(Mono.just(new CursorPage<>(List.of(), null)));
 
-        PointValueQuery query = PointValueQuery.builder().tenantId(1L).pointName("temp").page(new Pages()).build();
-        service.page(query);
+        PointValueQuery query = PointValueQuery.builder().tenantId(1L).pointName("temp").build();
+        service.page(query).block();
 
         ArgumentCaptor<SeriesFilter> filter = ArgumentCaptor.forClass(SeriesFilter.class);
-        verify(tsdbStore).history(filter.capture(), any(), any(), anyInt(), any());
+        verify(reactiveTsdbStore).history(filter.capture(), any(), any(), anyInt(), any());
         assertThat(filter.getValue().series()).containsExactly(new SeriesKey(1L, 10L, 20L));
     }
 
     @Test
     void pageWithMissingScopedPointStillValidatesScopeFirst() {
-        when(pointFacade.getById(1L, 20L)).thenReturn(null);
-        PointValueQuery query = PointValueQuery.builder().tenantId(1L).pointId(20L).page(new Pages()).build();
+        when(pointFacade.getByIdReactive(1L, 20L)).thenReturn(Mono.empty());
+        PointValueQuery query = PointValueQuery.builder().tenantId(1L).pointId(20L).build();
 
         // Scope validation runs before any series resolution — a missing point
         // is a client error, not an empty page (pre-existing contract).
-        assertThatThrownBy(() -> service.page(query))
+        assertThatThrownBy(() -> service.page(query).block())
                 .isInstanceOf(NotFoundException.class);
         verifyNoTsdbReads();
     }
 
     @Test
     void seriesVolumesMapsPortRows() {
-        when(tsdbStore.seriesCounts(eq(1L), any(), any()))
-                .thenReturn(List.of(new SeriesCount(new SeriesKey(1L, 10L, 20L), 7L)));
+        when(reactiveTsdbStore.seriesCounts(eq(1L), any(), any()))
+                .thenReturn(reactor.core.publisher.Flux.just(new SeriesCount(new SeriesKey(1L, 10L, 20L), 7L)));
 
-        List<PointValueVolumeBO> volumes = service.seriesVolumes(1L, Instant.EPOCH);
+        List<PointValueVolumeBO> volumes = service.seriesVolumes(1L, Instant.EPOCH).block();
 
         assertThat(volumes).hasSize(1);
         assertThat(volumes.getFirst().deviceId()).isEqualTo(10L);
@@ -325,9 +363,8 @@ class PointValueServiceImplTest {
     }
 
     private void verifyNoTsdbReads() {
-        verify(tsdbStore, never()).last(any(), anyInt(), any());
-        verify(tsdbStore, never()).history(any(), any(), any(), anyInt(), any());
-        verify(tsdbStore, never()).count(any(), any(), any());
+        verify(reactiveTsdbStore, never()).history(any(), any(), any(), anyInt(), any());
+        verify(reactiveTsdbStore, never()).count(any(), any(), any());
     }
 
 }

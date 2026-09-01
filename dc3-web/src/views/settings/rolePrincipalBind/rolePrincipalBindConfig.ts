@@ -53,8 +53,8 @@ export const createRolePrincipalBindConfig = (t: Translator): EntityListConfig =
       kind: 'treeSelect',
       tree: {
         load: async () => {
-          const res: any = await listRole({page: {current: 1, size: 1000}});
-          return res?.data?.records || [];
+          const res: any = await listRole({offset: 0, limit: 200});
+          return res?.items || [];
         },
         props: {label: 'roleName', value: 'id'},
       },

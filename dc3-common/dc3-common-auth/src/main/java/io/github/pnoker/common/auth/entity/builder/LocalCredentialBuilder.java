@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.LocalCredentialBO;
 import io.github.pnoker.common.auth.entity.model.LocalCredentialDO;
 import io.github.pnoker.common.auth.entity.vo.LocalCredentialVO;
@@ -26,7 +25,6 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PasswordAlgorithmEnum;
 import io.github.pnoker.common.enums.RequirePasswordChangeFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -134,24 +132,5 @@ public interface LocalCredentialBuilder {
      */
     List<LocalCredentialBO> buildBOListByDOList(List<LocalCredentialDO> entityDOList);
 
-    /**
-     * Convert do page to bo page.
-     *
-     * @param entityPageDO persistence object
-     * @return converted value
-     */
-    default Page<LocalCredentialBO> buildBOPageByDOPage(Page<LocalCredentialDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    /**
-     * Convert bo page to vo page.
-     *
-     * @param entityPageBO business object
-     * @return converted value
-     */
-    default Page<LocalCredentialVO> buildVOPageByBOPage(Page<LocalCredentialBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
 }

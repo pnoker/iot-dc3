@@ -17,23 +17,21 @@
 
 package io.github.pnoker.common.driver.grpc.client;
 
-import io.github.pnoker.api.common.GrpcPage;
+import io.github.pnoker.api.common.PageRequest;
 import io.github.pnoker.api.common.GrpcPointDTO;
-import io.github.pnoker.api.common.driver.GrpcPagePointDTO;
-import io.github.pnoker.api.common.driver.GrpcPagePointQuery;
+import io.github.pnoker.api.common.driver.GrpcOffsetPagePointDTO;
+import io.github.pnoker.api.common.driver.GrpcOffsetPointQuery;
 import io.github.pnoker.api.common.driver.GrpcPointQuery;
-import io.github.pnoker.api.common.driver.GrpcRPagePointDTO;
-import io.github.pnoker.api.common.driver.GrpcRPointDTO;
 import io.github.pnoker.api.common.driver.PointApiGrpc;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.entity.builder.PointBuilder;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
-import io.github.pnoker.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,7 +46,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PointClient {
 
-    private final PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
+    private final PointApiGrpc.PointApiStub pointApiStub;
 
     private final DriverMetadata driverMetadata;
 
@@ -60,25 +58,13 @@ public class PointClient {
      *
      * @return all points
      */
-    public List<PointBO> list() {
-        long current = 1;
-        GrpcRPagePointDTO rPagePointDTO = getGrpcRPagePointDTO(current);
-        GrpcPagePointDTO pageDTO = rPagePointDTO.getData();
-        List<GrpcPointDTO> dataList = pageDTO.getDataList();
-        List<PointBO> pointBOList = dataList.stream().map(pointBuilder::buildDTOByGrpcDTO).toList();
-        ArrayList<PointBO> allPointBOList = new ArrayList<>(pointBOList);
-
-        long pages = pageDTO.getPage().getPages();
-        while (current < pages) {
-            current++;
-            GrpcRPagePointDTO tPagePointDTO = getGrpcRPagePointDTO(current);
-            GrpcPagePointDTO tPageDTO = tPagePointDTO.getData();
-            List<GrpcPointDTO> tDataList = tPageDTO.getDataList();
-            List<PointBO> tPointBOList = tDataList.stream().map(pointBuilder::buildDTOByGrpcDTO).toList();
-            allPointBOList.addAll(tPointBOList);
-            pages = tPageDTO.getPage().getPages();
-        }
-        return allPointBOList;
+    public Flux<PointBO> list() {
+        return loadPage(0, 200)
+                .expand(page -> page.hasNext()
+                        ? loadPage(page.offset() + Math.max(page.limit(), 1), page.limit())
+                        : Mono.empty())
+                .concatMapIterable(PointPage::data)
+                .map(pointBuilder::buildDTOByGrpcDTO);
     }
 
     /**
@@ -89,31 +75,32 @@ public class PointClient {
      * @param id Point ID
      * @return PointBO
      */
-    public PointBO getById(Long id) {
-        GrpcPointQuery.Builder query = GrpcPointQuery.newBuilder();
-        query.setTenantId(driverMetadata.getDriver().getTenantId())
-                .setDriverId(driverMetadata.getDriver().getId()).setPointId(id);
-        GrpcRPointDTO rPointDTO = pointApiBlockingStub.getById(query.build());
-        if (!rPointDTO.getResult().getOk()) {
-            log.error("Point metadata unavailable, pointId={}", id);
-            return null;
-        }
-
-        return pointBuilder.buildDTOByGrpcDTO(rPointDTO.getData());
+    public Mono<PointBO> getById(Long id) {
+        return Mono.defer(() -> {
+            GrpcPointQuery query = GrpcPointQuery.newBuilder()
+                    .setTenantId(driverMetadata.getDriver().getTenantId())
+                    .setDriverId(driverMetadata.getDriver().getId())
+                    .setPointId(id)
+                    .build();
+                    return ReactiveGrpcClientSupport.<GrpcPointQuery, GrpcPointDTO>unary("get point metadata",
+                            observer -> pointApiStub.getById(query, observer))
+                    .map(pointBuilder::buildDTOByGrpcDTO);
+        });
     }
 
-    private GrpcRPagePointDTO getGrpcRPagePointDTO(long current) {
-        GrpcPagePointQuery.Builder query = GrpcPagePointQuery.newBuilder();
-        GrpcPage.Builder page = GrpcPage.newBuilder();
-        page.setCurrent(current);
-        query.setTenantId(driverMetadata.getDriver().getTenantId())
+    private Mono<PointPage> loadPage(long offset, int limit) {
+        GrpcOffsetPointQuery query = GrpcOffsetPointQuery.newBuilder()
+                .setTenantId(driverMetadata.getDriver().getTenantId())
                 .setDriverId(driverMetadata.getDriver().getId())
-                .setPage(page);
-        GrpcRPagePointDTO rPagePointDTO = pointApiBlockingStub.listByPage(query.build());
-        if (!rPagePointDTO.getResult().getOk()) {
-            throw new ServiceException("Failed to fetch point list");
-        }
-        return rPagePointDTO;
+                .setPage(PageRequest.newBuilder().setOffset(offset).setLimit(limit).build())
+                .build();
+        return ReactiveGrpcClientSupport.<GrpcOffsetPointQuery, GrpcOffsetPagePointDTO>unary(
+                        "list point metadata", observer -> pointApiStub.list(query, observer))
+                .map(response -> new PointPage(response.getPage().getOffset(), response.getPage().getLimit(),
+                        response.getPage().getHasNext(), response.getItemsList()));
+    }
+
+    private record PointPage(long offset, int limit, boolean hasNext, List<GrpcPointDTO> data) {
     }
 
 }

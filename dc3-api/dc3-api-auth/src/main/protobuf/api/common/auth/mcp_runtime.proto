@@ -19,7 +19,6 @@ syntax = "proto3";
 
 package api.common.auth;
 
-import "api/common/r.proto";
 
 option java_package = "io.github.pnoker.api.center.auth";
 option java_outer_classname = "McpRuntimeProto";
@@ -28,55 +27,26 @@ option java_multiple_files = true;
 
 // Internal MCP runtime service consumed by gateway through the facade layer.
 service McpRuntimeApi {
-  // Introspect an MCP OAuth access token.
-  rpc Introspect (GrpcMcpIntrospectRequest) returns (GrpcRMcpIntrospectDTO);
+  // List tools visible to the bearer token's principal and MCP connection.
+  rpc ListTools (GrpcMcpListToolsRequest) returns (GrpcMcpToolListDTO);
 
-  // List tools visible to the principal and MCP connection.
-  rpc ListTools (GrpcMcpToolListRequest) returns (GrpcRMcpToolListDTO);
-
-  // Resolve one visible tool to its backend invocation metadata.
-  rpc ResolveTool (GrpcMcpToolResolveRequest) returns (GrpcRMcpToolResolveDTO);
-
-  // Authorize one tool call, enforcing high-risk confirmation and idempotency.
-  rpc AuthorizeToolCall (GrpcMcpToolAuthorizeRequest) returns (GrpcRMcpToolAuthorizeDTO);
+  // Authorize one tool call and resolve its backend invocation atomically.
+  rpc CallTool (GrpcMcpCallToolRequest) returns (GrpcMcpCallToolDTO);
 
   // Store one MCP call audit record.
-  rpc Audit (GrpcMcpAuditCommand) returns (GrpcRMcpBoolean);
+  rpc Audit (GrpcMcpAuditCommand) returns (GrpcMcpBoolean);
 }
 
-// Token introspection request.
-message GrpcMcpIntrospectRequest {
-  // OAuth bearer token.
+message GrpcMcpListToolsRequest { string token = 1; }
+message GrpcMcpCallToolRequest {
   string token = 1;
-}
-
-// Token introspection response wrapper.
-message GrpcRMcpIntrospectDTO {
-  // Common result wrapper.
-  GrpcR result = 1;
-
-  // Introspection result.
-  GrpcMcpIntrospectDTO data = 2;
-}
-
-// Token introspection result.
-message GrpcMcpIntrospectDTO {
-  optional bool active = 1;
-  string iss = 2;
-  repeated string aud = 3;
-  string sub = 4;
-  string jti = 5;
-  int64 exp = 6;
-  int64 iat = 7;
-  int64 tenant_id = 8;
-  int64 principal_id = 9;
-  GrpcMcpPrincipalType principal_type = 10;
-  string principal_name = 11;
-  string display_name = 12;
-  string client_id = 13;
-  int64 mcp_connection_id = 14;
-  GrpcOAuthGrantType grant_type = 15;
-  string scope = 16;
+  string tool_name = 2;
+  string argument_digest = 3;
+  string confirm_id = 4;
+  string idempotency_key = 5;
+  string client_name = 6;
+  string client_version = 7;
+  string remote_ip = 8;
 }
 
 // MCP principal classification. Names match PrincipalTypeEnum values.
@@ -87,29 +57,8 @@ enum GrpcMcpPrincipalType {
   SYSTEM = 3;
 }
 
-// OAuth grant type. Enum names are upper-case (Java enum constants must be);
-// the on-the-wire value is the enum name, which the boundary converts
-// to/from the lowercase OAuth spec form (authorization_code etc.).
-enum GrpcOAuthGrantType {
-  GRPC_OAUTH_GRANT_TYPE_UNSPECIFIED = 0;
-  AUTHORIZATION_CODE = 1;
-  CLIENT_CREDENTIALS = 2;
-  REFRESH_TOKEN = 3;
-}
-
-// Visible tool list request.
-message GrpcMcpToolListRequest {
-  int64 tenant_id = 1;
-  int64 principal_id = 2;
-  int64 mcp_connection_id = 3;
-  string scope = 4;
-}
-
 // Visible tool list response wrapper.
-message GrpcRMcpToolListDTO {
-  // Common result wrapper.
-  GrpcR result = 1;
-
+message GrpcMcpToolListDTO {
   // Visible tool definitions.
   repeated GrpcMcpToolDefinitionDTO tools = 2;
 }
@@ -119,8 +68,9 @@ message GrpcMcpToolDefinitionDTO {
   string name = 1;
   string title = 2;
   string description = 3;
-  GrpcMcpToolAnnotationsDTO annotations = 4;
-  GrpcMcpToolMetadataDTO meta = 5;
+  string input_schema = 4;
+  GrpcMcpToolAnnotationsDTO annotations = 5;
+  GrpcMcpToolMetadataDTO meta = 6;
 }
 
 // MCP tool annotations.
@@ -146,24 +96,6 @@ message GrpcMcpToolMetadataDTO {
   GrpcMcpRiskLevel risk_level = 3;
 }
 
-// Visible tool resolve request.
-message GrpcMcpToolResolveRequest {
-  int64 tenant_id = 1;
-  int64 principal_id = 2;
-  int64 mcp_connection_id = 3;
-  string scope = 4;
-  string tool_name = 5;
-}
-
-// Visible tool resolve response wrapper.
-message GrpcRMcpToolResolveDTO {
-  // Common result wrapper.
-  GrpcR result = 1;
-
-  // Resolved tool invocation metadata.
-  GrpcMcpToolResolveDTO data = 2;
-}
-
 // Resolved tool invocation metadata.
 message GrpcMcpToolResolveDTO {
   string tool_id = 1;
@@ -173,27 +105,7 @@ message GrpcMcpToolResolveDTO {
   string service_name = 5;
   string api_path = 6;
   string http_method = 7;
-}
-
-// Tool call authorization request.
-message GrpcMcpToolAuthorizeRequest {
-  int64 tenant_id = 1;
-  int64 principal_id = 2;
-  int64 mcp_connection_id = 3;
-  string scope = 4;
-  string tool_name = 5;
-  string argument_digest = 6;
-  string confirm_id = 7;
-  string idempotency_key = 8;
-}
-
-// Tool call authorization response wrapper.
-message GrpcRMcpToolAuthorizeDTO {
-  // Common result wrapper.
-  GrpcR result = 1;
-
-  // Authorization decision.
-  GrpcMcpToolAuthorizeDTO data = 2;
+  string input_schema = 8;
 }
 
 // Tool call authorization decision values. Names match the auth-side
@@ -205,16 +117,25 @@ enum GrpcMcpDecision {
   REJECTED = 3;
 }
 
-// Tool call authorization decision.
-message GrpcMcpToolAuthorizeDTO {
-  // Authorization decision.
+// Principal context that auth authorizes for downstream forwarding.
+message GrpcMcpPrincipalContext {
+  int64 tenant_id = 1;
+  int64 principal_id = 2;
+  GrpcMcpPrincipalType principal_type = 3;
+  string principal_name = 4;
+  string display_name = 5;
+  string client_id = 6;
+  int64 connection_id = 7;
+}
+
+// Atomic tools/call response.
+message GrpcMcpCallToolDTO {
   GrpcMcpDecision decision = 1;
-  // Confirmation ticket ID issued when decision is CONFIRM_REQUIRED.
   string confirm_id = 2;
-  // Human readable reason or confirmation prompt.
   string message = 3;
-  // Resolved tool risk level.
   GrpcMcpRiskLevel risk_level = 4;
+  GrpcMcpToolResolveDTO tool = 5;
+  GrpcMcpPrincipalContext principal = 6;
 }
 
 // MCP audit outcome. Names match McpAuditStatusEnum values.
@@ -251,10 +172,6 @@ message GrpcMcpAuditCommand {
 }
 
 // Boolean response wrapper for MCP runtime calls.
-message GrpcRMcpBoolean {
-  // Common result wrapper.
-  GrpcR result = 1;
-
-  // Response data.
-  bool data = 2;
+message GrpcMcpBoolean {
+  bool value = 1;
 }

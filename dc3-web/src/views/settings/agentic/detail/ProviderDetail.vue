@@ -72,7 +72,7 @@ const load = () => {
   listAgenticProviders()
     .then((res) => {
       reactiveData.data =
-        (res.data || []).find((item) => String(item.id) === reactiveData.id) || ({} as AgenticProvider);
+        (res || []).find((item) => String(item.id) === reactiveData.id) || ({} as AgenticProvider);
     })
     .catch(() => {
       // handled globally

@@ -27,11 +27,11 @@ model uses to read and operate platform resources.
 - Bound from the `dc3.agentic` prefix (`AgenticProperties`).
 - An OpenAI-compatible fallback model is configured via the `AGENTIC_FALLBACK_OPENAI_*` environment variables (see
   `.env.example`).
-- Conversation memory uses the Spring AI JDBC chat-memory repository.
+- Conversation memory uses the module's reactive R2DBC stores.
 
 ## Dependencies
 
-- `spring-ai-starter-model-chat-memory-repository-jdbc` — Spring AI JDBC-backed conversation memory
+- `spring-boot-starter-data-r2dbc` — reactive conversation/session persistence
 
 ## Build Instructions
 

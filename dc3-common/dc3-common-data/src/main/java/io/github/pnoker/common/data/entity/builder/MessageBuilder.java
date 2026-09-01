@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.data.entity.model.MessageDO;
 import io.github.pnoker.common.data.entity.vo.MessageVO;
@@ -28,7 +27,6 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -45,7 +43,7 @@ import java.util.Optional;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(componentModel = "spring", implementationName = "DataMessageBuilderImpl", uses = {MapStructUtil.class})
 public interface MessageBuilder {
 
     /**
@@ -187,18 +185,10 @@ public interface MessageBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
-    default Page<MessageBO> buildBOPageByDOPage(Page<MessageDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
     /**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    default Page<MessageVO> buildVOPageByBOPage(Page<MessageBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

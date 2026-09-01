@@ -336,7 +336,7 @@ const showEdit = (row: EventRecord) => {
     reactiveData.paramLoading = true;
     listEventParamByEventId(String(row.id))
       .then((res) => {
-        reactiveData.originalParams = res.data || [];
+        reactiveData.originalParams = res || [];
         reactiveData.params = cloneParams(reactiveData.originalParams);
       })
       .finally(() => {

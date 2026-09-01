@@ -17,7 +17,8 @@
 
 package io.github.pnoker.common.facade.entity.query;
 
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,13 +28,9 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
-/**
- * Facade-level point value query.
- *
- * @author pnoker
- * @since 2016.10.1
- */
+/** Facade-level point value offset query. */
 @Getter
 @Setter
 @Builder
@@ -45,15 +42,17 @@ public class FacadePointValueQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private long offset;
 
-    private Pages page;
+    @Builder.Default
+    private int limit = PageRequest.DEFAULT_LIMIT;
 
+    @Builder.Default
+    private List<SortSpec> sort = List.of();
 
     private Long tenantId;
 
-
     private Long deviceId;
-
 
     private Long pointId;
 

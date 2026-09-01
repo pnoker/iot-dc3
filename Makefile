@@ -20,7 +20,7 @@ SHELL := /bin/bash
 
 .PHONY: help env init-env clean package test test-it test-e2e coverage deploy \
 	build up stop down ps logs config pull restart refresh reset \
-	run changelog openapi tag validate-annotations validate-logging validate-postgres-init \
+ run changelog openapi tag validate-annotations validate-logging validate-postgres-init validate-schema-fingerprint validate-r2dbc-migration \
 	validate-documentation validate-javadoc \
 	stack-deploy stack-rm stack-ps k8s-apply k8s-delete helm-install helm-uninstall \
 	release-backfill release-backfill-apply release-backfill-refresh
@@ -105,6 +105,8 @@ help:
 	@printf '  %-24s %s\n' 'make coverage' 'Generate aggregated JaCoCo coverage'
 	@printf '  %-24s %s\n' 'make validate-logging' 'Run backend and frontend logging policy gates'
 	@printf '  %-24s %s\n' 'make validate-postgres-init' 'Validate PostgreSQL initialization schema comments and syntax policy'
+	@printf '  %-24s %s\n' 'make validate-schema-fingerprint' 'Verify canonical clean-DDL fingerprints for PostgreSQL/MySQL'
+	@printf '  %-24s %s\n' 'make validate-r2dbc-migration' 'Fail when legacy relation persistence remains outside the JDBC allow-list'
 	@printf '  %-24s %s\n' 'make validate-documentation' 'Validate documentation against executable project metadata'
 	@printf '  %-24s %s\n' 'make validate-javadoc' 'Validate public Java API documentation and references'
 	@printf '  %-24s %s\n' 'make run SERVICE=auth' 'Run one Spring Boot service with env auto-loaded'
@@ -183,6 +185,12 @@ validate-logging:
 
 validate-postgres-init:
 	python3 dc3/bin/check_postgres_init.py
+
+validate-schema-fingerprint:
+	python3 dc3/bin/schema_fingerprint.py --check
+
+validate-r2dbc-migration:
+	python3 dc3/bin/check_r2dbc_migration.py
 
 validate-documentation:
 	python3 dc3/bin/check_documentation.py

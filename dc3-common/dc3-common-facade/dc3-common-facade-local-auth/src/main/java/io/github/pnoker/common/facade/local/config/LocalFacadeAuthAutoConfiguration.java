@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.facade.local.config;
 
-import io.github.pnoker.common.facade.local.TenantLocalFacade;
 import io.github.pnoker.common.facade.local.builder.FacadeLocalCredentialBuilder;
 import io.github.pnoker.common.facade.local.builder.FacadeTenantBuilder;
 import io.github.pnoker.common.facade.local.builder.FacadeUserBuilder;
@@ -28,7 +27,7 @@ import org.springframework.context.annotation.FilterType;
 
 /**
  * Auto-configuration for the auth-domain local facade implementations. Active only when
- * {@code dc3.facade.mode=local}. Scans the facade-local package but restricts
+ * {@code dc3.facade.auth.mode=local}. Scans the facade-local package but restricts
  * registration to the auth-domain classes carried by this module, so the scan stays
  * deterministic even when the manager-domain module is also on the classpath.
  * MapStruct-generated {@code *BuilderImpl} classes are picked up via their interfaces
@@ -38,10 +37,11 @@ import org.springframework.context.annotation.FilterType;
  * @since 2016.10.1
  */
 @AutoConfiguration
-@ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "local")
+@ConditionalOnProperty(name = "dc3.facade.auth.mode", havingValue = "local")
 @ComponentScan(basePackages = "io.github.pnoker.common.facade.local", useDefaultFilters = false,
         includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                classes = {io.github.pnoker.common.facade.local.TenantLocalFacade.class,
+                classes = {
+                        io.github.pnoker.common.facade.local.TenantLocalFacade.class,
                         io.github.pnoker.common.facade.local.TokenLocalFacade.class,
                         io.github.pnoker.common.facade.local.UserLocalFacade.class,
                         io.github.pnoker.common.facade.local.LocalCredentialLocalFacade.class,
@@ -52,10 +52,9 @@ import org.springframework.context.annotation.FilterType;
 public class LocalFacadeAuthAutoConfiguration {
 
     /**
-     * Referenced only to ensure the {@link TenantLocalFacade} symbol is linked against
-     * this module's compiled classes at AutoConfiguration load time.
+     * Referenced only to ensure the reactive tenant facade symbol is linked.
      */
     @SuppressWarnings("unused")
-    private static final Class<?> CANARY = TenantLocalFacade.class;
+    private static final Class<?> CANARY = io.github.pnoker.common.facade.local.TenantLocalFacade.class;
 
 }

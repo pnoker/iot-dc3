@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -53,12 +52,16 @@ public enum ApiTypeEnum {
      * GET
      */
     GET((byte) 3, "get", "GET"),
+
+    /**
+     * PATCH
+     */
+    PATCH((byte) 4, "patch", "PATCH"),
     ;
 
     /**
      * Index
      */
-    @EnumValue
     private final Byte index;
 
     /**

@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
 import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
+import reactor.core.publisher.Mono;
 
 /**
  * Business service for point command operations.
@@ -35,7 +36,7 @@ public interface PointCommandService {
      * @param entityBO PointCommandReadBO
      * @return generated commandId for status tracking
      */
-    String read(Long tenantId, PointCommandReadBO entityBO);
+    Mono<String> read(Long tenantId, PointCommandReadBO entityBO);
 
     /**
      * Read command from trusted internal callers.
@@ -43,7 +44,7 @@ public interface PointCommandService {
      * @param entityBO PointCommandReadBO
      * @return generated commandId
      */
-    default String read(PointCommandReadBO entityBO) {
+    default Mono<String> read(PointCommandReadBO entityBO) {
         return read(null, entityBO);
     }
 
@@ -54,7 +55,7 @@ public interface PointCommandService {
      * @param entityBO PointCommandWriteBO
      * @return generated commandId for status tracking
      */
-    String write(Long tenantId, PointCommandWriteBO entityBO);
+    Mono<String> write(Long tenantId, PointCommandWriteBO entityBO);
 
     /**
      * Write command from trusted internal callers.
@@ -62,7 +63,7 @@ public interface PointCommandService {
      * @param entityBO PointCommandWriteBO
      * @return generated commandId
      */
-    default String write(PointCommandWriteBO entityBO) {
+    default Mono<String> write(PointCommandWriteBO entityBO) {
         return write(null, entityBO);
     }
 

@@ -17,25 +17,22 @@
 
 package io.github.pnoker.common.facade.local;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.facade.api.CommandFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeCommandQuery;
+import io.github.pnoker.common.facade.entity.query.FacadeCommandOffsetQuery;
 import io.github.pnoker.common.facade.local.builder.FacadeCommandBuilder;
-import io.github.pnoker.common.manager.entity.bo.CommandBO;
-import io.github.pnoker.common.manager.entity.query.CommandQuery;
-import io.github.pnoker.common.manager.service.CommandService;
-import io.github.pnoker.common.tenant.TenantContextHolder;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.manager.service.ReactiveCommandService;
+import io.github.pnoker.common.manager.repository.CommandFilter;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * In-process CommandFacade implementation.
@@ -43,58 +40,33 @@ import java.util.Objects;
  * @author pnoker
  * @since 2016.10.1
  */
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CommandLocalFacade implements CommandFacade {
 
-    private final CommandService commandService;
+    private final ReactiveCommandService reactiveCommandService;
 
     private final FacadeCommandBuilder facadeCommandBuilder;
 
     @Override
-    public FacadeCommandBO getById(Long tenantId, Long id) {
-        TenantContextHolder.setTenantId(tenantId);
-        try {
-            CommandBO managerBO = commandService.getById(id);
-            return Objects.isNull(managerBO) ? null : facadeCommandBuilder.toFacadeBO(managerBO);
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Mono<FacadeCommandBO> getById(Long tenantId, Long id) {
+        return reactiveCommandService.getById(tenantId, id)
+                .map(facadeCommandBuilder::toFacadeBO)
+                .onErrorResume(NotFoundException.class, ignored -> Mono.empty());
     }
 
     @Override
-    public List<FacadeCommandBO> listByIds(Long tenantId, Collection<Long> ids) {
-        TenantContextHolder.setTenantId(tenantId);
-        try {
-            if (Objects.isNull(ids) || ids.isEmpty()) {
-                return Collections.emptyList();
-            }
-            List<CommandBO> list = commandService.listByIds(new HashSet<>(ids));
-            if (Objects.isNull(list) || list.isEmpty()) {
-                return Collections.emptyList();
-            }
-            return list.stream().map(facadeCommandBuilder::toFacadeBO).toList();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Flux<FacadeCommandBO> listByIds(Long tenantId, Collection<Long> ids) {
+        return reactiveCommandService.listByIds(tenantId, ids == null ? List.of() : ids.stream().filter(Objects::nonNull).distinct().toList())
+                .map(facadeCommandBuilder::toFacadeBO);
     }
 
     @Override
-    public FacadePage<FacadeCommandBO> listByPage(FacadeCommandQuery query) {
-        TenantContextHolder.setTenantId(query.getTenantId());
-        try {
-            CommandQuery managerQuery = facadeCommandBuilder.toManagerQuery(query);
-            Page<CommandBO> page = commandService.list(managerQuery);
-            if (Objects.isNull(page)) {
-                return FacadePage.empty();
-            }
-
-            List<FacadeCommandBO> records = page.getRecords().stream().map(facadeCommandBuilder::toFacadeBO).toList();
-            return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Mono<OffsetPage<FacadeCommandBO>> list(FacadeCommandOffsetQuery query) {
+        return reactiveCommandService.list(new CommandFilter(query.tenantId(), query.commandName(), query.commandCode(),
+                        query.commandTypeFlag(), query.callTypeFlag(), query.profileId(), query.enableFlag(), query.version(),
+                        query.deviceId(), query.offset(), query.limit(), query.sort()))
+                .map(page -> OffsetPage.of(page.items().stream().map(facadeCommandBuilder::toFacadeBO).toList(), page.offset(), page.limit(), page.total()));
     }
 
 }

@@ -17,10 +17,9 @@
 
 package io.github.pnoker.common.data.entity.vo;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
-import io.github.pnoker.common.utils.PageUtil;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +27,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * VO for querying command records with pagination and filters.
@@ -56,17 +56,13 @@ public class CommandHistoryQueryVO implements Serializable {
     @Schema(description = "Filter by command lifecycle status (PENDING, SENT, SUCCESS, FAILED, TIMEOUT, EXPIRED, DEAD, DUPLICATE).", example = "SUCCESS")
     private PointCommandStatusEnum status;
 
-    @Schema(description = "Pagination parameters (page number, page size).")
-    private Pages page;
+    @Schema(description = "Zero-based result offset.", example = "0")
+    private Long offset = 0L;
 
-    /**
-     * To page.
-     *
-     * @param <T> generic type parameter
-     * @return paginated result
-     */
-    public <T> Page<T> toPage() {
-        return PageUtil.page(page);
-    }
+    @Schema(description = "Maximum number of records.", example = "50")
+    private Integer limit = PageRequest.DEFAULT_LIMIT;
+
+    @Schema(description = "Stable, whitelisted sort fields.")
+    private List<SortSpec> sort = List.of();
 
 }

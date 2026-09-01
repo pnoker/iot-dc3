@@ -20,6 +20,7 @@ import {expect, type Page, test} from '@playwright/test';
 import {
   apiPost,
   clickTab,
+  deleteVersionedEntity,
   ensureE2eData,
   expectHealthy,
   fillFirstEditableInput,
@@ -51,12 +52,12 @@ async function gotoProfileEdit(page: Page, profileId: string, active = 'profileC
 }
 
 async function findCreatedId(page: Page, listUrl: string, nameField: string, name: string) {
-  const response = await apiPost<{ records?: Array<{ id?: unknown }> }>(page, listUrl, {
-    page: {current: 1, size: 1},
+  const response = await apiPost<{items?: Array<{id?: unknown}>}>(page, listUrl, {
+    offset: 0, limit: 1,
     [nameField]: name,
   });
-  if (!response.data?.ok) return undefined;
-  const id = response.data.data?.records?.[0]?.id;
+  if (response.status >= 300) return undefined;
+  const id = response.data?.items?.[0]?.id;
   return id == null ? undefined : String(id);
 }
 
@@ -155,7 +156,7 @@ test.describe('profile edit tabs', () => {
       commandId = await findCreatedId(page, '/api/v3/manager/command/list', 'commandName', commandName);
       expect(commandId, 'created command id').toBeDefined();
     } finally {
-      if (commandId) await apiPost(page, '/api/v3/manager/command/delete', {}, {id: commandId}).catch(() => {
+      if (commandId) await deleteVersionedEntity(page, '/api/v3/manager/command', commandId).catch(() => {
       });
       await e2eData.cleanup();
     }
@@ -212,9 +213,9 @@ test.describe('profile edit tabs', () => {
       eventId = await findCreatedId(page, '/api/v3/manager/event/list', 'eventName', eventName);
       expect(eventId, 'created event id').toBeDefined();
     } finally {
-      if (commandId) await apiPost(page, '/api/v3/manager/command/delete', {}, {id: commandId}).catch(() => {
+      if (commandId) await deleteVersionedEntity(page, '/api/v3/manager/command', commandId).catch(() => {
       });
-      if (eventId) await apiPost(page, '/api/v3/manager/event/delete', {}, {id: eventId}).catch(() => {
+      if (eventId) await deleteVersionedEntity(page, '/api/v3/manager/event', eventId).catch(() => {
       });
       await e2eData.cleanup();
     }

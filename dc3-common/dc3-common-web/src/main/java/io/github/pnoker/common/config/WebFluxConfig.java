@@ -19,7 +19,10 @@ package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.utils.JsonUtil;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.codec.ServerCodecConfigurer;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 
@@ -31,6 +34,12 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
  */
 @AutoConfiguration
 public class WebFluxConfig implements WebFluxConfigurer {
+
+    @Bean
+    @ConditionalOnMissingBean
+    public WebClient.Builder webClientBuilder() {
+        return WebClient.builder();
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {

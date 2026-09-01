@@ -17,18 +17,15 @@
 
 package io.github.pnoker.common.auth.biz.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.auth.biz.DictionaryForAuthService;
-import io.github.pnoker.common.auth.dal.TenantManager;
-import io.github.pnoker.common.auth.entity.model.TenantDO;
-import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
-import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.auth.repository.ReactiveTenantDictionaryStore;
+import io.github.pnoker.common.entity.option.DictionaryOption;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * Dictionary lookup service implementation for the auth module.
@@ -41,20 +38,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DictionaryForAuthServiceImpl implements DictionaryForAuthService {
 
-    private final TenantManager tenantManager;
+    private final ReactiveTenantDictionaryStore tenantStore;
 
     @Override
-    public List<DictionaryBO> tenantDictionary() {
-        LambdaQueryWrapper<TenantDO> wrapper = Wrappers.<TenantDO>query().lambda();
-        wrapper.eq(TenantDO::getEnableFlag, EnableFlagEnum.ENABLE);
-        List<TenantDO> entityDOList = tenantManager.list(wrapper);
-
-        return entityDOList.stream().map(entityDO -> {
-            DictionaryBO driverDictionary = new DictionaryBO();
-            driverDictionary.setLabel(entityDO.getTenantName());
-            driverDictionary.setValue(entityDO.getId().toString());
-            return driverDictionary;
-        }).toList();
+    public Mono<List<DictionaryOption>> listTenantOptions() {
+        return tenantStore.listEnabled()
+                .map(tenant -> DictionaryOption.leaf(tenant.getTenantName(), tenant.getId().toString()))
+                .collectList();
     }
 
 }

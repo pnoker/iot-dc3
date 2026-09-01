@@ -17,9 +17,8 @@
 
 package io.github.pnoker.common.auth.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
-import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthProtocolException;
+import io.github.pnoker.common.auth.biz.ReactiveOAuthMcpRuntimeService;
+import io.github.pnoker.common.auth.exception.OAuthProtocolException;
 import io.github.pnoker.common.auth.entity.builder.McpConnectionBuilder;
 import io.github.pnoker.common.auth.entity.builder.OAuthClientBuilder;
 import io.github.pnoker.common.auth.entity.vo.McpAuditVO;
@@ -31,9 +30,9 @@ import io.github.pnoker.common.auth.entity.vo.McpToolVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationResponseVO;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
+import io.github.pnoker.common.auth.service.ReactiveMcpCatalogService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,6 +54,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -72,7 +73,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class McpManagementController implements BaseController {
 
-    private final OAuthMcpRuntimeService oauthMcpRuntimeService;
+    private final ReactiveOAuthMcpRuntimeService oauthMcpRuntimeService;
+    private final ReactiveMcpCatalogService reactiveMcpCatalogService;
     private final McpConnectionBuilder mcpConnectionBuilder;
     private final OAuthClientBuilder oauthClientBuilder;
 
@@ -91,8 +93,8 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/metadata")
-    public Mono<R<Map<String, Object>>> metadata() {
-        return async(() -> R.ok(oauthMcpRuntimeService.authorizationServerMetadata()));
+    public Mono<Map<String, Object>> metadata() {
+        return oauthMcpRuntimeService.authorizationServerMetadata();
     }
 
     /**
@@ -112,15 +114,15 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
     @PostMapping("/client/register")
-    public Mono<R<OAuthClientRegistrationResponseVO>> registerClient(
+    public Mono<OAuthClientRegistrationResponseVO> registerClient(
             @RequestBody OAuthClientRegistrationRequestVO request) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> {
             if (oauthClientBuilder.isUnknownClientType(request)) {
-                throw new OAuthProtocolException(HttpStatus.BAD_REQUEST.value(), "invalid_client_metadata",
-                        "unsupported client_type");
+                return Mono.error(new OAuthProtocolException(HttpStatus.BAD_REQUEST.value(), "invalid_client_metadata",
+                        "unsupported client_type"));
             }
-            return R.ok(oauthMcpRuntimeService.registerClient(oauthClientBuilder.buildBOByRequestVO(request), header));
-        }));
+            return oauthMcpRuntimeService.registerClient(oauthClientBuilder.buildBOByRequestVO(request), header);
+        });
     }
 
     /**
@@ -138,8 +140,8 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/client/list")
-    public Mono<R<List<OAuthClientVO>>> listClients() {
-        return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listClients(header))));
+    public Mono<List<OAuthClientVO>> listClients() {
+        return getPrincipalHeader().flatMap(header -> oauthMcpRuntimeService.listClients(header).collectList());
     }
 
     /**
@@ -157,9 +159,8 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/connection/list")
-    public Mono<R<List<McpConnectionVO>>> listConnections() {
-        return getPrincipalHeader()
-                .flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listConnections(header))));
+    public Mono<List<McpConnectionVO>> listConnections() {
+        return getPrincipalHeader().flatMap(oauthMcpRuntimeService::listConnections);
     }
 
     /**
@@ -178,10 +179,10 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/connection/add")
-    public Mono<R<McpConnectionVO>> createConnection(
+    public Mono<McpConnectionVO> createConnection(
             @Validated(Add.class) @RequestBody McpConnectionAddVO connection) {
-        return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.createConnection(
-                mcpConnectionBuilder.buildBOByAddVO(connection), header))));
+        return getPrincipalHeader().flatMap(header -> oauthMcpRuntimeService.createConnection(
+                mcpConnectionBuilder.buildBOByAddVO(connection), header));
     }
 
     /**
@@ -201,11 +202,8 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
     @PostMapping("/connection/revoke")
-    public Mono<R<Boolean>> revokeConnection(@Parameter(description = "Primary key of the MCP connection to revoke.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            oauthMcpRuntimeService.revokeConnection(id, header);
-            return R.ok(true);
-        }));
+    public Mono<Boolean> revokeConnection(@Parameter(description = "Primary key of the MCP connection to revoke.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getPrincipalHeader().flatMap(header -> oauthMcpRuntimeService.revokeConnection(id, header).thenReturn(true));
     }
 
     /**
@@ -224,15 +222,14 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/connection/tools/replace")
-    public Mono<R<Boolean>> replaceConnectionTools(
+    public Mono<Boolean> replaceConnectionTools(
             @Validated(Update.class) @RequestBody McpConnectionToolsReplaceVO request) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
+        return getPrincipalHeader().flatMap(header -> {
             McpConnectionToolsReplaceVO body =
                     request == null ? new McpConnectionToolsReplaceVO() : request;
-            oauthMcpRuntimeService.replaceConnectionTools(Long.parseLong(body.getConnectionId()), toolIds(body.getToolIds()),
-                    header);
-            return R.ok(true);
-        }));
+            return oauthMcpRuntimeService.replaceConnectionTools(Long.parseLong(body.getConnectionId()), toolIds(body.getToolIds()),
+                    header).thenReturn(true);
+        });
     }
 
     /**
@@ -251,9 +248,8 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/connection/tools/list")
-    public Mono<R<List<String>>> listConnectionTools(@Parameter(description = "Primary key of the MCP connection to list tools for.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getPrincipalHeader().flatMap(header -> async(() -> R.ok(oauthMcpRuntimeService.listConnectionToolIds(id,
-                header))));
+    public Mono<List<String>> listConnectionTools(@Parameter(description = "Primary key of the MCP connection to list tools for.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getPrincipalHeader().flatMapMany(header -> oauthMcpRuntimeService.listConnectionToolIds(id, header)).collectList();
     }
 
     /**
@@ -271,8 +267,8 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/tool/catalog/refresh")
-    public Mono<R<Integer>> refreshToolCatalog() {
-        return async(() -> R.ok(oauthMcpRuntimeService.refreshToolCatalog()));
+    public Mono<Integer> refreshToolCatalog() {
+        return oauthMcpRuntimeService.refreshToolCatalog();
     }
 
     /**
@@ -291,15 +287,11 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/tool/list")
-    public Mono<R<Page<McpToolVO>>> listToolCatalog(
+    public Mono<OffsetPage<McpToolVO>> listToolCatalog(
             @RequestBody(required = false) McpToolCatalogQueryVO request) {
         McpToolCatalogQueryVO body = request == null ? new McpToolCatalogQueryVO() : request;
-        return async(() -> R.ok(oauthMcpRuntimeService.pageToolCatalog(
-                StringUtils.defaultString(body.getKeyword()),
-                StringUtils.defaultString(body.getRiskLevel()),
-                body.getPage() == null ? 1L : body.getPage().getCurrent(),
-                body.getPage() == null ? intValue(body.getLimit()) : body.getPage().getSize()
-        )));
+        return Mono.defer(() -> reactiveMcpCatalogService.listTools(StringUtils.trimToEmpty(body.getKeyword()),
+                StringUtils.trimToEmpty(body.getRiskLevel()), page(body.getOffset(), body.getLimit(), body.getSort())));
     }
 
     /**
@@ -309,9 +301,8 @@ public class McpManagementController implements BaseController {
      * @param toolId      optional filter by MCP tool id
      * @param status      optional filter by invocation outcome (SUCCESS, DENIED, POLICY_DENIED, ERROR, UNKNOWN)
      * @param riskLevel   optional filter by tool risk level (LOW, MEDIUM, HIGH)
-     * @param limit       optional page size kept for backward compatibility; ignored when {@code size} is present
-     * @param current     optional one-based page number
-     * @param size        optional page size (bounded to 1-500, defaults to 200)
+     * @param offset      zero-based result offset
+     * @param limit       maximum page size (bounded to 1-200)
      * @return one page of append-only audit records matching the filters
      */
     @PreAuthorize("@perm.can('mcp', 'list')")
@@ -324,28 +315,26 @@ public class McpManagementController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/audit/list")
-    public Mono<R<Page<McpAuditVO>>> listAuditLog(
+    public Mono<OffsetPage<McpAuditVO>> listAuditLog(
             @Parameter(description = "Filter by owning principal ID.", example = "2048") @RequestParam(value = "principal_id", required = false) Long principalId,
             @Parameter(description = "Filter by MCP tool ID.", example = "tool_read_device") @RequestParam(value = "tool_id", required = false) String toolId,
             @Parameter(description = "Filter by audit invocation outcome: SUCCESS, DENIED, POLICY_DENIED, ERROR, or UNKNOWN.", example = "SUCCESS") @RequestParam(value = "status", required = false) String status,
             @Parameter(description = "Filter by tool risk level: LOW, MEDIUM, or HIGH.", example = "LOW") @RequestParam(value = "risk_level", required = false) String riskLevel,
-            @Parameter(description = "Page size kept for backward compatibility; ignored when size is present.", example = "20") @RequestParam(value = "limit", required = false) Integer limit,
-            @Parameter(description = "One-based page number.", example = "1") @RequestParam(value = "current", required = false) Long current,
-            @Parameter(description = "Page size, bounded to 1-500.", example = "12") @RequestParam(value = "size", required = false) Integer size) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(oauthMcpRuntimeService.pageAudit(
-                tenantId, principalId, StringUtils.defaultString(toolId), StringUtils.defaultString(status),
-                StringUtils.defaultString(riskLevel),
-                current == null ? 1L : current,
-                size == null ? intValue(limit) : size
-        ))));
+            @Parameter(description = "Zero-based result offset.", example = "0") @RequestParam(value = "offset", required = false) Long offset,
+            @Parameter(description = "Maximum number of results, bounded to 1-200.", example = "50") @RequestParam(value = "limit", required = false) Integer limit) {
+        return getTenantId().flatMap(tenantId -> reactiveMcpCatalogService.listAudit(
+                tenantId, principalId, StringUtils.trimToEmpty(toolId), StringUtils.trimToEmpty(status),
+                StringUtils.trimToEmpty(riskLevel), new PageRequest(offset == null ? 0 : offset,
+                        limit == null ? PageRequest.DEFAULT_LIMIT : limit, List.of())));
     }
 
     private List<String> toolIds(List<String> value) {
         return value == null ? List.of() : value.stream().filter(StringUtils::isNotBlank).toList();
     }
 
-    private int intValue(Integer value) {
-        return value == null ? 0 : value;
+    private PageRequest page(Long offset, Integer limit, List<io.github.pnoker.db.r2dbc.core.page.SortSpec> sort) {
+        return new PageRequest(offset == null ? 0 : offset,
+                limit == null ? PageRequest.DEFAULT_LIMIT : limit, sort);
     }
 
 }

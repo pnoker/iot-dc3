@@ -17,18 +17,14 @@
 
 package io.github.pnoker.common.manager.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.SuccessCode;
-import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.CommandAttributeBO;
 import io.github.pnoker.common.manager.entity.builder.CommandAttributeBuilder;
-import io.github.pnoker.common.manager.entity.query.CommandAttributeQuery;
+import io.github.pnoker.common.manager.entity.query.CommandAttributeOffsetRequest;
+import io.github.pnoker.common.manager.repository.CommandAttributeFilter;
 import io.github.pnoker.common.manager.entity.vo.CommandAttributeVO;
-import io.github.pnoker.common.manager.service.CommandAttributeService;
-import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.manager.service.ReactiveCommandAttributeService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,12 +32,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,9 +47,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 
 /**
  * Manages command attribute field definitions declared on profile templates, the configurable fields of a downward control instruction.
@@ -68,9 +65,7 @@ public class CommandAttributeController implements BaseController {
 
     private final CommandAttributeBuilder commandAttributeBuilder;
 
-    private final CommandAttributeService commandAttributeService;
-
-    private final DriverService driverService;
+    private final ReactiveCommandAttributeService commandAttributeService;
 
     /**
      * Declare a new command attribute field definition on a profile template for the current tenant.
@@ -88,13 +83,18 @@ public class CommandAttributeController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody CommandAttributeVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<CommandAttributeVO> add(@Validated(Add.class) @RequestBody CommandAttributeVO entityVO) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
+            Long tenantId = tuple.getT1().getT1();
             CommandAttributeBO entityBO = commandAttributeBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            commandAttributeService.add(entityBO);
-            return R.ok(SuccessCode.ADD);
-        }));
+            entityBO.setCreatorId(tuple.getT1().getT2());
+            entityBO.setCreatorName(tuple.getT2());
+            entityBO.setOperatorId(tuple.getT1().getT2());
+            entityBO.setOperatorName(tuple.getT2());
+            return commandAttributeService.add(entityBO).map(commandAttributeBuilder::buildVOByBO);
+        });
     }
 
     /**
@@ -112,13 +112,12 @@ public class CommandAttributeController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, commandAttributeService.getById(id));
-            commandAttributeService.delete(id);
-            return R.ok(SuccessCode.DELETE);
-        }));
+    @DeleteMapping("/delete")
+    public Mono<Void> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id,
+                             @Parameter(description = "Current optimistic-lock version required as a deletion precondition.", example = "0") @NotNull @Min(0) @RequestParam("version") Integer version) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> commandAttributeService.delete(tuple.getT1().getT1(), id, version,
+                        tuple.getT1().getT2(), tuple.getT2()).then());
     }
 
     /**
@@ -137,14 +136,16 @@ public class CommandAttributeController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody CommandAttributeVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<CommandAttributeVO> update(@Validated(Update.class) @RequestBody CommandAttributeVO entityVO) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
+            Long tenantId = tuple.getT1().getT1();
             CommandAttributeBO entityBO = commandAttributeBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, commandAttributeService.getById(entityBO.getId()));
-            commandAttributeService.update(entityBO);
-            return R.ok(SuccessCode.UPDATE);
-        }));
+            entityBO.setOperatorId(tuple.getT1().getT2());
+            entityBO.setOperatorName(tuple.getT2());
+            return commandAttributeService.update(entityBO).map(commandAttributeBuilder::buildVOByBO);
+        });
     }
 
     /**
@@ -163,12 +164,9 @@ public class CommandAttributeController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_id")
-    public Mono<R<CommandAttributeVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            CommandAttributeBO entityBO = requireTenant(tenantId, commandAttributeService.getById(id));
-            CommandAttributeVO entityVO = commandAttributeBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
-        }));
+    public Mono<CommandAttributeVO> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId().flatMap(tenantId -> commandAttributeService.getById(tenantId, id)
+                .map(commandAttributeBuilder::buildVOByBO));
     }
 
     /**
@@ -187,17 +185,9 @@ public class CommandAttributeController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list_by_driver_id")
-    public Mono<R<List<CommandAttributeVO>>> listByDriverId(@Parameter(description = "Identifier of the driver whose command attributes are enumerated; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            try {
-                requireTenant(tenantId, driverService.getById(driverId));
-                List<CommandAttributeBO> entityBOList = filterTenant(tenantId, commandAttributeService.listByDriverId(driverId));
-                List<CommandAttributeVO> entityVO = commandAttributeBuilder.buildVOListByBOList(entityBOList);
-                return R.ok(entityVO);
-            } catch (NotFoundException ignored) {
-                return R.ok(Collections.emptyList());
-            }
-        }));
+    public Mono<List<CommandAttributeVO>> listByDriverId(@Parameter(description = "Identifier of the driver whose command attributes are enumerated; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+        return getTenantId().flatMap(tenantId -> commandAttributeService.listByDriverId(tenantId, driverId)
+                .map(commandAttributeBuilder::buildVOByBO).collectList());
     }
 
     /**
@@ -216,14 +206,13 @@ public class CommandAttributeController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<CommandAttributeVO>>> list(@RequestBody(required = false) CommandAttributeQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            CommandAttributeQuery query = Objects.isNull(entityQuery) ? new CommandAttributeQuery() : entityQuery;
-            query.setTenantId(tenantId);
-            Page<CommandAttributeBO> entityPageBO = commandAttributeService.list(query);
-            Page<CommandAttributeVO> entityPageVO = commandAttributeBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
-        }));
+    public Mono<OffsetPage<CommandAttributeVO>> list(@RequestBody(required = false) CommandAttributeOffsetRequest request) {
+        CommandAttributeOffsetRequest query = request == null ? new CommandAttributeOffsetRequest() : request;
+        return getTenantId().flatMap(tenantId -> commandAttributeService.list(new CommandAttributeFilter(
+                        tenantId, query.attributeName(), query.attributeCode(), query.attributeTypeFlag(), query.driverId(),
+                        query.enableFlag(), query.version(), query.offset(), query.limit(), query.sort()))
+                .map(page -> OffsetPage.of(page.items().stream().map(commandAttributeBuilder::buildVOByBO).toList(),
+                        page.offset(), page.limit(), page.total())));
     }
 
 }

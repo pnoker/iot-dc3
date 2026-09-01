@@ -17,11 +17,6 @@
 
 package io.github.pnoker.common.data.entity.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,73 +35,53 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName(value = "dc3_notify_history", autoResultMap = true)
 public class NotifyHistoryDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
-    @TableField("rule_id")
     private Long ruleId;
 
-    @TableField("notify_id")
     private Long notifyId;
 
-    @TableField("message_id")
     private Long messageId;
 
-    @TableField("channel_id")
     private Long channelId;
 
-    @TableField("alarm_id")
     private Long alarmId;
 
-    @TableField("channel_type_flag")
+    private String dedupeKey;
+
     private Byte channelTypeFlag;
 
-    @TableField("target")
     private String target;
 
-    @TableField("status_flag")
     private Byte statusFlag;
 
-    @TableField(value = "request_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt requestExt;
 
-    @TableField(value = "response_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt responseExt;
 
-    @TableField("error_message")
     private String errorMessage;
 
-    @TableField("retry_count")
     private Integer retryCount;
 
-    @TableField("tenant_id")
     private Long tenantId;
 
-    @TableField("remark")
     private String remark;
 
-    @TableField("creator_id")
     private Long creatorId;
 
-    @TableField("creator_name")
     private String creatorName;
 
-    @TableField("create_time")
     private LocalDateTime createTime;
 
-    @TableField("operator_id")
     private Long operatorId;
 
-    @TableField("operator_name")
     private String operatorName;
 
-    @TableField("operate_time")
     private LocalDateTime operateTime;
 
 }

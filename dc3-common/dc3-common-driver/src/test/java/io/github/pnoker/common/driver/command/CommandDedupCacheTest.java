@@ -23,6 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CommandDedupCacheTest {
 
+    private record Result(String value) {
+    }
+
     @Test
     void releaseAllowsRetryAfterFailedAttempt() {
         CommandDedupCache cache = new CommandDedupCache();
@@ -33,5 +36,17 @@ class CommandDedupCacheTest {
         cache.release("cmd-1");
 
         assertThat(cache.tryAcquire("cmd-1")).isTrue();
+    }
+
+    @Test
+    void completedResultSurvivesDuplicateAcquisition() {
+        CommandDedupCache cache = new CommandDedupCache();
+        Result result = new Result("ok");
+
+        assertThat(cache.tryAcquire("cmd-1")).isTrue();
+        cache.complete("cmd-1", result);
+
+        assertThat(cache.tryAcquire("cmd-1")).isFalse();
+        assertThat(cache.result("cmd-1", Result.class)).contains(result);
     }
 }

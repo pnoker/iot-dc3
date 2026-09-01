@@ -45,7 +45,8 @@ Used with `@Validated(...)` in controllers:
 - `CommandCallDTO` / `CommandCallResultDTO` — Custom command request/result payloads
 - Domain-specific `*Ext` classes — JSON extension-column shapes
 
-`RequestHeader`, `Pages`, `TreeNode`, `R<T>`, and `TenantOwned` belong to `dc3-common-public`, not this module. Shared
+`RequestHeader`, `PageRequest`, `OffsetPage`, `CursorPage`, `TreeNode`, and `TenantOwned` belong to `dc3-common-public` or
+`dc3-db-r2dbc-core`, not this module. Shared
 top-level enums belong to `dc3-common-constant` and are referenced by model fields where appropriate.
 
 ## Usage Example
@@ -53,10 +54,10 @@ top-level enums belong to `dc3-common-constant` and are referenced by model fiel
 ```java
 // Validation groups in controller
 @PostMapping("/add")
-public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) { ...}
+public Mono<ResponseEntity<DriverVO>> add(@Validated(Add.class) @RequestBody DriverVO entityVO) { ...}
 
 @PostMapping("/update")
-public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverVO entityVO) { ...}
+public Mono<ResponseEntity<DriverVO>> update(@Validated(Update.class) @RequestBody DriverVO entityVO) { ...}
 ```
 
 ## Build Instructions

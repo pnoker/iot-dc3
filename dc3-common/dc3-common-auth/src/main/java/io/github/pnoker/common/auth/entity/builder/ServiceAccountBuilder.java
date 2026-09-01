@@ -17,13 +17,11 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ServiceAccountBO;
 import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
 import io.github.pnoker.common.auth.entity.vo.ServiceAccountVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -108,24 +106,5 @@ public interface ServiceAccountBuilder {
      */
     List<ServiceAccountBO> buildBOListByDOList(List<ServiceAccountDO> entityDOList);
 
-    /**
-     * Convert do page to bo page.
-     *
-     * @param entityPageDO persistence object
-     * @return converted value
-     */
-    default Page<ServiceAccountBO> buildBOPageByDOPage(Page<ServiceAccountDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    /**
-     * Convert bo page to vo page.
-     *
-     * @param entityPageBO business object
-     * @return converted value
-     */
-    default Page<ServiceAccountVO> buildVOPageByBOPage(Page<ServiceAccountBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
 }

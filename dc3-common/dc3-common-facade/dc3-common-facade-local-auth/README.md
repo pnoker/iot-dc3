@@ -19,7 +19,7 @@ classes convert between auth domain objects and facade BOs. Beans are registered
 
 ## Activation
 
-Active when the in-process facade mode is selected (`dc3.facade.mode=local`) and `dc3-common-auth` is on the classpath.
+Active when the auth-domain in-process mode is selected (`dc3.facade.auth.mode=local`) and `dc3-common-auth` is on the classpath.
 
 ## Dependencies
 

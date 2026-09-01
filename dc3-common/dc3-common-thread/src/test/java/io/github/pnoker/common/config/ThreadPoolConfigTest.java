@@ -24,13 +24,13 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ThreadPoolConfigTest {
 
@@ -88,9 +88,7 @@ class ThreadPoolConfigTest {
     }
 
     @Test
-    void blockingRejectedHandlerRunsInCallerThreadWhenQueueIsFull() throws Exception {
-        // Saturate the pool: 2 cores busy + 8 queued + 2 max = up to 12 simultaneous; 13th
-        // should be rejected and run in the caller thread.
+    void saturatedPoolRejectsInsteadOfBlockingCaller() throws Exception {
         pool = config.threadPoolExecutor();
         java.util.concurrent.CountDownLatch hold = new java.util.concurrent.CountDownLatch(1);
         java.util.concurrent.CountDownLatch ready = new java.util.concurrent.CountDownLatch(4);
@@ -104,13 +102,8 @@ class ThreadPoolConfigTest {
                 }
             });
         }
-        // 13th task: pool full + queue full -> rejected handler runs it on caller thread.
-        AtomicInteger ranOn = new AtomicInteger();
-        Thread caller = Thread.currentThread();
-        pool.execute(() -> ranOn.set(Thread.currentThread() == caller ? 1 : 0));
-        // Give the rejected handler time to run.
-        await().atMost(java.time.Duration.ofSeconds(2)).until(() -> ranOn.get() != 0);
-        assertThat(ranOn.get()).isEqualTo(1);
+        assertThatThrownBy(() -> pool.execute(() -> { }))
+                .isInstanceOf(RejectedExecutionException.class);
         hold.countDown();
     }
 

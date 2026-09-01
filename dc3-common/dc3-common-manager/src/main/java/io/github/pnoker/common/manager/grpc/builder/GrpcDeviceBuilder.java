@@ -17,16 +17,16 @@
 
 package io.github.pnoker.common.manager.grpc.builder;
 
-import io.github.pnoker.api.center.manager.GrpcPageDeviceQuery;
+import io.github.pnoker.api.center.manager.GrpcOffsetDeviceQuery;
 import io.github.pnoker.api.common.GrpcBase;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
-import io.github.pnoker.common.manager.entity.query.DeviceQuery;
-import io.github.pnoker.common.optional.EnableOptional;
-import io.github.pnoker.common.utils.GrpcBuilderUtil;
+import io.github.pnoker.common.manager.repository.DeviceFilter;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -34,6 +34,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -46,59 +47,34 @@ import java.util.Optional;
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcDeviceBuilder {
 
-    /**
-     * Grpc Query to Query
-     *
-     * @param entityQuery GrpcPageDeviceQuery
-     * @return DeviceQuery
-     */
-    @Mapping(target = "page", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "labelId", ignore = true)
-    DeviceQuery buildQueryByGrpcQuery(GrpcPageDeviceQuery entityQuery);
-
-    /**
-     * After process.
-     *
-     * @param entityGrpc  entity grpc
-     * @param entityQuery entity query
-     */
-    @AfterMapping
-    default void afterProcess(GrpcPageDeviceQuery entityGrpc,
-                              @MappingTarget DeviceQuery.DeviceQueryBuilder entityQuery) {
-        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
-        entityQuery.page(pages);
-
-        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
-    }
-
-    /**
-     * Grpc Query to Query
-     *
-     * @param entityQuery GrpcPageDeviceQuery
-     * @return DeviceQuery
-     */
-    @Mapping(target = "page", ignore = true)
-    @Mapping(target = "deviceName", ignore = true)
-    @Mapping(target = "deviceCode", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "profileId", ignore = true)
-    @Mapping(target = "groupId", ignore = true)
-    @Mapping(target = "labelId", ignore = true)
-    DeviceQuery buildQueryByGrpcQuery(io.github.pnoker.api.common.driver.GrpcPageDeviceQuery entityQuery);
-
-    /**
-     * After process.
-     *
-     * @param entityGrpc  entity grpc
-     * @param entityQuery entity query
-     */
-    @AfterMapping
-    default void afterProcess(io.github.pnoker.api.common.driver.GrpcPageDeviceQuery entityGrpc,
-                              @MappingTarget DeviceQuery.DeviceQueryBuilder entityQuery) {
-        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
-        entityQuery.page(pages);
+    /** Convert and validate the canonical offset query used by the reactive RPC. */
+    default DeviceFilter buildFilterByGrpcQuery(GrpcOffsetDeviceQuery request) {
+        if (request == null) {
+            throw new IllegalArgumentException("device query is required");
+        }
+        io.github.pnoker.api.common.PageRequest page = request.hasPage()
+                ? request.getPage()
+                : io.github.pnoker.api.common.PageRequest.newBuilder().setLimit(50).build();
+        long offset = page.getOffset();
+        int limit = page.getLimit() <= 0 ? 50 : page.getLimit();
+        List<SortSpec> sort = new ArrayList<>();
+        for (io.github.pnoker.api.common.SortSpec spec : page.getSortList()) {
+            if (spec.getField().isBlank()
+                    || spec.getDirection() == io.github.pnoker.api.common.SortDirection.SORT_DIRECTION_UNSPECIFIED) {
+                throw new IllegalArgumentException("sort field and direction are required");
+            }
+            sort.add(new SortSpec(spec.getField(), spec.getDirection()
+                    == io.github.pnoker.api.common.SortDirection.SORT_DIRECTION_DESC
+                    ? SortSpec.Direction.DESC : SortSpec.Direction.ASC));
+        }
+        return new DeviceFilter(request.getTenantId(), request.getDeviceName(), request.getDeviceCode(),
+                request.hasDriverId() ? request.getDriverId() : null,
+                request.hasProfileId() ? request.getProfileId() : null,
+                request.hasEnableFlag() ? EnableFlagEnum.ofIndex((byte) request.getEnableFlag()) : null,
+                request.hasVersion() ? request.getVersion() : null,
+                request.hasGroupId() ? request.getGroupId() : null,
+                request.hasLabelId() ? request.getLabelId() : null,
+                offset, limit, sort);
     }
 
     /**

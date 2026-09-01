@@ -1,9 +1,9 @@
 # DC3 MQ TCK
 
-`dc3-mq-tck` is the broker-neutral contract suite of the `dc3-mq` family: an adapter that passes these tests is
-compliant with the messaging port. `AbstractMqContractTest` defines the shared contract (publish/confirm, subscribe,
-batch consumption, retry, and poison-message handling); one concrete test per adapter boots the broker in a disposable
-Testcontainers container.
+`dc3-mq-tck` is the release gate for the four supported `dc3-mq` adapters. An adapter that passes these tests is compliant
+with the messaging port. `AbstractMqContractTest` defines the shared contract (publish/confirm, Publisher completion,
+subscribe, batch consumption, retry, lifecycle re-delivery, and poison-message handling); each concrete test boots the
+broker in a disposable Testcontainers container.
 
 ## Contract tests
 
@@ -11,10 +11,8 @@ Testcontainers container.
 |------------------------|----------------------------------------------|
 | `RabbitMqContractTest` | RabbitMQ (`rabbitmq:3.13-management-alpine`) |
 | `KafkaContractTest`    | Apache Kafka (`apache/kafka:3.9.0`)          |
-| `RocketMqContractTest` | RocketMQ                                     |
-| `PulsarContractTest`   | Pulsar                                       |
-| `ActiveMqContractTest` | ActiveMQ                                     |
-| `MqttContractTest`     | HiveMQ CE                                    |
+| `PulsarContractTest`   | Apache Pulsar                                |
+| `MqttContractTest`     | HiveMQ CE (MQTT 5)                           |
 
 ## Running
 

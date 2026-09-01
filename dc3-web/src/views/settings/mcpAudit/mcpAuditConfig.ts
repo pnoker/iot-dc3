@@ -31,8 +31,7 @@ const RISK_OPTIONS = [
   {label: 'HIGH', value: 'HIGH'},
 ];
 
-// Read-only audit log: family list page, no add/edit/delete. Backend returns the
-// latest N rows (no real paging); `list` wraps the array into a single-page result.
+// Read-only audit log: offset pagination is provided by the backend; no add/edit/delete.
 export const createMcpAuditConfig = (t: Translator): EntityListConfig => ({
   name: 'mcp-audit',
   editable: false,
@@ -69,10 +68,10 @@ export const createMcpAuditConfig = (t: Translator): EntityListConfig => ({
       toolId: p.toolId,
       status: p.status,
       riskLevel: p.riskLevel,
-      current: p.page?.current,
-      size: p.page?.size,
+      offset: p.offset,
+      limit: p.limit,
     });
-    return {data: {records: res?.data?.records ?? [], total: res?.data?.total ?? 0}} as R;
+    return res;
   },
   emptyText: t('settings.mcpAudit.empty'),
 });

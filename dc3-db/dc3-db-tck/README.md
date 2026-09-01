@@ -1,19 +1,17 @@
 # DC3 DB TCK
 
-`dc3-db-tck` is the relational contract suite of the `dc3-db` family: identical mapper-level assertions executed against
-every supported dialect, so a dialect adapter is certified by the same behaviour matrix.
+`dc3-db-tck` is the relational contract suite for the canonical PostgreSQL runtime.
+It executes the production R2DBC repository ports directly; JDBC, MyBatis and
+alternate relational engines are deliberately absent from this module.
 
 ## Contract tests
 
-`AbstractDbDialectContractTest` defines the shared assertions; one concrete test per dialect boots the engine in a
-disposable Testcontainers container and runs the real mappers from `dc3-common-auth` / `dc3-common-data` /
-`dc3-common-manager`:
+`PostgresDialectContractTest` boots a disposable Testcontainers PostgreSQL instance and runs the
+same `DatabaseClient`/repository contract used by production:
 
-| Test                          | Dialect    |
+| Test                          | Engine     |
 |-------------------------------|------------|
 | `PostgresDialectContractTest` | PostgreSQL |
-| `MysqlDialectContractTest`    | MySQL      |
-| `MariadbDialectContractTest`  | MariaDB    |
 
 ## Running
 
@@ -26,5 +24,5 @@ mvn -s .mvn/settings.xml -pl dc3-db/dc3-db-tck test
 
 ## Related Modules
 
-- `dc3-db-core` — dialect-neutral base under test
-- `dc3-db-postgres` / `dc3-db-mysql` / `dc3-db-mariadb` — the adapters under test
+- `dc3-db-r2dbc-core` / `dc3-db-r2dbc-runtime` — reactive contracts and runtime
+- `dc3-db-r2dbc-postgres` — the only supported relational adapter

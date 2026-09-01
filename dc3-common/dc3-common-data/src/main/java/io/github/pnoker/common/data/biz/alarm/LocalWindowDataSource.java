@@ -24,8 +24,11 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Reads window samples out of {@link WindowSampleBuffer} and folds them in
@@ -48,8 +51,11 @@ public class LocalWindowDataSource implements WindowDataSource {
     private final WindowSampleBuffer windowSampleBuffer;
 
     @Override
-    public AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode) {
-        List<WindowSample> samples = samples(spec, fact);
+    public Mono<AggregateOutcome> aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode) {
+        return samples(spec, fact).collectList().map(values -> aggregate(values, mode));
+    }
+
+    private AggregateOutcome aggregate(List<WindowSample> samples, WindowModeEnum mode) {
         long count = samples.size();
         if (mode == WindowModeEnum.COUNT) {
             return new AggregateOutcome(BigDecimal.valueOf(count), count);
@@ -78,16 +84,16 @@ public class LocalWindowDataSource implements WindowDataSource {
     }
 
     @Override
-    public List<WindowSample> samples(WindowSpec spec, RuleFact fact) {
+    public Flux<WindowSample> samples(WindowSpec spec, RuleFact fact) {
         if (Objects.isNull(spec) || Objects.isNull(spec.duration())
                 || Objects.isNull(fact) || Objects.isNull(fact.getEntityId())
                 || Objects.isNull(fact.getAlarmTargetTypeFlag())) {
-            return List.of();
+            return Flux.empty();
         }
-        LocalDateTime to = Objects.requireNonNullElse(fact.getFactTime(), LocalDateTime.now());
+        LocalDateTime to = Objects.requireNonNullElse(fact.getFactTime(), LocalDateTime.now(ZoneOffset.UTC));
         LocalDateTime from = to.minus(spec.duration());
         WindowSampleKey key = WindowSampleKey.of(fact.getTenantId(), fact.getAlarmTargetTypeFlag(), fact.getEntityId());
-        return windowSampleBuffer.snapshot(key, from, to);
+        return Flux.defer(() -> Flux.fromIterable(windowSampleBuffer.snapshot(key, from, to)));
     }
 
 }

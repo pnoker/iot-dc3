@@ -67,8 +67,8 @@ const {resolveBySource, nameBySource} = useEntityNames();
 const load = async () => {
   loading.value = true;
   try {
-    const res: { data?: { records?: AlertEventRow[] } } = await alertPage({confirmFlag: 0, current: 1, size: 5});
-    const data: AlertEventRow[] = res?.data?.records ?? [];
+    const res: any = await alertPage({confirmFlag: 0, offset: 0, limit: 5});
+    const data: AlertEventRow[] = res?.items ?? [];
     rows.value = data;
     await resolveBySource(data);
   } catch {

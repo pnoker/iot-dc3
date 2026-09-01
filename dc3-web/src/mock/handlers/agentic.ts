@@ -17,7 +17,7 @@
 
 import {on} from '../dispatch';
 import {paginate} from '../query';
-import {ok, responseOf} from '../response';
+import {fail, ok, responseOf} from '../response';
 import {newId, stamp} from '../crud';
 import {currentMockLocale} from '../locale';
 
@@ -99,15 +99,15 @@ export function registerAgenticHandlers(): void {
     return responseOf(ctx.config, ok(paginate(rows, ctx.body)));
   });
   on('post', 'api/v3/agentic/session/delete', (ctx) => {
-    const id = ctx.body?.conversationId;
+    const id = ctx.params.conversation_id;
     const coll = ctx.db.agenticSessions;
     const i = coll.findIndex((r) => String(r.conversationId) === String(id));
     if (i >= 0) coll.splice(i, 1);
-    return responseOf(ctx.config, ok(true));
+    return responseOf(ctx.config, undefined, 204);
   });
   on('post', 'api/v3/agentic/session/update', (ctx) => {
     const coll = ctx.db.agenticSessions;
-    const i = coll.findIndex((r) => String(r.conversationId) === String(ctx.body?.conversationId));
+    const i = coll.findIndex((r) => String(r.conversationId) === String(ctx.params.conversation_id));
     if (i >= 0) {
       const current = coll[i]!;
       coll[i] = {
@@ -120,14 +120,7 @@ export function registerAgenticHandlers(): void {
       };
       return responseOf(ctx.config, ok(localizeAgenticRow(coll[i]!)));
     }
-    const created = {
-      ...ctx.body,
-      title: ctx.body?.title || (currentMockLocale() === 'zh' ? '新对话' : 'New conversation'),
-      createTime: stamp(),
-      operateTime: stamp(),
-    };
-    coll.unshift(created);
-    return responseOf(ctx.config, ok(created));
+    return responseOf(ctx.config, fail('NOT_FOUND', 'Session not found', 404), 404);
   });
   on('get', 'api/v3/agentic/message/list', (ctx) => {
     const id = ctx.params.conversation_id;
@@ -147,7 +140,7 @@ export function registerAgenticHandlers(): void {
         message: {
           role: 'assistant',
           content: '这是一个 mock 演示回复。在真实环境中将调用配置的 AI 模型。',
-          status: 2,
+          status: 'COMPLETED',
           finishReason: 'stop',
         },
         createTime: stamp(),
@@ -159,7 +152,7 @@ export function registerAgenticHandlers(): void {
       .filter((action) =>
         String(action.conversationId) === String(ctx.params.conversation_id) && Number(action.status) === 0)
       .map(localizeAgenticRow);
-    return responseOf(ctx.config, ok(rows));
+    return responseOf(ctx.config, ok(paginate(rows, ctx.params)));
   });
   on('post', 'api/v3/agentic/action/confirm', (ctx) => {
     const action = ctx.db.agenticActions.find((item) => String(item.actionId) === String(ctx.params.action_id));
@@ -197,22 +190,39 @@ export function registerAgenticHandlers(): void {
     ),
   );
   on('post', 'api/v3/auth/mcp/client/register', (ctx) => {
-    const row: Record<string, unknown> = {id: newId(), ...ctx.body, enableFlag: 'ENABLE'};
+    const row: Record<string, unknown> = {
+      id: newId(),
+      clientId: `dc3_${newId()}`,
+      clientName: ctx.body?.client_name,
+      clientType: ctx.body?.client_type || 'PUBLIC',
+      authorizationGrantTypes: (ctx.body?.grant_types || []).join(' '),
+      scopes: ctx.body?.scope || '',
+      enableFlag: 0,
+    };
     ctx.db.mcpClients.push(row);
-    return responseOf(ctx.config, ok(String(row.id)));
+    return responseOf(ctx.config, ok({
+      client_id: row.clientId,
+      client_name: row.clientName,
+      client_type: row.clientType,
+      grant_types: ctx.body?.grant_types || [],
+      redirect_uris: ctx.body?.redirect_uris || [],
+      scope: row.scopes,
+      token_endpoint_auth_method: row.clientType === 'CONFIDENTIAL' ? 'client_secret_basic' : 'none',
+      ...(row.clientType === 'CONFIDENTIAL' ? {client_secret: `secret_${newId()}`} : {}),
+    }), 201);
   });
   on('post', 'api/v3/auth/mcp/client/list', (ctx) =>
-    responseOf(ctx.config, ok(paginate(ctx.db.mcpClients, ctx.body))),
+    responseOf(ctx.config, ok(ctx.db.mcpClients)),
   );
 
   // ── MCP: connections ──
   on('post', 'api/v3/auth/mcp/connection/list', (ctx) =>
-    responseOf(ctx.config, ok(paginate(ctx.db.mcpConnections, ctx.body))),
+    responseOf(ctx.config, ok(ctx.db.mcpConnections)),
   );
   on('post', 'api/v3/auth/mcp/connection/add', (ctx) => {
     const row: Record<string, unknown> = {...ctx.body, id: newId()};
     ctx.db.mcpConnections.push(row);
-    return responseOf(ctx.config, ok(String(row.id)));
+    return responseOf(ctx.config, ok(row));
   });
   on('post', 'api/v3/auth/mcp/connection/revoke', (ctx) => {
     const row = ctx.db.mcpConnections.find((r) => String(r.id) === String(ctx.params.id));
@@ -228,7 +238,7 @@ export function registerAgenticHandlers(): void {
   );
 
   // ── MCP: tool catalog & audit ──
-  on('post', 'api/v3/auth/mcp/tool/catalog/refresh', (ctx) => responseOf(ctx.config, ok(true)));
+  on('post', 'api/v3/auth/mcp/tool/catalog/refresh', (ctx) => responseOf(ctx.config, ok(0)));
   on('post', 'api/v3/auth/mcp/tool/list', (ctx) =>
     responseOf(ctx.config, ok(paginate(ctx.db.mcpTools, ctx.body))),
   );

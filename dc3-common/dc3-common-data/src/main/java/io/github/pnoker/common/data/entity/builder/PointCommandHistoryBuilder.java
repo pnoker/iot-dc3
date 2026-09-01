@@ -17,11 +17,9 @@
 
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryVO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -53,15 +51,5 @@ public interface PointCommandHistoryBuilder {
      * @return converted value
      */
     List<PointCommandHistoryVO> buildVOListByDOList(List<PointCommandHistoryDO> entityDOList);
-
-    /**
-     * Convert do page to vo page.
-     *
-     * @param entityPageDO persistence object
-     * @return converted value
-     */
-    default Page<PointCommandHistoryVO> buildVOPageByDOPage(Page<PointCommandHistoryDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildVOByDO);
-    }
 
 }

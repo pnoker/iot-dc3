@@ -26,8 +26,7 @@ interface McpToolHandlers {
 
 const RISK_OPTIONS = MCP_RISK_LEVEL_OPTIONS.map((o) => ({label: o.label, value: o.value}));
 
-// Read-only tool catalog. Backend `tool/list` pages by keyword/riskLevel filter and
-// returns {records, total}; the pager state drives current/size through `page`.
+// Read-only tool catalog. Backend `tool/list` uses offset/limit pagination.
 export const createMcpToolConfig = (t: Translator, handlers: McpToolHandlers): EntityListConfig => ({
   name: 'mcp-tool',
   title: t('nav.settingsMcpTool'),
@@ -49,8 +48,8 @@ export const createMcpToolConfig = (t: Translator, handlers: McpToolHandlers): E
   defaultForm: () => ({}),
   list: async (query) => {
     const p = query as Record<string, any>;
-    const res: any = await listMcpTool({keyword: p.keyword, riskLevel: p.riskLevel, page: p.page});
-    return {data: {records: res?.data?.records ?? [], total: res?.data?.total ?? 0}} as R;
+    const res: any = await listMcpTool({keyword: p.keyword, riskLevel: p.riskLevel, offset: p.offset, limit: p.limit, sort: p.sort});
+    return res;
   },
   toolbarActions: [
     {

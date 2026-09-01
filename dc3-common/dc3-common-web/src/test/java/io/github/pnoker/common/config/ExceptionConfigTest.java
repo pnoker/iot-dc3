@@ -19,6 +19,7 @@ package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.ConflictException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,11 +49,13 @@ class ExceptionConfigTest {
     }
 
     @Test
-    void globalExceptionWrapsMessageInFailEnvelope() {
-        StepVerifier.create(handler.globalException(new RuntimeException("boom"), request))
-                .assertNext(response -> {
-                    assertThat(response.isOk()).isFalse();
-                    assertThat(response.getMessage()).isEqualTo("boom");
+    void globalExceptionProducesProblemDetails() {
+        ServerHttpResponse httpResponse = new MockServerHttpResponse();
+        StepVerifier.create(handler.globalException(new RuntimeException("boom"), request, httpResponse))
+                .assertNext(problem -> {
+                    assertThat(problem.status()).isEqualTo(500);
+                    assertThat(problem.code()).isEqualTo(ErrorCode.FAILURE.getCode());
+                    assertThat(problem.detail()).isEqualTo("Internal server error");
                 })
                 .verifyComplete();
     }
@@ -63,9 +66,9 @@ class ExceptionConfigTest {
         ResponseStatusException ex = new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "downstream down");
 
         StepVerifier.create(handler.responseStatusException(ex, request, response))
-                .assertNext(envelope -> {
-                    assertThat(envelope.isOk()).isFalse();
-                    assertThat(envelope.getMessage()).isEqualTo("downstream down");
+                .assertNext(problem -> {
+                    assertThat(problem.status()).isEqualTo(503);
+                    assertThat(problem.detail()).isEqualTo("downstream down");
                 })
                 .verifyComplete();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
@@ -77,7 +80,7 @@ class ExceptionConfigTest {
         ResponseStatusException ex = new ResponseStatusException(HttpStatus.NOT_FOUND);
 
         StepVerifier.create(handler.responseStatusException(ex, request, response))
-                .assertNext(envelope -> assertThat(envelope.getMessage()).contains("404"))
+                .assertNext(problem -> assertThat(problem.detail()).contains("404"))
                 .verifyComplete();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
@@ -86,22 +89,33 @@ class ExceptionConfigTest {
     void requestExceptionAlignsBodyCodeAndStatusToValidation() {
         ServerHttpResponse response = new MockServerHttpResponse();
         StepVerifier.create(handler.businessException(new RequestException("invalid"), request, response))
-                .assertNext(env -> {
-                    assertThat(env.isOk()).isFalse();
-                    assertThat(env.getMessage()).isEqualTo("invalid");
-                    assertThat(env.getCode()).isEqualTo(ErrorCode.VALIDATION.getCode());
+                .assertNext(problem -> {
+                    assertThat(problem.detail()).isEqualTo("invalid");
+                    assertThat(problem.code()).isEqualTo(ErrorCode.VALIDATION.getCode());
                 })
                 .verifyComplete();
         assertThat(response.getStatusCode().value()).isEqualTo(422);
     }
 
     @Test
+    void conflictExceptionProducesConflictProblemDetails() {
+        ServerHttpResponse response = new MockServerHttpResponse();
+        StepVerifier.create(handler.businessException(new ConflictException("stale version"), request, response))
+                .assertNext(problem -> {
+                    assertThat(problem.detail()).isEqualTo("stale version");
+                    assertThat(problem.code()).isEqualTo(ErrorCode.CONFLICT.getCode());
+                })
+                .verifyComplete();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+    }
+
+    @Test
     void notFoundExceptionAlignsBodyCodeAndStatusToNotFound() {
         ServerHttpResponse response = new MockServerHttpResponse();
         StepVerifier.create(handler.businessException(new NotFoundException("not here"), request, response))
-                .assertNext(env -> {
-                    assertThat(env.getMessage()).isEqualTo("not here");
-                    assertThat(env.getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
+                .assertNext(problem -> {
+                    assertThat(problem.detail()).isEqualTo("not here");
+                    assertThat(problem.code()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
                 })
                 .verifyComplete();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
@@ -111,9 +125,9 @@ class ExceptionConfigTest {
     void unAuthorizedExceptionAlignsBodyCodeAndStatusToUnauthorized() {
         ServerHttpResponse response = new MockServerHttpResponse();
         StepVerifier.create(handler.businessException(new UnAuthorizedException("nope"), request, response))
-                .assertNext(env -> {
-                    assertThat(env.getMessage()).isEqualTo("nope");
-                    assertThat(env.getCode()).isEqualTo(ErrorCode.UNAUTHORIZED.getCode());
+                .assertNext(problem -> {
+                    assertThat(problem.detail()).isEqualTo("nope");
+                    assertThat(problem.code()).isEqualTo(ErrorCode.UNAUTHORIZED.getCode());
                 })
                 .verifyComplete();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
@@ -133,11 +147,11 @@ class ExceptionConfigTest {
         MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
         when(exception.getBindingResult()).thenReturn(bindingResult);
 
-        StepVerifier.create(handler.methodArgumentNotValidException(exception, request))
-                .assertNext(env -> {
-                    assertThat(env.isOk()).isFalse();
-                    assertThat(env.getMessage()).contains("\"name\":\"must not be blank\"");
-                    assertThat(env.getMessage()).contains("\"age\":\"must be positive\"");
+        ServerHttpResponse response = new MockServerHttpResponse();
+        StepVerifier.create(handler.methodArgumentNotValidException(exception, request, response))
+                .assertNext(problem -> {
+                    assertThat(problem.errors().get("name")).containsExactly("must not be blank");
+                    assertThat(problem.errors().get("age")).containsExactly("must be positive");
                 })
                 .verifyComplete();
     }

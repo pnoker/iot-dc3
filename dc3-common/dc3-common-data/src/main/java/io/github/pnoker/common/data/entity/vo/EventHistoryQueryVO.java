@@ -17,10 +17,9 @@
 
 package io.github.pnoker.common.data.entity.vo;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
-import io.github.pnoker.common.utils.PageUtil;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,17 +55,13 @@ public class EventHistoryQueryVO implements Serializable {
     @Schema(description = "Type of the event to filter by.", example = "ALERT")
     private EventTypeFlagEnum eventTypeFlag;
 
-    @Schema(description = "Pagination parameters: page number and page size.")
-    private Pages page;
+    @Schema(description = "Zero-based result offset.", example = "0")
+    private long offset;
 
-    /**
-     * To page.
-     *
-     * @param <T> generic type parameter
-     * @return paginated result
-     */
-    public <T> Page<T> toPage() {
-        return PageUtil.page(page);
-    }
+    @Schema(description = "Maximum number of results.", example = "50")
+    private int limit = PageRequest.DEFAULT_LIMIT;
+
+    @Schema(description = "Stable sort fields; defaults to occurTime DESC, id DESC.")
+    private java.util.List<SortSpec> sort = java.util.List.of();
 
 }

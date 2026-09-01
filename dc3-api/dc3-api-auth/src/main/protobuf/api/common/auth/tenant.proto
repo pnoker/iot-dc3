@@ -20,7 +20,6 @@ syntax = "proto3";
 package api.common.auth;
 
 import "api/common/base.proto";
-import "api/common/r.proto";
 
 // Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.auth";
@@ -31,22 +30,13 @@ option java_multiple_files = true;
 // Service interface defining tenant-related RPC calls
 service TenantApi {
   // Query tenant information by tenant code
-  rpc GetByCode (GrpcCodeQuery) returns (GrpcRTenantDTO);
+  rpc GetByCode (GrpcCodeQuery) returns (GrpcTenantDTO);
 }
 
 // Request message for querying by tenant code
 message GrpcCodeQuery {
   // Tenant code, unique identifier of a tenant
   string code = 1;
-}
-
-// Response wrapper for tenant information
-message GrpcRTenantDTO {
-  // Common result wrapper with status code, message, etc.
-  GrpcR result = 1;
-
-  // Returned tenant data
-  GrpcTenantDTO data = 2;
 }
 
 // Tenant data structure with basic information

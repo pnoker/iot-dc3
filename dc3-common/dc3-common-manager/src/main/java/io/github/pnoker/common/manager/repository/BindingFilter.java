@@ -1,0 +1,4 @@
+package io.github.pnoker.common.manager.repository;
+import io.github.pnoker.common.enums.EntityTypeEnum;import io.github.pnoker.db.r2dbc.core.page.SortSpec;import java.util.List;import java.util.Set;
+/** Immutable tenant-scoped polymorphic binding filter. */
+public record BindingFilter(Long tenantId,EntityTypeEnum entityType,Long ownerId,Long entityId,long offset,int limit,List<SortSpec> sort){private static final Set<String>SORT=Set.of("id","entityId","createTime","operateTime");public BindingFilter{if(tenantId==null||tenantId<=0)throw new IllegalArgumentException("tenantId must be positive");if(offset<0)throw new IllegalArgumentException("offset must be non-negative");if(limit<1||limit>200)throw new IllegalArgumentException("limit must be between 1 and 200");sort=sort==null?List.of():List.copyOf(sort);if(sort.stream().anyMatch(v->v==null||!SORT.contains(v.field())))throw new IllegalArgumentException("unsupported binding sort field");}}

@@ -1,30 +1,11 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.dal.EntityAlarmManager;
-import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.mapper.EntityStateMapper;
+import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
+import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
@@ -38,32 +19,18 @@ import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
 import io.github.pnoker.common.mq.message.MqMessage;
 import io.github.pnoker.common.mq.sender.MessageSender;
-import io.github.pnoker.common.tenant.TenantContextHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-/**
- * Tick-triggered scanner for expired device state leases.
- *
- * <p>A RabbitMQ TTL + DLX tick queue fires every 10 seconds. On each tick the
- * scanner queries {@code dc3_entity_state} for devices whose
- * {@code expire_time <= now()} and whose {@code state_flag} is still in the
- * heartbeat-renewed family. Each expired device is atomically claimed via
- * {@code lease_version} and an offline alarm is written.
- *
- * <p>After processing, the scanner publishes the next tick so the cycle
- * continues indefinitely.
- *
- * @author pnoker
- * @since 2026.5.21
- */
+/** Reactive scanner that fences and expires device leases. */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -73,193 +40,75 @@ public class EntityStateExpiryScanner {
     private static final int OFFLINE_RENEW_SECONDS = 300;
     private static final int BATCH_LIMIT = 500;
 
-    private final EntityStateManager entityStateManager;
-    private final EntityStateMapper entityStateMapper;
-    private final EntityAlarmManager entityAlarmManager;
+    private final ReactiveEntityStateStore stateStore;
+    private final ReactiveEntityAlarmStore entityAlarmStore;
     private final AlarmRuleTriggerService alarmRuleTriggerService;
     private final MessageSender messageSender;
 
-    private final org.springframework.transaction.support.TransactionTemplate transactionTemplate;
-
-    /**
-     * Bootstrap the first tick after the context is fully started.
-     * Uses {@code ApplicationReadyEvent} rather than {@code @PostConstruct}
-     * to guarantee {@code RabbitAdmin} has declared all queues and bindings
-     * before the first publish, avoiding an inevitable NO_ROUTE on startup.
-     */
     @EventListener(ApplicationReadyEvent.class)
     void publishInitialTick() {
         messageSender.send(MqMessage.of(MqTopic.DEVICE_SCAN, "", TICK_BODY));
-        log.info("Published initial device scan tick");
     }
 
-    /**
-     * Process one scan cycle: find expired devices, mark offline, write alarms,
-     * then publish the next tick.
-     */
     @Dc3Listener(topic = MqTopic.DEVICE_SCAN)
-    public void onScanTick(MqReceived<Object> message, Acknowledgment ack) {
-        try {
-            // This tick fires on a RabbitMQ consumer thread with no HTTP/security
-            // context, so there is no tenant on the thread. The scan must look
-            // across all tenants' device-state rows (and write alarms back keyed
-            // by each row's own tenant_id), so wrap the whole cycle in runIgnoreAction.
-            TenantContextHolder.runIgnoreAction(this::scanExpiredDevices);
-
-            // Publish next tick to keep the cycle going
-            messageSender.send(MqMessage.of(MqTopic.DEVICE_SCAN, "", TICK_BODY));
-
-            ack.ack();
-        } catch (Exception e) {
-            log.error("Device scan tick failed", e);
-            ack.reject(true);
-        }
+    public Mono<Void> onScanTick(MqReceived<Object> message, Acknowledgment ack) {
+        return scanExpiredDevices().then(Mono.fromRunnable(() -> messageSender.send(
+                        MqMessage.of(MqTopic.DEVICE_SCAN, "", TICK_BODY))))
+                .doOnError(error -> log.error("Device scan tick failed", error))
+                .then();
     }
 
-    /**
-     * Claim a batch of expired online device leases, build offline alarms for each,
-     * persist them in bulk, then complete each device's expiry (state update + event
-     * publish).
-     */
-    private void scanExpiredDevices() {
-        List<EntityStateDO> claimed = transactionTemplate.execute(status -> {
-            List<EntityStateDO> locked = entityStateMapper.selectExpiredForClaim(
-                    EntityTypeEnum.DEVICE.getIndex(),
-                    EntityStatusEnum.ONLINE.getIndex(),
-                    EntityStatusEnum.MAINTAIN.getIndex(),
-                    EntityStatusEnum.FAULT.getIndex(),
-                    BATCH_LIMIT);
-            if (locked.isEmpty()) {
-                return List.of();
-            }
-            entityStateMapper.markClaimedOffline(
-                    locked.stream().map(EntityStateDO::getId).toList(),
-                    EntityStatusEnum.OFFLINE.getIndex(),
-                    OFFLINE_RENEW_SECONDS);
-            return locked;
-        });
-        if (claimed.isEmpty()) {
-            return;
-        }
-        // The claim returned pre-update rows; derive each post-update view in
-        // Java (the update is deterministic per column).
-        byte offlineFlag = EntityStatusEnum.OFFLINE.getIndex();
-        List<EntityStateDO> expired = claimed.stream().map(state -> {
-            EntityStateDO view = new EntityStateDO();
-            view.setId(state.getId());
-            view.setEntityTypeFlag(state.getEntityTypeFlag());
-            view.setEntityId(state.getEntityId());
-            view.setParentEntityId(state.getParentEntityId());
-            view.setStateFlag(offlineFlag);
-            view.setLastStateFlag(state.getStateFlag());
-            view.setLeaseVersion(state.getLeaseVersion() + 1);
-            view.setExpireTime(state.getExpireTime());
-            view.setTimeoutSeconds(state.getTimeoutSeconds());
-            view.setLastHeartbeatTime(state.getLastHeartbeatTime());
-            view.setLastAlarmId(state.getLastAlarmId());
-            view.setTimeoutSourceFlag(state.getTimeoutSourceFlag());
-            view.setStateExt(state.getStateExt());
-            view.setTenantId(state.getTenantId());
-            view.setCreateTime(state.getCreateTime());
-            view.setOperateTime(state.getOperateTime());
-            return view;
-        }).toList();
-
-        List<EntityAlarmDO> alarms = new ArrayList<>();
-        List<ExpiredDeviceContext> contexts = new ArrayList<>();
-
-        for (EntityStateDO state : expired) {
-            try {
-                EntityAlarmDO alarm = buildOfflineAlarm(state);
-                alarms.add(alarm);
-                contexts.add(new ExpiredDeviceContext(state, alarm));
-            } catch (Exception e) {
-                log.warn("Device expiry processing failed, deviceId={}", state.getEntityId(), e);
-            }
-        }
-
-        if (!alarms.isEmpty()) {
-            entityAlarmManager.saveBatch(alarms);
-        }
-
-        for (ExpiredDeviceContext ctx : contexts) {
-            try {
-                completeExpiredDevice(ctx);
-            } catch (Exception e) {
-                log.warn("Device expiry completion failed, deviceId={}", ctx.state.getEntityId(), e);
-            }
-        }
+    private Mono<Void> scanExpiredDevices() {
+        return stateStore.claimExpired(EntityTypeEnum.DEVICE, BATCH_LIMIT, OFFLINE_RENEW_SECONDS)
+                .collectList()
+                .flatMap(claimed -> {
+                    if (claimed.isEmpty()) return Mono.empty();
+                    List<ExpiredDeviceContext> contexts = claimed.stream()
+                            .map(state -> new ExpiredDeviceContext(state, buildOfflineAlarm(state))).toList();
+                    return entityAlarmStore.insertBatch(contexts.stream().map(ExpiredDeviceContext::alarm).toList())
+                            .flatMapMany(saved -> {
+                                if (saved.size() != contexts.size() || saved.stream().anyMatch(alarm -> alarm.getId() == null)) {
+                                    return Flux.error(new IllegalStateException("failed to persist device expiry alarms"));
+                                }
+                                return Flux.fromIterable(contexts).concatMap(this::completeExpiredDevice);
+                            }).then();
+                });
     }
 
-    /**
-     * Build an offline alarm row for an expired device, recording its previous state and
-     * a P1-level timeout message.
-     *
-     * @param scanned the expired device's state row
-     * @return the assembled alarm row
-     */
-    private EntityAlarmDO buildOfflineAlarm(EntityStateDO scanned) {
-        EntityStatusEnum prev = EntityStatusEnum.ofIndex(scanned.getLastStateFlag());
-        String prevCode = Objects.nonNull(prev) ? prev.getCode() : DataConstant.STATUS_UNKNOWN;
-        String message = String.format("Device heartbeat timed out (last=%s); marked OFFLINE", prevCode);
-
+    private EntityAlarmDO buildOfflineAlarm(ReactiveEntityStateStore.EntityStateLease state) {
         EntityAlarmDO alarm = new EntityAlarmDO();
         alarm.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.DEVICE.getIndex());
-        alarm.setEntityId(scanned.getEntityId());
-        alarm.setDriverId(scanned.getParentEntityId());
-        alarm.setDeviceId(scanned.getEntityId());
-        alarm.setPointId(0L);
-        alarm.setRuleId(0L);
-        alarm.setRuleStateId(0L);
+        alarm.setEntityId(state.entityId()); alarm.setDriverId(state.parentEntityId()); alarm.setDeviceId(state.entityId());
+        alarm.setPointId(0L); alarm.setRuleId(0L); alarm.setRuleStateId(0L);
         alarm.setAlarmTypeFlag(AlarmTypeEnum.OFFLINE.getIndex());
         alarm.setAlarmSourceFlag(AlarmSourceTypeEnum.STATE_TIMEOUT.getIndex());
         alarm.setAlarmLevelFlag(AlarmMessageLevelEnum.P1.getIndex());
-        alarm.setAlarmExt(JsonExt.builder().type("device-offline").content(message).version(1).build());
-        alarm.setExpiredTime(0L);
-        alarm.setConfirmFlag((byte) 0);
-        alarm.setTenantId(scanned.getTenantId());
+        String previous = statusCode(state.lastStateFlag());
+        alarm.setAlarmExt(JsonExt.builder().type("device-offline")
+                .content(String.format("Device heartbeat timed out (last=%s); marked OFFLINE", previous)).version(1).build());
+        alarm.setExpiredTime(0L); alarm.setConfirmFlag((byte) 0); alarm.setTenantId(state.tenantId());
         return alarm;
     }
 
-    /**
-     * Complete an expired device's transition: mark its state offline, publish a device
-     * alarm event, and publish a device-state event to the message bus.
-     *
-     * @param ctx the expired device context carrying its state and alarm
-     */
-    private void completeExpiredDevice(ExpiredDeviceContext ctx) {
-        EntityStateDO scanned = ctx.state;
-        EntityAlarmDO alarm = ctx.alarm;
-        EntityStatusEnum prev = EntityStatusEnum.ofIndex(scanned.getLastStateFlag());
-        String prevCode = Objects.nonNull(prev) ? prev.getCode() : DataConstant.STATUS_UNKNOWN;
-
-        // Update lastAlarmId
-        entityStateManager.lambdaUpdate()
-                .eq(EntityStateDO::getTenantId, scanned.getTenantId())
-                .eq(EntityStateDO::getId, scanned.getId())
-                .eq(EntityStateDO::getEntityId, scanned.getEntityId())
-                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DEVICE.getIndex())
-                .eq(EntityStateDO::getLeaseVersion, scanned.getLeaseVersion())
-                .set(EntityStateDO::getLastAlarmId, alarm.getId())
-                .update();
-
-        // Trigger alarm rule pipeline
-        String message = String.format("Device heartbeat timed out (last=%s); marked OFFLINE", prevCode);
-        DeviceAlarmDTO dto = DeviceAlarmDTO.builder()
-                .driverId(scanned.getParentEntityId())
-                .tenantId(scanned.getTenantId())
-                .deviceId(scanned.getEntityId())
-                .status(EntityStatusEnum.OFFLINE.getCode())
-                .statusName(EntityStatusEnum.OFFLINE.name())
-                .message(message)
-                .alarmId(alarm.getId())
-                .build();
-        alarmRuleTriggerService.processDeviceAlarm(dto);
-
-        log.info("Device scan marked OFFLINE: deviceId={}, tenantId={}, prevStatus={}",
-                scanned.getEntityId(), scanned.getTenantId(), prevCode);
+    private Mono<Void> completeExpiredDevice(ExpiredDeviceContext context) {
+        ReactiveEntityStateStore.EntityStateLease state = context.state();
+        EntityAlarmDO alarm = context.alarm();
+        return stateStore.markAlarm(state.tenantId(), EntityTypeEnum.DEVICE, state.entityId(), state.leaseVersion(), alarm.getId())
+                .flatMap(updated -> {
+                    if (!updated) return Mono.empty();
+                    String previous = statusCode(state.lastStateFlag());
+                    return alarmRuleTriggerService.processDeviceAlarm(DeviceAlarmDTO.builder().driverId(state.parentEntityId())
+                            .tenantId(state.tenantId()).deviceId(state.entityId()).status(EntityStatusEnum.OFFLINE.getCode())
+                            .statusName(EntityStatusEnum.OFFLINE.name())
+                            .message(String.format("Device heartbeat timed out (last=%s); marked OFFLINE", previous))
+                            .alarmId(alarm.getId()).build());
+                });
     }
 
-    private record ExpiredDeviceContext(EntityStateDO state, EntityAlarmDO alarm) {
+    private String statusCode(byte flag) {
+        EntityStatusEnum status = EntityStatusEnum.ofIndex(flag);
+        return status == null ? DataConstant.STATUS_UNKNOWN : status.getCode();
     }
+
+    private record ExpiredDeviceContext(ReactiveEntityStateStore.EntityStateLease state, EntityAlarmDO alarm) { }
 }

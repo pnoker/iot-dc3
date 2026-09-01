@@ -24,7 +24,9 @@ import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -38,9 +40,9 @@ import java.util.function.Function;
  * consumer.
  *
  * <p>Cache freshness comes from RabbitMQ events, not TTL. {@code maximumSize} caps
- * memory only. {@link #loadCache(long)} is intentionally synchronous: it lets the
- * MetadataReceiver surface gRPC failures so the message can be nack-requeued instead
- * of silently dropped.
+ * memory only. Event-driven refreshes expose their completion as a {@link Mono}, so
+ * broker settlement waits for the upstream metadata lookup without blocking the
+ * consumer thread.
  *
  * @param <V> cached value type
  * @author pnoker
@@ -74,7 +76,7 @@ public abstract class AbstractMetadataCache<V> {
      */
     protected AbstractMetadataCache(DriverProperties.MetadataProperties.CacheProperties cacheProps,
                                     String name,
-                                    Function<Long, V> loader) {
+                                    Function<Long, Mono<V>> loader) {
         this.name = name;
         this.loadTimeoutSeconds = cacheProps.getLoadTimeoutSeconds();
 
@@ -88,12 +90,12 @@ public abstract class AbstractMetadataCache<V> {
             builder.recordStats();
         }
 
-        this.cache = builder.buildAsync((id, executor) -> CompletableFuture.supplyAsync(() -> {
+        this.cache = builder.buildAsync((id, executor) -> {
             log.debug("Load {} metadata, id={}", name, id);
-            V value = loader.apply(id);
-            postLoad(id, value);
-            return value;
-        }, executor));
+            return loader.apply(id)
+                    .doOnSuccess(value -> postLoad(id, value))
+                    .toFuture();
+        });
     }
 
     /**
@@ -133,9 +135,8 @@ public abstract class AbstractMetadataCache<V> {
     }
 
     /**
-     * Refreshes the cache entry for {@code id}, blocking until the load completes or
-     * times out so the caller (typically the RabbitMQ metadata consumer) can decide
-     * whether to ack or nack the triggering event.
+     * Refreshes the cache entry for {@code id} and exposes the upstream completion to
+     * the caller so broker settlement can follow the metadata transaction.
      *
      * <p>Behavior:
      * <ul>
@@ -148,22 +149,13 @@ public abstract class AbstractMetadataCache<V> {
      * </ul>
      *
      * @param id cache key
-     * @return loaded value, or {@code null} if upstream reports the record is gone
-     * @throws ServiceException when the loader fails or the wait is interrupted/times out
+     * @return loaded value, or an empty completion if upstream reports the record is gone
      */
-    public V loadCache(long id) {
-        try {
-            return cache.synchronous().refresh(id).get(loadTimeoutSeconds, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new ServiceException("Interrupted while refreshing {} cache, id={}", name, id, e);
-        } catch (TimeoutException e) {
-            throw new ServiceException("Timed out refreshing {} cache after {}s, id={}",
-                    name, loadTimeoutSeconds, id, e);
-        } catch (ExecutionException e) {
-            Throwable cause = e.getCause() != null ? e.getCause() : e;
-            throw new ServiceException("Failed to refresh {} cache, id={}", name, id, cause);
-        }
+    public Mono<V> refreshCache(long id) {
+        return Mono.defer(() -> Mono.fromFuture(cache.synchronous().refresh(id)))
+                .timeout(Duration.ofSeconds(loadTimeoutSeconds))
+                .onErrorMap(error -> !(error instanceof ServiceException),
+                        error -> new ServiceException("Failed to refresh {} cache, id={}", name, id, error));
     }
 
     /**

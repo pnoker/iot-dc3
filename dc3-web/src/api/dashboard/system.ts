@@ -22,22 +22,23 @@ import type {
   AlertStatsSummary,
   CoverageGap,
   ProtocolHealth,
-  SilentSource
+  SilentSource,
+  SystemHealth
 } from '@/config/types/dashboard';
 
-export const alertStats = () => httpGet<R<AlertStatsSummary>>(`${API_DATA_BASE}/dashboard/alert/stats`);
+export const alertStats = () => httpGet<AlertStatsSummary>(`${API_DATA_BASE}/dashboard/alert/stats`);
 
-export const alertLatest = (size = 10) =>
-  httpGet<R<AlertEventRow[]>>(`${API_DATA_BASE}/dashboard/alert/latest`, {params: {size}});
+export const alertLatest = (limit = 10) =>
+  httpGet<AlertEventRow[]>(`${API_DATA_BASE}/dashboard/alert/latest`, {params: {limit}});
 
-export const systemHealth = () => httpGet<R<Record<string, unknown>>>(`${API_DATA_BASE}/dashboard/system/health`);
+export const systemHealth = () => httpGet<SystemHealth>(`${API_DATA_BASE}/dashboard/system/health`);
 
-export const protocolHealth = () => httpGet<R<ProtocolHealth[]>>(`${API_DATA_BASE}/dashboard/protocol/health`);
+export const protocolHealth = () => httpGet<ProtocolHealth[]>(`${API_DATA_BASE}/dashboard/protocol/health`);
 
 export const silentSources = (baselineDays = 7, silentMinutes = 15, limit = 50) =>
-  httpGet<R<SilentSource[]>>(`${API_DATA_BASE}/dashboard/silent/sources`, {
+  httpGet<SilentSource[]>(`${API_DATA_BASE}/dashboard/silent/sources`, {
     params: {baseline_days: baselineDays, silent_minutes: silentMinutes, limit},
   });
 
 export const coverageGap = (limit = 100) =>
-  httpGet<R<CoverageGap>>(`${API_DATA_BASE}/dashboard/coverage/gap`, {params: {limit}});
+  httpGet<CoverageGap>(`${API_DATA_BASE}/dashboard/coverage/gap`, {params: {limit}});

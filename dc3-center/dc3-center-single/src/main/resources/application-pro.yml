@@ -17,13 +17,10 @@
 
 # Production environment configuration
 spring:
-  datasource:
-    dynamic:
-      datasource:
-        master:
-          url: ${DC3_DB_URL:jdbc:postgresql://${POSTGRES_HOST:dc3-postgres}:${POSTGRES_PORT:5432}/${POSTGRES_DB:dc3}?currentSchema=${POSTGRES_SCHEMA:dc3_single}&applicationName=dc3&ssl=false&stringtype=unspecified&clientEncoding=UTF8&serverTimezone=Asia/Shanghai}
-          username: ${POSTGRES_USERNAME:dc3}
-          password: ${POSTGRES_PASSWORD:}
+  r2dbc:
+    url: "${DC3_R2DBC_URL:}"
+    username: ${POSTGRES_USERNAME:dc3}
+    password: ${POSTGRES_PASSWORD:}
 
 # OpenAPI / Swagger UI are disabled in production. The endpoints simply do not
 # exist here, so the doc-path whitelist in WebFluxSecurityConfig exposes nothing.

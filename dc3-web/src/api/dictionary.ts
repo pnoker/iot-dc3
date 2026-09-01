@@ -15,18 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpPost} from '@/api/common';
-import {API_MANAGER_BASE} from '@/config/constant/api';
+import {httpGet, httpPost} from '@/api/common';
+import {API_AUTH_BASE, API_MANAGER_BASE} from '@/config/constant/api';
 import type {Dictionary, PageQuery, PageResult} from '@/config/types';
 
-export const listDriverDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
-  httpPost<T>(`${API_MANAGER_BASE}/dictionary/driver`, query);
+export const listTenantDictionary = () => httpGet<Dictionary[]>(`${API_AUTH_BASE}/dictionary/list_tenant`);
 
-export const listDeviceDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
-  httpPost<T>(`${API_MANAGER_BASE}/dictionary/device`, query);
+export const listDriverDictionary = <T = PageResult<Dictionary>>(query: PageQuery) =>
+  httpPost<T>(`${API_MANAGER_BASE}/dictionary/list_driver`, query);
 
-export const listProfileDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
-  httpPost<T>(`${API_MANAGER_BASE}/dictionary/profile`, query);
+export const listDeviceDictionary = <T = PageResult<Dictionary>>(query: PageQuery) =>
+  httpPost<T>(`${API_MANAGER_BASE}/dictionary/list_device`, query);
 
-export const listPointDictionary = <T = R<PageResult<Dictionary>>>(query: PageQuery) =>
-  httpPost<T>(`${API_MANAGER_BASE}/dictionary/device_point`, query);
+export const listProfileDictionary = <T = PageResult<Dictionary>>(query: PageQuery) =>
+  httpPost<T>(`${API_MANAGER_BASE}/dictionary/list_profile`, query);
+
+export const listPointDictionary = <T = PageResult<Dictionary>>(query: PageQuery) =>
+  httpPost<T>(`${API_MANAGER_BASE}/dictionary/list_device_point`, query);
+
+export const listProfilePointDictionary = <T = PageResult<Dictionary>>(query: PageQuery) =>
+  httpPost<T>(`${API_MANAGER_BASE}/dictionary/list_profile_point`, query);
+
+export const listDriverDeviceDictionary = <T = PageResult<Dictionary>>(query: PageQuery) =>
+  httpPost<T>(`${API_MANAGER_BASE}/dictionary/list_driver_device`, query);

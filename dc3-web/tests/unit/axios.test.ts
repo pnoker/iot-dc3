@@ -62,7 +62,7 @@ describe('axios request instance', () => {
       // Token is NOT injected — it travels in an httpOnly cookie.
       expect(config.headers.get(AUTH_HEADERS.TOKEN)).toBeUndefined();
 
-      return responseOf(config, 200, '{"ok":true,"code":0,"message":"success","data":{"id":"9007199254740993"}}');
+      return responseOf(config, 200, '{"id":"9007199254740993"}');
     });
 
     const response = await request({
@@ -72,12 +72,7 @@ describe('axios request instance', () => {
       adapter,
     });
 
-    expect(response).toEqual({
-      ok: true,
-      code: 0,
-      message: 'success',
-      data: {id: '9007199254740993'},
-    });
+    expect(response).toEqual({id: '9007199254740993'});
   });
 
   it('removes auth keys and routes to login on unauthorized responses', async () => {
@@ -85,12 +80,10 @@ describe('axios request instance', () => {
     setStorage(AUTH_HEADERS.LOGIN, 'dc3');
     setStorage(AUTH_HEADERS.AUTHENTICATED, true, true);
 
-    const adapter: AxiosAdapter = async (config) => responseOf(config, 401, {ok: false, code: 401});
+    const problem = {type: 'about:blank', title: 'Unauthorized', status: 401, code: 'AUTH_UNAUTHORIZED'};
+    const adapter: AxiosAdapter = async (config) => responseOf(config, 401, problem);
 
-    await expect(request({url: 'api/v3/auth/token/check', method: 'post', adapter})).rejects.toEqual({
-      ok: false,
-      code: 401,
-    });
+    await expect(request({url: 'api/v3/auth/token/check', method: 'post', adapter})).rejects.toBe(problem);
 
     expect(notificationSpies.warnMessage).toHaveBeenCalledTimes(1);
     // Only auth keys are removed — not the entire localStorage
@@ -102,7 +95,7 @@ describe('axios request instance', () => {
   });
 
   it('rejects non-ok business responses and surfaces the server payload', async () => {
-    const payload = {ok: false, code: 50001, message: 'business failed'};
+    const payload = {type: 'about:blank', title: 'Bad Request', status: 400, code: 'VALIDATION_FAILED', detail: 'business failed'};
     // Use status 400 — non-ok, non-401, non-5xx hits the failMessage branch
     const adapter: AxiosAdapter = async (config) => responseOf(config, 400, payload);
 
@@ -110,7 +103,7 @@ describe('axios request instance', () => {
 
     expect(notificationSpies.failMessage).toHaveBeenCalledWith(
       'API request error. Please contact the system administrator.',
-      50001,
+      'VALIDATION_FAILED',
       payload
     );
   });

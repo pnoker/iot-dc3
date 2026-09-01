@@ -118,7 +118,7 @@ const load = async () => {
   if (!reactiveData.id) return;
   await getUserById(reactiveData.id)
     .then((res: any) => {
-      reactiveData.data = res.data || {};
+      reactiveData.data = res || {};
     })
     .catch(() => {
       // handled globally
@@ -130,7 +130,7 @@ const loadRoles = () => {
   reactiveData.rolesLoading = true;
   listRoleByPrincipalId(principalId())
     .then((res: any) => {
-      reactiveData.roles = (res.data as any[]) || [];
+      reactiveData.roles = (res as any[]) || [];
       reactiveData.rolesLoaded = true;
     })
     .catch(() => {
@@ -146,7 +146,7 @@ const loadResources = () => {
   reactiveData.resourcesLoading = true;
   listResourceByPrincipalId(principalId())
     .then((res: any) => {
-      reactiveData.resources = (res.data as any[]) || [];
+      reactiveData.resources = (res as any[]) || [];
       reactiveData.resourcesLoaded = true;
     })
     .catch(() => {

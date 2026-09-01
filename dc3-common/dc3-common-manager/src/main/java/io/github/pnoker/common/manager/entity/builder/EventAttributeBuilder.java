@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.EventAttributeExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
@@ -27,7 +26,6 @@ import io.github.pnoker.common.manager.entity.model.EventAttributeDO;
 import io.github.pnoker.common.manager.entity.vo.EventAttributeVO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -174,24 +172,6 @@ public interface EventAttributeBuilder {
      */
     List<EventAttributeVO> buildVOListByBOList(List<EventAttributeBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    default Page<EventAttributeBO> buildBOPageByDOPage(Page<EventAttributeDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<EventAttributeVO> buildVOPageByBOPage(Page<EventAttributeBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
 }

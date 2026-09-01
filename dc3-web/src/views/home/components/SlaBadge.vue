@@ -60,12 +60,12 @@ const warn = computed(() => backlog.over24h > 0);
 
 const load = () =>
   run(async () => {
-    const [a, s]: [{ data?: AgingBacklog }, { data?: SilentSource[] }] = await Promise.all([
+    const [a, s]: [AgingBacklog, SilentSource[]] = await Promise.all([
       alertAging(),
       silentSources(7, 15, 200),
     ]);
-    Object.assign(backlog, a?.data ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
-    silentCount.value = (s?.data ?? []).length;
+    Object.assign(backlog, a ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
+    silentCount.value = (s ?? []).length;
   });
 
 const jumpTo = (tab: 'sla' | 'availability') => {

@@ -21,6 +21,7 @@ import io.github.pnoker.common.manager.entity.vo.dashboard.DeviceStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.DriverStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.GrowthVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyVO;
+import reactor.core.publisher.Mono;
 
 /**
  * Manager-side dashboard aggregate service — powers the home page's driver/device
@@ -38,7 +39,7 @@ public interface DashboardService {
      * @param tenantId caller's tenant id
      * @return driver statistics for the tenant
      */
-    DriverStatsVO driverStats(Long tenantId);
+    Mono<DriverStatsVO> driverStats(Long tenantId);
 
     /**
      * Aggregate device statistics for the dashboard home view: device counts plus the
@@ -48,14 +49,14 @@ public interface DashboardService {
      * @param topN     number of top devices to return, ranked by point-value volume
      * @return device statistics for the tenant
      */
-    DeviceStatsVO deviceStats(Long tenantId, int topN);
+    Mono<DeviceStatsVO> deviceStats(Long tenantId, int topN);
 
     /**
      * Daily new-row counts for driver / device / point / profile tables over the last
      * {@code days} days. Used to back the stat-card sparklines on the home page. Arrays
      * are fixed length = {@code days} with zero-padded missing days, oldest first.
      */
-    GrowthVO dailyGrowth(Long tenantId, int days);
+    Mono<GrowthVO> dailyGrowth(Long tenantId, int days);
 
     /**
      * Four-column topology Sankey (Driver → Device → Profile → Point) used by the home
@@ -80,6 +81,6 @@ public interface DashboardService {
      * @param rangeKey time window key for volume mode; ignored for cardinality. Defaults
      *                 to {@code "7d"} when blank.
      */
-    TopologyVO topology(Long tenantId, String mode, String rangeKey);
+    Mono<TopologyVO> topology(Long tenantId, String mode, String rangeKey);
 
 }

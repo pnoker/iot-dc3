@@ -17,16 +17,15 @@
 
 package io.github.pnoker.common.manager.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
-import io.github.pnoker.common.dal.entity.bo.LabelBO;
-import io.github.pnoker.common.dal.entity.builder.LabelBuilder;
-import io.github.pnoker.common.dal.entity.query.LabelQuery;
-import io.github.pnoker.common.dal.entity.vo.LabelVO;
-import io.github.pnoker.common.dal.service.LabelService;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.SuccessCode;
+import io.github.pnoker.common.manager.entity.bo.LabelBO;
+import io.github.pnoker.common.manager.entity.builder.LabelBuilder;
+import io.github.pnoker.common.manager.entity.query.LabelListRequest;
+import io.github.pnoker.common.manager.entity.vo.LabelVO;
+import io.github.pnoker.common.manager.repository.LabelFilter;
+import io.github.pnoker.common.manager.service.ReactiveLabelService;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,16 +37,17 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * REST controller exposing label management endpoints.
@@ -64,7 +64,7 @@ public class LabelController implements BaseController {
 
     private final LabelBuilder labelBuilder;
 
-    private final LabelService labelService;
+    private final ReactiveLabelService labelService;
 
     /**
      * Create a label for the current tenant.
@@ -81,13 +81,15 @@ public class LabelController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<ResponseEntity<LabelVO>> add(@Validated(Add.class) @RequestBody LabelVO entityVO) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
             LabelBO entityBO = labelBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(tenantId);
-            labelService.add(entityBO);
-            return R.ok(SuccessCode.ADD);
-        }));
+            entityBO.setTenantId(tuple.getT1().getT1()); entityBO.setCreatorId(tuple.getT1().getT2());
+            entityBO.setCreatorName(tuple.getT2()); entityBO.setOperatorId(tuple.getT1().getT2()); entityBO.setOperatorName(tuple.getT2());
+            return labelService.add(entityBO).map(labelBuilder::buildVOByBO)
+                    .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(created));
+        });
     }
 
     /**
@@ -104,13 +106,11 @@ public class LabelController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, labelService.getById(id));
-            labelService.delete(id);
-            return R.ok(SuccessCode.DELETE);
-        }));
+    @DeleteMapping("/delete")
+    public Mono<ResponseEntity<Void>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> labelService.delete(tuple.getT1().getT1(), id, tuple.getT1().getT2(), tuple.getT2())
+                        .thenReturn(ResponseEntity.noContent().build()));
     }
 
     /**
@@ -128,14 +128,13 @@ public class LabelController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<ResponseEntity<LabelVO>> update(@Validated(Update.class) @RequestBody LabelVO entityVO) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
             LabelBO entityBO = labelBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, labelService.getById(entityBO.getId()));
-            labelService.update(entityBO);
-            return R.ok(SuccessCode.UPDATE);
-        }));
+            entityBO.setTenantId(tuple.getT1().getT1()); entityBO.setOperatorId(tuple.getT1().getT2()); entityBO.setOperatorName(tuple.getT2());
+            return labelService.update(entityBO).map(labelBuilder::buildVOByBO).map(ResponseEntity::ok);
+        });
     }
 
     /**
@@ -153,18 +152,14 @@ public class LabelController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_id")
-    public Mono<R<LabelVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            LabelBO entityBO = requireTenant(tenantId, labelService.getById(id));
-            LabelVO entityVO = labelBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
-        }));
+    public Mono<LabelVO> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId().flatMap(tenantId -> labelService.getById(tenantId, id)).map(labelBuilder::buildVOByBO);
     }
 
     /**
      * Page through labels with filters.
      *
-     * @param entityQuery query filters (may be null)
+     * @param request query filters (may be null)
      * @return a page of LabelVO matching the query
      */
     @PreAuthorize("@perm.can('label', 'list')")
@@ -176,14 +171,12 @@ public class LabelController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<LabelVO>>> list(@RequestBody(required = false) LabelQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            LabelQuery query = Objects.isNull(entityQuery) ? new LabelQuery() : entityQuery;
-            query.setTenantId(tenantId);
-            Page<LabelBO> entityPageBO = labelService.list(query);
-            Page<LabelVO> entityPageVO = labelBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
-        }));
+    public Mono<OffsetPage<LabelVO>> list(@RequestBody(required = false) LabelListRequest request) {
+        LabelListRequest query = request == null ? new LabelListRequest() : request;
+        return getTenantId().flatMap(tenantId -> labelService.list(new LabelFilter(tenantId, query.labelName(),
+                        query.color(), query.entityTypeFlag(), query.enableFlag(), query.offset(), query.limit(), query.sort())))
+                .map(page -> new OffsetPage<>(page.items().stream().map(labelBuilder::buildVOByBO).toList(),
+                        page.offset(), page.limit(), page.total(), page.hasNext()));
     }
 
 }

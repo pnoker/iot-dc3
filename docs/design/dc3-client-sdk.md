@@ -24,7 +24,7 @@ HTTP 网关契约目前被实现了两次：
 ```text
 dc3-sdk/
 ├── src/
-│   ├── core/            http adapter contract, envelope R<T>, pagination,
+│   ├── core/            http adapter contract, typed payloads, pagination,
 │   │                    token/session lifecycle, error taxonomy
 │   ├── api/             one module per domain (driver/device/point/...),
 │   │                    mirroring backend CRUD verbs (getXxx/listXxx/add/update/delete)
@@ -46,7 +46,7 @@ interface HttpClient {
     params?: Record<string, unknown>;
     data?: unknown;
     headers?: Record<string, string>;
-  }): Promise<R<T>>;
+  }): Promise<T>;
 }
 
 // Interceptors owned by the HOST, not the SDK: auth headers and 401
@@ -90,7 +90,7 @@ interface SdkOptions {
 
 1. **Phase 0（已落地）**：L1 配置去框架化——引入 `Translator` 类型，16 个实体配置模块零 vue-i18n import。
 2. **Phase 1**：搭建 `dc3-sdk` 包（pnpm workspace），移植
-   `PageQuery/PageResult`、`R<T>` 信封、错误分类体系；使用 mock 适配器的 vitest。
+   `PageQuery/PageResult`、RFC 9457 错误和错误分类体系；使用 mock 适配器的 vitest。
 3. **Phase 2**：移植 30 个 API 封装模块；针对后端 OpenAPI 规范（或录制的 fixture）做契约测试。
 4. **Phase 3**：dc3-web 接入 SDK——删除 `src/api`，保留 axios 适配器 + 拦截器作为宿主粘合层；删除任何内容之前
    先跑完整 e2e（608 个单元测试 + Playwright）。

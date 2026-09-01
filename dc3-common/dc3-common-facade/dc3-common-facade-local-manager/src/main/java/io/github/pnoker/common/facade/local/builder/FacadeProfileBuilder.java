@@ -18,9 +18,7 @@
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
-import io.github.pnoker.common.facade.entity.query.FacadeProfileQuery;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
-import io.github.pnoker.common.manager.entity.query.ProfileQuery;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 
@@ -32,14 +30,6 @@ import org.mapstruct.Mapper;
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeProfileBuilder {
-
-    /**
-     * To manager query.
-     *
-     * @param facadeQuery facade query
-     * @return to manager query result
-     */
-    ProfileQuery toManagerQuery(FacadeProfileQuery facadeQuery);
 
     /**
      * To facade business object.

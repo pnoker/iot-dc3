@@ -18,12 +18,9 @@
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
-import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
-import io.github.pnoker.common.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 /**
  * Converts between the facade-api shapes and {@code dc3-common-manager} internals. Field
@@ -34,16 +31,6 @@ import org.mapstruct.Mapping;
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface FacadeDeviceBuilder {
-
-    /**
-     * To manager query.
-     *
-     * @param facadeQuery facade query
-     * @return to manager query result
-     */
-    @Mapping(target = "groupId", ignore = true)
-    @Mapping(target = "labelId", ignore = true)
-    DeviceQuery toManagerQuery(FacadeDeviceQuery facadeQuery);
 
     /**
      * To facade business object.

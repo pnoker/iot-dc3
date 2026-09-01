@@ -40,7 +40,12 @@ spring:
 
 dc3:
   facade:
-    mode: ${DC3_FACADE_MODE:grpc}
+    auth:
+      mode: grpc
+    manager:
+      mode: grpc
+    data:
+      mode: grpc
 
 # Aggregated Swagger UI. The gateway has no controllers of its own; it federates
 # the per-center API docs into a single UI with a service selector. Each entry's

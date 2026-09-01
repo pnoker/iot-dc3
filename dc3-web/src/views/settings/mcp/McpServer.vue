@@ -95,7 +95,7 @@ const loadMetadata = async () => {
   loading.value = true;
   try {
     const res = await getMcpMetadata();
-    metadata.value = res.data || {};
+    metadata.value = res || {};
   } finally {
     loading.value = false;
   }

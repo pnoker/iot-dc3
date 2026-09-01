@@ -97,7 +97,7 @@ const {
   currentChange,
 } = usePagedList<ProfileRecord>({
   pageSize: 12,
-  sortColumn: 'create_time',
+  sortColumn: 'createTime',
   request: (query) => listProfile(query),
 });
 
@@ -132,8 +132,8 @@ const addThing = (form: unknown, done: () => void) => {
     });
 };
 
-const disableThing = (id: string, done: () => void) => {
-  updateProfile({id: String(id), enableFlag: 'DISABLE'})
+const disableThing = (profile: ProfileRecord, done: () => void) => {
+  updateProfile({...profile, enableFlag: 'DISABLE'})
     .then(() => {
       successMessage();
       load();
@@ -145,8 +145,8 @@ const disableThing = (id: string, done: () => void) => {
     });
 };
 
-const enableThing = (id: string, done: () => void) => {
-  updateProfile({id: String(id), enableFlag: 'ENABLE'})
+const enableThing = (profile: ProfileRecord, done: () => void) => {
+  updateProfile({...profile, enableFlag: 'ENABLE'})
     .then(() => {
       successMessage();
       load();
@@ -158,8 +158,8 @@ const enableThing = (id: string, done: () => void) => {
     });
 };
 
-const deleteThing = (id: string, done: () => void) => {
-  deleteProfile(String(id))
+const deleteThing = (profile: ProfileRecord, done: () => void) => {
+  deleteProfile(profile.id, profile.version)
     .then(() => {
       successMessage();
       load();

@@ -18,18 +18,14 @@
 package io.github.pnoker.common.auth.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcPermissionQuery;
-import io.github.pnoker.api.center.auth.GrpcRPermissionCodesDTO;
+import io.github.pnoker.api.center.auth.GrpcPermissionCodesDTO;
 import io.github.pnoker.api.center.auth.PermissionApiGrpc;
-import io.github.pnoker.api.common.GrpcRFactory;
-import io.github.pnoker.common.auth.entity.bo.ResourceBO;
-import io.github.pnoker.common.auth.service.RoleResourceBindService;
-import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.auth.repository.ReactivePermissionStore;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 
 /**
  * gRPC server handling permission-code lookup requests.
@@ -42,30 +38,25 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PermissionServer extends PermissionApiGrpc.PermissionApiImplBase {
 
-    private final RoleResourceBindService roleResourceBindService;
+    private final ReactivePermissionStore permissionStore;
 
     @Override
     public void listPermissionCodes(GrpcPermissionQuery request,
-                                    StreamObserver<GrpcRPermissionCodesDTO> responseObserver) {
-        GrpcRPermissionCodesDTO.Builder builder = GrpcRPermissionCodesDTO.newBuilder();
-
-        try {
-            roleResourceBindService.listResourceByPrincipalId(request.getPrincipalId(), request.getTenantId())
-                    .stream()
-                    .map(ResourceBO::getResourceCode)
-                    .filter(Objects::nonNull)
-                    .filter(code -> !code.isBlank())
-                    .forEach(builder::addCodes);
-
-            builder.setResult(GrpcRFactory.ok());
-        } catch (Exception e) {
-            log.warn("listPermissionCodes failed, tenant={}, principal={}",
-                    request.getTenantId(), request.getPrincipalId(), e);
-            builder.setResult(GrpcRFactory.fail(ErrorCode.FAILURE));
-        }
-
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
+                                    StreamObserver<GrpcPermissionCodesDTO> responseObserver) {
+        permissionStore.listResourceCodes(request.getTenantId(), request.getPrincipalId())
+                .collectList()
+                .subscribe(codes -> {
+                    GrpcPermissionCodesDTO.Builder builder = GrpcPermissionCodesDTO.newBuilder();
+                    codes.forEach(builder::addCodes);
+                    responseObserver.onNext(builder.build());
+                    responseObserver.onCompleted();
+                }, error -> {
+                    log.warn("listPermissionCodes failed, tenant={}, principal={}",
+                            request.getTenantId(), request.getPrincipalId(), error);
+                    responseObserver.onError(io.grpc.Status.INTERNAL
+                            .withDescription("permission lookup failed")
+                            .withCause(error).asRuntimeException());
+                });
     }
 
 }

@@ -21,6 +21,7 @@ import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.CommandRuntimeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
@@ -29,7 +30,6 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -129,7 +129,7 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public Map<String, String> execute(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> commandConfig,
-                                       DeviceBO device, FacadeCommandBO command, Map<String, String> paramValues) {
+                                       DeviceBO device, CommandRuntimeBO command, Map<String, String> paramValues) {
         Map<String, String> result = new LinkedHashMap<>();
         String sendCommand = getConfigValue(commandConfig, "sendCommand", "${value}");
         if (Objects.nonNull(paramValues)) {

@@ -37,6 +37,7 @@ class CustomExceptionContractTest {
             AddException.class,
             AssociatedException.class,
             ConfigException.class,
+            ConflictException.class,
             ConnectorException.class,
             CronException.class,
             DeleteException.class,

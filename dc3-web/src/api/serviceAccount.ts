@@ -19,6 +19,7 @@ import {httpPost} from '@/api/common';
 import {createCrudApi} from '@/api/factory';
 import {API_SERVICE_ACCOUNT_BASE} from '@/config/constant/api';
 import type {ServiceAccountForm, ServiceAccountRecord} from '@/config/types/auth';
+import type {PageQuery, PageResult} from '@/config/types';
 
 const crud = createCrudApi<ServiceAccountForm, ServiceAccountRecord>({base: API_SERVICE_ACCOUNT_BASE});
 
@@ -29,11 +30,11 @@ export const deleteServiceAccount = crud.delete;
 export const updateServiceAccount = crud.update;
 
 export const enableServiceAccount = (id: string) =>
-  httpPost<R<string>>(`${API_SERVICE_ACCOUNT_BASE}/enable`, undefined, {params: {id}});
+  httpPost<string>(`${API_SERVICE_ACCOUNT_BASE}/enable`, undefined, {params: {id}});
 
 export const disableServiceAccount = (id: string) =>
-  httpPost<R<string>>(`${API_SERVICE_ACCOUNT_BASE}/disable`, undefined, {params: {id}});
+  httpPost<string>(`${API_SERVICE_ACCOUNT_BASE}/disable`, undefined, {params: {id}});
 
 export const getServiceAccountById = crud.getById;
 
-export const listServiceAccount = crud.list;
+export const listServiceAccount = (query: PageQuery) => crud.list<PageResult<ServiceAccountRecord>>(query);

@@ -17,11 +17,10 @@
 
 package io.github.pnoker.common.data.entity.bo;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
 
 /**
  * Business object for submitting a point write command.
@@ -32,9 +31,23 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
 public class PointCommandWriteBO {
+
+    public PointCommandWriteBO() {
+    }
+
+    public PointCommandWriteBO(Long deviceId, Long pointId, String value, String commandId) {
+        this(deviceId, pointId, value, commandId, null);
+    }
+
+    public PointCommandWriteBO(Long deviceId, Long pointId, String value, String commandId,
+                               PointCommandSourceEnum source) {
+        this.deviceId = deviceId;
+        this.pointId = pointId;
+        this.value = value;
+        this.commandId = commandId;
+        this.source = source;
+    }
 
     /**
      * Device ID to write the point value to
@@ -55,5 +68,7 @@ public class PointCommandWriteBO {
      * Optional pre-generated command ID for idempotent submission
      */
     private String commandId;
+
+    private PointCommandSourceEnum source;
 
 }

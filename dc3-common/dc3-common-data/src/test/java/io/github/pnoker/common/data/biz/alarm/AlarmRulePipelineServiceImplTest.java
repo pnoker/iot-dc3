@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import reactor.core.publisher.Flux;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class AlarmRulePipelineServiceImplTest {
@@ -79,10 +81,11 @@ class AlarmRulePipelineServiceImplTest {
     void processEvaluatesRuleEngineAndNotifies() {
         RuleFact fact = fact(7L, AlarmTargetTypeEnum.POINT, 11L);
         RuleMatch m = match(fact);
-        when(ruleEngine.evaluate(fact)).thenReturn(List.of(m));
-        when(ruleNotificationService.notify(m)).thenReturn(List.of(history(1L)));
+        when(ruleEngine.evaluate(fact)).thenReturn(Flux.just(m));
+        when(ruleAlarmPersistenceService.ensureAlarm(m)).thenReturn(Mono.just(m));
+        when(ruleNotificationService.notify(m)).thenReturn(Flux.just(history(1L)));
 
-        List<NotifyHistoryBO> result = service.process(fact);
+        List<NotifyHistoryBO> result = service.process(fact).collectList().block();
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getId()).isEqualTo(1L);
@@ -92,9 +95,9 @@ class AlarmRulePipelineServiceImplTest {
     @Test
     void processReturnsEmptyWhenNoRulesMatch() {
         RuleFact fact = fact(7L, AlarmTargetTypeEnum.POINT, 11L);
-        when(ruleEngine.evaluate(fact)).thenReturn(List.of());
+        when(ruleEngine.evaluate(fact)).thenReturn(Flux.empty());
 
-        List<NotifyHistoryBO> result = service.process(fact);
+        List<NotifyHistoryBO> result = service.process(fact).collectList().block();
 
         assertThat(result).isEmpty();
         verify(ruleAlarmPersistenceService, never()).ensureAlarm(any());
@@ -105,8 +108,8 @@ class AlarmRulePipelineServiceImplTest {
 
     @Test
     void processBatchReturnsEmptyForNullAndEmptyInput() {
-        assertThat(service.processBatch(null)).isEmpty();
-        assertThat(service.processBatch(List.of())).isEmpty();
+        assertThat(service.processBatch(null).collectList().block()).isEmpty();
+        assertThat(service.processBatch(List.of()).collectList().block()).isEmpty();
         verifyNoPipelineInteraction();
     }
 
@@ -119,10 +122,11 @@ class AlarmRulePipelineServiceImplTest {
                 fact(7L, AlarmTargetTypeEnum.POINT, 11L));  // valid
 
         RuleMatch m = match(fact(7L, AlarmTargetTypeEnum.POINT, 11L));
-        when(ruleEngine.evaluate(any())).thenReturn(List.of(m));
-        when(ruleNotificationService.notifyBatch(anyList())).thenReturn(List.of(history(1L)));
+        when(ruleEngine.evaluate(any())).thenReturn(Flux.just(m));
+        when(ruleAlarmPersistenceService.ensureAlarm(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(ruleNotificationService.notifyBatch(anyList())).thenReturn(Flux.just(history(1L)));
 
-        List<NotifyHistoryBO> result = service.processBatch(facts);
+        List<NotifyHistoryBO> result = service.processBatch(facts).collectList().block();
 
         assertThat(result).hasSize(1);
         // Only 1 evaluation for the single valid fact
@@ -142,12 +146,13 @@ class AlarmRulePipelineServiceImplTest {
         RuleMatch m2 = match(f2);
         RuleMatch m3 = match(f3);
 
-        when(ruleEngine.evaluate(f1)).thenReturn(List.of(m1));
-        when(ruleEngine.evaluate(f2)).thenReturn(List.of(m2));
-        when(ruleEngine.evaluate(f3)).thenReturn(List.of(m3));
-        when(ruleNotificationService.notifyBatch(anyList())).thenReturn(List.of(history(1L), history(2L), history(3L)));
+        when(ruleEngine.evaluate(f1)).thenReturn(Flux.just(m1));
+        when(ruleEngine.evaluate(f2)).thenReturn(Flux.just(m2));
+        when(ruleEngine.evaluate(f3)).thenReturn(Flux.just(m3));
+        when(ruleAlarmPersistenceService.ensureAlarm(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(ruleNotificationService.notifyBatch(anyList())).thenReturn(Flux.just(history(1L), history(2L), history(3L)));
 
-        List<NotifyHistoryBO> result = service.processBatch(List.of(f1, f2, f3));
+        List<NotifyHistoryBO> result = service.processBatch(List.of(f1, f2, f3)).collectList().block();
 
         assertThat(result).hasSize(3);
         verify(ruleEngine, times(3)).evaluate(any());
@@ -160,9 +165,9 @@ class AlarmRulePipelineServiceImplTest {
     @Test
     void processBatchReturnsEmptyWhenNoMatchesProduced() {
         RuleFact fact = fact(7L, AlarmTargetTypeEnum.POINT, 11L);
-        when(ruleEngine.evaluate(fact)).thenReturn(List.of());
+        when(ruleEngine.evaluate(fact)).thenReturn(Flux.empty());
 
-        List<NotifyHistoryBO> result = service.processBatch(List.of(fact));
+        List<NotifyHistoryBO> result = service.processBatch(List.of(fact)).collectList().block();
 
         assertThat(result).isEmpty();
         verify(ruleAlarmPersistenceService, never()).ensureAlarm(any());

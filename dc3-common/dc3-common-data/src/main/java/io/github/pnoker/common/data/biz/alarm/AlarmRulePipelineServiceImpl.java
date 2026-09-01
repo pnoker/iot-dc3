@@ -21,11 +21,11 @@ import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
 
 /**
  * Alarm rule processing pipeline implementation.
@@ -44,19 +44,19 @@ public class AlarmRulePipelineServiceImpl implements AlarmRulePipelineService {
     private final RuleAlarmPersistenceService ruleAlarmPersistenceService;
 
     @Override
-    public List<NotifyHistoryBO> process(RuleFact fact) {
-        List<NotifyHistoryBO> histories = new ArrayList<>();
-        for (RuleMatch match : ruleEngine.evaluate(fact)) {
-            ruleAlarmPersistenceService.ensureAlarm(match);
-            histories.addAll(ruleNotificationService.notify(match));
+    public Flux<NotifyHistoryBO> process(RuleFact fact) {
+        if (fact == null) {
+            return Flux.empty();
         }
-        return histories;
+        return ruleEngine.evaluate(fact)
+                .concatMap(match -> ruleAlarmPersistenceService.ensureAlarm(match)
+                        .flatMapMany(ruleNotificationService::notify));
     }
 
     @Override
-    public List<NotifyHistoryBO> processBatch(List<RuleFact> facts) {
+    public Flux<NotifyHistoryBO> processBatch(List<RuleFact> facts) {
         if (facts == null || facts.isEmpty()) {
-            return List.of();
+            return Flux.empty();
         }
         List<RuleFact> validFacts = facts.stream()
                 .filter(Objects::nonNull)
@@ -64,7 +64,7 @@ public class AlarmRulePipelineServiceImpl implements AlarmRulePipelineService {
                 .filter(f -> Objects.nonNull(f.getAlarmTargetTypeFlag()))
                 .toList();
         if (validFacts.isEmpty()) {
-            return List.of();
+            return Flux.empty();
         }
 
         // Group by (tenantId, alarmTargetTypeFlag, entityId) so RuleRegistry
@@ -73,19 +73,14 @@ public class AlarmRulePipelineServiceImpl implements AlarmRulePipelineService {
                 .collect(Collectors.groupingBy(f ->
                         new RuleRegistry.RuleCacheKey(f.getTenantId(), f.getAlarmTargetTypeFlag(), f.getEntityId())));
 
-        List<RuleMatch> allMatches = new ArrayList<>();
-        for (List<RuleFact> group : grouped.values()) {
-            for (RuleFact fact : group) {
-                for (RuleMatch match : ruleEngine.evaluate(fact)) {
-                    ruleAlarmPersistenceService.ensureAlarm(match);
-                    allMatches.add(match);
-                }
-            }
-        }
-        if (allMatches.isEmpty()) {
-            return List.of();
-        }
-        return ruleNotificationService.notifyBatch(allMatches);
+        return Flux.fromIterable(grouped.values())
+                .concatMap(Flux::fromIterable)
+                .concatMap(ruleEngine::evaluate)
+                .concatMap(match -> ruleAlarmPersistenceService.ensureAlarm(match))
+                .collectList()
+                .flatMapMany(matches -> matches.isEmpty()
+                        ? Flux.empty()
+                        : ruleNotificationService.notifyBatch(matches));
     }
 
 }

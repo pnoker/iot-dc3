@@ -22,7 +22,6 @@ import io.github.pnoker.common.agentic.entity.vo.ModelProviderVO;
 import io.github.pnoker.common.agentic.service.ModelProviderService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,13 +32,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -74,8 +76,9 @@ public class ProviderController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list")
-    public Mono<R<List<ModelProviderVO>>> list() {
-        return async(() -> R.ok(modelProviderBuilder.buildVOListByBOList(modelProviderService.list())));
+    public Mono<List<ModelProviderVO>> list() {
+        return getPrincipalHeader().flatMap(header -> modelProviderService.list(header)
+                .map(modelProviderBuilder::buildVOListByBOList));
     }
 
     /**
@@ -94,11 +97,11 @@ public class ProviderController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/config/add")
-    public Mono<R<ModelProviderVO>> add(@Validated(Add.class) @RequestBody ModelProviderVO request) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
+    public Mono<ModelProviderVO> add(@Validated(Add.class) @RequestBody ModelProviderVO request) {
+        return getPrincipalHeader().flatMap(header -> {
             ModelProviderBO entityBO = modelProviderBuilder.buildBOByVO(request);
-            return R.ok(modelProviderBuilder.buildVOByBO(modelProviderService.add(entityBO, header)));
-        }));
+            return modelProviderService.add(entityBO, header).map(modelProviderBuilder::buildVOByBO);
+        });
     }
 
     /**
@@ -117,11 +120,11 @@ public class ProviderController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/config/update")
-    public Mono<R<ModelProviderVO>> update(@Validated(Update.class) @RequestBody ModelProviderVO request) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
+    public Mono<ModelProviderVO> update(@Validated(Update.class) @RequestBody ModelProviderVO request) {
+        return getPrincipalHeader().flatMap(header -> {
             ModelProviderBO entityBO = modelProviderBuilder.buildBOByVO(request);
-            return R.ok(modelProviderBuilder.buildVOByBO(modelProviderService.update(entityBO, header)));
-        }));
+            return modelProviderService.update(entityBO, header).map(modelProviderBuilder::buildVOByBO);
+        });
     }
 
     /**
@@ -139,12 +142,10 @@ public class ProviderController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/config/delete")
-    public Mono<R<Boolean>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return async(() -> {
-            modelProviderService.delete(id);
-            return R.ok(true);
-        });
+    @DeleteMapping("/config/delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getPrincipalHeader().flatMap(header -> modelProviderService.delete(id, header));
     }
 
 }

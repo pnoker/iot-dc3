@@ -209,15 +209,16 @@ const history = () => {
     historyData.value = [];
     return;
   }
-  listPointValueHistory(props.data.deviceId, props.data.pointId, 100)
+  listPointValueHistory(props.data.deviceId, props.data.pointId, undefined, 100)
     .then((res) => {
       const pointValueType = (props.point.pointTypeFlag || '').toLowerCase();
+      const values = res.items.map((item) => String(item.value ?? ''));
       if (pointValueType === 'string') {
         historyData.value = [];
       } else if (pointValueType === 'boolean') {
-        historyData.value = res.data.reverse().map((value: string) => (value === 'true' ? 1 : 0));
+        historyData.value = values.reverse().map((value) => (value === 'true' ? 1 : 0));
       } else {
-        historyData.value = res.data.reverse().map((value: string) => +value);
+        historyData.value = values.reverse().map((value) => +value);
       }
     })
     .catch(() => {

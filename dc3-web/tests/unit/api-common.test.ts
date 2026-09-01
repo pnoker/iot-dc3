@@ -60,8 +60,7 @@ describe("shared API transport helpers", () => {
         {
           params: { id: "7" },
           url: "/device/delete",
-          method: "post",
-          data: undefined,
+          method: "delete",
         },
       ],
       [{ params: { id: "7" }, url: "/device/get_by_id", method: "get" }],

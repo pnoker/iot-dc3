@@ -22,6 +22,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
 
 import java.util.Collection;
 import java.util.Map;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral status and health facade.
@@ -30,49 +31,9 @@ import java.util.Map;
  * @since 2026.5.14
  */
 public interface StatusHealthFacade {
-
-    /**
-     * Resolve the status code for each device id, scoped to a tenant.
-     *
-     * @param tenantId  tenant scope
-     * @param deviceIds device ids to resolve
-     * @return map from device id to its status code
-     */
-    Map<Long, String> listDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds);
-
-    /**
-     * Resolve the status code for each device sharing a profile, scoped to a tenant.
-     *
-     * @param tenantId  tenant scope
-     * @param profileId profile whose devices to resolve
-     * @return map from device id to its status code
-     */
-    Map<Long, String> listDeviceStatusesByProfileId(Long tenantId, Long profileId);
-
-    /**
-     * Resolve the status code for each driver id, scoped to a tenant.
-     *
-     * @param tenantId  tenant scope
-     * @param driverIds driver ids to resolve
-     * @return map from driver id to its status code
-     */
-    Map<Long, String> listDriverStatusesByIds(Long tenantId, Collection<Long> driverIds);
-
-    /**
-     * Summarize the status of a driver and its devices, scoped to a tenant.
-     *
-     * @param tenantId tenant scope
-     * @param driverId driver id
-     * @return the driver/device status summary
-     */
-    FacadeDriverDeviceStatusSummaryBO getDriverDeviceStatusSummary(Long tenantId, Long driverId);
-
-    /**
-     * Snapshot the system health (centers, infrastructure, fleet) for a tenant.
-     *
-     * @param tenantId tenant scope
-     * @return the system health snapshot
-     */
-    FacadeSystemHealthBO systemHealth(Long tenantId);
-
+    Mono<Map<Long, String>> listDeviceStatusesByIdsReactive(Long tenantId, Collection<Long> deviceIds);
+    Mono<Map<Long, String>> listDeviceStatusesByProfileIdReactive(Long tenantId, Long profileId);
+    Mono<Map<Long, String>> listDriverStatusesByIdsReactive(Long tenantId, Collection<Long> driverIds);
+    Mono<FacadeDriverDeviceStatusSummaryBO> getDriverDeviceStatusSummaryReactive(Long tenantId, Long driverId);
+    Mono<FacadeSystemHealthBO> systemHealthReactive(Long tenantId);
 }

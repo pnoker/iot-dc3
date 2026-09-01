@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
+import reactor.core.publisher.Mono;
 
 /**
  * Handles driver heartbeat/state events: refreshes the online-status cache and
@@ -35,6 +36,6 @@ public interface DriverStateService {
      *
      * @param entityDTO DriverStateDTO
      */
-    void heartbeat(DriverStateDTO entityDTO);
+    Mono<Void> heartbeat(DriverStateDTO entityDTO);
 
 }

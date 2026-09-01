@@ -17,28 +17,26 @@
 
 package io.github.pnoker.common.auth.controller;
 
-import io.github.pnoker.common.auth.entity.builder.IdentityAuditLogBuilder;
+import io.github.pnoker.common.auth.entity.query.IdentityAuditLogCursorRequest;
 import io.github.pnoker.common.auth.entity.vo.IdentityAuditLogVO;
-import io.github.pnoker.common.auth.service.AuditLogService;
+import io.github.pnoker.common.auth.repository.IdentityAuditLogFilter;
+import io.github.pnoker.common.auth.service.ReactiveAuditLogService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.common.entity.R;
+import io.github.pnoker.db.r2dbc.core.page.CursorPage;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 /**
  * REST controller exposing the identity/authorization audit log. Admin-only and tenant-scoped.
@@ -53,25 +51,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuditLogController implements BaseController {
 
-    private final AuditLogService auditLogService;
-    private final IdentityAuditLogBuilder identityAuditLogBuilder;
+    private final ReactiveAuditLogService auditLogService;
 
     /**
      * List identity and authorization audit entries for the current tenant.
      *
-     * @param principalId  optional filter by the principal who performed the action
-     * @param action       optional filter by audit action type (e.g. LOGIN, GRANT, REVOKE)
-     * @param resourceType optional filter by the targeted resource type (e.g. USER, ROLE)
-     * @param resourceId   optional filter by the targeted resource id
-     * @param status       optional filter by audit event outcome (e.g. SUCCESS, FAILURE)
-     * @param limit        optional cap on the number of entries returned; 0 or absent means no explicit limit
+     * @param request signed-cursor request containing filters and page size
      * @return an append-only list of IdentityAuditLogVO matching the filters; admin-only, tenant-scoped
      */
     @PreAuthorize("@perm.can('audit', 'list')")
     @Operation(summary = "List Identity Audit Log",
-            description = "List identity and authorization audit entries for the current tenant, with optional filters " +
-                    "by principal, action, resource type/id and status, plus a result limit. Admin-only; returns an " +
-                    "append-only trail of who changed which identity or permission.",
+            description = "List identity and authorization audit entries for the current tenant using a signed opaque cursor. " +
+                    "Filters are bound to the cursor and the fixed create-time/id descending order; no total count is computed.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "LOW"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -79,17 +70,12 @@ public class AuditLogController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<List<IdentityAuditLogVO>>> list(
-            @Parameter(description = "Filter by the identity of the principal (user or service account) who performed the action; must belong to the current tenant.", example = "1024") @RequestParam(value = "principal_id", required = false) Long principalId,
-            @Parameter(description = "Filter by the audit action type, e.g. LOGIN, LOGOUT, GRANT, REVOKE, PASSWORD_CHANGE.", example = "LOGIN") @RequestParam(value = "action", required = false) String action,
-            @Parameter(description = "Filter by the type of resource targeted by the action, e.g. USER, ROLE, PERMISSION.", example = "ROLE") @RequestParam(value = "resource_type", required = false) String resourceType,
-            @Parameter(description = "Filter by the identifier of the targeted resource; combined with resource_type to narrow results.", example = "2048") @RequestParam(value = "resource_id", required = false) Long resourceId,
-            @Parameter(description = "Filter by the outcome status of the audit event, e.g. SUCCESS, FAILURE, DENIED.", example = "SUCCESS") @RequestParam(value = "status", required = false) String status,
-            @Parameter(description = "Maximum number of audit log entries to return; 0 or absent means no explicit limit.", example = "50") @RequestParam(value = "limit", required = false) Integer limit) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(identityAuditLogBuilder.buildVOListByBOList(
-                auditLogService.list(tenantId, principalId, StringUtils.defaultString(action),
-                        StringUtils.defaultString(resourceType), resourceId, StringUtils.defaultString(status),
-                        limit == null ? 0 : limit)
-        ))));
+    public Mono<ResponseEntity<CursorPage<IdentityAuditLogVO>>> list(
+            @RequestBody(required = false) IdentityAuditLogCursorRequest request) {
+        IdentityAuditLogCursorRequest query = request == null ? new IdentityAuditLogCursorRequest() : request;
+        return getTenantId().flatMap(tenantId -> auditLogService.list(new IdentityAuditLogFilter(
+                        tenantId, query.principalId(), query.action(), query.resourceType(), query.resourceId(),
+                        query.status(), query.cursor(), query.limit()))
+                .map(ResponseEntity::ok));
     }
 }

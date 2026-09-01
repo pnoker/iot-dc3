@@ -17,12 +17,6 @@
 
 package io.github.pnoker.common.auth.entity.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,49 +36,21 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName(value = "dc3_identity_audit_log", autoResultMap = true)
 public class IdentityAuditLogDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
-
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
-
-    @TableField("tenant_id")
     private Long tenantId;
-
-    @TableField("principal_id")
     private Long principalId;
-
-    @TableField("principal_type")
     private String principalType;
-
-    @TableField("action")
     private String action;
-
-    @TableField("resource_type")
     private String resourceType;
-
-    @TableField("resource_id")
     private Long resourceId;
-
-    @TableField("resource_name")
     private String resourceName;
-
-    @TableField("status")
     private String status;
-
-    @TableField("error_code")
     private String errorCode;
-
-    @TableField(value = "detail_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt detailExt;
-
-    @TableField("create_time")
     private LocalDateTime createTime;
-
-    @TableLogic
-    @TableField("deleted")
     private Byte deleted;
 }

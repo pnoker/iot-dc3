@@ -107,7 +107,7 @@ const refresh = async () => {
   loading.value = true;
   try {
     const res: any = await streamLatest(props.size);
-    const data: Row[] = res?.data ?? [];
+    const data: Row[] = res ?? [];
     rows.value = data;
     lastRefreshed.value = new Date().toISOString();
   } catch {

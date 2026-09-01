@@ -33,7 +33,7 @@
 
     <description>
         IoT DC3 pluggable message broker layer: the broker-neutral port, one certified
-        adapter per broker (rabbitmq default, kafka, rocketmq, pulsar, activemq, mqtt 5)
+        reactive adapter per broker (rabbitmq default, kafka, pulsar, mqtt 5)
         and the contract suite that gates adapter compliance. Deployments pick exactly
         one adapter via dc3.mq.type — see docs/mq-brokers.md and
         docs/design/mq-abstraction.md.
@@ -43,9 +43,7 @@
         <module>dc3-mq-core</module>
         <module>dc3-mq-rabbitmq</module>
         <module>dc3-mq-kafka</module>
-        <module>dc3-mq-rocketmq</module>
         <module>dc3-mq-pulsar</module>
-        <module>dc3-mq-activemq</module>
         <module>dc3-mq-mqtt</module>
         <module>dc3-mq-tck</module>
     </modules>

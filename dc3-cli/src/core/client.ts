@@ -29,6 +29,7 @@ export class Dc3Client {
     path: string,
     body?: unknown,
     retryOn401 = true,
+    extraHeaders: Record<string, string> = {},
   ): Promise<T> {
     const gateway = await this.getGateway();
     const profile = await configManager.getActiveProfile();
@@ -45,12 +46,24 @@ export class Dc3Client {
     const headers = state
       ? tokenManager.buildHeaders(state)
       : { 'Content-Type': 'application/json' };
+    Object.assign(headers, extraHeaders);
+    const isFormData =
+      typeof FormData !== 'undefined' && body instanceof FormData;
+    if (isFormData) {
+      // Let fetch generate the multipart boundary and Content-Type header.
+      delete headers['Content-Type'];
+    }
+    const requestBody = isFormData
+      ? (body as FormData)
+      : body === undefined
+        ? undefined
+        : JSON.stringify(body);
 
     const url = `${gateway}${path}`;
     const res = await fetch(url, {
       method,
       headers,
-      body: body ? JSON.stringify(body) : undefined,
+      body: requestBody,
     });
 
     // 401 fallback — renew and retry once
@@ -65,13 +78,20 @@ export class Dc3Client {
         const newHeaders = newState
           ? tokenManager.buildHeaders(newState)
           : headers;
+        Object.assign(newHeaders, extraHeaders);
+        if (isFormData) {
+          delete newHeaders['Content-Type'];
+        }
         const retryRes = await fetch(url, {
           method,
           headers: newHeaders,
-          body: body ? JSON.stringify(body) : undefined,
+          body: requestBody,
         });
         if (!retryRes.ok) {
           throw await this.buildError(retryRes);
+        }
+        if (retryRes.status === 204) {
+          return undefined as T;
         }
         return (await retryRes.json()) as T;
       }
@@ -83,7 +103,7 @@ export class Dc3Client {
 
     // 204 No Content (for delete operations)
     if (res.status === 204) {
-      return { ok: true } as unknown as T;
+      return undefined as T;
     }
 
     return (await res.json()) as T;
@@ -96,6 +116,14 @@ export class Dc3Client {
 
   async post<T = unknown>(path: string, body?: unknown): Promise<T> {
     return this.request<T>('POST', path, body);
+  }
+
+  async postForm<T = unknown>(
+    path: string,
+    body: FormData,
+    headers: Record<string, string> = {},
+  ): Promise<T> {
+    return this.request<T>('POST', path, body, true, headers);
   }
 
   async del<T = unknown>(path: string): Promise<T> {
@@ -131,8 +159,11 @@ export class Dc3Client {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: username, tenant }),
       });
-      const saltData = (await saltRes.json()) as { ok: boolean; data: string };
-      if (!saltData.ok) throw new Error(`Salt failed: ${(saltData as unknown as Record<string, string>).message}`);
+      if (!saltRes.ok) throw await this.buildError(saltRes);
+      const salt = (await saltRes.json()) as unknown;
+      if (typeof salt !== 'string' || salt.length === 0) {
+        throw new Error('Salt endpoint returned an invalid resource');
+      }
 
       // Step 2: Generate token
       const tokenRes = await fetch(`${gateway}/api/v3/auth/token/generate`, {
@@ -141,23 +172,19 @@ export class Dc3Client {
         body: JSON.stringify({
           name: username,
           tenant,
-          salt: saltData.data,
+          salt,
           password: md5(password),
         }),
       });
-      const tokenData = (await tokenRes.json()) as {
-        ok: boolean;
-        data: string;
-        message?: string;
-      };
-      if (!tokenData.ok) throw new Error(`Token generation failed: ${tokenData.message}`);
+      if (!tokenRes.ok) throw await this.buildError(tokenRes);
+      const token = parseTokenResource(await tokenRes.json());
 
       // Step 3: Parse and persist
-      const jwtPayload = decodeJwt(tokenData.data);
+      const jwtPayload = decodeJwt(token);
       await tokenManager.saveState(
         {
-          token: tokenData.data,
-          salt: saltData.data,
+          token,
+          salt,
           tenant,
           username,
           issuedAt: jwtPayload.iat,
@@ -245,9 +272,10 @@ export class Dc3Client {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: username, tenant }),
     });
-    const saltData = (await saltRes.json()) as { ok: boolean; data: string; message?: string };
-    if (!saltData.ok) {
-      throw new Error(`Salt failed: ${saltData.message ?? 'unknown error'}`);
+    if (!saltRes.ok) throw await this.buildError(saltRes);
+    const salt = (await saltRes.json()) as unknown;
+    if (typeof salt !== 'string' || salt.length === 0) {
+      throw new Error('Salt endpoint returned an invalid resource');
     }
 
     // Step 2: generate
@@ -257,30 +285,17 @@ export class Dc3Client {
       body: JSON.stringify({
         name: username,
         tenant,
-        salt: saltData.data,
+        salt,
         password: md5(password),
       }),
     });
-    const tokenData = (await tokenRes.json()) as {
-      ok: boolean;
-      data: string;
-      message?: string;
-    };
-    if (!tokenData.ok) {
-      throw new Error(
-        `Login failed: ${tokenData.message ?? 'invalid credentials'}`,
-      );
-    }
-
-    // Current backends deliver the ticket via the dc3-token cookie and an
-    // acknowledgement body (data:"ok"); June-era builds returned the JWT in data.
-    // Support both shapes so the CLI works against either.
-    const token = extractTicket(tokenRes, tokenData.data);
+    if (!tokenRes.ok) throw await this.buildError(tokenRes);
+    const token = parseTokenResource(await tokenRes.json());
     const jwtPayload = decodeJwt(token);
     await tokenManager.saveState(
       {
         token,
-        salt: saltData.data,
+        salt,
         tenant,
         username,
         issuedAt: jwtPayload.iat,
@@ -320,7 +335,7 @@ export class Dc3Client {
     const msg = (() => {
       try {
         const json = JSON.parse(body);
-        return json.message ?? body;
+        return json.detail ?? json.title ?? body;
       } catch {
         return body;
       }
@@ -359,21 +374,12 @@ export class ApiError extends Error {
 }
 
 
-/**
- * Pull the login ticket out of a generate response: prefer a dc3-token cookie
- * (current contract), fall back to a JWT-shaped body value (legacy contract).
- */
-export function extractTicket(res: Response, bodyData: unknown): string {
-  const asString = typeof bodyData === 'string' ? bodyData : '';
-  if (/^eyJ[\w-]*\.[\w-]*\.[\w-]*$/.test(asString)) {
-    return asString;
+/** Validate the direct token resource returned by the auth endpoint. */
+export function parseTokenResource(value: unknown): string {
+  if (typeof value !== 'string' || !/^eyJ[\w-]*\.[\w-]*\.[\w-]*$/u.test(value)) {
+    throw new Error('Token endpoint returned an invalid resource');
   }
-  const setCookie = res.headers.get('set-cookie') ?? '';
-  const match = setCookie.match(/dc3-token=([^;\s]+)/u);
-  if (match?.[1]) {
-    return decodeURIComponent(match[1]);
-  }
-  throw new Error('Login succeeded but no dc3-token was found in the response');
+  return value;
 }
 
 /** Singleton instance */

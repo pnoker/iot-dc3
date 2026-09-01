@@ -5,28 +5,18 @@
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.agentic.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.builder.SessionBuilder;
 import io.github.pnoker.common.agentic.entity.query.SessionQuery;
 import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 import io.github.pnoker.common.agentic.service.SessionService;
-import io.github.pnoker.common.agentic.utils.AgenticConversationIdUtil;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.exception.RequestException;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -35,43 +25,36 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
-/**
- * REST controller exposing session management endpoints.
- *
- * @author pnoker
- * @since 2016.10.1
- */
-@Tag(name = "session", description = "Agent conversation sessions: create, manage, and terminate AI agent conversation contexts including message history and tool invocation state")
+/** REST controller exposing tenant-scoped reactive session resources. */
+@Tag(name = "session", description = "Agent conversation sessions")
 @Slf4j
 @RestController
 @RequestMapping(AgenticConstant.SESSION_URL_PREFIX)
 @RequiredArgsConstructor
 public class SessionController implements BaseController {
 
-    private final SessionService sessionService;
+    private static final int DEFAULT_LIMIT = 50;
+    private static final int MAX_LIMIT = 200;
 
+    private final SessionService sessionService;
     private final SessionBuilder sessionBuilder;
 
-    /**
-     * Page through the current user's AI chat sessions for this tenant.
-     *
-     * @param query optional paging and filter criteria; tenant and user scope are forced to the caller
-     * @return a page of SessionVO summaries matching the query
-     */
     @PreAuthorize("@perm.can('session', 'list')")
-    @Operation(summary = "List Sessions", description = "Page through the current user's AI chat sessions for this tenant. " +
-            "Returns a page of session summaries; use to resume or browse past conversations.",
+    @Operation(summary = "List Sessions", description = "List the current user's sessions using zero-based offset pagination.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "LOW"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -79,27 +62,22 @@ public class SessionController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<SessionVO>>> list(@RequestBody(required = false) SessionQuery query) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            SessionQuery scopedQuery = Objects.isNull(query) ? new SessionQuery() : query;
-            scopedQuery.setTenantId(header.getTenantId());
-            scopedQuery.setUserId(header.getUserId());
-            Page<SessionBO> page = sessionService.listByPage(scopedQuery);
-            Page<SessionVO> voPage = sessionBuilder.buildVOPageByBOPage(page);
-            voPage.getRecords().forEach(session -> sanitizeSession(header, session));
-            return R.ok(voPage);
-        }));
+    public Mono<OffsetPage<SessionVO>> list(@RequestBody(required = false) SessionQuery query) {
+        SessionQuery request = query == null ? new SessionQuery() : query;
+        long offset = request.getOffset() == null ? 0L : request.getOffset();
+        int limit = request.getLimit() == null ? DEFAULT_LIMIT : request.getLimit();
+        if (offset < 0 || limit < 1 || limit > MAX_LIMIT) {
+            return Mono.error(new RequestException("offset must be non-negative and limit must be between 1 and 200"));
+        }
+        return getPrincipalHeader().flatMap(header -> sessionService
+                .list(offset, limit, request.getConversationId(), request.getSort(), header)
+                .map(page -> new OffsetPage<>(page.items().stream().map(sessionBuilder::buildVOByBO)
+                        .peek(this::sanitizeSession).toList(), page.offset(), page.limit(),
+                        page.total(), page.hasNext())));
     }
 
-    /**
-     * Fetch a single AI chat session by its conversation id.
-     *
-     * @param conversationId client-visible conversation id scoped to the current user and tenant
-     * @return the matched SessionVO; fails when no matching session exists
-     */
     @PreAuthorize("@perm.can('session', 'get')")
-    @Operation(summary = "Get Session", description = "Fetch a single AI chat session by its conversation id, scoped to the current user and tenant. " +
-            "Returns the session details, or a failure when no matching session exists.",
+    @Operation(summary = "Get Session", description = "Get one session scoped to the authenticated tenant and user.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "LOW"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -107,53 +85,36 @@ public class SessionController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_conversation_id")
-    public Mono<R<SessionVO>> get(@Parameter(description = "Unique conversation identifier scoped to the current user and tenant; use the value returned when the session was created.", example = "conv-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            SessionBO session = sessionService.getByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(),
-                    header.getUserId(), conversationId));
-            if (Objects.isNull(session)) {
-                return R.fail("Session not found");
-            }
-            SessionVO vo = sessionBuilder.buildVOByBO(session);
-            sanitizeSession(header, vo);
-            return R.ok(vo);
-        }));
+    public Mono<SessionVO> get(
+            @Parameter(description = "Client-visible conversation identifier")
+            @NotBlank @RequestParam("conversation_id") String conversationId) {
+        return getPrincipalHeader().flatMap(header -> sessionService
+                .get(conversationId, header)
+                .switchIfEmpty(Mono.error(new RequestException("Session not found")))
+                .map(sessionBuilder::buildVOByBO)
+                .doOnNext(this::sanitizeSession));
     }
 
-    /**
-     * Permanently delete an AI chat session and its message history by conversation id.
-     *
-     * @param conversationId client-visible conversation id scoped to the current user and tenant; identifies the session to delete along with its message history
-     * @return an empty R completing with no body on success (delete cannot be undone)
-     */
     @PreAuthorize("@perm.can('session', 'delete')")
-    @Operation(summary = "Delete Session", description = "Permanently delete an AI chat session and its message history by conversation id, scoped to the current user and tenant. " +
-            "Use to discard a conversation; this cannot be undone.",
+    @Operation(summary = "Delete Session", description = "Delete a session and all of its messages atomically.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "HIGH"),
                     @ExtensionProperty(name = "destructive", value = "true"),
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/delete")
-    public Mono<R<Boolean>> delete(@Parameter(description = "Unique conversation identifier scoped to the current user and tenant; identifies the session to permanently delete along with its message history.", example = "conv-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            sessionService.deleteByConversationId(AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
-                    conversationId));
-            return R.ok();
-        }));
+    @DeleteMapping("/delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> delete(
+            @Parameter(description = "Client-visible conversation identifier")
+            @NotBlank @RequestParam("conversation_id") String conversationId) {
+        return getPrincipalHeader().flatMap(header -> sessionService
+                .delete(conversationId, header)
+                .then());
     }
 
-    /**
-     * Update editable fields of an AI chat session identified by conversation id.
-     *
-     * @param conversationId client-visible conversation id scoped to the current user and tenant; identifies the session to update
-     * @param request        optional session payload carrying the editable fields (e.g. name) to apply
-     * @return the updated SessionVO; fails when the session does not exist
-     */
     @PreAuthorize("@perm.can('session', 'update')")
-    @Operation(summary = "Update Session", description = "Update editable fields of an AI chat session identified by conversation id, scoped to the current user and tenant. " +
-            "Use to rename or adjust a session; returns the updated session, or a failure when it does not exist.",
+    @Operation(summary = "Update Session", description = "Update editable session metadata and return the resource.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -161,25 +122,21 @@ public class SessionController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/update")
-    public Mono<R<SessionVO>> update(@Parameter(description = "Unique conversation identifier scoped to the current user and tenant; identifies the session whose editable fields (e.g. name) are to be updated.", example = "conv-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
-                                     @RequestBody(required = false) SessionVO request) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            SessionBO session = sessionService.update(AgenticConversationIdUtil.scope(header.getTenantId(),
-                    header.getUserId(), conversationId), request);
-            if (Objects.isNull(session)) {
-                return R.fail("Session not found");
-            }
-            SessionVO vo = sessionBuilder.buildVOByBO(session);
-            sanitizeSession(header, vo);
-            return R.ok(vo);
-        }));
+    public Mono<SessionVO> update(
+            @Parameter(description = "Client-visible conversation identifier")
+            @NotBlank @RequestParam("conversation_id") String conversationId,
+            @RequestBody(required = false) SessionVO request) {
+        return getPrincipalHeader().flatMap(header -> {
+            SessionVO payload = Objects.requireNonNullElseGet(request, SessionVO::new);
+            return sessionService.update(conversationId, payload.getSessionExt(), payload.getTitle(), header)
+                    .switchIfEmpty(Mono.error(new RequestException("Session not found")))
+                    .map(sessionBuilder::buildVOByBO)
+                    .doOnNext(this::sanitizeSession);
+        });
     }
 
-    private void sanitizeSession(RequestHeader.PrincipalHeader header, SessionVO session) {
-        session.setConversationId(AgenticConversationIdUtil.stripScope(header.getTenantId(), header.getUserId(),
-                session.getConversationId()));
+    private void sanitizeSession(SessionVO session) {
         session.setTenantId(null);
         session.setUserId(null);
     }
-
 }

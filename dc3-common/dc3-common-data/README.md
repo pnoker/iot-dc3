@@ -98,5 +98,5 @@ mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-data -am test
 
 - `dc3-center-data` — Bootstraps this module as a Spring Boot service
 - `dc3-api-manager` — gRPC API consumed by this module for driver/point resolution
-- `dc3-tsdb-core` / `dc3-tsdb-timescale` — store-neutral time-series port and TimescaleDB adapter
+- `dc3-tsdb-core` — store-neutral reactive Port implemented by this module's `R2dbcTsdbStore`
 - `dc3-mq-core` / `dc3-mq-rabbitmq` — broker-neutral messaging port and RabbitMQ adapter

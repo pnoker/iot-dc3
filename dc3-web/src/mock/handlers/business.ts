@@ -17,7 +17,7 @@
 
 import {on} from '../dispatch';
 import {paginate} from '../query';
-import {ok, responseOf} from '../response';
+import {fail, ok, responseOf} from '../response';
 import {newId, registerCrud, stamp} from '../crud';
 import {db} from '../db';
 
@@ -42,8 +42,50 @@ const configScope = (
 };
 
 export function registerBusinessHandlers(): void {
+  const registerVersionedCrud = (
+    baseUrl: string,
+    collection: 'commands' | 'commandParams' | 'events' | 'eventParams',
+    search: string[] = [],
+    exact: string[] = ['enableFlag'],
+  ) => {
+    const rows = () => db[collection];
+    const matchesFilter = (row: Record<string, unknown>, body: Record<string, unknown>) =>
+      search.every((field) => String(row[field] ?? '').toLowerCase().includes(String(body[field] ?? '').toLowerCase())) &&
+      exact.every((field) => {
+        const value = body[field];
+        return value === undefined || value === null || value === '' || value === 'ALL' || String(row[field]) === String(value);
+      });
+
+    on('post', `${baseUrl}/list`, (ctx) => responseOf(ctx.config, ok(paginate(rows(), ctx.body, matchesFilter))));
+    on('get', `${baseUrl}/get_by_id`, (ctx) =>
+      responseOf(ctx.config, ok(rows().find((row) => String(row.id) === String(ctx.params.id)) ?? {})),
+    );
+    on('post', `${baseUrl}/add`, (ctx) => {
+      const row = {...ctx.body, id: newId(), version: 0, createTime: stamp(), operateTime: stamp()};
+      rows().push(row);
+      return responseOf(ctx.config, ok(row), 201);
+    });
+    on('post', `${baseUrl}/update`, (ctx) => {
+      const index = rows().findIndex(
+        (row) => String(row.id) === String(ctx.body?.id) && Number(row.version) === Number(ctx.body?.version),
+      );
+      if (index < 0) return responseOf(ctx.config, fail('R4091', 'Version conflict', 409), 409);
+      const row = {...rows()[index], ...ctx.body, version: Number(rows()[index]?.version ?? 0) + 1, operateTime: stamp()};
+      rows()[index] = row;
+      return responseOf(ctx.config, ok(row));
+    });
+    on('delete', `${baseUrl}/delete`, (ctx) => {
+      const index = rows().findIndex(
+        (row) => String(row.id) === String(ctx.params.id) && Number(row.version) === Number(ctx.params.version),
+      );
+      if (index < 0) return responseOf(ctx.config, fail('R4091', 'Version conflict', 409), 409);
+      rows().splice(index, 1);
+      return responseOf(ctx.config, null, 204);
+    });
+  };
+
   // ── A1. command ──
-  registerCrud({baseUrl: 'api/v3/manager/command', collection: 'commands', search: ['commandName', 'commandCode']});
+  registerVersionedCrud('api/v3/manager/command', 'commands', ['commandName', 'commandCode']);
   on('get', 'api/v3/manager/command/list_by_profile_id', (ctx) =>
     responseOf(
       ctx.config,
@@ -52,7 +94,7 @@ export function registerBusinessHandlers(): void {
   );
 
   // ── A2. command_param ──
-  registerCrud({baseUrl: 'api/v3/manager/command_param', collection: 'commandParams', exact: ['commandId']});
+  registerVersionedCrud('api/v3/manager/command_param', 'commandParams', [], ['commandId']);
   on('get', 'api/v3/manager/command_param/list_by_command_id', (ctx) =>
     responseOf(
       ctx.config,
@@ -61,7 +103,7 @@ export function registerBusinessHandlers(): void {
   );
 
   // ── A3. event ──
-  registerCrud({baseUrl: 'api/v3/manager/event', collection: 'events', search: ['eventName', 'eventCode']});
+  registerVersionedCrud('api/v3/manager/event', 'events', ['eventName', 'eventCode']);
   on('get', 'api/v3/manager/event/list_by_profile_id', (ctx) =>
     responseOf(
       ctx.config,
@@ -70,7 +112,7 @@ export function registerBusinessHandlers(): void {
   );
 
   // ── A4. event_param ──
-  registerCrud({baseUrl: 'api/v3/manager/event_param', collection: 'eventParams', exact: ['eventId']});
+  registerVersionedCrud('api/v3/manager/event_param', 'eventParams', [], ['eventId']);
   on('get', 'api/v3/manager/event_param/list_by_event_id', (ctx) =>
     responseOf(
       ctx.config,
@@ -109,18 +151,38 @@ export function registerBusinessHandlers(): void {
   on('get', 'api/v3/manager/event_attribute_config/list_by_device_id_and_event_id', (ctx) =>
     responseOf(ctx.config, ok(configScope(db.attributeConfigs, ctx.params.device_id, 'event', ctx.params.event_id))),
   );
-  // driver_attribute_config is the only mutable config scope in the demo.
-  on('post', 'api/v3/manager/driver_attribute_config/add', (ctx) => {
-    const row: Record<string, unknown> = {...ctx.body, id: newId()};
-    db.attributeConfigs.push(row);
-    return responseOf(ctx.config, ok(String(row.id)));
-  });
-  on('post', 'api/v3/manager/driver_attribute_config/update', (ctx) => {
-    const coll = db.attributeConfigs;
-    const i = coll.findIndex((r) => String(r.id) === String(ctx.body?.id));
-    if (i >= 0) coll[i] = {...coll[i], ...ctx.body};
-    return responseOf(ctx.config, ok(String(ctx.body?.id ?? '')));
-  });
+  const registerAttributeConfigWrites = (baseUrl: string) => {
+    on('post', `${baseUrl}/add`, (ctx) => {
+      const row: Record<string, unknown> = {...ctx.body, id: newId(), version: 0};
+      db.attributeConfigs.push(row);
+      return responseOf(ctx.config, ok(row), 201);
+    });
+    on('patch', `${baseUrl}/update`, (ctx) => {
+      const index = db.attributeConfigs.findIndex(
+        (row) => String(row.id) === String(ctx.body?.id) && Number(row.version) === Number(ctx.body?.version),
+      );
+      if (index < 0) return responseOf(ctx.config, fail('R4091', 'Version conflict', 409), 409);
+      const row = {
+        ...db.attributeConfigs[index],
+        ...ctx.body,
+        version: Number(db.attributeConfigs[index]?.version ?? 0) + 1,
+      };
+      db.attributeConfigs[index] = row;
+      return responseOf(ctx.config, ok(row));
+    });
+    on('delete', `${baseUrl}/delete`, (ctx) => {
+      const index = db.attributeConfigs.findIndex(
+        (row) => String(row.id) === String(ctx.params.id) && Number(row.version) === Number(ctx.params.version),
+      );
+      if (index < 0) return responseOf(ctx.config, fail('R4091', 'Version conflict', 409), 409);
+      db.attributeConfigs.splice(index, 1);
+      return responseOf(ctx.config, null, 204);
+    });
+  };
+  registerAttributeConfigWrites('api/v3/manager/driver_attribute_config');
+  registerAttributeConfigWrites('api/v3/manager/point_attribute_config');
+  registerAttributeConfigWrites('api/v3/manager/command_attribute_config');
+  registerAttributeConfigWrites('api/v3/manager/event_attribute_config');
 
   // ── B. alarm sub-resources ──
   registerCrud({baseUrl: 'api/v3/data/rule', collection: 'alarmRules', search: ['ruleName', 'ruleCode']});
@@ -150,7 +212,7 @@ export function registerBusinessHandlers(): void {
     }));
     return responseOf(ctx.config, ok(paginate(rows, ctx.body)));
   });
-  on('post', 'api/v3/manager/event_history/list', (ctx) => {
+  on('post', 'api/v3/data/event_history/list', (ctx) => {
     const deviceId = db.devices[0]?.id ?? '1';
     const rows = db.events.slice(0, 3).map((e) => ({
       recordId: newId(),

@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.DriverExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.DriverTypeEnum;
@@ -28,7 +27,6 @@ import io.github.pnoker.common.manager.entity.vo.DriverVO;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -181,24 +179,6 @@ public interface DriverBuilder {
      */
     List<DriverVO> buildVOListByBOList(List<DriverBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    default Page<DriverBO> buildBOPageByDOPage(Page<DriverDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<DriverVO> buildVOPageByBOPage(Page<DriverBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
 }

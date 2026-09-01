@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.github.pnoker.common.enums.CommandHistorySourceEnum;
 
 import java.util.Map;
 
@@ -57,5 +58,9 @@ public class CommandCallBO {
      * Parameter values for this command invocation, keyed by parameter code
      */
     private Map<String, String> paramValues;
+
+    private CommandHistorySourceEnum source;
+
+    private Long sourceUserId;
 
 }

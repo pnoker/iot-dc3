@@ -18,10 +18,10 @@
 package io.github.pnoker.common.auth.controller;
 
 import io.github.pnoker.common.annotation.PublicEndpoint;
-import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
-import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthProtocolException;
+import io.github.pnoker.common.auth.biz.ReactiveOAuthMcpRuntimeService;
 import io.github.pnoker.common.auth.entity.builder.OAuthClientBuilder;
 import io.github.pnoker.common.auth.entity.vo.OAuthClientRegistrationRequestVO;
+import io.github.pnoker.common.auth.exception.OAuthProtocolException;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -59,7 +59,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OAuthController {
 
-    private final OAuthMcpRuntimeService oauthMcpRuntimeService;
+    private final ReactiveOAuthMcpRuntimeService oauthMcpRuntimeService;
     private final OAuthClientBuilder oauthClientBuilder;
 
     /**
@@ -78,7 +78,7 @@ public class OAuthController {
     @PublicEndpoint
     @GetMapping(McpConstant.WELL_KNOWN_AUTHORIZATION_SERVER)
     public Mono<Map<String, Object>> authorizationServerMetadata() {
-        return Mono.fromSupplier(oauthMcpRuntimeService::authorizationServerMetadata);
+        return oauthMcpRuntimeService.authorizationServerMetadata();
     }
 
     /**
@@ -97,7 +97,7 @@ public class OAuthController {
     @PublicEndpoint
     @GetMapping(McpConstant.OAUTH2_JWKS)
     public Mono<Map<String, Object>> jwks() {
-        return Mono.fromSupplier(oauthMcpRuntimeService::jwks);
+        return oauthMcpRuntimeService.jwks();
     }
 
     /**
@@ -121,16 +121,14 @@ public class OAuthController {
             @RequestBody OAuthClientRegistrationRequestVO request,
             @org.springframework.web.bind.annotation.RequestHeader(
                     value = RequestConstant.Header.X_AUTH_PRINCIPAL, required = false) String principalJson) {
-        return Mono.<ResponseEntity<?>>fromSupplier(() -> {
-                    if (oauthClientBuilder.isUnknownClientType(request)) {
-                        throw new OAuthProtocolException(HttpStatus.BAD_REQUEST.value(), "invalid_client_metadata",
-                                "unsupported client_type");
-                    }
-                    return ResponseEntity.status(HttpStatus.CREATED)
-                            .body(oauthMcpRuntimeService.registerClient(oauthClientBuilder.buildBOByRequestVO(request),
-                                    parsePrincipal(principalJson)));
-                })
-                .onErrorResume(OAuthProtocolException.class, this::oauthAnyError);
+        if (request == null || oauthClientBuilder.isUnknownClientType(request)) {
+            return oauthAnyError(new OAuthProtocolException(HttpStatus.BAD_REQUEST.value(), "invalid_client_metadata",
+                    "unsupported client_type"));
+        }
+        Mono<ResponseEntity<?>> response = oauthMcpRuntimeService
+                .registerClient(oauthClientBuilder.buildBOByRequestVO(request), parsePrincipal(principalJson))
+                .<ResponseEntity<?>>map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value));
+        return response.onErrorResume(OAuthProtocolException.class, this::oauthAnyError);
     }
 
     /**
@@ -151,13 +149,12 @@ public class OAuthController {
     @PublicEndpoint
     @GetMapping(McpConstant.OAUTH2_AUTHORIZE)
     public Mono<ResponseEntity<Map<String, Object>>> authorize(
-            @Parameter(description = "OAuth 2.1 authorization request parameters. Required fields: client_id, redirect_uri, response_type (must be 'code'), scope, and code_challenge / code_challenge_method (PKCE). Optional: state (recommended for CSRF protection).", example = "client_id=my-client&response_type=code&redirect_uri=https%3A%2F%2Fapp.example.com%2Fcallback&scope=openid&state=xyz&code_challenge=abc123&code_challenge_method=S256") @RequestParam MultiValueMap<String, String> params,
+            @Parameter(description = "OAuth 2.1 authorization request parameters. Required fields: client_id, redirect_uri, response_type (must be 'code'), scope, and code_challenge / code_challenge_method (PKCE). Optional: state (recommended for CSRF protection) and consent (approve or deny when the client requires user consent).", example = "client_id=my-client&response_type=code&redirect_uri=https%3A%2F%2Fapp.example.com%2Fcallback&scope=openid&state=xyz&code_challenge=abc123&code_challenge_method=S256&consent=approve") @RequestParam MultiValueMap<String, String> params,
             @org.springframework.web.bind.annotation.RequestHeader(
                     value = RequestConstant.Header.X_AUTH_PRINCIPAL, required = false) String principalJson) {
-        return Mono.fromSupplier(() -> {
-            URI location = oauthMcpRuntimeService.authorize(firstValues(params), parsePrincipal(principalJson));
-            return ResponseEntity.status(HttpStatus.FOUND).location(location).<Map<String, Object>>build();
-        }).onErrorResume(OAuthProtocolException.class, this::oauthError);
+        return oauthMcpRuntimeService.authorize(firstValues(params), parsePrincipal(principalJson))
+                .map(location -> ResponseEntity.status(HttpStatus.FOUND).location(location).<Map<String, Object>>build())
+                .onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
 
     /**
@@ -182,7 +179,7 @@ public class OAuthController {
                     value = HttpHeaders.AUTHORIZATION, required = false) String authorizationHeader) {
         return exchange.getFormData()
                 .map(this::firstValues)
-                .map(form -> ResponseEntity.ok(oauthMcpRuntimeService.token(form, authorizationHeader)))
+                .flatMap(form -> oauthMcpRuntimeService.token(form, authorizationHeader).map(ResponseEntity::ok))
                 .onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
 
@@ -208,7 +205,7 @@ public class OAuthController {
                     value = HttpHeaders.AUTHORIZATION, required = false) String authorizationHeader) {
         return exchange.getFormData()
                 .map(this::firstValues)
-                .map(form -> ResponseEntity.ok(oauthMcpRuntimeService.revoke(form, authorizationHeader)))
+                .flatMap(form -> oauthMcpRuntimeService.revoke(form, authorizationHeader).map(ResponseEntity::ok))
                 .onErrorResume(OAuthProtocolException.class, this::oauthError);
     }
 

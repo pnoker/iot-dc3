@@ -17,7 +17,9 @@
 
 package io.github.pnoker.common.facade.local;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import reactor.core.publisher.Mono;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
@@ -63,29 +65,27 @@ class PointValueLocalFacadeTest {
 
     @Test
     void lastValueReturnsNullWhenLatestPageMissing() {
-        when(pointValueService.latest(any(PointValueQuery.class))).thenReturn(null);
-        assertThat(facade.lastValue(1L, 2L, 3L)).isNull();
+        when(pointValueService.latest(any(PointValueQuery.class))).thenReturn(Mono.empty());
+        assertThat(facade.lastValue(1L, 2L, 3L).block()).isNull();
         verify(facadePointValueBuilder, never()).toFacadeBO(any());
     }
 
     @Test
     void lastValueReturnsNullWhenLatestPageEmpty() {
-        Page<PointValueBO> page = new Page<>(1, 1);
-        page.setRecords(List.of());
-        when(pointValueService.latest(any(PointValueQuery.class))).thenReturn(page);
-        assertThat(facade.lastValue(1L, 2L, 3L)).isNull();
+        OffsetPage<PointValueBO> page = OffsetPage.of(List.of(), 0, 1, 0);
+        when(pointValueService.latest(any(PointValueQuery.class))).thenReturn(Mono.just(page));
+        assertThat(facade.lastValue(1L, 2L, 3L).block()).isNull();
     }
 
     @Test
     void lastValueMapsFirstRecordThroughBuilderAndPassesQueryFields() {
         PointValueBO bo = new PointValueBO();
         FacadePointValueBO mapped = new FacadePointValueBO();
-        Page<PointValueBO> page = new Page<>(1, 1);
-        page.setRecords(List.of(bo));
-        when(pointValueService.latest(any(PointValueQuery.class))).thenReturn(page);
+        OffsetPage<PointValueBO> page = OffsetPage.of(List.of(bo), 0, 1, 1);
+        when(pointValueService.latest(any(PointValueQuery.class))).thenReturn(Mono.just(page));
         when(facadePointValueBuilder.toFacadeBO(bo)).thenReturn(mapped);
 
-        assertThat(facade.lastValue(1L, 2L, 3L)).isSameAs(mapped);
+        assertThat(facade.lastValue(1L, 2L, 3L).block()).isSameAs(mapped);
 
         ArgumentCaptor<PointValueQuery> captor = ArgumentCaptor.forClass(PointValueQuery.class);
         verify(pointValueService).latest(captor.capture());
@@ -97,20 +97,20 @@ class PointValueLocalFacadeTest {
 
     @Test
     void historyReturnsEmptyForNullOrEmptyServiceResult() {
-        when(pointValueService.history(1L, 2L, 3L, 10)).thenReturn(null);
-        assertThat(facade.history(1L, 2L, 3L, 10)).isEmpty();
-        when(pointValueService.history(1L, 2L, 3L, 10)).thenReturn(List.of());
-        assertThat(facade.history(1L, 2L, 3L, 10)).isEmpty();
+        when(pointValueService.history(1L, 2L, 3L, null, 10)).thenReturn(Mono.empty());
+        assertThat(facade.history(1L, 2L, 3L, null, 10).block()).isNull();
+        when(pointValueService.history(1L, 2L, 3L, null, 10)).thenReturn(Mono.just(CursorPage.of(List.of(), null)));
+        assertThat(facade.history(1L, 2L, 3L, null, 10).block().items()).isEmpty();
     }
 
     @Test
     void historyForwardsServiceResultUnchanged() {
-        when(pointValueService.history(1L, 2L, 3L, 10)).thenReturn(List.of(
+        when(pointValueService.history(1L, 2L, 3L, null, 10)).thenReturn(Mono.just(CursorPage.of(List.of(
                 PointValueBO.builder().calValue("23.5").build(),
-                PointValueBO.builder().calValue("24.0").build()));
+                PointValueBO.builder().calValue("24.0").build()), null)));
         when(facadePointValueBuilder.toFacadeBO(any(PointValueBO.class))).thenAnswer(inv ->
                 FacadePointValueBO.builder().value(inv.<PointValueBO>getArgument(0).getCalValue()).build());
-        assertThat(facade.history(1L, 2L, 3L, 10))
+        assertThat(facade.history(1L, 2L, 3L, null, 10).block().items())
                 .map(FacadePointValueBO::getValue).containsExactly("23.5", "24.0");
     }
 

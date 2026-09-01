@@ -2,9 +2,9 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,11 +17,11 @@
 
 package io.github.pnoker.common.auth.controller;
 
-import io.github.pnoker.common.auth.biz.TokenService;
+import io.github.pnoker.common.auth.biz.ReactiveTokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.auth.entity.query.TokenQuery;
 import io.github.pnoker.common.constant.common.RequestConstant;
-import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.exception.UnAuthorizedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,24 +31,18 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.mock.http.server.reactive.MockServerHttpResponse;
 import reactor.test.StepVerifier;
+import reactor.core.publisher.Mono;
 
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-/**
- * Lightweight controller unit test that drives the reactive {@code Mono<R<...>>} via
- * StepVerifier without spinning up a Spring web context. This pins the controller's
- * envelope shaping (R.ok / R.fail / R.ok with composed message) and is much cheaper
- * to maintain than a full {@code @WebFluxTest} slice — slice variants land alongside
- * Testcontainers integration tests in a later stage.
- */
 @ExtendWith(MockitoExtension.class)
 class TokenControllerTest {
 
     @Mock
-    private TokenService tokenService;
+    private ReactiveTokenService tokenService;
 
     private TokenController controller;
 
@@ -58,6 +52,7 @@ class TokenControllerTest {
         query.setName("alice");
         query.setSalt("0123456789abcdef0123456789abcdef");
         query.setPassword("hash");
+        query.setNewPassword("new-hash");
         query.setToken("token");
         return query;
     }
@@ -68,42 +63,30 @@ class TokenControllerTest {
     }
 
     @Test
-    void generateSaltReturnsOkEnvelopeWithSaltMessage() {
-        when(tokenService.generateSalt("alice", "tenant-A")).thenReturn("salt-value");
+    void generateSaltReturnsDirectResource() {
+        when(tokenService.generateSalt("alice", "tenant-A")).thenReturn(Mono.just("salt-value"));
 
         StepVerifier.create(controller.generateSalt(query()))
-                .assertNext(response -> {
-                    assertThat(response.isOk()).isTrue();
-                    assertThat(response.getData()).isEqualTo("salt-value");
-                    assertThat(response.getMessage()).contains("5 minutes");
-                })
+                .expectNext("salt-value")
                 .verifyComplete();
     }
 
     @Test
-    void generateSaltReturnsFailEnvelopeWhenServiceReturnsNull() {
-        when(tokenService.generateSalt("alice", "tenant-A")).thenReturn(null);
+    void generateSaltSignalsUnauthorizedWhenServiceReturnsNull() {
+        when(tokenService.generateSalt("alice", "tenant-A")).thenReturn(Mono.error(new UnAuthorizedException("invalid")));
 
         StepVerifier.create(controller.generateSalt(query()))
-                .assertNext(response -> assertThat(response.isOk()).isFalse())
-                .verifyComplete();
+                .expectError(UnAuthorizedException.class)
+                .verify();
     }
 
     @Test
-    void generateTokenSucceedsWithExpiryMessage() {
-        when(tokenService.generateToken("alice",
-                "hash", "tenant-A"))
-                .thenReturn("jwt-token");
+    void generateTokenReturnsDirectResourceAndSetsCookie() {
+        when(tokenService.generateToken("alice", "hash", "tenant-A")).thenReturn(Mono.just("jwt-token"));
         ServerHttpResponse httpResponse = new MockServerHttpResponse();
 
         StepVerifier.create(controller.generateToken(query(), httpResponse))
-                .assertNext(response -> {
-                    assertThat(response.isOk()).isTrue();
-                    // Token travels in an httpOnly cookie; body data is just "ok" so it
-                    // never reaches frontend storage.
-                    assertThat(response.getData()).isEqualTo("ok");
-                    assertThat(response.getMessage()).contains("12 hours");
-                })
+                .expectNext("jwt-token")
                 .verifyComplete();
 
         ResponseCookie cookie = httpResponse.getCookies().getFirst(RequestConstant.Header.TOKEN_COOKIE);
@@ -115,65 +98,67 @@ class TokenControllerTest {
     }
 
     @Test
-    void generateTokenReturnsFailWhenServiceReturnsNull() {
-        when(tokenService.generateToken("alice",
-                "hash", "tenant-A"))
-                .thenReturn(null);
+    void generateTokenSignalsUnauthorizedWhenServiceReturnsNull() {
+        when(tokenService.generateToken("alice", "hash", "tenant-A")).thenReturn(Mono.error(new UnAuthorizedException("invalid")));
         ServerHttpResponse httpResponse = new MockServerHttpResponse();
 
         StepVerifier.create(controller.generateToken(query(), httpResponse))
-                .assertNext(response -> assertThat(response.isOk()).isFalse())
-                .verifyComplete();
+                .expectError(UnAuthorizedException.class)
+                .verify();
 
-        // No token means no Set-Cookie: the body alone signals failure.
         assertThat(httpResponse.getCookies().getFirst(RequestConstant.Header.TOKEN_COOKIE)).isNull();
     }
 
     @Test
-    void checkValidReturnsTrueWithRemainingExpiryMessage() {
+    void changePasswordReturnsTrue() {
+        when(tokenService.changePassword("alice", "hash", "new-hash", "tenant-A")).thenReturn(Mono.empty());
+
+        StepVerifier.create(controller.changePassword(query()))
+                .expectNext(Boolean.TRUE)
+                .verifyComplete();
+    }
+
+    @Test
+    void cancelTokenCompletesAndClearsCookie() {
+        when(tokenService.tryCancelToken("alice", "tenant-A")).thenReturn(Mono.just(true));
+        ServerHttpResponse httpResponse = new MockServerHttpResponse();
+
+        StepVerifier.create(controller.cancelToken(query(), httpResponse))
+                .verifyComplete();
+
+        ResponseCookie cookie = httpResponse.getCookies().getFirst(RequestConstant.Header.TOKEN_COOKIE);
+        assertThat(cookie).isNotNull();
+        assertThat(cookie.getValue()).isEmpty();
+        assertThat(cookie.getMaxAge().isZero()).isTrue();
+    }
+
+    @Test
+    void cancelTokenSignalsUnauthorizedWhenServiceRejects() {
+        when(tokenService.tryCancelToken("alice", "tenant-A")).thenReturn(Mono.just(false));
+        ServerHttpResponse httpResponse = new MockServerHttpResponse();
+
+        StepVerifier.create(controller.cancelToken(query(), httpResponse))
+                .expectError(UnAuthorizedException.class)
+                .verify();
+    }
+
+    @Test
+    void checkValidReturnsDirectResource() {
         TokenValid valid = new TokenValid(true, new Date(1_700_000_000_000L));
-        when(tokenService.checkValid("alice",
-                "token", "tenant-A"))
-                .thenReturn(valid);
+        when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(Mono.just(valid));
 
         StepVerifier.create(controller.checkValid(query()))
-                .assertNext(response -> {
-                    assertThat(response.isOk()).isTrue();
-                    assertThat(response.getData()).isTrue();
-                    assertThat(response.getMessage()).startsWith("The token will expire in");
-                })
+                .expectNext(valid)
                 .verifyComplete();
     }
 
     @Test
-    void checkValidReturnsFalseWithExpiredMessageWhenExpiryKnown() {
-        TokenValid invalidWithExpiry = new TokenValid(false, new Date(1_700_000_000_000L));
-        when(tokenService.checkValid("alice",
-                "token", "tenant-A"))
-                .thenReturn(invalidWithExpiry);
+    void checkValidPreservesInvalidResultWithoutEnvelope() {
+        TokenValid invalid = new TokenValid(false, null);
+        when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(Mono.just(invalid));
 
         StepVerifier.create(controller.checkValid(query()))
-                .assertNext(response -> {
-                    assertThat(response.isOk()).isTrue();
-                    assertThat(response.getData()).isFalse();
-                    assertThat(response.getMessage()).startsWith("The token has expired in");
-                })
-                .verifyComplete();
-    }
-
-    @Test
-    void checkValidReturnsFalseWithGenericMessageWhenExpiryUnknown() {
-        TokenValid invalidNoExpiry = new TokenValid(false, null);
-        when(tokenService.checkValid("alice",
-                "token", "tenant-A"))
-                .thenReturn(invalidNoExpiry);
-
-        StepVerifier.<R<Boolean>>create(controller.checkValid(query()))
-                .assertNext(response -> {
-                    assertThat(response.isOk()).isTrue();
-                    assertThat(response.getData()).isFalse();
-                    assertThat(response.getMessage()).isEqualTo("The token has expired");
-                })
+                .expectNext(invalid)
                 .verifyComplete();
     }
 }

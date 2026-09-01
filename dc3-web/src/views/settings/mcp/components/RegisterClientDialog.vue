@@ -117,8 +117,8 @@ const splitText = (value: string) =>
     .filter(Boolean);
 
 const loadServiceAccounts = async () => {
-  const res = await listServiceAccount({page: {current: 1, size: 1000}});
-  serviceAccounts.value = (res.data?.records || []).filter((sa) => isEnabledFlag(sa.enableFlag));
+  const res = await listServiceAccount({offset: 0, limit: 1000});
+  serviceAccounts.value = (res?.items || []).filter((sa) => isEnabledFlag(sa.enableFlag));
 };
 
 const open = () => {
@@ -142,9 +142,9 @@ const submit = async () => {
       ...form.value,
       grant_types: grantTypes.value,
       redirect_uris: splitText(redirectUrisText.value),
-      scope: scopes.value,
+      scope: scopes.value.join(' '),
     });
-    registeredSecret.value = String(res.data?.client_secret || '');
+    registeredSecret.value = String(res?.client_secret || '');
     successMessage(t('settings.mcp.saved'));
     emit('saved');
     // Keep the dialog open when a confidential client returns a one-time secret

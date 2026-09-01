@@ -19,9 +19,10 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
-import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -44,9 +45,9 @@ public class FeishuBotNotifyChannelAdapter extends WebhookNotifyChannelAdapter {
 
     private static final String HMAC_SHA256 = "HmacSHA256";
 
-    public FeishuBotNotifyChannelAdapter(OkHttpClient okHttpClient,
+    public FeishuBotNotifyChannelAdapter(WebClient.Builder webClientBuilder,
                                          NotifyCredentialResolver notifyCredentialResolver) {
-        super(okHttpClient, notifyCredentialResolver);
+        super(webClientBuilder, notifyCredentialResolver);
     }
 
     @Override
@@ -55,10 +56,10 @@ public class FeishuBotNotifyChannelAdapter extends WebhookNotifyChannelAdapter {
     }
 
     @Override
-    public NotifySendResult send(NotifyChannelBO channel, MessagePayload payload) {
+    public Mono<NotifySendResult> send(NotifyChannelBO channel, MessagePayload payload) {
         Optional<NotifyCredential> credentialOptional = notifyCredentialResolver.resolve(channel.getCredentialRef());
         if (credentialOptional.isEmpty() || StringUtils.isBlank(credentialOptional.get().getWebhookUrl())) {
-            return NotifySendResult.failed(channel.getCredentialRef(), "Notify credential is not configured");
+            return Mono.just(NotifySendResult.failed(channel.getCredentialRef(), "Notify credential is not configured"));
         }
 
         NotifyCredential credential = credentialOptional.get();
@@ -66,10 +67,10 @@ public class FeishuBotNotifyChannelAdapter extends WebhookNotifyChannelAdapter {
         try {
             body = buildFeishuBody(channel, credential, payload);
         } catch (IllegalStateException e) {
-            return NotifySendResult.failed(channel.getCredentialRef(), e.getMessage());
+            return Mono.just(NotifySendResult.failed(channel.getCredentialRef(), e.getMessage()));
         }
         if (body.containsKey("error")) {
-            return NotifySendResult.failed(channel.getCredentialRef(), Objects.toString(body.get("error")));
+            return Mono.just(NotifySendResult.failed(channel.getCredentialRef(), Objects.toString(body.get("error"))));
         }
         return postJson(channel.getCredentialRef(), credential, body);
     }

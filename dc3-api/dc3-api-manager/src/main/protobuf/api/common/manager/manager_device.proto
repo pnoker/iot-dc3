@@ -20,10 +20,8 @@ syntax = "proto3";
 package api.common.manager;
 
 import "api/common/page.proto";
-import "api/common/r.proto";
 import "api/common/entity.proto";
 import "api/common/manager/manager_query.proto";
-import "api/common/manager/manager_query_page.proto";
 
 // Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.manager";
@@ -33,59 +31,47 @@ option java_multiple_files = true;
 
 // Service interface defining RPC calls related to device management
 service DeviceApi {
-  // Paginated query for device information
-  rpc ListByPage (GrpcPageDeviceQuery) returns (GrpcRPageDeviceDTO);
+  // Canonical offset-based query. Page-number RPCs are retired for new clients.
+  rpc List (GrpcOffsetDeviceQuery) returns (GrpcOffsetPageDeviceDTO);
   // Query device list by Profile ID
-  rpc ListByProfileId (GrpcProfileQuery) returns (GrpcRDeviceListDTO);
+  rpc ListByProfileId (GrpcProfileQuery) returns (GrpcDeviceListDTO);
   // Query device list by Driver ID
-  rpc ListByDriverId (GrpcDriverQuery) returns (GrpcRDeviceListDTO);
+  rpc ListByDriverId (GrpcDriverQuery) returns (GrpcDeviceListDTO);
   // Query single device information by Device ID
-  rpc GetByDeviceId (GrpcDeviceQuery) returns (GrpcRDeviceDTO);
+  rpc GetByDeviceId (GrpcDeviceQuery) returns (GrpcDeviceDTO);
   // Batch query device information by Device IDs
-  rpc ListByDeviceIds (GrpcDeviceIdsQuery) returns (GrpcRDeviceListDTO);
+  rpc ListByDeviceIds (GrpcDeviceIdsQuery) returns (GrpcDeviceListDTO);
   // Resolve the active runtime owner used for fenced command routing.
-  rpc GetActiveOwner (GrpcDeviceQuery) returns (GrpcRDeviceOwnerDTO);
+  rpc GetActiveOwner (GrpcDeviceQuery) returns (GrpcDeviceOwnerDTO);
 }
 
-// Response wrapper for paginated device query
-message GrpcRPageDeviceDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
-  // Returned paginated device data
-  GrpcPageDeviceDTO data = 2;
+message GrpcOffsetDeviceQuery {
+  PageRequest page = 1;
+  int64 tenant_id = 2;
+  string device_name = 3;
+  string device_code = 4;
+  optional int64 driver_id = 5;
+  optional int64 profile_id = 6;
+  optional int32 enable_flag = 7;
+  optional int32 version = 8;
+  optional int64 group_id = 9;
+  optional int64 label_id = 10;
 }
 
-// Device page data structure
-message GrpcPageDeviceDTO {
-  // Pagination information including page number, page size, and total count
-  GrpcPage page = 1;
-
-  // List of device data
-  repeated GrpcDeviceDTO data = 2;
+message GrpcOffsetPageDeviceDTO {
+  OffsetPage page = 1;
+  repeated GrpcDeviceDTO items = 2;
 }
+
 
 // Response wrapper for device list query
-message GrpcRDeviceListDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
-  // Returned device list data
-  repeated GrpcDeviceDTO data = 2;
+message GrpcDeviceListDTO {
+  repeated GrpcDeviceDTO items = 1;
 }
 
 // Response wrapper for single device query
-message GrpcRDeviceDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
-  // Returned single device data
-  GrpcDeviceDTO data = 2;
-}
-
-message GrpcRDeviceOwnerDTO {
-  GrpcR result = 1;
-  int64 driver_id = 2;
-  string owner_node = 3;
-  int64 fencing_token = 4;
+message GrpcDeviceOwnerDTO {
+  int64 driver_id = 1;
+  string owner_node = 2;
+  int64 fencing_token = 3;
 }

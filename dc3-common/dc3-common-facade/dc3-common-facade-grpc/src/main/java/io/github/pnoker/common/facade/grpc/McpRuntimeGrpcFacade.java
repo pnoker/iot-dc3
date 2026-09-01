@@ -1,264 +1,73 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.auth.*;
-import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.constant.service.McpConstant;
-import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
-import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
-import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
-import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
-import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
-import io.github.pnoker.common.entity.dto.McpToolListResponseDTO;
-import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.entity.dto.*;
 import io.github.pnoker.common.facade.api.McpRuntimeFacade;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.util.HashSet;
-
-/**
- * gRPC {@link McpRuntimeFacade}.
- *
- * @author pnoker
- * @since 2026.6.12
- */
-@Slf4j
+/** Reactive gRPC MCP runtime facade. */
 @Component
 @RequiredArgsConstructor
 public class McpRuntimeGrpcFacade implements McpRuntimeFacade {
-
-    private final McpRuntimeApiGrpc.McpRuntimeApiBlockingStub mcpRuntimeApiBlockingStub;
-
-    private final GrpcFacadeSupport grpcFacadeSupport;
+    private final McpRuntimeApiGrpc.McpRuntimeApiStub stub;
 
     @Override
-    public McpIntrospectResponseDTO introspect(String token) {
-        GrpcMcpIntrospectRequest request = GrpcMcpIntrospectRequest.newBuilder()
-                .setToken(StringUtils.defaultString(token))
-                .build();
-        GrpcRMcpIntrospectDTO response = grpcFacadeSupport.call("McpRuntimeFacade.introspect",
-                mcpRuntimeApiBlockingStub, stub -> stub.introspect(request));
-        requireOk("McpRuntimeFacade.introspect", response.getResult());
-        return response.hasData() ? toDTO(response.getData()) : McpIntrospectResponseDTO.inactive();
+    public Mono<McpToolListResponseDTO> listTools(String token) {
+        return ReactiveGrpcClientSupport.<GrpcMcpListToolsRequest, GrpcMcpToolListDTO>unary(
+                "McpRuntimeFacade.listTools", observer -> stub.listTools(
+                        GrpcMcpListToolsRequest.newBuilder().setToken(StringUtils.defaultString(token)).build(), observer))
+                .map(response -> McpToolListResponseDTO.builder().tools(response.getToolsList().stream().map(this::toTool).toList()).build());
     }
 
     @Override
-    public McpToolListResponseDTO listTools(Long tenantId, Long principalId, Long mcpConnectionId, String scope) {
-        GrpcMcpToolListRequest request = GrpcMcpToolListRequest.newBuilder()
-                .setTenantId(value(tenantId))
-                .setPrincipalId(value(principalId))
-                .setMcpConnectionId(value(mcpConnectionId))
-                .setScope(StringUtils.defaultString(scope))
-                .build();
-        GrpcRMcpToolListDTO response = grpcFacadeSupport.call("McpRuntimeFacade.listTools",
-                mcpRuntimeApiBlockingStub, stub -> stub.listTools(request));
-        requireOk("McpRuntimeFacade.listTools", response.getResult());
-        return McpToolListResponseDTO.builder()
-                .tools(response.getToolsList().stream().map(this::toDTO).toList())
-                .build();
+    public Mono<McpCallToolResponseDTO> callTool(McpCallToolRequestDTO request) {
+        McpCallToolRequestDTO value = request == null ? new McpCallToolRequestDTO() : request;
+        GrpcMcpCallToolRequest grpc = GrpcMcpCallToolRequest.newBuilder()
+                .setToken(StringUtils.defaultString(value.getToken()))
+                .setToolName(StringUtils.defaultString(value.getToolName()))
+                .setArgumentDigest(StringUtils.defaultString(value.getArgumentDigest()))
+                .setConfirmId(StringUtils.defaultString(value.getConfirmId()))
+                .setIdempotencyKey(StringUtils.defaultString(value.getIdempotencyKey()))
+                .setClientName(StringUtils.defaultString(value.getClientName()))
+                .setClientVersion(StringUtils.defaultString(value.getClientVersion()))
+                .setRemoteIp(StringUtils.defaultString(value.getRemoteIp())).build();
+        return ReactiveGrpcClientSupport.<GrpcMcpCallToolRequest, GrpcMcpCallToolDTO>unary(
+                "McpRuntimeFacade.callTool", observer -> stub.callTool(grpc, observer))
+                .map(this::toCall);
     }
 
     @Override
-    public McpToolResolveResponseDTO resolveTool(Long tenantId, Long principalId, Long mcpConnectionId, String scope,
-                                                 String toolName) {
-        GrpcMcpToolResolveRequest request = GrpcMcpToolResolveRequest.newBuilder()
-                .setTenantId(value(tenantId))
-                .setPrincipalId(value(principalId))
-                .setMcpConnectionId(value(mcpConnectionId))
-                .setScope(StringUtils.defaultString(scope))
-                .setToolName(StringUtils.defaultString(toolName))
-                .build();
-        GrpcRMcpToolResolveDTO response = grpcFacadeSupport.call("McpRuntimeFacade.resolveTool",
-                mcpRuntimeApiBlockingStub, stub -> stub.resolveTool(request));
-        requireOk("McpRuntimeFacade.resolveTool", response.getResult());
-        return response.hasData() ? toDTO(response.getData()) : new McpToolResolveResponseDTO();
+    public Mono<Void> audit(McpAuditCommandDTO command) {
+        McpAuditCommandDTO value = command == null ? new McpAuditCommandDTO() : command;
+        GrpcMcpAuditCommand grpc = GrpcMcpAuditCommand.newBuilder()
+                .setTraceId(StringUtils.defaultString(value.getTraceId())).setTenantId(value(value.getTenantId()))
+                .setPrincipalId(value(value.getPrincipalId())).setClientId(StringUtils.defaultString(value.getClientId()))
+                .setConnectionId(value(value.getConnectionId())).setToolId(StringUtils.defaultString(value.getToolId()))
+                .setToolName(StringUtils.defaultString(value.getToolName())).setPermissionCode(StringUtils.defaultString(value.getPermissionCode()))
+                .setRiskLevel(risk(value.getRiskLevel())).setConfirmId(StringUtils.defaultString(value.getConfirmId()))
+                .setIdempotencyKey(StringUtils.defaultString(value.getIdempotencyKey())).setArgumentDigest(StringUtils.defaultString(value.getArgumentDigest()))
+                .setStatus(status(value.getStatus())).setErrorCode(StringUtils.defaultString(value.getErrorCode()))
+                .setDurationMs(value(value.getDurationMs())).setClientName(StringUtils.defaultString(value.getClientName()))
+                .setClientVersion(StringUtils.defaultString(value.getClientVersion())).setRemoteIp(StringUtils.defaultString(value.getRemoteIp())).build();
+        return ReactiveGrpcClientSupport.<GrpcMcpAuditCommand, GrpcMcpBoolean>unary(
+                "McpRuntimeFacade.audit", observer -> stub.audit(grpc, observer)).then();
     }
-
-    @Override
-    public McpToolAuthorizeResponseDTO authorizeToolCall(McpToolAuthorizeRequestDTO request) {
-        request = request == null ? new McpToolAuthorizeRequestDTO() : request;
-        GrpcMcpToolAuthorizeRequest grpcRequest = GrpcMcpToolAuthorizeRequest.newBuilder()
-                .setTenantId(parseLong(request.getTenantId()))
-                .setPrincipalId(parseLong(request.getPrincipalId()))
-                .setMcpConnectionId(parseLong(request.getMcpConnectionId()))
-                .setScope(StringUtils.defaultString(request.getScope()))
-                .setToolName(StringUtils.defaultString(request.getToolName()))
-                .setArgumentDigest(StringUtils.defaultString(request.getArgumentDigest()))
-                .setConfirmId(StringUtils.defaultString(request.getConfirmId()))
-                .setIdempotencyKey(StringUtils.defaultString(request.getIdempotencyKey()))
-                .build();
-        GrpcRMcpToolAuthorizeDTO response = grpcFacadeSupport.call("McpRuntimeFacade.authorizeToolCall",
-                mcpRuntimeApiBlockingStub, stub -> stub.authorizeToolCall(grpcRequest));
-        requireOk("McpRuntimeFacade.authorizeToolCall", response.getResult());
-        return response.hasData() ? toDTO(response.getData()) : new McpToolAuthorizeResponseDTO();
+    private McpToolDefinitionDTO toTool(GrpcMcpToolDefinitionDTO source) {
+        return McpToolDefinitionDTO.builder().name(source.getName()).title(source.getTitle()).description(source.getDescription())
+                .inputSchema(source.getInputSchema().isBlank() ? java.util.Map.of() : io.github.pnoker.common.utils.JsonUtil.parseObject(source.getInputSchema(), java.util.Map.class))
+                .annotations(McpToolDefinitionDTO.Annotations.builder().readOnlyHint(source.getAnnotations().getReadOnlyHint()).destructiveHint(source.getAnnotations().getDestructiveHint()).idempotentHint(source.getAnnotations().getIdempotentHint()).openWorldHint(source.getAnnotations().getOpenWorldHint()).build())
+                .meta(McpToolDefinitionDTO.Metadata.builder().toolId(source.getMeta().getToolId()).permissionCode(source.getMeta().getPermissionCode()).riskLevel(source.getMeta().getRiskLevel().name()).build()).build();
     }
-
-    @Override
-    public void audit(McpAuditCommandDTO command) {
-        GrpcRMcpBoolean response = grpcFacadeSupport.call("McpRuntimeFacade.audit", mcpRuntimeApiBlockingStub,
-                stub -> stub.audit(toGrpc(command)));
-        requireOk("McpRuntimeFacade.audit", response.getResult());
+    private McpCallToolResponseDTO toCall(GrpcMcpCallToolDTO source) {
+        GrpcMcpPrincipalContext principal = source.getPrincipal();
+        return McpCallToolResponseDTO.builder().decision(source.getDecision().name()).confirmId(source.getConfirmId()).message(source.getMessage()).riskLevel(source.getRiskLevel().name())
+                .tool(McpToolResolveResponseDTO.builder().toolId(source.getTool().getToolId()).toolName(source.getTool().getToolName()).permissionCode(source.getTool().getPermissionCode()).riskLevel(source.getTool().getRiskLevel().name()).serviceName(source.getTool().getServiceName()).apiPath(source.getTool().getApiPath()).httpMethod(source.getTool().getHttpMethod()).inputSchema(source.getTool().getInputSchema().isBlank() ? java.util.Map.of() : io.github.pnoker.common.utils.JsonUtil.parseObject(source.getTool().getInputSchema(), java.util.Map.class)).build())
+                .principal(McpPrincipalContextDTO.builder().tenantId(principal.getTenantId()).principalId(principal.getPrincipalId()).principalType(principal.getPrincipalType().name()).principalName(principal.getPrincipalName()).displayName(principal.getDisplayName()).clientId(principal.getClientId()).connectionId(principal.getConnectionId()).build()).build();
     }
-
-    private McpToolAuthorizeResponseDTO toDTO(GrpcMcpToolAuthorizeDTO source) {
-        return McpToolAuthorizeResponseDTO.builder()
-                .decision(source.getDecision().name())
-                .confirmId(source.getConfirmId())
-                .message(source.getMessage())
-                .riskLevel(source.getRiskLevel().name())
-                .build();
-    }
-
-    private McpIntrospectResponseDTO toDTO(GrpcMcpIntrospectDTO source) {
-        return McpIntrospectResponseDTO.builder()
-                .active(source.getActive())
-                .iss(source.getIss())
-                .aud(new HashSet<>(source.getAudList()))
-                .sub(source.getSub())
-                .jti(source.getJti())
-                .exp(zeroToNull(source.getExp()))
-                .iat(zeroToNull(source.getIat()))
-                .tenantId(toNullableString(source.getTenantId()))
-                .principalId(toNullableString(source.getPrincipalId()))
-                .principalType(source.getPrincipalType().name())
-                .principalName(source.getPrincipalName())
-                .displayName(source.getDisplayName())
-                .clientId(source.getClientId())
-                .mcpConnectionId(toNullableString(source.getMcpConnectionId()))
-                .grantType(source.getGrantType().name().toLowerCase())
-                .scope(source.getScope())
-                .build();
-    }
-
-    private McpToolDefinitionDTO toDTO(GrpcMcpToolDefinitionDTO source) {
-        return McpToolDefinitionDTO.builder()
-                .name(source.getName())
-                .title(source.getTitle())
-                .description(source.getDescription())
-                .inputSchema(McpConstant.ToolDefinition.DEFAULT_INPUT_SCHEMA)
-                .annotations(toDTO(source.getAnnotations()))
-                .meta(toDTO(source.getMeta()))
-                .build();
-    }
-
-    private McpToolDefinitionDTO.Annotations toDTO(GrpcMcpToolAnnotationsDTO source) {
-        return McpToolDefinitionDTO.Annotations.builder()
-                .readOnlyHint(source.getReadOnlyHint())
-                .destructiveHint(source.getDestructiveHint())
-                .idempotentHint(source.getIdempotentHint())
-                .openWorldHint(source.getOpenWorldHint())
-                .build();
-    }
-
-    private McpToolDefinitionDTO.Metadata toDTO(GrpcMcpToolMetadataDTO source) {
-        return McpToolDefinitionDTO.Metadata.builder()
-                .toolId(source.getToolId())
-                .permissionCode(source.getPermissionCode())
-                .riskLevel(source.getRiskLevel().name())
-                .build();
-    }
-
-    private McpToolResolveResponseDTO toDTO(GrpcMcpToolResolveDTO source) {
-        return McpToolResolveResponseDTO.builder()
-                .toolId(source.getToolId())
-                .toolName(source.getToolName())
-                .permissionCode(source.getPermissionCode())
-                .riskLevel(source.getRiskLevel().name())
-                .serviceName(source.getServiceName())
-                .apiPath(source.getApiPath())
-                .httpMethod(source.getHttpMethod())
-                .build();
-    }
-
-    private GrpcMcpAuditCommand toGrpc(McpAuditCommandDTO source) {
-        source = source == null ? new McpAuditCommandDTO() : source;
-        return GrpcMcpAuditCommand.newBuilder()
-                .setTraceId(StringUtils.defaultString(source.getTraceId()))
-                .setTenantId(value(source.getTenantId()))
-                .setPrincipalId(value(source.getPrincipalId()))
-                .setPrincipalType(toGrpcPrincipalType(source.getPrincipalType()))
-                .setClientId(StringUtils.defaultString(source.getClientId()))
-                .setConnectionId(value(source.getConnectionId()))
-                .setToolId(StringUtils.defaultString(source.getToolId()))
-                .setToolName(StringUtils.defaultString(source.getToolName()))
-                .setPermissionCode(StringUtils.defaultString(source.getPermissionCode()))
-                .setRiskLevel(toGrpcRiskLevel(source.getRiskLevel()))
-                .setConfirmId(StringUtils.defaultString(source.getConfirmId()))
-                .setIdempotencyKey(StringUtils.defaultString(source.getIdempotencyKey()))
-                .setArgumentDigest(StringUtils.defaultString(source.getArgumentDigest()))
-                .setStatus(toGrpcAuditStatus(source.getStatus()))
-                .setErrorCode(StringUtils.defaultString(source.getErrorCode()))
-                .setDurationMs(value(source.getDurationMs()))
-                .setClientName(StringUtils.defaultString(source.getClientName()))
-                .setClientVersion(StringUtils.defaultString(source.getClientVersion()))
-                .setRemoteIp(StringUtils.defaultString(source.getRemoteIp()))
-                .build();
-    }
-
-    private Long zeroToNull(long value) {
-        return value == 0 ? null : value;
-    }
-
-    private long value(Long value) {
-        return value == null ? 0 : value;
-    }
-
-    private String toNullableString(long value) {
-        return value == 0 ? null : String.valueOf(value);
-    }
-
-    private long parseLong(String value) {
-        return StringUtils.isBlank(value) ? 0 : Long.parseLong(value);
-    }
-
-    private void requireOk(String operation, GrpcR result) {
-        if (!result.getOk()) {
-            throw new ServiceException(operation + " failed: [" + result.getCode() + "] " + result.getMessage());
-        }
-    }
-
-    private GrpcMcpRiskLevel toGrpcRiskLevel(String value) {
-        try {
-            return GrpcMcpRiskLevel.valueOf(StringUtils.defaultIfBlank(value, ""));
-        } catch (IllegalArgumentException e) {
-            return GrpcMcpRiskLevel.MCP_RISK_LEVEL_UNSPECIFIED;
-        }
-    }
-
-    private GrpcMcpPrincipalType toGrpcPrincipalType(String value) {
-        try {
-            return GrpcMcpPrincipalType.valueOf(StringUtils.defaultIfBlank(value, ""));
-        } catch (IllegalArgumentException e) {
-            return GrpcMcpPrincipalType.MCP_PRINCIPAL_TYPE_UNSPECIFIED;
-        }
-    }
-
-    private GrpcMcpAuditStatus toGrpcAuditStatus(String value) {
-        try {
-            return GrpcMcpAuditStatus.valueOf(StringUtils.defaultIfBlank(value, ""));
-        } catch (IllegalArgumentException e) {
-            return GrpcMcpAuditStatus.MCP_AUDIT_STATUS_UNSPECIFIED;
-        }
-    }
-
+    private long value(Long value) { return value == null ? 0 : value; }
+    private GrpcMcpRiskLevel risk(String value) { try { return GrpcMcpRiskLevel.valueOf(StringUtils.defaultString(value)); } catch (Exception e) { return GrpcMcpRiskLevel.MCP_RISK_LEVEL_UNSPECIFIED; } }
+    private GrpcMcpAuditStatus status(String value) { try { return GrpcMcpAuditStatus.valueOf(StringUtils.defaultString(value)); } catch (Exception e) { return GrpcMcpAuditStatus.MCP_AUDIT_STATUS_UNSPECIFIED; } }
 }

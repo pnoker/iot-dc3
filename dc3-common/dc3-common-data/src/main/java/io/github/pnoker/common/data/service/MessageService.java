@@ -17,9 +17,10 @@
 
 package io.github.pnoker.common.data.service;
 
-import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.data.entity.query.MessageQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
 /**
  * Business service for alarm message template operations.
@@ -27,6 +28,11 @@ import io.github.pnoker.common.data.entity.query.MessageQuery;
  * @author pnoker
  * @since 2016.10.1
  */
-public interface MessageService extends BaseService<MessageBO, MessageQuery> {
+public interface MessageService {
+    Mono<MessageBO> add(MessageBO value);
+    Mono<Boolean> delete(Long tenantId, Long id);
+    Mono<MessageBO> update(MessageBO value);
+    Mono<MessageBO> getById(Long tenantId, Long id);
+    Mono<OffsetPage<MessageBO>> list(Long tenantId, MessageQuery query);
 
 }

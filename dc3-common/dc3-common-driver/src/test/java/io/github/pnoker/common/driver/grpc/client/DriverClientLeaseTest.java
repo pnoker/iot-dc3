@@ -17,10 +17,9 @@
 
 package io.github.pnoker.common.driver.grpc.client;
 
-import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDeviceLeaseDTO;
-import io.github.pnoker.api.common.driver.GrpcRDriverLeaseDTO;
+import io.github.pnoker.api.common.driver.GrpcDriverLeaseDTO;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.builder.DriverBuilder;
 import io.github.pnoker.common.driver.entity.builder.GrpcCommandAttributeBuilder;
@@ -36,8 +35,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Map;
+import io.grpc.stub.StreamObserver;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -48,7 +47,7 @@ import static org.mockito.Mockito.when;
 class DriverClientLeaseTest {
 
     @Mock
-    private DriverApiGrpc.DriverApiBlockingStub stub;
+    private DriverApiGrpc.DriverApiStub stub;
     @Mock
     private DriverBuilder driverBuilder;
     @Mock
@@ -82,11 +81,10 @@ class DriverClientLeaseTest {
     @Test
     void changedLeaseSnapshotIsInstalledOnlyAfterAllBatchesComplete() {
         long deadline = System.currentTimeMillis() + 60_000;
-        when(stub.renewLease(any())).thenReturn(List.of(
-                response(deadline, 5L, false, lease(1L, 501L)),
-                response(deadline, 5L, true, lease(2L, 502L))).iterator());
+        stubResponses(response(deadline, 5L, false, lease(1L, 501L)),
+                response(deadline, 5L, true, lease(2L, 502L)));
 
-        client.renewLease();
+        client.renewLease().block();
 
         assertThat(metadata.getDeviceIds()).containsExactlyInAnyOrder(1L, 2L);
         assertThat(metadata.getFencingToken(1L)).isEqualTo(501L);
@@ -96,20 +94,29 @@ class DriverClientLeaseTest {
     @Test
     void incompleteLeaseSnapshotDoesNotReplaceCurrentOwnership() {
         long deadline = System.currentTimeMillis() + 60_000;
-        when(stub.renewLease(any())).thenReturn(List.of(
-                response(deadline, 5L, false, lease(1L, 501L))).iterator());
+        stubResponses(response(deadline, 5L, false, lease(1L, 501L)));
 
-        assertThatThrownBy(client::renewLease)
+        assertThatThrownBy(() -> client.renewLease().block())
                 .isInstanceOf(ServiceException.class)
                 .hasMessageContaining("before snapshot completion");
         assertThat(metadata.getDeviceIds()).containsExactly(99L);
         assertThat(metadata.getAssignmentVersion()).isEqualTo(4L);
     }
 
-    private GrpcRDriverLeaseDTO response(long deadline, long version, boolean complete,
+    private void stubResponses(GrpcDriverLeaseDTO... responses) {
+        org.mockito.Mockito.doAnswer(invocation -> {
+            StreamObserver<GrpcDriverLeaseDTO> observer = invocation.getArgument(1);
+            for (GrpcDriverLeaseDTO response : responses) {
+                observer.onNext(response);
+            }
+            observer.onCompleted();
+            return null;
+        }).when(stub).renewLease(any(), any());
+    }
+
+    private GrpcDriverLeaseDTO response(long deadline, long version, boolean complete,
                                          GrpcDeviceLeaseDTO lease) {
-        return GrpcRDriverLeaseDTO.newBuilder()
-                .setResult(GrpcRFactory.ok())
+        return GrpcDriverLeaseDTO.newBuilder()
                 .setLeaseUntilEpochMillis(deadline)
                 .setAssignmentVersion(version)
                 .setAssignmentsChanged(true)

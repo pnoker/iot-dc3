@@ -57,7 +57,7 @@
                 <span
                 ><el-icon><Edit/></el-icon> {{ $t('common.operationTime') }}:
                 </span>
-                {{ timestamp(data.operateTime) }}
+                {{ timestamp(data.operateTime || '') }}
               </li>
             </ul>
             <ul class="things-body-content-item-column-2">
@@ -65,7 +65,7 @@
                 <span
                 ><el-icon><Location/></el-icon> {{ $t('point.card.dataType') }}:
                 </span>
-                {{ $t(pointTypeKey(data.pointTypeFlag)) }}
+                {{ $t(pointTypeKey(data.pointTypeFlag || '')) }}
               </li>
               <li class="nowrap-item">
                 <span
@@ -83,13 +83,13 @@
                 <span
                 ><el-icon><Location/></el-icon> {{ $t('point.card.rw') }}:
                 </span>
-                {{ $t(rwFlagKey(data.rwFlag)) }}
+                {{ $t(rwFlagKey(data.rwFlag || '')) }}
               </li>
               <li class="nowrap-item">
                 <span
                 ><el-icon><Sunset/></el-icon> {{ $t('common.createTime') }}:
                 </span>
-                {{ timestamp(data.createTime) }}
+                {{ timestamp(data.createTime || '') }}
               </li>
             </ul>
           </div>
@@ -126,10 +126,11 @@ import {pointTypeKey, rwFlagKey} from '@/utils/pointFormatUtil';
 import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
 import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
+import type {PointRecord} from '@/config/types/manager';
 
 const props = defineProps({
   embedded: {type: Boolean, default: false},
-  data: {type: Object as PropType<Record<string, any>>, default: () => ({})},
+  data: {type: Object as PropType<PointRecord>, required: true},
   profile: {type: Object as PropType<Record<string, any>>, default: () => ({})},
   icon: {type: String, default: 'images/common/point.png'},
 });
@@ -138,11 +139,11 @@ const emit = defineEmits(['disable', 'enable', 'delete', 'edit', 'detail']);
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const emitToggle = (name: 'disable' | 'enable') => {
-  emit(name, props.data.id, props.data.profileId, () => successMessage());
+  emit(name, props.data, () => successMessage());
 };
 
 const emitDelete = () => {
-  emit('delete', props.data.id, () => successMessage());
+  emit('delete', props.data, () => successMessage());
 };
 </script>
 

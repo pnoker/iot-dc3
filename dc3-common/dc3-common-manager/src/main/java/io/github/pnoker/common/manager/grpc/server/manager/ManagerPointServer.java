@@ -17,33 +17,24 @@
 
 package io.github.pnoker.common.manager.grpc.server.manager;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.api.center.manager.GrpcPagePointDTO;
-import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
+import io.github.pnoker.api.center.manager.GrpcOffsetPointQuery;
+import io.github.pnoker.api.center.manager.GrpcOffsetPagePointDTO;
 import io.github.pnoker.api.center.manager.GrpcPointIdsQuery;
 import io.github.pnoker.api.center.manager.GrpcPointQuery;
-import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
-import io.github.pnoker.api.center.manager.GrpcRPointDTO;
-import io.github.pnoker.api.center.manager.GrpcRPointListDTO;
+import io.github.pnoker.api.center.manager.GrpcPointListDTO;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
-import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcPointDTO;
-import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.manager.entity.bo.PointBO;
-import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointBuilder;
-import io.github.pnoker.common.manager.service.PointService;
-import io.github.pnoker.common.tenant.TenantContextHolder;
+import io.github.pnoker.common.manager.grpc.GrpcPageUtil;
+import io.github.pnoker.common.manager.service.ReactivePointService;
+import io.github.pnoker.common.manager.repository.PointFilter;
 import io.grpc.stub.StreamObserver;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Mono;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * gRPC server handling manager point facade requests.
@@ -51,110 +42,53 @@ import java.util.Objects;
  * @author pnoker
  * @since 2016.10.1
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
 
     private final GrpcPointBuilder grpcPointBuilder;
 
-    private final PointService pointService;
+    private final ReactivePointService reactivePointService;
 
-    @Override
-    public void listByPage(GrpcPagePointQuery request, StreamObserver<GrpcRPagePointDTO> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            GrpcRPagePointDTO.Builder builder = GrpcRPagePointDTO.newBuilder();
-            GrpcR result;
-
-            PointQuery query = grpcPointBuilder.buildQueryByGrpcQuery(request);
-
-            Page<PointBO> entityPage = pointService.list(query);
-            if (Objects.isNull(entityPage)) {
-                result = GrpcRFactory.notFound();
-            } else {
-                result = GrpcRFactory.ok();
-
-                GrpcPagePointDTO.Builder pagePointBuilder = GrpcPagePointDTO.newBuilder();
-                GrpcPage.Builder page = GrpcPage.newBuilder();
-                page.setCurrent(entityPage.getCurrent());
-                page.setSize(entityPage.getSize());
-                page.setPages(entityPage.getPages());
-                page.setTotal(entityPage.getTotal());
-                pagePointBuilder.setPage(page);
-
-                List<GrpcPointDTO> entityGrpcDTOList = entityPage.getRecords()
-                        .stream()
-                        .map(grpcPointBuilder::buildGrpcDTOByBO)
-                        .toList();
-                pagePointBuilder.addAllData(entityGrpcDTOList);
-
-                builder.setData(pagePointBuilder);
-            }
-
-            builder.setResult(result);
-            responseObserver.onNext(builder.build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    @Autowired
+    public ManagerPointServer(GrpcPointBuilder grpcPointBuilder, ReactivePointService reactivePointService) {
+        this.grpcPointBuilder = grpcPointBuilder;
+        this.reactivePointService = reactivePointService;
     }
 
     @Override
-    public void listByIds(GrpcPointIdsQuery request, StreamObserver<GrpcRPointListDTO> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            GrpcRPointListDTO.Builder builder = GrpcRPointListDTO.newBuilder();
-            GrpcR result;
+    public void list(GrpcOffsetPointQuery request, StreamObserver<GrpcOffsetPagePointDTO> observer) {
+        ReactiveGrpcServerSupport.subscribe(Mono.fromSupplier(() -> filter(request))
+                .flatMap(reactivePointService::list)
+                .map(page -> GrpcOffsetPagePointDTO.newBuilder()
+                        .setPage(io.github.pnoker.api.common.OffsetPage.newBuilder().setOffset(page.offset())
+                                .setLimit(page.limit()).setTotal(page.total()).setHasNext(page.hasNext()))
+                        .addAllItems(page.items().stream().map(grpcPointBuilder::buildGrpcDTOByBO).toList()).build()), observer);
+    }
 
-            List<PointBO> entityBOList = pointService.listByIds(new HashSet<>(request.getPointIdsList()));
-            if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
-                result = GrpcRFactory.notFound();
-            } else {
-                result = GrpcRFactory.ok();
-
-                List<GrpcPointDTO> entityGrpcDTOList = entityBOList.stream()
-                        .map(grpcPointBuilder::buildGrpcDTOByBO)
-                        .toList();
-
-                builder.addAllData(entityGrpcDTOList);
-            }
-
-            builder.setResult(result);
-            responseObserver.onNext(builder.build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    private PointFilter filter(GrpcOffsetPointQuery request) {
+        var page = GrpcPageUtil.require(request.hasPage() ? request.getPage() : null);
+        return new PointFilter(request.getTenantId(), request.getPointName(), request.getPointCode(),
+                request.hasPointTypeFlag() ? io.github.pnoker.common.enums.PointTypeEnum.ofIndex((byte) request.getPointTypeFlag()) : null,
+                request.hasRwFlag() ? io.github.pnoker.common.enums.RwTypeEnum.ofIndex((byte) request.getRwFlag()) : null,
+                request.hasProfileId() ? request.getProfileId() : null,
+                request.hasEnableFlag() ? io.github.pnoker.common.enums.EnableFlagEnum.ofIndex((byte) request.getEnableFlag()) : null,
+                request.hasGroupId() ? request.getGroupId() : null, request.hasLabelId() ? request.getLabelId() : null,
+                request.hasVersion() ? request.getVersion() : null, request.hasDeviceId() ? request.getDeviceId() : null,
+                page.offset(), page.limit(), page.sort());
     }
 
     @Override
-    public void getById(GrpcPointQuery request, StreamObserver<GrpcRPointDTO> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            GrpcRPointDTO.Builder builder = GrpcRPointDTO.newBuilder();
-            GrpcR result;
+    public void listByIds(GrpcPointIdsQuery request, StreamObserver<GrpcPointListDTO> responseObserver) {
+        ReactiveGrpcServerSupport.subscribe(reactivePointService.listByIds(request.getTenantId(), request.getPointIdsList())
+                .map(grpcPointBuilder::buildGrpcDTOByBO).collectList()
+                .map(values -> GrpcPointListDTO.newBuilder().addAllItems(values).build()), responseObserver);
+    }
 
-            PointBO entityBO;
-            try {
-                entityBO = pointService.getById(request.getPointId());
-            } catch (NotFoundException ignored) {
-                entityBO = null;
-            }
-            if (Objects.isNull(entityBO)) {
-                result = GrpcRFactory.notFound();
-            } else {
-                result = GrpcRFactory.ok();
-
-                builder.setData(grpcPointBuilder.buildGrpcDTOByBO(entityBO));
-            }
-
-            builder.setResult(result);
-            responseObserver.onNext(builder.build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    @Override
+    public void getById(GrpcPointQuery request, StreamObserver<GrpcPointDTO> responseObserver) {
+        ReactiveGrpcServerSupport.subscribe(reactivePointService.getById(request.getTenantId(), request.getPointId())
+                .map(grpcPointBuilder::buildGrpcDTOByBO)
+                .switchIfEmpty(Mono.error(new NotFoundException("point does not exist"))), responseObserver);
     }
 
 }

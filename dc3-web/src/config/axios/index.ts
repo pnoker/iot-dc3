@@ -34,8 +34,42 @@ const request: AxiosInstance = axios.create({
   timeout: AXIOS_CONFIG.TIMEOUT,
   withCredentials: true,
   headers: {Accept: AXIOS_CONFIG.HEADERS.ACCEPT, 'Content-Type': AXIOS_CONFIG.HEADERS.CONTENT_TYPE},
-  validateStatus: (status) => status >= AXIOS_CONFIG.MIN_STATUS && status <= AXIOS_CONFIG.MAX_STATUS,
+  validateStatus: (status) => status >= AXIOS_CONFIG.MIN_STATUS && status < 300,
 });
+
+type ProblemPayload = {
+  status?: number;
+  code?: string;
+  title?: string;
+  detail?: string;
+  [key: string]: unknown;
+};
+
+const normalizeProblem = (status: number, data: unknown, fallback?: string): ProblemPayload => {
+  if (data && typeof data === 'object') {
+    return data as ProblemPayload;
+  }
+  return {status, title: fallback ?? 'HTTP request failed', detail: fallback ?? 'HTTP request failed'};
+};
+
+const notifyProblem = (status: number, problem: ProblemPayload) => {
+  if (typeof problem.code === 'string' && PASSWORD_CHANGE_CODES.includes(problem.code as (typeof PASSWORD_CHANGE_CODES)[number])) {
+    return;
+  }
+  if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
+    warnMessage(i18n.global.t('common.axios.unauthorized'), i18n.global.t('common.axios.unauthorizedTitle'));
+    removeStorage(AUTH_HEADERS.TENANT);
+    removeStorage(AUTH_HEADERS.LOGIN);
+    removeStorage(AUTH_HEADERS.AUTHENTICATED, true);
+    router.push({name: 'login'}).catch(() => {});
+  } else if (status >= 500) {
+    failMessage(i18n.global.t('common.axios.serverErrorMessage', {status}), i18n.global.t('common.axios.serverError'));
+  } else if (status > 0) {
+    failMessage(i18n.global.t('common.axios.requestError'), problem.code ?? problem.title, problem);
+  } else {
+    failMessage(i18n.global.t('common.axios.networkErrorMessage'), i18n.global.t('common.axios.networkError'));
+  }
+};
 
 /**
  * Request interceptor to add authentication headers
@@ -72,8 +106,12 @@ request.interceptors.request.use(
  */
 request.interceptors.response.use(
   (response: AxiosResponse) => {
-    const ok = response.data?.ok || false;
-    const status = response.status || AXIOS_CONFIG.UNAUTHORIZED_STATUS;
+    if (response.status < AXIOS_CONFIG.MIN_STATUS || response.status >= 300) {
+      const problem = normalizeProblem(response.status, response.data);
+      notifyProblem(response.status, problem);
+      return Promise.reject(problem);
+    }
+
     const responseType = response.config.responseType;
 
     // Handle blob response type (e.g., file downloads)
@@ -81,42 +119,16 @@ request.interceptors.response.use(
       return response;
     }
 
-    // Return data if request was successful
-    if (ok) {
-      return response.data;
-    }
-
-    // Password change / expiry: a business outcome, not an error. Pass the payload
-    // through silently so the login flow can open the password change dialog.
-    if (PASSWORD_CHANGE_CODES.includes(response.data?.code)) {
-      return Promise.reject(response.data);
-    }
-
-    // Handle unauthorized access
-    if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
-      warnMessage(i18n.global.t('common.axios.unauthorized'), i18n.global.t('common.axios.unauthorizedTitle'));
-      // Remove auth keys only — never nuke entire localStorage. The token cookie
-      // is cleared server-side on 401; here we just drop the frontend flag.
-      removeStorage(AUTH_HEADERS.TENANT);
-      removeStorage(AUTH_HEADERS.LOGIN);
-      removeStorage(AUTH_HEADERS.AUTHENTICATED, true);
-      router.push({name: 'login'}).catch(() => {
-      });
-    } else if (status >= 500) {
-      failMessage(i18n.global.t('common.axios.serverErrorMessage', {status}), i18n.global.t('common.axios.serverError'));
-    } else {
-      failMessage(i18n.global.t('common.axios.requestError'), response.data?.code, response.data);
-    }
-    // Reject with the server payload so callers can inspect code/message if needed.
-    // Existing no-op `.catch(() => {})` sites remain valid because they ignore the argument.
-    return Promise.reject(response.data ?? {status, message: 'Request failed'});
+    return response.data;
   },
   (error: AxiosError) => {
-    if (!error.response) {
-      // Network error — no response received
-      failMessage(i18n.global.t('common.axios.networkErrorMessage'), i18n.global.t('common.axios.networkError'));
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
+    const status = error.response?.status ?? 0;
+    const problem = normalizeProblem(status, error.response?.data, error.message);
+    notifyProblem(status, problem);
+    return Promise.reject(problem);
   }
 );
 

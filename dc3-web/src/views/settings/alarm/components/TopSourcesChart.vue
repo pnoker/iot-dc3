@@ -69,7 +69,7 @@ const load = async () => {
   loading.value = true;
   try {
     const res: any = await alertTopSources(props.days ?? 30, props.limit ?? 10);
-    const rows: any[] = res?.data ?? [];
+    const rows: any[] = res ?? [];
 
     await resolveBySource(rows);
 

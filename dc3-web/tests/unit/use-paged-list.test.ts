@@ -150,12 +150,7 @@ describe('usePagedList', () => {
 
   it('loads server-paginated rows when a request handler is provided', async () => {
     const request = vi.fn(() =>
-      Promise.resolve({
-        ok: true,
-        code: 'ok',
-        message: 'ok',
-        data: {records: sampleRows.slice(0, 2), total: sampleRows.length},
-      })
+      Promise.resolve({items: sampleRows.slice(0, 2), offset: 0, limit: 2, total: sampleRows.length, hasNext: true})
     );
     const {state, load, search, sort, sizeChange, currentChange} = usePagedList<Row, { keyword?: string }>({
       request,
@@ -164,7 +159,7 @@ describe('usePagedList', () => {
     await load();
     expect(state.listData).toEqual(sampleRows.slice(0, 2));
     expect(state.page.total).toBe(sampleRows.length);
-    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({page: state.page}));
+    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({offset: 0, limit: 12, sort: []}));
 
     search({keyword: 'Row 02'});
     await Promise.resolve();
@@ -172,17 +167,35 @@ describe('usePagedList', () => {
 
     sort();
     await Promise.resolve();
-    expect(request).toHaveBeenLastCalledWith(
-      expect.objectContaining({page: expect.objectContaining({orders: [{column: 'create_time', asc: true}]})})
-    );
+    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({sort: [{field: 'create_time', direction: 'ASC'}]}));
 
     sizeChange(24);
     await Promise.resolve();
     expect(state.page.current).toBe(1);
-    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({page: expect.objectContaining({size: 24})}));
+    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({offset: 0, limit: 24}));
 
     currentChange(2);
     await Promise.resolve();
-    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({page: expect.objectContaining({current: 2})}));
+    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({offset: 24, limit: 24}));
+  });
+
+  it('keeps the newest server response when requests resolve out of order', async () => {
+    let resolveFirst!: (value: {items: Row[]; offset: number; limit: number; total: number; hasNext: boolean}) => void;
+    let resolveSecond!: (value: {items: Row[]; offset: number; limit: number; total: number; hasNext: boolean}) => void;
+    const request = vi
+      .fn()
+      .mockReturnValueOnce(new Promise((resolve) => (resolveFirst = resolve)))
+      .mockReturnValueOnce(new Promise((resolve) => (resolveSecond = resolve)));
+    const {state, load} = usePagedList<Row>({request});
+
+    const first = load();
+    const second = load();
+    resolveFirst({items: [sampleRows[0]], offset: 0, limit: 12, total: 1, hasNext: false});
+    resolveSecond({items: [sampleRows[1]], offset: 0, limit: 12, total: 1, hasNext: false});
+    await Promise.all([first, second]);
+
+    expect(state.listData).toEqual([sampleRows[1]]);
+    expect(state.loading).toBe(false);
   });
 });
+      Promise.resolve({items: sampleRows.slice(0, 2), offset: 0, limit: 2, total: sampleRows.length, hasNext: true})

@@ -132,13 +132,13 @@ const eventLength = computed(() => {
 const device = () => {
   getDeviceById(reactiveData.id)
     .then((res) => {
-      reactiveData.data = res.data;
-      reactiveData.deviceTable[res.data.id] = res.data.deviceName;
+      reactiveData.data = res;
+      reactiveData.deviceTable[res.id] = res.deviceName;
       reactiveData.profile = {};
 
       getDriverById(reactiveData.data.driverId || '')
         .then((res) => {
-          reactiveData.driver = res.data;
+          reactiveData.driver = res;
         })
         .catch(() => {
           // nothing to do
@@ -147,7 +147,7 @@ const device = () => {
       if (reactiveData.data.profileId) {
         getProfileById(String(reactiveData.data.profileId))
           .then((res) => {
-            reactiveData.profile = res.data || {};
+            reactiveData.profile = res || {};
           })
           .catch(() => {
             // nothing to do

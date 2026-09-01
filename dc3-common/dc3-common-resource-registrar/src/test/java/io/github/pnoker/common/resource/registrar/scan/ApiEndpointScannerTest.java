@@ -88,14 +88,15 @@ class ApiEndpointScannerTest {
     }
 
     @Test
-    void unsupportedMethodsAndDefaultExcludesAreFilteredOut() {
+    void patchMethodsAreSupportedAndDefaultExcludesAreFilteredOut() {
         register(PatchOnlyController.class);
         register(ActuatorController.class);
         ApiEndpointScanner scanner = new ApiEndpointScanner(handlerMapping, new ResourceRegistrarProperties());
 
         List<FacadeScannedApiBO> apis = scanner.scan();
 
-        assertThat(apis).isEmpty();
+        assertThat(apis).extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath)
+                .containsExactly(org.assertj.core.groups.Tuple.tuple("PATCH", "/api/patch"));
     }
 
     @Test

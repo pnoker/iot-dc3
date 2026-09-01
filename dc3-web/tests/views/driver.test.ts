@@ -21,8 +21,8 @@ import {describe, expect, it, vi} from 'vitest';
 import {mountListPage} from './_helpers';
 
 const driverMocks = vi.hoisted(() => ({
-  listDriverStatus: vi.fn(() => Promise.resolve({data: {}})),
-  listDriver: vi.fn(() => Promise.resolve({data: {records: [{id: 'd-1', driverName: 'Modbus'}], total: 1}})),
+  listDriverStatus: vi.fn(() => Promise.resolve( {})),
+  listDriver: vi.fn(() => Promise.resolve( {items: [{id: 'd-1', driverName: 'Modbus'}], total: 1})),
 }));
 
 vi.mock('@/api/driver', () => driverMocks);

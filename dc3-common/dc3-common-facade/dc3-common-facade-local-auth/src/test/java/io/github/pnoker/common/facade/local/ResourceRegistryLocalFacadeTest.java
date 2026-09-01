@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.facade.local;
 
-import io.github.pnoker.common.auth.biz.ResourceRegistrySyncService;
+import io.github.pnoker.common.auth.biz.ReactiveResourceRegistrySyncService;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistryScannedApi;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncCommand;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncResult;
@@ -30,6 +30,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.List;
 
@@ -40,7 +42,7 @@ import static org.mockito.Mockito.when;
 class ResourceRegistryLocalFacadeTest {
 
     @Mock
-    private ResourceRegistrySyncService resourceRegistrySyncService;
+    private ReactiveResourceRegistrySyncService resourceRegistrySyncService;
 
     private ResourceRegistryLocalFacade facade;
 
@@ -74,14 +76,16 @@ class ResourceRegistryLocalFacadeTest {
                 .build();
 
         when(resourceRegistrySyncService.sync(any(ResourceRegistrySyncCommand.class)))
-                .thenReturn(ResourceRegistrySyncResult.builder()
+                .thenReturn(Mono.just(ResourceRegistrySyncResult.builder()
                         .inserted(1)
                         .updated(2)
                         .deleted(3)
                         .unchanged(4)
-                        .build());
+                        .build()));
 
-        FacadeResourceRegistrySyncResultBO result = facade.sync(commandBO);
+        java.util.concurrent.atomic.AtomicReference<FacadeResourceRegistrySyncResultBO> resultRef = new java.util.concurrent.atomic.AtomicReference<>();
+        StepVerifier.create(facade.sync(commandBO)).consumeNextWith(resultRef::set).verifyComplete();
+        FacadeResourceRegistrySyncResultBO result = resultRef.get();
 
         ArgumentCaptor<ResourceRegistrySyncCommand> captor =
                 ArgumentCaptor.forClass(ResourceRegistrySyncCommand.class);
@@ -110,9 +114,9 @@ class ResourceRegistryLocalFacadeTest {
                 .apis(null)
                 .build();
         when(resourceRegistrySyncService.sync(any(ResourceRegistrySyncCommand.class)))
-                .thenReturn(ResourceRegistrySyncResult.builder().build());
+                .thenReturn(Mono.just(ResourceRegistrySyncResult.builder().build()));
 
-        facade.sync(commandBO);
+        StepVerifier.create(facade.sync(commandBO)).expectNextCount(1).verifyComplete();
 
         ArgumentCaptor<ResourceRegistrySyncCommand> captor =
                 ArgumentCaptor.forClass(ResourceRegistrySyncCommand.class);
@@ -128,9 +132,9 @@ class ResourceRegistryLocalFacadeTest {
                 .apis(List.of())
                 .build();
         when(resourceRegistrySyncService.sync(any(ResourceRegistrySyncCommand.class)))
-                .thenReturn(ResourceRegistrySyncResult.builder().build());
+                .thenReturn(Mono.just(ResourceRegistrySyncResult.builder().build()));
 
-        facade.sync(commandBO);
+        StepVerifier.create(facade.sync(commandBO)).expectNextCount(1).verifyComplete();
 
         ArgumentCaptor<ResourceRegistrySyncCommand> captor =
                 ArgumentCaptor.forClass(ResourceRegistrySyncCommand.class);

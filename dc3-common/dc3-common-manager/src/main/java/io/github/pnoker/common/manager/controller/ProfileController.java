@@ -17,17 +17,15 @@
 
 package io.github.pnoker.common.manager.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.entity.builder.ProfileBuilder;
-import io.github.pnoker.common.manager.entity.query.ProfileQuery;
+import io.github.pnoker.common.manager.entity.query.ProfileOffsetRequest;
 import io.github.pnoker.common.manager.entity.vo.ProfileVO;
-import io.github.pnoker.common.manager.service.DeviceService;
-import io.github.pnoker.common.manager.service.ProfileService;
+import io.github.pnoker.common.manager.service.ReactiveProfileService;
+import io.github.pnoker.common.manager.repository.ProfileFilter;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,12 +33,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +50,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -69,9 +68,7 @@ public class ProfileController implements BaseController {
 
     private final ProfileBuilder profileBuilder;
 
-    private final ProfileService profileService;
-
-    private final DeviceService deviceService;
+    private final ReactiveProfileService reactiveProfileService;
 
     /**
      * Register a new profile template for the current tenant, then return the add-success status.
@@ -88,13 +85,15 @@ public class ProfileController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody ProfileVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<ProfileVO> add(@Validated(Add.class) @RequestBody ProfileVO entityVO) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
+            Long tenantId = tuple.getT1().getT1();
             ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            profileService.add(entityBO);
-            return R.ok(SuccessCode.ADD);
-        }));
+            entityBO.setCreatorId(tuple.getT1().getT2()); entityBO.setCreatorName(tuple.getT2()); entityBO.setOperatorId(tuple.getT1().getT2()); entityBO.setOperatorName(tuple.getT2());
+            return reactiveProfileService.add(entityBO).map(profileBuilder::buildVOByBO);
+        });
     }
 
     /**
@@ -111,13 +110,11 @@ public class ProfileController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, profileService.getById(id));
-            profileService.delete(id);
-            return R.ok(SuccessCode.DELETE);
-        }));
+    @DeleteMapping("/delete")
+    public Mono<Void> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id,
+                             @Parameter(description = "Current optimistic-lock version required as a deletion precondition.", example = "0") @NotNull @Min(0) @RequestParam("version") Integer version) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> reactiveProfileService.delete(tuple.getT1().getT1(), id, version, tuple.getT1().getT2(), tuple.getT2()).then());
     }
 
     /**
@@ -135,14 +132,15 @@ public class ProfileController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody ProfileVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<ProfileVO> update(@Validated(Update.class) @RequestBody ProfileVO entityVO) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
+            Long tenantId = tuple.getT1().getT1();
             ProfileBO entityBO = profileBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, profileService.getById(entityBO.getId()));
-            profileService.update(entityBO);
-            return R.ok(SuccessCode.UPDATE);
-        }));
+            entityBO.setOperatorId(tuple.getT1().getT2()); entityBO.setOperatorName(tuple.getT2());
+            return reactiveProfileService.update(entityBO).map(profileBuilder::buildVOByBO);
+        });
     }
 
     /**
@@ -160,12 +158,8 @@ public class ProfileController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_id")
-    public Mono<R<ProfileVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            ProfileBO entityBO = requireTenant(tenantId, profileService.getById(id));
-            ProfileVO entityVO = profileBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
-        }));
+    public Mono<ProfileVO> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId().flatMap(tenantId -> reactiveProfileService.getById(tenantId, id).map(profileBuilder::buildVOByBO));
     }
 
     /**
@@ -183,13 +177,9 @@ public class ProfileController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list_by_ids")
-    public Mono<R<Map<String, ProfileVO>>> listByIds(@RequestBody Set<Long> profileIds) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.listByIds(profileIds));
-            Map<String, ProfileVO> deviceMap = entityBOList.stream()
-                    .collect(Collectors.toMap(bo -> String.valueOf(bo.getId()), entityBO -> profileBuilder.buildVOByBO(entityBO)));
-            return R.ok(deviceMap);
-        }));
+    public Mono<Map<String, ProfileVO>> listByIds(@RequestBody Set<Long> profileIds) {
+        return getTenantId().flatMap(tenantId -> reactiveProfileService.listByIds(tenantId, profileIds == null ? List.of() : List.copyOf(profileIds))
+                .collectMap(bo -> String.valueOf(bo.getId()), profileBuilder::buildVOByBO));
     }
 
     /**
@@ -207,13 +197,8 @@ public class ProfileController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list_by_device_id")
-    public Mono<R<List<ProfileVO>>> listByDeviceId(@Parameter(description = "Identifier of the device whose instantiated profiles are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, deviceService.getById(deviceId));
-            List<ProfileBO> entityBOList = filterTenant(tenantId, profileService.listByDeviceId(deviceId));
-            List<ProfileVO> entityVOList = profileBuilder.buildVOListByBOList(entityBOList);
-            return R.ok(entityVOList);
-        }));
+    public Mono<List<ProfileVO>> listByDeviceId(@Parameter(description = "Identifier of the device whose instantiated profiles are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+        return getTenantId().flatMap(tenantId -> reactiveProfileService.listByDeviceId(tenantId, deviceId).map(profileBuilder::buildVOByBO).collectList());
     }
 
     /**
@@ -231,14 +216,14 @@ public class ProfileController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<ProfileVO>>> list(@RequestBody(required = false) ProfileQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            ProfileQuery query = Objects.isNull(entityQuery) ? new ProfileQuery() : entityQuery;
-            query.setTenantId(tenantId);
-            Page<ProfileBO> entityPageBO = profileService.list(query);
-            Page<ProfileVO> entityPageVO = profileBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
-        }));
+    public Mono<OffsetPage<ProfileVO>> list(@RequestBody(required = false) ProfileOffsetRequest request) {
+        ProfileOffsetRequest query = request == null ? new ProfileOffsetRequest() : request;
+        return getTenantId().flatMap(tenantId -> reactiveProfileService.list(new ProfileFilter(
+                        tenantId, query.profileName(), query.profileCode(), query.profileShareFlag(),
+                        query.profileTypeFlag(), query.enableFlag(), query.groupId(), query.labelId(),
+                        query.version(), query.deviceId(), query.offset(), query.limit(), query.sort()))
+                .map(page -> OffsetPage.of(page.items().stream().map(profileBuilder::buildVOByBO).toList(),
+                        page.offset(), page.limit(), page.total())));
     }
 
 }

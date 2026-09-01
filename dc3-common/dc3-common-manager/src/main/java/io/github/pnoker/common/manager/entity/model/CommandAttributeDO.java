@@ -17,12 +17,6 @@
 
 package io.github.pnoker.common.manager.entity.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,7 +37,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName(value = "dc3_command_attribute", autoResultMap = true)
 public class CommandAttributeDO implements Serializable {
 
     @Serial
@@ -52,116 +45,96 @@ public class CommandAttributeDO implements Serializable {
     /**
      * Primary key ID
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
      * Name
      */
-    @TableField("attribute_name")
     private String attributeName;
 
     /**
      * Code
      */
-    @TableField("attribute_code")
     private String attributeCode;
 
     /**
      * Type
      */
-    @TableField("attribute_type_flag")
     private Byte attributeTypeFlag;
 
     /**
      *
      */
-    @TableField("default_value")
     private String defaultValue;
 
     /**
      * Driver ID
      */
-    @TableField("driver_id")
     private Long driverId;
 
     /**
      *
      */
-    @TableField(value = "attribute_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt attributeExt;
 
     /**
      * Enable flag, 0:Enable, 1:Disable
      */
-    @TableField("enable_flag")
     private Byte enableFlag;
 
     /**
      * Tenant ID
      */
-    @TableField("tenant_id")
     private Long tenantId;
 
     /**
      * Description
      */
-    @TableField("remark")
     private String remark;
 
     /**
      *
      */
-    @TableField("signature")
     private String signature;
 
     /**
      *
      */
-    @TableField("version")
     private Integer version;
 
     /**
      * Creator ID
      */
-    @TableField("creator_id")
     private Long creatorId;
 
     /**
      * Creator Name
      */
-    @TableField("creator_name")
     private String creatorName;
 
     /**
      * Create Time
      */
-    @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
      * Operator ID
      */
-    @TableField("operator_id")
     private Long operatorId;
 
     /**
      * Operator Name
      */
-    @TableField("operator_name")
     private String operatorName;
 
     /**
      * Operate Time
      */
-    @TableField("operate_time")
     private LocalDateTime operateTime;
 
     /**
      * Logical delete flag, 0:not deleted, 1:deleted
      */
-    @TableLogic
-    @TableField("deleted")
     private Byte deleted;
 
 }

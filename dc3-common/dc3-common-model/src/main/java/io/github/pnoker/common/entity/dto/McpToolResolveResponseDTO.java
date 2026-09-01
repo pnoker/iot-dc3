@@ -27,6 +27,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * Auth-to-gateway resolved backend invocation contract for one MCP tool.
@@ -59,5 +60,7 @@ public class McpToolResolveResponseDTO implements Serializable {
     private String apiPath;
 
     private String httpMethod;
+
+    private Map<String, Object> inputSchema;
 
 }

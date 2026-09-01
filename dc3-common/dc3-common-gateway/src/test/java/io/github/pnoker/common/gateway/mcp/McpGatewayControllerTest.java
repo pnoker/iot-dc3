@@ -17,7 +17,9 @@
 
 package io.github.pnoker.common.gateway.mcp;
 
-import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
+import io.github.pnoker.common.entity.dto.McpCallToolResponseDTO;
+import io.github.pnoker.common.entity.dto.McpPrincipalContextDTO;
+import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
 import io.github.pnoker.common.entity.dto.McpToolListResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +45,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,27 +85,13 @@ class McpGatewayControllerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(response.getHeaders().getFirst(HttpHeaders.WWW_AUTHENTICATE))
                 .contains("resource_metadata");
-        verify(mcpGatewayClient, never()).introspect(any());
-    }
-
-    @Test
-    void mcpReturnsBearerChallengeWhenTokenIsInactive() {
-        MockServerWebExchange exchange = authorizedExchange();
-        when(mcpGatewayClient.introspect("token"))
-                .thenReturn(Mono.just(McpIntrospectResponseDTO.inactive()));
-
-        var response = controller.mcp(Map.of("jsonrpc", "2.0", "method", "initialize", "id", 1),
-                exchange).block();
-
-        assertThat(response).isNotNull();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        verifyNoInteractions(mcpGatewayClient);
     }
 
     @Test
     void initializeReturnsMcpServerCapabilitiesForActiveToken() {
         MockServerWebExchange exchange = authorizedExchange();
-        when(mcpGatewayClient.introspect("token")).thenReturn(Mono.just(activeContext()));
-
+        when(mcpGatewayClient.validateToken("token")).thenReturn(Mono.empty());
         var response = controller.mcp(Map.of("jsonrpc", "2.0", "method", "initialize", "id", 7),
                 exchange).block();
 
@@ -111,17 +100,16 @@ class McpGatewayControllerTest {
         assertThat(response.getBody()).containsEntry("jsonrpc", "2.0").containsEntry("id", 7);
         assertThat(castMap(response.getBody().get("result")))
                 .containsEntry("protocolVersion", "2025-06-18");
+        verify(mcpGatewayClient).validateToken("token");
     }
 
     @Test
     void toolsListDelegatesToAuthFilteredToolList() {
         MockServerWebExchange exchange = authorizedExchange();
-        McpIntrospectResponseDTO context = activeContext();
         McpToolListResponseDTO tools = McpToolListResponseDTO.builder()
                 .tools(List.of(McpToolDefinitionDTO.builder().name("auth_user_get").build()))
                 .build();
-        when(mcpGatewayClient.introspect("token")).thenReturn(Mono.just(context));
-        when(mcpGatewayClient.listTools(context)).thenReturn(Mono.just(tools));
+        when(mcpGatewayClient.listTools("token")).thenReturn(Mono.just(tools));
 
         var response = controller.mcp(Map.of("jsonrpc", "2.0", "method", "tools/list", "id", 9),
                 exchange).block();
@@ -131,48 +119,16 @@ class McpGatewayControllerTest {
     }
 
     @Test
-    void toolsCallPassesArgumentsAndMetaToGatewayClient() {
+    void toolsCallUsesAtomicFacadeRequest() {
         MockServerWebExchange exchange = authorizedExchange();
-        McpIntrospectResponseDTO context = activeContext();
-        when(mcpGatewayClient.introspect("token")).thenReturn(Mono.just(context));
-        when(mcpGatewayClient.callTool(eq(context), eq("restart_device"), anyMap(), anyMap(), any()))
+        when(mcpGatewayClient.callTool(eq("token"), eq("restart_device"), anyMap(), anyMap(), any()))
                 .thenReturn(Mono.just(Map.of("content", List.of(Map.of("type", "text", "text", "{}")))));
-
-        Map<String, Object> request = Map.of(
-                "jsonrpc", "2.0",
-                "method", "tools/call",
-                "id", 10,
-                "params", Map.of(
-                        "name", "restart_device",
-                        "arguments", Map.of("deviceId", 3L),
-                        "_meta", Map.of("confirm_id", "confirm-1", "idempotency_key", "idem-1")
-                )
-        );
+        Map<String, Object> request = Map.of("jsonrpc", "2.0", "method", "tools/call", "id", 10,
+                "params", Map.of("name", "restart_device", "arguments", Map.of("deviceId", 3L),
+                        "_meta", Map.of("confirm_id", "confirm-1", "idempotency_key", "idem-1")));
         var response = controller.mcp(request, exchange).block();
-
-        ArgumentCaptor<Map<String, Object>> arguments = ArgumentCaptor.forClass(Map.class);
-        ArgumentCaptor<Map<String, Object>> meta = ArgumentCaptor.forClass(Map.class);
-        verify(mcpGatewayClient).callTool(eq(context), eq("restart_device"), arguments.capture(), meta.capture(),
-                any(ServerWebExchange.class));
-
+        verify(mcpGatewayClient).callTool(eq("token"), eq("restart_device"), anyMap(), anyMap(), any(ServerWebExchange.class));
         assertThat(response).isNotNull();
-        assertThat(arguments.getValue()).containsEntry("deviceId", 3L);
-        assertThat(meta.getValue()).containsEntry("confirm_id", "confirm-1")
-                .containsEntry("idempotency_key", "idem-1");
-    }
-
-    private McpIntrospectResponseDTO activeContext() {
-        return McpIntrospectResponseDTO.builder()
-                .active(true)
-                .tenantId("1")
-                .principalId("100")
-                .principalType("USER")
-                .principalName("admin")
-                .displayName("Admin")
-                .clientId("dc3_client")
-                .mcpConnectionId("300")
-                .scope("mcp:tools:list mcp:tools:call")
-                .build();
     }
 
     private MockServerWebExchange authorizedExchange() {

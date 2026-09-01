@@ -17,18 +17,14 @@
 
 package io.github.pnoker.common.manager.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.SuccessCode;
-import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeBO;
 import io.github.pnoker.common.manager.entity.builder.DriverAttributeBuilder;
-import io.github.pnoker.common.manager.entity.query.DriverAttributeQuery;
+import io.github.pnoker.common.manager.entity.query.DriverAttributeOffsetRequest;
+import io.github.pnoker.common.manager.repository.DriverAttributeFilter;
 import io.github.pnoker.common.manager.entity.vo.DriverAttributeVO;
-import io.github.pnoker.common.manager.service.DriverAttributeService;
-import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.manager.service.ReactiveDriverAttributeService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,11 +32,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,17 +47,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 
 /**
- * REST controller exposing driver attribute management endpoints.
+ * Manages driver attribute field definitions declared on profile templates, the configurable fields of a downward control instruction.
  *
  * @author pnoker
  * @since 2016.10.1
  */
-@Tag(name = "driver_attribute", description = "Driver attribute definitions: manage configurable properties of protocol drivers including name, type, default value, and validation constraints")
+@Tag(name = "driver_attribute", description = "Command attribute definitions: manage configurable parameters of device commands including name, type, default value, and validation rules")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.DRIVER_ATTRIBUTE_URL_PREFIX)
@@ -68,19 +65,17 @@ public class DriverAttributeController implements BaseController {
 
     private final DriverAttributeBuilder driverAttributeBuilder;
 
-    private final DriverAttributeService driverAttributeService;
-
-    private final DriverService driverService;
+    private final ReactiveDriverAttributeService driverAttributeService;
 
     /**
-     * Create a driver attribute definition for the current tenant.
+     * Declare a new driver attribute field definition on a profile template for the current tenant.
      *
-     * @param entityVO driver attribute payload to create (name, code, type, default value)
+     * @param entityVO driver attribute payload to create (name, type, default value, validation rules)
      * @return add-success status
      */
     @PreAuthorize("@perm.can('driver_attribute', 'add')")
-    @Operation(summary = "Add Driver Attribute", description = "Define a new driver attribute for the current tenant. A driver attribute is a configurable field " +
-            "declared on a driver (name, code, type, default value) that driver instances supply a concrete value for; returns the new attribute ID.",
+    @Operation(summary = "Add Driver Attribute", description = "Declare a new driver attribute field on a profile template. " +
+            "A driver attribute is a configurable field definition of a downward control instruction; returns the new attribute ID.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -88,48 +83,52 @@ public class DriverAttributeController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody DriverAttributeVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<DriverAttributeVO> add(@Validated(Add.class) @RequestBody DriverAttributeVO entityVO) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
+            Long tenantId = tuple.getT1().getT1();
             DriverAttributeBO entityBO = driverAttributeBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            driverAttributeService.add(entityBO);
-            return R.ok(SuccessCode.ADD);
-        }));
+            entityBO.setCreatorId(tuple.getT1().getT2());
+            entityBO.setCreatorName(tuple.getT2());
+            entityBO.setOperatorId(tuple.getT1().getT2());
+            entityBO.setOperatorName(tuple.getT2());
+            return driverAttributeService.add(entityBO).map(driverAttributeBuilder::buildVOByBO);
+        });
     }
 
     /**
-     * Delete a driver attribute definition by ID.
+     * Permanently delete a driver attribute field definition by ID, scoped to the current tenant.
      *
-     * @param id id of the driver attribute to delete (must be tenant-owned)
+     * @param id id of the driver attribute to delete; must belong to the current tenant
      * @return delete-success status
      */
     @PreAuthorize("@perm.can('driver_attribute', 'delete')")
-    @Operation(summary = "Delete Driver Attribute", description = "Permanently delete a driver attribute by ID (tenant-scoped). Removes the attribute definition for its " +
-            "driver; the action cannot be undone.",
+    @Operation(summary = "Delete Driver Attribute", description = "Permanently delete a driver attribute field definition by ID (tenant-scoped). " +
+            "Removes the field from its parent command; the action cannot be undone.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "HIGH"),
                     @ExtensionProperty(name = "destructive", value = "true"),
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, driverAttributeService.getById(id));
-            driverAttributeService.delete(id);
-            return R.ok(SuccessCode.DELETE);
-        }));
+    @DeleteMapping("/delete")
+    public Mono<Void> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id,
+                             @Parameter(description = "Current optimistic-lock version required as a deletion precondition.", example = "0") @NotNull @Min(0) @RequestParam("version") Integer version) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> driverAttributeService.delete(tuple.getT1().getT1(), id, version,
+                        tuple.getT1().getT2(), tuple.getT2()).then());
     }
 
     /**
-     * Update an existing driver attribute definition.
+     * Modify an existing driver attribute field definition, scoped to the current tenant.
      *
-     * @param entityVO driver attribute payload to update (must carry an existing id)
+     * @param entityVO driver attribute payload carrying the updated fields; ownership is verified before applying
      * @return update-success status
      */
     @PreAuthorize("@perm.can('driver_attribute', 'update')")
-    @Operation(summary = "Update Driver Attribute", description = "Update an existing driver attribute (tenant-scoped). Modifies the field definition's name, code, type, " +
-            "default value or enable flag on its driver.",
+    @Operation(summary = "Update Driver Attribute", description = "Modify an existing driver attribute field definition (tenant-scoped). " +
+            "Use to rename or change the type/default of a field declared on a command in the profile template.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -137,25 +136,27 @@ public class DriverAttributeController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody DriverAttributeVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<DriverAttributeVO> update(@Validated(Update.class) @RequestBody DriverAttributeVO entityVO) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
+            Long tenantId = tuple.getT1().getT1();
             DriverAttributeBO entityBO = driverAttributeBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, driverAttributeService.getById(entityBO.getId()));
-            driverAttributeService.update(entityBO);
-            return R.ok(SuccessCode.UPDATE);
-        }));
+            entityBO.setOperatorId(tuple.getT1().getT2());
+            entityBO.setOperatorName(tuple.getT2());
+            return driverAttributeService.update(entityBO).map(driverAttributeBuilder::buildVOByBO);
+        });
     }
 
     /**
-     * Fetch a single driver attribute definition by ID.
+     * Fetch one driver attribute field definition by ID, scoped to the current tenant.
      *
-     * @param id id of the driver attribute to fetch (must be tenant-owned)
+     * @param id id of the driver attribute to fetch; must belong to the current tenant
      * @return the matched DriverAttributeVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('driver_attribute', 'get')")
-    @Operation(summary = "Get Driver Attribute by ID", description = "Fetch one driver attribute by ID (tenant-scoped). Use to inspect a driver's configurable field " +
-            "definition such as its type and default value before configuring driver attribute values.",
+    @Operation(summary = "Get Driver Attribute by ID", description = "Fetch one driver attribute field definition by ID (tenant-scoped). " +
+            "Returns the attribute's name, type and default value as declared on its parent command.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "LOW"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -163,23 +164,20 @@ public class DriverAttributeController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_id")
-    public Mono<R<DriverAttributeVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            DriverAttributeBO entityBO = requireTenant(tenantId, driverAttributeService.getById(id));
-            DriverAttributeVO entityVO = driverAttributeBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
-        }));
+    public Mono<DriverAttributeVO> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId().flatMap(tenantId -> driverAttributeService.getById(tenantId, id)
+                .map(driverAttributeBuilder::buildVOByBO));
     }
 
     /**
-     * List every driver attribute declared on a given driver.
+     * Return every driver attribute field definition reachable through a given driver, scoped to the current tenant.
      *
-     * @param driverId id of the driver whose declared attributes are returned (must be tenant-owned)
-     * @return a list of DriverAttributeVO for the driver; an empty list when the driver is not found
+     * @param driverId id of the driver whose reachable driver attribute fields are enumerated; must belong to the current tenant
+     * @return a list of DriverAttributeVO exposed by the driver; empty when the driver is not found
      */
     @PreAuthorize("@perm.can('driver_attribute', 'list')")
-    @Operation(summary = "List Driver Attributes by Driver ID", description = "Return every driver attribute declared on a given driver (tenant-scoped). Use to discover which " +
-            "configurable fields a driver exposes; returns an empty list when the driver does not exist.",
+    @Operation(summary = "List Driver Attributes by Driver ID", description = "Return every driver attribute exposed by the commands of devices driven by a given driver (tenant-scoped). " +
+            "Use to enumerate which configurable command fields a driver-type adapter can send; returns an empty list when the driver is not found.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "LOW"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -187,28 +185,20 @@ public class DriverAttributeController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list_by_driver_id")
-    public Mono<R<List<DriverAttributeVO>>> listByDriverId(@Parameter(description = "Identifier of the driver whose declared attributes are returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            try {
-                requireTenant(tenantId, driverService.getById(driverId));
-                List<DriverAttributeBO> entityBOList = filterTenant(tenantId, driverAttributeService.listByDriverId(driverId));
-                List<DriverAttributeVO> entityVO = driverAttributeBuilder.buildVOListByBOList(entityBOList);
-                return R.ok(entityVO);
-            } catch (NotFoundException ignored) {
-                return R.ok(Collections.emptyList());
-            }
-        }));
+    public Mono<List<DriverAttributeVO>> listByDriverId(@Parameter(description = "Identifier of the driver whose driver attributes are enumerated; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+        return getTenantId().flatMap(tenantId -> driverAttributeService.listByDriverId(tenantId, driverId)
+                .map(driverAttributeBuilder::buildVOByBO).collectList());
     }
 
     /**
-     * Page through driver attribute definitions with filters.
+     * Page through driver attribute field definitions for the current tenant with query filters.
      *
-     * @param entityQuery query filters such as name, code and driver (may be null)
+     * @param entityQuery optional query filters; null treated as empty
      * @return a page of DriverAttributeVO matching the query
      */
     @PreAuthorize("@perm.can('driver_attribute', 'list')")
-    @Operation(summary = "List Driver Attributes", description = "Page through driver attributes for the current tenant with filters such as name, code and driver. Returns a " +
-            "page of driver attributes; use for browsing or selecting a target attribute.",
+    @Operation(summary = "List Driver Attributes", description = "Page through driver attribute field definitions for the current tenant with query filters. " +
+            "Returns a page of attributes; use for browsing command fields or selecting a target attribute to inspect or edit.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "LOW"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -216,14 +206,13 @@ public class DriverAttributeController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<DriverAttributeVO>>> list(@RequestBody(required = false) DriverAttributeQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            DriverAttributeQuery query = Objects.isNull(entityQuery) ? new DriverAttributeQuery() : entityQuery;
-            query.setTenantId(tenantId);
-            Page<DriverAttributeBO> entityPageBO = driverAttributeService.list(query);
-            Page<DriverAttributeVO> entityPageVO = driverAttributeBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
-        }));
+    public Mono<OffsetPage<DriverAttributeVO>> list(@RequestBody(required = false) DriverAttributeOffsetRequest request) {
+        DriverAttributeOffsetRequest query = request == null ? new DriverAttributeOffsetRequest() : request;
+        return getTenantId().flatMap(tenantId -> driverAttributeService.list(new DriverAttributeFilter(
+                        tenantId, query.attributeName(), query.attributeCode(), query.attributeTypeFlag(), query.driverId(),
+                        query.enableFlag(), query.version(), query.offset(), query.limit(), query.sort()))
+                .map(page -> OffsetPage.of(page.items().stream().map(driverAttributeBuilder::buildVOByBO).toList(),
+                        page.offset(), page.limit(), page.total())));
     }
 
 }

@@ -17,10 +17,10 @@
 
 package io.github.pnoker.common.data.entity.vo;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,6 +30,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Query view object for point command list API.
@@ -60,17 +61,13 @@ public class PointCommandHistoryQueryVO implements Serializable {
     @Schema(description = "Type of the point command to filter by (e.g. read, write).", example = "READ")
     private PointCommandTypeEnum type;
 
-    @Schema(description = "Current page number for pagination, starting at 1.", example = "1")
-    private Long page = 1L;
+    @Schema(description = "Zero-based result offset.", example = "0")
+    private Long offset = 0L;
 
-    @Schema(description = "Number of records per page.", example = "20")
-    private Long size = 20L;
+    @Schema(description = "Maximum number of records.", example = "50")
+    private Integer limit = PageRequest.DEFAULT_LIMIT;
 
-    /**
-     * Convert to MyBatis-Plus Page object.
-     */
-    public Page<PointCommandHistoryDO> toPage() {
-        return new Page<>(page, size);
-    }
+    @Schema(description = "Stable, whitelisted sort fields.")
+    private List<SortSpec> sort = List.of();
 
 }

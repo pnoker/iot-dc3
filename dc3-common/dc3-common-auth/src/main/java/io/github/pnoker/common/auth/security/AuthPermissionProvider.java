@@ -17,14 +17,13 @@
 
 package io.github.pnoker.common.auth.security;
 
-import io.github.pnoker.common.auth.service.RoleResourceBindService;
+import io.github.pnoker.common.auth.repository.ReactivePermissionStore;
 import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.common.security.PermissionProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,11 +39,16 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component("authPermissionProvider")
 @RequiredArgsConstructor
-public class AuthPermissionProvider implements PermissionProvider {
+public class AuthPermissionProvider implements PermissionProvider, PermissionCacheInvalidator {
 
     private static final long CACHE_TTL_MS = 300_000; // 5 minutes
-    private final RoleResourceBindService roleResourceBindService;
+    private ReactivePermissionStore reactivePermissionStore;
     private final ConcurrentHashMap<String, CacheEntry> cache = new ConcurrentHashMap<>();
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    void setReactivePermissionStore(ReactivePermissionStore reactivePermissionStore) {
+        this.reactivePermissionStore = reactivePermissionStore;
+    }
 
     @Override
     public Mono<Set<String>> listPermissionCodes(Long tenantId, Long principalId) {
@@ -56,15 +60,9 @@ public class AuthPermissionProvider implements PermissionProvider {
         if (entry != null && entry.isValid()) {
             return Mono.just(entry.resourceCodes);
         }
-        return Mono.fromCallable(() -> {
-            var resources = roleResourceBindService.listResourceByPrincipalId(principalId, tenantId);
-            Set<String> codes = resources.stream()
-                    .map(r -> r.getResourceCode())
-                    .filter(code -> code != null && !code.isBlank())
-                    .collect(Collectors.toSet());
-            cache.put(cacheKey, new CacheEntry(codes, CACHE_TTL_MS));
-            return codes;
-        }).subscribeOn(Schedulers.boundedElastic());
+        if (reactivePermissionStore == null) return Mono.error(new IllegalStateException("ReactivePermissionStore is not configured"));
+        return reactivePermissionStore.listResourceCodes(tenantId, principalId).collect(Collectors.toSet())
+                .doOnNext(codes -> cache.put(cacheKey, new CacheEntry(codes, CACHE_TTL_MS)));
     }
 
     @Override
@@ -77,15 +75,27 @@ public class AuthPermissionProvider implements PermissionProvider {
         if (entry != null && entry.isValid()) {
             return Mono.just(entry.hasPermission(resourceCode));
         }
-        return Mono.fromCallable(() -> {
-            var resources = roleResourceBindService.listResourceByPrincipalId(principalId, tenantId);
-            Set<String> codes = resources.stream()
-                    .map(r -> r.getResourceCode())
-                    .filter(code -> code != null && !code.isBlank())
-                    .collect(Collectors.toSet());
-            cache.put(cacheKey, new CacheEntry(codes, CACHE_TTL_MS));
-            return codes.contains(PermissionMethods.WILDCARD) || codes.contains(resourceCode);
-        }).subscribeOn(Schedulers.boundedElastic());
+        if (reactivePermissionStore == null) return Mono.error(new IllegalStateException("ReactivePermissionStore is not configured"));
+        return reactivePermissionStore.listResourceCodes(tenantId, principalId).collect(Collectors.toSet())
+                .doOnNext(codes -> cache.put(cacheKey, new CacheEntry(codes, CACHE_TTL_MS)))
+                .map(codes -> codes.contains(PermissionMethods.WILDCARD) || codes.contains(resourceCode));
+    }
+
+    @Override
+    public void invalidate(Long tenantId, Long principalId) {
+        if (tenantId != null && principalId != null) cache.remove(tenantId + ":" + principalId);
+    }
+
+    @Override
+    public void invalidateTenant(Long tenantId) {
+        if (tenantId == null) return;
+        String prefix = tenantId + ":";
+        cache.keySet().removeIf(key -> key.startsWith(prefix));
+    }
+
+    @Override
+    public void invalidateAll() {
+        cache.clear();
     }
 
     private static class CacheEntry {

@@ -18,10 +18,10 @@ must not be edited directly.
 ## Contract changes
 
 1. Update the affected `.proto` files.
-2. Preserve field numbers and RPC compatibility where practical.
+2. Treat contract changes as a coordinated hard cutover; compatibility shims are not supported.
 3. Compile the affected module to regenerate Java sources.
 4. Update server implementations, builders, and clients together.
-5. Verify tenant propagation, `GrpcR` error handling, and single/list cardinality naming.
+5. Verify tenant propagation, standard gRPC status handling, and single/list cardinality naming.
 
 ```bash
 mvn -s .mvn/settings.xml -q -f dc3-api/pom.xml compile

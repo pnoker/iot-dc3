@@ -16,13 +16,13 @@ export function registerSessionCommand(program: Command): void {
   session
     .command('list')
     .description('List conversations for the current principal')
-    .option('--page <n>', 'Page number', '1')
-    .option('--size <n>', 'Page size', '20')
+    .option('--offset <n>', 'Zero-based result offset', '0')
+    .option('--limit <n>', 'Maximum items to return', '20')
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post('/api/v3/agentic/session/list', {
-        page: { current: Number(opts.page), size: Number(opts.size) },
+        offset: Number(opts.offset), limit: Number(opts.limit),
       });
       printAndExit(result, format);
     });
@@ -64,7 +64,7 @@ export function registerSessionCommand(program: Command): void {
       const result = await dc3Client.request(
         'POST',
         `/api/v3/agentic/session/update?conversation_id=${encodeURIComponent(id)}`,
-        { name: opts.name },
+        { title: opts.name },
       );
       printAndExit(result, format);
     });
@@ -121,12 +121,17 @@ export function registerActionCommand(program: Command): void {
     .command('pending')
     .description('List tool calls awaiting approval for one conversation')
     .requiredOption('--conversation-id <id>', 'Conversation identifier')
+    .option('--offset <number>', 'Zero-based result offset', (value) => Number.parseInt(value, 10))
+    .option('--limit <number>', 'Maximum results to return', (value) => Number.parseInt(value, 10))
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       try {
+        const params = new URLSearchParams({conversation_id: opts.conversationId});
+        if (opts.offset !== undefined) params.set('offset', String(opts.offset));
+        if (opts.limit !== undefined) params.set('limit', String(opts.limit));
         const result = await dc3Client.get(
-          `/api/v3/agentic/action/pending?conversation_id=${encodeURIComponent(opts.conversationId)}`,
+          `/api/v3/agentic/action/pending?${params.toString()}`,
         );
         printAndExit(result, format);
       } catch (err) {

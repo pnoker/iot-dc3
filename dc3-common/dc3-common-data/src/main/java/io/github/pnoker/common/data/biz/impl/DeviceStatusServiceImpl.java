@@ -1,109 +1,55 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.data.biz.DeviceStatusService;
-import io.github.pnoker.common.data.dal.EntityStateManager;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.entity.query.DeviceQuery;
+import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
+import io.github.pnoker.common.facade.entity.query.FacadeDeviceOffsetQuery;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-/**
- * Business service implementation for device status operations.
- *
- * @author pnoker
- * @since 2016.10.1
- */
-@Slf4j
+/** Reactive device status service backed by the entity lease projection. */
 @Service
 @RequiredArgsConstructor
 public class DeviceStatusServiceImpl implements DeviceStatusService {
 
     private final DeviceFacade deviceFacade;
-
-    private final EntityStateManager entityStateManager;
-
+    private final ReactiveEntityStateStore stateStore;
 
     @Override
-    public Map<String, String> getStatusByPage(DeviceQuery pageQuery) {
-        FacadeDeviceQuery facadeQuery = FacadeDeviceQuery.builder()
-                .page(pageQuery.getPage())
-                .deviceName(pageQuery.getDeviceName())
-                .deviceCode(pageQuery.getDeviceCode())
-                .driverId(pageQuery.getDriverId())
-                .profileId(pageQuery.getProfileId())
-                .tenantId(pageQuery.getTenantId())
-                .enableFlag(pageQuery.getEnableFlag())
-                .build();
-
-        FacadePage<FacadeDeviceBO> page = deviceFacade.listByPage(facadeQuery);
-        if (page.getRecords().isEmpty()) {
-            return Map.of();
-        }
-
-        return getStatusMap(page.getRecords());
+    public Mono<Map<String, String>> list(FacadeDeviceOffsetQuery query) {
+        return deviceFacade.listReactive(query)
+                .flatMap(page -> statuses(query.tenantId(), page.items()));
     }
 
     @Override
-    public Map<String, String> listByProfileId(Long tenantId, Long profileId) {
-        List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(tenantId, profileId);
-        if (devices.isEmpty()) {
-            return Map.of();
-        }
-        return getStatusMap(devices);
+    public Mono<Map<String, String>> listByProfileId(Long tenantId, Long profileId) {
+        return deviceFacade.listByProfileIdReactive(tenantId, profileId)
+                .collectList()
+                .flatMap(devices -> statuses(tenantId, devices));
     }
 
-    /**
-     * Get a map of device statuses keyed by device id.
-     */
-    private Map<String, String> getStatusMap(List<FacadeDeviceBO> devices) {
-        Map<String, String> statusMap = new HashMap<>(16);
-        LocalDateTime now = LocalDateTime.now();
-        devices.forEach(device -> {
-            EntityStateDO state = entityStateManager.lambdaQuery()
-                    .eq(EntityStateDO::getTenantId, device.getTenantId())
-                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DEVICE.getIndex())
-                    .eq(EntityStateDO::getEntityId, device.getId())
-                    .one();
-            String status;
-            if (Objects.isNull(state) || state.getExpireTime().isBefore(now)) {
-                status = EntityStatusEnum.OFFLINE.getCode();
-            } else {
-                EntityStatusEnum e = EntityStatusEnum.ofIndex(state.getStateFlag());
-                status = Objects.nonNull(e) ? e.getCode() : EntityStatusEnum.OFFLINE.getCode();
-            }
-            statusMap.put(String.valueOf(device.getId()), status);
-        });
-        return statusMap;
+    private Mono<Map<String, String>> statuses(Long tenantId, List<FacadeDeviceBO> devices) {
+        List<Long> ids = devices.stream().map(FacadeDeviceBO::getId).filter(id -> id != null && id > 0).toList();
+        if (ids.isEmpty()) return Mono.just(Map.of());
+        return stateStore.listStateFlags(tenantId, EntityTypeEnum.DEVICE, ids)
+                .map(flags -> devices.stream().filter(device -> device.getId() != null)
+                        .collect(Collectors.toUnmodifiableMap(device -> String.valueOf(device.getId()),
+                                device -> statusCode(flags.get(device.getId())))));
     }
 
+    private String statusCode(Byte state) {
+        if (state == null) return EntityStatusEnum.OFFLINE.getCode();
+        EntityStatusEnum value = EntityStatusEnum.ofIndex(state);
+        return value == null ? EntityStatusEnum.OFFLINE.getCode() : value.getCode();
+    }
 }

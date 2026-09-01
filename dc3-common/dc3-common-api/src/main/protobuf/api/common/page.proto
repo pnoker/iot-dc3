@@ -25,17 +25,33 @@ option java_outer_classname = "PageProto";
 option objc_class_prefix = "Common";
 option java_multiple_files = true;
 
-// Page DTO
-message GrpcPage {
-  // Total count
-  int64 total = 1;
+// Canonical request used by all new list RPCs. Offset is zero based and limit
+// is bounded by the server (currently 1..200). Do not add page-number fields.
+message PageRequest {
+  int64 offset = 1;
+  int32 limit = 2;
+  repeated SortSpec sort = 3;
+}
 
-  // Number of items per page
-  int64 size = 2;
+message SortSpec {
+  string field = 1;
+  SortDirection direction = 2;
+}
 
-  // Current page number
-  int64 current = 3;
+enum SortDirection {
+  SORT_DIRECTION_UNSPECIFIED = 0;
+  SORT_DIRECTION_ASC = 1;
+  SORT_DIRECTION_DESC = 2;
+}
 
-  // Total number of pages
-  int64 pages = 4;
+message OffsetPage {
+  int64 offset = 1;
+  int32 limit = 2;
+  int64 total = 3;
+  bool has_next = 4;
+}
+
+message CursorPage {
+  string next_cursor = 1;
+  bool has_next = 2;
 }

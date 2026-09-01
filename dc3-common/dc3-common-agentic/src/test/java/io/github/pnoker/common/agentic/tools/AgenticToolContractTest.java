@@ -22,6 +22,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
+import reactor.core.publisher.Mono;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -60,7 +61,9 @@ class AgenticToolContractTest {
     @ParameterizedTest
     @MethodSource("toolMethods")
     void platformToolsReturnStructuredResults(Method method) {
-        assertThat(method.getReturnType()).isEqualTo(AgenticToolResult.class);
+        assertThat(method.getReturnType())
+                .as("Tool method %s must return AgenticToolResult or Mono", method.getName())
+                .isIn(AgenticToolResult.class, Mono.class);
     }
 
     @ParameterizedTest

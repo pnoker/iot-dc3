@@ -17,12 +17,10 @@
 
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.data.entity.vo.PointValueVO;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -108,18 +106,10 @@ public interface PointValueBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
-    default Page<PointValueBO> buildBOPageByDOPage(Page<PointValueDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
     /**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    default Page<PointValueVO> buildVOPageByBOPage(Page<PointValueBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

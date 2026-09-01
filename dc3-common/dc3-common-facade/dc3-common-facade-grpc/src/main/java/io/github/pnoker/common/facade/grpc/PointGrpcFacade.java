@@ -17,25 +17,23 @@
 
 package io.github.pnoker.common.facade.grpc;
 
-import io.github.pnoker.api.center.manager.GrpcPagePointDTO;
-import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
+import io.github.pnoker.api.center.manager.GrpcOffsetPointQuery;
+import io.github.pnoker.api.center.manager.GrpcOffsetPagePointDTO;
 import io.github.pnoker.api.center.manager.GrpcPointIdsQuery;
 import io.github.pnoker.api.center.manager.GrpcPointQuery;
-import io.github.pnoker.api.center.manager.GrpcRPagePointDTO;
-import io.github.pnoker.api.center.manager.GrpcRPointDTO;
-import io.github.pnoker.api.center.manager.GrpcRPointListDTO;
+import io.github.pnoker.api.center.manager.GrpcPointListDTO;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
-import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
+import io.github.pnoker.common.facade.entity.query.FacadePointOffsetQuery;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcPointBuilder;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -43,86 +41,64 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * gRPC PointFacade: forwards to Manager Center via
- * {@link PointApiGrpc.PointApiBlockingStub}.
+ * gRPC PointFacade: forwards to Manager Center. Canonical reactive methods use the
+ * asynchronous stub; legacy methods remain available to callers that have not moved yet.
  *
  * @author pnoker
  * @since 2016.10.1
  */
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PointGrpcFacade implements PointFacade {
 
-    private final PointApiGrpc.PointApiBlockingStub pointApiBlockingStub;
+
+    private final PointApiGrpc.PointApiStub pointApiStub;
 
     private final FacadeGrpcPointBuilder facadeGrpcPointBuilder;
 
     private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public FacadePointBO getById(Long tenantId, Long id) {
-        GrpcPointQuery request = GrpcPointQuery.newBuilder().setPointId(id).setTenantId(tenantId).build();
-        GrpcRPointDTO response = grpcFacadeSupport.call("PointFacade.getById", pointApiBlockingStub,
-                stub -> stub.getById(request));
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "getById");
-            return null;
+    public Mono<FacadePointBO> getByIdReactive(Long tenantId, Long id) {
+        if (tenantId == null || id == null) {
+            return Mono.empty();
         }
-        return facadeGrpcPointBuilder.toFacadeBO(response.getData());
+        GrpcPointQuery request = GrpcPointQuery.newBuilder().setPointId(id).setTenantId(tenantId).build();
+        PointApiGrpc.PointApiStub stub = grpcFacadeSupport.withDeadline(pointApiStub);
+        return ReactiveGrpcClientSupport.<GrpcPointQuery, GrpcPointDTO>unary(
+                        "PointFacade.getById", observer -> stub.getById(request, observer))
+                .map(facadeGrpcPointBuilder::toFacadeBO);
     }
 
     @Override
-    public List<FacadePointBO> listByIds(Long tenantId, Collection<Long> ids) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
+    public Flux<FacadePointBO> listByIdsReactive(Long tenantId, Collection<Long> ids) {
+        if (tenantId == null || ids == null || ids.isEmpty()) {
+            return Flux.empty();
         }
         List<Long> pointIds = ids.stream().filter(Objects::nonNull).distinct().toList();
         if (pointIds.isEmpty()) {
-            return Collections.emptyList();
+            return Flux.empty();
         }
-
         GrpcPointIdsQuery request = GrpcPointIdsQuery.newBuilder().addAllPointIds(pointIds).setTenantId(tenantId).build();
-        GrpcRPointListDTO response = grpcFacadeSupport.call("PointFacade.listByIds", pointApiBlockingStub,
-                stub -> stub.listByIds(request));
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "listByIds");
-            return Collections.emptyList();
-        }
-        return response.getDataList().stream().map(facadeGrpcPointBuilder::toFacadeBO).toList();
+        PointApiGrpc.PointApiStub stub = grpcFacadeSupport.withDeadline(pointApiStub);
+        return ReactiveGrpcClientSupport.<GrpcPointIdsQuery, GrpcPointListDTO>unary(
+                        "PointFacade.listByIds", observer -> stub.listByIds(request, observer))
+                .flatMapMany(response -> Flux.fromIterable(response.getItemsList()).map(facadeGrpcPointBuilder::toFacadeBO));
     }
 
     @Override
-    public FacadePage<FacadePointBO> listByPage(FacadePointQuery query) {
-        GrpcPagePointQuery request = facadeGrpcPointBuilder.toGrpcPageQuery(query);
-        GrpcRPagePointDTO response = grpcFacadeSupport.call("PointFacade.listByPage", pointApiBlockingStub,
-                stub -> stub.listByPage(request));
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "listByPage");
-            return FacadePage.empty();
-        }
-
-        GrpcPagePointDTO pageDTO = response.getData();
-        List<FacadePointBO> records = pageDTO.getDataList().stream().map(facadeGrpcPointBuilder::toFacadeBO).toList();
-
-        return new FacadePage<>(pageDTO.getPage().getCurrent(), pageDTO.getPage().getSize(),
-                pageDTO.getPage().getTotal(), pageDTO.getPage().getPages(), records);
-    }
-
-    /**
-     * Guard a gRPC result: NOT_FOUND is treated as a normal empty outcome, any other
-     * error code throws a service exception.
-     *
-     * @param result the gRPC result envelope
-     * @param op     the operation name, for error messages
-     */
-    private void guardOrThrow(GrpcR result, String op) {
-        String code = result.getCode();
-        if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
-            log.debug("PointGrpcFacade.{} => no resource", op);
-            return;
-        }
-        throw new ServiceException("PointFacade." + op + " failed: [" + code + "] " + result.getMessage());
+    public Mono<OffsetPage<FacadePointBO>> listReactive(FacadePointOffsetQuery query) {
+        GrpcOffsetPointQuery request = facadeGrpcPointBuilder.toGrpcOffsetQuery(query);
+        PointApiGrpc.PointApiStub stub = grpcFacadeSupport.withDeadline(pointApiStub);
+        return ReactiveGrpcClientSupport.<GrpcOffsetPointQuery, GrpcOffsetPagePointDTO>unary(
+                        "PointFacade.list", observer -> stub.list(request, observer))
+                .map(response -> {
+                    if (!response.hasPage()) throw new IllegalStateException("PointFacade.list returned no page");
+                    var page = response.getPage();
+                    List<FacadePointBO> items = response.getItemsList().stream()
+                            .map(facadeGrpcPointBuilder::toFacadeBO).toList();
+                    return OffsetPage.of(items, page.getOffset(), page.getLimit(), page.getTotal());
+                });
     }
 
 }

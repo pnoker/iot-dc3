@@ -1,75 +1,68 @@
-# 时序存储选型指南
+# 时序存储现状
 
-DC3 的设备位值历史存放在可插拔的时序存储后面（端口定义见
-[docs/design/tsdb-abstraction.md](./design/tsdb-abstraction.md)）。每个存储 一个适配器模块，由 `dc3.tsdb.type`
-选择，同时只激活一个；每个适配器都 通过同一套 24 例库中立契约套件（`dc3-tsdb-tck`）认证。
+## 结论
 
-## 能力矩阵（按适配器实际声明发布，非预估）
+DC3 当前只保留一条时序存储实现：`dc3-common-data` 的原生 `R2dbcTsdbStore`。它直接实现
+`dc3-tsdb-core` 的响应式 `TsdbStore` Port，使用 `DatabaseClient` 和 `TransactionalOperator` 访问
+PostgreSQL/TimescaleDB。平台不再提供 JDBC、同步 HTTP、同步 Session 或“`Mono.fromCallable` 包装”的外部
+TSDB 适配器，也不再提供运行时 `dc3.tsdb.type` 选择。
 
-| 能力                     | timescale                                                                                | tdengine                      | influxdb (3.x)                             | iotdb (2.x)                                    |
-|--------------------------|------------------------------------------------------------------------------------------|-------------------------------|--------------------------------------------|------------------------------------------------|
-| 部署形态                 | 内嵌 PG（默认）/外置                                                                     | 外置                          | 外置                                       | 外置                                           |
-| 序列模型                 | 行列 (tenant,device,point)                                                               | 超级表+tags+确定性子表        | measurement+tags                           | 树路径 `root.dc3.t*.d*.p*`                     |
-| 去重 (序列,时间)         | upsert 后写胜                                                                            | 后写胜                        | 后写胜                                     | 后写胜                                         |
-| 微秒精度                 | ✅                                                                                       | ✅（库级 `PRECISION 'us'`）   | ✅（ns 存储）                              | ✅（需 `timestamp_precision=us`）              |
-| 分桶聚合                 | ✅ time_bucket                                                                           | ✅ INTERVAL                   | ✅ date_bin                                | ✅ GROUP BY 窗口                               |
-| 空桶补零                 | ❌（省略空桶，面板端补零）                                                               | ❌（省略空桶）                | ❌（省略空桶）                             | ❌（省略空桶）                                 |
-| PERCENTILE               | ✅ 精确                                                                                  | ✅ 精确（单表限制→子表直查）  | ❌（近似→声明 false，门面精算）            | ❌（无此函数→声明 false）                      |
-| FIRST/LAST (M4)          | ✅                                                                                       | ✅                            | ✅（ordered array_agg）                    | ✅ FIRST_VALUE/LAST_VALUE                      |
-| 租户分析面 S13-①②③⑤      | ✅                                                                                       | ✅                            | ✅                                         | ✅（driver 维度除外，见下）                    |
-| 按 driver 分组计数 S13-② | ✅                                                                                       | ✅                            | ✅                                         | ❌（driver 是 measurement 非路径层——如实拒绝） |
-| 延迟直方图 S13-④         | ✅                                                                                       | ❌ 声明 false（面板零桶降级） | ✅                                         | ❌ 声明 false                                  |
-| rollup 分级 S16          | ✅ NATIVE（共享 cagg，见设计 §9.6；无扩展的纯 PG 部署启动时协商降级 NONE，读走原始扫描） | NONE（诚实原始扫描）          | NONE                                       | NONE                                           |
-| 范围删除                 | ✅                                                                                       | ✅（含上界-1µs 换算）         | ❌（Core 无行删除→声明 false，走分区工具） | ✅（deleteData）                               |
-| 相关系数 S19             | ✅ SQL 端                                                                                | ❌ 声明 false（门面桶化自算） | ❌ 声明 false                              | ❌ 声明 false                                  |
-| 契约套件                 | 24/24                                                                                    | 24/24（2 跳过）               | 24/24（2 跳过）                            | 24/24（3 跳过）                                |
+## 模块边界
 
-跳过数=该适配器如实声明为不支持、由套件按能力门控跳过的用例数。跳过不是 缺陷：不支持的能力由数据中心门面降级（如延迟直方图返回零桶、相关系数与
-精确分位数由 S19 门面从有界拉取中自算），绝不给错数据。
+| 模块 | 职责 |
+| --- | --- |
+| `dc3-tsdb-core` | 定义 `TsdbStore`、`TsdbModel`、游标分页和能力声明；不依赖具体数据库 |
+| `dc3-common-data` | 实现 `R2dbcTsdbStore`，承载写入、历史读取、聚合和租户隔离 |
+| `dc3-center-data` | 配置 R2DBC `ConnectionFactory`，通过 facade 暴露数据能力 |
 
-## 换型操作
+`dc3-tsdb/dc3-tsdb-timescale`、`dc3-tsdb-tdengine`、`dc3-tsdb-influxdb`、`dc3-tsdb-iotdb` 和
+`dc3-tsdb-tck` 已从源码构建中移除；`target/` 下的历史 jar 不属于可发布模块。
 
-1. `make up STACK=optional SERVICES="tdengine"`（或 influxdb / iotdb）启动目标 存储；IoTDB 首启会自动挂载
-   `dc3/dependencies/iotdb/iotdb-system.properties`
-   （微秒精度 + 全接口 RPC，两行配置， **必需**）。
-2. 主栈环境：`DC3_TSDB_TYPE=tdengine`（默认 `timescale`），按需覆盖连接变量：
-    - tdengine：`DC3_TSDB_TDENGINE_URL`（默认 `jdbc:TAOS-RS://dc3-tdengine:6041/`）
-    - influxdb：`DC3_TSDB_INFLUXDB_URL` / `DC3_TSDB_INFLUXDB_TOKEN`（admin token 自建）
-    - iotdb：`DC3_TSDB_IOTDB_HOST` / `DC3_TSDB_IOTDB_PORT`（root/root 默认）
-3. Maven 侧把所选适配器加入数据中心依赖（默认只打包 timescale）：
+## 数据模型
 
-```xml
-<dependency>
-    <groupId>io.github.pnoker</groupId>
-    <artifactId>dc3-tsdb-tdengine</artifactId> <!-- 或 dc3-tsdb-influxdb / dc3-tsdb-iotdb -->
-</dependency>
-```
+历史表是 `dc3_history.dc3_point_value`，逻辑主键为 `(tenant_id, device_id, point_id, create_time)`。
+写入列同时保存原始值、计算值、数值投影、质量码、消息幂等字段、驱动节点、序号、fencing token 和
+接收时间。所有时间使用 UTC `Instant`，精度为微秒；数值不可解析时 `num_value` 为 `NULL`，不把字符串
+强行转换为零。
 
-> 与 MQ 家族同款约定（[docs/mq-brokers.md](./mq-brokers.md)）：默认适配器随
-> 服务打包，其余按部署显式引入——没人应为不用的存储付出 jar 与启动开销。
+`dc3_point_value_latest` 等最新值投影属于关系数据面，由 Data 域事务维护；TSDB Port 只负责历史样本，
+避免跨存储双写和读写竞态。
 
-## 各存储落地要点（适配器 javadoc 有完整清单）
+## Port 操作
 
-- **timescale**：内嵌模式复用主 PG 的 `history` 数据源；S16 三级生命周期 （raw 30 天 → 1 分钟层 1 年 → 1 小时层永久）与
-  Grafana 共享同一套 real-time cagg。无 timescaledb 扩展的纯 PG 部署在启动时把 rollup 能力协商为
-  NONE（日志可见），分桶读自动走原始扫描；分桶聚合不补零 （`gapFill=false`，空桶省略，消费端自行补零）。
-- **tdengine**：时间戳全程 epoch-µs 字面量（REST 驱动的 Timestamp 序列化按 JVM 时区、服务端按 UTC 解析——字符串形态必漂移）；PERCENTILE
-  单表限制走 确定性子表直查，子表未建（尚无样本）时按空序列处理而非报错；保留天数可配（`dc3.tsdb.tdengine.retention-days`，默认
-  180，仅影响新建库）。
-- **influxdb**：v3 HTTP API 直连（行协议写入 + query_sql CSV 读取，零客户端 依赖）；整型字段必须带 `i` 后缀（否则列绑 Float64
-  永久丢 ns 精度）；行协议 字符串字段转义反斜杠/双引号/换行/回车（裸换行会截断行、腐蚀整批写入）；行删除 不存在，租户注销走分区工具。
-- **iotdb**：路径节点不能纯数字（`t1/d10/p20` 前缀）；`WHERE time` 的裸数字按 **毫秒**解释（与库精度无关，µs 字面量会静默匹配空集）——一律用
-  `2026-08-20T12:59:59+00:00` 形态；租户级 last/history 通过通配符枚举序列 如实支持（`tenantWideScan=true`）；保留天数可配 （
-  `dc3.tsdb.iotdb.ttl-days`，默认 180）；session 池化且 必须关重定向 （`enableRedirection(false)`，节点发现会发容器内地址）。
+`TsdbStore` 的写入和读取全部返回 `Mono`/`Flux`：
 
-## 认证复跑
+- `append`：非空、有界批量写入；同一批次原子失败或成功，数据库冲突按最后写入胜；
+- `last`：按 `SeriesFilter` 返回每个序列最新样本；
+- `history`：半开时间窗内按 `deviceTime/messageId/series` 的降序游标分页；
+- `aggregate`、`bucketedAggregate`：窗口聚合和升序分桶聚合；百分位参数严格校验；
+- `count`、`seriesCounts`、`seriesLastSeen`、`latencyHistogram`、`correlation`：分析查询，均带租户范围。
+
+所有查询都要求正数 `tenantId`、正数序列 ID 和有限 deadline。`limit/pageSize` 超出上限或非法时直接
+返回 `IllegalArgumentException`，不静默截断；超时由 Reactor `timeout` 终止并释放连接。
+
+## 分页与排序
+
+历史样本使用不透明 cursor，不暴露页码；cursor 包含设备时间、序列和 messageId，服务端验证租户和窗口。
+管理类关系查询统一使用 `offset`/`limit`/`sort`，返回 `items`、`total`、`hasNext`。排序字段由白名单
+映射到 SQL 列，禁止把客户端字符串直接拼进 SQL。`COUNT` 与 `items` 在同一事务快照下计算，避免总数与
+列表跨快照漂移。
+
+## 租户与一致性不变量
+
+1. 每条 SQL 都显式带 `tenant_id`；跨租户序列、join 和 correlation 请求直接拒绝。
+2. 软删除数据必须带 `deleted = 0`；更新和删除同时检查租户及版本，乐观锁冲突不重试覆盖。
+3. 批量写入有 `maxAppendBatch` 上限；不存在无界 `concatMap` 或无限缓存。
+4. 连接、事务和取消信号由 R2DBC/Reactor 管理，不允许阻塞桥接。
+5. 数据库方言由已配置的 R2DBC dialect 提供，启动时必须且只能存在一个有效连接配置。
+
+## 验证
 
 ```bash
-export DOCKER_HOST="unix://$(podman info --format '{{.Host.RemoteSocket.Path}}')"
-export TESTCONTAINERS_RYUK_DISABLED=true
-mvn -s .mvn/settings.xml -f dc3-tsdb/pom.xml -DskipTests install
-mvn -s .mvn/settings.xml -pl dc3-tsdb/dc3-tsdb-tck test -Dtest=TimescaleContractTest
-# 其余三库需显式开启（镜像较重）:
-export DC3_TSDB_TCK=true
-mvn -s .mvn/settings.xml -pl dc3-tsdb/dc3-tsdb-tck test -Dtest=TdengineContractTest   # 或 Influxdb / Iotdb
+mvn -s .mvn/settings.xml -q -DskipTests compile
+mvn -s .mvn/settings.xml -q test -pl dc3-tsdb/dc3-tsdb-core,dc3-common/dc3-common-data -am
 ```
+
+需要真实 PostgreSQL 时运行 `make up-db` 后执行 Data 域 R2DBC integration tests。新增存储实现必须先
+提供真正的异步客户端、租户隔离测试、取消/超时测试和分页一致性测试；仅用同步客户端包裹 Reactor
+不满足本项目架构要求。

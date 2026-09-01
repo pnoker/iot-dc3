@@ -45,13 +45,13 @@
                 <el-icon>
                   <Edit/>
                 </el-icon>
-                {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime) }}
+                {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime || '') }}
               </li>
               <li class="nowrap-item">
                 <el-icon>
                   <Sunset/>
                 </el-icon>
-                {{ $t('common.createTime') }}: {{ timestamp(data.createTime) }}
+                {{ $t('common.createTime') }}: {{ timestamp(data.createTime || '') }}
               </li>
             </ul>
           </div>
@@ -88,11 +88,12 @@ import {successMessage} from '@/utils/notificationUtil';
 import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
 import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
+import type {DeviceRecord} from '@/config/types/manager';
 
 const props = defineProps({
   embedded: {type: Boolean, default: false},
   status: {type: String, default: ''},
-  data: {type: Object as PropType<Record<string, any>>, default: () => ({})},
+  data: {type: Object as PropType<DeviceRecord>, required: true},
   driver: {type: Object as PropType<Record<string, any>>, default: () => ({})},
   icon: {type: String, default: 'images/common/device.png'},
 });
@@ -101,11 +102,11 @@ const emit = defineEmits(['disable', 'enable', 'delete']);
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const emitToggle = (name: 'disable' | 'enable') => {
-  emit(name, props.data.id, props.data.driverId, () => successMessage());
+  emit(name, props.data, () => successMessage());
 };
 
 const emitDelete = () => {
-  emit('delete', props.data.id, () => successMessage());
+  emit('delete', props.data, () => successMessage());
 };
 
 const edit = () => {

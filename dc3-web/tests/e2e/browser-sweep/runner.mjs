@@ -309,7 +309,7 @@ async function testActualDelete(page, watch, testCase) {
   const suffix = Date.now().toString(36).slice(-8);
   const name = `codex_${testCase.name.toLowerCase().replace(/[^a-z]+/g, '_')}_${suffix}`;
   const add = await apiPost(page, testCase.addUrl, testCase.seed(name, suffix));
-  if (!add.data?.ok) throw new Error(`${testCase.name} seed failed: ${JSON.stringify(add.data)}`);
+  if (add.status >= 300) throw new Error(`${testCase.name} seed failed: ${JSON.stringify(add.data)}`);
   const before = await listCount(page, testCase.listUrl, testCase.nameField, name);
   if (before < 1) throw new Error(`${testCase.name} seed not found after add`);
 

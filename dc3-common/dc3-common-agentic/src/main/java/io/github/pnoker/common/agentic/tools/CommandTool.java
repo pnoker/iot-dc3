@@ -16,23 +16,19 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
-import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.agentic.utils.AgenticToolUtil;
 import io.github.pnoker.common.facade.api.CommandFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeCommandQuery;
+import io.github.pnoker.common.facade.entity.query.FacadeCommandOffsetQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Objects;
+import reactor.core.publisher.Mono;
 
 /**
  * Command-domain tools exposed to the LLM via Spring AI @Tool.
@@ -40,156 +36,42 @@ import java.util.Objects;
  * @author pnoker
  * @since 2016.10.1
  */
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CommandTool {
 
     private final CommandFacade commandFacade;
 
-    /**
-     * Return command by identifier.
-     *
-     * @param commandId   command identifier
-     * @param toolContext tool context
-     * @return lookup command by identifier result
-     */
-    @Tool(description = "Look up a command (custom instruction) by its numeric ID. Returns command name, code, type (custom/config/action), call type (sync/async), timeout in seconds, and bound profile ID.")
-    @AgenticToolMetadata(domain = "command", title = "Query command by ID")
-    public AgenticToolResult<FacadeCommandBO> lookupCommandById(
-            @ToolParam(description = "The numeric command ID") Long commandId,
-            ToolContext toolContext) {
+    public Mono<AgenticToolResult<FacadeCommandBO>> lookupCommandByIdReactive(Long commandId, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, commandId={}", "lookupCommandById", tenantId, commandId);
-        FacadeCommandBO bo = commandFacade.getById(tenantId, commandId);
-        if (Objects.isNull(bo)) {
-            return AgenticToolResult.notFound("Command not found for ID: " + commandId);
-        }
-        return AgenticToolResult.ok("Command loaded", bo);
+        return commandFacade.getById(tenantId, commandId)
+                .map(value -> AgenticToolResult.ok("Command loaded", value))
+                .defaultIfEmpty(AgenticToolResult.notFound("Command not found for ID: " + commandId));
     }
 
-    /**
-     * Return commands by identifiers.
-     *
-     * @param commandIds  command identifiers
-     * @param toolContext tool context
-     * @return lookup commands by identifiers result
-     */
-    @Tool(description = "Batch look up commands by numeric IDs. Returns up to 50 tenant-scoped commands.")
-    @AgenticToolMetadata(domain = "command", title = "Batch query commands by IDs")
-    public AgenticToolResult<List<FacadeCommandBO>> lookupCommandsByIds(
-            @ToolParam(description = "The numeric command IDs") List<Long> commandIds,
-            ToolContext toolContext) {
+    public Mono<AgenticToolResult<List<FacadeCommandBO>>> lookupCommandsByIdsReactive(List<Long> commandIds, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         List<Long> ids = AgenticToolUtil.normalizeIds(commandIds);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, commandIds={}", "lookupCommandsByIds", tenantId, ids);
-        if (ids.isEmpty()) {
-            return AgenticToolResult.invalid("No valid command IDs provided.");
-        }
-        List<FacadeCommandBO> commands = commandFacade.listByIds(tenantId, ids);
-        if (Objects.isNull(commands) || commands.isEmpty()) {
-            return AgenticToolResult.empty("No commands found for IDs: " + ids, List.of());
-        }
-        return AgenticToolResult.ok("Commands loaded", commands);
+        if (ids.isEmpty()) return Mono.just(AgenticToolResult.invalid("No valid command IDs provided."));
+        return commandFacade.listByIds(tenantId, ids).collectList().map(values -> values.isEmpty()
+                ? AgenticToolResult.empty("No commands found for IDs: " + ids, List.of())
+                : AgenticToolResult.ok("Commands loaded", values));
     }
 
-    /**
-     * Return the matching commands.
-     *
-     * @param commandName command name
-     * @param profileId   profile identifier
-     * @param page        page
-     * @param size        size
-     * @param toolContext tool context
-     * @return search commands result
-     */
-    @Tool(description = "Search for commands with optional filters. Returns a paginated list.")
-    @AgenticToolMetadata(domain = "command", title = "Search commands")
-    public AgenticToolResult<FacadePage<FacadeCommandBO>> searchCommands(
-            @ToolParam(description = "Command name filter (partial match), or null to skip") String commandName,
-            @ToolParam(description = "Profile ID filter, or null to skip") Long profileId,
-            @ToolParam(description = "Page number (1-based)") int page,
-            @ToolParam(description = "Page size") int size,
-            ToolContext toolContext) {
+    public Mono<AgenticToolResult<OffsetPage<FacadeCommandBO>>> searchCommandsReactive(String commandName, Long profileId, long offset, int limit, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, commandName={}, profileId={}, page={}, size={}",
-                "searchCommands", tenantId, commandName, profileId, page, size);
-
-        FacadeCommandQuery query = new FacadeCommandQuery();
-        query.setCommandName(commandName);
-        query.setProfileId(profileId);
-        query.setTenantId(tenantId);
-        query.setPage(AgenticToolUtil.page(page, size));
-
-        FacadePage<FacadeCommandBO> result = commandFacade.listByPage(query);
-        if (!AgenticToolUtil.hasRecords(result)) {
-            return AgenticToolResult.empty("No commands found.", result);
-        }
-        return AgenticToolResult.ok("Command page loaded", result);
+        return Mono.defer(() -> commandFacade.list(new FacadeCommandOffsetQuery(tenantId, commandName, null, null, null, profileId, null, null, null, offset, limit, List.of())))
+                .map(value -> value.items().isEmpty() ? AgenticToolResult.empty("No commands found.", value) : AgenticToolResult.ok("Command page loaded", value));
     }
 
-    /**
-     * Return the matching commands by device identifier.
-     *
-     * @param deviceId    device identifier
-     * @param page        page
-     * @param size        size
-     * @param toolContext tool context
-     * @return list commands by device identifier result
-     */
-    @Tool(description = "List commands bound to a specific device ID. Use this before executing commands when the user knows the device but not the command ID.")
-    @AgenticToolMetadata(domain = "command", title = "List commands by device")
-    public AgenticToolResult<FacadePage<FacadeCommandBO>> listCommandsByDeviceId(
-            @ToolParam(description = "The device ID") Long deviceId,
-            @ToolParam(description = "Page number (1-based)") int page,
-            @ToolParam(description = "Page size") int size,
-            ToolContext toolContext) {
+    public Mono<AgenticToolResult<OffsetPage<FacadeCommandBO>>> listCommandsByDeviceIdReactive(Long deviceId, long offset, int limit, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, page={}, size={}", "listCommandsByDeviceId",
-                tenantId, deviceId, page, size);
-
-        FacadeCommandQuery query = new FacadeCommandQuery();
-        query.setDeviceId(deviceId);
-        query.setTenantId(tenantId);
-        query.setPage(AgenticToolUtil.page(page, size));
-
-        FacadePage<FacadeCommandBO> result = commandFacade.listByPage(query);
-        if (!AgenticToolUtil.hasRecords(result)) {
-            return AgenticToolResult.empty("No commands found for device ID: " + deviceId, result);
-        }
-        return AgenticToolResult.ok("Command page loaded for device " + deviceId, result);
+        return Mono.defer(() -> commandFacade.list(new FacadeCommandOffsetQuery(tenantId, null, null, null, null, null, null, null, deviceId, offset, limit, List.of()))).map(value -> value.items().isEmpty() ? AgenticToolResult.empty("No commands found for device ID: " + deviceId, value) : AgenticToolResult.ok("Command page loaded for device " + deviceId, value));
     }
 
-    /**
-     * Return the matching commands by profile identifier.
-     *
-     * @param profileId   profile identifier
-     * @param page        page
-     * @param size        size
-     * @param toolContext tool context
-     * @return list commands by profile identifier result
-     */
-    @Tool(description = "List commands under a specific profile/template ID. Use this when the user wants all custom instructions defined by a template.")
-    @AgenticToolMetadata(domain = "command", title = "List commands by profile")
-    public AgenticToolResult<FacadePage<FacadeCommandBO>> listCommandsByProfileId(
-            @ToolParam(description = "The profile/template ID") Long profileId,
-            @ToolParam(description = "Page number (1-based)") int page,
-            @ToolParam(description = "Page size") int size,
-            ToolContext toolContext) {
+    public Mono<AgenticToolResult<OffsetPage<FacadeCommandBO>>> listCommandsByProfileIdReactive(Long profileId, long offset, int limit, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}, page={}, size={}",
-                "listCommandsByProfileId", tenantId, profileId, page, size);
-
-        FacadeCommandQuery query = new FacadeCommandQuery();
-        query.setProfileId(profileId);
-        query.setTenantId(tenantId);
-        query.setPage(AgenticToolUtil.page(page, size));
-
-        FacadePage<FacadeCommandBO> result = commandFacade.listByPage(query);
-        if (!AgenticToolUtil.hasRecords(result)) {
-            return AgenticToolResult.empty("No commands found for profile ID: " + profileId, result);
-        }
-        return AgenticToolResult.ok("Command page loaded for profile " + profileId, result);
+        return Mono.defer(() -> commandFacade.list(new FacadeCommandOffsetQuery(tenantId, null, null, null, null, profileId, null, null, null, offset, limit, List.of()))).map(value -> value.items().isEmpty() ? AgenticToolResult.empty("No commands found for profile ID: " + profileId, value) : AgenticToolResult.ok("Command page loaded for profile " + profileId, value));
     }
 
 }

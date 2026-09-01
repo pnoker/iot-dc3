@@ -114,6 +114,12 @@ public record AgenticRunEvent(String type, String name, String title, String det
                 AgenticConstant.ToolResult.CODE_ERROR);
     }
 
+    public static AgenticRunEvent requestCancelled() {
+        return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_EVENT, AgenticConstant.RunEvent.NAME_AGENTIC,
+                "Request cancelled", "The client cancelled the response stream.", now(),
+                AgenticConstant.RunEvent.PHASE_RESULT, "cancelled", "CANCELLED");
+    }
+
     private static long now() {
         return Instant.now().toEpochMilli();
     }

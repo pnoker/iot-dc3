@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.EventExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -29,7 +28,6 @@ import io.github.pnoker.common.manager.entity.vo.EventVO;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -173,24 +171,5 @@ public interface EventBuilder {
      */
     List<EventVO> buildVOListByBOList(List<EventBO> entityBOList);
 
-    /**
-     * Convert do page to bo page.
-     *
-     * @param entityPageDO persistence object
-     * @return converted value
-     */
-    default Page<EventBO> buildBOPageByDOPage(Page<EventDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    /**
-     * Convert bo page to vo page.
-     *
-     * @param entityPageBO business object
-     * @return converted value
-     */
-    default Page<EventVO> buildVOPageByBOPage(Page<EventBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
 }

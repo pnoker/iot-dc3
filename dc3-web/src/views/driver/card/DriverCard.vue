@@ -47,13 +47,13 @@
                 <el-icon>
                   <Edit/>
                 </el-icon>
-                {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime) }}
+                {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime || '') }}
               </li>
               <li class="nowrap-item">
                 <el-icon>
                   <Sunset/>
                 </el-icon>
-                {{ $t('common.createTime') }}: {{ timestamp(data.createTime) }}
+                {{ $t('common.createTime') }}: {{ timestamp(data.createTime || '') }}
               </li>
             </ul>
           </div>
@@ -65,6 +65,14 @@
         </div>
         <div v-if="!footer" class="things-card__footer">
           <div class="things-card-footer-operation">
+            <el-popconfirm
+              :title="$t('common.confirmDelete', {name: $t('common.entityDriver')})"
+              @confirm="emitDelete"
+            >
+              <template #reference>
+                <el-button link type="primary" @click.stop>{{ $t('common.delete') }}</el-button>
+              </template>
+            </el-popconfirm>
             <el-button link type="primary" @click.stop="detail">{{ $t('common.detail') }}</el-button>
           </div>
         </div>
@@ -81,16 +89,18 @@ import router from '@/config/router';
 import {copy} from '@/utils/commonUtil';
 import {timestamp} from '@/utils/dateUtil';
 import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
+import {successMessage} from '@/utils/notificationUtil';
 import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
+import type {DriverRecord} from '@/config/types/manager';
 
 const props = defineProps({
   icon: {type: String, default: 'images/common/driver.png'},
   statusTable: {type: Object as PropType<Record<string, string>>, default: () => ({})},
-  data: {type: Object as PropType<Record<string, any>>, default: () => ({})},
+  data: {type: Object as PropType<DriverRecord>, required: true},
   footer: {type: Boolean, default: false},
 });
 
-defineEmits(['select-change']);
+const emit = defineEmits(['select-change', 'delete']);
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const status = computed(() => {
@@ -111,6 +121,10 @@ const statusLabelKey = computed(() => {
   if (status.value === 'FAULT') return 'status.fault';
   return 'status.offline';
 });
+
+const emitDelete = () => {
+  emit('delete', props.data, () => successMessage());
+};
 
 const detail = () => {
   const id = props.data.id;

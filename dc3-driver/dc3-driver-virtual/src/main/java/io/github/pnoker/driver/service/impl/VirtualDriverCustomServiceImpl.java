@@ -21,24 +21,19 @@ import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.CommandRuntimeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.EventRuntimeBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
-import io.github.pnoker.common.facade.api.EventFacade;
-import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeEventQuery;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -83,7 +78,6 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
     private final DriverMetadata driverMetadata;
     private final DeviceMetadata deviceMetadata;
     private final DriverSenderService driverSenderService;
-    private final EventFacade eventFacade;
     private final AtomicLong lastEventReportMillis = new AtomicLong();
     @Value("${dc3.driver.code}")
     private String driverCode;
@@ -237,7 +231,7 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public Map<String, String> execute(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> commandConfig,
-                                       DeviceBO device, FacadeCommandBO command, Map<String, String> paramValues) {
+                                       DeviceBO device, CommandRuntimeBO command, Map<String, String> paramValues) {
         Map<String, String> context = new LinkedHashMap<>();
         if (Objects.nonNull(paramValues)) {
             context.putAll(paramValues);
@@ -245,9 +239,9 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
         context.put("deviceId", String.valueOf(device.getId()));
         context.put("deviceCode", device.getDeviceCode());
         context.put("deviceName", device.getDeviceName());
-        context.put("commandId", String.valueOf(command.getId()));
-        context.put("commandCode", command.getCommandCode());
-        context.put("commandName", command.getCommandName());
+        context.put("commandId", String.valueOf(command.id()));
+        context.put("commandCode", command.commandCode());
+        context.put("commandName", command.commandName());
 
         String payloadTemplate = getConfigValue(commandConfig, PAYLOAD_TEMPLATE);
         String payload = render(StringUtils.defaultString(payloadTemplate), context);
@@ -260,7 +254,7 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
         result.putIfAbsent("payload", payload);
         result.putIfAbsent("response", response);
         log.info("Virtual command executed, deviceId={}, commandId={}, payloadLength={}, responseLength={}, resultCount={}",
-                device.getId(), command.getId(), payload.length(), response.length(), result.size());
+                device.getId(), command.id(), payload.length(), response.length(), result.size());
         return result;
     }
 
@@ -321,9 +315,9 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
             return;
         }
 
-        List<FacadeEventBO> events = listDeviceEvents(device);
-        for (FacadeEventBO event : events) {
-            Map<String, AttributeBO> eventConfig = deviceMetadata.getEventConfig(device.getId(), event.getId());
+        List<EventRuntimeBO> events = listDeviceEvents(device);
+        for (EventRuntimeBO event : events) {
+            Map<String, AttributeBO> eventConfig = deviceMetadata.getEventConfig(device.getId(), event.id());
             if (eventConfig.isEmpty()) {
                 continue;
             }
@@ -331,33 +325,26 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
             EventReportDTO report = buildEventReport(device, event, eventConfig);
             driverSenderService.eventReportSender(report);
             log.info("Virtual event reported, deviceId={}, eventId={}, eventCode={}, parameterCount={}",
-                    device.getId(), event.getId(), report.eventCode(), report.paramValues().size());
+                    device.getId(), event.id(), report.eventCode(), report.paramValues().size());
         }
     }
 
-    private List<FacadeEventBO> listDeviceEvents(DeviceBO device) {
-        Pages page = new Pages();
-        page.setSize(100);
-        FacadeEventQuery query = FacadeEventQuery.builder()
-                .page(page)
-                .tenantId(device.getTenantId())
-                .deviceId(device.getId())
-                .enableFlag(EnableFlagEnum.ENABLE)
-                .build();
-        FacadePage<FacadeEventBO> eventPage = eventFacade.listByPage(query);
-        if (Objects.isNull(eventPage) || Objects.isNull(eventPage.getRecords())) {
+    private List<EventRuntimeBO> listDeviceEvents(DeviceBO device) {
+        if (Objects.isNull(device.getEventRuntimeIdMap())) {
             return List.of();
         }
-        return eventPage.getRecords();
+        return device.getEventRuntimeIdMap().values().stream()
+                .sorted(java.util.Comparator.comparing(EventRuntimeBO::id))
+                .toList();
     }
 
-    private EventReportDTO buildEventReport(DeviceBO device, FacadeEventBO event, Map<String, AttributeBO> eventConfig) {
+    private EventReportDTO buildEventReport(DeviceBO device, EventRuntimeBO event, Map<String, AttributeBO> eventConfig) {
         Map<String, Object> rawEvent = new LinkedHashMap<>();
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("value", String.valueOf(ThreadLocalRandom.current().nextInt(0, 100)));
         payload.put("deviceCode", device.getDeviceCode());
         payload.put("source", "virtual");
-        rawEvent.put("eventCode", event.getEventCode());
+        rawEvent.put("eventCode", event.eventCode());
         rawEvent.put("payload", payload);
 
         String eventCode = valueToString(resolvePath(rawEvent,
@@ -369,13 +356,13 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
                 .recordId(UUID.randomUUID().toString())
                 .tenantId(device.getTenantId())
                 .deviceId(device.getId())
-                .eventId(event.getId())
-                .eventCode(StringUtils.defaultIfBlank(eventCode, event.getEventCode()))
-                .eventTypeFlag(event.getEventTypeFlag().getIndex())
-                .eventLevelFlag(event.getEventLevelFlag().getIndex())
+                .eventId(event.id())
+                .eventCode(StringUtils.defaultIfBlank(eventCode, event.eventCode()))
+                .eventTypeFlag(event.eventTypeFlag().getIndex())
+                .eventLevelFlag(event.eventLevelFlag().getIndex())
                 .paramValues(toParamValues(payloadValue))
                 .configSnapshot(buildConfigSnapshot(eventConfig))
-                .message("Virtual event " + event.getEventCode() + " from " + device.getDeviceCode())
+                .message("Virtual event " + event.eventCode() + " from " + device.getDeviceCode())
                 .occurTime(Instant.now())
                 .schemaVersion(SCHEMA_VERSION)
                 .build();

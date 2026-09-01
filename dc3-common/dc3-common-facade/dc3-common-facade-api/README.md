@@ -10,7 +10,9 @@ these contracts at runtime:
 - **In-process** (`dc3-common-facade-local-auth` / `-data` / `-manager`) — direct local calls inside the
   `dc3-center-single` monolith.
 
-The implementation is selected by the `dc3.facade.mode` property (`DC3_FACADE_MODE`, default `grpc`), so controllers and
+The implementation is selected independently per domain by `dc3.facade.auth.mode`, `dc3.facade.manager.mode`, and
+`dc3.facade.data.mode`. A center sets its own domain to `disabled`, because facades are cross-service boundaries;
+the single-process center uses `local`, and remote consumers use `grpc`. Controllers and
 services never depend on transport details.
 
 ## Module Information
@@ -22,11 +24,15 @@ services never depend on transport details.
 
 | Domain  | Facade interfaces                                                                                                                      |
 |---------|----------------------------------------------------------------------------------------------------------------------------------------|
-| Auth    | `TokenFacade`, `UserFacade`, `TenantFacade`, `PermissionFacade`, `ResourceRegistryFacade`, `McpRuntimeFacade`, `LocalCredentialFacade` |
+| Auth    | `TokenFacade`, `ReactiveTokenFacade`, `UserFacade`, `ReactiveUserFacade`, `TenantFacade`, `ReactiveTenantFacade`, `PermissionFacade`, `ResourceRegistryFacade`, `McpRuntimeFacade`, `LocalCredentialFacade`, `ReactiveLocalCredentialFacade` |
 | Manager | `DriverFacade`, `DeviceFacade`, `PointFacade`, `ProfileFacade`, `CommandFacade`, `EventFacade`                                         |
 | Data    | `PointValueFacade`, `PointCommandFacade`, `StatusHealthFacade`                                                                         |
 
-Facades exchange business objects (BO); request/response shaping is the caller's responsibility.
+Facades exchange business objects (BO); request/response shaping is the caller's responsibility. New manager read
+paths expose Reactor types directly: `Mono<T>` for a single record, `Flux<T>` for a bounded collection, and
+`Mono<OffsetPage<T>>` for offset pagination. `FacadePointOffsetQuery` is the canonical point-list request; it carries
+an explicit tenant, `offset`, `limit` (1..200), filters, and a whitelisted sort specification. New gRPC/local point
+facade calls use these methods and never block a WebFlux or Agentic event loop.
 
 ## Dependencies
 

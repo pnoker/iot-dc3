@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * configuration views for the driver runtime.
  *
  * <p>Cache freshness is event-driven: RabbitMQ metadata events call
- * {@link #loadCache(long)} or {@link #removeCache(long)}. There is no TTL — the
+ * {@link #refreshCache(long)} or {@link #removeCache(long)}. There is no TTL — the
  * {@code maximumSize} bound only caps memory.
  *
  * <p>When the upstream loader returns {@code null} (the device has been removed at

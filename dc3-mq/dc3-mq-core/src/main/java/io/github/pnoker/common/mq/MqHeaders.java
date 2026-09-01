@@ -52,12 +52,18 @@ public final class MqHeaders {
     public static final String CORRELATION_ID = "dc3-correlation-id";
 
     /**
-     * Partition key mirror for brokers with no native key field (MQTT user property,
-     * JMS string property). Adapters whose broker carries the key natively (rabbit
-     * routing key, kafka record key, rocketmq keys, pulsar key) do not stamp it; the
+     * Partition key mirror for brokers with no native key field (MQTT user property).
+     * Adapters whose broker carries the key natively (RabbitMQ routing key, Kafka
+     * record key, Pulsar key) do not stamp it; the
      * adapters' client-side topic routers read whichever field their broker uses.
      */
     public static final String PARTITION_KEY = "dc3-partition-key";
+
+    /**
+     * Adapter-neutral delivery attempt counter. Brokers with no native redelivery
+     * count increment this header when they republish a delivery for retry.
+     */
+    public static final String REDELIVERY_COUNT = "dc3-redelivery-count";
 
     private MqHeaders() {
         throw new IllegalStateException("Utility class");

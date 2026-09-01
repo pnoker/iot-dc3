@@ -115,11 +115,15 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-core</artifactId>
+            <artifactId>dc3-db-r2dbc-core</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-postgres</artifactId>
+            <artifactId>dc3-db-r2dbc-runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-postgres</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>

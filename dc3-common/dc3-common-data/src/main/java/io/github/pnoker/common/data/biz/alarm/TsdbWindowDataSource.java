@@ -22,23 +22,22 @@ import io.github.pnoker.common.data.biz.store.PointValueSampleConverter;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.WindowModeEnum;
 import io.github.pnoker.common.tsdb.model.TsdbModel.AggregateFunction;
-import io.github.pnoker.common.tsdb.model.TsdbModel.CursorPage;
 import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
 import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
 import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
-import io.github.pnoker.common.tsdb.model.TsdbModel.WindowAggregate;
-import io.github.pnoker.common.tsdb.spi.TsdbStore;
+import io.github.pnoker.common.data.repository.ReactiveTsdbStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Long-window backend. Pushes the aggregate to the time-series store through
@@ -65,7 +64,7 @@ public class TsdbWindowDataSource implements WindowDataSource {
      */
     private static final int SAMPLE_PAGE_SIZE = 5000;
 
-    private final TsdbStore tsdbStore;
+    private final ReactiveTsdbStore tsdbStore;
 
     private final PointValueSampleConverter converter;
 
@@ -85,13 +84,13 @@ public class TsdbWindowDataSource implements WindowDataSource {
     }
 
     @Override
-    public AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode) {
+    public Mono<AggregateOutcome> aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode) {
         if (!isPointFact(fact) || Objects.isNull(spec) || Objects.isNull(spec.duration())) {
-            return AggregateOutcome.empty();
+            return Mono.just(AggregateOutcome.empty());
         }
         Long deviceId = longValue(fact.value("deviceId"));
         if (Objects.isNull(deviceId) || deviceId <= 0) {
-            return AggregateOutcome.empty();
+            return Mono.just(AggregateOutcome.empty());
         }
         LocalDateTime to = Objects.requireNonNullElse(fact.getFactTime(),
                 LocalDateTime.now(TimeConstant.DEFAULT_ZONEID));
@@ -102,25 +101,23 @@ public class TsdbWindowDataSource implements WindowDataSource {
         // as non-exceeding — silent missed alarms. Failing the evaluation keeps
         // the breakage visible.
         SeriesKey series = new SeriesKey(fact.getTenantId(), deviceId, fact.getEntityId());
-        WindowAggregate result = tsdbStore.aggregate(SeriesFilter.of(series),
+        return tsdbStore.aggregate(SeriesFilter.of(series),
                 AggregateFunction.valueOf(mode.toAggregateFunction().name()),
                 new TimeWindow(converter.toInstant(from), converter.toInstant(to)),
-                null, DEADLINE).get(series);
-        if (Objects.isNull(result)) {
-            return AggregateOutcome.empty();
-        }
-        BigDecimal value = Objects.isNull(result.value()) ? null : BigDecimal.valueOf(result.value());
-        return new AggregateOutcome(value, result.sampleCount());
+                null, DEADLINE)
+                .flatMap(values -> Mono.justOrEmpty(values.get(series)))
+                .map(result -> new AggregateOutcome(Objects.isNull(result.value()) ? null : BigDecimal.valueOf(result.value()), result.sampleCount()))
+                .defaultIfEmpty(AggregateOutcome.empty());
     }
 
     @Override
-    public List<WindowSample> samples(WindowSpec spec, RuleFact fact) {
+    public Flux<WindowSample> samples(WindowSpec spec, RuleFact fact) {
         if (!isPointFact(fact) || Objects.isNull(spec) || Objects.isNull(spec.duration())) {
-            return List.of();
+            return Flux.empty();
         }
         Long deviceId = longValue(fact.value("deviceId"));
         if (Objects.isNull(deviceId) || deviceId <= 0) {
-            return List.of();
+            return Flux.empty();
         }
         LocalDateTime to = Objects.requireNonNullElse(fact.getFactTime(),
                 LocalDateTime.now(TimeConstant.DEFAULT_ZONEID));
@@ -129,22 +126,15 @@ public class TsdbWindowDataSource implements WindowDataSource {
         SeriesKey series = new SeriesKey(fact.getTenantId(), deviceId, fact.getEntityId());
         TimeWindow window = new TimeWindow(converter.toInstant(from), converter.toInstant(to));
 
-        // The port pages descending; ALL/ANY evaluates oldest → newest, so
-        // drain the window and flip once at the end.
-        List<PointValueSample> descending = new ArrayList<>();
-        CursorPage<PointValueSample> page = tsdbStore.history(SeriesFilter.of(series), window,
-                null, SAMPLE_PAGE_SIZE, DEADLINE);
-        descending.addAll(page.items());
-        while (Objects.nonNull(page.nextCursor()) && descending.size() < SAMPLE_PAGE_SIZE * 20) {
-            page = tsdbStore.history(SeriesFilter.of(series), window, page.nextCursor(),
-                    SAMPLE_PAGE_SIZE, DEADLINE);
-            descending.addAll(page.items());
-        }
-        descending.sort(Comparator.comparing(PointValueSample::deviceTime));
-        return descending.stream()
+        return tsdbStore.history(SeriesFilter.of(series), window, null, SAMPLE_PAGE_SIZE, DEADLINE)
+                .expand(page -> Objects.isNull(page.nextCursor())
+                        ? Mono.empty()
+                        : tsdbStore.history(SeriesFilter.of(series), window, page.nextCursor(), SAMPLE_PAGE_SIZE, DEADLINE))
+                .concatMapIterable(page -> page.items())
+                .take((long) SAMPLE_PAGE_SIZE * 20)
+                .sort(Comparator.comparing(PointValueSample::deviceTime))
                 .map(sample -> new WindowSample(sample.numericValue(), sample.calValue(),
-                        converter.toWallClock(sample.deviceTime())))
-                .toList();
+                        converter.toWallClock(sample.deviceTime())));
     }
 
 }

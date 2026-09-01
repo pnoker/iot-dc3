@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.CommandHistoryService;
@@ -25,7 +24,8 @@ import io.github.pnoker.common.data.entity.builder.CommandHistoryBuilder;
 import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
-import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -43,8 +43,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * REST controller for custom command call management.
@@ -80,13 +78,9 @@ public class CommandHistoryController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "true")
             }))
     @PostMapping("/call")
-    public Mono<R<String>> call(@Validated @RequestBody CommandCallVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            String recordId = commandHistoryService.call(tenantId, commandHistoryBuilder.buildBOByVO(entityVO));
-            R<String> result = R.ok();
-            result.setData(recordId);
-            return result;
-        }));
+    public Mono<String> call(@Validated @RequestBody CommandCallVO entityVO) {
+        return getTenantId().flatMap(tenantId -> commandHistoryService.call(tenantId,
+                commandHistoryBuilder.buildBOByVO(entityVO)));
     }
 
     /**
@@ -106,9 +100,9 @@ public class CommandHistoryController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_record_id")
-    public Mono<R<CommandHistoryVO>> getByRecordId(@Parameter(description = "Record ID returned by the Call Command endpoint; must resolve to a command-call history entry owned by the current tenant", example = "cmd_20260523_a1b2c3d4") @NotBlank @RequestParam String recordId) {
-        return getTenantId().flatMap(tenantId -> async(() ->
-                R.ok(commandHistoryService.getByRecordId(tenantId, recordId))));
+    public Mono<CommandHistoryVO> getByRecordId(@Parameter(description = "Record ID returned by the Call Command endpoint; must resolve to a command-call history entry owned by the current tenant", example = "cmd_20260523_a1b2c3d4") @NotBlank @RequestParam String recordId) {
+        return getTenantId().flatMap(tenantId -> commandHistoryService.getByRecordId(tenantId, recordId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Command history does not exist"))));
     }
 
     /**
@@ -128,11 +122,8 @@ public class CommandHistoryController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<CommandHistoryVO>>> list(@RequestBody(required = false) CommandHistoryQueryVO queryVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            CommandHistoryQueryVO query = Objects.isNull(queryVO) ? new CommandHistoryQueryVO() : queryVO;
-            return R.ok(commandHistoryService.list(tenantId, query));
-        }));
+    public Mono<OffsetPage<CommandHistoryVO>> list(@RequestBody(required = false) CommandHistoryQueryVO queryVO) {
+        return getTenantId().flatMap(tenantId -> commandHistoryService.list(tenantId, queryVO));
     }
 
 }

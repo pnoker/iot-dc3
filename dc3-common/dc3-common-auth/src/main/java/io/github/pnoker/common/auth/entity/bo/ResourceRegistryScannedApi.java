@@ -39,7 +39,7 @@ import lombok.ToString;
 public class ResourceRegistryScannedApi {
 
     /**
-     * HTTP method: GET / POST / PUT / DELETE.
+     * HTTP method: GET / POST / PUT / PATCH / DELETE.
      */
     private String method;
 

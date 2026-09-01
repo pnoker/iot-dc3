@@ -75,7 +75,7 @@ export const useAuthStore = defineStore('auth', () => {
     });
     try {
       const saltRes = await generateSalt({tenant: form.tenant, name: form.name});
-      const salt: string = saltRes.data;
+      const salt: string = saltRes;
       if (!salt) {
         failMessage(i18n.global.t('login.failed'));
         return;

@@ -2,31 +2,18 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  */
 package io.github.pnoker.common.agentic.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.config.AgenticProperties;
-import io.github.pnoker.common.agentic.dal.ModelConfigManager;
-import io.github.pnoker.common.agentic.dal.ModelProviderManager;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
-import io.github.pnoker.common.agentic.entity.builder.ModelConfigBuilder;
-import io.github.pnoker.common.agentic.entity.model.ModelConfigDO;
-import io.github.pnoker.common.agentic.entity.model.ModelProviderDO;
-import io.github.pnoker.common.agentic.entity.vo.ModelVO;
+import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
+import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
 import io.github.pnoker.common.agentic.service.ModelConfigService;
+import io.github.pnoker.common.agentic.entity.vo.ModelVO;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -36,25 +23,20 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Implements model configuration listing, save, update, and remove operations.
- *
- * @author pnoker
- * @since 2016.10.1
- */
+/** Reactive model configuration application service. */
 @Service
 @RequiredArgsConstructor
 public class ModelConfigServiceImpl implements ModelConfigService {
 
-    private final ModelConfigManager modelConfigManager;
-    private final ModelProviderManager modelProviderManager;
-    private final ModelConfigBuilder modelConfigBuilder;
+    private final ReactiveModelConfigStore modelConfigStore;
+    private final ReactiveModelProviderStore modelProviderStore;
     private final AgenticProperties properties;
 
     @Value("${spring.ai.openai.chat.options.model:gpt-4o}")
@@ -67,209 +49,98 @@ public class ModelConfigServiceImpl implements ModelConfigService {
     private Integer fallbackMaxTokens;
 
     @Override
-    public List<ModelVO> listOptions() {
-        List<ModelConfigBO> configs = enabledConfigs();
-        if (configs.isEmpty()) {
-            return List.of(new ModelVO(fallbackModel, fallbackModel, true,
-                    properties.isFallbackToolCallingEnabled(), properties.isFallbackVisionEnabled(),
-                    properties.isFallbackReasoningEnabled(), fallbackTemperature, fallbackMaxTokens));
-        }
-        return configs.stream().map(item -> new ModelVO(item.getModel(), item.getLabel(), truthy(item.getStream()),
-                truthy(item.getToolCall()), truthy(item.getVision()), truthy(item.getReasoning()),
-                item.getTemperature(), item.getMaxTokens())).toList();
+    public Mono<List<ModelVO>> listOptions(RequestHeader.PrincipalHeader header) {
+        return modelConfigStore.list(header, true).collectList().map(configs -> {
+            if (configs.isEmpty()) {
+                return List.of(new ModelVO(fallbackModel, fallbackModel, true,
+                        properties.isFallbackToolCallingEnabled(), properties.isFallbackVisionEnabled(),
+                        properties.isFallbackReasoningEnabled(), fallbackTemperature, fallbackMaxTokens));
+            }
+            return configs.stream().map(item -> new ModelVO(item.getModel(), item.getLabel(), truthy(item.getStream()),
+                    truthy(item.getToolCall()), truthy(item.getVision()), truthy(item.getReasoning()),
+                    item.getTemperature(), item.getMaxTokens())).toList();
+        });
     }
 
     @Override
-    public List<ModelConfigBO> listConfigs() {
-        List<ModelConfigDO> entityDOList = modelConfigManager.list(Wrappers.<ModelConfigDO>query()
-                .lambda()
-                .orderByDesc(ModelConfigDO::getDefaultFlag)
-                .orderByAsc(ModelConfigDO::getModel));
-        return modelConfigBuilder.buildBOListByDOList(entityDOList).stream()
-                .map(this::fillProviderName)
-                .toList();
+    public Mono<List<ModelConfigBO>> listConfigs(RequestHeader.PrincipalHeader header) {
+        return modelConfigStore.list(header, false).collectList();
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ModelConfigBO add(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
-        validate(entityBO);
-        ModelConfigBO targetBO = new ModelConfigBO();
-        apply(targetBO, entityBO);
-        fillCreateAudit(targetBO, header);
-        ModelConfigDO entityDO = modelConfigBuilder.buildDOByBO(targetBO);
-        modelConfigManager.save(entityDO);
-        normalizeDefault(entityDO);
-        return fillProviderName(modelConfigBuilder.buildBOByDO(entityDO));
+    public Mono<ModelConfigBO> add(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
+        return Mono.defer(() -> validate(entityBO, header)
+                .then(Mono.defer(() -> modelConfigStore.insert(normalize(entityBO, null, header), header))));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ModelConfigBO update(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
-        if (Objects.isNull(entityBO) || Objects.isNull(entityBO.getId())) {
-            throw new RequestException("Model config ID is required");
-        }
-        validate(entityBO);
-        ModelConfigDO existingDO = modelConfigManager.getById(entityBO.getId());
-        if (Objects.isNull(existingDO)) {
-            throw new NotFoundException("Model config does not exist");
-        }
-        ModelConfigBO targetBO = modelConfigBuilder.buildBOByDO(existingDO);
-        apply(targetBO, entityBO);
-        fillOperateAudit(targetBO, header);
-        ModelConfigDO entityDO = modelConfigBuilder.buildDOByBO(targetBO);
-        modelConfigManager.updateById(entityDO);
-        normalizeDefault(entityDO);
-        return fillProviderName(modelConfigBuilder.buildBOByDO(entityDO));
+    public Mono<ModelConfigBO> update(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
+        return Mono.defer(() -> {
+            if (entityBO == null || entityBO.getId() == null) {
+                return Mono.error(new RequestException("Model config ID is required"));
+            }
+            return validate(entityBO, header)
+                    .then(Mono.defer(() -> modelConfigStore.get(entityBO.getId(), header)))
+                    .switchIfEmpty(Mono.error(new NotFoundException("Model config does not exist")))
+                    .map(existing -> normalize(entityBO, existing, header))
+                    .flatMap(value -> Mono.defer(() -> modelConfigStore.update(value, header)))
+                    .switchIfEmpty(Mono.error(new NotFoundException("Model config does not exist")));
+        });
     }
 
     @Override
-    public void delete(Long id) {
-        modelConfigManager.removeById(id);
+    public Mono<Void> delete(Long id, RequestHeader.PrincipalHeader header) {
+        return modelConfigStore.delete(id, header)
+                .flatMap(deleted -> deleted ? Mono.<Void>empty()
+                        : Mono.error(new NotFoundException("Model config does not exist")));
     }
 
-    /**
-     * List enabled model configs, with the default one ordered first.
-     *
-     * @return enabled model configs
-     */
-    private List<ModelConfigBO> enabledConfigs() {
-        LambdaQueryWrapper<ModelConfigDO> wrapper = Wrappers.<ModelConfigDO>query()
-                .lambda()
-                .eq(ModelConfigDO::getEnableFlag, EnableFlagEnum.ENABLE)
-                .orderByDesc(ModelConfigDO::getDefaultFlag)
-                .orderByAsc(ModelConfigDO::getModel);
-        return modelConfigBuilder.buildBOListByDOList(modelConfigManager.list(wrapper));
-    }
-
-    /**
-     * Validate a model config: model and provider are required, the provider must exist,
-     * temperature (when set) must be in [0, 2], and maxTokens (when set) must be positive.
-     *
-     * @param entityBO the model config to validate
-     */
-    private void validate(ModelConfigBO entityBO) {
-        if (Objects.isNull(entityBO) || StringUtils.isBlank(entityBO.getModel())) {
-            throw new RequestException("Model is required");
+    private Mono<Void> validate(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
+        if (entityBO == null || StringUtils.isBlank(entityBO.getModel())) {
+            return Mono.error(new RequestException("Model is required"));
         }
-        if (Objects.isNull(entityBO.getProviderId()) || entityBO.getProviderId() == 0) {
-            throw new RequestException("Provider is required");
+        if (entityBO.getProviderId() == null || entityBO.getProviderId() == 0) {
+            return Mono.error(new RequestException("Provider is required"));
         }
-        ModelProviderDO provider = modelProviderManager.getById(entityBO.getProviderId());
-        if (Objects.isNull(provider)) {
-            throw new NotFoundException("Provider does not exist");
-        }
-        if (Objects.nonNull(entityBO.getTemperature())
+        if (entityBO.getTemperature() != null
                 && (entityBO.getTemperature() < 0.0 || entityBO.getTemperature() > 2.0)) {
-            throw new RequestException("Temperature must be between 0.0 and 2.0");
+            return Mono.error(new RequestException("Temperature must be between 0.0 and 2.0"));
         }
-        if (Objects.nonNull(entityBO.getMaxTokens()) && entityBO.getMaxTokens() < 1) {
-            throw new RequestException("Max tokens must be greater than 0");
+        if (entityBO.getMaxTokens() != null && entityBO.getMaxTokens() < 1) {
+            return Mono.error(new RequestException("Max tokens must be greater than 0"));
         }
+        return modelProviderStore.get(entityBO.getProviderId(), header)
+                .switchIfEmpty(Mono.error(new NotFoundException("Provider does not exist")))
+                .then();
     }
 
-    /**
-     * Copy fields from the source BO onto the target, applying defaults for blank
-     * capability flags, temperature, maxTokens, and remark.
-     *
-     * @param targetBO the target to populate
-     * @param sourceBO the source carrying the user-supplied values
-     */
-    private void apply(ModelConfigBO targetBO, ModelConfigBO sourceBO) {
-        targetBO.setModel(sourceBO.getModel().trim());
-        targetBO.setLabel(StringUtils.defaultIfBlank(sourceBO.getLabel(), sourceBO.getModel()).trim());
-        targetBO.setProviderId(sourceBO.getProviderId());
-        targetBO.setStream(defaultBool(sourceBO.getStream(), true));
-        targetBO.setToolCall(defaultBool(sourceBO.getToolCall(), true));
-        targetBO.setVision(defaultBool(sourceBO.getVision(), false));
-        targetBO.setReasoning(defaultBool(sourceBO.getReasoning(), false));
-        targetBO.setTemperature(Objects.nonNull(sourceBO.getTemperature()) ? sourceBO.getTemperature()
-                : fallbackTemperature);
-        targetBO.setMaxTokens(Objects.nonNull(sourceBO.getMaxTokens()) ? sourceBO.getMaxTokens()
-                : fallbackMaxTokens);
-        targetBO.setDefaultFlag(Objects.nonNull(sourceBO.getDefaultFlag()) ? sourceBO.getDefaultFlag()
-                : DefaultFlagEnum.NOT_DEFAULT);
-        targetBO.setEnableFlag(Objects.nonNull(sourceBO.getEnableFlag()) ? sourceBO.getEnableFlag()
-                : EnableFlagEnum.ENABLE);
-        targetBO.setRemark(StringUtils.defaultString(sourceBO.getRemark()));
-    }
-
-    /**
-     * Stamp the creator, operator, tenant, and timestamps for a new model config.
-     *
-     * @param entityBO the model config to stamp
-     * @param header   the authenticated principal header
-     */
-    private void fillCreateAudit(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
-        LocalDateTime now = LocalDateTime.now();
-        entityBO.setCreateTime(now);
-        entityBO.setOperateTime(now);
-        entityBO.setCreatorId(header.getUserId());
-        entityBO.setCreatorName(header.getUserName());
-        entityBO.setOperatorId(header.getUserId());
-        entityBO.setOperatorName(header.getUserName());
-        entityBO.setTenantId(header.getTenantId());
-    }
-
-    /**
-     * Stamp the operator and operate timestamp for an updated model config.
-     *
-     * @param entityBO the model config to stamp
-     * @param header   the authenticated principal header
-     */
-    private void fillOperateAudit(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {
-        entityBO.setOperateTime(LocalDateTime.now());
-        entityBO.setOperatorId(header.getUserId());
-        entityBO.setOperatorName(header.getUserName());
-    }
-
-    /**
-     * Enforce the single-default invariant: when a config is marked default, clear the
-     * default flag on every other config.
-     *
-     * @param entityDO the config being saved as default
-     */
-    private void normalizeDefault(ModelConfigDO entityDO) {
-        if (!Objects.equals(entityDO.getDefaultFlag(), DefaultFlagEnum.DEFAULT.getIndex())) {
-            return;
-        }
-        modelConfigManager.update(Wrappers.<ModelConfigDO>lambdaUpdate()
-                .set(ModelConfigDO::getDefaultFlag, DefaultFlagEnum.NOT_DEFAULT.getIndex())
-                .eq(ModelConfigDO::getDefaultFlag, DefaultFlagEnum.DEFAULT.getIndex())
-                .ne(ModelConfigDO::getId, entityDO.getId()));
-    }
-
-    private Boolean defaultBool(Boolean value, boolean defaultValue) {
-        return Objects.nonNull(value) ? value : defaultValue;
+    private ModelConfigBO normalize(ModelConfigBO source, ModelConfigBO existing,
+                                    RequestHeader.PrincipalHeader header) {
+        ModelConfigBO value = new ModelConfigBO();
+        value.setId(source.getId());
+        value.setModel(source.getModel().trim());
+        value.setLabel(StringUtils.defaultIfBlank(source.getLabel(), source.getModel()).trim());
+        value.setProviderId(source.getProviderId());
+        value.setStream(source.getStream() == null ? true : source.getStream());
+        value.setToolCall(source.getToolCall() == null ? true : source.getToolCall());
+        value.setVision(source.getVision() == null ? false : source.getVision());
+        value.setReasoning(source.getReasoning() == null ? false : source.getReasoning());
+        value.setTemperature(source.getTemperature() == null ? fallbackTemperature : source.getTemperature());
+        value.setMaxTokens(source.getMaxTokens() == null ? fallbackMaxTokens : source.getMaxTokens());
+        value.setDefaultFlag(source.getDefaultFlag() == null ? DefaultFlagEnum.NOT_DEFAULT : source.getDefaultFlag());
+        value.setEnableFlag(source.getEnableFlag() == null ? EnableFlagEnum.ENABLE : source.getEnableFlag());
+        value.setRemark(StringUtils.defaultString(source.getRemark()));
+        value.setTenantId(header.getTenantId());
+        value.setCreatorId(existing == null ? header.getUserId() : existing.getCreatorId());
+        value.setCreatorName(existing == null ? header.getUserName() : existing.getCreatorName());
+        value.setCreateTime(existing == null ? LocalDateTime.now(ZoneOffset.UTC) : existing.getCreateTime());
+        value.setOperatorId(header.getUserId());
+        value.setOperatorName(header.getUserName());
+        value.setOperateTime(LocalDateTime.now(ZoneOffset.UTC));
+        return value;
     }
 
     private boolean truthy(Boolean value) {
         return Boolean.TRUE.equals(value);
     }
-
-    /**
-     * Fill the provider display name onto a model config BO.
-     *
-     * @param entityBO the model config
-     * @return the same BO, with providerName set
-     */
-    private ModelConfigBO fillProviderName(ModelConfigBO entityBO) {
-        entityBO.setProviderName(resolveProviderName(entityBO.getProviderId()));
-        return entityBO;
-    }
-
-    /**
-     * Resolve the provider display name by id, returning null for a missing or zero id.
-     *
-     * @param providerId the provider id
-     * @return the provider name, or null
-     */
-    private String resolveProviderName(Long providerId) {
-        if (Objects.isNull(providerId) || providerId == 0) {
-            return null;
-        }
-        ModelProviderDO provider = modelProviderManager.getById(providerId);
-        return Objects.isNull(provider) ? null : provider.getName();
-    }
-
 }

@@ -34,4 +34,4 @@ export const getResourceById = crud.getById;
 export const listResource = crud.list;
 
 export const listResourceTree = (query: PageQuery = {}) =>
-  httpPost<R<ResourceRecord[]>>(`${API_AUTH_BASE}/resource/list_tree`, query);
+  httpPost<ResourceRecord[]>(`${API_AUTH_BASE}/resource/list_tree`, query);

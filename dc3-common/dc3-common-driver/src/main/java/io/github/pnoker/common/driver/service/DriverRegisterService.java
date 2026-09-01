@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.driver.service;
 
+import reactor.core.publisher.Mono;
+
 /**
  * Service contract for registering the current driver instance with the manager center.
  *
@@ -28,6 +30,6 @@ public interface DriverRegisterService {
     /**
      * Performs driver registration during application startup.
      */
-    void initial();
+    Mono<Void> initial();
 
 }

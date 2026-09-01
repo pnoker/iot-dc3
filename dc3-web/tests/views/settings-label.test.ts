@@ -21,10 +21,10 @@ import {describe, expect, it, vi} from 'vitest';
 import {mountListPage} from './_helpers';
 
 const labelMocks = vi.hoisted(() => ({
-  addLabel: vi.fn(() => Promise.resolve({data: true})),
-  deleteLabel: vi.fn(() => Promise.resolve({data: true})),
-  listLabel: vi.fn(() => Promise.resolve({data: {records: [{id: 'l-1', labelName: 'PROD'}], total: 1}})),
-  updateLabel: vi.fn(() => Promise.resolve({data: true})),
+  addLabel: vi.fn(() => Promise.resolve( true)),
+  deleteLabel: vi.fn(() => Promise.resolve( true)),
+  listLabel: vi.fn(() => Promise.resolve( {items: [{id: 'l-1', labelName: 'PROD'}], total: 1})),
+  updateLabel: vi.fn(() => Promise.resolve( true)),
 }));
 
 vi.mock('@/api/label', () => labelMocks);

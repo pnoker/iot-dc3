@@ -96,7 +96,7 @@
 **非目标**
 
 - 客户端看到的 MCP 线上协议不变（仍是 JSON-RPC 2.0 + OAuth bearer）。
-- 管理平面（`McpManagementController`）与前端 MCP 设置页不变。
+- 管理平面正在同步切换：工具目录和审计列表统一使用 `OffsetPage(items, offset, limit, total, hasNext)`，前端 MCP API 已按该形状发送 `offset/limit`。
 - `McpOpenApiAggregator` / `dc3_api` 工具目录的生成方式不变。
 - 后端服务认证下游 principal 头的方式不变（HMAC + JSON header 维持原样）。
 
@@ -121,21 +121,18 @@
 ```proto
 service McpRuntimeApi {
   // tools/list: auth verifies the token and returns the visible tool list.
-  rpc ListTools (GrpcMcpListToolsRequest) returns (GrpcRMcpToolListDTO);
+  rpc ListTools (GrpcMcpListToolsRequest) returns (GrpcMcpToolListDTO);
 
   // tools/call: auth verifies the token, enforces visibility + risk + idempotency,
   // and returns the decision, the resolved tool, and the principal context.
-  rpc CallTool (GrpcMcpCallToolRequest) returns (GrpcRMcpCallToolDTO);
+  rpc CallTool (GrpcMcpCallToolRequest) returns (GrpcMcpCallToolDTO);
 
   // Audit: decoupled from the call path (fire-and-forget or broker event).
-  rpc Audit (GrpcMcpAuditCommand) returns (GrpcRMcpBoolean);
+  rpc Audit (GrpcMcpAuditCommand) returns (GrpcMcpBoolean);
 }
 ```
 
-移除：`Introspect`、`ResolveTool`、`AuthorizeToolCall` 及其请求/响应消息
-（`GrpcMcpIntrospectRequest`、`GrpcRMcpIntrospectDTO`、`GrpcMcpIntrospectDTO`、
-`GrpcMcpToolListRequest`、`GrpcMcpToolResolveRequest`、`GrpcRMcpToolResolveDTO`、
-`GrpcMcpToolResolveDTO`、`GrpcMcpToolAuthorizeRequest`、`GrpcRMcpToolAuthorizeDTO`）。共享枚举
+移除：`Introspect`、`ResolveTool`、`AuthorizeToolCall` 及其请求/响应消息。共享枚举
 （`GrpcMcpRiskLevel`、`GrpcMcpDecision`、`GrpcMcpPrincipalType`、
 `GrpcMcpAuditStatus`）保留。
 

@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -45,7 +44,6 @@ public enum PasswordAlgorithmEnum {
     BCRYPT("BCRYPT", "bcrypt", "BCrypt"),
     ;
 
-    @EnumValue
     private final String value;
 
     private final String code;

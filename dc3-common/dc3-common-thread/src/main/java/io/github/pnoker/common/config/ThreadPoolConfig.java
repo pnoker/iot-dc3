@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -70,7 +71,7 @@ public class ThreadPoolConfig {
         return new ThreadPoolExecutor(thread.getCorePoolSize(), thread.getMaximumPoolSize(), thread.getKeepAliveTime(),
                 TimeUnit.SECONDS, new LinkedBlockingQueue<>(thread.getMaximumPoolSize() * 2),
                 r -> new Thread(r, "[T]" + thread.getPrefix() + threadPoolAtomic.getAndIncrement()),
-                new BlockingRejectedExecutionHandler());
+                new FailFastRejectedExecutionHandler());
     }
 
     /**
@@ -95,38 +96,31 @@ public class ThreadPoolConfig {
     public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
         return new ScheduledThreadPoolExecutor(thread.getCorePoolSize(),
                 r -> new Thread(r, "[ST]" + thread.getPrefix() + scheduledThreadPoolAtomic.getAndIncrement()),
-                new BlockingRejectedExecutionHandler());
+                new FailFastRejectedExecutionHandler());
     }
 
     /**
-     * Custom RejectedExecutionHandler for blocking rejected tasks
+     * Fail-fast rejection policy for bounded blocking work.
      * <p>
-     * Instead of rejecting tasks when the thread pool is full, this handler attempts to
-     * execute them in the calling thread.
+     * Caller-runs would silently move driver I/O onto broker, gRPC, or event-loop
+     * threads, defeating the isolation boundary.
      * </p>
      *
      * @author pnoker
      * @since 2016.10.1
      */
-    private static class BlockingRejectedExecutionHandler implements RejectedExecutionHandler {
+    private static class FailFastRejectedExecutionHandler implements RejectedExecutionHandler {
 
         /**
-         * Handle rejected execution by attempting to run task in calling thread
+         * Reject work when the bounded executor is saturated.
          *
          * @param runnable The runnable task requested to be executed
          * @param executor The executor attempting to execute this task
          */
         @Override
         public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
-            try {
-                log.info("Blocking executor rejected task, executor={}", executor);
-
-                if (!executor.isShutdown()) {
-                    runnable.run();
-                }
-            } catch (Exception e) {
-                log.error("BlockingRejectedExecutionHandler failed", e);
-            }
+            log.warn("Bounded executor rejected task, executor={}", executor);
+            throw new RejectedExecutionException("Bounded executor capacity exhausted");
         }
 
     }

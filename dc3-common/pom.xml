@@ -82,7 +82,6 @@
         <module>dc3-common-api</module>
         <module>dc3-common-auth</module>
         <module>dc3-common-constant</module>
-        <module>dc3-common-dal</module>
         <module>dc3-common-data</module>
         <module>dc3-common-driver</module>
         <module>dc3-common-exception</module>
@@ -277,11 +276,6 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-dal</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-data</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
@@ -353,7 +347,17 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-db-postgres</artifactId>
+                <artifactId>dc3-db-r2dbc-core</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-db-r2dbc-runtime</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-db-r2dbc-postgres</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>

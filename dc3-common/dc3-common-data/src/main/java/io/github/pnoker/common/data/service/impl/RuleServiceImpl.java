@@ -1,37 +1,14 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.data.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.data.biz.alarm.RuleRegistry;
 import io.github.pnoker.common.data.biz.alarm.WindowSpec;
 import io.github.pnoker.common.data.biz.alarm.WindowSpecParser;
-import io.github.pnoker.common.data.dal.RuleManager;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.builder.RuleBuilder;
 import io.github.pnoker.common.data.entity.model.RuleDO;
 import io.github.pnoker.common.data.entity.query.RuleQuery;
+import io.github.pnoker.common.data.repository.ReactiveRuleStore;
 import io.github.pnoker.common.data.service.RuleService;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.AssociatedException;
@@ -40,173 +17,116 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.exception.UpdateException;
-import io.github.pnoker.common.utils.FieldUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
-/**
- * Business service implementation for alarm rule operations.
- *
- * @author pnoker
- * @since 2016.10.1
- */
-@Slf4j
+/** Reactive tenant-scoped alarm rule service. */
 @Service
 @RequiredArgsConstructor
 public class RuleServiceImpl implements RuleService {
 
     private final RuleBuilder ruleBuilder;
-
-    private final RuleManager ruleManager;
-
+    private final ReactiveRuleStore ruleStore;
     private final RuleRegistry ruleRegistry;
 
     @Override
-    public void add(RuleBO entityBO) {
-        validateWindowModeEnum(entityBO);
-        checkDuplicate(entityBO, false, true);
-
-        RuleDO entityDO = ruleBuilder.buildDOByBO(entityBO);
-        if (!ruleManager.save(entityDO)) {
-            throw new AddException("Failed to create alarm rule");
-        }
-        ruleRegistry.invalidateTenant(entityBO.getTenantId());
+    public Mono<RuleBO> add(RuleBO entityBO) {
+        return Mono.defer(() -> {
+            validate(entityBO);
+            RuleDO entityDO = ruleBuilder.buildDOByBO(entityBO);
+            return ruleStore.existsActiveCode(value(entityDO.getTenantId()), entityDO.getRuleCode(), null)
+                    .flatMap(duplicate -> duplicate
+                            ? Mono.<RuleBO>error(new DuplicateException("Alarm rule has been duplicated"))
+                            : ruleStore.insert(entityDO)
+                            .map(ruleBuilder::buildBOByDO)
+                            .switchIfEmpty(Mono.error(new AddException("Failed to create alarm rule"))))
+                    .doOnSuccess(created -> {
+                        if (created != null) ruleRegistry.invalidateTenant(created.getTenantId());
+                    })
+                    .onErrorMap(DataIntegrityViolationException.class,
+                            error -> new DuplicateException("Alarm rule has been duplicated"));
+        });
     }
 
     @Override
-    public void delete(Long id) {
-        RuleDO existing = getDOById(id, true);
-
-        // Alarm ruleAlarm rule
-        LambdaQueryChainWrapper<RuleDO> wrapper = ruleManager.lambdaQuery().eq(RuleDO::getEntityId, id);
-        long count = wrapper.count();
-        if (count > 0) {
-            throw new AssociatedException("Failed to remove alarm rule: some sub alarm rules exists in the alarm rule");
-        }
-
-        if (!ruleManager.removeById(id)) {
-            throw new DeleteException("Failed to remove alarm rule");
-        }
-        ruleRegistry.invalidateTenant(existing.getTenantId());
+    public Mono<Boolean> delete(Long tenantId, Long id) {
+        return ruleStore.get(value(tenantId), value(id))
+                .switchIfEmpty(Mono.error(new NotFoundException("Alarm rule does not exist")))
+                .flatMap(existing -> ruleStore.hasChildren(value(tenantId), value(id))
+                        .flatMap(hasChildren -> hasChildren
+                                ? Mono.<Boolean>error(new AssociatedException(
+                                        "Failed to remove alarm rule: some sub alarm rules exists in the alarm rule"))
+                                : ruleStore.softDelete(value(tenantId), value(id))))
+                .flatMap(deleted -> deleted ? Mono.just(true)
+                        : Mono.error(new DeleteException("Failed to remove alarm rule")))
+                .doOnSuccess(deleted -> ruleRegistry.invalidateTenant(value(tenantId)));
     }
 
     @Override
-    public void update(RuleBO entityBO) {
-        getDOById(entityBO.getId(), true);
-        validateWindowModeEnum(entityBO);
-
-        checkDuplicate(entityBO, true, true);
-
-        RuleDO entityDO = ruleBuilder.buildDOByBO(entityBO);
-        entityDO.setOperateTime(null);
-        if (!ruleManager.updateById(entityDO)) {
-            throw new UpdateException("Failed to update alarm rule");
-        }
-        ruleRegistry.invalidateTenant(entityBO.getTenantId());
+    public Mono<RuleBO> update(RuleBO entityBO) {
+        return Mono.defer(() -> {
+            validate(entityBO);
+            if (!valid(entityBO.getTenantId()) || !valid(entityBO.getId())) {
+                return Mono.error(new UpdateException("Rule tenant and id are required"));
+            }
+            RuleDO entityDO = ruleBuilder.buildDOByBO(entityBO);
+            entityDO.setTenantId(entityBO.getTenantId());
+            entityDO.setId(entityBO.getId());
+            return ruleStore.get(value(entityBO.getTenantId()), value(entityBO.getId()))
+                    .switchIfEmpty(Mono.error(new NotFoundException("Alarm rule does not exist")))
+                    .then(ruleStore.existsActiveCode(value(entityBO.getTenantId()), entityDO.getRuleCode(), entityBO.getId()))
+                    .flatMap(duplicate -> duplicate
+                            ? Mono.<RuleBO>error(new DuplicateException("Alarm rule has been duplicated"))
+                            : ruleStore.update(entityDO)
+                            .map(ruleBuilder::buildBOByDO)
+                            .switchIfEmpty(Mono.error(new UpdateException("Failed to update alarm rule"))))
+                    .doOnSuccess(updated -> {
+                        if (updated != null) ruleRegistry.invalidateTenant(updated.getTenantId());
+                    })
+                    .onErrorMap(DataIntegrityViolationException.class,
+                            error -> new DuplicateException("Alarm rule has been duplicated"));
+        });
     }
 
     @Override
-    public RuleBO getById(Long id) {
-        RuleDO entityDO = getDOById(id, true);
-        return ruleBuilder.buildBOByDO(entityDO);
+    public Mono<RuleBO> getById(Long tenantId, Long id) {
+        return ruleStore.get(value(tenantId), value(id))
+                .switchIfEmpty(Mono.error(new NotFoundException("Alarm rule does not exist")))
+                .map(ruleBuilder::buildBOByDO);
     }
 
     @Override
-    public Page<RuleBO> list(RuleQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<RuleDO> entityPageDO = ruleManager.page(PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return ruleBuilder.buildBOPageByDOPage(entityPageDO);
+    public Mono<OffsetPage<RuleBO>> list(Long tenantId, RuleQuery entityQuery) {
+        return Mono.defer(() -> {
+            requireTenant(tenantId);
+            RuleQuery query = entityQuery == null ? new RuleQuery() : entityQuery;
+            PageRequest page = new PageRequest(query.getOffset(), query.getLimit(), query.getSort());
+            return ruleStore.list(tenantId, query.getRuleName(), query.getRuleCode(), query.getEntityId(),
+                            query.getAlarmTargetTypeFlag(), query.getEnableFlag(), page)
+                    .map(result -> OffsetPage.of(result.items().stream().map(ruleBuilder::buildBOByDO).toList(),
+                            result.offset(), result.limit(), result.total()));
+        });
     }
 
-    /**
-     * Build fuzzy query wrapper for alarm rule search.
-     *
-     * @param entityQuery {@link RuleQuery} query parameters
-     * @return {@link LambdaQueryWrapper} for {@link RuleDO}
-     */
-    private LambdaQueryWrapper<RuleDO> fuzzyQuery(RuleQuery entityQuery) {
-        LambdaQueryWrapper<RuleDO> wrapper = Wrappers.<RuleDO>query().lambda();
-        wrapper.like(StringUtils.isNotEmpty(entityQuery.getRuleName()), RuleDO::getRuleName,
-                entityQuery.getRuleName());
-        wrapper.eq(StringUtils.isNotEmpty(entityQuery.getRuleCode()), RuleDO::getRuleCode,
-                entityQuery.getRuleCode());
-        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getEntityId()), RuleDO::getEntityId,
-                entityQuery.getEntityId());
-        wrapper.eq(Objects.nonNull(entityQuery.getAlarmTargetTypeFlag()), RuleDO::getAlarmTargetTypeFlag,
-                Objects.isNull(entityQuery.getAlarmTargetTypeFlag()) ? null
-                        : entityQuery.getAlarmTargetTypeFlag().getIndex());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), RuleDO::getEnableFlag,
-                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        return wrapper;
+    private void validate(RuleBO entityBO) {
+        if (entityBO == null) throw new IllegalArgumentException("rule is required");
+        if (!valid(entityBO.getTenantId())) throw new IllegalArgumentException("tenantId is required");
+        validateWindowMode(entityBO);
     }
 
-    /**
-     * Check whether an alarm rule is duplicated by rule name, code, and bound entity.
-     *
-     * @param entityBO       {@link RuleBO} to be validated
-     * @param isUpdate       whether the operation is an update (true) or create (false)
-     * @param throwException whether to throw {@link DuplicateException} when duplicated
-     * @return {@code true} if duplicated, otherwise {@code false}
-     */
-    private boolean checkDuplicate(RuleBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<RuleDO> wrapper = Wrappers.<RuleDO>query().lambda();
-        wrapper.eq(RuleDO::getRuleName, entityBO.getRuleName());
-        wrapper.eq(RuleDO::getRuleCode, entityBO.getRuleCode());
-        wrapper.eq(RuleDO::getEntityId, entityBO.getEntityId());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        RuleDO one = ruleManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("Alarm rule has been duplicated");
-        }
-        return duplicate;
-    }
-
-    /**
-     * Validate the rule's window block by parsing it through {@link WindowSpecParser}.
-     * Rejects unknown modes, missing or non-positive durations on
-     * aggregation modes, and malformed ISO-8601 duration strings — the same
-     * rules the runtime evaluator will apply later.
-     */
-    private void validateWindowModeEnum(RuleBO entityBO) {
-        if (Objects.isNull(entityBO) || Objects.isNull(entityBO.getRuleExt())
-                || Objects.isNull(entityBO.getRuleExt().getContent())) {
-            return;
-        }
+    private void validateWindowMode(RuleBO entityBO) {
+        if (entityBO.getRuleExt() == null || entityBO.getRuleExt().getContent() == null) return;
         RuleExt.Window window = entityBO.getRuleExt().getContent().getWindow();
-        if (Objects.isNull(window)) {
-            return;
-        }
+        if (window == null) return;
         WindowSpec spec = WindowSpecParser.parse(window);
-        if (!spec.valid()) {
-            throw new UnSupportException("Invalid rule window: {}", spec.reason());
-        }
+        if (!spec.valid()) throw new UnSupportException("Invalid rule window: " + spec.reason());
     }
 
-    /**
-     * Get alarm rule data object by primary key ID.
-     *
-     * @param id             primary key ID
-     * @param throwException whether to throw {@link NotFoundException} when not found
-     * @return {@link RuleDO} if found, otherwise {@code null} when {@code throwException}
-     * is false
-     */
-    private RuleDO getDOById(Long id, boolean throwException) {
-        RuleDO entityDO = ruleManager.getById(id);
-        if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("Alarm rule does not exist");
-        }
-        return entityDO;
-    }
-
+    private long value(Long value) { return value == null ? 0L : value; }
+    private boolean valid(Long value) { return value != null && value > 0; }
+    private void requireTenant(Long tenantId) { if (!valid(tenantId)) throw new IllegalArgumentException("tenantId is required"); }
 }

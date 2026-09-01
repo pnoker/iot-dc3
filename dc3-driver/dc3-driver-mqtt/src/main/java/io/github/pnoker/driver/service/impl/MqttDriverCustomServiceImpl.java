@@ -22,6 +22,7 @@ import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.CommandRuntimeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
@@ -30,7 +31,6 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import io.github.pnoker.driver.service.MqttSendService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -285,11 +285,11 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
 
     @Override
     public Map<String, String> execute(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> commandConfig,
-                                       DeviceBO device, FacadeCommandBO command, Map<String, String> paramValues) {
+                                       DeviceBO device, CommandRuntimeBO command, Map<String, String> paramValues) {
         String commandTopic = getConfigValue(commandConfig, COMMAND_TOPIC);
         if (StringUtils.isBlank(commandTopic)) {
             throw new IllegalStateException("MQTT command topic is blank, deviceId=" + device.getId()
-                    + ", commandId=" + command.getId());
+                    + ", commandId=" + command.id());
         }
 
         Map<String, String> context = new LinkedHashMap<>();
@@ -299,9 +299,9 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
         context.put("deviceId", String.valueOf(device.getId()));
         context.put("deviceCode", device.getDeviceCode());
         context.put("deviceName", device.getDeviceName());
-        context.put("commandId", String.valueOf(command.getId()));
-        context.put("commandCode", command.getCommandCode());
-        context.put("commandName", command.getCommandName());
+        context.put("commandId", String.valueOf(command.id()));
+        context.put("commandCode", command.commandCode());
+        context.put("commandName", command.commandName());
 
         String payloadTemplate = StringUtils.defaultIfBlank(getConfigValue(commandConfig, PAYLOAD_TEMPLATE), "{}");
         String payload = render(payloadTemplate, context);
@@ -320,7 +320,7 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
         }
         result.put("payload", payload);
         log.info("MQTT command executed, deviceId={}, commandId={}, topic={}, qos={}, payloadLength={}",
-                device.getId(), command.getId(), commandTopic, commandQos, payload.length());
+                device.getId(), command.id(), commandTopic, commandQos, payload.length());
         return result;
     }
 

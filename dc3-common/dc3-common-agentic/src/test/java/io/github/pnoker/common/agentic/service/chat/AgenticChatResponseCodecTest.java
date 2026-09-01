@@ -133,7 +133,7 @@ class AgenticChatResponseCodecTest {
     }
 
     private AgenticPreparedChatBO prepared(AgenticRunTrace runTrace, boolean reasoning) {
-        return new AgenticPreparedChatBO("hello", "tenant:user:conversation", null, "dc3-test-model",
+        return new AgenticPreparedChatBO("hello", "conversation", null, "dc3-test-model",
                 Map.of(), null, null, runTrace, true, reasoning, List.of(), List.of(),
                 AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
     }

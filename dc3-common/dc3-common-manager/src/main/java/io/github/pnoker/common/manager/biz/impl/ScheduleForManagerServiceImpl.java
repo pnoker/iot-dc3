@@ -25,6 +25,7 @@ import io.github.pnoker.common.quartz.QuartzService;
 import lombok.RequiredArgsConstructor;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
+import org.springframework.context.annotation.Profile;
 
 /**
  * Scheduled task service implementation for the manager module.
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Service;
  * @since 2016.10.1
  */
 @Service
+@Profile("quartz")
 @RequiredArgsConstructor
 public class ScheduleForManagerServiceImpl implements ScheduleForManagerService {
 

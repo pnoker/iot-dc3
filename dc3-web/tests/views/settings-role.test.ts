@@ -21,17 +21,17 @@ import {describe, expect, it, vi} from 'vitest';
 import {mountListPage} from './_helpers';
 
 const roleMocks = vi.hoisted(() => ({
-  addRole: vi.fn(() => Promise.resolve({data: true})),
-  deleteRole: vi.fn(() => Promise.resolve({data: true})),
-  listRole: vi.fn(() => Promise.resolve({data: {records: [{id: 'r-1', roleName: 'Admin'}], total: 1}})),
-  listRoleTree: vi.fn(() => Promise.resolve({data: []})),
-  updateRole: vi.fn(() => Promise.resolve({data: true})),
+  addRole: vi.fn(() => Promise.resolve( true)),
+  deleteRole: vi.fn(() => Promise.resolve( true)),
+  listRole: vi.fn(() => Promise.resolve( {items: [{id: 'r-1', roleName: 'Admin'}], total: 1})),
+  listRoleTree: vi.fn(() => Promise.resolve( [])),
+  updateRole: vi.fn(() => Promise.resolve( true)),
 }));
 
 vi.mock('@/api/role', () => roleMocks);
 vi.mock('@/api/roleResourceBind', () => ({
-  addRoleResourceBind: vi.fn(() => Promise.resolve({data: true})),
-  deleteRoleResourceBind: vi.fn(() => Promise.resolve({data: true})),
+  addRoleResourceBind: vi.fn(() => Promise.resolve( true)),
+  deleteRoleResourceBind: vi.fn(() => Promise.resolve( true)),
 }));
 vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 

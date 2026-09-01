@@ -20,8 +20,7 @@ package io.github.pnoker.common.data.controller;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DeviceStatusService;
-import io.github.pnoker.common.data.entity.query.DeviceQuery;
-import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.facade.entity.query.FacadeDeviceOffsetQuery;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -40,7 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * REST controller exposing device status management endpoints.
@@ -72,13 +70,8 @@ public class DeviceStatusController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Map<String, String>>> deviceStatus(@RequestBody(required = false) DeviceQuery deviceQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            DeviceQuery query = Objects.isNull(deviceQuery) ? new DeviceQuery() : deviceQuery;
-            query.setTenantId(tenantId);
-            Map<String, String> statuses = deviceStatusService.getStatusByPage(query);
-            return R.ok(statuses);
-        }));
+    public Mono<Map<String, String>> deviceStatus(@RequestBody(required = false) FacadeDeviceOffsetQuery query) {
+        return getTenantId().flatMap(tenantId -> deviceStatusService.list(withTenant(query, tenantId)));
     }
 
     /**
@@ -97,14 +90,8 @@ public class DeviceStatusController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list_by_driver_id")
-    public Mono<R<Map<String, String>>> deviceStatusByDriverId(@Parameter(description = "Identifier of the driver; must belong to the current tenant. Only devices managed by this driver are returned.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            DeviceQuery deviceQuery = new DeviceQuery();
-            deviceQuery.setDriverId(driverId);
-            deviceQuery.setTenantId(tenantId);
-            Map<String, String> statuses = deviceStatusService.getStatusByPage(deviceQuery);
-            return R.ok(statuses);
-        }));
+    public Mono<Map<String, String>> deviceStatusByDriverId(@Parameter(description = "Identifier of the driver; must belong to the current tenant. Only devices managed by this driver are returned.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+        return getTenantId().flatMap(tenantId -> deviceStatusService.list(new FacadeDeviceOffsetQuery(tenantId, null, null, driverId, null, null, null, null, null, 0, 50, java.util.List.of())));
     }
 
     /**
@@ -123,15 +110,19 @@ public class DeviceStatusController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list_by_profile_id")
-    public Mono<R<Map<String, String>>> deviceStatusByProfileId(
+    public Mono<Map<String, String>> deviceStatusByProfileId(
             @Parameter(description = "Identifier of the profile template; must belong to the current tenant. Only devices bound to this profile are returned.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            DeviceQuery deviceQuery = new DeviceQuery();
-            deviceQuery.setProfileId(profileId);
-            deviceQuery.setTenantId(tenantId);
-            Map<String, String> statuses = deviceStatusService.getStatusByPage(deviceQuery);
-            return R.ok(statuses);
-        }));
+        return getTenantId().flatMap(tenantId -> deviceStatusService.listByProfileId(tenantId, profileId));
+    }
+
+    private FacadeDeviceOffsetQuery withTenant(FacadeDeviceOffsetQuery query, Long tenantId) {
+        if (query == null) {
+            return new FacadeDeviceOffsetQuery(tenantId, null, null, null, null, null, null, null, null,
+                    0, 50, java.util.List.of());
+        }
+        return new FacadeDeviceOffsetQuery(tenantId, query.deviceName(), query.deviceCode(), query.driverId(),
+                query.profileId(), query.enableFlag(), query.version(), query.groupId(), query.labelId(),
+                query.offset(), query.limit(), query.sort());
     }
 
 }

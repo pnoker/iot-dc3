@@ -17,10 +17,11 @@
 
 package io.github.pnoker.common.data.biz;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.CommandCallBO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
 /**
  * Business service for custom command call operations.
@@ -38,7 +39,7 @@ public interface CommandHistoryService {
      * @param entityBO {@link CommandCallBO} command call payload
      * @return the record id assigned to the call
      */
-    String call(Long tenantId, CommandCallBO entityBO);
+    Mono<String> call(Long tenantId, CommandCallBO entityBO);
 
     /**
      * Get a single command history record by record id, scoped to a tenant.
@@ -47,7 +48,7 @@ public interface CommandHistoryService {
      * @param recordId the record id
      * @return the command history, or {@code null} if not found
      */
-    CommandHistoryVO getByRecordId(Long tenantId, String recordId);
+    Mono<CommandHistoryVO> getByRecordId(Long tenantId, String recordId);
 
     /**
      * Get a single command history record by record id across tenants.
@@ -55,8 +56,8 @@ public interface CommandHistoryService {
      * @param recordId the record id
      * @return the command history, or {@code null} if not found
      */
-    default CommandHistoryVO getByRecordId(String recordId) {
-        return getByRecordId(null, recordId);
+    default Mono<CommandHistoryVO> getByRecordId(String recordId) {
+        return Mono.error(new IllegalArgumentException("tenantId is required"));
     }
 
     /**
@@ -66,6 +67,6 @@ public interface CommandHistoryService {
      * @param queryVO  filter and pagination parameters
      * @return the matching command history page
      */
-    Page<CommandHistoryVO> list(Long tenantId, CommandHistoryQueryVO queryVO);
+    Mono<OffsetPage<CommandHistoryVO>> list(Long tenantId, CommandHistoryQueryVO queryVO);
 
 }

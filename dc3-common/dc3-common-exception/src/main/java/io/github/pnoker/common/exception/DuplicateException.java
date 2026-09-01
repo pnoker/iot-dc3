@@ -56,7 +56,7 @@ public class DuplicateException extends BusinessException {
 
     @Override
     public ErrorCode getErrorCode() {
-        return ErrorCode.VALIDATION;
+        return ErrorCode.ALREADY_EXISTS;
     }
 
 }

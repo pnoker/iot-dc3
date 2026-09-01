@@ -18,7 +18,6 @@
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,6 +53,6 @@ public class DeviceByPointVO {
      *
      */
     @Schema(description = "Devices bound to the given point; only devices visible to the current tenant are returned.")
-    private List<DeviceDO> devices;
+    private List<DeviceVO> devices;
 
 }

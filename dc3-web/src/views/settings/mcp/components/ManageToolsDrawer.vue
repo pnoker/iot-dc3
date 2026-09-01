@@ -83,14 +83,13 @@ const open = async (row: McpConnectionRecord) => {
   visible.value = true;
   loading.value = true;
   try {
-    // One large page (the service caps size at 500) so the assignment drawer can
-    // toggle the whole catalog without paging.
+    // Load the catalog in one bounded request; the platform-wide limit is 200.
     const [toolRes, selectedRes] = await Promise.all([
-      listMcpTool({page: {current: 1, size: 500}}),
+      listMcpTool({offset: 0, limit: 200}),
       listMcpConnectionTool(row.id),
     ]);
-    tools.value = toolRes.data?.records || [];
-    selectedToolIds.value = selectedRes.data || [];
+    tools.value = toolRes?.items || [];
+    selectedToolIds.value = selectedRes || [];
   } finally {
     loading.value = false;
   }

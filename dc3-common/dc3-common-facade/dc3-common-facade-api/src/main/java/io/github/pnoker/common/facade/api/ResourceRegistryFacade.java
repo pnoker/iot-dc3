@@ -19,6 +19,7 @@ package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResultBO;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral resource registry facade. Mirrors
@@ -33,6 +34,6 @@ public interface ResourceRegistryFacade {
      * Submit the caller's full API inventory. The auth-side server reconciles it against
      * the dc3_api and dc3_resource tables and returns counters.
      */
-    FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command);
+    Mono<FacadeResourceRegistrySyncResultBO> sync(FacadeResourceRegistrySyncCommandBO command);
 
 }

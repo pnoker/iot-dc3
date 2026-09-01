@@ -17,13 +17,11 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.RolePrincipalBindBO;
 import io.github.pnoker.common.auth.entity.model.RolePrincipalBindDO;
 import io.github.pnoker.common.auth.entity.vo.RolePrincipalBindVO;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -108,24 +106,5 @@ public interface RolePrincipalBindBuilder {
      */
     List<RolePrincipalBindBO> buildBOListByDOList(List<RolePrincipalBindDO> entityDOList);
 
-    /**
-     * Convert do page to bo page.
-     *
-     * @param entityPageDO persistence object
-     * @return converted value
-     */
-    default Page<RolePrincipalBindBO> buildBOPageByDOPage(Page<RolePrincipalBindDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    /**
-     * Convert bo page to vo page.
-     *
-     * @param entityPageBO business object
-     * @return converted value
-     */
-    default Page<RolePrincipalBindVO> buildVOPageByBOPage(Page<RolePrincipalBindBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
 }

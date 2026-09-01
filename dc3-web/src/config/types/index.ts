@@ -15,7 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type {Login, Attribute, Dictionary, Order, PageQuery, PageResult} from './common';
+export type {
+  Login,
+  Attribute,
+  Dictionary,
+  Order,
+  SortSpec,
+  PageQuery,
+  CursorPageQuery,
+  PageResult,
+  CursorPageResult,
+} from './common';
 
 export type {
   AgenticModel,
@@ -60,6 +70,8 @@ export type {
 
 export type {CommandRecord, CommandForm, CommandParamRecord, CommandParamForm, CommandHistoryRecord} from './command';
 export type {EventRecord, EventForm, EventParamRecord, EventParamForm, EventHistoryRecord} from './event';
+
+export type {EntityPagination} from './entityList';
 
 export type {
   UserForm,

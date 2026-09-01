@@ -15,24 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {httpGet, httpPost, versionedDelete} from '@/api/common';
+import type {AxiosResponse} from 'axios';
 import {API_DATA_BASE, API_MANAGER_BASE} from '@/config/constant/api';
 import type {PageQuery, PageResult} from '@/config/types';
 import type {DeviceForm, DeviceRecord} from '@/config/types/manager';
-import {isNull} from '@/utils/validationUtil';
+import type {OperationAccepted, OperationView} from '@/config/types/operation';
 
-export const addDevice = (device: DeviceForm) => httpPost<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/add`, device);
+export const addDevice = (device: DeviceForm) => httpPost<DeviceRecord>(`${API_MANAGER_BASE}/device/add`, device);
 
-export const deleteDevice = (id: string) => httpPost(`${API_MANAGER_BASE}/device/delete`, undefined, {params: {id}});
+export const deleteDevice = (id: string, version: number) => versionedDelete(`${API_MANAGER_BASE}/device`, id, version);
 
 export const updateDevice = (device: DeviceForm) =>
-  httpPost<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/update`, device);
+  httpPost<DeviceRecord>(`${API_MANAGER_BASE}/device/update`, device);
 
 export const getDeviceById = (id: string) =>
-  httpGet<R<DeviceRecord>>(`${API_MANAGER_BASE}/device/get_by_id`, {params: {id}});
+  httpGet<DeviceRecord>(`${API_MANAGER_BASE}/device/get_by_id`, {params: {id}});
 
 export const listDeviceByIds = (deviceIds: string[]) =>
-  httpPost<R<Record<string, DeviceRecord>>>(`${API_MANAGER_BASE}/device/list_by_ids`, deviceIds);
+  httpPost<Record<string, DeviceRecord>>(`${API_MANAGER_BASE}/device/list_by_ids`, deviceIds);
 
 export const getDeviceCountByDriverId = (driverId: string) =>
   httpGet(`${API_MANAGER_BASE}/device/get_count_by_driver_id`, {params: {driver_id: driverId}});
@@ -40,7 +41,7 @@ export const getDeviceCountByDriverId = (driverId: string) =>
 export const listDeviceByProfileId = (profileId: string) =>
   httpGet(`${API_MANAGER_BASE}/device/list_by_profile_id`, {params: {profile_id: profileId}});
 
-export const listDevice = <T = R<PageResult<DeviceRecord>>>(query: PageQuery) =>
+export const listDevice = <T = PageResult<DeviceRecord>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/device/list`, query);
 
 export const listDeviceStatus = (query: Record<string, unknown>) =>
@@ -52,32 +53,38 @@ export const listDeviceStatusByDriverId = (driverId: string) =>
 export const listDeviceStatusByProfileId = (profileId: string) =>
   httpGet(`${API_DATA_BASE}/device/status/list_by_profile_id`, {params: {profile_id: profileId}});
 
-export const listDeviceByPointId = (pointId: string) =>
+export const getDeviceStatisticsByPointId = (pointId: string) =>
   httpGet<
-    R<{
+    {
       count: number;
       devices: DeviceRecord[];
-    }>
-  >(`${API_MANAGER_BASE}/point/list_device_statistics_by_point_id`, {
+    }
+  >(`${API_MANAGER_BASE}/point/get_device_statistics_by_point_id`, {
     params: {point_id: pointId},
   });
 
 export const importDeviceTemplate = (device: Record<string, unknown>) =>
-  httpPost(`${API_MANAGER_BASE}/device/export/import_template`, device, {responseType: 'blob'});
+  httpPost<AxiosResponse<Blob>>(`${API_MANAGER_BASE}/device/export/import_template`, device, {responseType: 'blob'});
 
-export const importDevice = (form: Record<string, unknown>, file: File) => {
+export const importDevice = (form: Record<string, unknown>, file: File, idempotencyKey: string) => {
   const data = new FormData();
-  Object.entries(form).forEach(([key, value]) => {
-    // The file is appended separately below — never serialize it as a string field.
-    if (key === 'file') return;
-    if (!isNull(value)) {
-      data.append(key, String(value));
-    }
-  });
+  data.append(
+    'request',
+    new Blob([JSON.stringify({driverId: form.driverId, profileId: form.profileId})], {type: 'application/json'})
+  );
   data.append('file', file);
   // No manual Content-Type: axios clears it for FormData in browsers so the
   // client sets the multipart boundary automatically.
-  return httpPost(`${API_MANAGER_BASE}/device/import`, data, {
+  return httpPost<OperationAccepted>(`${API_MANAGER_BASE}/device/import`, data, {
+    headers: {'Idempotency-Key': idempotencyKey},
     timeout: 0,
+  });
+};
+
+export const getDeviceImportOperation = (statusUri: string, signal?: AbortSignal) => {
+  const [path = '', query = ''] = statusUri.split('?', 2);
+  return httpGet<OperationView>(path.replace(/^\/+/, ''), {
+    params: Object.fromEntries(new URLSearchParams(query)),
+    signal,
   });
 };

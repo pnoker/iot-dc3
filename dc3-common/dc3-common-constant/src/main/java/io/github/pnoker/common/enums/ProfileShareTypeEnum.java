@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -53,7 +52,6 @@ public enum ProfileShareTypeEnum {
     /**
      * Index
      */
-    @EnumValue
     private final Byte index;
 
     /**

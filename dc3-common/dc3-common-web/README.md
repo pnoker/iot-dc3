@@ -18,7 +18,7 @@ REST-based center services.
 | `WebFluxConfig`         | Global WebFlux configuration (codecs, CORS, message converters)                      |
 | `WebFluxSecurityConfig` | Security chain, public-path rules, and facade-backed authorization                   |
 | `RequestIdWebFilter`    | Adds and propagates request IDs for tracing                                          |
-| `ExceptionConfig`       | `@ControllerAdvice` global exception handler mapping exceptions to `R<T>` responses  |
+| `ExceptionConfig`       | `@ControllerAdvice` global exception handler mapping failures to RFC 9457 Problem Details |
 | `BaseController`        | Reactive controller helpers plus user/tenant context resolution                      |
 | `PrincipalHeaderUtil`   | Reads the signed principal headers injected by the gateway                           |
 | `SpringDocConfig`       | Shared springdoc/OpenAPI group configuration                                         |
@@ -26,13 +26,16 @@ REST-based center services.
 
 ## Exception Handling
 
-All exceptions thrown by controllers are caught by `ExceptionConfig` and mapped to a structured `R<T>` response:
+All exceptions thrown by controllers are caught by `ExceptionConfig` and mapped to an
+`application/problem+json` response:
 
 ```json
 {
-  "ok": false,
-  "code": "R500",
-  "message": "Service exception"
+  "type": "https://iot-dc3.github.io/problems/validation",
+  "title": "Validation failed",
+  "status": 400,
+  "detail": "limit must be between 1 and 200",
+  "instance": "/api/v3/manager/device/list"
 }
 ```
 
@@ -53,4 +56,4 @@ mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-web -am test
 ## Related Modules
 
 - `dc3-common-auth`, `dc3-common-data`, `dc3-common-manager` — All include this for reactive web support
-- `dc3-common-public` — Provides `R<T>` response wrapper
+- `dc3-common-public` — Provides shared request, enum and Problem Details models

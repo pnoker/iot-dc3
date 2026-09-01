@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * <pre>{@code
  *   @PreAuthorize("@perm.can('device', 'get')")
  *   @GetMapping("/{id}")
- *   public Mono<R<DeviceVO>> getById(@PathVariable Long id) { ... }
+ *   public Mono<DeviceVO> getById(@PathVariable Long id) { ... }
  * }</pre>
  * <p>
  * The bean composes the full {@code resource_code} as

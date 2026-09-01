@@ -1,377 +1,107 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.auth.grpc;
 
 import io.github.pnoker.api.center.auth.*;
-import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.api.common.GrpcRFactory;
-import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
-import io.github.pnoker.common.auth.biz.impl.OAuthMcpRuntimeServiceImpl.OAuthProtocolException;
-import io.github.pnoker.common.constant.service.McpConstant;
+import io.github.pnoker.common.auth.biz.ReactiveOAuthMcpRuntimeService;
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
-import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
-import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
-import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
+import io.github.pnoker.common.entity.dto.McpCallToolRequestDTO;
+import io.github.pnoker.common.entity.dto.McpCallToolResponseDTO;
+import io.github.pnoker.common.entity.dto.McpPrincipalContextDTO;
 import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
+import io.github.pnoker.common.entity.dto.McpToolListResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
-import io.github.pnoker.common.enums.ErrorCode;
-import io.github.pnoker.common.tenant.TenantContextHolder;
+import io.github.pnoker.common.exception.AssociatedException;
+import io.github.pnoker.common.exception.AccessDeniedException;
+import io.github.pnoker.common.exception.BusinessException;
+import io.github.pnoker.common.exception.DuplicateException;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.RequestException;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import io.grpc.stub.ServerCallStreamObserver;
+import reactor.core.Disposable;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * gRPC server for gateway-to-auth MCP runtime calls.
- *
- * @author pnoker
- * @since 2026.6.12
- */
-@Slf4j
+/** Reactive gRPC server for MCP runtime decisions. */
 @Service
 @RequiredArgsConstructor
 public class McpRuntimeServer extends McpRuntimeApiGrpc.McpRuntimeApiImplBase {
-
-    private final OAuthMcpRuntimeService oauthMcpRuntimeService;
+    private final ReactiveOAuthMcpRuntimeService service;
 
     @Override
-    public void introspect(GrpcMcpIntrospectRequest request,
-                           StreamObserver<GrpcRMcpIntrospectDTO> responseObserver) {
-        GrpcRMcpIntrospectDTO.Builder response = GrpcRMcpIntrospectDTO.newBuilder();
-        try {
-            response.setResult(ok());
-            response.setData(toGrpc(oauthMcpRuntimeService.introspect(request.getToken())));
-        } catch (Exception e) {
-            log.warn("MCP introspect failed", e);
-            response.setResult(failure(e));
-            response.setData(toGrpc(McpIntrospectResponseDTO.inactive()));
-        }
-        responseObserver.onNext(response.build());
-        responseObserver.onCompleted();
+    public void listTools(GrpcMcpListToolsRequest request, StreamObserver<GrpcMcpToolListDTO> observer) {
+        subscribe(service.listTools(request.getToken()).map(this::toGrpc), observer);
     }
 
     @Override
-    public void listTools(GrpcMcpToolListRequest request,
-                          StreamObserver<GrpcRMcpToolListDTO> responseObserver) {
-        GrpcRMcpToolListDTO.Builder response = GrpcRMcpToolListDTO.newBuilder();
-        try {
-            response.setResult(ok());
-            // PublicEndpoint (McpGatewayController.mcp via gRPC): no tenant interceptor on the
-            // gateway path; queries carry an explicit tenant_id argument, so bypass tenant-line
-            // filtering here. The management controller calls the service directly and is unaffected.
-            TenantContextHolder.runIgnoreAction(() ->
-                    oauthMcpRuntimeService.listVisibleTools(request.getTenantId(), request.getPrincipalId(),
-                                    request.getMcpConnectionId(), scopes(request.getScope()))
-                            .forEach(tool -> response.addTools(toGrpc(tool))));
-        } catch (OAuthProtocolException e) {
-            response.setResult(protocolFailure(e));
-        } catch (Exception e) {
-            log.warn("MCP list tools failed", e);
-            response.setResult(failure(e));
-        }
-        responseObserver.onNext(response.build());
-        responseObserver.onCompleted();
+    public void callTool(GrpcMcpCallToolRequest request, StreamObserver<GrpcMcpCallToolDTO> observer) {
+        McpCallToolRequestDTO command = McpCallToolRequestDTO.builder().token(request.getToken()).toolName(request.getToolName())
+                .argumentDigest(request.getArgumentDigest()).confirmId(request.getConfirmId()).idempotencyKey(request.getIdempotencyKey())
+                .clientName(request.getClientName()).clientVersion(request.getClientVersion()).remoteIp(request.getRemoteIp()).build();
+        subscribe(service.callTool(command).map(this::toGrpc), observer);
     }
 
     @Override
-    public void resolveTool(GrpcMcpToolResolveRequest request,
-                            StreamObserver<GrpcRMcpToolResolveDTO> responseObserver) {
-        GrpcRMcpToolResolveDTO.Builder response = GrpcRMcpToolResolveDTO.newBuilder();
-        try {
-            // PublicEndpoint (McpGatewayController.mcp via gRPC): see listTools above.
-            McpToolResolveResponseDTO tool = TenantContextHolder.runIgnore(() ->
-                    oauthMcpRuntimeService.resolveVisibleTool(request.getTenantId(),
-                            request.getPrincipalId(), request.getMcpConnectionId(), request.getToolName(),
-                            scopes(request.getScope())));
-            response.setResult(ok());
-            response.setData(toGrpc(tool));
-        } catch (OAuthProtocolException e) {
-            response.setResult(protocolFailure(e));
-        } catch (Exception e) {
-            log.warn("MCP resolve tool failed", e);
-            response.setResult(failure(e));
+    public void audit(GrpcMcpAuditCommand request, StreamObserver<GrpcMcpBoolean> observer) {
+        Mono<GrpcMcpBoolean> result = service.audit(McpAuditCommandDTO.builder().traceId(request.getTraceId()).tenantId(request.getTenantId()).principalId(request.getPrincipalId())
+                .principalType(request.getPrincipalType().name()).clientId(request.getClientId()).connectionId(request.getConnectionId()).toolId(request.getToolId())
+                .toolName(request.getToolName()).permissionCode(request.getPermissionCode()).riskLevel(request.getRiskLevel().name()).confirmId(request.getConfirmId())
+                .idempotencyKey(request.getIdempotencyKey()).argumentDigest(request.getArgumentDigest()).status(request.getStatus().name()).errorCode(request.getErrorCode())
+                .durationMs(request.getDurationMs()).clientName(request.getClientName()).clientVersion(request.getClientVersion()).remoteIp(request.getRemoteIp()).build())
+                .thenReturn(GrpcMcpBoolean.newBuilder().setValue(true).build());
+        subscribe(result, observer);
+    }
+
+    private <T> void subscribe(Mono<T> publisher, StreamObserver<T> observer) {
+        AtomicReference<Disposable> subscription = new AtomicReference<>();
+        if (observer instanceof ServerCallStreamObserver<?> serverObserver) {
+            serverObserver.setOnCancelHandler(() -> {
+                Disposable disposable = subscription.get();
+                if (disposable != null) disposable.dispose();
+            });
         }
-        responseObserver.onNext(response.build());
-        responseObserver.onCompleted();
+        Disposable disposable = publisher.subscribe(observer::onNext, error -> observer.onError(toStatus(error)), observer::onCompleted);
+        subscription.set(disposable);
     }
 
-    @Override
-    public void authorizeToolCall(GrpcMcpToolAuthorizeRequest request,
-                                  StreamObserver<GrpcRMcpToolAuthorizeDTO> responseObserver) {
-        GrpcRMcpToolAuthorizeDTO.Builder response = GrpcRMcpToolAuthorizeDTO.newBuilder();
-        try {
-            McpToolAuthorizeRequestDTO requestDTO = McpToolAuthorizeRequestDTO.builder()
-                    .tenantId(String.valueOf(request.getTenantId()))
-                    .principalId(String.valueOf(request.getPrincipalId()))
-                    .mcpConnectionId(String.valueOf(request.getMcpConnectionId()))
-                    .scope(request.getScope())
-                    .toolName(request.getToolName())
-                    .argumentDigest(request.getArgumentDigest())
-                    .confirmId(request.getConfirmId())
-                    .idempotencyKey(request.getIdempotencyKey())
-                    .build();
-            // PublicEndpoint (McpGatewayController.mcp via gRPC): see listTools above.
-            McpToolAuthorizeResponseDTO decision = TenantContextHolder.runIgnore(() ->
-                    oauthMcpRuntimeService.authorizeToolCall(requestDTO));
-            response.setResult(ok());
-            response.setData(toGrpc(decision));
-        } catch (OAuthProtocolException e) {
-            response.setResult(protocolFailure(e));
-        } catch (Exception e) {
-            log.warn("MCP authorize tool call failed", e);
-            response.setResult(failure(e));
-        }
-        responseObserver.onNext(response.build());
-        responseObserver.onCompleted();
+    private GrpcMcpToolListDTO toGrpc(McpToolListResponseDTO value) {
+        GrpcMcpToolListDTO.Builder result = GrpcMcpToolListDTO.newBuilder();
+        if (value != null && value.getTools() != null) value.getTools().stream().map(this::toGrpc).forEach(result::addTools);
+        return result.build();
     }
-
-    @Override
-    public void audit(GrpcMcpAuditCommand request, StreamObserver<GrpcRMcpBoolean> responseObserver) {
-        GrpcRMcpBoolean.Builder response = GrpcRMcpBoolean.newBuilder();
-        try {
-            // PublicEndpoint (McpGatewayController.mcp via gRPC): see listTools above.
-            McpAuditCommandDTO command = toDTO(request);
-            TenantContextHolder.runIgnoreAction(() -> oauthMcpRuntimeService.audit(command));
-            response.setResult(ok());
-            response.setData(true);
-        } catch (Exception e) {
-            log.warn("MCP audit failed", e);
-            response.setResult(failure(e));
-            response.setData(false);
-        }
-        responseObserver.onNext(response.build());
-        responseObserver.onCompleted();
+    private GrpcMcpToolDefinitionDTO toGrpc(McpToolDefinitionDTO value) {
+        return GrpcMcpToolDefinitionDTO.newBuilder().setName(StringUtils.defaultString(value.getName())).setTitle(StringUtils.defaultString(value.getTitle()))
+                .setDescription(StringUtils.defaultString(value.getDescription())).setInputSchema(io.github.pnoker.common.utils.JsonUtil.toJsonString(value.getInputSchema()))
+                .setAnnotations(GrpcMcpToolAnnotationsDTO.newBuilder().setReadOnlyHint(value.getAnnotations() != null && value.getAnnotations().isReadOnlyHint()).setDestructiveHint(value.getAnnotations() != null && value.getAnnotations().isDestructiveHint()).setIdempotentHint(value.getAnnotations() != null && value.getAnnotations().isIdempotentHint()).setOpenWorldHint(value.getAnnotations() != null && value.getAnnotations().isOpenWorldHint()).build())
+                .setMeta(GrpcMcpToolMetadataDTO.newBuilder().setToolId(value.getMeta() == null ? "" : StringUtils.defaultString(value.getMeta().getToolId())).setPermissionCode(value.getMeta() == null ? "" : StringUtils.defaultString(value.getMeta().getPermissionCode())).setRiskLevel(risk(value.getMeta() == null ? null : value.getMeta().getRiskLevel())).build()).build();
     }
-
-    /**
-     * Convert an introspection response DTO to its gRPC form, defaulting nulls to
-     * empty/zero.
-     *
-     * @param source the DTO
-     * @return the gRPC introspection DTO
-     */
-    private GrpcMcpIntrospectDTO toGrpc(McpIntrospectResponseDTO source) {
-        GrpcMcpIntrospectDTO.Builder builder = GrpcMcpIntrospectDTO.newBuilder()
-                .setActive(source.isActive());
-        if (source.getAud() != null) {
-            builder.addAllAud(source.getAud());
-        }
-        return builder
-                .setIss(StringUtils.defaultString(source.getIss()))
-                .setSub(StringUtils.defaultString(source.getSub()))
-                .setJti(StringUtils.defaultString(source.getJti()))
-                .setExp(source.getExp() == null ? 0 : source.getExp())
-                .setIat(source.getIat() == null ? 0 : source.getIat())
-                .setTenantId(source.getTenantId() == null ? 0 : Long.parseLong(source.getTenantId()))
-                .setPrincipalId(source.getPrincipalId() == null ? 0 : Long.parseLong(source.getPrincipalId()))
-                .setPrincipalType(toGrpcPrincipalType(source.getPrincipalType()))
-                .setPrincipalName(StringUtils.defaultString(source.getPrincipalName()))
-                .setDisplayName(StringUtils.defaultString(source.getDisplayName()))
-                .setClientId(StringUtils.defaultString(source.getClientId()))
-                .setMcpConnectionId(source.getMcpConnectionId() == null ? 0 : Long.parseLong(source.getMcpConnectionId()))
-                .setGrantType(toGrpcGrantType(source.getGrantType()))
-                .setScope(StringUtils.defaultString(source.getScope()))
-                .build();
+    private GrpcMcpCallToolDTO toGrpc(McpCallToolResponseDTO value) {
+        GrpcMcpCallToolDTO.Builder result = GrpcMcpCallToolDTO.newBuilder().setDecision(decision(value.getDecision())).setConfirmId(StringUtils.defaultString(value.getConfirmId())).setMessage(StringUtils.defaultString(value.getMessage())).setRiskLevel(risk(value.getRiskLevel()));
+        if (value.getTool() != null) result.setTool(toGrpc(value.getTool()));
+        if (value.getPrincipal() != null) result.setPrincipal(toGrpc(value.getPrincipal()));
+        return result.build();
     }
-
-    /**
-     * Convert a tool definition DTO to its gRPC form, including annotations and metadata.
-     *
-     * @param source the DTO
-     * @return the gRPC tool definition DTO
-     */
-    private GrpcMcpToolDefinitionDTO toGrpc(McpToolDefinitionDTO source) {
-        return GrpcMcpToolDefinitionDTO.newBuilder()
-                .setName(StringUtils.defaultString(source.getName()))
-                .setTitle(StringUtils.defaultString(source.getTitle()))
-                .setDescription(StringUtils.defaultString(source.getDescription()))
-                .setAnnotations(toGrpc(source.getAnnotations()))
-                .setMeta(toGrpc(source.getMeta()))
-                .build();
+    private GrpcMcpToolResolveDTO toGrpc(McpToolResolveResponseDTO value) {
+        return GrpcMcpToolResolveDTO.newBuilder().setToolId(StringUtils.defaultString(value.getToolId())).setToolName(StringUtils.defaultString(value.getToolName())).setPermissionCode(StringUtils.defaultString(value.getPermissionCode())).setRiskLevel(risk(value.getRiskLevel())).setServiceName(StringUtils.defaultString(value.getServiceName())).setApiPath(StringUtils.defaultString(value.getApiPath())).setHttpMethod(StringUtils.defaultString(value.getHttpMethod())).setInputSchema(io.github.pnoker.common.utils.JsonUtil.toJsonString(value.getInputSchema())).build();
     }
-
-    /**
-     * Convert tool annotation hints to their gRPC form, defaulting null to empty.
-     *
-     * @param source the annotations
-     * @return the gRPC annotations DTO
-     */
-    private GrpcMcpToolAnnotationsDTO toGrpc(McpToolDefinitionDTO.Annotations source) {
-        if (source == null) {
-            return GrpcMcpToolAnnotationsDTO.getDefaultInstance();
-        }
-        return GrpcMcpToolAnnotationsDTO.newBuilder()
-                .setReadOnlyHint(source.isReadOnlyHint())
-                .setDestructiveHint(source.isDestructiveHint())
-                .setIdempotentHint(source.isIdempotentHint())
-                .setOpenWorldHint(source.isOpenWorldHint())
-                .build();
+    private GrpcMcpPrincipalContext toGrpc(McpPrincipalContextDTO value) { return GrpcMcpPrincipalContext.newBuilder().setTenantId(value.getTenantId() == null ? 0 : value.getTenantId()).setPrincipalId(value.getPrincipalId() == null ? 0 : value.getPrincipalId()).setPrincipalType(principal(value.getPrincipalType())).setPrincipalName(StringUtils.defaultString(value.getPrincipalName())).setDisplayName(StringUtils.defaultString(value.getDisplayName())).setClientId(StringUtils.defaultString(value.getClientId())).setConnectionId(value.getConnectionId() == null ? 0 : value.getConnectionId()).build(); }
+    private GrpcMcpRiskLevel risk(String value) { try { return GrpcMcpRiskLevel.valueOf(StringUtils.defaultString(value)); } catch (Exception e) { return GrpcMcpRiskLevel.MCP_RISK_LEVEL_UNSPECIFIED; } }
+    private GrpcMcpDecision decision(String value) { try { return GrpcMcpDecision.valueOf(StringUtils.defaultString(value)); } catch (Exception e) { return GrpcMcpDecision.MCP_DECISION_UNSPECIFIED; } }
+    private GrpcMcpPrincipalType principal(String value) { try { return GrpcMcpPrincipalType.valueOf(StringUtils.defaultString(value)); } catch (Exception e) { return GrpcMcpPrincipalType.MCP_PRINCIPAL_TYPE_UNSPECIFIED; } }
+    private RuntimeException toStatus(Throwable error) {
+        String description = Objects.requireNonNullElse(error.getMessage(), error.getClass().getSimpleName());
+        Status status;
+        if (error instanceof NotFoundException) status = Status.NOT_FOUND;
+        else if (error instanceof DuplicateException) status = Status.ALREADY_EXISTS;
+        else if (error instanceof RequestException || error instanceof IllegalArgumentException) status = Status.INVALID_ARGUMENT;
+        else if (error instanceof AccessDeniedException) status = Status.PERMISSION_DENIED;
+        else if (error instanceof AssociatedException || error instanceof BusinessException) status = Status.FAILED_PRECONDITION;
+        else status = Status.INTERNAL;
+        return status.withDescription(description).withCause(error).asRuntimeException();
     }
-
-    /**
-     * Convert tool metadata (tool id, permission code, risk level) to its gRPC form,
-     * defaulting null to empty.
-     *
-     * @param source the metadata
-     * @return the gRPC metadata DTO
-     */
-    private GrpcMcpToolMetadataDTO toGrpc(McpToolDefinitionDTO.Metadata source) {
-        if (source == null) {
-            return GrpcMcpToolMetadataDTO.getDefaultInstance();
-        }
-        return GrpcMcpToolMetadataDTO.newBuilder()
-                .setToolId(StringUtils.defaultString(source.getToolId()))
-                .setPermissionCode(StringUtils.defaultString(source.getPermissionCode()))
-                .setRiskLevel(toGrpcRiskLevel(source.getRiskLevel()))
-                .build();
-    }
-
-    /**
-     * Convert a resolved tool response DTO to its gRPC form.
-     *
-     * @param source the DTO
-     * @return the gRPC resolved tool DTO
-     */
-    private GrpcMcpToolResolveDTO toGrpc(McpToolResolveResponseDTO source) {
-        return GrpcMcpToolResolveDTO.newBuilder()
-                .setToolId(StringUtils.defaultString(source.getToolId()))
-                .setToolName(StringUtils.defaultString(source.getToolName()))
-                .setPermissionCode(StringUtils.defaultString(source.getPermissionCode()))
-                .setRiskLevel(toGrpcRiskLevel(source.getRiskLevel()))
-                .setServiceName(StringUtils.defaultString(source.getServiceName()))
-                .setApiPath(StringUtils.defaultString(source.getApiPath()))
-                .setHttpMethod(StringUtils.defaultString(source.getHttpMethod()))
-                .build();
-    }
-
-    /**
-     * Convert an authorization decision DTO to its gRPC form.
-     *
-     * @param source the DTO
-     * @return the gRPC authorization DTO
-     */
-    private GrpcMcpToolAuthorizeDTO toGrpc(McpToolAuthorizeResponseDTO source) {
-        return GrpcMcpToolAuthorizeDTO.newBuilder()
-                .setDecision(toGrpcDecision(source.getDecision()))
-                .setConfirmId(StringUtils.defaultString(source.getConfirmId()))
-                .setMessage(StringUtils.defaultString(source.getMessage()))
-                .setRiskLevel(toGrpcRiskLevel(source.getRiskLevel()))
-                .build();
-    }
-
-    private GrpcMcpDecision toGrpcDecision(String value) {
-        try {
-            return GrpcMcpDecision.valueOf(StringUtils.defaultIfBlank(value, ""));
-        } catch (IllegalArgumentException e) {
-            return GrpcMcpDecision.MCP_DECISION_UNSPECIFIED;
-        }
-    }
-
-    private GrpcMcpRiskLevel toGrpcRiskLevel(String value) {
-        try {
-            return GrpcMcpRiskLevel.valueOf(StringUtils.defaultIfBlank(value, ""));
-        } catch (IllegalArgumentException e) {
-            return GrpcMcpRiskLevel.MCP_RISK_LEVEL_UNSPECIFIED;
-        }
-    }
-
-    private GrpcMcpPrincipalType toGrpcPrincipalType(String value) {
-        try {
-            return GrpcMcpPrincipalType.valueOf(StringUtils.defaultIfBlank(value, ""));
-        } catch (IllegalArgumentException e) {
-            return GrpcMcpPrincipalType.MCP_PRINCIPAL_TYPE_UNSPECIFIED;
-        }
-    }
-
-    private GrpcOAuthGrantType toGrpcGrantType(String value) {
-        try {
-            return GrpcOAuthGrantType.valueOf(StringUtils.defaultIfBlank(value, "").toUpperCase());
-        } catch (IllegalArgumentException e) {
-            return GrpcOAuthGrantType.GRPC_OAUTH_GRANT_TYPE_UNSPECIFIED;
-        }
-    }
-
-    /**
-     * Convert a gRPC audit command to its DTO form.
-     *
-     * @param source the gRPC audit command
-     * @return the audit command DTO
-     */
-    private McpAuditCommandDTO toDTO(GrpcMcpAuditCommand source) {
-        return McpAuditCommandDTO.builder()
-                .traceId(source.getTraceId())
-                .tenantId(source.getTenantId())
-                .principalId(source.getPrincipalId())
-                .principalType(source.getPrincipalType().name())
-                .clientId(source.getClientId())
-                .connectionId(source.getConnectionId())
-                .toolId(source.getToolId())
-                .toolName(source.getToolName())
-                .permissionCode(source.getPermissionCode())
-                .riskLevel(source.getRiskLevel().name())
-                .confirmId(source.getConfirmId())
-                .idempotencyKey(source.getIdempotencyKey())
-                .argumentDigest(source.getArgumentDigest())
-                .status(source.getStatus().name())
-                .errorCode(source.getErrorCode())
-                .durationMs(source.getDurationMs())
-                .clientName(source.getClientName())
-                .clientVersion(source.getClientVersion())
-                .remoteIp(source.getRemoteIp())
-                .build();
-    }
-
-    /**
-     * Parse a space-delimited scope string into a set, returning empty for blank input.
-     *
-     * @param value the raw scope string
-     * @return the parsed scope set
-     */
-    private Set<String> scopes(String value) {
-        if (StringUtils.isBlank(value)) {
-            return Set.of();
-        }
-        return Arrays.stream(value.trim().split(McpConstant.Scope.DELIMITER_REGEX))
-                .filter(StringUtils::isNotBlank)
-                .collect(Collectors.toSet());
-    }
-
-    private GrpcR ok() {
-        return GrpcRFactory.ok();
-    }
-
-    private GrpcR protocolFailure(OAuthProtocolException exception) {
-        return GrpcR.newBuilder()
-                .setOk(false)
-                .setCode(exception.getError())
-                .setMessage(exception.getDescription())
-                .build();
-    }
-
-    private GrpcR failure(Exception exception) {
-        return StringUtils.isBlank(exception.getMessage())
-                ? GrpcRFactory.fail(ErrorCode.FAILURE)
-                : GrpcRFactory.fail(ErrorCode.FAILURE, exception.getMessage());
-    }
-
 }

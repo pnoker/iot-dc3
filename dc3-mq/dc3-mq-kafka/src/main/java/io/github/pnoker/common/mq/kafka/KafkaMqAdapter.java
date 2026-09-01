@@ -21,8 +21,10 @@ import io.github.pnoker.common.constant.mq.ConsumptionProfile;
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.OrderingGuarantee;
 import io.github.pnoker.common.constant.mq.SubscriptionMode;
+import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.adapter.BrokerCapabilities;
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
 import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireConfirmation;
@@ -33,9 +35,12 @@ import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.mq.subscription.KeyRoutes;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -48,19 +53,26 @@ import org.springframework.kafka.listener.AcknowledgingMessageListener;
 import org.springframework.kafka.listener.BatchAcknowledgingMessageListener;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.ConsumerAwareRebalanceListener;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.kafka.support.Acknowledgment;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -79,7 +91,8 @@ import java.util.concurrent.TimeUnit;
  * is acknowledged and skipped (Rabbit unroutable-drop semantics; the message's home,
  * if any, is a matching listener on another JVM). Specs on the same (topic, group)
  * must agree on the delivery mode; BROADCAST specs keep an independent container each.
- * Kafka exposes no delivery count, so {@code redelivered} is always false here.
+ * Kafka requeues by republishing with an internal attempt header, which also drives
+ * the delivery's {@code redelivered} flag and bounded dead-letter policy.
  *
  * @author pnoker
  * @since 2026.8.19
@@ -91,13 +104,7 @@ public class KafkaMqAdapter implements BrokerAdapter {
      * Physical topic prefix; the design doc's namespace knob lands here in phase 3.
      */
     private static final String TOPIC_PREFIX = "dc3.";
-
-    /**
-     * DLQ send timeout: dead-lettering is synchronous so callers can decide between
-     * committing (send ok) and leaving the offsets uncommitted for broker redelivery
-     * (send failed — the message must not be lost silently).
-     */
-    private static final Duration DEAD_LETTER_SEND_TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration SUBSCRIPTION_READY_TIMEOUT = Duration.ofSeconds(30);
 
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
     private final Map<String, Object> baseConsumerConfig;
@@ -107,6 +114,29 @@ public class KafkaMqAdapter implements BrokerAdapter {
     private final Map<String, KeyRoutes<RawBatchListener>> batchRoutes = new ConcurrentHashMap<>();
     private final Map<String, MessageListenerContainer> containers = new ConcurrentHashMap<>();
     private volatile boolean stopped;
+
+    private static final class SubscriptionReady {
+
+        private final int expectedConsumers;
+        private final CountDownLatch latch = new CountDownLatch(1);
+        private final Set<Consumer<?, ?>> assignedConsumers = java.util.Collections.newSetFromMap(
+                new IdentityHashMap<>());
+
+        private SubscriptionReady(int expectedConsumers) {
+            this.expectedConsumers = expectedConsumers;
+        }
+
+        private synchronized void assigned(Consumer<?, ?> consumer) {
+            assignedConsumers.add(consumer);
+            if (assignedConsumers.size() >= expectedConsumers) {
+                latch.countDown();
+            }
+        }
+
+        private boolean await(Duration timeout) throws InterruptedException {
+            return latch.await(timeout.toMillis(), TimeUnit.MILLISECONDS);
+        }
+    }
 
     public KafkaMqAdapter(KafkaTemplate<String, byte[]> kafkaTemplate, Map<String, Object> baseConsumerConfig,
                           BatchConsumerProperties retryProperties) {
@@ -219,13 +249,15 @@ public class KafkaMqAdapter implements BrokerAdapter {
                     spec.topic(), spec.mode(), spec.delivery(), groupId);
             return;
         }
+        int concurrency = concurrency(spec);
+        SubscriptionReady ready = new SubscriptionReady(concurrency);
         ConcurrentMessageListenerContainer<String, byte[]> container =
                 new ConcurrentMessageListenerContainer<>(consumerFactory(groupId, false),
-                        containerProperties(spec, groupId));
+                        containerProperties(spec, groupId, ready));
         container.getContainerProperties().setMessageListener(
                 (AcknowledgingMessageListener<String, byte[]>) (record, springAck)
                         -> deliverSingle(record, springAck, routeKey));
-        start(spec, groupId, routeKey, container);
+        start(spec, groupId, routeKey, container, concurrency, ready);
     }
 
     @Override
@@ -239,13 +271,15 @@ public class KafkaMqAdapter implements BrokerAdapter {
                     spec.topic(), spec.mode(), spec.delivery(), groupId);
             return;
         }
+        int concurrency = concurrency(spec);
+        SubscriptionReady ready = new SubscriptionReady(concurrency);
         ConcurrentMessageListenerContainer<String, byte[]> container =
                 new ConcurrentMessageListenerContainer<>(consumerFactory(groupId, true),
-                        containerProperties(spec, groupId));
+                        containerProperties(spec, groupId, ready));
         container.getContainerProperties().setMessageListener(
                 (BatchAcknowledgingMessageListener<String, byte[]>) (records, springAck)
                         -> deliverBatch(records, springAck, routeKey));
-        start(spec, groupId, routeKey, container);
+        start(spec, groupId, routeKey, container, concurrency, ready);
     }
 
     /**
@@ -261,23 +295,13 @@ public class KafkaMqAdapter implements BrokerAdapter {
             springAck.acknowledge();
             return;
         }
-        try {
-            listener.onDelivery(deliveryOf(record, springAck, false));
-        } catch (MqPoisonException e) {
-            log.warn("Kafka poison delivery dead-lettered, topic={}, offset={}", record.topic(), record.offset(), e);
-            if (publishDead(record)) {
-                springAck.acknowledge();
-            } else {
-                // dead-letter send failed: leave the offset uncommitted so the broker
-                // redelivers instead of silently losing the message
-                log.error("Kafka dead-letter publish failed, offset left uncommitted for redelivery, topic={}, offset={}",
-                        record.topic(), record.offset());
-            }
-        } catch (Exception e) {
-            log.warn("Kafka delivery failed, nacking for redelivery, topic={}, offset={}",
-                    record.topic(), record.offset(), e);
-            springAck.nack(Duration.ofMillis(50));
-        }
+        normalize(Mono.defer(() -> listener.onDelivery(deliveryOf(record))), record.topic(), record.offset())
+                .flatMap(disposition -> settle(List.of(record), disposition))
+                .doOnSuccess(ignored -> springAck.acknowledge())
+                .doOnError(error -> log.error(
+                        "Kafka delivery settlement failed; offset remains uncommitted, topic={}, offset={}",
+                        record.topic(), record.offset(), error))
+                .subscribe();
     }
 
     /**
@@ -308,74 +332,43 @@ public class KafkaMqAdapter implements BrokerAdapter {
         if (dropped > 0) {
             log.debug("Kafka batch routing dropped {} unmatched record(s) in this JVM", dropped);
         }
-        boolean consumed = true;
-        for (Map.Entry<RawBatchListener, List<ConsumerRecord<String, byte[]>>> entry : grouped.entrySet()) {
-            if (!deliverSubBatch(entry.getKey(), entry.getValue(), springAck)) {
-                consumed = false;
-            }
-        }
-        if (consumed) {
-            springAck.acknowledge();
-        } else {
-            // at least one dead-letter send failed: leave the offsets uncommitted so
-            // the broker redelivers the batch instead of losing it silently
-            log.error("Kafka batch dead-letter publish failed; offsets left uncommitted for broker redelivery");
-        }
+        Flux.fromIterable(grouped.entrySet())
+                .concatMap(entry -> normalize(Mono.defer(() -> entry.getKey().onBatch(entry.getValue().stream()
+                                .map(this::deliveryOf).toList())),
+                        entry.getValue().get(0).topic(), entry.getValue().get(0).offset())
+                        .flatMap(disposition -> settle(entry.getValue(), disposition)))
+                .then()
+                .doOnSuccess(ignored -> springAck.acknowledge())
+                .doOnError(error -> log.error(
+                        "Kafka batch settlement failed; offsets remain uncommitted for redelivery", error))
+                .subscribe();
     }
 
-    /**
-     * @return true when the sub-batch was consumed (ok or fully dead-lettered)
-     */
-    private boolean deliverSubBatch(RawBatchListener listener, List<ConsumerRecord<String, byte[]>> batch,
-                                    Acknowledgment springAck) {
-        // Synchronous bounded retry with backoff, mirroring the rabbit batch
-        // factory's stateless retry advice; exhaustion dead-letters the whole
-        // batch instead of dropping it silently.
-        int maxAttempts = Math.max(1, retryProperties.getMaxRetries()) + 1;
-        for (int attempt = 1; ; attempt++) {
-            try {
-                listener.onBatch(batch.stream()
-                        .map(record -> deliveryOf(record, springAck, true)).toList());
-                return true;
-            } catch (MqPoisonException e) {
-                log.warn("Kafka poison batch dead-lettered, size={}", batch.size(), e);
-                return deadLetterAll(batch);
-            } catch (Exception e) {
-                if (attempt >= maxAttempts) {
-                    log.error("Kafka batch exhausted retries, dead-lettering, size={}",
-                            batch.size(), e);
-                    return deadLetterAll(batch);
-                }
-                sleepBackoff(attempt);
-            }
-        }
+    private Mono<DeliveryDisposition> normalize(Mono<DeliveryDisposition> completion, String topic, long offset) {
+        return completion
+                .onErrorResume(MqPoisonException.class, error -> {
+                    log.warn("Kafka poison delivery dead-lettered, topic={}, offset={}", topic, offset, error);
+                    return Mono.just(DeliveryDisposition.DEAD_LETTER);
+                })
+                .onErrorResume(error -> {
+                    log.warn("Kafka delivery failed, scheduling broker redelivery, topic={}, offset={}",
+                            topic, offset, error);
+                    return Mono.just(DeliveryDisposition.REQUEUE);
+                });
     }
 
-    /**
-     * @return true when every dead-letter send was confirmed by the broker
-     */
-    private boolean deadLetterAll(List<ConsumerRecord<String, byte[]>> batch) {
-        boolean all = true;
-        for (ConsumerRecord<String, byte[]> record : batch) {
-            all &= publishDead(record);
-        }
-        return all;
+    private Mono<Void> settle(List<ConsumerRecord<String, byte[]>> records, DeliveryDisposition disposition) {
+        return switch (disposition) {
+            case ACK -> Mono.empty();
+            case DEAD_LETTER -> Flux.fromIterable(records).concatMap(this::publishDead).then();
+            case REQUEUE -> Flux.fromIterable(records).concatMap(record ->
+                    redeliveryCount(record) >= Math.max(1, retryProperties.getMaxRetries())
+                            ? publishDead(record) : republish(record)).then();
+        };
     }
 
-    /**
-     * Exponential backoff between synchronous batch retry attempts, bounded by the
-     * configured ceiling; interrupted sleep aborts the wait without failing the batch.
-     */
-    private void sleepBackoff(int attempt) {
-        long initial = retryProperties.getRetryInitialIntervalMillis();
-        long cap = retryProperties.getRetryMaxIntervalMillis();
-        long exponent = Math.min(Math.max(attempt - 1, 0), 30);
-        long delay = initial >= cap ? cap : Math.min(initial * (1L << exponent), cap);
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+    private Mono<Void> republish(ConsumerRecord<String, byte[]> record) {
+        return publishCopy(record, record.topic(), redeliveryCount(record) + 1);
     }
 
     /**
@@ -394,13 +387,39 @@ public class KafkaMqAdapter implements BrokerAdapter {
     }
 
     private void start(SubscriptionSpec spec, String groupId, String routeKey,
-                       ConcurrentMessageListenerContainer<String, byte[]> container) {
+                       ConcurrentMessageListenerContainer<String, byte[]> container, int concurrency,
+                       SubscriptionReady ready) {
         container.setAutoStartup(true);
-        container.setConcurrency(spec.profile() == ConsumptionProfile.THROUGHPUT ? 4 : 2);
+        container.setConcurrency(concurrency);
         containers.put(routeKey, container);
-        container.start();
-        log.info("Kafka subscription started, topic={}, mode={}, delivery={}, groupId={}",
-                spec.topic(), spec.mode(), spec.delivery(), groupId);
+        try {
+            container.start();
+            if (!ready.await(SUBSCRIPTION_READY_TIMEOUT)) {
+                throw new IllegalStateException("Kafka subscription did not complete initial assignment within "
+                        + SUBSCRIPTION_READY_TIMEOUT.toSeconds() + " seconds: topic=" + spec.topic()
+                        + ", groupId=" + groupId);
+            }
+            log.info("Kafka subscription ready, topic={}, mode={}, delivery={}, groupId={}",
+                    spec.topic(), spec.mode(), spec.delivery(), groupId);
+        } catch (InterruptedException error) {
+            Thread.currentThread().interrupt();
+            container.stop();
+            containers.remove(routeKey, container);
+            singleRoutes.remove(routeKey);
+            batchRoutes.remove(routeKey);
+            throw new IllegalStateException("Interrupted while awaiting Kafka partition assignment: topic="
+                    + spec.topic() + ", groupId=" + groupId, error);
+        } catch (RuntimeException error) {
+            container.stop();
+            containers.remove(routeKey, container);
+            singleRoutes.remove(routeKey);
+            batchRoutes.remove(routeKey);
+            throw error;
+        }
+    }
+
+    private int concurrency(SubscriptionSpec spec) {
+        return spec.profile() == ConsumptionProfile.THROUGHPUT ? 4 : 2;
     }
 
     private ConsumerFactory<String, byte[]> consumerFactory(String groupId, boolean batch) {
@@ -413,10 +432,17 @@ public class KafkaMqAdapter implements BrokerAdapter {
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
-    private ContainerProperties containerProperties(SubscriptionSpec spec, String groupId) {
+    private ContainerProperties containerProperties(SubscriptionSpec spec, String groupId, SubscriptionReady ready) {
         ContainerProperties properties = new ContainerProperties(topicName(spec.topic()));
-        properties.setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+        properties.setAckMode(ContainerProperties.AckMode.MANUAL);
+        properties.setAsyncAcks(true);
         properties.setGroupId(groupId);
+        properties.setConsumerRebalanceListener(new ConsumerAwareRebalanceListener() {
+            @Override
+            public void onPartitionsAssigned(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
+                ready.assigned(consumer);
+            }
+        });
         return properties;
     }
 
@@ -433,9 +459,8 @@ public class KafkaMqAdapter implements BrokerAdapter {
         return base;
     }
 
-    private WireMqDelivery deliveryOf(ConsumerRecord<String, byte[]> record, Acknowledgment springAck, boolean batch) {
-        return new WireMqDelivery(record.value(), headersOf(record), false,
-                new KafkaAcknowledgment(springAck, List.of(record), batch));
+    private WireMqDelivery deliveryOf(ConsumerRecord<String, byte[]> record) {
+        return new WireMqDelivery(record.value(), headersOf(record), redeliveryCount(record) > 0);
     }
 
     private Map<String, String> headersOf(ConsumerRecord<String, byte[]> record) {
@@ -455,71 +480,31 @@ public class KafkaMqAdapter implements BrokerAdapter {
         return record;
     }
 
-    /**
-     * Synchronous dead-letter publish: the caller only commits the offset when this
-     * returns true; on failure the offsets stay uncommitted and the broker redelivers.
-     *
-     * @return true when the broker accepted the dead-letter record
-     */
-    private boolean publishDead(ConsumerRecord<String, byte[]> record) {
-        try {
-            ProducerRecord<String, byte[]> dead = new ProducerRecord<>(deadLetterTopic(record.topic()),
-                    record.key(), record.value());
-            for (Header header : record.headers()) {
-                dead.headers().add(header);
-            }
-            kafkaTemplate.send(dead).get(DEAD_LETTER_SEND_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
-            return true;
-        } catch (Exception e) {
-            log.error("Kafka dead-letter publish failed, topic={}, offset={}", record.topic(), record.offset(), e);
-            return false;
-        }
+    private Mono<Void> publishDead(ConsumerRecord<String, byte[]> record) {
+        return publishCopy(record, deadLetterTopic(record.topic()), redeliveryCount(record));
     }
 
-    /**
-     * Port acknowledgment over spring-kafka's handle: ack commits the offset(s),
-     * reject(true) nacks for near-immediate redelivery — the batch acknowledgment only
-     * implements {@code nack(index, duration)} (the index-less overload throws
-     * UnsupportedOperationException), so a batch reject nacks from index 0 to redeliver
-     * the whole batch — and reject(false) republishes the record(s) to the dead-letter
-     * topic and commits.
-     */
-    private final class KafkaAcknowledgment implements io.github.pnoker.common.mq.listener.Acknowledgment {
-
-        private final Acknowledgment springAcknowledgment;
-        private final List<ConsumerRecord<String, byte[]>> records;
-        private final boolean batch;
-
-        private KafkaAcknowledgment(Acknowledgment springAcknowledgment, List<ConsumerRecord<String, byte[]>> records,
-                                    boolean batch) {
-            this.springAcknowledgment = springAcknowledgment;
-            this.records = records;
-            this.batch = batch;
-        }
-
-        @Override
-        public void ack() {
-            springAcknowledgment.acknowledge();
-        }
-
-        @Override
-        public void reject(boolean requeue) {
-            if (requeue) {
-                if (batch) {
-                    // redeliver the whole batch: ConsumerBatchAcknowledgment only
-                    // supports the indexed nack
-                    springAcknowledgment.nack(0, Duration.ofMillis(50));
-                } else {
-                    springAcknowledgment.nack(Duration.ofMillis(50));
-                }
-                return;
+    private Mono<Void> publishCopy(ConsumerRecord<String, byte[]> source, String targetTopic, int attempt) {
+        ProducerRecord<String, byte[]> target = new ProducerRecord<>(targetTopic, source.key(), source.value());
+        for (Header header : source.headers()) {
+            if (!MqHeaders.REDELIVERY_COUNT.equals(header.key())) {
+                target.headers().add(header);
             }
-            if (deadLetterAll(records)) {
-                springAcknowledgment.acknowledge();
-            } else {
-                log.error("Kafka dead-letter publish failed on reject, offsets left uncommitted for redelivery, records={}",
-                        records.size());
-            }
+        }
+        target.headers().add(new RecordHeader(MqHeaders.REDELIVERY_COUNT,
+                String.valueOf(attempt).getBytes(StandardCharsets.UTF_8)));
+        return Mono.fromFuture(kafkaTemplate.send(target)).then();
+    }
+
+    private int redeliveryCount(ConsumerRecord<String, byte[]> record) {
+        Header header = record.headers().lastHeader(MqHeaders.REDELIVERY_COUNT);
+        if (Objects.isNull(header) || Objects.isNull(header.value())) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(new String(header.value(), StandardCharsets.UTF_8));
+        } catch (NumberFormatException ignored) {
+            return 0;
         }
     }
 }

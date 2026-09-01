@@ -35,10 +35,9 @@
     </description>
 
     <modules>
-        <module>dc3-db-core</module>
-        <module>dc3-db-postgres</module>
-        <module>dc3-db-mysql</module>
-        <module>dc3-db-mariadb</module>
+        <module>dc3-db-r2dbc-core</module>
+        <module>dc3-db-r2dbc-runtime</module>
+        <module>dc3-db-r2dbc-postgres</module>
         <module>dc3-db-tck</module>
     </modules>
 

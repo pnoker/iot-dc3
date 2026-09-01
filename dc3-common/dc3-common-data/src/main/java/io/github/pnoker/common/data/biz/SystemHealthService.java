@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
+import reactor.core.publisher.Mono;
 
 /**
  * Aggregates liveness probes for the home-page banner: center services (auth / data /
@@ -38,6 +39,6 @@ public interface SystemHealthService {
      * facades; infra / center probes ignore it.
      * </p>
      */
-    SystemHealthVO snapshot(Long tenantId);
+    Mono<SystemHealthVO> snapshot(Long tenantId);
 
 }

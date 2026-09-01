@@ -56,83 +56,93 @@ dc3 auth token --header                # Display full auth headers as JSON
 ### Device (`dc3 device`)
 
 ```bash
-dc3 device list [--driver-id] [--profile-id] [--page] [--size]
+dc3 device list [--driver-id] [--profile-id] [--offset] [--limit]
 dc3 device get <id>
 dc3 device create --name "..." --driver-id "..." --profile-id "..."
-dc3 device update <id> --name "..."
-dc3 device delete <id>
+dc3 device update <id> --version <n> [--name "..."] [--driver-id "..."] [--profile-id "..."]
+dc3 device delete <id> --version <n>
 dc3 device count --driver-id "..."
 dc3 device status <id>
+dc3 device import <file.xlsx> --driver-id "..." --profile-id "..." [--idempotency-key "..."] [--no-wait]
 ```
+
+`device import` submits a canonical multipart request (`request` JSON part plus `file` XLSX part) with an idempotency key. It polls the returned durable operation until a terminal status by default; use `--no-wait` to return the `202 Accepted` resource immediately.
 
 ### Driver (`dc3 driver`)
 
 ```bash
-dc3 driver list [--page] [--size]
+dc3 driver list [--offset] [--limit]
 dc3 driver get <id>
+dc3 driver create --name "..." --service-name "..." --service-host "..." [--type DRIVER_CLIENT]
+dc3 driver update <id> --version <n> [--name "..."] [--service-name "..."] [--service-host "..."]
+dc3 driver delete <id> --version <n>
 dc3 driver status <id>
 ```
 
 ### Point (`dc3 point`)
 
 ```bash
-dc3 point list [--device-id] [--profile-id] [--page] [--size]
+dc3 point list [--device-id] [--profile-id] [--offset] [--limit]
 dc3 point get <id>
 dc3 point read <id>                                      # Read latest value
 dc3 point history <id> --device-id <did> [--count 100]   # Read history
 dc3 point write <id> --device-id <did> --value 25.5      # Write value
-dc3 point create --name "..." --profile-id "..."
-dc3 point update <id> --name "..."
-dc3 point delete <id>
+dc3 point create --name "..." --profile-id "..." [--type FLOAT] [--rw READ_ONLY]
+dc3 point update <id> --version <n> [--name "..."] [--profile-id "..."] [--type FLOAT]
+dc3 point delete <id> --version <n>
 ```
 
 ### Profile (`dc3 profile`)
 
 ```bash
-dc3 profile list [--device-id] [--type] [--page]
+dc3 profile list [--device-id] [--type] [--offset] [--limit]
 dc3 profile get <id>
 dc3 profile create --name "..." [--type "..."]
-dc3 profile update <id> --name "..."
-dc3 profile delete <id>
+dc3 profile update <id> --version <n> [--name "..."] [--type USER]
+dc3 profile delete <id> --version <n>
 ```
 
 ### Group & Label (`dc3 group`, `dc3 label`)
 
 ```bash
-dc3 group list [--page]
+dc3 group list [--offset] [--limit]
 dc3 group get <id>
 dc3 group create --name "..."
 
-dc3 label list [--page]
+dc3 label list [--offset] [--limit]
 dc3 label get <id>
 ```
 
 ### Event (`dc3 event`)
 
 ```bash
-dc3 event list [--device-id] [--profile-id] [--page]
+dc3 event list [--device-id] [--profile-id] [--offset] [--limit]
 dc3 event get <id>
-dc3 event create --name "..." --profile-id "..."
-dc3 event delete <id>
-dc3 event history [--page]
+dc3 event create --name "..." --profile-id "..." [--type INFO] [--level LOW]
+dc3 event update <id> --version <n> [--name "..."] [--profile-id "..."]
+dc3 event delete <id> --version <n>
+dc3 event history [--offset] [--limit]
 ```
 
 ### Command (`dc3 command`)
 
 ```bash
-dc3 command list [--device-id] [--page]
+dc3 command list [--device-id] [--profile-id] [--offset] [--limit]
 dc3 command get <id>
+dc3 command create --name "..." --profile-id "..." [--type CUSTOM] [--call-type SYNC] [--timeout 30]
+dc3 command update <id> --version <n> [--name "..."] [--profile-id "..."]
+dc3 command delete <id> --version <n>
 dc3 command call --device-id "..." --command-id "..." [--params '{"k":"v"}']
 dc3 command history <recordId>
-dc3 command history-list [--page]
+dc3 command history-list [--offset] [--limit]
 ```
 
 ### Alert (`dc3 alert`)
 
 ```bash
 dc3 alert stats                       # Alert overview
-dc3 alert list [--source device|driver|point] [--page]
-dc3 alert latest [--size 10]          # Latest alerts
+dc3 alert list [--source device|driver|point] [--offset] [--limit]
+dc3 alert latest [--limit 10]         # Latest alerts
 dc3 alert confirm --source device --id 789
 dc3 alert unconfirm --source device --id 789
 dc3 alert trend [--days 30]           # Trend analysis
@@ -149,7 +159,8 @@ dc3 session messages conv-abc123
 dc3 session rename conv-abc123 --name "boiler watch"
 dc3 session delete conv-abc123
 
-dc3 action pending --conversation-id conv-abc123   # tool calls awaiting approval
+dc3 action pending --conversation-id conv-abc123   # offset page of tool calls awaiting approval
+dc3 action pending --conversation-id conv-abc123 --offset 50 --limit 50
 dc3 action confirm action-xyz789
 dc3 action reject  action-xyz789
 ```
@@ -186,7 +197,7 @@ dc3 dashboard timeseries [--granularity hour] [--range-hours 24]
 dc3 dashboard top [--dimension device] [--range-hours 24] [--limit 10]
 dc3 dashboard topology [--mode cardinality]
 dc3 dashboard health                  # System + protocol health
-dc3 dashboard stream [--size 20]      # Real-time data stream
+dc3 dashboard stream [--limit 20]     # Real-time data stream
 dc3 dashboard driver-stats            # Driver statistics
 dc3 dashboard device-stats [--top-n 10]
 ```
@@ -194,7 +205,7 @@ dc3 dashboard device-stats [--top-n 10]
 ### Topic (`dc3 topic`)
 
 ```bash
-dc3 topic list [--page]
+dc3 topic list [--offset] [--limit]
 ```
 
 ### Tool Catalog (`dc3 tools`)
@@ -218,12 +229,12 @@ dc3 chat --conversation-id <id>       # Continue conversation
 
 ## Global Options
 
-| Option | Description |
-|--------|-------------|
-| `--profile <name>` | Use a specific config profile |
+| Option                       | Description                                           |
+| ---------------------------- | ----------------------------------------------------- |
+| `--profile <name>`           | Use a specific config profile                         |
 | `--format json\|table\|yaml` | Output format (default: table for TTY, json for pipe) |
-| `--verbose` | Show request/response details |
-| `--ci` | CI mode: no colors, json output, strict exit codes |
+| `--verbose`                  | Show request/response details                         |
+| `--ci`                       | CI mode: no colors, json output, strict exit codes    |
 
 ## Multi-Profile
 
@@ -264,9 +275,9 @@ Configure your AI tool to connect to the Gateway MCP endpoint:
   "mcpServers": {
     "dc3": {
       "transport": "http",
-      "url": "http://localhost:8000/mcp"
-    }
-  }
+      "url": "http://localhost:8000/mcp",
+    },
+  },
 }
 ```
 
@@ -274,21 +285,21 @@ The AI agent will discover all platform API tools automatically.
 
 ## Credential Storage
 
-| Store | Description | Use Case |
-|-------|-------------|----------|
-| `keychain` | OS-level keychain (macOS Keychain, Linux Secret Service, Windows Credential Manager) | Daily use (default) |
-| `encrypted` | AES-256-GCM encrypted file at `~/.dc3/credentials.enc` | Fallback when keychain unavailable |
-| `env` | `DC3_PASSWORD` environment variable | CI/CD, scripting |
-| `prompt` | Interactive prompt on every use | Maximum security, no auto-renewal |
+| Store       | Description                                                                          | Use Case                           |
+| ----------- | ------------------------------------------------------------------------------------ | ---------------------------------- |
+| `keychain`  | OS-level keychain (macOS Keychain, Linux Secret Service, Windows Credential Manager) | Daily use (default)                |
+| `encrypted` | AES-256-GCM encrypted file at `~/.dc3/credentials.enc`                               | Fallback when keychain unavailable |
+| `env`       | `DC3_PASSWORD` environment variable                                                  | CI/CD, scripting                   |
+| `prompt`    | Interactive prompt on every use                                                      | Maximum security, no auto-renewal  |
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| 0 | Success |
-| 1 | Business error (invalid input, auth failure) |
-| 2 | Network error (gateway unreachable) |
-| 3 | Authentication error (needs login) |
+| Code | Meaning                                      |
+| ---- | -------------------------------------------- |
+| 0    | Success                                      |
+| 1    | Business error (invalid input, auth failure) |
+| 2    | Network error (gateway unreachable)          |
+| 3    | Authentication error (needs login)           |
 
 ## License
 

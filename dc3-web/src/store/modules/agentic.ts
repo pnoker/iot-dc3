@@ -156,7 +156,7 @@ export const useAgenticStore = defineStore('agentic', () => {
   const loadModels = async () => {
     try {
       const response = await listAgenticModels();
-      models.value = response.data?.length ? response.data : [DEFAULT_MODEL];
+      models.value = response?.length ? response : [DEFAULT_MODEL];
     } catch (error) {
       models.value = [DEFAULT_MODEL];
       warnMessage(i18n.global.t('agentic.failedModels'), 'Agentic', error);
@@ -173,8 +173,8 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const loadSessions = async () => {
     try {
-      const response = await listAgenticSessions({page: {current: 1, size: 50}});
-      sessions.value = (response.data?.records || []).map(normalizeSession);
+      const response = await listAgenticSessions({offset: 0, limit: 50});
+      sessions.value = (response?.items || []).map(normalizeSession);
       if (activeConversationId.value) {
         restoreSessionModel(sessions.value.find((session) => session.conversationId === activeConversationId.value));
       }
@@ -261,7 +261,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         title: normalizedTitle,
       });
       sessions.value = sessions.value.map((session) =>
-        session.conversationId === conversationId ? normalizeSession({...session, ...(response.data || {})}) : session
+        session.conversationId === conversationId ? normalizeSession({...session, ...(response || {})}) : session
       );
     } catch (error) {
       warnMessage(i18n.global.t('agentic.failedSessionUpdate'), 'Agentic', error);
@@ -363,14 +363,15 @@ export const useAgenticStore = defineStore('agentic', () => {
     }
     try {
       const response = await listAgenticMessages(conversationId);
-      if (response.data) {
+      if (response) {
         const previousMessages = messagesByConversation.value[conversationId] || [];
-        const loadedMessages = response.data.map((message) => ({
+        const loadedMessages = response.map((message) => ({
           id: String(message.id || createMessageId(message.role)),
           role: message.role,
           content: message.content || '',
           contentExt: message.contentExt,
           messageIndex: message.messageIndex,
+          status: message.status,
           reasoning: message.reasoning || message.contentExt?.reasoningContent,
         }));
         messagesByConversation.value[conversationId] = mergeEphemeralAssistantState(previousMessages, loadedMessages);
@@ -387,7 +388,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     }
     try {
       const response = await listAgenticAttachments(conversationId);
-      attachmentsByConversation.value[conversationId] = response.data || [];
+      attachmentsByConversation.value[conversationId] = response || [];
     } catch (error) {
       attachmentsByConversation.value[conversationId] = attachmentsByConversation.value[conversationId] || [];
       warnMessage(i18n.global.t('agentic.failedAttachments'), 'Agentic', error);
@@ -398,11 +399,11 @@ export const useAgenticStore = defineStore('agentic', () => {
     const conversationId = ensureActiveSession();
     const response = await uploadAgenticAttachment(conversationId, file);
     attachmentsByConversation.value[conversationId] = [
-      response.data,
+      response,
       ...(attachmentsByConversation.value[conversationId] || []),
     ];
     pendingAttachmentIdsByConversation.value[conversationId] = [
-      response.data.id,
+      response.id,
       ...(pendingAttachmentIdsByConversation.value[conversationId] || []),
     ];
   };
@@ -420,7 +421,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     }
     try {
       const response = await listPendingAgenticActions(conversationId);
-      pendingActionsByConversation.value[conversationId] = response.data || [];
+      pendingActionsByConversation.value[conversationId] = response?.items || [];
     } catch (error) {
       pendingActionsByConversation.value[conversationId] = [];
       warnMessage(i18n.global.t('agentic.failedActions'), 'Agentic', error);
@@ -491,7 +492,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     try {
       const response = await updateAgenticSession(conversationId, {sessionExt: {model: nextModel}});
       sessions.value = sessions.value.map((session) =>
-        session.conversationId === conversationId ? normalizeSession({...session, ...(response.data || {})}) : session
+        session.conversationId === conversationId ? normalizeSession({...session, ...(response || {})}) : session
       );
     } catch (error) {
       warnMessage(i18n.global.t('agentic.failedSessionModel'), 'Agentic', error);

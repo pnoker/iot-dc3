@@ -21,6 +21,7 @@ import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.core.Dc3ListenerProcessor;
 import io.github.pnoker.common.mq.core.MessageSenderImpl;
 import io.github.pnoker.common.mq.sender.MessageSender;
+import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -64,6 +65,20 @@ public class MqAutoConfiguration {
             log.info("Broker has no publisher confirmation: durability relies on the driver outbox");
         }
         return new MessageSenderImpl(adapter);
+    }
+
+    /**
+     * Exposes the same publisher through the non-blocking contract. A custom
+     * {@link MessageSender} must explicitly implement {@link ReactiveMessageSender};
+     * silently adapting a blocking publisher would violate the reactive boundary.
+     */
+    @Bean
+    @ConditionalOnMissingBean(ReactiveMessageSender.class)
+    public ReactiveMessageSender reactiveMessageSender(MessageSender messageSender) {
+        if (messageSender instanceof ReactiveMessageSender reactive) {
+            return reactive;
+        }
+        throw new IllegalStateException("MessageSender must implement ReactiveMessageSender");
     }
 
     /**

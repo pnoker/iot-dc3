@@ -19,11 +19,9 @@ syntax = "proto3";
 
 package api.common.manager;
 
-import "api/common/page.proto";
-import "api/common/r.proto";
 import "api/common/entity.proto";
 import "api/common/manager/manager_query.proto";
-import "api/common/manager/manager_query_page.proto";
+import "api/common/page.proto";
 
 option java_package = "io.github.pnoker.api.center.manager";
 option java_outer_classname = "ManagerEventProto";
@@ -32,27 +30,30 @@ option java_multiple_files = true;
 
 // Service interface defining RPC calls related to event management
 service EventApi {
-  rpc ListByPage (GrpcPageEventQuery) returns (GrpcRPageEventDTO);
-  rpc GetById (GrpcEventQuery) returns (GrpcREventDTO);
-  rpc ListByIds (GrpcEventIdsQuery) returns (GrpcREventListDTO);
+  // Canonical offset-based query.
+  rpc List (GrpcOffsetEventQuery) returns (GrpcOffsetPageEventDTO);
+  rpc GetById (GrpcEventQuery) returns (GrpcEventDTO);
+  rpc ListByIds (GrpcEventIdsQuery) returns (GrpcEventListDTO);
 }
 
-message GrpcRPageEventDTO {
-  GrpcR result = 1;
-  GrpcPageEventDTO data = 2;
+message GrpcOffsetEventQuery {
+  PageRequest page = 1;
+  int64 tenant_id = 2;
+  string event_name = 3;
+  string event_code = 4;
+  optional int32 event_type_flag = 5;
+  optional int32 event_level_flag = 6;
+  optional int64 profile_id = 7;
+  optional int32 enable_flag = 8;
+  optional int32 version = 9;
+  optional int64 device_id = 10;
 }
 
-message GrpcPageEventDTO {
-  GrpcPage page = 1;
-  repeated GrpcEventDTO data = 2;
+message GrpcOffsetPageEventDTO {
+  OffsetPage page = 1;
+  repeated GrpcEventDTO items = 2;
 }
 
-message GrpcREventListDTO {
-  GrpcR result = 1;
-  repeated GrpcEventDTO data = 2;
-}
-
-message GrpcREventDTO {
-  GrpcR result = 1;
-  GrpcEventDTO data = 2;
+message GrpcEventListDTO {
+  repeated GrpcEventDTO items = 1;
 }

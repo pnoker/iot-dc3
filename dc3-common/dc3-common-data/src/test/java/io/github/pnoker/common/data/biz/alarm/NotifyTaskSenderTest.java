@@ -19,23 +19,25 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
-import io.github.pnoker.common.mq.sender.MessageSender;
+import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class NotifyTaskSenderTest {
 
     @Mock
-    private MessageSender messageSender;
+    private ReactiveMessageSender messageSender;
 
 
     @InjectMocks
@@ -49,9 +51,10 @@ class NotifyTaskSenderTest {
                 .channelTypeFlag((byte) 0)
                 .build();
 
-        sender.publish(task);
+        when(messageSender.sendConfirmed(any())).thenReturn(Mono.empty());
+        sender.publish(task).block();
 
-        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.NOTIFY_TASK
+        verify(messageSender).sendConfirmed(argThat(m -> m.getTopic() == MqTopic.NOTIFY_TASK
                 && "0".equals(m.getPartitionKey()) && m.getPayload() == task));
     }
 
@@ -62,17 +65,18 @@ class NotifyTaskSenderTest {
                 .channelId(2L)
                 .build(); // channelTypeFlag missing
 
-        sender.publish(task);
+        when(messageSender.sendConfirmed(any())).thenReturn(Mono.empty());
+        sender.publish(task).block();
 
-        verify(messageSender).send(argThat(m -> m.getTopic() == MqTopic.NOTIFY_TASK
+        verify(messageSender).sendConfirmed(argThat(m -> m.getTopic() == MqTopic.NOTIFY_TASK
                 && "unknown".equals(m.getPartitionKey()) && m.getPayload() == task));
     }
 
     @Test
     void refusesToPublishWhenHistoryIdIsMissing() {
         NotifyTaskDTO task = NotifyTaskDTO.builder().channelId(2L).build();
-        sender.publish(task);
-        verify(messageSender, never()).send(any());
+        sender.publish(task).block();
+        verify(messageSender, never()).sendConfirmed(any());
     }
 
 }

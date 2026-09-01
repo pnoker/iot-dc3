@@ -17,26 +17,17 @@
 
 package io.github.pnoker.common.auth.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.auth.dal.PrincipalManager;
-import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
 import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.UserBuilder;
-import io.github.pnoker.common.auth.entity.model.PrincipalDO;
-import io.github.pnoker.common.auth.entity.query.UserQuery;
+import io.github.pnoker.common.auth.entity.query.UserOffsetRequest;
 import io.github.pnoker.common.auth.entity.vo.UserVO;
-import io.github.pnoker.common.auth.service.TenantMembershipService;
-import io.github.pnoker.common.auth.service.UserService;
+import io.github.pnoker.common.auth.service.ReactiveUserCommandService;
+import io.github.pnoker.common.auth.service.ReactiveUserService;
+import io.github.pnoker.common.auth.repository.UserFilter;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.MembershipStatusEnum;
-import io.github.pnoker.common.enums.PrincipalSourceTypeEnum;
-import io.github.pnoker.common.enums.PrincipalTypeEnum;
-import io.github.pnoker.common.enums.SuccessCode;
-import io.github.pnoker.common.exception.AddException;
-import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,14 +41,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
 
 /**
  * REST controller exposing user account management endpoints.
@@ -74,11 +66,9 @@ public class UserController implements BaseController {
 
     private final UserBuilder userBuilder;
 
-    private final UserService userService;
+    private final ReactiveUserService reactiveUserService;
 
-    private final TenantMembershipService tenantMembershipService;
-
-    private final PrincipalManager principalManager;
+    private final ReactiveUserCommandService reactiveUserCommandService;
 
     /**
      * Create a user under the current tenant and enroll them as an active tenant member.
@@ -95,42 +85,16 @@ public class UserController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody UserVO entityVO) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            UserBO entityBO = userBuilder.buildBOByVO(entityVO);
-            PrincipalDO principal = new PrincipalDO();
-            principal.setPrincipalType(PrincipalTypeEnum.USER.getValue());
-            principal.setPrincipalName(entityBO.getUserName());
-            principal.setDisplayName(entityBO.getNickName());
-            principal.setSourceType(PrincipalSourceTypeEnum.LOCAL.getValue());
-            principal.setEnableFlag(EnableFlagEnum.ENABLE.getIndex());
-            principal.setLockedFlag(EnableFlagEnum.ENABLE.getIndex());
-            principal.setCreatorId(header.getUserId());
-            principal.setCreatorName(header.getNickName());
-            principal.setOperatorId(header.getUserId());
-            principal.setOperatorName(header.getNickName());
-            if (!principalManager.save(principal)) {
-                throw new AddException("Failed to create principal");
-            }
-            entityBO.setPrincipalId(principal.getId());
-            entityBO.setCreatorId(header.getUserId());
-            entityBO.setCreatorName(header.getNickName());
-            entityBO.setOperatorId(header.getUserId());
-            entityBO.setOperatorName(header.getNickName());
-            userService.add(entityBO);
-            UserBO saved = userService.getByUserName(entityBO.getUserName(), true);
-            TenantMembershipBO membership = new TenantMembershipBO();
-            membership.setTenantId(header.getTenantId());
-            membership.setPrincipalId(saved.getPrincipalId());
-            membership.setPrincipalType(PrincipalTypeEnum.USER);
-            membership.setMembershipStatus(MembershipStatusEnum.ACTIVE);
-            membership.setCreatorId(header.getUserId());
-            membership.setCreatorName(header.getNickName());
-            membership.setOperatorId(header.getUserId());
-            membership.setOperatorName(header.getNickName());
-            tenantMembershipService.add(membership);
-            return R.ok(SuccessCode.ADD);
-        }));
+    public Mono<ResponseEntity<UserVO>> add(@Validated(Add.class) @RequestBody UserVO entityVO) {
+        return getPrincipalHeader().flatMap(header -> {
+            UserBO user = userBuilder.buildBOByVO(entityVO);
+            user.setCreatorId(header.getUserId());
+            user.setCreatorName(header.getNickName());
+            user.setOperatorId(header.getUserId());
+            user.setOperatorName(header.getNickName());
+            return reactiveUserCommandService.add(header.getTenantId(), user, header.getUserId(), header.getNickName())
+                    .map(saved -> ResponseEntity.status(201).body(userBuilder.buildVOByBO(saved)));
+        });
     }
 
     /**
@@ -147,19 +111,11 @@ public class UserController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            UserBO user = userService.getById(id);
-            tenantMembershipService.requireTenantMember(tenantId, user.getPrincipalId());
-            TenantMembershipBO membership = tenantMembershipService.getByTenantIdAndPrincipalId(tenantId,
-                    user.getPrincipalId());
-            userService.delete(id);
-            if (Objects.nonNull(membership)) {
-                tenantMembershipService.delete(membership.getId());
-            }
-            return R.ok(SuccessCode.DELETE);
-        }));
+    @DeleteMapping("/delete")
+    public Mono<ResponseEntity<Void>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getPrincipalHeader().flatMap(header -> reactiveUserCommandService
+                .delete(header.getTenantId(), id, header.getUserId(), header.getNickName())
+                .thenReturn(ResponseEntity.noContent().build()));
     }
 
     /**
@@ -177,17 +133,19 @@ public class UserController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody UserVO entityVO) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
+    public Mono<ResponseEntity<UserVO>> update(@Validated(Update.class) @RequestBody UserVO entityVO) {
+        return getPrincipalHeader().flatMap(header -> {
             UserBO entityBO = userBuilder.buildBOByVO(entityVO);
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
-            UserBO current = userService.getById(entityBO.getId());
-            tenantMembershipService.requireTenantMember(header.getTenantId(), current.getPrincipalId());
-            entityBO.setPrincipalId(current.getPrincipalId());
-            userService.update(entityBO);
-            return R.ok(SuccessCode.UPDATE);
-        }));
+            return reactiveUserService.getById(header.getTenantId(), entityBO.getId())
+                    .flatMap(current -> {
+                        entityBO.setPrincipalId(current.getPrincipalId());
+                        return reactiveUserCommandService.update(header.getTenantId(), entityBO,
+                                header.getUserId(), header.getNickName());
+                    })
+                    .map(saved -> ResponseEntity.ok(userBuilder.buildVOByBO(saved)));
+        });
     }
 
     /**
@@ -205,13 +163,9 @@ public class UserController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_id")
-    public Mono<R<UserVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            UserBO entityBO = userService.getById(id);
-            tenantMembershipService.requireTenantMember(tenantId, entityBO.getPrincipalId());
-            UserVO entityVO = userBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
-        }));
+    public Mono<ResponseEntity<UserVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId().flatMap(tenantId -> reactiveUserService.getById(tenantId, id)
+                .map(user -> ResponseEntity.ok(userBuilder.buildVOByBO(user))));
     }
 
     /**
@@ -229,18 +183,9 @@ public class UserController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_name")
-    public Mono<R<UserVO>> getByName(@Parameter(description = "Username (login name) of the user to look up within the current tenant. Both not-found and wrong-tenant cases return 404 to avoid leaking name existence.", example = "john_doe") @NotNull @RequestParam(value = "name") String name) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            UserBO entityBO = userService.getByUserName(name, false);
-            // Both "not found" and "wrong tenant" return the same 404 so the
-            // response shape does not reveal whether a user name exists.
-            if (Objects.isNull(entityBO)) {
-                throw new NotFoundException("Resource does not exist");
-            }
-            tenantMembershipService.requireTenantMember(tenantId, entityBO.getPrincipalId());
-            UserVO entityVO = userBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
-        }));
+    public Mono<ResponseEntity<UserVO>> getByName(@Parameter(description = "Username (login name) of the user to look up within the current tenant. Both not-found and wrong-tenant cases return 404 to avoid leaking name existence.", example = "john_doe") @NotNull @RequestParam(value = "name") String name) {
+        return getTenantId().flatMap(tenantId -> reactiveUserService.getByUserName(tenantId, name)
+                .map(user -> ResponseEntity.ok(userBuilder.buildVOByBO(user))));
     }
 
     /**
@@ -258,16 +203,13 @@ public class UserController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<UserVO>>> list(@RequestBody(required = false) UserQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            UserQuery query = Objects.isNull(entityQuery) ? new UserQuery() : entityQuery;
-            // Overwrite whatever the client sent. Tenant scope is a hard
-            // boundary, not a filter — a caller cannot reach across tenants.
-            query.setTenantId(tenantId);
-            Page<UserBO> entityPageBO = userService.list(query);
-            Page<UserVO> entityPageVO = userBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
-        }));
+    public Mono<ResponseEntity<OffsetPage<UserVO>>> list(@RequestBody(required = false) UserOffsetRequest request) {
+        UserOffsetRequest query = request == null ? new UserOffsetRequest() : request;
+        return getTenantId().flatMap(tenantId -> reactiveUserService.list(new UserFilter(tenantId, query.principalId(),
+                query.nickName(), query.userName(), query.phone(), query.email(), query.enableFlag(),
+                new PageRequest(query.offset(), query.limit(), query.sort())))
+                .map(page -> ResponseEntity.ok(OffsetPage.of(page.items().stream().map(userBuilder::buildVOByBO).toList(),
+                        page.offset(), page.limit(), page.total()))));
     }
 
 }

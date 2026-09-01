@@ -48,13 +48,13 @@ describe('agentic store', () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
 
-    apiMocks.listAgenticMessages.mockResolvedValue({data: undefined});
-    apiMocks.listAgenticAttachments.mockResolvedValue({data: []});
-    apiMocks.getPendingAgenticActions.mockResolvedValue({data: []});
-    apiMocks.listAgenticModels.mockResolvedValue({data: []});
-    apiMocks.listAgenticSessions.mockResolvedValue({data: {records: []}});
+    apiMocks.listAgenticMessages.mockResolvedValue(undefined);
+    apiMocks.listAgenticAttachments.mockResolvedValue([]);
+    apiMocks.getPendingAgenticActions.mockResolvedValue([]);
+    apiMocks.listAgenticModels.mockResolvedValue([]);
+    apiMocks.listAgenticSessions.mockResolvedValue({items: []});
     apiMocks.updateAgenticSession.mockImplementation((conversationId: string, data: Record<string, unknown>) =>
-      Promise.resolve({data: {conversationId, ...data}})
+      Promise.resolve({conversationId, ...data})
     );
   });
 
@@ -66,26 +66,24 @@ describe('agentic store', () => {
         callbacks.onDelta?.('设备运行正常。');
       }
     );
-    apiMocks.listAgenticMessages.mockResolvedValue({
-      data: [
-        {
-          id: 'persisted-user-1',
-          role: 'user',
-          content: '查看设备状态',
-          messageIndex: 1,
+    apiMocks.listAgenticMessages.mockResolvedValue([
+      {
+        id: 'persisted-user-1',
+        role: 'user',
+        content: '查看设备状态',
+        messageIndex: 1,
+      },
+      {
+        id: 'persisted-assistant-1',
+        role: 'assistant',
+        content: '设备运行正常。',
+        contentExt: {
+          reasoning: true,
+          reasoningContent: '检查设备状态，确认采集点。',
         },
-        {
-          id: 'persisted-assistant-1',
-          role: 'assistant',
-          content: '设备运行正常。',
-          contentExt: {
-            reasoning: true,
-            reasoningContent: '检查设备状态，确认采集点。',
-          },
-          messageIndex: 2,
-        },
-      ],
-    });
+        messageIndex: 2,
+      },
+    ]);
 
     const store = useAgenticStore();
     // Direct field assignment instead of `bootstrap()` — going through the
@@ -140,35 +138,31 @@ describe('agentic store', () => {
   });
 
   it('restores session preferences from persisted session_ext metadata', async () => {
-    apiMocks.listAgenticModels.mockResolvedValue({
-      data: [
+    apiMocks.listAgenticModels.mockResolvedValue([
+      {
+        model: 'deepseek-v4-pro',
+        label: 'DeepSeek V4 Pro',
+        stream: true,
+        toolCall: true,
+        vision: false,
+        reasoning: true,
+        temperature: 0.7,
+        maxTokens: 2048,
+      },
+    ]);
+    apiMocks.listAgenticSessions.mockResolvedValue({
+      items: [
         {
-          model: 'deepseek-v4-pro',
-          label: 'DeepSeek V4 Pro',
-          stream: true,
-          toolCall: true,
-          vision: false,
-          reasoning: true,
-          temperature: 0.7,
-          maxTokens: 2048,
+          conversationId: 'conversation-1',
+          title: 'Device status',
+          session_ext: {
+            model: 'deepseek-v4-pro',
+            reasoning_enabled: true,
+            temperature: 0.2,
+            max_tokens: 4096,
+          },
         },
       ],
-    });
-    apiMocks.listAgenticSessions.mockResolvedValue({
-      data: {
-        records: [
-          {
-            conversationId: 'conversation-1',
-            title: 'Device status',
-            session_ext: {
-              model: 'deepseek-v4-pro',
-              reasoning_enabled: true,
-              temperature: 0.2,
-              max_tokens: 4096,
-            },
-          },
-        ],
-      },
     });
 
     const store = useAgenticStore();

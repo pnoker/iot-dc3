@@ -20,12 +20,16 @@ package io.github.pnoker.common.agentic.controller;
 import io.github.pnoker.common.agentic.entity.builder.ModelConfigBuilder;
 import io.github.pnoker.common.agentic.entity.vo.ModelVO;
 import io.github.pnoker.common.agentic.service.ModelConfigService;
+import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.security.GatewayAuthenticationToken;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.test.StepVerifier;
+import reactor.core.publisher.Mono;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 
 import java.util.List;
 
@@ -52,24 +56,35 @@ class ModelControllerTest {
     @Test
     void listForwardsListOptionsFromService() {
         ModelVO option = new ModelVO("gpt-4o", "GPT 4o", true, true, true, false, 0.7, 2048);
-        when(modelConfigService.listOptions()).thenReturn(List.of(option));
+        RequestHeader.PrincipalHeader header = header();
+        when(modelConfigService.listOptions(header)).thenReturn(Mono.just(List.of(option)));
 
-        StepVerifier.create(controller.list())
+        StepVerifier.create(controller.list()
+                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(
+                                new GatewayAuthenticationToken(header, List.of()))))
                 .assertNext(response -> {
-                    assertThat(response.isOk()).isTrue();
-                    assertThat(response.getData()).containsExactly(option);
+                    assertThat(response).containsExactly(option);
                 })
-                .verifyComplete();
+                .expectComplete()
+                .verify();
     }
 
     @Test
-    void deleteCallsServiceRemoveAndReturnsTrueEnvelope() {
-        StepVerifier.create(controller.delete(42L))
-                .assertNext(response -> {
-                    assertThat(response.isOk()).isTrue();
-                    assertThat(response.getData()).isTrue();
-                })
+    void deleteCallsServiceAndCompletesWithoutBody() {
+        RequestHeader.PrincipalHeader header = header();
+        when(modelConfigService.delete(42L, header)).thenReturn(Mono.empty());
+        StepVerifier.create(controller.delete(42L)
+                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(
+                                new GatewayAuthenticationToken(header, List.of()))))
                 .verifyComplete();
-        verify(modelConfigService).delete(42L);
+        verify(modelConfigService).delete(42L, header);
+    }
+
+    private RequestHeader.PrincipalHeader header() {
+        RequestHeader.PrincipalHeader header = new RequestHeader.PrincipalHeader();
+        header.setTenantId(1L);
+        header.setPrincipalId(2L);
+        header.setPrincipalName("admin");
+        return header;
     }
 }

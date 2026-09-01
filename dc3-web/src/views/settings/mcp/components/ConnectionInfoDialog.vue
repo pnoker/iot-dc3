@@ -51,7 +51,7 @@ const open = async (row: McpConnectionRecord) => {
   clientId.value = row.clientId || '';
   visible.value = true;
   const res = await getMcpMetadata();
-  metadata.value = res.data || {};
+  metadata.value = res || {};
 };
 
 defineExpose({open});

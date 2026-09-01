@@ -28,7 +28,7 @@ import org.springframework.context.annotation.FilterType;
 
 /**
  * Auto-configuration for the data-domain local facade implementations. Active only when
- * {@code dc3.facade.mode=local}. Scans the facade-local package but restricts
+ * {@code dc3.facade.data.mode=local}. Scans the facade-local package but restricts
  * registration to the data-domain classes carried by this module so it remains
  * deterministic alongside the auth/manager-domain modules. MapStruct-generated
  * {@code *BuilderImpl} classes are picked up via their interfaces (AssignableTypeFilter
@@ -38,7 +38,7 @@ import org.springframework.context.annotation.FilterType;
  * @since 2016.10.1
  */
 @AutoConfiguration
-@ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "local")
+@ConditionalOnProperty(name = "dc3.facade.data.mode", havingValue = "local")
 @ComponentScan(basePackages = "io.github.pnoker.common.facade.local", useDefaultFilters = false,
         includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
                 PointValueLocalFacade.class, PointCommandLocalFacade.class, StatusHealthLocalFacade.class,

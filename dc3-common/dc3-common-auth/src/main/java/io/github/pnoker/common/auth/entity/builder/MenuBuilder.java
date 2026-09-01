@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.MenuBO;
 import io.github.pnoker.common.auth.entity.bo.MenuTreeBO;
 import io.github.pnoker.common.auth.entity.model.MenuDO;
@@ -31,7 +30,6 @@ import io.github.pnoker.common.enums.MenuTypeFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -193,25 +191,7 @@ public interface MenuBuilder {
      */
     List<MenuVO> buildVOListByBOList(List<MenuBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    default Page<MenuBO> buildBOPageByDOPage(Page<MenuDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<MenuVO> buildVOPageByBOPage(Page<MenuBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
     /**
      * Convert bo list to tree view object list.

@@ -24,18 +24,19 @@ import io.github.pnoker.common.constant.mq.OrderingGuarantee;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.adapter.BrokerCapabilities;
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
 import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireConfirmation;
 import io.github.pnoker.common.mq.adapter.WireMqDelivery;
 import io.github.pnoker.common.mq.config.BatchConsumerProperties;
-import io.github.pnoker.common.mq.listener.MqBatchListener;
 import io.github.pnoker.common.mq.listener.MqPoisonException;
 import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.aop.Advice;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
+import org.springframework.amqp.ImmediateRequeueAmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.core.MessageProperties;
@@ -46,7 +47,10 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareBatchMessageListener;
 import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
+import org.springframework.amqp.rabbit.listener.adapter.AbstractAdaptableMessageListener;
 import org.springframework.amqp.rabbit.retry.MessageBatchRecoverer;
+import org.springframework.amqp.listener.adapter.InvocationResult;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -131,14 +135,7 @@ public class RabbitMqAdapter implements BrokerAdapter {
         container.setQueueNames(queue);
         container.setAcknowledgeMode(org.springframework.amqp.core.AcknowledgeMode.MANUAL);
         applyProfile(container, spec.profile());
-        container.setAdviceChain(singleRetryAdvice());
-        container.setMessageListener((ChannelAwareMessageListener) (message, channel) -> {
-            try {
-                listener.onDelivery(deliveryOf(message, channel));
-            } catch (MqPoisonException e) {
-                throw new AmqpRejectAndDontRequeueException("Poison message dead-lettered: " + e.getMessage(), e);
-            }
-        });
+        container.setMessageListener(new ReactiveSingleMessageListener(listener));
         start(spec, queue, container);
     }
 
@@ -154,18 +151,8 @@ public class RabbitMqAdapter implements BrokerAdapter {
         container.setConsumerBatchEnabled(true);
         container.setBatchSize(batchProperties.getBatchSize());
         container.setBatchReceiveTimeout(batchProperties.getReceiveTimeoutMillis());
-        container.setAdviceChain(batchRetryAdvice());
-        container.setMessageListener((ChannelAwareBatchMessageListener) (messages, channel)
-                -> handleBatch(messages, channel, listener));
+        container.setMessageListener(new ReactiveBatchMessageListener(listener));
         start(spec, queue, container);
-    }
-
-    private void handleBatch(List<Message> messages, Channel channel, RawBatchListener listener) {
-        try {
-            listener.onBatch(deliveriesOf(messages, channel));
-        } catch (MqPoisonException e) {
-            throw new AmqpRejectAndDontRequeueException("Poison batch dead-lettered: " + e.getMessage(), e);
-        }
     }
 
     private void start(SubscriptionSpec spec, String queue, SimpleMessageListenerContainer container) {
@@ -203,72 +190,159 @@ public class RabbitMqAdapter implements BrokerAdapter {
         }
     }
 
-    private Advice batchRetryAdvice() {
-        MessageBatchRecoverer recoverer = (messages, cause) -> {
-            log.error("Point-value batch exhausted retries, rejecting to dead-letter exchange, size={}",
-                    messages.size(), cause);
-            throw new AmqpRejectAndDontRequeueException("Point-value batch exhausted retries", true, cause);
-        };
-        return RetryInterceptorBuilder.stateless()
-                .maxRetries(batchProperties.getMaxRetries())
-                .backOffOptions(batchProperties.getRetryInitialIntervalMillis(),
-                        batchProperties.getRetryMultiplier(), batchProperties.getRetryMaxIntervalMillis())
-                .recoverer(recoverer)
-                .build();
-    }
-
-    /**
-     * Bounded redelivery for single deliveries — the single-delivery twin of
-     * {@link #batchRetryAdvice()}, honoring the {@link MqBatchListener} contract
-     * (bounded attempts, exhaustion dead-letters, poison dead-letters immediately).
-     *
-     * <p>Implemented as an in-process stateless retry rather than the requeue-based
-     * stateful interceptor: stateful retry keys redelivery state off the AMQP
-     * {@code messageId}, and this port publishes no message ids — with a null key the
-     * stateful interceptor bypasses retry entirely, so every attempt would look like
-     * the first and unbounded requeue loops would return. In-process bounded retry with
-     * a dead-lettering recoverer is deterministic and matches the batch path.
-     * {@code AmqpRejectAndDontRequeueException} (how poison surfaces) is excluded from
-     * retrying so poison dead-letters on the first attempt.
-     */
-    private Advice singleRetryAdvice() {
-        org.springframework.amqp.rabbit.retry.MessageRecoverer recoverer = (message, cause) -> {
-            log.error("RabbitMQ delivery exhausted retries, rejecting to dead-letter, routingKey={}",
-                    Objects.nonNull(message) ? message.getMessageProperties().getReceivedRoutingKey() : null, cause);
-            throw new AmqpRejectAndDontRequeueException("RabbitMQ delivery exhausted retries", true, cause);
-        };
-        org.springframework.core.retry.RetryPolicy policy = org.springframework.core.retry.RetryPolicy.builder()
-                .maxRetries(batchProperties.getMaxRetries())
-                .delay(java.time.Duration.ofMillis(batchProperties.getRetryInitialIntervalMillis()))
-                .multiplier(batchProperties.getRetryMultiplier())
-                .maxDelay(java.time.Duration.ofMillis(batchProperties.getRetryMaxIntervalMillis()))
-                .excludes(AmqpRejectAndDontRequeueException.class)
-                .build();
-        return RetryInterceptorBuilder.stateless()
-                .retryPolicy(policy)
-                .recoverer(recoverer)
-                .build();
-    }
-
-    private WireMqDelivery deliveryOf(Message message, Channel channel) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+    private WireMqDelivery deliveryOf(Message message) {
         boolean redelivered = Boolean.TRUE.equals(message.getMessageProperties().getRedelivered());
-        return new WireMqDelivery(message.getBody(), headersOf(message), redelivered,
-                RabbitAcknowledgment.single(channel, deliveryTag));
+        return new WireMqDelivery(message.getBody(), headersOf(message), redelivered);
     }
 
-    private List<WireMqDelivery> deliveriesOf(List<Message> messages, Channel channel) {
+    private List<WireMqDelivery> deliveriesOf(List<Message> messages) {
         if (messages.isEmpty()) {
             return List.of();
         }
-        long lastTag = messages.get(messages.size() - 1).getMessageProperties().getDeliveryTag();
-        RabbitAcknowledgment acknowledgment = RabbitAcknowledgment.batch(channel, lastTag);
         List<WireMqDelivery> deliveries = new ArrayList<>(messages.size());
         for (Message message : messages) {
             boolean redelivered = Boolean.TRUE.equals(message.getMessageProperties().getRedelivered());
-            deliveries.add(new WireMqDelivery(message.getBody(), headersOf(message), redelivered, acknowledgment));
+            deliveries.add(new WireMqDelivery(message.getBody(), headersOf(message), redelivered));
         }
         return deliveries;
+    }
+
+    private Mono<Void> terminal(Mono<DeliveryDisposition> completion, List<Message> messages) {
+        return completion
+                .onErrorResume(MqPoisonException.class, error -> {
+                    log.warn("RabbitMQ poison delivery dead-lettered", error);
+                    return Mono.just(DeliveryDisposition.DEAD_LETTER);
+                })
+                .onErrorResume(error -> {
+                    log.warn("RabbitMQ delivery failed, requesting redelivery", error);
+                    return Mono.just(DeliveryDisposition.REQUEUE);
+                })
+                .flatMap(disposition -> switch (disposition) {
+            case ACK -> Mono.<Void>empty();
+            case REQUEUE -> retryOrDeadLetter(messages);
+            case DEAD_LETTER -> Mono.<Void>error(new AmqpRejectAndDontRequeueException("Listener rejected delivery"));
+        }).onErrorResume(MqPoisonException.class,
+                error -> Mono.error(new AmqpRejectAndDontRequeueException("Poison delivery rejected", error)));
+    }
+
+    private Mono<Void> retryOrDeadLetter(List<Message> messages) {
+        int maxRetries = Math.max(1, batchProperties.getMaxRetries());
+        if (messages.stream().anyMatch(message -> redeliveryCount(message) >= maxRetries)) {
+            return Mono.error(new AmqpRejectAndDontRequeueException("Listener retries exhausted"));
+        }
+        return reactor.core.publisher.Flux.fromIterable(messages)
+                .concatMap(this::republishForRetry)
+                .then();
+    }
+
+    private Mono<Void> republishForRetry(Message source) {
+        String exchange = source.getMessageProperties().getReceivedExchange();
+        String routingKey = source.getMessageProperties().getReceivedRoutingKey();
+        if (Objects.isNull(exchange) || Objects.isNull(routingKey)) {
+            return Mono.error(new IllegalStateException("Rabbit delivery has no source exchange/routing key"));
+        }
+        MessageProperties properties = new MessageProperties();
+        properties.getHeaders().putAll(source.getMessageProperties().getHeaders());
+        properties.setContentType(source.getMessageProperties().getContentType());
+        properties.setDeliveryMode(source.getMessageProperties().getDeliveryMode());
+        properties.setHeader(MqHeaders.REDELIVERY_COUNT, String.valueOf(redeliveryCount(source) + 1));
+        String correlationId = source.getMessageProperties().getCorrelationId();
+        if (Objects.nonNull(correlationId)) {
+            properties.setCorrelationId(correlationId);
+        }
+        org.springframework.amqp.rabbit.connection.CorrelationData correlationData =
+                new org.springframework.amqp.rabbit.connection.CorrelationData(UUID.randomUUID().toString());
+        rabbitTemplate.send(exchange, routingKey, new Message(source.getBody(), properties), correlationData);
+        return Mono.fromFuture(correlationData.getFuture()).flatMap(confirm -> {
+            boolean routed = Objects.nonNull(confirm) && confirm.isAck() && Objects.isNull(correlationData.getReturned());
+            return routed ? Mono.empty() : Mono.error(new IllegalStateException("Rabbit retry publish was not confirmed"));
+        });
+    }
+
+    private int redeliveryCount(Message message) {
+        Object value = message.getMessageProperties().getHeaders().get(MqHeaders.REDELIVERY_COUNT);
+        if (Objects.isNull(value)) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(String.valueOf(value));
+        } catch (NumberFormatException ignored) {
+            return 0;
+        }
+    }
+
+    private abstract class ReactiveMessageListener extends AbstractAdaptableMessageListener {
+
+        private final boolean multiple;
+
+        private ReactiveMessageListener(boolean multiple) {
+            this.multiple = multiple;
+        }
+
+        @Override
+        public boolean isAsyncReplies() {
+            return true;
+        }
+
+        protected void complete(Mono<DeliveryDisposition> completion, List<Message> messages, Channel channel) {
+            Message message = messages.get(messages.size() - 1);
+            handleResult(new InvocationResult(terminal(completion, messages), null, Void.class, this, null), message, channel);
+        }
+
+        @Override
+        protected void basicAck(Message message, Channel channel) {
+            try {
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), multiple);
+            } catch (java.io.IOException error) {
+                log.error("RabbitMQ acknowledgment failed", error);
+            }
+        }
+
+        @Override
+        protected void asyncFailure(Message message, Channel channel, Throwable error, Object source) {
+            boolean requeue = !(error instanceof AmqpRejectAndDontRequeueException);
+            try {
+                channel.basicNack(message.getMessageProperties().getDeliveryTag(), multiple, requeue);
+            } catch (java.io.IOException ackError) {
+                log.error("RabbitMQ rejection failed", ackError);
+            }
+        }
+    }
+
+    private final class ReactiveSingleMessageListener extends ReactiveMessageListener
+            implements ChannelAwareMessageListener {
+
+        private final RawDeliveryListener listener;
+
+        private ReactiveSingleMessageListener(RawDeliveryListener listener) {
+            super(false);
+            this.listener = listener;
+        }
+
+        @Override
+        public void onMessage(Message message, Channel channel) {
+            complete(reactor.core.publisher.Mono.defer(() -> listener.onDelivery(deliveryOf(message))),
+                    List.of(message), channel);
+        }
+    }
+
+    private final class ReactiveBatchMessageListener extends ReactiveMessageListener
+            implements ChannelAwareBatchMessageListener {
+
+        private final RawBatchListener listener;
+
+        private ReactiveBatchMessageListener(RawBatchListener listener) {
+            super(true);
+            this.listener = listener;
+        }
+
+        @Override
+        public void onMessageBatch(List<Message> messages, Channel channel) {
+            if (!messages.isEmpty()) {
+                complete(reactor.core.publisher.Mono.defer(() -> listener.onBatch(deliveriesOf(messages))),
+                        messages, channel);
+            }
+        }
     }
 
     private Map<String, String> headersOf(Message message) {

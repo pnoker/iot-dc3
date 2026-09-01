@@ -80,7 +80,7 @@ const load = () => {
   if (!reactiveData.id) return;
   getApiById(reactiveData.id)
     .then((res: any) => {
-      reactiveData.data = res.data || {};
+      reactiveData.data = res || {};
     })
     .catch(() => {
       // handled globally

@@ -26,6 +26,7 @@ import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -50,25 +51,20 @@ public class DeviceAlarmReceiver {
      * @param entityDTO the deserialized device alarm
      */
     @Dc3Listener(topic = MqTopic.ALARM, keyPattern = "device.*")
-    public void deviceAlarmReceive(MqReceived<DeviceAlarmDTO> message, Acknowledgment ack) {
+    public Mono<Void> deviceAlarmReceive(MqReceived<DeviceAlarmDTO> message, Acknowledgment ack) {
         DeviceAlarmDTO entityDTO = message.payload();
-        try {
-            log.debug("Device alarm received, tenantId={}, driverId={}, deviceId={}",
-                    Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
-                    Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
+        log.debug("Device alarm received, tenantId={}, driverId={}, deviceId={}",
+                Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
+                Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
+                Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId());
+        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())) {
+            log.warn("Invalid device alarm, deviceId is null, deviceId={}",
                     Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId());
-            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())) {
-                log.warn("Invalid device alarm, deviceId is null, deviceId={}",
-                        Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId());
-                ack.reject(false);
-                return;
-            }
-            deviceAlarmService.alarm(entityDTO);
-            ack.ack();
-        } catch (Exception e) {
-            log.error("Device alarm consume failed.", e);
-            ack.reject(true);
+            ack.reject(false);
+            return Mono.empty();
         }
+        return deviceAlarmService.alarm(entityDTO)
+                .doOnError(error -> log.error("Device alarm processing failed.", error));
     }
 
 }

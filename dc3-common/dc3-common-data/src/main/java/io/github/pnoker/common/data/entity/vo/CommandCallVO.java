@@ -55,7 +55,4 @@ public class CommandCallVO implements Serializable {
     @Schema(description = "Parameter values for this command invocation, keyed by parameter code.")
     private Map<String, String> paramValues;
 
-    @Schema(description = "Client-side correlation ID used to match this call with its asynchronous response.", example = "cmd-req-9f3a7c2d")
-    private String commandId_;
-
 }

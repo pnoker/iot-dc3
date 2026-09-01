@@ -28,6 +28,7 @@ import io.github.pnoker.common.agentic.service.runtime.AgenticRuntime;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntimeResult;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,6 @@ import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicReference;
@@ -66,82 +66,142 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     public Flux<ServerSentEvent<String>> streamChatCompletion(ChatCompletionRequestVO request,
                                                               RequestHeader.PrincipalHeader userHeader) {
         return Flux.defer(() -> {
-            AgenticPreparedChatBO prepared = requestPreparer.prepare(request, userHeader, "stream");
-            messageRecorder.persistUserMessage(prepared, userHeader);
+            return requestPreparer.prepareReactive(request, userHeader, "stream")
+                    .flatMapMany(prepared -> persistUserMessage(prepared, userHeader)
+                    .thenMany(streamPrepared(prepared, userHeader)));
+        });
+    }
 
-            String chatId = responseCodec.newChatId();
-            long created = Instant.now().getEpochSecond();
-            StringBuilder assistantContent = new StringBuilder();
-            StringBuilder assistantReasoningContent = new StringBuilder();
-            AtomicReference<String> lastFinishReason = new AtomicReference<>();
+    private Flux<ServerSentEvent<String>> streamPrepared(AgenticPreparedChatBO prepared,
+                                                          RequestHeader.PrincipalHeader userHeader) {
+        String chatId = responseCodec.newChatId();
+        long created = Instant.now().getEpochSecond();
+        StringBuilder assistantContent = new StringBuilder();
+        StringBuilder assistantReasoningContent = new StringBuilder();
+        AtomicReference<String> lastFinishReason = new AtomicReference<>(AgenticConstant.Chat.FINISH_REASON_STOP);
 
-            Flux<ServerSentEvent<String>> runtimeEvents = agenticRuntime.stream(prepared)
-                    .doOnNext(frame -> {
-                        if (frame.hasFinishReason()) {
-                            lastFinishReason.set(frame.finishReason());
-                        }
-                        if (frame.delta().content() != null) {
-                            assistantContent.append(frame.delta().content());
-                        }
-                        if (frame.delta().reasoningContent() != null) {
-                            assistantReasoningContent.append(frame.delta().reasoningContent());
-                        }
-                    })
-                    .concatMap(frame -> Flux.fromIterable(responseCodec.streamEvents(prepared, chatId, created,
-                            frame.delta())))
-                    .doOnComplete(() -> {
-                        messageRecorder.persistAssistantMessage(prepared, assistantContent.toString(),
-                                assistantReasoningContent.toString(), userHeader);
-                        log.info(
-                                "Agentic stream complete, conversationId={}, model={}, contentLen={}, finishReason={}",
-                                sanitize(prepared.scopedConversationId()), sanitize(prepared.model()), assistantContent.length(),
-                                lastFinishReason.get());
-                    });
+        Flux<ServerSentEvent<String>> runtimeEvents = agenticRuntime.stream(prepared)
+                .doOnNext(frame -> {
+                    if (frame.hasFinishReason()) {
+                        lastFinishReason.set(frame.finishReason());
+                    }
+                    if (frame.delta().content() != null) {
+                        assistantContent.append(frame.delta().content());
+                    }
+                    if (frame.delta().reasoningContent() != null) {
+                        assistantReasoningContent.append(frame.delta().reasoningContent());
+                    }
+                })
+                .concatMap(frame -> Flux.fromIterable(responseCodec.streamEvents(prepared, chatId, created,
+                        frame.delta())));
 
-            Flux<ServerSentEvent<String>> initialEvents = Flux.fromIterable(responseCodec.initialEvents(prepared));
-            Flux<ServerSentEvent<String>> responseEvents = runtimeEvents.onErrorResume(error -> {
-                log.warn("Agentic stream chat failed, conversationId={}, model={}",
-                        sanitize(prepared.scopedConversationId()), sanitize(prepared.model()), error);
-                lastFinishReason.set(AgenticConstant.Chat.FINISH_REASON_ERROR);
-                prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(error.getMessage()));
-                return Flux.fromIterable(responseCodec.streamEvents(prepared, chatId, created, AgenticStreamDelta.empty()))
-                        .doOnComplete(() -> messageRecorder.persistAssistantMessage(prepared,
-                                assistantContent.toString(), assistantReasoningContent.toString(), userHeader));
-            });
+        Flux<ServerSentEvent<String>> responseEvents = runtimeEvents
+                .onErrorResume(error -> {
+                    log.warn("Agentic stream chat failed, conversationId={}, model={}",
+                            sanitize(prepared.conversationId()), sanitize(prepared.model()), error);
+                    lastFinishReason.set(AgenticConstant.Chat.FINISH_REASON_ERROR);
+                    prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(error.getMessage()));
+                    return Flux.fromIterable(responseCodec.streamEvents(prepared, chatId, created,
+                            AgenticStreamDelta.empty()));
+                });
 
-            return initialEvents
-                    .concatWith(responseEvents)
-                    .concatWith(Mono.defer(() -> Mono.just(ServerSentEvent.<String>builder()
-                            .data(responseCodec.formatFinalChunk(chatId, created, prepared.model(),
-                                    lastFinishReason.get()))
-                            .build())))
-                    .concatWith(Mono.just(ServerSentEvent.<String>builder()
-                            .data(AgenticConstant.Chat.STREAM_DONE)
-                            .build()));
-        }).subscribeOn(Schedulers.boundedElastic());
+        Flux<ServerSentEvent<String>> response = Flux.fromIterable(responseCodec.initialEvents(prepared))
+                .concatWith(responseEvents);
+        Flux<ServerSentEvent<String>> persistedResponse = Flux.usingWhen(Mono.just(prepared), ignored -> response,
+                ignored -> persistStreamTermination(prepared, assistantContent, assistantReasoningContent,
+                        streamStatus(lastFinishReason.get()), lastFinishReason.get(), userHeader),
+                (ignored, error) -> {
+                    prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(error.getMessage()));
+                    return persistStreamTermination(prepared, assistantContent, assistantReasoningContent,
+                            AgenticMessageStatusEnum.FAILED, AgenticConstant.Chat.FINISH_REASON_ERROR, userHeader);
+                },
+                ignored -> {
+                    prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestCancelled());
+                    return persistStreamTermination(prepared, assistantContent, assistantReasoningContent,
+                            AgenticMessageStatusEnum.CANCELLED, AgenticConstant.Chat.FINISH_REASON_CANCELLED,
+                            userHeader);
+                });
+        return persistedResponse
+                .concatWith(Mono.fromSupplier(() -> ServerSentEvent.<String>builder()
+                        .data(responseCodec.formatFinalChunk(chatId, created, prepared.model(), lastFinishReason.get()))
+                        .build()))
+                .concatWith(Mono.just(ServerSentEvent.<String>builder()
+                        .data(AgenticConstant.Chat.STREAM_DONE)
+                        .build()));
     }
 
     @Override
-    public Mono<ChatCompletionResponseVO> chatCompletion(ChatCompletionRequestVO request, RequestHeader.PrincipalHeader userHeader) {
-        return Mono.fromCallable(() -> {
-            AgenticPreparedChatBO prepared = requestPreparer.prepare(request, userHeader, "blocking");
-            messageRecorder.persistUserMessage(prepared, userHeader);
+    public Mono<ChatCompletionResponseVO> chatCompletion(ChatCompletionRequestVO request,
+                                                          RequestHeader.PrincipalHeader userHeader) {
+        return Mono.defer(() -> {
+            return requestPreparer.prepareReactive(request, userHeader, "blocking")
+                    .flatMap(prepared -> persistUserMessage(prepared, userHeader)
+                    .then(agenticRuntime.call(prepared))
+                    .flatMap(result -> persistAssistantAndBuildResponse(prepared, result, userHeader))
+                    .onErrorResume(error -> {
+                        prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(error.getMessage()));
+                        return persistAssistantMessage(prepared, "", null, AgenticMessageStatusEnum.FAILED, userHeader)
+                                .then(Mono.error(error));
+                    }));
+        });
+    }
 
-            AgenticRuntimeResult result;
-            try {
-                result = agenticRuntime.call(prepared);
-            } catch (RuntimeException e) {
-                prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(e.getMessage()));
-                messageRecorder.persistAssistantMessage(prepared, "", userHeader);
-                throw e;
-            }
-            String assistantText = StringUtils.defaultString(result.content());
-            messageRecorder.persistAssistantMessage(prepared, assistantText, userHeader);
-            log.info("Agentic blocking complete, conversationId={}, model={}, contentLen={}, finishReason={}",
-                    sanitize(prepared.scopedConversationId()), sanitize(prepared.model()), assistantText.length(), result.finishReason());
+    private Mono<ChatCompletionResponseVO> persistAssistantAndBuildResponse(AgenticPreparedChatBO prepared,
+                                                                               AgenticRuntimeResult result,
+                                                                               RequestHeader.PrincipalHeader userHeader) {
+        String assistantText = StringUtils.defaultString(result.content());
+        return persistAssistantMessage(prepared, assistantText, userHeader)
+                .then(Mono.fromSupplier(() -> {
+                    log.info("Agentic chat complete, conversationId={}, model={}, contentLen={}, finishReason={}",
+                            sanitize(prepared.conversationId()), sanitize(prepared.model()), assistantText.length(),
+                            result.finishReason());
+                    return responseCodec.blockingResponse(prepared, assistantText, result.finishReason());
+                }));
+    }
 
-            return responseCodec.blockingResponse(prepared, assistantText, result.finishReason());
-        }).subscribeOn(Schedulers.boundedElastic());
+    private Mono<Void> persistUserMessage(AgenticPreparedChatBO prepared,
+                                           RequestHeader.PrincipalHeader userHeader) {
+        Mono<Void> persistence = messageRecorder.persistUserMessage(prepared, userHeader);
+        return persistence == null ? Mono.empty() : persistence;
+    }
+
+    private Mono<Void> persistAssistantMessage(AgenticPreparedChatBO prepared, String content,
+                                                RequestHeader.PrincipalHeader userHeader) {
+        Mono<Void> persistence = messageRecorder.persistAssistantMessage(prepared, content, userHeader);
+        return persistence == null ? Mono.empty() : persistence;
+    }
+
+    private Mono<Void> persistAssistantMessage(AgenticPreparedChatBO prepared, String content,
+                                                String reasoningContent,
+                                                RequestHeader.PrincipalHeader userHeader) {
+        Mono<Void> persistence = messageRecorder.persistAssistantMessage(prepared, content, reasoningContent,
+                userHeader);
+        return persistence == null ? Mono.empty() : persistence;
+    }
+
+    private Mono<Void> persistAssistantMessage(AgenticPreparedChatBO prepared, String content,
+                                                String reasoningContent, AgenticMessageStatusEnum status,
+                                                RequestHeader.PrincipalHeader userHeader) {
+        Mono<Void> persistence = messageRecorder.persistAssistantMessage(prepared, content, reasoningContent, status,
+                userHeader);
+        return persistence == null ? Mono.empty() : persistence;
+    }
+
+    private Mono<Void> persistStreamTermination(AgenticPreparedChatBO prepared, StringBuilder content,
+                                                 StringBuilder reasoningContent,
+                                                 AgenticMessageStatusEnum status, String finishReason,
+                                                 RequestHeader.PrincipalHeader userHeader) {
+        return persistAssistantMessage(prepared, content.toString(), reasoningContent.toString(), status, userHeader)
+                .then(Mono.fromRunnable(() -> log.info(
+                        "Agentic stream terminated, conversationId={}, model={}, contentLen={}, status={}, finishReason={}",
+                        sanitize(prepared.conversationId()), sanitize(prepared.model()), content.length(), status,
+                        finishReason)));
+    }
+
+    private AgenticMessageStatusEnum streamStatus(String finishReason) {
+        return AgenticConstant.Chat.FINISH_REASON_ERROR.equals(finishReason)
+                ? AgenticMessageStatusEnum.FAILED
+                : AgenticMessageStatusEnum.COMPLETED;
     }
 
 }

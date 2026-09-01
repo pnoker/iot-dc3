@@ -47,14 +47,13 @@ exports[`API wrapper contracts > agentic > deleteAgenticModelConfig maps to its 
 {
   "args": [
     "api/v3/agentic/model/config/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -62,14 +61,13 @@ exports[`API wrapper contracts > agentic > deleteAgenticProvider maps to its tra
 {
   "args": [
     "api/v3/agentic/provider/config/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -77,14 +75,13 @@ exports[`API wrapper contracts > agentic > deleteAgenticSession maps to its tran
 {
   "args": [
     "api/v3/agentic/session/delete",
-    undefined,
     {
       "params": {
         "conversation_id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -367,14 +364,13 @@ exports[`API wrapper contracts > alarm > deleteMessage maps to its transport con
 {
   "args": [
     "api/v3/data/message/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -382,14 +378,13 @@ exports[`API wrapper contracts > alarm > deleteNotify maps to its transport cont
 {
   "args": [
     "api/v3/data/notify/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -397,14 +392,13 @@ exports[`API wrapper contracts > alarm > deleteNotifyChannel maps to its transpo
 {
   "args": [
     "api/v3/data/notify/channel/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -412,14 +406,13 @@ exports[`API wrapper contracts > alarm > deleteNotifyChannelBind maps to its tra
 {
   "args": [
     "api/v3/data/notify/channel/bind/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -427,14 +420,13 @@ exports[`API wrapper contracts > alarm > deleteRule maps to its transport contra
 {
   "args": [
     "api/v3/data/rule/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -1013,14 +1005,13 @@ exports[`API wrapper contracts > api > deleteApi maps to its transport contract 
 {
   "args": [
     "api/v3/auth/api/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -1078,8 +1069,72 @@ exports[`API wrapper contracts > api > updateApi maps to its transport contract 
 }
 `;
 
+exports[`API wrapper contracts > attribute > deleteCommandAttribute maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/command_attribute/delete",
+    {
+      "params": {
+        "id": "id-1",
+        "version": 3,
+      },
+    },
+  ],
+  "transport": "httpDelete",
+}
+`;
+
+exports[`API wrapper contracts > attribute > deleteDriverAttribute maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/driver_attribute/delete",
+    {
+      "params": {
+        "id": "id-1",
+        "version": 3,
+      },
+    },
+  ],
+  "transport": "httpDelete",
+}
+`;
+
+exports[`API wrapper contracts > attribute > deleteEventAttribute maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/event_attribute/delete",
+    {
+      "params": {
+        "id": "id-1",
+        "version": 3,
+      },
+    },
+  ],
+  "transport": "httpDelete",
+}
+`;
+
+exports[`API wrapper contracts > attribute > deletePointAttribute maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/point_attribute/delete",
+    {
+      "params": {
+        "id": "id-1",
+        "version": 3,
+      },
+    },
+  ],
+  "transport": "httpDelete",
+}
+`;
+
 exports[`API wrapper contracts > attribute > has every export covered by the contract matrix 1`] = `
 [
+  "deleteCommandAttribute",
+  "deleteDriverAttribute",
+  "deleteEventAttribute",
+  "deletePointAttribute",
   "listCommandAttributeByDriverId",
   "listDriverAttributeByDriverId",
   "listEventAttributeByDriverId",
@@ -1175,14 +1230,14 @@ exports[`API wrapper contracts > command > deleteCommand maps to its transport c
 {
   "args": [
     "api/v3/manager/command/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
+        "version": 3,
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -1190,14 +1245,14 @@ exports[`API wrapper contracts > command > deleteCommandParam maps to its transp
 {
   "args": [
     "api/v3/manager/command_param/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
+        "version": 3,
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -1240,6 +1295,7 @@ exports[`API wrapper contracts > command > has every export covered by the contr
   "listCommand",
   "listCommandByProfileId",
   "listCommandHistory",
+  "listCommandParam",
   "listCommandParamByCommandId",
   "updateCommand",
   "updateCommandParam",
@@ -1286,6 +1342,25 @@ exports[`API wrapper contracts > command > listCommandHistory maps to its transp
         "current": 2,
         "size": 20,
       },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > command > listCommandParam maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/command_param/list",
+    {
+      "limit": 20,
+      "offset": 20,
+      "sort": [
+        {
+          "direction": "ASC",
+          "field": "id",
+        },
+      ],
     },
   ],
   "transport": "httpPost",
@@ -1352,14 +1427,14 @@ exports[`API wrapper contracts > device > deleteDevice maps to its transport con
 {
   "args": [
     "api/v3/manager/device/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
+        "version": 3,
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -1391,17 +1466,47 @@ exports[`API wrapper contracts > device > getDeviceCountByDriverId maps to its t
 }
 `;
 
+exports[`API wrapper contracts > device > getDeviceImportOperation maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/operations/get_by_id",
+    {
+      "params": {
+        "id": "operation-1",
+      },
+      "signal": undefined,
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > device > getDeviceStatisticsByPointId maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/point/get_device_statistics_by_point_id",
+    {
+      "params": {
+        "point_id": "id-1",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
 exports[`API wrapper contracts > device > has every export covered by the contract matrix 1`] = `
 [
   "addDevice",
   "deleteDevice",
   "getDeviceById",
   "getDeviceCountByDriverId",
+  "getDeviceImportOperation",
+  "getDeviceStatisticsByPointId",
   "importDevice",
   "importDeviceTemplate",
   "listDevice",
   "listDeviceByIds",
-  "listDeviceByPointId",
   "listDeviceByProfileId",
   "listDeviceStatus",
   "listDeviceStatusByDriverId",
@@ -1416,6 +1521,9 @@ exports[`API wrapper contracts > device > importDevice maps to its transport con
     "api/v3/manager/device/import",
     FormData {},
     {
+      "headers": {
+        "Idempotency-Key": "device-import-idempotency-key",
+      },
       "timeout": 0,
     },
   ],
@@ -1466,20 +1574,6 @@ exports[`API wrapper contracts > device > listDeviceByIds maps to its transport 
     ],
   ],
   "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > device > listDeviceByPointId maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/manager/point/list_device_statistics_by_point_id",
-    {
-      "params": {
-        "point_id": "id-1",
-      },
-    },
-  ],
-  "transport": "httpGet",
 }
 `;
 
@@ -1558,16 +1652,35 @@ exports[`API wrapper contracts > device > updateDevice maps to its transport con
 exports[`API wrapper contracts > dictionary > has every export covered by the contract matrix 1`] = `
 [
   "listDeviceDictionary",
+  "listDriverDeviceDictionary",
   "listDriverDictionary",
   "listPointDictionary",
   "listProfileDictionary",
+  "listProfilePointDictionary",
+  "listTenantDictionary",
 ]
 `;
 
 exports[`API wrapper contracts > dictionary > listDeviceDictionary maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/dictionary/device",
+    "api/v3/manager/dictionary/list_device",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > dictionary > listDriverDeviceDictionary maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/dictionary/list_driver_device",
     {
       "keyword": "demo",
       "page": {
@@ -1583,7 +1696,7 @@ exports[`API wrapper contracts > dictionary > listDeviceDictionary maps to its t
 exports[`API wrapper contracts > dictionary > listDriverDictionary maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/dictionary/driver",
+    "api/v3/manager/dictionary/list_driver",
     {
       "keyword": "demo",
       "page": {
@@ -1599,7 +1712,7 @@ exports[`API wrapper contracts > dictionary > listDriverDictionary maps to its t
 exports[`API wrapper contracts > dictionary > listPointDictionary maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/dictionary/device_point",
+    "api/v3/manager/dictionary/list_device_point",
     {
       "keyword": "demo",
       "page": {
@@ -1615,7 +1728,7 @@ exports[`API wrapper contracts > dictionary > listPointDictionary maps to its tr
 exports[`API wrapper contracts > dictionary > listProfileDictionary maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/dictionary/profile",
+    "api/v3/manager/dictionary/list_profile",
     {
       "keyword": "demo",
       "page": {
@@ -1625,6 +1738,46 @@ exports[`API wrapper contracts > dictionary > listProfileDictionary maps to its 
     },
   ],
   "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > dictionary > listProfilePointDictionary maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/dictionary/list_profile_point",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > dictionary > listTenantDictionary maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/dictionary/list_tenant",
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > driver > deleteDriver maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/driver/delete",
+    {
+      "params": {
+        "id": "id-1",
+        "version": 3,
+      },
+    },
+  ],
+  "transport": "httpDelete",
 }
 `;
 
@@ -1644,6 +1797,7 @@ exports[`API wrapper contracts > driver > getDriverById maps to its transport co
 
 exports[`API wrapper contracts > driver > has every export covered by the contract matrix 1`] = `
 [
+  "deleteDriver",
   "getDriverById",
   "listDriver",
   "listDriverByIds",
@@ -1728,14 +1882,14 @@ exports[`API wrapper contracts > event > deleteEvent maps to its transport contr
 {
   "args": [
     "api/v3/manager/event/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
+        "version": 3,
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -1743,14 +1897,14 @@ exports[`API wrapper contracts > event > deleteEventParam maps to its transport 
 {
   "args": [
     "api/v3/manager/event_param/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
+        "version": 3,
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -1793,6 +1947,7 @@ exports[`API wrapper contracts > event > has every export covered by the contrac
   "listEvent",
   "listEventByProfileId",
   "listEventHistory",
+  "listEventParam",
   "listEventParamByEventId",
   "updateEvent",
   "updateEventParam",
@@ -1839,6 +1994,25 @@ exports[`API wrapper contracts > event > listEventHistory maps to its transport 
         "current": 2,
         "size": 20,
       },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > event > listEventParam maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/event_param/list",
+    {
+      "limit": 20,
+      "offset": 20,
+      "sort": [
+        {
+          "direction": "ASC",
+          "field": "id",
+        },
+      ],
     },
   ],
   "transport": "httpPost",
@@ -1905,14 +2079,13 @@ exports[`API wrapper contracts > group > deleteGroup maps to its transport contr
 {
   "args": [
     "api/v3/manager/group/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -1980,16 +2153,14 @@ exports[`API wrapper contracts > identityAudit > listIdentityAudit maps to its t
 {
   "args": [
     "api/v3/auth/identity_audit/list",
-    undefined,
     {
-      "params": {
-        "action": "CREATE",
-        "limit": 20,
-        "principal_id": "principal-1",
-        "resource_id": "res-1",
-        "resource_type": "role",
-        "status": "SUCCESS",
-      },
+      "action": "CREATE",
+      "cursor": undefined,
+      "limit": 20,
+      "principalId": "principal-1",
+      "resourceId": "res-1",
+      "resourceType": "role",
+      "status": "SUCCESS",
     },
   ],
   "transport": "httpPost",
@@ -2052,6 +2223,66 @@ exports[`API wrapper contracts > info > addPointInfo maps to its transport contr
 }
 `;
 
+exports[`API wrapper contracts > info > deleteCommandInfo maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/command_attribute_config/delete",
+    {
+      "params": {
+        "id": "id-1",
+        "version": 3,
+      },
+    },
+  ],
+  "transport": "httpDelete",
+}
+`;
+
+exports[`API wrapper contracts > info > deleteDriverInfo maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/driver_attribute_config/delete",
+    {
+      "params": {
+        "id": "id-1",
+        "version": 3,
+      },
+    },
+  ],
+  "transport": "httpDelete",
+}
+`;
+
+exports[`API wrapper contracts > info > deleteEventInfo maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/event_attribute_config/delete",
+    {
+      "params": {
+        "id": "id-1",
+        "version": 3,
+      },
+    },
+  ],
+  "transport": "httpDelete",
+}
+`;
+
+exports[`API wrapper contracts > info > deletePointInfo maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/manager/point_attribute_config/delete",
+    {
+      "params": {
+        "id": "id-1",
+        "version": 3,
+      },
+    },
+  ],
+  "transport": "httpDelete",
+}
+`;
+
 exports[`API wrapper contracts > info > getDriverInfoByDeviceIdAndAttributeId maps to its transport contract 1`] = `
 {
   "args": [
@@ -2073,6 +2304,10 @@ exports[`API wrapper contracts > info > has every export covered by the contract
   "addDriverInfo",
   "addEventInfo",
   "addPointInfo",
+  "deleteCommandInfo",
+  "deleteDriverInfo",
+  "deleteEventInfo",
+  "deletePointInfo",
   "getDriverInfoByDeviceIdAndAttributeId",
   "listCommandInfoByDeviceId",
   "listCommandInfoByDeviceIdAndCommandId",
@@ -2199,7 +2434,7 @@ exports[`API wrapper contracts > info > updateCommandInfo maps to its transport 
       "name": "demo",
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpPatch",
 }
 `;
 
@@ -2213,7 +2448,7 @@ exports[`API wrapper contracts > info > updateDriverInfo maps to its transport c
       "name": "demo",
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpPatch",
 }
 `;
 
@@ -2227,7 +2462,7 @@ exports[`API wrapper contracts > info > updateEventInfo maps to its transport co
       "name": "demo",
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpPatch",
 }
 `;
 
@@ -2241,7 +2476,7 @@ exports[`API wrapper contracts > info > updatePointInfo maps to its transport co
       "name": "demo",
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpPatch",
 }
 `;
 
@@ -2263,14 +2498,13 @@ exports[`API wrapper contracts > label > deleteLabel maps to its transport contr
 {
   "args": [
     "api/v3/manager/label/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -2360,14 +2594,13 @@ exports[`API wrapper contracts > localCredential > deleteLocalCredential maps to
 {
   "args": [
     "api/v3/auth/local_credential/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -2378,6 +2611,7 @@ exports[`API wrapper contracts > localCredential > has every export covered by t
   "deleteLocalCredential",
   "listLocalCredential",
   "resetLocalCredentialPassword",
+  "updateLocalCredential",
 ]
 `;
 
@@ -2407,6 +2641,20 @@ exports[`API wrapper contracts > localCredential > resetLocalCredentialPassword 
         "id": "id-1",
         "password": "secret-1",
       },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > localCredential > updateLocalCredential maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/auth/local_credential/update",
+    {
+      "enableFlag": "ENABLE",
+      "id": "payload-1",
+      "name": "demo",
     },
   ],
   "transport": "httpPost",
@@ -2460,6 +2708,7 @@ exports[`API wrapper contracts > mcp > listMcpAudit maps to its transport contra
     {
       "params": {
         "limit": 20,
+        "offset": undefined,
         "principal_id": "principal-1",
         "risk_level": "LOW",
         "status": "ACTIVE",
@@ -2591,14 +2840,13 @@ exports[`API wrapper contracts > menu > deleteMenu maps to its transport contrac
 {
   "args": [
     "api/v3/auth/menu/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -2691,14 +2939,14 @@ exports[`API wrapper contracts > point > deletePoint maps to its transport contr
 {
   "args": [
     "api/v3/manager/point/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
+        "version": 3,
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -2805,7 +3053,7 @@ exports[`API wrapper contracts > point > listPointByProfileId maps to its transp
 exports[`API wrapper contracts > point > listPointUnit maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/manager/point/unit",
+    "api/v3/manager/point/list_units",
     {
       "keyword": "demo",
       "page": {
@@ -2837,11 +3085,12 @@ exports[`API wrapper contracts > point > listPointValue maps to its transport co
 exports[`API wrapper contracts > point > listPointValueHistory maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/point_value/list_history_by_device_id_and_point_id",
+    "api/v3/data/point_value/history",
     {
       "params": {
-        "count": 30,
+        "cursor": undefined,
         "device_id": "1001",
+        "limit": 30,
         "point_id": "2002",
       },
     },
@@ -2993,14 +3242,14 @@ exports[`API wrapper contracts > profile > deleteProfile maps to its transport c
 {
   "args": [
     "api/v3/manager/profile/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
+        "version": 3,
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -3105,14 +3354,13 @@ exports[`API wrapper contracts > resource > deleteResource maps to its transport
 {
   "args": [
     "api/v3/auth/resource/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -3205,14 +3453,13 @@ exports[`API wrapper contracts > role > deleteRole maps to its transport contrac
 {
   "args": [
     "api/v3/auth/role/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -3305,14 +3552,13 @@ exports[`API wrapper contracts > rolePrincipalBind > deleteRolePrincipalBind map
 {
   "args": [
     "api/v3/auth/role_principal/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -3388,14 +3634,13 @@ exports[`API wrapper contracts > roleResourceBind > deleteRoleResourceBind maps 
 {
   "args": [
     "api/v3/auth/role_resource/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -3486,14 +3731,13 @@ exports[`API wrapper contracts > serviceAccount > deleteServiceAccount maps to i
 {
   "args": [
     "api/v3/auth/service_account/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -3701,7 +3945,7 @@ exports[`API wrapper contracts > stats > streamLatest maps to its transport cont
     "api/v3/data/dashboard/stream",
     {
       "params": {
-        "size": 20,
+        "limit": 20,
       },
     },
   ],
@@ -3715,7 +3959,7 @@ exports[`API wrapper contracts > system > alertLatest maps to its transport cont
     "api/v3/data/dashboard/alert/latest",
     {
       "params": {
-        "size": 10,
+        "limit": 10,
       },
     },
   ],
@@ -3809,14 +4053,13 @@ exports[`API wrapper contracts > tenantMembership > deleteTenantMembership maps 
 {
   "args": [
     "api/v3/auth/tenant_membership/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 
@@ -3940,14 +4183,13 @@ exports[`API wrapper contracts > user > deleteUser maps to its transport contrac
 {
   "args": [
     "api/v3/auth/user_profile/delete",
-    undefined,
     {
       "params": {
         "id": "id-1",
       },
     },
   ],
-  "transport": "httpPost",
+  "transport": "httpDelete",
 }
 `;
 

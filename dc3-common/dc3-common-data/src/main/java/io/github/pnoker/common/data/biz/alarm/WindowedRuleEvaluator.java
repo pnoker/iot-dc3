@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
+import reactor.core.publisher.Mono;
 
 /**
  * Window-aware rule evaluation. Handles every {@link WindowModeEnum} other than
@@ -85,10 +86,10 @@ public class WindowedRuleEvaluator {
     /**
      * Evaluate the rule's firing branch against the windowed samples.
      */
-    public boolean matches(RuleBO rule, RuleFact fact, WindowSpec spec) {
+    public Mono<Boolean> matches(RuleBO rule, RuleFact fact, WindowSpec spec) {
         RuleExt.Condition condition = condition(rule);
         if (Objects.isNull(condition) || Objects.isNull(spec) || !spec.valid() || spec.mode() == WindowModeEnum.LAST) {
-            return false;
+            return Mono.just(false);
         }
         return evaluate(spec, fact, condition);
     }
@@ -99,17 +100,17 @@ public class WindowedRuleEvaluator {
      * recovery is enabled, the operator is non-null, and the synthesized
      * condition holds.
      */
-    public boolean recovers(RuleBO rule, RuleFact fact, WindowSpec spec) {
+    public Mono<Boolean> recovers(RuleBO rule, RuleFact fact, WindowSpec spec) {
         if (Objects.isNull(rule) || Objects.isNull(rule.getRuleExt())
                 || Objects.isNull(rule.getRuleExt().getContent())) {
-            return false;
+            return Mono.just(false);
         }
         RuleExt.Recovery recovery = rule.getRuleExt().getContent().getRecovery();
         RuleExt.Condition condition = rule.getRuleExt().getContent().getCondition();
         if (Objects.isNull(recovery) || !Boolean.TRUE.equals(recovery.getEnabled())
                 || Objects.isNull(condition) || Objects.isNull(spec) || !spec.valid()
                 || spec.mode() == WindowModeEnum.LAST) {
-            return false;
+            return Mono.just(false);
         }
         return evaluate(spec, fact, ConditionEvaluator.recoveryConditionOf(condition, recovery));
     }
@@ -123,15 +124,15 @@ public class WindowedRuleEvaluator {
      * @param condition the condition to evaluate
      * @return true if the condition is met
      */
-    private boolean evaluate(WindowSpec spec, RuleFact fact, RuleExt.Condition condition) {
+    private Mono<Boolean> evaluate(WindowSpec spec, RuleFact fact, RuleExt.Condition condition) {
         if (Objects.isNull(condition)) {
-            return false;
+            return Mono.just(false);
         }
         WindowModeEnum mode = spec.mode();
         return switch (mode) {
             case AVG, MIN, MAX, SUM, COUNT -> evaluateAggregate(spec, fact, mode, condition);
             case ALL, ANY -> evaluateFold(spec, fact, mode, condition);
-            default -> false;
+            default -> Mono.just(false);
         };
     }
 
@@ -145,12 +146,10 @@ public class WindowedRuleEvaluator {
      * @param condition the condition to evaluate
      * @return true if the condition is met
      */
-    private boolean evaluateAggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode, RuleExt.Condition condition) {
-        WindowDataSource.AggregateOutcome outcome = windowDataSource.aggregate(spec, fact, mode);
-        if (outcome.sampleCount() < spec.minSamples()) {
-            return false;
-        }
-        return ConditionEvaluator.evaluate(condition, outcome.value());
+    private Mono<Boolean> evaluateAggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode, RuleExt.Condition condition) {
+        return windowDataSource.aggregate(spec, fact, mode)
+                .map(outcome -> outcome.sampleCount() >= spec.minSamples()
+                        && ConditionEvaluator.evaluate(condition, outcome.value()));
     }
 
     /**
@@ -163,21 +162,17 @@ public class WindowedRuleEvaluator {
      * @param condition the condition to evaluate
      * @return true if the condition is met
      */
-    private boolean evaluateFold(WindowSpec spec, RuleFact fact, WindowModeEnum mode, RuleExt.Condition condition) {
-        List<WindowSample> samples = windowDataSource.samples(spec, fact);
-        if (samples.size() < spec.minSamples()) {
-            return false;
-        }
-        if (samples.isEmpty()) {
-            return false;
-        }
-        return switch (mode) {
-            case ALL ->
-                    samples.stream().allMatch(s -> ConditionEvaluator.evaluate(condition, sampleValue(condition, s)));
-            case ANY ->
-                    samples.stream().anyMatch(s -> ConditionEvaluator.evaluate(condition, sampleValue(condition, s)));
-            default -> false;
-        };
+    private Mono<Boolean> evaluateFold(WindowSpec spec, RuleFact fact, WindowModeEnum mode, RuleExt.Condition condition) {
+        return windowDataSource.samples(spec, fact).collectList().map(samples -> {
+            if (samples.size() < spec.minSamples() || samples.isEmpty()) {
+                return false;
+            }
+            return switch (mode) {
+                case ALL -> samples.stream().allMatch(s -> ConditionEvaluator.evaluate(condition, sampleValue(condition, s)));
+                case ANY -> samples.stream().anyMatch(s -> ConditionEvaluator.evaluate(condition, sampleValue(condition, s)));
+                default -> false;
+            };
+        });
     }
 
 }

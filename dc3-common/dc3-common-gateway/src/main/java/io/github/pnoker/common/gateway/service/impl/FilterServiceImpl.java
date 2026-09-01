@@ -39,10 +39,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Locale;
 
 /**
  * Resolves tenant, local credential, and principal from the incoming request and
@@ -63,14 +65,21 @@ public class FilterServiceImpl implements FilterService {
      */
     private static final Duration AUTH_LOOKUP_TTL = Duration.ofSeconds(60);
 
-    private final Cache<String, Optional<FacadeTenantBO>> tenantCache = Caffeine.newBuilder()
+
+
+
+    private final Cache<String, Mono<Optional<FacadeTenantBO>>> reactiveTenantCache = Caffeine.newBuilder()
             .expireAfterWrite(AUTH_LOOKUP_TTL).maximumSize(10_000).build();
 
-    private final Cache<String, Optional<FacadeLocalCredentialBO>> credentialCache = Caffeine.newBuilder()
+    private final Cache<String, Mono<Optional<FacadeLocalCredentialBO>>> reactiveCredentialCache = Caffeine.newBuilder()
             .expireAfterWrite(AUTH_LOOKUP_TTL).maximumSize(10_000).build();
 
-    private final Cache<Long, Optional<FacadeUserBO>> userCache = Caffeine.newBuilder()
+    private final Cache<String, Mono<Optional<FacadeUserBO>>> reactiveUserCache = Caffeine.newBuilder()
             .expireAfterWrite(AUTH_LOOKUP_TTL).maximumSize(10_000).build();
+
+
+
+
 
     private final TenantFacade tenantFacade;
 
@@ -81,81 +90,93 @@ public class FilterServiceImpl implements FilterService {
     private final TokenFacade tokenFacade;
 
     @Override
-    public FacadeTenantBO getTenant(ServerHttpRequest request) {
+    public Mono<FacadeTenantBO> getTenantReactive(ServerHttpRequest request) {
         String code = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TENANT);
-        if (StringUtils.isEmpty(code)) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+        if (StringUtils.isBlank(code)) {
+            return Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST));
         }
-
-        FacadeTenantBO tenant = tenantCache.get(code, key -> Optional.ofNullable(tenantFacade.getByCode(key)))
-                .orElse(null);
-        if (Objects.isNull(tenant) || tenant.getEnableFlag() != EnableFlagEnum.ENABLE) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-        return tenant;
+        String normalizedCode = code.trim();
+        Mono<Optional<FacadeTenantBO>> lookup = reactiveTenantCache.get(normalizedCode, key ->
+                Mono.defer(() -> tenantFacade.getByCode(key))
+                        .filter(tenant -> tenant.getEnableFlag() == EnableFlagEnum.ENABLE)
+                        .map(Optional::of)
+                        .defaultIfEmpty(Optional.empty())
+                        .cache(AUTH_LOOKUP_TTL));
+        return lookup.flatMap(this::optionalValue)
+                .switchIfEmpty(Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST)));
     }
 
     @Override
-    public FacadeLocalCredentialBO getLocalCredential(ServerHttpRequest request) {
+    public Mono<FacadeLocalCredentialBO> getLocalCredentialReactive(ServerHttpRequest request, Long tenantId) {
         String name = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_LOGIN);
-        if (StringUtils.isEmpty(name)) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
+        if (StringUtils.isBlank(name) || tenantId == null || tenantId <= 0) {
+            return Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST));
         }
-
-        FacadeLocalCredentialBO credential = credentialCache
-                .get(name, key -> Optional.ofNullable(localCredentialFacade.getByLoginName(key)))
-                .orElse(null);
-        if (Objects.isNull(credential) || credential.getEnableFlag() != EnableFlagEnum.ENABLE) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-        return credential;
+        String normalizedName = name.trim().toLowerCase(Locale.ROOT);
+        String key = tenantId + ":" + normalizedName;
+        Mono<Optional<FacadeLocalCredentialBO>> lookup = reactiveCredentialCache.get(key, ignored ->
+                Mono.defer(() -> localCredentialFacade.getByLoginName(tenantId, normalizedName))
+                        .filter(credential -> credential.getEnableFlag() == EnableFlagEnum.ENABLE)
+                        .map(Optional::of)
+                        .defaultIfEmpty(Optional.empty())
+                        .cache(AUTH_LOOKUP_TTL));
+        return lookup.flatMap(this::optionalValue)
+                .switchIfEmpty(Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST)));
     }
 
     @Override
-    public RequestHeader.PrincipalHeader getUser(FacadeLocalCredentialBO credential, FacadeTenantBO tenant) {
+    public Mono<RequestHeader.PrincipalHeader> getUserReactive(FacadeLocalCredentialBO credential,
+                                                               FacadeTenantBO tenant) {
+        if (credential == null || tenant == null || credential.getPrincipalId() == null || tenant.getId() == null) {
+            return Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST));
+        }
         Long principalId = credential.getPrincipalId();
-        if (Objects.isNull(principalId)) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-
-        FacadeUserBO user = userCache.get(principalId, id -> Optional.ofNullable(userFacade.getByPrincipalId(id)))
-                .orElse(null);
-        if (Objects.isNull(user) || !principalId.equals(user.getPrincipalId())) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
-
-        RequestHeader.PrincipalHeader header = new RequestHeader.PrincipalHeader();
-        header.setPrincipalId(principalId);
-        header.setPrincipalType(PrincipalTypeEnum.USER.getValue());
-        header.setDisplayName(user.getNickName());
-        header.setPrincipalName(user.getUserName());
-        header.setTenantId(tenant.getId());
-        return header;
+        String key = tenant.getId() + ":" + principalId;
+        Mono<Optional<FacadeUserBO>> lookup = reactiveUserCache.get(key, ignored ->
+                Mono.defer(() -> userFacade.getByPrincipalId(tenant.getId(), principalId))
+                        .filter(user -> principalId.equals(user.getPrincipalId()))
+                        .map(Optional::of)
+                        .defaultIfEmpty(Optional.empty())
+                        .cache(AUTH_LOOKUP_TTL));
+        return lookup.flatMap(this::optionalValue)
+                .switchIfEmpty(Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST)))
+                .map(user -> {
+                    RequestHeader.PrincipalHeader header = new RequestHeader.PrincipalHeader();
+                    header.setPrincipalId(principalId);
+                    header.setPrincipalType(PrincipalTypeEnum.USER.getValue());
+                    header.setDisplayName(user.getNickName());
+                    header.setPrincipalName(user.getUserName());
+                    header.setTenantId(tenant.getId());
+                    return header;
+                });
     }
 
     @Override
-    public void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeLocalCredentialBO credential) {
-        // Token is carried in an httpOnly cookie the frontend cannot read; fall back to
-        // the X-Auth-Token header for backward compatibility during the rollout.
-        String token = RequestUtil.getRequestCookie(request, RequestConstant.Header.TOKEN_COOKIE);
-        if (StringUtils.isEmpty(token)) {
-            String headerToken = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
-            try {
-                RequestHeader.TokenHeader header = JsonUtil.parseObject(headerToken, RequestHeader.TokenHeader.class);
-                token = Objects.nonNull(header) ? header.getToken() : null;
-            } catch (Exception e) {
-                throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST, e);
+    public Mono<Void> checkValidReactive(ServerHttpRequest request, FacadeTenantBO tenant,
+                                         FacadeLocalCredentialBO credential) {
+        return Mono.defer(() -> {
+            String token = RequestUtil.getRequestCookie(request, RequestConstant.Header.TOKEN_COOKIE);
+            if (StringUtils.isBlank(token)) {
+                String headerToken = RequestUtil.getRequestHeader(request, RequestConstant.Header.X_AUTH_TOKEN);
+                try {
+                    RequestHeader.TokenHeader header = JsonUtil.parseObject(headerToken, RequestHeader.TokenHeader.class);
+                    token = header == null ? null : header.getToken();
+                } catch (Exception error) {
+                    return Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST, error));
+                }
             }
-        }
-        if (StringUtils.isEmpty(token)) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
+            if (StringUtils.isBlank(token) || tenant == null || credential == null) {
+                return Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST));
+            }
+            return tokenFacade.checkValid(tenant.getTenantCode(), credential.getLoginName(), token)
+                    .flatMap(valid -> Boolean.TRUE.equals(valid)
+                            ? Mono.<Void>empty()
+                            : Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST)));
+        });
+    }
 
-        // Token validity is intentionally NOT cached — it's the freshness check.
-        boolean valid = tokenFacade.checkValid(tenant.getTenantCode(), credential.getLoginName(), token);
-        if (!valid) {
-            throw new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST);
-        }
+    private <T> Mono<T> optionalValue(Optional<T> value) {
+        return value.map(Mono::just).orElseGet(Mono::empty);
     }
 
 }

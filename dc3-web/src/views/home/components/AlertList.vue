@@ -35,13 +35,13 @@
           :key="row.id"
           :hollow="row.confirmFlag === 'CONFIRMED'"
           :timestamp="formatClock(row.createTime)"
-          :type="timelineColour(row.eventTypeFlag)"
+          :type="timelineColour(row.alarmTypeFlag)"
           placement="top"
         >
           <div class="alert-list__body">
             <div class="alert-list__tags">
-              <el-tag :type="tagType(row.eventTypeFlag)" size="small">
-                {{ levelLabel(row.eventTypeFlag) }}
+              <el-tag :type="tagType(row.alarmTypeFlag)" size="small">
+                {{ levelLabel(row.alarmTypeFlag) }}
               </el-tag>
               <el-tag :type="sourceTagType(row.source)" size="small">
                 {{ sourceLabel(row) }}
@@ -73,7 +73,7 @@ interface AlertRow {
   source: AlertSource;
   sourceId: string;
   pointId: string;
-  eventTypeFlag: number;
+  alarmTypeFlag: number;
   confirmFlag: string;
   createTime: string;
   message?: string;
@@ -94,9 +94,9 @@ const refresh = async () => {
   loading.value = true;
   try {
     const [s, l]: any = await Promise.all([alertStats(), alertLatest(props.size)]);
-    stats.total = (s?.data?.driverAlerts ?? 0) + (s?.data?.deviceAlerts ?? 0);
-    stats.unconfirmed = (s?.data?.driverUnconfirmed ?? 0) + (s?.data?.deviceUnconfirmed ?? 0);
-    const data: AlertRow[] = l?.data ?? [];
+    stats.total = (s?.driverAlerts ?? 0) + (s?.deviceAlerts ?? 0);
+    stats.unconfirmed = (s?.driverUnconfirmed ?? 0) + (s?.deviceUnconfirmed ?? 0);
+    const data: AlertRow[] = Array.isArray(l) ? l : l?.items ?? [];
     rows.value = data;
     await resolveBySource(data);
   } catch {

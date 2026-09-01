@@ -27,12 +27,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 import java.util.Optional;
 
 /**
- * System-health tools exposed to the LLM via Spring AI @Tool.
+ * System-health tool exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
  * @since 2016.10.1
@@ -52,18 +53,17 @@ public class SystemTool {
      */
     @Tool(description = "Get a system health snapshot: center services, infrastructure, driver fleet, and device fleet.")
     @AgenticToolMetadata(domain = "system", title = "Get system health")
-    public AgenticToolResult<FacadeSystemHealthBO> getSystemHealth(ToolContext toolContext) {
+    public Mono<AgenticToolResult<FacadeSystemHealthBO>> getSystemHealth(ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getSystemHealth", tenantId);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
+            return Mono.just(AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE));
         }
-        FacadeSystemHealthBO health = facade.systemHealth(tenantId);
-        if (Objects.isNull(health)) {
-            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.SYSTEM_HEALTH_UNAVAILABLE);
-        }
-        return AgenticToolResult.ok("System health loaded", health);
+        return facade.systemHealthReactive(tenantId)
+                .map(health -> Objects.isNull(health)
+                        ? AgenticToolResult.<FacadeSystemHealthBO>unavailable(AgenticConstant.ToolMessage.SYSTEM_HEALTH_UNAVAILABLE)
+                        : AgenticToolResult.ok("System health loaded", health));
     }
 
 }

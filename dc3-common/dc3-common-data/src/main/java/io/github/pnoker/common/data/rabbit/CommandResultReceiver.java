@@ -18,19 +18,16 @@
 package io.github.pnoker.common.data.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
-import io.github.pnoker.common.data.dal.CommandHistoryManager;
-import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
+import io.github.pnoker.common.data.repository.ReactiveCommandHistoryStore;
 import io.github.pnoker.common.entity.dto.CommandCallResultDTO;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Objects;
 
 /**
@@ -44,7 +41,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CommandResultReceiver {
 
-    private final CommandHistoryManager commandHistoryManager;
+    private final ReactiveCommandHistoryStore historyStore;
 
     /**
      * Consume a command execution result and update the matching command history record
@@ -55,45 +52,39 @@ public class CommandResultReceiver {
      * @param resultDTO the deserialized command result
      */
     @Dc3Listener(topic = MqTopic.COMMAND_RESULT)
-    public void onResult(MqReceived<CommandCallResultDTO> message, Acknowledgment ack) {
+    public Mono<Void> onResult(MqReceived<CommandCallResultDTO> message, Acknowledgment ack) {
         CommandCallResultDTO resultDTO = message.payload();
+        if (Objects.isNull(resultDTO) || Objects.isNull(resultDTO.recordId())) {
+            ack.reject(false);
+            return Mono.empty();
+        }
+
+        Long tenantId = resultDTO.tenantId() != null ? resultDTO.tenantId() : tenantId(message);
+        if (tenantId == null || tenantId <= 0 || resultDTO.status() == null) {
+            ack.reject(false);
+            return Mono.empty();
+        }
+        log.info("Receive command result: recordId={}, status={}", resultDTO.recordId(), resultDTO.status());
+        return historyStore.complete(tenantId, resultDTO.recordId(), resultDTO.status(),
+                        resultDTO.resultValues() == null ? null : io.github.pnoker.common.utils.JsonUtil.toJsonString(resultDTO.resultValues()),
+                        resultDTO.configSnapshot(), resultDTO.errorCode(), resultDTO.errorMessage(), resultDTO.finishedAt())
+                .doOnNext(updated -> {
+                    if (updated) {
+                        log.info("Updated command record status: recordId={}, status={}",
+                                resultDTO.recordId(), resultDTO.status());
+                    }
+                })
+                .doOnError(error -> log.error("Command result persistence failed, recordId={}",
+                        resultDTO.recordId(), error))
+                .then();
+    }
+
+    private Long tenantId(MqReceived<?> message) {
         try {
-            if (Objects.isNull(resultDTO) || Objects.isNull(resultDTO.recordId())) {
-                ack.reject(false);
-                return;
-            }
-
-            log.info("Receive command result: recordId={}, status={}", resultDTO.recordId(), resultDTO.status());
-
-            CommandHistoryDO recordDO = commandHistoryManager.lambdaQuery()
-                    .eq(CommandHistoryDO::getRecordId, resultDTO.recordId())
-                    .one();
-
-            if (Objects.nonNull(recordDO)) {
-                recordDO.setStatus(resultDTO.status());
-                recordDO.setErrorCode(resultDTO.errorCode());
-                recordDO.setErrorMessage(resultDTO.errorMessage());
-                if (Objects.nonNull(resultDTO.resultValues())) {
-                    recordDO.setResultValues(JsonUtil.toJsonString(resultDTO.resultValues()));
-                }
-                if (Objects.nonNull(resultDTO.configSnapshot())) {
-                    recordDO.setConfigSnapshot(resultDTO.configSnapshot());
-                }
-                if (Objects.nonNull(resultDTO.finishedAt())) {
-                    recordDO.setFinishTime(LocalDateTime.ofInstant(resultDTO.finishedAt(), ZoneId.systemDefault()));
-                } else {
-                    recordDO.setFinishTime(LocalDateTime.now());
-                }
-                commandHistoryManager.updateById(recordDO);
-                log.info("Updated command record status: recordId={}, status={}", resultDTO.recordId(), resultDTO.status());
-            } else {
-                log.warn("Command record not found for result: recordId={}", resultDTO.recordId());
-            }
-
-            ack.ack();
-        } catch (Exception e) {
-            log.error("Command result processing failed.", e);
-            ack.reject(true);
+            String value = message.headers().get(io.github.pnoker.common.mq.MqHeaders.TENANT_ID);
+            return value == null ? null : Long.valueOf(value);
+        } catch (NumberFormatException ignored) {
+            return null;
         }
     }
 

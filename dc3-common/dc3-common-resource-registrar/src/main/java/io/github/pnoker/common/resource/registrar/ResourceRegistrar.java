@@ -19,7 +19,6 @@ package io.github.pnoker.common.resource.registrar;
 
 import io.github.pnoker.common.facade.api.ResourceRegistryFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResultBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.registrar.config.ResourceRegistrarProperties;
 import io.github.pnoker.common.resource.registrar.scan.ApiEndpointScanner;
@@ -29,8 +28,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
 
 /**
  * Drives a one-shot sync of the local HTTP endpoint inventory to the auth resource tables
@@ -60,39 +59,42 @@ public class ResourceRegistrar {
      * and logs the registration error.
      */
     @EventListener(ApplicationReadyEvent.class)
-    public void register() {
+    public void onApplicationReady() {
+        register().subscribe(null, error -> {
+            if (properties.isFailFast()) {
+                throw reactor.core.Exceptions.propagate(error);
+            }
+            log.error("Resource registrar startup synchronization failed", error);
+        });
+    }
+
+    public Mono<Void> register() {
         if (!properties.isEnabled()) {
             log.info("Resource registrar disabled; skipping endpoint registration");
-            return;
+            return Mono.empty();
         }
         String serviceName = resolveServiceName();
         if (StringUtils.isBlank(serviceName)) {
             String msg = "Resource registrar cannot resolve a service name "
                     + "(set dc3.resource-registrar.service-name or spring.application.name)";
             if (properties.isFailFast()) {
-                throw new IllegalStateException(msg);
+                return Mono.error(new IllegalStateException(msg));
             }
             log.warn("Resource registrar disabled, reason=serviceNameUnavailable");
-            return;
+            return Mono.empty();
         }
-        try {
-            List<FacadeScannedApiBO> apis = scanner.scan();
-            FacadeResourceRegistrySyncCommandBO command = FacadeResourceRegistrySyncCommandBO.builder()
-                    .serviceName(serviceName)
-                    .deleteMissing(properties.isDeleteMissing())
-                    .apis(apis)
-                    .build();
-            FacadeResourceRegistrySyncResultBO result = facade.sync(command);
-            log.info(
-                    "Resource registrar synchronized, serviceName={}, endpointCount={}, inserted={}, updated={}, deleted={}, unchanged={}",
-                    serviceName, apis.size(), result.getInserted(), result.getUpdated(), result.getDeleted(),
-                    result.getUnchanged());
-        } catch (RuntimeException e) {
-            if (properties.isFailFast()) {
-                throw e;
-            }
-            log.error("Resource registrar synchronization failed, serviceName={}", serviceName, e);
-        }
+        return Mono.fromSupplier(scanner::scan)
+                .flatMap(apis -> facade.sync(FacadeResourceRegistrySyncCommandBO.builder()
+                        .serviceName(serviceName)
+                        .deleteMissing(properties.isDeleteMissing())
+                        .apis(apis)
+                        .build())
+                        .doOnNext(result -> log.info(
+                                "Resource registrar synchronized, serviceName={}, endpointCount={}, inserted={}, updated={}, deleted={}, unchanged={}",
+                                serviceName, apis.size(), result.getInserted(), result.getUpdated(), result.getDeleted(), result.getUnchanged())))
+                .then()
+                .onErrorResume(error -> properties.isFailFast() ? Mono.error(error) : Mono.fromRunnable(() ->
+                        log.error("Resource registrar synchronization failed, serviceName={}", serviceName, error)));
     }
 
     /**

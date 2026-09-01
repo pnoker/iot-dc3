@@ -29,7 +29,6 @@ import org.springframework.ai.tool.ToolCallbackProvider;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -62,15 +61,13 @@ class AgenticPromptBuilderTest {
 
     private AgenticPromptBuilder promptBuilder;
 
-    @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
         promptBuilder = new AgenticPromptBuilder(chatClientFactory, toolCallbackProvider, toolCallAdvisor);
-        when(chatClientFactory.getOrCreate("dc3-test-model")).thenReturn(chatClient);
+        when(chatClientFactory.getOrCreate("dc3-test-model", null)).thenReturn(chatClient);
         when(chatClient.prompt()).thenReturn(promptSpec);
         when(promptSpec.user(anyString())).thenReturn(promptSpec);
         when(promptSpec.toolContext(any(Map.class))).thenReturn(promptSpec);
-        when(promptSpec.advisors(any(Consumer.class))).thenReturn(promptSpec);
         when(promptSpec.system(anyString())).thenReturn(promptSpec);
     }
 
@@ -116,7 +113,7 @@ class AgenticPromptBuilderTest {
     }
 
     private AgenticPreparedChatBO prepared(boolean toolCallingEnabled) {
-        return new AgenticPreparedChatBO("show me device status", "tenant:user:conversation",
+        return new AgenticPreparedChatBO("show me device status", "conversation",
                 null, "dc3-test-model", Map.of(), null, null, new AgenticRunTrace(), toolCallingEnabled,
                 false, List.of(), List.of(), AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
     }

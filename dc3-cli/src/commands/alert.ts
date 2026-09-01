@@ -23,13 +23,13 @@ export function registerAlertCommand(program: Command): void {
     .command('list')
     .description('List alerts')
     .option('--source <source>', 'Alert source: driver, device, point')
-    .option('--page <n>', 'Page number', '1')
-    .option('--size <n>', 'Page size', '20')
+    .option('--offset <n>', 'Zero-based result offset', '0')
+    .option('--limit <n>', 'Maximum items to return', '20')
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const body: Record<string, unknown> = {
-        page: { current: Number(opts.page), size: Number(opts.size) },
+        offset: Number(opts.offset), limit: Number(opts.limit),
       };
       if (opts.source) body.source = opts.source;
       const result = await dc3Client.post(
@@ -43,12 +43,12 @@ export function registerAlertCommand(program: Command): void {
   alert
     .command('latest')
     .description('Latest alerts')
-    .option('--size <n>', 'Number of alerts', '10')
+    .option('--limit <n>', 'Maximum number of alerts', '10')
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.get(
-        `/api/v3/data/dashboard/alert/latest?size=${opts.size}`,
+        `/api/v3/data/dashboard/alert/latest?limit=${opts.limit}`,
       );
       printAndExit(result, format);
     });

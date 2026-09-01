@@ -54,13 +54,9 @@ import java.util.UUID;
  * The same id is echoed back on the response via {@code X-Request-Id}, so callers can
  * correlate a failing request with server logs and distributed traces.
  *
- * <p><b>Why Reactor Context, not MDC:</b> This is a WebFlux application. Controllers run their
- * blocking suppliers on {@code Schedulers.boundedElastic()} (see {@code BaseController.async()}),
- * which is a different thread than the Netty event loop this filter runs on. MDC is
- * {@link ThreadLocal}-backed and does not cross that hop, so the id is published via the Reactor
- * {@link Context} instead — it propagates along the call chain regardless of thread switches.
- * {@code BaseController.async()} reads it back from the Reactor {@code ContextView} and sets MDC on the
- * worker thread, where the business {@code log.*} calls actually execute.
+     * <p><b>Why Reactor Context:</b> Reactor chains may change execution threads. Publishing the id in
+     * the Reactor {@link Context} keeps it attached to the subscriber rather than a specific thread,
+     * while the response header gives callers a transport-level correlation key.
  *
  * @author pnoker
  * @since 2026.7.7
@@ -92,11 +88,8 @@ public class RequestIdWebFilter implements WebFilter {
         String finalRequestId = requestId;
         // Echo back so callers can correlate a failing request with server-side logs and traces.
         exchange.getResponse().getHeaders().add(RequestIdConstant.HEADER, finalRequestId);
-        // Publish the id through the Reactor Context (not just MDC): the Context propagates
-        // along the reactive call chain regardless of thread hops, so BaseController.async()
-        // — which switches to Schedulers.boundedElastic() — can read it and set MDC on the
-        // worker thread where business log.* calls actually execute. MDC alone would be lost
-        // the moment the supplier hops off the Netty event loop.
+        // Publish in the Reactor context so downstream reactive operators retain the
+        // correlation id even when execution changes threads.
         return chain.filter(exchange).contextWrite(ctx -> ctx.put(RequestIdConstant.REACTOR_CONTEXT_KEY, finalRequestId));
     }
 }

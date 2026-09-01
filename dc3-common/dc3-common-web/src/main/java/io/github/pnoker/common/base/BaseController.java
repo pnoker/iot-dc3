@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.base;
 
-import io.github.pnoker.common.constant.common.RequestIdConstant;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.exception.AccessDeniedException;
@@ -26,13 +24,10 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.security.GatewayAuthenticationToken;
 import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.common.security.PermissionProvider;
-import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.github.pnoker.common.utils.PrincipalHeaderUtil;
-import org.slf4j.MDC;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,7 +35,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -122,44 +116,6 @@ public interface BaseController {
      */
     default Mono<String> getUserName() {
         return PrincipalHeaderUtil.getUserName();
-    }
-
-    /**
-     * Run a synchronous (typically JDBC / blocking-IO) supplier on the bounded-elastic
-     * scheduler so the Netty event loop stays free.
-     * <p>
-     * Use this in reactive controllers that wrap blocking service calls. Exceptions
-     * thrown by the supplier propagate as {@code Mono.error(...)} and are mapped to
-     * {@code R.fail(...)} by the global {@code ExceptionConfig}, so callers should not
-     * try/catch around the supplier.
-     */
-    default <T> Mono<R<T>> async(Supplier<R<T>> supplier) {
-        return ReactiveSecurityContextHolder.getContext()
-                .map(ctx -> ctx.getAuthentication())
-                .filter(auth -> auth instanceof GatewayAuthenticationToken)
-                .cast(GatewayAuthenticationToken.class)
-                .map(token -> Optional.ofNullable(token.getPrincipalHeader().getTenantId()))
-                .defaultIfEmpty(Optional.empty())
-                .flatMap(tenantId -> Mono.deferContextual(ctx -> Mono.fromCallable(() -> {
-                    // The supplier runs on a boundedElastic worker thread (see subscribeOn
-                    // below). Both tenantId and requestId are ThreadLocal-backed, so they must
-                    // be (re)applied on this worker thread — mirroring TenantContextHolder,
-                    // requestId is sourced from the Reactor Context published by
-                    // RequestIdWebFilter, since MDC does not survive the thread hop.
-                    tenantId.ifPresent(TenantContextHolder::setTenantId);
-                    String requestId = ctx.getOrDefault(RequestIdConstant.REACTOR_CONTEXT_KEY, null);
-                    if (requestId != null) {
-                        MDC.put(RequestIdConstant.MDC_KEY, requestId);
-                    }
-                    try {
-                        return supplier.get();
-                    } finally {
-                        TenantContextHolder.clear();
-                        if (requestId != null) {
-                            MDC.remove(RequestIdConstant.MDC_KEY);
-                        }
-                    }
-                }).subscribeOn(Schedulers.boundedElastic())));
     }
 
     /**

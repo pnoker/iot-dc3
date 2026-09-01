@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,9 +51,9 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
     private final WindowSampleBuffer windowSampleBuffer;
 
     @Override
-    public void processPointValue(PointValueBO pointValue) {
+    public Mono<Void> processPointValue(PointValueBO pointValue) {
         if (Objects.isNull(pointValue) || !isValidId(pointValue.getTenantId()) || !isValidId(pointValue.getPointId())) {
-            return;
+            return Mono.empty();
         }
 
         // Append to the in-memory window buffer *before* dispatching to the
@@ -64,7 +65,7 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
                 WindowSampleKey.of(pointValue.getTenantId(), AlarmTargetTypeEnum.POINT, pointValue.getPointId()),
                 new WindowSample(pointValue.getNumValue(), pointValue.getCalValue(), ts));
 
-        process(new RuleFact(
+        return process(new RuleFact(
                 pointValue.getTenantId(),
                 AlarmTargetTypeEnum.POINT,
                 pointValue.getPointId(),
@@ -74,9 +75,9 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
     }
 
     @Override
-    public void processPointValues(List<PointValueBO> pointValues) {
+    public Mono<Void> processPointValues(List<PointValueBO> pointValues) {
         if (CollectionUtils.isEmpty(pointValues)) {
-            return;
+            return Mono.empty();
         }
 
         List<RuleFact> facts = new ArrayList<>();
@@ -97,21 +98,21 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
                     RuleFactValues.point(pointValue)));
         }
         if (facts.isEmpty()) {
-            return;
+            return Mono.empty();
         }
         // Group by (tenantId, targetType, entityId) so the engine's RuleRegistry
         // cache is amortized across all facts in the same group; rule_state and
         // notify_history are batch-written in a single transaction.
-        alarmRulePipelineService.processBatch(facts);
+        return alarmRulePipelineService.processBatch(facts).then();
     }
 
     @Override
-    public void processDeviceAlarm(DeviceAlarmDTO alarm) {
+    public Mono<Void> processDeviceAlarm(DeviceAlarmDTO alarm) {
         if (Objects.isNull(alarm) || !isValidId(alarm.getTenantId()) || !isValidId(alarm.getDeviceId())) {
-            return;
+            return Mono.empty();
         }
 
-        process(new RuleFact(
+        return process(new RuleFact(
                 alarm.getTenantId(),
                 AlarmTargetTypeEnum.DEVICE,
                 alarm.getDeviceId(),
@@ -121,12 +122,12 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
     }
 
     @Override
-    public void processDriverAlarm(DriverAlarmDTO alarm) {
+    public Mono<Void> processDriverAlarm(DriverAlarmDTO alarm) {
         if (Objects.isNull(alarm) || !isValidId(alarm.getTenantId()) || !isValidId(alarm.getDriverId())) {
-            return;
+            return Mono.empty();
         }
 
-        process(new RuleFact(
+        return process(new RuleFact(
                 alarm.getTenantId(),
                 AlarmTargetTypeEnum.DRIVER,
                 alarm.getDriverId(),
@@ -136,12 +137,12 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
     }
 
     @Override
-    public void processEventReport(EventReportDTO entityDTO) {
+    public Mono<Void> processEventReport(EventReportDTO entityDTO) {
         if (Objects.isNull(entityDTO) || !isValidId(entityDTO.tenantId()) || !isValidId(entityDTO.deviceId())) {
-            return;
+            return Mono.empty();
         }
 
-        process(new RuleFact(
+        return process(new RuleFact(
                 entityDTO.tenantId(),
                 AlarmTargetTypeEnum.EVENT,
                 entityDTO.deviceId(),
@@ -156,13 +157,11 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
      *
      * @param fact the rule fact to evaluate
      */
-    private void process(RuleFact fact) {
-        try {
-            alarmRulePipelineService.process(fact);
-        } catch (Exception e) {
-            log.error("Alarm rule pipeline failed, tenantId={}, targetType={}, entityId={}",
-                    fact.getTenantId(), fact.getAlarmTargetTypeFlag(), fact.getEntityId(), e);
-        }
+    private Mono<Void> process(RuleFact fact) {
+        return alarmRulePipelineService.process(fact)
+                .then()
+                .doOnError(e -> log.error("Alarm rule pipeline failed, tenantId={}, targetType={}, entityId={}",
+                        fact.getTenantId(), fact.getAlarmTargetTypeFlag(), fact.getEntityId(), e));
     }
 
     /**

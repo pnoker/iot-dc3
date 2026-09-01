@@ -94,9 +94,9 @@ const parentName = computed(() => {
 });
 
 const loadParents = () => {
-  listGroup({page: {current: 1, size: 5000}})
+  listGroup({offset: 0, limit: 200})
     .then((res: any) => {
-      const records = res.data?.records || [];
+      const records = res?.items || [];
       records.forEach((row: Record<string, any>) => {
         reactiveData.parentMap[String(row.id)] = row.groupName || String(row.id);
       });
@@ -110,7 +110,7 @@ const load = () => {
   if (!reactiveData.id) return;
   getGroupById(reactiveData.id)
     .then((res: any) => {
-      reactiveData.data = res.data || {};
+      reactiveData.data = res || {};
     })
     .catch(() => {
       // handled globally

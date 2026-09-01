@@ -26,6 +26,7 @@ import io.github.pnoker.common.agentic.tools.ProfileTool;
 import io.github.pnoker.common.agentic.tools.SystemTool;
 import io.github.pnoker.common.agentic.tools.TenantTool;
 import io.github.pnoker.common.agentic.tools.UserTool;
+import io.github.pnoker.common.agentic.service.runtime.ReactiveAgenticToolRegistry;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.PointCommandFacade;
@@ -84,17 +85,19 @@ class ChatClientConfigTest {
 
     private ToolCallbackProvider provider;
 
+    private ReactiveAgenticToolRegistry reactiveToolRegistry;
+
     @BeforeEach
     void setUp() {
         ChatClientConfig config = new ChatClientConfig();
         TenantTool tenantTool = new TenantTool();
         UserTool userTool = new UserTool();
-        DeviceTool deviceTool = new DeviceTool(deviceFacade, pointFacade, pointValueFacade,
-                Optional.of(statusHealthFacade));
-        DriverTool driverTool = new DriverTool(driverFacade, Optional.of(statusHealthFacade));
+        DeviceTool deviceTool = new DeviceTool(deviceFacade, pointFacade, pointValueFacade);
+        DriverTool driverTool = new DriverTool(driverFacade);
         ProfileTool profileTool = new ProfileTool(Optional.of(profileFacade));
         PointTool pointTool = new PointTool(pointFacade);
         PointValueTool pointValueTool = new PointValueTool(pointValueFacade, pointCommandFacade, actionService);
+        reactiveToolRegistry = new ReactiveAgenticToolRegistry(pointValueTool, new ObjectMapper());
         SystemTool systemTool = new SystemTool(Optional.of(statusHealthFacade));
         provider = config.agenticToolCallbackProvider(tenantTool, userTool, deviceTool, driverTool, profileTool,
                 pointTool, pointValueTool, systemTool, new ObjectMapper());
@@ -105,34 +108,27 @@ class ChatClientConfigTest {
         assertThat(toolNames()).contains(
                 "getCurrentTenantInfo",
                 "getCurrentUserProfile",
-                "lookupDeviceById",
-                "lookupDevicesByIds",
-                "searchDevices",
-                "listDevicesByDriverId",
-                "listDevicesByProfileId",
-                "lookupDriverById",
-                "lookupDriversByIds",
-                "lookupDriverByDeviceId",
-                "searchDrivers",
-                "lookupPointById",
-                "lookupPointsByIds",
-                "searchPoints",
-                "listPointsByDeviceId",
-                "listPointsByProfileId",
-                "getLatestPointValue",
-                "getPointValueHistory",
-                "getDeviceLatestPointValues",
-                "readPointValue",
-                "writePointValue",
-                "lookupProfileById",
-                "lookupProfilesByIds",
-                "searchProfiles",
-                "listProfilesByDeviceId",
-                "getDeviceStatusesByIds",
-                "getDeviceStatusesByProfileId",
-                "getDriverStatusesByIds",
-                "getDriverDeviceStatusSummary",
                 "getSystemHealth");
+    }
+
+    @Test
+    void reactiveToolRegistryRegistersWritePointValueOnlyOnce() {
+        assertThat(reactiveToolRegistry.tools()).containsOnlyKeys("writePointValue", "readPointValue",
+                "getLatestPointValue", "getPointValueHistory");
+        var tool = reactiveToolRegistry.tools().get("writePointValue");
+        assertThat(tool.definition().name()).isEqualTo("writePointValue");
+        assertThat(tool.definition().inputSchema()).contains("deviceId", "pointId", "value");
+    }
+
+    @Test
+    void reactiveToolRegistryRegistersProfileOffsetTools() {
+        ProfileTool profileTool = new ProfileTool(Optional.of(profileFacade));
+        ReactiveAgenticToolRegistry registry = new ReactiveAgenticToolRegistry(null, null, profileTool,
+                new ObjectMapper());
+        assertThat(registry.tools()).containsOnlyKeys("lookupProfileById", "lookupProfilesByIds",
+                "searchProfiles", "listProfilesByDeviceId");
+        assertThat(registry.tools().get("searchProfiles").definition().inputSchema())
+                .contains("offset", "limit");
     }
 
     @Test

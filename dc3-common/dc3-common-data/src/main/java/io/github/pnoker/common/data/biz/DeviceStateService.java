@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
+import reactor.core.publisher.Mono;
 
 /**
  * Handles device heartbeat/state events: refreshes the online-status cache and
@@ -35,6 +36,6 @@ public interface DeviceStateService {
      *
      * @param entityDTO DeviceStateDTO
      */
-    void heartbeat(DeviceStateDTO entityDTO);
+    Mono<Void> heartbeat(DeviceStateDTO entityDTO);
 
 }

@@ -34,7 +34,7 @@
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
         Local (in-process) Facade implementations for the manager domain: Device / Driver /
-        Point. Activated when dc3.facade.mode=local. Transitively pulls in dc3-common-manager
+        Point. Activated when dc3.facade.manager.mode=local. Transitively pulls in dc3-common-manager
         and its dependencies (including the messaging port for command dispatch).
     </description>
 
@@ -55,6 +55,12 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

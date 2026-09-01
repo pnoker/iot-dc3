@@ -80,7 +80,7 @@ export default defineComponent({
       if (!ids.length) return;
       try {
         const res: any = await listPrincipalByIds(ids);
-        (res?.data || []).forEach((p: any) => {
+        (res || []).forEach((p: any) => {
           ownerNameMap[String(p.id)] = p.displayName || p.principalName || String(p.id);
         });
       } catch {
@@ -100,7 +100,7 @@ export default defineComponent({
     // Resolve the current user's principalId to use as the default owner of a new service account.
     getUserByName(String(authStore.getName || ''))
       .then((res) => {
-        ownerPrincipalId.value = String(res.data?.principalId || '');
+        ownerPrincipalId.value = String(res?.principalId || '');
       })
       .catch(() => {
         // handled globally

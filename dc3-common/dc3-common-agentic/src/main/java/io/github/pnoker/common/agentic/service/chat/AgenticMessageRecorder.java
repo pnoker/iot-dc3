@@ -18,13 +18,15 @@ package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
-import io.github.pnoker.common.agentic.service.MessageService;
+import io.github.pnoker.common.agentic.repository.ReactiveMessageStore;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +41,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AgenticMessageRecorder {
 
-    private final MessageService messageService;
+    private final ReactiveMessageStore messageStore;
 
     /**
      * Persist user message.
@@ -47,9 +49,9 @@ public class AgenticMessageRecorder {
      * @param prepared   prepared
      * @param userHeader user header
      */
-    public void persistUserMessage(AgenticPreparedChatBO prepared, RequestHeader.PrincipalHeader userHeader) {
-        messageService.save(prepared.scopedConversationId(), "user", buildUserContent(prepared), prepared.model(),
-                userHeader);
+    public Mono<Void> persistUserMessage(AgenticPreparedChatBO prepared, RequestHeader.PrincipalHeader userHeader) {
+        return messageStore.save(prepared.conversationId(), "user", buildUserContent(prepared), prepared.model(),
+                AgenticMessageStatusEnum.COMPLETED, userHeader).then();
     }
 
     /**
@@ -59,9 +61,9 @@ public class AgenticMessageRecorder {
      * @param content    content
      * @param userHeader user header
      */
-    public void persistAssistantMessage(AgenticPreparedChatBO prepared, String content,
+    public Mono<Void> persistAssistantMessage(AgenticPreparedChatBO prepared, String content,
                                         RequestHeader.PrincipalHeader userHeader) {
-        persistAssistantMessage(prepared, content, null, userHeader);
+        return persistAssistantMessage(prepared, content, null, AgenticMessageStatusEnum.COMPLETED, userHeader);
     }
 
     /**
@@ -74,15 +76,22 @@ public class AgenticMessageRecorder {
      * @param reasoningContent the reasoning trace, may be null
      * @param userHeader       authenticated caller principal and tenant
      */
-    public void persistAssistantMessage(AgenticPreparedChatBO prepared, String content, String reasoningContent,
+    public Mono<Void> persistAssistantMessage(AgenticPreparedChatBO prepared, String content, String reasoningContent,
                                         RequestHeader.PrincipalHeader userHeader) {
+        return persistAssistantMessage(prepared, content, reasoningContent, AgenticMessageStatusEnum.COMPLETED,
+                userHeader);
+    }
+
+    public Mono<Void> persistAssistantMessage(AgenticPreparedChatBO prepared, String content, String reasoningContent,
+                                              AgenticMessageStatusEnum status,
+                                              RequestHeader.PrincipalHeader userHeader) {
         AgenticMessageContent messageContent = buildAssistantContent(prepared, StringUtils.defaultString(content),
                 StringUtils.trimToNull(reasoningContent));
-        if (!hasPersistableAssistantContent(messageContent)) {
-            return;
+        if (status == AgenticMessageStatusEnum.COMPLETED && !hasPersistableAssistantContent(messageContent)) {
+            return Mono.empty();
         }
-        messageService.save(prepared.scopedConversationId(), AgenticConstant.Chat.ROLE_ASSISTANT, messageContent,
-                prepared.model(), userHeader);
+        return messageStore.save(prepared.conversationId(), AgenticConstant.Chat.ROLE_ASSISTANT,
+                messageContent, prepared.model(), status, userHeader).then();
     }
 
     private AgenticMessageContent buildUserContent(AgenticPreparedChatBO prepared) {

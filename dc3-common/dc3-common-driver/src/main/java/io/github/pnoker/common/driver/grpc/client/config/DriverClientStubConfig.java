@@ -26,8 +26,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.grpc.client.GrpcChannelFactory;
 
 /**
- * Spring configuration that creates the blocking gRPC stubs used by the driver SDK to
- * talk to the manager center.
+ * Spring configuration for asynchronous gRPC calls from the driver SDK to manager
+ * center.
  *
  * @author pnoker
  * @since 2016.10.1
@@ -35,37 +35,19 @@ import org.springframework.grpc.client.GrpcChannelFactory;
 @Configuration
 public class DriverClientStubConfig {
 
-    /**
-     * Provides a blocking stub for the driver API exposed by the manager center.
-     *
-     * @param channels gRPC channel factory used to create the manager service channel
-     * @return blocking stub bound to the manager driver service
-     */
     @Bean
-    public DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub(GrpcChannelFactory channels) {
-        return DriverApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    public DriverApiGrpc.DriverApiStub driverApiStub(GrpcChannelFactory channels) {
+        return DriverApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
-    /**
-     * Provides a blocking stub for the device API exposed by the manager center.
-     *
-     * @param channels gRPC channel factory used to create the manager service channel
-     * @return blocking stub bound to the manager device service
-     */
     @Bean
-    public DeviceApiGrpc.DeviceApiBlockingStub deviceApiBlockingStub(GrpcChannelFactory channels) {
-        return DeviceApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    public DeviceApiGrpc.DeviceApiStub deviceApiStub(GrpcChannelFactory channels) {
+        return DeviceApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
-    /**
-     * Provides a blocking stub for the point API exposed by the manager center.
-     *
-     * @param channels gRPC channel factory used to create the manager service channel
-     * @return blocking stub bound to the manager point service
-     */
     @Bean
-    public PointApiGrpc.PointApiBlockingStub pointApiBlockingStub(GrpcChannelFactory channels) {
-        return PointApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    public PointApiGrpc.PointApiStub pointApiStub(GrpcChannelFactory channels) {
+        return PointApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
 }

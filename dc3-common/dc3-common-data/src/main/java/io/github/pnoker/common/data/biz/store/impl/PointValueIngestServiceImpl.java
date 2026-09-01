@@ -17,18 +17,22 @@
 
 package io.github.pnoker.common.data.biz.store.impl;
 
-import io.github.pnoker.common.data.biz.store.IngestIdempotencyWindow;
 import io.github.pnoker.common.data.biz.store.PointValueIngestService;
 import io.github.pnoker.common.data.biz.store.PointValueSampleConverter;
+import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.entity.builder.PointValueBuilder;
-import io.github.pnoker.common.data.mapper.PointValueMapper;
+import io.github.pnoker.common.data.repository.ReactivePointValueLatestStore;
+import io.github.pnoker.common.data.repository.ReactivePointValueIngestOutbox;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
-import io.github.pnoker.common.tsdb.spi.TsdbStore;
+import io.github.pnoker.common.data.repository.ReactiveTsdbStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
+import reactor.util.retry.Retry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,6 +42,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Default ingest orchestration (docs/design/tsdb-abstraction.md §9.1/§9.2).
@@ -66,33 +71,60 @@ public class PointValueIngestServiceImpl implements PointValueIngestService {
             .thenComparing(PointValueBO::getSequence, Comparator.nullsFirst(Comparator.naturalOrder()))
             .thenComparing(PointValueBO::getMessageId, Comparator.nullsFirst(Comparator.naturalOrder()));
 
-    private final PointValueMapper pointValueMapper;
+    private final ReactivePointValueLatestStore latestStore;
     private final PointValueBuilder pointValueBuilder;
     private final PointValueSampleConverter converter;
     private final DeviceFacade deviceFacade;
-    private final TsdbStore tsdbStore;
-    private final IngestIdempotencyWindow idempotencyWindow;
+    private final ReactiveTsdbStore reactiveTsdbStore;
+    private final ReactivePointValueIngestOutbox ingestOutbox;
+
+    private final AlarmRuleTriggerService alarmRuleTriggerService;
 
     @Override
-    public boolean saveValue(PointValueBO valueBO) {
-        return !saveValues(List.of(valueBO)).isEmpty();
+    public Mono<Boolean> saveValue(PointValueBO valueBO) {
+        return saveValues(List.of(valueBO)).map(values -> !values.isEmpty());
     }
 
     @Override
-    public List<PointValueBO> saveValues(List<PointValueBO> valueBOList) {
-        if (Objects.isNull(valueBOList) || valueBOList.isEmpty()) {
-            return List.of();
-        }
+    public Mono<List<PointValueBO>> saveValues(List<PointValueBO> valueBOList) {
+        if (Objects.isNull(valueBOList) || valueBOList.isEmpty()) return Mono.just(List.of());
+        return filterLeaseValidReactive(valueBOList)
+                .map(this::prepare)
+                .flatMap(accepted -> {
+                    if (accepted.isEmpty()) return Mono.just(List.of());
+                    List<PointValueBO> ordered = new ArrayList<>(accepted);
+                    ordered.sort(INGEST_ORDER);
+                    List<io.github.pnoker.common.data.entity.model.PointValueDO> rows =
+                            pointValueBuilder.buildDOListByBOList(ordered);
+                    String owner = UUID.randomUUID().toString();
+                    return enqueue(rows, owner).flatMap(enqueuedRows -> {
+                                if (enqueuedRows.isEmpty()) {
+                                    Flux<io.github.pnoker.common.data.entity.model.PointValueDO> persisted = ingestOutbox.findPersisted(rows);
+                                    return persisted.map(row -> row.getTenantId() + ":" + row.getMessageId()).collectList()
+                                            .map(ids -> ordered.stream().filter(row -> ids.contains(row.getTenantId() + ":" + row.getMessageId())).toList());
+                                }
+                                Map<String, io.github.pnoker.common.data.entity.model.PointValueDO> enqueuedById =
+                                        enqueuedRows.stream().collect(java.util.stream.Collectors.toMap(
+                                                row -> row.getTenantId() + ":" + row.getMessageId(), row -> row));
+                                List<PointValueBO> durableAccepted = ordered.stream()
+                                        .filter(row -> enqueuedById.containsKey(row.getTenantId() + ":" + row.getMessageId()))
+                                        .toList();
+                                if (durableAccepted.isEmpty()) return Mono.just(List.of());
+                                List<PointValueBO> acceptedInInputOrder = accepted.stream()
+                                        .filter(row -> enqueuedById.containsKey(row.getTenantId() + ":" + row.getMessageId()))
+                                        .toList();
+                                return reactiveTsdbStore.append(converter.toSamples(durableAccepted))
+                                        .then(Mono.defer(() -> latestStore.upsertBatch(enqueuedRows)))
+                                        .then(markDurablePersisted(enqueuedRows, owner))
+                                        .retryWhen(Retry.backoff(3, java.time.Duration.ofMillis(100))
+                                                .maxBackoff(java.time.Duration.ofSeconds(2)))
+                                        .thenReturn(acceptedInInputOrder);
+                            });
+                });
+    }
 
-        List<PointValueBO> candidates = filterLeaseValid(valueBOList);
-        if (candidates.isEmpty()) {
-            return List.of();
-        }
-
-        // One entry per message id: drop within-batch duplicates (first wins)
-        // and anything the idempotency window already holds. Marking happens
-        // only after the whole batch persisted, so a mid-batch crash replays
-        // both writes instead of silently losing the latest projection.
+    private List<PointValueBO> prepare(List<PointValueBO> candidates) {
+        if (candidates.isEmpty()) return List.of();
         Map<String, PointValueBO> accepted = new LinkedHashMap<>();
         for (PointValueBO value : candidates) {
             if (Objects.isNull(value.getMessageId())) {
@@ -100,59 +132,104 @@ public class PointValueIngestServiceImpl implements PointValueIngestService {
                         value.getTenantId(), value.getDeviceId(), value.getPointId());
                 continue;
             }
-            if (accepted.containsKey(value.getMessageId()) || idempotencyWindow.seen(value.getMessageId())) {
-                continue;
-            }
-            accepted.put(value.getMessageId(), value);
+            String dedupKey = value.getTenantId() + ":" + value.getMessageId();
+            if (accepted.containsKey(dedupKey)) continue;
+            accepted.put(dedupKey, value);
         }
-        if (accepted.isEmpty()) {
-            return List.of();
-        }
-
-        // One entry per natural key (tenant/device/point/createTime): a batch
-        // holding two samples with the same natural key but different message
-        // ids would poison stores whose batch upsert cannot affect the same
-        // row twice (timescale ON CONFLICT). Last occurrence wins — the same
-        // last-write-wins rule the stores apply on replay.
+        if (accepted.isEmpty()) return List.of();
         Map<List<Object>, PointValueBO> byNaturalKey = new LinkedHashMap<>();
         for (PointValueBO value : accepted.values()) {
             byNaturalKey.put(Arrays.asList(value.getTenantId(), value.getDeviceId(),
                     value.getPointId(), value.getCreateTime()), value);
         }
-        List<PointValueBO> acceptedValues = new ArrayList<>(byNaturalKey.values());
-        // Persistence runs in INGEST_ORDER; the caller gets its own input order.
-        List<PointValueBO> ordered = new ArrayList<>(acceptedValues);
-        ordered.sort(INGEST_ORDER);
+        return new ArrayList<>(byNaturalKey.values());
+    }
 
-        tsdbStore.append(converter.toSamples(ordered));
-        pointValueMapper.upsertLatestBatch(pointValueBuilder.buildDOListByBOList(ordered));
-        acceptedValues.forEach(value -> idempotencyWindow.mark(value.getMessageId()));
-        return acceptedValues;
+    @Override
+    public Mono<Void> markProcessed(List<PointValueBO> valueBOList) {
+        if (valueBOList == null || valueBOList.isEmpty()) return Mono.empty();
+        return Flux.fromIterable(valueBOList)
+                .filter(Objects::nonNull)
+                .map(pointValueBuilder::buildDOByBO)
+                .concatMap(row -> {
+                    Mono<Integer> result = ingestOutbox.markProcessed(row);
+                    return result.switchIfEmpty(Mono.just(0)).flatMap(updated -> updated == 1
+                            ? Mono.just(updated)
+                            : Mono.error(new IllegalStateException("Ingest receipt is not PERSISTED: "
+                                    + row.getTenantId() + ":" + row.getMessageId())));
+                }).then();
+    }
+
+    private Mono<List<io.github.pnoker.common.data.entity.model.PointValueDO>> enqueue(
+            List<io.github.pnoker.common.data.entity.model.PointValueDO> rows, String owner) {
+        return ingestOutbox.enqueue(rows, owner);
+    }
+
+    private Mono<Void> markDurablePersisted(List<io.github.pnoker.common.data.entity.model.PointValueDO> rows, String owner) {
+        if (rows == null || rows.isEmpty()) return Mono.empty();
+        return Flux.fromIterable(rows).concatMap(row -> {
+            Mono<Integer> result = ingestOutbox.markPersisted(row, owner);
+            return result.switchIfEmpty(Mono.just(0)).flatMap(updated -> updated == 1
+                    ? Mono.just(updated)
+                    : Mono.error(new IllegalStateException("Ingest receipt claim was lost: "
+                            + row.getTenantId() + ":" + row.getMessageId())));
+        }).then();
+    }
+
+    @Override
+    public Mono<Integer> replayPending() {
+        String owner = UUID.randomUUID().toString();
+        return ingestOutbox.claim(owner, 100)
+                .concatMap(row -> replayOne(row, owner).onErrorResume(error -> ingestOutbox.markFailed(row, owner,
+                                error.getMessage()).flatMap(updated -> updated == 1 ? Mono.just(0)
+                                        : Mono.error(new IllegalStateException("Ingest receipt claim was lost while failing: "
+                                                + row.getTenantId() + ":" + row.getMessageId(), error)))))
+                .reduce(0, Integer::sum);
+    }
+
+    private Mono<Integer> replayOne(io.github.pnoker.common.data.entity.model.PointValueDO row, String owner) {
+        PointValueBO value = pointValueBuilder.buildBOByDO(row);
+        Mono<Integer> latest = latestStore.upsertBatch(List.of(row));
+        return reactiveTsdbStore.append(converter.toSamples(List.of(value)))
+                .then(latest)
+                .then(alarmRuleTriggerService.processPointValue(value))
+                .then(ingestOutbox.markPersisted(row, owner))
+                .flatMap(updated -> updated == 1 ? ingestOutbox.markProcessed(row)
+                        : Mono.error(new IllegalStateException("Ingest receipt claim was lost: "
+                                + row.getTenantId() + ":" + row.getMessageId())))
+                .flatMap(updated -> updated == 1 ? Mono.just(updated)
+                        : Mono.error(new IllegalStateException("Ingest receipt was not marked processed: "
+                                + row.getTenantId() + ":" + row.getMessageId())))
+                .thenReturn(1);
     }
 
     /**
      * Resolve the active lease owner once per distinct device and keep only
      * the values whose send envelope matches it.
      */
-    private List<PointValueBO> filterLeaseValid(List<PointValueBO> values) {
-        Map<Long, FacadeDeviceOwnerBO> ownersByDevice = new HashMap<>();
-        List<PointValueBO> valid = new ArrayList<>(values.size());
-        for (PointValueBO value : values) {
-            if (Objects.isNull(value.getTenantId()) || Objects.isNull(value.getDeviceId())
-                    || Objects.isNull(value.getPointId())) {
-                log.warn("Dropping point value with incomplete series key: {}", value);
-                continue;
-            }
-            FacadeDeviceOwnerBO owner = ownersByDevice.computeIfAbsent(value.getDeviceId(),
-                    deviceId -> deviceFacade.getActiveOwner(value.getTenantId(), deviceId));
-            if (isCurrentOwner(owner, value)) {
-                valid.add(value);
-            } else {
-                log.debug("Dropping stale-owner point value: tenantId={}, deviceId={}, pointId={}, messageId={}",
-                        value.getTenantId(), value.getDeviceId(), value.getPointId(), value.getMessageId());
-            }
-        }
-        return valid;
+    private Mono<List<PointValueBO>> filterLeaseValidReactive(List<PointValueBO> values) {
+        Map<String, Mono<FacadeDeviceOwnerBO>> owners = new HashMap<>();
+        return reactor.core.publisher.Flux.fromIterable(values)
+                .filter(value -> {
+                    boolean valid = value != null && value.getTenantId() != null && value.getDeviceId() != null
+                            && value.getPointId() != null;
+                    if (!valid) log.warn("Dropping point value with incomplete series key: {}", value);
+                    return valid;
+                })
+                .concatMap(value -> {
+                    String key = value.getTenantId() + ":" + value.getDeviceId();
+                    Mono<FacadeDeviceOwnerBO> owner = owners.computeIfAbsent(key,
+                            ignored -> safe(deviceFacade.getActiveOwnerReactive(value.getTenantId(), value.getDeviceId())).cache());
+                    return owner.filter(candidate -> isCurrentOwner(candidate, value)).map(ignored -> value)
+                            .switchIfEmpty(Mono.fromRunnable(() -> log.debug(
+                                    "Dropping stale-owner point value: tenantId={}, deviceId={}, pointId={}, messageId={}",
+                                    value.getTenantId(), value.getDeviceId(), value.getPointId(), value.getMessageId())))
+                            .flux();
+                }).collectList();
+    }
+
+    private Mono<FacadeDeviceOwnerBO> safe(Mono<FacadeDeviceOwnerBO> publisher) {
+        return publisher == null ? Mono.empty() : publisher;
     }
 
     private boolean isCurrentOwner(FacadeDeviceOwnerBO owner, PointValueBO value) {

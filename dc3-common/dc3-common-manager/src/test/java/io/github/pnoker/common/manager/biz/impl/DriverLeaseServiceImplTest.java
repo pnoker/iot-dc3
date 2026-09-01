@@ -1,121 +1,123 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.manager.biz.impl;
 
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.manager.dal.DriverLeaseManager;
-import io.github.pnoker.common.manager.entity.bo.DriverLeaseGrantBO;
+import io.github.pnoker.common.manager.entity.bo.DeviceLeaseBO;
 import io.github.pnoker.common.manager.entity.model.DeviceLeaseDO;
 import io.github.pnoker.common.manager.entity.model.DriverLeaseStateDO;
+import io.github.pnoker.common.manager.repository.ReactiveDriverLeaseStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DriverLeaseServiceImplTest {
-
-    @Mock
-    private DriverLeaseManager manager;
-
+    @Mock private ReactiveDriverLeaseStore store;
+    @Mock private TransactionalOperator transactionalOperator;
     private DriverLeaseServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        service = new DriverLeaseServiceImpl(manager);
+        lenient().when(transactionalOperator.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        lenient().when(store.acquireDriverLock(any(), any())).thenReturn(Mono.empty());
+        lenient().when(store.renewInstance(any(), any(), anyString(), anyString(), anyString(), any())).thenReturn(Mono.empty());
+        lenient().when(store.deleteExpiredInstances(any(), any(), any())).thenReturn(Mono.empty());
+        lenient().when(store.deleteOrphanedLeases(any(), any())).thenReturn(Mono.empty());
+        lenient().when(store.reconcileDeviceLeases(anyList())).thenReturn(Mono.empty());
+        lenient().when(store.listActiveNodes(any(), any())).thenReturn(Flux.empty());
+        lenient().when(store.getDeviceRevision(any(), any())).thenReturn(Mono.just(0L));
+        lenient().when(store.getLeaseState(any(), any())).thenReturn(Mono.empty());
+        lenient().when(store.listDriverDeviceIds(any(), any(), anyLong(), anyInt())).thenReturn(Flux.empty());
+        lenient().when(store.advanceAssignmentVersion(any(), any(), anyString(), anyLong())).thenReturn(Mono.just(1L));
+        lenient().when(store.listOwnedLeases(any(), any(), anyString(), anyLong(), anyInt())).thenReturn(Flux.empty());
+        lenient().when(store.getActiveLease(any(), any())).thenReturn(Mono.empty());
+        service = new DriverLeaseServiceImpl(store, transactionalOperator);
     }
 
     @Test
-    void initialRenewReconcilesAllDevicesAndReturnsOwnedAssignment() {
-        List<Long> deviceIds = LongStream.rangeClosed(1, 100).boxed().toList();
-        when(manager.listActiveNodes(1L, 2L)).thenReturn(List.of("node-a", "node-b"));
-        when(manager.getLeaseState(1L, 2L)).thenReturn(null);
-        when(manager.listDriverDeviceIds(1L, 2L, 0L, 5000)).thenReturn(deviceIds);
-        when(manager.advanceAssignmentVersion(eq(1L), eq(2L), anyString(), eq(0L))).thenReturn(8L);
-        DriverLeaseGrantBO grant = service.renew(1L, 2L, "node-a", "client-a", "host-a", 30, 0);
+    void initialRenewReconcilesAllDevicesAndReturnsChangedGrant() {
+        when(store.listActiveNodes(1L, 2L)).thenReturn(Flux.just("node-a", "node-b"));
+        when(store.getDeviceRevision(1L, 2L)).thenReturn(Mono.just(0L));
+        when(store.getLeaseState(1L, 2L)).thenReturn(Mono.empty());
+        when(store.listDriverDeviceIds(1L, 2L, 0L, 5000)).thenReturn(Flux.fromStream(LongStream.rangeClosed(1, 100).boxed()));
+        when(store.advanceAssignmentVersion(eq(1L), eq(2L), anyString(), eq(0L))).thenReturn(Mono.just(8L));
+
+        StepVerifier.create(service.renew(1L, 2L, "node-a", "client-a", "host-a", 30, 0))
+                .assertNext(grant -> {
+                    assertThat(grant.assignmentVersion()).isEqualTo(8L);
+                    assertThat(grant.assignmentsChanged()).isTrue();
+                }).verifyComplete();
 
         ArgumentCaptor<List<DeviceLeaseDO>> assignments = ArgumentCaptor.forClass(List.class);
-        verify(manager).reconcileDeviceLeases(assignments.capture());
+        verify(store).reconcileDeviceLeases(assignments.capture());
         assertThat(assignments.getValue()).hasSize(100);
-        assertThat(assignments.getValue()).extracting(DeviceLeaseDO::getOwnerNode)
-                .containsOnlyElementsOf(Set.of("node-a", "node-b"))
-                .contains("node-a", "node-b");
-        assertThat(grant.assignmentVersion()).isEqualTo(8L);
-        assertThat(grant.assignmentsChanged()).isTrue();
+        assertThat(assignments.getValue()).extracting(DeviceLeaseDO::getOwnerNode).contains("node-a", "node-b");
     }
 
     @Test
-    void stableHeartbeatDoesNotScanDevicesOrReturnAssignmentAgain() {
-        when(manager.listActiveNodes(1L, 2L)).thenReturn(List.of("node-a", "node-b"));
-        when(manager.getLeaseState(1L, 2L)).thenReturn(null);
-        when(manager.listDriverDeviceIds(1L, 2L, 0L, 5000)).thenReturn(List.of(10L));
-        when(manager.advanceAssignmentVersion(eq(1L), eq(2L), anyString(), eq(0L))).thenReturn(9L);
-        service.renew(1L, 2L, "node-a", "client-a", "host-a", 30, 0);
-
-        ArgumentCaptor<String> membershipHash = ArgumentCaptor.forClass(String.class);
-        verify(manager).advanceAssignmentVersion(org.mockito.ArgumentMatchers.eq(1L),
-                org.mockito.ArgumentMatchers.eq(2L), membershipHash.capture(), eq(0L));
+    void stableHeartbeatSkipsReconciliation() {
         DriverLeaseStateDO state = new DriverLeaseStateDO();
-        state.setMembershipHash(membershipHash.getValue());
+        state.setMembershipHash(hash(List.of("node-a", "node-b")));
         state.setDeviceRevision(0L);
         state.setAssignmentVersion(9L);
-        when(manager.getLeaseState(1L, 2L)).thenReturn(state);
+        when(store.listActiveNodes(1L, 2L)).thenReturn(Flux.just("node-a", "node-b"));
+        when(store.getDeviceRevision(1L, 2L)).thenReturn(Mono.just(0L));
+        when(store.getLeaseState(1L, 2L)).thenReturn(Mono.just(state));
 
-        DriverLeaseGrantBO heartbeat = service.renew(
-                1L, 2L, "node-a", "client-a", "host-a", 30, 9L);
-
-        verify(manager, times(1)).listDriverDeviceIds(1L, 2L, 0L, 5000);
-        verify(manager, times(2)).getDeviceRevision(1L, 2L);
-        verify(manager, times(1)).reconcileDeviceLeases(anyList());
-        assertThat(heartbeat.assignmentsChanged()).isFalse();
+        StepVerifier.create(service.renew(1L, 2L, "node-a", "client-a", "host-a", 30, 9L))
+                .assertNext(grant -> assertThat(grant.assignmentsChanged()).isFalse()).verifyComplete();
+        verify(store, never()).listDriverDeviceIds(any(), any(), anyLong(), anyInt());
+        verify(store, never()).reconcileDeviceLeases(anyList());
+        verify(store, never()).advanceAssignmentVersion(any(), any(), anyString(), anyLong());
     }
 
     @Test
-    void ownedAssignmentsAreReadWithBoundedKeysetPages() {
-        when(manager.listOwnedLeases(1L, 2L, "node-a", 100L, 1000))
-                .thenReturn(List.of(new DeviceLeaseDO(1L, 2L, 101L, "node-a", 501L)));
-
-        assertThat(service.listOwnedLeases(1L, 2L, "node-a", 100L, 1000))
-                .containsExactly(new io.github.pnoker.common.manager.entity.bo.DeviceLeaseBO(
-                        2L, 101L, "node-a", 501L));
+    void ownedAssignmentsUseValidatedKeysetCursor() {
+        when(store.listOwnedLeases(1L, 2L, "node-a", 100L, 1000)).thenReturn(Flux.just(new DeviceLeaseDO(1L, 2L, 101L, "node-a", 7L)));
+        StepVerifier.create(service.listOwnedLeases(1L, 2L, "node-a", 100L, 1000))
+                .assertNext(lease -> assertThat(lease.deviceId()).isEqualTo(101L)).verifyComplete();
+        StepVerifier.create(service.listOwnedLeases(1L, 2L, "node-a", -1L, 1000)).expectError(ServiceException.class).verify();
     }
 
     @Test
-    void invalidLeaseIdentityFailsBeforeDatabaseWork() {
-        assertThatThrownBy(() -> service.renew(1L, 2L, "", "client", "host", 30, 0))
-                .isInstanceOf(ServiceException.class)
-                .hasMessageContaining("identity");
-        verify(manager, never()).acquireDriverLock(2L);
+    void missingAssignmentStateIsAnError() {
+        when(store.getLeaseState(1L, 2L)).thenReturn(Mono.empty());
+        StepVerifier.create(service.getAssignmentVersion(1L, 2L)).expectError(ServiceException.class).verify();
+    }
+
+    @Test
+    void invalidRenewInputFailsBeforeDatabase() {
+        StepVerifier.create(service.renew(1L, 2L, "", "client", "host", 30, 0)).expectError(ServiceException.class).verify();
+        verifyNoInteractions(store);
+    }
+
+    @Test
+    void activeOwnerIsTenantScopedAndReactive() {
+        when(store.getActiveLease(1L, 10L)).thenReturn(Mono.just(new DeviceLeaseDO(1L, 2L, 10L, "node-a", 4L)));
+        StepVerifier.create(service.getActiveOwner(1L, 10L))
+                .assertNext(owner -> assertThat(owner).isEqualTo(new DeviceLeaseBO(2L, 10L, "node-a", 4L))).verifyComplete();
+    }
+
+    private String hash(List<String> nodes) {
+        try {
+            var digest = java.security.MessageDigest.getInstance("SHA-256");
+            return java.util.HexFormat.of().formatHex(digest.digest(String.join("\u0000", nodes).getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+        } catch (Exception error) { throw new AssertionError(error); }
     }
 }

@@ -21,11 +21,11 @@ import type {GroupRecord} from '@/config/types/manager';
 import type {EntityListConfig, Translator} from '@/config/types/entityList';
 import {nameRules, remarkRules} from '@/utils/formRuleUtil';
 
-const GROUP_PAGE_QUERY = {page: {current: 1, size: 5000, orders: [{column: 'group_index', asc: true}]}};
+const GROUP_PAGE_QUERY = {offset: 0, limit: 200, sort: [{field: 'group_index', direction: 'ASC' as const}]};
 
 const loadGroupRecords = async (): Promise<GroupRecord[]> => {
   const res = await listGroup(GROUP_PAGE_QUERY);
-  return (res.data?.records || []) as GroupRecord[];
+  return (res?.items || []) as GroupRecord[];
 };
 
 /** Build a sorted tree from flat GroupRecord rows. */

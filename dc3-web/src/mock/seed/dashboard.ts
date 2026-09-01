@@ -111,8 +111,8 @@ export const statsTimeseries = (
 };
 
 export const systemHealth = {
-  center: {auth: 'UP', data: 'UP', manager: 'UP'},
-  infra: {database: 'UP', mq: 'UP', gateway: 'UP'},
+  center: {auth: 'up', data: 'up', manager: 'up'},
+  infra: {database: 'up', mq: 'up', gateway: 'up'},
   drivers: {total: drivers.length, online: Math.max(0, drivers.length - 1)},
   devices: {total: devices.length, online: Math.max(0, devices.length - 3)},
 };

@@ -17,7 +17,7 @@
 
 import {on} from '../dispatch';
 import {paginate} from '../query';
-import {ok, responseOf} from '../response';
+import {fail, ok, responseOf} from '../response';
 import {db} from '../db';
 
 const dec = (p: Record<string, unknown>): number => Number(p.valueDecimal ?? 2);
@@ -97,6 +97,29 @@ const allRows = (deviceId?: string, pointId?: string): Record<string, unknown>[]
   return rows;
 };
 
+const cursorScope = (deviceId?: unknown, pointId?: unknown): string =>
+  `${deviceId == null ? '' : String(deviceId)}|${pointId == null ? '' : String(pointId)}`;
+
+const encodeCursor = (scope: string, offset: number): string =>
+  Buffer.from(JSON.stringify({v: 1, scope, offset}), 'utf8').toString('base64url');
+
+const decodeCursor = (token: unknown, scope: string): number => {
+  if (typeof token !== 'string' || token.length === 0) return 0;
+  try {
+    const decoded = JSON.parse(Buffer.from(token, 'base64url').toString('utf8')) as {
+      v?: number;
+      scope?: string;
+      offset?: number;
+    };
+    const offset = decoded.offset as number | undefined;
+    if (decoded.v !== 1 || decoded.scope !== scope || typeof offset !== 'number' || !Number.isSafeInteger(offset)
+      || offset < 0) throw new Error('invalid cursor');
+    return offset as number;
+  } catch {
+    throw new Error('invalid cursor');
+  }
+};
+
 /**
  * Realistic point-value time series so the value tables/charts render a live
  * 24h waveform instead of an empty state. Values are deterministic per point id
@@ -112,19 +135,58 @@ export function registerTimeseriesHandlers(): void {
   // Paged history, optionally narrowed by device/point.
   on('post', 'api/v3/data/point_value/list', (ctx) => {
     const rows = allRows(ctx.body?.deviceId, ctx.body?.pointId);
-    return responseOf(ctx.config, ok(paginate(rows, ctx.body)));
+    const limit = Math.max(1, Math.min(Number(ctx.body?.limit ?? 12), 200));
+    const scope = cursorScope(ctx.body?.deviceId, ctx.body?.pointId);
+    let offset: number;
+    try {
+      offset = decodeCursor(ctx.body?.cursor, scope);
+    } catch {
+      return responseOf(ctx.config, fail('INVALID_CURSOR', 'cursor is invalid or does not match this query'), 400);
+    }
+    const items = rows.slice(offset, offset + limit);
+    const nextOffset = offset + items.length;
+    const hasNext = nextOffset < rows.length;
+    return responseOf(ctx.config, ok({
+      items,
+      nextCursor: hasNext ? encodeCursor(scope, nextOffset) : null,
+      hasNext,
+    }));
   });
 
   // GET history by device+point (query params use snake_case ids).
-  on('get', 'api/v3/data/point_value/list_history_by_device_id_and_point_id', (ctx) => {
+  on('get', 'api/v3/data/point_value/history', (ctx) => {
     const rows = allRows(ctx.params.device_id as string, ctx.params.point_id as string);
-    return responseOf(ctx.config, ok(rows));
+    const limit = Math.max(1, Math.min(Number(ctx.params.limit ?? 100), 500));
+    const scope = cursorScope(ctx.params.device_id, ctx.params.point_id);
+    let offset: number;
+    try {
+      offset = decodeCursor(ctx.params.cursor, scope);
+    } catch {
+      return responseOf(ctx.config, fail('INVALID_CURSOR', 'cursor is invalid or does not match this query'), 400);
+    }
+    const page = rows.slice(offset, offset + limit);
+    const nextOffset = offset + page.length;
+    const hasNext = nextOffset < rows.length;
+    return responseOf(ctx.config, ok({
+      items: page,
+      nextCursor: hasNext ? encodeCursor(scope, nextOffset) : null,
+      hasNext,
+    }));
   });
 
-  // Point read/write commands — read returns a fresh sample, write is no-op success.
+  // Point commands are asynchronous: return the accepted command resource.
   on('post', 'api/v3/data/point_command/read', (ctx) => {
-    const point = db.points.find((p) => String(p.id) === String(ctx.body?.pointId));
-    return responseOf(ctx.config, ok({pointId: ctx.body?.pointId, value: String(point ? valueAt(point, 0) : 0)}));
+    const commandId = `mock-read-${ctx.body?.deviceId ?? 'device'}-${ctx.body?.pointId ?? 'point'}`;
+    return responseOf(ctx.config, ok({
+      commandId,
+      statusUri: `/api/v3/data/point_command_history/get_by_command_id?commandId=${commandId}`,
+    }), 202);
   });
-  on('post', 'api/v3/data/point_command/write', (ctx) => responseOf(ctx.config, ok(true)));
+  on('post', 'api/v3/data/point_command/write', (ctx) => {
+    const commandId = `mock-write-${ctx.body?.deviceId ?? 'device'}-${ctx.body?.pointId ?? 'point'}`;
+    return responseOf(ctx.config, ok({
+      commandId,
+      statusUri: `/api/v3/data/point_command_history/get_by_command_id?commandId=${commandId}`,
+    }), 202);
+  });
 }

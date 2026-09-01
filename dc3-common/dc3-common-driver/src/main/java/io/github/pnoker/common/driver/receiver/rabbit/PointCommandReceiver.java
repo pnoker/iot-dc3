@@ -32,12 +32,15 @@ import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * RabbitMQ consumer that dispatches point read and write commands to the corresponding
@@ -49,7 +52,6 @@ import java.util.Objects;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class PointCommandReceiver {
 
     /**
@@ -63,24 +65,34 @@ public class PointCommandReceiver {
     private final DeviceLockManager deviceLockManager;
     private final DriverMetadata driverMetadata;
     private final DriverProperties driverProperties;
+    private final Scheduler commandScheduler;
+
+    public PointCommandReceiver(DriverReadService driverReadService, DriverWriteService driverWriteService,
+                                DriverSenderService driverSenderService, CommandDedupCache dedupCache,
+                                DeviceLockManager deviceLockManager, DriverMetadata driverMetadata,
+                                DriverProperties driverProperties, ThreadPoolExecutor threadPoolExecutor) {
+        this.driverReadService = driverReadService;
+        this.driverWriteService = driverWriteService;
+        this.driverSenderService = driverSenderService;
+        this.dedupCache = dedupCache;
+        this.deviceLockManager = deviceLockManager;
+        this.driverMetadata = driverMetadata;
+        this.driverProperties = driverProperties;
+        this.commandScheduler = Schedulers.fromExecutor(threadPoolExecutor);
+    }
 
     /**
      * Handles an incoming point command by validating the payload, rejecting duplicates,
      * dispatching the read or write under a per-device lock, and sending a result receipt
      * before acknowledging the delivery (or nack-ing for retry on transient failure).
      *
-     * @param channel   RabbitMQ channel used to ack, nack, or reject the delivery
-     * @param message   Spring AMQP message carrying the delivery tag and redelivery flag
-     * @param entityDTO deserialized point command payload (type, command id, tenant, value)
+     * @param message broker-neutral delivery carrying the point command
+     * @param ack     poison-message disposition selector
      */
     @Dc3Listener(topic = MqTopic.POINT_COMMAND, group = "${dc3.driver.client}", keyPattern = "${dc3.driver.service}.${dc3.driver.node}")
-    public void pointCommandReceive(MqReceived<PointCommandDTO> message, Acknowledgment ack) {
+    public Mono<Void> pointCommandReceive(MqReceived<PointCommandDTO> message, Acknowledgment ack) {
         PointCommandDTO entityDTO = message.payload();
-        boolean redelivered = message.redelivered();
-        try {
-            // Validate first: the debug log below dereferences entityDTO, so a null
-            // payload must be rejected before logging to avoid an NPE that would
-            // otherwise fall through to the nack(requeue) path and requeue garbage.
+        return Mono.defer(() -> {
             if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.commandId())
                     || Objects.isNull(entityDTO.tenantId()) || Objects.isNull(entityDTO.ownerNode())
                     || Objects.isNull(entityDTO.fencingToken()) || Objects.isNull(entityDTO.type())
@@ -90,7 +102,7 @@ public class PointCommandReceiver {
                         Objects.isNull(entityDTO) ? null : entityDTO.tenantId(),
                         Objects.isNull(entityDTO) ? null : entityDTO.type());
                 ack.reject(false);
-                return;
+                return Mono.empty();
             }
 
             log.debug("Point command received, commandId={}, type={}", entityDTO.commandId(), entityDTO.type());
@@ -98,84 +110,86 @@ public class PointCommandReceiver {
                 log.error("Point command rejected, reason=invalidPayload, commandId={}, tenantId={}, type={}",
                         entityDTO.commandId(), entityDTO.tenantId(), entityDTO.type());
                 ack.reject(false);
-                return;
+                return Mono.empty();
             }
 
             String commandId = entityDTO.commandId();
-            Long tenantId = entityDTO.tenantId();
+            return dedupCache.result(commandId, PointCommandResultDTO.class)
+                    .map(this::publishResult)
+                    .orElseGet(() -> processNewCommand(entityDTO, message.redelivered()));
+        });
+    }
 
-            // Expire-at pre-check
-            if (Objects.nonNull(entityDTO.expireAt()) && Instant.now().isAfter(entityDTO.expireAt())) {
-                log.warn("Point command rejected, reason=expired, commandId={}, expireAt={}",
-                        commandId, entityDTO.expireAt());
-                sendResult(commandId, tenantId, PointCommandStatusEnum.EXPIRED,
-                        null, "EXPIRED", "Command expired before execution", ack);
-                return;
-            }
+    private Mono<Void> processNewCommand(PointCommandDTO command, boolean redelivered) {
+        String commandId = command.commandId();
+        Long tenantId = command.tenantId();
+        Long deviceId = deviceId(command.payload());
 
-            // Dedup check
-            if (!dedupCache.tryAcquire(commandId)) {
-                log.warn("Point command rejected, reason=duplicate, commandId={}", commandId);
-                sendResult(commandId, tenantId, PointCommandStatusEnum.DUPLICATE,
-                        null, "DUPLICATE", "Command already processed", ack);
-                return;
-            }
-
-            // Extract deviceId for per-device serialization
-            Long lockDeviceId = switch (entityDTO.payload()) {
-                case PointCommandPayload.ReadPayload r -> r.deviceId();
-                case PointCommandPayload.WritePayload w -> w.deviceId();
-            };
-
-            if (!Objects.equals(driverProperties.getNode(), entityDTO.ownerNode())
-                    || !Objects.equals(driverMetadata.getFencingToken(lockDeviceId), entityDTO.fencingToken())) {
-                log.warn("Reject stale-owner point command, commandId={}, deviceId={}, fencingToken={}",
-                        commandId, lockDeviceId, entityDTO.fencingToken());
-                sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED,
-                        null, "STALE_OWNER", "Device ownership lease changed", ack);
-                return;
-            }
-
-            // Dispatch under per-device lock to prevent protocol interleaving
-            String responseValue = deviceLockManager.runExclusive(lockDeviceId, () -> {
-                String rv = null;
-                switch (entityDTO.payload()) {
-                    case PointCommandPayload.ReadPayload r -> {
-                        driverReadService.read(r.deviceId(), r.pointId());
-                    }
-                    case PointCommandPayload.WritePayload w -> {
-                        boolean ok = driverWriteService.write(w.deviceId(), w.pointId(), w.value());
-                        if (ok) {
-                            rv = w.value();
-                        }
-                    }
-                }
-                return rv;
-            });
-
-            if (Objects.isNull(responseValue) && entityDTO.payload()
-                    instanceof PointCommandPayload.WritePayload) {
-                sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED,
-                        null, "WRITE_FAILED", "Device write returned false", ack);
-                return;
-            }
-
-            sendResult(commandId, tenantId, PointCommandStatusEnum.SUCCESS,
-                    responseValue, null, null, ack);
-
-        } catch (Exception e) {
-            if (redelivered) {
-                log.error("Point command failed on redelivery, sending FAILED.", e);
-                String commandId = Objects.nonNull(entityDTO) ? entityDTO.commandId() : null;
-                Long tenantId = Objects.nonNull(entityDTO) ? entityDTO.tenantId() : null;
-                sendResult(commandId, tenantId, PointCommandStatusEnum.FAILED,
-                        null, "DRIVER_ERROR", e.getMessage(), ack);
-            } else {
-                log.warn("Point command failed, requeueing.", e);
-                releaseDedup(entityDTO);
-                ack.reject(true);
-            }
+        if (Objects.nonNull(command.expireAt()) && Instant.now().isAfter(command.expireAt())) {
+            log.warn("Point command rejected, reason=expired, commandId={}, expireAt={}",
+                    commandId, command.expireAt());
+            return publishResult(result(commandId, tenantId, PointCommandStatusEnum.EXPIRED,
+                    null, "EXPIRED", "Command expired before execution"));
         }
+
+        if (!Objects.equals(driverProperties.getNode(), command.ownerNode())
+                || !Objects.equals(driverMetadata.getFencingToken(deviceId), command.fencingToken())) {
+            log.warn("Reject stale-owner point command, commandId={}, deviceId={}, fencingToken={}",
+                    commandId, deviceId, command.fencingToken());
+            return publishResult(result(commandId, tenantId, PointCommandStatusEnum.FAILED,
+                    null, "STALE_OWNER", "Device ownership lease changed"));
+        }
+
+        if (!dedupCache.tryAcquire(commandId)) {
+            log.warn("Point command rejected, reason=duplicate, commandId={}", commandId);
+            return publishResult(result(commandId, tenantId, PointCommandStatusEnum.DUPLICATE,
+                    null, "DUPLICATE", "Command already processing"));
+        }
+
+        Mono<PointCommandResultDTO> execution = Mono.fromCallable(() -> deviceLockManager.runExclusive(deviceId,
+                        () -> execute(command)))
+                .subscribeOn(commandScheduler)
+                .map(response -> result(commandId, tenantId, response.status(), response.value(),
+                        response.errorCode(), response.errorMessage()))
+                .onErrorResume(error -> handleExecutionFailure(command, redelivered, error));
+
+        return execution.flatMap(commandResult -> {
+            dedupCache.complete(commandId, commandResult);
+            return publishResult(commandResult);
+        });
+    }
+
+    private PointExecutionResult execute(PointCommandDTO command) {
+        return switch (command.payload()) {
+            case PointCommandPayload.ReadPayload read -> {
+                driverReadService.read(read.deviceId(), read.pointId());
+                yield new PointExecutionResult(PointCommandStatusEnum.SUCCESS, null, null, null);
+            }
+            case PointCommandPayload.WritePayload write -> driverWriteService.write(
+                    write.deviceId(), write.pointId(), write.value())
+                    ? new PointExecutionResult(PointCommandStatusEnum.SUCCESS, write.value(), null, null)
+                    : new PointExecutionResult(PointCommandStatusEnum.FAILED, null,
+                    "WRITE_FAILED", "Device write returned false");
+        };
+    }
+
+    private Mono<PointCommandResultDTO> handleExecutionFailure(PointCommandDTO command, boolean redelivered,
+                                                                Throwable error) {
+        if (!redelivered) {
+            log.warn("Point command failed, requeueing, commandId={}", command.commandId(), error);
+            dedupCache.release(command.commandId());
+            return Mono.error(error);
+        }
+        log.error("Point command failed on redelivery, sending FAILED, commandId={}", command.commandId(), error);
+        return Mono.just(result(command.commandId(), command.tenantId(), PointCommandStatusEnum.FAILED,
+                null, "DRIVER_ERROR", error.getMessage()));
+    }
+
+    private Long deviceId(PointCommandPayload payload) {
+        return switch (payload) {
+            case PointCommandPayload.ReadPayload read -> read.deviceId();
+            case PointCommandPayload.WritePayload write -> write.deviceId();
+        };
     }
 
     private boolean isInvalidPayload(PointCommandPayload payload) {
@@ -186,38 +200,28 @@ public class PointCommandReceiver {
         };
     }
 
-    private void releaseDedup(PointCommandDTO entityDTO) {
-        if (Objects.nonNull(entityDTO) && Objects.nonNull(entityDTO.commandId())) {
-            dedupCache.release(entityDTO.commandId());
-        }
+    private PointCommandResultDTO result(String commandId, Long tenantId, PointCommandStatusEnum status,
+                                         String responseValue, String errorCode, String errorMessage) {
+        return PointCommandResultDTO.builder()
+                .commandId(commandId)
+                .tenantId(tenantId)
+                .status(status)
+                .responseValue(responseValue)
+                .errorCode(errorCode)
+                .errorMessage(errorMessage)
+                .finishedAt(Instant.now())
+                .schemaVersion(SCHEMA_VERSION)
+                .build();
     }
 
-    private void sendResult(String commandId, Long tenantId, PointCommandStatusEnum status,
-                            String responseValue, String errorCode, String errorMessage,
-                            Acknowledgment ack) {
-        try {
-            if (Objects.nonNull(commandId)) {
-                PointCommandResultDTO result = PointCommandResultDTO.builder()
-                        .commandId(commandId)
-                        .tenantId(tenantId)
-                        .status(status)
-                        .responseValue(responseValue)
-                        .errorCode(errorCode)
-                        .errorMessage(errorMessage)
-                        .finishedAt(Instant.now())
-                        .schemaVersion(SCHEMA_VERSION)
-                        .build();
-                driverSenderService.pointCommandResultSender(result);
-            }
-        } catch (Exception e) {
-            log.error("Failed to send command result, commandId={}", commandId, e);
-            if (Objects.nonNull(commandId)) {
-                dedupCache.release(commandId);
-            }
-            ack.reject(true);
-            return;
-        }
-        ack.ack();
+    private Mono<Void> publishResult(PointCommandResultDTO result) {
+        return driverSenderService.pointCommandResultSender(result)
+                .doOnError(error -> log.error("Failed to publish point-command result, commandId={}",
+                        result.commandId(), error));
+    }
+
+    private record PointExecutionResult(PointCommandStatusEnum status, String value,
+                                        String errorCode, String errorMessage) {
     }
 
 }

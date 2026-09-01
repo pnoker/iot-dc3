@@ -86,7 +86,7 @@ const load = async () => {
       granularity: granularityFor(rangeKey.value),
       rangeKey: rangeKey.value,
     });
-    const points = (res?.data ?? []).map((p: any) => ({bucket: p.bucket, count: Number(p.count) || 0}));
+    const points = (res ?? []).map((p: any) => ({bucket: p.bucket, count: Number(p.count) || 0}));
     await nextTick();
     render(points);
   } catch {

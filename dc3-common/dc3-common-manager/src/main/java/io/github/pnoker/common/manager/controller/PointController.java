@@ -17,23 +17,17 @@
 
 package io.github.pnoker.common.manager.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.SuccessCode;
-import io.github.pnoker.common.manager.entity.bo.DeviceByPointBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
-import io.github.pnoker.common.manager.entity.bo.PointConfigByDeviceBO;
 import io.github.pnoker.common.manager.entity.builder.DeviceBuilder;
 import io.github.pnoker.common.manager.entity.builder.PointBuilder;
-import io.github.pnoker.common.manager.entity.query.PointQuery;
+import io.github.pnoker.common.manager.entity.query.PointOffsetQuery;
 import io.github.pnoker.common.manager.entity.vo.DeviceByPointVO;
 import io.github.pnoker.common.manager.entity.vo.PointConfigByDeviceVO;
 import io.github.pnoker.common.manager.entity.vo.PointVO;
-import io.github.pnoker.common.manager.service.DeviceService;
-import io.github.pnoker.common.manager.service.PointService;
-import io.github.pnoker.common.manager.service.ProfileService;
+import io.github.pnoker.common.manager.service.ReactivePointService;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,12 +35,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,9 +52,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * REST controller exposing point management endpoints.
@@ -74,14 +68,9 @@ import java.util.stream.Collectors;
 public class PointController implements BaseController {
 
     private final PointBuilder pointBuilder;
-
-    private final PointService pointService;
-
     private final DeviceBuilder deviceBuilder;
 
-    private final DeviceService deviceService;
-
-    private final ProfileService profileService;
+    private final ReactivePointService reactivePointService;
 
     /**
      * Define a new point on a profile template for the current tenant, then return the add-success status.
@@ -99,13 +88,15 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<PointVO> add(@Validated(Add.class) @RequestBody PointVO entityVO) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
+            Long tenantId = tuple.getT1().getT1();
             PointBO entityBO = pointBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            pointService.add(entityBO);
-            return R.ok(SuccessCode.ADD);
-        }));
+            entityBO.setCreatorId(tuple.getT1().getT2()); entityBO.setCreatorName(tuple.getT2()); entityBO.setOperatorId(tuple.getT1().getT2()); entityBO.setOperatorName(tuple.getT2());
+            return reactivePointService.add(entityBO).map(pointBuilder::buildVOByBO);
+        });
     }
 
     /**
@@ -123,13 +114,11 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, pointService.getById(id));
-            pointService.delete(id);
-            return R.ok(SuccessCode.DELETE);
-        }));
+    @DeleteMapping("/delete")
+    public Mono<Void> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id,
+                             @Parameter(description = "Current optimistic-lock version required as a deletion precondition.", example = "0") @NotNull @Min(0) @RequestParam("version") Integer version) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> reactivePointService.delete(tuple.getT1().getT1(), id, version, tuple.getT1().getT2(), tuple.getT2()).then());
     }
 
     /**
@@ -148,14 +137,15 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody PointVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<PointVO> update(@Validated(Update.class) @RequestBody PointVO entityVO) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
+            Long tenantId = tuple.getT1().getT1();
             PointBO entityBO = pointBuilder.buildBOByVO(entityVO);
             entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, pointService.getById(entityBO.getId()));
-            pointService.update(entityBO);
-            return R.ok(SuccessCode.UPDATE);
-        }));
+            entityBO.setOperatorId(tuple.getT1().getT2()); entityBO.setOperatorName(tuple.getT2());
+            return reactivePointService.update(entityBO).map(pointBuilder::buildVOByBO);
+        });
     }
 
     /**
@@ -174,12 +164,8 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_id")
-    public Mono<R<PointVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            PointBO entityBO = requireTenant(tenantId, pointService.getById(id));
-            PointVO entityVO = pointBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
-        }));
+    public Mono<PointVO> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId().flatMap(tenantId -> reactivePointService.getById(tenantId, id).map(pointBuilder::buildVOByBO));
     }
 
     /**
@@ -198,13 +184,8 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list_by_ids")
-    public Mono<R<Map<String, PointVO>>> listByIds(@RequestBody Set<Long> pointIds) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            List<PointBO> entityBOList = filterTenant(tenantId, pointService.listByIds(pointIds));
-            Map<String, PointVO> deviceMap = entityBOList.stream()
-                    .collect(Collectors.toMap(bo -> String.valueOf(bo.getId()), entityBO -> pointBuilder.buildVOByBO(entityBO)));
-            return R.ok(deviceMap);
-        }));
+    public Mono<Map<String, PointVO>> listByIds(@RequestBody Set<Long> pointIds) {
+        return getTenantId().flatMap(tenantId -> reactivePointService.listByIds(tenantId, pointIds == null ? List.of() : List.copyOf(pointIds)).collectMap(bo -> String.valueOf(bo.getId()), pointBuilder::buildVOByBO));
     }
 
     /**
@@ -223,13 +204,8 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list_by_profile_id")
-    public Mono<R<List<PointVO>>> listByProfileId(@Parameter(description = "Identifier of the profile template whose points should be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, profileService.getById(profileId));
-            List<PointBO> entityBOList = filterTenant(tenantId, pointService.listByProfileId(profileId, tenantId));
-            List<PointVO> entityVOList = pointBuilder.buildVOListByBOList(entityBOList);
-            return R.ok(entityVOList);
-        }));
+    public Mono<List<PointVO>> listByProfileId(@Parameter(description = "Identifier of the profile template whose points should be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "profile_id") Long profileId) {
+        return getTenantId().flatMap(tenantId -> reactivePointService.listByProfileId(tenantId, profileId).map(pointBuilder::buildVOByBO).collectList());
     }
 
     /**
@@ -248,24 +224,13 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list_by_device_id")
-    public Mono<R<List<PointVO>>> listByDeviceId(@Parameter(description = "Identifier of the device whose available points should be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, deviceService.getById(deviceId));
-            List<PointBO> entityBOList = filterTenant(tenantId, pointService.listByDeviceId(deviceId, tenantId));
-            List<PointVO> entityVOList = pointBuilder.buildVOListByBOList(entityBOList);
-            return R.ok(entityVOList);
-        }));
+    public Mono<List<PointVO>> listByDeviceId(@Parameter(description = "Identifier of the device whose available points should be listed; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+        return getTenantId().flatMap(tenantId -> reactivePointService.listByDeviceId(tenantId, deviceId).map(pointBuilder::buildVOByBO).collectList());
     }
 
-    /**
-     * Page through points for the current tenant using the supplied query filters.
-     *
-     * @param entityQuery optional query filters (name, profile); a new query is used when null
-     * @return a page of PointVO matching the query
-     */
+    /** Canonical offset-based point listing. New clients must use this contract. */
     @PreAuthorize("@perm.can('point', 'list')")
-    @Operation(summary = "List Points", description = "Page through points for the current tenant with filters such as name and profile. " +
-            "Returns a page of point definitions; use for browsing points or selecting targets for value reads, writes or device binding.",
+    @Operation(summary = "List Points", description = "List tenant-scoped points with offset pagination and explicit sorting.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "LOW"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -273,14 +238,18 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<PointVO>>> list(@RequestBody(required = false) PointQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            PointQuery query = Objects.isNull(entityQuery) ? new PointQuery() : entityQuery;
-            query.setTenantId(tenantId);
-            Page<PointBO> entityPageBO = pointService.list(query);
-            Page<PointVO> entityPageVO = pointBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
-        }));
+    public Mono<OffsetPage<PointVO>> list(@RequestBody(required = false) PointOffsetQuery request) {
+        PointOffsetQuery query = request == null
+                ? new PointOffsetQuery(0L, 50, List.of(), null, null, null, null, null, null, null, null, null, null)
+                : request;
+        long offset = query.offset() == null ? 0L : query.offset();
+        int limit = query.limit() == null ? 50 : query.limit();
+        return getTenantId().flatMap(tenantId -> reactivePointService.list(new io.github.pnoker.common.manager.repository.PointFilter(
+                        tenantId, query.pointName(), query.pointCode(), query.pointTypeFlag(), query.rwFlag(),
+                        query.profileId(), query.enableFlag(), query.groupId(), query.labelId(), query.version(),
+                        query.deviceId(), offset, limit, query.sort()))
+                .map(page -> OffsetPage.of(page.items().stream().map(pointBuilder::buildVOByBO).toList(),
+                        page.offset(), page.limit(), page.total())));
     }
 
     /**
@@ -298,21 +267,10 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/unit")
-    public Mono<R<Map<String, String>>> unit(@RequestBody Set<Long> pointIds) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            Set<Long> scopedPointIds = filterTenant(tenantId, pointService.listByIds(pointIds)).stream()
-                    .map(PointBO::getId)
-                    .collect(Collectors.toSet());
-            Map<String, String> units = pointService.unit(scopedPointIds);
-            if (Objects.nonNull(units)) {
-                Map<String, String> unitCodeMap = units.entrySet()
-                        .stream()
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                return R.ok(unitCodeMap);
-            }
-            return R.fail();
-        }));
+    @PostMapping("/list_units")
+    public Mono<Map<String, String>> listUnits(@RequestBody Set<Long> pointIds) {
+        return getTenantId().flatMap(tenantId -> reactivePointService.listUnits(tenantId,
+                pointIds == null ? List.of() : List.copyOf(pointIds)));
     }
 
     /**
@@ -330,15 +288,11 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @GetMapping("/list_device_statistics_by_point_id")
-    public Mono<R<DeviceByPointVO>> getPointStatisticsWithDevice(
+    @GetMapping("/get_device_statistics_by_point_id")
+    public Mono<DeviceByPointVO> getDeviceStatisticsByPointId(
             @Parameter(description = "Identifier of the point whose device statistics should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "point_id") Long pointId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, pointService.getById(pointId));
-            DeviceByPointBO deviceByPointBO = pointService.getPointStatisticsWithDevice(pointId);
-            DeviceByPointVO deviceByPointVO = deviceBuilder.buildVOPointByBO(deviceByPointBO);
-            return R.ok(deviceByPointVO);
-        }));
+        return getTenantId().flatMap(tenantId -> reactivePointService.getDeviceStatisticsByPointId(tenantId, pointId)
+                .map(deviceBuilder::buildVOPointByBO));
     }
 
     /**
@@ -357,12 +311,8 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_count_by_device_id")
-    public Mono<R<Long>> getCountByDeviceId(@Parameter(description = "Identifier of the device whose point count should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, deviceService.getById(deviceId));
-            Long count = pointService.getCountByDeviceId(deviceId);
-            return R.ok(count);
-        }));
+    public Mono<Long> getCountByDeviceId(@Parameter(description = "Identifier of the device whose point count should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
+        return getTenantId().flatMap(tenantId -> reactivePointService.getCountByDeviceId(tenantId, deviceId));
     }
 
     /**
@@ -381,14 +331,10 @@ public class PointController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_point_config_by_device_id")
-    public Mono<R<PointConfigByDeviceVO>> getPointConfigByDeviceId(
+    public Mono<PointConfigByDeviceVO> getPointConfigByDeviceId(
             @Parameter(description = "Identifier of the device whose resolved point configuration should be returned; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "device_id") Long deviceId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, deviceService.getById(deviceId));
-            PointConfigByDeviceBO pointConfigByDeviceBO = pointService.getPointConfigByDeviceId(deviceId);
-            PointConfigByDeviceVO pointConfigByDeviceVO = pointBuilder.buildVODeviceByBO(pointConfigByDeviceBO);
-            return R.ok(pointConfigByDeviceVO);
-        }));
+        return getTenantId().flatMap(tenantId -> reactivePointService.getPointConfigByDeviceId(tenantId, deviceId)
+                .map(pointBuilder::buildVODeviceByBO));
     }
 
 }

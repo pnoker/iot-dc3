@@ -17,8 +17,9 @@
 
 package io.github.pnoker.common.entity.query;
 
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,14 +30,14 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
- * Point Value Query Object
- * <p>
- * Query object for searching and filtering point values in the repository layer. Supports
- * filtering by tenant, device, point name, and enable status. Includes pagination support
- * for large datasets.
- * </p>
+ * Point value query parameters.
+ *
+ * <p>Latest snapshots use canonical zero-based offset pagination. Historical
+ * point-value reads use an opaque cursor and never accept an offset.</p>
  *
  * @author pnoker
  * @since 2016.10.1
@@ -47,73 +48,50 @@ import java.io.Serializable;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Point Value query parameters")
+@Schema(description = "Point value query parameters")
 public class PointValueQuery implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
-    private Pages page;
+    @Schema(description = "Zero-based result offset; supported by latest snapshots only (history uses cursor)", example = "0", minimum = "0")
+    private long offset;
 
-    /**
-     * Tenant ID for multi-tenant data isolation
-     */
+    @Builder.Default
+    @Schema(description = "Maximum number of records to return", example = "50", minimum = "1", maximum = "200")
+    private int limit = PageRequest.DEFAULT_LIMIT;
+
+    @Builder.Default
+    @Schema(description = "Stable allow-listed sort fields")
+    private List<SortSpec> sort = List.of();
+
+    @Schema(description = "Opaque signed cursor returned by the previous history page")
+    private String cursor;
+
     @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
     private Long tenantId;
 
-    // Query fields
-
-    /**
-     * Device ID to filter by specific device
-     */
-    @Schema(description = "Filter by device ID. Returns results scoped to a specific device.", example = "1024")
+    @Schema(description = "Filter by device ID", example = "1024")
     private Long deviceId;
 
-    /**
-     * Device name for text-based filtering
-     */
-    @Schema(description = "Filter by device name. Supports partial matching.", example = "Temperature Sensor 01")
+    @Schema(description = "Filter by device name", example = "Temperature Sensor 01")
     private String deviceName;
 
-    /**
-     * Point ID to filter by specific point
-     */
-    @Schema(description = "Filter by data point ID.", example = "2048")
+    @Schema(description = "Filter by data point ID", example = "2048")
     private Long pointId;
 
-    /**
-     * Point name for text-based filtering
-     */
-    @Schema(description = "Filter by data point name. Supports partial matching.", example = "Temperature")
+    @Schema(description = "Filter by data point name", example = "Temperature")
     private String pointName;
 
-    /**
-     * Enable flag to filter active/inactive points
-     */
-    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
+    @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1)", example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
-    /**
-     * Optional lower bound for create_time filtering (time range feature).
-     */
-    @Schema(description = "Start time for querying point values")
-    private java.time.LocalDateTime createTimeFrom;
+    @Schema(description = "Lower bound for create_time filtering")
+    private LocalDateTime createTimeFrom;
 
-    /**
-     * Convenience field: when set (e.g. 24, 168, 720), the service layer converts it to
-     * createTimeFrom = now - rangeHours. Retained for backward compatibility; new callers
-     * should set {@link #rangeKey}.
-     */
     @Schema(description = "Fallback rolling time range in hours", example = "24")
     private Integer rangeHours;
 
-    /**
-     * Preferred time-range selector. Accepts one of the
-     * {@link io.github.pnoker.common.enums.TimeRangeKeyEnum} codes ({@code today},
-     * {@code 24h}, {@code 7d}, {@code 30d}). Takes precedence over {@link #rangeHours}
-     * when both are supplied.
-     */
     @Schema(description = "Preset time range key: today, 24h, 7d, or 30d", example = "24h")
     private String rangeKey;
 

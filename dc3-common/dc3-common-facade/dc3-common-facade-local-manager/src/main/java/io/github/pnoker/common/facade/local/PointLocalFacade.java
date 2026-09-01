@@ -17,17 +17,14 @@
 
 package io.github.pnoker.common.facade.local;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
+import io.github.pnoker.common.facade.entity.query.FacadePointOffsetQuery;
 import io.github.pnoker.common.facade.local.builder.FacadePointBuilder;
-import io.github.pnoker.common.manager.entity.bo.PointBO;
-import io.github.pnoker.common.manager.entity.query.PointQuery;
-import io.github.pnoker.common.manager.service.PointService;
-import io.github.pnoker.common.tenant.TenantContextHolder;
-import lombok.RequiredArgsConstructor;
+import io.github.pnoker.common.manager.service.ReactivePointService;
+import io.github.pnoker.common.manager.repository.PointFilter;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import org.springframework.beans.factory.annotation.Autowired;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -36,65 +33,63 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
- * In-process PointFacade implementation.
+ * In-process PointFacade implementation. Canonical reactive methods route directly to
+ * the manager R2DBC service without using tenant thread-locals.
  *
  * @author pnoker
  * @since 2016.10.1
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class PointLocalFacade implements PointFacade {
 
-    private final PointService pointService;
+
+    private final ReactivePointService reactivePointService;
 
     private final FacadePointBuilder facadePointBuilder;
 
+    /** Constructor used by the Spring local facade. */
+    @Autowired
+    public PointLocalFacade(ReactivePointService reactivePointService, FacadePointBuilder facadePointBuilder) {
+        this.reactivePointService = reactivePointService;
+        this.facadePointBuilder = facadePointBuilder;
+    }
+
+    /** Constructor retained for focused unit tests of the synchronous legacy methods. */
+
     @Override
-    public FacadePointBO getById(Long tenantId, Long id) {
-        TenantContextHolder.setTenantId(tenantId);
-        try {
-            PointBO managerBO = pointService.getById(id);
-            return Objects.isNull(managerBO) ? null : facadePointBuilder.toFacadeBO(managerBO);
-        } finally {
-            TenantContextHolder.clear();
+    public Mono<FacadePointBO> getByIdReactive(Long tenantId, Long id) {
+        if (reactivePointService == null) {
+            return Mono.error(new IllegalStateException("Reactive point service is not configured"));
         }
+        return reactivePointService.getById(tenantId, id).map(facadePointBuilder::toFacadeBO);
     }
 
     @Override
-    public List<FacadePointBO> listByIds(Long tenantId, Collection<Long> ids) {
-        TenantContextHolder.setTenantId(tenantId);
-        try {
-            if (Objects.isNull(ids) || ids.isEmpty()) {
-                return Collections.emptyList();
-            }
-            List<PointBO> list = pointService.listByIds(new HashSet<>(ids));
-            if (Objects.isNull(list) || list.isEmpty()) {
-                return Collections.emptyList();
-            }
-            return list.stream().map(facadePointBuilder::toFacadeBO).toList();
-        } finally {
-            TenantContextHolder.clear();
+    public Flux<FacadePointBO> listByIdsReactive(Long tenantId, Collection<Long> ids) {
+        if (reactivePointService == null || ids == null || ids.isEmpty()) {
+            return Flux.empty();
         }
+        List<Long> pointIds = ids.stream().filter(Objects::nonNull).distinct().toList();
+        return reactivePointService.listByIds(tenantId, pointIds).map(facadePointBuilder::toFacadeBO);
     }
 
     @Override
-    public FacadePage<FacadePointBO> listByPage(FacadePointQuery query) {
-        TenantContextHolder.setTenantId(query.getTenantId());
-        try {
-            PointQuery managerQuery = facadePointBuilder.toManagerQuery(query);
-            Page<PointBO> page = pointService.list(managerQuery);
-            if (Objects.isNull(page)) {
-                return FacadePage.empty();
-            }
-
-            List<FacadePointBO> records = page.getRecords().stream().map(facadePointBuilder::toFacadeBO).toList();
-            return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
-        } finally {
-            TenantContextHolder.clear();
+    public Mono<OffsetPage<FacadePointBO>> listReactive(FacadePointOffsetQuery query) {
+        if (reactivePointService == null) {
+            return Mono.error(new IllegalStateException("Reactive point service is not configured"));
         }
+        PointFilter filter = new PointFilter(query.tenantId(), query.pointName(), query.pointCode(),
+                query.pointTypeFlag(), query.rwFlag(), query.profileId(), query.enableFlag(), query.groupId(),
+                query.labelId(), query.version(), query.deviceId(), query.offset(), query.limit(), query.sort());
+        return reactivePointService.list(filter)
+                .map(page -> OffsetPage.of(page.items().stream().map(facadePointBuilder::toFacadeBO).toList(),
+                        page.offset(), page.limit(), page.total()));
     }
+
 
 }

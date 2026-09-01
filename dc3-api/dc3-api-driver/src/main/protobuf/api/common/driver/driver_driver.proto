@@ -19,7 +19,6 @@ syntax = "proto3";
 
 package api.common.driver;
 
-import "api/common/r.proto";
 import "api/common/entity.proto";
 import "api/common/driver/driver_entity.proto";
 import "api/common/driver/driver_query.proto";
@@ -33,20 +32,17 @@ option java_multiple_files = true;
 // Service interface defining RPC calls related to drivers
 service DriverApi {
   // Driver registration, used by the driver service to register itself with the platform
-  rpc DriverRegister (GrpcDriverRegisterDTO) returns (GrpcRDriverRegisterDTO);
+  rpc DriverRegister (GrpcDriverRegisterDTO) returns (GrpcDriverRegistrationDTO);
 
   // Query the current registered driver metadata without re-registering it
-  rpc GetById (GrpcDriverQuery) returns (GrpcRDriverRegisterDTO);
+  rpc GetById (GrpcDriverQuery) returns (GrpcDriverRegistrationDTO);
 
   // Renew this runtime instance and stream a bounded snapshot of the devices it owns.
-  rpc RenewLease (GrpcDriverLeaseRequest) returns (stream GrpcRDriverLeaseDTO);
+  rpc RenewLease (GrpcDriverLeaseRequest) returns (stream GrpcDriverLeaseDTO);
 }
 
 // Driver registration response structure
-message GrpcRDriverRegisterDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
+message GrpcDriverRegistrationDTO {
   // Basic driver information
   GrpcDriverDTO driver = 2;
 
@@ -66,8 +62,7 @@ message GrpcRDriverRegisterDTO {
 
 }
 
-message GrpcRDriverLeaseDTO {
-  GrpcR result = 1;
+message GrpcDriverLeaseDTO {
   repeated GrpcDeviceLeaseDTO device_leases = 2;
   int64 lease_until_epoch_millis = 3;
   int64 assignment_version = 4;

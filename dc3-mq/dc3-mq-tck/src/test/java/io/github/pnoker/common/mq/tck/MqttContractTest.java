@@ -87,6 +87,7 @@ class MqttContractTest extends AbstractMqContractTest {
     protected void shutdownAdapter() {
         if (Objects.nonNull(mqttAdapter)) {
             mqttAdapter.stop();
+            mqttAdapter = null;
         }
     }
 

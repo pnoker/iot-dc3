@@ -21,6 +21,8 @@ server:
 
 # Spring application configuration
 spring:
+  config:
+    import: classpath:application-r2dbc.yml
   application:
     name: @project.artifactId@
   webflux:
@@ -37,7 +39,8 @@ spring:
 # DC3 platform configuration
 dc3:
   facade:
-    mode: local
+    auth:
+      mode: local
 
 # Logging configuration
 logging:

@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.mq.sender.MessageSender;
+import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +45,9 @@ class DriverSenderServiceImplTest {
     private MessageSender messageSender;
 
     @Mock
+    private ReactiveMessageSender reactiveMessageSender;
+
+    @Mock
     private BufferService bufferService;
 
     private DriverMetadata metadata;
@@ -60,7 +64,7 @@ class DriverSenderServiceImplTest {
         driver.setTenantId(1L);
         metadata.setDriver(driver);
         metadata.setDeviceLeases(Map.of(10L, 77L), System.currentTimeMillis() + 10_000, 5L);
-        service = new DriverSenderServiceImpl(properties, metadata, messageSender, bufferService);
+        service = new DriverSenderServiceImpl(properties, metadata, messageSender, reactiveMessageSender, bufferService);
     }
 
     @Test

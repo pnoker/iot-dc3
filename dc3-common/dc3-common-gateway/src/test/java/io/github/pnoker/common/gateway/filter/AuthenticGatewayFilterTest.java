@@ -43,7 +43,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -96,13 +95,20 @@ class AuthenticGatewayFilterTest {
         credential.setPrincipalId(100L);
         tenant = new FacadeTenantBO();
         tenant.setTenantName("Acme");
+        tenant.setId(1L);
+        tenant.setTenantCode("acme");
+    }
+
+    private void stubSuccessfulAuthentication() {
+        when(filterService.getTenantReactive(any())).thenReturn(Mono.just(tenant));
+        when(filterService.getLocalCredentialReactive(any(), any())).thenReturn(Mono.just(credential));
+        when(filterService.checkValidReactive(any(), any(), any())).thenReturn(Mono.empty());
+        when(filterService.getUserReactive(credential, tenant)).thenReturn(Mono.just(user));
     }
 
     @Test
     void writesXAuthPrincipalAndStripsXAuthSignWhenSigningDisabled() {
-        when(filterService.getTenant(any())).thenReturn(tenant);
-        when(filterService.getLocalCredential(any())).thenReturn(credential);
-        when(filterService.getUser(credential, tenant)).thenReturn(user);
+        stubSuccessfulAuthentication();
 
         AtomicReference<ServerWebExchange> capture = new AtomicReference<>();
         MockServerWebExchange initial = MockServerWebExchange.from(MockServerHttpRequest.get("/foo")
@@ -119,9 +125,7 @@ class AuthenticGatewayFilterTest {
 
     @Test
     void writesHmacSignedHeaderWhenSigningEnabled() {
-        when(filterService.getTenant(any())).thenReturn(tenant);
-        when(filterService.getLocalCredential(any())).thenReturn(credential);
-        when(filterService.getUser(credential, tenant)).thenReturn(user);
+        stubSuccessfulAuthentication();
 
         AtomicReference<ServerWebExchange> capture = new AtomicReference<>();
         filter(true).filter(exchange(), capturingChain(capture)).block();
@@ -137,23 +141,23 @@ class AuthenticGatewayFilterTest {
 
     @Test
     void responsesAreUnauthorizedWhenFilterServiceThrowsUnauthorized() {
-        when(filterService.getTenant(any())).thenReturn(tenant);
-        when(filterService.getLocalCredential(any())).thenReturn(credential);
-        doThrow(new UnAuthorizedException("token rejected"))
-                .when(filterService).checkValid(any(), any(), any());
+        when(filterService.getTenantReactive(any())).thenReturn(Mono.just(tenant));
+        when(filterService.getLocalCredentialReactive(any(), any())).thenReturn(Mono.just(credential));
+        when(filterService.checkValidReactive(any(), any(), any()))
+                .thenReturn(Mono.error(new UnAuthorizedException("token rejected")));
 
         MockServerWebExchange ex = exchange();
         AtomicReference<ServerWebExchange> capture = new AtomicReference<>();
         filter(false).filter(ex, capturingChain(capture)).block();
 
         assertThat(ex.getResponse().getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(ex.getResponse().getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_JSON);
+        assertThat(ex.getResponse().getHeaders().getContentType()).isEqualTo(MediaType.APPLICATION_PROBLEM_JSON);
         assertThat(capture.get()).isNull();
     }
 
     @Test
     void responsesAreInternalServerErrorOnUnexpectedException() {
-        when(filterService.getTenant(any())).thenThrow(new RuntimeException("boom"));
+        when(filterService.getTenantReactive(any())).thenReturn(Mono.error(new RuntimeException("boom")));
 
         MockServerWebExchange ex = exchange();
         AtomicReference<ServerWebExchange> capture = new AtomicReference<>();
@@ -165,9 +169,7 @@ class AuthenticGatewayFilterTest {
 
     @Test
     void responsesAreServiceUnavailableWhenRouteConnectFailsAfterAuthentication() {
-        when(filterService.getTenant(any())).thenReturn(tenant);
-        when(filterService.getLocalCredential(any())).thenReturn(credential);
-        when(filterService.getUser(credential, tenant)).thenReturn(user);
+        stubSuccessfulAuthentication();
 
         // Authentication succeeds, then the routed backend (e.g. a center that is not
         // running) refuses the connection; the failure must surface as 503, not as an
@@ -187,17 +189,12 @@ class AuthenticGatewayFilterTest {
 
     @Test
     void filterShortCircuitsAuthLookupOnFailFastValidation() {
-        when(filterService.getTenant(any())).thenReturn(null);
-        // checkValid is the only place that can throw — when getTenant returns null and
-        // checkValid does not throw, the filter still tries to build the user header.
-        when(filterService.getLocalCredential(any())).thenReturn(null);
-        when(filterService.getUser(null, null)).thenReturn(user);
+        when(filterService.getTenantReactive(any())).thenReturn(Mono.empty());
 
         AtomicReference<ServerWebExchange> capture = new AtomicReference<>();
         filter(false).filter(exchange(), capturingChain(capture)).block();
 
-        verify(filterService).checkValid(any(), any(), any());
-        assertThat(capture.get()).isNotNull();
+        assertThat(capture.get()).isNull();
     }
 
     @Test
@@ -221,6 +218,6 @@ class AuthenticGatewayFilterTest {
         assertThat(forwarded.getFirst(RequestConstant.Header.X_AUTH_PRINCIPAL))
                 .contains("SERVICE_ACCOUNT")
                 .contains("mcp:tools:call");
-        org.mockito.Mockito.verify(filterService, org.mockito.Mockito.never()).getTenant(org.mockito.ArgumentMatchers.any());
+        org.mockito.Mockito.verify(filterService, org.mockito.Mockito.never()).getTenantReactive(org.mockito.ArgumentMatchers.any());
     }
 }

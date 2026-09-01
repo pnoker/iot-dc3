@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.facade.api;
 
+import reactor.core.publisher.Mono;
+
 import java.util.Set;
 
 /**
@@ -34,6 +36,6 @@ public interface PermissionFacade {
      * @param principalId target principal
      * @return full resource code set; empty when the principal has no grants
      */
-    Set<String> listPermissionCodes(Long tenantId, Long principalId);
+    Mono<Set<String>> listPermissionCodes(Long tenantId, Long principalId);
 
 }

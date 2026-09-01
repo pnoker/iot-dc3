@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -60,7 +59,6 @@ public enum NotifyHistoryStatusEnum {
     SKIPPED((byte) 4, "skipped", "Skipped"),
     ;
 
-    @EnumValue
     private final Byte index;
 
     private final String code;

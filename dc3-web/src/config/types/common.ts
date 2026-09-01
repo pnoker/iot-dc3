@@ -28,6 +28,7 @@ export interface Login {
 /** Attribute information */
 export interface Attribute {
   id: string;
+  version: number;
   name: string;
   attributeName: string;
   attributeCode: string;
@@ -42,7 +43,7 @@ export interface Attribute {
 
 /** Dictionary item */
 export interface Dictionary {
-  type: string;
+  type?: string;
   label: string;
   value: string;
   disabled: boolean;
@@ -50,26 +51,48 @@ export interface Dictionary {
   children: Array<Dictionary>;
 }
 
-/** Sort order for table queries */
+/** Sort order accepted by the server. The field is mapped through a backend whitelist. */
+export interface SortSpec {
+  field: string;
+  direction: 'ASC' | 'DESC';
+}
+
+/** Legacy UI sort shape kept only for local table state. It is never sent on the wire. */
 export interface Order {
   column: string;
   asc: boolean;
 }
 
-/** Pagination query shape used by all list endpoints */
+/** Offset pagination request. Search fields are carried at the top level. */
 export interface PageQuery {
-  page?: {
-    total?: number;
-    size?: number;
-    current?: number;
-    orders?: Order[];
-  };
+  offset?: number;
+  limit?: number;
+  sort?: SortSpec[];
 
   [key: string]: unknown;
 }
 
-/** Generic paginated response */
+/** Cursor pagination request for history/high-volume endpoints. */
+export interface CursorPageQuery {
+  cursor?: string;
+  limit?: number;
+  sort?: SortSpec[];
+
+  [key: string]: unknown;
+}
+
+/** Generic offset paginated response returned by list endpoints. */
 export interface PageResult<T = unknown> {
+  items: T[];
+  offset: number;
+  limit: number;
   total: number;
-  records: T[];
+  hasNext: boolean;
+}
+
+/** Cursor page returned by history endpoints. The cursor is opaque and signed. */
+export interface CursorPageResult<T = unknown> {
+  items: T[];
+  nextCursor: string | null;
+  hasNext: boolean;
 }

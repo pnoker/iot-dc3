@@ -40,7 +40,7 @@ import i18n from '@/config/i18n';
  * id string rather than showing a spinner forever.
  */
 
-type BatchResponse = { data?: Record<string, any> };
+type BatchResponse = Record<string, any>;
 
 type EntityKind = 'device' | 'driver' | 'profile' | 'point';
 
@@ -129,7 +129,7 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string>): Promise<vo
   const promise = (async () => {
     try {
       const res = await fetchers[kind](missing);
-      const data = res?.data ?? {};
+      const data = res;
       for (const id of missing) {
         const row = data[id];
         // Cache whatever the backend returned — even empty → fallback to id.

@@ -52,6 +52,8 @@ public class NotifyHistoryBO extends BaseBO implements TenantOwned {
 
     private Long alarmId;
 
+    private String dedupeKey;
+
     private NotifyChannelTypeEnum channelTypeFlag;
 
     private String target;

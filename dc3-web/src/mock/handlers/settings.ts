@@ -162,10 +162,22 @@ export function registerSettingsHandlers(): void {
   });
 
   // ── identity audit ──
-  registerCrud({
-    baseUrl: 'api/v3/auth/identity_audit',
-    collection: 'identityAudits',
-    search: ['action', 'status'],
+  on('post', 'api/v3/auth/identity_audit/list', (ctx) => {
+    const body = ctx.body || {};
+    const rows = db.identityAudits
+      .filter((row) => body.action == null || body.action === '' || String(row.action) === String(body.action))
+      .filter((row) => body.status == null || body.status === '' || String(row.status) === String(body.status))
+      .filter((row) => body.principalId == null || String(row.principalId) === String(body.principalId))
+      .filter((row) => body.resourceType == null || body.resourceType === '' || String(row.resourceType) === String(body.resourceType));
+    const limit = Math.min(200, Math.max(1, Number(body.limit ?? 20)));
+    const offset = body.cursor ? Number.parseInt(atob(String(body.cursor)), 10) : 0;
+    const items = rows.slice(offset, offset + limit);
+    const hasNext = offset + items.length < rows.length;
+    return responseOf(ctx.config, ok({
+      items,
+      nextCursor: hasNext ? btoa(String(offset + items.length)) : null,
+      hasNext,
+    }));
   });
 
   // ── local credential ──

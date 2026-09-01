@@ -34,6 +34,7 @@ import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.mq.message.MqMessage;
 import io.github.pnoker.common.mq.sender.MessageSender;
+import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -75,6 +76,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
      * Broker-neutral publisher used to deliver every outbound message to the data center.
      */
     private final MessageSender messageSender;
+
+    private final ReactiveMessageSender reactiveMessageSender;
 
     /**
      * Durable point-value outbox. Values are committed locally before RabbitMQ publication and are
@@ -263,11 +266,12 @@ public class DriverSenderServiceImpl implements DriverSenderService {
      * @param resultDTO point command result payload
      */
     @Override
-    public void pointCommandResultSender(PointCommandResultDTO resultDTO) {
+    public reactor.core.publisher.Mono<Void> pointCommandResultSender(PointCommandResultDTO resultDTO) {
         if (Objects.isNull(resultDTO)) {
-            return;
+            return reactor.core.publisher.Mono.empty();
         }
-        sendConfirmed(MqTopic.POINT_COMMAND_RESULT, driverProperties.getService(), resultDTO);
+        return reactiveMessageSender.sendConfirmed(
+                MqMessage.of(MqTopic.POINT_COMMAND_RESULT, driverProperties.getService(), resultDTO));
     }
 
     /**
@@ -276,11 +280,12 @@ public class DriverSenderServiceImpl implements DriverSenderService {
      * @param resultDTO command call result payload
      */
     @Override
-    public void commandResultSender(CommandCallResultDTO resultDTO) {
+    public reactor.core.publisher.Mono<Void> commandResultSender(CommandCallResultDTO resultDTO) {
         if (Objects.isNull(resultDTO)) {
-            return;
+            return reactor.core.publisher.Mono.empty();
         }
-        sendConfirmed(MqTopic.COMMAND_RESULT, driverProperties.getService(), resultDTO);
+        return reactiveMessageSender.sendConfirmed(
+                MqMessage.of(MqTopic.COMMAND_RESULT, driverProperties.getService(), resultDTO));
     }
 
     /**

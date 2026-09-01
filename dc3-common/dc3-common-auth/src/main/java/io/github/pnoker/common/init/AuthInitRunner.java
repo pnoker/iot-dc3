@@ -19,12 +19,12 @@ package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.auth.config.OAuthProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 
 /**
  * Authentication Initialization Runner for DC3 IoT Platform. This class handles
@@ -36,8 +36,9 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @Slf4j
 @AutoConfiguration
-@ComponentScan(basePackages = {"io.github.pnoker.common.auth"})
-@MapperScan(basePackages = {"io.github.pnoker.common.auth.mapper"})
+@ComponentScan(basePackages = {"io.github.pnoker.common.auth"},
+        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
+                pattern = "io\\.github\\.pnoker\\.common\\.auth\\.dal\\..*"))
 @EnableConfigurationProperties(OAuthProperties.class)
 public class AuthInitRunner implements ApplicationRunner {
 

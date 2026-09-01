@@ -1,22 +1,5 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 package io.github.pnoker.common.agentic.tools;
 
-import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.agentic.utils.AgenticToolUtil;
@@ -24,175 +7,91 @@ import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.facade.api.ProfileFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeProfileQuery;
+import io.github.pnoker.common.facade.entity.query.FacadeProfileOffsetQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Profile/template-domain tools exposed to the LLM via Spring AI @Tool.
- *
- * @author pnoker
- * @since 2016.10.1
- */
-@Slf4j
+/** Non-blocking profile/template tools. */
 @Component
 @RequiredArgsConstructor
 public class ProfileTool {
-
     private final Optional<ProfileFacade> profileFacade;
 
-    /**
-     * Return profile by identifier.
-     *
-     * @param profileId   profile identifier
-     * @param toolContext tool context
-     * @return lookup profile by identifier result
-     */
-    @Tool(description = "Look up a profile/template by its numeric ID. Returns template name, code, type, share flag, enable status, and version.")
-    @AgenticToolMetadata(domain = "profile", title = "Query profile by ID")
-    public AgenticToolResult<FacadeProfileBO> lookupProfileById(
-            @ToolParam(description = "The numeric profile/template ID") Long profileId,
-            ToolContext toolContext) {
-        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, profileId={}", "lookupProfileById", tenantId,
-                profileId);
-        ProfileFacade facade = profileFacade.orElse(null);
-        if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE);
-        }
-        FacadeProfileBO profile = facade.getById(tenantId, profileId);
-        if (Objects.isNull(profile)) {
-            return AgenticToolResult.notFound("Profile not found for ID: " + profileId);
-        }
-        return AgenticToolResult.ok("Profile loaded", profile);
+    public Mono<AgenticToolResult<FacadeProfileBO>> lookupProfileByIdReactive(Long profileId, ToolContext context) {
+        return Mono.defer(() -> {
+            Long tenantId = AgenticToolContextUtil.requireTenantId(context);
+            ProfileFacade facade = profileFacade.orElse(null);
+            if (facade == null) return Mono.just(AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE));
+            if (profileId == null || profileId <= 0) return Mono.just(AgenticToolResult.invalid("Profile ID must be positive."));
+            return facade.getByIdReactive(tenantId, profileId).map(value -> AgenticToolResult.ok("Profile loaded", value))
+                    .defaultIfEmpty(AgenticToolResult.notFound("Profile not found for ID: " + profileId));
+        });
     }
 
-    /**
-     * Return profiles by identifiers.
-     *
-     * @param profileIds  profile identifiers
-     * @param toolContext tool context
-     * @return lookup profiles by identifiers result
-     */
-    @Tool(description = "Batch look up profiles/templates by numeric IDs. Returns up to 50 tenant-scoped templates.")
-    @AgenticToolMetadata(domain = "profile", title = "Batch query profiles by IDs")
-    public AgenticToolResult<List<FacadeProfileBO>> lookupProfilesByIds(
-            @ToolParam(description = "The numeric profile/template IDs") List<Long> profileIds,
-            ToolContext toolContext) {
-        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        List<Long> ids = AgenticToolUtil.normalizeIds(profileIds);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, profileIds={}", "lookupProfilesByIds", tenantId, ids);
-        ProfileFacade facade = profileFacade.orElse(null);
-        if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE);
-        }
-        if (ids.isEmpty()) {
-            return AgenticToolResult.invalid("No valid profile IDs provided.");
-        }
-        List<FacadeProfileBO> profiles = facade.listByIds(tenantId, ids);
-        if (Objects.isNull(profiles) || profiles.isEmpty()) {
-            return AgenticToolResult.empty("No profiles found for IDs: " + ids, List.of());
-        }
-        return AgenticToolResult.ok("Profiles loaded", profiles);
+    public Mono<AgenticToolResult<List<FacadeProfileBO>>> lookupProfilesByIdsReactive(List<Long> profileIds, ToolContext context) {
+        return Mono.defer(() -> {
+            Long tenantId = AgenticToolContextUtil.requireTenantId(context);
+            ProfileFacade facade = profileFacade.orElse(null);
+            if (facade == null) return Mono.just(AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE));
+            List<Long> ids = AgenticToolUtil.normalizeIds(profileIds);
+            if (ids.isEmpty()) return Mono.just(AgenticToolResult.invalid("No valid profile IDs provided."));
+            return facade.listByIdsReactive(tenantId, ids).collectList().map(values -> values.isEmpty()
+                    ? AgenticToolResult.empty("No profiles found for IDs: " + ids, List.of())
+                    : AgenticToolResult.ok("Profiles loaded", values));
+        });
     }
 
-    /**
-     * Return the matching profiles.
-     *
-     * @param profileName profile name
-     * @param profileCode profile code
-     * @param profileType profile type
-     * @param page        page
-     * @param size        size
-     * @param toolContext tool context
-     * @return search profiles result
-     */
-    @Tool(description = "Search profiles/templates with optional filters. profileType accepts system, driver, user, or their enum names.")
-    @AgenticToolMetadata(domain = "profile", title = "Search profiles")
-    public AgenticToolResult<FacadePage<FacadeProfileBO>> searchProfiles(
-            @ToolParam(description = "Profile/template name filter (partial match), or null to skip") String profileName,
-            @ToolParam(description = "Profile/template code filter, or null to skip") String profileCode,
-            @ToolParam(description = "Profile type filter: system, driver, user, SYSTEM, DRIVER, USER, or null to skip") String profileType,
-            @ToolParam(description = "Page number (1-based)") int page,
-            @ToolParam(description = "Page size") int size,
-            ToolContext toolContext) {
-        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        log.debug(
-                "Agentic tool invoked, tool={}, tenantId={}, profileName={}, profileCode={}, profileType={}, page={}, size={}",
-                "searchProfiles", tenantId, profileName, profileCode, profileType, page, size);
-        ProfileFacade facade = profileFacade.orElse(null);
-        if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE);
-        }
-
-        FacadeProfileQuery query = new FacadeProfileQuery();
-        query.setTenantId(tenantId);
-        query.setProfileName(profileName);
-        query.setProfileCode(profileCode);
-        query.setProfileTypeFlag(parseProfileType(profileType));
-        query.setPage(AgenticToolUtil.page(page, size));
-        FacadePage<FacadeProfileBO> result = facade.listByPage(query);
-        if (!AgenticToolUtil.hasRecords(result)) {
-            return AgenticToolResult.empty("No profiles found.", result);
-        }
-        return AgenticToolResult.ok("Profile page loaded", result);
+    public Mono<AgenticToolResult<OffsetPage<FacadeProfileBO>>> searchProfilesReactive(String profileName,
+                                                                                          String profileCode,
+                                                                                          String profileType,
+                                                                                          long offset, int limit,
+                                                                                          ToolContext context) {
+        return Mono.defer(() -> {
+            Long tenantId = AgenticToolContextUtil.requireTenantId(context);
+            ProfileFacade facade = profileFacade.orElse(null);
+            if (facade == null) return Mono.just(AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE));
+            if (offset < 0) return Mono.just(AgenticToolResult.invalid("Offset must be non-negative."));
+            if (limit < 1 || limit > 200) return Mono.just(AgenticToolResult.invalid("Limit must be between 1 and 200."));
+            return facade.listReactive(new FacadeProfileOffsetQuery(tenantId, profileName, profileCode, null,
+                            parseProfileType(profileType), null, null, null, null, null, offset,
+                            limit, List.of()))
+                    .map(page -> page.items().isEmpty() ? AgenticToolResult.empty("No profiles found.", page)
+                            : AgenticToolResult.ok("Profile page loaded", page));
+        });
     }
 
-    /**
-     * Return the matching profiles by device identifier.
-     *
-     * @param deviceId    device identifier
-     * @param toolContext tool context
-     * @return list profiles by device identifier result
-     */
-    @Tool(description = "List profiles/templates bound to a specific device ID.")
-    @AgenticToolMetadata(domain = "profile", title = "List profiles by device")
-    public AgenticToolResult<List<FacadeProfileBO>> listProfilesByDeviceId(
-            @ToolParam(description = "The device ID") Long deviceId,
-            ToolContext toolContext) {
-        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}", "listProfilesByDeviceId", tenantId,
-                deviceId);
-        ProfileFacade facade = profileFacade.orElse(null);
-        if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE);
-        }
-        List<FacadeProfileBO> profiles = facade.listByDeviceId(tenantId, deviceId);
-        if (Objects.isNull(profiles) || profiles.isEmpty()) {
-            return AgenticToolResult.empty("No profiles found for device ID: " + deviceId, List.of());
-        }
-        return AgenticToolResult.ok("Profiles loaded for device " + deviceId, profiles);
+    public Mono<AgenticToolResult<OffsetPage<FacadeProfileBO>>> listProfilesByDeviceIdReactive(Long deviceId,
+                                                                                                 long offset, int limit,
+                                                                                                 ToolContext context) {
+        return Mono.defer(() -> {
+            Long tenantId = AgenticToolContextUtil.requireTenantId(context);
+            ProfileFacade facade = profileFacade.orElse(null);
+            if (facade == null) return Mono.just(AgenticToolResult.unavailable(AgenticConstant.ToolMessage.PROFILE_UNAVAILABLE));
+            if (deviceId == null || deviceId <= 0) return Mono.just(AgenticToolResult.invalid("Device ID must be positive."));
+            if (offset < 0) return Mono.just(AgenticToolResult.invalid("Offset must be non-negative."));
+            if (limit < 1 || limit > 200) return Mono.just(AgenticToolResult.invalid("Limit must be between 1 and 200."));
+            return facade.listReactive(new FacadeProfileOffsetQuery(tenantId, null, null, null, null, null,
+                            null, null, null, deviceId, offset, limit, List.of()))
+                    .map(page -> page.items().isEmpty() ? AgenticToolResult.empty("No profiles found for device ID: " + deviceId, page)
+                            : AgenticToolResult.ok("Profile page loaded for device " + deviceId, page));
+        });
     }
 
-    /**
-     * Parse a profile type from a free-form string by trying, in order, index (byte),
-     * code, then name. Returns null when the value is blank or matches none.
-     *
-     * @param value the raw profile type value from the tool call
-     * @return the resolved profile type, or null
-     */
     private ProfileTypeEnum parseProfileType(String value) {
-        if (StringUtils.isBlank(value)) {
-            return null;
-        }
+        if (StringUtils.isBlank(value)) return null;
         String trimmed = value.trim();
         try {
             return ProfileTypeEnum.ofIndex(Byte.valueOf(trimmed));
         } catch (NumberFormatException ignored) {
-            // Continue with code/name lookup.
+            ProfileTypeEnum byCode = ProfileTypeEnum.ofCode(trimmed.toLowerCase());
+            return byCode == null ? ProfileTypeEnum.ofName(trimmed.toUpperCase()) : byCode;
         }
-        ProfileTypeEnum byCode = ProfileTypeEnum.ofCode(trimmed.toLowerCase());
-        return Objects.nonNull(byCode) ? byCode : ProfileTypeEnum.ofName(trimmed.toUpperCase());
     }
-
 }

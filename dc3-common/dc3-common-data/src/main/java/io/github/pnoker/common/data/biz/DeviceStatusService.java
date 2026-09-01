@@ -1,51 +1,14 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.data.biz;
 
-import io.github.pnoker.common.data.entity.query.DeviceQuery;
+import io.github.pnoker.common.facade.entity.query.FacadeDeviceOffsetQuery;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-/**
- * Business service for device status operations.
- *
- * @author pnoker
- * @since 2016.10.1
- */
+/** Reactive business service for tenant-scoped device status. */
 public interface DeviceStatusService {
 
-    /**
-     * Paged query of device status, used in conjunction with paged query of devices
-     *
-     * @param deviceQuery DeviceQuery, including pagination parameters
-     * @return Map Long:String, where Long is the device ID and String is the device
-     * status
-     */
-    Map<String, String> getStatusByPage(DeviceQuery deviceQuery);
+    Mono<Map<String, String>> list(FacadeDeviceOffsetQuery query);
 
-    /**
-     * Query device status by profile ID
-     *
-     * @param tenantId  Tenant ID
-     * @param profileId Profile ID
-     * @return Map Long:String, where Long is the device ID and String is the device
-     * status
-     */
-    Map<String, String> listByProfileId(Long tenantId, Long profileId);
-
+    Mono<Map<String, String>> listByProfileId(Long tenantId, Long profileId);
 }

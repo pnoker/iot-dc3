@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
-import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.agentic.service.ActionService;
@@ -26,6 +25,7 @@ import io.github.pnoker.common.agentic.utils.AgenticVisualizationUtil;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.facade.api.PointCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
@@ -33,9 +33,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.tool.annotation.Tool;
-import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,76 +58,59 @@ public class PointValueTool {
 
     private final ActionService actionService;
 
-    /**
-     * Return latest point value.
-     *
-     * @param deviceId    device identifier
-     * @param pointId     point identifier
-     * @param toolContext tool context
-     * @return get latest point value result
-     */
-    @Tool(description = "Get the latest point value for a specific device and point. Returns the current value.")
-    @AgenticToolMetadata(domain = "point-value", title = "Get latest point value")
-    public AgenticToolResult<FacadePointValueBO> getLatestPointValue(
-            @ToolParam(description = "The device ID") Long deviceId,
-            @ToolParam(description = "The point (metric) ID") Long pointId,
-            ToolContext toolContext) {
-        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "getLatestPointValue",
-                tenantId, deviceId, pointId);
-        try {
-            FacadePointValueBO value = pointValueFacade.lastValue(tenantId, deviceId, pointId);
-            if (Objects.isNull(value)) {
-                return AgenticToolResult.empty("No latest value found for device " + deviceId + " point " + pointId,
-                        null);
+    /** Reactive latest-value lookup for the non-blocking tool registry. */
+    public Mono<AgenticToolResult<FacadePointValueBO>> getLatestPointValueReactive(
+            Long deviceId, Long pointId, ToolContext toolContext) {
+        return Mono.defer(() -> {
+            Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
+            if (deviceId == null || pointId == null) {
+                return Mono.just(AgenticToolResult.invalid("Device ID and point ID are required."));
             }
-            return AgenticToolResult.ok("Latest point value loaded", value);
-        } catch (Exception e) {
-            log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "getLatestPointValue",
-                    tenantId, deviceId, pointId, e);
-            return AgenticToolResult.error("Error retrieving latest value: " + e.getMessage());
-        }
+            log.debug("Agentic reactive tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}",
+                    "getLatestPointValue", tenantId, deviceId, pointId);
+            return pointValueFacade.lastValue(tenantId, deviceId, pointId)
+                    .map(value -> AgenticToolResult.ok("Latest point value loaded", value))
+                    .defaultIfEmpty(AgenticToolResult.empty(
+                            "No latest value found for device " + deviceId + " point " + pointId, null))
+                    .onErrorResume(error -> {
+                        log.warn("Agentic reactive tool failed, tool={}, tenantId={}, deviceId={}, pointId={}",
+                                "getLatestPointValue", tenantId, deviceId, pointId, error);
+                        return Mono.just(AgenticToolResult.error("Error retrieving latest value: " + error.getMessage()));
+                    });
+        });
     }
 
-    /**
-     * Return point value history.
-     *
-     * @param deviceId    device identifier
-     * @param pointId     point identifier
-     * @param count       count
-     * @param toolContext tool context
-     * @return get point value history result
-     */
-    @Tool(description = "Get historical point values for a specific device and point. Returns raw values and chart-ready numeric points as structured data.")
-    @AgenticToolMetadata(domain = "point-value", title = "Get point value history")
-    public AgenticToolResult<PointValueHistory> getPointValueHistory(
-            @ToolParam(description = "The device ID") Long deviceId,
-            @ToolParam(description = "The point (metric) ID") Long pointId,
-            @ToolParam(description = "Number of historical records to retrieve") int count,
-            ToolContext toolContext) {
-        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
-                "getPointValueHistory", tenantId, deviceId, pointId, count);
-        int size = AgenticToolUtil.clamp(count, 1, AgenticConstant.ToolLimit.MAX_HISTORY_RECORDS);
-        try {
-            List<FacadePointValueBO> history = pointValueFacade.history(tenantId, deviceId, pointId, size);
-            if (AgenticToolUtil.isEmpty(history)) {
-                return AgenticToolResult.empty("No history data found for device " + deviceId + " point " + pointId,
-                        new PointValueHistory(deviceId, pointId, size, List.of(), null,
-                                AgenticVisualizationUtil.NumericSummary.empty(0)));
+    /** Reactive history lookup for the non-blocking tool registry. */
+    public Mono<AgenticToolResult<PointValueHistory>> getPointValueHistoryReactive(
+            Long deviceId, Long pointId, int count, ToolContext toolContext) {
+        return Mono.defer(() -> {
+            Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
+            if (deviceId == null || pointId == null) {
+                return Mono.just(AgenticToolResult.invalid("Device ID and point ID are required."));
             }
-            List<String> values = history.stream().map(FacadePointValueBO::getValue).toList();
-            AgenticVisualizationUtil.NumericSeries numericSeries =
-                    AgenticVisualizationUtil.numericSeriesFromNewestFirst(values);
-            PointValueHistory result = new PointValueHistory(deviceId, pointId, size, values,
-                    buildHistoryChart(deviceId, pointId, numericSeries), numericSeries.summary());
-            return AgenticToolResult.ok("Point value history loaded", result,
-                    buildHistoryVisualizations(deviceId, pointId, numericSeries));
-        } catch (Exception e) {
-            log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
-                    "getPointValueHistory", tenantId, deviceId, pointId, size, e);
-            return AgenticToolResult.error("Error retrieving history: " + e.getMessage());
-        }
+            int size = AgenticToolUtil.clamp(count, 1, AgenticConstant.ToolLimit.MAX_HISTORY_RECORDS);
+            return pointValueFacade.history(tenantId, deviceId, pointId, null, size)
+                    .map(history -> {
+                        if (history.items().isEmpty()) {
+                            return AgenticToolResult.empty(
+                                    "No history data found for device " + deviceId + " point " + pointId,
+                                    new PointValueHistory(deviceId, pointId, size, List.of(), null,
+                                            AgenticVisualizationUtil.NumericSummary.empty(0)));
+                        }
+                        List<String> values = history.items().stream().map(FacadePointValueBO::getValue).toList();
+                        AgenticVisualizationUtil.NumericSeries numericSeries =
+                                AgenticVisualizationUtil.numericSeriesFromNewestFirst(values);
+                        PointValueHistory result = new PointValueHistory(deviceId, pointId, size, values,
+                                buildHistoryChart(deviceId, pointId, numericSeries), numericSeries.summary());
+                        return AgenticToolResult.ok("Point value history loaded", result,
+                                buildHistoryVisualizations(deviceId, pointId, numericSeries));
+                    })
+                    .onErrorResume(error -> {
+                        log.warn("Agentic reactive tool failed, tool={}, tenantId={}, deviceId={}, pointId={}, count={}",
+                                "getPointValueHistory", tenantId, deviceId, pointId, size, error);
+                        return Mono.just(AgenticToolResult.error("Error retrieving history: " + error.getMessage()));
+                    });
+        });
     }
 
     /**
@@ -139,27 +121,25 @@ public class PointValueTool {
      * @param toolContext tool context
      * @return read point value result
      */
-    @Tool(description = "Send a read command to a device for a specific point. The driver will read the current value from the physical device.")
-    @AgenticToolMetadata(domain = "point-value", title = "Send point read command")
-    public AgenticToolResult<PointCommandResult> readPointValue(
-            @ToolParam(description = "The device ID") Long deviceId,
-            @ToolParam(description = "The point (metric) ID to read") Long pointId,
+    public Mono<AgenticToolResult<PointCommandResult>> readPointValueReactive(
+            Long deviceId, Long pointId,
             ToolContext toolContext) {
-        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "readPointValue", tenantId,
-                deviceId, pointId);
-        try {
-            boolean success = pointCommandFacade.submitRead(tenantId, deviceId, pointId);
-            PointCommandResult result = new PointCommandResult(deviceId, pointId, null, success, false, null);
-            if (success) {
-                return AgenticToolResult.ok("Read command sent", result);
+        return Mono.defer(() -> {
+            Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
+            if (deviceId == null || pointId == null) {
+                return Mono.just(AgenticToolResult.invalid("Device ID and point ID are required."));
             }
-            return AgenticToolResult.error("Read command failed for device " + deviceId + " point " + pointId);
-        } catch (Exception e) {
-            log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "readPointValue", tenantId,
-                    deviceId, pointId, e);
-            return AgenticToolResult.error("Error sending read command: " + e.getMessage());
-        }
+            log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}", "readPointValue", tenantId,
+                    deviceId, pointId);
+            return pointCommandFacade.submitRead(tenantId, deviceId, pointId, PointCommandSourceEnum.AGENTIC)
+                    .map(commandId -> AgenticToolResult.ok("Read command accepted",
+                            new PointCommandResult(deviceId, pointId, commandId, true, false, null)))
+                    .onErrorResume(error -> {
+                        log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "readPointValue",
+                                tenantId, deviceId, pointId, error);
+                        return Mono.just(AgenticToolResult.error("Error sending read command: " + error.getMessage()));
+                    });
+        });
     }
 
     /**
@@ -171,34 +151,29 @@ public class PointValueTool {
      * @param toolContext tool context
      * @return write point value result
      */
-    @Tool(description = "Prepare a point write command for a specific device and point. This tool never writes directly; it creates a pending action that requires explicit user confirmation before execution.")
-    @AgenticToolMetadata(domain = "point-value", title = "Prepare point write command")
-    public AgenticToolResult<PointCommandResult> writePointValue(
-            @ToolParam(description = "The device ID") Long deviceId,
-            @ToolParam(description = "The point (metric) ID to write") Long pointId,
-            @ToolParam(description = "The value to write (as a string)") String value,
+    public Mono<AgenticToolResult<PointCommandResult>> writePointValueReactive(Long deviceId, Long pointId, String value,
             ToolContext toolContext) {
-        Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, valueLength={}",
-                "writePointValue", tenantId, deviceId, pointId, Objects.isNull(value) ? 0 : value.length());
-        try {
+        return Mono.defer(() -> {
+            Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
+            log.debug("Agentic tool invoked, tool={}, tenantId={}, deviceId={}, pointId={}, valueLength={}",
+                    "writePointValue", tenantId, deviceId, pointId, Objects.isNull(value) ? 0 : value.length());
             if (Objects.isNull(deviceId) || Objects.isNull(pointId)) {
-                return AgenticToolResult.invalid("Device ID and point ID are required for point write commands.");
+                return Mono.just(AgenticToolResult.invalid("Device ID and point ID are required for point write commands."));
             }
             if (StringUtils.isBlank(value)) {
-                return AgenticToolResult.invalid("Point write value is required.");
+                return Mono.just(AgenticToolResult.invalid("Point write value is required."));
             }
             RequestHeader.PrincipalHeader header = AgenticToolContextUtil.requirePrincipalHeader(toolContext);
             String conversationId = AgenticToolContextUtil.requireConversationId(toolContext);
-            String actionId = actionService.createWritePointValueAction(conversationId, deviceId, pointId, value,
-                    header);
-            return AgenticToolResult.ok("Write command is pending user confirmation",
-                    new PointCommandResult(deviceId, pointId, value, false, true, actionId));
-        } catch (Exception e) {
-            log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "writePointValue", tenantId,
-                    deviceId, pointId, e);
-            return AgenticToolResult.error("Error preparing write command: " + e.getMessage());
-        }
+            return actionService.createWritePointValueAction(conversationId, deviceId, pointId, value, header)
+                    .map(actionId -> AgenticToolResult.ok("Write command is pending user confirmation",
+                            new PointCommandResult(deviceId, pointId, value, false, true, actionId)))
+                    .onErrorResume(error -> {
+                        log.warn("Agentic tool failed, tool={}, tenantId={}, deviceId={}, pointId={}", "writePointValue",
+                                tenantId, deviceId, pointId, error);
+                        return Mono.just(AgenticToolResult.error("Error preparing write command: " + error.getMessage()));
+                    });
+        });
     }
 
     /**

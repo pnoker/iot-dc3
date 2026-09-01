@@ -19,7 +19,7 @@ facade BOs. Beans are registered by `LocalFacadeManagerAutoConfiguration`.
 
 ## Activation
 
-Active when the in-process facade mode is selected (`dc3.facade.mode=local`) and `dc3-common-manager` is on the
+Active when the manager-domain in-process mode is selected (`dc3.facade.manager.mode=local`) and `dc3-common-manager` is on the
 classpath.
 
 ## Dependencies

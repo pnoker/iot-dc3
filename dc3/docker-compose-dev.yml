@@ -28,20 +28,9 @@ x-app-runtime-env: &app-runtime-env
   # Internal async-plane broker selection (docs/mq-brokers.md); rabbitmq is the default
   DC3_MQ_TYPE: "${DC3_MQ_TYPE:-rabbitmq}"
   # Relational dialect selection (docs/db-dialects.md); postgres is the default
-  DC3_DB_TYPE: "${DC3_DB_TYPE:-postgres}"
-  # Time-series store selection (docs/design/tsdb-abstraction.md); timescale is the default
-  DC3_TSDB_TYPE: "${DC3_TSDB_TYPE:-timescale}"
-  # Non-timescale adapter connection settings (only used when DC3_TSDB_TYPE matches)
-  DC3_TSDB_TDENGINE_URL: "${DC3_TSDB_TDENGINE_URL:-jdbc:TAOS-RS://dc3-tdengine:6041/}"
-  DC3_TSDB_INFLUXDB_URL: "${DC3_TSDB_INFLUXDB_URL:-http://dc3-influxdb:8181}"
-  DC3_TSDB_INFLUXDB_TOKEN: "${DC3_TSDB_INFLUXDB_TOKEN:-}"
-  DC3_TSDB_IOTDB_HOST: "${DC3_TSDB_IOTDB_HOST:-dc3-iotdb}"
-  DC3_TSDB_IOTDB_PORT: "${DC3_TSDB_IOTDB_PORT:-6667}"
   # Non-rabbitmq adapter connection settings (only used when DC3_MQ_TYPE matches)
   DC3_MQ_KAFKA_BOOTSTRAP: "${DC3_MQ_KAFKA_BOOTSTRAP:-kafka:9092}"
-  DC3_MQ_ROCKETMQ_NAMESRV: "${DC3_MQ_ROCKETMQ_NAMESRV:-rocketmq-namesrv:9876}"
   DC3_MQ_PULSAR_URL: "${DC3_MQ_PULSAR_URL:-pulsar://pulsar:6650}"
-  DC3_MQ_ACTIVEMQ_URL: "${DC3_MQ_ACTIVEMQ_URL:-tcp://activemq:61616}"
   DC3_MQ_MQTT_HOST: "${DC3_MQ_MQTT_HOST:-dc3-rabbitmq}"
   DC3_MQ_MQTT_PORT: "${DC3_MQ_MQTT_PORT:-1883}"
   AUTH_HMAC_SECRET: ${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
@@ -50,6 +39,9 @@ x-app-runtime-env: &app-runtime-env
   POSTGRES_USERNAME: ${POSTGRES_USERNAME:-dc3}
   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dc3dc3dc3}
   POSTGRES_DB: ${POSTGRES_DB:-dc3}
+  DC3_R2DBC_URL: "${DC3_R2DBC_URL:-r2dbc:postgresql://dc3-postgres:5432/dc3}"
+  DC3_SCHEMA_FINGERPRINT: "${DC3_SCHEMA_FINGERPRINT:-c0f7f2264a1169469d44dc2e72dd439477a0f1f4a3369002e0a0572a386c96fa}"
+  DC3_SCHEMA_CONTRACT: "${DC3_SCHEMA_CONTRACT:-r2dbc-flag-day-v1}"
   RABBITMQ_VIRTUAL_HOST: ${RABBITMQ_VIRTUAL_HOST:-dc3}
   RABBITMQ_HOST: dc3-rabbitmq
   RABBITMQ_PORT: "${RABBITMQ_CONTAINER_PORT:-5672}"
@@ -1087,4 +1079,3 @@ volumes:
 networks:
   dc3net:
     driver: bridge
-

@@ -23,7 +23,7 @@ import {mountListPage} from './_helpers';
 const apiMocks = vi.hoisted(() => ({
   listApi: vi.fn(() =>
     Promise.resolve({
-      data: {records: [{id: 'api-1', apiName: '/api/v3/manager/device/list', enableFlag: 'ENABLE'}], total: 1},
+      data: {items: [{id: 'api-1', apiName: '/api/v3/manager/device/list', enableFlag: 'ENABLE'}], total: 1},
     })
   ),
 }));
@@ -53,7 +53,7 @@ describe('SettingsApi view', () => {
 
     expect(apiMocks.listApi).toHaveBeenCalledTimes(1);
     expect(apiMocks.listApi).toHaveBeenCalledWith(
-      expect.objectContaining({page: expect.objectContaining({current: 1, size: 12})})
+      expect.objectContaining({offset: 0, limit: 12})
     );
   });
 });

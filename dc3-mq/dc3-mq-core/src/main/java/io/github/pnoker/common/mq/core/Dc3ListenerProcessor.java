@@ -17,10 +17,10 @@
 
 package io.github.pnoker.common.mq.core;
 
-import io.github.pnoker.common.constant.common.RequestIdConstant;
 import io.github.pnoker.common.constant.mq.DeliveryMode;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
 import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireMqDelivery;
@@ -28,15 +28,16 @@ import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.env.Environment;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -46,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Processes {@link Dc3Listener @Dc3Listener} methods after all singletons exist and
@@ -59,7 +61,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2026.8.19
  */
 @Slf4j
-@RequiredArgsConstructor
 public class Dc3ListenerProcessor implements SmartInitializingSingleton, ApplicationContextAware {
 
     private final BrokerAdapter adapter;
@@ -68,6 +69,11 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
      */
     private final Map<Class<?>, List<Method>> listenerMethodCache = new ConcurrentHashMap<>();
     private ApplicationContext applicationContext;
+
+    public Dc3ListenerProcessor(BrokerAdapter adapter) {
+        this.adapter = adapter;
+        MqContextPropagation.initialize();
+    }
 
     private static String firstRequestId(WireMqDelivery delivery) {
         return Objects.nonNull(delivery.headers()) ? delivery.headers().get(MqHeaders.REQUEST_ID) : null;
@@ -156,48 +162,100 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
 
     @SuppressWarnings("unchecked")
     private RawDeliveryListener deliveryBridge(Object bean, Method method, Class<?> payloadType) {
-        return delivery -> {
+        return delivery -> Mono.defer(() -> {
             Object payload = EnvelopeCodec.deserialize(delivery, payloadType);
             MqReceived<Object> received = new MqReceived<>(payload, delivery.headers(), delivery.redelivered());
-            invokeWithMdc(bean, method, received, delivery.acknowledgment(), firstRequestId(delivery));
-        };
+            return invokeWithMdc(bean, method, received, firstRequestId(delivery));
+        });
     }
 
     @SuppressWarnings("unchecked")
     private RawBatchListener batchBridge(Object bean, Method method, Class<?> payloadType) {
-        return batch -> {
+        return batch -> Mono.defer(() -> {
             if (batch.isEmpty()) {
-                return;
+                return Mono.just(DeliveryDisposition.ACK);
             }
-            Acknowledgment acknowledgment = batch.get(0).acknowledgment();
             List<MqReceived<Object>> received = new ArrayList<>(batch.size());
             for (WireMqDelivery delivery : batch) {
                 Object payload = EnvelopeCodec.deserialize(delivery, payloadType);
                 received.add(new MqReceived<>(payload, delivery.headers(), delivery.redelivered()));
             }
-            invokeWithMdc(bean, method, received, acknowledgment, firstRequestId(batch.get(0)));
-        };
+            return invokeWithMdc(bean, method, received, firstRequestId(batch.get(0)));
+        });
     }
 
-    private void invokeWithMdc(Object bean, Method method, Object argument, Acknowledgment acknowledgment,
-                               String requestId) {
-        if (Objects.nonNull(requestId)) {
-            MDC.put(RequestIdConstant.MDC_KEY, requestId);
-        }
+    private Mono<DeliveryDisposition> invokeWithMdc(Object bean, Method method, Object argument, String requestId) {
+        Mono<DeliveryDisposition> invocation = Mono.defer(() -> invoke(bean, method, argument));
+        return invocation.contextWrite(context -> Objects.isNull(requestId)
+                ? context.delete(MqContextPropagation.REQUEST_ID_CONTEXT_KEY)
+                : context.put(MqContextPropagation.REQUEST_ID_CONTEXT_KEY, requestId));
+    }
+
+    private Mono<DeliveryDisposition> invoke(Object bean, Method method, Object argument) {
+        DecisionAcknowledgment acknowledgment = new DecisionAcknowledgment();
         try {
-            method.invoke(bean, argument, acknowledgment);
+            Object result = method.invoke(bean, argument, acknowledgment);
+            if (result instanceof Publisher<?> publisher) {
+                return Flux.from(publisher).then()
+                        .then(Mono.fromSupplier(acknowledgment::dispositionOrAck))
+                        .onErrorResume(error -> {
+                            if (error instanceof ConflictingDeliveryDispositionException) {
+                                return Mono.error(error);
+                            }
+                            return acknowledgment.disposition().map(Mono::just)
+                                    .orElseGet(() -> Mono.error(error));
+                        });
+            } else if (result != null) {
+                throw new IllegalStateException("@Dc3Listener method must return void or Publisher: " + method);
+            }
+            return Mono.just(acknowledgment.dispositionOrAck());
         } catch (InvocationTargetException e) {
             Throwable cause = e.getTargetException();
             if (cause instanceof RuntimeException runtimeException) {
-                throw runtimeException;
+                return Mono.error(runtimeException);
             }
-            throw new IllegalStateException("Dc3Listener invocation failed: " + method, cause);
+            return Mono.error(new IllegalStateException("Dc3Listener invocation failed: " + method, cause));
         } catch (IllegalAccessException e) {
-            throw new IllegalStateException("Dc3Listener method not accessible: " + method, e);
-        } finally {
-            if (Objects.nonNull(requestId)) {
-                MDC.remove(RequestIdConstant.MDC_KEY);
+            return Mono.error(new IllegalStateException("Dc3Listener method not accessible: " + method, e));
+        }
+    }
+
+    private static final class DecisionAcknowledgment implements Acknowledgment {
+
+        private final AtomicReference<DeliveryDisposition> disposition = new AtomicReference<>();
+
+        @Override
+        public void ack() {
+            decide(DeliveryDisposition.ACK);
+        }
+
+        @Override
+        public void reject(boolean requeue) {
+            decide(requeue ? DeliveryDisposition.REQUEUE : DeliveryDisposition.DEAD_LETTER);
+        }
+
+        private void decide(DeliveryDisposition selected) {
+            DeliveryDisposition existing = disposition.get();
+            if (Objects.nonNull(existing) && existing != selected) {
+                throw new ConflictingDeliveryDispositionException(existing, selected);
             }
+            disposition.compareAndSet(null, selected);
+        }
+
+        private java.util.Optional<DeliveryDisposition> disposition() {
+            return java.util.Optional.ofNullable(disposition.get());
+        }
+
+        private DeliveryDisposition dispositionOrAck() {
+            return Objects.requireNonNullElse(disposition.get(), DeliveryDisposition.ACK);
+        }
+    }
+
+    private static final class ConflictingDeliveryDispositionException extends IllegalStateException {
+
+        private ConflictingDeliveryDispositionException(DeliveryDisposition existing,
+                                                        DeliveryDisposition selected) {
+            super("Conflicting delivery dispositions: " + existing + " and " + selected);
         }
     }
 }

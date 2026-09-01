@@ -26,6 +26,7 @@ import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -50,24 +51,19 @@ public class DriverAlarmReceiver {
      * @param entityDTO the deserialized driver alarm
      */
     @Dc3Listener(topic = MqTopic.ALARM, keyPattern = "driver.*")
-    public void driverAlarmReceive(MqReceived<DriverAlarmDTO> message, Acknowledgment ack) {
+    public Mono<Void> driverAlarmReceive(MqReceived<DriverAlarmDTO> message, Acknowledgment ack) {
         DriverAlarmDTO entityDTO = message.payload();
-        try {
-            log.debug("Driver alarm received, tenantId={}, driverId={}",
-                    Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
+        log.debug("Driver alarm received, tenantId={}, driverId={}",
+                Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
+                Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
+        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())) {
+            log.warn("Invalid driver alarm, driverId is null, driverId={}",
                     Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
-            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())) {
-                log.warn("Invalid driver alarm, driverId is null, driverId={}",
-                        Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
-                ack.reject(false);
-                return;
-            }
-            driverAlarmService.alarm(entityDTO);
-            ack.ack();
-        } catch (Exception e) {
-            log.error("Driver alarm consume failed.", e);
-            ack.reject(true);
+            ack.reject(false);
+            return Mono.empty();
         }
+        return driverAlarmService.alarm(entityDTO)
+                .doOnError(error -> log.error("Driver alarm processing failed.", error));
     }
 
 }

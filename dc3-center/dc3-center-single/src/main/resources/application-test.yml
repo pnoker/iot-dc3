@@ -17,13 +17,10 @@
 
 # Test environment configuration will overwrite the content configured in application-*.yml
 spring:
-  datasource:
-    dynamic:
-      datasource:
-        master:
-          url: ${DC3_DB_URL:jdbc:postgresql://${POSTGRES_HOST:dc3-postgres}:${POSTGRES_PORT:5432}/${POSTGRES_DB:dc3}?currentSchema=${POSTGRES_SCHEMA:dc3_single}&applicationName=dc3&ssl=false&stringtype=unspecified&clientEncoding=UTF8&serverTimezone=Asia/Shanghai}
-          username: ${POSTGRES_USERNAME:dc3}
-          password: ${POSTGRES_PASSWORD:}
+  r2dbc:
+    url: "${DC3_R2DBC_URL:}"
+    username: ${POSTGRES_USERNAME:dc3}
+    password: ${POSTGRES_PASSWORD:}
   rabbitmq:
     virtual-host: ${RABBITMQ_VIRTUAL_HOST:dc3}
     host: ${RABBITMQ_HOST:dc3-rabbitmq}

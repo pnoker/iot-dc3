@@ -18,12 +18,9 @@ package io.github.pnoker.common.agentic.controller;
 
 import io.github.pnoker.common.agentic.entity.builder.MessageBuilder;
 import io.github.pnoker.common.agentic.entity.vo.MessageVO;
-import io.github.pnoker.common.agentic.service.MessageService;
-import io.github.pnoker.common.agentic.utils.AgenticConversationIdUtil;
+import io.github.pnoker.common.agentic.repository.ReactiveMessageStore;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.common.RequestHeader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -47,14 +44,14 @@ import java.util.List;
  * @since 2016.10.1
  */
 @Tag(name = "message", description = "Agent conversation messages: manage messages exchanged between AI agents and language models within conversation sessions including user prompts and assistant responses")
-@RestController
+@RestController("agenticMessageController")
 @RequestMapping(AgenticConstant.MESSAGE_URL_PREFIX)
 @RequiredArgsConstructor
 public class MessageController implements BaseController {
 
     private final MessageBuilder messageBuilder;
 
-    private final MessageService messageService;
+    private final ReactiveMessageStore messageStore;
 
     /**
      * List the ordered message history of one AI chat session.
@@ -72,20 +69,11 @@ public class MessageController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list")
-    public Mono<R<List<MessageVO>>> list(@Parameter(description = "Client-visible conversation identifier scoped to the current user and tenant; used to retrieve the full message history of one chat session.", example = "conv-20240101-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
-                    conversationId);
-            List<MessageVO> messages = messageBuilder.buildVOListByBOList(messageService.list(scopedConversationId,
-                    header));
-            messages.forEach(message -> sanitize(header, message));
-            return R.ok(messages);
-        }));
-    }
-
-    private void sanitize(RequestHeader.PrincipalHeader header, MessageVO message) {
-        message.setConversationId(AgenticConversationIdUtil.stripScope(header.getTenantId(), header.getUserId(),
-                message.getConversationId()));
+    public Mono<List<MessageVO>> list(@Parameter(description = "Client-visible conversation identifier scoped to the current user and tenant; used to retrieve the full message history of one chat session.", example = "conv-20240101-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
+        return getPrincipalHeader().flatMap(header ->
+                messageStore.list(conversationId, header)
+                    .map(messageBuilder::buildVOByBO)
+                    .collectList());
     }
 
 }

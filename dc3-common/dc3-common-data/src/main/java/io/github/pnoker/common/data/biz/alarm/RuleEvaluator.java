@@ -18,6 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
+import reactor.core.publisher.Mono;
 
 /**
  * Deterministic evaluator for structured alarm rules.
@@ -34,7 +35,7 @@ public interface RuleEvaluator {
      * @param fact fact
      * @return true if matched
      */
-    boolean matches(RuleBO rule, RuleFact fact);
+    Mono<Boolean> matches(RuleBO rule, RuleFact fact);
 
     /**
      * Whether the fact satisfies the recovery condition.
@@ -43,6 +44,6 @@ public interface RuleEvaluator {
      * @param fact fact
      * @return true if recovered
      */
-    boolean recovers(RuleBO rule, RuleFact fact);
+    Mono<Boolean> recovers(RuleBO rule, RuleFact fact);
 
 }

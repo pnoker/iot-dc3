@@ -80,10 +80,10 @@ const form = ref<McpConnectionForm>({});
 const loadOptions = async () => {
   const [clientRes, principalRes] = await Promise.all([
     listMcpClient(),
-    listPrincipal({page: {current: 1, size: 1000}}),
+    listPrincipal({offset: 0, limit: 200}),
   ]);
-  clients.value = clientRes.data || [];
-  principalOptions.value = (((principalRes as any)?.data?.records || []) as any[]).map((p) => ({
+  clients.value = clientRes || [];
+  principalOptions.value = (((principalRes as any)?.data?.items || []) as any[]).map((p) => ({
     label: p.displayName || p.principalName || String(p.id),
     value: String(p.id),
   }));

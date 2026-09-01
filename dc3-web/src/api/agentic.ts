@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {httpDelete, httpGet, httpPost} from '@/api/common';
 import {API_AGENTIC_BASE} from '@/config/constant/api';
 import {AUTH_HEADERS} from '@/config/constant/common';
 import type {
@@ -57,35 +57,35 @@ interface OpenAIChunk {
   }>;
 }
 
-export const listAgenticModels = () => httpGet<R<AgenticModel[]>>(`${API_AGENTIC_BASE}/model/list`);
+export const listAgenticModels = () => httpGet<AgenticModel[]>(`${API_AGENTIC_BASE}/model/list`);
 
-export const listAgenticModelConfigs = () => httpGet<R<AgenticModelConfig[]>>(`${API_AGENTIC_BASE}/model/config/list`);
+export const listAgenticModelConfigs = () => httpGet<AgenticModelConfig[]>(`${API_AGENTIC_BASE}/model/config/list`);
 
 export const addAgenticModelConfig = (data: AgenticModelConfig) =>
-  httpPost<R<AgenticModelConfig>>(`${API_AGENTIC_BASE}/model/config/add`, data);
+  httpPost<AgenticModelConfig>(`${API_AGENTIC_BASE}/model/config/add`, data);
 
 export const updateAgenticModelConfig = (data: AgenticModelConfig) =>
-  httpPost<R<AgenticModelConfig>>(`${API_AGENTIC_BASE}/model/config/update`, data);
+  httpPost<AgenticModelConfig>(`${API_AGENTIC_BASE}/model/config/update`, data);
 
 export const deleteAgenticModelConfig = (id: string) =>
-  httpPost<R<boolean>>(`${API_AGENTIC_BASE}/model/config/delete`, undefined, {params: {id}});
+  httpDelete<void>(`${API_AGENTIC_BASE}/model/config/delete`, {params: {id}});
 
-export const listAgenticProviders = () => httpGet<R<AgenticProvider[]>>(`${API_AGENTIC_BASE}/provider/list`);
+export const listAgenticProviders = () => httpGet<AgenticProvider[]>(`${API_AGENTIC_BASE}/provider/list`);
 
 export const addAgenticProvider = (data: AgenticProvider) =>
-  httpPost<R<AgenticProvider>>(`${API_AGENTIC_BASE}/provider/config/add`, data);
+  httpPost<AgenticProvider>(`${API_AGENTIC_BASE}/provider/config/add`, data);
 
 export const updateAgenticProvider = (data: AgenticProvider) =>
-  httpPost<R<AgenticProvider>>(`${API_AGENTIC_BASE}/provider/config/update`, data);
+  httpPost<AgenticProvider>(`${API_AGENTIC_BASE}/provider/config/update`, data);
 
 export const deleteAgenticProvider = (id: string) =>
-  httpPost<R<boolean>>(`${API_AGENTIC_BASE}/provider/config/delete`, undefined, {params: {id}});
+  httpDelete<void>(`${API_AGENTIC_BASE}/provider/config/delete`, {params: {id}});
 
 export const listAgenticSessions = (query?: PageQuery) =>
-  httpPost<R<PageResult<AgenticSession>>>(`${API_AGENTIC_BASE}/session/list`, query ?? {});
+  httpPost<PageResult<AgenticSession>>(`${API_AGENTIC_BASE}/session/list`, query ?? {});
 
 export const deleteAgenticSession = (conversationId: string) =>
-  httpPost<R<boolean>>(`${API_AGENTIC_BASE}/session/delete`, undefined, {
+  httpDelete<void>(`${API_AGENTIC_BASE}/session/delete`, {
     params: {conversation_id: conversationId},
   });
 
@@ -93,17 +93,17 @@ export const updateAgenticSession = (
   conversationId: string,
   data: Partial<Pick<AgenticSession, 'title' | 'sessionExt'>>
 ) =>
-  httpPost<R<AgenticSession>>(`${API_AGENTIC_BASE}/session/update`, data, {
+  httpPost<AgenticSession>(`${API_AGENTIC_BASE}/session/update`, data, {
     params: {conversation_id: conversationId},
   });
 
 export const listAgenticMessages = (conversationId: string) =>
-  httpGet<R<AgenticMessage[]>>(`${API_AGENTIC_BASE}/message/list`, {params: {conversation_id: conversationId}});
+  httpGet<AgenticMessage[]>(`${API_AGENTIC_BASE}/message/list`, {params: {conversation_id: conversationId}});
 
 export const uploadAgenticAttachment = (conversationId: string, file: File) => {
   const data = new FormData();
   data.append('file', file);
-  return httpPost<R<AgenticAttachment>>(`${API_AGENTIC_BASE}/attachment/upload`, data, {
+  return httpPost<AgenticAttachment>(`${API_AGENTIC_BASE}/attachment/upload`, data, {
     params: {conversation_id: conversationId},
     timeout: 0,
     headers: {'Content-Type': 'multipart/form-data'},
@@ -111,18 +111,20 @@ export const uploadAgenticAttachment = (conversationId: string, file: File) => {
 };
 
 export const listAgenticAttachments = (conversationId: string) =>
-  httpGet<R<AgenticAttachment[]>>(`${API_AGENTIC_BASE}/attachment/list`, {
+  httpGet<AgenticAttachment[]>(`${API_AGENTIC_BASE}/attachment/list`, {
     params: {conversation_id: conversationId},
   });
 
-export const listPendingAgenticActions = (conversationId: string) =>
-  httpGet<R<AgenticAction[]>>(`${API_AGENTIC_BASE}/action/pending`, {params: {conversation_id: conversationId}});
+export const listPendingAgenticActions = (conversationId: string, query?: Pick<PageQuery, 'offset' | 'limit'>) =>
+  httpGet<PageResult<AgenticAction>>(`${API_AGENTIC_BASE}/action/pending`, {
+    params: {conversation_id: conversationId, ...(query ?? {})},
+  });
 
 export const confirmAgenticAction = (actionId: string) =>
-  httpPost<R<AgenticAction>>(`${API_AGENTIC_BASE}/action/confirm`, undefined, {params: {action_id: actionId}});
+  httpPost<AgenticAction>(`${API_AGENTIC_BASE}/action/confirm`, undefined, {params: {action_id: actionId}});
 
 export const rejectAgenticAction = (actionId: string) =>
-  httpPost<R<AgenticAction>>(`${API_AGENTIC_BASE}/action/reject`, undefined, {params: {action_id: actionId}});
+  httpPost<AgenticAction>(`${API_AGENTIC_BASE}/action/reject`, undefined, {params: {action_id: actionId}});
 
 export const streamAgenticChatCompletion = async (
   data: AgenticChatCompletionRequest,

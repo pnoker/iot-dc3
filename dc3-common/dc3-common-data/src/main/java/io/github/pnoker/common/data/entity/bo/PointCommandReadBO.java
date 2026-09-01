@@ -17,11 +17,10 @@
 
 package io.github.pnoker.common.data.entity.bo;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
 
 /**
  * Business object for submitting a point read command.
@@ -32,9 +31,21 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
-@AllArgsConstructor
 public class PointCommandReadBO {
+
+    public PointCommandReadBO() {
+    }
+
+    public PointCommandReadBO(Long deviceId, Long pointId, String commandId) {
+        this(deviceId, pointId, commandId, null);
+    }
+
+    public PointCommandReadBO(Long deviceId, Long pointId, String commandId, PointCommandSourceEnum source) {
+        this.deviceId = deviceId;
+        this.pointId = pointId;
+        this.commandId = commandId;
+        this.source = source;
+    }
 
     /**
      * Device ID to read the point value from
@@ -50,5 +61,7 @@ public class PointCommandReadBO {
      * Optional pre-generated command ID for idempotent submission
      */
     private String commandId;
+
+    private PointCommandSourceEnum source;
 
 }

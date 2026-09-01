@@ -101,7 +101,7 @@ export const useMenuStore = defineStore('menu', {
       this.loading = true;
       try {
         const res: any = await listMenuTree({});
-        this.tree = Array.isArray(res?.data) ? res.data : [];
+        this.tree = Array.isArray(res) ? res : [];
         this.loaded = true;
       } catch {
         this.tree = [];

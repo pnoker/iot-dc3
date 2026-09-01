@@ -40,7 +40,7 @@
             <el-empty :description="$t('driver.empty')"/>
           </el-col>
           <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-            <driver-card :data="data" :status-table="statusTable"/>
+            <driver-card :data="data" :status-table="statusTable" @delete="onDelete"/>
           </el-col>
         </template>
       </el-row>
@@ -51,10 +51,11 @@
 <script lang="ts" setup>
 import {reactive, watch} from 'vue';
 
-import {listDriver, listDriverStatus} from '@/api/driver';
+import {deleteDriver, listDriver, listDriverStatus} from '@/api/driver';
 import {usePagedList} from '@/composables/usePagedList';
 
 import type {DriverRecord} from '@/config/types/manager';
+import {successMessage} from '@/utils/notificationUtil';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
@@ -86,10 +87,19 @@ const reset = () => {
 
 const refresh = () => load();
 
+const onDelete = (driver: DriverRecord, done: () => void) => {
+  deleteDriver(driver.id, driver.version)
+    .then(() => {
+      successMessage();
+      load();
+    })
+    .finally(done);
+};
+
 const loadStatus = () => {
   listDriverStatus({page: reactiveData.page, ...(reactiveData.query as Record<string, unknown>)})
     .then((res) => {
-      Object.assign(statusTable, res.data as Record<string, string>);
+      Object.assign(statusTable, res as Record<string, string>);
     })
     .catch(() => {
       // handled globally

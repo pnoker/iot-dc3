@@ -106,8 +106,8 @@
         />
         <el-table-column :label="$t('settings.event.alarmType')" width="110">
           <template #default="{row}">
-            <el-tag :type="alarmTypeTag(row.eventTypeFlag)" size="small">
-              {{ alarmTypeLabel(row.eventTypeFlag) }}
+            <el-tag :type="alarmTypeTag(row.alarmTypeFlag)" size="small">
+              {{ alarmTypeLabel(row.alarmTypeFlag) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -196,7 +196,7 @@ interface Row {
   source: 'point' | 'device' | 'driver';
   sourceId: string;
   pointId: string;
-  eventTypeFlag: number;
+  alarmTypeFlag: number;
   alarmLevelFlag?: number;
   confirmFlag: string;
   createTime: string;
@@ -268,14 +268,14 @@ const load = async () => {
   try {
     const res: any = await alertPage({
       source: props.source,
-      eventTypeFlag: formData.alarmTypeFlag === '' ? null : Number(formData.alarmTypeFlag),
+      alarmTypeFlag: formData.alarmTypeFlag === '' ? null : Number(formData.alarmTypeFlag),
       confirmFlag: formData.confirmFlag === '' ? null : Number(formData.confirmFlag),
       rangeKey: formData.rangeKey || null,
-      current: page.current,
-      size: page.size,
+      offset: (page.current - 1) * page.size,
+      limit: page.size,
     });
-    const data = res?.data ?? {};
-    rows.value = data.records ?? [];
+    const data = res ?? {};
+    rows.value = data.items ?? [];
     page.total = Number(data.total ?? 0);
     await resolveNames(rows.value);
   } catch {
@@ -298,7 +298,7 @@ const resolveNames = async (batch: Row[]) => {
     } else {
       res = await listDriverByIds(ids);
     }
-    const data = res?.data || {};
+    const data = res || {};
     for (const id of ids) {
       const item = data[id];
       if (item) {

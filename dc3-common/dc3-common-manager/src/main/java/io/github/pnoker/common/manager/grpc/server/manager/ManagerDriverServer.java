@@ -17,34 +17,24 @@
 
 package io.github.pnoker.common.manager.grpc.server.manager;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.manager.DriverApiGrpc;
 import io.github.pnoker.api.center.manager.GrpcDeviceQuery;
 import io.github.pnoker.api.center.manager.GrpcDriverIdsQuery;
-import io.github.pnoker.api.center.manager.GrpcPageDriverDTO;
-import io.github.pnoker.api.center.manager.GrpcPageDriverQuery;
-import io.github.pnoker.api.center.manager.GrpcRDriverDTO;
-import io.github.pnoker.api.center.manager.GrpcRDriverListDTO;
-import io.github.pnoker.api.center.manager.GrpcRPageDriverDTO;
-import io.github.pnoker.api.common.GrpcDriverDTO;
+import io.github.pnoker.api.center.manager.GrpcDriverListDTO;
 import io.github.pnoker.api.common.GrpcDriverQuery;
-import io.github.pnoker.api.common.GrpcPage;
-import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.manager.entity.bo.DriverBO;
-import io.github.pnoker.common.manager.entity.query.DriverQuery;
+import io.github.pnoker.common.manager.grpc.GrpcPageUtil;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
-import io.github.pnoker.common.manager.service.DriverService;
-import io.github.pnoker.common.tenant.TenantContextHolder;
+import io.github.pnoker.common.manager.service.ReactiveDriverService;
+import io.github.pnoker.common.manager.repository.DriverFilter;
+import io.github.pnoker.api.center.manager.GrpcOffsetDriverQuery;
+import io.github.pnoker.api.center.manager.GrpcOffsetPageDriverDTO;
+import io.github.pnoker.api.common.OffsetPage;
 import io.grpc.stub.StreamObserver;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Mono;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * gRPC server handling manager driver facade requests.
@@ -52,134 +42,54 @@ import java.util.Objects;
  * @author pnoker
  * @since 2016.10.1
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
     private final GrpcDriverBuilder grpcDriverBuilder;
 
-    private final DriverService driverService;
+    private final ReactiveDriverService reactiveDriverService;
 
-    @Override
-    public void listByPage(GrpcPageDriverQuery request, StreamObserver<GrpcRPageDriverDTO> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            GrpcRPageDriverDTO.Builder builder = GrpcRPageDriverDTO.newBuilder();
-            GrpcR result;
-
-            DriverQuery query = grpcDriverBuilder.buildQueryByGrpcQuery(request);
-
-            Page<DriverBO> entityPage = driverService.list(query);
-            if (Objects.isNull(entityPage)) {
-                result = GrpcRFactory.notFound();
-            } else {
-                result = GrpcRFactory.ok();
-
-                GrpcPageDriverDTO.Builder pageBuilder = GrpcPageDriverDTO.newBuilder();
-                GrpcPage.Builder page = GrpcPage.newBuilder();
-                page.setCurrent(entityPage.getCurrent());
-                page.setSize(entityPage.getSize());
-                page.setPages(entityPage.getPages());
-                page.setTotal(entityPage.getTotal());
-                pageBuilder.setPage(page);
-
-                List<GrpcDriverDTO> entityGrpcDTOList = entityPage.getRecords()
-                        .stream()
-                        .map(grpcDriverBuilder::buildGrpcDTOByBO)
-                        .toList();
-                pageBuilder.addAllData(entityGrpcDTOList);
-
-                builder.setData(pageBuilder);
-            }
-
-            builder.setResult(result);
-            responseObserver.onNext(builder.build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    @Autowired
+    public ManagerDriverServer(GrpcDriverBuilder builder, ReactiveDriverService service) {
+        this.grpcDriverBuilder = builder;
+        this.reactiveDriverService = service;
     }
 
     @Override
-    public void getByDeviceId(GrpcDeviceQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
-            GrpcR result;
+    public void list(GrpcOffsetDriverQuery request, StreamObserver<GrpcOffsetPageDriverDTO> observer) {
+        ReactiveGrpcServerSupport.subscribe(Mono.fromSupplier(() -> filter(request)).flatMap(reactiveDriverService::list)
+                .map(page -> GrpcOffsetPageDriverDTO.newBuilder().setPage(OffsetPage.newBuilder().setOffset(page.offset()).setLimit(page.limit()).setTotal(page.total()).setHasNext(page.hasNext()))
+                        .addAllItems(page.items().stream().map(grpcDriverBuilder::buildGrpcDTOByBO).toList()).build()), observer);
+    }
 
-            DriverBO entityDO = driverService.getByDeviceId(request.getDeviceId(), null);
-            if (Objects.isNull(entityDO)) {
-                result = GrpcRFactory.notFound();
-            } else {
-                result = GrpcRFactory.ok();
-
-                builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(entityDO));
-            }
-
-            builder.setResult(result);
-            responseObserver.onNext(builder.build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    private DriverFilter filter(GrpcOffsetDriverQuery request) {
+        var page = GrpcPageUtil.require(request.hasPage() ? request.getPage() : null);
+        return new DriverFilter(request.getTenantId(), request.getDriverName(), request.getDriverCode(), request.getServiceName(), request.getServiceHost(),
+                request.hasDriverTypeFlag() ? io.github.pnoker.common.enums.DriverTypeEnum.ofIndex((byte) request.getDriverTypeFlag()) : null,
+                request.hasEnableFlag() ? io.github.pnoker.common.enums.EnableFlagEnum.ofIndex((byte) request.getEnableFlag()) : null,
+                request.hasVersion() ? request.getVersion() : null, request.hasGroupId() ? request.getGroupId() : null,
+                request.hasLabelId() ? request.getLabelId() : null, page.offset(), page.limit(), page.sort());
     }
 
     @Override
-    public void listByDriverIds(GrpcDriverIdsQuery request, StreamObserver<GrpcRDriverListDTO> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            GrpcRDriverListDTO.Builder builder = GrpcRDriverListDTO.newBuilder();
-            GrpcR result;
-
-            List<DriverBO> entityBOList = driverService.listByIds(new HashSet<>(request.getDriverIdsList()));
-            if (Objects.isNull(entityBOList) || entityBOList.isEmpty()) {
-                result = GrpcRFactory.notFound();
-            } else {
-                result = GrpcRFactory.ok();
-
-                List<GrpcDriverDTO> entityGrpcDTOList = entityBOList.stream()
-                        .map(grpcDriverBuilder::buildGrpcDTOByBO)
-                        .toList();
-
-                builder.addAllData(entityGrpcDTOList);
-            }
-
-            builder.setResult(result);
-            responseObserver.onNext(builder.build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public void getByDeviceId(GrpcDeviceQuery request, StreamObserver<io.github.pnoker.api.common.GrpcDriverDTO> responseObserver) {
+        ReactiveGrpcServerSupport.subscribe(reactiveDriverService.getByDeviceId(request.getTenantId(), request.getDeviceId())
+                .map(grpcDriverBuilder::buildGrpcDTOByBO)
+                .switchIfEmpty(Mono.error(new NotFoundException("driver does not exist"))), responseObserver);
     }
 
     @Override
-    public void getByDriverId(GrpcDriverQuery request, StreamObserver<GrpcRDriverDTO> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            GrpcRDriverDTO.Builder builder = GrpcRDriverDTO.newBuilder();
-            GrpcR result;
+    public void listByDriverIds(GrpcDriverIdsQuery request, StreamObserver<GrpcDriverListDTO> responseObserver) {
+        ReactiveGrpcServerSupport.subscribe(reactiveDriverService.listByIds(request.getTenantId(), request.getDriverIdsList())
+                .map(grpcDriverBuilder::buildGrpcDTOByBO).collectList()
+                .map(values -> GrpcDriverListDTO.newBuilder().addAllItems(values).build()), responseObserver);
+    }
 
-            DriverBO driverBO;
-            try {
-                driverBO = driverService.getById(request.getDriverId());
-            } catch (NotFoundException ignored) {
-                driverBO = null;
-            }
-            if (Objects.isNull(driverBO)) {
-                result = GrpcRFactory.notFound();
-            } else {
-                result = GrpcRFactory.ok();
-
-                builder.setData(grpcDriverBuilder.buildGrpcDTOByBO(driverBO));
-            }
-
-            builder.setResult(result);
-            responseObserver.onNext(builder.build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    @Override
+    public void getByDriverId(GrpcDriverQuery request, StreamObserver<io.github.pnoker.api.common.GrpcDriverDTO> responseObserver) {
+        ReactiveGrpcServerSupport.subscribe(reactiveDriverService.getById(request.getTenantId(), request.getDriverId())
+                .map(grpcDriverBuilder::buildGrpcDTOByBO)
+                .switchIfEmpty(Mono.error(new NotFoundException("driver does not exist"))), responseObserver);
     }
 
 }

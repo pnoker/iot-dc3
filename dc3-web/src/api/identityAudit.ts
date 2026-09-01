@@ -17,6 +17,7 @@
 
 import {httpPost} from '@/api/common';
 import {API_IDENTITY_AUDIT_BASE} from '@/config/constant/api';
+import type {CursorPageResult} from '@/config/types';
 import type {IdentityAuditRecord} from '@/config/types/auth';
 
 export const listIdentityAudit = (
@@ -27,15 +28,15 @@ export const listIdentityAudit = (
     resourceId?: string;
     status?: string;
     limit?: number;
+    cursor?: string;
   } = {}
 ) =>
-  httpPost<R<IdentityAuditRecord[]>>(`${API_IDENTITY_AUDIT_BASE}/list`, undefined, {
-    params: {
-      principal_id: params.principalId,
-      action: params.action,
-      resource_type: params.resourceType,
-      resource_id: params.resourceId,
-      status: params.status,
-      limit: params.limit,
-    },
+  httpPost<CursorPageResult<IdentityAuditRecord>>(`${API_IDENTITY_AUDIT_BASE}/list`, {
+    principalId: params.principalId,
+    action: params.action,
+    resourceType: params.resourceType,
+    resourceId: params.resourceId,
+    status: params.status,
+    cursor: params.cursor,
+    limit: params.limit,
   });

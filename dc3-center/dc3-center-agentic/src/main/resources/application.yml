@@ -19,6 +19,8 @@ server:
   port: ${DC3_AGENTIC_PORT:8600}
 
 spring:
+  config:
+    import: classpath:application-r2dbc.yml
   application:
     name: @project.artifactId@
   webflux:
@@ -29,7 +31,12 @@ spring:
 
 dc3:
   facade:
-    mode: ${DC3_FACADE_MODE:grpc}
+    auth:
+      mode: grpc
+    manager:
+      mode: grpc
+    data:
+      mode: grpc
 
 logging:
   file:

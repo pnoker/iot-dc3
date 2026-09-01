@@ -26,6 +26,7 @@ import io.github.pnoker.common.agentic.entity.vo.ChatCompletionResponseVO;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.constant.common.SymbolConstant;
+import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * Encodes agentic chat responses and server-sent events.
@@ -91,7 +91,7 @@ public class AgenticChatResponseCodec {
      */
     public String newChatId() {
         return AgenticConstant.Chat.ID_PREFIX
-                + UUID.randomUUID().toString().replace(SymbolConstant.HYPHEN, StringUtils.EMPTY).substring(0, 24);
+                + UuidV7.next().toString().replace(SymbolConstant.HYPHEN, StringUtils.EMPTY).substring(0, 24);
     }
 
     /**

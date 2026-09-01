@@ -21,10 +21,16 @@ import {describe, expect, it, vi} from 'vitest';
 import {mountListPage} from './_helpers';
 
 const profileMocks = vi.hoisted(() => ({
-  addProfile: vi.fn(() => Promise.resolve({data: true})),
-  deleteProfile: vi.fn(() => Promise.resolve({data: true})),
-  listProfile: vi.fn(() => Promise.resolve({data: {records: [{id: 'p-1', profileName: 'Sensor'}], total: 1}})),
-  updateProfile: vi.fn(() => Promise.resolve({data: true})),
+  addProfile: vi.fn(() => Promise.resolve( true)),
+  deleteProfile: vi.fn(() => Promise.resolve( true)),
+  listProfile: vi.fn(() => Promise.resolve({
+    items: [{id: 'p-1', profileName: 'Sensor'}],
+    offset: 0,
+    limit: 12,
+    total: 1,
+    hasNext: false,
+  })),
+  updateProfile: vi.fn(() => Promise.resolve( true)),
 }));
 
 vi.mock('@/api/profile', () => profileMocks);

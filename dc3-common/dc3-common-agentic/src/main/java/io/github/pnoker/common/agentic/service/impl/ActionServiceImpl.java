@@ -5,47 +5,32 @@
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.agentic.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import io.github.pnoker.common.agentic.dal.ActionManager;
 import io.github.pnoker.common.agentic.entity.bo.ActionBO;
-import io.github.pnoker.common.agentic.entity.builder.ActionBuilder;
-import io.github.pnoker.common.agentic.entity.model.ActionDO;
+import io.github.pnoker.common.agentic.repository.ReactiveActionStore;
 import io.github.pnoker.common.agentic.service.ActionService;
-import io.github.pnoker.common.constant.common.QueryWrapperConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticActionStatusEnum;
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.facade.api.PointCommandFacade;
+import io.github.pnoker.common.utils.UuidV7;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
-/**
- * Implements agentic action lifecycle: creation, confirmation, rejection, and write-point-value execution.
- *
- * @author pnoker
- * @since 2016.10.1
- */
+/** Implements the agentic action lifecycle. */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -53,143 +38,100 @@ public class ActionServiceImpl implements ActionService {
 
     private static final String ACTION_WRITE_POINT_VALUE = "writePointValue";
 
-    private final ActionManager actionManager;
-    private final ActionBuilder actionBuilder;
-
+    private final ReactiveActionStore actionStore;
     private final PointCommandFacade pointCommandFacade;
 
     @Override
-    public String createWritePointValueAction(String conversationId, Long deviceId, Long pointId, String value,
-                                              RequestHeader.PrincipalHeader header) {
-        ActionBO entityBO = new ActionBO();
-        entityBO.setActionId(UUID.randomUUID().toString());
-        entityBO.setConversationId(conversationId);
-        entityBO.setActionType(ACTION_WRITE_POINT_VALUE);
-        entityBO.setTitle("Write point value");
-        entityBO.setDescription("Write value to device " + deviceId + ", point " + pointId);
-        entityBO.setPayload(Map.of("deviceId", deviceId, "pointId", pointId, "value", value));
-        entityBO.setStatus(AgenticActionStatusEnum.PENDING);
-        entityBO.setExpireTime(LocalDateTime.now().plusMinutes(10));
-        entityBO.setTenantId(header.getTenantId());
-        entityBO.setUserId(header.getUserId());
-        fillCreateAudit(entityBO, header);
-        ActionDO entityDO = actionBuilder.buildDOByBO(entityBO);
-        actionManager.save(entityDO);
-        return entityDO.getActionId();
+    public Mono<String> createWritePointValueAction(String conversationId, Long deviceId, Long pointId,
+                                                    String value, RequestHeader.PrincipalHeader header) {
+        Objects.requireNonNull(header, "header must not be null");
+        if (conversationId == null || conversationId.isBlank()) {
+            return Mono.error(new RequestException("Conversation ID is required"));
+        }
+        if (deviceId == null || pointId == null) {
+            return Mono.error(new RequestException("Device ID and point ID are required"));
+        }
+        ActionBO action = new ActionBO();
+        action.setActionId(UuidV7.next().toString());
+        action.setConversationId(conversationId);
+        action.setActionType(ACTION_WRITE_POINT_VALUE);
+        action.setTitle("Write point value");
+        action.setDescription("Write value to device " + deviceId + ", point " + pointId);
+        action.setPayload(Map.of("deviceId", deviceId, "pointId", pointId, "value", value));
+        action.setStatus(AgenticActionStatusEnum.PENDING);
+        action.setExpireTime(LocalDateTime.now(ZoneOffset.UTC).plusMinutes(10));
+        action.setTenantId(header.getTenantId());
+        action.setUserId(header.getUserId());
+        fillCreateAudit(action, header);
+        return actionStore.create(action).map(ActionBO::getActionId);
+    }
+
+
+    @Override
+    public Mono<OffsetPage<ActionBO>> listPending(long offset, int limit, String conversationId,
+                                                   RequestHeader.PrincipalHeader header) {
+        Objects.requireNonNull(header, "header must not be null");
+        return actionStore.listPending(offset, limit, conversationId, header, Instant.now());
     }
 
     @Override
-    public List<ActionBO> listPending(String conversationId, RequestHeader.PrincipalHeader header) {
-        LambdaQueryWrapper<ActionDO> wrapper = scopedWrapper(header)
-                .eq(ActionDO::getConversationId, conversationId)
-                .eq(ActionDO::getStatus, AgenticActionStatusEnum.PENDING)
-                .ge(ActionDO::getExpireTime, LocalDateTime.now())
-                .orderByDesc(ActionDO::getCreateTime);
-        return actionBuilder.buildBOListByDOList(actionManager.list(wrapper));
+    public Mono<ActionBO> confirm(String actionId, RequestHeader.PrincipalHeader header) {
+        return getPending(actionId, header)
+                .flatMap(action -> actionStore.claimPending(actionId, header,
+                                AgenticActionStatusEnum.CONFIRMED, Instant.now())
+                        .switchIfEmpty(Mono.error(new RequestException("Agentic action is no longer pending"))))
+                .flatMap(action -> execute(action, header));
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ActionBO confirm(String actionId, RequestHeader.PrincipalHeader header) {
-        ActionDO action = getPending(actionId, header);
-        claimPending(action, header, AgenticActionStatusEnum.CONFIRMED, "Agentic action is no longer pending");
-
-        try {
-            if (ACTION_WRITE_POINT_VALUE.equals(action.getActionType())) {
-                Map<String, Object> payload = action.getPayload();
-                boolean success = pointCommandFacade.submitWrite(header.getTenantId(),
-                        longValue(payload.get("deviceId")),
-                        longValue(payload.get("pointId")), Objects.toString(payload.get("value"), ""));
-                action.setStatus(success ? AgenticActionStatusEnum.EXECUTED.getIndex()
-                        : AgenticActionStatusEnum.FAILED.getIndex());
-                action.setRemark(success ? "Executed" : "Facade returned false");
-            } else {
-                action.setStatus(AgenticActionStatusEnum.FAILED.getIndex());
-                action.setRemark("Unsupported action type");
-            }
-        } catch (Exception e) {
-            log.warn("Action execution failed, actionId={}", action.getId(), e);
-            action.setStatus(AgenticActionStatusEnum.FAILED.getIndex());
-            action.setRemark(e.getMessage());
-        }
-
-        action.setOperateTime(LocalDateTime.now());
-        actionManager.updateById(action);
-        return actionBuilder.buildBOByDO(action);
+    public Mono<ActionBO> reject(String actionId, RequestHeader.PrincipalHeader header) {
+        return getPending(actionId, header)
+                .flatMap(action -> actionStore.claimPending(actionId, header,
+                                AgenticActionStatusEnum.REJECTED, Instant.now())
+                        .switchIfEmpty(Mono.error(new RequestException("Agentic action is no longer pending"))));
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ActionBO reject(String actionId, RequestHeader.PrincipalHeader header) {
-        ActionDO action = getPending(actionId, header);
-        claimPending(action, header, AgenticActionStatusEnum.REJECTED,
-                "Agentic action is no longer pending");
-        return actionBuilder.buildBOByDO(action);
+    private Mono<ActionBO> getPending(String actionId, RequestHeader.PrincipalHeader header) {
+        if (actionId == null || actionId.isBlank()) {
+            return Mono.error(new RequestException("Action ID is required"));
+        }
+        if (header == null) {
+            return Mono.error(new IllegalArgumentException("header must not be null"));
+        }
+        return actionStore.find(actionId, header)
+                .switchIfEmpty(Mono.error(new NotFoundException("Agentic action does not exist")))
+                .flatMap(action -> {
+                    if (action.getStatus() != AgenticActionStatusEnum.PENDING) {
+                        return Mono.error(new RequestException("Agentic action is no longer pending"));
+                    }
+                    if (action.getExpireTime() != null
+                            && action.getExpireTime().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+                        return Mono.error(new RequestException("Agentic action has expired"));
+                    }
+                    return Mono.just(action);
+                });
     }
 
-    /**
-     * Load a pending, non-expired action by action id, scoped to the caller.
-     *
-     * @param actionId the action id
-     * @param header   the authenticated principal header
-     * @return the pending action
-     * @throws NotFoundException when the action does not exist
-     * @throws RequestException  when the action is not pending or has expired
-     */
-    private ActionDO getPending(String actionId, RequestHeader.PrincipalHeader header) {
-        LambdaQueryWrapper<ActionDO> wrapper = scopedWrapper(header)
-                .eq(ActionDO::getActionId, actionId)
-                .last(QueryWrapperConstant.LIMIT_ONE);
-        ActionDO action = actionManager.getOne(wrapper);
-        if (Objects.isNull(action)) {
-            throw new NotFoundException("Agentic action does not exist");
+    private Mono<ActionBO> execute(ActionBO action, RequestHeader.PrincipalHeader header) {
+        if (!ACTION_WRITE_POINT_VALUE.equals(action.getActionType())) {
+            return actionStore.updateExecutionResult(action.getActionId(), header,
+                    AgenticActionStatusEnum.FAILED, "Unsupported action type", Instant.now());
         }
-        if (!Objects.equals(action.getStatus(), AgenticActionStatusEnum.PENDING.getIndex())) {
-            throw new RequestException("Agentic action is no longer pending");
-        }
-        if (Objects.nonNull(action.getExpireTime()) && action.getExpireTime().isBefore(LocalDateTime.now())) {
-            throw new RequestException("Agentic action has expired");
-        }
-        return action;
+        Map<String, Object> payload = action.getPayload();
+        return pointCommandFacade.submitWrite(header.getTenantId(), longValue(payload.get("deviceId")),
+                        longValue(payload.get("pointId")), Objects.toString(payload.get("value"), ""),
+                        PointCommandSourceEnum.AGENTIC)
+                .flatMap(commandId -> actionStore.updateExecutionResult(action.getActionId(), header,
+                        AgenticActionStatusEnum.EXECUTED, "Command accepted: " + commandId, Instant.now()))
+                .onErrorResume(exception -> {
+                    log.warn("Action execution failed, actionId={}", action.getActionId(), exception);
+                    return actionStore.updateExecutionResult(action.getActionId(), header,
+                            AgenticActionStatusEnum.FAILED, exception.getMessage(), Instant.now());
+                });
     }
 
-    /**
-     * Atomically transition a pending action to the next status using an optimistic
-     * update guarded by the PENDING status and expiry, preventing concurrent
-     * confirm/reject races.
-     *
-     * @param action         the action to transition
-     * @param header         the authenticated principal header
-     * @param nextStatus     the target status
-     * @param failureMessage the error message when the optimistic update loses the race
-     */
-    private void claimPending(ActionDO action, RequestHeader.PrincipalHeader header, AgenticActionStatusEnum nextStatus,
-                              String failureMessage) {
-        LocalDateTime now = LocalDateTime.now();
-        boolean updated = actionManager.update(Wrappers.<ActionDO>lambdaUpdate()
-                .set(ActionDO::getStatus, nextStatus.getIndex())
-                .set(ActionDO::getOperateTime, now)
-                .eq(ActionDO::getId, action.getId())
-                .eq(ActionDO::getUserId, header.getUserId())
-                .eq(ActionDO::getStatus, AgenticActionStatusEnum.PENDING.getIndex())
-                .and(wrapper -> wrapper.isNull(ActionDO::getExpireTime)
-                        .or()
-                        .ge(ActionDO::getExpireTime, now)));
-        if (!updated) {
-            throw new RequestException(failureMessage);
-        }
-        action.setStatus(nextStatus.getIndex());
-        action.setOperateTime(now);
-    }
-
-    /**
-     * Stamp the creator, operator, and timestamps for a new action.
-     *
-     * @param entityBO the action to stamp
-     * @param header   the authenticated principal header
-     */
     private void fillCreateAudit(ActionBO entityBO, RequestHeader.PrincipalHeader header) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         entityBO.setCreateTime(now);
         entityBO.setOperateTime(now);
         entityBO.setCreatorId(header.getUserId());
@@ -198,30 +140,17 @@ public class ActionServiceImpl implements ActionService {
         entityBO.setOperatorName(header.getUserName());
     }
 
-    /**
-     * Build a query wrapper scoped to the caller's user id.
-     *
-     * @param header the authenticated principal header
-     * @return a user-scoped query wrapper
-     */
-    private LambdaQueryWrapper<ActionDO> scopedWrapper(RequestHeader.PrincipalHeader header) {
-        return Wrappers.<ActionDO>query()
-                .lambda()
-                .eq(ActionDO::getUserId, header.getUserId());
-    }
-
     private Long longValue(Object value) {
         if (value instanceof Number number) {
             return number.longValue();
         }
-        if (Objects.nonNull(value)) {
+        if (value != null) {
             try {
                 return Long.valueOf(value.toString());
-            } catch (NumberFormatException e) {
-                throw new RequestException("Agentic action payload ID is not a valid number", e);
+            } catch (NumberFormatException exception) {
+                throw new RequestException("Agentic action payload ID is not a valid number", exception);
             }
         }
         throw new RequestException("Agentic action payload is missing required ID");
     }
-
 }

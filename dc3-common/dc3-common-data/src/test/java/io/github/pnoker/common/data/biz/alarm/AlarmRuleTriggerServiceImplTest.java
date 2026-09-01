@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 import java.util.stream.IntStream;
@@ -32,6 +33,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AlarmRuleTriggerServiceImplTest {
@@ -56,7 +58,8 @@ class AlarmRuleTriggerServiceImplTest {
 
     @Test
     void processPointValueDispatchesToPipelineWhenIdsAreValid() {
-        service.processPointValue(point(11L, 7L));
+        when(alarmRulePipelineService.process(any())).thenReturn(Flux.empty());
+        service.processPointValue(point(11L, 7L)).block();
         verify(alarmRulePipelineService).process(any(RuleFact.class));
     }
 
@@ -74,8 +77,8 @@ class AlarmRuleTriggerServiceImplTest {
 
     @Test
     void processPointValuesNoopOnEmptyBatch() {
-        service.processPointValues(List.of());
-        service.processPointValues(null);
+        service.processPointValues(List.of()).block();
+        service.processPointValues(null).block();
         verifyNoInteractions(alarmRulePipelineService);
     }
 
@@ -88,7 +91,8 @@ class AlarmRuleTriggerServiceImplTest {
                 .mapToObj(i -> point(11L + (i % 5), 7L))
                 .toList();
 
-        service.processPointValues(batch);
+        when(alarmRulePipelineService.processBatch(anyList())).thenReturn(Flux.empty());
+        service.processPointValues(batch).block();
 
         verify(alarmRulePipelineService).processBatch(anyList());
     }
@@ -104,7 +108,8 @@ class AlarmRuleTriggerServiceImplTest {
                 point(13L, 0L),      // invalid tenantId
                 point(14L, 7L));
 
-        service.processPointValues(batch);
+        when(alarmRulePipelineService.processBatch(anyList())).thenReturn(Flux.empty());
+        service.processPointValues(batch).block();
 
         verify(alarmRulePipelineService).processBatch(anyList());
         verify(alarmRulePipelineService, never()).processBatch(null);

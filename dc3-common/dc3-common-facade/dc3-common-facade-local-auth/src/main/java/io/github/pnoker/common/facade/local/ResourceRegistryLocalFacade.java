@@ -17,10 +17,9 @@
 
 package io.github.pnoker.common.facade.local;
 
-import io.github.pnoker.common.auth.biz.ResourceRegistrySyncService;
+import io.github.pnoker.common.auth.biz.ReactiveResourceRegistrySyncService;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistryScannedApi;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncCommand;
-import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncResult;
 import io.github.pnoker.common.facade.api.ResourceRegistryFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResultBO;
@@ -32,6 +31,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import reactor.core.publisher.Mono;
 
 /**
  * In-process {@link ResourceRegistryFacade}. Used when the calling service and the auth
@@ -45,7 +45,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ResourceRegistryLocalFacade implements ResourceRegistryFacade {
 
-    private final ResourceRegistrySyncService resourceRegistrySyncService;
+    private final ReactiveResourceRegistrySyncService resourceRegistrySyncService;
 
     private static List<ResourceRegistryScannedApi> toScannedApis(List<FacadeScannedApiBO> apis) {
         if (Objects.isNull(apis) || apis.isEmpty()) {
@@ -66,19 +66,21 @@ public class ResourceRegistryLocalFacade implements ResourceRegistryFacade {
     }
 
     @Override
-    public FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command) {
-        ResourceRegistrySyncCommand cmd = ResourceRegistrySyncCommand.builder()
-                .serviceName(command.getServiceName())
-                .deleteMissing(command.isDeleteMissing())
-                .apis(toScannedApis(command.getApis()))
-                .build();
-        ResourceRegistrySyncResult result = resourceRegistrySyncService.sync(cmd);
-        return FacadeResourceRegistrySyncResultBO.builder()
-                .inserted(result.getInserted())
-                .updated(result.getUpdated())
-                .deleted(result.getDeleted())
-                .unchanged(result.getUnchanged())
-                .build();
+    public Mono<FacadeResourceRegistrySyncResultBO> sync(FacadeResourceRegistrySyncCommandBO command) {
+        return Mono.defer(() -> {
+            if (command == null) return Mono.error(new IllegalArgumentException("registry sync command is required"));
+            ResourceRegistrySyncCommand cmd = ResourceRegistrySyncCommand.builder()
+                    .serviceName(command.getServiceName())
+                    .deleteMissing(command.isDeleteMissing())
+                    .apis(toScannedApis(command.getApis()))
+                    .build();
+            return resourceRegistrySyncService.sync(cmd).map(result -> FacadeResourceRegistrySyncResultBO.builder()
+                    .inserted(result.getInserted())
+                    .updated(result.getUpdated())
+                    .deleted(result.getDeleted())
+                    .unchanged(result.getUnchanged())
+                    .build());
+        });
     }
 
 }

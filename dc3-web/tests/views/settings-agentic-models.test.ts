@@ -21,11 +21,11 @@ import {describe, expect, it, vi} from 'vitest';
 import {mountListPage} from './_helpers';
 
 const agenticMocks = vi.hoisted(() => ({
-  addAgenticModelConfig: vi.fn(() => Promise.resolve({data: true})),
-  deleteAgenticModelConfig: vi.fn(() => Promise.resolve({data: true})),
-  listAgenticModelConfigs: vi.fn(() => Promise.resolve({data: []})),
-  listAgenticProviders: vi.fn(() => Promise.resolve({data: []})),
-  updateAgenticModelConfig: vi.fn(() => Promise.resolve({data: true})),
+  addAgenticModelConfig: vi.fn(() => Promise.resolve( true)),
+  deleteAgenticModelConfig: vi.fn(() => Promise.resolve( true)),
+  listAgenticModelConfigs: vi.fn(() => Promise.resolve( [])),
+  listAgenticProviders: vi.fn(() => Promise.resolve( [])),
+  updateAgenticModelConfig: vi.fn(() => Promise.resolve( true)),
 }));
 
 vi.mock('@/api/agentic', () => agenticMocks);

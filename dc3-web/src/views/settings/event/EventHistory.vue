@@ -189,7 +189,7 @@ const resolveDeviceNames = async (rows: EventHistoryRecord[]) => {
   if (!ids.length) return;
   try {
     const res: any = await listDeviceByIds(ids);
-    const data = res?.data || {};
+    const data = res || {};
     ids.forEach((id) => {
       if (data[id]) deviceNameMap[id] = data[id].deviceName || id;
     });
@@ -225,7 +225,7 @@ const refresh = () => doRefresh();
 const openDetail = (row: EventHistoryRecord) => {
   getEventHistoryByRecordId(row.recordId)
     .then((res) => {
-      detailRow.value = res.data || row;
+      detailRow.value = res || row;
       detailVisible.value = true;
     })
     .catch(() => {

@@ -67,6 +67,7 @@ import {computed, onMounted, onUnmounted, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useAuthStore} from '@/store/modules/auth';
 import {systemHealth} from '@/api/dashboard';
+import type {SystemHealth} from '@/config/types/dashboard';
 
 interface ServiceRow {
   key: string;
@@ -134,8 +135,7 @@ const tick = () => {
 
 const refreshHealth = async () => {
   try {
-    const res: any = await systemHealth();
-    const data = res?.data;
+    const data: SystemHealth = await systemHealth();
     if (!data) return;
     if (data.center) center.value = data.center;
     if (data.infra) infra.value = data.infra;

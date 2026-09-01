@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
-
+import reactor.core.publisher.Flux;
 import java.util.List;
 
 /**
@@ -35,7 +35,7 @@ public interface AlarmRulePipelineService {
      * @param fact normalized fact
      * @return persisted notification records
      */
-    List<NotifyHistoryBO> process(RuleFact fact);
+    Flux<NotifyHistoryBO> process(RuleFact fact);
 
     /**
      * Batch-evaluate facts and execute notification side effects for all
@@ -47,6 +47,6 @@ public interface AlarmRulePipelineService {
      * @param facts normalized facts
      * @return persisted notification records
      */
-    List<NotifyHistoryBO> processBatch(List<RuleFact> facts);
+    Flux<NotifyHistoryBO> processBatch(List<RuleFact> facts);
 
 }

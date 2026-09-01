@@ -17,6 +17,9 @@
 
 package io.github.pnoker.common.facade.api;
 
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
+import reactor.core.publisher.Mono;
+
 /**
  * Protocol-neutral point command facade.
  * <p>
@@ -25,10 +28,10 @@ package io.github.pnoker.common.facade.api;
  * this interface:
  * <ul>
  * <li>{@code PointCommandLocalFacade} — in-process call into
- * {@code PointCommandService}, selected when {@code dc3.facade.mode=local} (single
+ * {@code PointCommandService}, selected when {@code dc3.facade.data.mode=local} (single
  * deployment).</li>
  * <li>{@code PointCommandGrpcFacade} — gRPC call against Data Center, selected when
- * {@code dc3.facade.mode=grpc} (distributed deployment, default).</li>
+ * {@code dc3.facade.data.mode=grpc} (default).</li>
  * </ul>
  *
  * @author pnoker
@@ -42,9 +45,13 @@ public interface PointCommandFacade {
      * @param tenantId current tenant id
      * @param deviceId device id
      * @param pointId  point id
-     * @return {@code true} if the command was accepted.
+     * @return the accepted command identifier used to query command history.
      */
-    boolean submitRead(Long tenantId, Long deviceId, Long pointId);
+    Mono<String> submitRead(Long tenantId, Long deviceId, Long pointId);
+
+    default Mono<String> submitRead(Long tenantId, Long deviceId, Long pointId, PointCommandSourceEnum source) {
+        return submitRead(tenantId, deviceId, pointId);
+    }
 
     /**
      * Dispatch a write command to a device for a specific point.
@@ -53,8 +60,13 @@ public interface PointCommandFacade {
      * @param deviceId device id
      * @param pointId  point id
      * @param value    value to write
-     * @return {@code true} if the command was accepted.
+     * @return the accepted command identifier used to query command history.
      */
-    boolean submitWrite(Long tenantId, Long deviceId, Long pointId, String value);
+    Mono<String> submitWrite(Long tenantId, Long deviceId, Long pointId, String value);
+
+    default Mono<String> submitWrite(Long tenantId, Long deviceId, Long pointId, String value,
+                                      PointCommandSourceEnum source) {
+        return submitWrite(tenantId, deviceId, pointId, value);
+    }
 
 }

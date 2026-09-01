@@ -38,6 +38,6 @@ class ApiCodeConsistencyTest {
         // Write-side format: serviceName + ":" + ApiTypeEnum.<METHOD>.name() + ":" + path
         // -> dc3-center-fixturesvc:POST:/device/add . The aggregator must match it verbatim.
         assertThat(quality).containsKey("dc3-center-fixturesvc:POST:/device/add");
-        assertThat(quality.keySet()).allMatch(k -> k.matches("^dc3-center-[^:]+:(GET|POST|PUT|DELETE):/.*"));
+        assertThat(quality.keySet()).allMatch(k -> k.matches("^dc3-center-[^:]+:(GET|POST|PUT|PATCH|DELETE):/.*"));
     }
 }

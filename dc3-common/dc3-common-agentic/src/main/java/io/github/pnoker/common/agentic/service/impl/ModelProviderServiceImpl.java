@@ -2,26 +2,15 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  */
 package io.github.pnoker.common.agentic.service.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
-import io.github.pnoker.common.agentic.dal.ModelProviderManager;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
-import io.github.pnoker.common.agentic.entity.builder.ModelProviderBuilder;
-import io.github.pnoker.common.agentic.entity.model.ModelProviderDO;
+import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
 import io.github.pnoker.common.agentic.service.ModelProviderService;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
@@ -32,82 +21,63 @@ import io.github.pnoker.common.exception.RequestException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Implements model provider listing, save, update, and remove operations.
- *
- * @author pnoker
- * @since 2016.10.1
- */
+/** Reactive model provider application service. */
 @Service
 @RequiredArgsConstructor
 public class ModelProviderServiceImpl implements ModelProviderService {
 
-    private final ModelProviderManager modelProviderManager;
-    private final ModelProviderBuilder modelProviderBuilder;
+    private final ReactiveModelProviderStore modelProviderStore;
     private final ChatClientFactory chatClientFactory;
 
     @Override
-    public List<ModelProviderBO> list() {
-        List<ModelProviderDO> entityDOList = modelProviderManager.list(Wrappers.<ModelProviderDO>query()
-                .lambda()
-                .orderByDesc(ModelProviderDO::getDefaultFlag)
-                .orderByAsc(ModelProviderDO::getName));
-        return modelProviderBuilder.buildBOListByDOList(entityDOList);
+    public Mono<List<ModelProviderBO>> list(RequestHeader.PrincipalHeader header) {
+        return modelProviderStore.list(header).collectList();
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ModelProviderBO add(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header) {
-        validate(entityBO);
-        ModelProviderBO targetBO = new ModelProviderBO();
-        apply(targetBO, entityBO, false);
-        fillCreateAudit(targetBO, header);
-        ModelProviderDO entityDO = modelProviderBuilder.buildDOByBO(targetBO);
-        modelProviderManager.save(entityDO);
-        normalizeDefault(entityDO);
-        return modelProviderBuilder.buildBOByDO(entityDO);
+    public Mono<ModelProviderBO> add(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header) {
+        return Mono.defer(() -> {
+            validate(entityBO);
+            ModelProviderBO value = normalize(entityBO, null, header);
+            return modelProviderStore.insert(value, header);
+        });
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public ModelProviderBO update(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header) {
-        if (Objects.isNull(entityBO) || Objects.isNull(entityBO.getId())) {
-            throw new RequestException("Provider ID is required");
-        }
-        validate(entityBO);
-        ModelProviderDO existingDO = modelProviderManager.getById(entityBO.getId());
-        if (Objects.isNull(existingDO)) {
-            throw new NotFoundException("Provider does not exist");
-        }
-        ModelProviderBO targetBO = modelProviderBuilder.buildBOByDO(existingDO);
-        apply(targetBO, entityBO, true);
-        fillOperateAudit(targetBO, header);
-        ModelProviderDO entityDO = modelProviderBuilder.buildDOByBO(targetBO);
-        modelProviderManager.updateById(entityDO);
-        normalizeDefault(entityDO);
-        chatClientFactory.evict(entityDO.getId());
-        return modelProviderBuilder.buildBOByDO(entityDO);
+    public Mono<ModelProviderBO> update(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header) {
+        return Mono.defer(() -> {
+            if (entityBO == null || entityBO.getId() == null) {
+                return Mono.error(new RequestException("Provider ID is required"));
+            }
+            validate(entityBO);
+            return modelProviderStore.get(entityBO.getId(), header)
+                    .switchIfEmpty(Mono.error(new NotFoundException("Provider does not exist")))
+                    .map(existing -> normalize(entityBO, existing, header))
+                    .flatMap(value -> modelProviderStore.update(value, header))
+                    .switchIfEmpty(Mono.error(new NotFoundException("Provider does not exist")))
+                    .doOnNext(value -> chatClientFactory.evict(value.getId()));
+        });
     }
 
     @Override
-    public void delete(Long id) {
-        modelProviderManager.removeById(id);
-        chatClientFactory.evict(id);
+    public Mono<Void> delete(Long id, RequestHeader.PrincipalHeader header) {
+        return modelProviderStore.delete(id, header)
+                .flatMap(deleted -> {
+                    if (!deleted) return Mono.error(new NotFoundException("Provider does not exist"));
+                    chatClientFactory.evict(id);
+                    return Mono.<Void>empty();
+                });
     }
 
-    /**
-     * Validate a provider: name and base URL are required.
-     *
-     * @param entityBO the provider to validate
-     */
     private void validate(ModelProviderBO entityBO) {
-        if (Objects.isNull(entityBO) || StringUtils.isBlank(entityBO.getName())) {
+        if (entityBO == null || StringUtils.isBlank(entityBO.getName())) {
             throw new RequestException("Provider name is required");
         }
         if (StringUtils.isBlank(entityBO.getBaseUrl())) {
@@ -115,75 +85,26 @@ public class ModelProviderServiceImpl implements ModelProviderService {
         }
     }
 
-    /**
-     * Copy fields from the source BO onto the target, applying defaults. The API key is
-     * replaced when a new one is supplied; otherwise it is kept only when
-     * {@code keepExistingApiKey} is true.
-     *
-     * @param targetBO           the target to populate
-     * @param sourceBO           the source carrying user-supplied values
-     * @param keepExistingApiKey whether to retain the existing key when none is supplied
-     */
-    private void apply(ModelProviderBO targetBO, ModelProviderBO sourceBO, boolean keepExistingApiKey) {
-        targetBO.setName(sourceBO.getName().trim());
-        targetBO.setProviderType(Objects.nonNull(sourceBO.getProviderType()) ? sourceBO.getProviderType()
-                : AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE);
-        targetBO.setBaseUrl(sourceBO.getBaseUrl().trim());
-        if (StringUtils.isNotBlank(sourceBO.getApiKey())) {
-            targetBO.setApiKey(sourceBO.getApiKey().trim());
-        } else if (!keepExistingApiKey) {
-            targetBO.setApiKey(null);
-        }
-        targetBO.setDefaultFlag(Objects.nonNull(sourceBO.getDefaultFlag()) ? sourceBO.getDefaultFlag()
-                : DefaultFlagEnum.NOT_DEFAULT);
-        targetBO.setEnableFlag(Objects.nonNull(sourceBO.getEnableFlag()) ? sourceBO.getEnableFlag()
-                : EnableFlagEnum.ENABLE);
-        targetBO.setRemark(StringUtils.defaultString(sourceBO.getRemark()));
+    private ModelProviderBO normalize(ModelProviderBO source, ModelProviderBO existing,
+                                      RequestHeader.PrincipalHeader header) {
+        ModelProviderBO value = new ModelProviderBO();
+        value.setId(source.getId());
+        value.setName(source.getName().trim());
+        value.setProviderType(source.getProviderType() == null ? AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE
+                : source.getProviderType());
+        value.setBaseUrl(source.getBaseUrl().trim());
+        value.setApiKey(StringUtils.isBlank(source.getApiKey()) && existing != null ? existing.getApiKey()
+                : StringUtils.defaultString(source.getApiKey()));
+        value.setDefaultFlag(source.getDefaultFlag() == null ? DefaultFlagEnum.NOT_DEFAULT : source.getDefaultFlag());
+        value.setEnableFlag(source.getEnableFlag() == null ? EnableFlagEnum.ENABLE : source.getEnableFlag());
+        value.setRemark(StringUtils.defaultString(source.getRemark()));
+        value.setTenantId(header.getTenantId());
+        value.setCreatorId(existing == null ? header.getUserId() : existing.getCreatorId());
+        value.setCreatorName(existing == null ? header.getUserName() : existing.getCreatorName());
+        value.setCreateTime(existing == null ? LocalDateTime.now(ZoneOffset.UTC) : existing.getCreateTime());
+        value.setOperatorId(header.getUserId());
+        value.setOperatorName(header.getUserName());
+        value.setOperateTime(LocalDateTime.now(ZoneOffset.UTC));
+        return value;
     }
-
-    /**
-     * Stamp the creator, operator, tenant, and timestamps for a new provider.
-     *
-     * @param entityBO the provider to stamp
-     * @param header   the authenticated principal header
-     */
-    private void fillCreateAudit(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header) {
-        LocalDateTime now = LocalDateTime.now();
-        entityBO.setCreateTime(now);
-        entityBO.setOperateTime(now);
-        entityBO.setCreatorId(header.getUserId());
-        entityBO.setCreatorName(header.getUserName());
-        entityBO.setOperatorId(header.getUserId());
-        entityBO.setOperatorName(header.getUserName());
-        entityBO.setTenantId(header.getTenantId());
-    }
-
-    /**
-     * Stamp the operator and operate timestamp for an updated provider.
-     *
-     * @param entityBO the provider to stamp
-     * @param header   the authenticated principal header
-     */
-    private void fillOperateAudit(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header) {
-        entityBO.setOperateTime(LocalDateTime.now());
-        entityBO.setOperatorId(header.getUserId());
-        entityBO.setOperatorName(header.getUserName());
-    }
-
-    /**
-     * Enforce the single-default invariant: when a provider is marked default, clear the
-     * default flag on every other provider.
-     *
-     * @param entityDO the provider being saved as default
-     */
-    private void normalizeDefault(ModelProviderDO entityDO) {
-        if (!Objects.equals(entityDO.getDefaultFlag(), DefaultFlagEnum.DEFAULT.getIndex())) {
-            return;
-        }
-        modelProviderManager.update(Wrappers.<ModelProviderDO>lambdaUpdate()
-                .set(ModelProviderDO::getDefaultFlag, DefaultFlagEnum.NOT_DEFAULT.getIndex())
-                .eq(ModelProviderDO::getDefaultFlag, DefaultFlagEnum.DEFAULT.getIndex())
-                .ne(ModelProviderDO::getId, entityDO.getId()));
-    }
-
 }

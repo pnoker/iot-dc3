@@ -140,7 +140,7 @@ const {
 const load = () =>
   withLoading(async () => {
     const response = await listAgenticProviders();
-    setAllData(response.data || []);
+    setAllData(response || []);
   });
 
 const refresh = () => load();

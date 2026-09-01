@@ -19,7 +19,6 @@ syntax = "proto3";
 
 package api.common.data;
 
-import "api/common/r.proto";
 
 option java_package = "io.github.pnoker.api.center.data";
 option java_outer_classname = "StatusHealthProto";
@@ -29,19 +28,19 @@ option java_multiple_files = true;
 // Service interface defining RPC calls related to fleet status and health.
 service StatusHealthApi {
   // Query device statuses by device IDs
-  rpc DeviceStatusesByIds (GrpcIdsStatusQuery) returns (GrpcRStatusMap);
+  rpc DeviceStatusesByIds (GrpcIdsStatusQuery) returns (GrpcStatusMap);
 
   // Query device statuses by profile/template ID
-  rpc DeviceStatusesByProfileId (GrpcProfileStatusQuery) returns (GrpcRStatusMap);
+  rpc DeviceStatusesByProfileId (GrpcProfileStatusQuery) returns (GrpcStatusMap);
 
   // Query driver statuses by driver IDs
-  rpc DriverStatusesByIds (GrpcIdsStatusQuery) returns (GrpcRStatusMap);
+  rpc DriverStatusesByIds (GrpcIdsStatusQuery) returns (GrpcStatusMap);
 
   // Query device online/offline summary under a driver
-  rpc DriverDeviceStatusSummary (GrpcDriverStatusQuery) returns (GrpcRStringMap);
+  rpc DriverDeviceStatusSummary (GrpcDriverStatusQuery) returns (GrpcStringMap);
 
   // Query system health snapshot
-  rpc SystemHealth (GrpcTenantHealthQuery) returns (GrpcRSystemHealthDTO);
+  rpc SystemHealth (GrpcTenantHealthQuery) returns (GrpcSystemHealthDTO);
 }
 
 // Tenant-scoped IDs query.
@@ -78,32 +77,18 @@ message GrpcTenantHealthQuery {
 }
 
 // Response wrapper for status maps keyed by ID.
-message GrpcRStatusMap {
-  // Common result wrapper
-  GrpcR result = 1;
-
+message GrpcStatusMap {
   // Status map keyed by entity ID
   map<int64, string> data = 2;
 }
 
 // Response wrapper for string maps.
-message GrpcRStringMap {
-  // Common result wrapper
-  GrpcR result = 1;
-
+message GrpcStringMap {
   // String map data
   map<string, string> data = 2;
 }
 
 // Response wrapper for system health.
-message GrpcRSystemHealthDTO {
-  // Common result wrapper
-  GrpcR result = 1;
-
-  // System health data
-  GrpcSystemHealthDTO data = 2;
-}
-
 // System health DTO.
 message GrpcSystemHealthDTO {
   // Center service reachability

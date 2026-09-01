@@ -70,8 +70,8 @@ let graph: Graph | undefined;
 
 const load = () =>
   run(async () => {
-    const res: { data?: CorrelationPair[] } = await alertCorrelation(hours.value, windowSec, 15);
-    pairs.value = res?.data ?? [];
+    const res: CorrelationPair[] = await alertCorrelation(hours.value, windowSec, 15);
+    pairs.value = res ?? [];
     // Feed both endpoints per pair into the shared name cache.
     const flat = pairs.value.flatMap((p) => [
       {source: p.aSource, sourceId: p.aSourceId},

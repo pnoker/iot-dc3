@@ -23,6 +23,7 @@ import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.mq.sender.MessageSender;
 import io.github.pnoker.common.mq.sender.MqPublishException;
 import io.github.pnoker.common.mq.sender.SendConfirmation;
+import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Core {@link MessageSender} implementation: serializes, stamps headers, negotiates the
@@ -43,7 +45,7 @@ import java.util.concurrent.TimeoutException;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class MessageSenderImpl implements MessageSender {
+public class MessageSenderImpl implements MessageSender, ReactiveMessageSender {
 
     private static final ScheduledExecutorService DELAY_FALLBACK = Executors.newScheduledThreadPool(1, runnable -> {
         Thread thread = new Thread(runnable, "dc3-mq-delay-fallback");
@@ -96,6 +98,31 @@ public class MessageSenderImpl implements MessageSender {
             Throwable cause = failure.isDone() ? failure.join() : e;
             throw new MqPublishException("MQ publish was not confirmed: " + cause.getMessage(), cause);
         }
+    }
+
+    @Override
+    public reactor.core.publisher.Mono<Void> sendConfirmed(MqMessage message) {
+        return reactor.core.publisher.Mono.create(sink -> {
+            AtomicBoolean cancelled = new AtomicBoolean();
+            sink.onCancel(() -> cancelled.set(true));
+            WireMqMessage wire;
+            try {
+                wire = EnvelopeCodec.prepare(message);
+            } catch (Throwable error) {
+                sink.error(error);
+                return;
+            }
+            adapter.publish(wire, (envelope, confirmed, cause) -> {
+                if (cancelled.get()) {
+                    return;
+                }
+                if (confirmed) {
+                    sink.success();
+                } else {
+                    sink.error(cause != null ? cause : new MqPublishException("Broker did not confirm the publish"));
+                }
+            });
+        });
     }
 
     private void publishWithDelayFallback(MqMessage message, WireMqMessage wire) {

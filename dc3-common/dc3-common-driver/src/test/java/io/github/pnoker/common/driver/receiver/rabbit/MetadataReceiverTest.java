@@ -28,7 +28,6 @@ import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,13 +35,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MetadataReceiverTest {
@@ -65,162 +71,134 @@ class MetadataReceiverTest {
     private DriverMetadata driverMetadata;
     private MetadataReceiver receiver;
 
-    private static MetadataEventDTO event(MetadataTypeEnum type, MetadataOperateTypeEnum op, Long id) {
-        MetadataEventDTO dto = new MetadataEventDTO();
-        dto.setMetadataType(type);
-        dto.setOperateType(op);
-        dto.setId(id);
-        return dto;
-    }
-
-    private static <T> T any() {
-        return org.mockito.ArgumentMatchers.any();
-    }
-
     @BeforeEach
     void setUp() {
         driverMetadata = new DriverMetadata();
         driverMetadata.setDeviceLeases(Map.of(99L, 1L), System.currentTimeMillis() + 60_000, 1L);
-
-        receiver = new MetadataReceiver(pointMetadata, driverMetadata, deviceMetadata, driverClient, metadataEventPublisher);
-
+        receiver = new MetadataReceiver(pointMetadata, driverMetadata, deviceMetadata, driverClient,
+                metadataEventPublisher);
+        lenient().when(deviceMetadata.refreshCache(anyLong())).thenReturn(Mono.empty());
+        lenient().when(pointMetadata.refreshCache(anyLong())).thenReturn(Mono.empty());
+        lenient().when(driverClient.refreshMetadata(anyLong())).thenReturn(Mono.empty());
     }
 
     @Test
-    void rejectsNullPayload() throws Exception {
-        receiver.metadataReceive(new MqReceived<>(null, Map.of(), false), ack);
+    void rejectsInvalidEnvelopeAsDeadLetter() {
+        StepVerifier.create(receiver.metadataReceive(received(null), ack)).verifyComplete();
+
         verify(ack).reject(false);
-        verify(metadataEventPublisher, never()).publishEvent(any());
+        verifyNoInteractions(metadataEventPublisher);
     }
 
     @Test
-    void rejectsPayloadWithoutId() throws Exception {
-        MetadataEventDTO dto = new MetadataEventDTO();
-        dto.setMetadataType(MetadataTypeEnum.DEVICE);
-        dto.setOperateType(MetadataOperateTypeEnum.ADD);
-        receiver.metadataReceive(new MqReceived<>(dto, Map.of(), false), ack);
-        verify(ack).reject(false);
-    }
+    void deviceRefreshCompletesBeforePublishingLocalEvent() {
+        MetadataEventDTO event = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD, 10L);
 
-    @Test
-    void deviceAddRefreshesCacheWithoutBypassingLeaseOwnership() throws Exception {
-        MetadataEventDTO dto = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD, 10L);
-        receiver.metadataReceive(new MqReceived<>(dto, Map.of(), false), ack);
-        verify(deviceMetadata).loadCache(10L);
+        StepVerifier.create(receiver.metadataReceive(received(event), ack)).verifyComplete();
+
+        verify(deviceMetadata).refreshCache(10L);
         assertThat(driverMetadata.getDeviceIds()).containsExactly(99L);
-        verify(metadataEventPublisher).publishEvent(org.mockito.ArgumentMatchers.any(MetadataEvent.class));
-        verify(ack).ack();
+        verify(metadataEventPublisher).publishEvent(any(MetadataEvent.class));
+        verifyNoInteractions(ack);
     }
 
     @Test
-    void deviceUpdateAlsoTriggersLoadCache() throws Exception {
-        MetadataEventDTO dto = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE, 10L);
-        receiver.metadataReceive(new MqReceived<>(dto, Map.of(), false), ack);
-        verify(deviceMetadata).loadCache(10L);
-        verify(ack).ack();
+    void deviceRefreshFailurePropagatesAndSkipsLocalEvent() {
+        MetadataEventDTO event = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE, 10L);
+        when(deviceMetadata.refreshCache(10L))
+                .thenReturn(Mono.error(new IllegalStateException("manager unavailable")));
+
+        StepVerifier.create(receiver.metadataReceive(received(event), ack))
+                .expectErrorMessage("manager unavailable")
+                .verify();
+
+        verify(metadataEventPublisher, never()).publishEvent(any());
+        verifyNoInteractions(ack);
     }
 
     @Test
-    void deviceDeleteRemovesCacheAndDriverDeviceIds() throws Exception {
-        driverMetadata.setDeviceLeases(Map.of(99L, 1L), System.currentTimeMillis() + 60_000, 1L);
-        MetadataEventDTO dto = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE, 99L);
-        receiver.metadataReceive(new MqReceived<>(dto, Map.of(), false), ack);
+    void deviceDeleteRemovesOwnershipBeforePublishingEvent() {
+        MetadataEventDTO event = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE, 99L);
+
+        StepVerifier.create(receiver.metadataReceive(received(event), ack)).verifyComplete();
+
         verify(deviceMetadata).removeCache(99L);
-        assertThat(driverMetadata.getDeviceIds()).doesNotContain(99L);
-        verify(metadataEventPublisher).publishEvent(org.mockito.ArgumentMatchers.any(MetadataEvent.class));
-        verify(ack).ack();
+        assertThat(driverMetadata.getDeviceIds()).isEmpty();
+        verify(metadataEventPublisher).publishEvent(any(MetadataEvent.class));
     }
 
     @Test
-    void pointAddTriggersLoadCache() throws Exception {
-        MetadataEventDTO dto = event(MetadataTypeEnum.POINT, MetadataOperateTypeEnum.ADD, 20L);
-        receiver.metadataReceive(new MqReceived<>(dto, Map.of(), false), ack);
-        verify(pointMetadata).loadCache(20L);
-        verify(ack).ack();
+    void pointRefreshUsesReactiveCacheCompletion() {
+        MetadataEventDTO event = event(MetadataTypeEnum.POINT, MetadataOperateTypeEnum.UPDATE, 20L);
+
+        StepVerifier.create(receiver.metadataReceive(received(event), ack)).verifyComplete();
+
+        verify(pointMetadata).refreshCache(20L);
+        verify(metadataEventPublisher).publishEvent(any(MetadataEvent.class));
     }
 
     @Test
-    void pointDeleteRemovesCache() throws Exception {
-        MetadataEventDTO dto = event(MetadataTypeEnum.POINT, MetadataOperateTypeEnum.DELETE, 20L);
-        receiver.metadataReceive(new MqReceived<>(dto, Map.of(), false), ack);
-        verify(pointMetadata).removeCache(20L);
-        verify(ack).ack();
-    }
+    void driverRefreshUsesAsyncGrpcCompletion() {
+        MetadataEventDTO event = event(MetadataTypeEnum.DRIVER, MetadataOperateTypeEnum.UPDATE, 7L);
 
-    @Test
-    void driverUpdateRefreshesDriverMetadata() throws Exception {
-        MetadataEventDTO dto = event(MetadataTypeEnum.DRIVER, MetadataOperateTypeEnum.UPDATE, 7L);
-        receiver.metadataReceive(new MqReceived<>(dto, Map.of(), false), ack);
+        StepVerifier.create(receiver.metadataReceive(received(event), ack)).verifyComplete();
+
         verify(driverClient).refreshMetadata(7L);
-        verify(metadataEventPublisher).publishEvent(org.mockito.ArgumentMatchers.any(MetadataEvent.class));
-        verify(ack).ack();
+        verify(metadataEventPublisher).publishEvent(any(MetadataEvent.class));
     }
 
     @Test
-    void driverDeleteClearsAllDriverSideCaches() throws Exception {
-        driverMetadata.setDriver(new DriverBO());
+    void driverDeleteClearsAllCaches() {
+        DriverBO driver = new DriverBO();
+        driverMetadata.setDriver(driver);
         driverMetadata.setDriverStatus(EntityStatusEnum.ONLINE);
+        MetadataEventDTO event = event(MetadataTypeEnum.DRIVER, MetadataOperateTypeEnum.DELETE, 7L);
 
-        MetadataEventDTO dto = event(MetadataTypeEnum.DRIVER, MetadataOperateTypeEnum.DELETE, 7L);
-        receiver.metadataReceive(new MqReceived<>(dto, Map.of(), false), ack);
+        StepVerifier.create(receiver.metadataReceive(received(event), ack)).verifyComplete();
 
         verify(deviceMetadata).clearCache();
         verify(pointMetadata).clearCache();
-        assertThat(driverMetadata.getDeviceIds()).isEmpty();
+        verify(driverClient, never()).refreshMetadata(7L);
         assertThat(driverMetadata.getDriver()).isNull();
         assertThat(driverMetadata.getDriverStatus()).isEqualTo(EntityStatusEnum.OFFLINE);
-        verify(driverClient, never()).refreshMetadata(7L);
-        verify(metadataEventPublisher).publishEvent(org.mockito.ArgumentMatchers.any(MetadataEvent.class));
-        verify(ack).ack();
     }
 
     @Test
-    void commandMetadataEventIsForwardedWithoutCacheMutation() throws Exception {
-        MetadataEventDTO dto = event(MetadataTypeEnum.COMMAND, MetadataOperateTypeEnum.UPDATE, 30L);
+    void commandAndEventMetadataAreForwardedWithoutCacheMutation() {
+        StepVerifier.create(receiver.metadataReceive(
+                        received(event(MetadataTypeEnum.COMMAND, MetadataOperateTypeEnum.UPDATE, 30L)), ack))
+                .verifyComplete();
+        StepVerifier.create(receiver.metadataReceive(
+                        received(event(MetadataTypeEnum.EVENT, MetadataOperateTypeEnum.UPDATE, 40L)), ack))
+                .verifyComplete();
 
-        receiver.metadataReceive(new MqReceived<>(dto, Map.of(), false), ack);
-
-        verify(deviceMetadata, never()).loadCache(30L);
-        verify(pointMetadata, never()).loadCache(30L);
-        verify(metadataEventPublisher).publishEvent(org.mockito.ArgumentMatchers.any(MetadataEvent.class));
-        verify(ack).ack();
+        verify(deviceMetadata, never()).refreshCache(anyLong());
+        verify(pointMetadata, never()).refreshCache(anyLong());
+        verify(metadataEventPublisher, org.mockito.Mockito.times(2)).publishEvent(any(MetadataEvent.class));
     }
 
     @Test
-    void eventMetadataEventIsForwardedWithoutCacheMutation() throws Exception {
-        MetadataEventDTO dto = event(MetadataTypeEnum.EVENT, MetadataOperateTypeEnum.UPDATE, 40L);
-
-        receiver.metadataReceive(new MqReceived<>(dto, Map.of(), false), ack);
-
-        verify(deviceMetadata, never()).loadCache(40L);
-        verify(pointMetadata, never()).loadCache(40L);
-        verify(metadataEventPublisher).publishEvent(org.mockito.ArgumentMatchers.any(MetadataEvent.class));
-        verify(ack).ack();
-    }
-
-    @Test
-    void nacksAndRequeuesOnPublisherFailure() throws Exception {
-        MetadataEventDTO dto = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD, 10L);
-        doThrow(new RuntimeException("downstream offline"))
+    void localPublisherFailurePropagates() {
+        MetadataEventDTO event = event(MetadataTypeEnum.POINT, MetadataOperateTypeEnum.DELETE, 20L);
+        doThrow(new IllegalStateException("local listener failed"))
                 .when(metadataEventPublisher).publishEvent(any());
-        receiver.metadataReceive(new MqReceived<>(dto, Map.of(), false), ack);
-        verify(ack).reject(true);
+
+        StepVerifier.create(receiver.metadataReceive(received(event), ack))
+                .expectErrorMessage("local listener failed")
+                .verify();
+
+        verifyNoInteractions(ack);
     }
 
-    @Test
-    void deviceAddNacksAndRequeuesWhenLoadCacheFails() throws Exception {
-        MetadataEventDTO dto = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD, 10L);
-        doThrow(new ServiceException("manager center unreachable"))
-                .when(deviceMetadata).loadCache(10L);
+    private MqReceived<MetadataEventDTO> received(MetadataEventDTO event) {
+        return new MqReceived<>(event, Map.of(), false);
+    }
 
-        receiver.metadataReceive(new MqReceived<>(dto, Map.of(), false), ack);
-
-        // gRPC failure must surface as nack(requeue) rather than ack — earlier the
-        // loader was fire-and-forget and a failure silently dropped the event.
-        verify(ack).reject(true);
-        // Metadata events never create ownership; only a complete Manager lease
-        // snapshot can install a device and fencing token.
-        assertThat(driverMetadata.getDeviceIds()).containsExactly(99L);
-        verify(metadataEventPublisher, never()).publishEvent(any());
+    private MetadataEventDTO event(MetadataTypeEnum type, MetadataOperateTypeEnum operation, Long id) {
+        MetadataEventDTO event = new MetadataEventDTO();
+        event.setMetadataType(type);
+        event.setOperateType(operation);
+        event.setId(id);
+        return event;
     }
 }

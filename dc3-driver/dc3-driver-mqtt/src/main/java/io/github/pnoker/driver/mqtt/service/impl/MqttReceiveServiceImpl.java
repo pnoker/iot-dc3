@@ -20,13 +20,11 @@ package io.github.pnoker.driver.mqtt.service.impl;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.EventRuntimeBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
-import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.facade.api.EventFacade;
-import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
 import io.github.pnoker.common.mqtt.entity.MessageHeader;
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
@@ -68,7 +66,6 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
     private final DriverSenderService driverSenderService;
     private final DriverMetadata driverMetadata;
     private final DeviceMetadata deviceMetadata;
-    private final EventFacade eventFacade;
 
     /**
      * Processes a single MQTT message received from the broker.
@@ -157,7 +154,8 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
                     continue;
                 }
 
-                FacadeEventBO event = eventFacade.getById(device.getTenantId(), eventId);
+                EventRuntimeBO event = Objects.isNull(device.getEventRuntimeIdMap())
+                        ? null : device.getEventRuntimeIdMap().get(eventId);
                 EventReportDTO report = buildEventReport(device, event, eventConfig, payloadRoot, topic);
                 if (Objects.isNull(report)) {
                     continue;
@@ -172,15 +170,15 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         return reported;
     }
 
-    private EventReportDTO buildEventReport(DeviceBO device, FacadeEventBO event, Map<String, AttributeBO> eventConfig,
+    private EventReportDTO buildEventReport(DeviceBO device, EventRuntimeBO event, Map<String, AttributeBO> eventConfig,
                                             Object payloadRoot, String topic) {
-        if (Objects.isNull(event) || !EnableFlagEnum.ENABLE.equals(event.getEnableFlag())) {
+        if (Objects.isNull(event)) {
             return null;
         }
 
         String eventCode = valueToString(resolvePath(payloadRoot,
                 StringUtils.defaultIfBlank(getConfigValue(eventConfig, EVENT_CODE_PATH), "$.eventCode")));
-        if (StringUtils.isNotBlank(eventCode) && !Objects.equals(eventCode, event.getEventCode())) {
+        if (StringUtils.isNotBlank(eventCode) && !Objects.equals(eventCode, event.eventCode())) {
             return null;
         }
 
@@ -190,13 +188,13 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
                 .recordId(UUID.randomUUID().toString())
                 .tenantId(device.getTenantId())
                 .deviceId(device.getId())
-                .eventId(event.getId())
-                .eventCode(StringUtils.defaultIfBlank(eventCode, event.getEventCode()))
-                .eventTypeFlag(event.getEventTypeFlag().getIndex())
-                .eventLevelFlag(event.getEventLevelFlag().getIndex())
+                .eventId(event.id())
+                .eventCode(StringUtils.defaultIfBlank(eventCode, event.eventCode()))
+                .eventTypeFlag(event.eventTypeFlag().getIndex())
+                .eventLevelFlag(event.eventLevelFlag().getIndex())
                 .paramValues(toParamValues(payloadValue))
                 .configSnapshot(buildConfigSnapshot(eventConfig))
-                .message("MQTT event " + event.getEventCode() + " from topic " + StringUtils.defaultString(topic))
+                .message("MQTT event " + event.eventCode() + " from topic " + StringUtils.defaultString(topic))
                 .occurTime(Instant.now())
                 .schemaVersion(SCHEMA_VERSION)
                 .build();

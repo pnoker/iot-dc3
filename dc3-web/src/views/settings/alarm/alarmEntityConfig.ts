@@ -42,7 +42,7 @@ import {
 import {listDevice} from '@/api/device';
 import {listDriver} from '@/api/driver';
 import {listPoint} from '@/api/point';
-import type {PageQuery} from '@/config/types';
+import type {AlarmEntity, PageQuery, PageResult} from '@/config/types';
 
 export type AlarmTabKey = 'rule' | 'notify' | 'message' | 'channel' | 'bind' | 'state' | 'history';
 export type AlarmFieldKind = 'input' | 'number' | 'select' | 'remoteSelect' | 'enableFlag' | 'textarea' | 'json';
@@ -92,10 +92,10 @@ export interface AlarmEntityConfig {
   columns: AlarmColumnConfig[];
   fields: AlarmFieldConfig[];
   defaultForm: () => Record<string, unknown>;
-  list: (query: PageQuery) => Promise<R<unknown>>;
-  add?: (payload: Record<string, unknown>) => Promise<R<unknown>>;
-  update?: (payload: Record<string, unknown>) => Promise<R<unknown>>;
-  remove?: (id: string) => Promise<R<unknown>>;
+  list: (query: PageQuery) => Promise<PageResult<AlarmEntity>>;
+  add?: (payload: Record<string, unknown>) => Promise<unknown>;
+  update?: (payload: Record<string, unknown>) => Promise<unknown>;
+  remove?: (id: string) => Promise<unknown>;
 }
 
 export const ALARM_DETAIL_ROUTE_MAP: Record<AlarmTabKey, string> = {
@@ -168,25 +168,25 @@ const defaultBindExt = () =>
 
 // remoteSelect loaders: resolve foreign-key fields to selectable {name → id}
 // options instead of typing raw ids. value is String(id) so edit-mode echo matches.
-const FK_PAGE: PageQuery = {page: {current: 1, size: 1000}};
+const FK_PAGE: PageQuery = {offset: 0, limit: 200};
 
 const loadNotifyOptions = async (): Promise<AlarmOption[]> => {
   const res: any = await listNotify(FK_PAGE);
-  return (res?.data?.records || []).map((r: any) => ({
+  return (res?.items || []).map((r: any) => ({
     label: r.notifyName || r.notifyCode || String(r.id),
     value: String(r.id),
   }));
 };
 const loadMessageOptions = async (): Promise<AlarmOption[]> => {
   const res: any = await listMessage(FK_PAGE);
-  return (res?.data?.records || []).map((r: any) => ({
+  return (res?.items || []).map((r: any) => ({
     label: r.messageName || r.messageCode || String(r.id),
     value: String(r.id),
   }));
 };
 const loadChannelOptions = async (): Promise<AlarmOption[]> => {
   const res: any = await listNotifyChannel(FK_PAGE);
-  return (res?.data?.records || []).map((r: any) => ({
+  return (res?.items || []).map((r: any) => ({
     label: r.channelName || r.channelCode || String(r.id),
     value: String(r.id),
   }));
@@ -205,7 +205,7 @@ const loadEntityOptions = async (form: Record<string, any>): Promise<AlarmOption
     res = await listPoint(FK_PAGE);
     nameKey = 'pointName';
   }
-  return (res?.data?.records || []).map((r: any) => ({label: r[nameKey] || String(r.id), value: String(r.id)}));
+  return (res?.items || []).map((r: any) => ({label: r[nameKey] || String(r.id), value: String(r.id)}));
 };
 
 export const createAlarmEntityConfigs = (t: Translate) => {

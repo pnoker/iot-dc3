@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -34,16 +33,16 @@ import java.util.Optional;
 @AllArgsConstructor
 public enum AgenticMessageStatusEnum {
 
-    /**
-     * Message saved successfully.
-     */
-    OK((byte) 0, "ok", "Message saved successfully"),
+    COMPLETED((byte) 0, "completed", "Generation completed"),
+
+    FAILED((byte) 1, "failed", "Generation failed"),
+
+    CANCELLED((byte) 2, "cancelled", "Generation cancelled"),
     ;
 
     /**
      * Index value stored in database.
      */
-    @EnumValue
     private final Byte index;
 
     /**

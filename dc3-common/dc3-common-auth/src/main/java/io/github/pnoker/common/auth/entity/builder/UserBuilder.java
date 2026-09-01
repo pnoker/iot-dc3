@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.model.UserDO;
 import io.github.pnoker.common.auth.entity.vo.UserVO;
@@ -27,7 +26,6 @@ import io.github.pnoker.common.entity.ext.UserSocialExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -189,24 +187,6 @@ public interface UserBuilder {
      */
     List<UserVO> buildVOListByBOList(List<UserBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    default Page<UserBO> buildBOPageByDOPage(Page<UserDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<UserVO> buildVOPageByBOPage(Page<UserBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
 }

@@ -8,13 +8,13 @@ export function registerGroupCommand(program: Command): void {
   group
     .command('list')
     .description('List groups')
-    .option('--page <n>', 'Page number', '1')
-    .option('--size <n>', 'Page size', '20')
+    .option('--offset <n>', 'Zero-based result offset', '0')
+    .option('--limit <n>', 'Maximum items to return', '20')
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post('/api/v3/manager/group/list', {
-        page: { current: Number(opts.page), size: Number(opts.size) },
+        offset: Number(opts.offset), limit: Number(opts.limit),
       });
       printAndExit(result, format);
     });

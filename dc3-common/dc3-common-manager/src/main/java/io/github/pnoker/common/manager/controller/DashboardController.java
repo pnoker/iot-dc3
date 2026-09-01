@@ -19,7 +19,6 @@ package io.github.pnoker.common.manager.controller;
 
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.manager.entity.vo.dashboard.DeviceStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.DriverStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.GrowthVO;
@@ -55,7 +54,7 @@ import reactor.core.publisher.Mono;
  */
 @Tag(name = "dashboard", description = "Manager dashboard configuration: manage device-management dashboard layouts, widgets, and display preferences")
 @Slf4j
-@RestController
+@RestController("managerDashboardController")
 @RequestMapping(ManagerConstant.DASHBOARD_URL_PREFIX)
 @RequiredArgsConstructor
 public class DashboardController implements BaseController {
@@ -77,8 +76,8 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/driver/stats")
-    public Mono<R<DriverStatsVO>> driverStats() {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.driverStats(tenantId))));
+    public Mono<DriverStatsVO> driverStats() {
+        return getTenantId().flatMap(dashboardService::driverStats);
     }
 
     /**
@@ -98,8 +97,8 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/device/stats")
-    public Mono<R<DeviceStatsVO>> deviceStats(@Parameter(description = "Number of top devices to return, ranked by point-value volume; clamped server-side.", example = "10") @RequestParam(value = "top_n", defaultValue = "10") int topN) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.deviceStats(tenantId, topN))));
+    public Mono<DeviceStatsVO> deviceStats(@Parameter(description = "Number of top devices to return, ranked by point-value volume; clamped server-side.", example = "10") @RequestParam(value = "top_n", defaultValue = "10") int topN) {
+        return getTenantId().flatMap(tenantId -> dashboardService.deviceStats(tenantId, topN));
     }
 
     /**
@@ -120,8 +119,8 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/growth")
-    public Mono<R<GrowthVO>> dailyGrowth(@Parameter(description = "Trailing day window for the growth trend; output is zero-padded to this length.", example = "7") @RequestParam(value = "days", defaultValue = "7") int days) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.dailyGrowth(tenantId, days))));
+    public Mono<GrowthVO> dailyGrowth(@Parameter(description = "Trailing day window for the growth trend; output is zero-padded to this length.", example = "7") @RequestParam(value = "days", defaultValue = "7") int days) {
+        return getTenantId().flatMap(tenantId -> dashboardService.dailyGrowth(tenantId, days));
     }
 
     /**
@@ -151,10 +150,10 @@ public class DashboardController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/topology")
-    public Mono<R<TopologyVO>> topology(@Parameter(description = "Topology aggregation mode: cardinality counts relationships per edge (default), volume weights edges by point-value sample counts over the range window.", example = "cardinality") @RequestParam(value = "mode", defaultValue = "cardinality") String mode,
+    public Mono<TopologyVO> topology(@Parameter(description = "Topology aggregation mode: cardinality counts relationships per edge (default), volume weights edges by point-value sample counts over the range window.", example = "cardinality") @RequestParam(value = "mode", defaultValue = "cardinality") String mode,
                                         @Parameter(description = "Preset time window for volume mode: today, 24h, 7d, or 30d. Ignored in cardinality mode.", example = "7d")
                                         @RequestParam(value = "range_key", required = false) String rangeKey) {
-        return getTenantId().flatMap(tenantId -> async(() -> R.ok(dashboardService.topology(tenantId, mode, rangeKey))));
+        return getTenantId().flatMap(tenantId -> dashboardService.topology(tenantId, mode, rangeKey));
     }
 
 }

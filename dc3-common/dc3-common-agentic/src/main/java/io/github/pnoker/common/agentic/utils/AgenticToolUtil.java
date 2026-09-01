@@ -18,8 +18,7 @@ package io.github.pnoker.common.agentic.utils;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,24 +48,10 @@ public class AgenticToolUtil {
             return List.of();
         }
         return ids.stream()
-                .filter(Objects::nonNull)
+                .filter(id -> id != null && id > 0)
                 .distinct()
                 .limit(AgenticConstant.ToolLimit.MAX_IDS)
                 .toList();
-    }
-
-    /**
-     * Page.
-     *
-     * @param current current
-     * @param size    size
-     * @return page result
-     */
-    public static Pages page(int current, int size) {
-        Pages page = new Pages();
-        page.setCurrent(current);
-        page.setSize(size);
-        return page;
     }
 
     /**
@@ -101,14 +86,9 @@ public class AgenticToolUtil {
         return Objects.isNull(values) || values.isEmpty();
     }
 
-    /**
-     * Determine whether records.
-     *
-     * @param page page
-     * @return {@code true} when the page contains at least one record
-     */
-    public static boolean hasRecords(FacadePage<?> page) {
-        return Objects.nonNull(page) && !isEmpty(page.getRecords());
+    /** Determine whether an offset page contains at least one item. */
+    public static boolean hasItems(OffsetPage<?> page) {
+        return Objects.nonNull(page) && !isEmpty(page.items());
     }
 
 }

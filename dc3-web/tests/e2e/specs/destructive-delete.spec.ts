@@ -152,12 +152,12 @@ function uniqueName() {
 }
 
 async function listCount(page: Page, listUrl: string, nameField: string, name: string) {
-  const response = await apiPost<{ records?: unknown[]; total?: number }>(page, listUrl, {
-    page: {current: 1, size: 1},
+  const response = await apiPost<{items?: unknown[]; total?: number}>(page, listUrl, {
+    offset: 0, limit: 1,
     [nameField]: name,
   });
-  if (!response.data?.ok) return -1;
-  return response.data.data?.records?.length ?? 0;
+  if (response.status >= 300) return -1;
+  return response.data?.items?.length ?? 0;
 }
 
 test.describe('destructive UI delete', () => {
@@ -188,7 +188,7 @@ test.describe('destructive UI delete', () => {
       try {
         const name = uniqueName();
         const seed = await apiPost(page, testCase.addUrl, testCase.seed(name, deps));
-        expect(seed.data?.ok, `${testCase.name} seed`).toBe(true);
+        expect(seed.status, `${testCase.name} seed`).toBeLessThan(300);
 
         // Confirm the seed actually shows up in the list — protects
         // against silent backend acceptance that doesn't materialise.

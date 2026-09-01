@@ -28,6 +28,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,10 +38,10 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PointValueReceiverTest {
@@ -61,25 +63,26 @@ class PointValueReceiverTest {
     void persistsCompleteBatchBeforeAcknowledging() {
         MqReceived<PointValueBO> first = received(validValue("m-1", 1L));
         MqReceived<PointValueBO> second = received(validValue("m-2", 2L));
+        when(pointValueService.save(anyList())).thenReturn(Mono.empty());
 
-        receiver.pointValueReceive(List.of(first, second), ack);
+        StepVerifier.create(receiver.pointValueReceive(List.of(first, second), ack))
+                .verifyComplete();
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<PointValueBO>> captor = ArgumentCaptor.forClass(List.class);
         verify(pointValueService).save(captor.capture());
         assertThat(captor.getValue()).extracting(PointValueBO::getMessageId)
                 .containsExactly("m-1", "m-2");
-        verify(ack).ack();
     }
 
     @Test
     void doesNotAcknowledgeWhenPersistenceFails() {
-        doThrow(new IllegalStateException("database unavailable"))
-                .when(pointValueService).save(anyList());
+        when(pointValueService.save(anyList()))
+                .thenReturn(Mono.error(new IllegalStateException("database unavailable")));
 
-        assertThatThrownBy(() -> receiver.pointValueReceive(List.of(received(validValue("m-1", 1L))), ack))
-                .isInstanceOf(IllegalStateException.class);
-        verify(ack, never()).ack();
+        StepVerifier.create(receiver.pointValueReceive(List.of(received(validValue("m-1", 1L))), ack))
+                .expectErrorMessage("database unavailable")
+                .verify();
     }
 
     @Test
@@ -94,7 +97,7 @@ class PointValueReceiverTest {
 
     @Test
     void ignoresEmptyBatch() {
-        receiver.pointValueReceive(List.of(), ack);
+        StepVerifier.create(receiver.pointValueReceive(List.of(), ack)).verifyComplete();
 
         verifyNoInteractions(pointValueService, ack);
     }

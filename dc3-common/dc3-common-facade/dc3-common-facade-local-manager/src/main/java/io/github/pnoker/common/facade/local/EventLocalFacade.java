@@ -17,25 +17,22 @@
 
 package io.github.pnoker.common.facade.local;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.facade.api.EventFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeEventQuery;
+import io.github.pnoker.common.facade.entity.query.FacadeEventOffsetQuery;
 import io.github.pnoker.common.facade.local.builder.FacadeEventBuilder;
-import io.github.pnoker.common.manager.entity.bo.EventBO;
-import io.github.pnoker.common.manager.entity.query.EventQuery;
-import io.github.pnoker.common.manager.service.EventService;
-import io.github.pnoker.common.tenant.TenantContextHolder;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.manager.service.ReactiveEventService;
+import io.github.pnoker.common.manager.repository.EventFilter;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * In-process EventFacade implementation.
@@ -43,58 +40,30 @@ import java.util.Objects;
  * @author pnoker
  * @since 2016.10.1
  */
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class EventLocalFacade implements EventFacade {
 
-    private final EventService eventService;
+    private final ReactiveEventService reactiveEventService;
 
     private final FacadeEventBuilder facadeEventBuilder;
 
     @Override
-    public FacadeEventBO getById(Long tenantId, Long id) {
-        TenantContextHolder.setTenantId(tenantId);
-        try {
-            EventBO managerBO = eventService.getById(id);
-            return Objects.isNull(managerBO) ? null : facadeEventBuilder.toFacadeBO(managerBO);
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Mono<FacadeEventBO> getById(Long tenantId, Long id) {
+        return reactiveEventService.getById(tenantId, id)
+                .map(facadeEventBuilder::toFacadeBO)
+                .onErrorResume(NotFoundException.class, ignored -> Mono.empty());
     }
 
     @Override
-    public List<FacadeEventBO> listByIds(Long tenantId, Collection<Long> ids) {
-        TenantContextHolder.setTenantId(tenantId);
-        try {
-            if (Objects.isNull(ids) || ids.isEmpty()) {
-                return Collections.emptyList();
-            }
-            List<EventBO> list = eventService.listByIds(new HashSet<>(ids));
-            if (Objects.isNull(list) || list.isEmpty()) {
-                return Collections.emptyList();
-            }
-            return list.stream().map(facadeEventBuilder::toFacadeBO).toList();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Flux<FacadeEventBO> listByIds(Long tenantId, Collection<Long> ids) {
+        return reactiveEventService.listByIds(tenantId, ids == null ? List.of() : ids.stream().filter(Objects::nonNull).distinct().toList()).map(facadeEventBuilder::toFacadeBO);
     }
 
     @Override
-    public FacadePage<FacadeEventBO> listByPage(FacadeEventQuery query) {
-        TenantContextHolder.setTenantId(query.getTenantId());
-        try {
-            EventQuery managerQuery = facadeEventBuilder.toManagerQuery(query);
-            Page<EventBO> page = eventService.list(managerQuery);
-            if (Objects.isNull(page)) {
-                return FacadePage.empty();
-            }
-
-            List<FacadeEventBO> records = page.getRecords().stream().map(facadeEventBuilder::toFacadeBO).toList();
-            return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Mono<OffsetPage<FacadeEventBO>> list(FacadeEventOffsetQuery query) {
+        return reactiveEventService.list(new EventFilter(query.tenantId(), query.eventName(), query.eventCode(), query.eventTypeFlag(), query.eventLevelFlag(), query.profileId(), query.enableFlag(), query.version(), query.deviceId(), query.offset(), query.limit(), query.sort()))
+                .map(page -> OffsetPage.of(page.items().stream().map(facadeEventBuilder::toFacadeBO).toList(), page.offset(), page.limit(), page.total()));
     }
 
 }

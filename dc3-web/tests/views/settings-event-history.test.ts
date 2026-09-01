@@ -21,8 +21,8 @@ import {describe, expect, it, vi} from 'vitest';
 import {mountListPage} from './_helpers';
 
 const eventMocks = vi.hoisted(() => ({
-  getEventHistoryByRecordId: vi.fn(() => Promise.resolve({data: {}})),
-  listEventHistory: vi.fn(() => Promise.resolve({data: {records: [], total: 0}})),
+  getEventHistoryByRecordId: vi.fn(() => Promise.resolve( {})),
+  listEventHistory: vi.fn(() => Promise.resolve( {items: [], total: 0})),
 }));
 
 vi.mock('@/api/event', () => eventMocks);

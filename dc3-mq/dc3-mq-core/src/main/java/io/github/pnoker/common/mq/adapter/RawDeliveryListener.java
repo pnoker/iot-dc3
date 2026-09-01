@@ -17,6 +17,9 @@
 
 package io.github.pnoker.common.mq.adapter;
 
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
+import reactor.core.publisher.Mono;
+
 /**
  * Single-delivery callback the core registers with the adapter.
  *
@@ -30,6 +33,7 @@ public interface RawDeliveryListener {
      * Handle one raw delivery.
      *
      * @param delivery the raw delivery
+     * @return one terminal broker action after business processing completes
      */
-    void onDelivery(WireMqDelivery delivery);
+    Mono<DeliveryDisposition> onDelivery(WireMqDelivery delivery);
 }

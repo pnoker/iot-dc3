@@ -272,8 +272,8 @@ const state = reactive({
 
 const fetchCount = async (source: 'point' | 'device' | 'driver', confirmFlag: number | null) => {
   try {
-    const res: { data?: { total?: number } } = await alertPage({source, confirmFlag, current: 1, size: 1});
-    return Number(res?.data?.total ?? 0);
+    const res: any = await alertPage({source, confirmFlag, offset: 0, limit: 1});
+    return Number(res?.total ?? 0);
   } catch {
     return 0;
   }
@@ -294,28 +294,20 @@ const load = async () => {
     state.deviceUnconfirmed = du;
     state.driverTotal = rt;
     state.driverUnconfirmed = ru;
-    const statsData = (
-      stats as {
-        data?: {
-          sparkline24h?: number[];
-          todayDeviceAlarms?: number;
-          todayDriverAlarms?: number;
-          todayDeviceUnconfirmed?: number;
-          todayDriverUnconfirmed?: number;
-        };
-      } | null
-    )?.data;
+    const statsData = stats as {
+      sparkline24h?: number[];
+      todayDeviceAlarms?: number;
+      todayDriverAlarms?: number;
+      todayDeviceUnconfirmed?: number;
+      todayDriverUnconfirmed?: number;
+    } | null;
     state.sparkline24h = statsData?.sparkline24h ?? [];
     state.todayDevice = Number(statsData?.todayDeviceAlarms ?? 0);
     state.todayDriver = Number(statsData?.todayDriverAlarms ?? 0);
     state.todayDeviceUnconfirmed = Number(statsData?.todayDeviceUnconfirmed ?? 0);
     state.todayDriverUnconfirmed = Number(statsData?.todayDriverUnconfirmed ?? 0);
 
-    const trendRows =
-      ((trend as { data?: Array<{ deviceCount?: number; driverCount?: number }> } | null)?.data as Array<{
-        deviceCount?: number;
-        driverCount?: number;
-      }>) || [];
+    const trendRows = (trend as Array<{ deviceCount?: number; driverCount?: number }> | null) || [];
     state.driverDaily = trendRows.map((r) => Number(r.driverCount || 0));
     state.deviceDaily = trendRows.map((r) => Number(r.deviceCount || 0));
   } finally {

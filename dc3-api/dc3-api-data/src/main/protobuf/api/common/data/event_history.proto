@@ -19,9 +19,8 @@ syntax = "proto3";
 
 package api.common.data;
 
-import "api/common/r.proto";
 import "api/common/page.proto";
-import "api/common/data/command_history.proto";
+import "api/common/data/data_query.proto";
 
 option java_package = "io.github.pnoker.api.center.data";
 option java_outer_classname = "EventHistoryProto";
@@ -29,9 +28,9 @@ option objc_class_prefix = "Data";
 option java_multiple_files = true;
 
 service EventHistoryApi {
-  rpc ReportEvent (GrpcEventReportVO) returns (GrpcRString);
-  rpc GetByRecordId (GrpcStringQuery) returns (GrpcREventHistoryDTO);
-  rpc ListByPage (GrpcEventHistoryQuery) returns (GrpcRPageEventHistoryDTO);
+  rpc ReportEvent (GrpcEventReportVO) returns (GrpcEventAccepted);
+  rpc GetByRecordId (GrpcStringQuery) returns (GrpcEventHistoryDTO);
+  rpc List (GrpcEventHistoryQuery) returns (GrpcEventHistoryOffsetPage);
 }
 
 message GrpcEventReportVO {
@@ -65,24 +64,18 @@ message GrpcEventHistoryDTO {
 }
 
 message GrpcEventHistoryQuery {
-  int64 device_id = 1;
-  int64 event_id = 2;
-  int32 event_type_flag = 3;
-  int64 tenant_id = 4;
-  GrpcPage page = 5;
+  PageRequest page = 1;
+  int64 tenant_id = 2;
+  optional int64 device_id = 3;
+  optional int64 event_id = 4;
+  optional int32 event_type_flag = 5;
 }
 
-message GrpcREventHistoryDTO {
-  GrpcR result = 1;
-  GrpcEventHistoryDTO data = 2;
+message GrpcEventAccepted {
+  string record_id = 1;
 }
 
-message GrpcPageEventHistoryDTO {
-  GrpcPage page = 1;
-  repeated GrpcEventHistoryDTO data = 2;
-}
-
-message GrpcRPageEventHistoryDTO {
-  GrpcR result = 1;
-  GrpcPageEventHistoryDTO data = 2;
+message GrpcEventHistoryOffsetPage {
+  OffsetPage page = 1;
+  repeated GrpcEventHistoryDTO items = 2;
 }

@@ -32,20 +32,13 @@
     <packaging>pom</packaging>
 
     <description>
-        IoT DC3 pluggable time-series store layer: the store-neutral TsdbStore port, one
-        adapter per store (timescale default, tdengine, influxdb, iotdb planned) and the
-        contract suite that gates adapter compliance. Deployments pick exactly one store
-        via dc3.tsdb.type — see docs/design/tsdb-abstraction.md and docs/mq-brokers.md
-        for the sibling broker family.
+        IoT DC3 time-series port backed by PostgreSQL TimescaleDB. The store-neutral
+        TsdbStore contract keeps history, aggregation and cursor semantics explicit while
+        the runtime uses the same R2DBC connection and transaction boundary as relational data.
     </description>
 
     <modules>
         <module>dc3-tsdb-core</module>
-        <module>dc3-tsdb-timescale</module>
-        <module>dc3-tsdb-tdengine</module>
-        <module>dc3-tsdb-influxdb</module>
-        <module>dc3-tsdb-iotdb</module>
-        <module>dc3-tsdb-tck</module>
     </modules>
 
 </project>

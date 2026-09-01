@@ -16,15 +16,13 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
-import io.github.pnoker.common.agentic.entity.bo.ActionBO;
 import io.github.pnoker.common.agentic.entity.builder.ActionBuilder;
 import io.github.pnoker.common.agentic.entity.vo.ActionVO;
 import io.github.pnoker.common.agentic.service.ActionService;
-import io.github.pnoker.common.agentic.utils.AgenticConversationIdUtil;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -62,7 +60,7 @@ public class ActionController implements BaseController {
      * List agent tool calls awaiting human approval in the given conversation.
      *
      * @param conversationId client-visible id of the conversation whose pending tool calls are listed; scoped to the current tenant and user
-     * @return a list of pending ActionVO entries with tool name and parameters, ready for the user to confirm or reject
+     * @return an offset page of pending ActionVO entries with tool name and parameters
      */
     @PreAuthorize("@perm.can('action', 'get')")
     @Operation(summary = "List Pending Agent Actions", description = "List agent tool calls awaiting human approval in the given conversation, scoped to the current tenant and user. " +
@@ -74,26 +72,30 @@ public class ActionController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/pending")
-    public Mono<R<List<ActionVO>>> pending(@Parameter(description = "Unique identifier of the agentic conversation whose pending tool calls are to be listed; scoped to the current tenant and user.", example = "conv-20240618-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
-                    conversationId);
-            List<ActionVO> actions = actionBuilder.buildVOListByBOList(actionService.listPending(scopedConversationId,
-                    header));
-            actions.forEach(action -> sanitize(header, action));
-            return R.ok(actions);
-        }));
+    public Mono<OffsetPage<ActionVO>> pending(@Parameter(description = "Unique identifier of the agentic conversation whose pending tool calls are to be listed; scoped to the current tenant and user.", example = "conv-20240618-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
+                                              @Parameter(description = "Zero-based offset into the pending action collection.", example = "0")
+                                              @RequestParam(value = "offset", defaultValue = "0") long offset,
+                                              @Parameter(description = "Maximum number of pending actions to return (1-200).", example = "50")
+                                              @RequestParam(value = "limit", defaultValue = "50") int limit) {
+        return getPrincipalHeader().flatMap(header -> {
+            PageRequest pageRequest = new PageRequest(offset, limit);
+            return actionService.listPending(pageRequest.offset(), pageRequest.limit(), conversationId, header)
+                    .map(page -> {
+                        List<ActionVO> items = actionBuilder.buildVOListByBOList(page.items());
+                        return OffsetPage.of(items, page.offset(), page.limit(), page.total());
+                    });
+        });
     }
 
     /**
      * Approve a pending agent tool call so the assistant may execute it.
      *
      * @param actionId id of the pending agent tool call to approve; must belong to the current tenant and be in pending state
-     * @return the ActionVO with its updated confirmed status
+     * @return the ActionVO with its updated execution status
      */
     @PreAuthorize("@perm.can('action', 'list')")
     @Operation(summary = "Confirm Agent Action", description = "Approve a pending agent tool call by id so the assistant may execute it. " +
-            "Returns the action with its updated confirmed status; call after the user accepts a proposed tool invocation.",
+            "Returns the action with its updated execution status; call after the user accepts a proposed tool invocation.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -101,13 +103,9 @@ public class ActionController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/confirm")
-    public Mono<R<ActionVO>> confirm(@Parameter(description = "Unique identifier of the pending agent tool call to approve; the action must belong to the current tenant and be in pending state.", example = "action-20240618-xyz789") @NotBlank @RequestParam(value = "action_id") String actionId) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            ActionBO actionBO = actionService.confirm(actionId, header);
-            ActionVO action = actionBuilder.buildVOByBO(actionBO);
-            sanitize(header, action);
-            return R.ok(action);
-        }));
+    public Mono<ActionVO> confirm(@Parameter(description = "Unique identifier of the pending agent tool call to approve; the action must belong to the current tenant and be in pending state.", example = "action-20240618-xyz789") @NotBlank @RequestParam(value = "action_id") String actionId) {
+        return getPrincipalHeader().flatMap(header -> actionService.confirm(actionId, header)
+                .map(actionBuilder::buildVOByBO));
     }
 
     /**
@@ -126,18 +124,9 @@ public class ActionController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/reject")
-    public Mono<R<ActionVO>> reject(@Parameter(description = "Unique identifier of the pending agent tool call to decline; the action must belong to the current tenant and be in pending state.", example = "action-20240618-xyz789") @NotBlank @RequestParam(value = "action_id") String actionId) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            ActionBO actionBO = actionService.reject(actionId, header);
-            ActionVO action = actionBuilder.buildVOByBO(actionBO);
-            sanitize(header, action);
-            return R.ok(action);
-        }));
-    }
-
-    private void sanitize(RequestHeader.PrincipalHeader header, ActionVO action) {
-        action.setConversationId(AgenticConversationIdUtil.stripScope(header.getTenantId(), header.getUserId(),
-                action.getConversationId()));
+    public Mono<ActionVO> reject(@Parameter(description = "Unique identifier of the pending agent tool call to decline; the action must belong to the current tenant and be in pending state.", example = "action-20240618-xyz789") @NotBlank @RequestParam(value = "action_id") String actionId) {
+        return getPrincipalHeader().flatMap(header -> actionService.reject(actionId, header)
+                .map(actionBuilder::buildVOByBO));
     }
 
 }

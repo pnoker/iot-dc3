@@ -97,8 +97,8 @@ const render = () => {
 
 const load = () =>
   run(async () => {
-    const res: { data?: MttaTrend[] } = await alertMtta(Number(daysKey.value));
-    rows.value = res?.data ?? [];
+    const res: MttaTrend[] = await alertMtta(Number(daysKey.value));
+    rows.value = res ?? [];
     await nextTick();
     if (rows.value.length > 0) render();
   });

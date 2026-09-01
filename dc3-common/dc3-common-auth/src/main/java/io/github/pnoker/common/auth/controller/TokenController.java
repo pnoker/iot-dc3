@@ -18,14 +18,12 @@
 package io.github.pnoker.common.auth.controller;
 
 import io.github.pnoker.common.annotation.PublicEndpoint;
-import io.github.pnoker.common.auth.biz.TokenService;
+import io.github.pnoker.common.auth.biz.ReactiveTokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.auth.entity.query.TokenQuery;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.utils.TimeUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
@@ -33,6 +31,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,11 +40,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import reactor.core.publisher.Mono;
+import io.github.pnoker.common.exception.UnAuthorizedException;
 
 import java.time.Duration;
-import java.util.Objects;
-
 /**
  * REST controller for token validation and management.
  *
@@ -59,7 +58,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class TokenController implements BaseController {
 
-    private final TokenService tokenService;
+    private final ReactiveTokenService tokenService;
 
     /**
      * Generate a random password salt for a user under the given tenant.
@@ -88,11 +87,8 @@ public class TokenController implements BaseController {
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
     @PostMapping("/salt")
-    public Mono<R<String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
-        return async(() -> {
-            String salt = tokenService.generateSalt(entityVO.getName(), entityVO.getTenant());
-            return Objects.nonNull(salt) ? R.ok(salt, "The salt will expire in 5 minutes") : R.fail();
-        });
+    public Mono<String> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
+        return tokenService.generateSalt(entityVO.getName(), entityVO.getTenant());
     }
 
     /**
@@ -123,19 +119,11 @@ public class TokenController implements BaseController {
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
     @PostMapping("/generate")
-    public Mono<R<String>> generateToken(@Validated @RequestBody TokenQuery entityVO, ServerHttpResponse response) {
-        return async(() -> {
-            String token = tokenService.generateToken(entityVO.getName(), entityVO.getPassword(),
-                    entityVO.getTenant());
-            if (Objects.nonNull(token)) {
-                response.addCookie(ResponseCookie.from(RequestConstant.Header.TOKEN_COOKIE, token)
+    public Mono<String> generateToken(@Validated @RequestBody TokenQuery entityVO, ServerHttpResponse response) {
+        return tokenService.generateToken(entityVO.getName(), entityVO.getPassword(), entityVO.getTenant())
+                .doOnNext(token -> response.addCookie(ResponseCookie.from(RequestConstant.Header.TOKEN_COOKIE, token)
                         .httpOnly(true).secure(true).sameSite("Strict").path("/")
-                        .maxAge(Duration.ofHours(12)).build());
-            }
-            // Token travels in the httpOnly cookie above; the body only signals success
-            // so the value never reaches frontend storage.
-            return Objects.nonNull(token) ? R.ok("ok", "The token will expire in 12 hours.") : R.fail();
-        });
+                        .maxAge(Duration.ofHours(12)).build()));
     }
 
     /**
@@ -166,12 +154,9 @@ public class TokenController implements BaseController {
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
     @PostMapping("/change_password")
-    public Mono<R<Boolean>> changePassword(@Validated @RequestBody TokenQuery entityVO) {
-        return async(() -> {
-            tokenService.changePassword(entityVO.getName(), entityVO.getPassword(), entityVO.getNewPassword(),
-                    entityVO.getTenant());
-            return R.ok(true, "Password changed");
-        });
+    public Mono<Boolean> changePassword(@Validated @RequestBody TokenQuery entityVO) {
+        return tokenService.changePassword(entityVO.getName(), entityVO.getPassword(), entityVO.getNewPassword(),
+                        entityVO.getTenant()).thenReturn(Boolean.TRUE);
     }
 
     /**
@@ -191,16 +176,14 @@ public class TokenController implements BaseController {
                     @ExtensionProperty(name = "hidden", value = "true")
             }))
     @PostMapping("/cancel")
-    public Mono<R<Boolean>> cancelToken(@Validated @RequestBody TokenQuery entityVO, ServerHttpResponse response) {
-        return async(() -> {
-            boolean ok = tokenService.tryCancelToken(entityVO.getName(), entityVO.getTenant());
-            if (ok) {
-                response.addCookie(ResponseCookie.from(RequestConstant.Header.TOKEN_COOKIE, "")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> cancelToken(@Validated @RequestBody TokenQuery entityVO, ServerHttpResponse response) {
+        return tokenService.tryCancelToken(entityVO.getName(), entityVO.getTenant())
+                .flatMap(cancelled -> cancelled
+                        ? Mono.fromRunnable(() -> response.addCookie(ResponseCookie.from(RequestConstant.Header.TOKEN_COOKIE, "")
                         .httpOnly(true).secure(true).sameSite("Strict").path("/")
-                        .maxAge(Duration.ZERO).build());
-            }
-            return ok ? R.ok(true, "Token cancelled") : R.fail("Cancel token failed");
-        });
+                        .maxAge(Duration.ZERO).build()))
+                        : Mono.error(new UnAuthorizedException("Cancel token failed")));
     }
 
     /**
@@ -219,23 +202,8 @@ public class TokenController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/check")
-    public Mono<R<Boolean>> checkValid(@Validated @RequestBody TokenQuery entityVO) {
-        return async(() -> {
-            TokenValid tokenValid = tokenService.checkValid(entityVO.getName(), entityVO.getToken(),
-                    entityVO.getTenant());
-
-            boolean valid = tokenValid.isValid();
-            String message = "The token has expired";
-            if (valid && Objects.nonNull(tokenValid.getExpireTime())) {
-                String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
-                message = "The token will expire in " + expireTime;
-            } else if (!valid && Objects.nonNull(tokenValid.getExpireTime())) {
-                String expireTime = TimeUtil.completeFormat(tokenValid.getExpireTime());
-                message = "The token has expired in " + expireTime;
-            }
-
-            return R.ok(valid, message);
-        });
+    public Mono<TokenValid> checkValid(@Validated @RequestBody TokenQuery entityVO) {
+        return tokenService.checkValid(entityVO.getName(), entityVO.getToken(), entityVO.getTenant());
     }
 
 }

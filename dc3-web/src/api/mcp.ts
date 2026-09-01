@@ -17,7 +17,7 @@
 
 import {httpGet, httpPost} from '@/api/common';
 import {API_MCP_BASE} from '@/config/constant/api';
-import type {PageResult} from '@/config/types';
+import type {PageQuery, PageResult} from '@/config/types';
 import type {
   McpAuditRecord,
   McpClientRegistrationForm,
@@ -27,37 +27,39 @@ import type {
   OAuthClientRecord,
 } from '@/config/types/auth';
 
-export const getMcpMetadata = () => httpGet<R<Record<string, unknown>>>(`${API_MCP_BASE}/metadata`);
+export const getMcpMetadata = () => httpGet<Record<string, unknown>>(`${API_MCP_BASE}/metadata`);
 
 export const registerMcpClient = (body: McpClientRegistrationForm) =>
-  httpPost<R<Record<string, unknown>>>(`${API_MCP_BASE}/client/register`, body);
+  httpPost<Record<string, unknown>>(`${API_MCP_BASE}/client/register`, body);
 
-export const listMcpClient = () => httpPost<R<OAuthClientRecord[]>>(`${API_MCP_BASE}/client/list`);
+export const listMcpClient = () => httpPost<OAuthClientRecord[]>(`${API_MCP_BASE}/client/list`);
 
-export const listMcpConnection = () => httpPost<R<McpConnectionRecord[]>>(`${API_MCP_BASE}/connection/list`);
+export const listMcpConnection = () => httpPost<McpConnectionRecord[]>(`${API_MCP_BASE}/connection/list`);
 
 export const addMcpConnection = (body: McpConnectionForm) =>
-  httpPost<R<McpConnectionRecord>>(`${API_MCP_BASE}/connection/add`, body);
+  httpPost<McpConnectionRecord>(`${API_MCP_BASE}/connection/add`, body);
 
 export const revokeMcpConnection = (id: string) =>
-  httpPost<R<boolean>>(`${API_MCP_BASE}/connection/revoke`, undefined, {params: {id}});
+  httpPost<boolean>(`${API_MCP_BASE}/connection/revoke`, undefined, {params: {id}});
 
 export const replaceMcpConnectionTools = (connectionId: string, toolIds: string[]) =>
-  httpPost<R<boolean>>(`${API_MCP_BASE}/connection/tools/replace`, {
+  httpPost<boolean>(`${API_MCP_BASE}/connection/tools/replace`, {
     connectionId,
     toolIds,
   });
 
 export const listMcpConnectionTool = (id: string) =>
-  httpGet<R<string[]>>(`${API_MCP_BASE}/connection/tools/list`, {params: {id}});
+  httpGet<string[]>(`${API_MCP_BASE}/connection/tools/list`, {params: {id}});
 
-export const refreshMcpToolCatalog = () => httpPost<R<number>>(`${API_MCP_BASE}/tool/catalog/refresh`);
+export const refreshMcpToolCatalog = () => httpPost<number>(`${API_MCP_BASE}/tool/catalog/refresh`);
 
 export const listMcpTool = (query: {
   keyword?: string;
   riskLevel?: string;
-  page?: {current?: number; size?: number};
-} = {}) => httpPost<R<PageResult<McpToolRecord>>>(`${API_MCP_BASE}/tool/list`, query);
+  offset?: number;
+  limit?: number;
+  sort?: PageQuery['sort'];
+} = {}) => httpPost<PageResult<McpToolRecord>>(`${API_MCP_BASE}/tool/list`, query);
 
 export const listMcpAudit = (
   params: {
@@ -65,11 +67,11 @@ export const listMcpAudit = (
     toolId?: string;
     status?: string;
     riskLevel?: string;
-    current?: number;
-    size?: number;
+    offset?: number;
+    limit?: number;
   } = {}
 ) =>
-  httpPost<R<PageResult<McpAuditRecord>>>(`${API_MCP_BASE}/audit/list`, undefined, {
+  httpPost<PageResult<McpAuditRecord>>(`${API_MCP_BASE}/audit/list`, undefined, {
     // Wire params follow the platform snake_case query convention; the camelCase
     // signature is kept for callers. Undefined keys are dropped by the transport.
     params: {
@@ -77,7 +79,7 @@ export const listMcpAudit = (
       tool_id: params.toolId,
       status: params.status,
       risk_level: params.riskLevel,
-      current: params.current,
-      size: params.size,
+      offset: params.offset,
+      limit: params.limit,
     },
   });

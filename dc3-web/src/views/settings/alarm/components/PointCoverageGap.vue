@@ -97,8 +97,8 @@ const subtitleText = computed(() =>
 
 const load = () =>
   run(async () => {
-    const res: { data?: CoverageGap } = await coverageGap(100);
-    Object.assign(report, res?.data ?? {totalPoints: 0, missingPoints: 0, items: []});
+    const res: CoverageGap = await coverageGap(100);
+    Object.assign(report, res ?? {totalPoints: 0, missingPoints: 0, items: []});
     await Promise.all([
       resolvePoints(report.items.map((r) => r.pointId)),
       resolveProfiles(report.items.map((r) => r.profileId)),

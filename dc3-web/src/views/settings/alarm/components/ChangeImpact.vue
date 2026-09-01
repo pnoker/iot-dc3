@@ -79,8 +79,8 @@ const rows = ref<ChangeImpact[]>([]);
 
 const load = () =>
   run(async () => {
-    const res: { data?: ChangeImpact[] } = await alertChangeImpact(Number(daysKey.value), 30);
-    rows.value = res?.data ?? [];
+    const res: ChangeImpact[] = await alertChangeImpact(Number(daysKey.value), 30);
+    rows.value = res ?? [];
     // Each entityId goes through its kind-specific batch endpoint.
     await Promise.all([
       resolveDrivers(rows.value.filter((r) => r.kind === 'driver').map((r) => r.entityId)),

@@ -17,18 +17,16 @@
 
 package io.github.pnoker.common.mq.adapter;
 
-import io.github.pnoker.common.mq.listener.Acknowledgment;
-
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import java.util.Map;
 
 /**
  * Raw wire-level delivery an adapter hands to the core bridge: JSON body, string
- * headers, redelivery flag and the adapter-built acknowledgement handle. For batch
- * deliveries the acknowledgement is batch-level (ack commits the whole batch).
+ * headers and redelivery flag. Broker acknowledgment handles never cross the adapter
+ * boundary; the listener returns a {@link DeliveryDisposition} after completion.
  *
  * @author pnoker
  * @since 2026.8.19
  */
-public record WireMqDelivery(byte[] body, Map<String, String> headers, boolean redelivered,
-                             Acknowledgment acknowledgment) {
+public record WireMqDelivery(byte[] body, Map<String, String> headers, boolean redelivered) {
 }

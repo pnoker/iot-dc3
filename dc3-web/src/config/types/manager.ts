@@ -44,6 +44,7 @@ export interface DeviceForm {
 
 export interface DeviceRecord extends DeviceForm {
   id: string;
+  version: number;
   createTime?: string;
   operateTime?: string;
 }
@@ -52,12 +53,14 @@ export interface DeviceRecord extends DeviceForm {
 
 export interface DriverRecord {
   id: string;
+  version: number;
   driverName?: string;
   driverCode?: string;
   serviceName?: string;
   serviceHost?: string;
   driverTypeFlag?: string;
   enableFlag?: string;
+  remark?: string;
   createTime?: string;
   operateTime?: string;
 
@@ -89,6 +92,7 @@ export interface ProfileForm {
 
 export interface ProfileRecord extends ProfileForm {
   id: string;
+  version: number;
   createTime?: string;
   operateTime?: string;
 }
@@ -123,6 +127,7 @@ export interface PointForm {
 
 export interface PointRecord extends PointForm {
   id: string;
+  version: number;
   createTime?: string;
   operateTime?: string;
 }
@@ -131,6 +136,7 @@ export interface PointRecord extends PointForm {
 
 export interface DriverInfoForm {
   id?: string;
+  version?: number;
   deviceId?: string;
   attributeId?: string;
   configValue?: string;
@@ -140,6 +146,7 @@ export interface DriverInfoForm {
 
 export interface PointInfoForm {
   id?: string;
+  version?: number;
   deviceId?: string;
   pointId?: string;
   attributeId?: string;
@@ -150,6 +157,7 @@ export interface PointInfoForm {
 
 export interface CommandInfoForm {
   id?: string;
+  version?: number;
   deviceId?: string;
   commandId?: string;
   attributeId?: string;
@@ -160,6 +168,7 @@ export interface CommandInfoForm {
 
 export interface EventInfoForm {
   id?: string;
+  version?: number;
   deviceId?: string;
   eventId?: string;
   attributeId?: string;

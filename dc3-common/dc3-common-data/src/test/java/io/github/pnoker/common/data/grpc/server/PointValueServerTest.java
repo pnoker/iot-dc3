@@ -17,22 +17,21 @@
 
 package io.github.pnoker.common.data.grpc.server;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 import io.github.pnoker.api.center.data.GrpcPointValueCommandQuery;
 import io.github.pnoker.api.center.data.GrpcPointValueDTO;
 import io.github.pnoker.api.center.data.GrpcPointValueHistoryQuery;
 import io.github.pnoker.api.center.data.GrpcPointValueQuery;
 import io.github.pnoker.api.center.data.GrpcPointValueWriteCommand;
-import io.github.pnoker.api.center.data.GrpcRBoolean;
-import io.github.pnoker.api.center.data.GrpcRPointValueDTO;
-import io.github.pnoker.api.center.data.GrpcRPointValueStringList;
+import io.github.pnoker.api.center.data.GrpcPointCommandAccepted;
+import io.github.pnoker.db.r2dbc.core.page.CursorPage;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
 import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
@@ -49,9 +48,9 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -88,113 +87,99 @@ class PointValueServerTest {
     }
 
     @Test
-    void lastValueReturnsOkEnvelopeWithDataForKnownPoint() {
-        Page<PointValueBO> page = new Page<>();
-        page.setRecords(List.of(PointValueBO.builder()
+    void lastValueReturnsDataForKnownPoint() {
+        OffsetPage<PointValueBO> page = OffsetPage.of(List.of(PointValueBO.builder()
                 .deviceId(10L)
                 .pointId(20L)
                 .rawValue("42")
                 .calValue("42.0")
-                .build()));
-        when(pointValueService.latest(any())).thenReturn(page);
+                .build()), 0, 1, 1);
+        when(pointValueService.latest(any())).thenReturn(Mono.just(page));
 
-        GrpcRPointValueDTO response = stub.getLastValue(GrpcPointValueQuery.newBuilder()
+        GrpcPointValueDTO response = stub.getLastValue(GrpcPointValueQuery.newBuilder()
                 .setTenantId(1L)
                 .setDeviceId(10L)
                 .setPointId(20L)
                 .build());
-        assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getData().getValue()).isEqualTo("42.0");
-        assertThat(response.getData().getRawValue()).isEqualTo("42");
+        assertThat(response.getValue()).isEqualTo("42.0");
+        assertThat(response.getRawValue()).isEqualTo("42");
     }
 
     @Test
-    void lastValueReturnsNoResourceForEmptyPage() {
-        Page<PointValueBO> empty = new Page<>();
-        empty.setRecords(List.of());
-        when(pointValueService.latest(any())).thenReturn(empty);
+    void lastValueReturnsNotFoundStatusForEmptyPage() {
+        OffsetPage<PointValueBO> empty = OffsetPage.of(List.of(), 0, 1, 0);
+        when(pointValueService.latest(any())).thenReturn(Mono.just(empty));
 
-        GrpcRPointValueDTO response = stub.getLastValue(GrpcPointValueQuery.newBuilder()
-                .setTenantId(1L).setDeviceId(10L).setPointId(20L).build());
-        assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
+        assertThatThrownBy(() -> stub.getLastValue(GrpcPointValueQuery.newBuilder()
+                .setTenantId(1L).setDeviceId(10L).setPointId(20L).build())).hasMessageContaining("NOT_FOUND");
     }
 
     @Test
-    void lastValueReturnsFailureEnvelopeOnException() {
-        when(pointValueService.latest(any())).thenThrow(new NotFoundException("Device does not exist"));
+    void lastValueReturnsGrpcStatusOnException() {
+        when(pointValueService.latest(any())).thenReturn(Mono.error(new NotFoundException("Device does not exist")));
 
-        GrpcRPointValueDTO response = stub.getLastValue(GrpcPointValueQuery.newBuilder()
-                .setTenantId(1L).setDeviceId(99L).setPointId(20L).build());
-        assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.FAILURE.getCode());
-        assertThat(response.getResult().getMessage()).contains("Device");
+        assertThatThrownBy(() -> stub.getLastValue(GrpcPointValueQuery.newBuilder()
+                .setTenantId(1L).setDeviceId(99L).setPointId(20L).build()))
+                .hasMessageContaining("NOT_FOUND");
     }
 
     @Test
     void historyValueReturnsListFromService() {
-        when(pointValueService.history(eq(1L), eq(10L), eq(20L), eq(50)))
-                .thenReturn(List.of(
+        when(pointValueService.history(eq(1L), eq(10L), eq(20L), eq(""), eq(50)))
+                .thenReturn(Mono.just(CursorPage.of(List.of(
                         PointValueBO.builder().calValue("v1").build(),
                         PointValueBO.builder().calValue("v2").build(),
-                        PointValueBO.builder().calValue("v3").build()));
+                        PointValueBO.builder().calValue("v3").build()), null)));
 
-        GrpcRPointValueStringList response = stub.listHistoryValues(GrpcPointValueHistoryQuery.newBuilder()
-                .setTenantId(1L).setDeviceId(10L).setPointId(20L).setCount(50)
+        io.github.pnoker.api.center.data.GrpcPointValueCursorPage response = stub.listHistoryValues(GrpcPointValueHistoryQuery.newBuilder()
+                .setTenantId(1L).setDeviceId(10L).setPointId(20L).setLimit(50)
                 .build());
-        assertThat(response.getResult().getOk()).isTrue();
         assertThat(response.getDataList()).map(GrpcPointValueDTO::getValue).containsExactly("v1", "v2", "v3");
     }
 
     @Test
-    void historyValueReturnsFailureEnvelopeOnException() {
-        when(pointValueService.history(any(), any(), any(), eq(50)))
-                .thenThrow(new NotFoundException("Point does not exist"));
+    void historyValueReturnsGrpcStatusOnException() {
+        when(pointValueService.history(any(), any(), any(), any(), eq(50)))
+                .thenReturn(Mono.error(new NotFoundException("Point does not exist")));
 
-        GrpcRPointValueStringList response = stub.listHistoryValues(GrpcPointValueHistoryQuery.newBuilder()
-                .setTenantId(1L).setDeviceId(10L).setPointId(99L).setCount(50)
-                .build());
-        assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.FAILURE.getCode());
+        assertThatThrownBy(() -> stub.listHistoryValues(GrpcPointValueHistoryQuery.newBuilder()
+                .setTenantId(1L).setDeviceId(10L).setPointId(99L).setLimit(50)
+                .build())).hasMessageContaining("NOT_FOUND");
     }
 
     @Test
     void readCommandDispatchesToCommandService() {
-        GrpcRBoolean response = stub.readCommand(GrpcPointValueCommandQuery.newBuilder()
+        when(pointCommandService.read(any(), any())).thenReturn(reactor.core.publisher.Mono.just("cmd-1"));
+        GrpcPointCommandAccepted response = stub.readCommand(GrpcPointValueCommandQuery.newBuilder()
                 .setTenantId(1L).setDeviceId(10L).setPointId(20L).build());
-        assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getData()).isTrue();
+        assertThat(response.getCommandId()).isEqualTo("cmd-1");
         verify(pointCommandService).read(eq(1L), any(PointCommandReadBO.class));
     }
 
     @Test
     void readCommandReturnsFailureOnAuthorizationError() {
-        doThrow(new io.github.pnoker.common.exception.UnAuthorizedException("nope"))
-                .when(pointCommandService).read(any(), any());
-        GrpcRBoolean response = stub.readCommand(GrpcPointValueCommandQuery.newBuilder()
-                .setTenantId(1L).setDeviceId(10L).setPointId(20L).build());
-        assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getData()).isFalse();
+        when(pointCommandService.read(any(), any())).thenReturn(reactor.core.publisher.Mono.error(
+                new io.github.pnoker.common.exception.UnAuthorizedException("nope")));
+        org.junit.jupiter.api.Assertions.assertThrows(io.grpc.StatusRuntimeException.class, () -> stub.readCommand(GrpcPointValueCommandQuery.newBuilder()
+                .setTenantId(1L).setDeviceId(10L).setPointId(20L).build()));
     }
 
     @Test
     void writeCommandPropagatesValuePayload() {
-        GrpcRBoolean response = stub.writeCommand(GrpcPointValueWriteCommand.newBuilder()
+        when(pointCommandService.write(any(), any())).thenReturn(reactor.core.publisher.Mono.just("cmd-2"));
+        GrpcPointCommandAccepted response = stub.writeCommand(GrpcPointValueWriteCommand.newBuilder()
                 .setTenantId(1L).setDeviceId(10L).setPointId(20L).setValue("99")
                 .build());
-        assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getData()).isTrue();
+        assertThat(response.getCommandId()).isEqualTo("cmd-2");
         verify(pointCommandService).write(eq(1L), any(PointCommandWriteBO.class));
     }
 
     @Test
     void writeCommandReturnsFailureOnException() {
-        doThrow(new NotFoundException("Device does not exist"))
-                .when(pointCommandService).write(any(), any());
-        GrpcRBoolean response = stub.writeCommand(GrpcPointValueWriteCommand.newBuilder()
+        when(pointCommandService.write(any(), any())).thenReturn(reactor.core.publisher.Mono.error(
+                new NotFoundException("Device does not exist")));
+        org.junit.jupiter.api.Assertions.assertThrows(io.grpc.StatusRuntimeException.class, () -> stub.writeCommand(GrpcPointValueWriteCommand.newBuilder()
                 .setTenantId(1L).setDeviceId(99L).setPointId(20L).setValue("v")
-                .build());
-        assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getData()).isFalse();
+                .build()));
     }
 }

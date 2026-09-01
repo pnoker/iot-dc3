@@ -70,7 +70,7 @@ export default defineComponent({
       if (!ids.length) return;
       try {
         const res: any = await listPrincipalByIds(ids);
-        (res?.data || []).forEach((p: any) => {
+        (res || []).forEach((p: any) => {
           principalNameMap[String(p.id)] = p.displayName || p.principalName || String(p.id);
         });
       } catch {
@@ -92,8 +92,8 @@ export default defineComponent({
     const loadPrincipalOptions = async () => {
       if (principalOptions.value.length) return;
       try {
-        const res: any = await listPrincipal({page: {current: 1, size: 1000}});
-        principalOptions.value = (res?.data?.records || []).map((p: any) => ({
+        const res: any = await listPrincipal({offset: 0, limit: 200});
+        principalOptions.value = (res?.items || []).map((p: any) => ({
           label: p.displayName || p.principalName || String(p.id),
           value: String(p.id),
         }));

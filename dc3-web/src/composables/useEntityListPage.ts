@@ -20,7 +20,7 @@ import {computed, reactive, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRouter} from 'vue-router';
 
-import type {Order, PageQuery} from '@/config/types';
+import type {CursorPageResult, Order, PageQuery, SortSpec, PageResult} from '@/config/types';
 import type {EntityColumnConfig, EntityListConfig, EntityOption} from '@/config/types/entityList';
 import {ENUM_TAG_TYPE_MAP} from '@/config/constant/enums';
 import {timestampLabel} from '@/utils/dateUtil';
@@ -69,9 +69,12 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
       total: 0,
       size: config.value.pageSize || 12,
       current: 1,
+      hasNext: false,
       orders: [{column: config.value.defaultOrderColumn || 'create_time', asc: false}] as Order[],
     },
   });
+  let latestLoadId = 0;
+  const cursorStack: Array<string | undefined> = [undefined];
 
   const dialogTitle = computed(() => {
     const entity = config.value.title || config.value.name;
@@ -125,12 +128,16 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
       if (sf.multiple && Array.isArray(value) && value.length === 0) return;
       result[sf.prop] = value;
     });
-    if (config.value.mode !== 'tree') {
-      result.page = {
-        current: state.page.current,
-        size: state.page.size,
-        orders: state.page.orders,
-      };
+    if (config.value.pagination === 'cursor') {
+      result.cursor = cursorStack[state.page.current - 1];
+      result.limit = state.page.size;
+    } else if (config.value.mode !== 'tree') {
+      result.offset = (state.page.current - 1) * state.page.size;
+      result.limit = state.page.size;
+      result.sort = state.page.orders.map((order): SortSpec => ({
+        field: order.column,
+        direction: order.asc ? 'ASC' : 'DESC',
+      }));
     }
     return result;
   };
@@ -161,18 +168,25 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
   };
 
   const load = () => {
+    const loadId = ++latestLoadId;
     state.loading = true;
     config.value
       .list(query())
-      .then((res: R) => {
+      .then((data: PageResult<Record<string, any>> | CursorPageResult<Record<string, any>> | Record<string, any>[]) => {
+        if (loadId !== latestLoadId) return;
         if (config.value.mode === 'tree') {
-          state.rows = (res.data as Record<string, any>[]) || [];
+          state.rows = (data as unknown as Record<string, any>[]) || [];
         } else {
-          // Config-driven boundary: the envelope's data shape depends on the
-          // concrete config.list implementation, so narrow it once here.
-          const page = (res.data ?? {}) as { records?: Record<string, any>[]; total?: number };
-          state.rows = page.records || [];
-          state.page.total = Number(page.total || 0);
+          const page = data as PageResult<Record<string, any>>;
+          state.rows = page.items;
+          if (config.value.pagination === 'cursor') {
+            const cursorPage = data as CursorPageResult<Record<string, any>>;
+            state.page.hasNext = cursorPage.hasNext;
+            cursorStack[state.page.current] = cursorPage.nextCursor ?? undefined;
+          } else {
+            state.page.total = page.total;
+            state.page.hasNext = page.hasNext;
+          }
         }
         // Relations resolve after rows arrive so loaders can act on them.
         return loadRelations(config.value.mode === 'tree' ? flattenRows(state.rows) : state.rows);
@@ -181,19 +195,23 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
         // handled globally
       })
       .finally(() => {
-        state.loading = false;
+        if (loadId === latestLoadId) state.loading = false;
       });
   };
 
   const search = (params: Record<string, any>) => {
     Object.assign(searchForm, params || {});
     state.page.current = 1;
+    cursorStack.splice(0, cursorStack.length, undefined);
+    state.page.hasNext = false;
     load();
   };
 
   const reset = () => {
     resetSearchForm(searchForm, defaultSearchForm());
     state.page.current = 1;
+    cursorStack.splice(0, cursorStack.length, undefined);
+    state.page.hasNext = false;
     load();
   };
 
@@ -201,17 +219,34 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
     const currentOrder = state.page.orders[0];
     const asc = currentOrder ? !currentOrder.asc : true;
     state.page.orders = [{column: config.value.defaultOrderColumn || 'create_time', asc}];
+    cursorStack.splice(0, cursorStack.length, undefined);
+    state.page.current = 1;
     load();
   };
 
   const sizeChange = (size: number) => {
     state.page.size = size;
     state.page.current = 1;
+    cursorStack.splice(0, cursorStack.length, undefined);
+    state.page.hasNext = false;
     load();
   };
 
   const currentChange = (current: number) => {
+    if (config.value.pagination === 'cursor') return;
     state.page.current = current;
+    load();
+  };
+
+  const cursorNext = () => {
+    if (config.value.pagination !== 'cursor' || !state.page.hasNext) return;
+    state.page.current += 1;
+    load();
+  };
+
+  const cursorPrevious = () => {
+    if (config.value.pagination !== 'cursor' || state.page.current <= 1) return;
+    state.page.current -= 1;
     load();
   };
 
@@ -366,6 +401,8 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
     sort,
     sizeChange,
     currentChange,
+    cursorNext,
+    cursorPrevious,
     openAdd,
     openEdit,
     openDetail,

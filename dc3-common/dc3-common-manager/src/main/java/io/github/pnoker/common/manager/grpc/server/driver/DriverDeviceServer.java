@@ -1,236 +1,154 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.manager.grpc.server.driver;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.common.GrpcDeviceDTO;
-import io.github.pnoker.api.common.GrpcPage;
-import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.api.common.GrpcRFactory;
+import io.github.pnoker.api.common.GrpcCommandRuntimeDTO;
+import io.github.pnoker.api.common.GrpcEventRuntimeDTO;
 import io.github.pnoker.api.common.driver.DeviceApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDeviceQuery;
-import io.github.pnoker.api.common.driver.GrpcPageDeviceDTO;
-import io.github.pnoker.api.common.driver.GrpcPageDeviceQuery;
-import io.github.pnoker.api.common.driver.GrpcRDeviceAttachDTO;
-import io.github.pnoker.api.common.driver.GrpcRDeviceDTO;
-import io.github.pnoker.api.common.driver.GrpcRPageDeviceDTO;
+import io.github.pnoker.api.common.driver.GrpcOffsetDeviceQuery;
+import io.github.pnoker.api.common.driver.GrpcOffsetPageDeviceDTO;
+import io.github.pnoker.api.common.driver.GrpcDeviceAttachDTO;
 import io.github.pnoker.common.manager.entity.bo.CommandAttributeConfigBO;
+import io.github.pnoker.common.manager.entity.bo.CommandBO;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeConfigBO;
-import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.bo.EventAttributeConfigBO;
+import io.github.pnoker.common.manager.entity.bo.EventBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
-import io.github.pnoker.common.manager.entity.bo.PointBO;
-import io.github.pnoker.common.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.manager.grpc.builder.GrpcCommandAttributeConfigBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDeviceBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverAttributeConfigBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcEventAttributeConfigBuilder;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointAttributeConfigBuilder;
-import io.github.pnoker.common.manager.service.CommandAttributeConfigService;
-import io.github.pnoker.common.manager.service.DeviceService;
-import io.github.pnoker.common.manager.service.DriverAttributeConfigService;
-import io.github.pnoker.common.manager.service.DriverService;
-import io.github.pnoker.common.manager.service.EventAttributeConfigService;
-import io.github.pnoker.common.manager.service.PointAttributeConfigService;
-import io.github.pnoker.common.manager.service.PointService;
-import io.github.pnoker.common.optional.CollectionOptional;
-import io.github.pnoker.common.tenant.TenantContextHolder;
+import io.github.pnoker.common.manager.grpc.GrpcPageUtil;
+import io.github.pnoker.common.manager.service.ReactiveCommandAttributeConfigService;
+import io.github.pnoker.common.manager.service.ReactiveCommandService;
+import io.github.pnoker.common.manager.service.ReactiveDeviceService;
+import io.github.pnoker.common.manager.service.ReactiveDriverAttributeConfigService;
+import io.github.pnoker.common.manager.service.ReactiveDriverService;
+import io.github.pnoker.common.manager.service.ReactiveEventAttributeConfigService;
+import io.github.pnoker.common.manager.service.ReactiveEventService;
+import io.github.pnoker.common.manager.service.ReactivePointAttributeConfigService;
+import io.github.pnoker.common.manager.service.ReactivePointService;
+import io.github.pnoker.common.manager.repository.DeviceFilter;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Objects;
 
-/**
- * gRPC server handling driver-to-manager device requests.
- *
- * @author pnoker
- * @since 2016.10.1
- */
-@Slf4j
+/** Reactive gRPC server handling driver-to-manager device requests. */
 @Service
 @RequiredArgsConstructor
 public class DriverDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
-
     private final GrpcDeviceBuilder grpcDeviceBuilder;
-
     private final GrpcDriverAttributeConfigBuilder grpcDriverAttributeConfigBuilder;
-
     private final GrpcPointAttributeConfigBuilder grpcPointAttributeConfigBuilder;
-
     private final GrpcCommandAttributeConfigBuilder grpcCommandAttributeConfigBuilder;
-
     private final GrpcEventAttributeConfigBuilder grpcEventAttributeConfigBuilder;
-
-    private final DeviceService deviceService;
-
-    private final DriverService driverService;
-
-    private final PointService pointService;
-
-    private final DriverAttributeConfigService driverAttributeConfigService;
-
-    private final PointAttributeConfigService pointAttributeConfigService;
-
-    private final CommandAttributeConfigService commandAttributeConfigService;
-
-    private final EventAttributeConfigService eventAttributeConfigService;
+    private final ReactiveDeviceService deviceService;
+    private final ReactiveDriverService driverService;
+    private final ReactivePointService pointService;
+    private final ReactiveDriverAttributeConfigService driverAttributeConfigService;
+    private final ReactivePointAttributeConfigService pointAttributeConfigService;
+    private final ReactiveCommandAttributeConfigService commandAttributeConfigService;
+    private final ReactiveCommandService commandService;
+    private final ReactiveEventAttributeConfigService eventAttributeConfigService;
+    private final ReactiveEventService eventService;
 
     @Override
-    public void listByPage(GrpcPageDeviceQuery request, StreamObserver<GrpcRPageDeviceDTO> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            GrpcRPageDeviceDTO.Builder builder = GrpcRPageDeviceDTO.newBuilder();
-            GrpcR result;
-
-            DeviceQuery query = grpcDeviceBuilder.buildQueryByGrpcQuery(request);
-
-            Page<DeviceBO> entityPage = driverInTenant(query.getTenantId(), query.getDriverId())
-                    ? deviceService.list(query) : null;
-            if (Objects.isNull(entityPage)) {
-                result = GrpcRFactory.notFound();
-            } else {
-                result = GrpcRFactory.ok();
-
-                GrpcPageDeviceDTO.Builder pageBuilder = GrpcPageDeviceDTO.newBuilder();
-                GrpcPage.Builder page = GrpcPage.newBuilder();
-                page.setCurrent(entityPage.getCurrent());
-                page.setSize(entityPage.getSize());
-                page.setPages(entityPage.getPages());
-                page.setTotal(entityPage.getTotal());
-                pageBuilder.setPage(page);
-
-                List<GrpcRDeviceAttachDTO> entityGrpcDTOList = entityPage.getRecords()
-                        .stream()
-                        .map(entityBO -> getDeviceAttachDTO(entityBO).build())
-                        .toList();
-                pageBuilder.addAllData(entityGrpcDTOList);
-
-                builder.setData(pageBuilder);
-            }
-
-            builder.setResult(result);
-            responseObserver.onNext(builder.build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public void list(GrpcOffsetDeviceQuery request, StreamObserver<GrpcOffsetPageDeviceDTO> responseObserver) {
+        Mono<GrpcOffsetPageDeviceDTO> response = Mono.defer(() -> {
+            var page = GrpcPageUtil.require(request.hasPage() ? request.getPage() : null);
+            long offset = page.offset();
+            int limit = page.limit();
+            DeviceFilter filter = new DeviceFilter(request.getTenantId(), null, null,
+                    request.getDriverId(), null, null, null, null, null, offset, limit, page.sort());
+            return driverService.getById(request.getTenantId(), request.getDriverId())
+                    .switchIfEmpty(Mono.error(new IllegalStateException("driver does not exist")))
+                    .then(deviceService.list(filter))
+                    .flatMap(result -> Flux.fromIterable(result.items()).concatMap(this::getDeviceAttachDTO, 8)
+                            .collectList()
+                            .map(items -> GrpcOffsetPageDeviceDTO.newBuilder()
+                                    .setPage(io.github.pnoker.api.common.OffsetPage.newBuilder()
+                                            .setOffset(result.offset()).setLimit(result.limit())
+                                            .setTotal(result.total()).setHasNext(result.hasNext()))
+                                    .addAllItems(items)
+                                    .build()));
+        });
+        io.github.pnoker.common.manager.grpc.server.manager.ReactiveGrpcServerSupport.subscribe(response, responseObserver);
     }
 
     @Override
-    public void getById(GrpcDeviceQuery request, StreamObserver<GrpcRDeviceDTO> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            GrpcRDeviceDTO.Builder builder = GrpcRDeviceDTO.newBuilder();
-            GrpcR result;
+    public void getById(GrpcDeviceQuery request, StreamObserver<GrpcDeviceAttachDTO> responseObserver) {
+        Mono<GrpcDeviceAttachDTO> response = driverService.getById(request.getTenantId(), request.getDriverId())
+                .zipWith(deviceService.getById(request.getTenantId(), request.getDeviceId()))
+                .filter(tuple -> java.util.Objects.equals(tuple.getT2().getDriverId(), tuple.getT1().getId()))
+                .flatMap(tuple -> getDeviceAttachDTO(tuple.getT2()))
+                .switchIfEmpty(Mono.error(new io.github.pnoker.common.exception.NotFoundException("device does not exist")));
+        io.github.pnoker.common.manager.grpc.server.manager.ReactiveGrpcServerSupport.subscribe(response, responseObserver);
+    }
 
-            DriverBO driverBO = selectDriver(request.getDriverId());
-            DeviceBO entityBO = selectDevice(request.getDeviceId());
-            if (Objects.isNull(entityBO) || Objects.isNull(driverBO)
-                    || !Objects.equals(entityBO.getDriverId(), driverBO.getId())
-                    || !Objects.equals(entityBO.getTenantId(), driverBO.getTenantId())) {
-                result = GrpcRFactory.notFound();
-            } else {
-                result = GrpcRFactory.ok();
+    private Mono<GrpcDeviceAttachDTO> getDeviceAttachDTO(DeviceBO device) {
+        Mono<List<Long>> pointIds = pointService.listByDeviceId(device.getTenantId(), device.getId()).map(value -> value.getId()).collectList();
+        Mono<List<DriverAttributeConfigBO>> driverConfigs = driverAttributeConfigService.listByDeviceId(device.getTenantId(), device.getId()).collectList();
+        Mono<List<PointAttributeConfigBO>> pointConfigs = pointAttributeConfigService.listByDeviceId(device.getTenantId(), device.getId()).collectList();
+        Mono<List<CommandAttributeConfigBO>> commandConfigs = commandAttributeConfigService.listByDeviceId(device.getTenantId(), device.getId()).collectList();
+        Mono<List<EventAttributeConfigBO>> eventConfigs = eventAttributeConfigService.listByDeviceId(device.getTenantId(), device.getId()).collectList();
+        Mono<List<CommandBO>> commands = commandService.listByDeviceId(device.getTenantId(), device.getId())
+                .filter(command -> io.github.pnoker.common.enums.EnableFlagEnum.ENABLE.equals(command.getEnableFlag()))
+                .collectList();
+        Mono<List<EventBO>> events = eventService.listByDeviceId(device.getTenantId(), device.getId())
+                .filter(event -> io.github.pnoker.common.enums.EnableFlagEnum.ENABLE.equals(event.getEnableFlag()))
+                .collectList();
+        return Mono.zip(pointIds, driverConfigs, pointConfigs, commandConfigs, eventConfigs, events, commands)
+                .map(tuple -> GrpcDeviceAttachDTO.newBuilder()
+                        .setDevice(grpcDeviceBuilder.buildGrpcDTOByBO(device))
+                        .addAllPointIds(tuple.getT1())
+                        .addAllDriverConfigs(tuple.getT2().stream().map(grpcDriverAttributeConfigBuilder::buildGrpcDTOByBO).toList())
+                        .addAllPointConfigs(tuple.getT3().stream().map(grpcPointAttributeConfigBuilder::buildGrpcDTOByBO).toList())
+                        .addAllCommandConfigs(tuple.getT4().stream().map(grpcCommandAttributeConfigBuilder::buildGrpcDTOByBO).toList())
+                        .addAllEventConfigs(tuple.getT5().stream().map(grpcEventAttributeConfigBuilder::buildGrpcDTOByBO).toList())
+                        .addAllEvents(tuple.getT6().stream().map(this::eventRuntime).toList())
+                        .addAllCommands(tuple.getT7().stream().map(this::commandRuntime).toList())
+                        .build());
+    }
 
-                builder.setData(getDeviceAttachDTO(entityBO));
-            }
-
-            builder.setResult(result);
-            responseObserver.onNext(builder.build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
+    private GrpcCommandRuntimeDTO commandRuntime(CommandBO command) {
+        GrpcCommandRuntimeDTO.Builder builder = GrpcCommandRuntimeDTO.newBuilder()
+                .setCommandId(String.valueOf(command.getId()))
+                .setCommandName(command.getCommandName())
+                .setCommandCode(command.getCommandCode())
+                .setCommandTypeFlag(command.getCommandTypeFlag().getIndex())
+                .setCallTypeFlag(command.getCallTypeFlag().getIndex())
+                .setEnableFlag(command.getEnableFlag().getIndex());
+        if (command.getTimeout() != null) {
+            builder.setTimeout(command.getTimeout());
         }
-    }
-
-    /**
-     * Return whether a driver exists and belongs to the given tenant.
-     *
-     * @param tenantId tenant scope
-     * @param driverId the driver to check
-     * @return true if the driver belongs to the tenant
-     */
-    private boolean driverInTenant(Long tenantId, Long driverId) {
-        DriverBO driverBO = selectDriver(driverId);
-        return Objects.nonNull(driverBO) && Objects.equals(tenantId, driverBO.getTenantId());
-    }
-
-    private DriverBO selectDriver(Long driverId) {
-        try {
-            return driverService.getById(driverId);
-        } catch (Exception ignored) {
-            return null;
+        if (command.getCommandExt() != null) {
+            builder.setCommandExt(io.github.pnoker.common.utils.JsonUtil.toJsonString(command.getCommandExt()));
         }
-    }
-
-    private DeviceBO selectDevice(Long deviceId) {
-        try {
-            return deviceService.getById(deviceId);
-        } catch (Exception ignored) {
-            return null;
+        if (command.getVersion() != null) {
+            builder.setVersion(command.getVersion());
         }
+        return builder.build();
     }
 
-    /**
-     * Build the device-attach DTO carrying the device, its point ids, point attribute
-     * config, and driver attribute config.
-     *
-     * @param entityBO the device
-     * @return the assembled builder
-     */
-    private GrpcRDeviceAttachDTO.Builder getDeviceAttachDTO(DeviceBO entityBO) {
-        GrpcRDeviceAttachDTO.Builder builder = GrpcRDeviceAttachDTO.newBuilder();
-        GrpcDeviceDTO entityGrpcDTO = grpcDeviceBuilder.buildGrpcDTOByBO(entityBO);
-        builder.setDevice(entityGrpcDTO);
-
-        // Attach the device's point ids
-        List<PointBO> pointBOList = pointService.listByDeviceId(entityBO.getId(), entityBO.getTenantId());
-        CollectionOptional.ofNullable(pointBOList)
-                .ifPresent(value -> builder.addAllPointIds(value.stream().map(PointBO::getId).toList()));
-
-        List<DriverAttributeConfigBO> driverAttributeConfigBOList = driverAttributeConfigService
-                .listByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(driverAttributeConfigBOList)
-                .ifPresent(value -> builder
-                        .addAllDriverConfigs(value.stream().map(grpcDriverAttributeConfigBuilder::buildGrpcDTOByBO).toList()));
-
-        List<PointAttributeConfigBO> pointAttributeConfigBOList = pointAttributeConfigService
-                .listByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(pointAttributeConfigBOList)
-                .ifPresent(value -> builder
-                        .addAllPointConfigs(value.stream().map(grpcPointAttributeConfigBuilder::buildGrpcDTOByBO).toList()));
-
-        List<CommandAttributeConfigBO> commandAttributeConfigBOList = commandAttributeConfigService
-                .listByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(commandAttributeConfigBOList)
-                .ifPresent(value -> builder
-                        .addAllCommandConfigs(value.stream().map(grpcCommandAttributeConfigBuilder::buildGrpcDTOByBO).toList()));
-
-        List<EventAttributeConfigBO> eventAttributeConfigBOList = eventAttributeConfigService
-                .listByDeviceId(entityBO.getId());
-        CollectionOptional.ofNullable(eventAttributeConfigBOList)
-                .ifPresent(value -> builder
-                        .addAllEventConfigs(value.stream().map(grpcEventAttributeConfigBuilder::buildGrpcDTOByBO).toList()));
-        return builder;
+    private GrpcEventRuntimeDTO eventRuntime(EventBO event) {
+        GrpcEventRuntimeDTO.Builder builder = GrpcEventRuntimeDTO.newBuilder()
+                .setEventId(String.valueOf(event.getId()))
+                .setEventName(event.getEventName())
+                .setEventCode(event.getEventCode())
+                .setEventTypeFlag(event.getEventTypeFlag().getIndex())
+                .setEventLevelFlag(event.getEventLevelFlag().getIndex())
+                .setEnableFlag(event.getEnableFlag().getIndex());
+        if (event.getVersion() != null) {
+            builder.setVersion(event.getVersion());
+        }
+        return builder.build();
     }
 
 }

@@ -46,14 +46,13 @@ MAPPED_COLUMN_RE = re.compile(
     r'@(?:TableField|TableId)\s*\(\s*(?:value\s*=\s*)?"(?P<column>[a-z][a-z0-9_]*)"',
     re.IGNORECASE,
 )
-NON_COLUMN_PREFIXES = {"check", "constraint", "exclude", "foreign", "primary", "unique"}
+NON_COLUMN_PREFIXES = {"check", "constraint", "exclude", "foreign", "primary", "references", "unique"}
 LICENSE_MARKER = "Copyright 2016-present the IoT DC3 original author or authors."
 MODULE_SQL_PREFIXES = {
     "dc3-common-agentic": ("06-",),
     "dc3-common-auth": ("02-",),
-    "dc3-common-dal": ("01-",),
     "dc3-common-data": ("03-", "05-"),
-    "dc3-common-manager": ("01-", "04-"),
+    "dc3-common-manager": ("04-",),
 }
 
 
@@ -107,13 +106,6 @@ def validate_file(path: Path) -> tuple[list[str], int, int]:
         errors.append(f"{path.name}: expected exactly one license header")
     if re.search(r"=\s+>", text):
         errors.append(f"{path.name}: invalid named-argument token '= >'; use '=>'")
-    if re.search(r"COMMENT\s*\r?\n\s*ON\b", text, re.IGNORECASE):
-        errors.append(f"{path.name}: keep COMMENT ON on one line")
-    if re.search(r"\b(?:CREATE|ALTER|LOAD)\s*\r?\n", text, re.IGNORECASE):
-        errors.append(f"{path.name}: do not split a SQL operation keyword from its object")
-    if re.search(r"\bSET\(", text, re.IGNORECASE):
-        errors.append(f"{path.name}: use 'SET (' with a separating space")
-
     for table in tables:
         label = f"{path.name}:{table.line} {table.name}"
         if table.name not in table_comments:

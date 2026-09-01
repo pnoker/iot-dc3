@@ -249,8 +249,8 @@ const onUpdate = (form: unknown, done: () => void) => {
     });
 };
 
-const onDisable = (id: string, profileId: string, done: () => void) => {
-  updatePoint({ id, profileId, enableFlag: "DISABLE" })
+const onDisable = (point: PointRecord, done: () => void) => {
+  updatePoint({...point, enableFlag: 'DISABLE'})
     .then(() => {
       successMessage();
       load();
@@ -261,8 +261,8 @@ const onDisable = (id: string, profileId: string, done: () => void) => {
     });
 };
 
-const onEnable = (id: string, profileId: string, done: () => void) => {
-  updatePoint({ id, profileId, enableFlag: "ENABLE" })
+const onEnable = (point: PointRecord, done: () => void) => {
+  updatePoint({...point, enableFlag: 'ENABLE'})
     .then(() => {
       successMessage();
       load();
@@ -273,8 +273,8 @@ const onEnable = (id: string, profileId: string, done: () => void) => {
     });
 };
 
-const onDelete = (id: string, done: () => void) => {
-  deletePoint(id)
+const onDelete = (point: PointRecord, done: () => void) => {
+  deletePoint(point.id, point.version)
     .then(() => {
       successMessage();
       load();
@@ -304,7 +304,7 @@ watch(
     }
     listProfileByIds(profileIds)
       .then((res) => {
-        reactiveData.profileTable = (res.data || {}) as Record<
+        reactiveData.profileTable = (res || {}) as Record<
           string,
           Record<string, any>
         >;

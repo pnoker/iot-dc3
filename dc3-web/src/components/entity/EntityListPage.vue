@@ -19,8 +19,11 @@
   <div class="entity-list-page">
     <tool-card
       :form-model="searchForm"
-      :hide-pagination="config.mode === 'tree'"
-      :hide-sort="config.mode === 'tree'"
+      :cursor-mode="config.pagination === 'cursor'"
+      :cursor-next="config.pagination === 'cursor' && state.page.hasNext"
+      :cursor-previous="config.pagination === 'cursor' && state.page.current > 1"
+      :hide-pagination="config.mode === 'tree' || config.pagination === 'cursor'"
+      :hide-sort="config.mode === 'tree' || config.pagination === 'cursor'"
       :page="config.mode === 'tree' ? {total: 0, size: 0, current: 1} : state.page"
       @refresh="load"
       @reset="reset"
@@ -28,6 +31,8 @@
       @sort="sort"
       @size-change="sizeChange"
       @current-change="currentChange"
+      @cursor-next="cursorNext"
+      @cursor-previous="cursorPrevious"
     >
       <template #filters="{search: doSearch}">
         <el-form-item v-for="field in config.searchFields" :key="field.prop" :label="field.label" :prop="field.prop">
@@ -319,6 +324,8 @@ const {
   sort,
   sizeChange,
   currentChange,
+  cursorNext,
+  cursorPrevious,
   openAdd,
   openEdit,
   openDetail,

@@ -26,6 +26,7 @@ import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -51,26 +52,21 @@ public class DriverStateReceiver {
      * @param entityDTO the deserialized driver state
      */
     @Dc3Listener(topic = MqTopic.STATE, keyPattern = "driver.*")
-    public void driverStateReceive(MqReceived<DriverStateDTO> message, Acknowledgment ack) {
+    public Mono<Void> driverStateReceive(MqReceived<DriverStateDTO> message, Acknowledgment ack) {
         DriverStateDTO entityDTO = message.payload();
-        try {
-            log.debug("Driver state received, tenantId={}, driverId={}, status={}",
-                    Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
-                    Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
-                    Objects.isNull(entityDTO) ? null : entityDTO.getStatus());
-            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())
-                    || Objects.isNull(entityDTO.getTenantId()) || Objects.isNull(entityDTO.getStatus())) {
-                log.warn("Invalid driver state, some required fields are null, driverId={}",
-                        Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
-                ack.reject(false);
-                return;
-            }
-            driverStateService.heartbeat(entityDTO);
-            ack.ack();
-        } catch (Exception e) {
-            log.error("Driver state consume failed.", e);
-            ack.reject(true);
+        log.debug("Driver state received, tenantId={}, driverId={}, status={}",
+                Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
+                Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
+                Objects.isNull(entityDTO) ? null : entityDTO.getStatus());
+        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())
+                || Objects.isNull(entityDTO.getTenantId()) || Objects.isNull(entityDTO.getStatus())) {
+            log.warn("Invalid driver state, some required fields are null, driverId={}",
+                    Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
+            ack.reject(false);
+            return Mono.empty();
         }
+        return driverStateService.heartbeat(entityDTO)
+                .doOnError(error -> log.error("Driver state persistence failed", error));
     }
 
 }

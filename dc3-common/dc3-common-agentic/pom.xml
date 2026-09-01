@@ -38,9 +38,12 @@
     <dependencies>
 
         <!-- AI Related -->
+        <!-- Chat memory is backed by the reactive dc3_message repository.  Do not
+             pull the JDBC chat-memory starter: it adds a second DataSource,
+             spring-jdbc and HikariCP to the agentic runtime. -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-starter-model-chat-memory-repository-jdbc</artifactId>
+            <artifactId>spring-ai-model</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.ai</groupId>
@@ -74,6 +77,16 @@
             <version>5.0.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-r2dbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-core</artifactId>
+            <version>${dc3.version}</version>
+        </dependency>
+
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -82,22 +95,7 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-dal</artifactId>
-            <version>${dc3.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-facade-api</artifactId>
-            <version>${dc3.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-core</artifactId>
-            <version>${dc3.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-postgres</artifactId>
             <version>${dc3.version}</version>
         </dependency>
         <dependency>

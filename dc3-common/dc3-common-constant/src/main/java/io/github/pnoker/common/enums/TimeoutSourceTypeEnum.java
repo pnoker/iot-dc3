@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -55,7 +54,6 @@ public enum TimeoutSourceTypeEnum {
     PROFILE((byte) 3, "profile", "Profile"),
     ;
 
-    @EnumValue
     private final Byte index;
 
     private final String code;

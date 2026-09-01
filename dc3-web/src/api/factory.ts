@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {httpDelete, httpGet, httpPost} from '@/api/common';
 import type {PageQuery, PageResult} from '@/config/types';
 
 /**
@@ -25,7 +25,7 @@ import type {PageQuery, PageResult} from '@/config/types';
  *
  * URL convention (matches every existing inline module):
  * - add/update -> POST ${prefix}/add | /update   (body = form)
- * - delete     -> POST ${prefix}/delete            (id as query param)
+ * - delete     -> DELETE ${prefix}/delete          (id as query param)
  * - getById    -> GET  ${prefix}/get_by_id          (id as query param)
  * - list       -> POST ${prefix}/list               (body = page query)
  *
@@ -34,24 +34,24 @@ import type {PageQuery, PageResult} from '@/config/types';
  * entity path (e.g. `API_SERVICE_ACCOUNT_BASE = 'api/v3/auth/service_account'`),
  * so those pass `{base}` alone.
  *
- * `list` keeps a generic override (`<T = R<PageResult<TRecord>>>`) so callers
+ * `list` keeps a generic override (`<T = PageResult<TRecord>>`) so callers
  * that remap the envelope (e.g. `listPoint<ListPageResponse>`) still compile.
  */
 export type CrudApi<TForm, TRecord> = {
-  add: (form: TForm) => Promise<R<TRecord>>;
-  update: (form: TForm) => Promise<R<TRecord>>;
-  delete: (id: string) => Promise<R<string>>;
-  getById: (id: string) => Promise<R<TRecord>>;
-  list: <T = R<PageResult<TRecord>>>(query: PageQuery) => Promise<T>;
+  add: (form: TForm) => Promise<TRecord>;
+  update: (form: TForm) => Promise<TRecord>;
+  delete: (id: string) => Promise<void>;
+  getById: (id: string) => Promise<TRecord>;
+  list: <T = PageResult<TRecord>>(query: PageQuery) => Promise<T>;
 };
 
 export function createCrudApi<TForm, TRecord>(config: { base: string; entity?: string }): CrudApi<TForm, TRecord> {
   const prefix = config.entity ? `${config.base}/${config.entity}` : config.base;
   return {
-    add: (form: TForm) => httpPost<R<TRecord>>(`${prefix}/add`, form),
-    update: (form: TForm) => httpPost<R<TRecord>>(`${prefix}/update`, form),
-    delete: (id: string) => httpPost<R<string>>(`${prefix}/delete`, undefined, {params: {id}}),
-    getById: (id: string) => httpGet<R<TRecord>>(`${prefix}/get_by_id`, {params: {id}}),
-    list: <T = R<PageResult<TRecord>>>(query: PageQuery) => httpPost<T>(`${prefix}/list`, query)
+    add: (form: TForm) => httpPost<TRecord>(`${prefix}/add`, form),
+    update: (form: TForm) => httpPost<TRecord>(`${prefix}/update`, form),
+    delete: (id: string) => httpDelete<void>(`${prefix}/delete`, {params: {id}}),
+    getById: (id: string) => httpGet<TRecord>(`${prefix}/get_by_id`, {params: {id}}),
+    list: <T = PageResult<TRecord>>(query: PageQuery) => httpPost<T>(`${prefix}/list`, query)
   };
 }

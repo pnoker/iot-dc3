@@ -26,7 +26,6 @@ data:
   # Runtime profile / feature flags
   NODE_ENV: "test"
   APM_AGENT_ENABLE: "false"
-  DC3_FACADE_MODE: "grpc"
   DC3_FACADE_GRPC_DEADLINE_MS: "3000"
 
   # Center-to-center service discovery (k8s Service DNS names).

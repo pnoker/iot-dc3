@@ -19,11 +19,8 @@ package io.github.pnoker.common.agentic.controller;
 import io.github.pnoker.common.agentic.entity.builder.AttachmentBuilder;
 import io.github.pnoker.common.agentic.entity.vo.AttachmentVO;
 import io.github.pnoker.common.agentic.service.AttachmentService;
-import io.github.pnoker.common.agentic.utils.AgenticConversationIdUtil;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.common.RequestHeader;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -76,17 +73,10 @@ public class AttachmentController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/upload")
-    public Mono<R<AttachmentVO>> upload(@Parameter(description = "Unique identifier of the AI conversation to attach the file to; must belong to the current tenant and user.", example = "conv-20240101-abcde") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
+    public Mono<AttachmentVO> upload(@Parameter(description = "Unique identifier of the AI conversation to attach the file to; must belong to the current tenant and user.", example = "conv-20240101-abcde") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
                                         @RequestPart("file") Mono<FilePart> filePart) {
-        return getPrincipalHeader().flatMap(header -> filePart.flatMap(part -> {
-            String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
-                    conversationId);
-            return attachmentService.upload(scopedConversationId, part, header).map(attachmentBO -> {
-                AttachmentVO attachment = attachmentBuilder.buildVOByBO(attachmentBO);
-                sanitize(header, attachment);
-                return R.ok(attachment);
-            });
-        }));
+        return getPrincipalHeader().flatMap(header -> filePart.flatMap(part ->
+                attachmentService.upload(conversationId, part, header).map(attachmentBuilder::buildVOByBO)));
     }
 
     /**
@@ -105,20 +95,11 @@ public class AttachmentController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list")
-    public Mono<R<List<AttachmentVO>>> list(@Parameter(description = "Unique identifier of the AI conversation whose attachments should be listed; must belong to the current tenant and user.", example = "conv-20240101-abcde") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            String scopedConversationId = AgenticConversationIdUtil.scope(header.getTenantId(), header.getUserId(),
-                    conversationId);
-            List<AttachmentVO> attachments = attachmentBuilder.buildVOListByBOList(attachmentService.list(
-                    scopedConversationId, header));
-            attachments.forEach(attachment -> sanitize(header, attachment));
-            return R.ok(attachments);
-        }));
-    }
-
-    private void sanitize(RequestHeader.PrincipalHeader header, AttachmentVO attachment) {
-        attachment.setConversationId(AgenticConversationIdUtil.stripScope(header.getTenantId(), header.getUserId(),
-                attachment.getConversationId()));
+    public Mono<List<AttachmentVO>> list(@Parameter(description = "Unique identifier of the AI conversation whose attachments should be listed; must belong to the current tenant and user.", example = "conv-20240101-abcde") @NotBlank @RequestParam(value = "conversation_id") String conversationId) {
+        return getPrincipalHeader().flatMap(header ->
+                attachmentService.list(conversationId, header)
+                    .map(attachmentBuilder::buildVOByBO)
+                    .collectList());
     }
 
 }

@@ -94,8 +94,8 @@ const load = async () => {
   loading.value = true;
   try {
     const {hours, minCount} = window.value;
-    const res: { data?: AlertStormRow[] } = await alertStormSources(hours, minCount, props.limit);
-    rows.value = res?.data ?? [];
+    const res: AlertStormRow[] = await alertStormSources(hours, minCount, props.limit);
+    rows.value = res ?? [];
     await resolveBySource(rows.value);
   } catch {
     // handled globally

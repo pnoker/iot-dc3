@@ -26,6 +26,7 @@ import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -51,30 +52,25 @@ public class DeviceStateReceiver {
      * @param entityDTO the deserialized device state
      */
     @Dc3Listener(topic = MqTopic.STATE, keyPattern = "device.*")
-    public void deviceStateReceive(MqReceived<DeviceStateDTO> message, Acknowledgment ack) {
+    public Mono<Void> deviceStateReceive(MqReceived<DeviceStateDTO> message, Acknowledgment ack) {
         DeviceStateDTO entityDTO = message.payload();
-        try {
-            log.debug("Device state received, tenantId={}, driverId={}, deviceId={}, status={}",
-                    Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
-                    Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
+        log.debug("Device state received, tenantId={}, driverId={}, deviceId={}, status={}",
+                Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
+                Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
+                Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId(),
+                Objects.isNull(entityDTO) ? null : entityDTO.getStatus());
+        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())
+                || Objects.isNull(entityDTO.getDriverId()) || Objects.isNull(entityDTO.getTenantId())
+                || Objects.isNull(entityDTO.getStatus()) || Objects.isNull(entityDTO.getTimeoutUnit())
+                || entityDTO.getTimeout() <= 0) {
+            log.warn("Invalid device state, some required fields are null, deviceId={}, driverId={}",
                     Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId(),
-                    Objects.isNull(entityDTO) ? null : entityDTO.getStatus());
-            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())
-                    || Objects.isNull(entityDTO.getDriverId()) || Objects.isNull(entityDTO.getTenantId())
-                    || Objects.isNull(entityDTO.getStatus()) || Objects.isNull(entityDTO.getTimeoutUnit())
-                    || entityDTO.getTimeout() <= 0) {
-                log.warn("Invalid device state, some required fields are null, deviceId={}, driverId={}",
-                        Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId(),
-                        Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
-                ack.reject(false);
-                return;
-            }
-            deviceStateService.heartbeat(entityDTO);
-            ack.ack();
-        } catch (Exception e) {
-            log.error("Device state consume failed.", e);
-            ack.reject(true);
+                    Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
+            ack.reject(false);
+            return Mono.empty();
         }
+        return deviceStateService.heartbeat(entityDTO)
+                .doOnError(error -> log.error("Device state persistence failed", error));
     }
 
 }

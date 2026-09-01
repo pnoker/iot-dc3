@@ -18,12 +18,9 @@
 package io.github.pnoker.common.auth.controller;
 
 import io.github.pnoker.common.auth.biz.DictionaryForAuthService;
-import io.github.pnoker.common.auth.entity.builder.DictionaryForAuthBuilder;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
-import io.github.pnoker.common.dal.entity.vo.DictionaryVO;
-import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.entity.option.DictionaryOption;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
@@ -51,8 +48,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DictionaryForAuthController implements BaseController {
 
-    private final DictionaryForAuthBuilder dictionaryForAuthBuilder;
-
     private final DictionaryForAuthService dictionaryForAuthService;
 
     /**
@@ -69,13 +64,9 @@ public class DictionaryForAuthController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @GetMapping("/tenant")
-    public Mono<R<List<DictionaryVO>>> tenantDictionary() {
-        return async(() -> {
-            List<DictionaryBO> entityBOList = dictionaryForAuthService.tenantDictionary();
-            List<DictionaryVO> entityVOList = dictionaryForAuthBuilder.buildVOListByBOList(entityBOList);
-            return R.ok(entityVOList);
-        });
+    @GetMapping("/list_tenant")
+    public Mono<List<DictionaryOption>> listTenantOptions() {
+        return dictionaryForAuthService.listTenantOptions();
     }
 
 }

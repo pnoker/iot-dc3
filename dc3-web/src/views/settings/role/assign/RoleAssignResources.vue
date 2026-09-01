@@ -282,20 +282,20 @@ const load = async () => {
     const [treeRes, ownRes, bindsRes] = await Promise.all([
       listResourceTree({}) as Promise<any>,
       listResourceByRoleId(reactiveData.role.id) as Promise<any>,
-      listRoleResourceBind({page: {size: 1000, current: 1}, roleId: reactiveData.role.id}) as Promise<any>,
+      listRoleResourceBind({offset: 0, limit: 200, roleId: reactiveData.role.id}) as Promise<any>,
     ]);
 
-    const treeData = (treeRes.data as any[]) || [];
+    const treeData = (treeRes as any[]) || [];
     const {flatMap, trees} = groupByType(treeData);
     reactiveData.nodeMap = flatMap;
     reactiveData.treesByType = trees;
 
-    const ownIds = ((ownRes.data as any[]) || []).map((r) => String(r.id));
+    const ownIds = ((ownRes as any[]) || []).map((r) => String(r.id));
     reactiveData.originalResourceIds = ownIds;
     reactiveData.selectedIds = [...ownIds];
 
     const bindMap = new Map<string, string>();
-    for (const bind of (bindsRes.data?.records as any[]) || []) {
+    for (const bind of (bindsRes?.items as any[]) || []) {
       bindMap.set(String(bind.resourceId), String(bind.id));
     }
     reactiveData.bindIdByResourceId = bindMap;

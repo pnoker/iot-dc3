@@ -17,17 +17,16 @@
 
 package io.github.pnoker.common.manager.grpc.builder;
 
-import io.github.pnoker.api.center.manager.GrpcPageProfileQuery;
+import io.github.pnoker.api.center.manager.GrpcOffsetProfileQuery;
 import io.github.pnoker.api.common.GrpcBase;
-import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.api.common.GrpcProfileDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ProfileShareTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
-import io.github.pnoker.common.manager.entity.query.ProfileQuery;
+import io.github.pnoker.common.manager.repository.ProfileFilter;
+import io.github.pnoker.common.manager.grpc.GrpcPageUtil;
 import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
@@ -36,6 +35,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.List;
 
 /**
  * MapStruct builder for profile gRPC message conversion.
@@ -46,33 +46,16 @@ import java.util.Optional;
 @Component
 public class GrpcProfileBuilder {
 
-    /**
-     * Convert grpc query to query.
-     *
-     * @param entityGrpc entity grpc
-     * @return converted value
-     */
-    public ProfileQuery buildQueryByGrpcQuery(GrpcPageProfileQuery entityGrpc) {
-        ProfileQuery.ProfileQueryBuilder builder = ProfileQuery.builder();
-        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
-        builder.page(pages);
-        LongOptional.ofNullable(entityGrpc.getTenantId()).ifPresent(builder::tenantId);
-        StringOptional.ofNullable(entityGrpc.getProfileName()).ifPresent(builder::profileName);
-        StringOptional.ofNullable(entityGrpc.getProfileCode()).ifPresent(builder::profileCode);
-        if (entityGrpc.getProfileShareFlag() != DefaultConstant.NULL_INT) {
-            builder.profileShareFlag(ProfileShareTypeEnum.ofIndex((byte) entityGrpc.getProfileShareFlag()));
-        }
-        if (entityGrpc.getProfileTypeFlag() != DefaultConstant.NULL_INT) {
-            builder.profileTypeFlag(ProfileTypeEnum.ofIndex((byte) entityGrpc.getProfileTypeFlag()));
-        }
-        if (entityGrpc.getEnableFlag() != DefaultConstant.NULL_INT) {
-            builder.enableFlag(EnableFlagEnum.ofIndex((byte) entityGrpc.getEnableFlag()));
-        }
-        if (entityGrpc.getVersion() != DefaultConstant.NULL_INT) {
-            builder.version(entityGrpc.getVersion());
-        }
-        LongOptional.ofNullable(entityGrpc.getDeviceId()).ifPresent(builder::deviceId);
-        return builder.build();
+    /** Convert the canonical offset request into a validated repository filter. */
+    public ProfileFilter buildFilterByGrpcQuery(GrpcOffsetProfileQuery request) {
+        var page = GrpcPageUtil.require(request.hasPage() ? request.getPage() : null);
+        return new ProfileFilter(request.getTenantId(), request.getProfileName(), request.getProfileCode(),
+                request.hasProfileShareFlag() ? ProfileShareTypeEnum.ofIndex((byte) request.getProfileShareFlag()) : null,
+                request.hasProfileTypeFlag() ? ProfileTypeEnum.ofIndex((byte) request.getProfileTypeFlag()) : null,
+                request.hasEnableFlag() ? EnableFlagEnum.ofIndex((byte) request.getEnableFlag()) : null,
+                request.hasGroupId() ? request.getGroupId() : null, request.hasLabelId() ? request.getLabelId() : null,
+                request.hasVersion() ? request.getVersion() : null, request.hasDeviceId() ? request.getDeviceId() : null,
+                page.offset(), page.limit(), page.sort());
     }
 
     /**
@@ -105,21 +88,6 @@ public class GrpcProfileBuilder {
         }
         LongOptional.ofNullable(entityBO.getTenantId()).ifPresent(builder::setTenantId);
         return builder.build();
-    }
-
-    /**
-     * Build grpc page.
-     *
-     * @param page page
-     * @return converted value
-     */
-    public GrpcPage buildGrpcPage(com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProfileBO> page) {
-        return GrpcPage.newBuilder()
-                .setCurrent(page.getCurrent())
-                .setSize(page.getSize())
-                .setPages(page.getPages())
-                .setTotal(page.getTotal())
-                .build();
     }
 
 }

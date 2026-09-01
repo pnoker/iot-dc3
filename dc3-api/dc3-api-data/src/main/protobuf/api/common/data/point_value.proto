@@ -19,7 +19,6 @@ syntax = "proto3";
 
 package api.common.data;
 
-import "api/common/r.proto";
 
 // Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.data";
@@ -30,19 +29,19 @@ option java_multiple_files = true;
 // Service interface defining RPC calls related to point values
 service PointValueApi {
   // Query the latest collected value of a device point
-  rpc GetLastValue (GrpcPointValueQuery) returns (GrpcRPointValueDTO);
+  rpc GetLastValue (GrpcPointValueQuery) returns (GrpcPointValueDTO);
 
   // Query historical values of a device point
-  rpc ListHistoryValues (GrpcPointValueHistoryQuery) returns (GrpcRPointValueStringList);
+  rpc ListHistoryValues (GrpcPointValueHistoryQuery) returns (GrpcPointValueCursorPage);
 
   // Per-series sample volumes since a timestamp — dashboard topology weights
-  rpc ListSeriesVolumes (GrpcPointVolumeQuery) returns (GrpcRPointVolumeList);
+  rpc ListSeriesVolumes (GrpcPointVolumeQuery) returns (GrpcPointVolumeList);
 
   // Send a read command to a device for a specific point
-  rpc ReadCommand (GrpcPointValueCommandQuery) returns (GrpcRBoolean);
+  rpc ReadCommand (GrpcPointValueCommandQuery) returns (GrpcPointCommandAccepted);
 
   // Send a write command to a device for a specific point
-  rpc WriteCommand (GrpcPointValueWriteCommand) returns (GrpcRBoolean);
+  rpc WriteCommand (GrpcPointValueWriteCommand) returns (GrpcPointCommandAccepted);
 }
 
 // Request structure for querying a single point value
@@ -55,15 +54,6 @@ message GrpcPointValueQuery {
 
   // Tenant ID
   int64 tenant_id = 3;
-}
-
-// Response wrapper for single point value query
-message GrpcRPointValueDTO {
-  // Common result wrapper
-  GrpcR result = 1;
-
-  // Point value data
-  GrpcPointValueDTO data = 2;
 }
 
 // Point value data structure
@@ -101,17 +91,26 @@ message GrpcPointValueHistoryQuery {
   // Tenant ID
   int64 tenant_id = 3;
 
-  // Number of records to retrieve
-  int32 count = 4;
+  // Opaque cursor returned by the previous page
+  string cursor = 4;
+
+  // Number of records to retrieve (1..500)
+  int32 limit = 5;
 }
 
-// Response wrapper for historical values (newest first, each with its timestamp)
-message GrpcRPointValueStringList {
-  // Common result wrapper
-  GrpcR result = 1;
-
+// Cursor page for historical values (newest first, each with its timestamp)
+message GrpcPointValueCursorPage {
   // Historical point values, each carrying its value and create_time.
   repeated GrpcPointValueDTO data = 2;
+
+  // Opaque cursor for the next page; empty when exhausted.
+  string next_cursor = 3;
+
+  // Effective page size.
+  int32 limit = 4;
+
+  // True when another page is available.
+  bool has_next = 5;
 }
 
 // Request for per-series volume counts
@@ -136,10 +135,7 @@ message GrpcPointVolumeDTO {
 }
 
 // Response wrapper for per-series volume counts
-message GrpcRPointVolumeList {
-  // Common result wrapper
-  GrpcR result = 1;
-
+message GrpcPointVolumeList {
   // Volume rows
   repeated GrpcPointVolumeDTO data = 2;
 }
@@ -154,6 +150,9 @@ message GrpcPointValueCommandQuery {
 
   // Tenant ID
   int64 tenant_id = 3;
+
+  // PointCommandSourceEnum index (0=http, 1=grpc, 2=agentic, 3=scheduled).
+  int32 source = 4;
 }
 
 // Request structure for sending a write command
@@ -169,13 +168,13 @@ message GrpcPointValueWriteCommand {
 
   // Tenant ID
   int64 tenant_id = 4;
+
+  // PointCommandSourceEnum index (0=http, 1=grpc, 2=agentic, 3=scheduled).
+  int32 source = 5;
 }
 
-// Generic boolean response wrapper
-message GrpcRBoolean {
-  // Common result wrapper
-  GrpcR result = 1;
-
-  // Response data (true/false)
-  bool data = 2;
+// Accepted asynchronous point command.
+message GrpcPointCommandAccepted {
+  // Command identifier used to query command history.
+  string command_id = 1;
 }

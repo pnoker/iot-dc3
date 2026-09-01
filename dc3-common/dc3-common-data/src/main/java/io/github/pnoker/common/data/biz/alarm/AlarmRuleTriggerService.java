@@ -23,6 +23,7 @@ import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * Converts runtime data into rule facts and feeds the alarm rule pipeline.
@@ -37,7 +38,7 @@ public interface AlarmRuleTriggerService {
      *
      * @param pointValue point value
      */
-    void processPointValue(PointValueBO pointValue);
+    Mono<Void> processPointValue(PointValueBO pointValue);
 
     /**
      * Process a batch of point value samples. Implementations should group
@@ -46,27 +47,27 @@ public interface AlarmRuleTriggerService {
      *
      * @param pointValues point values
      */
-    void processPointValues(List<PointValueBO> pointValues);
+    Mono<Void> processPointValues(List<PointValueBO> pointValues);
 
     /**
      * Process a device alarm event.
      *
      * @param alarm device alarm payload
      */
-    void processDeviceAlarm(DeviceAlarmDTO alarm);
+    Mono<Void> processDeviceAlarm(DeviceAlarmDTO alarm);
 
     /**
      * Process a driver alarm event.
      *
      * @param alarm driver alarm payload
      */
-    void processDriverAlarm(DriverAlarmDTO alarm);
+    Mono<Void> processDriverAlarm(DriverAlarmDTO alarm);
 
     /**
      * Process an event report.
      *
      * @param entityDTO event report payload
      */
-    void processEventReport(EventReportDTO entityDTO);
+    Mono<Void> processEventReport(EventReportDTO entityDTO);
 
 }

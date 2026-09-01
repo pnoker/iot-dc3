@@ -20,7 +20,7 @@ import {API_MANAGER_BASE} from '@/config/constant/api';
 import type {TopologyMode, TopologyResponse} from '@/config/types/dashboard';
 
 export const topology = (params: { mode?: TopologyMode; rangeKey?: string } = {}) =>
-  httpGet<R<TopologyResponse>>(`${API_MANAGER_BASE}/dashboard/topology`, {
+  httpGet<TopologyResponse>(`${API_MANAGER_BASE}/dashboard/topology`, {
     params: {
       ...(params.mode ? {mode: params.mode} : {}),
       ...(params.rangeKey ? {range_key: params.rangeKey} : {}),

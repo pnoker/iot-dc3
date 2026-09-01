@@ -38,11 +38,13 @@
 
     <dependencies>
 
-        <!-- mybatis-plus relocated its spring service/impl classes here in 3.5.17;
-             auth managers import them directly, so the dependency is explicit. -->
         <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-spring</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-r2dbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-core</artifactId>
         </dependency>
 
         <!-- Process-local cache for the token denylist -->
@@ -74,23 +76,11 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-dal</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-log</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-model</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-postgres</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>

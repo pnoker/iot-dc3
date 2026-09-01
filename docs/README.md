@@ -1,6 +1,6 @@
 # IoT DC3 文档导航(docs/)
 
-> 本文件是 `docs/` 目录的中文导读与分类索引:13 篇文档分三类,逐篇给出摘要、状态与阅读建议。
+> 本文件是 `docs/` 目录的中文导读与分类索引，按类别给出摘要、状态与阅读建议。
 > 仓库工程规范见根目录 [AGENTS.md](../AGENTS.md)。目录内全部文档均为简体中文。
 
 ## 总览
@@ -10,7 +10,8 @@
 | 选型指南 | [db-dialects.md](./db-dialects.md) 关系库选型 | 有效 |
 | 选型指南 | [tsdb-stores.md](./tsdb-stores.md) 时序存储选型 | 有效 |
 | 选型指南 | [mq-brokers.md](./mq-brokers.md) 消息中间件选型 | 有效 |
-| 设计/架构 | [design/relational-r2dbc.md](./design/relational-r2dbc.md) R2DBC 关系访问层 | 已批准(2026-08-28),待实施 |
+| 设计/架构 | [design/relational-r2dbc.md](./design/relational-r2dbc.md) R2DBC 关系访问层 | 已落地，待全量实库/拓扑验收 |
+| 质量/测试 | [r2dbc-migration-test-handoff.md](./r2dbc-migration-test-handoff.md) R2DBC 全平台测试交接 | 待执行，发布硬门禁 |
 | 设计/架构 | [design/tsdb-abstraction.md](./design/tsdb-abstraction.md) 时序存储 Port | 已落地 |
 | 设计/架构 | [design/mq-abstraction.md](./design/mq-abstraction.md) 消息中间件 Port | 已落地 |
 | 设计/架构 | [design/storage-abstraction.md](./design/storage-abstraction.md) 存储抽象总纲 | 部分被取代(§3/§4) |
@@ -44,7 +45,7 @@
 ### 3. [消息 broker 选型指南](./mq-brokers.md)
 
 - **回答的问题**:内部异步面选哪个 broker;南向设备面 MQTT 怎么与之共处("两平面一原则")。
-- **关键结论**:RabbitMQ 默认;Kafka / Pulsar / ActiveMQ / MQTT 5 已认证;RocketMQ 实验性(未认证,自担风险)。
+- **关键结论**:RabbitMQ 默认;Kafka / Pulsar / MQTT 5 与 RabbitMQ 均已通过同一套真实 broker TCK。
 - **注意**:能力矩阵里"延迟消息"多数是本地回退(fallback)而非原生;Kafka 适配器不配 SASL/TLS。
 
 ---
@@ -62,25 +63,30 @@ storage-abstraction.md(2026-08-17 总纲)
 
 ### 4. [基于 Spring Data R2DBC 的关系访问层设计](./design/relational-r2dbc.md)
 
-- **一句话**:用 Spring Data R2DBC 替换 MyBatis-Plus + JDBC,auth 中心试点,目标是 GraalVM native + 端到端响应式 + 方言自由。
-- **读什么**:§3 事实清单(F1–F15,全部经代码核实);§5 决策表 **D1–D19**(每方言每服务模块、TCK 纪律、编译期租户隔离、
-  Facade/gRPC 阻塞边界、timestamptz 编解码、雪花 workerId 分配);§12 P0–P5 阶段计划(P2–P3 为 go/no-go 闸门)。
-- **注意**:分页信封是一次性硬切换(D8,不搞兼容);auth 的 HTTP 分页契约会被有意破坏。
+- **一句话**:用统一的 PostgreSQL R2DBC + Reactor 替换 MyBatis-Plus/JDBC，四个业务域和 single center 一次性切换。
+- **读什么**:数据格式、租户/事务不变量、offset/cursor 分页、Flux 取消和发布门禁。
+- **注意**:分页和响应信封是一次性硬切换，不保留旧 `R<T>`、页码字段或兼容别名。
+
+#### 4.1 [R2DBC flag-day 全平台测试交接](./r2dbc-migration-test-handoff.md)
+
+- **一句话**:用 Podman 对 Auth、Manager、Data、Agentic、single/distributed、Gateway、Web、CLI 和 PostgreSQL/TimescaleDB 做连续白盒、黑盒与故障交叉验收。
+- **读什么**:当前已证实与未证实边界、已知阻断问题、全 Store 实库矩阵、数据库组合、分页/流式协议和发布硬门禁。
+- **注意**:当前单元/TCK 基线不能替代本文要求的全链路证据；任一必测项失败、跳过或无证据都阻断发布。
 
 ### 5. [时序存储抽象(TSDB Port)](./design/tsdb-abstraction.md)
 
-- **一句话**:把位值时序存储抽成 Port,`dc3-tsdb-core` + 四适配器(timescale/tdengine/influxdb/iotdb)+ TCK,Phase 1–3 已落地并 TCK 认证。
+- **一句话**:关系与时序统一为 PostgreSQL/TimescaleDB + R2DBC，`dc3-tsdb-core` 定义历史 Port，单一实现由 Data 域承载并接受 PostgreSQL TCK。
 - **读什么**:port 必须承载的语义(§4)、核心 API(§6);能力差异的落地细节对应 [tsdb-stores.md](./tsdb-stores.md)。
 
 ### 6. [消息中间件抽象(MQ Port)](./design/mq-abstraction.md)
 
-- **一句话**:center ↔ driver 异步平面的 broker 抽象,`dc3-mq-core` + 六适配器(rocketmq 实验)+ TCK,已交付。
+- **一句话**: center ↔ driver 异步平面的 broker 抽象,`dc3-mq-core` + 四适配器(RabbitMQ/Kafka/Pulsar/MQTT 5)+ TCK,已交付。
 - **读什么**:核心 API(§6)、订阅模式与目的地映射(§7)、逐 broker 的硬语义(§8:延迟消息、死信、MQTT 两平面分离)。
 
-### 7. [存储抽象总纲](./design/storage-abstraction.md) *部分被取代*
+### 7. [统一 PostgreSQL R2DBC 存储设计](./design/storage-abstraction.md)
 
-- **一句话**:整个"可插拔存储"叙事的起点;关系/时序两半已分别演进出后继文档,**只有 §1–2(三层模型)、§5(向量占位)、§6(统一配置面)仍是现行参考**。
-- **读法**:当历史背景或总纲骨架读,不要按 §3/§4 实施。
+- **一句话**:统一 PostgreSQL、TimescaleDB、R2DBC、JSONB、UTC 时间、租户隔离和事务边界的现行总纲。
+- **读什么**:运行时拓扑、数据格式、分页、并发、取消和发布门禁。
 
 ### 8. [MCP 运行时全面重构:内聚的授权契约](./design/mcp-runtime-overhaul.md) *提案*
 
@@ -124,7 +130,7 @@ storage-abstraction.md(2026-08-17 总纲)
 |------------|----------|
 | 部署 / 换库 / 换 broker | [db-dialects](./db-dialects.md) → [tsdb-stores](./tsdb-stores.md) → [mq-brokers](./mq-brokers.md) |
 | 理解存储层现状与演进 | [storage-abstraction §1–2](./design/storage-abstraction.md) → [tsdb-abstraction](./design/tsdb-abstraction.md) → [db-dialects](./db-dialects.md) → [relational-r2dbc](./design/relational-r2dbc.md) |
-| 参与 auth R2DBC 迁移 | [relational-r2dbc 全文](./design/relational-r2dbc.md)(重点 §5 决策表 D1–D19)→ [db-dialects](./db-dialects.md) → 根目录 AGENTS.md |
+| 验收全平台 R2DBC 迁移 | [relational-r2dbc 全文](./design/relational-r2dbc.md) → [r2dbc-migration-test-handoff](./r2dbc-migration-test-handoff.md) → 根目录 AGENTS.md |
 | 前端 / 客户端开发 | [frontend-three-terminal-ux](./design/frontend-three-terminal-ux.md) → [dc3-client-sdk](./design/dc3-client-sdk.md) |
 | MCP / AI 集成 | [mcp-runtime-overhaul](./design/mcp-runtime-overhaul.md) → [relational-r2dbc §5 D13](./design/relational-r2dbc.md)(OAuth/MCP 聚合拆分) |
 | 了解项目定位 / 竞品差异 | [comparison-dgiot](./comparison-dgiot.md) → [comparison-supos-free](./comparison-supos-free.md) → [dc3-thing-model-review](./dc3-thing-model-review.md) |

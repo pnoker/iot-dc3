@@ -26,6 +26,7 @@ import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -50,28 +51,24 @@ public class EventReportReceiver {
      * @param entityDTO the deserialized event report
      */
     @Dc3Listener(topic = MqTopic.EVENT)
-    public void onEventReport(MqReceived<EventReportDTO> message, Acknowledgment ack) {
+    public Mono<Void> onEventReport(MqReceived<EventReportDTO> message, Acknowledgment ack) {
         EventReportDTO entityDTO = message.payload();
-        try {
-            log.debug("Event report received, recordId={}, deviceId={}, eventId={}",
+        log.debug("Event report received, recordId={}, deviceId={}, eventId={}",
+                Objects.isNull(entityDTO) ? null : entityDTO.recordId(),
+                Objects.isNull(entityDTO) ? null : entityDTO.deviceId(),
+                Objects.isNull(entityDTO) ? null : entityDTO.eventId());
+        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.recordId())
+                || Objects.isNull(entityDTO.deviceId()) || Objects.isNull(entityDTO.eventId())) {
+            log.warn("Invalid event report, some required fields are null, recordId={}, deviceId={}, eventId={}",
                     Objects.isNull(entityDTO) ? null : entityDTO.recordId(),
                     Objects.isNull(entityDTO) ? null : entityDTO.deviceId(),
                     Objects.isNull(entityDTO) ? null : entityDTO.eventId());
-            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.recordId())
-                    || Objects.isNull(entityDTO.deviceId()) || Objects.isNull(entityDTO.eventId())) {
-                log.warn("Invalid event report, some required fields are null, recordId={}, deviceId={}, eventId={}",
-                        Objects.isNull(entityDTO) ? null : entityDTO.recordId(),
-                        Objects.isNull(entityDTO) ? null : entityDTO.deviceId(),
-                        Objects.isNull(entityDTO) ? null : entityDTO.eventId());
-                ack.reject(false);
-                return;
-            }
-            eventHistoryService.report(entityDTO);
-            ack.ack();
-        } catch (Exception e) {
-            log.error("Event report consume failed.", e);
-            ack.reject(true);
+            ack.reject(false);
+            return Mono.empty();
         }
+        return eventHistoryService.report(entityDTO)
+                .doOnError(error -> log.error("Event report processing failed.", error))
+                .then();
     }
 
 }

@@ -22,7 +22,6 @@ import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
 import io.github.pnoker.common.data.entity.property.AlarmWindowProperties;
 import io.github.pnoker.common.data.entity.property.NotifyCredentialProperties;
 import lombok.RequiredArgsConstructor;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -31,15 +30,14 @@ import org.springframework.context.annotation.ComponentScan;
 
 /**
  * Data Initialization Runner for DC3 IoT Platform. This class handles data initialization
- * tasks during application startup, configuring component scanning for data-related
- * classes and MyBatis mappers.
+ * tasks during application startup and configuring component scanning for
+ * data-related classes.
  *
  * @author pnoker
  * @since 2016.10.1
  */
 @AutoConfiguration
 @ComponentScan(basePackages = {"io.github.pnoker.common.data"})
-@MapperScan(basePackages = {"io.github.pnoker.common.data.mapper"})
 @EnableConfigurationProperties({NotifyCredentialProperties.class,
         AlarmCacheProperties.class, AlarmWindowProperties.class})
 @RequiredArgsConstructor

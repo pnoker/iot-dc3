@@ -19,11 +19,12 @@ package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.manager.biz.ScheduleForManagerService;
 import lombok.RequiredArgsConstructor;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
@@ -36,12 +37,13 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @AutoConfiguration
 @EnableAsync
-@ComponentScan(basePackages = {"io.github.pnoker.common.manager"})
-@MapperScan(basePackages = {"io.github.pnoker.common.manager.mapper"})
+@ComponentScan(basePackages = {"io.github.pnoker.common.manager"},
+        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
+                pattern = "io\\.github\\.pnoker\\.common\\.manager\\.dal\\..*"))
 @RequiredArgsConstructor
 public class ManagerInitRunner implements ApplicationRunner {
 
-    private final ScheduleForManagerService scheduleForManagerService;
+    private final ObjectProvider<ScheduleForManagerService> scheduleForManagerService;
 
     /**
      * Executes the initialization process when the application starts. This method
@@ -53,7 +55,10 @@ public class ManagerInitRunner implements ApplicationRunner {
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        scheduleForManagerService.initial();
+        ScheduleForManagerService scheduler = scheduleForManagerService.getIfAvailable();
+        if (scheduler != null) {
+            scheduler.initial();
+        }
     }
 
 }

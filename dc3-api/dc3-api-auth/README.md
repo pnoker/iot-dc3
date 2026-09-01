@@ -15,8 +15,8 @@
 | `ResourceRegistryApi` | `Sync`                                                                 | synchronize annotated API/menu resources |
 | `McpRuntimeApi`       | `Introspect`, `ListTools`, `ResolveTool`, `AuthorizeToolCall`, `Audit` | authorize and audit MCP tools            |
 
-Every response uses a contract-specific wrapper containing `GrpcR`. Callers must inspect the result envelope before
-reading response data.
+Every RPC returns its typed payload directly. Failures use standard gRPC status codes and metadata; callers never
+inspect an application-level response envelope.
 
 ## Consumers and implementation
 
@@ -37,5 +37,5 @@ mvn -s .mvn/settings.xml -q -pl dc3-api/dc3-api-auth -am compile
 This module has no handwritten runtime code or module-specific tests. A successful compile verifies proto syntax and
 generated Java sources; server/facade behaviour is tested in the implementing modules.
 
-When changing the contract, preserve field numbers, update implementations and clients together, and verify that tenant
-and authorization context remain explicit.
+When changing the contract, update implementations and clients together, and verify that tenant and authorization
+context remain explicit.

@@ -152,8 +152,8 @@ const {
 const load = () =>
   withLoading(async () => {
     const [configResponse, providerResponse] = await Promise.all([listAgenticModelConfigs(), listAgenticProviders()]);
-    providers.value = providerResponse.data || [];
-    setAllData(configResponse.data || []);
+    providers.value = providerResponse || [];
+    setAllData(configResponse || []);
   });
 
 const refresh = () => load();

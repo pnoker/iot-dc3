@@ -29,7 +29,6 @@ center and driver applications.
 
 | Module                          | Responsibility                                        |
 |---------------------------------|-------------------------------------------------------|
-| `dc3-common-dal`                | shared label/group persistence                        |
 | `dc3-common-mqtt`               | MQTT client configuration                             |
 | `dc3-common-quartz`             | scheduling infrastructure                             |
 | `dc3-common-thread`             | managed executors                                     |
@@ -42,7 +41,7 @@ center and driver applications.
 Datasource, messaging, and time-series storage were split into dedicated top-level families; business modules depend on
 them directly:
 
-- `dc3-db` — relational dialect adapters (PostgreSQL/MySQL/MariaDB) behind `dc3.db.type`
+- `dc3-db` — canonical PostgreSQL R2DBC runtime, dialect contract and schema fingerprint gate
 - `dc3-mq` — broker-neutral messaging port with per-broker adapters (RabbitMQ, Kafka, RocketMQ, Pulsar, ActiveMQ, MQTT)
 - `dc3-tsdb` — store-neutral time-series port with per-store adapters (TimescaleDB, TDengine, InfluxDB, IoTDB)
 

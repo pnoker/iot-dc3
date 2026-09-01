@@ -91,6 +91,7 @@ export interface AgenticSessionExt {
 }
 
 export type AgenticMessageRole = 'user' | 'assistant' | 'system';
+export type AgenticMessageStatus = 'COMPLETED' | 'FAILED' | 'CANCELLED';
 
 export interface AgenticMessage {
   id: string;
@@ -99,7 +100,7 @@ export interface AgenticMessage {
   contentExt?: AgenticMessageContent;
   model?: string;
   messageIndex?: number;
-  status?: number;
+  status?: AgenticMessageStatus;
   streaming?: boolean;
   reasoning?: string;
   finishReason?: string;

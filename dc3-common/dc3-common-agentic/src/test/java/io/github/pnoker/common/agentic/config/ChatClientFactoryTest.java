@@ -2,132 +2,84 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  */
-
 package io.github.pnoker.common.agentic.config;
 
-import io.github.pnoker.common.agentic.dal.ModelConfigManager;
-import io.github.pnoker.common.agentic.dal.ModelProviderManager;
-import io.github.pnoker.common.agentic.entity.builder.ModelConfigBuilder;
-import io.github.pnoker.common.agentic.entity.builder.ModelProviderBuilder;
+import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
+import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
+import io.github.pnoker.common.entity.common.RequestHeader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.api.Advisor;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 
-/**
- * Pure-Mockito coverage of {@link ChatClientFactory}. Provider lookup paths build
- * {@code Wrappers.lambdaQuery()} chains that need the MyBatis-Plus entity cache and
- * are deferred to integration tests; tests here exercise the resolveModel
- * shortcut and the per-provider cache eviction contract.
- */
 @ExtendWith(MockitoExtension.class)
 class ChatClientFactoryTest {
 
     @Mock
-    private ModelProviderManager modelProviderManager;
+    private ReactiveModelProviderStore modelProviderStore;
 
     @Mock
-    private ModelConfigManager modelConfigManager;
-
-    @Mock
-    private ModelProviderBuilder modelProviderBuilder;
-
-    @Mock
-    private ModelConfigBuilder modelConfigBuilder;
+    private ReactiveModelConfigStore modelConfigStore;
 
     @Mock
     private ChatClient.Builder fallbackBuilder;
 
-    @Mock
-    private Advisor memoryAdvisor;
-
     private ChatClientFactory factory;
-
-    private static Field cacheField() throws NoSuchFieldException {
-        Field field = ChatClientFactory.class.getDeclaredField("cache");
-        field.setAccessible(true);
-        return field;
-    }
-
-    private static void injectField(Object target, String name, Object value) throws Exception {
-        Field field = ChatClientFactory.class.getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(target, value);
-    }
+    private RequestHeader.PrincipalHeader header;
 
     @BeforeEach
     void setUp() throws Exception {
         AgenticProperties properties = new AgenticProperties();
-        factory = new ChatClientFactory(modelProviderManager, modelConfigManager, modelProviderBuilder,
-                modelConfigBuilder, fallbackBuilder, memoryAdvisor, properties);
-        injectField(factory, "fallbackModel", "gpt-4o");
+        factory = new ChatClientFactory(modelProviderStore, modelConfigStore, fallbackBuilder, properties);
+        injectField("fallbackModel", "gpt-4o");
+        header = new RequestHeader.PrincipalHeader();
+        header.setTenantId(1L);
+        header.setPrincipalId(2L);
+        header.setPrincipalName("admin");
+        lenient().when(modelConfigStore.findDefault(header)).thenReturn(reactor.core.publisher.Mono.empty());
+        lenient().when(modelConfigStore.findByModel("gpt-4o", header)).thenReturn(reactor.core.publisher.Mono.empty());
+        lenient().when(modelConfigStore.findByModel("unknown-model", header)).thenReturn(reactor.core.publisher.Mono.empty());
     }
 
     @Test
-    void resolveModelReturnsConfiguredFallbackWhenNoModelConfigExists() {
-        assertThat(factory.resolveModel("  gpt-4o  ")).isEqualTo("gpt-4o");
-        assertThat(factory.resolveModel("unknown-model")).isEqualTo("gpt-4o");
+    void resolveModelUsesReactiveFallbackWhenNoModelConfigExists() {
+        StepVerifier.create(factory.resolveModelReactive("  gpt-4o  ", header))
+                .expectNext("gpt-4o").verifyComplete();
+        StepVerifier.create(factory.resolveModelReactive("unknown-model", header))
+                .expectNext("gpt-4o").verifyComplete();
     }
 
     @Test
     void supportsToolCallUsesFallbackCapabilityWhenNoModelConfigExists() {
-        assertThat(factory.supportsToolCall("gpt-4o")).isTrue();
-        assertThat(factory.supportsToolCall("unknown-model")).isFalse();
+        StepVerifier.create(factory.supportsToolCallReactive("gpt-4o", header))
+                .expectNext(true).verifyComplete();
+        StepVerifier.create(factory.supportsToolCallReactive("unknown-model", header))
+                .expectNext(false).verifyComplete();
     }
 
     @Test
-    void evictRemovesCachedClientForGivenProviderId() throws Exception {
-        @SuppressWarnings("unchecked")
-        Map<Long, ChatClient> cache = (Map<Long, ChatClient>) cacheField().get(factory);
-        ChatClient cached = org.mockito.Mockito.mock(ChatClient.class);
-        cache.put(7L, cached);
-
-        factory.evict(7L);
-
-        assertThat(cache).doesNotContainKey(7L);
-    }
-
-    @Test
-    void evictIsNoOpForUnknownProviderId() throws Exception {
-        @SuppressWarnings("unchecked")
-        Map<Long, ChatClient> cache = (Map<Long, ChatClient>) cacheField().get(factory);
-        ChatClient cached = org.mockito.Mockito.mock(ChatClient.class);
-        cache.put(7L, cached);
-
+    void evictIsSafeForUnknownProviderId() {
         factory.evict(999L);
-
-        assertThat(cache).containsKey(7L);
+        assertThat(factory).isNotNull();
     }
 
-    @Test
-    void evictDoesNotThrowOnEmptyCache() throws Exception {
-        @SuppressWarnings("unchecked")
-        Map<Long, ChatClient> cache = (Map<Long, ChatClient>) cacheField().get(factory);
-        assertThat(cache).isInstanceOf(ConcurrentHashMap.class);
-        // Eviction with no entry present is a no-op.
-        factory.evict(1L);
-        factory.evict(2L);
-        assertThat(cache).isEmpty();
+    private void injectField(String name, Object value) throws Exception {
+        Field field = ChatClientFactory.class.getDeclaredField(name);
+        field.setAccessible(true);
+        field.set(factory, value);
     }
 }

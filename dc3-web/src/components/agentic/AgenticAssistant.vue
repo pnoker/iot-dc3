@@ -962,7 +962,16 @@ const assistantStatus = (message: AgenticMessage) => {
   if (message.streaming) {
     return message.content ? t('agentic.statusStreaming') : t('agentic.statusThinking');
   }
+  if (message.status === 'CANCELLED') {
+    return t('agentic.statusCancelled');
+  }
+  if (message.status === 'FAILED') {
+    return t('agentic.statusFailed');
+  }
   const reason = message.finishReason?.toLowerCase();
+  if (reason === 'cancelled' || reason === 'canceled') {
+    return t('agentic.statusCancelled');
+  }
   if (reason === 'error' || reason === 'failed') {
     return t('agentic.statusFailed');
   }

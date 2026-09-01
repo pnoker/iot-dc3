@@ -87,8 +87,8 @@ const rows = ref<FlappingSource[]>([]);
 
 const load = () =>
   run(async () => {
-    const res: { data?: FlappingSource[] } = await alertFlapping(Number(windowKey.value), minCount.value, 30);
-    rows.value = res?.data ?? [];
+    const res: FlappingSource[] = await alertFlapping(Number(windowKey.value), minCount.value, 30);
+    rows.value = res ?? [];
     await resolveBySource(rows.value);
   });
 

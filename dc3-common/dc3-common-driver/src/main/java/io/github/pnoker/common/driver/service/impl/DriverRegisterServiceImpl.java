@@ -26,6 +26,7 @@ import io.github.pnoker.common.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * Default {@link DriverRegisterService} implementation that builds the registration
@@ -55,18 +56,14 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
      * properties.
      */
     @Override
-    public void initial() {
-        try {
-            // Build driver registration information from properties
+    public Mono<Void> initial() {
+        return Mono.defer(() -> {
             RegisterBO entityBO = buildRegisterBOByProperty();
             log.debug("Driver registration prepared, serviceName={}, driverCode={}, tenantCode={}",
                     entityBO.getDriver().getServiceName(), entityBO.getDriver().getDriverCode(), entityBO.getTenant());
-            // Register driver with the driver client
-            driverClient.driverRegister(entityBO);
-        } catch (Exception e) {
-            log.error("Driver initialization failed", e);
-            throw new ServiceException("Driver initialization failed: {}", e.getMessage(), e);
-        }
+            return driverClient.driverRegister(entityBO);
+        }).onErrorMap(error -> !(error instanceof ServiceException),
+                error -> new ServiceException("Driver initialization failed: {}", error.getMessage(), error));
     }
 
     /**

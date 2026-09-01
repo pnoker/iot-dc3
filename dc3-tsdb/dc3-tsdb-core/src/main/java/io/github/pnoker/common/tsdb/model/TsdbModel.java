@@ -98,6 +98,12 @@ public final class TsdbModel {
      * @param pointId  point of the series
      */
     public record SeriesKey(long tenantId, long deviceId, long pointId) {
+
+        public SeriesKey {
+            if (tenantId <= 0 || deviceId <= 0 || pointId <= 0) {
+                throw new IllegalArgumentException("series identifiers must be positive");
+            }
+        }
     }
 
     /**
@@ -110,6 +116,15 @@ public final class TsdbModel {
      */
     public record SeriesFilter(long tenantId, List<SeriesKey> series) {
 
+        public SeriesFilter {
+            if (tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
+            series = series == null ? List.of() : List.copyOf(series);
+            if (series.stream().anyMatch(key -> key == null || key.tenantId() != tenantId
+                    || key.deviceId() <= 0 || key.pointId() <= 0)) {
+                throw new IllegalArgumentException("series must be non-null, positive and tenant-scoped");
+            }
+        }
+
         /**
          * Filter for exactly one series; the tenant id comes from that series.
          *
@@ -117,6 +132,7 @@ public final class TsdbModel {
          * @return a single-series filter
          */
         public static SeriesFilter of(SeriesKey single) {
+            if (single == null) throw new IllegalArgumentException("series must not be null");
             return new SeriesFilter(single.tenantId(), List.of(single));
         }
 
@@ -225,12 +241,40 @@ public final class TsdbModel {
     }
 
     /**
-     * S5: descending page anchor — (deviceTime, messageId) tuple; null = start from newest.
+     * S5: descending page anchor. The series key is part of the tie-break so a
+     * tenant-wide or multi-series scan cannot skip rows sharing the same time and
+     * message id. Window bounds are carried by the signed API cursor to preserve a
+     * stable snapshot when a rolling range is used.
      *
      * @param deviceTime anchor device time
      * @param messageId  anchor message id
+     * @param series     anchor series, null only for internal single-series callers
+     * @param windowFrom snapshot window lower bound, null for an unbound internal cursor
+     * @param windowTo   snapshot window upper bound, null for an unbound internal cursor
      */
-    public record Cursor(Instant deviceTime, String messageId) {
+    public record Cursor(Instant deviceTime, String messageId, SeriesKey series,
+                         Instant windowFrom, Instant windowTo) {
+
+        public Cursor {
+            if (deviceTime == null || messageId == null || messageId.isBlank()) {
+                throw new IllegalArgumentException("cursor position is required");
+            }
+            if ((windowFrom == null) != (windowTo == null)
+                    || (windowFrom != null && !windowFrom.isBefore(windowTo))) {
+                throw new IllegalArgumentException("cursor window must be a valid half-open range");
+            }
+            if (series != null && (series.tenantId() <= 0 || series.deviceId() <= 0 || series.pointId() <= 0)) {
+                throw new IllegalArgumentException("cursor series must be positive");
+            }
+        }
+
+        public Cursor(Instant deviceTime, String messageId, SeriesKey series) {
+            this(deviceTime, messageId, series, null, null);
+        }
+
+        public Cursor withWindow(TimeWindow window) {
+            return new Cursor(deviceTime, messageId, series, window.from(), window.toExclusive());
+        }
     }
 
     /**

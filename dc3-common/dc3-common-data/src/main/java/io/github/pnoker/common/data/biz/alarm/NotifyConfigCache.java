@@ -19,29 +19,17 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import io.github.pnoker.common.data.dal.MessageManager;
-import io.github.pnoker.common.data.dal.NotifyChannelBindManager;
-import io.github.pnoker.common.data.dal.NotifyChannelManager;
-import io.github.pnoker.common.data.dal.NotifyManager;
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
-import io.github.pnoker.common.data.entity.builder.MessageBuilder;
-import io.github.pnoker.common.data.entity.builder.NotifyBuilder;
-import io.github.pnoker.common.data.entity.builder.NotifyChannelBindBuilder;
-import io.github.pnoker.common.data.entity.builder.NotifyChannelBuilder;
-import io.github.pnoker.common.data.entity.model.MessageDO;
-import io.github.pnoker.common.data.entity.model.NotifyChannelBindDO;
-import io.github.pnoker.common.data.entity.model.NotifyChannelDO;
-import io.github.pnoker.common.data.entity.model.NotifyDO;
+import io.github.pnoker.common.data.repository.ReactiveNotifyConfigStore;
 import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -65,34 +53,14 @@ import java.util.Objects;
 @Component
 public class NotifyConfigCache {
 
-    private final NotifyManager notifyManager;
-    private final NotifyBuilder notifyBuilder;
-    private final MessageManager messageManager;
-    private final MessageBuilder messageBuilder;
-    private final NotifyChannelManager notifyChannelManager;
-    private final NotifyChannelBuilder notifyChannelBuilder;
-    private final NotifyChannelBindManager notifyChannelBindManager;
-    private final NotifyChannelBindBuilder notifyChannelBindBuilder;
+    private final ReactiveNotifyConfigStore configStore;
+    private final Cache<NotifyKey, Mono<NotifyBO>> notifyCache;
+    private final Cache<MessageKey, Mono<MessageBO>> messageCache;
+    private final Cache<ChannelKey, Mono<NotifyChannelBO>> channelCache;
+    private final Cache<NotifyBindKey, Mono<List<NotifyChannelBindBO>>> bindCache;
 
-    private final Cache<Long, NotifyBO> notifyCache;
-    private final Cache<Long, MessageBO> messageCache;
-    private final Cache<Long, NotifyChannelBO> channelCache;
-    private final Cache<NotifyBindKey, List<NotifyChannelBindBO>> bindCache;
-
-    public NotifyConfigCache(NotifyManager notifyManager, NotifyBuilder notifyBuilder,
-                             MessageManager messageManager, MessageBuilder messageBuilder,
-                             NotifyChannelManager notifyChannelManager, NotifyChannelBuilder notifyChannelBuilder,
-                             NotifyChannelBindManager notifyChannelBindManager,
-                             NotifyChannelBindBuilder notifyChannelBindBuilder,
-                             AlarmCacheProperties alarmCacheProperties) {
-        this.notifyManager = notifyManager;
-        this.notifyBuilder = notifyBuilder;
-        this.messageManager = messageManager;
-        this.messageBuilder = messageBuilder;
-        this.notifyChannelManager = notifyChannelManager;
-        this.notifyChannelBuilder = notifyChannelBuilder;
-        this.notifyChannelBindManager = notifyChannelBindManager;
-        this.notifyChannelBindBuilder = notifyChannelBindBuilder;
+    public NotifyConfigCache(ReactiveNotifyConfigStore configStore, AlarmCacheProperties alarmCacheProperties) {
+        this.configStore = configStore;
         AlarmCacheProperties.CacheTuning tuning = alarmCacheProperties.getNotify();
         this.notifyCache = newCache(tuning);
         this.messageCache = newCache(tuning);
@@ -112,35 +80,26 @@ public class NotifyConfigCache {
     }
 
     /**
-     * Returns the notify policy for {@code id}, or {@code null} when it doesn't
+     * Returns the notify policy for {@code id}, or an empty Mono when it doesn't
      * exist. Caches the result either way so a hot rule pointing at a missing
      * policy does not pound the database.
      */
-    public NotifyBO getNotify(Long id) {
-        if (!isValidId(id)) {
-            return null;
-        }
-        NotifyBO bo = notifyCache.get(id, key -> {
-            NotifyDO entity = notifyManager.getById(key);
-            return Objects.nonNull(entity) ? notifyBuilder.buildBOByDO(entity) : null;
-        });
-        return bo;
+    public Mono<NotifyBO> getNotify(Long id, Long tenantId) {
+        if (!isValidId(id) || !isValidId(tenantId)) return Mono.empty();
+        return notifyCache.get(new NotifyKey(id, tenantId), key ->
+                configStore.getNotify(key.tenantId(), key.id()).cache());
     }
 
     /**
-     * Return message.
+     * Return message reactively.
      *
      * @param id id
      * @return get message result
      */
-    public MessageBO getMessage(Long id) {
-        if (!isValidId(id)) {
-            return null;
-        }
-        return messageCache.get(id, key -> {
-            MessageDO entity = messageManager.getById(key);
-            return Objects.nonNull(entity) ? messageBuilder.buildBOByDO(entity) : null;
-        });
+    public Mono<MessageBO> getMessage(Long id, Long tenantId) {
+        if (!isValidId(id) || !isValidId(tenantId)) return Mono.empty();
+        return messageCache.get(new MessageKey(id, tenantId), key ->
+                configStore.getMessage(key.tenantId(), key.id()).cache());
     }
 
     /**
@@ -149,44 +108,23 @@ public class NotifyConfigCache {
      * call site, so we encode that here to keep callers from forgetting the
      * tenant guard.
      */
-    public NotifyChannelBO getChannel(Long id, Long tenantId) {
-        if (!isValidId(id)) {
-            return null;
-        }
-        NotifyChannelBO bo = channelCache.get(id, key -> {
-            NotifyChannelDO entity = notifyChannelManager.getById(key);
-            if (Objects.isNull(entity) || Objects.isNull(entity.getChannelTypeFlag())) {
-                return null;
-            }
-            return notifyChannelBuilder.buildBOByDO(entity);
-        });
-        if (Objects.isNull(bo)) {
-            return null;
-        }
-        if (!Objects.equals(bo.getTenantId(), tenantId)) {
-            return null;
-        }
-        return bo;
+    public Mono<NotifyChannelBO> getChannel(Long id, Long tenantId) {
+        if (!isValidId(id) || !isValidId(tenantId)) return Mono.empty();
+        return channelCache.get(new ChannelKey(id, tenantId), key ->
+                configStore.getChannel(key.tenantId(), key.id()).filter(channel ->
+                        Objects.equals(channel.getTenantId(), key.tenantId())
+                                && channel.getChannelTypeFlag() != null).cache());
     }
 
     /**
      * Returns enabled bindings for {@code (tenantId, notifyId)}. The result is
      * an unmodifiable list to keep accidental mutation from corrupting the cache.
      */
-    public List<NotifyChannelBindBO> findEnabledBinds(NotifyBO notify) {
-        if (Objects.isNull(notify) || !isValidId(notify.getId()) || !isValidId(notify.getTenantId())) {
-            return List.of();
-        }
+    public Mono<List<NotifyChannelBindBO>> findEnabledBinds(NotifyBO notify) {
+        if (notify == null || !isValidId(notify.getId()) || !isValidId(notify.getTenantId())) return Mono.just(List.of());
         NotifyBindKey key = new NotifyBindKey(notify.getTenantId(), notify.getId());
-        List<NotifyChannelBindBO> list = bindCache.get(key, k -> {
-            List<NotifyChannelBindDO> rows = notifyChannelBindManager.lambdaQuery()
-                    .eq(NotifyChannelBindDO::getNotifyId, k.notifyId())
-                    .eq(NotifyChannelBindDO::getTenantId, k.tenantId())
-                    .eq(NotifyChannelBindDO::getEnableFlag, EnableFlagEnum.ENABLE.getIndex())
-                    .list();
-            return Collections.unmodifiableList(notifyChannelBindBuilder.buildBOListByDOList(rows));
-        });
-        return Objects.requireNonNullElse(list, List.of());
+        return bindCache.get(key, k -> configStore.listEnabledBinds(k.tenantId(), k.notifyId())
+                .collectList().map(List::copyOf).cache());
     }
 
     /**
@@ -195,9 +133,7 @@ public class NotifyConfigCache {
      * @param id id
      */
     public void invalidateNotify(Long id) {
-        if (Objects.nonNull(id)) {
-            notifyCache.invalidate(id);
-        }
+        if (Objects.nonNull(id)) notifyCache.asMap().keySet().removeIf(key -> Objects.equals(key.id(), id));
     }
 
     /**
@@ -206,9 +142,7 @@ public class NotifyConfigCache {
      * @param id id
      */
     public void invalidateMessage(Long id) {
-        if (Objects.nonNull(id)) {
-            messageCache.invalidate(id);
-        }
+        if (Objects.nonNull(id)) messageCache.asMap().keySet().removeIf(key -> Objects.equals(key.id(), id));
     }
 
     /**
@@ -217,9 +151,7 @@ public class NotifyConfigCache {
      * @param id id
      */
     public void invalidateChannel(Long id) {
-        if (Objects.nonNull(id)) {
-            channelCache.invalidate(id);
-        }
+        if (Objects.nonNull(id)) channelCache.asMap().keySet().removeIf(key -> Objects.equals(key.id(), id));
     }
 
     /**
@@ -247,6 +179,15 @@ public class NotifyConfigCache {
      * Cache key of one notify rule's channel bindings: tenant + notify id.
      */
     public record NotifyBindKey(Long tenantId, Long notifyId) {
+    }
+
+    public record NotifyKey(Long id, Long tenantId) {
+    }
+
+    public record MessageKey(Long id, Long tenantId) {
+    }
+
+    public record ChannelKey(Long id, Long tenantId) {
     }
 
 }

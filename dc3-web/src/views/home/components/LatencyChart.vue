@@ -77,7 +77,7 @@ const load = async () => {
   loading.value = true;
   try {
     const res: any = await statsLatency({rangeKey: rangeKey.value});
-    const rows = (res?.data ?? []) as { bin: number; count: number }[];
+    const rows = (res ?? []) as { bin: number; count: number }[];
     await nextTick();
     render(rows);
   } catch {

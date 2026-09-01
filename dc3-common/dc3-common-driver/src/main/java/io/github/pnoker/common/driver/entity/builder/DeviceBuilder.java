@@ -61,7 +61,9 @@ public interface DeviceBuilder {
     @Mapping(target = "driverAttributeConfigIdMap", ignore = true)
     @Mapping(target = "pointAttributeConfigIdMap", ignore = true)
     @Mapping(target = "commandAttributeConfigIdMap", ignore = true)
+    @Mapping(target = "commandRuntimeIdMap", ignore = true)
     @Mapping(target = "eventAttributeConfigIdMap", ignore = true)
+    @Mapping(target = "eventRuntimeIdMap", ignore = true)
     DeviceBO buildDTOByGrpcDTO(GrpcDeviceDTO entityGrpc);
 
     /**

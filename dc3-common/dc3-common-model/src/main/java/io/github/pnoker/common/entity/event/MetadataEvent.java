@@ -39,6 +39,8 @@ public class MetadataEvent extends ApplicationEvent {
 
     private final Long id;
 
+    private final Long tenantId;
+
     private final MetadataTypeEnum metadataType;
 
     private final MetadataOperateTypeEnum operateType;
@@ -54,7 +56,12 @@ public class MetadataEvent extends ApplicationEvent {
      * @param operateType  Metadata operation type
      */
     public MetadataEvent(Object source, Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType) {
-        this(source, id, metadataType, operateType, Collections.emptySet());
+        this(source, null, id, metadataType, operateType, Collections.emptySet());
+    }
+
+    public MetadataEvent(Object source, Long tenantId, Long id, MetadataTypeEnum metadataType,
+                         MetadataOperateTypeEnum operateType) {
+        this(source, tenantId, id, metadataType, operateType, Collections.emptySet());
     }
 
     /**
@@ -68,7 +75,13 @@ public class MetadataEvent extends ApplicationEvent {
      */
     public MetadataEvent(Object source, Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType,
                          Collection<String> targetServices) {
+        this(source, null, id, metadataType, operateType, targetServices);
+    }
+
+    public MetadataEvent(Object source, Long tenantId, Long id, MetadataTypeEnum metadataType,
+                         MetadataOperateTypeEnum operateType, Collection<String> targetServices) {
         super(source);
+        this.tenantId = tenantId;
         this.id = id;
         this.metadataType = metadataType;
         this.operateType = operateType;

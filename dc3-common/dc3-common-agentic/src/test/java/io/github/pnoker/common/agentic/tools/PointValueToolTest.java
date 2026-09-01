@@ -21,6 +21,7 @@ import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.service.ActionService;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.facade.api.PointCommandFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
@@ -30,10 +31,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ToolContext;
+import reactor.test.StepVerifier;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -68,64 +71,79 @@ class PointValueToolTest {
     @Test
     void writePointValueAlwaysCreatesPendingAction() {
         when(actionService.createWritePointValueAction("conv-1", 10L, 20L, "42", header))
-                .thenReturn("action-1");
+                .thenReturn(reactor.core.publisher.Mono.just("action-1"));
 
-        AgenticToolResult<PointValueTool.PointCommandResult> result = tool.writePointValue(10L, 20L, "42",
-                toolContext(Map.of(
+        StepVerifier.create(tool.writePointValueReactive(10L, 20L, "42", toolContext(Map.of(
                         AgenticConstant.ToolContextKey.CONVERSATION_ID, "conv-1",
-                        AgenticConstant.ToolContextKey.USER_HEADER, header)));
-
-        assertThat(result.success()).isTrue();
-        assertThat(result.data()).isNotNull();
-        assertThat(result.data().sent()).isFalse();
-        assertThat(result.data().pendingConfirmation()).isTrue();
-        assertThat(result.data().actionId()).isEqualTo("action-1");
+                        AgenticConstant.ToolContextKey.USER_HEADER, header))))
+                .assertNext(result -> {
+                    assertThat(result.success()).isTrue();
+                    assertThat(result.data()).isNotNull();
+                    assertThat(result.data().sent()).isFalse();
+                    assertThat(result.data().pendingConfirmation()).isTrue();
+                    assertThat(result.data().actionId()).isEqualTo("action-1");
+                })
+                .verifyComplete();
         verify(actionService).createWritePointValueAction("conv-1", 10L, 20L, "42", header);
         verify(pointCommandFacade, never()).submitWrite(anyLong(), anyLong(), anyLong(), anyString());
     }
 
     @Test
     void getPointValueHistoryReturnsRawValuesAndChartData() {
-        when(pointValueFacade.history(1L, 10L, 20L, 5)).thenReturn(List.of(
+        when(pointValueFacade.history(1L, 10L, 20L, null, 5)).thenReturn(reactor.core.publisher.Mono.just(io.github.pnoker.db.r2dbc.core.page.CursorPage.of(List.of(
                 FacadePointValueBO.builder().value("24.0").build(),
                 FacadePointValueBO.builder().value("23.8").build(),
                 FacadePointValueBO.builder().value("offline").build(),
-                FacadePointValueBO.builder().value("23.5").build()));
+                FacadePointValueBO.builder().value("23.5").build()), null)));
 
-        AgenticToolResult<PointValueTool.PointValueHistory> result = tool.getPointValueHistory(10L, 20L, 5,
-                toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, header)));
+        AtomicReference<PointValueTool.PointValueHistory> history = new AtomicReference<>();
+        StepVerifier.create(tool.getPointValueHistoryReactive(10L, 20L, 5,
+                        toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, header))))
+                .assertNext(value -> {
+                    assertThat(value.success()).isTrue();
+                    history.set(value.data());
+                }).verifyComplete();
+        PointValueTool.PointValueHistory result = history.get();
 
-        assertThat(result.success()).isTrue();
-        assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
-        assertThat(result.data().values()).containsExactly("24.0", "23.8", "offline", "23.5");
-        assertThat(result.data().chart()).isNotNull();
-        assertThat(result.data().chart().series()).hasSize(1);
-        assertThat(result.data().chart().series().get(0).data())
+        assertThat(result.values()).containsExactly("24.0", "23.8", "offline", "23.5");
+        assertThat(result.chart()).isNotNull();
+        assertThat(result.chart().series()).hasSize(1);
+        assertThat(result.chart().series().get(0).data())
                 .containsExactly(List.of(0, 23.5D), List.of(1, 23.8D), List.of(2, 24.0D));
-        assertThat(result.data().summary().numericCount()).isEqualTo(3);
-        assertThat(result.data().summary().nonNumericCount()).isEqualTo(1);
-        assertThat(result.data().summary().latest()).isEqualTo(24.0D);
-        assertThat(result.data().summary().average()).isEqualTo((23.5D + 23.8D + 24.0D) / 3);
-        assertThat(result.visualizations()).hasSize(2);
-        assertThat(result.visualizations().get(0).getType()).isEqualTo(AgenticConstant.Visualization.Type.LINE);
-        assertThat(result.visualizations().get(0).getDataset()).hasSize(3);
-        assertThat(result.visualizations().get(0).getAnnotations()).hasSize(1);
-        assertThat(result.visualizations().get(1).getType()).isEqualTo(AgenticConstant.Visualization.Type.STAT);
-        assertThat(result.visualizations().get(1).getDataset()).hasSize(1);
+        assertThat(result.summary().numericCount()).isEqualTo(3);
+        assertThat(result.summary().nonNumericCount()).isEqualTo(1);
+        assertThat(result.summary().latest()).isEqualTo(24.0D);
+        assertThat(result.summary().average()).isEqualTo((23.5D + 23.8D + 24.0D) / 3);
+    }
+
+    @Test
+    void reactiveLatestValueUsesReactiveFacade() {
+        FacadePointValueBO latest = FacadePointValueBO.builder().value("42").build();
+        when(pointValueFacade.lastValue(1L, 10L, 20L)).thenReturn(reactor.core.publisher.Mono.just(latest));
+
+        StepVerifier.create(tool.getLatestPointValueReactive(10L, 20L,
+                        toolContext(Map.of(AgenticConstant.ToolContextKey.TENANT_ID, 1L))))
+                .assertNext(result -> {
+                    assertThat(result.success()).isTrue();
+                    assertThat(result.data()).isSameAs(latest);
+                })
+                .verifyComplete();
+        verify(pointValueFacade).lastValue(1L, 10L, 20L);
     }
 
     @Test
     void readPointValueSendsReadCommandThroughPointCommandFacade() {
-        when(pointCommandFacade.submitRead(1L, 10L, 20L)).thenReturn(true);
+        when(pointCommandFacade.submitRead(1L, 10L, 20L, PointCommandSourceEnum.AGENTIC))
+                .thenReturn(reactor.core.publisher.Mono.just("cmd-1"));
 
-        AgenticToolResult<PointValueTool.PointCommandResult> result = tool.readPointValue(10L, 20L,
-                toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, header)));
+        AgenticToolResult<PointValueTool.PointCommandResult> result = tool.readPointValueReactive(10L, 20L,
+                toolContext(Map.of(AgenticConstant.ToolContextKey.USER_HEADER, header))).block();
 
         assertThat(result.success()).isTrue();
         assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
         assertThat(result.data().sent()).isTrue();
         assertThat(result.data().pendingConfirmation()).isFalse();
-        verify(pointCommandFacade).submitRead(1L, 10L, 20L);
+        verify(pointCommandFacade).submitRead(1L, 10L, 20L, PointCommandSourceEnum.AGENTIC);
     }
 
     private ToolContext toolContext(Map<String, Object> values) {

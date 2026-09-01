@@ -20,7 +20,8 @@ package io.github.pnoker.common.manager.biz;
 import io.github.pnoker.common.manager.entity.bo.DeviceLeaseBO;
 import io.github.pnoker.common.manager.entity.bo.DriverLeaseGrantBO;
 
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Coordinates driver-runtime leases and deterministic device ownership.
@@ -46,8 +47,8 @@ public interface DriverLeaseService {
      * @param knownAssignmentVersion assignment version already observed by the runtime
      * @return renewed lease expiry, current assignment version, and whether the runtime must reload assignments
      */
-    DriverLeaseGrantBO renew(Long tenantId, Long driverId, String node, String client,
-                             String host, int leaseSeconds, long knownAssignmentVersion);
+    Mono<DriverLeaseGrantBO> renew(Long tenantId, Long driverId, String node, String client,
+                                   String host, int leaseSeconds, long knownAssignmentVersion);
 
     /**
      * Lists the active device assignments owned by one runtime node using an exclusive device-ID cursor.
@@ -59,7 +60,7 @@ public interface DriverLeaseService {
      * @param limit         page size from 1 through 2000
      * @return assignments ordered by device ID
      */
-    List<DeviceLeaseBO> listOwnedLeases(Long tenantId, Long driverId, String node,
+    Flux<DeviceLeaseBO> listOwnedLeases(Long tenantId, Long driverId, String node,
                                         long afterDeviceId, int limit);
 
     /**
@@ -69,7 +70,7 @@ public interface DriverLeaseService {
      * @param driverId positive logical driver ID
      * @return current assignment version
      */
-    long getAssignmentVersion(Long tenantId, Long driverId);
+    Mono<Long> getAssignmentVersion(Long tenantId, Long driverId);
 
     /**
      * Resolves the unexpired runtime owner used to route a command to a tenant-owned device.
@@ -78,5 +79,5 @@ public interface DriverLeaseService {
      * @param deviceId positive device ID
      * @return active owner and fencing token, or {@code null} when the identity is invalid or no active lease exists
      */
-    DeviceLeaseBO getActiveOwner(Long tenantId, Long deviceId);
+    Mono<DeviceLeaseBO> getActiveOwner(Long tenantId, Long deviceId);
 }

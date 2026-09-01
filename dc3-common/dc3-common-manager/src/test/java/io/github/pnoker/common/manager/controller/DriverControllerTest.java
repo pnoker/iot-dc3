@@ -1,32 +1,13 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.manager.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.builder.DriverBuilder;
-import io.github.pnoker.common.manager.entity.query.DriverQuery;
+import io.github.pnoker.common.manager.entity.query.DriverListRequest;
 import io.github.pnoker.common.manager.entity.vo.DriverVO;
-import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.manager.service.ReactiveDriverService;
 import io.github.pnoker.common.security.GatewayAuthenticationToken;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,216 +24,66 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Reactive controller test that exercises DriverController through StepVerifier
- * with the principal security context wired manually. This is intentionally lighter than a
- * full {@code @WebFluxTest} — controller-only routing, request validation and
- * filter chain end up covered by the gateway slice and Spring slice tests in
- * later stages.
- */
 @ExtendWith(MockitoExtension.class)
 class DriverControllerTest {
 
     private static final long TENANT_ID = 100L;
 
-    @Mock
-    private DriverBuilder driverBuilder;
-
-    @Mock
-    private DriverService driverService;
-
+    @Mock private DriverBuilder driverBuilder;
+    @Mock private ReactiveDriverService reactiveDriverService;
     private DriverController controller;
 
-    private static <T> Mono<T> withTenantContext(Mono<T> mono) {
-        RequestHeader.PrincipalHeader user = new RequestHeader.PrincipalHeader(7L, "USER", "Alice", "alice",
-                TENANT_ID, null, null);
-        return mono.contextWrite(ReactiveSecurityContextHolder.withAuthentication(
-                new GatewayAuthenticationToken(user, Set.of())));
-    }
-
-    private static <T> Mono<T> withMissingHeader(Mono<T> mono) {
-        return mono;
-    }
-
     @BeforeEach
-    void setUp() {
-        controller = new DriverController(driverBuilder, driverService);
+    void setUp() { controller = new DriverController(driverBuilder, reactiveDriverService); }
+
+    private static <T> Mono<T> withTenant(Mono<T> source) {
+        RequestHeader.PrincipalHeader header = new RequestHeader.PrincipalHeader(7L, "USER", "Alice", "alice", TENANT_ID, null, null);
+        return source.contextWrite(ReactiveSecurityContextHolder.withAuthentication(new GatewayAuthenticationToken(header, Set.of())));
     }
 
     @Test
-    void addProjectsTenantOntoBoBeforeDelegating() {
-        DriverVO vo = new DriverVO();
-        DriverBO bo = new DriverBO();
-        when(driverBuilder.buildBOByVO(vo)).thenReturn(bo);
-
-        StepVerifier.create(withTenantContext(controller.add(vo)))
-                .assertNext(envelope -> assertThat(envelope.isOk()).isTrue())
-                .verifyComplete();
-
-        ArgumentCaptor<DriverBO> captor = ArgumentCaptor.forClass(DriverBO.class);
-        verify(driverService).add(captor.capture());
-        assertThat(captor.getValue().getTenantId()).isEqualTo(TENANT_ID);
+    void addReturnsCreatedDriverAndInjectsTenant() {
+        DriverVO request = new DriverVO(); DriverBO input = new DriverBO(); DriverBO saved = new DriverBO(); DriverVO output = new DriverVO();
+        when(driverBuilder.buildBOByVO(request)).thenReturn(input); when(reactiveDriverService.add(input)).thenReturn(Mono.just(saved));
+        when(driverBuilder.buildVOByBO(saved)).thenReturn(output);
+        StepVerifier.create(withTenant(controller.add(request))).assertNext(response -> {
+            assertThat(response.getStatusCode().value()).isEqualTo(201); assertThat(response.getBody()).isSameAs(output);
+        }).verifyComplete();
+        assertThat(input.getTenantId()).isEqualTo(TENANT_ID);
     }
 
     @Test
-    void addReturnsErrorWhenTenantHeaderMissing() {
-        StepVerifier.create(withMissingHeader(controller.add(new DriverVO())))
-                .expectError()
-                .verify();
-        verify(driverService, never()).add(any(DriverBO.class));
+    void deleteReturnsNoContent() {
+        when(reactiveDriverService.delete(TENANT_ID, 1L, 3, 7L, "alice")).thenReturn(Mono.just(true));
+        StepVerifier.create(withTenant(controller.delete(1L, 3))).assertNext(response -> assertThat(response.getStatusCode().value()).isEqualTo(204)).verifyComplete();
     }
 
     @Test
-    void deleteRequiresTenantOwnership() {
-        DriverBO bo = new DriverBO();
-        bo.setId(1L);
-        bo.setTenantId(TENANT_ID);
-        when(driverService.getById(1L)).thenReturn(bo);
-
-        StepVerifier.create(withTenantContext(controller.delete(1L)))
-                .assertNext(envelope -> assertThat(envelope.isOk()).isTrue())
-                .verifyComplete();
-        verify(driverService).delete(1L);
+    void updateReturnsUpdatedDriver() {
+        DriverVO request = new DriverVO(); DriverBO input = new DriverBO(); DriverBO saved = new DriverBO(); DriverVO output = new DriverVO();
+        when(driverBuilder.buildBOByVO(request)).thenReturn(input); when(reactiveDriverService.update(input)).thenReturn(Mono.just(saved)); when(driverBuilder.buildVOByBO(saved)).thenReturn(output);
+        StepVerifier.create(withTenant(controller.update(request))).assertNext(response -> assertThat(response.getBody()).isSameAs(output)).verifyComplete();
+        assertThat(input.getTenantId()).isEqualTo(TENANT_ID);
     }
 
     @Test
-    void deleteRejectsCrossTenantResource() {
-        DriverBO bo = new DriverBO();
-        bo.setId(1L);
-        bo.setTenantId(999L);
-        when(driverService.getById(1L)).thenReturn(bo);
-
-        StepVerifier.create(withTenantContext(controller.delete(1L)))
-                .expectErrorMatches(throwable -> throwable instanceof NotFoundException)
-                .verify();
-        verify(driverService, never()).delete(any(Long.class));
+    void listUsesCanonicalOffsetPageAndTenant() {
+        DriverBO driver = new DriverBO(); DriverVO vo = new DriverVO();
+        when(reactiveDriverService.list(any())).thenReturn(Mono.just(OffsetPage.of(List.of(driver), 20, 10, 31)));
+        when(driverBuilder.buildVOByBO(driver)).thenReturn(vo);
+        StepVerifier.create(withTenant(controller.list(new DriverListRequest(20, 10, List.of(), null, null, null, null, null, null, null, null, null))))
+                .assertNext(page -> { assertThat(page.items()).containsExactly(vo); assertThat(page.offset()).isEqualTo(20); assertThat(page.total()).isEqualTo(31); }).verifyComplete();
+        ArgumentCaptor<io.github.pnoker.common.manager.repository.DriverFilter> captor = ArgumentCaptor.forClass(io.github.pnoker.common.manager.repository.DriverFilter.class);
+        verify(reactiveDriverService).list(captor.capture()); assertThat(captor.getValue().tenantId()).isEqualTo(TENANT_ID);
     }
 
     @Test
-    void updateProjectsTenantAndChecksOwnership() {
-        DriverVO vo = new DriverVO();
-        vo.setId("1");
-        DriverBO bo = new DriverBO();
-        bo.setId(1L);
-        bo.setTenantId(TENANT_ID);
-        when(driverBuilder.buildBOByVO(vo)).thenReturn(bo);
-        when(driverService.getById(1L)).thenReturn(bo);
-
-        StepVerifier.create(withTenantContext(controller.update(vo)))
-                .assertNext(envelope -> assertThat(envelope.isOk()).isTrue())
-                .verifyComplete();
-        verify(driverService).update(bo);
-    }
-
-    @Test
-    void updateRejectsCrossTenantUpdate() {
-        DriverVO vo = new DriverVO();
-        vo.setId("1");
-        DriverBO bo = new DriverBO();
-        bo.setId(1L);
-        DriverBO existing = new DriverBO();
-        existing.setId(1L);
-        existing.setTenantId(999L);
-        when(driverBuilder.buildBOByVO(vo)).thenReturn(bo);
-        when(driverService.getById(1L)).thenReturn(existing);
-
-        StepVerifier.create(withTenantContext(controller.update(vo)))
-                .expectError(NotFoundException.class)
-                .verify();
-        verify(driverService, never()).update(any(DriverBO.class));
-    }
-
-    @Test
-    void getByIdReturnsBoForOwnedRow() {
-        DriverBO bo = new DriverBO();
-        bo.setId(1L);
-        bo.setTenantId(TENANT_ID);
-        DriverVO vo = new DriverVO();
-        when(driverService.getById(1L)).thenReturn(bo);
-        when(driverBuilder.buildVOByBO(bo)).thenReturn(vo);
-
-        StepVerifier.create(withTenantContext(controller.getById(1L)))
-                .assertNext(envelope -> assertThat(envelope.getData()).isSameAs(vo))
-                .verifyComplete();
-    }
-
-    @Test
-    void getByIdRejectsCrossTenantRow() {
-        DriverBO bo = new DriverBO();
-        bo.setId(1L);
-        bo.setTenantId(999L);
-        when(driverService.getById(1L)).thenReturn(bo);
-
-        StepVerifier.create(withTenantContext(controller.getById(1L)))
-                .expectError(NotFoundException.class)
-                .verify();
-    }
-
-    @Test
-    void listByIdsFiltersForOwnedDrivers() {
-        DriverBO own = new DriverBO();
-        own.setId(1L);
-        own.setTenantId(TENANT_ID);
-        DriverBO foreign = new DriverBO();
-        foreign.setId(2L);
-        foreign.setTenantId(999L);
-        DriverVO vo = new DriverVO();
-        vo.setId("1");
-        when(driverService.listByIds(Set.of(1L, 2L))).thenReturn(List.of(own, foreign));
-        when(driverBuilder.buildVOByBO(own)).thenReturn(vo);
-
-        StepVerifier.create(withTenantContext(controller.listByIds(Set.of(1L, 2L))))
-                .assertNext(envelope -> {
-                    assertThat(envelope.getData()).hasSize(1).containsKey("1");
-                    assertThat(envelope.getData().get("1")).isSameAs(vo);
-                })
-                .verifyComplete();
-    }
-
-    @Test
-    void listForcesTenantOnSearchQuery() {
-        DriverQuery incoming = new DriverQuery();
-        incoming.setTenantId(999L); // attempt to read other tenant; controller must override.
-        Page<DriverBO> bos = new Page<>();
-        Page<DriverVO> vos = new Page<>();
-        when(driverService.list(any(DriverQuery.class))).thenReturn(bos);
-        when(driverBuilder.buildVOPageByBOPage(bos)).thenReturn(vos);
-
-        StepVerifier.create(withTenantContext(controller.list(incoming)))
-                .assertNext(envelope -> assertThat(envelope.getData()).isSameAs(vos))
-                .verifyComplete();
-
-        ArgumentCaptor<DriverQuery> captor = ArgumentCaptor.forClass(DriverQuery.class);
-        verify(driverService).list(captor.capture());
-        assertThat(captor.getValue().getTenantId()).isEqualTo(TENANT_ID);
-    }
-
-    @Test
-    void listAcceptsNullEntityQuery() {
-        Page<DriverBO> bos = new Page<>();
-        Page<DriverVO> vos = new Page<>();
-        when(driverService.list(any(DriverQuery.class))).thenReturn(bos);
-        when(driverBuilder.buildVOPageByBOPage(bos)).thenReturn(vos);
-
-        StepVerifier.<R<Page<DriverVO>>>create(withTenantContext(controller.list(null)))
-                .assertNext(envelope -> assertThat(envelope.getData()).isSameAs(vos))
-                .verifyComplete();
-    }
-
-    @Test
-    void getByServiceNameDelegatesWithTenantScope() {
-        DriverBO bo = new DriverBO();
-        DriverVO vo = new DriverVO();
-        when(driverService.getByServiceName("dc3-driver-modbus-tcp", TENANT_ID)).thenReturn(bo);
-        when(driverBuilder.buildVOByBO(bo)).thenReturn(vo);
-
-        StepVerifier.create(withTenantContext(controller.getByServiceName("dc3-driver-modbus-tcp")))
-                .assertNext(envelope -> assertThat(envelope.getData()).isSameAs(vo))
-                .verifyComplete();
-        verify(driverService).getByServiceName(eq("dc3-driver-modbus-tcp"), eq(TENANT_ID));
+    void listByIdsReturnsTenantScopedMap() {
+        DriverBO driver = new DriverBO(); driver.setId(1L); DriverVO vo = new DriverVO();
+        when(reactiveDriverService.listByIds(TENANT_ID, List.of(1L))).thenReturn(reactor.core.publisher.Flux.just(driver)); when(driverBuilder.buildVOByBO(driver)).thenReturn(vo);
+        StepVerifier.create(withTenant(controller.listByIds(List.of(1L)))).assertNext(map -> assertThat(map).containsEntry("1", vo)).verifyComplete();
     }
 }

@@ -22,12 +22,12 @@ import io.github.pnoker.common.constant.mq.OrderingGuarantee;
 import io.github.pnoker.common.constant.mq.SubscriptionMode;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.adapter.BrokerCapabilities;
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
 import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireConfirmation;
 import io.github.pnoker.common.mq.adapter.WireMqDelivery;
 import io.github.pnoker.common.mq.config.BatchConsumerProperties;
-import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqPoisonException;
 import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.mq.subscription.KeyRoutes;
@@ -42,6 +42,8 @@ import org.apache.pulsar.client.api.PulsarClient;
 import org.apache.pulsar.client.api.PulsarClientException;
 import org.apache.pulsar.client.api.SubscriptionInitialPosition;
 import org.apache.pulsar.client.api.SubscriptionType;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -110,6 +112,7 @@ public class PulsarMqAdapter implements BrokerAdapter {
     private final Map<String, KeyRoutes<RawDeliveryListener>> singleRoutes = new ConcurrentHashMap<>();
     private final Map<String, KeyRoutes<RawBatchListener>> batchRoutes = new ConcurrentHashMap<>();
     private final Map<String, Consumer<byte[]>> consumers = new ConcurrentHashMap<>();
+    private final Map<MessageId, Integer> deliveryAttempts = new ConcurrentHashMap<>();
     private final List<BatchPump> pumps = new CopyOnWriteArrayList<>();
     private final List<ExecutorService> deliveryExecutors = new CopyOnWriteArrayList<>();
     private volatile boolean stopped;
@@ -289,6 +292,7 @@ public class PulsarMqAdapter implements BrokerAdapter {
         deliveryExecutors.forEach(ExecutorService::shutdownNow);
         consumers.forEach((routeKey, consumer) -> closeQuietly(routeKey, consumer));
         consumers.clear();
+        deliveryAttempts.clear();
         producers.forEach((topic, producer) -> {
             try {
                 producer.close();
@@ -333,58 +337,55 @@ public class PulsarMqAdapter implements BrokerAdapter {
             acknowledge(consumer, List.of(message));
             return;
         }
-        Acknowledgment ack = new PulsarAcknowledgment(consumer, List.of(message), spec.topic(), this);
-        int maxAttempts = Math.max(1, retryProperties.getMaxRetries()) + 1;
-        for (int attempt = 1; ; attempt++) {
-            try {
-                listener.onDelivery(deliveryOf(message, ack));
-                return;
-            } catch (MqPoisonException e) {
-                log.warn("Pulsar poison delivery dead-lettered, topic={}", spec.topic(), e);
-                deadLetter(spec.topic(), consumer, List.of(message));
-                return;
-            } catch (Exception e) {
-                if (attempt >= maxAttempts) {
-                    log.error("Pulsar delivery exhausted retries, dead-lettering, topic={}", spec.topic(), e);
-                    deadLetter(spec.topic(), consumer, List.of(message));
-                    return;
-                }
-                sleepBackoff(attempt);
-            }
-        }
+        normalize(Mono.defer(() -> listener.onDelivery(deliveryOf(message))), spec.topic())
+                .flatMap(disposition -> settle(spec.topic(), consumer, List.of(message), disposition))
+                .doOnError(error -> log.error("Pulsar delivery settlement failed, topic={}", spec.topic(), error))
+                .subscribe();
     }
 
-    private void sleepBackoff(int attempt) {
-        long initial = retryProperties.getRetryInitialIntervalMillis();
-        long cap = retryProperties.getRetryMaxIntervalMillis();
-        long exponent = Math.min(Math.max(attempt - 1, 0), 30);
-        long delay = initial >= cap ? cap : Math.min(initial * (1L << exponent), cap);
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+    private Mono<DeliveryDisposition> normalize(Mono<DeliveryDisposition> completion, MqTopic topic) {
+        return completion
+                .onErrorResume(MqPoisonException.class, error -> {
+                    log.warn("Pulsar poison delivery dead-lettered, topic={}", topic, error);
+                    return Mono.just(DeliveryDisposition.DEAD_LETTER);
+                })
+                .onErrorResume(error -> {
+                    log.warn("Pulsar delivery failed, requesting redelivery, topic={}", topic, error);
+                    return Mono.just(DeliveryDisposition.REQUEUE);
+                });
     }
 
-    private void deadLetter(MqTopic topic, Consumer<byte[]> consumer, List<Message<byte[]>> messages) {
-        try {
-            // ALWAYS the live topic plus .dlq — including topics without a logical
-            // dead-letter enum variant (Pulsar auto-creates the topic); routing the
-            // dead letter back onto the live topic would loop the failure forever
-            Producer<byte[]> producer = producer(deadLetterTopicName(topic));
-            List<CompletableFuture<MessageId>> sends = new ArrayList<>(messages.size());
-            for (Message<byte[]> message : messages) {
-                sends.add(producer.newMessage()
+    private Mono<Void> settle(MqTopic topic, Consumer<byte[]> consumer, List<Message<byte[]>> messages,
+                              DeliveryDisposition disposition) {
+        return switch (disposition) {
+            case ACK -> Mono.fromFuture(consumer.acknowledgeAsync(
+                    messages.stream().map(Message::getMessageId).toList()))
+                    .doOnSuccess(ignored -> messages.forEach(message -> deliveryAttempts.remove(message.getMessageId())));
+            case REQUEUE -> Flux.fromIterable(messages)
+                    .concatMap(message -> {
+                        int attempt = deliveryAttempts.merge(message.getMessageId(), 1, Integer::sum);
+                        if (attempt >= Math.max(1, retryProperties.getMaxRetries())) {
+                            return deadLetter(topic, consumer, List.of(message))
+                                    .doOnSuccess(ignored -> deliveryAttempts.remove(message.getMessageId()));
+                        }
+                        return Mono.fromRunnable(() -> consumer.negativeAcknowledge(message));
+                    })
+                    .then();
+            case DEAD_LETTER -> deadLetter(topic, consumer, messages)
+                    .doOnSuccess(ignored -> messages.forEach(message -> deliveryAttempts.remove(message.getMessageId())));
+        };
+    }
+
+    private Mono<Void> deadLetter(MqTopic topic, Consumer<byte[]> consumer, List<Message<byte[]>> messages) {
+        Producer<byte[]> deadLetterProducer = producer(deadLetterTopicName(topic));
+        return Flux.fromIterable(messages)
+                .concatMap(message -> Mono.fromFuture(deadLetterProducer.newMessage()
                         .value(message.getData())
                         .key(Objects.requireNonNullElse(message.getKey(), ""))
                         .properties(message.getProperties())
-                        .sendAsync());
-            }
-            CompletableFuture.allOf(sends.toArray(CompletableFuture[]::new)).join();
-            acknowledge(consumer, messages);
-        } catch (Exception e) {
-            log.error("Pulsar dead-letter publish failed, topic={}", topic, e);
-        }
+                        .sendAsync()))
+                .then(Mono.defer(() -> Mono.fromFuture(consumer.acknowledgeAsync(
+                        messages.stream().map(Message::getMessageId).toList()))));
     }
 
     private Producer<byte[]> producer(String topic) {
@@ -400,31 +401,9 @@ public class PulsarMqAdapter implements BrokerAdapter {
         });
     }
 
-    private WireMqDelivery deliveryOf(Message<byte[]> message, Acknowledgment acknowledgment) {
+    private WireMqDelivery deliveryOf(Message<byte[]> message) {
         return new WireMqDelivery(message.getData(), headersOf(message),
-                message.getRedeliveryCount() > 0, acknowledgment);
-    }
-
-    /**
-     * ack acknowledges the message(s); reject(true) negative-acks each for near
-     * immediate redelivery; reject(false) dead-letters the whole delivery batch.
-     */
-    private record PulsarAcknowledgment(Consumer<byte[]> consumer, List<Message<byte[]>> messages,
-                                        MqTopic topic, PulsarMqAdapter adapter) implements Acknowledgment {
-
-        @Override
-        public void ack() {
-            acknowledge(consumer, messages);
-        }
-
-        @Override
-        public void reject(boolean requeue) {
-            if (requeue) {
-                messages.forEach(consumer::negativeAcknowledge);
-                return;
-            }
-            adapter.deadLetter(topic, consumer, messages);
-        }
+                message.getRedeliveryCount() > 0);
     }
 
     /**
@@ -491,30 +470,25 @@ public class PulsarMqAdapter implements BrokerAdapter {
         }
 
         private void deliverSubBatch(RawBatchListener listener, List<Message<byte[]>> subBatch) {
-            Acknowledgment ack = new PulsarAcknowledgment(consumer, subBatch, spec.topic(), PulsarMqAdapter.this);
-            int maxAttempts = Math.max(1, retryProperties.getMaxRetries()) + 1;
-            for (int attempt = 1; ; attempt++) {
-                try {
-                    List<WireMqDelivery> deliveries = new ArrayList<>(subBatch.size());
-                    for (Message<byte[]> message : subBatch) {
-                        deliveries.add(deliveryOf(message, ack));
-                    }
-                    listener.onBatch(deliveries);
-                    break;
-                } catch (MqPoisonException e) {
-                    log.warn("Pulsar poison batch dead-lettered, size={}", subBatch.size(), e);
-                    deadLetter(spec.topic(), consumer, subBatch);
-                    break;
-                } catch (Exception e) {
-                    if (attempt >= maxAttempts) {
-                        log.error("Pulsar batch exhausted retries, dead-lettering, size={}",
-                                subBatch.size(), e);
-                        deadLetter(spec.topic(), consumer, subBatch);
-                        break;
-                    }
-                    sleepBackoff(attempt);
-                }
-            }
+            normalize(Mono.defer(() -> listener.onBatch(subBatch.stream().map(PulsarMqAdapter.this::deliveryOf).toList())),
+                    spec.topic())
+                    .flatMap(disposition -> settle(spec.topic(), consumer, subBatch, disposition))
+                    .doOnError(error -> log.error("Pulsar batch settlement failed, topic={}, size={}",
+                            spec.topic(), subBatch.size(), error))
+                    .subscribe();
+        }
+    }
+
+    private record MessageCollection(List<Message<byte[]>> messages) implements Messages<byte[]> {
+
+        @Override
+        public int size() {
+            return messages.size();
+        }
+
+        @Override
+        public java.util.Iterator<Message<byte[]>> iterator() {
+            return messages.iterator();
         }
     }
 }

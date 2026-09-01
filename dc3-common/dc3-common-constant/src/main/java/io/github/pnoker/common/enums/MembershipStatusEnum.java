@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -50,7 +49,6 @@ public enum MembershipStatusEnum {
     INVITED("INVITED", "invited", "Invited member"),
     ;
 
-    @EnumValue
     private final String value;
 
     private final String code;

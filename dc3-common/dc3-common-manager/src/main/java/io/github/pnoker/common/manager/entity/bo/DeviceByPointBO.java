@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.manager.entity.bo;
 
-import io.github.pnoker.common.manager.entity.model.DeviceDO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,6 +47,6 @@ public class DeviceByPointBO {
     /**
      *
      */
-    private List<DeviceDO> devices;
+    private List<DeviceBO> devices;
 
 }

@@ -32,7 +32,7 @@ const UPDATED = '2026-08-01T14:20:00';
  */
 const stubPage = (url: string) => {
   const entity = url.split('/').slice(-2, -1)[0] || 'entity';
-  const records = Array.from({length: 3}, (_, i) => ({
+  const items = Array.from({length: 3}, (_, i) => ({
     id: `mock-${entity}-${i + 1}`,
     name: `Mock ${entity} ${i + 1}`,
     enableFlag: 'ENABLE',
@@ -40,7 +40,7 @@ const stubPage = (url: string) => {
     operateTime: UPDATED,
     remark: 'Demo data',
   }));
-  return okPage(records);
+  return okPage(items);
 };
 
 /**

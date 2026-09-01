@@ -18,8 +18,7 @@
 package io.github.pnoker.common.data.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
-import io.github.pnoker.common.data.dal.CommandHistoryManager;
-import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
+import io.github.pnoker.common.data.repository.ReactiveCommandHistoryStore;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
@@ -28,8 +27,8 @@ import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -43,7 +42,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CommandDeadReceiver {
 
-    private final CommandHistoryManager commandHistoryManager;
+    private final ReactiveCommandHistoryStore historyStore;
 
     /**
      * Consume a command dead-letter message and mark the matching command history record
@@ -53,26 +52,31 @@ public class CommandDeadReceiver {
      * @param ack     the acknowledgement handle
      */
     @Dc3Listener(topic = MqTopic.COMMAND_DEAD)
-    public void onDeadLetter(MqReceived<Object> message, Acknowledgment ack) {
+    public Mono<Void> onDeadLetter(MqReceived<Object> message, Acknowledgment ack) {
+        String correlationId = message.headers().get(MqHeaders.CORRELATION_ID);
+        Long tenantId = tenantId(message);
+        if (correlationId == null || tenantId == null || tenantId <= 0) {
+            ack.reject(false);
+            return Mono.empty();
+        }
+        return historyStore.markDead(tenantId, correlationId, "DLX",
+                        "Message rejected to dead letter queue", java.time.Instant.now())
+                .doOnNext(updated -> {
+                    if (updated) {
+                        log.info("Marked dead command record: recordId={}", correlationId);
+                    }
+                })
+                .doOnError(error -> log.error("Command dead letter persistence failed, recordId={}",
+                        correlationId, error))
+                .then();
+    }
+
+    private Long tenantId(MqReceived<?> message) {
         try {
-            String correlationId = message.headers().get(MqHeaders.CORRELATION_ID);
-            if (Objects.nonNull(correlationId)) {
-                CommandHistoryDO recordDO = commandHistoryManager.lambdaQuery()
-                        .eq(CommandHistoryDO::getRecordId, correlationId)
-                        .one();
-                if (Objects.nonNull(recordDO)) {
-                    recordDO.setStatus(PointCommandStatusEnum.DEAD);
-                    recordDO.setErrorCode("DLX");
-                    recordDO.setErrorMessage("Message rejected to dead letter queue");
-                    recordDO.setFinishTime(LocalDateTime.now());
-                    commandHistoryManager.updateById(recordDO);
-                    log.info("Marked dead command record: recordId={}", correlationId);
-                }
-            }
-            ack.ack();
-        } catch (Exception e) {
-            log.error("Command dead letter processing failed", e);
-            ack.reject(true);
+            String value = message.headers().get(MqHeaders.TENANT_ID);
+            return value == null ? null : Long.valueOf(value);
+        } catch (NumberFormatException ignored) {
+            return null;
         }
     }
 

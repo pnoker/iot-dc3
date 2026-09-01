@@ -17,17 +17,17 @@
 
 package io.github.pnoker.common.auth.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.builder.PrincipalBuilder;
-import io.github.pnoker.common.auth.entity.query.PrincipalQuery;
+import io.github.pnoker.common.auth.entity.query.PrincipalOffsetRequest;
 import io.github.pnoker.common.auth.entity.vo.PrincipalVO;
-import io.github.pnoker.common.auth.service.AuditLogService;
-import io.github.pnoker.common.auth.service.PrincipalService;
+import io.github.pnoker.common.auth.repository.PrincipalFilter;
+import io.github.pnoker.common.auth.service.ReactiveAuditLogService;
+import io.github.pnoker.common.auth.service.ReactivePrincipalService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.SuccessCode;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -37,6 +37,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,7 +48,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * REST controller exposing principal management endpoints. Admin-only — the principal roster is a
@@ -66,9 +66,9 @@ public class PrincipalController implements BaseController {
 
     private final PrincipalBuilder principalBuilder;
 
-    private final PrincipalService principalService;
+    private final ReactivePrincipalService principalService;
 
-    private final AuditLogService auditLogService;
+    private final ReactiveAuditLogService auditLogService;
 
     /**
      * Fetch one principal (user or service account) by ID.
@@ -86,8 +86,9 @@ public class PrincipalController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_id")
-    public Mono<R<PrincipalVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return async(() -> R.ok(principalBuilder.buildVOByBO(principalService.getById(id))));
+    public Mono<ResponseEntity<PrincipalVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId().flatMap(tenantId -> principalService.getById(tenantId, id)
+                .map(principal -> ResponseEntity.ok(principalBuilder.buildVOByBO(principal))));
     }
 
     /**
@@ -106,9 +107,13 @@ public class PrincipalController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<PrincipalVO>>> list(@RequestBody(required = false) PrincipalQuery entityQuery) {
-        PrincipalQuery query = Objects.isNull(entityQuery) ? new PrincipalQuery() : entityQuery;
-        return async(() -> R.ok(principalBuilder.buildVOPageByBOPage(principalService.list(query))));
+    public Mono<ResponseEntity<OffsetPage<PrincipalVO>>> list(@RequestBody(required = false) PrincipalOffsetRequest request) {
+        PrincipalOffsetRequest query = request == null ? new PrincipalOffsetRequest() : request;
+        PrincipalFilter filter = new PrincipalFilter(query.principalType(), query.principalName(), query.displayName(),
+                query.sourceType(), query.enableFlag(), new PageRequest(query.offset(), query.limit(), query.sort()));
+        return getTenantId().flatMap(tenantId -> principalService.list(tenantId, filter).map(page -> ResponseEntity.ok(
+                OffsetPage.of(page.items().stream().map(principalBuilder::buildVOByBO).toList(),
+                        page.offset(), page.limit(), page.total()))));
     }
 
     /**
@@ -128,8 +133,9 @@ public class PrincipalController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list_by_ids")
-    public Mono<R<List<PrincipalVO>>> listByIds(@RequestBody Collection<Long> ids) {
-        return async(() -> R.ok(principalBuilder.buildVOListByBOList(principalService.listByIds(ids))));
+    public Mono<ResponseEntity<List<PrincipalVO>>> listByIds(@RequestBody Collection<Long> ids) {
+        return getTenantId().flatMap(tenantId -> principalService.listByIds(tenantId, ids)
+                .map(principalBuilder::buildVOByBO).collectList().map(ResponseEntity::ok));
     }
 
     /**
@@ -148,7 +154,7 @@ public class PrincipalController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/enable")
-    public Mono<R<String>> enable(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<ResponseEntity<Void>> enable(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return toggleEnableFlag(id, EnableFlagEnum.ENABLE);
     }
 
@@ -168,7 +174,7 @@ public class PrincipalController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/disable")
-    public Mono<R<String>> disable(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<ResponseEntity<Void>> disable(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
         return toggleEnableFlag(id, EnableFlagEnum.DISABLE);
     }
 
@@ -179,12 +185,12 @@ public class PrincipalController implements BaseController {
      * @param target the target enable flag
      * @return update-success result
      */
-    private Mono<R<String>> toggleEnableFlag(Long id, EnableFlagEnum target) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            principalService.setEnableFlag(id, target, header.getUserId(), header.getNickName());
-            auditLogService.log(header, target == EnableFlagEnum.ENABLE ? "ENABLE" : "DISABLE",
-                    "principal", id, null, "SUCCESS", null);
-            return R.ok(SuccessCode.UPDATE);
-        }));
+    private Mono<ResponseEntity<Void>> toggleEnableFlag(Long id, EnableFlagEnum target) {
+        return getPrincipalHeader().flatMap(header -> principalService
+                .setEnableFlag(header.getTenantId(), id, target, header.getUserId(), header.getNickName())
+                .flatMap(ignored -> auditLogService.log(header,
+                                target == EnableFlagEnum.ENABLE ? "ENABLE" : "DISABLE",
+                                "principal", id, null, "SUCCESS", null)
+                        .thenReturn(ResponseEntity.noContent().<Void>build())));
     }
 }

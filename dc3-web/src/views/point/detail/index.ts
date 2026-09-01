@@ -20,7 +20,7 @@ import {defineComponent, reactive} from 'vue';
 import {useRoute} from 'vue-router';
 import router from '@/config/router';
 
-import {listDeviceByPointId, listDeviceStatusByDriverId} from '@/api/device';
+import {getDeviceStatisticsByPointId, listDeviceStatusByDriverId} from '@/api/device';
 import {listDriverByIds} from '@/api/driver';
 import {getPointById} from '@/api/point';
 
@@ -53,7 +53,7 @@ export default defineComponent({
     const point = () => {
       getPointById(reactiveData.id)
         .then((res) => {
-          reactiveData.data = res.data;
+          reactiveData.data = res;
         })
         .catch(() => {
           // nothing to do
@@ -61,9 +61,9 @@ export default defineComponent({
     };
 
     const device = () => {
-      listDeviceByPointId(reactiveData.id)
+      getDeviceStatisticsByPointId(reactiveData.id)
         .then((res) => {
-          reactiveData.listDeviceData = res.data?.devices || [];
+          reactiveData.listDeviceData = res?.devices || [];
 
           // driver
           const driverIds = Array.from(new Set(reactiveData.listDeviceData.map((device) => device.driverId))).filter(
@@ -72,7 +72,7 @@ export default defineComponent({
           if (driverIds.length > 0) {
             listDriverByIds(driverIds)
               .then((res) => {
-                reactiveData.driverTable = res.data;
+                reactiveData.driverTable = res;
               })
               .catch(() => {
                 // nothing to do
@@ -81,7 +81,7 @@ export default defineComponent({
             Promise.all(driverIds.map((driverId) => listDeviceStatusByDriverId(driverId)))
               .then((resList) => {
                 reactiveData.statusTable = resList.reduce<Record<string, any>>((pre, cur) => {
-                  return {...pre, ...(cur.data || {})};
+                  return {...pre, ...(cur || {})};
                 }, {});
               })
               .catch(() => {

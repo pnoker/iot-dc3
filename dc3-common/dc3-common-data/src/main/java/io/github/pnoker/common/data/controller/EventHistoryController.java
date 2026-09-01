@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.EventHistoryService;
@@ -25,7 +24,7 @@ import io.github.pnoker.common.data.entity.builder.EventHistoryBuilder;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
 import io.github.pnoker.common.data.entity.vo.EventReportVO;
-import io.github.pnoker.common.entity.R;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -79,13 +78,8 @@ public class EventHistoryController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/report")
-    public Mono<R<String>> report(@Validated @RequestBody EventReportVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            String recordId = eventHistoryService.report(tenantId, eventHistoryBuilder.buildBOByVO(entityVO));
-            R<String> result = R.ok();
-            result.setData(recordId);
-            return result;
-        }));
+    public Mono<String> report(@Validated @RequestBody EventReportVO entityVO) {
+        return getTenantId().flatMap(tenantId -> eventHistoryService.report(tenantId, eventHistoryBuilder.buildBOByVO(entityVO)));
     }
 
     /**
@@ -103,9 +97,8 @@ public class EventHistoryController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_record_id")
-    public Mono<R<EventHistoryVO>> getByRecordId(@Parameter(description = "Identifier of the event history record to fetch; must belong to the current tenant.", example = "1024") @NotBlank @RequestParam String recordId) {
-        return getTenantId().flatMap(tenantId -> async(() ->
-                R.ok(eventHistoryService.getByRecordId(tenantId, recordId))));
+    public Mono<EventHistoryVO> getByRecordId(@Parameter(description = "Identifier of the event history record to fetch; must belong to the current tenant.", example = "1024") @NotBlank @RequestParam(name = "record_id") String recordId) {
+        return getTenantId().flatMap(tenantId -> eventHistoryService.getByRecordId(tenantId, recordId));
     }
 
     /**
@@ -124,11 +117,9 @@ public class EventHistoryController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<EventHistoryVO>>> list(@RequestBody(required = false) EventHistoryQueryVO queryVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            EventHistoryQueryVO query = Objects.isNull(queryVO) ? new EventHistoryQueryVO() : queryVO;
-            return R.ok(eventHistoryService.list(tenantId, query));
-        }));
+    public Mono<OffsetPage<EventHistoryVO>> list(@RequestBody(required = false) EventHistoryQueryVO queryVO) {
+        return getTenantId().flatMap(tenantId -> eventHistoryService.list(tenantId,
+                Objects.isNull(queryVO) ? new EventHistoryQueryVO() : queryVO));
     }
 
 }

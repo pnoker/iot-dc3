@@ -91,7 +91,7 @@ const load = async () => {
   loading.value = true;
   try {
     const res: any = await statsActivity({rangeKey: rangeKey.value});
-    const rows = (res?.data ?? []) as { dow: number; hour: number; count: number }[];
+    const rows = (res ?? []) as { dow: number; hour: number; count: number }[];
     await nextTick();
     render(rows);
   } catch {

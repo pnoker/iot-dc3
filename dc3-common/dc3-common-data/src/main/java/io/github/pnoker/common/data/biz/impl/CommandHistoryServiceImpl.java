@@ -1,34 +1,15 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.data.biz.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.data.biz.CommandHistoryService;
-import io.github.pnoker.common.data.dal.CommandHistoryManager;
 import io.github.pnoker.common.data.entity.bo.CommandCallBO;
 import io.github.pnoker.common.data.entity.builder.CommandHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.data.repository.ReactiveCommandHistoryStore;
+import io.github.pnoker.common.data.repository.ReactivePointCommandContext;
 import io.github.pnoker.common.entity.dto.CommandCallDTO;
 import io.github.pnoker.common.enums.CommandHistorySourceEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -43,29 +24,24 @@ import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeCommandQuery;
+import io.github.pnoker.common.facade.entity.query.FacadeCommandOffsetQuery;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.message.MqMessage;
-import io.github.pnoker.common.mq.sender.MessageSender;
+import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.UuidV7;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.UUID;
+import java.time.ZoneOffset;
 
-/**
- * Business service implementation for custom command call operations.
- *
- * @author pnoker
- * @since 2026.5.23
- */
+/** Reactive application service for custom command calls and history. */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -74,209 +50,131 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
     private static final int DEFAULT_COMMAND_TIMEOUT_SECONDS = 30;
 
     private final DeviceFacade deviceFacade;
-
     private final DriverFacade driverFacade;
-
     private final CommandFacade commandFacade;
-
-    private final MessageSender messageSender;
-
-    private final CommandHistoryManager commandHistoryManager;
-
-    private final CommandHistoryBuilder commandHistoryBuilder;
+    private final ReactivePointCommandContext commandContext;
+    private final ReactiveCommandHistoryStore historyStore;
+    private final ReactiveMessageSender messageSender;
+    private final CommandHistoryBuilder historyBuilder;
 
     @Override
-    public String call(Long tenantId, CommandCallBO entityBO) {
-        FacadeCommandBO command = validateCommandScope(tenantId, entityBO.getDeviceId(), entityBO.getCommandId(),
-                entityBO.getCommandCode());
-        Long commandId = command.getId();
-
-        FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityBO.getDeviceId());
-        if (Objects.isNull(driver)) {
-            throw new ServiceException("No driver registered for this device");
+    public Mono<String> call(Long tenantId, CommandCallBO request) {
+        if (tenantId == null || tenantId <= 0 || request == null || request.getDeviceId() == null) {
+            return Mono.error(new ServiceException("tenantId, deviceId and command are required"));
         }
-        FacadeDeviceOwnerBO owner = requireActiveOwner(tenantId, entityBO.getDeviceId(), driver.getId());
-
-        int timeoutSeconds = resolveCommandTimeout(command);
-
-        String recordId = UUID.randomUUID().toString();
-        LocalDateTime nowLocal = LocalDateTime.now();
-        Instant now = Instant.now();
-
-        CommandHistoryDO recordDO = new CommandHistoryDO();
-        recordDO.setRecordId(recordId);
-        recordDO.setTenantId(tenantId);
-        recordDO.setDeviceId(entityBO.getDeviceId());
-        recordDO.setCommandId(commandId);
-        recordDO.setCommandCode(command.getCommandCode());
-        recordDO.setParamValues(Objects.isNull(entityBO.getParamValues()) ? null : JsonUtil.toJsonString(entityBO.getParamValues()));
-        recordDO.setStatus(PointCommandStatusEnum.PENDING);
-        recordDO.setSource(CommandHistorySourceEnum.HTTP);
-        recordDO.setOccurTime(nowLocal);
-        recordDO.setExpireTime(nowLocal.plusSeconds(timeoutSeconds));
-        recordDO.setSchemaVersion((short) 1);
-        commandHistoryManager.save(recordDO);
-
-        CommandCallDTO commandDTO = CommandCallDTO.builder()
-                .recordId(recordId)
-                .tenantId(tenantId)
-                .ownerNode(owner.ownerNode())
-                .fencingToken(owner.fencingToken())
-                .deviceId(entityBO.getDeviceId())
-                .commandId(commandId)
-                .commandCode(command.getCommandCode())
-                .paramValues(entityBO.getParamValues())
-                .source(CommandHistorySourceEnum.HTTP)
-                .occurredAt(now)
-                .expireAt(now.plusSeconds(timeoutSeconds))
-                .schemaVersion(1)
-                .build();
-        try {
-            publishCommand(commandDTO, driver.getServiceName(), owner.ownerNode(), recordId);
-        } catch (Exception e) {
-            markPublishFailed(recordDO, e);
-            throw new ServiceException("Failed to route custom command to active driver owner", e);
-        }
-
-        recordDO.setStatus(PointCommandStatusEnum.SENT);
-        recordDO.setSendTime(LocalDateTime.now());
-        commandHistoryManager.updateById(recordDO);
-
-        return recordId;
+        return deviceFacade.getByIdReactive(tenantId, request.getDeviceId())
+                .switchIfEmpty(Mono.error(new NotFoundException("Device does not exist")))
+                .flatMap(device -> validateDevice(device)
+                        .then(resolveCommand(tenantId, device, request.getCommandId(), request.getCommandCode())
+                                .switchIfEmpty(Mono.error(new NotFoundException("Command does not exist")))
+                                .flatMap(command -> validateCommand(device, command)
+                                        .then(driverFacade.getByIdReactive(tenantId, device.getDriverId())
+                                                .switchIfEmpty(Mono.error(new ServiceException(
+                                                        "No driver registered for this device"))))
+                                        .flatMap(driver -> commandContext.activeOwner(tenantId, device.getId())
+                                                .filter(owner -> owner.driverId() != null
+                                                        && owner.driverId().equals(driver.getId())
+                                                        && StringUtils.isNotBlank(owner.ownerNode())
+                                                        && owner.fencingToken() != null && owner.fencingToken() > 0)
+                                                .switchIfEmpty(Mono.error(new ServiceException(
+                                                        "Device has no active driver owner")))
+                                                .flatMap(owner -> persistAndPublish(tenantId, request, device, command,
+                                                        driver, owner))))));
     }
 
     @Override
-    public CommandHistoryVO getByRecordId(Long tenantId, String recordId) {
-        CommandHistoryDO entityDO = commandHistoryManager.lambdaQuery()
-                .eq(Objects.nonNull(tenantId), CommandHistoryDO::getTenantId, tenantId)
-                .eq(CommandHistoryDO::getRecordId, recordId)
-                .one();
-        return commandHistoryBuilder.buildVOByDO(entityDO);
+    public Mono<CommandHistoryVO> getByRecordId(Long tenantId, String recordId) {
+        return historyStore.find(tenantId, recordId).map(historyBuilder::buildVOByDO);
     }
 
     @Override
-    public Page<CommandHistoryVO> list(Long tenantId, CommandHistoryQueryVO queryVO) {
-        LambdaQueryWrapper<CommandHistoryDO> wrapper = new LambdaQueryWrapper<CommandHistoryDO>()
-                .eq(CommandHistoryDO::getTenantId, tenantId)
-                .eq(Objects.nonNull(queryVO.getDeviceId()), CommandHistoryDO::getDeviceId, queryVO.getDeviceId())
-                .eq(Objects.nonNull(queryVO.getCommandId()), CommandHistoryDO::getCommandId, queryVO.getCommandId())
-                .eq(StringUtils.isNotBlank(queryVO.getCommandCode()), CommandHistoryDO::getCommandCode,
-                        queryVO.getCommandCode())
-                .eq(Objects.nonNull(queryVO.getStatus()), CommandHistoryDO::getStatus, queryVO.getStatus())
-                .orderByDesc(CommandHistoryDO::getOccurTime);
-        Page<CommandHistoryDO> page = commandHistoryManager.page(queryVO.toPage(), wrapper);
-        return commandHistoryBuilder.buildVOPageByDOPage(page);
+    public Mono<OffsetPage<CommandHistoryVO>> list(Long tenantId, CommandHistoryQueryVO queryVO) {
+        CommandHistoryQueryVO query = queryVO == null ? new CommandHistoryQueryVO() : queryVO;
+        long offset = query.getOffset() == null ? 0L : query.getOffset();
+        int limit = query.getLimit() == null ? 50 : query.getLimit();
+        return historyStore.list(tenantId, parseId(query.getDeviceId(), "deviceId"),
+                        parseId(query.getCommandId(), "commandId"), query.getCommandCode(), query.getStatus(),
+                        offset, limit, query.getSort())
+                .map(historyBuilder::buildVOPageByDOPage);
     }
 
-    /**
-     * Validate the device exists and is enabled within the tenant, then resolve and
-     * validate the command, requiring the command share the device's profile.
-     *
-     * @param tenantId    tenant scope
-     * @param deviceId    the device to validate
-     * @param commandId   the command id, preferred when present
-     * @param commandCode the command code, used as fallback
-     * @return the resolved, enabled command
-     */
-    private FacadeCommandBO validateCommandScope(Long tenantId, Long deviceId, Long commandId, String commandCode) {
-        FacadeDeviceBO device = deviceFacade.getById(tenantId, deviceId);
-        if (Objects.isNull(device)) {
-            throw new NotFoundException("Device does not exist");
-        }
-        if (EnableFlagEnum.DISABLE.equals(device.getEnableFlag())) {
-            throw new ServiceException("Device is disabled");
-        }
+    private Mono<FacadeCommandBO> resolveCommand(Long tenantId, FacadeDeviceBO device,
+                                                   Long commandId, String commandCode) {
+        if (commandId != null) return commandFacade.getById(tenantId, commandId);
+        if (StringUtils.isBlank(commandCode)) return Mono.error(new ServiceException("Command id or code is required"));
+        return commandFacade.list(new FacadeCommandOffsetQuery(tenantId, null, commandCode,
+                        null, null, device.getProfileId(), null, null, device.getId(), 0, 1, java.util.List.of()))
+                .flatMapMany(page -> reactor.core.publisher.Flux.fromIterable(page.items())).next();
+    }
 
-        FacadeCommandBO command = resolveCommand(tenantId, device, commandId, commandCode);
-        if (Objects.isNull(command)) {
-            throw new NotFoundException("Command does not exist");
-        }
+    private Mono<Void> validateDevice(FacadeDeviceBO device) {
+        return EnableFlagEnum.DISABLE.equals(device.getEnableFlag())
+                ? Mono.error(new ServiceException("Device is disabled")) : Mono.empty();
+    }
+
+    private Mono<Void> validateCommand(FacadeDeviceBO device, FacadeCommandBO command) {
         if (EnableFlagEnum.DISABLE.equals(command.getEnableFlag())) {
-            throw new ServiceException("Command is disabled");
+            return Mono.error(new ServiceException("Command is disabled"));
         }
-        if (Objects.isNull(device.getProfileId()) || !Objects.equals(device.getProfileId(), command.getProfileId())) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
+        if (device.getProfileId() == null || !device.getProfileId().equals(command.getProfileId())) {
+            return Mono.error(new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH));
         }
-        return command;
+        return Mono.empty();
     }
 
-    /**
-     * Resolve a command by id when present, otherwise by code within the device's profile.
-     * Requires at least one of command id or code.
-     *
-     * @param tenantId    tenant scope
-     * @param device      the device whose profile scopes the lookup
-     * @param commandId   the command id, used when present
-     * @param commandCode the command code, used as fallback
-     * @return the resolved command, or {@code null} when none matches
-     */
-    private FacadeCommandBO resolveCommand(Long tenantId, FacadeDeviceBO device, Long commandId, String commandCode) {
-        if (Objects.nonNull(commandId)) {
-            return commandFacade.getById(tenantId, commandId);
-        }
-        if (StringUtils.isBlank(commandCode)) {
-            throw new ServiceException("Command id or code is required");
-        }
-
-        Pages page = new Pages();
-        page.setSize(1);
-        FacadePage<FacadeCommandBO> commandPage = commandFacade.listByPage(FacadeCommandQuery.builder()
-                .page(page)
-                .tenantId(tenantId)
-                .profileId(device.getProfileId())
-                .commandCode(commandCode)
-                .build());
-        if (Objects.isNull(commandPage) || Objects.isNull(commandPage.getRecords()) || commandPage.getRecords().isEmpty()) {
-            return null;
-        }
-        return commandPage.getRecords().get(0);
+    private Mono<String> persistAndPublish(Long tenantId, CommandCallBO request, FacadeDeviceBO device,
+                                           FacadeCommandBO command, FacadeDriverBO driver,
+                                           FacadeDeviceOwnerBO owner) {
+        int timeout = command.getTimeout() == null || command.getTimeout() <= 0
+                ? DEFAULT_COMMAND_TIMEOUT_SECONDS : command.getTimeout();
+        String recordId = UuidV7.next().toString();
+        Instant now = Instant.now();
+        CommandHistoryDO history = new CommandHistoryDO();
+        history.setRecordId(recordId);
+        history.setTenantId(tenantId);
+        history.setDeviceId(device.getId());
+        history.setCommandId(command.getId());
+        history.setCommandCode(command.getCommandCode());
+        history.setParamValues(request.getParamValues() == null ? null : JsonUtil.toJsonString(request.getParamValues()));
+        history.setStatus(PointCommandStatusEnum.PENDING);
+        CommandHistorySourceEnum source = request.getSource() == null ? CommandHistorySourceEnum.HTTP : request.getSource();
+        history.setSource(source);
+        history.setSourceUserId(request.getSourceUserId());
+        history.setOccurTime(local(now));
+        history.setExpireTime(local(now.plusSeconds(timeout)));
+        history.setSchemaVersion((short) 1);
+        CommandCallDTO payload = CommandCallDTO.builder().recordId(recordId).tenantId(tenantId)
+                .ownerNode(owner.ownerNode()).fencingToken(owner.fencingToken()).deviceId(device.getId())
+                .commandId(command.getId()).commandCode(command.getCommandCode()).paramValues(request.getParamValues())
+                .source(source).sourceUserId(request.getSourceUserId()).occurredAt(now).expireAt(now.plusSeconds(timeout))
+                .schemaVersion(1).build();
+        return historyStore.insert(history)
+                .flatMap(saved -> messageSender.sendConfirmed(MqMessage.builder().topic(MqTopic.COMMAND)
+                                .partitionKey(driver.getServiceName() + "." + owner.ownerNode()).payload(payload)
+                                .header(MqHeaders.CORRELATION_ID, recordId)
+                                .header(MqHeaders.TENANT_ID, String.valueOf(tenantId)).build())
+                        .then(historyStore.markSent(tenantId, recordId, Instant.now()))
+                        .flatMap(marked -> marked ? Mono.just(recordId)
+                                : Mono.error(new ServiceException("Command disappeared before dispatch")))
+                        .onErrorResume(error -> historyStore.markPublishFailed(tenantId, recordId,
+                                        "BROKER_PUBLISH_FAILED", error.getMessage(), Instant.now())
+                                .onErrorResume(markError -> {
+                                    log.error("Failed to persist command publish failure, recordId={}", recordId, markError);
+                                    return Mono.just(false);
+                                }).then(Mono.error(new ServiceException(
+                                        "Failed to route custom command to active driver owner", error)))));
     }
 
-    /**
-     * Resolve the command timeout in seconds. The model has one unit only: seconds.
-     *
-     * @param command the command carrying the raw timeout
-     * @return the timeout in seconds
-     */
-    private int resolveCommandTimeout(FacadeCommandBO command) {
-        if (Objects.isNull(command) || Objects.isNull(command.getTimeout()) || command.getTimeout() <= 0) {
-            return DEFAULT_COMMAND_TIMEOUT_SECONDS;
+    private Long parseId(String value, String field) {
+        if (value == null || value.isBlank()) return null;
+        try {
+            return Long.valueOf(value);
+        } catch (NumberFormatException exception) {
+            throw new ServiceException(field + " must be a number", exception);
         }
-        return command.getTimeout();
     }
 
-    /**
-     * Publish a command call to the driver via RabbitMQ, correlating by record id.
-     *
-     * @param dto         the command call payload
-     * @param serviceName the target driver's service name
-     * @param recordId    the command history record id, used as the correlation id
-     */
-    private void publishCommand(CommandCallDTO dto, String serviceName, String ownerNode, String recordId) {
-        messageSender.sendConfirmed(MqMessage.builder()
-                .topic(MqTopic.COMMAND)
-                .partitionKey(serviceName + "." + ownerNode)
-                .payload(dto)
-                .header(MqHeaders.CORRELATION_ID, recordId)
-                .build(), Duration.ofSeconds(5));
+    private LocalDateTime local(Instant value) {
+        return LocalDateTime.ofInstant(value, ZoneOffset.UTC);
     }
-
-    private void markPublishFailed(CommandHistoryDO recordDO, Exception cause) {
-        recordDO.setStatus(PointCommandStatusEnum.FAILED);
-        recordDO.setErrorCode("BROKER_PUBLISH_FAILED");
-        recordDO.setErrorMessage(cause.getMessage());
-        recordDO.setFinishTime(LocalDateTime.now());
-        commandHistoryManager.updateById(recordDO);
-    }
-
-    private FacadeDeviceOwnerBO requireActiveOwner(Long tenantId, Long deviceId, Long driverId) {
-        FacadeDeviceOwnerBO owner = deviceFacade.getActiveOwner(tenantId, deviceId);
-        if (Objects.isNull(owner) || !Objects.equals(owner.driverId(), driverId)
-                || Objects.isNull(owner.ownerNode()) || owner.ownerNode().isBlank()
-                || Objects.isNull(owner.fencingToken()) || owner.fencingToken() <= 0) {
-            throw new ServiceException("Device has no active driver owner");
-        }
-        return owner;
-    }
-
 }

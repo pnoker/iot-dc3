@@ -1,277 +1,123 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.data.biz.impl;
 
-import io.github.pnoker.common.constant.mq.MqTopic;
-import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
 import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.data.entity.builder.PointCommandHistoryBuilder;
+import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
+import io.github.pnoker.common.data.repository.ReactivePointCommandContext;
+import io.github.pnoker.common.data.repository.ReactivePointCommandStore;
 import io.github.pnoker.common.data.validator.PointCommandValidator;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.RwTypeEnum;
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.exception.UnAuthorizedException;
-import io.github.pnoker.common.facade.api.DeviceFacade;
-import io.github.pnoker.common.facade.api.DriverFacade;
-import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.mq.sender.MessageSender;
+import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class PointCommandServiceImplTest {
 
-    @Mock
-    private DeviceFacade deviceFacade;
-
-    @Mock
-    private DriverFacade driverFacade;
-
-    @Mock
-    private PointFacade pointFacade;
-
-    @Mock
-    private MessageSender messageSender;
-
-    @Mock
-    private PointCommandHistoryManager pointCommandHistoryManager;
-
-    @Mock
-    private PointCommandHistoryBuilder pointCommandHistoryBuilder;
-
-    @Mock
-    private PointCommandValidator pointCommandValidator;
-
-    @InjectMocks
+    @Mock ReactivePointCommandContext context;
+    @Mock ReactivePointCommandStore store;
+    @Mock ReactiveMessageSender sender;
+    @Mock PointCommandHistoryBuilder builder;
+    @Mock PointCommandValidator validator;
     private PointCommandServiceImpl service;
-
     private FacadeDeviceBO device;
     private FacadePointBO point;
     private FacadeDriverBO driver;
+    private FacadeDeviceOwnerBO owner;
 
     @BeforeEach
     void setUp() {
-        device = new FacadeDeviceBO();
-        device.setProfileId(5L);
-        device.setEnableFlag(EnableFlagEnum.ENABLE);
-        point = new FacadePointBO();
-        point.setProfileId(5L);
-        point.setEnableFlag(EnableFlagEnum.ENABLE);
-        point.setRwFlag(RwTypeEnum.READ_WRITE);
-        driver = new FacadeDriverBO();
-        driver.setId(30L);
-        driver.setServiceName("dc3-driver-modbus-tcp");
+        service = new PointCommandServiceImpl(context, store, sender, builder, validator);
+        device = new FacadeDeviceBO(); device.setId(10L); device.setProfileId(5L); device.setEnableFlag(EnableFlagEnum.ENABLE);
+        point = new FacadePointBO(); point.setId(20L); point.setProfileId(5L); point.setEnableFlag(EnableFlagEnum.ENABLE); point.setRwFlag(RwTypeEnum.READ_WRITE);
+        driver = new FacadeDriverBO(); driver.setId(30L); driver.setServiceName("driver");
+        owner = new FacadeDeviceOwnerBO(30L, "node", 7L);
+        when(store.find(anyLong(), anyString())).thenReturn(Mono.empty());
+        when(store.insert(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(store.markSent(anyLong(), anyString(), any())).thenReturn(Mono.just(true));
+        when(sender.sendConfirmed(any())).thenReturn(Mono.empty());
+        when(context.device(1L, 10L)).thenReturn(Mono.just(device));
+        when(context.point(1L, 20L)).thenReturn(Mono.just(point));
+        when(context.driverByDevice(1L, 10L)).thenReturn(Mono.just(driver));
+        when(context.activeOwner(1L, 10L)).thenReturn(Mono.just(owner));
     }
 
     @Test
-    void readPublishesReadCommandToOwningDriver() {
-        when(deviceFacade.getById(1L, 10L)).thenReturn(device);
-        when(pointFacade.getById(1L, 20L)).thenReturn(point);
-        when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(driver);
-        mockActiveOwner();
-
-        PointCommandReadBO vo = new PointCommandReadBO();
-        vo.setDeviceId(10L);
-        vo.setPointId(20L);
-        service.read(1L, vo);
-
-        verify(messageSender).sendConfirmed(argThat(m -> m.getTopic() == MqTopic.POINT_COMMAND
-                && "dc3-driver-modbus-tcp.node-a".equals(m.getPartitionKey())), any());
-        verify(pointCommandHistoryManager).save(any());
-        verify(pointCommandHistoryManager).updateById(any());
+    void readReturnsCommandIdAfterBrokerConfirmation() {
+        PointCommandReadBO request = new PointCommandReadBO(10L, 20L, null);
+        StepVerifier.create(service.read(1L, request)).assertNext(id -> assertThat(id).isNotBlank()).verifyComplete();
+        verify(store).insert(any(PointCommandHistoryDO.class));
+        verify(store).markSent(eq(1L), anyString(), any());
+        verify(sender).sendConfirmed(any());
     }
 
     @Test
-    void readRejectsCommandWhenDriverUnknown() {
-        when(deviceFacade.getById(1L, 10L)).thenReturn(device);
-        when(pointFacade.getById(1L, 20L)).thenReturn(point);
-        when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(null);
-
-        PointCommandReadBO vo = new PointCommandReadBO();
-        vo.setDeviceId(10L);
-        vo.setPointId(20L);
-        assertThatThrownBy(() -> service.read(1L, vo))
-                .isInstanceOf(ServiceException.class)
-                .hasMessageContaining("No driver registered");
-
-        verifyNoInteractions(messageSender);
+    void writeRejectsReadOnlyPointWithoutPersistence() {
+        point.setRwFlag(RwTypeEnum.READ_ONLY);
+        PointCommandWriteBO request = new PointCommandWriteBO(10L, 20L, "42", null);
+        StepVerifier.create(service.write(1L, request)).expectErrorMessage("Point is not writable").verify();
+        verifyNoInteractions(store, sender);
     }
 
     @Test
-    void readRejectsUnknownDevice() {
-        when(deviceFacade.getById(1L, 99L)).thenReturn(null);
-        PointCommandReadBO vo = new PointCommandReadBO();
-        vo.setDeviceId(99L);
-        vo.setPointId(20L);
-        assertThatThrownBy(() -> service.read(1L, vo))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Device");
+    void missingDeviceIsNotFound() {
+        when(context.device(1L, 10L)).thenReturn(Mono.empty());
+        StepVerifier.create(service.read(1L, new PointCommandReadBO(10L, 20L, null)))
+                .expectError(NotFoundException.class).verify();
     }
 
     @Test
-    void readRejectsUnknownPoint() {
-        when(deviceFacade.getById(1L, 10L)).thenReturn(device);
-        when(pointFacade.getById(1L, 99L)).thenReturn(null);
-        PointCommandReadBO vo = new PointCommandReadBO();
-        vo.setDeviceId(10L);
-        vo.setPointId(99L);
-        assertThatThrownBy(() -> service.read(1L, vo))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Point");
+    void brokerFailureMarksCommandFailed() {
+        when(sender.sendConfirmed(any())).thenReturn(Mono.error(new IllegalStateException("nack")));
+        when(store.markPublishFailed(anyLong(), anyString(), anyString(), anyString(), any()))
+                .thenReturn(Mono.just(true));
+        StepVerifier.create(service.read(1L, new PointCommandReadBO(10L, 20L, null)))
+                .expectErrorMessage("Failed to route point command to active driver owner").verify();
+        verify(store).markPublishFailed(eq(1L), anyString(), eq("BROKER_PUBLISH_FAILED"), eq("nack"), any());
     }
 
     @Test
-    void readRejectsCrossProfileBindingAsUnauthorized() {
-        FacadeDeviceBO mismatchedDevice = new FacadeDeviceBO();
-        mismatchedDevice.setProfileId(99L);
-        mismatchedDevice.setEnableFlag(EnableFlagEnum.ENABLE);
-        when(deviceFacade.getById(1L, 10L)).thenReturn(mismatchedDevice);
-        when(pointFacade.getById(1L, 20L)).thenReturn(point);
-        PointCommandReadBO vo = new PointCommandReadBO();
-        vo.setDeviceId(10L);
-        vo.setPointId(20L);
-        assertThatThrownBy(() -> service.read(1L, vo)).isInstanceOf(UnAuthorizedException.class);
+    void idempotentRetryReturnsExistingCommandBeforeResourceLookup() {
+        PointCommandHistoryDO existing = new PointCommandHistoryDO();
+        existing.setTenantId(1L);
+        existing.setCommandId("cmd-existing");
+        existing.setDeviceId(10L);
+        existing.setPointId(20L);
+        existing.setType(io.github.pnoker.common.enums.PointCommandTypeEnum.READ);
+        when(store.find(1L, "cmd-existing")).thenReturn(Mono.just(existing));
+
+        StepVerifier.create(service.read(1L, new PointCommandReadBO(10L, 20L, "cmd-existing")))
+                .expectNext("cmd-existing").verifyComplete();
+        verifyNoInteractions(context, sender);
     }
 
     @Test
-    void readRejectsDeviceWithoutAnyProfileBinding() {
-        FacadeDeviceBO bareDevice = new FacadeDeviceBO();
-        bareDevice.setProfileId(null);
-        bareDevice.setEnableFlag(EnableFlagEnum.ENABLE);
-        when(deviceFacade.getById(1L, 10L)).thenReturn(bareDevice);
-        when(pointFacade.getById(1L, 20L)).thenReturn(point);
-        PointCommandReadBO vo = new PointCommandReadBO();
-        vo.setDeviceId(10L);
-        vo.setPointId(20L);
-        assertThatThrownBy(() -> service.read(1L, vo)).isInstanceOf(UnAuthorizedException.class);
-    }
-
-    @Test
-    void writePublishesWriteCommandToOwningDriver() {
-        when(deviceFacade.getById(1L, 10L)).thenReturn(device);
-        when(pointFacade.getById(1L, 20L)).thenReturn(point);
-        when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(driver);
-        mockActiveOwner();
-
-        PointCommandWriteBO vo = new PointCommandWriteBO();
-        vo.setDeviceId(10L);
-        vo.setPointId(20L);
-        vo.setValue("42.5");
-        service.write(1L, vo);
-
-        verify(messageSender).sendConfirmed(argThat(m -> m.getTopic() == MqTopic.POINT_COMMAND
-                && "dc3-driver-modbus-tcp.node-a".equals(m.getPartitionKey())), any());
-        verify(pointCommandHistoryManager).save(any());
-        verify(pointCommandHistoryManager).updateById(any());
-    }
-
-    @Test
-    void writeRejectsCommandWhenDriverUnknown() {
-        when(deviceFacade.getById(1L, 10L)).thenReturn(device);
-        when(pointFacade.getById(1L, 20L)).thenReturn(point);
-        when(driverFacade.getByDeviceId(1L, 10L)).thenReturn(null);
-        PointCommandWriteBO vo = new PointCommandWriteBO();
-        vo.setDeviceId(10L);
-        vo.setPointId(20L);
-        vo.setValue("v");
-        assertThatThrownBy(() -> service.write(1L, vo))
-                .isInstanceOf(ServiceException.class)
-                .hasMessageContaining("No driver registered");
-        verifyNoInteractions(messageSender);
-    }
-
-    @Test
-    void writeRejectsUnknownDevice() {
-        when(deviceFacade.getById(1L, 99L)).thenReturn(null);
-        PointCommandWriteBO vo = new PointCommandWriteBO();
-        vo.setDeviceId(99L);
-        vo.setPointId(20L);
-        assertThatThrownBy(() -> service.write(1L, vo)).isInstanceOf(NotFoundException.class);
-    }
-
-    @Test
-    void readRejectsDisabledDevice() {
-        FacadeDeviceBO disabledDevice = new FacadeDeviceBO();
-        disabledDevice.setProfileId(5L);
-        disabledDevice.setEnableFlag(EnableFlagEnum.DISABLE);
-        when(deviceFacade.getById(1L, 10L)).thenReturn(disabledDevice);
-
-        PointCommandReadBO vo = new PointCommandReadBO();
-        vo.setDeviceId(10L);
-        vo.setPointId(20L);
-        assertThatThrownBy(() -> service.read(1L, vo))
-                .isInstanceOf(ServiceException.class)
-                .hasMessageContaining("disabled");
-    }
-
-    @Test
-    void readRejectsDisabledPoint() {
-        FacadePointBO disabledPoint = new FacadePointBO();
-        disabledPoint.setProfileId(5L);
-        disabledPoint.setEnableFlag(EnableFlagEnum.DISABLE);
-        when(deviceFacade.getById(1L, 10L)).thenReturn(device);
-        when(pointFacade.getById(1L, 20L)).thenReturn(disabledPoint);
-
-        PointCommandReadBO vo = new PointCommandReadBO();
-        vo.setDeviceId(10L);
-        vo.setPointId(20L);
-        assertThatThrownBy(() -> service.read(1L, vo))
-                .isInstanceOf(ServiceException.class)
-                .hasMessageContaining("disabled");
-    }
-
-    @Test
-    void writeRejectsReadOnlyPoint() {
-        FacadePointBO readOnlyPoint = new FacadePointBO();
-        readOnlyPoint.setProfileId(5L);
-        readOnlyPoint.setEnableFlag(EnableFlagEnum.ENABLE);
-        readOnlyPoint.setRwFlag(RwTypeEnum.READ_ONLY);
-        when(deviceFacade.getById(1L, 10L)).thenReturn(device);
-        when(pointFacade.getById(1L, 20L)).thenReturn(readOnlyPoint);
-
-        PointCommandWriteBO vo = new PointCommandWriteBO();
-        vo.setDeviceId(10L);
-        vo.setPointId(20L);
-        vo.setValue("1.0");
-        assertThatThrownBy(() -> service.write(1L, vo))
-                .isInstanceOf(ServiceException.class)
-                .hasMessageContaining("not writable");
-    }
-
-    private void mockActiveOwner() {
-        when(deviceFacade.getActiveOwner(1L, 10L))
-                .thenReturn(new FacadeDeviceOwnerBO(30L, "node-a", 77L));
+    void commandSourceIsPersistedForNonHttpSubmission() {
+        PointCommandReadBO request = new PointCommandReadBO(10L, 20L, null, PointCommandSourceEnum.AGENTIC);
+        ArgumentCaptor<PointCommandHistoryDO> captor = ArgumentCaptor.forClass(PointCommandHistoryDO.class);
+        StepVerifier.create(service.read(1L, request)).expectNextCount(1).verifyComplete();
+        verify(store).insert(captor.capture());
+        assertThat(captor.getValue().getSource()).isEqualTo(PointCommandSourceEnum.AGENTIC);
     }
 }

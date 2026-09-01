@@ -37,180 +37,121 @@ import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.constant.service.ManagerConstant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.grpc.client.GrpcChannelFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 /**
  * @author pnoker
  * @since 2016.10.1
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
+@Import({GrpcStubConfig.AuthGrpcStubConfig.class, GrpcStubConfig.ManagerGrpcStubConfig.class,
+        GrpcStubConfig.DataGrpcStubConfig.class,})
 public class GrpcStubConfig {
 
-    /**
-     * Create and configure the application-managed tenant api blocking stub.
-     *
-     * @param channels channels
-     * @return tenant api blocking stub result
-     */
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(name = "dc3.facade.auth.mode", havingValue = "grpc", matchIfMissing = true)
+    static class AuthGrpcStubConfig {
+
+
     @Bean
-    public TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub(GrpcChannelFactory channels) {
-        return TenantApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    public TenantApiGrpc.TenantApiStub tenantApiStub(GrpcChannelFactory channels) {
+        return TenantApiGrpc.newStub(channels.createChannel(AuthConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed user api blocking stub.
-     *
-     * @param channels channels
-     * @return user api blocking stub result
-     */
+
     @Bean
-    public UserApiGrpc.UserApiBlockingStub userApiBlockingStub(GrpcChannelFactory channels) {
-        return UserApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    public UserApiGrpc.UserApiStub userApiStub(GrpcChannelFactory channels) {
+        return UserApiGrpc.newStub(channels.createChannel(AuthConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed token api blocking stub.
-     *
-     * @param channels channels
-     * @return token api blocking stub result
-     */
+
     @Bean
-    public TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub(GrpcChannelFactory channels) {
-        return TokenApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    public TokenApiGrpc.TokenApiStub tokenApiStub(GrpcChannelFactory channels) {
+        return TokenApiGrpc.newStub(channels.createChannel(AuthConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed local credential api blocking stub.
-     *
-     * @param channels channels
-     * @return local credential api blocking stub result
-     */
+
     @Bean
-    public LocalCredentialApiGrpc.LocalCredentialApiBlockingStub localCredentialApiBlockingStub(
-            GrpcChannelFactory channels) {
-        return LocalCredentialApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    public LocalCredentialApiGrpc.LocalCredentialApiStub localCredentialApiStub(GrpcChannelFactory channels) {
+        return LocalCredentialApiGrpc.newStub(channels.createChannel(AuthConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed resource registry api blocking stub.
-     *
-     * @param channels channels
-     * @return resource registry api blocking stub result
-     */
+
     @Bean
-    public ResourceRegistryApiGrpc.ResourceRegistryApiBlockingStub resourceRegistryApiBlockingStub(
-            GrpcChannelFactory channels) {
-        return ResourceRegistryApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    public PermissionApiGrpc.PermissionApiStub permissionApiStub(GrpcChannelFactory channels) {
+        return PermissionApiGrpc.newStub(channels.createChannel(AuthConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed permission api blocking stub.
-     *
-     * @param channels channels
-     * @return permission api blocking stub result
-     */
     @Bean
-    public PermissionApiGrpc.PermissionApiBlockingStub permissionApiBlockingStub(GrpcChannelFactory channels) {
-        return PermissionApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    public ResourceRegistryApiGrpc.ResourceRegistryApiStub resourceRegistryApiStub(GrpcChannelFactory channels) {
+        return ResourceRegistryApiGrpc.newStub(channels.createChannel(AuthConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed mcp runtime api blocking stub.
-     *
-     * @param channels channels
-     * @return mcp runtime api blocking stub result
-     */
     @Bean
-    public McpRuntimeApiGrpc.McpRuntimeApiBlockingStub mcpRuntimeApiBlockingStub(GrpcChannelFactory channels) {
-        return McpRuntimeApiGrpc.newBlockingStub(channels.createChannel(AuthConstant.SERVICE_NAME));
+    public McpRuntimeApiGrpc.McpRuntimeApiStub mcpRuntimeApiStub(GrpcChannelFactory channels) {
+        return McpRuntimeApiGrpc.newStub(channels.createChannel(AuthConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed manager driver api blocking stub.
-     *
-     * @param channels channels
-     * @return manager driver api blocking stub result
-     */
-    @Bean
-    public DriverApiGrpc.DriverApiBlockingStub managerDriverApiBlockingStub(GrpcChannelFactory channels) {
-        return DriverApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed manager device api blocking stub.
-     *
-     * @param channels channels
-     * @return manager device api blocking stub result
-     */
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(name = "dc3.facade.manager.mode", havingValue = "grpc", matchIfMissing = true)
+    static class ManagerGrpcStubConfig {
+
+
     @Bean
-    public DeviceApiGrpc.DeviceApiBlockingStub managerDeviceApiBlockingStub(GrpcChannelFactory channels) {
-        return DeviceApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    public DriverApiGrpc.DriverApiStub managerDriverApiStub(GrpcChannelFactory channels) {
+        return DriverApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed manager point api blocking stub.
-     *
-     * @param channels channels
-     * @return manager point api blocking stub result
-     */
+
     @Bean
-    public PointApiGrpc.PointApiBlockingStub managerPointApiBlockingStub(GrpcChannelFactory channels) {
-        return PointApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    public DeviceApiGrpc.DeviceApiStub managerDeviceApiStub(GrpcChannelFactory channels) {
+        return DeviceApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed manager profile api blocking stub.
-     *
-     * @param channels channels
-     * @return manager profile api blocking stub result
-     */
+
+
     @Bean
-    public ProfileApiGrpc.ProfileApiBlockingStub managerProfileApiBlockingStub(GrpcChannelFactory channels) {
-        return ProfileApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    public ProfileApiGrpc.ProfileApiStub managerProfileApiStub(GrpcChannelFactory channels) {
+        return ProfileApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed command api blocking stub.
-     *
-     * @param channels channels
-     * @return command api blocking stub result
-     */
     @Bean
-    public CommandApiGrpc.CommandApiBlockingStub commandApiBlockingStub(GrpcChannelFactory channels) {
-        return CommandApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    public PointApiGrpc.PointApiStub managerPointApiStub(GrpcChannelFactory channels) {
+        return PointApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed event api blocking stub.
-     *
-     * @param channels channels
-     * @return event api blocking stub result
-     */
     @Bean
-    public EventApiGrpc.EventApiBlockingStub eventApiBlockingStub(GrpcChannelFactory channels) {
-        return EventApiGrpc.newBlockingStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
+    public CommandApiGrpc.CommandApiStub commandApiStub(GrpcChannelFactory channels) {
+        return CommandApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed point value api blocking stub.
-     *
-     * @param channels channels
-     * @return point value api blocking stub result
-     */
     @Bean
-    public PointValueApiGrpc.PointValueApiBlockingStub pointValueApiBlockingStub(GrpcChannelFactory channels) {
-        return PointValueApiGrpc.newBlockingStub(channels.createChannel(DataConstant.SERVICE_NAME));
+    public EventApiGrpc.EventApiStub eventApiStub(GrpcChannelFactory channels) {
+        return EventApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
-    /**
-     * Create and configure the application-managed status health api blocking stub.
-     *
-     * @param channels channels
-     * @return status health api blocking stub result
-     */
+    }
+
+    @Configuration(proxyBeanMethods = false)
+    @ConditionalOnProperty(name = "dc3.facade.data.mode", havingValue = "grpc", matchIfMissing = true)
+    static class DataGrpcStubConfig {
+
+
     @Bean
-    public StatusHealthApiGrpc.StatusHealthApiBlockingStub statusHealthApiBlockingStub(GrpcChannelFactory channels) {
-        return StatusHealthApiGrpc.newBlockingStub(channels.createChannel(DataConstant.SERVICE_NAME));
+    public PointValueApiGrpc.PointValueApiStub pointValueApiStub(GrpcChannelFactory channels) {
+        return PointValueApiGrpc.newStub(channels.createChannel(DataConstant.SERVICE_NAME));
+    }
+
+
+    @Bean
+    public StatusHealthApiGrpc.StatusHealthApiStub statusHealthApiStub(GrpcChannelFactory channels) {
+        return StatusHealthApiGrpc.newStub(channels.createChannel(DataConstant.SERVICE_NAME));
+    }
+
     }
 
 }

@@ -17,16 +17,15 @@
 
 package io.github.pnoker.common.manager.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
-import io.github.pnoker.common.dal.entity.bo.GroupBO;
-import io.github.pnoker.common.dal.entity.builder.GroupBuilder;
-import io.github.pnoker.common.dal.entity.query.GroupQuery;
-import io.github.pnoker.common.dal.entity.vo.GroupVO;
-import io.github.pnoker.common.dal.service.GroupService;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.SuccessCode;
+import io.github.pnoker.common.manager.entity.bo.GroupBO;
+import io.github.pnoker.common.manager.entity.builder.GroupBuilder;
+import io.github.pnoker.common.manager.entity.query.GroupListRequest;
+import io.github.pnoker.common.manager.entity.vo.GroupVO;
+import io.github.pnoker.common.manager.repository.GroupFilter;
+import io.github.pnoker.common.manager.service.ReactiveGroupService;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,16 +37,17 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * REST controller exposing group management endpoints.
@@ -64,7 +64,7 @@ public class GroupController implements BaseController {
 
     private final GroupBuilder groupBuilder;
 
-    private final GroupService groupService;
+    private final ReactiveGroupService groupService;
 
     /**
      * Create a group for the current tenant.
@@ -81,13 +81,13 @@ public class GroupController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<ResponseEntity<GroupVO>> add(@Validated(Add.class) @RequestBody GroupVO entityVO) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
             GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(tenantId);
-            groupService.add(entityBO);
-            return R.ok(SuccessCode.ADD);
-        }));
+            entityBO.setTenantId(tuple.getT1().getT1());entityBO.setCreatorId(tuple.getT1().getT2());entityBO.setCreatorName(tuple.getT2());entityBO.setOperatorId(tuple.getT1().getT2());entityBO.setOperatorName(tuple.getT2());
+            return groupService.add(entityBO).map(groupBuilder::buildVOByBO).map(v->ResponseEntity.status(HttpStatus.CREATED).body(v));
+        });
     }
 
     /**
@@ -104,13 +104,10 @@ public class GroupController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, groupService.getById(id));
-            groupService.delete(id);
-            return R.ok(SuccessCode.DELETE);
-        }));
+    @DeleteMapping("/delete")
+    public Mono<ResponseEntity<Void>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple->groupService.delete(tuple.getT1().getT1(),id,tuple.getT1().getT2(),tuple.getT2()).thenReturn(ResponseEntity.noContent().build()));
     }
 
     /**
@@ -128,14 +125,13 @@ public class GroupController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody GroupVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
+    public Mono<ResponseEntity<GroupVO>> update(@Validated(Update.class) @RequestBody GroupVO entityVO) {
+        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
             GroupBO entityBO = groupBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, groupService.getById(entityBO.getId()));
-            groupService.update(entityBO);
-            return R.ok(SuccessCode.UPDATE);
-        }));
+            entityBO.setTenantId(tuple.getT1().getT1());entityBO.setOperatorId(tuple.getT1().getT2());entityBO.setOperatorName(tuple.getT2());
+            return groupService.update(entityBO).map(groupBuilder::buildVOByBO).map(ResponseEntity::ok);
+        });
     }
 
     /**
@@ -153,12 +149,8 @@ public class GroupController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_id")
-    public Mono<R<GroupVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            GroupBO entityBO = requireTenant(tenantId, groupService.getById(id));
-            GroupVO entityVO = groupBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
-        }));
+    public Mono<GroupVO> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId().flatMap(tenantId->groupService.getById(tenantId,id)).map(groupBuilder::buildVOByBO);
     }
 
     /**
@@ -176,14 +168,10 @@ public class GroupController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<GroupVO>>> list(@RequestBody(required = false) GroupQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            GroupQuery query = Objects.isNull(entityQuery) ? new GroupQuery() : entityQuery;
-            query.setTenantId(tenantId);
-            Page<GroupBO> entityPageBO = groupService.list(query);
-            Page<GroupVO> entityPageVO = groupBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
-        }));
+    public Mono<OffsetPage<GroupVO>> list(@RequestBody(required = false) GroupListRequest request) {
+        GroupListRequest query=request==null?new GroupListRequest():request;
+        return getTenantId().flatMap(tenantId->groupService.list(new GroupFilter(tenantId,query.groupName(),query.parentGroupId(),query.position(),query.groupTypeFlag(),query.enableFlag(),query.offset(),query.limit(),query.sort())))
+                .map(page->new OffsetPage<>(page.items().stream().map(groupBuilder::buildVOByBO).toList(),page.offset(),page.limit(),page.total(),page.hasNext()));
     }
 
 }

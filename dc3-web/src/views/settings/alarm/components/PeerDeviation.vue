@@ -90,8 +90,8 @@ const rows = ref<PeerDeviation[]>([]);
 
 const load = () =>
   run(async () => {
-    const res: { data?: PeerDeviation[] } = await alertPeerDeviation(Number(daysKey.value));
-    rows.value = res?.data ?? [];
+    const res: PeerDeviation[] = await alertPeerDeviation(Number(daysKey.value));
+    rows.value = res ?? [];
     await Promise.all([
       resolveDevices(rows.value.map((r) => r.deviceId)),
       resolveProfiles(rows.value.map((r) => r.profileId)),

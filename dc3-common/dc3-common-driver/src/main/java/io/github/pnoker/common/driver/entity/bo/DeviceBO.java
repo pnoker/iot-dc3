@@ -114,10 +114,16 @@ public class DeviceBO extends BaseBO {
      */
     private Map<Long, Map<Long, CommandAttributeConfigDTO>> commandAttributeConfigIdMap;
 
+    /** Command runtime definitions keyed by command identifier. */
+    private Map<Long, CommandRuntimeBO> commandRuntimeIdMap;
+
     /**
      * Event attribute configuration map keyed by event identifier and then attribute
      * identifier.
      */
     private Map<Long, Map<Long, EventAttributeConfigDTO>> eventAttributeConfigIdMap;
+
+    /** Event runtime definitions keyed by event identifier. */
+    private Map<Long, EventRuntimeBO> eventRuntimeIdMap;
 
 }

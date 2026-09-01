@@ -17,18 +17,14 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.data.biz.EventHistoryService;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.dal.EventHistoryManager;
 import io.github.pnoker.common.data.entity.bo.EventReportBO;
 import io.github.pnoker.common.data.entity.builder.EventHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EventHistoryAcknowledgeFlagEnum;
@@ -39,18 +35,19 @@ import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.EventFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeEventQuery;
+import io.github.pnoker.common.facade.entity.query.FacadeEventOffsetQuery;
+import io.github.pnoker.common.data.repository.ReactiveEventHistoryStore;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.List;
 
 /**
  * Business service implementation for event report operations.
@@ -69,120 +66,97 @@ public class EventHistoryServiceImpl implements EventHistoryService {
 
     private final AlarmRuleTriggerService alarmRuleTriggerService;
 
-    private final EventHistoryManager eventHistoryManager;
+    private final ReactiveEventHistoryStore eventHistoryStore;
 
     private final EventHistoryBuilder eventHistoryBuilder;
 
     @Override
-    public String report(Long tenantId, EventReportBO entityBO) {
-        FacadeEventBO event = validateEventScope(tenantId, entityBO.getDeviceId(), entityBO.getEventId(),
-                entityBO.getEventCode());
-
-        String recordId = UUID.randomUUID().toString();
-        LocalDateTime nowLocal = LocalDateTime.now();
-
-        EventHistoryDO recordDO = new EventHistoryDO();
-        recordDO.setRecordId(recordId);
-        recordDO.setTenantId(tenantId);
-        recordDO.setDeviceId(entityBO.getDeviceId());
-        recordDO.setEventId(event.getId());
-        recordDO.setEventCode(event.getEventCode());
-        recordDO.setEventTypeFlag(event.getEventTypeFlag().getIndex());
-        recordDO.setEventLevelFlag(event.getEventLevelFlag().getIndex());
-        recordDO.setParamValues(Objects.isNull(entityBO.getParamValues()) ? null : JsonUtil.toJsonString(entityBO.getParamValues()));
-        recordDO.setMessage(entityBO.getMessage());
-        recordDO.setOccurTime(nowLocal);
-        recordDO.setReceiveTime(nowLocal);
-        recordDO.setAcknowledgeFlag(EventHistoryAcknowledgeFlagEnum.NO.getIndex());
-        recordDO.setSchemaVersion((short) 1);
-        eventHistoryManager.save(recordDO);
-
-        return recordId;
+    public Mono<String> report(Long tenantId, EventReportBO entityBO) {
+        return validateEventScopeReactive(tenantId, entityBO.getDeviceId(), entityBO.getEventId(), entityBO.getEventCode())
+                .flatMap(event -> {
+                    String recordId = UUID.randomUUID().toString();
+                    LocalDateTime now = LocalDateTime.now(java.time.ZoneOffset.UTC);
+                    EventHistoryDO recordDO = new EventHistoryDO();
+                    recordDO.setRecordId(recordId);
+                    recordDO.setTenantId(tenantId);
+                    recordDO.setDeviceId(entityBO.getDeviceId());
+                    recordDO.setEventId(event.getId());
+                    recordDO.setEventCode(event.getEventCode());
+                    recordDO.setEventTypeFlag(event.getEventTypeFlag().getIndex());
+                    recordDO.setEventLevelFlag(event.getEventLevelFlag().getIndex());
+                    recordDO.setParamValues(entityBO.getParamValues() == null ? null : JsonUtil.toJsonString(entityBO.getParamValues()));
+                    recordDO.setMessage(entityBO.getMessage());
+                    recordDO.setOccurTime(now);
+                    recordDO.setReceiveTime(now);
+                    recordDO.setAcknowledgeFlag(EventHistoryAcknowledgeFlagEnum.NO.getIndex());
+                    recordDO.setSchemaVersion((short) 1);
+                    return eventHistoryStore.insert(recordDO).thenReturn(recordId);
+                });
     }
 
     @Override
-    public String report(EventReportDTO entityDTO) {
-        validateEventScope(entityDTO.tenantId(), entityDTO.deviceId(), entityDTO.eventId(), entityDTO.eventCode());
-
-        LocalDateTime nowLocal = LocalDateTime.now();
-
-        EventHistoryDO recordDO = new EventHistoryDO();
-        recordDO.setRecordId(entityDTO.recordId());
-        recordDO.setTenantId(entityDTO.tenantId());
-        recordDO.setDeviceId(entityDTO.deviceId());
-        recordDO.setEventId(entityDTO.eventId());
-        recordDO.setEventCode(entityDTO.eventCode());
-        recordDO.setEventTypeFlag(entityDTO.eventTypeFlag());
-        recordDO.setEventLevelFlag(entityDTO.eventLevelFlag());
-        recordDO.setParamValues(Objects.isNull(entityDTO.paramValues()) ? null : JsonUtil.toJsonString(entityDTO.paramValues()));
-        recordDO.setConfigSnapshot(entityDTO.configSnapshot());
-        recordDO.setMessage(entityDTO.message());
-        recordDO.setOccurTime(Objects.nonNull(entityDTO.occurTime())
-                ? LocalDateTime.ofInstant(entityDTO.occurTime(), ZoneId.systemDefault()) : nowLocal);
-        recordDO.setReceiveTime(nowLocal);
-        recordDO.setAcknowledgeFlag(EventHistoryAcknowledgeFlagEnum.NO.getIndex());
-        recordDO.setSchemaVersion((short) entityDTO.schemaVersion());
-        eventHistoryManager.save(recordDO);
-
-        alarmRuleTriggerService.processEventReport(entityDTO);
-
-        return entityDTO.recordId();
+    public Mono<String> report(EventReportDTO entityDTO) {
+        return validateEventScopeReactive(entityDTO.tenantId(), entityDTO.deviceId(), entityDTO.eventId(), entityDTO.eventCode())
+                .flatMap(event -> {
+                    LocalDateTime now = LocalDateTime.now(java.time.ZoneOffset.UTC);
+                    EventHistoryDO recordDO = new EventHistoryDO();
+                    recordDO.setRecordId(entityDTO.recordId());
+                    recordDO.setTenantId(entityDTO.tenantId());
+                    recordDO.setDeviceId(entityDTO.deviceId());
+                    recordDO.setEventId(event.getId());
+                    recordDO.setEventCode(event.getEventCode());
+                    recordDO.setEventTypeFlag(entityDTO.eventTypeFlag());
+                    recordDO.setEventLevelFlag(entityDTO.eventLevelFlag());
+                    recordDO.setParamValues(entityDTO.paramValues() == null ? null : JsonUtil.toJsonString(entityDTO.paramValues()));
+                    recordDO.setConfigSnapshot(entityDTO.configSnapshot());
+                    recordDO.setMessage(entityDTO.message());
+                    recordDO.setOccurTime(entityDTO.occurTime() == null ? now
+                            : LocalDateTime.ofInstant(entityDTO.occurTime(), java.time.ZoneOffset.UTC));
+                    recordDO.setReceiveTime(now);
+                    recordDO.setAcknowledgeFlag(EventHistoryAcknowledgeFlagEnum.NO.getIndex());
+                    recordDO.setSchemaVersion((short) entityDTO.schemaVersion());
+                    return eventHistoryStore.insert(recordDO)
+                            .then(alarmRuleTriggerService.processEventReport(entityDTO))
+                            .thenReturn(entityDTO.recordId());
+                });
     }
 
     @Override
-    public EventHistoryVO getByRecordId(Long tenantId, String recordId) {
-        EventHistoryDO entityDO = eventHistoryManager.lambdaQuery()
-                .eq(Objects.nonNull(tenantId), EventHistoryDO::getTenantId, tenantId)
-                .eq(EventHistoryDO::getRecordId, recordId)
-                .one();
-        return eventHistoryBuilder.buildVOByDO(entityDO);
+    public Mono<EventHistoryVO> getByRecordId(Long tenantId, String recordId) {
+        return eventHistoryStore.findByRecordId(tenantId, recordId).map(eventHistoryBuilder::buildVOByDO);
     }
 
     @Override
-    public Page<EventHistoryVO> list(Long tenantId, EventHistoryQueryVO queryVO) {
-        LambdaQueryWrapper<EventHistoryDO> wrapper = new LambdaQueryWrapper<EventHistoryDO>()
-                .eq(EventHistoryDO::getTenantId, tenantId)
-                .eq(Objects.nonNull(queryVO.getDeviceId()), EventHistoryDO::getDeviceId, queryVO.getDeviceId())
-                .eq(Objects.nonNull(queryVO.getEventId()), EventHistoryDO::getEventId, queryVO.getEventId())
-                .eq(StringUtils.isNotBlank(queryVO.getEventCode()), EventHistoryDO::getEventCode,
-                        queryVO.getEventCode())
-                .eq(Objects.nonNull(queryVO.getEventTypeFlag()), EventHistoryDO::getEventTypeFlag,
-                        Objects.nonNull(queryVO.getEventTypeFlag()) ? queryVO.getEventTypeFlag().getIndex() : null)
-                .orderByDesc(EventHistoryDO::getOccurTime);
-        Page<EventHistoryDO> page = eventHistoryManager.page(queryVO.toPage(), wrapper);
-        return eventHistoryBuilder.buildVOPageByDOPage(page);
+    public Mono<OffsetPage<EventHistoryVO>> list(Long tenantId, EventHistoryQueryVO queryVO) {
+        EventHistoryQueryVO query = queryVO == null ? new EventHistoryQueryVO() : queryVO;
+        Long deviceId = parseId(query.getDeviceId());
+        Long eventId = parseId(query.getEventId());
+        Byte eventType = query.getEventTypeFlag() == null ? null : query.getEventTypeFlag().getIndex();
+        return eventHistoryStore.list(tenantId, deviceId, eventId, query.getEventCode(), eventType,
+                        query.getOffset(), query.getLimit(), query.getSort())
+                .map(page -> OffsetPage.of(page.items().stream().map(eventHistoryBuilder::buildVOByDO).toList(),
+                        page.offset(), page.limit(), page.total()));
     }
 
-    /**
-     * Validate the device exists and is enabled within the tenant, then resolve and
-     * validate the event, requiring the event share the device's profile.
-     *
-     * @param tenantId  tenant scope
-     * @param deviceId  the device to validate
-     * @param eventId   the event id, preferred when present
-     * @param eventCode the event code, used as fallback
-     * @return the resolved, enabled event
-     */
-    private FacadeEventBO validateEventScope(Long tenantId, Long deviceId, Long eventId, String eventCode) {
-        FacadeDeviceBO device = deviceFacade.getById(tenantId, deviceId);
-        if (Objects.isNull(device)) {
-            throw new NotFoundException("Device does not exist");
-        }
-        if (EnableFlagEnum.DISABLE.equals(device.getEnableFlag())) {
-            throw new ServiceException("Device is disabled");
-        }
-
-        FacadeEventBO event = resolveEvent(tenantId, device, eventId, eventCode);
-        if (Objects.isNull(event)) {
-            throw new NotFoundException("Event does not exist");
-        }
-        if (EnableFlagEnum.DISABLE.equals(event.getEnableFlag())) {
-            throw new ServiceException("Event is disabled");
-        }
-        if (Objects.isNull(device.getProfileId()) || !Objects.equals(device.getProfileId(), event.getProfileId())) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
-        }
-        return event;
+    private Mono<FacadeEventBO> validateEventScopeReactive(Long tenantId, Long deviceId, Long eventId, String eventCode) {
+        return deviceFacade.getByIdReactive(tenantId, deviceId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Device does not exist")))
+                .flatMap(device -> {
+                    if (EnableFlagEnum.DISABLE.equals(device.getEnableFlag())) {
+                        return Mono.error(new ServiceException("Device is disabled"));
+                    }
+                    return resolveEventReactive(tenantId, device, eventId, eventCode)
+                            .switchIfEmpty(Mono.error(new NotFoundException("Event does not exist")))
+                            .flatMap(event -> {
+                                if (EnableFlagEnum.DISABLE.equals(event.getEnableFlag())) {
+                                    return Mono.error(new ServiceException("Event is disabled"));
+                                }
+                                if (device.getProfileId() == null || !Objects.equals(device.getProfileId(), event.getProfileId())) {
+                                    return Mono.error(new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH));
+                                }
+                                return Mono.just(event);
+                            });
+                });
     }
 
     /**
@@ -195,26 +169,20 @@ public class EventHistoryServiceImpl implements EventHistoryService {
      * @param eventCode the event code, used as fallback
      * @return the resolved event, or {@code null} when none matches
      */
-    private FacadeEventBO resolveEvent(Long tenantId, FacadeDeviceBO device, Long eventId, String eventCode) {
-        if (Objects.nonNull(eventId)) {
+    private Mono<FacadeEventBO> resolveEventReactive(Long tenantId, FacadeDeviceBO device, Long eventId, String eventCode) {
+        if (eventId != null) {
             return eventFacade.getById(tenantId, eventId);
         }
-        if (StringUtils.isBlank(eventCode)) {
-            throw new ServiceException("Event id or code is required");
+        if (eventCode == null || eventCode.isBlank()) {
+            return Mono.error(new ServiceException("Event id or code is required"));
         }
+        return eventFacade.list(new FacadeEventOffsetQuery(tenantId, null, eventCode, null, null,
+                device.getProfileId(), null, null, null, 0L, 1, List.of())).flatMapMany(page -> reactor.core.publisher.Flux.fromIterable(page.items())).next();
+    }
 
-        Pages page = new Pages();
-        page.setSize(1);
-        FacadePage<FacadeEventBO> eventPage = eventFacade.listByPage(FacadeEventQuery.builder()
-                .page(page)
-                .tenantId(tenantId)
-                .profileId(device.getProfileId())
-                .eventCode(eventCode)
-                .build());
-        if (Objects.isNull(eventPage) || Objects.isNull(eventPage.getRecords()) || eventPage.getRecords().isEmpty()) {
-            return null;
-        }
-        return eventPage.getRecords().get(0);
+    private Long parseId(String value) {
+        if (value == null || value.isBlank()) return null;
+        try { return Long.valueOf(value); } catch (NumberFormatException exception) { throw new IllegalArgumentException("invalid numeric id: " + value, exception); }
     }
 
 }

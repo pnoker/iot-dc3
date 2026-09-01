@@ -88,7 +88,7 @@ const load = () => {
   if (!reactiveData.id) return;
   getLabelById(reactiveData.id)
     .then((res: any) => {
-      reactiveData.data = res.data || {};
+      reactiveData.data = res || {};
     })
     .catch(() => {
       // handled globally

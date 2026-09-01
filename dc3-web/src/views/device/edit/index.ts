@@ -43,7 +43,10 @@ import {
   addDriverInfo,
   addEventInfo,
   addPointInfo,
-  getDriverInfoByDeviceIdAndAttributeId,
+  deleteCommandInfo,
+  deleteDriverInfo,
+  deleteEventInfo,
+  deletePointInfo,
   listCommandInfoByDeviceId,
   listDriverInfoByDeviceId,
   listEventInfoByDeviceId,
@@ -88,6 +91,7 @@ type AttributeConfigValue = string | number | boolean | null;
 
 interface AttributeFormItem {
   id?: string;
+  version?: number;
   configValue: any;
 }
 
@@ -205,10 +209,12 @@ function coerceAttributeValue(
 function createAttributeFormItem(
   attribute: Attribute,
   id?: string,
+  version?: number,
   value?: unknown,
 ): AttributeFormItem {
   return {
     id: id || undefined,
+    version,
     configValue: coerceAttributeValue(
       attribute,
       value ?? attribute.defaultValue,
@@ -223,6 +229,7 @@ function hasConfigValue(value: unknown): boolean {
 function createPointAttributeCell(
   attribute: Attribute,
   id?: string,
+  version?: number,
   value?: unknown,
 ): PointAttributeCell {
   const configValue = hasConfigValue(value)
@@ -230,6 +237,7 @@ function createPointAttributeCell(
     : null;
   return {
     id: id || undefined,
+    version,
     attributeId: attribute.id,
     configValue,
     originalValue: configValue,
@@ -241,6 +249,13 @@ function createPointAttributeCell(
 
 function serializeAttributeValue(value: unknown): string {
   return value === null || value === undefined ? "" : String(value);
+}
+
+function expectedVersion(item: AttributeFormItem): number {
+  if (!Number.isInteger(item.version) || Number(item.version) < 0) {
+    throw new Error(`Version is required for attribute configuration ${item.id || ""}`);
+  }
+  return Number(item.version);
 }
 
 function validateAttributeConfigValue(
@@ -617,11 +632,11 @@ export default defineComponent({
     const driverDictionary = (query?: string) => {
       reactiveData.driverLoading = true;
       listDriverDictionary({
-        page: { size: 50, current: 1 },
+        offset: 0, limit: 50,
         label: query || "",
       })
         .then((res) => {
-          reactiveData.driverDictionary = res.data.records;
+          reactiveData.driverDictionary = res.items;
         })
         .catch(() => {
           // nothing to do
@@ -638,11 +653,11 @@ export default defineComponent({
     const profileDictionary = (query?: string) => {
       reactiveData.profileLoading = true;
       listProfileDictionary({
-        page: { size: 50, current: 1 },
+        offset: 0, limit: 50,
         label: query || "",
       })
         .then((res) => {
-          reactiveData.profileDictionary = res.data.records;
+          reactiveData.profileDictionary = res.items;
         })
         .catch(() => {
           // nothing to do
@@ -659,12 +674,12 @@ export default defineComponent({
     const device = () => {
       getDeviceById(reactiveData.id)
         .then((res) => {
-          reactiveData.deviceFormData = res.data;
-          reactiveData.oldDeviceFormData = { ...res.data };
+          reactiveData.deviceFormData = res;
+          reactiveData.oldDeviceFormData = { ...res };
 
           getDriverById(reactiveData.deviceFormData.driverId || "").then(
             (res) => {
-              const driver = res.data;
+              const driver = res;
               reactiveData.driverDictionary.push({
                 label: driver.driverName,
                 value: driver.id,
@@ -675,7 +690,7 @@ export default defineComponent({
           if (reactiveData.deviceFormData.profileId) {
             getProfileById(String(reactiveData.deviceFormData.profileId)).then(
               (res) => {
-                const profile = res.data;
+                const profile = res;
                 if (!profile) return;
                 reactiveData.profileDictionary.push({
                   label: profile.profileName,
@@ -702,7 +717,7 @@ export default defineComponent({
       Promise.allSettled([
         listDriverAttributeByDriverId(driverId)
           .then((res) => {
-            reactiveData.driverAttributes = res.data;
+            reactiveData.driverAttributes = res;
             reactiveData.driverAttributeTable =
               reactiveData.driverAttributes.reduce(
                 (pre, cur) => {
@@ -729,7 +744,7 @@ export default defineComponent({
 
         listPointAttributeByDriverId(driverId)
           .then((res) => {
-            reactiveData.pointAttributes = res.data;
+            reactiveData.pointAttributes = res;
             reactiveData.pointAttributeTable =
               reactiveData.pointAttributes.reduce(
                 (pre, cur) => {
@@ -749,7 +764,7 @@ export default defineComponent({
 
         listCommandAttributeByDriverId(driverId)
           .then((res) => {
-            reactiveData.commandAttributes = res.data;
+            reactiveData.commandAttributes = res;
             reactiveData.commandAttributeTable =
               reactiveData.commandAttributes.reduce(
                 (pre, cur) => {
@@ -769,7 +784,7 @@ export default defineComponent({
 
         listEventAttributeByDriverId(driverId)
           .then((res) => {
-            reactiveData.eventAttributes = res.data;
+            reactiveData.eventAttributes = res;
             reactiveData.eventAttributeTable =
               reactiveData.eventAttributes.reduce(
                 (pre, cur) => {
@@ -795,7 +810,7 @@ export default defineComponent({
       listDriverInfoByDeviceId(reactiveData.id)
         .then((res) => {
           const formData: AttributeFormData = reactiveData.driverFormData;
-          res.data.forEach((info: DriverInfoForm) => {
+          res.forEach((info: DriverInfoForm) => {
             const attributeCode =
               reactiveData.driverAttributeTable[info.attributeId ?? ""];
             const attribute = reactiveData.driverAttributes.find(
@@ -805,6 +820,7 @@ export default defineComponent({
               formData[attributeCode] = createAttributeFormItem(
                 attribute,
                 info.id,
+                info.version,
                 info.configValue,
               );
             }
@@ -831,7 +847,7 @@ export default defineComponent({
       reactiveData.loading = true;
       listPointByProfileId(profileId)
         .then((res) => {
-          const rows: PointInfoMatrixRow[] = (res.data || []).map(
+          const rows: PointInfoMatrixRow[] = (res || []).map(
             (point: PointRecord) => {
               const attributes: Record<string, PointAttributeCell> = {};
 
@@ -862,7 +878,7 @@ export default defineComponent({
 
           return listPointInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
-              (infoRes.data || []).forEach((info: PointInfoForm) => {
+              (infoRes || []).forEach((info: PointInfoForm) => {
                 const attributeCode =
                   reactiveData.pointAttributeTable[info.attributeId ?? ""];
                 const attribute = reactiveData.pointAttributes.find(
@@ -873,6 +889,7 @@ export default defineComponent({
                   row.attributes[attributeCode] = createPointAttributeCell(
                     attribute,
                     info.id ?? "",
+                    info.version,
                     info.configValue,
                   );
                 }
@@ -904,7 +921,7 @@ export default defineComponent({
 
       listCommandByProfileId(profileId)
         .then((res) => {
-          const rows: CommandInfoMatrixRow[] = (res.data || []).map(
+          const rows: CommandInfoMatrixRow[] = (res || []).map(
             (command: CommandRecord) => {
               const attributes: Record<string, CommandAttributeCell> = {};
 
@@ -934,7 +951,7 @@ export default defineComponent({
 
           return listCommandInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
-              (infoRes.data || []).forEach((info: CommandInfoForm) => {
+              (infoRes || []).forEach((info: CommandInfoForm) => {
                 const attributeCode =
                   reactiveData.commandAttributeTable[info.attributeId ?? ""];
                 const attribute = reactiveData.commandAttributes.find(
@@ -945,6 +962,7 @@ export default defineComponent({
                   row.attributes[attributeCode] = createPointAttributeCell(
                     attribute,
                     info.id ?? "",
+                    info.version,
                     info.configValue,
                   );
                 }
@@ -973,7 +991,7 @@ export default defineComponent({
 
       listEventByProfileId(profileId)
         .then((res) => {
-          const rows: EventInfoMatrixRow[] = (res.data || []).map(
+          const rows: EventInfoMatrixRow[] = (res || []).map(
             (event: EventRecord) => {
               const attributes: Record<string, EventAttributeCell> = {};
 
@@ -1003,7 +1021,7 @@ export default defineComponent({
 
           return listEventInfoByDeviceId(reactiveData.id)
             .then((infoRes) => {
-              (infoRes.data || []).forEach((info: EventInfoForm) => {
+              (infoRes || []).forEach((info: EventInfoForm) => {
                 const attributeCode =
                   reactiveData.eventAttributeTable[info.attributeId ?? ""];
                 const attribute = reactiveData.eventAttributes.find(
@@ -1014,6 +1032,7 @@ export default defineComponent({
                   row.attributes[attributeCode] = createPointAttributeCell(
                     attribute,
                     info.id ?? "",
+                    info.version,
                     info.configValue,
                   );
                 }
@@ -1035,7 +1054,7 @@ export default defineComponent({
     const deviceUpdate = async (): Promise<boolean> => {
       try {
         const res = await updateDevice(reactiveData.deviceFormData);
-        reactiveData.oldDeviceFormData = { ...res.data };
+        reactiveData.oldDeviceFormData = { ...res };
         return true;
       } catch {
         return false;
@@ -1065,29 +1084,27 @@ export default defineComponent({
             }
             const driverInfo = {
               id: formItem.id || undefined,
+              version: formItem.version,
               attributeId: attribute.id,
               deviceId: reactiveData.id,
               configValue: serializeAttributeValue(formItem.configValue),
             };
 
             try {
-              const res: any = driverInfo.id
-                ? await updateDriverInfo(driverInfo)
-                : await addDriverInfo(driverInfo);
-              let savedId = String(res?.data?.id || formItem.id || "");
-              if (!savedId) {
-                const saved: any = await getDriverInfoByDeviceIdAndAttributeId(
-                  reactiveData.id,
-                  attribute.id,
-                );
-                savedId = String(saved?.data?.id || "");
+              if (driverInfo.id && !hasConfigValue(formItem.configValue)) {
+                await deleteDriverInfo(driverInfo.id, expectedVersion(formItem));
+                formItem.id = undefined;
+                formItem.version = undefined;
+              } else {
+                const saved = driverInfo.id
+                  ? await updateDriverInfo(driverInfo)
+                  : await addDriverInfo(driverInfo);
+                if (!saved.id || saved.version === undefined) {
+                  throw new Error(`Saved driver attribute config is incomplete: ${attribute.attributeCode}`);
+                }
+                formItem.id = String(saved.id);
+                formItem.version = saved.version;
               }
-              if (!savedId) {
-                throw new Error(
-                  `Saved driver attribute config without id: ${attribute.attributeCode}`,
-                );
-              }
-              formItem.id = savedId;
               reactiveData.oldDriverFormData[attribute.attributeCode] =
                 clone(formItem);
               driverDirtySet.delete(attribute.attributeCode);
@@ -1122,6 +1139,9 @@ export default defineComponent({
     ): boolean => {
       let valid = true;
       dirtyCells.forEach(({ attribute, cell }) => {
+        if (cell.id && !hasConfigValue(cell.configValue)) {
+          return;
+        }
         if (!validateAttributeCell(attribute, cell)) {
           valid = false;
         }
@@ -1236,6 +1256,7 @@ export default defineComponent({
 
           const payload: PointInfoForm = {
             id: cell.id || undefined,
+            version: cell.version,
             attributeId: cell.attributeId,
             deviceId: reactiveData.id,
             pointId: row.id,
@@ -1243,12 +1264,17 @@ export default defineComponent({
           };
 
           try {
-            // Backend add/update return R<String> (success code) without the new
-            // id, so there is nothing to read back from res.data.
-            if (cell.id) {
-              await updatePointInfo(payload);
+            if (cell.id && !hasConfigValue(cell.configValue)) {
+              await deletePointInfo(cell.id, expectedVersion(cell));
+              cell.id = undefined;
+              cell.version = undefined;
             } else {
-              await addPointInfo(payload);
+              const saved = cell.id ? await updatePointInfo(payload) : await addPointInfo(payload);
+              if (!saved.id || saved.version === undefined) {
+                throw new Error(`Saved point attribute config is incomplete: ${cell.attributeId}`);
+              }
+              cell.id = String(saved.id);
+              cell.version = saved.version;
             }
             cell.originalValue = cell.configValue;
             cell.dirty = false;
@@ -1386,6 +1412,7 @@ export default defineComponent({
 
           const payload: CommandInfoForm = {
             id: cell.id || undefined,
+            version: cell.version,
             attributeId: cell.attributeId,
             deviceId: reactiveData.id,
             commandId: row.id,
@@ -1393,10 +1420,17 @@ export default defineComponent({
           };
 
           try {
-            if (cell.id) {
-              await updateCommandInfo(payload);
+            if (cell.id && !hasConfigValue(cell.configValue)) {
+              await deleteCommandInfo(cell.id, expectedVersion(cell));
+              cell.id = undefined;
+              cell.version = undefined;
             } else {
-              await addCommandInfo(payload);
+              const saved = cell.id ? await updateCommandInfo(payload) : await addCommandInfo(payload);
+              if (!saved.id || saved.version === undefined) {
+                throw new Error(`Saved command attribute config is incomplete: ${cell.attributeId}`);
+              }
+              cell.id = String(saved.id);
+              cell.version = saved.version;
             }
             cell.originalValue = cell.configValue;
             cell.dirty = false;
@@ -1530,6 +1564,7 @@ export default defineComponent({
 
           const payload: EventInfoForm = {
             id: cell.id || undefined,
+            version: cell.version,
             attributeId: cell.attributeId,
             deviceId: reactiveData.id,
             eventId: row.id,
@@ -1537,10 +1572,17 @@ export default defineComponent({
           };
 
           try {
-            if (cell.id) {
-              await updateEventInfo(payload);
+            if (cell.id && !hasConfigValue(cell.configValue)) {
+              await deleteEventInfo(cell.id, expectedVersion(cell));
+              cell.id = undefined;
+              cell.version = undefined;
             } else {
-              await addEventInfo(payload);
+              const saved = cell.id ? await updateEventInfo(payload) : await addEventInfo(payload);
+              if (!saved.id || saved.version === undefined) {
+                throw new Error(`Saved event attribute config is incomplete: ${cell.attributeId}`);
+              }
+              cell.id = String(saved.id);
+              cell.version = saved.version;
             }
             cell.originalValue = cell.configValue;
             cell.dirty = false;

@@ -34,7 +34,7 @@ const flattenMenu = (nodes: MenuNode[]): MenuNode[] => {
 };
 
 export function registerMenuHandlers(): void {
-  // Drives the router guard + Layout top nav. menu store takes res.data when
+  // Drives the router guard + Layout top nav. menu store takes res when
   // it is an array, so we wrap the tree in an R envelope.
   on('post', 'api/v3/auth/menu/list_tree', (ctx) => responseOf(ctx.config, ok(menuTree)));
 

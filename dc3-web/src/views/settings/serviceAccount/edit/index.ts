@@ -76,7 +76,7 @@ export default defineComponent({
         }
         try {
           const res: any = await listPrincipalByIds([key]);
-          const p = (res?.data || [])[0];
+          const p = (res || [])[0];
           ownerName.value = p ? p.displayName || p.principalName || key : key;
         } catch {
           ownerName.value = key;

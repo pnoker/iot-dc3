@@ -19,9 +19,9 @@ package io.github.pnoker.common.agentic.service.chat;
 import io.github.pnoker.common.agentic.config.ChatClientConfig;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import org.apache.commons.lang3.StringUtils;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -62,18 +62,19 @@ public class AgenticPromptBuilder {
      * @return the assembled prompt spec
      */
     public ChatClient.ChatClientRequestSpec build(AgenticPreparedChatBO prepared) {
-        ChatClient chatClient = chatClientFactory.getOrCreate(prepared.model());
+        Long tenantId = tenantId(prepared);
+        ChatClient chatClient = chatClientFactory.getOrCreate(prepared.model(), tenantId);
         ChatClient.ChatClientRequestSpec promptSpec = chatClient.prompt()
                 .user(prepared.userMessage())
-                .toolContext(prepared.toolContext())
-                .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, prepared.scopedConversationId()));
+                .toolContext(prepared.toolContext());
 
         String systemPrompt = buildSystemPrompt(prepared);
         if (StringUtils.isNotBlank(systemPrompt)) {
             promptSpec = promptSpec.system(systemPrompt);
         }
         promptSpec = applyToolCallbacks(promptSpec, prepared);
-        promptSpec = applyRequestOptions(promptSpec, prepared.model(), prepared.temperature(), prepared.maxTokens());
+        promptSpec = applyRequestOptions(promptSpec, prepared.model(), tenantId, prepared.temperature(),
+                prepared.maxTokens());
         return promptSpec;
     }
 
@@ -86,9 +87,16 @@ public class AgenticPromptBuilder {
     }
 
     private ChatClient.ChatClientRequestSpec applyRequestOptions(ChatClient.ChatClientRequestSpec promptSpec,
-                                                                 String model, Double temperature, Integer maxTokens) {
-        ChatOptions.Builder<?> optionsBuilder = chatClientFactory.buildChatOptionsBuilder(model, temperature, maxTokens);
+                                                                 String model, Long tenantId, Double temperature,
+                                                                 Integer maxTokens) {
+        ChatOptions.Builder<?> optionsBuilder = chatClientFactory.buildChatOptionsBuilder(model, tenantId,
+                temperature, maxTokens);
         return Objects.nonNull(optionsBuilder) ? promptSpec.options(optionsBuilder) : promptSpec;
+    }
+
+    private Long tenantId(AgenticPreparedChatBO prepared) {
+        Object value = prepared.toolContext().get(AgenticConstant.ToolContextKey.TENANT_ID);
+        return value instanceof Number number ? number.longValue() : null;
     }
 
     /**

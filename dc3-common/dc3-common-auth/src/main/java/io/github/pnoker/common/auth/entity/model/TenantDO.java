@@ -17,12 +17,6 @@
 
 package io.github.pnoker.common.auth.entity.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
@@ -43,7 +37,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName(value = "dc3_tenant", autoResultMap = true)
 public class TenantDO implements Serializable {
 
     @Serial
@@ -52,80 +45,66 @@ public class TenantDO implements Serializable {
     /**
      * Primary key ID
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
      * TenantName
      */
-    @TableField("tenant_name")
     private String tenantName;
 
     /**
      * TenantCode
      */
-    @TableField("tenant_code")
     private String tenantCode;
 
     /**
      * Tenant
      */
-    @TableField(value = "tenant_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt tenantExt;
 
     /**
      * Enable flag, 0:Enable, 1:Disable
      */
-    @TableField("enable_flag")
     private Byte enableFlag;
 
     /**
      * Description
      */
-    @TableField("remark")
     private String remark;
 
     /**
      * Creator ID
      */
-    @TableField("creator_id")
     private Long creatorId;
 
     /**
      * Creator Name
      */
-    @TableField("creator_name")
     private String creatorName;
 
     /**
      * Create Time
      */
-    @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
      * Operator ID
      */
-    @TableField("operator_id")
     private Long operatorId;
 
     /**
      * Operator Name
      */
-    @TableField("operator_name")
     private String operatorName;
 
     /**
      * Operate Time
      */
-    @TableField("operate_time")
     private LocalDateTime operateTime;
 
     /**
      * Logical delete flag, 0:not deleted, 1:deleted
      */
-    @TableLogic
-    @TableField("deleted")
     private Byte deleted;
 
 }

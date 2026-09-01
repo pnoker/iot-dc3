@@ -20,7 +20,8 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.enums.WindowModeEnum;
 
 import java.math.BigDecimal;
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Pluggable backend for windowed alarm evaluation. Two production
@@ -46,13 +47,13 @@ public interface WindowDataSource {
      * the {@code minSamples} guard. Modes that do not reduce to a scalar
      * (LAST/ALL/ANY) should not be passed in.
      */
-    AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode);
+    Mono<AggregateOutcome> aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode);
 
     /**
      * Pull the raw samples in the rule's window, ordered oldest → newest.
      * Used by ALL/ANY where the rule condition runs sample-by-sample.
      */
-    List<WindowSample> samples(WindowSpec spec, RuleFact fact);
+    Flux<WindowSample> samples(WindowSpec spec, RuleFact fact);
 
     /**
      * Aggregate result + sample count. The value is null when the window had

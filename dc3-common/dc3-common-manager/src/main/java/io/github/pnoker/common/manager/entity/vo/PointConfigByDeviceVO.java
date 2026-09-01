@@ -18,7 +18,6 @@
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.manager.entity.model.PointDO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -60,6 +59,6 @@ public class PointConfigByDeviceVO {
      *
      */
     @Schema(description = "Point configurations belonging to the device; tenant-scoped.")
-    private List<PointDO> points;
+    private List<PointVO> points;
 
 }

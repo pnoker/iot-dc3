@@ -34,7 +34,7 @@ The WebFlux base path is `/agentic`; through the gateway the service is reached 
 ## Configuration
 
 - `DC3_AGENTIC_PORT` — HTTP port (default `8600`)
-- `DC3_FACADE_MODE` — facade transport (default `grpc`)
+- `DC3_FACADE_GRPC_DEADLINE_MS` — cross-service gRPC deadline in milliseconds (default `3000`)
 - Model/provider settings are bound via `AgenticProperties`, with an OpenAI-compatible fallback configured through the
   `AGENTIC_FALLBACK_OPENAI_*` environment variables (see `dc3/.env.example` / repo-root `.env.example`).
 

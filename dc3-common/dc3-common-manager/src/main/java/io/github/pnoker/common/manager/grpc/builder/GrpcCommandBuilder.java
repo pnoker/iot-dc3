@@ -17,16 +17,12 @@
 
 package io.github.pnoker.common.manager.grpc.builder;
 
-import io.github.pnoker.api.center.manager.GrpcPageCommandQuery;
 import io.github.pnoker.api.common.GrpcBase;
 import io.github.pnoker.api.common.GrpcCommandDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.CallTypeEnum;
 import io.github.pnoker.common.enums.CommandTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.CommandBO;
-import io.github.pnoker.common.manager.entity.query.CommandQuery;
-import io.github.pnoker.common.optional.EnableOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
@@ -45,36 +41,6 @@ import java.util.Optional;
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcCommandBuilder {
-
-    /**
-     * Convert grpc query to query.
-     *
-     * @param entityQuery entity query
-     * @return converted value
-     */
-    @Mapping(target = "page", ignore = true)
-    @Mapping(target = "commandType", ignore = true)
-    @Mapping(target = "callType", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    CommandQuery buildQueryByGrpcQuery(GrpcPageCommandQuery entityQuery);
-
-    /**
-     * After process.
-     *
-     * @param entityGrpc  entity grpc
-     * @param entityQuery entity query
-     */
-    @AfterMapping
-    default void afterProcess(GrpcPageCommandQuery entityGrpc, @MappingTarget CommandQuery.CommandQueryBuilder entityQuery) {
-        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
-        entityQuery.page(pages);
-
-        Optional.ofNullable(CommandTypeEnum.ofIndex((byte) entityGrpc.getCommandTypeFlag()))
-                .ifPresent(entityQuery::commandType);
-        Optional.ofNullable(CallTypeEnum.ofIndex((byte) entityGrpc.getCallTypeFlag()))
-                .ifPresent(entityQuery::callType);
-        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
-    }
 
     /**
      * Convert bo to grpc transfer object.

@@ -21,6 +21,7 @@ import {
   apiGet,
   apiPost,
   clickTab,
+  deleteVersionedEntity,
   ensureE2eData,
   expectHealthy,
   login,
@@ -52,12 +53,12 @@ async function gotoDeviceEdit(page: Page, deviceId: string, active = 'deviceConf
 }
 
 async function findRecordId(page: Page, listUrl: string, nameField: string, name: string) {
-  const response = await apiPost<{ records?: Array<{ id?: unknown }> }>(page, listUrl, {
-    page: {current: 1, size: 1},
+  const response = await apiPost<{items?: Array<{id?: unknown}>}>(page, listUrl, {
+    offset: 0, limit: 1,
     [nameField]: name,
   });
-  if (!response.data?.ok) return undefined;
-  const id = response.data.data?.records?.[0]?.id;
+  if (response.status >= 300) return undefined;
+  const id = response.data?.items?.[0]?.id;
   return id == null ? undefined : String(id);
 }
 
@@ -72,7 +73,7 @@ async function createDriverAttribute(page: Page, driverId: string) {
     enableFlag: 'ENABLE',
     remark: 'created by e2e device edit test',
   });
-  expect(add.data?.ok, 'driver attribute add').toBe(true);
+  expect(add.status, 'driver attribute add').toBeLessThan(300);
 
   const id = await findRecordId(page, '/api/v3/manager/driver_attribute/list', 'attributeName', name);
   expect(id, 'created driver attribute id').toBeDefined();
@@ -89,7 +90,7 @@ async function createDevice(page: Page, driverId: string, profileId: string) {
     enableFlag: 'ENABLE',
     remark: 'created by e2e device edit test',
   });
-  expect(add.data?.ok, 'device add').toBe(true);
+  expect(add.status, 'device add').toBeLessThan(300);
 
   const id = await findRecordId(page, '/api/v3/manager/device/list', 'deviceName', name);
   expect(id, 'created device id').toBeDefined();
@@ -195,9 +196,9 @@ test.describe('device edit tabs', () => {
         '/api/v3/manager/driver_attribute_config/list_by_device_id',
         {device_id: deviceId}
       );
-      const savedConfig = (
-        (configsAfterAdd.data as { data?: Array<{ attributeId?: unknown; id?: unknown }> }).data || []
-      ).find((item) => String(item.attributeId) === attributeId);
+      const savedConfig = (configsAfterAdd.data || []).find(
+        (item) => String((item as {attributeId?: unknown}).attributeId) === attributeId
+      ) as {id?: unknown} | undefined;
       expect(savedConfig?.id, 'driver attribute config should be created').toBeDefined();
 
       await gotoDeviceEdit(page, deviceId, 'driverConfig');
@@ -214,19 +215,15 @@ test.describe('device edit tabs', () => {
         '/api/v3/manager/driver_attribute_config/list_by_device_id',
         {device_id: deviceId}
       );
-      const matchingConfigs = (
-        (
-          configsAfterUpdate.data as {
-            data?: Array<{ attributeId?: unknown }>;
-          }
-        ).data || []
-      ).filter((item) => String(item.attributeId) === attributeId);
+      const matchingConfigs = (configsAfterUpdate.data || []).filter(
+        (item) => String((item as {attributeId?: unknown}).attributeId) === attributeId
+      );
       expect(matchingConfigs).toHaveLength(1);
     } finally {
-      if (deviceId) await apiPost(page, '/api/v3/manager/device/delete', {}, {id: deviceId}).catch(() => {
+      if (deviceId) await deleteVersionedEntity(page, '/api/v3/manager/device', deviceId).catch(() => {
       });
       if (attributeId)
-        await apiPost(page, '/api/v3/manager/driver_attribute/delete', {}, {id: attributeId}).catch(() => {
+        await deleteVersionedEntity(page, '/api/v3/manager/driver_attribute', attributeId).catch(() => {
         });
       await e2eData.cleanup();
     }
@@ -254,16 +251,16 @@ test.describe('device edit tabs', () => {
         configValue: 'persisted_value',
         enableFlag: 'ENABLE',
       });
-      expect(addConfig.data?.ok, 'driver attribute config add').toBe(true);
+      expect(addConfig.status, 'driver attribute config add').toBeLessThan(300);
 
       await gotoDeviceEdit(page, deviceId, 'driverConfig');
       const row = page.locator('tr').filter({hasText: attribute.name}).first();
       await expect(row.locator('input:not([readonly]):not([disabled])').first()).toHaveValue('persisted_value');
     } finally {
-      if (deviceId) await apiPost(page, '/api/v3/manager/device/delete', {}, {id: deviceId}).catch(() => {
+      if (deviceId) await deleteVersionedEntity(page, '/api/v3/manager/device', deviceId).catch(() => {
       });
       if (attributeId)
-        await apiPost(page, '/api/v3/manager/driver_attribute/delete', {}, {id: attributeId}).catch(() => {
+        await deleteVersionedEntity(page, '/api/v3/manager/driver_attribute', attributeId).catch(() => {
         });
       await e2eData.cleanup();
     }

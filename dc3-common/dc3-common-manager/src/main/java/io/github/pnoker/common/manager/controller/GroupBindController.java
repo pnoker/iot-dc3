@@ -17,23 +17,18 @@
 
 package io.github.pnoker.common.manager.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.ManagerConstant;
-import io.github.pnoker.common.dal.entity.bo.GroupBO;
-import io.github.pnoker.common.dal.entity.bo.GroupBindBO;
-import io.github.pnoker.common.dal.entity.builder.GroupBindBuilder;
-import io.github.pnoker.common.dal.entity.query.GroupBindQuery;
-import io.github.pnoker.common.dal.entity.vo.GroupBindVO;
-import io.github.pnoker.common.dal.service.GroupBindService;
-import io.github.pnoker.common.dal.service.GroupService;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.EntityTypeEnum;
-import io.github.pnoker.common.enums.SuccessCode;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.manager.service.EntityTenantService;
+import io.github.pnoker.common.manager.entity.bo.GroupBindBO;
+import io.github.pnoker.common.manager.entity.builder.GroupBindBuilder;
+import io.github.pnoker.common.manager.entity.query.GroupBindListRequest;
+import io.github.pnoker.common.manager.entity.vo.GroupBindVO;
+import io.github.pnoker.common.manager.repository.BindingFilter;
+import io.github.pnoker.common.manager.service.ReactiveGroupBindService;
+import io.github.pnoker.common.manager.service.ReactiveEntityTenantService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -42,8 +37,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,8 +49,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * REST controller exposing group binding management endpoints.
@@ -69,20 +65,18 @@ public class GroupBindController implements BaseController {
 
     private final GroupBindBuilder groupBindBuilder;
 
-    private final GroupBindService groupBindService;
+    private final ReactiveGroupBindService groupBindService;
 
-    private final GroupService groupService;
-
-    private final EntityTenantService entityTenantService;
+    private final ReactiveEntityTenantService entityTenantService;
 
     /**
      * Attach a tenant entity to a group.
      *
      * @param entityVO group binding payload to create (group id, entity id, entity type)
-     * @return add-success status
+     * @return the created group binding
      */
     @PreAuthorize("@perm.can('group_bind', 'add')")
-    @Operation(summary = "Add Group Binding", description = "Attach a tenant entity (device, driver, point, etc.) to a group. The entity's type must match the group's type and ownership is tenant-scoped; returns the new binding ID.",
+    @Operation(summary = "Add Group Binding", description = "Attach a tenant entity to a group. The entity type must match the group type and both resources must belong to the tenant; returns the created binding.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -90,47 +84,55 @@ public class GroupBindController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody GroupBindVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            GroupBindBO entityBO = groupBindBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(tenantId);
-            validateBind(tenantId, entityBO);
-            groupBindService.add(entityBO);
-            return R.ok(SuccessCode.ADD);
-        }));
+    public Mono<ResponseEntity<GroupBindVO>> add(@Validated(Add.class) @RequestBody GroupBindVO entityVO) {
+        return getTenantId()
+                .zipWith(getUserId().defaultIfEmpty(0L))
+                .zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
+                    GroupBindBO entityBO = groupBindBuilder.buildBOByVO(entityVO);
+                    entityBO.setTenantId(tuple.getT1().getT1());
+                    entityBO.setCreatorId(tuple.getT1().getT2());
+                    entityBO.setCreatorName(tuple.getT2());
+                    entityBO.setOperatorId(tuple.getT1().getT2());
+                    entityBO.setOperatorName(tuple.getT2());
+                    return entityTenantService.requireEntityTenant(entityBO.getTenantId(), entityBO.getEntityTypeFlag(), entityBO.getEntityId())
+                            .then(groupBindService.add(entityBO))
+                            .map(groupBindBuilder::buildVOByBO)
+                            .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(created));
+                });
     }
 
     /**
-     * Remove a group-to-entity binding by ID.
+     * Remove a group binding by ID.
      *
      * @param id id of the group binding to delete (must be tenant-owned)
-     * @return delete-success status
+     * @return an empty response after deletion
      */
     @PreAuthorize("@perm.can('group_bind', 'delete')")
-    @Operation(summary = "Delete Group Binding", description = "Remove a group-to-entity binding by ID (tenant-scoped). Detaches the entity from the group without deleting the group or the entity.",
+    @Operation(summary = "Delete Group Binding", description = "Permanently remove one tenant-owned group binding by ID.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
+                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                    @ExtensionProperty(name = "destructive", value = "true"),
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, groupBindService.getById(id));
-            groupBindService.delete(id);
-            return R.ok(SuccessCode.DELETE);
-        }));
+    @DeleteMapping("/delete")
+    public Mono<ResponseEntity<Void>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId()
+                .zipWith(getUserId().defaultIfEmpty(0L))
+                .zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> groupBindService.delete(tuple.getT1().getT1(), id, tuple.getT1().getT2(), tuple.getT2())
+                        .thenReturn(ResponseEntity.noContent().build()));
     }
 
     /**
-     * Change the group or entity referenced by an existing binding.
+     * Modify an existing group binding.
      *
      * @param entityVO group binding payload to update (must carry an existing id)
-     * @return update-success status
+     * @return the updated group binding
      */
     @PreAuthorize("@perm.can('group_bind', 'update')")
-    @Operation(summary = "Update Group Binding", description = "Change the group or entity referenced by an existing binding (tenant-scoped). The new entity's type must still match the target group's type.",
+    @Operation(summary = "Update Group Binding", description = "Modify an existing group binding for the current tenant. The new group and entity must match the binding's entity type and tenant scope.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -138,25 +140,30 @@ public class GroupBindController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody GroupBindVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            GroupBindBO entityBO = groupBindBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, groupBindService.getById(entityBO.getId()));
-            validateBind(tenantId, entityBO);
-            groupBindService.update(entityBO);
-            return R.ok(SuccessCode.UPDATE);
-        }));
+    public Mono<ResponseEntity<GroupBindVO>> update(@Validated(Update.class) @RequestBody GroupBindVO entityVO) {
+        return getTenantId()
+                .zipWith(getUserId().defaultIfEmpty(0L))
+                .zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> {
+                    GroupBindBO entityBO = groupBindBuilder.buildBOByVO(entityVO);
+                    entityBO.setTenantId(tuple.getT1().getT1());
+                    entityBO.setOperatorId(tuple.getT1().getT2());
+                    entityBO.setOperatorName(tuple.getT2());
+                    return entityTenantService.requireEntityTenant(entityBO.getTenantId(), entityBO.getEntityTypeFlag(), entityBO.getEntityId())
+                            .then(groupBindService.update(entityBO))
+                            .map(groupBindBuilder::buildVOByBO)
+                            .map(ResponseEntity::ok);
+                });
     }
 
     /**
      * Fetch a single group binding by ID.
      *
      * @param id id of the group binding to fetch (must be tenant-owned)
-     * @return the matched GroupBindVO; fails if not found or not tenant-owned
+     * @return the matched group binding
      */
     @PreAuthorize("@perm.can('group_bind', 'get')")
-    @Operation(summary = "Get Group Binding by ID", description = "Fetch one group binding by ID (tenant-scoped). Returns the group ID, entity type and entity ID of the association; use to inspect a specific link before editing or removing it.",
+    @Operation(summary = "Get Group Binding by ID", description = "Fetch one group binding by ID for the current tenant.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "LOW"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -164,22 +171,20 @@ public class GroupBindController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_by_id")
-    public Mono<R<GroupBindVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            GroupBindBO entityBO = requireTenant(tenantId, groupBindService.getById(id));
-            GroupBindVO entityVO = groupBindBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
-        }));
+    public Mono<GroupBindVO> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getTenantId()
+                .flatMap(tenantId -> groupBindService.getById(tenantId, id))
+                .map(groupBindBuilder::buildVOByBO);
     }
 
     /**
      * Page through group bindings with filters.
      *
-     * @param entityQuery query filters such as group id, entity type or entity id (may be null)
-     * @return a page of GroupBindVO matching the query
+     * @param request query filters (may be null)
+     * @return a page of group bindings matching the query
      */
     @PreAuthorize("@perm.can('group_bind', 'list')")
-    @Operation(summary = "List Group Bindings", description = "Page through group bindings for the current tenant, optionally filtered by group ID, entity type or entity ID. Returns a page of bindings; use to enumerate the members of a group or the groups an entity belongs to.",
+    @Operation(summary = "List Group Bindings", description = "Page through group bindings for the current tenant with optional group, entity type, and entity filters.",
             extensions = @Extension(name = "x-dc3-ai", properties = {
                     @ExtensionProperty(name = "riskLevel", value = "LOW"),
                     @ExtensionProperty(name = "destructive", value = "false"),
@@ -187,30 +192,23 @@ public class GroupBindController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<GroupBindVO>>> list(@RequestBody(required = false) GroupBindQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            GroupBindQuery query = Objects.isNull(entityQuery) ? new GroupBindQuery() : entityQuery;
-            query.setTenantId(tenantId);
-            Page<GroupBindBO> entityPageBO = groupBindService.list(query);
-            Page<GroupBindVO> entityPageVO = groupBindBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
-        }));
-    }
-
-    /**
-     * Validate a group binding: the group belongs to the tenant, its type matches the
-     * entity type, and the bound entity itself belongs to the tenant.
-     *
-     * @param tenantId tenant scope
-     * @param entityBO the binding to validate
-     */
-    private void validateBind(Long tenantId, GroupBindBO entityBO) {
-        EntityTypeEnum entityTypeFlag = entityBO.getEntityTypeFlag();
-        GroupBO groupBO = requireTenant(tenantId, groupService.getById(entityBO.getGroupId()));
-        if (!Objects.equals(groupBO.getGroupTypeFlag(), entityTypeFlag)) {
-            throw new NotFoundException("Resource does not exist");
-        }
-        entityTenantService.requireEntityTenant(tenantId, entityTypeFlag, entityBO.getEntityId());
+    public Mono<OffsetPage<GroupBindVO>> list(@RequestBody(required = false) GroupBindListRequest request) {
+        GroupBindListRequest query = request == null ? new GroupBindListRequest() : request;
+        return getTenantId()
+                .flatMap(tenantId -> groupBindService.list(new BindingFilter(
+                        tenantId,
+                        query.entityTypeFlag(),
+                        query.groupId(),
+                        query.entityId(),
+                        query.offset(),
+                        query.limit(),
+                        query.sort())))
+                .map(page -> new OffsetPage<>(
+                        page.items().stream().map(groupBindBuilder::buildVOByBO).toList(),
+                        page.offset(),
+                        page.limit(),
+                        page.total(),
+                        page.hasNext()));
     }
 
 }

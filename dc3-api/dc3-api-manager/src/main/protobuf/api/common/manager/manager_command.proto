@@ -19,11 +19,9 @@ syntax = "proto3";
 
 package api.common.manager;
 
-import "api/common/page.proto";
-import "api/common/r.proto";
 import "api/common/entity.proto";
 import "api/common/manager/manager_query.proto";
-import "api/common/manager/manager_query_page.proto";
+import "api/common/page.proto";
 
 option java_package = "io.github.pnoker.api.center.manager";
 option java_outer_classname = "ManagerCommandProto";
@@ -32,27 +30,30 @@ option java_multiple_files = true;
 
 // Service interface defining RPC calls related to command management
 service CommandApi {
-  rpc ListByPage (GrpcPageCommandQuery) returns (GrpcRPageCommandDTO);
-  rpc GetById (GrpcCommandQuery) returns (GrpcRCommandDTO);
-  rpc ListByIds (GrpcCommandIdsQuery) returns (GrpcRCommandListDTO);
+  // Canonical offset-based query.
+  rpc List (GrpcOffsetCommandQuery) returns (GrpcOffsetPageCommandDTO);
+  rpc GetById (GrpcCommandQuery) returns (GrpcCommandDTO);
+  rpc ListByIds (GrpcCommandIdsQuery) returns (GrpcCommandListDTO);
 }
 
-message GrpcRPageCommandDTO {
-  GrpcR result = 1;
-  GrpcPageCommandDTO data = 2;
+message GrpcOffsetCommandQuery {
+  PageRequest page = 1;
+  int64 tenant_id = 2;
+  string command_name = 3;
+  string command_code = 4;
+  optional int32 command_type_flag = 5;
+  optional int32 call_type_flag = 6;
+  optional int64 profile_id = 7;
+  optional int32 enable_flag = 8;
+  optional int32 version = 9;
+  optional int64 device_id = 10;
 }
 
-message GrpcPageCommandDTO {
-  GrpcPage page = 1;
-  repeated GrpcCommandDTO data = 2;
+message GrpcOffsetPageCommandDTO {
+  OffsetPage page = 1;
+  repeated GrpcCommandDTO items = 2;
 }
 
-message GrpcRCommandListDTO {
-  GrpcR result = 1;
-  repeated GrpcCommandDTO data = 2;
-}
-
-message GrpcRCommandDTO {
-  GrpcR result = 1;
-  GrpcCommandDTO data = 2;
+message GrpcCommandListDTO {
+  repeated GrpcCommandDTO items = 1;
 }

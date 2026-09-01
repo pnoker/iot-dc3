@@ -18,19 +18,17 @@
 package io.github.pnoker.common.auth.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcCodeQuery;
-import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
+import io.github.pnoker.api.center.auth.GrpcTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
-import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
 import io.github.pnoker.common.auth.grpc.builder.GrpcTenantBuilder;
-import io.github.pnoker.common.auth.service.TenantService;
-import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.auth.service.ReactiveTenantService;
+import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
+import reactor.core.Disposable;
 
 /**
  * gRPC server handling tenant facade requests.
@@ -45,27 +43,28 @@ public class TenantServer extends TenantApiGrpc.TenantApiImplBase {
 
     private final GrpcTenantBuilder grpcTenantBuilder;
 
-    private final TenantService tenantService;
+    private final ReactiveTenantService tenantService;
 
     @Override
-    public void getByCode(GrpcCodeQuery request, StreamObserver<GrpcRTenantDTO> responseObserver) {
-        GrpcRTenantDTO.Builder builder = GrpcRTenantDTO.newBuilder();
-
-        try {
-            TenantBO entityBO = tenantService.getByCode(request.getCode());
-            if (Objects.isNull(entityBO)) {
-                builder.setResult(GrpcRFactory.notFound());
-            } else {
-                builder.setResult(GrpcRFactory.ok());
-                builder.setData(grpcTenantBuilder.buildGrpcDTOByBO(entityBO));
-            }
-        } catch (Exception e) {
-            log.warn("getByCode failed", e);
-            builder.setResult(GrpcRFactory.fail(ErrorCode.FAILURE));
-        }
-
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
+    public void getByCode(GrpcCodeQuery request, StreamObserver<GrpcTenantDTO> responseObserver) {
+        Context grpcContext = Context.current();
+        Disposable subscription = tenantService.getByCode(request.getCode())
+                .switchIfEmpty(reactor.core.publisher.Mono.error(
+                        io.grpc.Status.NOT_FOUND.withDescription("Tenant not found").asRuntimeException()))
+                .subscribe(entityBO -> {
+                    if (grpcContext.isCancelled()) return;
+                    GrpcTenantDTO response = grpcTenantBuilder.buildGrpcDTOByBO(entityBO);
+                    responseObserver.onNext(response);
+                    responseObserver.onCompleted();
+                }, error -> {
+                    if (grpcContext.isCancelled()) return;
+                    log.warn("getByCode failed", error);
+                    responseObserver.onError(error instanceof io.grpc.StatusRuntimeException
+                            ? error
+                            : io.grpc.Status.INTERNAL.withDescription("getByCode failed").withCause(error)
+                            .asRuntimeException());
+                });
+        grpcContext.addListener(context -> subscription.dispose(), Runnable::run);
     }
 
 }

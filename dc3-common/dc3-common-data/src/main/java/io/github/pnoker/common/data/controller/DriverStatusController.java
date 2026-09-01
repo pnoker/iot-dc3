@@ -20,8 +20,7 @@ package io.github.pnoker.common.data.controller;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DriverStatusService;
-import io.github.pnoker.common.data.entity.query.DriverQuery;
-import io.github.pnoker.common.entity.R;
+import io.github.pnoker.common.facade.entity.query.FacadeDriverOffsetQuery;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -40,7 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * REST controller exposing driver status management endpoints.
@@ -72,13 +70,8 @@ public class DriverStatusController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Map<String, String>>> driverStatus(@RequestBody(required = false) DriverQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            DriverQuery query = Objects.isNull(entityQuery) ? new DriverQuery() : entityQuery;
-            query.setTenantId(tenantId);
-            Map<String, String> statuses = driverStatusService.getStatusByPage(query);
-            return R.ok(statuses);
-        }));
+    public Mono<Map<String, String>> driverStatus(@RequestBody(required = false) FacadeDriverOffsetQuery query) {
+        return getTenantId().flatMap(tenantId -> driverStatusService.list(withTenant(query, tenantId)));
     }
 
     /**
@@ -96,11 +89,8 @@ public class DriverStatusController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_device_online_by_driver_id")
-    public Mono<R<Long>> getDeviceOnlineByDriverId(@Parameter(description = "Identifier of the driver whose online device count is queried; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            Long result = driverStatusService.getDeviceOnlineByDriverId(tenantId, driverId);
-            return R.ok(result);
-        }));
+    public Mono<Long> getDeviceOnlineByDriverId(@Parameter(description = "Identifier of the driver whose online device count is queried; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+        return getTenantId().flatMap(tenantId -> driverStatusService.countOnlineDevices(tenantId, driverId));
     }
 
     /**
@@ -118,11 +108,18 @@ public class DriverStatusController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/get_device_offline_by_driver_id")
-    public Mono<R<Long>> getDeviceOfflineByDriverId(@Parameter(description = "Identifier of the driver whose offline device count is queried; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            Long result = driverStatusService.getDeviceOfflineByDriverId(tenantId, driverId);
-            return R.ok(result);
-        }));
+    public Mono<Long> getDeviceOfflineByDriverId(@Parameter(description = "Identifier of the driver whose offline device count is queried; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
+        return getTenantId().flatMap(tenantId -> driverStatusService.countOfflineDevices(tenantId, driverId));
+    }
+
+    private FacadeDriverOffsetQuery withTenant(FacadeDriverOffsetQuery query, Long tenantId) {
+        if (query == null) {
+            return new FacadeDriverOffsetQuery(tenantId, null, null, null, null, null, null, null, null, null,
+                    0, 50, java.util.List.of());
+        }
+        return new FacadeDriverOffsetQuery(tenantId, query.driverName(), query.driverCode(), query.serviceName(),
+                query.serviceHost(), query.driverTypeFlag(), query.enableFlag(), query.version(), query.groupId(),
+                query.labelId(), query.offset(), query.limit(), query.sort());
     }
 
 }

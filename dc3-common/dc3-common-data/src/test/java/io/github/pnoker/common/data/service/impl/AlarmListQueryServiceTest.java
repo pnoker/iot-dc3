@@ -17,11 +17,7 @@
 
 package io.github.pnoker.common.data.service.impl;
 
-import io.github.pnoker.common.data.dal.MessageManager;
-import io.github.pnoker.common.data.dal.NotifyChannelBindManager;
-import io.github.pnoker.common.data.dal.NotifyChannelManager;
-import io.github.pnoker.common.data.dal.NotifyManager;
-import io.github.pnoker.common.data.dal.RuleManager;
+import io.github.pnoker.common.data.biz.alarm.RuleRegistry;
 import io.github.pnoker.common.data.entity.builder.MessageBuilder;
 import io.github.pnoker.common.data.entity.builder.NotifyBuilder;
 import io.github.pnoker.common.data.entity.builder.NotifyChannelBindBuilder;
@@ -32,6 +28,11 @@ import io.github.pnoker.common.data.entity.query.NotifyChannelBindQuery;
 import io.github.pnoker.common.data.entity.query.NotifyChannelQuery;
 import io.github.pnoker.common.data.entity.query.NotifyQuery;
 import io.github.pnoker.common.data.entity.query.RuleQuery;
+import io.github.pnoker.common.data.repository.ReactiveRuleStore;
+import io.github.pnoker.common.data.repository.ReactiveNotifyAdminStore;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import org.mockito.Mockito;
+import reactor.core.publisher.Mono;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -47,31 +48,25 @@ class AlarmListQueryServiceTest {
     private RuleBuilder ruleBuilder;
 
     @Mock
-    private RuleManager ruleManager;
+    private ReactiveRuleStore ruleStore;
+
+    @Mock
+    private RuleRegistry ruleRegistry;
 
     @Mock
     private NotifyBuilder notifyBuilder;
 
     @Mock
-    private NotifyManager notifyManager;
+    private ReactiveNotifyAdminStore notifyAdminStore;
 
     @Mock
     private MessageBuilder messageBuilder;
 
     @Mock
-    private MessageManager messageManager;
-
-    @Mock
     private NotifyChannelBuilder notifyChannelBuilder;
 
     @Mock
-    private NotifyChannelManager notifyChannelManager;
-
-    @Mock
     private NotifyChannelBindBuilder notifyChannelBindBuilder;
-
-    @Mock
-    private NotifyChannelBindManager notifyChannelBindManager;
 
     @InjectMocks
     private RuleServiceImpl ruleService;
@@ -90,11 +85,19 @@ class AlarmListQueryServiceTest {
 
     @Test
     void alarmListQueriesAllowMissingOptionalFilters() {
-        assertThatCode(() -> ruleService.list(new RuleQuery())).doesNotThrowAnyException();
-        assertThatCode(() -> notifyService.list(new NotifyQuery())).doesNotThrowAnyException();
-        assertThatCode(() -> messageService.list(new MessageQuery())).doesNotThrowAnyException();
-        assertThatCode(() -> notifyChannelService.list(new NotifyChannelQuery())).doesNotThrowAnyException();
-        assertThatCode(() -> notifyChannelBindService.list(new NotifyChannelBindQuery()))
+        Mockito.when(ruleStore.list(1L, null, null, null, null, null,
+                        new io.github.pnoker.db.r2dbc.core.page.PageRequest(0, 50)))
+                .thenReturn(Mono.just(OffsetPage.of(java.util.List.of(), 0, 50, 0)));
+        OffsetPage<?> empty = OffsetPage.of(java.util.List.of(), 0, 50, 0);
+        Mockito.lenient().when(notifyAdminStore.listNotify(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((Mono) Mono.just(empty));
+        Mockito.lenient().when(notifyAdminStore.listMessage(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((Mono) Mono.just(empty));
+        Mockito.lenient().when(notifyAdminStore.listChannel(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((Mono) Mono.just(empty));
+        Mockito.lenient().when(notifyAdminStore.listBind(Mockito.anyLong(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((Mono) Mono.just(empty));
+        assertThatCode(() -> ruleService.list(1L, new RuleQuery()).block()).doesNotThrowAnyException();
+        assertThatCode(() -> notifyService.list(1L, new NotifyQuery()).block()).doesNotThrowAnyException();
+        assertThatCode(() -> messageService.list(1L, new MessageQuery()).block()).doesNotThrowAnyException();
+        assertThatCode(() -> notifyChannelService.list(1L, new NotifyChannelQuery()).block()).doesNotThrowAnyException();
+        assertThatCode(() -> notifyChannelBindService.list(1L, new NotifyChannelBindQuery()).block())
                 .doesNotThrowAnyException();
     }
 

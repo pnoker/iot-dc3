@@ -32,6 +32,6 @@ public interface RuleAlarmPersistenceService {
      *
      * @param match rule match
      */
-    void ensureAlarm(RuleMatch match);
+    reactor.core.publisher.Mono<RuleMatch> ensureAlarm(RuleMatch match);
 
 }

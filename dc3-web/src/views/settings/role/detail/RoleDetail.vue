@@ -114,7 +114,7 @@ const load = () => {
   if (!reactiveData.id) return;
   getRoleById(reactiveData.id)
     .then((res: any) => {
-      reactiveData.data = res.data || {};
+      reactiveData.data = res || {};
     })
     .catch(() => {
       // handled globally
@@ -126,7 +126,7 @@ const loadUsers = () => {
   reactiveData.usersLoading = true;
   listUserByRoleId(reactiveData.id)
     .then((res: any) => {
-      reactiveData.users = (res.data as any[]) || [];
+      reactiveData.users = (res as any[]) || [];
       reactiveData.usersLoaded = true;
     })
     .catch(() => {
@@ -142,7 +142,7 @@ const loadResources = () => {
   reactiveData.resourcesLoading = true;
   listResourceByRoleId(reactiveData.id)
     .then((res: any) => {
-      reactiveData.resources = (res.data as any[]) || [];
+      reactiveData.resources = (res as any[]) || [];
       reactiveData.resourcesLoaded = true;
     })
     .catch(() => {

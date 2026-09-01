@@ -227,6 +227,12 @@ export interface RoleResourceBindForm {
   [key: string]: unknown;
 }
 
+export interface RoleResourceBindRecord extends RoleResourceBindForm {
+  id: string;
+  createTime?: string;
+  operateTime?: string;
+}
+
 // ─── Service Account ────────────────────────────────────────────────
 
 export interface ServiceAccountForm {
@@ -256,7 +262,7 @@ export interface McpClientRegistrationForm {
   client_type?: 'PUBLIC' | 'CONFIDENTIAL' | string;
   grant_types?: string[];
   redirect_uris?: string[];
-  scope?: string[];
+  scope?: string;
   tenant_id?: string;
   service_account_principal_id?: string;
 

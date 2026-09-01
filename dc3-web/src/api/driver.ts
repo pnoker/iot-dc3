@@ -15,19 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {httpGet, httpPost, versionedDelete} from '@/api/common';
 import {API_DATA_BASE, API_MANAGER_BASE} from '@/config/constant/api';
 import type {PageQuery, PageResult} from '@/config/types';
 import type {DriverRecord} from '@/config/types/manager';
 
 export const getDriverById = (id: string) =>
-  httpGet<R<DriverRecord>>(`${API_MANAGER_BASE}/driver/get_by_id`, {params: {id}});
+  httpGet<DriverRecord>(`${API_MANAGER_BASE}/driver/get_by_id`, {params: {id}});
+
+export const deleteDriver = (id: string, version: number) => versionedDelete(`${API_MANAGER_BASE}/driver`, id, version);
 
 export const listDriverByIds = (driverIds: string[]) =>
-  httpPost<R<Record<string, DriverRecord>>>(`${API_MANAGER_BASE}/driver/list_by_ids`, driverIds);
+  httpPost<Record<string, DriverRecord>>(`${API_MANAGER_BASE}/driver/list_by_ids`, driverIds);
 
-export const listDriver = <T = R<PageResult<DriverRecord>>>(query: PageQuery) =>
+export const listDriver = <T = PageResult<DriverRecord>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/driver/list`, query);
 
 export const listDriverStatus = (query: Record<string, unknown>) =>
-  httpPost<R<Record<string, string>>>(`${API_DATA_BASE}/driver/status/list`, query);
+  httpPost<Record<string, string>>(`${API_DATA_BASE}/driver/status/list`, query);

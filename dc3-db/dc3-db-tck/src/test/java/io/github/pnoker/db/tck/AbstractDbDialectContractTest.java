@@ -2,555 +2,371 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  */
 
 package io.github.pnoker.db.tck;
 
-import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
-import io.github.pnoker.common.auth.mapper.OAuthMcpMapper;
-import io.github.pnoker.common.data.entity.bo.dashboard.AgingBucketRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.CorrelationPairRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow;
-import io.github.pnoker.common.data.mapper.AlertMapper;
-import io.github.pnoker.common.data.mapper.EntityStateMapper;
-import io.github.pnoker.common.data.mapper.PointValueMapper;
-import io.github.pnoker.common.manager.mapper.DriverLeaseMapper;
-import org.apache.ibatis.mapping.Environment;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
+import io.github.pnoker.common.data.entity.model.PointValueDO;
+import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
+import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
+import io.github.pnoker.common.data.repository.R2dbcEntityAlarmStore;
+import io.github.pnoker.common.data.repository.R2dbcNotifyHistoryStore;
+import io.github.pnoker.common.data.repository.NotifyHistoryInsertResult;
+import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
+import io.github.pnoker.common.data.repository.R2dbcEntityStateStore;
+import io.github.pnoker.common.data.repository.R2dbcPointValueIngestOutbox;
+import io.github.pnoker.common.data.repository.R2dbcPointValueLatestStore;
+import io.github.pnoker.common.data.repository.ReactivePointValueIngestOutbox;
+import io.github.pnoker.common.entity.ext.DriverExt;
+import io.github.pnoker.common.enums.EntityTypeEnum;
+import io.github.pnoker.common.manager.entity.bo.DriverBO;
+import io.github.pnoker.common.manager.repository.R2dbcDriverStore;
+import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
+import io.github.pnoker.db.r2dbc.core.dialect.StandardR2dbcDialect;
+import io.github.pnoker.db.r2dbc.runtime.transaction.SpringR2dbcPageTransaction;
+import io.r2dbc.spi.ConnectionFactories;
+import io.r2dbc.spi.ConnectionFactory;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.springframework.r2dbc.connection.R2dbcTransactionManager;
+import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Flux;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Dialect-neutral relational contract suite (docs/design/storage-abstraction.md
- * §3.3): one set of mapper-level assertions runs against PostgreSQL, MySQL 8 and
- * MariaDB with identical fixtures. The suite exercises the real mapper XML — including
- * the databaseId-routed forks — so passing it certifies that the dialects deliver
- * the same behavior on the forked statements: the fenced latest-value upsert, the
- * state upsert + re-select shape, the three-step expired-lease claim, the lease
- * upserts' row-local increments, the revision triggers, the tool-catalog JSON
- * extraction and CRUD twins, and the alert analytics twins (aging buckets,
- * interpolated percentile MTTA, correlation pairs).
- *
- * @author pnoker
- * @since 2026.8.24
+ * PostgreSQL R2DBC contract suite. Every assertion executes through the
+ * same reactive repository ports used by production. No JDBC, MyBatis mapper,
+ * blocking bridge or compatibility adapter is allowed in this test module.
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractDbDialectContractTest {
 
-    private static long idSeq = System.currentTimeMillis();
-    /**
-     * One factory per database, mirroring the production @DS wiring: the mappers
-     * under test span four databases (dc3_data state, dc3_history latest,
-     * dc3_manager leases, dc3_auth catalog); table names stay unqualified and
-     * resolve against the connection's selected database/schema.
-     */
-    private final java.util.Map<String, SqlSessionFactory> factories = new java.util.HashMap<>();
+    private static long idSequence = System.currentTimeMillis();
+    private final Map<String, ConnectionFactory> factories = new ConcurrentHashMap<>();
+    private final Map<String, DatabaseClient> clients = new ConcurrentHashMap<>();
 
-    private static long freshId() {
-        return ++idSeq;
-    }
+    protected abstract String r2dbcUrl();
 
-    /**
-     * The platform time convention: DATETIME(6) stored and compared in UTC.
-     */
-    private static LocalDateTime nowUtc() {
-        return LocalDateTime.now(java.time.ZoneOffset.UTC);
-    }
+    protected abstract String dialectName();
 
-    /**
-     * JDBC url of the engine under test for the given database (seed loaded).
-     */
-    protected abstract String jdbcUrl(String database);
+    protected abstract String fingerprintTable();
 
-    protected abstract String username();
+    protected abstract String operationTable();
 
-    protected abstract String password();
+    protected abstract String alarmTable();
 
-    /**
-     * MyBatis databaseId for the engine under test: "postgres" or "mysql".
-     */
-    protected abstract String databaseId();
+    protected abstract String notifyHistoryTable();
 
-    /**
-     * JDBC driver class for the engine under test.
-     */
-    protected abstract String driverClass();
-
-    private SqlSessionFactory factoryFor(String database) {
-        return factories.computeIfAbsent(database, name -> {
-            org.apache.ibatis.datasource.unpooled.UnpooledDataSource dataSource =
-                    new org.apache.ibatis.datasource.unpooled.UnpooledDataSource(
-                            driverClass(), jdbcUrl(name), username(), password());
-            org.apache.ibatis.session.Configuration configuration =
-                    new org.apache.ibatis.session.Configuration();
-            configuration.setEnvironment(new Environment("tck-" + name, new JdbcTransactionFactory(), dataSource));
-            // the harness knows its engine — set the databaseId the VendorDatabaseIdProvider
-            // would resolve, routing <statement databaseId="..."> forks in the mapper XML
-            configuration.setDatabaseId(databaseId());
-            configuration.setMapUnderscoreToCamelCase(true);
-            registerDialectHandlers(configuration);
-            for (String xml : List.of("mapping/EntityStateMapper.xml", "mapping/PointValueMapper.xml",
-                    "mapping/DriverLeaseMapper.xml", "mapping/OAuthMcpMapper.xml", "mapping/AlertMapper.xml")) {
-                try {
-                    // affectData is a mybatis-plus DTD extension (cache eviction hint);
-                    // the vanilla parser rejects it and the TCK does not depend on it
-                    String text = new String(org.apache.ibatis.io.Resources.getResourceAsStream(xml).readAllBytes(),
-                            java.nio.charset.StandardCharsets.UTF_8).replace(" affectData=\"true\"", "");
-                    new org.apache.ibatis.builder.xml.XMLMapperBuilder(
-                            new java.io.ByteArrayInputStream(text.getBytes(java.nio.charset.StandardCharsets.UTF_8)),
-                            configuration, xml, configuration.getSqlFragments()).parse();
-                } catch (Exception e) {
-                    throw new IllegalStateException("failed to parse " + xml, e);
-                }
-            }
-            return new SqlSessionFactoryBuilder().build(configuration);
+    @AfterAll
+    void closeFactories() {
+        factories.values().forEach(factory -> {
+            if (factory instanceof io.r2dbc.pool.ConnectionPool pool) pool.dispose();
         });
     }
 
-    /**
-     * Engine-specific type handlers (e.g. PostgreSQL timestamptz bridging).
-     */
-    protected void registerDialectHandlers(org.apache.ibatis.session.Configuration configuration) {
+    private static synchronized long id() {
+        return ++idSequence;
     }
 
-    private SqlSession open(String database) {
-        return factoryFor(database).openSession(true);
+    private DatabaseClient client() {
+        return clients.computeIfAbsent("default", ignored -> DatabaseClient.create(factory()));
     }
 
-    // ===== 1) fenced latest-value upsert (PointValueMapper.upsertLatestBatch) =====
-
-    @Test
-    void fencedLatestUpsertKeepsTheWinningEnvelope() {
-        try (SqlSession session = open("dc3_history")) {
-            PointValueMapper mapper = session.getMapper(PointValueMapper.class);
-            long tenant = freshId(), device = freshId(), point = freshId();
-            mapper.upsertLatestBatch(List.of(latest(tenant, device, point, "m-1", 5L, 1)));
-            mapper.upsertLatestBatch(List.of(latest(tenant, device, point, "m-2", 9L, 2)));
-            // stale fencing must not overwrite
-            mapper.upsertLatestBatch(List.of(latest(tenant, device, point, "m-old", 3L, 3)));
-            var rows = mapper.selectLatestPointValues(tenant, device, List.of(point));
-            assertThat(rows).hasSize(1);
-            assertThat(rows.getFirst().getMessageId()).isEqualTo("m-2");
-            assertThat(rows.getFirst().getFencingToken()).isEqualTo(9L);
-        }
+    private ConnectionFactory factory() {
+        return factories.computeIfAbsent("default", ignored -> ConnectionFactories.get(r2dbcUrl()));
     }
 
-    @Test
-    void fencedLatestTiebreaksOnTimeThenSequenceThenMessageId() {
-        try (SqlSession session = open("dc3_history")) {
-            PointValueMapper mapper = session.getMapper(PointValueMapper.class);
-            long tenant = freshId(), device = freshId(), point = freshId();
-            LocalDateTime time = LocalDateTime.of(2026, 8, 24, 12, 0, 0);
-            // equal fencing + time: later sequence wins
-            mapper.upsertLatestBatch(List.of(latest(tenant, device, point, "a", 7L, time, 1L)));
-            mapper.upsertLatestBatch(List.of(latest(tenant, device, point, "b", 7L, time, 2L)));
-            var rows = mapper.selectLatestPointValues(tenant, device, List.of(point));
-            assertThat(rows.getFirst().getMessageId()).isEqualTo("b");
-            // equal fencing + time + sequence: later message id wins
-            mapper.upsertLatestBatch(List.of(latest(tenant, device, point, "c", 7L, time, 2L)));
-            rows = mapper.selectLatestPointValues(tenant, device, List.of(point));
-            assertThat(rows.getFirst().getMessageId()).isEqualTo("c");
-        }
+    private R2dbcDialect dialect() {
+        return new StandardR2dbcDialect(dialectName(), fingerprintTable(),
+                "postgres".equals(dialectName()) ? '"' : '`', "postgres".equals(dialectName()));
     }
 
-    // ===== 2) entity-state upsert + re-select (the RETURNING-decoupled shape) =====
-
-    @Test
-    void stateUpsertInsertsThenBumpsLeaseVersionAndReSelects() {
-        try (SqlSession session = open("dc3_data")) {
-            EntityStateMapper mapper = session.getMapper(EntityStateMapper.class);
-            long tenant = freshId(), entity = freshId();
-            mapper.upsertEntityState(freshId(), tenant, (byte) 1, entity, 0L, (byte) 1, (byte) 0,
-                    nowUtc().plusSeconds(60), 60, (byte) 0, "tck", null);
-            var first = mapper.selectByUniqueKey(tenant, (byte) 1, entity);
-            assertThat(first).isNotNull();
-            assertThat(first.getLeaseVersion()).isEqualTo(1);
-
-            mapper.upsertEntityState(freshId(), tenant, (byte) 1, entity, 0L, (byte) 2, (byte) 0,
-                    nowUtc().plusSeconds(60), 60, (byte) 0, "tck", null);
-            var second = mapper.selectByUniqueKey(tenant, (byte) 1, entity);
-            assertThat(second.getLeaseVersion()).isEqualTo(2);
-            assertThat(second.getLastStateFlag()).isEqualTo((byte) 1);
-        }
+    private TransactionalOperator tx() {
+        return TransactionalOperator.create(new R2dbcTransactionManager(factory()));
     }
 
-    // ===== 3) three-step expired-lease claim =====
-
-    @Test
-    void expiredClaimLocksFlipsAndDerives() {
-        try (SqlSession session = open("dc3_data")) {
-            EntityStateMapper mapper = session.getMapper(EntityStateMapper.class);
-            long tenant = freshId(), entity = freshId();
-            mapper.upsertEntityState(freshId(), tenant, (byte) 1, entity, 0L, (byte) 2, (byte) 0,
-                    nowUtc().minusSeconds(5), 60, (byte) 0, "tck", null);
-            var locked = mapper.selectExpiredForClaim((byte) 1, (byte) 2, (byte) 3, (byte) 0, 10);
-            assertThat(locked).anyMatch(row -> row.getEntityId().equals(entity));
-            mapper.markClaimedOffline(locked.stream().map(
-                            io.github.pnoker.common.data.entity.model.EntityStateDO::getId).toList(),
-                    (byte) 0, 120);
-            var flipped = mapper.selectByUniqueKey(tenant, (byte) 1, entity);
-            assertThat(flipped.getStateFlag()).isEqualTo((byte) 0);
-            assertThat(flipped.getLastStateFlag()).isEqualTo((byte) 2);
-            assertThat(flipped.getLeaseVersion()).isEqualTo(2);
-        }
+    private R2dbcPointValueLatestStore latestStore() {
+        return new R2dbcPointValueLatestStore(client(), dialect(), tx());
     }
 
-    // ===== 4) lease upserts: row-local increments =====
+    private R2dbcEntityStateStore stateStore() {
+        return new R2dbcEntityStateStore(client(), tx(), dialect());
+    }
 
-    @Test
-    void deviceLeaseFencingAdvancesOnlyOnOwnershipChange() {
-        try (SqlSession session = open("dc3_manager")) {
-            DriverLeaseMapper mapper = session.getMapper(DriverLeaseMapper.class);
-            long tenant = freshId(), device = freshId();
-            mapper.upsertDeviceLeases(List.of(lease(tenant, 11, device, "node-a")));
-            var afterInsert = leaseRow(session, tenant, device);
-            assertThat(afterInsert.fencingToken()).isEqualTo(1L);
-            // same owner re-asserting: token must not move
-            mapper.upsertDeviceLeases(List.of(lease(tenant, 11, device, "node-a")));
-            assertThat(leaseRow(session, tenant, device).fencingToken()).isEqualTo(1L);
-            // ownership change: token advances
-            mapper.upsertDeviceLeases(List.of(lease(tenant, 12, device, "node-b")));
-            var afterMove = leaseRow(session, tenant, device);
-            assertThat(afterMove.driverId()).isEqualTo(12L);
-            assertThat(afterMove.fencingToken()).isEqualTo(2L);
-        }
+    private ReactivePointValueIngestOutbox outbox() {
+        return new R2dbcPointValueIngestOutbox(client(), dialect(), tx());
+    }
+
+    private ReactiveEntityAlarmStore alarmStore() {
+        return new R2dbcEntityAlarmStore(client(), tx(), dialect());
+    }
+
+    private R2dbcNotifyHistoryStore notifyHistoryStore() {
+        return new R2dbcNotifyHistoryStore(client(), tx(),
+                new SpringR2dbcPageTransaction(new R2dbcTransactionManager(factory())), dialect());
+    }
+
+    private R2dbcDriverStore driverStore() {
+        return new R2dbcDriverStore(client(), tx(),
+                new SpringR2dbcPageTransaction(new R2dbcTransactionManager(factory())),
+                JsonUtil.getJsonMapper(), dialect());
     }
 
     @Test
-    void leaseStateAssignmentVersionAdvancesPerUpsert() {
-        try (SqlSession session = open("dc3_manager")) {
-            DriverLeaseMapper mapper = session.getMapper(DriverLeaseMapper.class);
-            long tenant = freshId(), driver = freshId();
-            mapper.upsertLeaseState(tenant, driver, "hash-1", 1L);
-            var first = mapper.selectLeaseState(tenant, driver);
-            assertThat(first.getAssignmentVersion()).isEqualTo(1L);
-            mapper.upsertLeaseState(tenant, driver, "hash-2", 2L);
-            var second = mapper.selectLeaseState(tenant, driver);
-            assertThat(second.getAssignmentVersion()).isEqualTo(2L);
-            assertThat(second.getMembershipHash()).isEqualTo("hash-2");
-        }
+    void schemaFingerprintIsPresentAndFlagDayVersioned() {
+        Map<String, Object> row = client().sql("SELECT fingerprint_version,schema_contract,id_format,time_format,json_format FROM "
+                        + fingerprintTable() + " ORDER BY fingerprint_version DESC LIMIT 1")
+                .map((result, metadata) -> Map.of(
+                        "version", result.get("fingerprint_version"),
+                        "contract", result.get("schema_contract"),
+                        "id", result.get("id_format"),
+                        "time", result.get("time_format"),
+                        "json", result.get("json_format")))
+                .one().block();
+        assertThat(row).isNotNull();
+        assertThat(((Number) row.get("version")).intValue()).isGreaterThanOrEqualTo(2);
+        assertThat(row).containsEntry("contract", "r2dbc-flag-day-v1")
+                .containsEntry("id", "uuidv7")
+                .containsEntry("time", "utc-micros")
+                .containsEntry("json", "canonical-v1");
     }
-
-    // ===== 5) revision trigger (row-level on both engines) =====
 
     @Test
-    void deviceChangesBumpTheOwningDriversRevision() throws Exception {
-        try (SqlSession session = open("dc3_manager")) {
-            var jdbc = session.getConnection();
-            long tenant = freshId(), driver = freshId(), device = freshId();
-            insertDevice(jdbc, device, driver, tenant);
-            assertThat(revision(jdbc, tenant, driver)).isEqualTo(1L);
-            // trivial update: no bump
-            updateDeviceName(jdbc, device, "renamed");
-            assertThat(revision(jdbc, tenant, driver)).isEqualTo(1L);
-            // meaningful update: bump
-            flipDeviceEnabled(jdbc, device);
-            assertThat(revision(jdbc, tenant, driver)).isEqualTo(2L);
-        }
-    }
+    void latestUpsertIsFencedAndDeterministicallyOrdered() {
+        long tenant = id(), device = id(), point = id();
+        R2dbcPointValueLatestStore store = latestStore();
+        store.upsertBatch(List.of(value(tenant, device, point, "m-old", 3, 10))).block();
+        store.upsertBatch(List.of(value(tenant, device, point, "m-new", 9, 1))).block();
+        store.upsertBatch(List.of(value(tenant, device, point, "m-stale", 2, 99))).block();
 
-    // ===== 6) tool-catalog JSON extraction (seed data) =====
+        PointValueDO latest = store.latest(tenant, device, point).block();
+        assertThat(latest).isNotNull();
+        assertThat(latest.getMessageId()).isEqualTo("m-new");
+        assertThat(latest.getFencingToken()).isEqualTo(9L);
+
+        LocalDateTime tieTime = LocalDateTime.of(2026, 1, 2, 0, 0);
+        store.upsertBatch(List.of(value(tenant, device, point, "z", 9, 1, tieTime))).block();
+        store.upsertBatch(List.of(value(tenant, device, point, "a", 9, 1, tieTime))).block();
+        assertThat(store.latest(tenant, device, point).block().getMessageId()).isEqualTo("z");
+    }
 
     @Test
-    void toolCatalogCandidatesResolveTitlesThroughTheEncodedContent() throws Exception {
-        // the catalog rows are runtime-registered (ApiEndpointScanner), not seeded —
-        // plant one api row plus its permission resource and require both dialects
-        // to surface the title through the encoded content double-hop
-        long apiId = freshId();
-        long resourceId = freshId();
-        String content = "{\"title\":\"Tck Title\",\"url\":\"/tck\"}";
-        // api_ext.content holds the inner object as an escaped JSON string
-        String escaped = content.replace("\\", "\\\\").replace("\"", "\\\"");
-        String apiExt = "{\"type\":null,\"content\":\"" + escaped + "\",\"version\":1}";
-        try (SqlSession session = open("dc3_auth")) {
-            var jdbc = session.getConnection();
-            // parameterized: the value must not travel through SQL text, where
-            // MySQL's default backslash escapes would mangle the embedded JSON
-            try (var ps = jdbc.prepareStatement("INSERT INTO dc3_api (id, service_name, api_type_flag, api_name, "
-                    + "api_code, api_group, api_ext, enable_flag, remark, creator_id, creator_name, operator_id, "
-                    + "operator_name, deleted) VALUES (?, 'tck-center', 0, 'tck:list', 'tck-center:POST:/tck/list', "
-                    + "'', ?, 0, '', 1, 'tck', 1, 'tck', 0)")) {
-                ps.setLong(1, apiId);
-                // PG strictly rejects varchar->json and MySQL rejects the binary
-                // binding Types.OTHER produces — branch on the engine under test
-                if ("postgres".equals(databaseId())) {
-                    ps.setObject(2, apiExt, java.sql.Types.OTHER);
-                } else {
-                    ps.setString(2, apiExt);
-                }
-                ps.executeUpdate();
-            }
-            exec(jdbc, "INSERT INTO dc3_resource (id, parent_resource_id, resource_name, resource_code, "
-                    + "service_name, resource_type_flag, resource_scope_flag, entity_id, resource_ext, "
-                    + "enable_flag, creator_id, creator_name, operator_id, operator_name, deleted) "
-                    + "VALUES (" + resourceId + ", 0, 'tck api', 'tck-center:POST:/tck/list', 'tck-center', 6, 3, "
-                    + apiId + ", '{}', 0, 1, 'tck', 1, 'tck', 0)");
-        }
-        try (SqlSession session = open("dc3_auth")) {
-            OAuthMcpMapper mapper = session.getMapper(OAuthMcpMapper.class);
-            var candidates = mapper.listRegistryToolCandidates();
-            assertThat(candidates).anySatisfy(candidate -> {
-                assertThat(candidate.getToolId()).isEqualTo("tck-center:POST:/tck/list");
-                assertThat(candidate.getToolTitle()).isEqualTo("Tck Title");
-            });
-        }
+    void entityLeaseUpsertAndFencedExpiryClaimAreReactive() {
+        long tenant = id(), entity = id();
+        R2dbcEntityStateStore store = stateStore();
+        var first = store.upsert(id(), tenant, EntityTypeEnum.DEVICE, entity, id(), (byte) 2, (byte) 1,
+                Instant.now().minusSeconds(10), 1, (byte) 0, "{\"content\":\"online\"}").block();
+        assertThat(first).isNotNull();
+        assertThat(first.leaseVersion()).isEqualTo(1L);
+        var second = store.upsert(id(), tenant, EntityTypeEnum.DEVICE, entity, id(), (byte) 2, (byte) 1,
+                Instant.now(), 60, (byte) 0, "{\"content\":\"renewed\"}").block();
+        assertThat(second.leaseVersion()).isEqualTo(2L);
+        assertThat(store.claimExpired(tenant, EntityTypeEnum.DEVICE, entity, 2L, 60).block()).isNull();
     }
-
-    private void exec(java.sql.Connection connection, String sql) {
-        try (var ps = connection.prepareStatement(sql)) {
-            ps.executeUpdate();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    // ===== 7) tool-catalog CRUD twins (keyword filter + JSON defaults) =====
 
     @Test
-    void toolCatalogKeywordFilterAndJsonDefaultsSurviveTheDialectTwins() {
-        try (SqlSession session = open("dc3_auth")) {
-            OAuthMcpMapper mapper = session.getMapper(OAuthMcpMapper.class);
-            McpToolRecord plain = tool(freshId(), "tck-center:GET:/tck/plain", "plain", null);
-            McpToolRecord rich = tool(freshId(), "tck-center:GET:/tck/rich", "tckneedle-rich",
-                    "{\"title\":\"Rich\"}");
-            assertThat(mapper.insertTool(plain)).isEqualTo(1);
-            assertThat(mapper.insertTool(rich)).isEqualTo(1);
+    void expiredLeaseClaimCommitsBeforeDownstreamCancellation() {
+        long tenant = id(), entity = id();
+        R2dbcEntityStateStore store = stateStore();
+        store.upsert(id(), tenant, EntityTypeEnum.DEVICE, entity, id(), (byte) 2, (byte) 1,
+                Instant.now().minusSeconds(10), 1, (byte) 0, "{}").block();
 
-            List<McpToolRecord> all = mapper.listToolCatalog(null, null, 10);
-            assertThat(all).extracting(McpToolRecord::getToolId)
-                    .contains("tck-center:GET:/tck/plain", "tck-center:GET:/tck/rich");
-            assertThat(all).allSatisfy(tool -> assertThat(tool.getToolExt()).isNotBlank());
+        store.claimExpired(EntityTypeEnum.DEVICE, 1, 60).take(1).blockLast();
 
-            List<McpToolRecord> byKeyword = mapper.listToolCatalog("tckneedle", null, 10);
-            assertThat(byKeyword).hasSize(1);
-            assertThat(byKeyword.getFirst().getToolId()).isEqualTo("tck-center:GET:/tck/rich");
-            // MySQL normalizes stored JSON (insertion of spaces after colons);
-            // compare ignoring insignificant whitespace
-            assertThat(byKeyword.getFirst().getToolExt().replace(" ", ""))
-                    .isEqualTo("{\"title\":\"Rich\"}");
-
-            rich.setToolTitle("renamed");
-            assertThat(mapper.updateTool(rich)).isEqualTo(1);
-            assertThat(mapper.listToolCatalog("tckneedle", null, 10).getFirst().getToolTitle())
-                    .isEqualTo("renamed");
-        }
+        Map<String, Object> row = client().sql("SELECT entity_state_flag,lease_version FROM dc3_data.dc3_entity_state "
+                        + "WHERE tenant_id=:tenant AND entity_type_flag=:type AND entity_id=:entity")
+                .bind("tenant", tenant).bind("type", EntityTypeEnum.DEVICE.getIndex()).bind("entity", entity)
+                .map((result, metadata) -> Map.of("state", result.get("entity_state_flag"), "version", result.get("lease_version")))
+                .one().block();
+        assertThat(row).isNotNull();
+        assertThat(((Number) row.get("state")).byteValue()).isEqualTo(io.github.pnoker.common.enums.EntityStatusEnum.OFFLINE.getIndex());
+        assertThat(((Number) row.get("version")).longValue()).isEqualTo(2L);
     }
-
-    private McpToolRecord tool(long id, String toolId, String toolName, String toolExt) {
-        McpToolRecord tool = new McpToolRecord();
-        tool.setId(id);
-        tool.setToolId(toolId);
-        tool.setToolName(toolName);
-        tool.setToolTitle(toolName);
-        tool.setToolCategory("tck");
-        tool.setServiceName("tck-center");
-        tool.setApiCode(toolId);
-        tool.setPermissionCode(toolId);
-        tool.setHttpMethod("GET");
-        tool.setApiPath("/tck");
-        tool.setSchemaHash("hash");
-        tool.setRiskLevel("LOW");
-        tool.setReadOnlyHint((byte) 1);
-        tool.setDestructiveHint((byte) 0);
-        tool.setIdempotentHint((byte) 1);
-        tool.setOpenWorldHint((byte) 0);
-        tool.setEnableFlag((byte) 0);
-        tool.setToolExt(toolExt);
-        tool.setRemark("");
-        return tool;
-    }
-
-    // ===== 8) alert analytics twins (aging buckets / percentile MTTA / correlation pairs) =====
 
     @Test
-    void alertAnalyticsTwinsBucketAgeInterpolatePercentilesAndPairCorrelations() throws Exception {
-        // separate tenants per concern so one statement's fixtures never feed another's
-        long agingTenant = freshId();
-        long mttaTenant = freshId();
-        long correlationTenant = freshId();
-        // Fixed historical base: 2026-01-02 12:00 wall clock — 12:00 UTC and 20:00
-        // Asia/Shanghai share the same calendar date, so both engines bucket the
-        // day identically regardless of session time zone.
-        LocalDateTime mttaBase = LocalDateTime.of(2026, 1, 2, 12, 0, 0);
-        try (SqlSession session = open("dc3_data")) {
-            var jdbc = session.getConnection();
-            // aging fixtures — wall clock of the engine's session zone so the
-            // age deltas line up with the server's NOW()
-            LocalDateTime wallNow = "postgres".equals(databaseId())
-                    ? LocalDateTime.now() : LocalDateTime.now(java.time.ZoneOffset.UTC);
-            insertAlarm(jdbc, freshId(), agingTenant, 0, 101, 0, wallNow.minusMinutes(10), null);
-            insertAlarm(jdbc, freshId(), agingTenant, 1, 102, 0, wallNow.minusHours(30), null);
-            insertAlarm(jdbc, freshId(), agingTenant, 0, 103, 0, wallNow.minusHours(30), null);
-            // mtta fixtures: confirmed with 1s / 2s / 10s acknowledge latencies →
-            // PERCENTILE_CONT(0.5) = 2000ms, PERCENTILE_CONT(0.95) = 2000 + 0.9*(10000-2000) = 9200ms
-            insertAlarm(jdbc, freshId(), mttaTenant, 0, 201, 1, mttaBase, mttaBase.plusSeconds(1));
-            insertAlarm(jdbc, freshId(), mttaTenant, 0, 202, 1, mttaBase, mttaBase.plusSeconds(2));
-            insertAlarm(jdbc, freshId(), mttaTenant, 0, 203, 1, mttaBase, mttaBase.plusSeconds(10));
-            // correlation fixtures: point and device alarms at the same instant pair once;
-            // the far-away one stays out of the window
-            insertAlarm(jdbc, freshId(), correlationTenant, 0, 301, 0, mttaBase, null);
-            insertAlarm(jdbc, freshId(), correlationTenant, 1, 302, 0, mttaBase, null);
-            insertAlarm(jdbc, freshId(), correlationTenant, 2, 303, 0, mttaBase.plusHours(2), null);
-        }
-        try (SqlSession session = open("dc3_data")) {
-            AlertMapper mapper = session.getMapper(AlertMapper.class);
-
-            AgingBucketRow aging = mapper.agingBuckets(agingTenant);
-            assertThat(aging.getUnder1h()).isEqualTo(1);
-            assertThat(aging.getOver24h()).isEqualTo(2);
-            assertThat(aging.getTotal()).isEqualTo(3);
-
-            List<MttaTrendRow> trend = mapper.mttaByDay(mttaTenant, mttaBase.minusDays(1));
-            assertThat(trend).hasSize(1);
-            assertThat(trend.getFirst().getDate()).isEqualTo("2026-01-02");
-            assertThat(trend.getFirst().getConfirmedCount()).isEqualTo(3);
-            assertThat(trend.getFirst().getP50Ms()).isEqualTo(2000L);
-            assertThat(trend.getFirst().getP95Ms()).isEqualTo(9200L);
-
-            List<CorrelationPairRow> pairs = mapper.correlationPairs(correlationTenant, mttaBase.minusDays(1), 60, 10);
-            assertThat(pairs).hasSize(1);
-            assertThat(pairs.getFirst().getCoCount()).isEqualTo(1);
-        }
+    void outboxLifecycleRejectsDuplicatesAndEnforcesOwnerFence() {
+        long tenant = id(), device = id(), point = id();
+        PointValueDO row = value(tenant, device, point, "receipt-1", 1, 1);
+        ReactivePointValueIngestOutbox store = outbox();
+        String owner = UUID.randomUUID().toString();
+        assertThat(store.enqueue(List.of(row), owner).block()).hasSize(1);
+        assertThat(store.enqueue(List.of(row), UUID.randomUUID().toString()).block()).isEmpty();
+        assertThat(store.markPersisted(row, "wrong-owner").block()).isZero();
+        assertThat(store.markPersisted(row, owner).block()).isEqualTo(1);
+        assertThat(store.markProcessed(row).block()).isEqualTo(1);
+        assertThat(store.markProcessed(row).block()).isZero();
+        assertThat(store.findPersisted(List.of(row)).collectList().block()).isEmpty();
     }
 
-    private void insertAlarm(java.sql.Connection connection, long id, long tenant, int targetTypeFlag,
-                             long entityId, int confirmFlag, LocalDateTime createTime,
-                             LocalDateTime operateTime) throws Exception {
-        // alarm_ext stays on its '{}' default: binding JSON text through a varchar
-        // parameter is engine-divergent (PG rejects, MySQL needs plain string) and
-        // none of the analytics statements read it
-        try (var ps = connection.prepareStatement(
-                "INSERT INTO dc3_entity_alarm (id, alarm_target_type_flag, entity_id, alarm_type_flag, "
-                        + "confirm_flag, tenant_id, create_time, operate_time) VALUES (?,?,?,?,?,?,?,?)")) {
-            ps.setLong(1, id);
-            ps.setInt(2, targetTypeFlag);
-            ps.setLong(3, entityId);
-            ps.setInt(4, 0);
-            ps.setInt(5, confirmFlag);
-            ps.setLong(6, tenant);
-            ps.setObject(7, createTime);
-            ps.setObject(8, Objects.requireNonNullElseGet(operateTime, () -> createTime));
-            ps.executeUpdate();
-        }
+    @Test
+    void outboxReplayClaimIsExclusiveAndFailedRowsBackoff() {
+        long tenant = id(), device = id(), point = id();
+        PointValueDO row = value(tenant, device, point, "receipt-replay", 1, 1);
+        ReactivePointValueIngestOutbox store = outbox();
+        assertThat(store.enqueue(List.of(row), UUID.randomUUID().toString()).block()).hasSize(1);
+        client().sql("UPDATE " + operationTable() + " SET status='PENDING',claimed_by=NULL,claimed_at=NULL "
+                        + "WHERE tenant_id=:tenant AND message_id=:message")
+                .bind("tenant", tenant).bind("message", "receipt-replay").fetch().rowsUpdated().block();
+        String owner = UUID.randomUUID().toString();
+        PointValueDO claimed = store.claim(owner, 1).blockFirst();
+        assertThat(claimed).isNotNull();
+        assertThat(store.claim(UUID.randomUUID().toString(), 1).blockFirst()).isNull();
+        assertThat(store.markFailed(claimed, "wrong-owner", "boom").block()).isZero();
+        assertThat(store.markFailed(claimed, owner, "boom").block()).isEqualTo(1);
     }
 
-    // ===== helpers =====
+    @Test
+    void alarmInsertIsIdempotentByTenantAndDedupeKey() {
+        long tenant = id();
+        EntityAlarmDO alarm = new EntityAlarmDO();
+        alarm.setTenantId(tenant);
+        alarm.setEntityId(id());
+        alarm.setDriverId(id());
+        alarm.setDeviceId(id());
+        alarm.setPointId(id());
+        alarm.setRuleId(id());
+        alarm.setAlarmTargetTypeFlag((byte) 0);
+        alarm.setAlarmTypeFlag((byte) 0);
+        alarm.setAlarmSourceFlag((byte) 0);
+        alarm.setAlarmLevelFlag((byte) 2);
+        alarm.setConfirmFlag((byte) 0);
+        alarm.setExpiredTime(0L);
+        alarm.setDedupeKey("tck:" + tenant);
 
-    private io.github.pnoker.common.data.entity.model.PointValueDO latest(
-            long tenant, long device, long point, String messageId, long fencing, int sequence) {
-        return latest(tenant, device, point, messageId, fencing,
-                LocalDateTime.of(2026, 8, 24, 12, 0, sequence), (long) sequence);
+        EntityAlarmDO first = alarmStore().insert(alarm).block();
+        EntityAlarmDO duplicate = new EntityAlarmDO();
+        duplicate.setTenantId(tenant);
+        duplicate.setEntityId(alarm.getEntityId());
+        duplicate.setDriverId(alarm.getDriverId());
+        duplicate.setDeviceId(alarm.getDeviceId());
+        duplicate.setPointId(alarm.getPointId());
+        duplicate.setRuleId(alarm.getRuleId());
+        duplicate.setAlarmTargetTypeFlag((byte) 0);
+        duplicate.setAlarmTypeFlag((byte) 0);
+        duplicate.setAlarmSourceFlag((byte) 0);
+        duplicate.setAlarmLevelFlag((byte) 2);
+        duplicate.setConfirmFlag((byte) 0);
+        duplicate.setExpiredTime(0L);
+        duplicate.setDedupeKey(alarm.getDedupeKey());
+        EntityAlarmDO second = alarmStore().insert(duplicate).block();
+
+        assertThat(first).isNotNull();
+        assertThat(second).isNotNull();
+        assertThat(second.getId()).isEqualTo(first.getId());
+        assertThat(client().sql("SELECT COUNT(*) AS total FROM " + alarmTable()
+                        + " WHERE tenant_id=:tenant AND dedupe_key=:dedupe")
+                .bind("tenant", tenant).bind("dedupe", alarm.getDedupeKey())
+                .map((row, metadata) -> row.get("total", Number.class).longValue()).one().block()).isEqualTo(1L);
     }
 
-    private io.github.pnoker.common.data.entity.model.PointValueDO latest(
-            long tenant, long device, long point, String messageId, long fencing,
-            LocalDateTime createTime, Long sequence) {
-        io.github.pnoker.common.data.entity.model.PointValueDO valueDO =
-                new io.github.pnoker.common.data.entity.model.PointValueDO();
-        valueDO.setTenantId(tenant);
-        valueDO.setDeviceId(device);
-        valueDO.setPointId(point);
-        valueDO.setMessageId(messageId);
-        valueDO.setSchemaVersion(1);
-        valueDO.setDriverNode("tck-node");
-        valueDO.setSequence(sequence);
-        valueDO.setFencingToken(fencing);
-        valueDO.setRawValue("raw");
-        valueDO.setCalValue("cal");
-        valueDO.setNumValue(1.0);
-        valueDO.setDriverId(1L);
-        valueDO.setCreateTime(createTime);
-        valueDO.setOperateTime(createTime);
-        return valueDO;
+    @Test
+    void notifyHistoryInsertIsConcurrentAndIdempotentByTenantAndDedupeKey() {
+        long tenant = id();
+        String dedupeKey = "tck-notify:" + tenant;
+        NotifyHistoryDO first = notifyHistory(tenant, dedupeKey);
+        NotifyHistoryDO second = notifyHistory(tenant, dedupeKey);
+
+        List<NotifyHistoryInsertResult> results = Flux.merge(
+                        notifyHistoryStore().insertIdempotent(first),
+                        notifyHistoryStore().insertIdempotent(second))
+                .collectList().block();
+
+        assertThat(results).hasSize(2);
+        assertThat(results.stream().filter(NotifyHistoryInsertResult::inserted).count()).isEqualTo(1L);
+        assertThat(results.get(0).history().getId()).isEqualTo(results.get(1).history().getId());
+        assertThat(client().sql("SELECT COUNT(*) AS total FROM " + notifyHistoryTable()
+                        + " WHERE tenant_id=:tenant AND dedupe_key=:dedupe")
+                .bind("tenant", tenant).bind("dedupe", dedupeKey)
+                .map((row, metadata) -> row.get("total", Number.class).longValue()).one().block()).isEqualTo(1L);
     }
 
-    private LeaseRow leaseRow(SqlSession session, long tenant, long device) {
-        try (var ps = session.getConnection().prepareStatement(
-                "SELECT driver_id, fencing_token FROM dc3_device_lease WHERE tenant_id=? AND device_id=?")) {
-            ps.setLong(1, tenant);
-            ps.setLong(2, device);
-            try (var rs = ps.executeQuery()) {
-                rs.next();
-                return new LeaseRow(rs.getLong(1), rs.getLong(2));
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
+    @Test
+    void managerDriverWritesAreTenantScopedAndUseCompareAndSetVersions() {
+        long tenant = id();
+        DriverBO driver = new DriverBO();
+        driver.setTenantId(tenant);
+        driver.setDriverName("tck-driver-" + tenant);
+        driver.setDriverCode("tck-driver-code-" + tenant);
+        driver.setServiceName("tck-driver-service-" + tenant);
+        driver.setServiceHost("127.0.0.1");
+        driver.setVersion(0);
+        DriverExt driverExt = new DriverExt();
+        driverExt.setType("tck-driver");
+        driverExt.setVersion(7);
+        driverExt.setRemark("typed JSONB read");
+        driverExt.setContent(new DriverExt.Content("nested-value"));
+        driver.setDriverExt(driverExt);
+
+        DriverBO inserted = driverStore().insert(driver).block();
+        assertThat(inserted).isNotNull();
+        assertThat(inserted.getVersion()).isZero();
+        assertThat(inserted.getDriverExt()).isNotNull();
+        assertThat(inserted.getDriverExt().getType()).isEqualTo("tck-driver");
+        assertThat(inserted.getDriverExt().getContent().getKeep()).isEqualTo("nested-value");
+        assertThat(driverStore().get(id(), inserted.getId()).block()).isNull();
+
+        inserted.setDriverName(inserted.getDriverName() + "-updated");
+        DriverBO updated = driverStore().update(inserted, 0).block();
+        assertThat(updated).isNotNull();
+        assertThat(updated.getVersion()).isEqualTo(1);
+        assertThat(updated.getDriverName()).endsWith("-updated");
+        assertThat(updated.getDriverExt().getContent().getKeep()).isEqualTo("nested-value");
+        assertThat(driverStore().update(updated, 0).block()).isNull();
+        assertThat(driverStore().delete(tenant, updated.getId(), 0, id(), "tck").block()).isFalse();
+        assertThat(driverStore().delete(tenant, updated.getId(), 1, id(), "tck").block()).isTrue();
+        assertThat(driverStore().get(tenant, updated.getId()).block()).isNull();
     }
 
-    private io.github.pnoker.common.manager.entity.model.DeviceLeaseDO lease(
-            long tenant, long driver, long device, String node) {
-        io.github.pnoker.common.manager.entity.model.DeviceLeaseDO leaseDO =
-                new io.github.pnoker.common.manager.entity.model.DeviceLeaseDO();
-        leaseDO.setTenantId(tenant);
-        leaseDO.setDriverId(driver);
-        leaseDO.setDeviceId(device);
-        leaseDO.setOwnerNode(node);
-        return leaseDO;
+    private NotifyHistoryDO notifyHistory(long tenant, String dedupeKey) {
+        NotifyHistoryDO value = new NotifyHistoryDO();
+        value.setTenantId(tenant);
+        value.setRuleId(id());
+        value.setNotifyId(id());
+        value.setMessageId(id());
+        value.setChannelId(id());
+        value.setAlarmId(id());
+        value.setChannelTypeFlag((byte) 0);
+        value.setStatusFlag((byte) 0);
+        value.setDedupeKey(dedupeKey);
+        return value;
     }
 
-    private void insertDevice(java.sql.Connection connection, long id, long driverId, long tenantId)
-            throws Exception {
-        try (var ps = connection.prepareStatement(
-                "INSERT INTO dc3_device (id, device_name, device_code, driver_id, profile_id, enable_flag, "
-                        + "tenant_id, creator_id, creator_name, operator_id, operator_name) "
-                        + "VALUES (?,?,?,?,?,0,?,1,'tck',1,'tck')")) {
-            ps.setLong(1, id);
-            ps.setString(2, "tck-device");
-            ps.setString(3, "tck-" + id);
-            ps.setLong(4, driverId);
-            ps.setLong(5, 1);
-            ps.setLong(6, tenantId);
-            ps.executeUpdate();
-        }
+    private PointValueDO value(long tenant, long device, long point, String message, long fence, long sequence) {
+        return value(tenant, device, point, message, fence, sequence,
+                LocalDateTime.of(2026, 1, 1, 0, 0).plusSeconds(sequence));
     }
 
-    private void updateDeviceName(java.sql.Connection connection, long id, String name) throws Exception {
-        try (var ps = connection.prepareStatement("UPDATE dc3_device SET device_name=? WHERE id=?")) {
-            ps.setString(1, name);
-            ps.setLong(2, id);
-            ps.executeUpdate();
-        }
-    }
-
-    private void flipDeviceEnabled(java.sql.Connection connection, long id) throws Exception {
-        try (var ps = connection.prepareStatement("UPDATE dc3_device SET enable_flag=1 WHERE id=?")) {
-            ps.setLong(1, id);
-            ps.executeUpdate();
-        }
-    }
-
-    private long revision(java.sql.Connection connection, long tenantId, long driverId) throws Exception {
-        try (var ps = connection.prepareStatement(
-                "SELECT revision FROM dc3_driver_device_revision WHERE tenant_id=? AND driver_id=?")) {
-            ps.setLong(1, tenantId);
-            ps.setLong(2, driverId);
-            try (var rs = ps.executeQuery()) {
-                return rs.next() ? rs.getLong(1) : -1L;
-            }
-        }
-    }
-
-    private record LeaseRow(long driverId, long fencingToken) {
+    private PointValueDO value(long tenant, long device, long point, String message, long fence, long sequence,
+                               LocalDateTime createTime) {
+        PointValueDO value = new PointValueDO();
+        value.setTenantId(tenant);
+        value.setDeviceId(device);
+        value.setPointId(point);
+        value.setMessageId(message);
+        value.setSchemaVersion(1);
+        value.setDriverNode("tck-node");
+        value.setSequence(sequence);
+        value.setFencingToken(fence);
+        value.setRawValue("raw");
+        value.setCalValue("1");
+        value.setNumValue(1D);
+        value.setDriverId(id());
+        value.setCreateTime(createTime);
+        value.setOperateTime(createTime);
+        return value;
     }
 }

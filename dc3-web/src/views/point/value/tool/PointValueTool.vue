@@ -20,11 +20,16 @@
     :form-model="formData"
     :page="page"
     hide-sort
+    :cursor-mode="cursorMode"
+    :cursor-previous="cursorPrevious"
+    :cursor-next="cursorNext"
     @refresh="$emit('refresh')"
     @reset="onReset"
     @search="onSearch"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
+    @cursor-previous="$emit('cursor-previous')"
+    @cursor-next="$emit('cursor-next')"
   >
     <template #filters>
       <el-form-item v-if="embedded === ''" :label="$t('pointValue.tool.device')" prop="deviceId">
@@ -111,9 +116,12 @@ defineProps({
     type: Object,
     required: true,
   },
+  cursorMode: {type: Boolean, default: false},
+  cursorPrevious: {type: Boolean, default: false},
+  cursorNext: {type: Boolean, default: false},
 });
 
-const emit = defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-change']);
+const emit = defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-change', 'cursor-previous', 'cursor-next']);
 
 const formData = reactive<Record<string, any>>({enableFlag: '', rangeKey: ''});
 const deviceDictionaries = ref<Dictionary[]>([]);
@@ -133,11 +141,11 @@ const onReset = () => {
 const deviceDictionary = (query?: string) => {
   deviceLoading.value = true;
   listDeviceDictionary({
-    page: {size: 50, current: 1},
+    offset: 0, limit: 50,
     label: query || '',
   })
     .then((res) => {
-      deviceDictionaries.value = res.data.records;
+      deviceDictionaries.value = res.items;
     })
     .catch(() => {
       // nothing to do
@@ -150,12 +158,12 @@ const deviceDictionary = (query?: string) => {
 const pointDictionary = (query?: string) => {
   pointLoading.value = true;
   listPointDictionary({
-    page: {size: 50, current: 1},
+    offset: 0, limit: 50,
     label: query || '',
     parentId: formData.deviceId,
   })
     .then((res) => {
-      pointDictionaries.value = res.data.records;
+      pointDictionaries.value = res.items;
     })
     .catch(() => {
       // nothing to do

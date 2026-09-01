@@ -26,9 +26,9 @@ import AlarmNotify from '@/views/settings/alarm/AlarmNotify.vue';
 import {createElButtonStub, createElFormStub, layoutStubs} from '../setup/stubs/element-plus';
 
 const alarmMocks = vi.hoisted(() => {
-  const listResponse = {data: {records: [{id: 'alarm-row-1', ruleName: 'Cooling threshold'}], total: 1}};
+  const listResponse = {items: [{id: 'alarm-row-1', ruleName: 'Cooling threshold'}], total: 1};
   const list = () => vi.fn(() => Promise.resolve(listResponse));
-  const mutate = () => vi.fn(() => Promise.resolve({data: true}));
+  const mutate = () => vi.fn(() => Promise.resolve(true));
 
   return {
     addMessage: mutate(),
@@ -150,7 +150,9 @@ describe('AlarmNotify view', () => {
       expect.objectContaining({
         ruleName: 'Cooling threshold',
         enableFlag: 'ENABLE',
-        page: expect.objectContaining({current: 1, size: 12}),
+        offset: 0,
+        limit: 12,
+        sort: [{field: 'create_time', direction: 'DESC'}],
       })
     );
   });

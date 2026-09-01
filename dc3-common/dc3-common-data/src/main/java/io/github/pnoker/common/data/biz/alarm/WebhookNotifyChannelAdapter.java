@@ -20,17 +20,12 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
-import io.github.pnoker.common.utils.JsonUtil;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -44,14 +39,13 @@ import java.util.Optional;
 @Service
 public class WebhookNotifyChannelAdapter implements NotifyChannelAdapter {
 
-    private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
-
-    protected final OkHttpClient okHttpClient;
+    protected final WebClient.Builder webClientBuilder;
 
     protected final NotifyCredentialResolver notifyCredentialResolver;
 
-    public WebhookNotifyChannelAdapter(OkHttpClient okHttpClient, NotifyCredentialResolver notifyCredentialResolver) {
-        this.okHttpClient = okHttpClient;
+    public WebhookNotifyChannelAdapter(WebClient.Builder webClientBuilder,
+                                       NotifyCredentialResolver notifyCredentialResolver) {
+        this.webClientBuilder = webClientBuilder;
         this.notifyCredentialResolver = notifyCredentialResolver;
     }
 
@@ -61,10 +55,10 @@ public class WebhookNotifyChannelAdapter implements NotifyChannelAdapter {
     }
 
     @Override
-    public NotifySendResult send(NotifyChannelBO channel, MessagePayload payload) {
+    public Mono<NotifySendResult> send(NotifyChannelBO channel, MessagePayload payload) {
         Optional<NotifyCredential> credentialOptional = notifyCredentialResolver.resolve(channel.getCredentialRef());
         if (credentialOptional.isEmpty() || StringUtils.isBlank(credentialOptional.get().getWebhookUrl())) {
-            return NotifySendResult.failed(channel.getCredentialRef(), "Notify credential is not configured");
+            return Mono.just(NotifySendResult.failed(channel.getCredentialRef(), "Notify credential is not configured"));
         }
 
         NotifyCredential credential = credentialOptional.get();
@@ -77,33 +71,29 @@ public class WebhookNotifyChannelAdapter implements NotifyChannelAdapter {
      * @param target     target
      * @param credential credential
      * @param body       body
-     * @return post json result
+     * @return asynchronous post json result
      */
-    protected NotifySendResult postJson(String target, NotifyCredential credential, Map<String, Object> body) {
-        String json = JsonUtil.toJsonString(body);
-        Request.Builder builder = new Request.Builder()
-                .url(credential.getWebhookUrl())
-                .post(RequestBody.create(json, JSON));
-        for (Map.Entry<String, String> header : credential.getHeaders().entrySet()) {
-            builder.header(header.getKey(), header.getValue());
-        }
-
-        try (Response response = okHttpClient.newCall(builder.build()).execute()) {
-            Map<String, Object> responsePayload = new LinkedHashMap<>();
-            responsePayload.put("code", response.code());
-            responsePayload.put("message", response.message());
-            ResponseBody responseBody = response.body();
-            if (responseBody != null) {
-                responsePayload.put("body", responseBody.string());
-            }
-            if (response.isSuccessful()) {
-                return NotifySendResult.success(target, response.code(), response.message(), responsePayload);
-            }
-            return new NotifySendResult(NotifyHistoryStatusEnum.FAILED, target, response.code(), response.message(),
-                    null, responsePayload, response.message());
-        } catch (IOException e) {
-            return NotifySendResult.failed(target, e.getMessage());
-        }
+    protected Mono<NotifySendResult> postJson(String target, NotifyCredential credential, Map<String, Object> body) {
+        return webClientBuilder.build().post()
+                .uri(credential.getWebhookUrl())
+                .headers(headers -> headers.setAll(credential.getHeaders()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .exchangeToMono(response -> response.bodyToMono(String.class).defaultIfEmpty("")
+                        .map(responseBody -> {
+                            Map<String, Object> responsePayload = new LinkedHashMap<>();
+                            responsePayload.put("code", response.statusCode().value());
+                            responsePayload.put("message", response.statusCode().toString());
+                            responsePayload.put("body", responseBody);
+                            if (response.statusCode().is2xxSuccessful()) {
+                                return NotifySendResult.success(target, response.statusCode().value(),
+                                        response.statusCode().toString(), responsePayload);
+                            }
+                            return new NotifySendResult(NotifyHistoryStatusEnum.FAILED, target,
+                                    response.statusCode().value(), response.statusCode().toString(), null,
+                                    responsePayload, responseBody);
+                        }))
+                .onErrorResume(error -> Mono.just(NotifySendResult.failed(target, error.getMessage())));
     }
 
 }

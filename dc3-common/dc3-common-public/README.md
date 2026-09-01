@@ -3,7 +3,7 @@
 ## Overview
 
 `dc3-common-public` is the foundational public contracts and utilities module of the IoT DC3 platform. It provides the
-universal response wrapper (`R<T>`), `BaseService`, shared request/pagination/tree entities, tenant markers, HTTP client
+shared `BaseService`, request/pagination/tree entities, tenant markers, and HTTP client
 configuration, HMAC signing, and framework-neutral utility functions.
 
 Java `public` visibility does not determine module ownership. Framework- or capability-specific public APIs and helpers
@@ -17,22 +17,10 @@ remain in the narrowest owning module; platform-wide constants and shared top-le
 
 ## Key Components
 
-### Response Wrapper
+### HTTP Responses
 
-`R<T>` is the standard REST response envelope used by all controllers:
-
-```java
-// Success with data
-return Mono.just(R.ok(entityVO));
-
-// Success with message
-return Mono.just(R.ok(SuccessCode.ADD));
-
-// Failure with message
-return Mono.just(R.fail(e.getMessage()));
-```
-
-Fields: `ok` (boolean), `code` (String), `message` (String), `data` (T)
+REST controllers return typed payloads directly. Errors use RFC 9457 `application/problem+json` problem details;
+there is no application-level success/error envelope.
 
 ### Common Entities
 

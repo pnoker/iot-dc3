@@ -79,7 +79,7 @@ interface DetailConfig {
   detailTitle: string;
   fields: DetailField[];
   extProps: string[];
-  load: (id: string) => Promise<R>;
+  load: (id: string) => Promise<unknown>;
 }
 
 const props = withDefaults(
@@ -286,7 +286,7 @@ const load = () => {
   activeConfig.value
     .load(reactiveData.id)
     .then((res: any) => {
-      reactiveData.data = res.data || {};
+      reactiveData.data = res || {};
     })
     .catch(() => {
       // handled globally

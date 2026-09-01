@@ -17,16 +17,18 @@
 
 package io.github.pnoker.common.data.biz.store.impl;
 
-import io.github.pnoker.common.data.biz.store.IngestIdempotencyWindow;
 import io.github.pnoker.common.data.biz.store.PointValueSampleConverter;
+import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.entity.builder.PointValueBuilder;
 import io.github.pnoker.common.data.entity.model.PointValueDO;
-import io.github.pnoker.common.data.mapper.PointValueMapper;
+import io.github.pnoker.common.data.repository.ReactivePointValueLatestStore;
+import io.github.pnoker.common.data.repository.ReactivePointValueIngestOutbox;
+import reactor.core.publisher.Mono;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
-import io.github.pnoker.common.tsdb.spi.TsdbStore;
+import io.github.pnoker.common.data.repository.ReactiveTsdbStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
@@ -54,7 +57,7 @@ import static org.mockito.Mockito.when;
 class PointValueIngestServiceImplTest {
 
     @Mock
-    private PointValueMapper pointValueMapper;
+    private ReactivePointValueLatestStore latestStore;
 
     @Mock
     private PointValueBuilder pointValueBuilder;
@@ -63,10 +66,13 @@ class PointValueIngestServiceImplTest {
     private DeviceFacade deviceFacade;
 
     @Mock
-    private TsdbStore tsdbStore;
+    private ReactiveTsdbStore reactiveTsdbStore;
 
     @Mock
-    private IngestIdempotencyWindow idempotencyWindow;
+    private ReactivePointValueIngestOutbox ingestOutbox;
+
+    @Mock
+    private AlarmRuleTriggerService alarmRuleTriggerService;
 
     @Spy
     private PointValueSampleConverter converter = new PointValueSampleConverter();
@@ -102,37 +108,61 @@ class PointValueIngestServiceImplTest {
         // same-size DO list keeps the test off MapStruct internals.
         lenient().when(pointValueBuilder.buildDOListByBOList(anyList())).thenAnswer(invocation -> {
             List<PointValueBO> input = invocation.getArgument(0);
-            return input.stream().map(bo -> new PointValueDO()).toList();
+            return input.stream().map(bo -> {
+                PointValueDO row = new PointValueDO();
+                row.setTenantId(bo.getTenantId());
+                row.setMessageId(bo.getMessageId());
+                row.setDeviceId(bo.getDeviceId());
+                row.setPointId(bo.getPointId());
+                row.setCreateTime(bo.getCreateTime());
+                return row;
+            }).toList();
         });
-        lenient().when(deviceFacade.getActiveOwner(1L, 10L))
-                .thenReturn(new FacadeDeviceOwnerBO(5L, "node-a", 7L));
+        lenient().when(pointValueBuilder.buildDOByBO(any())).thenAnswer(invocation -> {
+            PointValueBO bo = invocation.getArgument(0);
+            PointValueDO row = new PointValueDO();
+            row.setTenantId(bo.getTenantId());
+            row.setMessageId(bo.getMessageId());
+            return row;
+        });
+        lenient().when(deviceFacade.getActiveOwnerReactive(1L, 10L))
+                .thenReturn(Mono.just(new FacadeDeviceOwnerBO(5L, "node-a", 7L)));
+        lenient().when(reactiveTsdbStore.append(anyList())).thenReturn(Mono.just(1));
+        lenient().when(latestStore.upsertBatch(anyList())).thenReturn(Mono.just(1));
+        lenient().when(ingestOutbox.enqueue(anyList(), any())).thenAnswer(invocation ->
+                Mono.just(invocation.getArgument(0)));
+        lenient().when(ingestOutbox.findPersisted(anyList())).thenReturn(reactor.core.publisher.Flux.empty());
+        lenient().when(ingestOutbox.markPersisted(any(), any())).thenReturn(Mono.just(1));
+        lenient().when(ingestOutbox.markProcessed(any())).thenReturn(Mono.just(1));
+        lenient().when(ingestOutbox.markFailed(any(), any(), any())).thenReturn(Mono.just(1));
+        lenient().when(alarmRuleTriggerService.processPointValue(any())).thenReturn(Mono.empty());
     }
 
     @Test
     void nullAndEmptyBatchesAreNoOps() {
-        assertThat(service.saveValues(null)).isEmpty();
-        assertThat(service.saveValues(List.of())).isEmpty();
-        verify(tsdbStore, never()).append(anyList());
-        verify(pointValueMapper, never()).upsertLatestBatch(anyList());
+        assertThat(service.saveValues(null).block()).isEmpty();
+        assertThat(service.saveValues(List.of()).block()).isEmpty();
+        verify(reactiveTsdbStore, never()).append(anyList());
+        verify(latestStore, never()).upsertBatch(anyList());
     }
 
     @Test
     void staleOwnerEnvelopeIsDroppedBeforeAnyWrite() {
-        when(deviceFacade.getActiveOwner(1L, 10L)).thenReturn(new FacadeDeviceOwnerBO(5L, "node-b", 9L));
+        when(deviceFacade.getActiveOwnerReactive(1L, 10L)).thenReturn(Mono.just(new FacadeDeviceOwnerBO(5L, "node-b", 9L)));
 
-        List<PointValueBO> accepted = service.saveValues(List.of(value));
+        List<PointValueBO> accepted = service.saveValues(List.of(value)).block();
 
         assertThat(accepted).isEmpty();
-        verify(tsdbStore, never()).append(anyList());
-        verify(pointValueMapper, never()).upsertLatestBatch(anyList());
+        verify(reactiveTsdbStore, never()).append(anyList());
+        verify(latestStore, never()).upsertBatch(anyList());
     }
 
     @Test
     void missingOwnerLeaseIsDropped() {
-        when(deviceFacade.getActiveOwner(1L, 10L)).thenReturn(null);
+        when(deviceFacade.getActiveOwnerReactive(1L, 10L)).thenReturn(Mono.empty());
 
-        assertThat(service.saveValues(List.of(value))).isEmpty();
-        verify(tsdbStore, never()).append(anyList());
+        assertThat(service.saveValues(List.of(value)).block()).isEmpty();
+        verify(reactiveTsdbStore, never()).append(anyList());
     }
 
     @Test
@@ -140,67 +170,136 @@ class PointValueIngestServiceImplTest {
         PointValueBO broken = PointValueBO.builder()
                 .tenantId(1L).deviceId(10L).messageId("m-broken").build();
 
-        assertThat(service.saveValues(List.of(broken))).isEmpty();
-        verify(tsdbStore, never()).append(anyList());
+        assertThat(service.saveValues(List.of(broken)).block()).isEmpty();
+        verify(reactiveTsdbStore, never()).append(anyList());
     }
 
     @Test
-    void messageIdWithoutWindowEntryIsPersistedAndMarkedAfterwards() {
-        when(idempotencyWindow.seen("m-1")).thenReturn(false);
-
-        List<PointValueBO> accepted = service.saveValues(List.of(value));
+    void messageIdIsMarkedOnlyAfterDownstreamCompletion() {
+        List<PointValueBO> accepted = service.saveValues(List.of(value)).block();
 
         assertThat(accepted).containsExactly(value);
-        InOrder order = inOrder(tsdbStore, pointValueMapper, idempotencyWindow);
-        order.verify(tsdbStore).append(anyList());
-        order.verify(pointValueMapper).upsertLatestBatch(anyList());
-        order.verify(idempotencyWindow).mark("m-1");
+        InOrder order = inOrder(reactiveTsdbStore, latestStore);
+        order.verify(reactiveTsdbStore).append(anyList());
+        order.verify(latestStore).upsertBatch(anyList());
+        service.markProcessed(accepted).block();
+        verify(ingestOutbox).markProcessed(any());
     }
 
     @Test
-    void seenMessageIdIsSkippedWithoutTouchingTheStore() {
-        when(idempotencyWindow.seen("m-1")).thenReturn(true);
+    void durableReceiptIsEnqueuedBeforeTsdbWrite() {
+        service.saveValues(List.of(value)).block();
 
-        assertThat(service.saveValues(List.of(value))).isEmpty();
-        verify(tsdbStore, never()).append(anyList());
-        verify(pointValueMapper, never()).upsertLatestBatch(anyList());
+        InOrder order = inOrder(ingestOutbox, reactiveTsdbStore);
+        order.verify(ingestOutbox).enqueue(anyList(), any());
+        order.verify(reactiveTsdbStore).append(anyList());
+    }
+
+    @Test
+    void duplicateDurableReceiptIsNotWrittenAgain() {
+        when(ingestOutbox.enqueue(anyList(), any())).thenReturn(Mono.just(List.of()));
+
+        assertThat(service.saveValues(List.of(value)).block()).isEmpty();
+        verify(reactiveTsdbStore, never()).append(anyList());
+        verify(latestStore, never()).upsertBatch(anyList());
+    }
+
+    @Test
+    void replayFailureMovesReceiptToRetryState() {
+        PointValueDO row = new PointValueDO();
+        row.setTenantId(1L);
+        row.setMessageId("m-replay");
+        when(ingestOutbox.claim(any(), any(Integer.class))).thenReturn(reactor.core.publisher.Flux.just(row));
+        when(pointValueBuilder.buildBOByDO(row)).thenReturn(value("m-replay", 20L, 7L,
+                LocalDateTime.parse("2026-08-20T10:00:00")));
+        when(reactiveTsdbStore.append(anyList())).thenReturn(Mono.error(new IllegalStateException("tsdb down")));
+        assertThat(service.replayPending().block()).isZero();
+        verify(ingestOutbox).markFailed(eq(row), any(), eq("tsdb down"));
+    }
+
+    @Test
+    void replayRunsAlarmPipelineAndMarksReceiptProcessed() {
+        PointValueDO row = new PointValueDO();
+        row.setTenantId(1L);
+        row.setMessageId("m-replay-ok");
+        PointValueBO replayValue = value("m-replay-ok", 20L, 7L,
+                LocalDateTime.parse("2026-08-20T10:00:00"));
+        when(ingestOutbox.claim(any(), any(Integer.class))).thenReturn(reactor.core.publisher.Flux.just(row));
+        when(pointValueBuilder.buildBOByDO(row)).thenReturn(replayValue);
+        when(alarmRuleTriggerService.processPointValue(replayValue)).thenReturn(Mono.empty());
+
+        assertThat(service.replayPending().block()).isEqualTo(1);
+
+        verify(alarmRuleTriggerService).processPointValue(replayValue);
+        InOrder order = inOrder(ingestOutbox, alarmRuleTriggerService);
+        order.verify(alarmRuleTriggerService).processPointValue(replayValue);
+        order.verify(ingestOutbox).markPersisted(eq(row), any());
+        order.verify(ingestOutbox).markProcessed(row);
+    }
+
+    @Test
+    void replayAlarmFailureRequeuesAndDoesNotMarkProcessed() {
+        PointValueDO row = new PointValueDO();
+        row.setTenantId(1L);
+        row.setMessageId("m-replay-alarm-fail");
+        PointValueBO replayValue = value("m-replay-alarm-fail", 20L, 7L,
+                LocalDateTime.parse("2026-08-20T10:00:00"));
+        when(ingestOutbox.claim(any(), any(Integer.class))).thenReturn(reactor.core.publisher.Flux.just(row));
+        when(pointValueBuilder.buildBOByDO(row)).thenReturn(replayValue);
+        when(alarmRuleTriggerService.processPointValue(replayValue))
+                .thenReturn(Mono.error(new IllegalStateException("alarm down")));
+
+        assertThat(service.replayPending().block()).isZero();
+
+        verify(ingestOutbox).markFailed(eq(row), any(), eq("alarm down"));
+        verify(ingestOutbox, never()).markProcessed(row);
+    }
+
+    @Test
+    void replayCompletionFailureRequeuesReceipt() {
+        PointValueDO row = new PointValueDO();
+        row.setTenantId(1L);
+        row.setMessageId("m-replay-complete-fail");
+        PointValueBO replayValue = value("m-replay-complete-fail", 20L, 7L,
+                LocalDateTime.parse("2026-08-20T10:00:00"));
+        when(ingestOutbox.claim(any(), any(Integer.class))).thenReturn(reactor.core.publisher.Flux.just(row));
+        when(pointValueBuilder.buildBOByDO(row)).thenReturn(replayValue);
+        when(ingestOutbox.markProcessed(row)).thenReturn(Mono.just(0));
+
+        assertThat(service.replayPending().block()).isZero();
+
+        verify(ingestOutbox).markFailed(eq(row), any(), any());
     }
 
     @Test
     void duplicateMessageIdWithinBatchKeepsOnlyTheFirst() {
         PointValueBO duplicate = value("m-1", 21L, 7L, LocalDateTime.parse("2026-08-20T10:00:01"));
-        when(idempotencyWindow.seen("m-1")).thenReturn(false);
-
-        List<PointValueBO> accepted = service.saveValues(List.of(value, duplicate));
+        List<PointValueBO> accepted = service.saveValues(List.of(value, duplicate)).block();
 
         assertThat(accepted).containsExactly(value);
         ArgumentCaptor<List<PointValueSample>> samples = ArgumentCaptor.forClass(List.class);
-        verify(tsdbStore).append(samples.capture());
+        verify(reactiveTsdbStore).append(samples.capture());
         assertThat(samples.getValue()).hasSize(1);
     }
 
     @Test
     void nullMessageIdIsDroppedWithTheRestPersisted() {
         PointValueBO noMessageId = value(null, 21L, 7L, LocalDateTime.parse("2026-08-20T10:00:00"));
-        when(idempotencyWindow.seen("m-1")).thenReturn(false);
-
-        List<PointValueBO> accepted = service.saveValues(List.of(noMessageId, value));
+        List<PointValueBO> accepted = service.saveValues(List.of(noMessageId, value)).block();
 
         assertThat(accepted).containsExactly(value);
-        verify(tsdbStore).append(anyList());
+        verify(reactiveTsdbStore).append(anyList());
     }
 
     @Test
     void upsertReceivesIngestOrderedRowsWhileAcceptedKeepsInputOrder() {
         // input order deliberately inverted relative to INGEST_ORDER (point asc)
         PointValueBO laterPoint = value("m-2", 21L, 7L, LocalDateTime.parse("2026-08-20T10:00:00"));
-        when(idempotencyWindow.seen(any())).thenReturn(false);
-
-        List<PointValueBO> accepted = service.saveValues(List.of(laterPoint, value));
+        List<PointValueBO> accepted = service.saveValues(List.of(laterPoint, value)).block();
 
         assertThat(accepted).containsExactly(laterPoint, value);
         ArgumentCaptor<List<PointValueSample>> appended = ArgumentCaptor.forClass(List.class);
-        verify(tsdbStore).append(appended.capture());
+        verify(reactiveTsdbStore).append(appended.capture());
         assertThat(appended.getValue().getFirst().series().pointId()).isEqualTo(20L);
         assertThat(appended.getValue().get(1).series().pointId()).isEqualTo(21L);
     }
@@ -208,22 +307,19 @@ class PointValueIngestServiceImplTest {
     @Test
     void leaseOwnerIsResolvedOncePerDistinctDevice() {
         PointValueBO otherPointSameDevice = value("m-2", 21L, 7L, LocalDateTime.parse("2026-08-20T10:00:00"));
-        when(idempotencyWindow.seen(any())).thenReturn(false);
+        service.saveValues(List.of(value, otherPointSameDevice)).block();
 
-        service.saveValues(List.of(value, otherPointSameDevice));
-
-        verify(deviceFacade).getActiveOwner(1L, 10L);
+        verify(deviceFacade).getActiveOwnerReactive(1L, 10L);
     }
 
     @Test
     void storeFailurePropagatesAndNothingIsMarked() {
-        when(idempotencyWindow.seen("m-1")).thenReturn(false);
-        when(tsdbStore.append(anyList())).thenThrow(new IllegalStateException("store down"));
+        when(reactiveTsdbStore.append(anyList())).thenReturn(Mono.error(new IllegalStateException("store down")));
 
-        assertThatThrownBy(() -> service.saveValues(List.of(value)))
+        assertThatThrownBy(() -> service.saveValues(List.of(value)).block())
                 .isInstanceOf(IllegalStateException.class);
-        verify(pointValueMapper, never()).upsertLatestBatch(anyList());
-        verify(idempotencyWindow, never()).mark(any());
+        verify(latestStore, never()).upsertBatch(anyList());
+        verify(ingestOutbox, never()).markPersisted(any(), any());
     }
 
 }

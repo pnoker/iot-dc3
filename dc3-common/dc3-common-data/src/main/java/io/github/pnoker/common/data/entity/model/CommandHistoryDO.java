@@ -17,10 +17,6 @@
 
 package io.github.pnoker.common.data.entity.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
 import io.github.pnoker.common.enums.CommandHistorySourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import lombok.Getter;
@@ -40,73 +36,51 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName(value = "dc3_command_history")
 public class CommandHistoryDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
-    @TableField("record_id")
     private String recordId;
 
-    @TableField("tenant_id")
     private Long tenantId;
 
-    @TableField("device_id")
     private Long deviceId;
 
-    @TableField("command_id")
     private Long commandId;
 
-    @TableField("command_code")
     private String commandCode;
 
-    @TableField("param_values")
     private String paramValues;
 
-    @TableField("result_values")
     private String resultValues;
 
-    @TableField("config_snapshot")
     private String configSnapshot;
 
-    @TableField("status")
     private PointCommandStatusEnum status;
 
-    @TableField("error_code")
     private String errorCode;
 
-    @TableField("error_message")
     private String errorMessage;
 
-    @TableField("source")
     private CommandHistorySourceEnum source;
 
-    @TableField("source_user_id")
     private Long sourceUserId;
 
-    @TableField("occur_time")
     private LocalDateTime occurTime;
 
-    @TableField("send_time")
     private LocalDateTime sendTime;
 
-    @TableField("finish_time")
     private LocalDateTime finishTime;
 
-    @TableField("expire_time")
     private LocalDateTime expireTime;
 
-    @TableField("schema_version")
     private Short schemaVersion;
 
-    @TableField("create_time")
     private LocalDateTime createTime;
 
-    @TableField("operate_time")
     private LocalDateTime operateTime;
 
 }

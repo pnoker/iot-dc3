@@ -383,7 +383,7 @@ const showEdit = (row: CommandRecord) => {
     reactiveData.paramLoading = true;
     listCommandParamByCommandId(String(row.id))
       .then((res) => {
-        reactiveData.originalParams = res.data || [];
+        reactiveData.originalParams = res || [];
         reactiveData.params = cloneParams(reactiveData.originalParams);
       })
       .finally(() => {

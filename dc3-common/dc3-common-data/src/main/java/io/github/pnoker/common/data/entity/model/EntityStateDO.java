@@ -17,11 +17,6 @@
 
 package io.github.pnoker.common.data.entity.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,94 +39,77 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName(value = "dc3_entity_state", autoResultMap = true)
 public class EntityStateDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
      * Entity type flag (matches EntityTypeEnum: DRIVER=3, DEVICE=6)
      */
-    @TableField("entity_type_flag")
     private Byte entityTypeFlag;
 
     /**
      * Entity ID (driver ID or device ID)
      */
-    @TableField("entity_id")
     private Long entityId;
 
     /**
      * Parent entity ID. For driver entries this is 0; for device entries the owning driver.
      */
-    @TableField("parent_entity_id")
     private Long parentEntityId;
 
     /**
      * Current status index ({@link io.github.pnoker.common.enums.EntityStatusEnum} index)
      */
-    @TableField("entity_state_flag")
     private Byte stateFlag;
 
     /**
      * Last state flag, default OFFLINE (1)
      */
-    @TableField("last_state_flag")
     private Byte lastStateFlag;
 
     /**
      * Monotonic version incremented on each heartbeat renewal
      */
-    @TableField("lease_version")
     private Long leaseVersion;
 
     /**
      * Absolute time when this lease expires
      */
-    @TableField("expire_time")
     private LocalDateTime expireTime;
 
     /**
      * Timeout in seconds used for this entry
      */
-    @TableField("timeout_seconds")
     private Integer timeoutSeconds;
 
     /**
      * Latest heartbeat time
      */
-    @TableField("last_heartbeat_time")
     private LocalDateTime lastHeartbeatTime;
 
     /**
      * Latest alarm ID, default 0
      */
-    @TableField("last_alarm_id")
     private Long lastAlarmId;
 
     /**
      * Timeout source (TimeoutSourceTypeEnum), default 0
      */
-    @TableField("timeout_source_flag")
     private Byte timeoutSourceFlag;
 
     /**
      * JSON extension payload
      */
-    @TableField(value = "entity_state_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt stateExt;
 
-    @TableField("tenant_id")
     private Long tenantId;
 
-    @TableField("create_time")
     private LocalDateTime createTime;
 
-    @TableField("operate_time")
     private LocalDateTime operateTime;
 
 }

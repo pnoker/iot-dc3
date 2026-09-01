@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
 import io.github.pnoker.common.data.entity.model.NotifyChannelBindDO;
 import io.github.pnoker.common.data.entity.vo.NotifyChannelBindVO;
@@ -26,7 +25,6 @@ import io.github.pnoker.common.entity.ext.NotifyChannelBindExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -165,18 +163,10 @@ public interface NotifyChannelBindBuilder {
      * @param entityPageDO persistence object
      * @return converted value
      */
-    default Page<NotifyChannelBindBO> buildBOPageByDOPage(Page<NotifyChannelBindDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
     /**
      * Convert bo page to vo page.
      *
      * @param entityPageBO business object
      * @return converted value
      */
-    default Page<NotifyChannelBindVO> buildVOPageByBOPage(Page<NotifyChannelBindBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

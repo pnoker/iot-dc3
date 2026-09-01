@@ -124,14 +124,14 @@ ON VIEW cagg_point_value_1h IS 'One-hour hierarchical point-value continuous agg
 -- lifecycle); the refresh offsets predate that on purpose so rebuilding the
 -- materialized tiers after a drop still folds whatever raw history exists.
 SELECT add_continuous_aggregate_policy('cagg_point_value_1m',
-                                       start_offset = > INTERVAL '7 days',
-                                       end_offset = > INTERVAL '1 minute',
-                                       schedule_interval = > INTERVAL '1 minute');
+                                       start_offset => INTERVAL '7 days',
+                                       end_offset => INTERVAL '1 minute',
+                                       schedule_interval => INTERVAL '1 minute');
 
 SELECT add_continuous_aggregate_policy('cagg_point_value_1h',
-                                       start_offset = > INTERVAL '180 days',
-                                       end_offset = > INTERVAL '5 minutes',
-                                       schedule_interval = > INTERVAL '5 minutes');
+                                       start_offset => INTERVAL '180 days',
+                                       end_offset => INTERVAL '5 minutes',
+                                       schedule_interval => INTERVAL '5 minutes');
 
 -- S16 tiered lifecycle: the minute tier ages out after one year; the hour tier
 -- is kept forever. The timescale adapter registers the same policy with

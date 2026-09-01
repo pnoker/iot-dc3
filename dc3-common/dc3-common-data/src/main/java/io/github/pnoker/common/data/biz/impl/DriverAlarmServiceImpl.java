@@ -19,8 +19,8 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.data.biz.DriverAlarmService;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
+import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
@@ -30,6 +30,7 @@ import io.github.pnoker.common.enums.AlarmTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
@@ -47,16 +48,16 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DriverAlarmServiceImpl implements DriverAlarmService {
 
-    private final EntityAlarmManager entityAlarmManager;
+    private final ReactiveEntityAlarmStore entityAlarmStore;
 
     private final AlarmRuleTriggerService alarmRuleTriggerService;
 
     @Override
-    public void alarm(DriverAlarmDTO entityDTO) {
+    public Mono<Void> alarm(DriverAlarmDTO entityDTO) {
         if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())) {
             log.warn("Driver alarm dropped, reason=missingDriverId, tenantId={}",
                     Objects.nonNull(entityDTO) ? entityDTO.getTenantId() : null);
-            return;
+            return Mono.empty();
         }
 
         Long tenantId = entityDTO.getTenantId();
@@ -64,7 +65,7 @@ public class DriverAlarmServiceImpl implements DriverAlarmService {
             // See DeviceAlarmServiceImpl: tenant must come from the upstream source; the
             // fail-closed interceptor forbids reverse-resolving it from the driver.
             log.warn("Driver alarm dropped, reason=missingTenantId, driverId={}", entityDTO.getDriverId());
-            return;
+            return Mono.empty();
         }
         entityDTO.setTenantId(tenantId);
 
@@ -85,10 +86,11 @@ public class DriverAlarmServiceImpl implements DriverAlarmService {
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
         entity.setTenantId(tenantId);
-        entityAlarmManager.save(entity);
-
-        entityDTO.setAlarmId(entity.getId());
-        alarmRuleTriggerService.processDriverAlarm(entityDTO);
+        return entityAlarmStore.insert(entity)
+                .flatMap(saved -> {
+                    entityDTO.setAlarmId(saved.getId());
+                    return alarmRuleTriggerService.processDriverAlarm(entityDTO);
+                }).then();
     }
 
 }

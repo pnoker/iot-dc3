@@ -16,14 +16,14 @@
  */
 
 interface PageInput {
-  current: number;
-  size: number;
+  offset: number;
+  limit: number;
 }
 
 /** Read pagination from a PageQuery body, defaulting to the usePagedList norms. */
 export const readPage = (body: any): PageInput => ({
-  current: Number(body?.page?.current ?? 1),
-  size: Number(body?.page?.size ?? 12),
+  offset: Math.max(0, Number(body?.offset ?? 0)),
+  limit: Math.min(200, Math.max(1, Number(body?.limit ?? 12))),
 });
 
 /** Case-insensitive substring match, the common driver/device/profile/point search. */
@@ -36,15 +36,15 @@ export const matches = (value: unknown, term: unknown): boolean => {
 
 /**
  * Mimic server-side pagination + filtering. Returns the PageResult shape
- * ({total, records}) that usePagedList reads from response.data.
+ * ({items, offset, limit, total, hasNext}) that usePagedList reads from response.
  */
 export const paginate = <T extends Record<string, any>>(
   rows: T[],
   body: any,
   filter?: (row: T, body: any) => boolean,
-): { total: number; records: T[] } => {
-  const {current, size} = readPage(body);
+): { items: T[]; offset: number; limit: number; total: number; hasNext: boolean } => {
+  const {offset, limit} = readPage(body);
   const filtered = filter ? rows.filter((row) => filter(row, body)) : rows;
-  const start = (current - 1) * size;
-  return {total: filtered.length, records: filtered.slice(start, start + size)};
+  const items = filtered.slice(offset, offset + limit);
+  return {items, offset, limit, total: filtered.length, hasNext: offset + items.length < filtered.length};
 };

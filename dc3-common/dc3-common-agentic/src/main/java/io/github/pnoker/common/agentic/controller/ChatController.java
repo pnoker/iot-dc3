@@ -20,7 +20,6 @@ import io.github.pnoker.common.agentic.entity.vo.ChatCompletionRequestVO;
 import io.github.pnoker.common.agentic.service.AgenticChatService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
@@ -61,7 +60,7 @@ public class ChatController implements BaseController {
      * OpenAI-compatible JSON response.
      *
      * @param request chat completion payload carrying the prompt, conversation context, model selection and stream flag
-     * @return a streaming SSE entity when stream is true, otherwise a JSON entity wrapping the full completion reply in R
+     * @return a streaming SSE entity when stream is true, otherwise the completion resource as JSON
      */
     @PreAuthorize("@perm.can('chat', 'list')")
     @Operation(summary = "Create Chat Completion", description = "Submit a chat prompt with conversation context and receive the assistant reply using the OpenAI-compatible completion format. "
@@ -83,7 +82,7 @@ public class ChatController implements BaseController {
             return agenticChatService.chatCompletion(request, header)
                     .map(response -> ResponseEntity.ok()
                             .contentType(MediaType.APPLICATION_JSON)
-                            .body(R.ok(response)));
+                            .body(response));
         });
     }
 

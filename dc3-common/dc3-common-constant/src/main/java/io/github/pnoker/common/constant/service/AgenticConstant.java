@@ -175,6 +175,8 @@ public class AgenticConstant {
          */
         public static final String FINISH_REASON_ERROR = "error";
 
+        public static final String FINISH_REASON_CANCELLED = "cancelled";
+
         private Chat() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }

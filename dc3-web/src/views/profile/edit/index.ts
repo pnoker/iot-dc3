@@ -66,15 +66,15 @@ export default defineComponent({
 
     const profile = () => {
       getProfileById(reactiveData.id as string).then((res) => {
-        reactiveData.profileFormData = res.data;
-        reactiveData.oldProfileFormData = {...res.data};
+        reactiveData.profileFormData = res;
+        reactiveData.oldProfileFormData = {...res};
       });
     };
 
     const profileSave = async () => {
       try {
         const res = await updateProfile(reactiveData.profileFormData);
-        reactiveData.oldProfileFormData = {...res.data};
+        reactiveData.oldProfileFormData = {...res};
       } catch {
         // API error
       }

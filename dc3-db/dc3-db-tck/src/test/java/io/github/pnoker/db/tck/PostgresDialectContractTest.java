@@ -17,7 +17,6 @@
 
 package io.github.pnoker.db.tck;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -45,10 +44,7 @@ class PostgresDialectContractTest extends AbstractDbDialectContractTest {
                     .withPassword("dc3")
                     // 00-iot-dc3-extensions (age, pgvector) is absent from this
                     // image — only the production base image carries those; the
-                    // dialect contract does not touch them, so mount 01..07 only
-                    .withCopyFileToContainer(
-                            MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/01-iot-dc3-common.sql"),
-                            "/docker-entrypoint-initdb.d/01-iot-dc3-common.sql")
+                    // dialect contract does not touch them.
                     .withCopyFileToContainer(
                             MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/02-iot-dc3-auth.sql"),
                             "/docker-entrypoint-initdb.d/02-iot-dc3-auth.sql")
@@ -63,6 +59,9 @@ class PostgresDialectContractTest extends AbstractDbDialectContractTest {
                     .withCopyFileToContainer(
                             MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/06-iot-dc3-agentic.sql"),
                             "/docker-entrypoint-initdb.d/06-iot-dc3-agentic.sql")
+                    .withCopyFileToContainer(
+                            MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/08-iot-dc3-runtime.sql"),
+                            "/docker-entrypoint-initdb.d/08-iot-dc3-runtime.sql")
                     // log-following is unreliable against podman; the listening
                     // TCP port (5432) flips when the postmaster is ready
                     .waitingFor(org.testcontainers.containers.wait.strategy.Wait.forListeningPort()
@@ -91,51 +90,32 @@ class PostgresDialectContractTest extends AbstractDbDialectContractTest {
     }
 
     @Override
-    protected String jdbcUrl(String database) {
-        return POSTGRES.getJdbcUrl() + "&currentSchema=" + database;
+    protected String r2dbcUrl() {
+        return "r2dbc:postgresql://dc3:dc3@" + POSTGRES.getHost() + ":" + POSTGRES.getMappedPort(5432) + "/dc3";
     }
 
     @Override
-    protected void registerDialectHandlers(org.apache.ibatis.session.Configuration configuration) {
-        configuration.getTypeHandlerRegistry().register(java.time.LocalDateTime.class,
-                io.github.pnoker.common.handler.TimestamptzLocalDateTimeTypeHandler.class);
-    }
-
-    @BeforeAll
-    void awaitPostmaster() throws Exception {
-        // the TCP port opens during the initdb phase (local-only) and closes
-        // again for the restart into the seeded runtime; poll a real JDBC
-        // handshake instead of trusting port or log readiness
-        long deadline = System.currentTimeMillis() + 5 * 60 * 1000;
-        while (System.currentTimeMillis() < deadline) {
-            try {
-                java.sql.DriverManager.getConnection(jdbcUrl("dc3_data"), username(), password()).close();
-                return;
-            } catch (Exception ignored) {
-                // still initializing or restarting
-            }
-            Thread.sleep(2000);
-        }
-        throw new IllegalStateException("postmaster never accepted JDBC connections");
-    }
-
-    @Override
-    protected String databaseId() {
+    protected String dialectName() {
         return "postgres";
     }
 
     @Override
-    protected String driverClass() {
-        return "org.postgresql.Driver";
+    protected String fingerprintTable() {
+        return "public.dc3_schema_fingerprint";
     }
 
     @Override
-    protected String username() {
-        return POSTGRES.getUsername();
+    protected String operationTable() {
+        return "public.dc3_point_value_ingest_outbox";
     }
 
     @Override
-    protected String password() {
-        return POSTGRES.getPassword();
+    protected String alarmTable() {
+        return "dc3_data.dc3_entity_alarm";
+    }
+
+    @Override
+    protected String notifyHistoryTable() {
+        return "dc3_data.dc3_notify_history";
     }
 }

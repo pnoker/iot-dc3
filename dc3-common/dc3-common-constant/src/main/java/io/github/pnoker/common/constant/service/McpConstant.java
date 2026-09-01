@@ -544,6 +544,11 @@ public class McpConstant {
         public static final String SCOPE = "scope";
 
         /**
+         * OAuth authorization request consent decision (approve or deny).
+         */
+        public static final String CONSENT = "consent";
+
+        /**
          * OAuth/MCP wire name for the SERVICE_ACCOUNT_PRINCIPAL_ID field.
          */
         public static final String SERVICE_ACCOUNT_PRINCIPAL_ID = "service_account_principal_id";

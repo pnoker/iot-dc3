@@ -100,7 +100,7 @@ const load = () => {
   if (!reactiveData.id) return;
   getMenuById(reactiveData.id)
     .then((res: any) => {
-      reactiveData.data = res.data || {};
+      reactiveData.data = res || {};
     })
     .catch(() => {
       // handled globally

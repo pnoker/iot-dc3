@@ -41,7 +41,7 @@ CREATE TABLE dc3_notify
     notify_code       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Notification code
     auto_confirm_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Auto-confirm flag
     notify_interval   BIGINT   DEFAULT 0 NOT NULL,                 -- Notification interval, milliseconds
-    notify_ext        JSON     DEFAULT '{}'::JSON        NOT NULL, -- Notification configuration
+    notify_ext        JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Notification configuration
     enable_flag       SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
     tenant_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
     remark            TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
@@ -110,7 +110,7 @@ CREATE TABLE dc3_notify_channel
     channel_code      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Notification channel code
     channel_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Notification channel type flag
     credential_ref    TEXT     DEFAULT ''::TEXT          NOT NULL, -- Credential reference
-    channel_ext       JSON     DEFAULT '{}'::JSON        NOT NULL, -- Notification channel configuration
+    channel_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Notification channel configuration
     enable_flag       SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
     tenant_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
     remark            TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
@@ -177,7 +177,7 @@ CREATE TABLE dc3_notify_channel_bind
     id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
     notify_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Notification ID
     channel_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Notification channel ID
-    bind_ext      JSON     DEFAULT '{}'::JSON        NOT NULL,   -- Notification channel binding configuration
+    bind_ext      JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Notification channel binding configuration
     enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
     tenant_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Tenant ID
     remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
@@ -242,7 +242,7 @@ CREATE TABLE dc3_message
     message_name  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Message name
     message_code  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Message code
     message_level SMALLINT DEFAULT 2 NOT NULL,                   -- Message level
-    message_ext   JSON     DEFAULT '{}'::JSON        NOT NULL,   -- Message configuration
+    message_ext   JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Message configuration
     enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
     tenant_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Tenant ID
     remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
@@ -311,7 +311,7 @@ CREATE TABLE dc3_rule
     entity_id              BIGINT   DEFAULT 0 NOT NULL,                 -- Entity ID
     notify_id              BIGINT   DEFAULT 0 NOT NULL,                 -- Notification ID
     message_id             BIGINT   DEFAULT 0 NOT NULL,                 -- Message ID
-    rule_ext               JSON     DEFAULT '{}'::JSON        NOT NULL, -- Rule configuration
+    rule_ext               JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Rule configuration
     enable_flag            SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
     tenant_id              BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
     remark                 TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
@@ -396,7 +396,7 @@ CREATE TABLE dc3_rule_state
     last_notify_time TIMESTAMPTZ,                                       -- Last notification time
     trigger_count          BIGINT   DEFAULT 0 NOT NULL,                 -- Trigger count
     alarm_id               BIGINT   DEFAULT 0 NOT NULL,                 -- Latest alarm ID (dc3_entity_alarm.id)
-    entity_state_ext       JSON     DEFAULT '{}'::JSON        NOT NULL, -- Rule state extension
+    entity_state_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Rule state extension
     tenant_id              BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
     remark                 TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
     creator_id             BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
@@ -475,11 +475,12 @@ CREATE TABLE dc3_notify_history
     message_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Message ID
     channel_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Notification channel ID
     alarm_id          BIGINT   DEFAULT 0 NOT NULL,                 -- Alarm ID (dc3_entity_alarm.id)
+    dedupe_key        TEXT,
     channel_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Notification channel type flag
     target            TEXT     DEFAULT ''::TEXT          NOT NULL, -- Notification target
     status_flag       SMALLINT DEFAULT 0 NOT NULL,                 -- Notification history status flag
-    request_ext       JSON     DEFAULT '{}'::JSON        NOT NULL, -- Notification request
-    response_ext      JSON     DEFAULT '{}'::JSON        NOT NULL, -- Notification response
+    request_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Notification request
+    response_ext      JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Notification response
     error_message     TEXT     DEFAULT ''::TEXT          NOT NULL, -- Error message
     retry_count       INTEGER  DEFAULT 0 NOT NULL,                 -- Retry count
     tenant_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
@@ -500,6 +501,7 @@ CREATE INDEX idx_notify_history_alarm ON dc3_notify_history (tenant_id, alarm_id
 CREATE INDEX idx_notify_history_channel ON dc3_notify_history (tenant_id, channel_id, status_flag, create_time DESC);
 -- Pending-task scan index used by the NotifyWorker replay/reaper paths.
 CREATE INDEX idx_notify_history_pending ON dc3_notify_history (tenant_id, status_flag, create_time);
+CREATE UNIQUE INDEX uq_notify_history_dedupe ON dc3_notify_history (tenant_id, dedupe_key);
 
 CREATE TRIGGER update_operate_time_trigger
     BEFORE UPDATE
@@ -521,6 +523,8 @@ COMMENT
 ON COLUMN dc3_notify_history.channel_id IS 'Notification channel ID';
 COMMENT
 ON COLUMN dc3_notify_history.alarm_id IS 'Alarm ID (dc3_entity_alarm.id)';
+COMMENT
+ON COLUMN dc3_notify_history.dedupe_key IS 'Tenant-scoped notification delivery idempotency key';
 COMMENT
 ON COLUMN dc3_notify_history.channel_type_flag IS 'Notification channel type flag';
 COMMENT
@@ -565,10 +569,11 @@ CREATE TABLE dc3_entity_alarm
     point_id               BIGINT   DEFAULT 0 NOT NULL,                 -- Point ID
     rule_id                BIGINT   DEFAULT 0 NOT NULL,                 -- Rule ID
     rule_state_id          BIGINT   DEFAULT 0 NOT NULL,                 -- Rule state ID
+    dedupe_key             VARCHAR(256),                                -- Source-derived idempotency key
     alarm_type_flag        SMALLINT DEFAULT 0 NOT NULL,                 -- Alarm type flag, 0: rule, 1: offline, 2: fault, 3: state flip, 4: report
     alarm_source_flag      SMALLINT DEFAULT 0 NOT NULL,                 -- Alarm source flag, 0: rule, 1: state timeout, 2: device report, 3: driver report, 4: system, 5: event report
     alarm_level_flag       SMALLINT DEFAULT 2 NOT NULL,                 -- Alarm level flag, 0: P0, 1: P1, 2: P2, 3: P3
-    alarm_ext              JSON     DEFAULT '{}'::JSON        NOT NULL, -- Alarm extension information
+    alarm_ext              JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Alarm extension information
     expired_time           BIGINT   DEFAULT 0 NOT NULL,                 -- Expiration duration, seconds
     confirm_flag           SMALLINT DEFAULT 0 NOT NULL,                 -- Confirmation flag, 0: unconfirmed, 1: confirmed
     tenant_id              BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
@@ -589,6 +594,7 @@ CREATE INDEX idx_entity_alarm_driver ON dc3_entity_alarm (tenant_id, driver_id, 
 CREATE INDEX idx_entity_alarm_device ON dc3_entity_alarm (tenant_id, device_id, create_time DESC);
 CREATE INDEX idx_entity_alarm_point ON dc3_entity_alarm (tenant_id, point_id, create_time DESC);
 CREATE INDEX idx_entity_alarm_rule ON dc3_entity_alarm (tenant_id, rule_id, create_time DESC);
+CREATE UNIQUE INDEX idx_entity_alarm_dedupe ON dc3_entity_alarm (tenant_id, dedupe_key);
 
 CREATE TRIGGER update_operate_time_trigger
     BEFORE UPDATE
@@ -614,6 +620,7 @@ COMMENT
 ON COLUMN dc3_entity_alarm.rule_id IS 'Rule ID';
 COMMENT
 ON COLUMN dc3_entity_alarm.rule_state_id IS 'Rule state ID';
+COMMENT ON COLUMN dc3_entity_alarm.dedupe_key IS 'Tenant-scoped source-derived idempotency key';
 COMMENT
 ON COLUMN dc3_entity_alarm.alarm_type_flag IS 'Alarm type flag, 0: rule, 1: offline, 2: fault, 3: state flip, 4: report';
 COMMENT
@@ -650,7 +657,7 @@ CREATE TABLE dc3_entity_state
     last_heartbeat_time TIMESTAMPTZ NOT NULL,                        -- Latest heartbeat time
     last_alarm_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Latest related alarm ID
     timeout_source_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Timeout source flag, 0: system, 1: driver, 2: device, 3: profile
-    entity_state_ext    JSON     DEFAULT '{}'::JSON        NOT NULL, -- State extension information
+    entity_state_ext    JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- State extension information
     tenant_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
     create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,      -- Creation time
     operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Operation time
@@ -740,9 +747,9 @@ CREATE TABLE dc3_point_command_history
     CONSTRAINT chk_point_command_history_source CHECK (source BETWEEN 0 AND 3)
 );
 
--- command_id is the external correlation key used by HTTP and RabbitMQ callbacks.
+-- command_id is an external correlation key scoped to its tenant.
 CREATE UNIQUE INDEX idx_point_command_history_unique
-    ON dc3_point_command_history (command_id);
+    ON dc3_point_command_history (tenant_id, command_id);
 
 -- Tenant-scoped command history pages sort by occurrence time.
 CREATE INDEX idx_point_command_history_tenant_time

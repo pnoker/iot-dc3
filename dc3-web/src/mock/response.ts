@@ -16,13 +16,8 @@
  */
 
 import type {AxiosResponse, InternalAxiosRequestConfig} from 'axios';
+import type {PageResult} from '@/config/types';
 
-/**
- * Build a minimal AxiosResponse, mirroring the adapter contract verified in
- * tests/unit/axios.test.ts. The response interceptor returns response.data
- * verbatim when ok===true, so `data` here MUST be the full R envelope — never
- * the inner payload.
- */
 export const responseOf = (
   config: InternalAxiosRequestConfig,
   data: unknown,
@@ -31,21 +26,35 @@ export const responseOf = (
   data,
   status,
   statusText: String(status),
-  headers: {},
+  headers: {'content-type': status >= 400 ? 'application/problem+json' : 'application/json'},
   config,
   request: {},
 });
 
-/**
- * R envelope constructors. The interceptor gates success on the `ok` boolean
- * alone; code is always '0' and must never be 'R4031'/'R4032' (those trigger
- * the change-password pass-through in the login flow).
- */
-export const ok = <T = unknown>(data: T): R<T> => ({ok: true, code: '0', message: 'success', data});
+export interface ProblemDetails {
+  type: string;
+  title: string;
+  status: number;
+  code: string;
+  detail: string;
+}
 
-export const fail = (code: string, message: string): R<null> => ({ok: false, code, message, data: null});
+export const ok = <T = unknown>(data: T): T => data;
 
-export const okPage = <T>(records: T[], total = records.length): R<{ total: number; records: T[] }> =>
-  ok({total, records});
+export const fail = (code: string, message: string, status = 400): ProblemDetails => ({
+  type: 'about:blank',
+  title: message,
+  status,
+  code,
+  detail: message,
+});
 
-export const okArray = <T>(data: T[]): R<T[]> => ok(data);
+export const okPage = <T>(items: T[], total = items.length, offset = 0, limit = items.length || 1): PageResult<T> => ({
+  items,
+  offset,
+  limit,
+  total,
+  hasNext: offset + items.length < total,
+});
+
+export const okArray = <T>(data: T[]): T[] => data;

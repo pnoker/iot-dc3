@@ -19,6 +19,7 @@ package io.github.pnoker.driver.mqtt.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.EventRuntimeBO;
 import io.github.pnoker.common.driver.entity.dto.EventAttributeConfigDTO;
 import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
@@ -31,8 +32,6 @@ import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
-import io.github.pnoker.common.facade.api.EventFacade;
-import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
 import io.github.pnoker.common.mqtt.entity.MessageHeader;
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,9 +57,6 @@ class MqttReceiveServiceImplTest {
     private DriverSenderService driverSenderService;
     @Mock
     private DeviceClient deviceClient;
-    @Mock
-    private EventFacade eventFacade;
-
     private DriverMetadata driverMetadata;
     private DeviceMetadata deviceMetadata;
     private MqttReceiveServiceImpl service;
@@ -96,7 +92,7 @@ class MqttReceiveServiceImplTest {
     void setUp() {
         driverMetadata = new DriverMetadata();
         deviceMetadata = new DeviceMetadata(new DriverProperties(), driverMetadata, deviceClient);
-        service = new MqttReceiveServiceImpl(driverSenderService, driverMetadata, deviceMetadata, eventFacade);
+        service = new MqttReceiveServiceImpl(driverSenderService, driverMetadata, deviceMetadata);
     }
 
     @Test
@@ -163,16 +159,8 @@ class MqttReceiveServiceImplTest {
                 2L, eventConfig(2L, 10L, 20L, "$.eventCode"),
                 3L, eventConfig(3L, 10L, 20L, "$.payload")
         )));
-        when(deviceClient.getById(10L)).thenReturn(device);
-
-        FacadeEventBO event = new FacadeEventBO();
-        event.setId(20L);
-        event.setTenantId(1L);
-        event.setEventCode("alarm");
-        event.setEventTypeFlag(EventTypeFlagEnum.ALERT);
-        event.setEventLevelFlag(EventLevelEnum.HIGH);
-        event.setEnableFlag(EnableFlagEnum.ENABLE);
-        when(eventFacade.getById(1L, 20L)).thenReturn(event);
+        device.setEventRuntimeIdMap(Map.of(20L, eventRuntime()));
+        when(deviceClient.getById(10L)).thenReturn(reactor.core.publisher.Mono.just(device));
 
         MqttMessage msg = mqttMessage("dc3/event/device-a", 1,
                 "{\"eventCode\":\"alarm\",\"payload\":{\"temperature\": \"92\", \"source\":\"mqtt\"}}");
@@ -208,16 +196,8 @@ class MqttReceiveServiceImplTest {
                 2L, eventConfig(2L, 10L, 20L, "$.eventCode"),
                 3L, eventConfig(3L, 10L, 20L, "$.payload")
         )));
-        when(deviceClient.getById(10L)).thenReturn(device);
-
-        FacadeEventBO event = new FacadeEventBO();
-        event.setId(20L);
-        event.setTenantId(1L);
-        event.setEventCode("alarm");
-        event.setEventTypeFlag(EventTypeFlagEnum.ALERT);
-        event.setEventLevelFlag(EventLevelEnum.HIGH);
-        event.setEnableFlag(EnableFlagEnum.ENABLE);
-        when(eventFacade.getById(1L, 20L)).thenReturn(event);
+        device.setEventRuntimeIdMap(Map.of(20L, eventRuntime()));
+        when(deviceClient.getById(10L)).thenReturn(reactor.core.publisher.Mono.just(device));
 
         MqttMessage msg = mqttMessage("dc3/event/device-a", 1,
                 "{\"deviceId\":10,\"pointId\":30,\"rawValue\":\"92\",\"eventCode\":\"alarm\",\"payload\":{\"temperature\":\"92\"}}");
@@ -232,7 +212,7 @@ class MqttReceiveServiceImplTest {
     }
 
     @Test
-    void eventReportFailureDoesNotDropPointValue() {
+    void missingEventRuntimeDoesNotDropPointValue() {
         installDeviceLease();
         driverMetadata.setEventAttributeIdMap(Map.of(
                 1L, eventAttribute(1L, "sourceTopic"),
@@ -248,8 +228,7 @@ class MqttReceiveServiceImplTest {
                 2L, eventConfig(2L, 10L, 20L, "$.eventCode"),
                 3L, eventConfig(3L, 10L, 20L, "$.payload")
         )));
-        when(deviceClient.getById(10L)).thenReturn(device);
-        when(eventFacade.getById(1L, 20L)).thenThrow(new RuntimeException("metadata unavailable"));
+        when(deviceClient.getById(10L)).thenReturn(reactor.core.publisher.Mono.just(device));
 
         MqttMessage msg = mqttMessage("dc3/event/device-a", 1,
                 "{\"deviceId\":10,\"pointId\":30,\"rawValue\":\"92\",\"eventCode\":\"alarm\",\"payload\":{\"temperature\":\"92\"}}");
@@ -257,6 +236,12 @@ class MqttReceiveServiceImplTest {
         service.receiveValue(msg);
 
         verify(driverSenderService).pointValueSender(any(PointValue.class));
+        verify(driverSenderService, never()).eventReportSender(any(EventReportDTO.class));
+    }
+
+    private EventRuntimeBO eventRuntime() {
+        return new EventRuntimeBO(20L, "Alarm", "alarm", EventTypeFlagEnum.ALERT,
+                EventLevelEnum.HIGH, EnableFlagEnum.ENABLE, 1);
     }
 
     private void installDeviceLease() {

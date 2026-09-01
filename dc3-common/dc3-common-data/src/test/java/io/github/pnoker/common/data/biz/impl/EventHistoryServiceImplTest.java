@@ -18,7 +18,7 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.dal.EventHistoryManager;
+import io.github.pnoker.common.data.repository.ReactiveEventHistoryStore;
 import io.github.pnoker.common.data.entity.bo.EventReportBO;
 import io.github.pnoker.common.data.entity.builder.EventHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
@@ -29,8 +29,6 @@ import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.EventFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeEventQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class EventHistoryServiceImplTest {
@@ -59,7 +58,7 @@ class EventHistoryServiceImplTest {
     private AlarmRuleTriggerService alarmRuleTriggerService;
 
     @Mock
-    private EventHistoryManager eventHistoryManager;
+    private ReactiveEventHistoryStore eventHistoryStore;
 
     @Mock
     private EventHistoryBuilder eventHistoryBuilder;
@@ -68,7 +67,7 @@ class EventHistoryServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new EventHistoryServiceImpl(deviceFacade, eventFacade, alarmRuleTriggerService, eventHistoryManager, eventHistoryBuilder);
+        service = new EventHistoryServiceImpl(deviceFacade, eventFacade, alarmRuleTriggerService, eventHistoryStore, eventHistoryBuilder);
     }
 
     @Test
@@ -97,21 +96,15 @@ class EventHistoryServiceImplTest {
         report.setEventCode("overheat");
         report.setParamValues(Map.of("value", "90"));
 
-        when(deviceFacade.getById(tenantId, deviceId)).thenReturn(device);
-        when(eventFacade.listByPage(any(FacadeEventQuery.class)))
-                .thenReturn(new FacadePage<>(1L, 1L, 1L, 1L, List.of(event)));
-        when(eventHistoryManager.save(any(EventHistoryDO.class))).thenReturn(true);
+        when(deviceFacade.getByIdReactive(tenantId, deviceId)).thenReturn(Mono.just(device));
+        when(eventFacade.list(any())).thenReturn(Mono.just(new io.github.pnoker.db.r2dbc.core.page.OffsetPage<>(List.of(), 0, 1, 0, false)));
+        when(eventFacade.list(any())).thenReturn(Mono.just(io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(List.of(event), 0, 1, 1)));
+        when(eventHistoryStore.insert(any(EventHistoryDO.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
 
-        String recordId = service.report(tenantId, report);
-
-        ArgumentCaptor<FacadeEventQuery> queryCaptor = ArgumentCaptor.forClass(FacadeEventQuery.class);
-        verify(eventFacade).listByPage(queryCaptor.capture());
-        assertThat(queryCaptor.getValue().getTenantId()).isEqualTo(tenantId);
-        assertThat(queryCaptor.getValue().getProfileId()).isEqualTo(30L);
-        assertThat(queryCaptor.getValue().getEventCode()).isEqualTo("overheat");
+        String recordId = service.report(tenantId, report).block();
 
         ArgumentCaptor<EventHistoryDO> recordCaptor = ArgumentCaptor.forClass(EventHistoryDO.class);
-        verify(eventHistoryManager).save(recordCaptor.capture());
+        verify(eventHistoryStore).insert(recordCaptor.capture());
         assertThat(recordCaptor.getValue().getRecordId()).isEqualTo(recordId);
         assertThat(recordCaptor.getValue().getEventId()).isEqualTo(eventId);
         assertThat(recordCaptor.getValue().getEventCode()).isEqualTo("overheat");

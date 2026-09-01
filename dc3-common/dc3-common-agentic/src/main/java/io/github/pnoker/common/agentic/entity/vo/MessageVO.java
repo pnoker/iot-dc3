@@ -54,7 +54,7 @@ public class MessageVO extends BaseVO {
     @Schema(description = "Zero-based ordinal position of this message within the conversation history.", example = "0")
     private Long messageIndex;
 
-    @Schema(description = "Persistence status: OK (stored successfully) or ERROR (storage failed).", example = "OK")
+    @Schema(description = "Generation lifecycle status: COMPLETED, FAILED, or CANCELLED.", example = "COMPLETED")
     private AgenticMessageStatusEnum status;
 
 }

@@ -22,6 +22,7 @@ import io.github.pnoker.common.mq.config.BatchConsumerProperties;
 import io.github.pnoker.common.mq.kafka.KafkaMqAdapter;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.images.builder.Transferable;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
@@ -30,8 +31,7 @@ import java.util.Objects;
 
 /**
  * Kafka harness for the broker-neutral contract suite. By default a disposable KRaft
- * container; setting {@code TCK_KAFKA_BOOTSTRAP} points it at an externally managed
- * broker (useful where the managed container misbehaves under a given runtime).
+ * container; setting {@code TCK_KAFKA_BOOTSTRAP} points it at an externally managed broker.
  *
  * @author pnoker
  * @since 2026.8.19
@@ -41,10 +41,7 @@ class KafkaContractTest extends AbstractMqContractTest {
 
     private static final String EXTERNAL_BOOTSTRAP = System.getenv("TCK_KAFKA_BOOTSTRAP");
 
-    // started manually (not via the extension) so TCK_KAFKA_BOOTSTRAP fully bypasses it:
-    // testcontainers 2.0.5 configures apache/kafka 3.9.0 with a nonroutable advertised
-    // listener the broker rejects, so some runtimes need an externally managed broker.
-    private static final KafkaContainer KAFKA = new KafkaContainer(DockerImageName.parse("apache/kafka:3.9.0"));
+    private static final KafkaContainer KAFKA = new PodmanCompatibleKafkaContainer();
     private KafkaMqAdapter kafkaAdapter;
 
     private static String bootstrap() {
@@ -77,6 +74,7 @@ class KafkaContractTest extends AbstractMqContractTest {
     protected void shutdownAdapter() {
         if (Objects.nonNull(kafkaAdapter)) {
             kafkaAdapter.stop();
+            kafkaAdapter = null;
         }
     }
 
@@ -90,5 +88,25 @@ class KafkaContractTest extends AbstractMqContractTest {
         adapter();
         Assumptions.assumeTrue(kafkaAdapter.capabilities().subscriptionExpiry(),
                 "kafka declares subscriptionExpiry=false; documented cleanup policy applies");
+    }
+
+    private static final class PodmanCompatibleKafkaContainer extends KafkaContainer {
+
+        private PodmanCompatibleKafkaContainer() {
+            super(DockerImageName.parse("apache/kafka:3.9.0"));
+        }
+
+        @Override
+        protected void containerIsStarting(com.github.dockerjava.api.command.InspectContainerResponse containerInfo) {
+            String advertisedHost = switch (getHost()) {
+                case "0.0.0.0", "::" -> "localhost";
+                default -> getHost();
+            };
+            String command = "#!/bin/bash\n"
+                    + "export KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://" + advertisedHost + ":" + getMappedPort(9092)
+                    + ",BROKER://localhost:9093,CONTROLLER://localhost:9094\n"
+                    + "/etc/kafka/docker/run\n";
+            copyFileToContainer(Transferable.of(command, 0777), "/tmp/testcontainers_start.sh");
+        }
     }
 }

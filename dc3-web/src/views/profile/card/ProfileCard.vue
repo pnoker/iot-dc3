@@ -33,13 +33,13 @@
                 <el-icon>
                   <Edit/>
                 </el-icon>
-                {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime) }}
+                {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime || '') }}
               </li>
               <li class="nowrap-item">
                 <el-icon>
                   <Sunset/>
                 </el-icon>
-                {{ $t('common.createTime') }}: {{ timestamp(data.createTime) }}
+                {{ $t('common.createTime') }}: {{ timestamp(data.createTime || '') }}
               </li>
             </ul>
           </div>
@@ -76,10 +76,11 @@ import {successMessage} from '@/utils/notificationUtil';
 import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
 import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
+import type {ProfileRecord} from '@/config/types/manager';
 
 const props = defineProps({
   embedded: {type: Boolean, default: false},
-  data: {type: Object as PropType<Record<string, any>>, default: () => ({})},
+  data: {type: Object as PropType<ProfileRecord>, required: true},
   icon: {type: String, default: 'images/common/profile.png'},
 });
 
@@ -87,7 +88,7 @@ const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing']);
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const emitAction = (name: 'disable-thing' | 'enable-thing' | 'delete-thing') => {
-  emit(name, props.data.id, () => successMessage());
+  emit(name, props.data, () => successMessage());
 };
 
 const edit = () => {

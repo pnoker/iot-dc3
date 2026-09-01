@@ -20,6 +20,7 @@ package io.github.pnoker.common.data.biz.alarm;
 import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
 
 import java.util.List;
+import reactor.core.publisher.Flux;
 
 /**
  * Handles notification side effects for rule matches.
@@ -35,7 +36,7 @@ public interface RuleNotificationService {
      * @param match rule match
      * @return persisted notify histories
      */
-    List<NotifyHistoryBO> notify(RuleMatch match);
+    Flux<NotifyHistoryBO> notify(RuleMatch match);
 
     /**
      * Batch notify channels for multiple rule matches in a single transaction.
@@ -46,6 +47,6 @@ public interface RuleNotificationService {
      * @param matches rule matches
      * @return persisted notify histories
      */
-    List<NotifyHistoryBO> notifyBatch(List<RuleMatch> matches);
+    Flux<NotifyHistoryBO> notifyBatch(List<RuleMatch> matches);
 
 }

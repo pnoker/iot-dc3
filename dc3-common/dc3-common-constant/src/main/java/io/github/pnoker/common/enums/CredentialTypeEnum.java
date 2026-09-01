@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -40,7 +39,6 @@ public enum CredentialTypeEnum {
     PASSWORD("PASSWORD", "password", "Password credential"),
     ;
 
-    @EnumValue
     private final String value;
 
     private final String code;

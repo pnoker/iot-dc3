@@ -27,6 +27,7 @@ import type {PageQuery} from '@/config/types';
 export type Translator = (key: string, params?: Record<string, unknown>) => string;
 
 export type EntityMode = 'page' | 'tree';
+export type EntityPagination = 'offset' | 'cursor';
 export type EntityFieldKind =
   'input' | 'number' | 'select' | 'enableFlag' | 'textarea' | 'json' | 'color' | 'treeSelect';
 export type EntityColumnKind = 'text' | 'tag' | 'code' | 'time' | 'enable' | 'color' | 'icon' | 'link';
@@ -120,6 +121,7 @@ export interface EntityListConfig {
   name: string; // Diagnostic and component name.
   title?: string; // Localized dialog entity name; falls back to name.
   mode?: EntityMode; // Defaults to 'page'.
+  pagination?: EntityPagination; // Defaults to offset; cursor is for history/high-volume lists.
   editable: boolean;
   rowKey?: string; // Required in tree mode; defaults to 'id'.
   defaultExpandAll?: boolean; // tree
@@ -137,10 +139,10 @@ export interface EntityListConfig {
   /** Builds the submitted payload instead of using the default field assembly. */
   toPayload?: (form: Record<string, any>) => Record<string, unknown>;
 
-  list: (query: PageQuery) => Promise<R<unknown>>;
-  add?: (payload: Record<string, unknown>) => Promise<R<unknown>>;
-  update?: (payload: Record<string, unknown>) => Promise<R<unknown>>;
-  remove?: (id: string) => Promise<R<unknown>>;
+  list: (query: PageQuery) => Promise<any>;
+  add?: (payload: Record<string, unknown>) => Promise<unknown>;
+  update?: (payload: Record<string, unknown>) => Promise<unknown>;
+  remove?: (id: string) => Promise<unknown>;
 
   detail?: { routeName: string }; // Detail route; omit to hide the detail action.
   extraActions?: EntityRowAction[];

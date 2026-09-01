@@ -29,6 +29,7 @@ import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +37,10 @@ import java.util.Objects;
 
 /**
  * Point-value consumer. RabbitMQ itself is the durable buffer; the consumer receives
- * broker batches, validates the schema-v1 envelope of every value, persists history and
- * latest projections in one transaction, and acknowledges the batch only after the
- * PostgreSQL transaction commits.
+ * broker batches, validates the schema-v1 envelope of every value, records a durable
+ * relational ingest receipt before writing history/latest projections, and acknowledges
+ * the batch only after the reactive write pipeline completes. A Quartz replay job drains
+ * receipts left by a process crash.
  *
  * @author pnoker
  * @since 2016.10.1
@@ -55,15 +57,15 @@ public class PointValueReceiver {
     /**
      * Consume and durably persist one broker batch. A value violating the schema
      * version poisons the whole batch (bounded retry, then dead-letter); the ack
-     * commits every delivery in the batch after the save transaction.
+     * commits every delivery in the batch after the save pipeline completes.
      *
      * @param messages raw batch in broker delivery order
      * @param ack      batch-level acknowledgement handle
      */
     @Dc3Listener(topic = MqTopic.POINT_VALUE, profile = ConsumptionProfile.THROUGHPUT, delivery = DeliveryMode.BATCH)
-    public void pointValueReceive(List<MqReceived<PointValueBO>> messages, Acknowledgment ack) {
+    public Mono<Void> pointValueReceive(List<MqReceived<PointValueBO>> messages, Acknowledgment ack) {
         if (messages.isEmpty()) {
-            return;
+            return Mono.empty();
         }
 
         List<PointValueBO> values = new ArrayList<>(messages.size());
@@ -76,10 +78,8 @@ public class PointValueReceiver {
             values.add(value);
         }
 
-        pointValueService.save(values);
-
-        ack.ack();
-        log.debug("Persisted and acknowledged point-value batch, size={}", values.size());
+        return pointValueService.save(values)
+                .doOnSuccess(ignored -> log.debug("Persisted point-value batch, size={}", values.size()));
     }
 
     private boolean valid(PointValueBO value) {

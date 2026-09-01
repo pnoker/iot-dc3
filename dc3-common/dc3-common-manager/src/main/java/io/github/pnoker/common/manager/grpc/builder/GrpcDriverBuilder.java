@@ -17,15 +17,12 @@
 
 package io.github.pnoker.common.manager.grpc.builder;
 
-import io.github.pnoker.api.center.manager.GrpcPageDriverQuery;
 import io.github.pnoker.api.common.GrpcBase;
 import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.ext.DriverExt;
 import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
-import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.optional.EnableOptional;
 import io.github.pnoker.common.optional.JsonOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
@@ -46,36 +43,6 @@ import java.util.Optional;
  */
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface GrpcDriverBuilder {
-
-    /**
-     * Grpc Query to Query
-     *
-     * @param entityQuery GrpcPageDriverQuery
-     * @return DriverQuery
-     */
-    @Mapping(target = "page", ignore = true)
-    @Mapping(target = "driverTypeFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "groupId", ignore = true)
-    @Mapping(target = "labelId", ignore = true)
-    DriverQuery buildQueryByGrpcQuery(GrpcPageDriverQuery entityQuery);
-
-    /**
-     * After process.
-     *
-     * @param entityGrpc  entity grpc
-     * @param entityQuery entity query
-     */
-    @AfterMapping
-    default void afterProcess(GrpcPageDriverQuery entityGrpc,
-                              @MappingTarget DriverQuery.DriverQueryBuilder entityQuery) {
-        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
-        entityQuery.page(pages);
-
-        Optional.ofNullable(DriverTypeEnum.ofIndex((byte) entityGrpc.getDriverTypeFlag()))
-                .ifPresent(entityQuery::driverTypeFlag);
-        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
-    }
 
     /**
      * BO to Grpc DTO

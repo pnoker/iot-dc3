@@ -129,12 +129,12 @@ describe('useEntityListPage', () => {
     await Promise.resolve();
 
     const lastCall = (config.list as ReturnType<typeof vi.fn>).mock.lastCall?.[0] as Record<string, unknown>;
-    expect(lastCall).toHaveProperty('page');
-    expect((lastCall.page as Record<string, unknown>).current).toBe(1);
+    expect(lastCall).toMatchObject({offset: 0, limit: 12});
+    expect(lastCall.sort).toBeInstanceOf(Array);
   });
 
   it('parses json field to object and coerces number field in payload when submitting', async () => {
-    const addFn = vi.fn().mockResolvedValue({ok: true, code: 'ok', message: 'ok', data: null});
+    const addFn = vi.fn().mockResolvedValue(null);
     const config = makeEntityListConfig();
     // Add a number field alongside the existing json 'extra' field
     config.fields = [...config.fields, {prop: 'count', label: 'Count', kind: 'number'}];
@@ -198,5 +198,29 @@ describe('useEntityListPage', () => {
 
     expect((config.list as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(callsBefore);
     expect(state.page.orders[0].asc).toBe(true);
+  });
+
+  it('keeps the newest response when list requests resolve out of order', async () => {
+    let resolveFirst!: (value: unknown) => void;
+    let resolveSecond!: (value: unknown) => void;
+    const config = makeEntityListConfig();
+    (config.list as ReturnType<typeof vi.fn>)
+      .mockReset()
+      .mockResolvedValueOnce({items: [], offset: 0, limit: 12, total: 0, hasNext: false})
+      .mockReturnValueOnce(new Promise((resolve) => (resolveFirst = resolve)))
+      .mockReturnValueOnce(new Promise((resolve) => (resolveSecond = resolve)));
+    const {state, load} = useEntityListPage(config);
+
+    const first = load();
+    const second = load();
+    resolveFirst({items: [ENTITY_LIST_ROWS[0]], offset: 0, limit: 12, total: 1, hasNext: false});
+    resolveSecond({items: [ENTITY_LIST_ROWS[1]], offset: 0, limit: 12, total: 1, hasNext: false});
+    await Promise.all([first, second]);
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(state.rows).toEqual([ENTITY_LIST_ROWS[1]]);
+    expect(state.loading).toBe(false);
   });
 });

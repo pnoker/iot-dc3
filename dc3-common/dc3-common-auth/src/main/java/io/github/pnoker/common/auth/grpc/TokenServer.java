@@ -18,20 +18,19 @@
 package io.github.pnoker.common.auth.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcLoginQuery;
-import io.github.pnoker.api.center.auth.GrpcRTokenDTO;
+import io.github.pnoker.api.center.auth.GrpcTokenValidationDTO;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
-import io.github.pnoker.api.common.GrpcRFactory;
-import io.github.pnoker.common.auth.biz.TokenService;
+import io.github.pnoker.common.auth.biz.ReactiveTokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
-import io.github.pnoker.common.enums.ErrorCode;
-import io.github.pnoker.common.tenant.TenantContextHolder;
 import io.github.pnoker.common.utils.TimeUtil;
+import com.google.common.util.concurrent.MoreExecutors;
+import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * gRPC server handling token facade requests.
@@ -44,34 +43,27 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class TokenServer extends TokenApiGrpc.TokenApiImplBase {
 
-    private final TokenService tokenService;
+    private final ReactiveTokenService tokenService;
 
     @Override
-    public void checkValid(GrpcLoginQuery request, StreamObserver<GrpcRTokenDTO> responseObserver) {
-        GrpcRTokenDTO.Builder builder = GrpcRTokenDTO.newBuilder();
-
-        try {
-            // Login path: validate the principal before a tenant context is bound to this
-            // thread. checkValid resolves tenant, credential, and tenant-membership; the
-            // membership lookup reads dc3_tenant_membership (tenant_id-bearing, not
-            // whitelisted), so run it with tenant filtering disabled.
-            TokenValid entity = TenantContextHolder.runIgnore(() -> tokenService.checkValid(request.getName(),
-                    request.getToken(), request.getTenant()));
-            if (Objects.isNull(entity)) {
-                builder.setResult(GrpcRFactory.notFound());
-            } else if (!entity.isValid()) {
-                builder.setResult(GrpcRFactory.fail(ErrorCode.TOKEN_INVALID));
-            } else {
-                builder.setResult(GrpcRFactory.ok());
-                builder.setData(TimeUtil.completeFormat(entity.getExpireTime()));
-            }
-        } catch (Exception e) {
-            log.warn("checkValid failed", e);
-            builder.setResult(GrpcRFactory.fail(ErrorCode.FAILURE));
-        }
-
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
+    public void checkValid(GrpcLoginQuery request, StreamObserver<GrpcTokenValidationDTO> responseObserver) {
+        Context context = Context.current();
+        AtomicBoolean terminated = new AtomicBoolean();
+        reactor.core.Disposable subscription = tokenService.checkValid(request.getName(), request.getToken(), request.getTenant())
+                .subscribe(entity -> {
+                    if (context.isCancelled() || !terminated.compareAndSet(false, true)) return;
+                    GrpcTokenValidationDTO.Builder builder = GrpcTokenValidationDTO.newBuilder()
+                            .setValid(entity.isValid());
+                    if (entity.isValid()) builder.setExpireTime(TimeUtil.completeFormat(entity.getExpireTime()));
+                    responseObserver.onNext(builder.build());
+                    responseObserver.onCompleted();
+                }, error -> {
+                    if (context.isCancelled() || !terminated.compareAndSet(false, true)) return;
+                    log.warn("checkValid failed", error);
+                    responseObserver.onError(io.grpc.Status.INTERNAL.withDescription("checkValid failed")
+                            .withCause(error).asRuntimeException());
+                });
+        context.addListener(ignored -> subscription.dispose(), MoreExecutors.directExecutor());
     }
 
 }

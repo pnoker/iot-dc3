@@ -18,51 +18,62 @@
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcPermissionQuery;
-import io.github.pnoker.api.center.auth.GrpcRPermissionCodesDTO;
+import io.github.pnoker.api.center.auth.GrpcPermissionCodesDTO;
 import io.github.pnoker.api.center.auth.PermissionApiGrpc;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.PermissionFacade;
+import io.github.pnoker.common.facade.grpc.config.GrpcFacadeProperties;
+import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-/**
- * gRPC {@link PermissionFacade}.
- *
- * @author pnoker
- * @since 2016.10.1
- */
+/** Reactive gRPC {@link PermissionFacade}. */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class PermissionGrpcFacade implements PermissionFacade {
 
-    private final PermissionApiGrpc.PermissionApiBlockingStub permissionApiBlockingStub;
+    private final PermissionApiGrpc.PermissionApiStub permissionApiStub;
 
-    private final GrpcFacadeSupport grpcFacadeSupport;
+    private final GrpcFacadeProperties properties;
 
     @Override
-    public Set<String> listPermissionCodes(Long tenantId, Long principalId) {
+    public Mono<Set<String>> listPermissionCodes(Long tenantId, Long principalId) {
         if (tenantId == null || principalId == null) {
-            return Set.of();
+            return Mono.just(Set.of());
         }
         GrpcPermissionQuery request = GrpcPermissionQuery.newBuilder()
                 .setTenantId(tenantId)
                 .setPrincipalId(principalId)
                 .build();
-        GrpcRPermissionCodesDTO response = grpcFacadeSupport.call("PermissionFacade.listPermissionCodes",
-                permissionApiBlockingStub, stub -> stub.listPermissionCodes(request));
-        if (!response.getResult().getOk()) {
-            throw new ServiceException("PermissionFacade.listPermissionCodes failed: ["
-                    + response.getResult().getCode() + "] " + response.getResult().getMessage());
-        }
-        return response.getCodesList()
-                .stream()
-                .filter(code -> code != null && !code.isBlank())
-                .collect(Collectors.toSet());
+        return Mono.create(sink -> deadlineStub().listPermissionCodes(request, new StreamObserver<>() {
+            @Override
+            public void onNext(GrpcPermissionCodesDTO response) {
+                sink.success(response.getCodesList().stream()
+                        .filter(code -> code != null && !code.isBlank())
+                        .collect(Collectors.toUnmodifiableSet()));
+            }
+
+            @Override
+            public void onError(Throwable error) {
+                sink.error(error);
+            }
+
+            @Override
+            public void onCompleted() {
+                // Unary response is completed from onNext; duplicate completion is ignored by MonoSink.
+            }
+        }));
     }
 
+    private PermissionApiGrpc.PermissionApiStub deadlineStub() {
+        return properties.getDeadlineMs() > 0
+                ? permissionApiStub.withDeadlineAfter(properties.getDeadlineMs(), TimeUnit.MILLISECONDS)
+                : permissionApiStub;
+    }
 }

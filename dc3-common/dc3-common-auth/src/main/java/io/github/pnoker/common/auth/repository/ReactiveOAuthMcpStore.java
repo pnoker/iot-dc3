@@ -1,0 +1,58 @@
+package io.github.pnoker.common.auth.repository;
+
+import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
+import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
+import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
+import io.github.pnoker.common.auth.entity.oauth.OAuthConsentRecord;
+import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
+import java.util.Collection;
+
+/** Complete reactive persistence port for OAuth and MCP state. */
+public interface ReactiveOAuthMcpStore extends ReactiveMcpRuntimeStore {
+    Mono<OAuthRegisteredClientRecord> getClient(String clientId);
+    Mono<Integer> insertClient(OAuthRegisteredClientRecord client);
+    Flux<OAuthRegisteredClientRecord> listClientsByOwner(Long ownerPrincipalId, Long tenantId);
+
+    Mono<OAuthAuthorizationRecord> getAuthorizationByCodeHash(String codeHash);
+    Mono<OAuthAuthorizationRecord> getAuthorizationByRefreshTokenHash(String refreshHash);
+    Mono<OAuthAuthorizationRecord> getAuthorizationByPreviousRefreshTokenHash(String previousRefreshHash);
+    Mono<Integer> insertAuthorization(OAuthAuthorizationRecord authorization);
+    Mono<OAuthConsentRecord> getConsent(Long registeredClientId, Long principalId, Long tenantId);
+    Mono<Integer> upsertConsent(OAuthConsentRecord consent);
+    Mono<Integer> activateAuthorizationTokens(Long id, String codeHash, String accessTokenJti,
+                                               LocalDateTime accessIssued, LocalDateTime accessExpires,
+                                               String refreshHash, String previousRefreshHash,
+                                               LocalDateTime refreshIssued, LocalDateTime refreshExpires,
+                                               String tokenClaims);
+    Mono<Integer> activateAuthorizationCode(String expectedCodeHash, Long id, String accessTokenJti,
+                                            LocalDateTime accessIssued, LocalDateTime accessExpires,
+                                            String refreshHash, String previousRefreshHash,
+                                            LocalDateTime refreshIssued, LocalDateTime refreshExpires,
+                                            String tokenClaims);
+    Mono<Integer> rotateAuthorizationRefreshToken(Long id, String expectedRefreshHash, String accessTokenJti,
+                                                   LocalDateTime accessIssued, LocalDateTime accessExpires,
+                                                   String refreshHash, LocalDateTime refreshIssued,
+                                                   LocalDateTime refreshExpires, String tokenClaims);
+    Mono<Integer> revokeAuthorizationByAccessTokenJti(String jti, String reason, LocalDateTime revokedTime);
+    Mono<Integer> revokeAuthorizationByRefreshTokenHash(String refreshHash, String reason, LocalDateTime revokedTime);
+
+    Mono<McpConnectionRecord> getActiveConnection(String clientId, Long principalId, Long tenantId, String grantType);
+    Flux<McpConnectionRecord> listConnections(Long tenantId, Long principalId);
+    Mono<Integer> insertConnection(McpConnectionRecord connection);
+    Mono<Integer> revokeConnection(Long id, Long tenantId, Long principalId, LocalDateTime revokeTime);
+
+    Flux<McpToolRecord> listRegistryToolCandidates();
+    Flux<McpToolRecord> listEnabledToolsByPermissionCodes(Collection<String> permissionCodes);
+    Mono<McpToolRecord> getTool(String toolId);
+    /** Atomically insert or refresh a catalog entry by its stable tool id. */
+    Mono<Integer> upsertTool(McpToolRecord tool);
+    Mono<Integer> insertTool(McpToolRecord tool);
+    Mono<Integer> updateTool(McpToolRecord tool);
+    Mono<Integer> deleteConnectionTools(Long connectionId);
+    Flux<String> listConnectionToolIds(Long connectionId, Long tenantId, Long principalId);
+    Mono<Integer> insertConnectionTool(Long id, Long connectionId, String toolId, Long operatorId, String operatorName);
+}

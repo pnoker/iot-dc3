@@ -62,11 +62,13 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue';
+import {computed, onBeforeUnmount, ref, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
 
 import {
   addDevice,
   deleteDevice,
+  getDeviceImportOperation,
   importDevice,
   importDeviceTemplate,
   listDevice,
@@ -75,10 +77,11 @@ import {
 } from '@/api/device';
 import {listDriverByIds} from '@/api/driver';
 import {usePagedList} from '@/composables/usePagedList';
-import {successMessage} from '@/utils/notificationUtil';
+import {failMessage, successMessage} from '@/utils/notificationUtil';
 import {isNull} from '@/utils/validationUtil';
 
 import type {DeviceRecord} from '@/config/types/manager';
+import type {OperationUiStatus, OperationView} from '@/config/types/operation';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
@@ -86,10 +89,6 @@ import DeviceAddForm from './add/DeviceAddForm.vue';
 import DeviceCard from './card/DeviceCard.vue';
 import DeviceImportForm from './import/DeviceImportForm.vue';
 import DeviceTool from './tool/DeviceTool.vue';
-
-interface DeviceImportTemplateResult {
-  data: BlobPart;
-}
 
 type DialogInstance = { show: () => void };
 
@@ -105,6 +104,9 @@ const props = withDefaults(
     profileId: '',
   }
 );
+const {t} = useI18n();
+const OPERATION_POLL_INTERVAL_MS = 1_000;
+let importAbortController: AbortController | null = null;
 
 const deviceAddFormRef = ref<DialogInstance | null>(null);
 const deviceImportFormRef = ref<DialogInstance | null>(null);
@@ -164,14 +166,11 @@ const openImport = () => {
   deviceImportFormRef.value?.show();
 };
 
-const importTemplate = (form: unknown, done: () => void) => {
+const importTemplate = (form: unknown, done: (successful: boolean) => void) => {
   importDeviceTemplate(form as Record<string, unknown>)
     .then((res) => {
-      const templateResponse = res as unknown as {
-        data: DeviceImportTemplateResult;
-        headers: Record<string, string>;
-      };
-      const url = window.URL.createObjectURL(new Blob([templateResponse.data.data]));
+      const templateResponse = res as {data: Blob; headers: Record<string, string>};
+      const url = window.URL.createObjectURL(templateResponse.data);
       const disposition = templateResponse.headers['content-disposition'] ?? '';
       const name = disposition.split(';')[1]?.split('filename=')[1] ?? 'device-import-template.xlsx';
       const link = document.createElement('a');
@@ -179,28 +178,81 @@ const importTemplate = (form: unknown, done: () => void) => {
       link.setAttribute('download', name);
       document.body.appendChild(link);
       link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      done(true);
     })
     .catch(() => {
-    })
-    .finally(() => {
-      done();
+      done(false);
     });
 };
 
-const onImport = (form: unknown, file: File, done: () => void) => {
-  importDevice(form as Record<string, unknown>, file)
-    .then(() => {
-      load();
-    })
-    .catch(() => {
-    })
-    .finally(() => {
-      done();
-    });
+const operationErrorDetail = (operation: OperationView) => {
+  if (operation.error && typeof operation.error === 'object') {
+    const error = operation.error as {detail?: unknown; title?: unknown};
+    if (typeof error.detail === 'string' && error.detail) return error.detail;
+    if (typeof error.title === 'string' && error.title) return error.title;
+  }
+  return t('device.import.status.failed');
 };
 
-const onDisable = (id: string, driverId: string, done: () => void) => {
-  updateDevice({id, driverId, enableFlag: 'DISABLE'})
+const delay = (milliseconds: number, signal: AbortSignal) =>
+  new Promise<void>((resolve, reject) => {
+    if (signal.aborted) {
+      reject(new DOMException('Operation polling aborted', 'AbortError'));
+      return;
+    }
+    const abort = () => {
+      clearTimeout(timer);
+      reject(new DOMException('Operation polling aborted', 'AbortError'));
+    };
+    const timer = window.setTimeout(() => {
+      signal.removeEventListener('abort', abort);
+      resolve();
+    }, milliseconds);
+    signal.addEventListener('abort', abort, {once: true});
+  });
+
+const pollOperation = async (
+  statusUri: string,
+  signal: AbortSignal,
+  report: (status: OperationUiStatus) => void
+) => {
+  while (true) {
+    const operation = await getDeviceImportOperation(statusUri, signal);
+    report(operation.status);
+    if (!['PENDING', 'RUNNING'].includes(operation.status)) return operation;
+    await delay(OPERATION_POLL_INTERVAL_MS, signal);
+  }
+};
+
+const onImport = async (
+  form: unknown,
+  file: File,
+  idempotencyKey: string,
+  report: (status: OperationUiStatus) => void
+) => {
+  importAbortController?.abort();
+  const controller = new AbortController();
+  importAbortController = controller;
+  try {
+    const accepted = await importDevice(form as Record<string, unknown>, file, idempotencyKey);
+    report('PENDING');
+    const operation = await pollOperation(accepted.statusUri, controller.signal, report);
+    if (operation.status === 'SUCCEEDED') {
+      await load();
+      return;
+    }
+    failMessage(operationErrorDetail(operation));
+  } catch {
+    if (!controller.signal.aborted) report('REQUEST_ERROR');
+  }
+};
+
+onBeforeUnmount(() => importAbortController?.abort());
+
+const onDisable = (device: DeviceRecord, done: () => void) => {
+  updateDevice({...device, enableFlag: 'DISABLE'})
     .then(() => {
       successMessage();
       load();
@@ -212,8 +264,8 @@ const onDisable = (id: string, driverId: string, done: () => void) => {
     });
 };
 
-const onEnable = (id: string, driverId: string, done: () => void) => {
-  updateDevice({id, driverId, enableFlag: 'ENABLE'})
+const onEnable = (device: DeviceRecord, done: () => void) => {
+  updateDevice({...device, enableFlag: 'ENABLE'})
     .then(() => {
       successMessage();
       load();
@@ -225,8 +277,8 @@ const onEnable = (id: string, driverId: string, done: () => void) => {
     });
 };
 
-const onDelete = (id: string, done: () => void) => {
-  deleteDevice(id)
+const onDelete = (device: DeviceRecord, done: () => void) => {
+  deleteDevice(device.id, device.version)
     .then(() => {
       successMessage();
       load();
@@ -246,7 +298,7 @@ watch(
     // Load status table
     listDeviceStatus({page: reactiveData.page, ...(reactiveData.query as Record<string, unknown>)})
       .then((res) => {
-        reactiveData.statusTable = (res.data || {}) as Record<string, string>;
+        reactiveData.statusTable = (res || {}) as Record<string, string>;
       })
       .catch(() => {
         // handled globally
@@ -260,7 +312,7 @@ watch(
     }
     listDriverByIds(driverIds)
       .then((res) => {
-        reactiveData.driverTable = (res.data || {}) as Record<string, Record<string, any>>;
+        reactiveData.driverTable = (res || {}) as Record<string, Record<string, any>>;
       })
       .catch(() => {
         // handled globally

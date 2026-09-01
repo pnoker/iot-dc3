@@ -17,19 +17,19 @@
 
 package io.github.pnoker.common.auth.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
 import io.github.pnoker.common.auth.entity.builder.TenantMembershipBuilder;
-import io.github.pnoker.common.auth.entity.query.TenantMembershipQuery;
+import io.github.pnoker.common.auth.entity.query.TenantMembershipOffsetRequest;
 import io.github.pnoker.common.auth.entity.vo.TenantMembershipVO;
-import io.github.pnoker.common.auth.service.AuditLogService;
-import io.github.pnoker.common.auth.service.TenantMembershipService;
+import io.github.pnoker.common.auth.repository.TenantMembershipFilter;
+import io.github.pnoker.common.auth.service.ReactiveAuditLogService;
+import io.github.pnoker.common.auth.service.ReactiveTenantMembershipCommandService;
+import io.github.pnoker.common.auth.service.ReactiveTenantMembershipService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.common.entity.R;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.github.pnoker.common.enums.MembershipStatusEnum;
-import io.github.pnoker.common.enums.SuccessCode;
-import io.github.pnoker.common.exception.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -40,9 +40,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -64,9 +66,11 @@ public class TenantMembershipController implements BaseController {
 
     private final TenantMembershipBuilder tenantMembershipBuilder;
 
-    private final TenantMembershipService tenantMembershipService;
+    private final ReactiveTenantMembershipService tenantMembershipService;
 
-    private final AuditLogService auditLogService;
+    private final ReactiveTenantMembershipCommandService tenantMembershipCommandService;
+
+    private final ReactiveAuditLogService auditLogService;
 
     /**
      * Page through the memberships of the caller's tenant.
@@ -84,12 +88,15 @@ public class TenantMembershipController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/list")
-    public Mono<R<Page<TenantMembershipVO>>> list(@RequestBody(required = false) TenantMembershipQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            TenantMembershipQuery query = Objects.isNull(entityQuery) ? new TenantMembershipQuery() : entityQuery;
-            query.setTenantId(tenantId);
-            return R.ok(tenantMembershipBuilder.buildVOPageByBOPage(tenantMembershipService.list(query)));
-        }));
+    public Mono<ResponseEntity<OffsetPage<TenantMembershipVO>>> list(
+            @RequestBody(required = false) TenantMembershipOffsetRequest request) {
+        TenantMembershipOffsetRequest query = request == null ? new TenantMembershipOffsetRequest() : request;
+        return getTenantId().flatMap(tenantId -> tenantMembershipService.list(new TenantMembershipFilter(
+                        tenantId, query.principalId(), query.principalType(), query.membershipStatus(),
+                        new PageRequest(query.offset(), query.limit(), query.sort())))
+                .map(page -> ResponseEntity.ok(OffsetPage.of(page.items().stream()
+                                .map(tenantMembershipBuilder::buildVOByBO).toList(),
+                        page.offset(), page.limit(), page.total()))));
     }
 
     /**
@@ -108,8 +115,8 @@ public class TenantMembershipController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/add")
-    public Mono<R<String>> add(@RequestBody TenantMembershipVO entityVO) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
+    public Mono<ResponseEntity<TenantMembershipVO>> add(@RequestBody TenantMembershipVO entityVO) {
+        return getPrincipalHeader().flatMap(header -> {
             TenantMembershipBO entityBO = tenantMembershipBuilder.buildBOByVO(entityVO);
             // Pin to the caller's tenant — the body tenant id is ignored.
             entityBO.setTenantId(header.getTenantId());
@@ -120,11 +127,12 @@ public class TenantMembershipController implements BaseController {
             entityBO.setCreatorName(header.getNickName());
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
-            tenantMembershipService.add(entityBO);
-            auditLogService.log(header, "CREATE", "tenant_membership", entityBO.getPrincipalId(),
-                    null, "SUCCESS", null);
-            return R.ok(SuccessCode.ADD);
-        }));
+            return tenantMembershipCommandService.add(entityBO)
+                    .flatMap(saved -> auditLogService.log(header, "CREATE", "tenant_membership",
+                                    saved.getPrincipalId(), null, "SUCCESS", null)
+                            .thenReturn(ResponseEntity.status(201)
+                                    .body(tenantMembershipBuilder.buildVOByBO(saved))));
+        });
     }
 
     /**
@@ -142,18 +150,12 @@ public class TenantMembershipController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            // Verify the membership belongs to the caller's tenant before deleting.
-            Long tenantId = header.getTenantId();
-            TenantMembershipBO current = tenantMembershipService.getById(id);
-            if (!Objects.equals(current.getTenantId(), tenantId)) {
-                throw new NotFoundException("Tenant membership does not exist");
-            }
-            tenantMembershipService.delete(id);
-            auditLogService.log(header, "DELETE", "tenant_membership", id, null, "SUCCESS", null);
-            return R.ok(SuccessCode.DELETE);
-        }));
+    @DeleteMapping("/delete")
+    public Mono<ResponseEntity<Void>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getPrincipalHeader().flatMap(header -> tenantMembershipCommandService
+                .delete(header.getTenantId(), id, header.getUserId(), header.getNickName())
+                .then(auditLogService.log(header, "DELETE", "tenant_membership", id,
+                        null, "SUCCESS", null))
+                .thenReturn(ResponseEntity.noContent().build()));
     }
 }

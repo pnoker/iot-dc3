@@ -81,12 +81,12 @@ export function registerDashboardCommand(program: Command): void {
   dash
     .command('stream')
     .description('Latest point value stream')
-    .option('--size <n>', 'Number of records', '20')
+    .option('--limit <n>', 'Maximum number of records', '20')
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.get(
-        `/api/v3/data/dashboard/stream?size=${opts.size}`,
+        `/api/v3/data/dashboard/stream?limit=${opts.limit}`,
       );
       printAndExit(result, format);
     });

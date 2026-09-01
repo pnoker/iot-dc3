@@ -20,24 +20,22 @@ package io.github.pnoker.common.facade.grpc;
 import io.github.pnoker.api.center.data.GrpcDriverStatusQuery;
 import io.github.pnoker.api.center.data.GrpcIdsStatusQuery;
 import io.github.pnoker.api.center.data.GrpcProfileStatusQuery;
-import io.github.pnoker.api.center.data.GrpcRStatusMap;
-import io.github.pnoker.api.center.data.GrpcRStringMap;
-import io.github.pnoker.api.center.data.GrpcRSystemHealthDTO;
+import io.github.pnoker.api.center.data.GrpcStatusMap;
+import io.github.pnoker.api.center.data.GrpcStringMap;
 import io.github.pnoker.api.center.data.GrpcSystemHealthDTO;
 import io.github.pnoker.api.center.data.GrpcTenantHealthQuery;
 import io.github.pnoker.api.center.data.StatusHealthApiGrpc;
-import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ErrorCode;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import io.grpc.stub.ClientResponseObserver;
+import io.grpc.stub.StreamObserver;
+import reactor.core.publisher.Mono;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -52,64 +50,90 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class StatusHealthGrpcFacade implements StatusHealthFacade {
 
-    private final StatusHealthApiGrpc.StatusHealthApiBlockingStub statusHealthApiBlockingStub;
-
-    private final GrpcFacadeSupport grpcFacadeSupport;
+    private final StatusHealthApiGrpc.StatusHealthApiStub statusHealthApiStub;
 
     @Override
-    public Map<Long, String> listDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds) {
-        GrpcIdsStatusQuery request = idsQuery(tenantId, deviceIds);
-        GrpcRStatusMap response = grpcFacadeSupport.call("StatusHealthFacade.listDeviceStatusesByIds",
-                statusHealthApiBlockingStub, stub -> stub.deviceStatusesByIds(request));
-        return statusMap(response.getResult(), response.getDataMap(), "listDeviceStatusesByIds");
+    public Mono<Map<Long, String>> listDeviceStatusesByIdsReactive(Long tenantId, Collection<Long> deviceIds) {
+        return unaryReactive(idsQuery(tenantId, deviceIds), statusHealthApiStub::deviceStatusesByIds)
+                .map(GrpcStatusMap::getDataMap);
     }
 
     @Override
-    public Map<Long, String> listDeviceStatusesByProfileId(Long tenantId, Long profileId) {
+    public Mono<Map<Long, String>> listDeviceStatusesByProfileIdReactive(Long tenantId, Long profileId) {
         GrpcProfileStatusQuery request = GrpcProfileStatusQuery.newBuilder()
                 .setTenantId(Objects.requireNonNullElse(tenantId, 0L))
-                .setProfileId(Objects.requireNonNullElse(profileId, 0L))
-                .build();
-        GrpcRStatusMap response = grpcFacadeSupport.call("StatusHealthFacade.listDeviceStatusesByProfileId",
-                statusHealthApiBlockingStub, stub -> stub.deviceStatusesByProfileId(request));
-        return statusMap(response.getResult(), response.getDataMap(), "listDeviceStatusesByProfileId");
+                .setProfileId(Objects.requireNonNullElse(profileId, 0L)).build();
+        return unaryReactive(request, statusHealthApiStub::deviceStatusesByProfileId)
+                .map(GrpcStatusMap::getDataMap);
     }
 
     @Override
-    public Map<Long, String> listDriverStatusesByIds(Long tenantId, Collection<Long> driverIds) {
-        GrpcIdsStatusQuery request = idsQuery(tenantId, driverIds);
-        GrpcRStatusMap response = grpcFacadeSupport.call("StatusHealthFacade.listDriverStatusesByIds",
-                statusHealthApiBlockingStub, stub -> stub.driverStatusesByIds(request));
-        return statusMap(response.getResult(), response.getDataMap(), "listDriverStatusesByIds");
+    public Mono<Map<Long, String>> listDriverStatusesByIdsReactive(Long tenantId, Collection<Long> driverIds) {
+        return unaryReactive(idsQuery(tenantId, driverIds), statusHealthApiStub::driverStatusesByIds)
+                .map(GrpcStatusMap::getDataMap);
     }
 
     @Override
-    public FacadeDriverDeviceStatusSummaryBO getDriverDeviceStatusSummary(Long tenantId, Long driverId) {
+    public Mono<FacadeDriverDeviceStatusSummaryBO> getDriverDeviceStatusSummaryReactive(Long tenantId, Long driverId) {
         GrpcDriverStatusQuery request = GrpcDriverStatusQuery.newBuilder()
                 .setTenantId(Objects.requireNonNullElse(tenantId, 0L))
-                .setDriverId(Objects.requireNonNullElse(driverId, 0L))
-                .build();
-        GrpcRStringMap response = grpcFacadeSupport.call("StatusHealthFacade.getDriverDeviceStatusSummary",
-                statusHealthApiBlockingStub, stub -> stub.driverDeviceStatusSummary(request));
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "getDriverDeviceStatusSummary");
-            return null;
-        }
-        return FacadeDriverDeviceStatusSummaryBO.fromMap(response.getDataMap());
+                .setDriverId(Objects.requireNonNullElse(driverId, 0L)).build();
+        return unaryReactive(request, statusHealthApiStub::driverDeviceStatusSummary)
+                .map(response -> FacadeDriverDeviceStatusSummaryBO.fromMap(response.getDataMap()))
+                .onErrorResume(error -> io.grpc.Status.fromThrowable(error).getCode() == io.grpc.Status.Code.NOT_FOUND
+                        ? Mono.empty() : Mono.error(error));
     }
 
     @Override
-    public FacadeSystemHealthBO systemHealth(Long tenantId) {
+    public Mono<FacadeSystemHealthBO> systemHealthReactive(Long tenantId) {
         GrpcTenantHealthQuery request = GrpcTenantHealthQuery.newBuilder()
-                .setTenantId(Objects.requireNonNullElse(tenantId, 0L))
-                .build();
-        GrpcRSystemHealthDTO response = grpcFacadeSupport.call("StatusHealthFacade.systemHealth",
-                statusHealthApiBlockingStub, stub -> stub.systemHealth(request));
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "systemHealth");
-            return null;
-        }
-        return toFacadeHealth(response.getData());
+                .setTenantId(Objects.requireNonNullElse(tenantId, 0L)).build();
+        return unaryReactive(request, statusHealthApiStub::systemHealth)
+                .map(this::toFacadeHealth);
+    }
+
+    private <Request, Response> Mono<Response> unaryReactive(Request request,
+                                                               java.util.function.BiConsumer<Request, StreamObserver<Response>> invocation) {
+        return Mono.create(sink -> {
+            java.util.concurrent.atomic.AtomicReference<io.grpc.stub.ClientCallStreamObserver<Request>> callRef =
+                    new java.util.concurrent.atomic.AtomicReference<>();
+            java.util.concurrent.atomic.AtomicBoolean cancelled = new java.util.concurrent.atomic.AtomicBoolean();
+            ClientResponseObserver<Request, Response> observer = new ClientResponseObserver<>() {
+                @Override
+                public void beforeStart(io.grpc.stub.ClientCallStreamObserver<Request> call) {
+                    callRef.set(call);
+                    if (cancelled.get()) {
+                        call.cancel("reactor subscriber cancelled", null);
+                    }
+                }
+
+                @Override
+                public void onNext(Response response) {
+                    sink.success(response);
+                }
+
+                @Override
+                public void onError(Throwable error) {
+                    sink.error(error);
+                }
+
+                @Override
+                public void onCompleted() {
+                    }
+            };
+            sink.onCancel(() -> {
+                cancelled.set(true);
+                io.grpc.stub.ClientCallStreamObserver<Request> call = callRef.get();
+                if (call != null) {
+                    call.cancel("reactor subscriber cancelled", null);
+                }
+            });
+            try {
+                invocation.accept(request, observer);
+            } catch (Throwable error) {
+                sink.error(error);
+            }
+        });
     }
 
     private GrpcIdsStatusQuery idsQuery(Long tenantId, Collection<Long> ids) {
@@ -121,13 +145,6 @@ public class StatusHealthGrpcFacade implements StatusHealthFacade {
         return builder.build();
     }
 
-    private Map<Long, String> statusMap(GrpcR result, Map<Long, String> data, String op) {
-        if (!result.getOk()) {
-            guardOrThrow(result, op);
-            return Collections.emptyMap();
-        }
-        return data;
-    }
 
     private FacadeSystemHealthBO toFacadeHealth(GrpcSystemHealthDTO dto) {
         if (Objects.isNull(dto)) {
@@ -143,20 +160,5 @@ public class StatusHealthGrpcFacade implements StatusHealthFacade {
         return health;
     }
 
-    /**
-     * Guard a gRPC result: NOT_FOUND is treated as a normal empty outcome, any other
-     * error code throws a service exception.
-     *
-     * @param result the gRPC result envelope
-     * @param op     the operation name, for error messages
-     */
-    private void guardOrThrow(GrpcR result, String op) {
-        String code = result.getCode();
-        if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
-            log.debug("StatusHealthGrpcFacade.{} => no resource", op);
-            return;
-        }
-        throw new ServiceException("StatusHealthFacade." + op + " failed: [" + code + "] " + result.getMessage());
-    }
 
 }

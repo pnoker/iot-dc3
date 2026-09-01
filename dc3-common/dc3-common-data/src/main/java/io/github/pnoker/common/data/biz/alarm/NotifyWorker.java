@@ -19,12 +19,8 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.mq.MqTopic;
-import io.github.pnoker.common.data.dal.NotifyChannelManager;
-import io.github.pnoker.common.data.dal.NotifyHistoryManager;
+import io.github.pnoker.common.data.repository.ReactiveNotifyHistoryStore;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
-import io.github.pnoker.common.data.entity.builder.NotifyChannelBuilder;
-import io.github.pnoker.common.data.entity.model.NotifyChannelDO;
-import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.NotifyHistoryResponseExt;
@@ -37,8 +33,10 @@ import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -72,13 +70,11 @@ public class NotifyWorker {
      */
     public static final int MAX_ATTEMPTS = 3;
 
-    private final NotifyChannelManager notifyChannelManager;
-
-    private final NotifyChannelBuilder notifyChannelBuilder;
+    private final NotifyConfigCache notifyConfigCache;
 
     private final NotifyChannelAdapterRegistry notifyChannelAdapterRegistry;
 
-    private final NotifyHistoryManager notifyHistoryManager;
+    private final ReactiveNotifyHistoryStore notifyHistoryStore;
 
     private final NotifyTaskSender notifyTaskSender;
 
@@ -89,29 +85,20 @@ public class NotifyWorker {
      * @param ack     the acknowledgement handle
      */
     @Dc3Listener(topic = MqTopic.NOTIFY_TASK)
-    public void onNotifyTask(MqReceived<NotifyTaskDTO> message, Acknowledgment ack) {
+    public Mono<Void> onNotifyTask(MqReceived<NotifyTaskDTO> message, Acknowledgment ack) {
         NotifyTaskDTO task = message.payload();
-        try {
-            if (Objects.isNull(task) || Objects.isNull(task.getNotifyHistoryId())
-                    || Objects.isNull(task.getChannelId())) {
-                log.error("Notify task rejected, reason=invalidEnvelope, historyId={}, channelId={}",
-                        Objects.nonNull(task) ? task.getNotifyHistoryId() : null,
-                        Objects.nonNull(task) ? task.getChannelId() : null);
-                ack.reject(false);
-                return;
-            }
-            dispatch(task);
-            ack.ack();
-        } catch (Exception e) {
-            log.error("Notify task consume failed, historyId={}, channelId={}, retry={}",
+        if (Objects.isNull(task) || Objects.isNull(task.getNotifyHistoryId())
+                || Objects.isNull(task.getChannelId()) || Objects.isNull(task.getTenantId())
+                || task.getTenantId() <= 0) {
+            log.error("Notify task rejected, reason=invalidEnvelope, historyId={}, channelId={}",
                     Objects.nonNull(task) ? task.getNotifyHistoryId() : null,
-                    Objects.nonNull(task) ? task.getChannelId() : null,
-                    Objects.nonNull(task) ? task.getRetryCount() : 0, e);
-            // Worker exception is internal — the task itself is preserved on the
-            // history row and the next /admin replay can pick it up; nack-requeue
-            // would loop in tight cases.
+                    Objects.nonNull(task) ? task.getChannelId() : null);
             ack.reject(false);
+            return Mono.empty();
         }
+        return dispatch(task)
+                .doOnError(error -> log.error("Notify task persistence failed, historyId={}",
+                        task.getNotifyHistoryId(), error));
     }
 
     /**
@@ -120,45 +107,41 @@ public class NotifyWorker {
      *
      * @param task the notify task to dispatch
      */
-    private void dispatch(NotifyTaskDTO task) {
-        NotifyChannelBO channel = loadChannel(task.getChannelId(), task.getTenantId());
-        if (Objects.isNull(channel)) {
-            persistTerminal(task, NotifySendResult.skipped(
-                    "notify-channel" + SymbolConstant.COLON + task.getChannelId(),
-                    "Notify channel not found or tenant mismatch"));
-            return;
-        }
+    private Mono<Void> dispatch(NotifyTaskDTO task) {
+        return notifyConfigCache.getChannel(task.getChannelId(), task.getTenantId())
+                .switchIfEmpty(Mono.error(new MissingNotifyChannelException(task.getChannelId())))
+                .flatMap(channel -> dispatch(channel, task))
+                .onErrorResume(MissingNotifyChannelException.class, error -> persistTerminal(task,
+                        NotifySendResult.skipped("notify-channel" + SymbolConstant.COLON + task.getChannelId(),
+                                "Notify channel not found or tenant mismatch")));
+    }
+
+    private Mono<Void> dispatch(NotifyChannelBO channel, NotifyTaskDTO task) {
         if (!EnableFlagEnum.ENABLE.equals(channel.getEnableFlag())) {
-            persistTerminal(task, NotifySendResult.skipped(channel.getCredentialRef(), "Notify channel is disabled"));
-            return;
+            return persistTerminal(task, NotifySendResult.skipped(channel.getCredentialRef(), "Notify channel is disabled"));
         }
         NotifyChannelTypeEnum type = channel.getChannelTypeFlag();
         NotifyChannelAdapter adapter = notifyChannelAdapterRegistry.find(type).orElse(null);
         if (Objects.isNull(adapter)) {
-            persistTerminal(task, NotifySendResult.failed(channel.getCredentialRef(),
+            return persistTerminal(task, NotifySendResult.failed(channel.getCredentialRef(),
                     "Notify channel adapter is missing for type=" + type));
-            return;
         }
 
-        MessagePayload payload = new MessagePayload(
-                type,
-                task.getPayloadType(),
+        MessagePayload payload = new MessagePayload(type, task.getPayloadType(),
                 Objects.requireNonNullElse(task.getPayload(), Map.of()),
                 Objects.requireNonNullElse(task.getMissingVariables(), List.of()));
-        NotifySendResult result = adapter.send(channel, payload);
-        if (NotifyHistoryStatusEnum.SUCCESS.equals(result.getStatusFlag())
-                || NotifyHistoryStatusEnum.SKIPPED.equals(result.getStatusFlag())) {
-            persistTerminal(task, result);
-            return;
-        }
-        // FAILED — decide retry vs terminal.
-        int nextAttempt = task.getRetryCount() + 1;
-        if (nextAttempt >= MAX_ATTEMPTS) {
-            persistTerminal(task, result);
-            return;
-        }
-        persistRetrying(task, result, nextAttempt);
-        NotifyTaskDTO retry = NotifyTaskDTO.builder()
+        return Mono.defer(() -> adapter.send(channel, payload))
+                .flatMap(result -> {
+                    if (NotifyHistoryStatusEnum.SUCCESS.equals(result.getStatusFlag())
+                            || NotifyHistoryStatusEnum.SKIPPED.equals(result.getStatusFlag())) {
+                        return persistTerminal(task, result);
+                    }
+                    int nextAttempt = Objects.requireNonNullElse(task.getRetryCount(), 0) + 1;
+                    if (nextAttempt >= MAX_ATTEMPTS) {
+                        return persistTerminal(task, result);
+                    }
+                    return persistRetrying(task, result, nextAttempt).then(Mono.defer(() -> {
+                        NotifyTaskDTO retry = NotifyTaskDTO.builder()
                 .notifyHistoryId(task.getNotifyHistoryId())
                 .tenantId(task.getTenantId())
                 .channelId(task.getChannelId())
@@ -167,56 +150,40 @@ public class NotifyWorker {
                 .payload(task.getPayload())
                 .missingVariables(task.getMissingVariables())
                 .retryCount(nextAttempt)
-                .createTime(LocalDateTime.now())
+                .createTime(LocalDateTime.now(ZoneOffset.UTC))
                 .build();
-        notifyTaskSender.publish(retry);
+                        Mono<Void> publication = notifyTaskSender.publish(retry);
+                        return publication == null ? Mono.empty() : publication;
+                    }));
+                });
     }
 
-    /**
-     * Load a notify channel by id, requiring it to belong to the tenant and carry a
-     * channel type.
-     *
-     * @param channelId the channel id
-     * @param tenantId  tenant scope
-     * @return the channel, or null when missing, cross-tenant, or untyped
-     */
-    private NotifyChannelBO loadChannel(Long channelId, Long tenantId) {
-        NotifyChannelDO entityDO = notifyChannelManager.getById(channelId);
-        if (Objects.isNull(entityDO) || !Objects.equals(entityDO.getTenantId(), tenantId)
-                || Objects.isNull(entityDO.getChannelTypeFlag())) {
-            return null;
+    private static final class MissingNotifyChannelException extends RuntimeException {
+        private MissingNotifyChannelException(Long channelId) {
+            super("Notify channel not found: " + channelId);
         }
-        return notifyChannelBuilder.buildBOByDO(entityDO);
     }
 
     /**
      * Final outcome (SUCCESS / FAILED / SKIPPED). Updates the history row in
      * place — the row id was assigned when the PENDING row was inserted.
      */
-    private void persistTerminal(NotifyTaskDTO task, NotifySendResult result) {
-        NotifyHistoryDO update = new NotifyHistoryDO();
-        update.setId(task.getNotifyHistoryId());
-        update.setStatusFlag(result.getStatusFlag().getIndex());
-        update.setTarget(Objects.toString(result.getTarget(), ""));
-        update.setResponseExt(toResponseExt(result));
-        update.setErrorMessage(Objects.toString(result.getErrorMessage(), ""));
-        update.setRetryCount(task.getRetryCount());
-        notifyHistoryManager.updateById(update);
+    private Mono<Void> persistTerminal(NotifyTaskDTO task, NotifySendResult result) {
+        return notifyHistoryStore.updateDelivery(task.getTenantId(), task.getNotifyHistoryId(), result.getStatusFlag().getIndex(),
+                        Objects.toString(result.getTarget(), ""), toResponseExt(result),
+                        Objects.toString(result.getErrorMessage(), ""), task.getRetryCount())
+                .flatMap(updated -> updated ? Mono.<Void>empty() : Mono.error(new IllegalStateException("notify history row not found")));
     }
 
     /**
      * Retryable failure. Status flips to RETRYING and retry_count is bumped so
      * the dashboard reflects in-flight attempts.
      */
-    private void persistRetrying(NotifyTaskDTO task, NotifySendResult result, int attempt) {
-        NotifyHistoryDO update = new NotifyHistoryDO();
-        update.setId(task.getNotifyHistoryId());
-        update.setStatusFlag(NotifyHistoryStatusEnum.RETRYING.getIndex());
-        update.setTarget(Objects.toString(result.getTarget(), ""));
-        update.setResponseExt(toResponseExt(result));
-        update.setErrorMessage(Objects.toString(result.getErrorMessage(), ""));
-        update.setRetryCount(attempt);
-        notifyHistoryManager.updateById(update);
+    private Mono<Void> persistRetrying(NotifyTaskDTO task, NotifySendResult result, int attempt) {
+        return notifyHistoryStore.updateDelivery(task.getTenantId(), task.getNotifyHistoryId(), NotifyHistoryStatusEnum.RETRYING.getIndex(),
+                        Objects.toString(result.getTarget(), ""), toResponseExt(result),
+                        Objects.toString(result.getErrorMessage(), ""), attempt)
+                .flatMap(updated -> updated ? Mono.<Void>empty() : Mono.error(new IllegalStateException("notify history row not found")));
     }
 
     private JsonExt toResponseExt(NotifySendResult result) {

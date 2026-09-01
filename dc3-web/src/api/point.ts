@@ -15,49 +15,55 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {httpGet, httpPost, versionedDelete} from '@/api/common';
 import {createCrudApi} from '@/api/factory';
 import {API_DATA_BASE, API_MANAGER_BASE} from '@/config/constant/api';
-import type {PageResult} from '@/config/types';
+import type {CursorPageResult, PageQuery, PageResult} from '@/config/types';
 import type {PointForm, PointRecord} from '@/config/types/manager';
+
+export interface PointCommandAccepted {
+  commandId: string;
+  statusUri: string;
+}
 
 const crud = createCrudApi<PointForm, PointRecord>({base: API_MANAGER_BASE, entity: 'point'});
 
 export const addPoint = crud.add;
 
-export const deletePoint = crud.delete;
+export const deletePoint = (id: string, version: number) => versionedDelete(`${API_MANAGER_BASE}/point`, id, version);
 
 export const updatePoint = crud.update;
 
 export const getPointById = crud.getById;
 
-export const listPoint = crud.list;
+export const listPoint = <T = PointRecord>(query: PageQuery) =>
+  httpPost<PageResult<T>, PageQuery>(`${API_MANAGER_BASE}/point/list`, query);
 
 export const listPointByIds = (pointIds: string[]) =>
-  httpPost<R<Record<string, PointRecord>>>(`${API_MANAGER_BASE}/point/list_by_ids`, pointIds);
+  httpPost<Record<string, PointRecord>>(`${API_MANAGER_BASE}/point/list_by_ids`, pointIds);
 
 export const listPointUnit = (pointIds: string[]) =>
-  httpPost<R<Record<string, string>>>(`${API_MANAGER_BASE}/point/unit`, pointIds);
+  httpPost<Record<string, string>>(`${API_MANAGER_BASE}/point/list_units`, pointIds);
 
 export const listPointByProfileId = (profileId: string) =>
-  httpGet<R<PointRecord[]>>(`${API_MANAGER_BASE}/point/list_by_profile_id`, {params: {profile_id: profileId}});
+  httpGet<PointRecord[]>(`${API_MANAGER_BASE}/point/list_by_profile_id`, {params: {profile_id: profileId}});
 
 export const listPointByDeviceId = (deviceId: string) =>
-  httpGet<R<PointRecord[]>>(`${API_MANAGER_BASE}/point/list_by_device_id`, {params: {device_id: deviceId}});
+  httpGet<PointRecord[]>(`${API_MANAGER_BASE}/point/list_by_device_id`, {params: {device_id: deviceId}});
 
 export const getPointValueLatest = (pointValue: Record<string, unknown>) =>
-  httpPost<R<PageResult<Record<string, unknown>>>>(`${API_DATA_BASE}/point_value/latest`, pointValue);
+  httpPost<PageResult<Record<string, unknown>>>(`${API_DATA_BASE}/point_value/latest`, pointValue);
 
 export const listPointValue = (pointValue: Record<string, unknown>) =>
-  httpPost<R<PageResult<Record<string, unknown>>>>(`${API_DATA_BASE}/point_value/list`, pointValue);
+  httpPost<CursorPageResult<Record<string, unknown>>>(`${API_DATA_BASE}/point_value/list`, pointValue);
 
-export const listPointValueHistory = (deviceId: string, pointId: string, count = 100) =>
-  httpGet<R<string[]>>(`${API_DATA_BASE}/point_value/list_history_by_device_id_and_point_id`, {
-    params: {device_id: deviceId, point_id: pointId, count}
+export const listPointValueHistory = (deviceId: string, pointId: string, cursor?: string, limit = 100) =>
+  httpGet<CursorPageResult<Record<string, unknown>>>(`${API_DATA_BASE}/point_value/history`, {
+    params: {device_id: deviceId, point_id: pointId, cursor, limit}
   });
 
 export const readPointValue = (pointValueReadVO: Record<string, unknown>) =>
-  httpPost<R<string>>(`${API_DATA_BASE}/point_command/read`, pointValueReadVO);
+  httpPost<PointCommandAccepted>(`${API_DATA_BASE}/point_command/read`, pointValueReadVO);
 
 export const writePointValue = (pointValueWriteVO: Record<string, unknown>) =>
-  httpPost<R<string>>(`${API_DATA_BASE}/point_command/write`, pointValueWriteVO);
+  httpPost<PointCommandAccepted>(`${API_DATA_BASE}/point_command/write`, pointValueWriteVO);

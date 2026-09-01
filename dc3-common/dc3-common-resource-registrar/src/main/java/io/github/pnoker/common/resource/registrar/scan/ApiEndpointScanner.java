@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
 public class ApiEndpointScanner {
 
     private static final Set<RequestMethod> SUPPORTED_METHODS = Set.of(RequestMethod.GET, RequestMethod.POST,
-            RequestMethod.PUT, RequestMethod.DELETE);
+            RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE);
 
     private static final List<String> DEFAULT_EXCLUDES = List.of("/actuator/**", "/error", "/error/**",
             "/favicon.ico");
@@ -87,7 +87,7 @@ public class ApiEndpointScanner {
         } else {
             scope = switch (httpMethod) {
                 case "POST" -> "add";
-                case "PUT" -> "update";
+                case "PUT", "PATCH" -> "update";
                 case "DELETE" -> "delete";
                 default -> "list";
             };

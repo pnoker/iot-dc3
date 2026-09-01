@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -50,7 +49,6 @@ public enum CommandHistorySourceEnum {
     AGENTIC((byte) 2, "agentic", "Agentic center"),
     ;
 
-    @EnumValue
     private final Byte index;
 
     private final String code;

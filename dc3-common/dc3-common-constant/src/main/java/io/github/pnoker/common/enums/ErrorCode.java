@@ -74,6 +74,14 @@ public enum ErrorCode implements ResponseCode {
      */
     OUT_OF_RANGE(422, "R422", "Number out of range"),
     /**
+     * A resource with the same business identity already exists.
+     */
+    ALREADY_EXISTS(409, "R4090", "Resource already exists"),
+    /**
+     * The resource changed after the caller read it.
+     */
+    CONFLICT(409, "R4091", "Resource version conflict"),
+    /**
      * Generic service failure.
      */
     FAILURE(500, "R500", "Service exception"),

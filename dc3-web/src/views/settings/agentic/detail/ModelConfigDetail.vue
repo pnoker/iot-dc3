@@ -104,7 +104,7 @@ const load = () => {
   listAgenticModelConfigs()
     .then((res) => {
       reactiveData.data =
-        (res.data || []).find((item) => String(item.id) === reactiveData.id) || ({} as AgenticModelConfig);
+        (res || []).find((item) => String(item.id) === reactiveData.id) || ({} as AgenticModelConfig);
     })
     .catch(() => {
       // handled globally

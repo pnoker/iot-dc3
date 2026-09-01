@@ -78,8 +78,8 @@ const render = () => {
 
 const load = () =>
   run(async () => {
-    const res: { data?: AgingBacklog } = await alertAging();
-    Object.assign(data, res?.data ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
+    const res: AgingBacklog = await alertAging();
+    Object.assign(data, res ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
     await nextTick();
     if (data.total > 0) render();
   });

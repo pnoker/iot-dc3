@@ -2,9 +2,9 @@
 
 ## Overview
 
-`dc3-common-manager` is the shared Device Management business module of the IoT DC3 platform. It contains all
-controllers, service implementations, gRPC servers, DAL managers, mappers, and event handling logic for the Manager
-Center. It is wired into `dc3-center-manager`.
+`dc3-common-manager` is the shared Device Management business module of the IoT DC3 platform. It owns the Manager
+domain's controllers, services, repository ports and adapters, gRPC servers, and event handling logic, including
+label/group persistence. It is wired into `dc3-center-manager`.
 
 ## Module Information
 
@@ -16,9 +16,9 @@ Center. It is wired into `dc3-center-manager`.
 | Layer                            | Contents                                                                                            |
 |----------------------------------|-----------------------------------------------------------------------------------------------------|
 | Controllers                      | REST controllers for driver, device, profile, point, group, label, topic, etc.                      |
-| Services                         | `DriverService`, `DeviceService`, `ProfileService`, `PointService`, `DriverRegisterService`         |
+| Services                         | Reactive business services returning `Mono`/`Flux` without blocking bridges                        |
+| Repositories                     | R2DBC repository ports and dialect-aware adapters for Manager metadata                              |
 | gRPC Servers (Spring `@Service`) | `DriverDriverServer`, `DriverDeviceServer`, `DriverPointServer`, `ManagerPointServer`               |
-| DAL Managers                     | `DriverManager`, `DeviceManager`, `ProfileManager`, `PointManager` (MyBatis-Plus `IService`)        |
 | Metadata Events                  | `MetadataEventPublisher`, `MetadataEventListener` — async metadata change notification via RabbitMQ |
 | Scheduled Jobs                   | `ScheduleForManagerServiceImpl` — Quartz-based hourly maintenance job (`HourlyJobForManager`)       |
 

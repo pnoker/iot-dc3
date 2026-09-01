@@ -96,12 +96,4 @@ public class SystemHealthVO implements Serializable {
 
     }
 
-    /**
-     * Backwards-compat alias — drivers used to be typed as DriverSummary.
-     */
-    @Schema(description = "Backwards-compat subclass preserved so older clients referencing DriverSummary still deserialize")
-    public static class DriverSummary extends FleetSummary {
-
-    }
-
 }

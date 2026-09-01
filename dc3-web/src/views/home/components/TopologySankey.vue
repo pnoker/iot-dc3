@@ -368,8 +368,8 @@ const load = async () => {
       mode.value === "volume"
         ? { mode: mode.value, rangeKey: rangeKey.value }
         : { mode: mode.value };
-    const res: { data?: TopologyResponse } = await topology(params);
-    const payload = res?.data ?? {
+    const res: TopologyResponse = await topology(params);
+    const payload = res ?? {
       nodes: [],
       links: [],
       stats: { driverCount: 0, deviceCount: 0, profileCount: 0, pointCount: 0 },

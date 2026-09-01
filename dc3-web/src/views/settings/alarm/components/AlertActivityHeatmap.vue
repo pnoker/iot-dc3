@@ -83,8 +83,8 @@ const render = (rows: { dow: number; hour: number; count: number }[]) => {
 const load = async () => {
   loading.value = true;
   try {
-    const res: { data?: { dow: number; hour: number; count: number }[] } = await alertActivity(7);
-    const rows = res?.data ?? [];
+    const res: { dow: number; hour: number; count: number }[] = await alertActivity(7);
+    const rows = res ?? [];
     await nextTick();
     render(rows);
   } catch {

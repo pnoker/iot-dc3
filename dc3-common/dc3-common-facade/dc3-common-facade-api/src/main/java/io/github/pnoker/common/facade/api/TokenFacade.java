@@ -17,6 +17,8 @@
 
 package io.github.pnoker.common.facade.api;
 
+import reactor.core.publisher.Mono;
+
 /**
  * Protocol-neutral token facade. Mirrors {@code api.center.auth.TokenApi}.
  * <p>
@@ -37,6 +39,6 @@ public interface TokenFacade {
      * @param token  token the client holds
      * @return {@code true} when the token is valid and unexpired for the identity
      */
-    boolean checkValid(String tenant, String name, String token);
+    Mono<Boolean> checkValid(String tenant, String name, String token);
 
 }

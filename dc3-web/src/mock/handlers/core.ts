@@ -18,8 +18,9 @@
 import {on} from '../dispatch';
 import {localizeEntities, localizeEntity} from '../locale';
 import {matches, paginate} from '../query';
-import {ok, responseOf} from '../response';
+import {fail, ok, responseOf} from '../response';
 import {newId, stamp} from '../crud';
+import type {MockCtx} from '../types';
 
 const enableFilter = (row: Record<string, unknown>, body: any): boolean => {
   const flag = body?.enableFlag;
@@ -69,13 +70,24 @@ export function registerCoreHandlers(): void {
       ok(byIdsMap(localizeEntities('driver', ctx.db.drivers), Array.isArray(ctx.body) ? ctx.body : [])),
     ),
   );
+  on('delete', 'api/v3/manager/driver/delete', (ctx) => {
+    const index = ctx.db.drivers.findIndex(
+      (row) => String(row.id) === String(ctx.params.id) && Number(row.version) === Number(ctx.params.version),
+    );
+    if (index < 0) return responseOf(ctx.config, fail('R4091', 'Version conflict', 409), 409);
+    ctx.db.drivers.splice(index, 1);
+    return responseOf(ctx.config, null, 204);
+  });
 
   // ── device ──
   on('post', 'api/v3/manager/device/list', (ctx) => {
     const rows = localizeEntities('device', ctx.db.devices);
     const filter = (d: Record<string, unknown>) =>
       matches(d.deviceName, ctx.body.deviceName) &&
+      (!ctx.body.deviceCode || String(d.deviceCode) === String(ctx.body.deviceCode)) &&
       (!ctx.body.driverId || String(d.driverId) === String(ctx.body.driverId)) &&
+      (!ctx.body.profileId || String(d.profileId) === String(ctx.body.profileId)) &&
+      (ctx.body.version === undefined || Number(d.version) === Number(ctx.body.version)) &&
       enableFilter(d, ctx.body);
     return responseOf(ctx.config, ok(paginate(rows, ctx.body, filter)));
   });
@@ -113,14 +125,15 @@ export function registerCoreHandlers(): void {
   );
 
   // ── point ──
-  on('post', 'api/v3/manager/point/list', (ctx) => {
+  const listPoints = (ctx: MockCtx) => {
     const rows = localizeEntities('point', ctx.db.points);
     const filter = (p: Record<string, unknown>) =>
       matches(p.pointName, ctx.body.pointName) &&
       (!ctx.body.profileId || String(p.profileId) === String(ctx.body.profileId)) &&
       enableFilter(p, ctx.body);
     return responseOf(ctx.config, ok(paginate(rows, ctx.body, filter)));
-  });
+  };
+  on('post', 'api/v3/manager/point/list', listPoints);
   on('get', 'api/v3/manager/point/get_by_id', (ctx) =>
     responseOf(
       ctx.config,
@@ -145,21 +158,27 @@ export function registerCoreHandlers(): void {
   // ── CUD for mutable entities (driver stays read-only — backend-registered) ──
   const cud = (url: string, key: 'devices' | 'profiles' | 'points') => {
     on('post', `${url}/add`, (ctx) => {
-      const row: Record<string, unknown> = {...ctx.body, id: newId(), createTime: stamp(), operateTime: stamp()};
+      const row: Record<string, unknown> = {...ctx.body, id: newId(), version: 0, createTime: stamp(), operateTime: stamp()};
       ctx.db[key].push(row);
-      return responseOf(ctx.config, ok(String(row.id)));
+      return responseOf(ctx.config, ok(row), 201);
     });
     on('post', `${url}/update`, (ctx) => {
       const coll = ctx.db[key];
-      const i = coll.findIndex((r) => String(r.id) === String(ctx.body?.id));
-      if (i >= 0) coll[i] = {...coll[i], ...ctx.body, operateTime: stamp()};
-      return responseOf(ctx.config, ok(String(ctx.body?.id ?? '')));
+      const i = coll.findIndex(
+        (row) => String(row.id) === String(ctx.body?.id) && Number(row.version) === Number(ctx.body?.version),
+      );
+      if (i < 0) return responseOf(ctx.config, fail('R4091', 'Version conflict', 409), 409);
+      coll[i] = {...coll[i], ...ctx.body, version: Number(coll[i]?.version ?? 0) + 1, operateTime: stamp()};
+      return responseOf(ctx.config, ok(coll[i]));
     });
-    on('post', `${url}/delete`, (ctx) => {
+    on('delete', `${url}/delete`, (ctx) => {
       const coll = ctx.db[key];
-      const i = coll.findIndex((r) => String(r.id) === String(ctx.params.id));
-      if (i >= 0) coll.splice(i, 1);
-      return responseOf(ctx.config, ok(String(ctx.params.id)));
+      const i = coll.findIndex(
+        (row) => String(row.id) === String(ctx.params.id) && Number(row.version) === Number(ctx.params.version),
+      );
+      if (i < 0) return responseOf(ctx.config, fail('R4091', 'Version conflict', 409), 409);
+      coll.splice(i, 1);
+      return responseOf(ctx.config, null, 204);
     });
   };
   cud('api/v3/manager/device', 'devices');

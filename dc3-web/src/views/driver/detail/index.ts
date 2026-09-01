@@ -66,7 +66,7 @@ export default defineComponent({
 
     const driver = () => {
       getDriverById(reactiveData.id).then((res) => {
-        reactiveData.data = res.data;
+        reactiveData.data = res;
       });
     };
 

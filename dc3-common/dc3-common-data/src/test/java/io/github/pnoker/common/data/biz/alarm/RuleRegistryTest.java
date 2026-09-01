@@ -18,8 +18,7 @@
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
-import io.github.pnoker.common.data.entity.builder.RuleBuilder;
-import io.github.pnoker.common.data.entity.model.RuleDO;
+import io.github.pnoker.common.data.repository.ReactiveRuleStore;
 import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +33,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,10 +42,7 @@ import static org.mockito.Mockito.when;
 class RuleRegistryTest {
 
     @Mock
-    private RuleCandidateLookup ruleCandidateLookup;
-
-    @Mock
-    private RuleBuilder ruleBuilder;
+    private ReactiveRuleStore ruleStore;
 
     private RuleRegistry registry;
 
@@ -62,60 +59,57 @@ class RuleRegistryTest {
     @BeforeEach
     void setUp() {
         AlarmCacheProperties props = new AlarmCacheProperties();
-        registry = new RuleRegistry(ruleCandidateLookup, ruleBuilder, props);
+        registry = new RuleRegistry(ruleStore, props);
     }
 
     @Test
     void cachesAcrossRepeatedLookups() {
-        when(ruleCandidateLookup.findCandidates(any())).thenReturn(List.of(new RuleDO()));
-        when(ruleBuilder.buildBOListByDOList(any())).thenReturn(List.of(rule(1L)));
+        when(ruleStore.listEnabledCandidates(anyLong(), any(), anyLong())).thenReturn(reactor.core.publisher.Flux.just(rule(1L)));
 
         // Same fact twice → only one DB lookup; the second call is a cache hit.
-        registry.findCandidates(fact(7L, 11L));
-        registry.findCandidates(fact(7L, 11L));
+        registry.findCandidates(fact(7L, 11L)).block();
+        registry.findCandidates(fact(7L, 11L)).block();
 
-        verify(ruleCandidateLookup, times(1)).findCandidates(any());
-        verify(ruleBuilder, times(1)).buildBOListByDOList(any());
+        verify(ruleStore, times(1)).listEnabledCandidates(anyLong(), any(), anyLong());
     }
 
     @Test
     void distinctEntitiesGetSeparateCacheEntries() {
-        when(ruleCandidateLookup.findCandidates(any())).thenReturn(List.of(new RuleDO()));
-        when(ruleBuilder.buildBOListByDOList(any())).thenReturn(List.of(rule(1L)));
+        when(ruleStore.listEnabledCandidates(anyLong(), any(), anyLong())).thenReturn(reactor.core.publisher.Flux.just(rule(1L)));
 
-        registry.findCandidates(fact(7L, 11L));
-        registry.findCandidates(fact(7L, 12L));
+        registry.findCandidates(fact(7L, 11L)).block();
+        registry.findCandidates(fact(7L, 12L)).block();
 
-        verify(ruleCandidateLookup, times(2)).findCandidates(any());
+        verify(ruleStore, times(2)).listEnabledCandidates(anyLong(), any(), anyLong());
     }
 
     @Test
     void invalidateTenantDropsOnlyMatchingTenant() {
-        when(ruleCandidateLookup.findCandidates(any())).thenReturn(List.of(new RuleDO()));
-        when(ruleBuilder.buildBOListByDOList(any())).thenReturn(List.of(rule(1L)));
+        when(ruleStore.listEnabledCandidates(anyLong(), any(), anyLong()))
+                .thenReturn(reactor.core.publisher.Flux.just(rule(1L)));
 
-        registry.findCandidates(fact(7L, 11L));
-        registry.findCandidates(fact(8L, 11L));
+        registry.findCandidates(fact(7L, 11L)).block();
+        registry.findCandidates(fact(8L, 11L)).block();
 
         registry.invalidateTenant(7L);
 
         // tenant 7 should re-load on the next lookup; tenant 8 stays cached.
-        registry.findCandidates(fact(7L, 11L));
-        registry.findCandidates(fact(8L, 11L));
+        registry.findCandidates(fact(7L, 11L)).block();
+        registry.findCandidates(fact(8L, 11L)).block();
 
-        verify(ruleCandidateLookup, times(3)).findCandidates(any()); // 2 misses + 1 reload after invalidate
+        verify(ruleStore, times(3)).listEnabledCandidates(anyLong(), any(), anyLong());
     }
 
     @Test
     void invalidateAllDropsEverything() {
-        when(ruleCandidateLookup.findCandidates(any())).thenReturn(List.of(new RuleDO()));
-        when(ruleBuilder.buildBOListByDOList(any())).thenReturn(List.of(rule(1L)));
+        when(ruleStore.listEnabledCandidates(anyLong(), any(), anyLong()))
+                .thenReturn(reactor.core.publisher.Flux.just(rule(1L)));
 
-        registry.findCandidates(fact(7L, 11L));
+        registry.findCandidates(fact(7L, 11L)).block();
         registry.invalidateAll();
-        registry.findCandidates(fact(7L, 11L));
+        registry.findCandidates(fact(7L, 11L)).block();
 
-        verify(ruleCandidateLookup, times(2)).findCandidates(any());
+        verify(ruleStore, times(2)).listEnabledCandidates(anyLong(), any(), anyLong());
     }
 
     @Test
@@ -123,10 +117,10 @@ class RuleRegistryTest {
         // A fact with null tenantId / entityId should not be cached, and must
         // not trip the underlying lookup either — the engine guards against
         // bad input upstream.
-        assertThat(registry.findCandidates(null)).isEmpty();
+        assertThat(registry.findCandidates(null).block()).isEmpty();
         assertThat(registry.findCandidates(new RuleFact(null, AlarmTargetTypeEnum.POINT, 11L,
-                null, LocalDateTime.now(), Map.of()))).isEmpty();
-        verify(ruleCandidateLookup, times(0)).findCandidates(any());
+                null, LocalDateTime.now(), Map.of())).block()).isEmpty();
+        verify(ruleStore, times(0)).listEnabledCandidates(anyLong(), any(), anyLong());
     }
 
 }

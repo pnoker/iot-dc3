@@ -1,23 +1,5 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.data.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
@@ -25,10 +7,9 @@ import io.github.pnoker.common.data.entity.builder.NotifyChannelBuilder;
 import io.github.pnoker.common.data.entity.query.NotifyChannelQuery;
 import io.github.pnoker.common.data.entity.vo.NotifyChannelVO;
 import io.github.pnoker.common.data.service.NotifyChannelService;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -36,9 +17,9 @@ import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,149 +28,28 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
-/**
- * Notification channel controller.
- *
- * @author pnoker
- * @since 2016.10.1
- */
-@Tag(name = "notify_channel", description = "Notification channel definitions: manage delivery mechanisms for alerts including email, SMS, webhook, and message-bus channels with endpoint configuration")
-@Slf4j
+@Tag(name = "notify_channel", description = "Notification delivery channels")
 @RestController
 @RequestMapping(DataConstant.NOTIFY_CHANNEL_URL_PREFIX)
 @RequiredArgsConstructor
 public class NotifyChannelController implements BaseController {
-
-    private final NotifyChannelBuilder notifyChannelBuilder;
-
-    private final NotifyChannelService notifyChannelService;
-
-    /**
-     * Create a notification delivery channel (email, SMS, webhook, or message bus) for
-     * the current tenant.
-     *
-     * @param entityVO notification channel payload (type, endpoint configuration) to create
-     * @return add-success status
-     */
-    @PreAuthorize("@perm.can('notify_channel', 'add')")
-    @Operation(summary = "Add Notification Channel", description = "Create a notification delivery channel (email, SMS, webhook, or message bus) for the current tenant. " +
-            "Returns add-success status; the channel must be bound to a rule via NotifyChannelBind before it can dispatch.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "false"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
-    @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody NotifyChannelVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            NotifyChannelBO entityBO = notifyChannelBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(tenantId);
-            notifyChannelService.add(entityBO);
-            return R.ok(SuccessCode.ADD);
-        }));
-    }
-
-    /**
-     * Delete a notification channel by ID, scoped to the current tenant.
-     *
-     * @param id primary key of the notification channel to delete; must belong to the current tenant
-     * @return delete-success status
-     */
-    @PreAuthorize("@perm.can('notify_channel', 'delete')")
-    @Operation(summary = "Delete Notification Channel", description = "Delete a notification channel by ID, scoped to the current tenant. " +
-            "Use to retire a delivery channel whose endpoint is no longer valid; existing NotifyHistory records are preserved.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
-                    @ExtensionProperty(name = "destructive", value = "true"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
-    @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, notifyChannelService.getById(id));
-            notifyChannelService.delete(id);
-            return R.ok(SuccessCode.DELETE);
-        }));
-    }
-
-    /**
-     * Update an existing notification channel's endpoint and configuration for the
-     * current tenant.
-     *
-     * @param entityVO notification channel payload with the endpoint/configuration to update; the owning tenant is verified before mutation
-     * @return update-success status
-     */
-    @PreAuthorize("@perm.can('notify_channel', 'update')")
-    @Operation(summary = "Update Notification Channel", description = "Update an existing notification channel's endpoint and configuration for the current tenant. " +
-            "Use to rotate webhook URLs, credentials, or recipient lists; the owning tenant is verified before mutation.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
-    @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody NotifyChannelVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            NotifyChannelBO entityBO = notifyChannelBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(tenantId);
-            requireTenant(tenantId, notifyChannelService.getById(entityBO.getId()));
-            notifyChannelService.update(entityBO);
-            return R.ok(SuccessCode.UPDATE);
-        }));
-    }
-
-    /**
-     * Return a single notification channel with its endpoint configuration, scoped to
-     * the current tenant.
-     *
-     * @param id primary key of the target notification channel; must belong to the current tenant
-     * @return the matched NotifyChannelVO with endpoint configuration; fails if not found or not tenant-owned
-     */
-    @PreAuthorize("@perm.can('notify_channel', 'get')")
-    @Operation(summary = "Get Notification Channel by ID", description = "Return a single notification channel with its endpoint configuration, scoped to the current tenant. " +
-            "Use to inspect how a rule's alerts will be delivered before binding or firing.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
-    @GetMapping("/get_by_id")
-    public Mono<R<NotifyChannelVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            NotifyChannelBO entityBO = requireTenant(tenantId, notifyChannelService.getById(id));
-            return R.ok(notifyChannelBuilder.buildVOByBO(entityBO));
-        }));
-    }
-
-    /**
-     * Page through notification delivery channels owned by the current tenant.
-     *
-     * @param entityQuery optional filter and pagination body; a default empty query is used when null
-     * @return a page of NotifyChannelVO matching the query
-     */
-    @PreAuthorize("@perm.can('notify_channel', 'list')")
-    @Operation(summary = "List Notification Channels", description = "Page through notification delivery channels owned by the current tenant. " +
-            "Use to enumerate available channels for rule binding; results are filtered by the query and returned as a paginated page.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
-    @PostMapping("/list")
-    public Mono<R<Page<NotifyChannelVO>>> list(@RequestBody(required = false) NotifyChannelQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            NotifyChannelQuery query = Objects.isNull(entityQuery) ? new NotifyChannelQuery() : entityQuery;
-            query.setTenantId(tenantId);
-            Page<NotifyChannelBO> entityPageBO = notifyChannelService.list(query);
-            return R.ok(notifyChannelBuilder.buildVOPageByBOPage(entityPageBO));
-        }));
-    }
-
+    private final NotifyChannelBuilder builder;
+    private final NotifyChannelService service;
+    @Operation(summary = "Add channel", description = "Create a tenant-scoped notification channel.", extensions = @Extension(name = "x-dc3-ai", properties = @ExtensionProperty(name = "riskLevel", value = "LOW")))
+    @PreAuthorize("@perm.can('notify_channel', 'add')") @PostMapping("/add")
+    public Mono<NotifyChannelVO> add(@Validated(Add.class) @RequestBody NotifyChannelVO request) { return context().flatMap(ctx -> { NotifyChannelBO value = builder.buildBOByVO(request); value.setTenantId(ctx.tenant()); value.setCreatorId(ctx.userId()); value.setCreatorName(ctx.userName()); value.setOperatorId(ctx.userId()); value.setOperatorName(ctx.userName()); return service.add(value).map(builder::buildVOByBO); }); }
+    @Operation(summary = "Delete channel", description = "Delete a tenant-scoped notification channel.", extensions = @Extension(name = "x-dc3-ai", properties = @ExtensionProperty(name = "riskLevel", value = "HIGH")))
+    @PreAuthorize("@perm.can('notify_channel', 'delete')") @DeleteMapping("/delete")
+    public Mono<Void> delete(@Parameter(description = "Tenant-owned channel ID") @NotNull @RequestParam("id") Long id) { return getTenantId().flatMap(tenant -> service.delete(tenant, id).then()); }
+    @Operation(summary = "Update channel", description = "Update a tenant-scoped notification channel.", extensions = @Extension(name = "x-dc3-ai", properties = @ExtensionProperty(name = "riskLevel", value = "MEDIUM")))
+    @PreAuthorize("@perm.can('notify_channel', 'update')") @PostMapping("/update")
+    public Mono<NotifyChannelVO> update(@Validated(Update.class) @RequestBody NotifyChannelVO request) { return context().flatMap(ctx -> { NotifyChannelBO value = builder.buildBOByVO(request); value.setTenantId(ctx.tenant()); value.setOperatorId(ctx.userId()); value.setOperatorName(ctx.userName()); return service.update(value).map(builder::buildVOByBO); }); }
+    @Operation(summary = "Get channel", description = "Return one tenant-scoped notification channel.", extensions = @Extension(name = "x-dc3-ai", properties = @ExtensionProperty(name = "riskLevel", value = "LOW")))
+    @PreAuthorize("@perm.can('notify_channel', 'get')") @GetMapping("/get_by_id")
+    public Mono<NotifyChannelVO> getById(@Parameter(description = "Tenant-owned channel ID") @NotNull @RequestParam("id") Long id) { return getTenantId().flatMap(tenant -> service.getById(tenant, id).map(builder::buildVOByBO)); }
+    @Operation(summary = "List channels", description = "List tenant-scoped notification channels.", extensions = @Extension(name = "x-dc3-ai", properties = @ExtensionProperty(name = "riskLevel", value = "LOW")))
+    @PreAuthorize("@perm.can('notify_channel', 'list')") @PostMapping("/list")
+    public Mono<OffsetPage<NotifyChannelVO>> list(@RequestBody(required = false) NotifyChannelQuery request) { return getTenantId().flatMap(tenant -> service.list(tenant, request).map(page -> OffsetPage.of(page.items().stream().map(builder::buildVOByBO).toList(), page.offset(), page.limit(), page.total()))); }
+    private Mono<Context> context() { return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty("")) .map(value -> new Context(value.getT1().getT1(), value.getT1().getT2(), value.getT2())); }
+    private record Context(Long tenant, Long userId, String userName) { }
 }

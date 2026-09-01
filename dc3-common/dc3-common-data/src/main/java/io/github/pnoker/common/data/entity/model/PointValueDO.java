@@ -17,8 +17,6 @@
 
 package io.github.pnoker.common.data.entity.model;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -36,7 +34,6 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@TableName("dc3_point_value")
 public class PointValueDO implements Serializable {
 
     @Serial
@@ -45,55 +42,46 @@ public class PointValueDO implements Serializable {
     /**
      * Immutable event identity used for idempotent inserts.
      */
-    @TableField("message_id")
     private String messageId;
 
     /**
      * Wire schema version.
      */
-    @TableField("schema_version")
     private Integer schemaVersion;
 
     /**
      * Unique runtime node that produced this reading.
      */
-    @TableField("driver_node")
     private String driverNode;
 
     /**
      * Monotonically increasing sequence within {@link #driverNode}.
      */
-    @TableField("sequence")
     private Long sequence;
 
     /**
      * Manager-issued device ownership fencing token.
      */
-    @TableField("fencing_token")
     private Long fencingToken;
 
     /**
      * Device ID
      */
-    @TableField("device_id")
     private Long deviceId;
 
     /**
      * Point ID
      */
-    @TableField("point_id")
     private Long pointId;
 
     /**
      * Raw value
      */
-    @TableField("raw_value")
     private String rawValue;
 
     /**
      *
      */
-    @TableField("cal_value")
     private String calValue;
 
     /**
@@ -101,31 +89,31 @@ public class PointValueDO implements Serializable {
      * queries (AVG/MIN/MAX/SUM/timeseries). NULL for non-numeric payloads
      * (booleans, JSON, free-form text).
      */
-    @TableField("num_value")
     private Double numValue;
+
+    /**
+     * OPC-UA style quality code. Zero represents a good sample.
+     */
+    private Integer quality;
 
     /**
      * Driver ID
      */
-    @TableField("driver_id")
     private Long driverId;
 
     /**
      * Tenant ID
      */
-    @TableField("tenant_id")
     private Long tenantId;
 
     /**
      * Create Time
      */
-    @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
      * Operate Time
      */
-    @TableField("operate_time")
     private LocalDateTime operateTime;
 
 }

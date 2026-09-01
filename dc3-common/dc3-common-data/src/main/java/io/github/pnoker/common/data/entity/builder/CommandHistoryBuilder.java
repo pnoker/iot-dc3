@@ -17,13 +17,12 @@
 
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.CommandCallBO;
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -70,8 +69,9 @@ public interface CommandHistoryBuilder {
      * @param entityPageDO persistence object
      * @return converted value
      */
-    default Page<CommandHistoryVO> buildVOPageByDOPage(Page<CommandHistoryDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildVOByDO);
+    default OffsetPage<CommandHistoryVO> buildVOPageByDOPage(OffsetPage<CommandHistoryDO> entityPageDO) {
+        return OffsetPage.of(entityPageDO.items().stream().map(this::buildVOByDO).toList(),
+                entityPageDO.offset(), entityPageDO.limit(), entityPageDO.total());
     }
 
 }

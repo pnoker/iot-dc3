@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
 import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 import io.github.pnoker.common.data.entity.vo.NotifyHistoryVO;
@@ -28,7 +27,6 @@ import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -54,6 +52,7 @@ public interface NotifyHistoryBuilder {
      * @return converted value
      */
     @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "dedupeKey", ignore = true)
     NotifyHistoryBO buildBOByVO(NotifyHistoryVO entityVO);
 
     /**
@@ -172,26 +171,6 @@ public interface NotifyHistoryBuilder {
      * @return converted value
      */
     List<NotifyHistoryVO> buildVOListByBOList(List<NotifyHistoryBO> entityBOList);
-
-    /**
-     * Convert do page to bo page.
-     *
-     * @param entityPageDO persistence object
-     * @return converted value
-     */
-    default Page<NotifyHistoryBO> buildBOPageByDOPage(Page<NotifyHistoryDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    /**
-     * Convert bo page to vo page.
-     *
-     * @param entityPageBO business object
-     * @return converted value
-     */
-    default Page<NotifyHistoryVO> buildVOPageByBOPage(Page<NotifyHistoryBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
     /**
      * Build request ext.

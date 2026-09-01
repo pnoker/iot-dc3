@@ -23,6 +23,7 @@ import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.SubscriptionMode;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.WireMqDelivery;
 import io.github.pnoker.common.mq.core.EnvelopeCodec;
 import io.github.pnoker.common.mq.core.MessageSenderImpl;
@@ -45,7 +46,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
+import java.util.function.Function;
+import reactor.core.publisher.Sinks;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -139,15 +141,15 @@ public abstract class AbstractMqContractTest {
      * Subscribe and collect received deliveries. When {@code each} is null, deliveries are
      * acknowledged immediately and recorded; otherwise the callback owns the acknowledgment.
      */
-    protected final List<Received> subscribeCollector(SubscriptionSpec spec, Consumer<WireMqDelivery> each) {
+    protected final List<Received> subscribeCollector(SubscriptionSpec spec,
+                                                      Function<WireMqDelivery, DeliveryDisposition> each) {
         List<Received> received = new CopyOnWriteArrayList<>();
         adapter().subscribe(spec, delivery -> {
+            received.add(new Received(delivery));
             if (Objects.nonNull(each)) {
-                each.accept(delivery);
-            } else {
-                received.add(new Received(delivery));
-                delivery.acknowledgment().ack();
+                return reactor.core.publisher.Mono.just(each.apply(delivery));
             }
+            return reactor.core.publisher.Mono.just(DeliveryDisposition.ACK);
         });
         settle();
         return received;
@@ -158,17 +160,15 @@ public abstract class AbstractMqContractTest {
      * first delivery's acknowledgment is used to ack the batch; otherwise the callback owns it.
      */
     protected final List<Received> subscribeBatchCollector(SubscriptionSpec spec,
-                                                           java.util.function.BiConsumer<List<Received>,
-                                                                   io.github.pnoker.common.mq.listener.Acknowledgment> batch) {
+                                                           Function<List<Received>, DeliveryDisposition> batch) {
         List<Received> received = new CopyOnWriteArrayList<>();
         adapter().subscribeBatch(spec, deliveries -> {
             List<Received> batchReceived = deliveries.stream().map(Received::new).toList();
             received.addAll(batchReceived);
             if (Objects.nonNull(batch)) {
-                batch.accept(batchReceived, deliveries.get(0).acknowledgment());
-            } else {
-                deliveries.get(0).acknowledgment().ack();
+                return reactor.core.publisher.Mono.just(batch.apply(batchReceived));
             }
+            return reactor.core.publisher.Mono.just(DeliveryDisposition.ACK);
         });
         settle();
         return received;
@@ -268,7 +268,7 @@ public abstract class AbstractMqContractTest {
     void rejectWithoutRequeueRoutesToTheDeadLetter() {
         List<Received> dead = subscribeCollector(loadBalance(MqTopic.POINT_COMMAND_DEAD, "tck-dlq-reader"), null);
         subscribeCollector(loadBalancePattern(MqTopic.POINT_COMMAND, "tck-dlq", "tck.*"),
-                delivery -> delivery.acknowledgment().reject(false));
+                delivery -> DeliveryDisposition.DEAD_LETTER);
 
         TestPayload sent = payload("doomed");
         sender().send(MqMessage.of(MqTopic.POINT_COMMAND, "tck.node", sent));
@@ -281,15 +281,40 @@ public abstract class AbstractMqContractTest {
         AtomicInteger attempts = new AtomicInteger();
         subscribeCollector(loadBalancePattern(MqTopic.POINT_COMMAND, "tck-rq", "tck.*"), delivery -> {
             if (attempts.getAndIncrement() == 0) {
-                delivery.acknowledgment().reject(true);
-            } else {
-                delivery.acknowledgment().ack();
+                return DeliveryDisposition.REQUEUE;
             }
+            return DeliveryDisposition.ACK;
         });
 
         sender().send(MqMessage.of(MqTopic.POINT_COMMAND, "tck.node", payload("retry")));
 
         await("redelivery observed", () -> attempts.get() >= 2);
+    }
+
+    @Test
+    void incompleteListenerPublisherIsNotSettledBeforeConsumerStops() {
+        SubscriptionSpec spec = loadBalancePattern(MqTopic.POINT_COMMAND, "tck-completion", "tck.*");
+        CountDownLatch delivered = new CountDownLatch(1);
+        Sinks.One<DeliveryDisposition> completion = Sinks.one();
+        adapter().subscribe(spec, delivery -> {
+            delivered.countDown();
+            return completion.asMono();
+        });
+        settle();
+
+        TestPayload sent = payload("wait-for-completion");
+        sender().send(MqMessage.of(MqTopic.POINT_COMMAND, "tck.node", sent));
+        try {
+            assertThat(delivered.await(10, TimeUnit.SECONDS)).isTrue();
+        } catch (InterruptedException error) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError("interrupted while awaiting first delivery", error);
+        }
+
+        shutdownAdapter();
+        List<Received> redelivered = subscribeCollector(spec, null);
+        await("unsettled message redelivered after restart",
+                () -> redelivered.stream().anyMatch(received -> received.payload.equals(sent)));
     }
 
     @Test
@@ -338,7 +363,7 @@ public abstract class AbstractMqContractTest {
     @Test
     void retryExhaustionDeadLettersInsteadOfDropping() {
         List<Received> dead = subscribeCollector(loadBalance(MqTopic.POINT_VALUE_DEAD, "tck-dead-reader"), null);
-        subscribeBatchCollector(batchSpec(MqTopic.POINT_VALUE), (batch, ack) -> {
+        subscribeBatchCollector(batchSpec(MqTopic.POINT_VALUE), batch -> {
             throw new IllegalStateException("always failing listener");
         });
 

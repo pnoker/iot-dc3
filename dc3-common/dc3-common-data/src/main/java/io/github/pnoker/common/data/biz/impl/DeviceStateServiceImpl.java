@@ -1,137 +1,72 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.data.biz.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
 import io.github.pnoker.common.data.biz.DeviceStateService;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.mapper.EntityStateMapper;
+import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.TimeoutSourceTypeEnum;
+import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * Business service implementation for device heartbeat and state processing.
- *
- * @author pnoker
- * @since 2016.10.1
- */
+/** Reactive device heartbeat and lease service. */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DeviceStateServiceImpl implements DeviceStateService {
 
     private final DeviceAlarmService deviceAlarmService;
-
-    private final EntityStateMapper entityStateMapper;
-
-    /**
-     * Return whether the online/offline side changed between the previous state index
-     * and the current status code (ONLINE and MAINTAIN count as the online side).
-     *
-     * @param prevIndex   the previous state flag index
-     * @param currentCode the current status code
-     * @return true if the online/offline side flipped
-     */
-    private static boolean isFlip(byte prevIndex, String currentCode) {
-        return online(prevIndex) != online(currentCode);
-    }
-
-    /**
-     * Return whether a state index is on the online side (ONLINE or MAINTAIN).
-     *
-     * @param index the state flag index
-     * @return true if online or maintain
-     */
-    private static boolean online(byte index) {
-        return index == EntityStatusEnum.ONLINE.getIndex() || index == EntityStatusEnum.MAINTAIN.getIndex();
-    }
-
-    private static boolean online(String code) {
-        return EntityStatusEnum.ONLINE.getCode().equals(code) || EntityStatusEnum.MAINTAIN.getCode().equals(code);
-    }
+    private final ReactiveEntityStateStore stateStore;
 
     @Override
-    public void heartbeat(DeviceStateDTO entityDTO) {
-        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())
-                || Objects.isNull(entityDTO.getDriverId()) || Objects.isNull(entityDTO.getTenantId())
-                || Objects.isNull(entityDTO.getStatus()) || Objects.isNull(entityDTO.getTimeoutUnit())
-                || entityDTO.getTimeout() <= 0) {
-            return;
-        }
-
-        long ttlSeconds = entityDTO.getTimeoutUnit().toSeconds(entityDTO.getTimeout());
-        if (ttlSeconds <= 0 || ttlSeconds > Integer.MAX_VALUE) {
-            return;
-        }
-
-        EntityStatusEnum statusEnum = EntityStatusEnum.ofCode(entityDTO.getStatus());
-        if (Objects.isNull(statusEnum)) {
-            statusEnum = EntityStatusEnum.OFFLINE;
-        }
-        String current = statusEnum.getCode();
-        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(ttlSeconds);
-        entityStateMapper.upsertEntityState(
-                IdWorker.getId(),
-                entityDTO.getTenantId(),
-                EntityTypeEnum.DEVICE.getIndex(),
-                entityDTO.getDeviceId(),
-                entityDTO.getDriverId(),
-                statusEnum.getIndex(),
-                EntityStatusEnum.OFFLINE.getIndex(),
-                expireTime,
-                (int) ttlSeconds,
-                TimeoutSourceTypeEnum.DRIVER.getIndex(),
-                "device-heartbeat",
-                entityDTO.getStateDescription());
-        // MySQL has no INSERT ... RETURNING; the portable shape re-reads the row
-        // by its unique key right after the upsert.
-        EntityStateDO stateDO = entityStateMapper.selectByUniqueKey(
-                entityDTO.getTenantId(), EntityTypeEnum.DEVICE.getIndex(), entityDTO.getDeviceId());
-        if (Objects.isNull(stateDO)) {
-            return;
-        }
-
-        byte lastIndex = stateDO.getLastStateFlag();
-        if (isFlip(lastIndex, current)) {
-            String message = String.format("Device status changed: %s -> %s",
-                    EntityStatusEnum.ofIndex(lastIndex) != null ? EntityStatusEnum.ofIndex(lastIndex).getCode() : DataConstant.STATUS_UNKNOWN,
-                    current);
-            DeviceAlarmDTO alarm = DeviceAlarmDTO.builder()
-                    .driverId(entityDTO.getDriverId())
-                    .tenantId(entityDTO.getTenantId())
-                    .deviceId(entityDTO.getDeviceId())
-                    .status(current)
-                    .statusName(EntityStatusEnum.ofCode(current) != null ? EntityStatusEnum.ofCode(current).name() : current)
-                    .message(message)
-                    .build();
-            deviceAlarmService.alarm(alarm);
-        }
+    public Mono<Void> heartbeat(DeviceStateDTO event) {
+        if (event == null || event.getDeviceId() == null || event.getDriverId() == null
+                || event.getTenantId() == null || event.getStatus() == null || event.getTimeoutUnit() == null
+                || event.getTimeout() <= 0) return Mono.empty();
+        long ttl = event.getTimeoutUnit().toSeconds(event.getTimeout());
+        if (ttl <= 0 || ttl > Integer.MAX_VALUE) return Mono.empty();
+        EntityStatusEnum current = EntityStatusEnum.ofCode(event.getStatus());
+        if (current == null) current = EntityStatusEnum.OFFLINE;
+        Map<String, Object> ext = new HashMap<>();
+        ext.put("type", "device-heartbeat");
+        ext.put("content", event.getStateDescription() == null ? "" : event.getStateDescription());
+        ext.put("version", 1);
+        EntityStatusEnum status = current;
+        return stateStore.upsert(null, event.getTenantId(), EntityTypeEnum.DEVICE, event.getDeviceId(),
+                        event.getDriverId(), status.getIndex(), EntityStatusEnum.OFFLINE.getIndex(), Instant.now(),
+                        (int) ttl, TimeoutSourceTypeEnum.DRIVER.getIndex(), JsonUtil.toJsonString(ext))
+                .flatMap(state -> {
+                    if (!isFlip(state.lastStateFlag(), status)) return Mono.empty();
+                    String previous = code(state.lastStateFlag());
+                    DeviceAlarmDTO alarm = DeviceAlarmDTO.builder().driverId(event.getDriverId())
+                            .tenantId(event.getTenantId()).deviceId(event.getDeviceId()).status(status.getCode())
+                            .statusName(status.name()).message(String.format("Device status changed: %s -> %s", previous, status.getCode()))
+                            .build();
+                    return deviceAlarmService.alarm(alarm);
+                });
     }
 
+    private boolean isFlip(byte previous, EntityStatusEnum current) {
+        return online(previous) != online(current);
+    }
+    private boolean online(byte value) {
+        return value == EntityStatusEnum.ONLINE.getIndex() || value == EntityStatusEnum.MAINTAIN.getIndex();
+    }
+    private boolean online(EntityStatusEnum value) {
+        return value == EntityStatusEnum.ONLINE || value == EntityStatusEnum.MAINTAIN;
+    }
+    private String code(byte value) {
+        EntityStatusEnum status = EntityStatusEnum.ofIndex(value);
+        return status == null ? DataConstant.STATUS_UNKNOWN : status.getCode();
+    }
 }

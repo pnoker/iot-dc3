@@ -162,7 +162,7 @@ export const labels: LabelRecord[] = [
 ];
 
 // ─── Api ─────────────────────────────────────────────────────────────
-// Covers GET/POST/PUT/DELETE across dc3-manager / dc3-auth / dc3-data and
+// Covers GET/POST/PUT/PATCH/DELETE across dc3-manager / dc3-auth / dc3-data and
 // the device/driver/point/profile api groups.
 export const apis: ApiRecord[] = [
   {
@@ -316,7 +316,7 @@ export const resources: ResourceRecord[] = [
 // ─── Command ─────────────────────────────────────────────────────────
 // Ids start at 9001. commandTypeFlag mirrors CommandTypeEnum
 // (CUSTOM/CONFIG/ACTION); callTypeFlag mirrors CallTypeEnum (SYNC/ASYNC).
-export const commands: CommandRecord[] = [
+const commandSeeds = [
   {
     id: '9001',
     commandName: '重启网关',
@@ -388,11 +388,12 @@ export const commands: CommandRecord[] = [
     operateTime: UPDATED,
   },
 ];
+export const commands: CommandRecord[] = commandSeeds.map((record) => ({...record, version: 0}));
 
 // ─── Command Param ───────────────────────────────────────────────────
 // Ids start at 9101. 1–2 params per command; paramDirectionFlag mirrors
 // ParamDirectionTypeEnum (INPUT/OUTPUT).
-export const commandParams: CommandParamRecord[] = [
+const commandParamSeeds = [
   {
     id: '9101',
     paramName: '延迟秒数',
@@ -466,11 +467,12 @@ export const commandParams: CommandParamRecord[] = [
     enableFlag: 'ENABLE',
   },
 ];
+export const commandParams: CommandParamRecord[] = commandParamSeeds.map((record) => ({...record, version: 0}));
 
 // ─── Event ───────────────────────────────────────────────────────────
 // Ids start at 9501. eventTypeFlag mirrors EventTypeFlagEnum subset
 // (ALERT/INFO); eventLevelFlag mirrors EventLevelEnum (LOW/MEDIUM/HIGH).
-export const events: EventRecord[] = [
+const eventSeeds = [
   {
     id: '9501',
     eventName: '温度超限告警',
@@ -537,10 +539,11 @@ export const events: EventRecord[] = [
     operateTime: UPDATED,
   },
 ];
+export const events: EventRecord[] = eventSeeds.map((record) => ({...record, version: 0}));
 
 // ─── Event Param ─────────────────────────────────────────────────────
 // Ids start at 9601. Each event carries the value/threshold it reports.
-export const eventParams: EventParamRecord[] = [
+const eventParamSeeds = [
   {
     id: '9601',
     paramName: '温度值',
@@ -578,12 +581,13 @@ export const eventParams: EventParamRecord[] = [
     enableFlag: 'ENABLE',
   },
 ];
+export const eventParams: EventParamRecord[] = eventParamSeeds.map((record) => ({...record, version: 0}));
 
 // ─── Attribute ───────────────────────────────────────────────────────
 // Ids start at 8001. Modbus-flavour driver/point attributes.
 // `name` is the technical key, `attributeName` the Chinese display name,
 // `attributeCode` the form identifier consumed by device edit.
-export const attributes: Attribute[] = [
+const attributeSeeds = [
   {
     id: '8001',
     name: 'host',
@@ -651,6 +655,11 @@ export const attributes: Attribute[] = [
     enableFlag: 'ENABLE',
   },
 ];
+export const attributes: Attribute[] = attributeSeeds.map((record) => ({
+  ...record,
+  version: 0,
+  attributeTypeFlag: record.attributeTypeFlag as Attribute['attributeTypeFlag'],
+}));
 
 // ─── Attribute Config ────────────────────────────────────────────────
 // Ids start at 30001. Unifies the four `*_attribute_config` tables:
@@ -662,6 +671,7 @@ export const attributes: Attribute[] = [
 // (e.g. devices[10]=3013 PLC/profile 2005, devices[12]=3016 HVAC/profile 2006).
 interface AttributeConfigRecord {
   id: string;
+  version: number;
   deviceId: string;
   attributeId: string;
   configValue: string;
@@ -676,18 +686,21 @@ export const attributeConfigs: AttributeConfigRecord[] = [
   // driver_attribute_config (device-level driver attributes)
   {
     id: '30001',
+    version: 0,
     deviceId: devices[0]!.id, // 3001
     attributeId: '8001', // host
     configValue: '192.168.1.100',
   },
   {
     id: '30002',
+    version: 0,
     deviceId: devices[0]!.id, // 3001
     attributeId: '8002', // port
     configValue: '502',
   },
   {
     id: '30003',
+    version: 0,
     deviceId: devices[1]!.id, // 3002
     attributeId: '8003', // unitId
     configValue: '2',
@@ -695,6 +708,7 @@ export const attributeConfigs: AttributeConfigRecord[] = [
   // point_attribute_config (point-level attributes)
   {
     id: '30004',
+    version: 0,
     deviceId: devices[0]!.id, // 3001
     pointId: points[0]!.id, // 5001 Temperature
     attributeId: '8004', // address
@@ -702,6 +716,7 @@ export const attributeConfigs: AttributeConfigRecord[] = [
   },
   {
     id: '30005',
+    version: 0,
     deviceId: devices[0]!.id, // 3001
     pointId: points[0]!.id, // 5001 Temperature
     attributeId: '8006', // factor
@@ -709,6 +724,7 @@ export const attributeConfigs: AttributeConfigRecord[] = [
   },
   {
     id: '30006',
+    version: 0,
     deviceId: devices[0]!.id, // 3001
     pointId: points[1]!.id, // 5002 Humidity
     attributeId: '8004', // address
@@ -717,6 +733,7 @@ export const attributeConfigs: AttributeConfigRecord[] = [
   // command_attribute_config (command-level attributes)
   {
     id: '30007',
+    version: 0,
     deviceId: devices[10]!.id, // 3013 PLC (profile 2005)
     commandId: '9003', // plc_set_speed
     attributeId: '8004', // address
@@ -724,6 +741,7 @@ export const attributeConfigs: AttributeConfigRecord[] = [
   },
   {
     id: '30008',
+    version: 0,
     deviceId: devices[12]!.id, // 3016 HVAC (profile 2006)
     commandId: '9004', // hvac_set_temp
     attributeId: '8004', // address
@@ -732,6 +750,7 @@ export const attributeConfigs: AttributeConfigRecord[] = [
   // event_attribute_config (event-level attributes)
   {
     id: '30009',
+    version: 0,
     deviceId: devices[0]!.id, // 3001 (profile 2001)
     eventId: '9501', // temp_over
     attributeId: '8004', // address
@@ -739,6 +758,7 @@ export const attributeConfigs: AttributeConfigRecord[] = [
   },
   {
     id: '30010',
+    version: 0,
     deviceId: devices[2]!.id, // 3004 (profile 2002)
     eventId: '9505', // overcurrent
     attributeId: '8004', // address

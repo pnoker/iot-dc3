@@ -15,18 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {httpDelete, httpGet, httpPost} from '@/api/common';
 import {API_AUTH_BASE} from '@/config/constant/api';
-import type {PageQuery} from '@/config/types';
-import type {RolePrincipalBindForm} from '@/config/types/auth';
+import type {PageQuery, PageResult} from '@/config/types';
+import type {RolePrincipalBindForm, RolePrincipalBindRecord} from '@/config/types/auth';
 
 export const addRolePrincipalBind = (body: RolePrincipalBindForm) =>
   httpPost(`${API_AUTH_BASE}/role_principal/add`, body);
 
 export const deleteRolePrincipalBind = (id: string) =>
-  httpPost(`${API_AUTH_BASE}/role_principal/delete`, undefined, {params: {id}});
+  httpDelete<void>(`${API_AUTH_BASE}/role_principal/delete`, {params: {id}});
 
-export const listRolePrincipalBind = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role_principal/list`, query);
+export const listRolePrincipalBind = (query: PageQuery) =>
+  httpPost<PageResult<RolePrincipalBindRecord>, PageQuery>(`${API_AUTH_BASE}/role_principal/list`, query);
 
 export const listRoleByPrincipalId = (principalId: string) =>
   httpGet(`${API_AUTH_BASE}/role_principal/list_role_by_principal`, {params: {principal_id: principalId}});

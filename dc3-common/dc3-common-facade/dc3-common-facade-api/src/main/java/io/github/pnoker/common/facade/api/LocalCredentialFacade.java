@@ -18,6 +18,7 @@
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral local credential facade.
@@ -30,6 +31,6 @@ public interface LocalCredentialFacade {
     /**
      * @return the local credential, or {@code null} when the login name does not exist.
      */
-    FacadeLocalCredentialBO getByLoginName(String loginName);
+    Mono<FacadeLocalCredentialBO> getByLoginName(Long tenantId, String loginName);
 
 }

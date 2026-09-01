@@ -136,7 +136,7 @@ const load = () => {
   if (!reactiveData.id) return;
   getResourceById(reactiveData.id)
     .then((res: any) => {
-      reactiveData.data = res.data || {};
+      reactiveData.data = res || {};
     })
     .catch(() => {
       // handled globally
@@ -148,7 +148,7 @@ const loadRoles = () => {
   reactiveData.rolesLoading = true;
   listRoleByResourceId(reactiveData.id)
     .then((res: any) => {
-      reactiveData.roles = (res.data as any[]) || [];
+      reactiveData.roles = (res as any[]) || [];
       reactiveData.rolesLoaded = true;
     })
     .catch(() => {
@@ -178,7 +178,7 @@ const loadChildren = () => {
   reactiveData.childrenLoading = true;
   listResourceTree({})
     .then((res: any) => {
-      const tree = (res.data as any[]) || [];
+      const tree = (res as any[]) || [];
       const node = findNode(tree, reactiveData.id);
       reactiveData.children = node?.children || [];
       reactiveData.childrenLoaded = true;

@@ -53,6 +53,7 @@ public class ResourceTreeBO extends ResourceBO {
         node.setParentResourceId(source.getParentResourceId());
         node.setResourceName(source.getResourceName());
         node.setResourceCode(source.getResourceCode());
+        node.setServiceName(source.getServiceName());
         node.setResourceTypeFlag(source.getResourceTypeFlag());
         node.setResourceScopeFlag(source.getResourceScopeFlag());
         node.setEntityId(source.getEntityId());

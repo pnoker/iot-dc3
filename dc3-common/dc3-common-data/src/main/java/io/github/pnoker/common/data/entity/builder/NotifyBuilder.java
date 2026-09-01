@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
 import io.github.pnoker.common.data.entity.model.NotifyDO;
 import io.github.pnoker.common.data.entity.vo.NotifyVO;
@@ -28,7 +27,6 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -187,18 +185,10 @@ public interface NotifyBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
-    default Page<NotifyBO> buildBOPageByDOPage(Page<NotifyDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
     /**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    default Page<NotifyVO> buildVOPageByBOPage(Page<NotifyBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

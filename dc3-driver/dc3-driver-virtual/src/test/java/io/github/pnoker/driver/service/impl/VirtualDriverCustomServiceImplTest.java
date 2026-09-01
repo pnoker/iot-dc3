@@ -19,13 +19,22 @@ package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
+import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.bo.EventRuntimeBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.enums.AttributeTypeEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.enums.EventLevelEnum;
+import io.github.pnoker.common.enums.EventTypeFlagEnum;
+import io.github.pnoker.common.entity.dto.EventReportDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -37,12 +46,19 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+import java.util.Map;
+import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 class VirtualDriverCustomServiceImplTest {
 
     @Mock
     private DriverMetadata driverMetadata;
+
+    @Mock
+    private DeviceMetadata deviceMetadata;
 
     @Mock
     private DriverSenderService driverSenderService;
@@ -82,6 +98,28 @@ class VirtualDriverCustomServiceImplTest {
     void scheduleIsSilentWhenNoDevicesRegistered() {
         assertThatNoException().isThrownBy(() -> service.schedule());
         verifyNoInteractions(driverSenderService);
+    }
+
+    @Test
+    void scheduleReportsEventFromAttachedRuntimeMetadata() {
+        DeviceBO device = new DeviceBO();
+        device.setId(10L);
+        device.setTenantId(1L);
+        device.setDeviceCode("virtual-1");
+        device.setEventRuntimeIdMap(Map.of(20L, new EventRuntimeBO(20L, "Alarm", "alarm",
+                EventTypeFlagEnum.ALERT, EventLevelEnum.HIGH, EnableFlagEnum.ENABLE, 1)));
+        when(driverMetadata.getDeviceIds()).thenReturn(Set.of(10L));
+        when(deviceMetadata.getCache(10L)).thenReturn(device);
+        when(deviceMetadata.getEventConfig(10L, 20L)).thenReturn(Map.of(
+                "eventCodePath", AttributeBO.builder().type(AttributeTypeEnum.STRING).value("$.eventCode").build(),
+                "payloadPath", AttributeBO.builder().type(AttributeTypeEnum.STRING).value("$.payload").build()));
+
+        service.schedule();
+
+        verify(driverSenderService).eventReportSender(org.mockito.ArgumentMatchers.argThat(report ->
+                report instanceof EventReportDTO event
+                        && event.eventId().equals(20L)
+                        && event.eventCode().equals("alarm")));
     }
 
     @Test

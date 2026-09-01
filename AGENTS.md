@@ -71,14 +71,13 @@ iot-dc3/
 Business modules follow this flow:
 
 ```text
-Controller (WebFlux) -> Service (BO) -> Manager (DO) -> Mapper (SQL)
+Controller (WebFlux) -> Service (BO) -> Reactive repository (R2DBC)
 ```
 
-- Controllers implement the `BaseController` interface and return `Mono<R<T>>`.
-- Use `BaseController.async(...)` to move blocking JDBC work to the bounded-elastic scheduler.
+- Controllers implement the `BaseController` interface and return typed `Mono<T>`/`Flux<T>` payloads.
+- Keep the request path non-blocking; use Reactor-native R2DBC publishers end to end.
 - Services extend `BaseService<B, Q>`, work in business objects, and own business rules.
-- Managers extend MyBatis-Plus `IService<DO>`; implementations extend `ServiceImpl<Mapper, DO>`.
-- Mappers extend MyBatis-Plus `BaseMapper<DO>` and contain persistence-level SQL operations.
+- Reactive repositories use `DatabaseClient`/`R2dbcEntityTemplate` and explicit tenant predicates.
 - Do not expose persistence objects from controllers or facade contracts.
 
 Common types:
@@ -87,7 +86,7 @@ Common types:
 |-------------------------------|---------------------|---------------------------------------------------------------|
 | `BaseService<B,Q>`            | `dc3-common-public` | base CRUD service contract                                    |
 | `BaseController`              | `dc3-common-web`    | reactive controller helpers and user/tenant context           |
-| `R<T>`                        | `dc3-common-public` | standard response envelope; use `R.ok(...)` and `R.fail(...)` |
+| RFC 9457 problem details      | `dc3-common-web`   | standard HTTP error body (`application/problem+json`)      |
 | `BaseBO`, `BaseVO`, `BaseDTO` | `dc3-common-model`  | shared business, web, and transfer fields                     |
 | `BaseBuilder`                 | `dc3-common-model`  | MapStruct conversion base                                     |
 | `TenantOwned`                 | `dc3-common-public` | marker for tenant-scoped entities                             |
@@ -146,7 +145,7 @@ When changing a contract:
 2. Compile the affected API module to regenerate sources.
 3. Update server implementations and client builders/stubs together.
 4. Preserve backward compatibility where practical.
-5. Verify tenant propagation and the `GrpcR` error envelope.
+5. Verify tenant propagation and standard gRPC status errors.
 
 Servers are Spring beans extending generated `*ImplBase` classes. Reuse shared stub configuration; do not construct ad
 hoc channels in business code.
@@ -202,7 +201,7 @@ CRUD-shaped names reflect result cardinality across Service, Controller, Facade,
 
 ### Web API and OpenAPI
 
-- Controllers return the standard `R<T>` envelope and never expose DOs.
+- Controllers return typed payloads and never expose DOs; errors use RFC 9457 problem details.
 - Apply grouped validation consistently and keep validation/exception messages in English.
 - Document REST endpoints with springdoc annotations; do not maintain a parallel handwritten OpenAPI spec.
 - Each business controller package needs the appropriate `GroupedOpenApi` bean, gateway aggregation route, and Swagger

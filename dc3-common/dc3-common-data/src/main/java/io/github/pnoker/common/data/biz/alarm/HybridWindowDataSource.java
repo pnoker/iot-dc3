@@ -26,6 +26,8 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Routes a window request to either the in-memory buffer (short windows) or
@@ -53,12 +55,12 @@ public class HybridWindowDataSource implements WindowDataSource {
     private final AlarmWindowProperties properties;
 
     @Override
-    public AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode) {
+    public Mono<AggregateOutcome> aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode) {
         return select(spec).aggregate(spec, fact, mode);
     }
 
     @Override
-    public List<WindowSample> samples(WindowSpec spec, RuleFact fact) {
+    public Flux<WindowSample> samples(WindowSpec spec, RuleFact fact) {
         return select(spec).samples(spec, fact);
     }
 

@@ -97,16 +97,6 @@
             <artifactId>dc3-api-driver</artifactId>
         </dependency>
 
-        <!-- DC3 Facade Related -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-facade-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-facade-grpc</artifactId>
-        </dependency>
-
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -143,6 +133,12 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-thread</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

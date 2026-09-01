@@ -18,29 +18,25 @@
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.manager.GrpcDeviceQuery;
-import io.github.pnoker.api.center.manager.GrpcPageProfileDTO;
+import io.github.pnoker.api.center.manager.GrpcOffsetPageProfileDTO;
+import io.github.pnoker.api.center.manager.GrpcOffsetProfileQuery;
 import io.github.pnoker.api.center.manager.GrpcProfileIdsQuery;
 import io.github.pnoker.api.center.manager.GrpcProfileQuery;
-import io.github.pnoker.api.center.manager.GrpcRPageProfileDTO;
-import io.github.pnoker.api.center.manager.GrpcRProfileDTO;
-import io.github.pnoker.api.center.manager.GrpcRProfileListDTO;
+import io.github.pnoker.api.center.manager.GrpcProfileListDTO;
 import io.github.pnoker.api.center.manager.ProfileApiGrpc;
-import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ErrorCode;
-import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.api.common.GrpcProfileDTO;
 import io.github.pnoker.common.facade.api.ProfileFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeProfileQuery;
+import io.github.pnoker.common.facade.entity.query.FacadeProfileOffsetQuery;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcProfileBuilder;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * gRPC ProfileFacade: forwards to Manager Center via {@link ProfileApiGrpc}.
@@ -48,91 +44,62 @@ import java.util.Objects;
  * @author pnoker
  * @since 2016.10.1
  */
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ProfileGrpcFacade implements ProfileFacade {
 
-    private final ProfileApiGrpc.ProfileApiBlockingStub profileApiBlockingStub;
+
+    private final ProfileApiGrpc.ProfileApiStub profileApiStub;
 
     private final FacadeGrpcProfileBuilder facadeGrpcProfileBuilder;
 
     private final GrpcFacadeSupport grpcFacadeSupport;
 
     @Override
-    public FacadeProfileBO getById(Long tenantId, Long id) {
+    public Mono<FacadeProfileBO> getByIdReactive(Long tenantId, Long id) {
+        if (tenantId == null || id == null) return Mono.empty();
         GrpcProfileQuery request = GrpcProfileQuery.newBuilder().setProfileId(id).setTenantId(tenantId).build();
-        GrpcRProfileDTO response = grpcFacadeSupport.call("ProfileFacade.getById", profileApiBlockingStub,
-                stub -> stub.getByProfileId(request));
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "getById");
-            return null;
-        }
-        return facadeGrpcProfileBuilder.toFacadeBO(response.getData());
+        ProfileApiGrpc.ProfileApiStub stub = grpcFacadeSupport.withDeadline(profileApiStub);
+        return ReactiveGrpcClientSupport.<GrpcProfileQuery, GrpcProfileDTO>unary(
+                        "ProfileFacade.getById", observer -> stub.getByProfileId(request, observer))
+                .map(facadeGrpcProfileBuilder::toFacadeBO);
     }
 
     @Override
-    public List<FacadeProfileBO> listByIds(Long tenantId, Collection<Long> ids) {
-        if (Objects.isNull(ids) || ids.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<Long> profileIds = ids.stream().filter(Objects::nonNull).distinct().toList();
-        if (profileIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        GrpcProfileIdsQuery request = GrpcProfileIdsQuery.newBuilder().addAllProfileIds(profileIds).setTenantId(tenantId).build();
-        GrpcRProfileListDTO response = grpcFacadeSupport.call("ProfileFacade.listByIds", profileApiBlockingStub,
-                stub -> stub.listByProfileIds(request));
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "listByIds");
-            return Collections.emptyList();
-        }
-        return response.getDataList().stream().map(facadeGrpcProfileBuilder::toFacadeBO).toList();
+    public Flux<FacadeProfileBO> listByIdsReactive(Long tenantId, Collection<Long> ids) {
+        if (tenantId == null || ids == null || ids.isEmpty()) return Flux.empty();
+        List<Long> normalized = ids.stream().filter(value -> value != null && value > 0).distinct().toList();
+        if (normalized.isEmpty()) return Flux.empty();
+        GrpcProfileIdsQuery request = GrpcProfileIdsQuery.newBuilder().addAllProfileIds(normalized).setTenantId(tenantId).build();
+        ProfileApiGrpc.ProfileApiStub stub = grpcFacadeSupport.withDeadline(profileApiStub);
+        return ReactiveGrpcClientSupport.<GrpcProfileIdsQuery, GrpcProfileListDTO>unary(
+                        "ProfileFacade.listByIds", observer -> stub.listByProfileIds(request, observer))
+                .flatMapMany(response -> Flux.fromIterable(response.getItemsList()).map(facadeGrpcProfileBuilder::toFacadeBO));
     }
 
     @Override
-    public FacadePage<FacadeProfileBO> listByPage(FacadeProfileQuery query) {
-        GrpcRPageProfileDTO response = grpcFacadeSupport.call("ProfileFacade.listByPage", profileApiBlockingStub,
-                stub -> stub.listByPage(facadeGrpcProfileBuilder.toGrpcPageQuery(query)));
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "listByPage");
-            return FacadePage.empty();
-        }
-        GrpcPageProfileDTO pageDTO = response.getData();
-        List<FacadeProfileBO> records = pageDTO.getDataList().stream()
-                .map(facadeGrpcProfileBuilder::toFacadeBO)
-                .toList();
-        return new FacadePage<>(pageDTO.getPage().getCurrent(), pageDTO.getPage().getSize(),
-                pageDTO.getPage().getTotal(), pageDTO.getPage().getPages(), records);
-    }
-
-    @Override
-    public List<FacadeProfileBO> listByDeviceId(Long tenantId, Long deviceId) {
+    public Flux<FacadeProfileBO> listByDeviceIdReactive(Long tenantId, Long deviceId) {
+        if (tenantId == null || deviceId == null) return Flux.empty();
         GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder().setDeviceId(deviceId).setTenantId(tenantId).build();
-        GrpcRProfileListDTO response = grpcFacadeSupport.call("ProfileFacade.listByDeviceId", profileApiBlockingStub,
-                stub -> stub.listByDeviceId(request));
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "listByDeviceId");
-            return Collections.emptyList();
-        }
-        return response.getDataList().stream().map(facadeGrpcProfileBuilder::toFacadeBO).toList();
+        ProfileApiGrpc.ProfileApiStub stub = grpcFacadeSupport.withDeadline(profileApiStub);
+        return ReactiveGrpcClientSupport.<GrpcDeviceQuery, GrpcProfileListDTO>unary(
+                        "ProfileFacade.listByDeviceId", observer -> stub.listByDeviceId(request, observer))
+                .flatMapMany(response -> Flux.fromIterable(response.getItemsList()).map(facadeGrpcProfileBuilder::toFacadeBO));
     }
 
-    /**
-     * Guard a gRPC result: NOT_FOUND is treated as a normal empty outcome, any other
-     * error code throws a service exception.
-     *
-     * @param result the gRPC result envelope
-     * @param op     the operation name, for error messages
-     */
-    private void guardOrThrow(GrpcR result, String op) {
-        String code = result.getCode();
-        if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
-            log.debug("ProfileGrpcFacade.{} => no resource", op);
-            return;
-        }
-        throw new ServiceException("ProfileFacade." + op + " failed: [" + code + "] " + result.getMessage());
+    @Override
+    public Mono<OffsetPage<FacadeProfileBO>> listReactive(FacadeProfileOffsetQuery query) {
+        GrpcOffsetProfileQuery request = facadeGrpcProfileBuilder.toGrpcOffsetQuery(query);
+        ProfileApiGrpc.ProfileApiStub stub = grpcFacadeSupport.withDeadline(profileApiStub);
+        return ReactiveGrpcClientSupport.<GrpcOffsetProfileQuery, GrpcOffsetPageProfileDTO>unary(
+                        "ProfileFacade.list", observer -> stub.list(request, observer))
+                .map(response -> {
+                    if (!response.hasPage()) throw new IllegalStateException("ProfileFacade.list returned no page");
+                    var page = response.getPage();
+                    List<FacadeProfileBO> items = response.getItemsList().stream()
+                            .map(facadeGrpcProfileBuilder::toFacadeBO).toList();
+                    return OffsetPage.of(items, page.getOffset(), page.getLimit(), page.getTotal());
+                });
     }
 
 }

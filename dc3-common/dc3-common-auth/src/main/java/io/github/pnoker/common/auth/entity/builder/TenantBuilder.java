@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
 import io.github.pnoker.common.auth.entity.model.TenantDO;
 import io.github.pnoker.common.auth.entity.vo.TenantVO;
@@ -27,7 +26,6 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -169,24 +167,6 @@ public interface TenantBuilder {
      */
     List<TenantVO> buildVOListByBOList(List<TenantBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    default Page<TenantBO> buildBOPageByDOPage(Page<TenantDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<TenantVO> buildVOPageByBOPage(Page<TenantBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
 }

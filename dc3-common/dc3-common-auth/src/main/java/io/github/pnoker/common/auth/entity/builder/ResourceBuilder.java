@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.bo.ResourceTreeBO;
 import io.github.pnoker.common.auth.entity.model.ResourceDO;
@@ -31,7 +30,6 @@ import io.github.pnoker.common.enums.ResourceTypeEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -193,25 +191,7 @@ public interface ResourceBuilder {
      */
     List<ResourceVO> buildVOListByBOList(List<ResourceBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    default Page<ResourceBO> buildBOPageByDOPage(Page<ResourceDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<ResourceVO> buildVOPageByBOPage(Page<ResourceBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
     /**
      * Convert bo list to tree view object list.

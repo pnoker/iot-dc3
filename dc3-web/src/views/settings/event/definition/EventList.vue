@@ -156,6 +156,7 @@ const {
   sizeChange,
   currentChange,
 } = usePagedList<EventRecord, Record<string, unknown>>({
+  sortColumn: 'createTime',
   request: (query) => listEvent(withFixedQuery(query)),
 });
 
@@ -196,7 +197,7 @@ const syncEventParams = (eventId: string, params: EventParamRecord[], originalPa
   const currentIds = new Set(params.map((item) => String(item.id || '')).filter(Boolean));
   const deleteTasks = originalParams
     .filter((item) => item.id && !currentIds.has(String(item.id)))
-    .map((item) => deleteEventParam(String(item.id)));
+    .map((item) => deleteEventParam(String(item.id), item.version));
 
   const saveTasks = params.map((item) => {
     const payload = {...item, eventId};
@@ -209,7 +210,7 @@ const syncEventParams = (eventId: string, params: EventParamRecord[], originalPa
 const onAdd = (form: EventForm, params: EventParamRecord[], done: DoneCallback) => {
   addEvent(withFixedProfile(form))
     .then((res) => {
-      const eventId = String(res.data || '');
+      const eventId = String(res?.id || '');
       if (!isValidCreatedId(eventId)) {
         failMessage(t('eventDefinition.errors.idNotReturned'));
         return Promise.reject(new Error(t('eventDefinition.errors.idNotReturned')));
@@ -249,22 +250,22 @@ const onUpdate = (
     });
 };
 
-const disableThing = (id: string, profileId: string, done: () => void) => {
-  updateEvent({id, profileId, enableFlag: 'DISABLE'}).then(() => {
+const disableThing = (event: EventRecord, done: () => void) => {
+  updateEvent({...event, enableFlag: 'DISABLE'}).then(() => {
     load();
     done();
   });
 };
 
-const enableThing = (id: string, profileId: string, done: () => void) => {
-  updateEvent({id, profileId, enableFlag: 'ENABLE'}).then(() => {
+const enableThing = (event: EventRecord, done: () => void) => {
+  updateEvent({...event, enableFlag: 'ENABLE'}).then(() => {
     load();
     done();
   });
 };
 
-const remove = (id: string, done?: () => void) => {
-  deleteEvent(id).then(() => {
+const remove = (event: EventRecord, done?: () => void) => {
+  deleteEvent(event.id, event.version).then(() => {
     load();
     if (done) {
       done();

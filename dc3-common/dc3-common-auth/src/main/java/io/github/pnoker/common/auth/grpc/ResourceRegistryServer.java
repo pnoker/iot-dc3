@@ -17,25 +17,22 @@
 
 package io.github.pnoker.common.auth.grpc;
 
-import io.github.pnoker.api.center.auth.GrpcRSyncResult;
 import io.github.pnoker.api.center.auth.GrpcScannedApiDTO;
 import io.github.pnoker.api.center.auth.GrpcSyncRequest;
 import io.github.pnoker.api.center.auth.GrpcSyncResultDTO;
 import io.github.pnoker.api.center.auth.ResourceRegistryApiGrpc;
-import io.github.pnoker.api.common.GrpcRFactory;
-import io.github.pnoker.common.auth.biz.ResourceRegistrySyncService;
+import io.github.pnoker.common.auth.biz.ReactiveResourceRegistrySyncService;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistryScannedApi;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncCommand;
-import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncResult;
-import io.github.pnoker.common.enums.ErrorCode;
 import io.grpc.stub.StreamObserver;
+import io.grpc.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 /**
  * gRPC server handling resource registration requests.
@@ -48,7 +45,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegistryApiImplBase {
 
-    private final ResourceRegistrySyncService resourceRegistrySyncService;
+    private final ReactiveResourceRegistrySyncService resourceRegistrySyncService;
 
     private static List<ResourceRegistryScannedApi> toScannedApis(List<GrpcScannedApiDTO> dtos) {
         List<ResourceRegistryScannedApi> apis = new ArrayList<>(dtos.size());
@@ -66,31 +63,38 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
     }
 
     @Override
-    public void sync(GrpcSyncRequest request, StreamObserver<GrpcRSyncResult> responseObserver) {
-        GrpcRSyncResult.Builder builder = GrpcRSyncResult.newBuilder();
+    public void sync(GrpcSyncRequest request, StreamObserver<GrpcSyncResultDTO> responseObserver) {
         try {
             ResourceRegistrySyncCommand command = ResourceRegistrySyncCommand.builder()
                     .serviceName(request.getServiceName())
                     .deleteMissing(request.getDeleteMissing())
                     .apis(toScannedApis(request.getApisList()))
                     .build();
-            ResourceRegistrySyncResult result = resourceRegistrySyncService.sync(command);
-
-            builder.setResult(GrpcRFactory.ok());
-            builder.setData(GrpcSyncResultDTO.newBuilder()
-                    .setInserted(result.getInserted())
-                    .setUpdated(result.getUpdated())
-                    .setDeleted(result.getDeleted())
-                    .setUnchanged(result.getUnchanged())
-                    .build());
+            resourceRegistrySyncService.sync(command).subscribe(result -> {
+                responseObserver.onNext(GrpcSyncResultDTO.newBuilder()
+                                .setInserted(result.getInserted())
+                                .setUpdated(result.getUpdated())
+                                .setDeleted(result.getDeleted())
+                                .setUnchanged(result.getUnchanged())
+                        .build());
+                responseObserver.onCompleted();
+            }, error -> {
+                log.error("Resource registry synchronization failed, serviceName={}", request.getServiceName(), error);
+                responseObserver.onError(status(error).withDescription(error.getMessage()).withCause(error)
+                        .asRuntimeException());
+            });
+            return;
         } catch (Exception e) {
             log.error("Resource registry synchronization failed, serviceName={}", request.getServiceName(), e);
-            builder.setResult(Objects.nonNull(e.getMessage())
-                    ? GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage())
-                    : GrpcRFactory.fail(ErrorCode.FAILURE));
+            responseObserver.onError(status(e).withDescription(e.getMessage()).withCause(e)
+                    .asRuntimeException());
         }
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
+    }
+
+    private static Status status(Throwable error) {
+        if (error instanceof TimeoutException) return Status.DEADLINE_EXCEEDED;
+        if (error instanceof IllegalArgumentException) return Status.INVALID_ARGUMENT;
+        return Status.INTERNAL;
     }
 
 }

@@ -74,11 +74,13 @@ export const createMcpConnectionConfig = (
   relations: [principalNameRelation()],
   list: async (query) => {
     const p = query as Record<string, any>;
-    const res: any = await listMcpConnection();
-    let records: Record<string, any>[] = Array.isArray(res?.data) ? res.data : [];
-    if (p.connectionName) records = records.filter((r) => includes(r.connectionName, p.connectionName));
-    if (p.principalType) records = records.filter((r) => r.principalType === p.principalType);
-    return {data: {records, total: records.length}} as R;
+    let items: Record<string, any>[] = await listMcpConnection();
+    if (p.connectionName) items = items.filter((r) => includes(r.connectionName, p.connectionName));
+    if (p.principalType) items = items.filter((r) => r.principalType === p.principalType);
+    const offset = Number(p.offset || 0);
+    const limit = Number(p.limit || 50);
+    const pageItems = items.slice(offset, offset + limit);
+    return {items: pageItems, offset, limit, total: items.length, hasNext: offset + limit < items.length};
   },
   toolbarActions: [
     {

@@ -27,23 +27,18 @@ const hasDefaultIdentity = (body: Record<string, unknown>) =>
 
 /**
  * Mock the token endpoints so the real login/logout/change-password flow runs
- * end-to-end. The auth store reads saltRes.data / tokenRes.data as plain
- * strings, so we return R<string> envelopes.
+ * end-to-end. Responses use the same direct payload shape as production HTTP.
  */
 export function registerAuthHandlers(): void {
   on('post', 'api/v3/auth/token/salt', (ctx) =>
-    responseOf(
-      ctx.config,
-      hasDefaultIdentity(ctx.body) ? ok('mock-salt') : fail('R4010', 'Invalid tenant or username'),
-    ),
+    hasDefaultIdentity(ctx.body)
+      ? responseOf(ctx.config, ok('mock-salt'))
+      : responseOf(ctx.config, fail('R4010', 'Invalid tenant or username', 401), 401),
   );
   on('post', 'api/v3/auth/token/generate', (ctx) =>
-    responseOf(
-      ctx.config,
-      hasDefaultIdentity(ctx.body) && String(ctx.body.password ?? '') === DEFAULT_PASSWORD
-        ? ok('ok')
-        : fail('R4010', 'Invalid credentials'),
-    ),
+    hasDefaultIdentity(ctx.body) && String(ctx.body.password ?? '') === DEFAULT_PASSWORD
+      ? responseOf(ctx.config, ok('ok'))
+      : responseOf(ctx.config, fail('R4010', 'Invalid credentials', 401), 401),
   );
   on('post', 'api/v3/auth/token/check', (ctx) => responseOf(ctx.config, ok(hasDefaultIdentity(ctx.body))));
   on('post', 'api/v3/auth/token/cancel', (ctx) => responseOf(ctx.config, ok(true)));

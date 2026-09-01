@@ -19,6 +19,8 @@ package io.github.pnoker.common.agentic.service;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.entity.common.RequestHeader;
 
+import reactor.core.publisher.Mono;
+
 import java.util.List;
 
 
@@ -34,8 +36,9 @@ public interface ModelProviderService {
      * List all registered model providers.
      *
      * @return all model providers
+     * @param header authenticated caller principal and tenant
      */
-    List<ModelProviderBO> list();
+    Mono<List<ModelProviderBO>> list(RequestHeader.PrincipalHeader header);
 
     /**
      * Register a model provider.
@@ -44,7 +47,7 @@ public interface ModelProviderService {
      * @param header   authenticated caller principal and tenant
      * @return the added provider
      */
-    ModelProviderBO add(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header);
+    Mono<ModelProviderBO> add(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header);
 
     /**
      * Update a model provider, evicting any cached ChatClient built from it.
@@ -53,13 +56,14 @@ public interface ModelProviderService {
      * @param header   authenticated caller principal and tenant
      * @return the updated provider
      */
-    ModelProviderBO update(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header);
+    Mono<ModelProviderBO> update(ModelProviderBO entityBO, RequestHeader.PrincipalHeader header);
 
     /**
      * Delete a model provider and clean up its cached ChatClient.
      *
      * @param id the provider id
+     * @param header authenticated caller principal and tenant
      */
-    void delete(Long id);
+    Mono<Void> delete(Long id, RequestHeader.PrincipalHeader header);
 
 }

@@ -17,9 +17,10 @@
 
 package io.github.pnoker.common.auth.biz;
 
-import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
+import io.github.pnoker.common.entity.option.DictionaryOption;
 
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * Dictionary lookup service for the auth module.
@@ -34,6 +35,6 @@ public interface DictionaryForAuthService {
      *
      * @return Dictionary Array
      */
-    List<DictionaryBO> tenantDictionary();
+    Mono<List<DictionaryOption>> listTenantOptions();
 
 }

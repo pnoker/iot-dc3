@@ -21,9 +21,9 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.entity.builder.PointCommandBuilder;
+import io.github.pnoker.common.data.entity.vo.PointCommandAcceptedVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
-import io.github.pnoker.common.entity.R;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
@@ -31,6 +31,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,13 +73,10 @@ public class PointCommandController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "true")
             }))
     @PostMapping("/read")
-    public Mono<R<String>> read(@Validated @RequestBody PointCommandReadVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            String commandId = pointCommandService.read(tenantId, pointCommandBuilder.buildBOByVO(entityVO));
-            R<String> result = R.ok();
-            result.setData(commandId);
-            return result;
-        }));
+    public Mono<ResponseEntity<PointCommandAcceptedVO>> read(@Validated @RequestBody PointCommandReadVO entityVO) {
+        return getTenantId().flatMap(tenantId -> pointCommandService
+                .read(tenantId, pointCommandBuilder.buildBOByVO(entityVO))
+                .map(this::accepted));
     }
 
     /**
@@ -96,13 +95,17 @@ public class PointCommandController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "true")
             }))
     @PostMapping("/write")
-    public Mono<R<String>> write(@Validated @RequestBody PointCommandWriteVO entityVO) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            String commandId = pointCommandService.write(tenantId, pointCommandBuilder.buildBOByVO(entityVO));
-            R<String> result = R.ok();
-            result.setData(commandId);
-            return result;
-        }));
+    public Mono<ResponseEntity<PointCommandAcceptedVO>> write(@Validated @RequestBody PointCommandWriteVO entityVO) {
+        return getTenantId().flatMap(tenantId -> pointCommandService
+                .write(tenantId, pointCommandBuilder.buildBOByVO(entityVO))
+                .map(this::accepted));
+    }
+
+    private ResponseEntity<PointCommandAcceptedVO> accepted(String commandId) {
+        String statusUri = DataConstant.POINT_COMMAND_HISTORY_URL_PREFIX
+                + "/get_by_command_id?commandId=" + commandId;
+        return ResponseEntity.status(HttpStatus.ACCEPTED).header("Location", statusUri)
+                .body(new PointCommandAcceptedVO(commandId, statusUri));
     }
 
 }

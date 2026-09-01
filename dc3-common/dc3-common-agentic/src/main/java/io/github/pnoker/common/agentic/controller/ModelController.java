@@ -23,7 +23,6 @@ import io.github.pnoker.common.agentic.entity.vo.ModelVO;
 import io.github.pnoker.common.agentic.service.ModelConfigService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,13 +33,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -76,8 +78,8 @@ public class ModelController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/list")
-    public Mono<R<List<ModelVO>>> list() {
-        return async(() -> R.ok(modelConfigService.listOptions()));
+    public Mono<List<ModelVO>> list() {
+        return getPrincipalHeader().flatMap(modelConfigService::listOptions);
     }
 
     /**
@@ -95,8 +97,9 @@ public class ModelController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @GetMapping("/config/list")
-    public Mono<R<List<ModelConfigVO>>> listConfigs() {
-        return async(() -> R.ok(modelConfigBuilder.buildVOListByBOList(modelConfigService.listConfigs())));
+    public Mono<List<ModelConfigVO>> listConfigs() {
+        return getPrincipalHeader().flatMap(header -> modelConfigService.listConfigs(header)
+                .map(modelConfigBuilder::buildVOListByBOList));
     }
 
     /**
@@ -115,11 +118,11 @@ public class ModelController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/config/add")
-    public Mono<R<ModelConfigVO>> add(@Validated(Add.class) @RequestBody ModelConfigVO request) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
+    public Mono<ModelConfigVO> add(@Validated(Add.class) @RequestBody ModelConfigVO request) {
+        return getPrincipalHeader().flatMap(header -> {
             ModelConfigBO entityBO = modelConfigBuilder.buildBOByVO(request);
-            return R.ok(modelConfigBuilder.buildVOByBO(modelConfigService.add(entityBO, header)));
-        }));
+            return modelConfigService.add(entityBO, header).map(modelConfigBuilder::buildVOByBO);
+        });
     }
 
     /**
@@ -138,11 +141,11 @@ public class ModelController implements BaseController {
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
     @PostMapping("/config/update")
-    public Mono<R<ModelConfigVO>> update(@Validated(Update.class) @RequestBody ModelConfigVO request) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
+    public Mono<ModelConfigVO> update(@Validated(Update.class) @RequestBody ModelConfigVO request) {
+        return getPrincipalHeader().flatMap(header -> {
             ModelConfigBO entityBO = modelConfigBuilder.buildBOByVO(request);
-            return R.ok(modelConfigBuilder.buildVOByBO(modelConfigService.update(entityBO, header)));
-        }));
+            return modelConfigService.update(entityBO, header).map(modelConfigBuilder::buildVOByBO);
+        });
     }
 
     /**
@@ -160,12 +163,10 @@ public class ModelController implements BaseController {
                     @ExtensionProperty(name = "idempotent", value = "true"),
                     @ExtensionProperty(name = "openWorld", value = "false")
             }))
-    @PostMapping("/config/delete")
-    public Mono<R<Boolean>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return async(() -> {
-            modelConfigService.delete(id);
-            return R.ok(true);
-        });
+    @DeleteMapping("/config/delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+        return getPrincipalHeader().flatMap(header -> modelConfigService.delete(id, header));
     }
 
 }

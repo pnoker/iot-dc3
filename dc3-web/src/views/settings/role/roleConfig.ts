@@ -62,7 +62,7 @@ export const createRoleConfig = (t: Translator, handlers: RoleHandlers): EntityL
       kind: 'treeSelect',
       rules: [{required: true, message: t('settings.role.parentRoleIdPlaceholder'), trigger: 'change'}],
       tree: {
-        load: () => listRoleTree().then((res: any) => (res.data as any[]) || []),
+        load: () => listRoleTree().then((res: any) => (res as any[]) || []),
         transform: (rows: any[]) => [{id: 0, roleName: t('settings.role.rootRole'), children: rows}],
         props: {label: 'roleName', children: 'children'},
         nodeKey: 'id',

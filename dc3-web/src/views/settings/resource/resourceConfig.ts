@@ -105,8 +105,8 @@ const resolveEntityNames = async (records: Record<string, any>[]): Promise<Recor
     }
   }
 
-  const fill = (ids: string[], res: R<Record<string, EntityRecord>>, nameKey: keyof EntityRecord) => {
-    const data = res.data || {};
+  const fill = (ids: string[], res: Record<string, EntityRecord>, nameKey: keyof EntityRecord) => {
+    const data = res || {};
     ids.forEach((id) => {
       const item = data[id];
       const name = item?.[nameKey];
@@ -144,9 +144,9 @@ const resolveEntityNames = async (records: Record<string, any>[]): Promise<Recor
   // that map.
   if (apiIds.length)
     promises.push(
-      listApi({page: {size: 1000, current: 1}})
+      listApi({offset: 0, limit: 1000})
         .then((r) => {
-          const apiRecords = r.data?.records || [];
+          const apiRecords = r.items;
           const byId = new Map(apiRecords.map((a) => [String(a.id), a.apiName]));
           apiIds.forEach((id) => {
             const name = byId.get(id);
@@ -311,7 +311,7 @@ export const createResourceConfig = (t: Translator, handlers: ResourceHandlers):
       required: true,
       placeholder: t('settings.resource.parentResourceIdPlaceholder'),
       tree: {
-        load: () => listResourceTree({}).then((res) => res.data || []),
+        load: () => listResourceTree({}).then((res) => res || []),
         transform: (rows) => buildParentTreeOptions(t, rows),
         props: {label: 'resourceName', children: 'children', disabled: 'disabled'},
         nodeKey: 'id',

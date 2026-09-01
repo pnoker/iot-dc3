@@ -151,7 +151,7 @@ const resolveNames = async (kind: NameKind, ids: string[]) => {
     else if (kind === 'point') res = await listPointByIds(missing);
     else if (kind === 'driver') res = await listDriverByIds(missing);
     else res = await listProfileByIds(missing);
-    const data = res?.data || {};
+    const data = res || {};
     for (const id of missing) {
       const item = data[id];
       if (item) {
@@ -265,7 +265,7 @@ const loadTop = async () => {
   };
   const dim = dimMap[activeTab.value as keyof typeof dimMap];
   const res: any = await statsTop({dimension: dim, rangeKey: rangeKey.value, limit: 10});
-  const rows: { entityId: number; count: number }[] = res?.data || [];
+  const rows: { entityId: number; count: number }[] = res || [];
   const ids = rows.map((r) => String(r.entityId));
   await resolveNames(dim, ids);
   const buckets = rows.map((r) => ({

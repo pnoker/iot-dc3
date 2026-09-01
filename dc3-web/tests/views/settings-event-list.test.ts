@@ -16,24 +16,26 @@
  */
 
 import {flushPromises} from '@vue/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {mountListPage} from './_helpers';
 
 const eventMocks = vi.hoisted(() => ({
-  addEvent: vi.fn(() => Promise.resolve({data: true})),
-  addEventParam: vi.fn(() => Promise.resolve({data: true})),
-  deleteEvent: vi.fn(() => Promise.resolve({data: true})),
-  deleteEventParam: vi.fn(() => Promise.resolve({data: true})),
-  listEvent: vi.fn(() => Promise.resolve({data: {records: [], total: 0}})),
-  updateEvent: vi.fn(() => Promise.resolve({data: true})),
-  updateEventParam: vi.fn(() => Promise.resolve({data: true})),
+  addEvent: vi.fn(() => Promise.resolve({id: '101'})),
+  addEventParam: vi.fn(() => Promise.resolve({id: '201'})),
+  deleteEvent: vi.fn(() => Promise.resolve( true)),
+  deleteEventParam: vi.fn(() => Promise.resolve( true)),
+  listEvent: vi.fn(() => Promise.resolve( {items: [], total: 0})),
+  updateEvent: vi.fn(() => Promise.resolve( true)),
+  updateEventParam: vi.fn(() => Promise.resolve( true)),
 }));
 
 vi.mock('@/api/event', () => eventMocks);
 vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('EventList view', () => {
+  beforeEach(() => vi.clearAllMocks());
+
   it('lists event definitions on mount', async () => {
     const EventList = (await import('@/views/settings/event/definition/EventList.vue')).default;
     await mountListPage({
@@ -46,5 +48,23 @@ describe('EventList view', () => {
     });
     await flushPromises();
     expect(eventMocks.listEvent).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the created event record id when saving parameters', async () => {
+    const EventList = (await import('@/views/settings/event/definition/EventList.vue')).default;
+    const wrapper = await mountListPage({
+      component: EventList,
+      stubs: {
+        EventCard: {template: '<div />'},
+        EventTool: {template: '<div />'},
+        EventEditForm: {
+          emits: ['add-thing'],
+          template: '<button class="emit-add" @click="$emit(\'add-thing\', {eventName: \'alarm\', profileId: \'10\'}, [{paramName: \'temperature\', paramCode: \'temperature\'}], () => undefined)" />',
+        },
+      },
+    });
+    await wrapper.get('.emit-add').trigger('click');
+    await flushPromises();
+    expect(eventMocks.addEventParam).toHaveBeenCalledWith(expect.objectContaining({eventId: '101'}));
   });
 });

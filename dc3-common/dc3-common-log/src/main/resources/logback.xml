@@ -100,12 +100,6 @@
     <!-- User configuration -->
     <logger name="io.github.pnoker.center.manager.receiver.rabbit" level="WARN"/>
 
-    <!-- Customized configuration -->
-    <logger name="org.mybatis.spring.mapper.ClassPathMapperScanner" level="ERROR"/>
-    <logger name="com.baomidou.mybatisplus.extension.spring" level="ERROR"/>
-    <logger name="com.baomidou.mybatisplus.core.metadata.TableInfoHelper" level="ERROR"/>
-    <logger name="com.baomidou.mybatisplus.core.injector.DefaultSqlInjector" level="ERROR"/>
-
     <!-- System configuration -->
     <logger name="org.springframework.boot.autoconfigure.thymeleaf" level="WARN"/>
     <logger name="org.springframework.cloud.netflix.eureka" level="WARN"/>
@@ -121,15 +115,12 @@
     <logger name="org.springframework.integration" level="WARN"/>
     <logger name="org.springframework.scheduling" level="WARN"/>
     <logger name="org.springframework.boot.web" level="WARN"/>
-    <logger name="org.mybatis.spring.mapper" level="WARN"/>
     <logger name="de.codecentric.boot.admin" level="WARN"/>
     <logger name="org.elasticsearch.client" level="WARN"/>
     <logger name="org.springframework.data" level="WARN"/>
     <logger name="org.springframework.amqp" level="WARN"/>
     <logger name="com.zaxxer.hikari.pool" level="WARN"/>
     <logger name="org.springframework.web" level="WARN"/>
-    <logger name="com.baomidou.dynamic" level="WARN"/>
-    <logger name="org.mybatis.spring" level="WARN"/>
     <logger name="net.devh.boot.grpc" level="WARN"/>
     <logger name="org.mongodb.driver" level="WARN"/>
     <logger name="com.zaxxer.hikari" level="WARN"/>

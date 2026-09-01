@@ -35,6 +35,10 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-runtime</artifactId>
+        </dependency>
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>

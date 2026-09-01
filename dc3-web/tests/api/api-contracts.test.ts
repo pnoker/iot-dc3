@@ -68,15 +68,21 @@ const streamRequest = (overrides: Partial<AgenticChatCompletionRequest> = {}): A
 const apiSpies = vi.hoisted(() => ({
   httpGet: vi.fn(() => Promise.resolve({ok: true, data: null})),
   httpPost: vi.fn(() => Promise.resolve({ok: true, data: null})),
+  httpPatch: vi.fn(() => Promise.resolve({ok: true, data: null})),
+  httpDelete: vi.fn(() => Promise.resolve({ok: true, data: null})),
   request: vi.fn(() => Promise.resolve({ok: true, data: null})),
 }));
 
 vi.mock('@/api/common', () => ({
   httpGet: apiSpies.httpGet,
   httpPost: apiSpies.httpPost,
+  httpPatch: apiSpies.httpPatch,
+  httpDelete: apiSpies.httpDelete,
   crudAdd: (base: string, payload: unknown) => apiSpies.httpPost(`${base}/add`, payload),
   crudUpdate: (base: string, payload: unknown) => apiSpies.httpPost(`${base}/update`, payload),
   crudDelete: (base: string, id: string) => apiSpies.httpPost(`${base}/delete`, undefined, {params: {id}}),
+  versionedDelete: (base: string, id: string, version: number) =>
+    apiSpies.httpDelete(`${base}/delete`, {params: {id, version}}),
   crudGetById: (base: string, id: string) => apiSpies.httpGet(`${base}/get_by_id`, {params: {id}}),
   crudList: (base: string, query: unknown) => apiSpies.httpPost(`${base}/list`, query),
 }));
@@ -87,7 +93,7 @@ vi.mock('@/config/axios', () => ({
 
 type ApiModule = Record<string, unknown>;
 type ApiFunction = (...args: unknown[]) => unknown;
-type TransportCall = { transport: 'httpGet' | 'httpPost' | 'request'; args: unknown[] };
+type TransportCall = { transport: 'httpGet' | 'httpPost' | 'httpPatch' | 'httpDelete' | 'request'; args: unknown[] };
 
 const modules: Record<string, ApiModule> = {
   agentic: agenticApi,
@@ -165,6 +171,12 @@ const pageQuery = {
   keyword: 'demo',
 };
 
+const offsetQuery = {
+  offset: 20,
+  limit: 20,
+  sort: [{field: 'id', direction: 'ASC'}],
+};
+
 const payload = {
   id: 'payload-1',
   name: 'demo',
@@ -189,11 +201,13 @@ const sampleArgsRegistry: Record<string, unknown[]> = {
   importDevice: [
     payload,
     new File(['demo'], 'demo.xlsx', {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+    'device-import-idempotency-key',
   ],
+  getDeviceImportOperation: ['/api/v3/manager/operations/get_by_id?id=operation-1'],
   alertConfirm: ['driver', 'alert-1'],
   alertUnconfirm: ['driver', 'alert-1'],
   alertBulkConfirm: [[{source: 'driver', id: 'alert-1'}], true],
-  listPointValueHistory: ['1001', '2002', 30],
+  listPointValueHistory: ['1001', '2002', undefined, 30],
   listRoleByPrincipalId: ['principal-1'],
   replaceMcpConnectionTools: ['connection-1', ['tool-1', 'tool-2']],
   listMcpAudit: [{principalId: 'principal-1', toolId: 'tool-1', status: 'ACTIVE', riskLevel: 'LOW', limit: 20}],
@@ -204,6 +218,8 @@ const sampleArgsRegistry: Record<string, unknown[]> = {
   getPointInfoByDeviceIdAndPointId: ['device-1', 'point-1'],
   listCommandInfoByDeviceIdAndCommandId: ['device-1', 'command-1'],
   listEventInfoByDeviceIdAndEventId: ['device-1', 'event-1'],
+  listCommandParam: [offsetQuery],
+  listEventParam: [offsetQuery],
   getCommandHistoryByRecordId: ['record-1'],
   getEventHistoryByRecordId: ['record-1'],
   // Auth wrappers whose enable/disable/reset/check verbs don't match the heuristic.
@@ -228,6 +244,22 @@ const sampleArgsRegistry: Record<string, unknown[]> = {
   alertPage: [pageQuery],
   // Array-id callers without `ByIds` suffix.
   getPointUnit: [['id-1', 'id-2']],
+  deleteDriver: ['id-1', 3],
+  deleteDevice: ['id-1', 3],
+  deleteProfile: ['id-1', 3],
+  deletePoint: ['id-1', 3],
+  deleteCommand: ['id-1', 3],
+  deleteCommandParam: ['id-1', 3],
+  deleteEvent: ['id-1', 3],
+  deleteEventParam: ['id-1', 3],
+  deleteDriverAttribute: ['id-1', 3],
+  deletePointAttribute: ['id-1', 3],
+  deleteCommandAttribute: ['id-1', 3],
+  deleteEventAttribute: ['id-1', 3],
+  deleteDriverInfo: ['id-1', 3],
+  deletePointInfo: ['id-1', 3],
+  deleteCommandInfo: ['id-1', 3],
+  deleteEventInfo: ['id-1', 3],
 };
 
 function sampleArgs(name: string): unknown[] {
@@ -264,6 +296,8 @@ function walkApiSourceFiles(dir: string): string[] {
 function resetTransportSpies() {
   apiSpies.httpGet.mockClear();
   apiSpies.httpPost.mockClear();
+  apiSpies.httpPatch.mockClear();
+  apiSpies.httpDelete.mockClear();
   apiSpies.request.mockClear();
 }
 
@@ -271,6 +305,8 @@ function transportCalls(): TransportCall[] {
   return [
     ...apiSpies.httpGet.mock.calls.map((args) => ({transport: 'httpGet' as const, args})),
     ...apiSpies.httpPost.mock.calls.map((args) => ({transport: 'httpPost' as const, args})),
+    ...apiSpies.httpPatch.mock.calls.map((args) => ({transport: 'httpPatch' as const, args})),
+    ...apiSpies.httpDelete.mock.calls.map((args) => ({transport: 'httpDelete' as const, args})),
     ...apiSpies.request.mock.calls.map((args) => ({transport: 'request' as const, args})),
   ];
 }
@@ -291,7 +327,10 @@ function callConfig(call: TransportCall) {
   if (call.transport === 'httpGet') {
     return call.args[1] as { params?: Record<string, unknown> } | undefined;
   }
-  return call.args[2] as { params?: Record<string, unknown> } | undefined;
+  if (call.transport === 'httpPost') {
+    return call.args[2] as { params?: Record<string, unknown> } | undefined;
+  }
+  return call.args[1] as { params?: Record<string, unknown> } | undefined;
 }
 
 function expectStandardUrl(call: TransportCall) {

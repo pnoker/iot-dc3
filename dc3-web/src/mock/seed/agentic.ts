@@ -337,7 +337,7 @@ interface ToolDef {
   toolName: string;
   toolTitle: string;
   apiPath: string;
-  httpMethod: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  httpMethod: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   permissionCode: string;
   riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
   readOnlyHint: number;

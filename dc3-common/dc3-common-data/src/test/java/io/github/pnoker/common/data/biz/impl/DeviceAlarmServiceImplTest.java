@@ -18,8 +18,8 @@
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
+import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
@@ -30,6 +30,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -42,7 +43,7 @@ import static org.mockito.Mockito.when;
 class DeviceAlarmServiceImplTest {
 
     @Mock
-    private EntityAlarmManager entityAlarmManager;
+    private ReactiveEntityAlarmStore entityAlarmStore;
 
     @Mock
     private AlarmRuleTriggerService alarmRuleTriggerService;
@@ -55,15 +56,15 @@ class DeviceAlarmServiceImplTest {
 
     @Test
     void dropsAlarmWhenDtoIsNull() {
-        service.alarm(null);
-        verifyNoInteractions(entityAlarmManager, alarmRuleTriggerService, deviceFacade);
+        service.alarm(null).block();
+        verifyNoInteractions(entityAlarmStore, alarmRuleTriggerService, deviceFacade);
     }
 
     @Test
     void dropsAlarmWhenDeviceIdMissing() {
         DeviceAlarmDTO dto = DeviceAlarmDTO.builder().tenantId(7L).message("x").build();
-        service.alarm(dto);
-        verifyNoInteractions(entityAlarmManager, alarmRuleTriggerService, deviceFacade);
+        service.alarm(dto).block();
+        verifyNoInteractions(entityAlarmStore, alarmRuleTriggerService, deviceFacade);
     }
 
     @Test
@@ -75,13 +76,15 @@ class DeviceAlarmServiceImplTest {
                 .message("offline")
                 .build();
 
-        service.alarm(dto);
+        when(entityAlarmStore.insert(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(alarmRuleTriggerService.processDeviceAlarm(any())).thenReturn(Mono.empty());
+        service.alarm(dto).block();
 
         // Facade not consulted because both ids are already valid.
         verifyNoInteractions(deviceFacade);
 
         ArgumentCaptor<EntityAlarmDO> captor = ArgumentCaptor.forClass(EntityAlarmDO.class);
-        verify(entityAlarmManager).save(captor.capture());
+        verify(entityAlarmStore).insert(captor.capture());
         assertThat(captor.getValue().getTenantId()).isEqualTo(7L);
         assertThat(captor.getValue().getDriverId()).isEqualTo(3L);
         assertThat(captor.getValue().getDeviceId()).isEqualTo(10L);
@@ -101,10 +104,10 @@ class DeviceAlarmServiceImplTest {
                 .message("offline")
                 .build(); // tenantId missing
 
-        service.alarm(dto);
+        service.alarm(dto).block();
 
         verifyNoInteractions(deviceFacade);
-        verify(entityAlarmManager, never()).save(any());
+        verify(entityAlarmStore, never()).insert(any());
         verifyNoInteractions(alarmRuleTriggerService);
     }
 
@@ -119,12 +122,14 @@ class DeviceAlarmServiceImplTest {
         device.setId(10L);
         device.setTenantId(7L);
         device.setDriverId(99L);
-        when(deviceFacade.getById(7L, 10L)).thenReturn(device);
+        when(deviceFacade.getByIdReactive(7L, 10L)).thenReturn(Mono.just(device));
 
-        service.alarm(dto);
+        when(entityAlarmStore.insert(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(alarmRuleTriggerService.processDeviceAlarm(any())).thenReturn(Mono.empty());
+        service.alarm(dto).block();
 
         ArgumentCaptor<EntityAlarmDO> captor = ArgumentCaptor.forClass(EntityAlarmDO.class);
-        verify(entityAlarmManager).save(captor.capture());
+        verify(entityAlarmStore).insert(captor.capture());
         assertThat(captor.getValue().getDriverId()).isEqualTo(99L);
         assertThat(dto.getDriverId()).isEqualTo(99L);
     }
@@ -136,11 +141,11 @@ class DeviceAlarmServiceImplTest {
                 .tenantId(7L)
                 .message("offline")
                 .build(); // driverId missing, device not found
-        when(deviceFacade.getById(7L, 10L)).thenReturn(null);
+        when(deviceFacade.getByIdReactive(7L, 10L)).thenReturn(Mono.empty());
 
-        service.alarm(dto);
+        service.alarm(dto).block();
 
-        verify(entityAlarmManager, never()).save(any());
+        verify(entityAlarmStore, never()).insert(any());
         verifyNoInteractions(alarmRuleTriggerService);
     }
 

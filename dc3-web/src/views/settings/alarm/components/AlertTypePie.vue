@@ -74,8 +74,8 @@ const render = (data: AlertTypeRow[]) => {
 const load = async () => {
   loading.value = true;
   try {
-    const res: { data?: AlertTypeRow[] } = await alertTypeDistribution(30);
-    rows.value = res?.data ?? [];
+    const res: AlertTypeRow[] = await alertTypeDistribution(30);
+    rows.value = res ?? [];
     await nextTick();
     if (rows.value.length > 0) render(rows.value);
   } catch {

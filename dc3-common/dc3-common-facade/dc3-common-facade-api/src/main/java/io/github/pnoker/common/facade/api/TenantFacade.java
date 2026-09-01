@@ -18,6 +18,7 @@
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral tenant facade. Mirrors {@code api.center.auth.TenantApi}.
@@ -27,9 +28,6 @@ import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
  */
 public interface TenantFacade {
 
-    /**
-     * @return the tenant, or {@code null} when no tenant carries the given code.
-     */
-    FacadeTenantBO getByCode(String code);
+    Mono<FacadeTenantBO> getByCode(String code);
 
 }

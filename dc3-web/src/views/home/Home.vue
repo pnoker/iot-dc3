@@ -175,7 +175,7 @@ interface ListPageSummary {
   total?: number;
 }
 
-type ListPageResponse = R<ListPageSummary>;
+type ListPageResponse = ListPageSummary;
 
 const {t} = useI18n();
 const router = useRouter();
@@ -205,18 +205,18 @@ const state = reactive<HomeState>({
   alertSparkline: [],
 });
 
-const emptyPage = {current: 1, size: 1};
+const emptyPage = {offset: 0, limit: 1};
 const toNumber = (value: number | string | null | undefined) => Number(value) || 0;
 const toNumberArray = (values: Array<number | string | null | undefined>) => values.map((value) => toNumber(value));
 const getSettledTotal = (result: PromiseSettledResult<ListPageResponse>) =>
-  result.status === 'fulfilled' ? toNumber(result.value.data.total) : 0;
+  result.status === 'fulfilled' ? toNumber(result.value.total) : 0;
 
 const loadTotals = async () => {
   const [driverRes, deviceRes, pointRes, profileRes] = await Promise.allSettled([
-    listDriver<ListPageResponse>({page: emptyPage}),
-    listDevice<ListPageResponse>({page: emptyPage}),
-    listPoint<ListPageResponse>({page: emptyPage}),
-    listProfile<ListPageResponse>({page: emptyPage}),
+    listDriver<ListPageResponse>(emptyPage),
+    listDevice<ListPageResponse>(emptyPage),
+    listPoint<ListPageResponse>(emptyPage),
+    listProfile<ListPageResponse>(emptyPage),
   ]);
 
   state.driverCount = getSettledTotal(driverRes);
@@ -228,7 +228,7 @@ const loadTotals = async () => {
 const loadToday = async () => {
   try {
     const res = await statsToday();
-    const data: StatsTodaySummary = res.data;
+    const data: StatsTodaySummary = res;
     state.todayCount = toNumber(data.today);
     state.todayPercentChange = toNumber(data.percentChange);
     state.totalCount = toNumber(data.total);
@@ -240,7 +240,7 @@ const loadToday = async () => {
 const loadSparkline = async () => {
   try {
     const res = await statsTimeseries({granularity: 'hour', rangeKey: '24h'});
-    const buckets: StatsTimeBucket[] = res.data;
+    const buckets: StatsTimeBucket[] = res;
     state.todaySparkline = buckets.map((bucket) => toNumber(bucket.count));
   } catch {
     // handled globally
@@ -250,7 +250,7 @@ const loadSparkline = async () => {
 const loadAlerts = async () => {
   try {
     const res = await alertStats();
-    const data: AlertStatsSummary = res.data;
+    const data: AlertStatsSummary = res;
     state.alertCount = toNumber(data.total);
     state.alertUnconfirmed = toNumber(data.unconfirmed);
     state.deviceAlertCount = toNumber(data.deviceAlerts);
@@ -270,7 +270,7 @@ const loadAlerts = async () => {
 const loadGrowth = async () => {
   try {
     const res = await dailyGrowth(7);
-    const data: DailyGrowthSummary = res.data;
+    const data: DailyGrowthSummary = res;
     state.driverSparkline = toNumberArray(data.driverDailyCounts ?? []);
     state.deviceSparkline = toNumberArray(data.deviceDailyCounts ?? []);
     state.pointSparkline = toNumberArray(data.pointDailyCounts ?? []);

@@ -38,6 +38,7 @@ export interface CommandForm {
 
 export interface CommandRecord extends CommandForm {
   id: string;
+  version: number;
   tenantId?: string;
   createTime?: string;
   operateTime?: string;
@@ -62,6 +63,7 @@ export interface CommandParamForm {
 
 export interface CommandParamRecord extends CommandParamForm {
   id: string;
+  version: number;
 }
 
 /**

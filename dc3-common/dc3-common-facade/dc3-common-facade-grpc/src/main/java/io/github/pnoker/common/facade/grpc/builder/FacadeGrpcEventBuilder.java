@@ -17,17 +17,17 @@
 
 package io.github.pnoker.common.facade.grpc.builder;
 
-import io.github.pnoker.api.center.manager.GrpcPageEventQuery;
+import io.github.pnoker.api.center.manager.GrpcOffsetEventQuery;
+import io.github.pnoker.api.common.PageRequest;
+import io.github.pnoker.api.common.SortDirection;
 import io.github.pnoker.api.common.GrpcEventDTO;
-import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.ext.EventExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
-import io.github.pnoker.common.facade.entity.query.FacadeEventQuery;
+import io.github.pnoker.common.facade.entity.query.FacadeEventOffsetQuery;
 import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
@@ -46,36 +46,15 @@ import java.util.Optional;
 @Component
 public class FacadeGrpcEventBuilder {
 
-    /**
-     * To grpc page query.
-     *
-     * @param query query
-     * @return to grpc page query result
-     */
-    public GrpcPageEventQuery toGrpcPageQuery(FacadeEventQuery query) {
-        GrpcPageEventQuery.Builder builder = GrpcPageEventQuery.newBuilder();
-
-        Pages pages = Objects.isNull(query.getPage()) ? new Pages() : query.getPage();
-        GrpcPage.Builder page = GrpcPage.newBuilder().setCurrent(pages.getCurrent()).setSize(pages.getSize());
-        builder.setPage(page);
-
-        LongOptional.ofNullable(query.getTenantId()).ifPresent(builder::setTenantId);
-        StringOptional.ofNullable(query.getEventName()).ifPresent(builder::setEventName);
-        StringOptional.ofNullable(query.getEventCode()).ifPresent(builder::setEventCode);
-        LongOptional.ofNullable(query.getDeviceId()).ifPresent(builder::setDeviceId);
-
-        Optional.ofNullable(query.getEventType())
-                .ifPresentOrElse(value -> builder.setEventTypeFlag(value.getIndex()),
-                        () -> builder.setEventTypeFlag(DefaultConstant.NULL_INT));
-        Optional.ofNullable(query.getEventLevel())
-                .ifPresentOrElse(value -> builder.setEventLevelFlag(value.getIndex()),
-                        () -> builder.setEventLevelFlag(DefaultConstant.NULL_INT));
-        Optional.ofNullable(query.getProfileId())
-                .ifPresentOrElse(builder::setProfileId, () -> builder.setProfileId(DefaultConstant.NULL_INT));
-        Optional.ofNullable(query.getEnableFlag())
-                .ifPresentOrElse(value -> builder.setEnableFlag(value.getIndex()),
-                        () -> builder.setEnableFlag(DefaultConstant.NULL_INT));
-
+    public GrpcOffsetEventQuery toGrpcOffsetQuery(FacadeEventOffsetQuery query) {
+        PageRequest.Builder page = PageRequest.newBuilder().setOffset(query.offset()).setLimit(query.limit());
+        if (query.sort() != null) query.sort().forEach(spec -> page.addSort(io.github.pnoker.api.common.SortSpec.newBuilder()
+                .setField(spec.field()).setDirection(spec.direction() == io.github.pnoker.db.r2dbc.core.page.SortSpec.Direction.DESC
+                        ? SortDirection.SORT_DIRECTION_DESC : SortDirection.SORT_DIRECTION_ASC).build()));
+        GrpcOffsetEventQuery.Builder builder = GrpcOffsetEventQuery.newBuilder().setPage(page).setTenantId(query.tenantId());
+        Optional.ofNullable(query.eventName()).ifPresent(builder::setEventName); Optional.ofNullable(query.eventCode()).ifPresent(builder::setEventCode);
+        Optional.ofNullable(query.eventTypeFlag()).ifPresent(value -> builder.setEventTypeFlag(value.getIndex())); Optional.ofNullable(query.eventLevelFlag()).ifPresent(value -> builder.setEventLevelFlag(value.getIndex()));
+        Optional.ofNullable(query.profileId()).ifPresent(builder::setProfileId); Optional.ofNullable(query.enableFlag()).ifPresent(value -> builder.setEnableFlag(value.getIndex())); Optional.ofNullable(query.version()).ifPresent(builder::setVersion); Optional.ofNullable(query.deviceId()).ifPresent(builder::setDeviceId);
         return builder.build();
     }
 

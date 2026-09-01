@@ -19,7 +19,7 @@ In-process data facades: `PointValueLocalFacade`, `PointCommandLocalFacade`, `St
 
 ## Activation
 
-Active when the in-process facade mode is selected (`dc3.facade.mode=local`) and `dc3-common-data` is on the classpath.
+Active when the data-domain in-process mode is selected (`dc3.facade.data.mode=local`) and `dc3-common-data` is on the classpath.
 
 ## Dependencies
 

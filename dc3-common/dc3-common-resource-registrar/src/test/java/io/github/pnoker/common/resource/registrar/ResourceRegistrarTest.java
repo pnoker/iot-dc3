@@ -30,12 +30,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -86,7 +86,7 @@ class ResourceRegistrarTest {
     @Test
     void disabledRegistrarSkipsScanAndSync() {
         properties.setEnabled(false);
-        registrar.register();
+        StepVerifier.create(registrar.register()).verifyComplete();
         verifyNoInteractions(scanner, facade, environment);
     }
 
@@ -97,9 +97,8 @@ class ResourceRegistrarTest {
         properties.setServiceName(null);
         when(environment.getProperty("spring.application.name")).thenReturn(null);
 
-        assertThatThrownBy(() -> registrar.register())
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("service name");
+        StepVerifier.create(registrar.register()).expectErrorSatisfies(error ->
+                assertThat(error).isInstanceOf(IllegalStateException.class).hasMessageContaining("service name")).verify();
         verifyNoInteractions(scanner, facade);
     }
 
@@ -110,7 +109,7 @@ class ResourceRegistrarTest {
         properties.setServiceName("   ");
         when(environment.getProperty("spring.application.name")).thenReturn("");
 
-        assertThatNoException().isThrownBy(() -> registrar.register());
+        StepVerifier.create(registrar.register()).verifyComplete();
         verifyNoInteractions(scanner, facade);
     }
 
@@ -119,9 +118,9 @@ class ResourceRegistrarTest {
         properties.setServiceName("dc3-center-auth");
         properties.setDeleteMissing(true);
         when(scanner.scan()).thenReturn(List.of(api("GET", "/probe")));
-        when(facade.sync(any())).thenReturn(result(1, 0, 0, 0));
+        when(facade.sync(any())).thenReturn(Mono.just(result(1, 0, 0, 0)));
 
-        registrar.register();
+        StepVerifier.create(registrar.register()).verifyComplete();
 
         ArgumentCaptor<FacadeResourceRegistrySyncCommandBO> captor =
                 ArgumentCaptor.forClass(FacadeResourceRegistrySyncCommandBO.class);
@@ -136,9 +135,9 @@ class ResourceRegistrarTest {
         properties.setServiceName(null);
         when(environment.getProperty("spring.application.name")).thenReturn("dc3-center-data");
         when(scanner.scan()).thenReturn(List.of());
-        when(facade.sync(any())).thenReturn(result(0, 0, 0, 0));
+        when(facade.sync(any())).thenReturn(Mono.just(result(0, 0, 0, 0)));
 
-        registrar.register();
+        StepVerifier.create(registrar.register()).verifyComplete();
 
         ArgumentCaptor<FacadeResourceRegistrySyncCommandBO> captor =
                 ArgumentCaptor.forClass(FacadeResourceRegistrySyncCommandBO.class);
@@ -152,9 +151,9 @@ class ResourceRegistrarTest {
         FacadeScannedApiBO probe = api("GET", "/probe");
         FacadeScannedApiBO write = api("POST", "/v3/point/write");
         when(scanner.scan()).thenReturn(List.of(probe, write));
-        when(facade.sync(any())).thenReturn(result(2, 0, 0, 0));
+        when(facade.sync(any())).thenReturn(Mono.just(result(2, 0, 0, 0)));
 
-        registrar.register();
+        StepVerifier.create(registrar.register()).verifyComplete();
 
         ArgumentCaptor<FacadeResourceRegistrySyncCommandBO> captor =
                 ArgumentCaptor.forClass(FacadeResourceRegistrySyncCommandBO.class);
@@ -169,7 +168,7 @@ class ResourceRegistrarTest {
         properties.setFailFast(false);
         when(scanner.scan()).thenThrow(new RuntimeException("scan boom"));
 
-        assertThatNoException().isThrownBy(() -> registrar.register());
+        StepVerifier.create(registrar.register()).verifyComplete();
         verify(facade, never()).sync(any());
     }
 
@@ -179,9 +178,7 @@ class ResourceRegistrarTest {
         properties.setFailFast(true);
         when(scanner.scan()).thenThrow(new RuntimeException("scan boom"));
 
-        assertThatThrownBy(() -> registrar.register())
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("scan boom");
+        StepVerifier.create(registrar.register()).expectErrorMessage("scan boom").verify();
         verify(facade, never()).sync(any());
     }
 
@@ -192,7 +189,7 @@ class ResourceRegistrarTest {
         when(scanner.scan()).thenReturn(List.of());
         when(facade.sync(any())).thenThrow(new RuntimeException("downstream offline"));
 
-        assertThatNoException().isThrownBy(() -> registrar.register());
+        StepVerifier.create(registrar.register()).verifyComplete();
     }
 
     @Test
@@ -202,8 +199,6 @@ class ResourceRegistrarTest {
         when(scanner.scan()).thenReturn(List.of());
         when(facade.sync(any())).thenThrow(new RuntimeException("downstream offline"));
 
-        assertThatThrownBy(() -> registrar.register())
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("downstream offline");
+        StepVerifier.create(registrar.register()).expectErrorMessage("downstream offline").verify();
     }
 }

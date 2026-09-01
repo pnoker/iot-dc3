@@ -39,7 +39,7 @@ CREATE TABLE dc3_tenant
     id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
     tenant_name   TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Tenant name
     tenant_code   TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Tenant code
-    tenant_ext    JSON     DEFAULT '{}'::JSON        NOT NULL,   -- Tenant extension information
+    tenant_ext    JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Tenant extension information
     enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
     remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
     creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
@@ -103,7 +103,7 @@ CREATE TABLE dc3_principal
     enable_flag    SMALLINT DEFAULT 0 NOT NULL,                  -- Enable flag, 0: enabled, 1: disabled
     locked_flag    SMALLINT DEFAULT 0 NOT NULL,                  -- Locked flag, 0: unlocked, 1: locked
     last_login_time TIMESTAMPTZ,                                 -- Last login time
-    principal_ext  JSON     DEFAULT '{}'::JSON     NOT NULL,     -- Principal extension information
+    principal_ext  JSONB     DEFAULT '{}'::JSONB     NOT NULL,     -- Principal extension information
     remark         TEXT     DEFAULT ''::TEXT       NOT NULL,     -- Description
     creator_id     BIGINT   DEFAULT 0 NOT NULL,                  -- Creator ID
     creator_name   TEXT     DEFAULT ''::TEXT       NOT NULL,     -- Creator name
@@ -177,8 +177,8 @@ CREATE TABLE dc3_user
     nick_name     TEXT     DEFAULT ''::TEXT          NOT NULL,   -- User nickname
     phone         TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Phone number
     email         TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Email
-    social_ext    JSON     DEFAULT '{}'::JSON        NOT NULL,   -- Social extension information
-    identity_ext  JSON     DEFAULT '{}'::JSON        NOT NULL,   -- Identity extension information
+    social_ext    JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Social extension information
+    identity_ext  JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Identity extension information
     enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
     remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
     creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
@@ -253,14 +253,14 @@ CREATE TABLE dc3_local_credential
     credential_type         TEXT     DEFAULT 'PASSWORD'::TEXT NOT NULL, -- Credential type
     password_hash           TEXT     DEFAULT ''::TEXT         NOT NULL, -- Password hash
     password_algorithm      TEXT     DEFAULT 'ARGON2ID'::TEXT NOT NULL, -- Password hash algorithm
-    password_params         JSON     DEFAULT '{}'::JSON       NOT NULL, -- Password hash parameters
+    password_params         JSONB     DEFAULT '{}'::JSONB       NOT NULL, -- Password hash parameters
     password_updated_time TIMESTAMPTZ,                                  -- Password update time
     password_expire_time TIMESTAMPTZ,                                   -- Password expiration time
     failed_attempts         INTEGER  DEFAULT 0 NOT NULL,                -- Failed login attempts
     locked_until TIMESTAMPTZ,                                           -- Credential locked until time
     require_password_change SMALLINT DEFAULT 1 NOT NULL,                -- Require password change flag, 0: no, 1: yes
     enable_flag             SMALLINT DEFAULT 0 NOT NULL,                -- Enable flag, 0: enabled, 1: disabled
-    credential_ext          JSON     DEFAULT '{}'::JSON       NOT NULL, -- Credential extension information
+    credential_ext          JSONB     DEFAULT '{}'::JSONB       NOT NULL, -- Credential extension information
     remark                  TEXT     DEFAULT ''::TEXT         NOT NULL, -- Description
     creator_id              BIGINT   DEFAULT 0 NOT NULL,                -- Creator ID
     creator_name            TEXT     DEFAULT ''::TEXT         NOT NULL, -- Creator name
@@ -347,7 +347,7 @@ CREATE TABLE dc3_tenant_membership
     principal_type    TEXT     DEFAULT 'USER'::TEXT   NOT NULL,  -- Principal type
     membership_status TEXT     DEFAULT 'ACTIVE'::TEXT NOT NULL,  -- Membership status
     joined_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Joined time
-    membership_ext    JSON     DEFAULT '{}'::JSON     NOT NULL,  -- Membership extension information
+    membership_ext    JSONB     DEFAULT '{}'::JSONB     NOT NULL,  -- Membership extension information
     remark            TEXT     DEFAULT ''::TEXT       NOT NULL,  -- Description
     creator_id        BIGINT   DEFAULT 0 NOT NULL,               -- Creator ID
     creator_name      TEXT     DEFAULT ''::TEXT       NOT NULL,  -- Creator name
@@ -418,7 +418,7 @@ CREATE TABLE dc3_service_account
     purpose               TEXT     DEFAULT ''::TEXT NOT NULL,    -- Service account purpose
     expire_time TIMESTAMPTZ,                                     -- Expiration time
     last_used_time TIMESTAMPTZ,                                  -- Last used time
-    credential_policy_ext JSON     DEFAULT '{}'::JSON NOT NULL,  -- Credential policy extension information
+    credential_policy_ext JSONB     DEFAULT '{}'::JSONB NOT NULL,  -- Credential policy extension information
     enable_flag           SMALLINT DEFAULT 0 NOT NULL,           -- Enable flag, 0: enabled, 1: disabled
     remark                TEXT     DEFAULT ''::TEXT NOT NULL,    -- Description
     creator_id            BIGINT   DEFAULT 0 NOT NULL,           -- Creator ID
@@ -505,10 +505,10 @@ CREATE TABLE dc3_identity_provider
     subject_claim     TEXT     DEFAULT 'sub'::TEXT       NOT NULL, -- Subject claim name
     username_claim    TEXT     DEFAULT ''::TEXT          NOT NULL, -- Username claim name
     email_claim       TEXT     DEFAULT 'email'::TEXT     NOT NULL, -- Email claim name
-    attribute_mapping JSON     DEFAULT '{}'::JSON        NOT NULL, -- Attribute mapping
+    attribute_mapping JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Attribute mapping
     provisioning_mode TEXT     DEFAULT 'LINK_ONLY'::TEXT NOT NULL, -- Provisioning mode
     enable_flag       SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
-    provider_ext      JSON     DEFAULT '{}'::JSON        NOT NULL, -- Provider extension information
+    provider_ext      JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Provider extension information
     remark            TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
     creator_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
     creator_name      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
@@ -610,7 +610,7 @@ CREATE TABLE dc3_external_identity
     first_login_time TIMESTAMPTZ,                                -- First login time
     last_login_time TIMESTAMPTZ,                                 -- Last login time
     last_claims_digest TEXT     DEFAULT ''::TEXT NOT NULL,       -- Last claims digest
-    identity_ext       JSON     DEFAULT '{}'::JSON NOT NULL,     -- External identity extension information
+    identity_ext       JSONB     DEFAULT '{}'::JSONB NOT NULL,     -- External identity extension information
     enable_flag        SMALLINT DEFAULT 0 NOT NULL,              -- Enable flag, 0: enabled, 1: disabled
     remark             TEXT     DEFAULT ''::TEXT NOT NULL,       -- Description
     creator_id         BIGINT   DEFAULT 0 NOT NULL,              -- Creator ID
@@ -688,7 +688,7 @@ CREATE TABLE dc3_role
     parent_role_id BIGINT   DEFAULT 0 NOT NULL,                  -- Parent role ID
     role_name      TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Role name
     role_code      TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Role code
-    role_ext       JSON     DEFAULT '{}'::JSON        NOT NULL,  -- Role extension information
+    role_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL,  -- Role extension information
     enable_flag    SMALLINT DEFAULT 0 NOT NULL,                  -- Enable flag, 0: enabled, 1: disabled
     tenant_id      BIGINT   DEFAULT 0 NOT NULL,                  -- Tenant ID
     remark         TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Description
@@ -758,7 +758,7 @@ CREATE TABLE dc3_resource
     resource_type_flag  SMALLINT DEFAULT 0 NOT NULL,                 -- Resource type flag
     resource_scope_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Resource scope flag
     entity_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Resource entity ID
-    resource_ext        JSON     DEFAULT '{}'::JSON        NOT NULL, -- Resource extension information
+    resource_ext        JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Resource extension information
     enable_flag         SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
     remark              TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
     creator_id          BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
@@ -1018,7 +1018,7 @@ CREATE TABLE dc3_api
     api_name      TEXT     DEFAULT ''::TEXT          NOT NULL,   -- API name
     api_code      TEXT     DEFAULT ''::TEXT          NOT NULL,   -- API code
     api_group     TEXT     DEFAULT ''::TEXT          NOT NULL,   -- API grouping (controller simple name)
-    api_ext       JSON     DEFAULT '{}'::JSON        NOT NULL,   -- API extension information
+    api_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- API extension information
     enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
     remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
     creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
@@ -1028,7 +1028,7 @@ CREATE TABLE dc3_api
     operator_name TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Operator name
     operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
     deleted       SMALLINT DEFAULT 0 NOT NULL,                   -- Logical delete flag, 0: not deleted, 1: deleted
-    CONSTRAINT chk_api_api_type_flag CHECK (api_type_flag BETWEEN 0 AND 3),
+    CONSTRAINT chk_api_api_type_flag CHECK (api_type_flag BETWEEN 0 AND 4),
     CONSTRAINT chk_api_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_api_deleted CHECK (deleted IN (0, 1))
 );
@@ -1096,12 +1096,12 @@ CREATE TABLE dc3_oauth_registered_client
     redirect_uris                TEXT     DEFAULT ''::TEXT       NOT NULL, -- Redirect URIs
     scopes                       TEXT     DEFAULT ''::TEXT       NOT NULL, -- OAuth scopes
     jwks_uri                     TEXT     DEFAULT ''::TEXT       NOT NULL, -- Client JWKS URI
-    jwk_set                      JSON     DEFAULT '{}'::JSON     NOT NULL, -- Client JWK set
+    jwk_set                      JSONB     DEFAULT '{}'::JSONB     NOT NULL, -- Client JWK set
     require_pkce                 SMALLINT DEFAULT 1 NOT NULL,              -- Require PKCE flag, 0: no, 1: yes
     require_consent              SMALLINT DEFAULT 1 NOT NULL,              -- Require consent flag, 0: no, 1: yes
     enable_flag                  SMALLINT DEFAULT 0 NOT NULL,              -- Enable flag, 0: enabled, 1: disabled
-    client_settings              JSON     DEFAULT '{}'::JSON     NOT NULL, -- Client settings
-    token_settings               JSON     DEFAULT '{}'::JSON     NOT NULL, -- Token settings
+    client_settings              JSONB     DEFAULT '{}'::JSONB     NOT NULL, -- Client settings
+    token_settings               JSONB     DEFAULT '{}'::JSONB     NOT NULL, -- Token settings
     remark                       TEXT     DEFAULT ''::TEXT       NOT NULL, -- Description
     creator_id                   BIGINT   DEFAULT 0 NOT NULL,              -- Creator ID
     creator_name                 TEXT     DEFAULT ''::TEXT       NOT NULL, -- Creator name
@@ -1210,8 +1210,8 @@ CREATE TABLE dc3_oauth_authorization
     previous_refresh_token_hash TEXT     DEFAULT ''::TEXT     NOT NULL, -- Previous (rotated) refresh token hash, used to detect replay
     refresh_token_issued TIMESTAMPTZ,                                   -- Refresh token issued time
     refresh_token_expires TIMESTAMPTZ,                                  -- Refresh token expiration time
-    token_claims                JSON     DEFAULT '{}'::JSON   NOT NULL, -- Token claims
-    token_metadata              JSON     DEFAULT '{}'::JSON   NOT NULL, -- Token metadata
+    token_claims                JSONB     DEFAULT '{}'::JSONB   NOT NULL, -- Token claims
+    token_metadata              JSONB     DEFAULT '{}'::JSONB   NOT NULL, -- Token metadata
     revoked_time TIMESTAMPTZ,                                           -- Revoked time
     revoke_reason               TEXT     DEFAULT ''::TEXT     NOT NULL, -- Revoke reason
     create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,         -- Creation time
@@ -1306,7 +1306,7 @@ CREATE TABLE dc3_oauth_authorization_consent
     principal_id         BIGINT   DEFAULT 0 NOT NULL,            -- Principal ID
     tenant_id            BIGINT   DEFAULT 0 NOT NULL,            -- Tenant ID
     scopes               TEXT     DEFAULT ''::TEXT   NOT NULL,   -- Consented scopes
-    consent_ext          JSON     DEFAULT '{}'::JSON NOT NULL,   -- Consent extension information
+    consent_ext          JSONB     DEFAULT '{}'::JSONB NOT NULL,   -- Consent extension information
     create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
     operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
     deleted              SMALLINT DEFAULT 0 NOT NULL,            -- Logical delete flag, 0: not deleted, 1: deleted
@@ -1361,7 +1361,7 @@ CREATE TABLE dc3_mcp_connection
     expire_time TIMESTAMPTZ,                                                -- Expiration time
     revoke_time TIMESTAMPTZ,                                                -- Revoke time
     last_used_time TIMESTAMPTZ,                                             -- Last used time
-    connection_ext  JSON     DEFAULT '{}'::JSON                   NOT NULL, -- Connection extension information
+    connection_ext  JSONB     DEFAULT '{}'::JSONB                   NOT NULL, -- Connection extension information
     remark          TEXT     DEFAULT ''::TEXT                     NOT NULL, -- Description
     creator_id      BIGINT   DEFAULT 0 NOT NULL,                            -- Creator ID
     creator_name    TEXT     DEFAULT ''::TEXT                     NOT NULL, -- Creator name
@@ -1453,7 +1453,7 @@ CREATE TABLE dc3_mcp_tool_catalog
     idempotent_hint  SMALLINT DEFAULT 0 NOT NULL,                -- Idempotent hint, 0: false, 1: true
     open_world_hint  SMALLINT DEFAULT 0 NOT NULL,                -- Open-world hint, 0: false, 1: true
     enable_flag      SMALLINT DEFAULT 0 NOT NULL,                -- Enable flag, 0: enabled, 1: disabled
-    tool_ext         JSON     DEFAULT '{}'::JSON  NOT NULL,      -- Tool extension information
+    tool_ext         JSONB     DEFAULT '{}'::JSONB  NOT NULL,      -- Tool extension information
     remark           TEXT     DEFAULT ''::TEXT    NOT NULL,      -- Description
     creator_id       BIGINT   DEFAULT 0 NOT NULL,                -- Creator ID
     creator_name     TEXT     DEFAULT ''::TEXT    NOT NULL,      -- Creator name
@@ -1623,7 +1623,7 @@ CREATE TABLE dc3_mcp_audit_log
     client_name     TEXT     DEFAULT ''::TEXT     NOT NULL,     -- MCP client name
     client_version  TEXT     DEFAULT ''::TEXT     NOT NULL,     -- MCP client version
     remote_ip       TEXT     DEFAULT ''::TEXT     NOT NULL,     -- Remote IP address
-    audit_ext       JSON     DEFAULT '{}'::JSON   NOT NULL,     -- Audit extension information
+    audit_ext       JSONB     DEFAULT '{}'::JSONB   NOT NULL,     -- Audit extension information
     create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
     deleted         SMALLINT DEFAULT 0 NOT NULL,                -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_mcp_audit_log_principal_type CHECK (principal_type IN ('USER', 'SERVICE_ACCOUNT')),
@@ -1715,7 +1715,7 @@ CREATE TABLE dc3_mcp_tool_confirmation
 
 CREATE UNIQUE INDEX idx_mcp_tool_confirmation_confirm_id
     ON dc3_mcp_tool_confirmation (confirm_id) WHERE deleted = 0 AND confirm_id <> ''::TEXT;
-CREATE INDEX idx_mcp_tool_confirmation_idempotency_key
+CREATE UNIQUE INDEX idx_mcp_tool_confirmation_idempotency_key
     ON dc3_mcp_tool_confirmation (connection_id, idempotency_key) WHERE deleted = 0 AND idempotency_key <> ''::TEXT;
 CREATE INDEX idx_mcp_tool_confirmation_principal
     ON dc3_mcp_tool_confirmation (tenant_id, principal_id, create_time) WHERE deleted = 0;
@@ -1763,7 +1763,7 @@ CREATE TABLE dc3_menu
     menu_code      TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Menu code
     menu_level     SMALLINT DEFAULT 0 NOT NULL,                  -- Menu level
     menu_index     SMALLINT DEFAULT 0 NOT NULL,                  -- Menu order
-    menu_ext       JSON     DEFAULT '{}'::JSON        NOT NULL,  -- Menu extension information
+    menu_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL,  -- Menu extension information
     enable_flag    SMALLINT DEFAULT 0 NOT NULL,                  -- Enable flag, 0: enabled, 1: disabled
     remark         TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Description
     creator_id     BIGINT   DEFAULT 0 NOT NULL,                  -- Creator ID
@@ -2188,7 +2188,7 @@ CREATE TABLE IF NOT EXISTS dc3_identity_audit_log
     resource_name  TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Audited resource name
     status         TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Result status
     error_code     TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Stable error code
-    detail_ext     JSON     DEFAULT '{}'::JSON   NOT NULL,      -- Structured audit details
+    detail_ext     JSONB     DEFAULT '{}'::JSONB   NOT NULL,      -- Structured audit details
     create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
     deleted        SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_identity_audit_deleted CHECK (deleted IN (0, 1))
@@ -2229,4 +2229,3 @@ COMMENT
 ON COLUMN dc3_identity_audit_log.create_time IS 'Creation time';
 COMMENT
 ON COLUMN dc3_identity_audit_log.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
-

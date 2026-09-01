@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
+import reactor.core.publisher.Mono;
 
 /**
  * Notification channel adapter.
@@ -40,8 +41,8 @@ public interface NotifyChannelAdapter {
      *
      * @param channel channel
      * @param payload rendered payload
-     * @return send result
+     * @return asynchronous send result
      */
-    NotifySendResult send(NotifyChannelBO channel, MessagePayload payload);
+    Mono<NotifySendResult> send(NotifyChannelBO channel, MessagePayload payload);
 
 }

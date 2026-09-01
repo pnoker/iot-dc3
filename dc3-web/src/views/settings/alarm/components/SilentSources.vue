@@ -82,8 +82,8 @@ const rows = ref<SilentSource[]>([]);
 
 const load = () =>
   run(async () => {
-    const res: { data?: SilentSource[] } = await apiSilentSources(7, Number(silentKey.value), 100);
-    rows.value = res?.data ?? [];
+    const res: SilentSource[] = await apiSilentSources(7, Number(silentKey.value), 100);
+    rows.value = res ?? [];
     await Promise.all([
       resolveDevices(rows.value.map((r) => r.deviceId)),
       resolvePoints(rows.value.map((r) => r.pointId)),

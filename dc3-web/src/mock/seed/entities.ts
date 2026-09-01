@@ -218,6 +218,7 @@ const profileDefs: ProfileDef[] = [
 
 export const drivers: DriverRecord[] = driverDefs.map((d, i) => ({
   id: String(1001 + i),
+  version: 0,
   driverName: d.name,
   driverCode: d.code,
   serviceName: d.service,
@@ -230,6 +231,7 @@ export const drivers: DriverRecord[] = driverDefs.map((d, i) => ({
 
 export const profiles: ProfileRecord[] = profileDefs.map((p, i) => ({
   id: String(2001 + i),
+  version: 0,
   profileName: p.name,
   profileCode: p.code,
   profileShareFlag: 'TENANT',
@@ -242,6 +244,7 @@ export const profiles: ProfileRecord[] = profileDefs.map((p, i) => ({
 export const points: PointRecord[] = profileDefs.flatMap((def, pi) =>
   def.points.map((pt, qi) => ({
     id: String(5001 + pi * 10 + qi),
+    version: 0,
     pointName: pt.name,
     pointCode: `${def.code}-${pt.name}`,
     pointTypeFlag: pt.type,
@@ -265,6 +268,7 @@ export const devices: DeviceRecord[] = profiles.flatMap((profile, pi) => {
     const driver = drivers[(pi + k) % drivers.length];
     return {
       id: String(3001 + index),
+      version: 0,
       deviceName: `${profile.profileName}-${String(k + 1).padStart(2, '0')}`,
       deviceCode: `DEV-${String(index + 1).padStart(3, '0')}`,
       driverId: driver!.id,

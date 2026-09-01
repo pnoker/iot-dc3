@@ -18,7 +18,8 @@
 package io.github.pnoker.common.data.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,6 +32,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Query parameters for alarm message template listing and filtering.
@@ -51,8 +53,14 @@ public class MessageQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
-    private Pages page;
+    @Schema(description = "Zero-based number of records to skip.")
+    private long offset;
+
+    @Schema(description = "Maximum number of records to return.", maximum = "200")
+    private int limit = PageRequest.DEFAULT_LIMIT;
+
+    @Schema(description = "Stable allow-listed sort fields.")
+    private List<SortSpec> sort = List.of();
 
     /**
      * Tenant ID

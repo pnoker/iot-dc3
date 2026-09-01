@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import reactor.core.publisher.Mono;
 
 /**
  * Deterministic evaluator for structured alarm rules. Dispatches by window
@@ -65,33 +66,33 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
     }
 
     @Override
-    public boolean matches(RuleBO rule, RuleFact fact) {
+    public Mono<Boolean> matches(RuleBO rule, RuleFact fact) {
         if (Objects.isNull(rule) || Objects.isNull(fact)) {
-            return false;
+            return Mono.just(false);
         }
         WindowSpec spec = parseSpec(rule);
         if (!spec.valid()) {
-            return false;
+            return Mono.just(false);
         }
         if (spec.mode() != WindowModeEnum.LAST) {
             return windowedRuleEvaluator.matches(rule, fact, spec);
         }
         RuleExt.Condition condition = condition(rule);
         if (Objects.isNull(condition)) {
-            return false;
+            return Mono.just(false);
         }
-        return ConditionEvaluator.evaluate(condition, fact.value(condition.getField()));
+        return Mono.just(ConditionEvaluator.evaluate(condition, fact.value(condition.getField())));
     }
 
     @Override
-    public boolean recovers(RuleBO rule, RuleFact fact) {
+    public Mono<Boolean> recovers(RuleBO rule, RuleFact fact) {
         if (Objects.isNull(rule) || Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())
                 || Objects.isNull(fact)) {
-            return false;
+            return Mono.just(false);
         }
         WindowSpec spec = parseSpec(rule);
         if (!spec.valid()) {
-            return false;
+            return Mono.just(false);
         }
         if (spec.mode() != WindowModeEnum.LAST) {
             return windowedRuleEvaluator.recovers(rule, fact, spec);
@@ -99,10 +100,10 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
         RuleExt.Recovery recovery = rule.getRuleExt().getContent().getRecovery();
         RuleExt.Condition condition = rule.getRuleExt().getContent().getCondition();
         if (Objects.isNull(recovery) || !Boolean.TRUE.equals(recovery.getEnabled()) || Objects.isNull(condition)) {
-            return false;
+            return Mono.just(false);
         }
         RuleExt.Condition recoveryCondition = ConditionEvaluator.recoveryConditionOf(condition, recovery);
-        return ConditionEvaluator.evaluate(recoveryCondition, fact.value(condition.getField()));
+        return Mono.just(ConditionEvaluator.evaluate(recoveryCondition, fact.value(condition.getField())));
     }
 
     private WindowSpec parseSpec(RuleBO rule) {

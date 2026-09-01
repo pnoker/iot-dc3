@@ -20,9 +20,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openai.client.OpenAIClient;
+import com.openai.client.OpenAIClientAsync;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.core.JsonValue;
-import com.openai.core.http.StreamResponse;
+import com.openai.core.http.AsyncStreamResponse;
 import com.openai.models.FunctionDefinition;
 import com.openai.models.FunctionParameters;
 import com.openai.models.chat.completions.ChatCompletion;
@@ -42,6 +43,7 @@ import com.openai.models.chat.completions.ChatCompletionUserMessageParam;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
+import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
@@ -57,6 +59,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Mono;
+import reactor.core.Disposable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -65,6 +69,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Explicit OpenAI-compatible agent loop used when provider-specific reasoning
@@ -88,14 +96,18 @@ public class OpenAiCompatibleAgenticRuntime {
 
     private final ToolCallbackProvider toolCallbackProvider;
 
+    private final ReactiveAgenticToolRegistry reactiveToolRegistry;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public OpenAiCompatibleAgenticRuntime(ChatClientFactory chatClientFactory, AgenticPromptBuilder promptBuilder,
                                           @Qualifier("agenticToolCallbackProvider")
-                                          ToolCallbackProvider toolCallbackProvider) {
+                                          ToolCallbackProvider toolCallbackProvider,
+                                          ReactiveAgenticToolRegistry reactiveToolRegistry) {
         this.chatClientFactory = chatClientFactory;
         this.promptBuilder = promptBuilder;
         this.toolCallbackProvider = toolCallbackProvider;
+        this.reactiveToolRegistry = reactiveToolRegistry;
     }
 
     /**
@@ -109,7 +121,7 @@ public class OpenAiCompatibleAgenticRuntime {
         if (Objects.isNull(prepared) || !prepared.toolCallingEnabled()) {
             return false;
         }
-        ModelProviderBO provider = chatClientFactory.resolveProviderForModel(prepared.model());
+        ModelProviderBO provider = chatClientFactory.resolveProviderForModel(prepared.model(), tenantId(prepared));
         return Objects.nonNull(provider)
                 && AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE.equals(provider.getProviderType());
     }
@@ -123,12 +135,15 @@ public class OpenAiCompatibleAgenticRuntime {
      */
     public Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatBO prepared) {
         return Flux.create(sink -> {
-            try {
-                doStream(prepared, sink);
-                sink.complete();
-            } catch (RuntimeException e) {
-                sink.error(e);
-            }
+            ModelProviderBO provider = requireProvider(prepared);
+            OpenAIClient client = createClient(provider);
+            OpenAIClientAsync asyncClient = client.async();
+            Disposable execution = streamRound(asyncClient, prepared, initialMessages(prepared),
+                            toolCallbacksByName(), sink, 0)
+                    .doFinally(signal -> client.close())
+                    .subscribe(ignored -> {
+                    }, sink::error, sink::complete);
+            sink.onCancel(execution::dispose);
         });
     }
 
@@ -141,126 +156,156 @@ public class OpenAiCompatibleAgenticRuntime {
      * @return the final assistant content and finish reason
      * @throws IllegalStateException if the agent loop exceeds the max rounds
      */
-    public AgenticRuntimeResult call(AgenticPreparedChatBO prepared) {
-        ModelProviderBO provider = requireProvider(prepared);
-        OpenAIClient client = createClient(provider);
-        Map<String, ToolCallback> callbacks = toolCallbacksByName();
-        List<ChatCompletionMessageParam> messages = initialMessages(prepared);
-        String finishReason = AgenticConstant.Chat.FINISH_REASON_STOP;
-
-        try {
-            for (int round = 0; round < AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS; round++) {
-                ChatCompletion completion = client.chat().completions().create(buildRequest(prepared, messages, true,
-                        false));
-                if (completion.choices().isEmpty()) {
-                    return new AgenticRuntimeResult("", finishReason);
-                }
-
-                ChatCompletion.Choice choice = completion.choices().get(0);
-                ChatCompletionMessage message = choice.message();
-                finishReason = choice.finishReason().asString();
-                List<ToolCall> toolCalls = toolCallsFromMessage(message);
-                if (toolCalls.isEmpty()) {
-                    return new AgenticRuntimeResult(message.content().orElse(""), finishReason);
-                }
-
-                messages.add(assistantToolCallMessage(message.content().orElse(null),
-                        extractReasoningContent(message._additionalProperties()), toolCalls));
-                messages.addAll(executeToolCalls(callbacks, prepared, toolCalls));
-            }
-        } finally {
-            client.close();
-        }
-
-        throw new IllegalStateException("Agent loop exceeded max rounds: "
-                + AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS);
+    public Mono<AgenticRuntimeResult> call(AgenticPreparedChatBO prepared) {
+        return Mono.defer(() -> {
+            ModelProviderBO provider = requireProvider(prepared);
+            OpenAIClient client = createClient(provider);
+            OpenAIClientAsync asyncClient = client.async();
+            List<ChatCompletionMessageParam> messages = initialMessages(prepared);
+            return callRound(asyncClient, prepared, messages, toolCallbacksByName(), 0)
+                    .doFinally(signal -> client.close());
+        });
     }
 
-    /**
-     * Drive the streaming agent loop into the given sink, executing tool calls and
-     * re-prompting until the model stops or the sink is cancelled.
-     */
-    private void doStream(AgenticPreparedChatBO prepared, FluxSink<AgenticRuntimeStreamFrame> sink) {
-        ModelProviderBO provider = requireProvider(prepared);
-        OpenAIClient client = createClient(provider);
-        Map<String, ToolCallback> callbacks = toolCallbacksByName();
-        List<ChatCompletionMessageParam> messages = initialMessages(prepared);
-
-        try {
-            for (int round = 0; round < AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS && !sink.isCancelled();
-                 round++) {
-                StreamRoundResult result = streamOneRound(client, prepared, messages, sink);
-                if (result.toolCalls().isEmpty()) {
-                    if (StringUtils.isNotBlank(result.finishReason())) {
-                        sink.next(new AgenticRuntimeStreamFrame(AgenticStreamDelta.empty(), result.finishReason()));
+    private Mono<AgenticRuntimeResult> callRound(OpenAIClientAsync client,
+                                                  AgenticPreparedChatBO prepared,
+                                                  List<ChatCompletionMessageParam> messages,
+                                                  Map<String, ToolCallback> callbacks,
+                                                  int round) {
+        if (round >= AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS) {
+            return Mono.error(new IllegalStateException("Agent loop exceeded max rounds: "
+                    + AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS));
+        }
+        return Mono.fromFuture(client.chat().completions().create(buildRequest(prepared, messages, true, false)))
+                .flatMap(completion -> {
+                    if (completion.choices().isEmpty()) {
+                        return Mono.just(new AgenticRuntimeResult("", AgenticConstant.Chat.FINISH_REASON_STOP));
                     }
-                    return;
-                }
-
-                messages.add(assistantToolCallMessage(result.content(), result.reasoningContent(), result.toolCalls()));
-                messages.addAll(executeToolCalls(callbacks, prepared, result.toolCalls()));
-                sink.next(new AgenticRuntimeStreamFrame(AgenticStreamDelta.empty(), null));
-            }
-        } finally {
-            client.close();
-        }
-
-        if (!sink.isCancelled()) {
-            throw new IllegalStateException("Agent loop exceeded max rounds: "
-                    + AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS);
-        }
+                    ChatCompletion.Choice choice = completion.choices().get(0);
+                    ChatCompletionMessage message = choice.message();
+                    String finishReason = choice.finishReason().asString();
+                    List<ToolCall> toolCalls = toolCallsFromMessage(message);
+                    if (toolCalls.isEmpty()) {
+                        return Mono.just(new AgenticRuntimeResult(message.content().orElse(""), finishReason));
+                    }
+                    messages.add(assistantToolCallMessage(message.content().orElse(null),
+                            extractReasoningContent(message._additionalProperties()), toolCalls));
+                    return executeToolCallsReactive(callbacks, prepared, toolCalls)
+                            .collectList()
+                            .flatMap(toolMessages -> {
+                                messages.addAll(toolMessages);
+                                return callRound(client, prepared, messages, callbacks, round + 1);
+                            });
+                });
     }
 
-    /**
-     * Stream a single model round, accumulating content, reasoning, and the
-     * (incrementally-arriving) tool calls into a single result, emitting deltas to the
-     * sink as they arrive.
-     */
-    private StreamRoundResult streamOneRound(OpenAIClient client, AgenticPreparedChatBO prepared,
-                                             List<ChatCompletionMessageParam> messages,
-                                             FluxSink<AgenticRuntimeStreamFrame> sink) {
+    private Mono<Void> streamRound(OpenAIClientAsync client,
+                                   AgenticPreparedChatBO prepared,
+                                   List<ChatCompletionMessageParam> messages,
+                                   Map<String, ToolCallback> callbacks,
+                                   FluxSink<AgenticRuntimeStreamFrame> sink,
+                                   int round) {
+        if (sink.isCancelled()) {
+            return Mono.empty();
+        }
+        if (round >= AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS) {
+            return Mono.error(new IllegalStateException("Agent loop exceeded max rounds: "
+                    + AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS));
+        }
+        return streamOneRound(client, prepared, messages, sink)
+                .flatMap(result -> {
+                    if (result.toolCalls().isEmpty()) {
+                        if (StringUtils.isNotBlank(result.finishReason()) && !sink.isCancelled()) {
+                            sink.next(new AgenticRuntimeStreamFrame(AgenticStreamDelta.empty(), result.finishReason()));
+                        }
+                        return Mono.empty();
+                    }
+                    messages.add(assistantToolCallMessage(result.content(), result.reasoningContent(),
+                            result.toolCalls()));
+                    return executeToolCallsReactive(callbacks, prepared, result.toolCalls())
+                            .collectList()
+                            .flatMap(toolMessages -> {
+                                messages.addAll(toolMessages);
+                                if (!sink.isCancelled()) {
+                                    sink.next(new AgenticRuntimeStreamFrame(AgenticStreamDelta.empty(), null));
+                                }
+                                return streamRound(client, prepared, messages, callbacks, sink, round + 1);
+                            });
+                });
+    }
+
+    private Mono<StreamRoundResult> streamOneRound(OpenAIClientAsync client,
+                                                    AgenticPreparedChatBO prepared,
+                                                    List<ChatCompletionMessageParam> messages,
+                                                    FluxSink<AgenticRuntimeStreamFrame> sink) {
         StringBuilder content = new StringBuilder();
         StringBuilder reasoningContent = new StringBuilder();
         Map<Long, StreamingToolCallBuilder> toolCallBuilders = new LinkedHashMap<>();
-        String finishReason = null;
+        AtomicReference<String> finishReason = new AtomicReference<>();
 
         ChatCompletionCreateParams request = buildRequest(prepared, messages, true, true);
-        try (StreamResponse<ChatCompletionChunk> response = client.chat().completions().createStreaming(request)) {
-            for (var iterator = response.stream().iterator(); iterator.hasNext(); ) {
-                ChatCompletionChunk chunk = iterator.next();
-                if (sink.isCancelled()) {
-                    break;
-                }
-                if (chunk.choices().isEmpty()) {
-                    continue;
-                }
-                for (ChatCompletionChunk.Choice choice : chunk.choices()) {
-                    ChatCompletionChunk.Choice.Delta delta = choice.delta();
-                    String reasoning = extractReasoningContent(delta._additionalProperties());
-                    if (StringUtils.isNotEmpty(reasoning)) {
-                        reasoningContent.append(reasoning);
-                        sink.next(new AgenticRuntimeStreamFrame(new AgenticStreamDelta(null, reasoning), null));
+        return Mono.create(resultSink -> {
+            AsyncStreamResponse<ChatCompletionChunk> response = client.chat().completions().createStreaming(request);
+            AtomicBoolean terminated = new AtomicBoolean();
+            AtomicBoolean cancelled = new AtomicBoolean();
+            resultSink.onCancel(() -> {
+                cancelled.set(true);
+                response.close();
+            });
+            response.subscribe(new AsyncStreamResponse.Handler<>() {
+                @Override
+                public void onNext(ChatCompletionChunk chunk) {
+                    if (sink.isCancelled() || cancelled.get()) {
+                        response.close();
+                        return;
                     }
-                    String text = delta.content().orElse(null);
-                    if (StringUtils.isNotEmpty(text)) {
-                        content.append(text);
-                        sink.next(new AgenticRuntimeStreamFrame(new AgenticStreamDelta(text, null), null));
+                    if (sink.requestedFromDownstream() == 0) {
+                        response.close();
+                        resultSink.error(new IllegalStateException("Agentic model stream consumer is too slow"));
+                        return;
                     }
-                    mergeToolCalls(toolCallBuilders, delta);
-                    if (choice.finishReason().isPresent()) {
-                        finishReason = choice.finishReason().get().asString();
+                    if (chunk.choices().isEmpty()) {
+                        return;
+                    }
+                    for (ChatCompletionChunk.Choice choice : chunk.choices()) {
+                        ChatCompletionChunk.Choice.Delta delta = choice.delta();
+                        String reasoning = extractReasoningContent(delta._additionalProperties());
+                        if (StringUtils.isNotEmpty(reasoning)) {
+                            reasoningContent.append(reasoning);
+                            sink.next(new AgenticRuntimeStreamFrame(new AgenticStreamDelta(null, reasoning), null));
+                        }
+                        String text = delta.content().orElse(null);
+                        if (StringUtils.isNotEmpty(text)) {
+                            content.append(text);
+                            sink.next(new AgenticRuntimeStreamFrame(new AgenticStreamDelta(text, null), null));
+                        }
+                        mergeToolCalls(toolCallBuilders, delta);
+                        if (choice.finishReason().isPresent()) {
+                            finishReason.set(choice.finishReason().get().asString());
+                        }
                     }
                 }
-            }
-        }
 
-        return new StreamRoundResult(content.toString(), reasoningContent.toString(),
-                toolCallBuilders.values().stream()
-                        .sorted(Comparator.comparingLong(StreamingToolCallBuilder::index))
-                        .map(StreamingToolCallBuilder::build)
-                        .filter(Objects::nonNull)
-                        .toList(),
-                finishReason);
+                @Override
+                public void onComplete(Optional<Throwable> error) {
+                    if (!terminated.compareAndSet(false, true)) {
+                        return;
+                    }
+                    response.close();
+                    if (error.isPresent()) {
+                        resultSink.error(error.get());
+                        return;
+                    }
+                    resultSink.success(new StreamRoundResult(content.toString(), reasoningContent.toString(),
+                            toolCallBuilders.values().stream()
+                                    .sorted(Comparator.comparingLong(StreamingToolCallBuilder::index))
+                                    .map(StreamingToolCallBuilder::build)
+                                    .filter(Objects::nonNull)
+                                    .toList(),
+                            finishReason.get()));
+                }
+            });
+        });
     }
 
     private ChatCompletionCreateParams buildRequest(AgenticPreparedChatBO prepared,
@@ -384,20 +429,28 @@ public class OpenAiCompatibleAgenticRuntime {
                 .build());
     }
 
-    private List<ChatCompletionMessageParam> executeToolCalls(Map<String, ToolCallback> callbacks,
-                                                              AgenticPreparedChatBO prepared,
-                                                              List<ToolCall> toolCalls) {
+    private Flux<ChatCompletionMessageParam> executeToolCallsReactive(Map<String, ToolCallback> callbacks,
+                                                                       AgenticPreparedChatBO prepared,
+                                                                       List<ToolCall> toolCalls) {
         ToolContext toolContext = new ToolContext(prepared.toolContext());
-        List<ChatCompletionMessageParam> results = new ArrayList<>();
-        for (ToolCall toolCall : toolCalls) {
-            ToolCallback callback = callbacks.get(toolCall.name());
-            if (Objects.isNull(callback)) {
-                throw new IllegalStateException("No tool callback found for tool: " + toolCall.name());
-            }
-            String result = callback.call(StringUtils.defaultIfBlank(toolCall.arguments(), "{}"), toolContext);
-            results.add(toolMessage(toolCall.id(), result));
-        }
-        return results;
+        Map<String, ReactiveAgenticTool> reactiveTools = reactiveTools();
+        return Flux.fromIterable(toolCalls)
+                .concatMap(toolCall -> Mono.defer(() -> {
+                    ReactiveAgenticTool reactiveTool = reactiveTools.get(toolCall.name());
+                    if (reactiveTool != null) {
+                        return reactiveTool.call(StringUtils.defaultIfBlank(toolCall.arguments(), "{}"), toolContext)
+                                .map(this::serializeToolResult)
+                                .map(result -> toolMessage(toolCall.id(), result));
+                    }
+                    ToolCallback callback = callbacks.get(toolCall.name());
+                    if (callback == null) {
+                        return Mono.error(new IllegalStateException("No tool callback found for tool: "
+                                + toolCall.name()));
+                    }
+                    return Mono.fromSupplier(() -> callback.call(
+                                    StringUtils.defaultIfBlank(toolCall.arguments(), "{}"), toolContext))
+                            .map(result -> toolMessage(toolCall.id(), result));
+                }));
     }
 
     private Map<String, ToolCallback> toolCallbacksByName() {
@@ -413,11 +466,27 @@ public class OpenAiCompatibleAgenticRuntime {
 
     private List<ChatCompletionTool> chatCompletionTools() {
         List<ChatCompletionTool> tools = new ArrayList<>();
+        Map<String, ReactiveAgenticTool> reactive = reactiveTools();
+        Set<String> reactiveNames = reactive.keySet();
         for (ToolCallback callback : toolCallbackProvider.getToolCallbacks()) {
             if (Objects.isNull(callback) || Objects.isNull(callback.getToolDefinition())) {
                 continue;
             }
             ToolDefinition definition = callback.getToolDefinition();
+            if (reactiveNames.contains(definition.name())) {
+                continue;
+            }
+            FunctionDefinition functionDefinition = FunctionDefinition.builder()
+                    .name(definition.name())
+                    .description(StringUtils.defaultString(definition.description()))
+                    .parameters(functionParameters(definition))
+                    .build();
+            tools.add(ChatCompletionTool.ofFunction(ChatCompletionFunctionTool.builder()
+                    .function(functionDefinition)
+                    .build()));
+        }
+        for (ReactiveAgenticTool tool : reactive.values()) {
+            ToolDefinition definition = tool.definition();
             FunctionDefinition functionDefinition = FunctionDefinition.builder()
                     .name(definition.name())
                     .description(StringUtils.defaultString(definition.description()))
@@ -428,6 +497,18 @@ public class OpenAiCompatibleAgenticRuntime {
                     .build()));
         }
         return tools;
+    }
+
+    private String serializeToolResult(Object result) {
+        try {
+            return objectMapper.writeValueAsString(result);
+        } catch (JsonProcessingException error) {
+            throw new IllegalStateException("Failed to serialize agentic tool result", error);
+        }
+    }
+
+    private Map<String, ReactiveAgenticTool> reactiveTools() {
+        return reactiveToolRegistry == null ? Map.of() : reactiveToolRegistry.tools();
     }
 
     private FunctionParameters functionParameters(ToolDefinition definition) {
@@ -482,12 +563,17 @@ public class OpenAiCompatibleAgenticRuntime {
     }
 
     private ModelProviderBO requireProvider(AgenticPreparedChatBO prepared) {
-        ModelProviderBO provider = chatClientFactory.resolveProviderForModel(prepared.model());
+        ModelProviderBO provider = chatClientFactory.resolveProviderForModel(prepared.model(), tenantId(prepared));
         if (Objects.isNull(provider)
                 || !AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE.equals(provider.getProviderType())) {
             throw new IllegalStateException("OpenAI-compatible provider is required for model: " + prepared.model());
         }
         return provider;
+    }
+
+    private Long tenantId(AgenticPreparedChatBO prepared) {
+        Object value = prepared.toolContext().get(AgenticConstant.ToolContextKey.TENANT_ID);
+        return value instanceof Number number ? number.longValue() : null;
     }
 
     private OpenAIClient createClient(ModelProviderBO provider) {

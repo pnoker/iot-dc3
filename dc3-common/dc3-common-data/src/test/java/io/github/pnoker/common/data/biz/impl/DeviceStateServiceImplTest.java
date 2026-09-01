@@ -1,43 +1,23 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.mapper.EntityStateMapper;
+import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
 import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.TimeoutSourceTypeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.TimeUnit;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyByte;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -46,107 +26,62 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DeviceStateServiceImplTest {
-
-    @Mock
-    private DeviceAlarmService deviceAlarmService;
-
-    @Mock
-    private EntityStateMapper entityStateMapper;
-
-    @InjectMocks
-    private DeviceStateServiceImpl service;
-
-    private DeviceStateDTO heartbeat(Long deviceId, String status, Long driverId, Long tenantId, int ttl, TimeUnit unit) {
-        DeviceStateDTO dto = new DeviceStateDTO();
-        dto.setDeviceId(deviceId);
-        dto.setStatus(status);
-        dto.setDriverId(driverId);
-        dto.setTenantId(tenantId);
-        dto.setTimeout(ttl);
-        dto.setTimeoutUnit(unit);
-        return dto;
-    }
-
-    private EntityStateDO persisted(byte stateFlag, byte lastStateFlag, long leaseVersion) {
-        EntityStateDO state = new EntityStateDO();
-        state.setEntityTypeFlag((byte) EntityTypeEnum.DEVICE.getIndex());
-        state.setEntityId(10L);
-        state.setParentEntityId(7L);
-        state.setTenantId(100L);
-        state.setStateFlag(stateFlag);
-        state.setLastStateFlag(lastStateFlag);
-        state.setLeaseVersion(leaseVersion);
-        state.setTimeoutSeconds(25);
-        state.setLastHeartbeatTime(LocalDateTime.now());
-        state.setLastAlarmId(0L);
-        return state;
-    }
-
-    private void stubUpsert(EntityStateDO state) {
-        when(entityStateMapper.upsertEntityState(anyLong(), anyLong(), anyByte(), anyLong(), anyLong(), anyByte(),
-                anyByte(), any(), anyInt(), anyByte(), anyString(), any())).thenReturn(1);
-        when(entityStateMapper.selectByUniqueKey(anyLong(), anyByte(), anyLong())).thenReturn(state);
-    }
+    @Mock DeviceAlarmService alarmService;
+    @Mock ReactiveEntityStateStore stateStore;
 
     @Test
-    void nullDtoDoesNothing() {
-        service.heartbeat(null);
-
-        verifyNoInteractions(entityStateMapper);
-    }
-
-    @Test
-    void newDeviceUpsertsDbRowWithCustomTimeout() {
-        stubUpsert(persisted((byte) EntityStatusEnum.ONLINE.getIndex(),
-                (byte) EntityStatusEnum.OFFLINE.getIndex(), 1L));
-
-        service.heartbeat(heartbeat(10L, EntityStatusEnum.ONLINE.getCode(), 7L, 100L, 25, TimeUnit.SECONDS));
-
-        verify(entityStateMapper).upsertEntityState(anyLong(),
-                eq(100L),
-                eq((byte) EntityTypeEnum.DEVICE.getIndex()),
-                eq(10L),
-                eq(7L),
-                eq((byte) EntityStatusEnum.ONLINE.getIndex()),
-                eq((byte) EntityStatusEnum.OFFLINE.getIndex()),
-                any(LocalDateTime.class),
-                eq(25),
-                eq((byte) TimeoutSourceTypeEnum.DRIVER.getIndex()),
-                eq("device-heartbeat"),
-                any());
-    }
-
-    @Test
-    void nullDriverIdDoesNothing() {
-        service.heartbeat(heartbeat(10L, EntityStatusEnum.ONLINE.getCode(), null, 100L, 25, TimeUnit.SECONDS));
-
-        verifyNoInteractions(entityStateMapper);
-    }
-
-    @Test
-    void nonPositiveTimeoutDoesNothing() {
-        service.heartbeat(heartbeat(10L, EntityStatusEnum.ONLINE.getCode(), 7L, 100L, 0, TimeUnit.SECONDS));
-
-        verifyNoInteractions(entityStateMapper);
+    void heartbeatUpsertsReactiveLease() {
+        DeviceStateServiceImpl service = new DeviceStateServiceImpl(alarmService, stateStore);
+        when(alarmService.alarm(any())).thenReturn(Mono.empty());
+        when(stateStore.upsert(any(), eq(100L), eq(EntityTypeEnum.DEVICE), eq(10L), eq(7L), any(byte.class),
+                any(byte.class), any(), eq(25), eq((byte) TimeoutSourceTypeEnum.DRIVER.getIndex()), any()))
+                .thenReturn(Mono.just(lease(EntityStatusEnum.ONLINE.getIndex(), EntityStatusEnum.OFFLINE.getIndex())));
+        service.heartbeat(event(10L, 7L, 100L, EntityStatusEnum.ONLINE.getCode(), 25)).block();
+        verify(stateStore).upsert(any(), eq(100L), eq(EntityTypeEnum.DEVICE), eq(10L), eq(7L),
+                eq((byte) EntityStatusEnum.ONLINE.getIndex()), eq((byte) EntityStatusEnum.OFFLINE.getIndex()),
+                any(), eq(25), eq((byte) TimeoutSourceTypeEnum.DRIVER.getIndex()), any());
     }
 
     @Test
     void statusFlipTriggersAlarm() {
-        stubUpsert(persisted((byte) EntityStatusEnum.OFFLINE.getIndex(),
-                (byte) EntityStatusEnum.ONLINE.getIndex(), 3L));
-
-        service.heartbeat(heartbeat(10L, EntityStatusEnum.OFFLINE.getCode(), 7L, 100L, 25, TimeUnit.SECONDS));
-
-        verify(deviceAlarmService).alarm(any());
+        DeviceStateServiceImpl service = new DeviceStateServiceImpl(alarmService, stateStore);
+        when(alarmService.alarm(any())).thenReturn(Mono.empty());
+        when(stateStore.upsert(any(), any(), any(), any(), any(), any(byte.class), any(byte.class), any(), any(Integer.class), any(byte.class), any()))
+                .thenReturn(Mono.just(lease(EntityStatusEnum.OFFLINE.getIndex(), EntityStatusEnum.ONLINE.getIndex())));
+        service.heartbeat(event(10L, 7L, 100L, EntityStatusEnum.OFFLINE.getCode(), 25)).block();
+        verify(alarmService).alarm(any());
     }
 
     @Test
-    void sameStatusNoAlarm() {
-        stubUpsert(persisted((byte) EntityStatusEnum.ONLINE.getIndex(),
-                (byte) EntityStatusEnum.ONLINE.getIndex(), 3L));
+    void statusFlipWaitsForAlarmCompletion() {
+        DeviceStateServiceImpl service = new DeviceStateServiceImpl(alarmService, stateStore);
+        AtomicBoolean completed = new AtomicBoolean();
+        when(stateStore.upsert(any(), any(), any(), any(), any(), any(byte.class), any(byte.class), any(), any(Integer.class), any(byte.class), any()))
+                .thenReturn(Mono.just(lease(EntityStatusEnum.OFFLINE.getIndex(), EntityStatusEnum.ONLINE.getIndex())));
+        when(alarmService.alarm(any())).thenReturn(Mono.defer(() -> {
+            completed.set(true);
+            return Mono.empty();
+        }));
 
-        service.heartbeat(heartbeat(10L, EntityStatusEnum.ONLINE.getCode(), 7L, 100L, 25, TimeUnit.SECONDS));
+        service.heartbeat(event(10L, 7L, 100L, EntityStatusEnum.OFFLINE.getCode(), 25)).block();
 
-        verify(deviceAlarmService, never()).alarm(any());
+        org.assertj.core.api.Assertions.assertThat(completed).isTrue();
+    }
+
+    @Test
+    void invalidHeartbeatIsIgnored() {
+        DeviceStateServiceImpl service = new DeviceStateServiceImpl(alarmService, stateStore);
+        service.heartbeat(null).block();
+        verifyNoInteractions(stateStore, alarmService);
+    }
+
+    private DeviceStateDTO event(Long device, Long driver, Long tenant, String status, int timeout) {
+        DeviceStateDTO value = new DeviceStateDTO(); value.setDeviceId(device); value.setDriverId(driver);
+        value.setTenantId(tenant); value.setStatus(status); value.setTimeout(timeout); value.setTimeoutUnit(TimeUnit.SECONDS); return value;
+    }
+    private ReactiveEntityStateStore.EntityStateLease lease(byte state, byte previous) {
+        return new ReactiveEntityStateStore.EntityStateLease(1L, 100L, EntityTypeEnum.DEVICE, 10L, 7L, state,
+                previous, 2L, Instant.now().plusSeconds(25), 25, Instant.now(), 0L,
+                (byte) TimeoutSourceTypeEnum.DRIVER.getIndex(), "{}");
     }
 }

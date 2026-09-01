@@ -28,17 +28,19 @@ import io.github.pnoker.common.constant.mq.SubscriptionMode;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.adapter.BrokerCapabilities;
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
 import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireConfirmation;
 import io.github.pnoker.common.mq.adapter.WireMqDelivery;
 import io.github.pnoker.common.mq.config.BatchConsumerProperties;
-import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqPoisonException;
 import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.mq.subscription.KeyRoutes;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -274,9 +276,9 @@ public class MqttMqAdapter implements BrokerAdapter {
         publishClient.disconnect();
     }
 
-    private WireMqDelivery deliveryOf(Pending pending, Acknowledgment acknowledgment) {
+    private WireMqDelivery deliveryOf(Pending pending) {
         byte[] body = pending.publish().getPayload().map(MqttMqAdapter::bytesOf).orElse(new byte[0]);
-        return new WireMqDelivery(body, headersOf(pending.publish()), pending.attempt() > 1, acknowledgment);
+        return new WireMqDelivery(body, headersOf(pending.publish()), pending.attempt() > 1);
     }
 
     private Mqtt5Publish publishOf(WireMqMessage wire) {
@@ -310,28 +312,6 @@ public class MqttMqAdapter implements BrokerAdapter {
      * (bounded client-side redelivery).
      */
     private record Pending(Mqtt5Publish publish, int attempt) {
-    }
-
-    /**
-     * ack acknowledges the publish (QoS 1); reject(true) re-enqueues for bounded
-     * client-side redelivery with the carried attempt counter (MQTT has no server
-     * nack, exhaustion dead-letters); reject(false) dead-letters.
-     */
-    private record MqttAcknowledgment(Pending pending, Dispatcher dispatcher) implements Acknowledgment {
-
-        @Override
-        public void ack() {
-            pending.publish().acknowledge();
-        }
-
-        @Override
-        public void reject(boolean requeue) {
-            if (requeue) {
-                dispatcher.requeue(pending);
-                return;
-            }
-            dispatcher.deadLetter(pending.publish());
-        }
     }
 
     /**
@@ -444,30 +424,11 @@ public class MqttMqAdapter implements BrokerAdapter {
         }
 
         private void deliverSubBatch(RawBatchListener listener, List<Pending> pendings) {
-            Acknowledgment ack = batchAck(pendings);
-            int maxAttempts = Math.max(1, retryProperties.getMaxRetries()) + 1;
-            for (int attempt = 1; ; attempt++) {
-                try {
-                    List<WireMqDelivery> deliveries = new ArrayList<>(pendings.size());
-                    for (Pending pending : pendings) {
-                        deliveries.add(deliveryOf(pending, ack));
-                    }
-                    listener.onBatch(deliveries);
-                    return;
-                } catch (MqPoisonException e) {
-                    log.warn("MQTT poison batch dead-lettered, size={}", pendings.size(), e);
-                    pendings.forEach(pending -> deadLetter(pending.publish()));
-                    return;
-                } catch (Exception e) {
-                    if (attempt >= maxAttempts) {
-                        log.error("MQTT batch exhausted retries, dead-lettering, size={}",
-                                pendings.size(), e);
-                        pendings.forEach(pending -> deadLetter(pending.publish()));
-                        return;
-                    }
-                    sleepBackoff(attempt);
-                }
-            }
+            normalize(Mono.defer(() -> listener.onBatch(pendings.stream().map(MqttMqAdapter.this::deliveryOf).toList())),
+                    pendings.get(0).publish().getTopic().toString())
+                    .flatMap(disposition -> settle(pendings, disposition))
+                    .doOnError(error -> log.error("MQTT batch settlement failed, size={}", pendings.size(), error))
+                    .subscribe();
         }
 
         private void deliverSingle(Pending pending) {
@@ -478,20 +439,33 @@ public class MqttMqAdapter implements BrokerAdapter {
                 pending.publish().acknowledge();
                 return;
             }
-            Acknowledgment ack = new MqttAcknowledgment(pending, this);
-            try {
-                listener.onDelivery(deliveryOf(pending, ack));
-            } catch (MqPoisonException e) {
-                deadLetter(pending.publish());
-            } catch (Exception e) {
-                if (pending.attempt() >= maxAttempts()) {
-                    log.error("MQTT delivery exhausted retries, dead-lettering, topic={}",
-                            pending.publish().getTopic(), e);
-                    deadLetter(pending.publish());
-                } else {
-                    sleepBackoff(pending.attempt());
-                }
-            }
+            normalize(Mono.defer(() -> listener.onDelivery(deliveryOf(pending))), pending.publish().getTopic().toString())
+                    .flatMap(disposition -> settle(List.of(pending), disposition))
+                    .doOnError(error -> log.error("MQTT delivery settlement failed, topic={}",
+                            pending.publish().getTopic(), error))
+                    .subscribe();
+        }
+
+        private Mono<DeliveryDisposition> normalize(Mono<DeliveryDisposition> completion, String topic) {
+            return completion
+                    .onErrorResume(MqPoisonException.class, error -> {
+                        log.warn("MQTT poison delivery dead-lettered, topic={}", topic, error);
+                        return Mono.just(DeliveryDisposition.DEAD_LETTER);
+                    })
+                    .onErrorResume(error -> {
+                        log.warn("MQTT delivery failed, requesting redelivery, topic={}", topic, error);
+                        return Mono.just(DeliveryDisposition.REQUEUE);
+                    });
+        }
+
+        private Mono<Void> settle(List<Pending> pendings, DeliveryDisposition disposition) {
+            return switch (disposition) {
+                case ACK -> Mono.fromRunnable(() ->
+                        pendings.forEach(pending -> pending.publish().acknowledge()));
+                case REQUEUE -> Mono.fromRunnable(() -> pendings.forEach(this::requeue));
+                case DEAD_LETTER -> Flux.fromIterable(pendings)
+                        .concatMap(pending -> deadLetter(pending.publish())).then();
+            };
         }
 
         /**
@@ -522,54 +496,19 @@ public class MqttMqAdapter implements BrokerAdapter {
             return Math.max(1, retryProperties.getMaxRetries()) + 1;
         }
 
-        private Acknowledgment batchAck(List<Pending> pendings) {
-            return new Acknowledgment() {
-                @Override
-                public void ack() {
-                    pendings.forEach(pending -> pending.publish().acknowledge());
-                }
-
-                @Override
-                public void reject(boolean requeue) {
-                    if (requeue) {
-                        pendings.forEach(Dispatcher.this::requeue);
-                    } else {
-                        pendings.forEach(pending -> deadLetter(pending.publish()));
-                    }
-                }
-            };
-        }
-
         /**
          * Republish to the dead-letter topic and acknowledge only when the republish
          * was accepted — a failed dead-letter publish leaves the message unacknowledged
          * so the broker redelivers it instead of losing it silently.
          */
-        private void deadLetter(Mqtt5Publish publish) {
-            try {
-                publishClient.publish(Mqtt5Publish.builder()
+        private Mono<Void> deadLetter(Mqtt5Publish publish) {
+            return Mono.fromFuture(publishClient.publish(Mqtt5Publish.builder()
                         .topic(deadLetterTopic(spec.topic()))
                         .qos(MqttQos.AT_LEAST_ONCE)
                         .payload(publish.getPayload().orElse(null))
                         .userProperties(publish.getUserProperties())
-                        .build()).join();
-                publish.acknowledge();
-            } catch (Exception e) {
-                log.error("MQTT dead-letter publish failed, message left unacknowledged for redelivery, topic={}",
-                        spec.topic(), e);
-            }
-        }
-
-        private void sleepBackoff(int attempt) {
-            long initial = retryProperties.getRetryInitialIntervalMillis();
-            long cap = retryProperties.getRetryMaxIntervalMillis();
-            long exponent = Math.min(Math.max(attempt - 1, 0), 30);
-            long delay = initial >= cap ? cap : Math.min(initial * (1L << exponent), cap);
-            try {
-                Thread.sleep(delay);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+                        .build()))
+                    .then(Mono.fromRunnable(publish::acknowledge));
         }
     }
 }

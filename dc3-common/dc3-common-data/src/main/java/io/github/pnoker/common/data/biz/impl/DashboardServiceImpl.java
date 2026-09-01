@@ -17,15 +17,14 @@
 
 package io.github.pnoker.common.data.biz.impl;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.TimeConstant;
 import io.github.pnoker.common.data.biz.DashboardService;
 import io.github.pnoker.common.data.biz.store.PointValueSampleConverter;
-import io.github.pnoker.common.data.entity.model.PointValueDO;
+import io.github.pnoker.common.data.biz.store.PointValueLatestService;
+import io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow;
 import io.github.pnoker.common.data.entity.vo.dashboard.*;
-import io.github.pnoker.common.data.mapper.AlertMapper;
-import io.github.pnoker.common.data.mapper.PointValueMapper;
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.data.repository.ReactiveAlertStore;
+import io.github.pnoker.common.data.repository.ReactiveAlertAnalyticsStore;
 import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.ConfirmFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
@@ -34,8 +33,6 @@ import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 import io.github.pnoker.common.tsdb.model.TsdbModel.BucketAggregate;
 import io.github.pnoker.common.tsdb.model.TsdbModel.DimensionCount;
 import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
@@ -44,10 +41,14 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
 import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
 import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
-import io.github.pnoker.common.tsdb.spi.TsdbStore;
+import io.github.pnoker.common.data.repository.ReactiveTsdbStore;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -74,7 +75,7 @@ import static io.github.pnoker.common.data.constant.DashboardLimits.*;
  * @since 2026.5.2
  */
 @Slf4j
-@Service
+@Service("dataDashboardService")
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
 
@@ -99,9 +100,11 @@ public class DashboardServiceImpl implements DashboardService {
      */
     private static final Set<String> ALERT_SOURCES = Set.of(SOURCE_DEVICE, SOURCE_DRIVER, SOURCE_POINT);
 
-    private final PointValueMapper pointValueMapper;
+    private final PointValueLatestService pointValueLatestService;
 
-    private final AlertMapper alertMapper;
+    private final ReactiveAlertStore alertStore;
+
+    private final ReactiveAlertAnalyticsStore alertAnalyticsStore;
 
     private final DeviceFacade deviceFacade;
 
@@ -111,7 +114,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     private final PointValueSampleConverter converter;
 
-    private final TsdbStore tsdbStore;
+    private final ReactiveTsdbStore tsdbStore;
 
     /**
      * BucketRow.key is Object (shared across SMALLINT / VARCHAR / BIGINT group columns);
@@ -126,422 +129,385 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public List<LatencyBucketVO> latencyHistogram(Long tenantId, int rangeHours) {
+    public Mono<List<LatencyBucketVO>> latencyHistogram(Long tenantId, int rangeHours) {
         int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
         LocalDateTime to = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
         LocalDateTime from = to.minusHours(hours);
         // Capability-gated op: stores without store-side binning (e.g. TDengine)
         // degrade to zero-filled bins instead of failing the dashboard.
-        List<LatencyBin> bins = tsdbStore.capabilities().latencyHistogram()
+        Mono<List<LatencyBin>> bins = tsdbStore.capabilities().latencyHistogram()
                 ? tsdbStore.latencyHistogram(tenantId, windowSince(from), LATENCY_EDGES_MS, DEADLINE)
-                : List.of();
-        // The port zero-pads every bin, so the UI always gets six buckets.
-        List<LatencyBucketVO> out = new ArrayList<>(LATENCY_EDGES_MS.size() + 1);
-        for (int i = 0; i <= LATENCY_EDGES_MS.size(); i++) {
-            LatencyBucketVO vo = new LatencyBucketVO();
-            vo.setBin(i);
-            vo.setCount(i < bins.size() ? bins.get(i).count() : 0L);
-            out.add(vo);
-        }
-        return out;
+                : Mono.just(List.of());
+        return bins.map(values -> {
+            List<LatencyBucketVO> out = new ArrayList<>(LATENCY_EDGES_MS.size() + 1);
+            for (int i = 0; i <= LATENCY_EDGES_MS.size(); i++) {
+                LatencyBucketVO vo = new LatencyBucketVO(); vo.setBin(i);
+                vo.setCount(i < values.size() ? values.get(i).count() : 0L); out.add(vo);
+            }
+            return out;
+        });
     }
 
     @Override
-    public List<ActivityCellVO> hourlyActivity(Long tenantId, int rangeHours) {
+    public Mono<List<ActivityCellVO>> hourlyActivity(Long tenantId, int rangeHours) {
         int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
         LocalDateTime to = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
         LocalDateTime from = to.minusHours(hours);
-        List<BucketAggregate> buckets = tsdbStore.bucketedCount(tenantId, windowSince(from),
-                Duration.ofHours(1), DEADLINE);
-        long[][] grid = new long[7][24];
-        for (BucketAggregate bucket : buckets) {
-            LocalDateTime wallClock = converter.toWallClock(bucket.bucketStart());
-            if (Objects.isNull(wallClock)) {
-                continue;
+        return tsdbStore.bucketedCount(tenantId, windowSince(from), Duration.ofHours(1), DEADLINE).map(buckets -> {
+            long[][] grid = new long[7][24];
+            for (BucketAggregate bucket : buckets) {
+                LocalDateTime wallClock = converter.toWallClock(bucket.bucketStart());
+                if (wallClock != null) grid[wallClock.getDayOfWeek().getValue() % 7][wallClock.getHour()] = bucket.sampleCount();
             }
-            int dow = wallClock.getDayOfWeek().getValue() % 7;
-            int hour = wallClock.getHour();
-            grid[dow][hour] = bucket.sampleCount();
-        }
-        List<ActivityCellVO> out = new ArrayList<>(7 * 24);
-        for (int d = 0; d < 7; d++) {
-            for (int h = 0; h < 24; h++) {
-                ActivityCellVO vo = new ActivityCellVO();
-                vo.setDow(d);
-                vo.setHour(h);
-                vo.setCount(grid[d][h]);
-                out.add(vo);
+            List<ActivityCellVO> out = new ArrayList<>(7 * 24);
+            for (int d = 0; d < 7; d++) for (int h = 0; h < 24; h++) {
+                ActivityCellVO vo = new ActivityCellVO(); vo.setDow(d); vo.setHour(h); vo.setCount(grid[d][h]); out.add(vo);
             }
-        }
-        return out;
+            return out;
+        });
     }
 
     @Override
-    public Page<AlertItemVO> alertPage(Long tenantId, String source, Integer alarmTypeFlag, Integer confirmFlag,
-                                       LocalDateTime from, long current, long size) {
-        String src = Objects.isNull(source) || source.isBlank() ? null : (ALERT_SOURCES.contains(source) ? source : null);
-        long clampedCurrent = Math.max(1L, current);
-        long clampedSize = Math.clamp(size, 1L, MAX_PAGE_SIZE);
-        long offset = (clampedCurrent - 1L) * clampedSize;
-
-        long total = alertMapper.countFiltered(tenantId, src, alarmTypeFlag, confirmFlag, from);
-        var rows = alertMapper.listPaged(tenantId, src, alarmTypeFlag, confirmFlag, from, offset, clampedSize);
-        List<AlertItemVO> records = new ArrayList<>(rows.size());
-        for (var row : rows) {
-            AlertItemVO vo = new AlertItemVO();
-            vo.setId(String.valueOf(row.getId()));
-            vo.setSource(row.getSource());
-            vo.setSourceId(String.valueOf(row.getSourceId()));
-            vo.setPointId(String.valueOf(row.getPointId()));
-            vo.setAlarmTypeFlag(AlarmTypeEnum.ofIndex((byte) row.getAlarmTypeFlag()));
-            vo.setConfirmFlag(ConfirmFlagEnum.ofIndex((byte) row.getConfirmFlag()));
-            vo.setCreateTime(row.getCreateTime());
-            vo.setMessage(row.getMessage());
-            records.add(vo);
-        }
-        // Use MyBatis-Plus Page so the JSON shape matches every other list
-        // endpoint in the project (current / size / total / pages / records).
-        Page<AlertItemVO> page = new Page<>(clampedCurrent, clampedSize, total);
-        page.setRecords(records);
-        return page;
+    public Mono<Long> countToday(Long tenantId) {
+        return tsdbStore.count(SeriesFilter.tenantWide(tenantId), windowSince(LocalDate.now(TimeConstant.DEFAULT_ZONEID).atStartOfDay()), DEADLINE);
     }
 
     @Override
-    public boolean confirmAlert(Long tenantId, String source, Long id) {
-        if (Objects.isNull(source) || !ALERT_SOURCES.contains(source) || Objects.isNull(id)) {
-            return false;
-        }
-        return alertMapper.confirmOne(tenantId, source, id) > 0;
-    }
-
-    @Override
-    public boolean unconfirmAlert(Long tenantId, String source, Long id) {
-        if (Objects.isNull(source) || !ALERT_SOURCES.contains(source) || Objects.isNull(id)) {
-            return false;
-        }
-        return alertMapper.unconfirmOne(tenantId, source, id) > 0;
-    }
-
-    @Override
-    public int bulkConfirmAlert(Long tenantId, List<AlertBulkConfirmVO.Item> items, boolean confirm) {
-        if (Objects.isNull(items) || items.isEmpty())
-            return 0;
-        int changed = 0;
-        for (AlertBulkConfirmVO.Item item : items) {
-            if (Objects.isNull(item) || Objects.isNull(item.getSource()) || Objects.isNull(item.getId()))
-                continue;
-            String source = item.getSource();
-            if (!ALERT_SOURCES.contains(source))
-                continue;
-            long id = Long.parseLong(item.getId());
-            changed += confirm ? alertMapper.confirmOne(tenantId, source, id)
-                    : alertMapper.unconfirmOne(tenantId, source, id);
-        }
-        return changed;
-    }
-
-    @Override
-    public long countToday(Long tenantId) {
-        LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).atStartOfDay();
-        return tsdbStore.count(SeriesFilter.tenantWide(tenantId),
-                windowSince(from), DEADLINE);
-    }
-
-    @Override
-    public long countYesterday(Long tenantId) {
+    public Mono<Long> countYesterday(Long tenantId) {
         LocalDate today = LocalDate.now(TimeConstant.DEFAULT_ZONEID);
-        TimeWindow window = new TimeWindow(converter.toInstant(today.minusDays(1).atStartOfDay()),
-                converter.toInstant(today.atStartOfDay()));
-        return tsdbStore.count(SeriesFilter.tenantWide(tenantId), window, DEADLINE);
-    }
-
-    @Override
-    public long countTotal(Long tenantId) {
-        // The whole history: a bounded [epoch, now) window keeps the port's
-        // TimeWindow shape without changing what a full-table count sees.
         return tsdbStore.count(SeriesFilter.tenantWide(tenantId),
-                new TimeWindow(Instant.EPOCH, Instant.now()), DEADLINE);
+                new TimeWindow(converter.toInstant(today.minusDays(1).atStartOfDay()), converter.toInstant(today.atStartOfDay())), DEADLINE);
     }
 
     @Override
-    public List<TimeseriesPointVO> timeseries(Long tenantId, String granularity, int rangeHours) {
+    public Mono<Long> countTotal(Long tenantId) {
+        return tsdbStore.count(SeriesFilter.tenantWide(tenantId), new TimeWindow(Instant.EPOCH, Instant.now()), DEADLINE);
+    }
+
+    @Override
+    public Mono<List<TimeseriesPointVO>> timeseries(Long tenantId, String granularity, int rangeHours) {
         String g = GRANULARITY.contains(granularity) ? granularity : "hour";
         int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
-        LocalDateTime to = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
-        LocalDateTime from = to.minusHours(hours);
-
-        List<BucketAggregate> buckets = tsdbStore.bucketedCount(tenantId, windowSince(from),
-                "day".equals(g) ? Duration.ofDays(1) : Duration.ofHours(1), DEADLINE);
-        List<TimeseriesPointVO> out = new ArrayList<>(buckets.size());
-        for (BucketAggregate bucket : buckets) {
-            TimeseriesPointVO vo = new TimeseriesPointVO();
-            vo.setBucket(converter.toWallClock(bucket.bucketStart()));
-            vo.setCount(bucket.sampleCount());
-            out.add(vo);
-        }
-        return out;
+        LocalDateTime from = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).minusHours(hours);
+        return tsdbStore.bucketedCount(tenantId, windowSince(from), "day".equals(g) ? Duration.ofDays(1) : Duration.ofHours(1), DEADLINE)
+                .map(buckets -> buckets.stream().map(bucket -> {
+                    TimeseriesPointVO vo = new TimeseriesPointVO(); vo.setBucket(converter.toWallClock(bucket.bucketStart())); vo.setCount(bucket.sampleCount()); return vo;
+                }).toList());
     }
 
     @Override
-    public List<TopEntityVO> top(Long tenantId, String dimension, int rangeHours, int limit) {
+    public Mono<List<TopEntityVO>> top(Long tenantId, String dimension, int rangeHours, int limit) {
         GroupDimension groupDimension = DIMENSIONS.get(dimension);
-        if (Objects.isNull(groupDimension)) {
-            throw new IllegalArgumentException("Unsupported dimension: " + dimension);
-        }
-        int clampedLimit = Math.clamp(limit, 1, MAX_LIMIT);
-        int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
-        LocalDateTime to = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
-        LocalDateTime from = to.minusHours(hours);
-
-        List<DimensionCount> rows;
-        try {
-            rows = tsdbStore.countByDimension(tenantId, windowSince(from), groupDimension, clampedLimit, DEADLINE);
-        } catch (UnsupportedOperationException e) {
-            // Capability-honest degradation (e.g. IoTDB cannot group by driver):
-            // an empty panel beats a 500 for a dimension the store declares out.
-            log.warn("countByDimension unsupported by the selected tsdb store: dimension={}, reason={}",
-                    groupDimension, e.getMessage());
-            return List.of();
-        }
-        List<TopEntityVO> out = new ArrayList<>(rows.size());
-        for (DimensionCount row : rows) {
-            TopEntityVO vo = new TopEntityVO();
-            vo.setEntityId(String.valueOf(row.entityId()));
-            vo.setCount(row.count());
-            out.add(vo);
-        }
-        return out;
+        if (groupDimension == null) return Mono.error(new IllegalArgumentException("Unsupported dimension: " + dimension));
+        LocalDateTime from = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).minusHours(Math.clamp(rangeHours, 1, MAX_HOURS_90D));
+        return tsdbStore.countByDimension(tenantId, windowSince(from), groupDimension, Math.clamp(limit, 1, MAX_LIMIT), DEADLINE)
+                .map(rows -> rows.stream().map(row -> { TopEntityVO vo = new TopEntityVO(); vo.setEntityId(String.valueOf(row.entityId())); vo.setCount(row.count()); return vo; }).toList());
     }
 
     @Override
-    public List<LatestPointValueVO> latestStream(Long tenantId, int size) {
-        int clamped = Math.clamp(size, 1, MAX_LIVE_SIZE);
-        List<PointValueDO> rows = pointValueMapper.selectLatestStream(tenantId, clamped);
-        List<LatestPointValueVO> out = new ArrayList<>(rows.size());
-        Set<Long> deviceIds = new HashSet<>();
-        Set<Long> pointIds = new HashSet<>();
-        Set<Long> driverIds = new HashSet<>();
-        for (PointValueDO row : rows) {
-            LatestPointValueVO vo = new LatestPointValueVO();
-            vo.setDeviceId(String.valueOf(row.getDeviceId()));
-            vo.setPointId(String.valueOf(row.getPointId()));
-            vo.setDriverId(String.valueOf(row.getDriverId()));
-            vo.setRawValue(row.getRawValue());
-            vo.setCalValue(row.getCalValue());
-            // Single value model: NUMERIC when the numeric projection parsed,
-            // STRING otherwise (booleans, JSON, free-form text).
-            vo.setValueType(Objects.nonNull(row.getNumValue()) ? "NUMERIC" : "STRING");
-            vo.setCreateTime(row.getCreateTime());
-            out.add(vo);
-            if (row.getDeviceId() > 0)
-                deviceIds.add(row.getDeviceId());
-            if (row.getPointId() > 0)
-                pointIds.add(row.getPointId());
-            if (row.getDriverId() > 0)
-                driverIds.add(row.getDriverId());
-        }
-
-        // Point-value projections live in the history data source; device / point /
-        // driver metadata lives in the master data source (and in remote
-        // Manager in distributed deployments), so we cannot JOIN them in SQL.
-        // Resolve names in bulk — local facade does it in one SQL, gRPC fans
-        // out concurrently — to avoid the per-id round-trip storm.
-        Map<Long, String> deviceNames = deviceFacade.listByIds(tenantId, deviceIds).stream()
-                .collect(java.util.stream.Collectors.toMap(FacadeDeviceBO::getId, FacadeDeviceBO::getDeviceName, (a, b) -> a));
-        Map<Long, String> pointNames = pointFacade.listByIds(tenantId, pointIds).stream()
-                .collect(java.util.stream.Collectors.toMap(FacadePointBO::getId, FacadePointBO::getPointName, (a, b) -> a));
-        Map<Long, String> driverNames = driverFacade.listByIds(tenantId, driverIds).stream()
-                .collect(java.util.stream.Collectors.toMap(FacadeDriverBO::getId, FacadeDriverBO::getDriverName, (a, b) -> a));
-
-        for (LatestPointValueVO vo : out) {
-            if (Objects.nonNull(vo.getDeviceId()))
-                vo.setDeviceName(deviceNames.get(Long.valueOf(vo.getDeviceId())));
-            if (Objects.nonNull(vo.getPointId()))
-                vo.setPointName(pointNames.get(Long.valueOf(vo.getPointId())));
-            if (Objects.nonNull(vo.getDriverId()))
-                vo.setDriverName(driverNames.get(Long.valueOf(vo.getDriverId())));
-        }
-
-        return out;
+    public Mono<List<SilentSourceVO>> silentSources(Long tenantId, int baselineDays, int silentMinutes, int limit) {
+        LocalDateTime now = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
+        LocalDateTime from = now.minusDays(Math.clamp(baselineDays, 1, MAX_BASELINE_DAYS));
+        Instant threshold = converter.toInstant(now.minusMinutes(Math.clamp(silentMinutes, 5, 60 * 24)));
+        return tsdbStore.lastSeenPerSeries(tenantId, windowSince(from), DEADLINE).map(seen -> seen.stream()
+                .filter(row -> row.lastSeen() != null && row.lastSeen().isBefore(threshold))
+                .sorted(Comparator.comparing(SeriesLastSeen::lastSeen).reversed()).limit(Math.clamp(limit, 1, MAX_COVERAGE_GAP_LIMIT))
+                .map(row -> { SilentSourceVO vo = new SilentSourceVO(); vo.setDeviceId(String.valueOf(row.series().deviceId())); vo.setPointId(String.valueOf(row.series().pointId())); vo.setLastSeen(converter.toWallClock(row.lastSeen())); vo.setSilentSeconds(Duration.between(vo.getLastSeen(), now).getSeconds()); return vo; }).toList());
     }
 
     @Override
-    public AlertStatsVO alertStats(Long tenantId) {
-        AlertStatsVO vo = new AlertStatsVO();
-        var totals = alertMapper.countAll(tenantId);
-        if (Objects.nonNull(totals)) {
-            vo.setTotal(totals.getTotal());
-            vo.setUnconfirmed(totals.getUnconfirmed());
-        }
-        var rows = alertMapper.countByType(tenantId);
-        List<AlertStatsVO.BucketVO> buckets = new ArrayList<>(rows.size());
-        for (var row : rows) {
-            AlertStatsVO.BucketVO b = new AlertStatsVO.BucketVO();
-            b.setKey(asString(row.getBucketKey()));
-            b.setCount(row.getCount());
-            buckets.add(b);
-        }
-        vo.setByType(buckets);
+    public Mono<CoverageGapVO> coverageGap(Long tenantId, int limit) {
+        return listAllPoints(tenantId)
+                .zipWith(tsdbStore.lastSeenPerSeries(tenantId, new TimeWindow(Instant.EPOCH, Instant.now()), DEADLINE))
+                .map(tuple -> {
+                    List<FacadePointBO> points = tuple.getT1();
+                    Set<Long> reported = tuple.getT2().stream().map(row -> row.series().pointId()).collect(java.util.stream.Collectors.toSet());
+                    CoverageGapVO vo = new CoverageGapVO(); vo.setTotalPoints(points.size());
+                    points.stream().filter(point -> !reported.contains(point.getId()))
+                            .limit(Math.clamp(limit, 1, MAX_COVERAGE_GAP_LIMIT)).forEach(point -> {
+                                CoverageGapVO.Item item = new CoverageGapVO.Item();
+                                item.setPointId(String.valueOf(point.getId())); item.setProfileId(String.valueOf(point.getProfileId())); vo.addItem(item);
+                            });
+                    vo.setMissingPoints(Math.max(0, points.size() - reported.size())); return vo;
+                });
+    }
 
-        for (var row : alertMapper.countBySource(tenantId)) {
-            String src = row.getSource();
-            long srcTotal = row.getTotal();
-            long srcUnconfirmed = row.getUnconfirmed();
-            if ("device".equals(src)) {
-                vo.setDeviceAlerts(srcTotal);
-                vo.setDeviceUnconfirmed(srcUnconfirmed);
-            } else if ("driver".equals(src)) {
-                vo.setDriverAlerts(srcTotal);
-                vo.setDriverUnconfirmed(srcUnconfirmed);
-            }
-        }
+    private Mono<List<FacadePointBO>> listAllPoints(Long tenantId) {
+        return listAllPoints(tenantId, 0, new ArrayList<>());
+    }
 
-        // Today's ALARM counts per source
-        LocalDateTime todayStart = LocalDate.now(TimeConstant.DEFAULT_ZONEID).atStartOfDay();
-        for (var row : alertMapper.todayBySource(tenantId, todayStart)) {
-            String src = row.getSource();
-            long srcTotal = row.getTotal();
-            long srcUnconfirmed = row.getUnconfirmed();
-            if ("device".equals(src)) {
-                vo.setTodayDeviceAlarms(srcTotal);
-                vo.setTodayDeviceUnconfirmed(srcUnconfirmed);
-            } else if ("driver".equals(src)) {
-                vo.setTodayDriverAlarms(srcTotal);
-                vo.setTodayDriverUnconfirmed(srcUnconfirmed);
-            }
-        }
+    private Mono<List<FacadePointBO>> listAllPoints(Long tenantId, long offset, List<FacadePointBO> collected) {
+        return pointFacade.listReactive(new io.github.pnoker.common.facade.entity.query.FacadePointOffsetQuery(tenantId, offset, 200))
+                .flatMap(page -> {
+                    collected.addAll(page.items());
+                    return page.hasNext() ? listAllPoints(tenantId, offset + page.items().size(), collected) : Mono.just(List.copyOf(collected));
+                });
+    }
 
-        // 24-hour hourly sparkline, anchored to top-of-hour now-23.
-        LocalDateTime anchor = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).withMinute(0).withSecond(0).withNano(0).minusHours(23);
-        long[] series = new long[24];
-        for (var row : alertMapper.hourlyCounts(tenantId, anchor)) {
-            LocalDateTime bucket = row.getBucket();
-            if (Objects.isNull(bucket))
-                continue;
-            long diffHours = java.time.Duration.between(anchor, bucket).toHours();
-            int idx = (int) diffHours;
-            if (idx >= 0 && idx < series.length) {
-                series[idx] = row.getCount();
-            }
-        }
-        List<Long> sparkline = new ArrayList<>(series.length);
-        for (long v : series)
-            sparkline.add(v);
-        vo.setSparkline24h(sparkline);
+    @Override
+    public Mono<OffsetPage<AlertItemVO>> alertPage(Long tenantId, String source, Integer alarmTypeFlag,
+                                                   Integer confirmFlag, LocalDateTime from, PageRequest page) {
+        String src = normalizeSource(source);
+        return alertStore.list(tenantId, src, alarmTypeFlag, confirmFlag, from, page)
+                .map(result -> OffsetPage.of(result.items().stream().map(this::toAlertVO).toList(),
+                        result.offset(), result.limit(), result.total()));
+    }
+
+    @Override
+    public Mono<Boolean> confirmAlert(Long tenantId, String source, Long id) {
+        return alertStore.updateConfirm(tenantId, normalizeSourceRequired(source), id, (byte) 1);
+    }
+
+    @Override
+    public Mono<Boolean> unconfirmAlert(Long tenantId, String source, Long id) {
+        return alertStore.updateConfirm(tenantId, normalizeSourceRequired(source), id, (byte) 0);
+    }
+
+    @Override
+    public Mono<Integer> bulkConfirmAlert(Long tenantId, List<AlertBulkConfirmVO.Item> items, boolean confirm) {
+        if (items == null || items.isEmpty()) return Mono.just(0);
+        byte flag = (byte) (confirm ? 1 : 0);
+        return Flux.fromIterable(items)
+                .filter(Objects::nonNull)
+                .concatMap(item -> parseAlertId(item)
+                        .flatMap(id -> {
+                            String source;
+                            try {
+                                source = normalizeSourceRequired(item.getSource());
+                            } catch (IllegalArgumentException exception) {
+                                return Mono.just(false);
+                            }
+                            return alertStore.updateConfirm(tenantId, source, id, flag);
+                        }))
+                .filter(Boolean::booleanValue)
+                .count()
+                .map(Long::intValue);
+    }
+
+    private AlertItemVO toAlertVO(AlertItemRow row) {
+        AlertItemVO vo = new AlertItemVO();
+        vo.setId(String.valueOf(row.getId()));
+        vo.setSource(row.getSource());
+        vo.setSourceId(String.valueOf(row.getSourceId()));
+        vo.setPointId(String.valueOf(row.getPointId()));
+        vo.setAlarmTypeFlag(AlarmTypeEnum.ofIndex((byte) row.getAlarmTypeFlag()));
+        vo.setConfirmFlag(ConfirmFlagEnum.ofIndex((byte) row.getConfirmFlag()));
+        vo.setCreateTime(row.getCreateTime());
+        vo.setMessage(row.getMessage());
         return vo;
     }
 
-    @Override
-    public List<AlertItemVO> alertLatest(Long tenantId, int size) {
-        int clamped = Math.clamp(size, 1, MAX_LIMIT);
-        var rows = alertMapper.latest(tenantId, clamped);
-        List<AlertItemVO> out = new ArrayList<>(rows.size());
-        for (var row : rows) {
-            AlertItemVO vo = new AlertItemVO();
-            vo.setId(String.valueOf(row.getId()));
-            vo.setSource(row.getSource());
-            vo.setSourceId(String.valueOf(row.getSourceId()));
-            vo.setPointId(String.valueOf(row.getPointId()));
-            vo.setAlarmTypeFlag(AlarmTypeEnum.ofIndex((byte) row.getAlarmTypeFlag()));
-            vo.setConfirmFlag(ConfirmFlagEnum.ofIndex((byte) row.getConfirmFlag()));
-            vo.setCreateTime(row.getCreateTime());
-            vo.setMessage(row.getMessage());
-            out.add(vo);
+    private String normalizeSource(String source) {
+        if (source == null || source.isBlank()) return null;
+        if (!ALERT_SOURCES.contains(source)) {
+            throw new IllegalArgumentException("alert source is not allowed: " + source);
         }
-        return out;
+        return source;
+    }
+
+    private String normalizeSourceRequired(String source) {
+        String value = normalizeSource(source);
+        if (value == null) throw new IllegalArgumentException("alert source is required");
+        return value;
+    }
+
+    private Mono<Long> parseAlertId(AlertBulkConfirmVO.Item item) {
+        if (item.getId() == null || item.getId().isBlank()) return Mono.empty();
+        try {
+            long id = Long.parseLong(item.getId());
+            return id > 0 ? Mono.just(id) : Mono.empty();
+        } catch (NumberFormatException exception) {
+            return Mono.empty();
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+    @Override
+    public Mono<List<LatestPointValueVO>> latestStream(Long tenantId, int limit) {
+        int clamped = Math.clamp(limit, 1, MAX_LIVE_SIZE);
+        return pointValueLatestService.listLatestStream(tenantId, clamped).collectList().flatMap(rows -> {
+            List<LatestPointValueVO> out = new ArrayList<>(rows.size());
+            Set<Long> deviceIds = new HashSet<>();
+            Set<Long> pointIds = new HashSet<>();
+            Set<Long> driverIds = new HashSet<>();
+            for (var row : rows) {
+                LatestPointValueVO vo = new LatestPointValueVO();
+                vo.setDeviceId(String.valueOf(row.getDeviceId()));
+                vo.setPointId(String.valueOf(row.getPointId()));
+                vo.setDriverId(String.valueOf(row.getDriverId()));
+                vo.setRawValue(row.getRawValue());
+                vo.setCalValue(row.getCalValue());
+                vo.setValueType(Objects.nonNull(row.getNumValue()) ? "NUMERIC" : "STRING");
+                vo.setCreateTime(row.getCreateTime());
+                out.add(vo);
+                if (row.getDeviceId() != null && row.getDeviceId() > 0) deviceIds.add(row.getDeviceId());
+                if (row.getPointId() != null && row.getPointId() > 0) pointIds.add(row.getPointId());
+                if (row.getDriverId() != null && row.getDriverId() > 0) driverIds.add(row.getDriverId());
+            }
+            return Mono.zip(deviceFacade.listByIdsReactive(tenantId, deviceIds).collectList(),
+                            pointFacade.listByIdsReactive(tenantId, pointIds).collectList(),
+                            driverFacade.listByIdsReactive(tenantId, driverIds).collectList())
+                    .map(tuple -> {
+                        Map<Long, String> deviceNames = tuple.getT1().stream().collect(java.util.stream.Collectors.toMap(FacadeDeviceBO::getId, FacadeDeviceBO::getDeviceName, (a, b) -> a));
+                        Map<Long, String> pointNames = tuple.getT2().stream().collect(java.util.stream.Collectors.toMap(FacadePointBO::getId, FacadePointBO::getPointName, (a, b) -> a));
+                        Map<Long, String> driverNames = tuple.getT3().stream().collect(java.util.stream.Collectors.toMap(FacadeDriverBO::getId, FacadeDriverBO::getDriverName, (a, b) -> a));
+                        out.forEach(vo -> {
+                            vo.setDeviceName(deviceNames.get(Long.valueOf(vo.getDeviceId())));
+                            vo.setPointName(pointNames.get(Long.valueOf(vo.getPointId())));
+                            vo.setDriverName(driverNames.get(Long.valueOf(vo.getDriverId())));
+                        });
+                        return out;
+                    });
+        });
     }
 
     @Override
-    public List<AlertTrendVO> alertTrend(Long tenantId, int days) {
+    public Mono<AlertStatsVO> alertStats(Long tenantId) {
+        LocalDateTime todayStart = LocalDate.now(TimeConstant.DEFAULT_ZONEID).atStartOfDay();
+        LocalDateTime anchor = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID)
+                .withMinute(0).withSecond(0).withNano(0).minusHours(23);
+        return Mono.zip(
+                        alertAnalyticsStore.countAll(tenantId).defaultIfEmpty(new io.github.pnoker.common.data.entity.bo.dashboard.AlertCountersRow()),
+                        alertAnalyticsStore.countByType(tenantId).collectList(),
+                        alertAnalyticsStore.countBySource(tenantId).collectList(),
+                        alertAnalyticsStore.todayBySource(tenantId, todayStart).collectList(),
+                        alertAnalyticsStore.hourlyCounts(tenantId, anchor).collectList())
+                .map(tuple -> {
+                    AlertStatsVO vo = new AlertStatsVO();
+                    var totals = tuple.getT1();
+                    vo.setTotal(totals.getTotal());
+                    vo.setUnconfirmed(totals.getUnconfirmed());
+                    vo.setByType(tuple.getT2().stream().map(row -> {
+                        AlertStatsVO.BucketVO bucket = new AlertStatsVO.BucketVO();
+                        bucket.setKey(asString(row.getBucketKey()));
+                        bucket.setCount(row.getCount());
+                        return bucket;
+                    }).toList());
+                    applySourceStats(tuple.getT3(), vo, false);
+                    applySourceStats(tuple.getT4(), vo, true);
+                    long[] series = new long[24];
+                    for (var row : tuple.getT5()) {
+                        if (row.getBucket() == null) continue;
+                        int index = (int) Duration.between(anchor, row.getBucket()).toHours();
+                        if (index >= 0 && index < series.length) series[index] = row.getCount();
+                    }
+                    vo.setSparkline24h(java.util.Arrays.stream(series).boxed().toList());
+                    return vo;
+                });
+    }
+
+    private void applySourceStats(List<io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow> rows,
+                                  AlertStatsVO target, boolean today) {
+        for (var row : rows) {
+            if ("device".equals(row.getSource())) {
+                if (today) {
+                    target.setTodayDeviceAlarms(row.getTotal());
+                    target.setTodayDeviceUnconfirmed(row.getUnconfirmed());
+                } else {
+                    target.setDeviceAlerts(row.getTotal());
+                    target.setDeviceUnconfirmed(row.getUnconfirmed());
+                }
+            } else if ("driver".equals(row.getSource())) {
+                if (today) {
+                    target.setTodayDriverAlarms(row.getTotal());
+                    target.setTodayDriverUnconfirmed(row.getUnconfirmed());
+                } else {
+                    target.setDriverAlerts(row.getTotal());
+                    target.setDriverUnconfirmed(row.getUnconfirmed());
+                }
+            }
+        }
+    }
+
+    @Override
+    public Mono<List<AlertItemVO>> alertLatest(Long tenantId, int limit) {
+        int clamped = Math.clamp(limit, 1, MAX_LIMIT);
+        return alertStore.list(tenantId, null, null, null, null, new PageRequest(0, clamped))
+                .map(page -> page.items().stream().map(this::toAlertVO).toList());
+    }
+
+    @Override
+    public Mono<List<AlertTrendVO>> alertTrend(Long tenantId, int days) {
         int clamped = Math.clamp(days, 1, MAX_DAYS);
         LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(clamped).atTime(LocalTime.MIN);
-        var rows = alertMapper.dailyTrend(tenantId, from);
-        List<AlertTrendVO> out = new ArrayList<>(rows.size());
-        for (var row : rows) {
-            AlertTrendVO vo = new AlertTrendVO();
-            vo.setDate(row.getDate());
-            vo.setDeviceCount(row.getDeviceCount());
-            vo.setDriverCount(row.getDriverCount());
-            out.add(vo);
-        }
-        return out;
+        return alertAnalyticsStore.dailyTrend(tenantId, from).collectList().map(rows -> {
+            Map<String, io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow> byDate = rows.stream()
+                    .collect(java.util.stream.Collectors.toMap(io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow::getDate,
+                            row -> row, (left, right) -> left));
+            List<AlertTrendVO> out = new ArrayList<>(clamped + 1);
+            for (int index = 0; index <= clamped; index++) {
+                String date = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(clamped - index).toString();
+                var row = byDate.get(date);
+                AlertTrendVO vo = new AlertTrendVO();
+                vo.setDate(date);
+                vo.setDeviceCount(row == null ? 0 : row.getDeviceCount());
+                vo.setDriverCount(row == null ? 0 : row.getDriverCount());
+                out.add(vo);
+            }
+            return out;
+        });
     }
 
     @Override
-    public List<AlertTopSourceVO> alertTopSources(Long tenantId, int days, int limit) {
+    public Mono<List<AlertTopSourceVO>> alertTopSources(Long tenantId, int days, int limit) {
         int clampedDays = Math.clamp(days, 1, MAX_DAYS);
         int clampedLimit = Math.clamp(limit, 1, MAX_LIMIT);
         LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(clampedDays).atTime(LocalTime.MIN);
-        var rows = alertMapper.topSources(tenantId, from, clampedLimit);
-        List<AlertTopSourceVO> out = new ArrayList<>(rows.size());
-        for (var row : rows) {
+        return alertAnalyticsStore.topSources(tenantId, from, clampedLimit).map(row -> {
             AlertTopSourceVO vo = new AlertTopSourceVO();
             vo.setSource(row.getSource());
             vo.setSourceId(String.valueOf(row.getSourceId()));
             vo.setCount(row.getCount());
-            out.add(vo);
-        }
-        return out;
+            return vo;
+        }).collectList();
     }
 
     @Override
-    public List<AlertActivityCellVO> alertActivity(Long tenantId, int days) {
+    public Mono<List<AlertActivityCellVO>> alertActivity(Long tenantId, int days) {
         int clampedDays = Math.clamp(days, 1, MAX_DAYS);
         LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(clampedDays).atTime(LocalTime.MIN);
-        var rows = alertMapper.activityHeatmap(tenantId, from);
-        long[][] grid = new long[7][24];
-        for (var row : rows) {
-            int dow = row.getDow();
-            int hour = row.getHour();
-            if (dow >= 0 && dow < 7 && hour >= 0 && hour < 24) {
-                grid[dow][hour] = row.getCount();
+        return alertAnalyticsStore.activityHeatmap(tenantId, from).collectList().map(rows -> {
+            long[][] grid = new long[7][24];
+            for (var row : rows) if (row.getDow() >= 0 && row.getDow() < 7 && row.getHour() >= 0 && row.getHour() < 24)
+                grid[row.getDow()][row.getHour()] = row.getCount();
+            List<AlertActivityCellVO> out = new ArrayList<>(7 * 24);
+            for (int d = 0; d < 7; d++) for (int h = 0; h < 24; h++) {
+                AlertActivityCellVO vo = new AlertActivityCellVO(); vo.setDow(d); vo.setHour(h); vo.setCount(grid[d][h]); out.add(vo);
             }
-        }
-        // Zero-pad every cell so the UI always receives 7 × 24 = 168 rows.
-        List<AlertActivityCellVO> out = new ArrayList<>(7 * 24);
-        for (int d = 0; d < 7; d++) {
-            for (int h = 0; h < 24; h++) {
-                AlertActivityCellVO vo = new AlertActivityCellVO();
-                vo.setDow(d);
-                vo.setHour(h);
-                vo.setCount(grid[d][h]);
-                out.add(vo);
-            }
-        }
-        return out;
+            return out;
+        });
     }
 
     @Override
-    public List<AlertTypeBucketVO> alertTypeDistribution(Long tenantId, int days) {
+    public Mono<List<AlertTypeBucketVO>> alertTypeDistribution(Long tenantId, int days) {
         int clampedDays = Math.clamp(days, 1, MAX_DAYS);
         LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(clampedDays).atTime(LocalTime.MIN);
-        var rows = alertMapper.typeDistribution(tenantId, from);
-        List<AlertTypeBucketVO> out = new ArrayList<>(rows.size());
-        for (var row : rows) {
+        return alertAnalyticsStore.typeDistribution(tenantId, from).map(row -> {
             AlertTypeBucketVO vo = new AlertTypeBucketVO();
             vo.setType(Objects.isNull(row.getBucketKey()) ? null : row.getBucketKey().toString());
             vo.setCount(row.getCount());
-            out.add(vo);
-        }
-        return out;
+            return vo;
+        }).collectList();
     }
 
     @Override
-    public List<AlertTopSourceVO> alertStormSources(Long tenantId, int hours, int minCount, int limit) {
+    public Mono<List<AlertTopSourceVO>> alertStormSources(Long tenantId, int hours, int minCount, int limit) {
         int clampedHours = Math.clamp(hours, 1, MAX_HOURS_30D);
         int clampedMin = Math.max(1, minCount);
         int clampedLimit = Math.clamp(limit, 1, MAX_LIMIT);
         LocalDateTime from = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).minusHours(clampedHours);
-        var rows = alertMapper.stormSources(tenantId, from, clampedMin, clampedLimit);
-        List<AlertTopSourceVO> out = new ArrayList<>(rows.size());
-        for (var row : rows) {
-            AlertTopSourceVO vo = new AlertTopSourceVO();
-            vo.setSource(row.getSource());
-            vo.setSourceId(String.valueOf(row.getSourceId()));
-            vo.setCount(row.getCount());
-            out.add(vo);
-        }
-        return out;
+        return alertAnalyticsStore.stormSources(tenantId, from, clampedMin, clampedLimit).map(row -> {
+            AlertTopSourceVO vo = new AlertTopSourceVO(); vo.setSource(row.getSource()); vo.setSourceId(String.valueOf(row.getSourceId())); vo.setCount(row.getCount()); return vo;
+        }).collectList();
     }
 
     // ================================================================
@@ -549,33 +515,28 @@ public class DashboardServiceImpl implements DashboardService {
     // ================================================================
 
     @Override
-    public List<FlappingSourceVO> alertFlapping(Long tenantId, int hours, int minCount, int limit) {
+    public Mono<List<FlappingSourceVO>> alertFlapping(Long tenantId, int hours, int minCount, int limit) {
         int h = Math.clamp(hours, 1, MAX_HOURS_7D);
         int min = Math.max(MIN_FLAPPING_COUNT, minCount);
         int lim = Math.clamp(limit, 1, MAX_LIMIT);
         LocalDateTime from = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).minusHours(h);
-        var rows = alertMapper.flappingSources(tenantId, from, min, lim);
-        List<FlappingSourceVO> out = new ArrayList<>(rows.size());
-        for (var r : rows) {
+        return alertAnalyticsStore.flappingSources(tenantId, from, min, lim).map(r -> {
             FlappingSourceVO vo = new FlappingSourceVO();
             vo.setSource(r.getSource());
             vo.setSourceId(String.valueOf(r.getSourceId()));
             vo.setAlarmTypeFlag(r.getAlarmTypeFlag());
             vo.setCount(r.getCount());
-            out.add(vo);
-        }
-        return out;
+            return vo;
+        }).collectList();
     }
 
     @Override
-    public List<CorrelationPairVO> alertCorrelation(Long tenantId, int hours, int windowSec, int limit) {
+    public Mono<List<CorrelationPairVO>> alertCorrelation(Long tenantId, int hours, int windowSec, int limit) {
         int h = Math.clamp(hours, 1, MAX_HOURS_7D);
         int w = Math.clamp(windowSec, MIN_CORRELATION_WINDOW_SEC, MAX_CORRELATION_WINDOW_SEC);
         int lim = Math.clamp(limit, 1, MAX_CORRELATION_PAIRS);
         LocalDateTime from = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).minusHours(h);
-        var rows = alertMapper.correlationPairs(tenantId, from, w, lim);
-        List<CorrelationPairVO> out = new ArrayList<>(rows.size());
-        for (var r : rows) {
+        return alertAnalyticsStore.correlationPairs(tenantId, from, w, lim).map(r -> {
             CorrelationPairVO vo = new CorrelationPairVO();
             vo.setASource(r.getASource());
             vo.setASourceId(String.valueOf(r.getASourceId()));
@@ -584,16 +545,15 @@ public class DashboardServiceImpl implements DashboardService {
             vo.setBSourceId(String.valueOf(r.getBSourceId()));
             vo.setBEventType(r.getBEventType());
             vo.setCoCount(r.getCoCount());
-            out.add(vo);
-        }
-        return out;
+            return vo;
+        }).collectList();
     }
 
     @Override
-    public List<PeerDeviationVO> alertPeerDeviation(Long tenantId, int days) {
+    public Mono<List<PeerDeviationVO>> alertPeerDeviation(Long tenantId, int days) {
         int d = Math.clamp(days, 1, MAX_PEER_DAYS);
         LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(d).atTime(LocalTime.MIN);
-        var rows = alertMapper.peerAlarmCounts(tenantId, from);
+        return alertAnalyticsStore.peerAlarmCounts(tenantId, from).collectList().map(rows -> {
 
         // Group by profile → list of (device, alarmCount); then pick median
         // and flag devices with count >= 3x median (and a floor of 5 alarms
@@ -631,151 +591,63 @@ public class DashboardServiceImpl implements DashboardService {
         out.sort((a, b) -> Long.compare(b.getAlarmCount(), a.getAlarmCount()));
         // Cap to 50 to keep payload bounded
         return out.size() > 50 ? out.subList(0, 50) : out;
+        });
     }
 
     @Override
-    public AgingBacklogVO alertAgingBacklog(Long tenantId) {
-        var row = alertMapper.agingBuckets(tenantId);
-        AgingBacklogVO vo = new AgingBacklogVO();
-        if (Objects.nonNull(row)) {
+    public Mono<AgingBacklogVO> alertAgingBacklog(Long tenantId) {
+        return alertAnalyticsStore.agingBuckets(tenantId).map(row -> {
+            AgingBacklogVO vo = new AgingBacklogVO();
             vo.setUnder1h(row.getUnder1h());
             vo.setH1to6(row.getH1to6());
             vo.setH6to24(row.getH6to24());
             vo.setOver24h(row.getOver24h());
             vo.setTotal(row.getTotal());
-        }
-        return vo;
+            return vo;
+        });
     }
 
     @Override
-    public List<MttaTrendVO> alertMtta(Long tenantId, int days) {
+    public Mono<List<MttaTrendVO>> alertMtta(Long tenantId, int days) {
         int d = Math.clamp(days, 1, MAX_DAYS);
         LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(d).atTime(LocalTime.MIN);
-        var rows = alertMapper.mttaByDay(tenantId, from);
-        List<MttaTrendVO> out = new ArrayList<>(rows.size());
-        for (var r : rows) {
+        return alertAnalyticsStore.mttaByDay(tenantId, from).map(r -> {
             MttaTrendVO vo = new MttaTrendVO();
             vo.setDate(r.getDate());
             vo.setP50Ms(r.getP50Ms());
             vo.setP95Ms(r.getP95Ms());
             vo.setConfirmedCount(r.getConfirmedCount());
-            out.add(vo);
-        }
-        return out;
+            return vo;
+        }).collectList();
     }
 
     @Override
-    public List<ProtocolHealthVO> protocolHealth(Long tenantId) {
-        var rows = alertMapper.protocolHealth(tenantId);
-        List<ProtocolHealthVO> out = new ArrayList<>(rows.size());
-        for (var r : rows) {
+    public Mono<List<ProtocolHealthVO>> protocolHealth(Long tenantId) {
+        return alertAnalyticsStore.protocolHealth(tenantId).map(r -> {
             ProtocolHealthVO vo = new ProtocolHealthVO();
             vo.setServiceName(r.getServiceName());
             vo.setDriverCount(r.getDriverCount());
             vo.setEnabledCount(r.getEnabledCount());
             vo.setDeviceCount(r.getDeviceCount());
-            out.add(vo);
-        }
-        return out;
+            return vo;
+        }).collectList();
     }
 
     @Override
-    public List<ChangeImpactVO> changeImpact(Long tenantId, int days, int limit) {
+    public Mono<List<ChangeImpactVO>> changeImpact(Long tenantId, int days, int limit) {
         int d = Math.clamp(days, 1, MAX_DAYS);
         int lim = Math.clamp(limit, 1, MAX_LIMIT);
         LocalDateTime from = LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(d).atTime(LocalTime.MIN);
-        var rows = alertMapper.recentChanges(tenantId, from, lim);
-        List<ChangeImpactVO> out = new ArrayList<>(rows.size());
-        for (var r : rows) {
+        return alertAnalyticsStore.recentChanges(tenantId, from, lim).map(r -> {
             ChangeImpactVO vo = new ChangeImpactVO();
             vo.setKind(r.getKind());
             vo.setEntityId(String.valueOf(r.getEntityId()));
             vo.setOperateTime(r.getOperateTime());
-            out.add(vo);
-        }
-        return out;
+            return vo;
+        }).collectList();
     }
 
-    @Override
-    public List<SilentSourceVO> silentSources(Long tenantId, int baselineDays, int silentMinutes, int limit) {
-        int baseline = Math.clamp(baselineDays, 1, MAX_BASELINE_DAYS);
-        int silent = Math.clamp(silentMinutes, 5, 60 * 24);
-        int lim = Math.clamp(limit, 1, MAX_COVERAGE_GAP_LIMIT);
 
-        LocalDateTime now = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
-        LocalDateTime from = now.minusDays(baseline);
-        LocalDateTime silentThreshold = now.minusMinutes(silent);
 
-        // Per-series lastSeen inside the baseline window; the "gone quiet"
-        // test (lastSeen < threshold) and the ordering stay in the application
-        // layer — the port only carries the S13-③ primitive.
-        List<SeriesLastSeen> seen = tsdbStore.lastSeenPerSeries(tenantId, windowSince(from), DEADLINE);
-        List<SeriesLastSeen> silentSeries = seen.stream()
-                .filter(row -> Objects.nonNull(row.lastSeen()))
-                .filter(row -> converter.toInstant(silentThreshold).isAfter(row.lastSeen()))
-                .sorted(Comparator.comparing(SeriesLastSeen::lastSeen).reversed())
-                .limit(lim)
-                .toList();
-
-        List<SilentSourceVO> out = new ArrayList<>(silentSeries.size());
-        for (SeriesLastSeen row : silentSeries) {
-            SilentSourceVO vo = new SilentSourceVO();
-            vo.setDeviceId(String.valueOf(row.series().deviceId()));
-            vo.setPointId(String.valueOf(row.series().pointId()));
-            LocalDateTime last = converter.toWallClock(row.lastSeen());
-            vo.setLastSeen(last);
-            if (Objects.nonNull(last)) {
-                vo.setSilentSeconds(java.time.Duration.between(last, now).getSeconds());
-            }
-            out.add(vo);
-        }
-        return out;
-    }
-
-    @Override
-    public CoverageGapVO coverageGap(Long tenantId, int limit) {
-        int lim = Math.clamp(limit, 1, MAX_COVERAGE_GAP_LIMIT);
-        CoverageGapVO vo = new CoverageGapVO();
-
-        // Points come from the manager facade; series-with-data from the
-        // port's lastSeen primitive. The cross-schema anti-join is gone —
-        // the application layer assembles the gap list.
-        List<FacadePointBO> points = new ArrayList<>();
-        long current = 1;
-        while (true) {
-            Pages pages = new Pages();
-            pages.setCurrent(current);
-            pages.setSize(200L);
-            FacadePage<FacadePointBO> page = pointFacade.listByPage(
-                    FacadePointQuery.builder().tenantId(tenantId).page(pages).build());
-            points.addAll(page.getRecords());
-            if (points.size() >= page.getTotal() || page.getRecords().isEmpty()) {
-                break;
-            }
-            current++;
-        }
-        vo.setTotalPoints(points.size());
-
-        Set<Long> pointsWithData = new HashSet<>();
-        for (SeriesLastSeen row : tsdbStore.lastSeenPerSeries(tenantId,
-                new TimeWindow(Instant.EPOCH, Instant.now()), DEADLINE)) {
-            pointsWithData.add(row.series().pointId());
-        }
-
-        List<FacadePointBO> gaps = points.stream()
-                .filter(point -> !pointsWithData.contains(point.getId()))
-                .sorted(Comparator.comparingLong(FacadePointBO::getId).reversed())
-                .limit(lim)
-                .toList();
-        for (FacadePointBO point : gaps) {
-            CoverageGapVO.Item it = new CoverageGapVO.Item();
-            it.setPointId(String.valueOf(point.getId()));
-            it.setProfileId(String.valueOf(point.getProfileId()));
-            vo.addItem(it);
-        }
-        // missingPoints = actual count; items may be capped.
-        vo.setMissingPoints(points.size() - pointsWithData.size());
-        return vo;
-    }
 
 }

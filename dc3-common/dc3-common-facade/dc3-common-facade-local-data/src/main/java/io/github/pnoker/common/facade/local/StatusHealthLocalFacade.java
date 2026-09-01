@@ -18,147 +18,67 @@
 package io.github.pnoker.common.facade.local;
 
 import io.github.pnoker.common.data.biz.SystemHealthService;
-import io.github.pnoker.common.data.dal.EntityStateManager;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
+import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-/**
- * In-process StatusHealthFacade implementation.
- *
- * @author pnoker
- * @since 2016.10.1
- */
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class StatusHealthLocalFacade implements StatusHealthFacade {
-
     private final DeviceFacade deviceFacade;
-
     private final DriverFacade driverFacade;
-
-    private final EntityStateManager entityStateManager;
-
     private final SystemHealthService systemHealthService;
+    private final ReactiveEntityStateStore entityStateStore;
 
     @Override
-    public Map<Long, String> listDeviceStatusesByIds(Long tenantId, Collection<Long> deviceIds) {
-        List<FacadeDeviceBO> devices = deviceFacade.listByIds(tenantId, deviceIds);
+    public Mono<Map<Long, String>> listDeviceStatusesByIdsReactive(Long tenantId, Collection<Long> deviceIds) {
+        return deviceFacade.listByIdsReactive(tenantId, deviceIds).map(FacadeDeviceBO::getId).collectList().flatMap(ids -> stateFlags(tenantId, EntityTypeEnum.DEVICE, ids).map(flags -> statusCodes(ids, flags)));
+    }
+    @Override
+    public Mono<Map<Long, String>> listDeviceStatusesByProfileIdReactive(Long tenantId, Long profileId) {
+        return deviceFacade.listByProfileIdReactive(tenantId, profileId).map(FacadeDeviceBO::getId).collectList().flatMap(ids -> stateFlags(tenantId, EntityTypeEnum.DEVICE, ids).map(flags -> statusCodes(ids, flags)));
+    }
+    @Override
+    public Mono<Map<Long, String>> listDriverStatusesByIdsReactive(Long tenantId, Collection<Long> driverIds) {
+        return driverFacade.listByIdsReactive(tenantId, driverIds).map(driver -> driver.getId()).collectList().flatMap(ids -> stateFlags(tenantId, EntityTypeEnum.DRIVER, ids).map(flags -> statusCodes(ids, flags)));
+    }
+    @Override
+    public Mono<FacadeDriverDeviceStatusSummaryBO> getDriverDeviceStatusSummaryReactive(Long tenantId, Long driverId) {
+        return driverFacade.getByIdReactive(tenantId, driverId).flatMap(driver -> deviceFacade.listByDriverIdReactive(tenantId, driverId).map(FacadeDeviceBO::getId).collectList().flatMap(ids -> stateFlags(tenantId, EntityTypeEnum.DEVICE, ids).map(flags -> {
+            int online = (int) ids.stream().filter(id -> EntityStatusEnum.ONLINE.getIndex().equals(flags.get(id))).count();
+            return new FacadeDriverDeviceStatusSummaryBO(driverId, ids.size(), online, ids.size() - online);
+        })));
+    }
+    @Override
+    public Mono<FacadeSystemHealthBO> systemHealthReactive(Long tenantId) {
+        return systemHealthService.snapshot(tenantId).map(this::toFacadeHealth);
+    }
+    private Mono<Map<Long, Byte>> stateFlags(Long tenantId, EntityTypeEnum type, Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) return Mono.just(Map.of());
+        return entityStateStore.listStateFlags(tenantId, type, ids);
+    }
+    private Map<Long, String> statusCodes(Collection<Long> ids, Map<Long, Byte> flags) {
         Map<Long, String> result = new LinkedHashMap<>();
-        devices.forEach(device -> result.put(device.getId(), deviceStatus(tenantId, device.getId())));
-        return result;
+        ids.forEach(id -> { EntityStatusEnum status = EntityStatusEnum.ofIndex(flags.get(id)); result.put(id, status == null ? EntityStatusEnum.OFFLINE.getCode() : status.getCode()); });
+        return Map.copyOf(result);
     }
-
-    @Override
-    public Map<Long, String> listDeviceStatusesByProfileId(Long tenantId, Long profileId) {
-        List<FacadeDeviceBO> devices = deviceFacade.listByProfileId(tenantId, profileId);
-        Map<Long, String> result = new LinkedHashMap<>();
-        devices.forEach(device -> result.put(device.getId(), deviceStatus(tenantId, device.getId())));
-        return result;
+    private FacadeSystemHealthBO toFacadeHealth(SystemHealthVO source) {
+        if (source == null) return null;
+        FacadeSystemHealthBO target = new FacadeSystemHealthBO(); target.setCenter(source.getCenter()); target.setInfra(source.getInfra()); target.setDrivers(summary(source.getDrivers())); target.setDevices(summary(source.getDevices())); return target;
     }
-
-    @Override
-    public Map<Long, String> listDriverStatusesByIds(Long tenantId, Collection<Long> driverIds) {
-        List<FacadeDriverBO> drivers = driverFacade.listByIds(tenantId, driverIds);
-        Map<Long, String> result = new LinkedHashMap<>();
-        drivers.forEach(driver -> result.put(driver.getId(), driverStatus(tenantId, driver.getId())));
-        return result;
-    }
-
-    @Override
-    public FacadeDriverDeviceStatusSummaryBO getDriverDeviceStatusSummary(Long tenantId, Long driverId) {
-        if (Objects.isNull(driverFacade.getById(tenantId, driverId))) {
-            return null;
-        }
-        List<FacadeDeviceBO> devices = deviceFacade.listByDriverId(tenantId, driverId);
-        long online = devices.stream()
-                .filter(device -> Objects.equals(EntityStatusEnum.ONLINE.getCode(), deviceStatus(tenantId,
-                        device.getId())))
-                .count();
-        int offline = (int) Math.max(0, devices.size() - online);
-        return new FacadeDriverDeviceStatusSummaryBO(driverId, devices.size(), (int) online, offline);
-    }
-
-    @Override
-    public FacadeSystemHealthBO systemHealth(Long tenantId) {
-        SystemHealthVO source = systemHealthService.snapshot(tenantId);
-        if (Objects.isNull(source)) {
-            return null;
-        }
-        FacadeSystemHealthBO target = new FacadeSystemHealthBO();
-        target.setCenter(source.getCenter());
-        target.setInfra(source.getInfra());
-        target.setDrivers(toFacadeSummary(source.getDrivers()));
-        target.setDevices(toFacadeSummary(source.getDevices()));
-        return target;
-    }
-
-    private FacadeSystemHealthBO.FleetSummary toFacadeSummary(SystemHealthVO.FleetSummary source) {
-        if (Objects.isNull(source)) {
-            return new FacadeSystemHealthBO.FleetSummary();
-        }
-        return new FacadeSystemHealthBO.FleetSummary(source.getTotal(), source.getOnline());
-    }
-
-    /**
-     * Resolve a device's status code from its entity state, returning OFFLINE when the
-     * state is missing or its lease has expired.
-     *
-     * @param tenantId tenant scope
-     * @param deviceId device id
-     * @return the status code
-     */
-    private String deviceStatus(Long tenantId, Long deviceId) {
-        EntityStateDO state = entityStateManager.lambdaQuery()
-                .eq(EntityStateDO::getTenantId, tenantId)
-                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DEVICE.getIndex())
-                .eq(EntityStateDO::getEntityId, deviceId)
-                .one();
-        if (Objects.isNull(state) || state.getExpireTime().isBefore(LocalDateTime.now())) {
-            return EntityStatusEnum.OFFLINE.getCode();
-        }
-        EntityStatusEnum e = EntityStatusEnum.ofIndex(state.getStateFlag());
-        return Objects.nonNull(e) ? e.getCode() : EntityStatusEnum.OFFLINE.getCode();
-    }
-
-    /**
-     * Resolve a driver's status code from its entity state, returning OFFLINE when the
-     * state is missing or its lease has expired.
-     *
-     * @param tenantId tenant scope
-     * @param driverId driver id
-     * @return the status code
-     */
-    private String driverStatus(Long tenantId, Long driverId) {
-        EntityStateDO state = entityStateManager.lambdaQuery()
-                .eq(EntityStateDO::getTenantId, tenantId)
-                .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
-                .eq(EntityStateDO::getEntityId, driverId)
-                .one();
-        if (Objects.isNull(state) || state.getExpireTime().isBefore(LocalDateTime.now())) {
-            return EntityStatusEnum.OFFLINE.getCode();
-        }
-        EntityStatusEnum e = EntityStatusEnum.ofIndex(state.getStateFlag());
-        return Objects.nonNull(e) ? e.getCode() : EntityStatusEnum.OFFLINE.getCode();
-    }
-
+    private FacadeSystemHealthBO.FleetSummary summary(SystemHealthVO.FleetSummary source) { return source == null ? new FacadeSystemHealthBO.FleetSummary() : new FacadeSystemHealthBO.FleetSummary(source.getTotal(), source.getOnline()); }
 }

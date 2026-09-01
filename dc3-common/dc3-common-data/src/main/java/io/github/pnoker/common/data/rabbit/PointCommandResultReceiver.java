@@ -18,8 +18,7 @@
 package io.github.pnoker.common.data.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
-import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
-import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
+import io.github.pnoker.common.data.repository.ReactivePointCommandStore;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
@@ -27,9 +26,8 @@ import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Objects;
 
 /**
@@ -44,7 +42,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PointCommandResultReceiver {
 
-    private final PointCommandHistoryManager pointCommandHistoryManager;
+    private final ReactivePointCommandStore pointCommandStore;
 
     /**
      * Consume a point command execution result and update the matching point command
@@ -55,41 +53,23 @@ public class PointCommandResultReceiver {
      * @param resultDTO the deserialized point command result
      */
     @Dc3Listener(topic = MqTopic.POINT_COMMAND_RESULT)
-    public void onResult(MqReceived<PointCommandResultDTO> message, Acknowledgment ack) {
+    public Mono<Void> onResult(MqReceived<PointCommandResultDTO> message, Acknowledgment ack) {
         PointCommandResultDTO resultDTO = message.payload();
-        try {
-            if (Objects.isNull(resultDTO) || Objects.isNull(resultDTO.commandId())) {
-                ack.reject(false);
-                return;
-            }
-
-            log.info("Receive point command result: commandId={}, status={}", resultDTO.commandId(), resultDTO.status());
-
-            PointCommandHistoryDO commandDO = pointCommandHistoryManager.lambdaQuery()
-                    .eq(PointCommandHistoryDO::getCommandId, resultDTO.commandId())
-                    .one();
-
-            if (Objects.nonNull(commandDO)) {
-                commandDO.setStatus(resultDTO.status());
-                commandDO.setErrorCode(resultDTO.errorCode());
-                commandDO.setErrorMessage(resultDTO.errorMessage());
-                commandDO.setResponseValue(resultDTO.responseValue());
-                if (Objects.nonNull(resultDTO.finishedAt())) {
-                    commandDO.setFinishTime(LocalDateTime.ofInstant(resultDTO.finishedAt(), ZoneId.systemDefault()));
-                } else {
-                    commandDO.setFinishTime(LocalDateTime.now());
-                }
-                pointCommandHistoryManager.updateById(commandDO);
-                log.info("Updated command status: commandId={}, status={}", resultDTO.commandId(), resultDTO.status());
-            } else {
-                log.warn("Command not found for result: commandId={}", resultDTO.commandId());
-            }
-
-            ack.ack();
-        } catch (Exception e) {
-            log.error("Point command result processing failed.", e);
-            ack.reject(true);
+        if (Objects.isNull(resultDTO) || Objects.isNull(resultDTO.commandId()) || resultDTO.commandId().isBlank()
+                || resultDTO.tenantId() == null || resultDTO.status() == null) {
+            ack.reject(false);
+            return Mono.empty();
         }
+        return pointCommandStore.complete(resultDTO.tenantId(), resultDTO.commandId(), resultDTO.status(),
+                        resultDTO.responseValue(), resultDTO.errorCode(), resultDTO.errorMessage(), resultDTO.finishedAt())
+                .doOnNext(updated -> {
+                    if (!updated) {
+                        ack.reject(false);
+                    }
+                })
+                .doOnError(error -> log.error("Point command result processing failed, commandId={}",
+                        resultDTO.commandId(), error))
+                .then();
     }
 
 }

@@ -17,9 +17,10 @@
 
 package io.github.pnoker.common.data.service;
 
-import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.data.entity.query.NotifyChannelQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
 /**
  * Notification channel service.
@@ -27,6 +28,11 @@ import io.github.pnoker.common.data.entity.query.NotifyChannelQuery;
  * @author pnoker
  * @since 2016.10.1
  */
-public interface NotifyChannelService extends BaseService<NotifyChannelBO, NotifyChannelQuery> {
+public interface NotifyChannelService {
+    Mono<NotifyChannelBO> add(NotifyChannelBO value);
+    Mono<Boolean> delete(Long tenantId, Long id);
+    Mono<NotifyChannelBO> update(NotifyChannelBO value);
+    Mono<NotifyChannelBO> getById(Long tenantId, Long id);
+    Mono<OffsetPage<NotifyChannelBO>> list(Long tenantId, NotifyChannelQuery query);
 
 }

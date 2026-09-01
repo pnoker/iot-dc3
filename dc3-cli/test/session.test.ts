@@ -54,10 +54,11 @@ describe('session command group', () => {
   });
 
   it('list posts paging body to /agentic/session/list', async () => {
-    await run(['session', 'list', '--page', '2', '--size', '5']);
+    await run(['session', 'list', '--offset', '5', '--limit', '5']);
     expect(fetchCalls[0].url).toBe('http://gw.test/api/v3/agentic/session/list');
     expect(JSON.parse(String(fetchCalls[0].init.body))).toEqual({
-      page: { current: 2, size: 5 },
+      offset: 5,
+      limit: 5,
     });
   });
 
@@ -75,7 +76,7 @@ describe('session command group', () => {
     expect(fetchCalls[0].url).toBe(
       'http://gw.test/api/v3/agentic/session/update?conversation_id=c1',
     );
-    expect(JSON.parse(String(fetchCalls[0].init.body))).toEqual({ name: 'new-name' });
+    expect(JSON.parse(String(fetchCalls[0].init.body))).toEqual({ title: 'new-name' });
   });
 
   it('delete posts to the delete route with the id param', async () => {
@@ -108,5 +109,12 @@ describe('action approval loop', () => {
     expect(fetchCalls[0].url).toBe('http://gw.test/api/v3/agentic/action/confirm?action_id=a-1');
     expect(fetchCalls[1].init.method).toBe('POST');
     expect(fetchCalls[1].url).toBe('http://gw.test/api/v3/agentic/action/reject?action_id=a-2');
+  });
+
+  it('pending forwards offset and limit when supplied', async () => {
+    await run(['action', 'pending', '--conversation-id', 'conv-1', '--offset', '10', '--limit', '5']);
+    expect(fetchCalls[0].url).toBe(
+      'http://gw.test/api/v3/agentic/action/pending?conversation_id=conv-1&offset=10&limit=5',
+    );
   });
 });

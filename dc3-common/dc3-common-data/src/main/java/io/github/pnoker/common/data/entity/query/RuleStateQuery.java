@@ -1,26 +1,10 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 package io.github.pnoker.common.data.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.RuleStatusEnum;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,15 +13,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
-/**
- * Query parameters for rule runtime state listing and filtering.
- *
- * @author pnoker
- * @since 2016.10.1
- */
 @Getter
 @Setter
 @Builder
@@ -45,34 +23,28 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(description = "Rule State query parameters")
+@Schema(description = "Rule State offset query parameters")
 public class RuleStateQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Schema(description = "Zero-based row offset", example = "0")
+    private long offset;
 
-    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
-    private Pages page;
+    @Schema(description = "Maximum rows to return", example = "50")
+    private int limit = PageRequest.DEFAULT_LIMIT;
 
-    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
-    private Long tenantId;
+    @Schema(description = "Whitelisted sort fields")
+    private List<SortSpec> sort = List.of();
 
-    @Schema(description = "rule ID", example = "1024")
+    @Schema(description = "Filter by rule identifier")
     private Long ruleId;
-
-    @Schema(description = "Alarm target type enum", example = "1")
+    @Schema(description = "Filter by alarm target type")
     private AlarmTargetTypeEnum alarmTargetTypeFlag;
-
-    @Schema(description = "Associated entity ID", example = "2048")
+    @Schema(description = "Filter by associated entity identifier")
     private Long entityId;
-
-    @Schema(description = "Alarm fingerprint", example = "rule_HIGH_TEMP_ALERT_device_1024")
+    @Schema(description = "Filter by rule state fingerprint")
     private String fingerprint;
-
-    @Schema(description = "Entity state enum", example = "TRIGGERED")
+    @Schema(description = "Filter by current rule state")
     private RuleStatusEnum entityStateFlag;
-
-    @Schema(description = "alarm ID", example = "512")
+    @Schema(description = "Filter by associated alarm identifier")
     private Long alarmId;
-
 }

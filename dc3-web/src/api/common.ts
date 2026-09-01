@@ -25,22 +25,31 @@ import type {PageQuery, PageResult} from '@/config/types';
  * response interceptor do the payload unwrapping.
  */
 
-export const httpGet = <T = R>(url: string, config?: AxiosRequestConfig) => request<T>({...config, url, method: 'get'});
+export const httpGet = <T = unknown>(url: string, config?: AxiosRequestConfig) => request<T>({...config, url, method: 'get'});
 
-export const httpPost = <T = R, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) =>
+export const httpPost = <T = unknown, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) =>
   request<T>({...config, url, method: 'post', data});
 
+export const httpPatch = <T = unknown, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig) =>
+  request<T>({...config, url, method: 'patch', data});
+
+export const httpDelete = <T = unknown>(url: string, config?: AxiosRequestConfig) =>
+  request<T>({...config, url, method: 'delete'});
+
 export const crudAdd = <TPayload, TResponse = string>(base: string, payload: TPayload) =>
-  httpPost<R<TResponse>, TPayload>(`${base}/add`, payload);
+  httpPost<TResponse, TPayload>(`${base}/add`, payload);
 
 export const crudUpdate = <TPayload, TResponse = string>(base: string, payload: TPayload) =>
-  httpPost<R<TResponse>, TPayload>(`${base}/update`, payload);
+  httpPost<TResponse, TPayload>(`${base}/update`, payload);
 
 export const crudDelete = (base: string, id: string) =>
-  httpPost<R<string>>(`${base}/delete`, undefined, {params: {id}});
+  httpDelete<void>(`${base}/delete`, {params: {id}});
+
+export const versionedDelete = (base: string, id: string, version: number) =>
+  httpDelete<void>(`${base}/delete`, {params: {id, version}});
 
 export const crudGetById = <TRecord>(base: string, id: string) =>
-  httpGet<R<TRecord>>(`${base}/get_by_id`, {params: {id}});
+  httpGet<TRecord>(`${base}/get_by_id`, {params: {id}});
 
 export const crudList = <TRecord>(base: string, query: PageQuery) =>
-  httpPost<R<PageResult<TRecord>>, PageQuery>(`${base}/list`, query);
+  httpPost<PageResult<TRecord>, PageQuery>(`${base}/list`, query);

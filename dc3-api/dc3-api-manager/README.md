@@ -7,21 +7,21 @@ services. Generated Java types use `io.github.pnoker.api.center.manager`.
 
 | Service      | Single-result RPCs                | Collection/page RPCs                                                 |
 |--------------|-----------------------------------|----------------------------------------------------------------------|
-| `DriverApi`  | `GetByDriverId`, `GetByDeviceId`  | `ListByPage`, `ListByDriverIds`                                      |
-| `DeviceApi`  | `GetByDeviceId`, `GetActiveOwner` | `ListByPage`, `ListByProfileId`, `ListByDriverId`, `ListByDeviceIds` |
-| `PointApi`   | `GetById`                         | `ListByPage`, `ListByIds`                                            |
-| `ProfileApi` | `GetByProfileId`                  | `ListByPage`, `ListByProfileIds`, `ListByDeviceId`                   |
-| `CommandApi` | `GetById`                         | `ListByPage`, `ListByIds`                                            |
-| `EventApi`   | `GetById`                         | `ListByPage`, `ListByIds`                                            |
+| `DriverApi`  | `GetByDriverId`, `GetByDeviceId`  | `List` (offset), `ListByDriverIds`             |
+| `DeviceApi`  | `GetByDeviceId`, `GetActiveOwner` | `List` (offset), `ListByProfileId`, `ListByDriverId`, `ListByDeviceIds` |
+| `PointApi`   | `GetById`                         | `List` (offset), `ListByIds`             |
+| `ProfileApi` | `GetByProfileId`                  | `List` (offset), `ListByProfileIds`, `ListByDeviceId` |
+| `CommandApi` | `GetById`                         | `List` (offset), `ListByIds`                  |
+| `EventApi`   | `GetById`                         | `List` (offset), `ListByIds`                   |
 
-Proto sources live under `src/main/protobuf/api/common/manager/`. Shared query and page messages are defined in
-`manager_query.proto` and `manager_query_page.proto`.
+Proto sources live under `src/main/protobuf/api/common/manager/`. Shared query and offset-page messages are defined in
+`manager_query.proto` and `api/common/page.proto`.
 
 ## Usage boundary
 
 Business services should inject facade interfaces such as `DriverFacade`, `DeviceFacade`, or `PointFacade` from
-`dc3-common-facade-api`. The distributed implementation in `dc3-common-facade-grpc` owns generated blocking stubs,
-channel selection, error-envelope handling, and BO conversion.
+`dc3-common-facade-api`. Canonical `List` contracts return an `OffsetPage` directly and are
+consumed through asynchronous gRPC stubs.
 
 A transport adapter that needs the generated API calls the current cardinality-matching methods, for example:
 
@@ -30,7 +30,7 @@ GrpcDeviceQuery request = GrpcDeviceQuery.newBuilder()
         .setDeviceId(deviceId)
         .setTenantId(tenantId)
         .build();
-GrpcRDriverDTO response = driverApiBlockingStub.getByDeviceId(request);
+GrpcDriverDTO response = driverApiBlockingStub.getByDeviceId(request);
 ```
 
 Do not use removed `SelectXxx` RPC names or ad hoc channel construction in business code.

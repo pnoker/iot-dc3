@@ -17,7 +17,6 @@
 
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.EventReportBO;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
@@ -26,7 +25,6 @@ import io.github.pnoker.common.enums.EventHistoryAcknowledgeFlagEnum;
 import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -87,15 +85,5 @@ public interface EventHistoryBuilder {
      * @return converted value
      */
     List<EventHistoryVO> buildVOListByDOList(List<EventHistoryDO> entityDOList);
-
-    /**
-     * Convert do page to vo page.
-     *
-     * @param entityPageDO persistence object
-     * @return converted value
-     */
-    default Page<EventHistoryVO> buildVOPageByDOPage(Page<EventHistoryDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildVOByDO);
-    }
 
 }

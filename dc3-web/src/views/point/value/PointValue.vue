@@ -20,11 +20,16 @@
     <point-value-tool
       :embedded="embedded"
       :page="reactiveData.page"
+      :cursor-mode="embedded !== 'device'"
+      :cursor-previous="embedded !== 'device' && reactiveData.page.current > 1"
+      :cursor-next="embedded !== 'device' && reactiveData.page.hasNext"
       @refresh="refresh"
       @reset="reset"
       @search="search"
       @size-change="sizeChange"
       @current-change="currentChange"
+      @cursor-previous="cursorPrevious"
+      @cursor-next="cursorNext"
     ></point-value-tool>
 
     <blank-card>
@@ -95,9 +100,11 @@ const reactiveData = reactive({
   query: {},
   page: {
     total: 0,
+    hasNext: false,
     size: 12,
     current: 1,
   },
+  cursorStack: [undefined] as Array<string | undefined>,
 });
 
 const editRef = ref<InstanceType<typeof pointValueEditForm>>();
@@ -117,11 +124,13 @@ const list = () => {
 
   if (props.embedded == 'device') {
     getPointValueLatest({
-      page: reactiveData.page,
+      offset: (reactiveData.page.current - 1) * reactiveData.page.size,
+      limit: reactiveData.page.size,
       ...reactiveData.query,
     })
       .then((res) => {
         loadPointValueList(res);
+        reactiveData.page.hasNext = res.hasNext ?? false;
       })
       .catch(() => {
         // nothing to do
@@ -131,11 +140,14 @@ const list = () => {
       });
   } else {
     listPointValue({
-      page: reactiveData.page,
+      limit: reactiveData.page.size,
+      cursor: reactiveData.cursorStack[reactiveData.page.current - 1],
       ...reactiveData.query,
     })
       .then((res) => {
         loadPointValueList(res);
+        reactiveData.page.hasNext = res.hasNext;
+        reactiveData.cursorStack[reactiveData.page.current] = res.nextCursor ?? undefined;
       })
       .catch(() => {
         // nothing to do
@@ -147,7 +159,7 @@ const list = () => {
 };
 
 const loadPointValueList = (res: any) => {
-  reactiveData.listData = res.data.records.map((record: any) => {
+  reactiveData.listData = (res.items || []).map((record: any) => {
     record.hasLatestValue = record.hasLatestValue !== false;
     if (!record.hasLatestValue || !record.createTime || !record.operateTime) {
       record.interval = null;
@@ -158,14 +170,14 @@ const loadPointValueList = (res: any) => {
     record.interval = tempDate2.getTime() - tempDate1.getTime();
     return record;
   });
-  reactiveData.page.total = res.data.total;
+  reactiveData.page.total = res.total ?? 0;
 
   // device
   const deviceIds = Array.from(new Set(reactiveData.listData.map((pointValue) => pointValue.deviceId)));
   if (deviceIds.length > 0) {
     listDeviceByIds(deviceIds)
       .then((res) => {
-        reactiveData.deviceTable = res.data;
+        reactiveData.deviceTable = res;
       })
       .catch(() => {
         // nothing to do
@@ -177,7 +189,7 @@ const loadPointValueList = (res: any) => {
   if (pointIds.length > 0) {
     listPointByIds(pointIds)
       .then((res) => {
-        reactiveData.pointTable = res.data;
+        reactiveData.pointTable = res;
       })
       .catch(() => {
         // nothing to do
@@ -185,7 +197,7 @@ const loadPointValueList = (res: any) => {
 
     listPointUnit(pointIds)
       .then((res) => {
-        reactiveData.unitTable = res.data;
+        reactiveData.unitTable = res;
       })
       .catch(() => {
         // nothing to do
@@ -199,11 +211,15 @@ const search = (params: any) => {
     if (v !== '' && v != null) cleaned[k] = v;
   }
   reactiveData.query = cleaned;
+  reactiveData.page.current = 1;
+  reactiveData.cursorStack = [undefined];
   list();
 };
 
 const reset = () => {
   reactiveData.query = {};
+  reactiveData.page.current = 1;
+  reactiveData.cursorStack = [undefined];
   list();
 };
 
@@ -247,11 +263,26 @@ const openDetail = (row: Record<string, unknown>) => {
 
 const sizeChange = (size: number) => {
   reactiveData.page.size = size;
+  reactiveData.page.current = 1;
+  reactiveData.cursorStack = [undefined];
   list();
 };
 
 const currentChange = (current: number) => {
+  if (props.embedded !== 'device' && current > reactiveData.page.current + 1) return;
   reactiveData.page.current = current;
+  list();
+};
+
+const cursorPrevious = () => {
+  if (reactiveData.page.current <= 1) return;
+  reactiveData.page.current -= 1;
+  list();
+};
+
+const cursorNext = () => {
+  if (!reactiveData.page.hasNext) return;
+  reactiveData.page.current += 1;
   list();
 };
 

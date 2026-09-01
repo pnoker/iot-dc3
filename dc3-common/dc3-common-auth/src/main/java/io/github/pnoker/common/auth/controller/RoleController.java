@@ -17,22 +17,22 @@
 
 package io.github.pnoker.common.auth.controller;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleTreeBO;
 import io.github.pnoker.common.auth.entity.builder.RoleBuilder;
-import io.github.pnoker.common.auth.entity.query.RoleQuery;
+import io.github.pnoker.common.auth.entity.query.RoleOffsetRequest;
 import io.github.pnoker.common.auth.entity.vo.RoleTreeVO;
 import io.github.pnoker.common.auth.entity.vo.RoleVO;
-import io.github.pnoker.common.auth.service.RoleService;
+import io.github.pnoker.common.auth.service.ReactiveRoleService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.enums.SuccessCode;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,15 +42,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Objects;
 
 /**
  * REST controller exposing role management endpoints.
@@ -67,7 +68,7 @@ public class RoleController implements BaseController {
 
     private final RoleBuilder roleBuilder;
 
-    private final RoleService roleService;
+    private final ReactiveRoleService roleService;
 
     /**
      * Create a named role that bundles permissions for the current tenant.
@@ -76,147 +77,56 @@ public class RoleController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('role', 'add')")
-    @Operation(summary = "Add Role", description = "Create a named permission bundle for the current tenant. A role groups resources (permissions) that can later be assigned to principals; returns the new role ID.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "false"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(summary = "Add Role", description = "Create a role in the current tenant and return the persisted role representation.", extensions = @Extension(name = "x-dc3-ai", properties = {@ExtensionProperty(name = "riskLevel", value = "MEDIUM"), @ExtensionProperty(name = "destructive", value = "false"), @ExtensionProperty(name = "idempotent", value = "false"), @ExtensionProperty(name = "openWorld", value = "false")}))
     @PostMapping("/add")
-    public Mono<R<String>> add(@Validated(Add.class) @RequestBody RoleVO entityVO) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(header.getTenantId());
-            entityBO.setCreatorId(header.getUserId());
-            entityBO.setCreatorName(header.getNickName());
-            entityBO.setOperatorId(header.getUserId());
-            entityBO.setOperatorName(header.getNickName());
-            roleService.add(entityBO);
-            return R.ok(SuccessCode.ADD);
-        }));
+    public Mono<ResponseEntity<RoleVO>> add(@Validated(Add.class) @RequestBody RoleVO entityVO) {
+        return getPrincipalHeader().flatMap(header -> {
+            RoleBO role = roleBuilder.buildBOByVO(entityVO); role.setTenantId(header.getTenantId());
+            role.setCreatorId(header.getUserId()); role.setCreatorName(header.getNickName()); role.setOperatorId(header.getUserId()); role.setOperatorName(header.getNickName());
+            return roleService.add(role).map(saved -> ResponseEntity.status(201).body(roleBuilder.buildVOByBO(saved)));
+        });
     }
 
-    /**
-     * Remove a role by ID, scoped to the current tenant.
-     *
-     * @param id id of the role to delete
-     * @return delete-success status
-     */
     @PreAuthorize("@perm.can('role', 'delete')")
-    @Operation(summary = "Delete Role", description = "Remove a role by ID, scoped to the current tenant. Deleting detaches the role from its bound resources and principals; the caller must own the role.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
-                    @ExtensionProperty(name = "destructive", value = "true"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
-    @PostMapping("/delete")
-    public Mono<R<String>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            requireTenant(tenantId, roleService.getById(id));
-            roleService.delete(id);
-            return R.ok(SuccessCode.DELETE);
-        }));
+    @Operation(summary = "Delete Role", description = "Delete a tenant role without children and return no content on success.", extensions = @Extension(name = "x-dc3-ai", properties = {@ExtensionProperty(name = "riskLevel", value = "HIGH"), @ExtensionProperty(name = "destructive", value = "true"), @ExtensionProperty(name = "idempotent", value = "true"), @ExtensionProperty(name = "openWorld", value = "false")}))
+    @DeleteMapping("/delete")
+    public Mono<ResponseEntity<Void>> delete(@Parameter(description = "Role identifier owned by the current tenant") @NotNull @RequestParam("id") Long id) {
+        return getPrincipalHeader().flatMap(header -> roleService.delete(header.getTenantId(), id, header.getUserId(), header.getNickName())).thenReturn(ResponseEntity.noContent().build());
     }
 
-    /**
-     * Modify a tenant-owned role's attributes after verifying ownership.
-     *
-     * @param entityVO role payload to apply
-     * @return update-success status
-     */
     @PreAuthorize("@perm.can('role', 'update')")
-    @Operation(summary = "Update Role", description = "Modify a tenant-owned role's attributes such as name and enable flag. Verifies ownership before applying; returns the update result.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(summary = "Update Role", description = "Update editable fields of a tenant role and return the new representation.", extensions = @Extension(name = "x-dc3-ai", properties = {@ExtensionProperty(name = "riskLevel", value = "MEDIUM"), @ExtensionProperty(name = "destructive", value = "false"), @ExtensionProperty(name = "idempotent", value = "true"), @ExtensionProperty(name = "openWorld", value = "false")}))
     @PostMapping("/update")
-    public Mono<R<String>> update(@Validated(Update.class) @RequestBody RoleVO entityVO) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
-            RoleBO entityBO = roleBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(header.getTenantId());
-            entityBO.setOperatorId(header.getUserId());
-            entityBO.setOperatorName(header.getNickName());
-            requireTenant(header.getTenantId(), roleService.getById(entityBO.getId()));
-            roleService.update(entityBO);
-            return R.ok(SuccessCode.UPDATE);
-        }));
+    public Mono<ResponseEntity<RoleVO>> update(@Validated(Update.class) @RequestBody RoleVO entityVO) {
+        return getPrincipalHeader().flatMap(header -> {
+            RoleBO role = roleBuilder.buildBOByVO(entityVO); role.setTenantId(header.getTenantId()); role.setOperatorId(header.getUserId()); role.setOperatorName(header.getNickName());
+            return roleService.update(header.getTenantId(), role).map(saved -> ResponseEntity.ok(roleBuilder.buildVOByBO(saved)));
+        });
     }
 
-    /**
-     * Fetch one role of the current tenant by its ID.
-     *
-     * @param id id of the role to retrieve
-     * @return the matched RoleVO; fails if not found or not tenant-owned
-     */
     @PreAuthorize("@perm.can('role', 'get')")
-    @Operation(summary = "Get Role by ID", description = "Fetch one role of the current tenant by its ID. Returns the role's attributes; use to inspect a role before binding resources or principals.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(summary = "Get Role by ID", description = "Fetch one role owned by the current tenant by its identifier.", extensions = @Extension(name = "x-dc3-ai", properties = {@ExtensionProperty(name = "riskLevel", value = "LOW"), @ExtensionProperty(name = "destructive", value = "false"), @ExtensionProperty(name = "idempotent", value = "true"), @ExtensionProperty(name = "openWorld", value = "false")}))
     @GetMapping("/get_by_id")
-    public Mono<R<RoleVO>> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            RoleBO entityBO = requireTenant(tenantId, roleService.getById(id));
-            RoleVO entityVO = roleBuilder.buildVOByBO(entityBO);
-            return R.ok(entityVO);
-        }));
+    public Mono<ResponseEntity<RoleVO>> getById(@Parameter(description = "Role identifier owned by the current tenant") @NotNull @RequestParam("id") Long id) {
+        return getTenantId().flatMap(tenantId -> roleService.getById(tenantId, id).map(role -> ResponseEntity.ok(roleBuilder.buildVOByBO(role))));
     }
 
-    /**
-     * Page through roles for the current tenant with optional filters.
-     *
-     * @param entityQuery optional role query filters (tenant id is set server-side)
-     * @return a page of RoleVO matching the query
-     */
     @PreAuthorize("@perm.can('role', 'list')")
-    @Operation(summary = "List Roles", description = "Page through roles for the current tenant with filters such as name and enable flag. Returns a page of roles; use for browsing or selecting a role to bind.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(summary = "List Roles", description = "List tenant roles with deterministic offset pagination and optional filters.", extensions = @Extension(name = "x-dc3-ai", properties = {@ExtensionProperty(name = "riskLevel", value = "LOW"), @ExtensionProperty(name = "destructive", value = "false"), @ExtensionProperty(name = "idempotent", value = "true"), @ExtensionProperty(name = "openWorld", value = "false")}))
     @PostMapping("/list")
-    public Mono<R<Page<RoleVO>>> list(@RequestBody(required = false) RoleQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
-            query.setTenantId(tenantId);
-            Page<RoleBO> entityPageBO = roleService.list(query);
-            Page<RoleVO> entityPageVO = roleBuilder.buildVOPageByBOPage(entityPageBO);
-            return R.ok(entityPageVO);
-        }));
+    public Mono<ResponseEntity<OffsetPage<RoleVO>>> list(@RequestBody(required = false) RoleOffsetRequest request) {
+        RoleOffsetRequest q = request == null ? new RoleOffsetRequest() : request;
+        return getTenantId().flatMap(tenantId -> roleService.list(new io.github.pnoker.common.auth.repository.RoleFilter(tenantId, q.roleName(), q.roleCode(), q.enableFlag(), new io.github.pnoker.db.r2dbc.core.page.PageRequest(q.offset(), q.limit(), q.sort())))
+                .map(page -> ResponseEntity.ok(OffsetPage.of(page.items().stream().map(roleBuilder::buildVOByBO).toList(), page.offset(), page.limit(), page.total()))));
     }
 
-    /**
-     * Return the tenant's roles as a hierarchical tree.
-     *
-     * @param entityQuery optional role query filters (tenant id is set server-side)
-     * @return a list of RoleTreeVO nodes representing the tenant's role hierarchy
-     */
     @PreAuthorize("@perm.can('role', 'list')")
-    @Operation(summary = "List Role Tree", description = "Return the tenant's roles as a hierarchical tree. Use when a nested role grouping is needed for selection or display rather than a flat page.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(summary = "List Role Tree", description = "List the tenant role hierarchy as a nested tree with stable ordering.", extensions = @Extension(name = "x-dc3-ai", properties = {@ExtensionProperty(name = "riskLevel", value = "LOW"), @ExtensionProperty(name = "destructive", value = "false"), @ExtensionProperty(name = "idempotent", value = "true"), @ExtensionProperty(name = "openWorld", value = "false")}))
     @PostMapping("/list_tree")
-    public Mono<R<List<RoleTreeVO>>> listTree(@RequestBody(required = false) RoleQuery entityQuery) {
-        return getTenantId().flatMap(tenantId -> async(() -> {
-            RoleQuery query = Objects.isNull(entityQuery) ? new RoleQuery() : entityQuery;
-            query.setTenantId(tenantId);
-            List<RoleTreeBO> entityBOList = roleService.listTree(query);
-            return R.ok(roleBuilder.buildTreeVOListByBOList(entityBOList));
-        }));
+    public Mono<ResponseEntity<List<RoleTreeVO>>> listTree(@RequestBody(required = false) RoleOffsetRequest request) {
+        RoleOffsetRequest q = request == null ? new RoleOffsetRequest() : request;
+        return getTenantId().flatMap(tenantId -> roleService.listTree(new io.github.pnoker.common.auth.repository.RoleFilter(tenantId, q.roleName(), q.roleCode(), q.enableFlag(), new io.github.pnoker.db.r2dbc.core.page.PageRequest(0, 200, q.sort())))
+                .map(roleBuilder::buildTreeVOByBO).collectList().map(ResponseEntity::ok));
     }
 
 }

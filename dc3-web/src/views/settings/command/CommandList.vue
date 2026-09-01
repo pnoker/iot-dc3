@@ -159,6 +159,7 @@ const {
   sizeChange,
   currentChange,
 } = usePagedList<CommandRecord, Record<string, unknown>>({
+  sortColumn: 'createTime',
   request: (query) => listCommand(withFixedQuery(query)),
 });
 
@@ -203,7 +204,7 @@ const syncCommandParams = (
   const currentIds = new Set(params.map((item) => String(item.id || '')).filter(Boolean));
   const deleteTasks = originalParams
     .filter((item) => item.id && !currentIds.has(String(item.id)))
-    .map((item) => deleteCommandParam(String(item.id)));
+    .map((item) => deleteCommandParam(String(item.id), item.version));
 
   const saveTasks = params.map((item) => {
     const payload = {...item, commandId};
@@ -216,7 +217,7 @@ const syncCommandParams = (
 const onAdd = (form: CommandForm, params: CommandParamRecord[], done: DoneCallback) => {
   addCommand(withFixedProfile(form))
     .then((res) => {
-      const commandId = String(res.data || '');
+      const commandId = String(res?.id || '');
       if (!isValidCreatedId(commandId)) {
         failMessage(t('command.errors.idNotReturned'));
         return Promise.reject(new Error(t('command.errors.idNotReturned')));
@@ -256,22 +257,22 @@ const onUpdate = (
     });
 };
 
-const disableThing = (id: string, profileId: string, done: () => void) => {
-  updateCommand({id, profileId, enableFlag: 'DISABLE'}).then(() => {
+const disableThing = (command: CommandRecord, done: () => void) => {
+  updateCommand({...command, enableFlag: 'DISABLE'}).then(() => {
     load();
     done();
   });
 };
 
-const enableThing = (id: string, profileId: string, done: () => void) => {
-  updateCommand({id, profileId, enableFlag: 'ENABLE'}).then(() => {
+const enableThing = (command: CommandRecord, done: () => void) => {
+  updateCommand({...command, enableFlag: 'ENABLE'}).then(() => {
     load();
     done();
   });
 };
 
-const remove = (id: string, done?: () => void) => {
-  deleteCommand(id).then(() => {
+const remove = (command: CommandRecord, done?: () => void) => {
+  deleteCommand(command.id, command.version).then(() => {
     load();
     if (done) {
       done();

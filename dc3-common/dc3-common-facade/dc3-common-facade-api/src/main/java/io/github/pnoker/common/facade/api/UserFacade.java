@@ -18,6 +18,7 @@
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral user facade. Mirrors {@code api.center.auth.UserApi}.
@@ -30,11 +31,11 @@ public interface UserFacade {
     /**
      * @return the user, or {@code null} when the id does not match any user.
      */
-    FacadeUserBO getById(Long id);
+    Mono<FacadeUserBO> getById(Long tenantId, Long id);
 
     /**
      * @return the user, or {@code null} when the principal id does not match any user.
      */
-    FacadeUserBO getByPrincipalId(Long principalId);
+    Mono<FacadeUserBO> getByPrincipalId(Long tenantId, Long principalId);
 
 }

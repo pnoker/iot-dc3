@@ -91,11 +91,11 @@ const filteredAlerts = (body: Record<string, any>): MockAlertRow[] => {
   return withConfirmationOverrides(alertRecords()).filter((row) => {
     if (body.source && row.source !== body.source) return false;
     if (
-      body.eventTypeFlag !== null &&
-      body.eventTypeFlag !== undefined &&
-      body.eventTypeFlag !== ""
+      body.alarmTypeFlag !== null &&
+      body.alarmTypeFlag !== undefined &&
+      body.alarmTypeFlag !== ""
     ) {
-      if (row.eventTypeFlag !== Number(body.eventTypeFlag)) return false;
+      if (row.eventTypeFlag !== Number(body.alarmTypeFlag)) return false;
     }
     if (
       body.confirmFlag !== null &&
@@ -113,6 +113,12 @@ const filteredAlerts = (body: Record<string, any>): MockAlertRow[] => {
     return true;
   });
 };
+
+const alertApiRows = (rows: MockAlertRow[]) =>
+  localizeAlertRows(rows).map((row) => ({
+    ...row,
+    alarmTypeFlag: row.eventTypeFlag,
+  }));
 
 /**
  * Home page hard dependencies plus the insight-card endpoints that populate
@@ -140,9 +146,9 @@ export function registerDashboardHandlers(): void {
     responseOf(ctx.config, ok(alertStats)),
   );
   on("get", "api/v3/data/dashboard/alert/latest", (ctx) => {
-    const size = Math.max(1, Number(ctx.params.size) || 10);
-    const rows = withConfirmationOverrides(alertRecords()).slice(0, size);
-    return responseOf(ctx.config, ok(localizeAlertRows(rows)));
+    const limit = Math.max(1, Number(ctx.params.limit) || 10);
+    const rows = withConfirmationOverrides(alertRecords()).slice(0, limit);
+    return responseOf(ctx.config, ok(alertApiRows(rows)));
   });
   on("get", "api/v3/data/dashboard/system/health", (ctx) =>
     responseOf(ctx.config, ok(systemHealth)),
@@ -154,13 +160,12 @@ export function registerDashboardHandlers(): void {
     responseOf(ctx.config, ok(localizeTopology(topology))),
   );
   on("post", "api/v3/data/dashboard/alert/page", (ctx) => {
-    const rows = localizeAlertRows(filteredAlerts(ctx.body));
-    const current = Math.max(1, Number(ctx.body.current) || 1);
-    const size = Math.max(1, Number(ctx.body.size) || 20);
-    const start = (current - 1) * size;
+    const rows = alertApiRows(filteredAlerts(ctx.body));
+    const offset = Math.max(0, Number(ctx.body.offset) || 0);
+    const limit = Math.min(200, Math.max(1, Number(ctx.body.limit) || 20));
     return responseOf(
       ctx.config,
-      okPage(rows.slice(start, start + size), rows.length),
+      okPage(rows.slice(offset, offset + limit), rows.length, offset, limit),
     );
   });
   on("post", "api/v3/data/dashboard/alert/confirm", (ctx) => {
@@ -260,8 +265,8 @@ export function registerDashboardHandlers(): void {
 
   on("get", "api/v3/data/dashboard/stream", (ctx) => {
     const rows = localizeStreamRows(streamLatest());
-    const size = Number(ctx.params.size) || rows.length;
-    return responseOf(ctx.config, ok(rows.slice(0, size)));
+    const limit = Number(ctx.params.limit) || rows.length;
+    return responseOf(ctx.config, ok(rows.slice(0, limit)));
   });
   on("get", "api/v3/manager/dashboard/device/stats", (ctx) =>
     responseOf(ctx.config, ok(deviceStats)),

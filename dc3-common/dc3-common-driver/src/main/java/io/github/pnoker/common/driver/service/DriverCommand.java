@@ -18,8 +18,8 @@
 package io.github.pnoker.common.driver.service;
 
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.CommandRuntimeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 
 import java.util.Collections;
 import java.util.Map;
@@ -51,7 +51,7 @@ public interface DriverCommand {
             Map<String, AttributeBO> driverConfig,
             Map<String, AttributeBO> commandConfig,
             DeviceBO device,
-            FacadeCommandBO command,
+            CommandRuntimeBO command,
             Map<String, String> paramValues) {
         return Collections.emptyMap();
     }

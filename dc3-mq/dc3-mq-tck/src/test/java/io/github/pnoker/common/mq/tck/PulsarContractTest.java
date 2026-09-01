@@ -86,6 +86,7 @@ class PulsarContractTest extends AbstractMqContractTest {
     protected void shutdownAdapter() {
         if (Objects.nonNull(pulsarAdapter)) {
             pulsarAdapter.stop();
+            pulsarAdapter = null;
         }
     }
 

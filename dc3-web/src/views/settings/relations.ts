@@ -41,7 +41,7 @@ export const principalNameRelation = (prop = 'principalId', key = 'principalName
     if (!ids.length) return {};
     const res: any = await listPrincipalByIds(ids);
     const map: Record<string, string> = {};
-    (res?.data || []).forEach((p: any) => {
+    (res || []).forEach((p: any) => {
       map[String(p.id)] = p.displayName || p.principalName || String(p.id);
     });
     return map;
@@ -55,7 +55,7 @@ export const deviceNameRelation = (prop = 'deviceId', key = 'deviceName'): Entit
     const ids = collectIds(rows, prop);
     if (!ids.length) return {};
     const res: any = await listDeviceByIds(ids);
-    const data = res?.data || {};
+    const data = res || {};
     const map: Record<string, string> = {};
     ids.forEach((id) => {
       if (data[id]) map[id] = data[id].deviceName || id;
@@ -70,8 +70,8 @@ export const roleNameRelation = (prop = 'roleId', key = 'roleName'): EntityRelat
   load: async (rows) => {
     const ids = collectIds(rows, prop);
     if (!ids.length) return {};
-    const res: any = await listRole({page: {current: 1, size: 1000}});
-    const records = res?.data?.records || [];
+    const res: any = await listRole({offset: 0, limit: 200});
+    const records = res?.items || [];
     const map: Record<string, string> = {};
     records.forEach((r: any) => {
       map[String(r.id)] = r.roleName || String(r.id);
@@ -90,8 +90,8 @@ export const principalIdField = (label: string, prop = 'principalId'): EntityFie
   kind: 'treeSelect',
   tree: {
     load: async () => {
-      const res: any = await listPrincipal({page: {current: 1, size: 1000}});
-      return (res?.data?.records || []).map((p: any) => ({
+      const res: any = await listPrincipal({offset: 0, limit: 200});
+      return (res?.items || []).map((p: any) => ({
         ...p,
         displayLabel: p.displayName || p.principalName || String(p.id),
       }));

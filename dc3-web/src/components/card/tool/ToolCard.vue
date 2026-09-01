@@ -53,7 +53,7 @@
         </div>
         <div class="tool-card-footer-page">
           <el-pagination
-            v-if="!hidePagination"
+            v-if="!hidePagination && !cursorMode"
             :current-page="+page.current"
             :layout="paginationLayout"
             :page-size="+page.size"
@@ -65,6 +65,10 @@
             @size-change="onSizeChange"
             @current-change="onCurrentChange"
           />
+          <template v-else-if="cursorMode">
+            <el-button :disabled="!cursorPrevious" @click="emit('cursor-previous')">{{ t('common.previous') }}</el-button>
+            <el-button :disabled="!cursorNext" type="primary" @click="emit('cursor-next')">{{ t('common.next') }}</el-button>
+          </template>
           <span aria-hidden="true" class="tool-card-footer-divider"/>
           <!-- Icon-only buttons need explicit accessible names (A7): the
                surrounding tooltip text is not part of the button's name. -->
@@ -114,6 +118,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  cursorMode: {
+    type: Boolean,
+    default: false,
+  },
+  cursorPrevious: {
+    type: Boolean,
+    default: false,
+  },
+  cursorNext: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits<{
@@ -123,6 +139,8 @@ const emit = defineEmits<{
   (e: 'sort'): void;
   (e: 'size-change', size: number): void;
   (e: 'current-change', current: number): void;
+  (e: 'cursor-previous'): void;
+  (e: 'cursor-next'): void;
 }>();
 
 const {t} = useI18n();

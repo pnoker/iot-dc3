@@ -321,7 +321,7 @@ const persistMockTurn = (db: MockDb, request: MockChatRequest, prompt: string): 
       role: 'user',
       content: prompt,
       messageIndex: nextIndex,
-      status: 2,
+      status: 'COMPLETED',
       streaming: false,
       createTime: created
     },
@@ -336,7 +336,7 @@ const persistMockTurn = (db: MockDb, request: MockChatRequest, prompt: string): 
         charts: scenario.charts().map(localizedChart),
         tokens: {input: 1480, output: 680, context: 820},
       },
-      model: request.model || 'gpt-4o', messageIndex: nextIndex + 1, status: 2, streaming: false,
+      model: request.model || 'gpt-4o', messageIndex: nextIndex + 1, status: 'COMPLETED', streaming: false,
       finishReason: 'stop', createTime: created,
     },
   );

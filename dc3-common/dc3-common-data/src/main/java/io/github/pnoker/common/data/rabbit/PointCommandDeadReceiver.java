@@ -18,8 +18,7 @@
 package io.github.pnoker.common.data.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
-import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
-import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
+import io.github.pnoker.common.data.repository.ReactivePointCommandStore;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
@@ -28,8 +27,8 @@ import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
@@ -44,7 +43,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PointCommandDeadReceiver {
 
-    private final PointCommandHistoryManager pointCommandHistoryManager;
+    private final ReactivePointCommandStore pointCommandStore;
 
     /**
      * Consume a point command dead-letter message and mark the matching point command
@@ -54,26 +53,28 @@ public class PointCommandDeadReceiver {
      * @param ack     the acknowledgement handle
      */
     @Dc3Listener(topic = MqTopic.POINT_COMMAND_DEAD)
-    public void onDeadLetter(MqReceived<Object> message, Acknowledgment ack) {
+    public Mono<Void> onDeadLetter(MqReceived<Object> message, Acknowledgment ack) {
+        String correlationId = message.headers().get(MqHeaders.CORRELATION_ID);
+        String tenantHeader = message.headers().get(MqHeaders.TENANT_ID);
+        if (correlationId == null || tenantHeader == null) {
+            ack.reject(false);
+            return Mono.empty();
+        }
         try {
-            String correlationId = message.headers().get(MqHeaders.CORRELATION_ID);
-            if (Objects.nonNull(correlationId)) {
-                PointCommandHistoryDO commandDO = pointCommandHistoryManager.lambdaQuery()
-                        .eq(PointCommandHistoryDO::getCommandId, correlationId)
-                        .one();
-                if (Objects.nonNull(commandDO)) {
-                    commandDO.setStatus(PointCommandStatusEnum.DEAD);
-                    commandDO.setErrorCode("DLX");
-                    commandDO.setErrorMessage("Message rejected to dead letter queue");
-                    commandDO.setFinishTime(LocalDateTime.now());
-                    pointCommandHistoryManager.updateById(commandDO);
-                    log.info("Marked dead command: commandId={}", correlationId);
-                }
-            }
-            ack.ack();
-        } catch (Exception e) {
-            log.error("Dead letter processing failed", e);
-            ack.reject(true);
+            Long tenantId = Long.valueOf(tenantHeader);
+            return pointCommandStore.markDead(tenantId, correlationId, "DLX",
+                            "Message rejected to dead letter queue", java.time.Instant.now())
+                    .doOnNext(updated -> {
+                        if (!updated) {
+                            ack.reject(false);
+                        }
+                    })
+                    .doOnError(error -> log.error("Dead letter processing failed, commandId={}",
+                            correlationId, error))
+                    .then();
+        } catch (NumberFormatException error) {
+            ack.reject(false);
+            return Mono.empty();
         }
     }
 

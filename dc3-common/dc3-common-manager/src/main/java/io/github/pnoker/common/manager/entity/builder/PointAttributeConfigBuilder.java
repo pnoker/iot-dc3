@@ -17,13 +17,11 @@
 
 package io.github.pnoker.common.manager.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.common.manager.entity.vo.PointAttributeConfigVO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -135,24 +133,6 @@ public interface PointAttributeConfigBuilder {
      */
     List<PointAttributeConfigVO> buildVOListByBOList(List<PointAttributeConfigBO> entityBOList);
 
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    default Page<PointAttributeConfigBO> buildBOPageByDOPage(Page<PointAttributeConfigDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
 
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<PointAttributeConfigVO> buildVOPageByBOPage(Page<PointAttributeConfigBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
 
 }

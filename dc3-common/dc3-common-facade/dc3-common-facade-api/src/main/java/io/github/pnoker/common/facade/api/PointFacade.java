@@ -18,11 +18,12 @@
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
+import io.github.pnoker.common.facade.entity.query.FacadePointOffsetQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Protocol-neutral point facade. Mirrors the RPCs on
@@ -32,21 +33,7 @@ import java.util.List;
  * @since 2016.10.1
  */
 public interface PointFacade {
-
-    /**
-     * Tenant-scoped single lookup. Returns {@code null} when the point is missing or
-     * belongs to another tenant.
-     */
-    FacadePointBO getById(Long tenantId, Long id);
-
-    /**
-     * Tenant-scoped bulk lookup. Missing or cross-tenant points are omitted.
-     */
-    List<FacadePointBO> listByIds(Long tenantId, Collection<Long> ids);
-
-    /**
-     * @return a page of points (never {@code null}; empty page when nothing matches).
-     */
-    FacadePage<FacadePointBO> listByPage(FacadePointQuery query);
-
+    Mono<FacadePointBO> getByIdReactive(Long tenantId, Long id);
+    Flux<FacadePointBO> listByIdsReactive(Long tenantId, Collection<Long> ids);
+    Mono<OffsetPage<FacadePointBO>> listReactive(FacadePointOffsetQuery query);
 }
