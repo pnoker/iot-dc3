@@ -21,48 +21,41 @@
 
     <parent>
         <groupId>io.github.pnoker</groupId>
-        <artifactId>dc3-center</artifactId>
+        <artifactId>dc3-common</artifactId>
         <version>2026.5.22</version>
     </parent>
 
-    <artifactId>dc3-center-single</artifactId>
+    <name>${project.artifactId}</name>
+    <artifactId>dc3-common-resource</artifactId>
+    <version>2026.5.22</version>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 Platform Integrated Service - A comprehensive collection of authorization, data, management,
-        and API services combined into a single module.
+    <inceptionYear>2016</inceptionYear>
+    <url>https://github.com/pnoker/iot-dc3</url>
+    <description>
+        Resource registrar for center services. Scans the local WebFlux handler mappings at startup
+        and syncs the discovered HTTP endpoints to the auth resource tables via the
+        ResourceRegistryFacade (local or gRPC transport).
     </description>
 
     <dependencies>
 
+        <!-- Web Flux (needed for RequestMappingHandlerMapping) -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-r2dbc-runtime</artifactId>
+            <artifactId>dc3-common-web</artifactId>
         </dependency>
+
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-agentic</artifactId>
+            <artifactId>dc3-common-facade-api</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-auth</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-data</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-facade-local</artifactId>
-            <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-manager</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-resource</artifactId>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

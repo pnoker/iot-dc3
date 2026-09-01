@@ -56,9 +56,9 @@ iot-dc3/
 ├── dc3-coverage/         aggregate JaCoCo report and absolute coverage gate
 ├── dc3-e2e/              Testcontainers-backed end-to-end tests
 ├── dc3/                  compose files, environment files, scripts, and generated release notes
-├── dc3-mq/               top-level MQ family aggregator (port=dc3-mq-core + 6 adapters + tck)
-├── dc3-tsdb/             top-level TSDB family aggregator (port=dc3-tsdb-core + 4 adapters + tck)
-├── dc3-db/               top-level relational family aggregator (core=dc3-db-core + 3 dialect adapters + tck)
+├── dc3-mq/               broker family (core + RabbitMQ/Kafka/Pulsar/MQTT adapters + tck)
+├── dc3-tsdb/             TimescaleDB-backed time-series port (`dc3-tsdb-core`)
+├── dc3-db/               relational R2DBC family (core contracts + runtime + PostgreSQL adapter + tck)
 ├── docs/                 selection guides (`mq-brokers.md`, `tsdb-stores.md`, `db-dialects.md`) and design docs under `design/`
 ├── Makefile              preferred backend/container command entrypoint
 └── .mvn/settings.xml     local Maven mirror configuration

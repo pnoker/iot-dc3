@@ -57,7 +57,7 @@
         <!-- Resource registrar — syncs discovered endpoints to auth resource tables -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-resource-registrar</artifactId>
+            <artifactId>dc3-common-resource</artifactId>
             <version>${dc3.version}</version>
         </dependency>
 

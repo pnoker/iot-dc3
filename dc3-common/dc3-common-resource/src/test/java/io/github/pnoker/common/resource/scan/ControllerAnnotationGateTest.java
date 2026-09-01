@@ -15,28 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.pnoker.common.agentic.scan;
+package io.github.pnoker.common.resource.scan;
 
-import io.github.pnoker.common.resource.scan.ControllerAnnotationGate;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * SP2 ratchet gate for the agentic service: every controller endpoint must carry a complete, legal
- * {@code x-dc3-ai} annotation and described request parameters. Once green it stays green — a new or
- * edited agentic endpoint that drops the annotation fails the build.
- */
-class AgenticAnnotationGateTest {
+class ControllerAnnotationGateTest {
+
+    private final ControllerAnnotationGate gate = new ControllerAnnotationGate();
 
     @Test
-    void allAgenticControllersAreFullyAnnotated() {
-        List<String> defects = new ControllerAnnotationGate()
-                .validatePackage("io.github.pnoker.common.agentic.controller");
-        assertThat(defects)
-                .as("x-dc3-ai annotation defects in agentic controllers: %s", defects)
-                .isEmpty();
+    void reportsDefectsForDefectiveControllerOnly() {
+        List<String> defects = gate.validatePackage(
+                "io.github.pnoker.common.resource.scan.gatefixtures");
+        // The well-formed controller contributes nothing; the defective one contributes ≥1.
+        assertThat(defects).isNotEmpty();
+        assertThat(defects).anyMatch(d -> d.startsWith("DefectiveController#get"));
+        assertThat(defects).noneMatch(d -> d.startsWith("WellFormedController#get"));
     }
 }

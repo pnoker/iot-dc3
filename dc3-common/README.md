@@ -35,7 +35,7 @@ center and driver applications.
 | `dc3-common-web`                | WebFlux, springdoc, security, and controller support  |
 | `dc3-common-log`                | logging defaults                                      |
 | `dc3-common-sql`                | SQL utilities                                         |
-| `dc3-common-resource-registrar` | API/resource annotation discovery and synchronization |
+| `dc3-common-resource`           | API/resource annotation discovery and synchronization |
 | `dc3-common-test`               | shared tests, harnesses, and Testcontainers           |
 
 Datasource, messaging, and time-series storage were split into dedicated top-level families; business modules depend on

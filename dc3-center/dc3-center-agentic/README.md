@@ -69,4 +69,4 @@ mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-agentic -am test
 
 - `dc3-common-agentic` — agentic SDK: Spring AI chat client, platform tools, conversation memory, model management
 - `dc3-common-facade-grpc` — gRPC facade for cross-service access
-- `dc3-common-resource-registrar` — registers this service's API / menu resources
+- `dc3-common-resource` — registers this service's API / menu resources

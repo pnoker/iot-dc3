@@ -172,7 +172,7 @@ test:
 
 validate-annotations:
 	@echo "Running x-dc3-ai annotation gate (allowlisted service modules)..."
-	$(MVN) -q -pl dc3-common/dc3-common-resource-registrar test -Dtest=ControllerAnnotationGateTest
+	$(MVN) -q -pl dc3-common/dc3-common-resource test -Dtest=ControllerAnnotationGateTest
 	$(MVN) -q -pl dc3-common/dc3-common-manager -am test -Dtest=ManagerAnnotationGateTest -Dsurefire.failIfNoSpecifiedTests=false
 	$(MVN) -q -pl dc3-common/dc3-common-data -am test -Dtest=DataAnnotationGateTest -Dsurefire.failIfNoSpecifiedTests=false
 	$(MVN) -q -pl dc3-common/dc3-common-agentic -am test -Dtest=AgenticAnnotationGateTest -Dsurefire.failIfNoSpecifiedTests=false

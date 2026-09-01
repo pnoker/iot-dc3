@@ -17,7 +17,7 @@
 
 package io.github.pnoker.common.auth.scan;
 
-import io.github.pnoker.common.resource.registrar.scan.ControllerAnnotationGate;
+import io.github.pnoker.common.resource.scan.ControllerAnnotationGate;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
