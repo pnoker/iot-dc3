@@ -1,0 +1,61 @@
+/*!
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Shared "glass capsule" recipe for the brand family surfaces: the header
+// brand/actions capsules and the login brand pill. One definition keeps the
+// capsule geometry (fixed height with fully rounded ends) and glass
+// decoration from drifting between pages.
+//
+// $extra-bg appends one more background layer behind the shared gradient
+// layers (the header capsules blend the elevated page background; the login
+// pill sits on its own canvas and omits it). Null collapses the layer.
+
+@mixin glass-capsule($extra-bg: null) {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 42px;
+  overflow: hidden;
+  border: 1px solid var(--dc3-border-strong);
+  // 999px clamps to height/2, so the ends stay perfect semicircles.
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 18% 0%, var(--dc3-highlight-sheen), transparent 38%),
+    var(--dc3-brand-gradient-soft),
+    $extra-bg;
+  box-shadow:
+    var(--dc3-shadow-md),
+    inset 0 1px 0 var(--dc3-highlight-sheen);
+  backdrop-filter: blur(18px) saturate(1.45);
+  -webkit-backdrop-filter: blur(18px) saturate(1.45);
+
+  &::after {
+    position: absolute;
+    z-index: -1;
+    top: 1px;
+    right: 12px;
+    left: 12px;
+    height: 42%;
+    border-radius: 999px;
+    background: linear-gradient(180deg, var(--dc3-highlight-sheen), transparent);
+    opacity: 0.72;
+    pointer-events: none;
+    content: '';
+  }
+}

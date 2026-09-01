@@ -29,8 +29,7 @@
           text
           @click="navDrawerVisible = true"
         />
-        <img :src="assetUrl('images/logo/logo.svg')" class="header_logo" />
-        <span class="header_title">IoT DC3</span>
+        <brand-lockup :compact="isMobile" />
       </div>
       <div class="header_actions_glass">
         <div v-if="!isMobile" class="header_menu_wrap">
@@ -52,14 +51,22 @@
         </div>
         <span class="header_actions_divider" aria-hidden="true" />
         <div class="header_user">
-          <el-dropdown trigger="click" @command="handleCommand">
+          <el-dropdown
+            popper-class="user-dropdown-popper"
+            trigger="click"
+            :popper-options="{
+              modifiers: [{ name: 'preventOverflow', options: { padding: 8 } }],
+            }"
+            @command="handleCommand"
+          >
             <button :aria-label="t('layout.account')" class="user_trigger" type="button">
-              <span class="user_initial" aria-hidden="true">{{ currentInitial }}</span>
-              <span v-if="isDesktop" class="user_name">{{ currentLogin }}</span>
-              <el-icon v-if="isDesktop" class="user_chevron"><ArrowDown/></el-icon>
+              <img :src="assetUrl('images/common/avatar.png')" alt="" class="user_avatar" />
             </button>
             <template #dropdown>
               <el-dropdown-menu>
+                <li class="user_dropdown_identity" role="none">
+                  <span class="user_dropdown_name">{{ currentLogin }}</span>
+                </li>
                 <el-dropdown-item :icon="QuestionFilled" command="help">{{
                   t("layout.about")
                 }}</el-dropdown-item>
@@ -122,11 +129,11 @@
 
 <script lang="ts" setup>
 import AgenticAssistant from "@/components/agentic/AgenticAssistant.vue";
+import BrandLockup from "@/components/brand/BrandLockup.vue";
 import NavMenu from "@/components/layout/NavMenu.vue";
 import { useBreakpoint } from "@/composables/useBreakpoint";
 import router from "@/config/router";
 import {
-  ArrowDown,
   Menu,
   QuestionFilled,
   Setting,
@@ -151,12 +158,11 @@ const route = useRoute();
 const authStore = useAuthStore();
 const menuStore = useMenuStore();
 const agenticStore = useAgenticStore();
-const { isDesktop, isMobile, isTablet } = useBreakpoint();
+const { isMobile, isTablet } = useBreakpoint();
 const navDrawerVisible = ref(false);
 const currentLogin = computed(() =>
   String(authStore.getName || authStore.name || "dc3"),
 );
-const currentInitial = computed(() => Array.from(currentLogin.value.trim())[0]?.toUpperCase() || "D");
 
 // Close the mobile navigation drawer once navigation actually happens.
 watch(
@@ -432,7 +438,7 @@ const handleCommand = async (command: string) => {
     await router.push({ name: "login" });
   } else if (command === "help") {
     const helpWindow = window.open(
-      "https://doc.dc3.site",
+      "https://dc3.site",
       "_blank",
       "noopener,noreferrer",
     );
@@ -442,6 +448,8 @@ const handleCommand = async (command: string) => {
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/glass-capsule.scss' as *;
+
 .container {
   color: var(--dc3-text-primary);
   -moz-osx-font-smoothing: grayscale;
@@ -468,41 +476,12 @@ const handleCommand = async (command: string) => {
 
     .header_brand_glass,
     .header_actions_glass {
-      position: relative;
-      isolation: isolate;
-      display: flex;
-      align-items: center;
-      box-sizing: border-box;
-      height: 42px;
-      overflow: hidden;
-      border: 1px solid var(--dc3-border-strong);
-      border-radius: 21px;
-      background:
-        radial-gradient(circle at 18% 0%, var(--dc3-highlight-sheen), transparent 38%),
-        var(--dc3-brand-gradient-soft),
-        color-mix(in srgb, var(--dc3-bg-elevated) 82%, transparent);
-      box-shadow:
-        var(--dc3-shadow-md),
-        inset 0 1px 0 var(--dc3-highlight-sheen);
-      backdrop-filter: blur(18px) saturate(1.45);
-      -webkit-backdrop-filter: blur(18px) saturate(1.45);
+      @include glass-capsule(
+        $extra-bg: color-mix(in srgb, var(--dc3-bg-elevated) 82%, transparent)
+      );
       transition:
         border-color 260ms ease,
         box-shadow 260ms ease;
-
-      &::after {
-        position: absolute;
-        z-index: -1;
-        top: 1px;
-        right: 12px;
-        left: 12px;
-        height: 42%;
-        border-radius: 999px;
-        background: linear-gradient(180deg, var(--dc3-highlight-sheen), transparent);
-        opacity: 0.72;
-        pointer-events: none;
-        content: "";
-      }
 
       &:hover {
         border-color: var(--dc3-border-strong);
@@ -514,13 +493,13 @@ const handleCommand = async (command: string) => {
 
     .header_brand_glass {
       flex: 0 0 auto;
-      padding: 5px 13px 5px 6px;
+      padding: 5px 14px 5px 6px;
     }
 
     .header_actions_glass {
       flex: 0 1 auto;
       min-width: 0;
-      max-width: calc(100% - 178px);
+      max-width: calc(100% - 228px);
       padding: 3px 5px 3px 7px;
     }
 
@@ -535,27 +514,6 @@ const handleCommand = async (command: string) => {
       display: none;
       flex: 0 0 auto;
       margin-right: 2px;
-    }
-
-    .header_logo {
-      flex: 0 0 auto;
-      width: 30px;
-      height: 30px;
-      filter: drop-shadow(0 4px 7px rgba(13, 82, 157, 0.2));
-    }
-
-    .header_title {
-      margin-left: 8px;
-      background: linear-gradient(112deg, #07549a, #149ed7 46%, #4f52bf);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      font-size: 20px;
-      font-weight: 740;
-      letter-spacing: -0.01em;
-      line-height: 1;
-      white-space: nowrap;
-      -webkit-text-fill-color: transparent;
     }
 
     .header_user {
@@ -591,15 +549,14 @@ const handleCommand = async (command: string) => {
     .user_trigger {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      justify-content: center;
+      min-width: 32px;
       min-height: 32px;
-      padding: 2px 7px 2px 2px;
+      padding: 2px;
       border: 0;
       border-radius: 16px;
       background: transparent;
-      color: var(--dc3-text-primary);
       cursor: pointer;
-      font: inherit;
       transition: background-color 180ms ease, box-shadow 180ms ease;
 
       &:hover,
@@ -609,36 +566,15 @@ const handleCommand = async (command: string) => {
         box-shadow: inset 0 0 0 1px var(--dc3-border-base);
       }
 
-      .user_initial {
-        display: grid;
-        place-items: center;
-        flex: 0 0 auto;
+      .user_avatar {
+        display: block;
         width: 28px;
         height: 28px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #119bd6, #5558c9);
         box-shadow:
           0 5px 12px rgba(23, 130, 191, 0.2),
           inset 0 1px 0 rgba(255, 255, 255, 0.34);
-        color: #ffffff;
-        font-size: 12px;
-        font-weight: 760;
-        line-height: 1;
-      }
-
-      .user_name {
-        max-width: 100px;
-        overflow: hidden;
-        color: var(--dc3-text-primary);
-        font-size: 13px;
-        font-weight: 620;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .user_chevron {
-        color: var(--dc3-text-muted);
-        font-size: 11px;
+        object-fit: cover;
       }
     }
 
@@ -654,7 +590,7 @@ const handleCommand = async (command: string) => {
     // settings, and account remain first-class actions in the same capsule.
     @media (max-width: $breakpoint-sm-max) {
       .header_actions_glass {
-        max-width: calc(100% - 164px);
+        max-width: calc(100% - 218px);
       }
     }
 
@@ -674,10 +610,6 @@ const handleCommand = async (command: string) => {
         display: inline-flex;
       }
 
-      .header_title {
-        display: none;
-      }
-
       .header_actions_glass {
         flex: 0 0 auto;
         max-width: none;
@@ -688,11 +620,6 @@ const handleCommand = async (command: string) => {
         width: 30px;
         height: 30px;
       }
-
-      .user_trigger {
-        padding-right: 2px;
-      }
-
     }
   }
 

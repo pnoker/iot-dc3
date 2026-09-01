@@ -139,7 +139,13 @@ export const layoutStubs: Record<string, ComponentOptions> = {
   ElMenu: passthrough('nav', 'el-menu-stub'),
   ElMenuItem: passthrough('a', 'el-menu-item-stub'),
   ElSubMenu: passthrough('div', 'el-sub-menu-stub'),
-  ElDropdown: passthrough('div', 'el-dropdown-stub'),
+  // ElDropdown keeps its menu content in a named `dropdown` slot (the real
+  // component teleports it to a popper). Render both slots so layouts can
+  // assert trigger and menu content.
+  ElDropdown: {
+    template:
+      '<div class="el-dropdown-stub"><slot /><slot name="dropdown" /></div>',
+  },
   ElDropdownMenu: passthrough('div', 'el-dropdown-menu-stub'),
   ElDropdownItem: passthrough('div', 'el-dropdown-item-stub'),
   ElIcon: passthrough('span', 'el-icon-stub'),

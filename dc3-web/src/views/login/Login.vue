@@ -25,10 +25,7 @@
       <app-preferences class="login-preferences" surface />
 
       <div class="login-story">
-        <div class="login-brand-pill">
-          <img :src="assetUrl('images/logo/logo.svg')" alt="" class="login-brand-logo"/>
-          <span>IoT DC3</span>
-        </div>
+        <brand-lockup class="login-brand-pill" />
 
         <div class="login-story-copy">
           <span class="login-kicker">PHYSICAL AI RUNTIME</span>
@@ -52,10 +49,7 @@
 
       <div class="login-card-wrap">
         <div class="login-card">
-          <div class="login-card-brand">
-            <img :src="assetUrl('images/logo/logo.svg')" alt=""/>
-            <span>IoT DC3</span>
-          </div>
+          <brand-lockup class="login-card-brand" />
           <div class="login-main">
             <span class="login-card-kicker">{{ t('login.console') }}</span>
             <h2 class="login-title">{{ t('login.welcome') }}</h2>
@@ -148,8 +142,8 @@ import {PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
 import {failMessage, successMessage} from '@/utils/notificationUtil';
 
 import AppPreferences from '@/components/layout/AppPreferences.vue';
+import BrandLockup from '@/components/brand/BrandLockup.vue';
 import Particles from '@/components/particles/Particles.vue';
-import {assetUrl} from '@/utils/assetUrl';
 
 interface LoginFormModel {
   tenant: string;

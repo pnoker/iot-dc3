@@ -388,6 +388,8 @@ export default {
     },
   },
   layout: {
+    brandDescription: 'IoT DC3 AGENTIC: Sense, Reason, Act, Evolve',
+    brandSignal: 'Sense · Reason · Act · Evolve',
     about: 'About',
     logout: 'Logout',
     admin: 'Admin',

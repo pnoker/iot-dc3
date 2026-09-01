@@ -30,7 +30,7 @@ const PLATFORM_BANNER = `
 |   (  <_> )    |     |    \`   \\\\     \\\\____/       \\\\
 |___|\\\\____/|____|    /_______  /\\\\______  /______  /
                              \\\\/        \\\\/       \\\\/
-https://doc.dc3.site
+https://dc3.site
 IoT DC3 Platform V${packageJson.version}`;
 
 /**

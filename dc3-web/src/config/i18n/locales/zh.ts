@@ -382,6 +382,8 @@ export default {
     },
   },
   layout: {
+    brandDescription: 'IoT DC3 AGENTIC：感知、推理、行动、进化',
+    brandSignal: '感知、推理、行动、进化',
     about: '关于',
     logout: '退出登录',
     admin: '管理员',

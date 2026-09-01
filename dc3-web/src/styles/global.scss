@@ -181,3 +181,64 @@ body {
     color: var(--el-color-primary);
   }
 }
+
+// The account dropdown teleports to body, so its unscoped theme lives here.
+// It mirrors the workspace glass language — elevated translucent surface,
+// soft dc3 border and shadow — so light and dark themes both follow the
+// --dc3 tokens instead of Element defaults. Three class levels so the
+// surface wins the cascade against Element's later-injected .is-light.
+.el-popper.el-dropdown__popper.user-dropdown-popper {
+  overflow: hidden;
+  border: 1px solid var(--dc3-border-base);
+  border-radius: var(--dc3-radius-lg);
+  background: var(--dc3-bg-elevated);
+  box-shadow: var(--dc3-shadow-md);
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  backdrop-filter: blur(18px) saturate(1.32);
+  -webkit-backdrop-filter: blur(18px) saturate(1.32);
+
+  // The glass surface carries its own rounded edge; the default popper
+  // arrow would poke outside it.
+  .el-popper__arrow {
+    display: none;
+  }
+
+  .el-dropdown-menu {
+    min-width: 150px;
+    padding: 5px;
+    background: transparent;
+  }
+
+  // Identity header: who is signed in, split from the actions by a rule.
+  .user_dropdown_identity {
+    padding: 9px 12px 11px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid var(--dc3-border-base);
+
+    .user_dropdown_name {
+      display: block;
+      overflow: hidden;
+      color: var(--dc3-text-primary);
+      font-size: 13px;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .el-dropdown-menu__item {
+    border-radius: 8px;
+    color: var(--dc3-text-regular);
+
+    &:not(.is-disabled):hover,
+    &:not(.is-disabled):focus {
+      background: var(--dc3-bg-interactive);
+      color: var(--dc3-text-brand);
+    }
+  }
+
+  // Element renders `divided` as a standalone separator <li>.
+  .el-dropdown-menu__item--divided {
+    border-top-color: var(--dc3-border-base);
+  }
+}

@@ -99,12 +99,22 @@ describe('Layout', () => {
     // The fixed shell has exactly two glass capsules: brand on the left,
     // menu + user controls on the right.
     expect(wrapper.findAll('.header_brand_glass')).toHaveLength(1);
+    expect(wrapper.find('.brand-lockup__title').text()).toContain('IoT DC3');
+    expect(wrapper.find('.brand-lockup__agentic').text()).toBe('AGENTIC');
+    expect(wrapper.find('.brand-lockup__spark').exists()).toBe(true);
+    expect(wrapper.find('.brand-lockup__signal').text()).toBe('Sense · Reason · Act · Evolve');
     expect(wrapper.findAll('.header_actions_glass')).toHaveLength(1);
     expect(wrapper.find('.header_actions_glass .header_menu_wrap').exists()).toBe(true);
     expect(wrapper.find('.header_actions_glass .app-preferences').exists()).toBe(true);
     expect(wrapper.find('.header_actions_glass .app-preferences__theme').exists()).toBe(true);
     expect(wrapper.find('.header_actions_glass .header_user').exists()).toBe(true);
     expect(wrapper.find('.header_actions_glass .user_trigger').exists()).toBe(true);
+    // The trigger is a bare avatar; the name lives in the dropdown identity row.
+    const avatar = wrapper.find('.header_actions_glass .user_trigger .user_avatar');
+    expect(avatar.exists()).toBe(true);
+    expect(avatar.attributes('src')).toContain('images/common/avatar.png');
+    expect(wrapper.find('.user_trigger .user_name').exists()).toBe(false);
+    expect(wrapper.find('.user_dropdown_identity .user_dropdown_name').exists()).toBe(true);
 
     // Home item is always present.
     expect(wrapper.text()).toContain('Home');
