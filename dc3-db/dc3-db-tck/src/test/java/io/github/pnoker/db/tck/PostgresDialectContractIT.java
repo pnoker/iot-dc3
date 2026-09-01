@@ -32,7 +32,7 @@ import org.testcontainers.utility.MountableFile;
  * @since 2026.8.24
  */
 @Testcontainers(disabledWithoutDocker = true)
-class PostgresDialectContractTest extends AbstractDbDialectContractTest {
+class PostgresDialectContractIT extends AbstractDbDialectContractTest {
 
     @Container
     private static final PostgreSQLContainer<?> POSTGRES =

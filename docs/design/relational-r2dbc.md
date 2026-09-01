@@ -69,7 +69,7 @@ Agentic 记忆直接写入 `dc3_message`，不再引入 JDBC Chat Memory 或第�
 python3 dc3/bin/check_r2dbc_migration.py
 python3 dc3/bin/schema_fingerprint.py --check
 mvn -s .mvn/settings.xml -q -DskipTests compile
-mvn -s .mvn/settings.xml -q -pl dc3-db/dc3-db-tck -am test
+mvn -s .mvn/settings.xml -q -pl dc3-db/dc3-db-tck -am verify
 ```
 
 发布前还必须通过 Manager OpenAPI annotation gate、gRPC contract tests、Agentic cancellation tests、Web `pnpm check/test/build` 和 CLI `pnpm build/test`。任一门禁失败都阻止发布；不存在“先上线 Auth、其余模块后补”的中间状态。

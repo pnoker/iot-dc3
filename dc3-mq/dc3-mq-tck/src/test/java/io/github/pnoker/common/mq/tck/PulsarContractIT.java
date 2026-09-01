@@ -34,7 +34,7 @@ import java.util.Objects;
  * @author pnoker
  * @since 2026.8.20
  */
-class PulsarContractTest extends AbstractMqContractTest {
+class PulsarContractIT extends AbstractMqContractTest {
 
     private static final String EXTERNAL_URL = System.getenv("TCK_PULSAR_URL");
 

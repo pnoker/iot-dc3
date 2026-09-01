@@ -37,7 +37,7 @@ import java.util.Objects;
  * @since 2026.8.19
  */
 @Testcontainers(disabledWithoutDocker = true)
-class KafkaContractTest extends AbstractMqContractTest {
+class KafkaContractIT extends AbstractMqContractTest {
 
     private static final String EXTERNAL_BOOTSTRAP = System.getenv("TCK_KAFKA_BOOTSTRAP");
 

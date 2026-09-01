@@ -26,7 +26,7 @@ mvn -s .mvn/settings.xml -pl dc3-mq/dc3-mq-kafka -am package
 
 ## Testing
 
-No module-specific tests; behaviour is verified by `KafkaContractTest` in `dc3-mq-tck` (disposable
+No module-specific tests; behaviour is verified by `KafkaContractIT` in `dc3-mq-tck` (disposable
 `apache/kafka:3.9.0` container).
 
 ## Related Modules

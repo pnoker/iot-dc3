@@ -133,7 +133,7 @@ completion、重投、poison、取消和生命周期。真实 broker 测试必�
 consumer 后使用同 group 重建仍可重投”。任何适配器未通过完整 TCK，都不属于支持矩阵。
 
 ```bash
-mvn -s .mvn/settings.xml -pl dc3-mq/dc3-mq-tck -am test
+mvn -s .mvn/settings.xml -pl dc3-mq/dc3-mq-tck -am verify
 ```
 
 ## 8. 决策结果

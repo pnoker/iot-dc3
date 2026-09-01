@@ -6,12 +6,12 @@ alternate relational engines are deliberately absent from this module.
 
 ## Contract tests
 
-`PostgresDialectContractTest` boots a disposable Testcontainers PostgreSQL instance and runs the
+`PostgresDialectContractIT` boots a disposable Testcontainers PostgreSQL instance and runs the
 same `DatabaseClient`/repository contract used by production:
 
 | Test                          | Engine     |
 |-------------------------------|------------|
-| `PostgresDialectContractTest` | PostgreSQL |
+| `PostgresDialectContractIT` | PostgreSQL |
 
 ## Running
 
@@ -19,7 +19,7 @@ Requires a container runtime — the tests are annotated `@Testcontainers(disabl
 without Docker:
 
 ```bash
-mvn -s .mvn/settings.xml -pl dc3-db/dc3-db-tck test
+mvn -s .mvn/settings.xml -pl dc3-db/dc3-db-tck -am verify
 ```
 
 ## Related Modules

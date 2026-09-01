@@ -9,18 +9,18 @@ broker in a disposable Testcontainers container.
 
 | Test                   | Broker                                       |
 |------------------------|----------------------------------------------|
-| `RabbitMqContractTest` | RabbitMQ (`rabbitmq:3.13-management-alpine`) |
-| `KafkaContractTest`    | Apache Kafka (`apache/kafka:3.9.0`)          |
-| `PulsarContractTest`   | Apache Pulsar                                |
-| `MqttContractTest`     | HiveMQ CE (MQTT 5)                           |
+| `RabbitMqContractIT` | RabbitMQ (`rabbitmq:3.13-management-alpine`) |
+| `KafkaContractIT`    | Apache Kafka (`apache/kafka:3.9.0`)          |
+| `PulsarContractIT`   | Apache Pulsar                                |
+| `MqttContractIT`     | HiveMQ CE (MQTT 5)                           |
 
 ## Running
 
-Requires a container runtime — the tests are annotated `@Testcontainers(disabledWithoutDocker = true)` and are skipped
-without Docker:
+Requires a container runtime or the documented external-broker environment variables. Container-backed cases are
+skipped when Docker is unavailable:
 
 ```bash
-mvn -s .mvn/settings.xml -pl dc3-mq/dc3-mq-tck test
+mvn -s .mvn/settings.xml -pl dc3-mq/dc3-mq-tck -am verify
 ```
 
 ## Related Modules

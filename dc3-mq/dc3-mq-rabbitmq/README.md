@@ -35,7 +35,7 @@ mvn -s .mvn/settings.xml -pl dc3-mq/dc3-mq-rabbitmq -am package
 
 ## Testing
 
-No module-specific tests; behaviour is verified by `RabbitMqContractTest` in `dc3-mq-tck`.
+No module-specific tests; behaviour is verified by `RabbitMqContractIT` in `dc3-mq-tck`.
 
 ## Related Modules
 

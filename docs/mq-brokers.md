@@ -56,7 +56,7 @@ Kafka 的 requeue 通过重新发布并提交原 offset 实现，因此重启窗
 ## 验证
 
 ```bash
-mvn -s .mvn/settings.xml -pl dc3-mq/dc3-mq-tck -am test
+mvn -s .mvn/settings.xml -pl dc3-mq/dc3-mq-tck -am verify
 ```
 
 `dc3-mq-tck` 是发布门禁：四个适配器都必须通过共享契约，包括发布确认、Publisher completion、重投、批量和

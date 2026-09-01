@@ -43,7 +43,7 @@ import java.util.Objects;
  * @since 2026.8.19
  */
 @Testcontainers(disabledWithoutDocker = true)
-class RabbitMqContractTest extends AbstractMqContractTest {
+class RabbitMqContractIT extends AbstractMqContractTest {
 
     @Container
     private static final RabbitMQContainer RABBIT =

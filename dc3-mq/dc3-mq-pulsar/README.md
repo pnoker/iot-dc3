@@ -25,7 +25,7 @@ mvn -s .mvn/settings.xml -pl dc3-mq/dc3-mq-pulsar -am package
 
 ## Testing
 
-No module-specific tests; behaviour is verified by `PulsarContractTest` in `dc3-mq-tck`.
+No module-specific tests; behaviour is verified by `PulsarContractIT` in `dc3-mq-tck`.
 
 ## Related Modules
 

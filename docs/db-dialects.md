@@ -40,7 +40,7 @@ dc3:
 ```bash
 python3 dc3/bin/schema_fingerprint.py --check
 python3 dc3/bin/check_r2dbc_migration.py
-mvn -s .mvn/settings.xml -q -pl dc3-db/dc3-db-tck -am test
+mvn -s .mvn/settings.xml -q -pl dc3-db/dc3-db-tck -am verify
 ```
 
 `dc3-db-tck` 只启动 PostgreSQL Testcontainers，复用生产 R2DBC repository port，覆盖租户隔离、软删除、乐观锁、幂等写入、租约 fencing、分页和 schema 指纹。任何新增存储实现必须先获得架构评审，不得通过增加第二套运行时适配器来规避契约。

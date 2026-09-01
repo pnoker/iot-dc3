@@ -40,7 +40,7 @@ import java.util.Objects;
  * @author pnoker
  * @since 2026.8.19
  */
-class MqttContractTest extends AbstractMqContractTest {
+class MqttContractIT extends AbstractMqContractTest {
 
     private static final String EXTERNAL_HOST = System.getenv("TCK_MQTT_HOST");
     private static final String EXTERNAL_PORT = System.getenv("TCK_MQTT_PORT");
