@@ -23,6 +23,7 @@ import io.github.pnoker.common.data.entity.vo.PointCommandReadVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandWriteVO;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * MapStruct builder converting point command request VO to BO.
@@ -39,6 +40,7 @@ public interface PointCommandBuilder {
      * @param entityVO PointCommandReadVO
      * @return PointCommandReadBO
      */
+    @Mapping(target = "source", ignore = true)
     PointCommandReadBO buildBOByVO(PointCommandReadVO entityVO);
 
     /**
@@ -47,6 +49,7 @@ public interface PointCommandBuilder {
      * @param entityVO PointCommandWriteVO
      * @return PointCommandWriteBO
      */
+    @Mapping(target = "source", ignore = true)
     PointCommandWriteBO buildBOByVO(PointCommandWriteVO entityVO);
 
 }

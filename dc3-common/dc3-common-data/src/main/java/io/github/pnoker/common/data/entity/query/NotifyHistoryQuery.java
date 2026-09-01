@@ -29,8 +29,10 @@ public class NotifyHistoryQuery implements Serializable {
     @Schema(description = "Zero-based row offset", example = "0")
     private long offset;
     @Schema(description = "Maximum rows to return", example = "50")
+    @Builder.Default
     private int limit = PageRequest.DEFAULT_LIMIT;
     @Schema(description = "Whitelisted notification history sort fields")
+    @Builder.Default
     private List<SortSpec> sort = List.of();
     @Schema(description = "Filter by alarm rule identifier")
     private Long ruleId;

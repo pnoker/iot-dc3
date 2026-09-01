@@ -56,9 +56,11 @@ public class NotifyChannelBindQuery implements Serializable {
     private long offset;
 
     @Schema(description = "Maximum number of records to return.", maximum = "200")
+    @Builder.Default
     private int limit = PageRequest.DEFAULT_LIMIT;
 
     @Schema(description = "Stable allow-listed sort fields.")
+    @Builder.Default
     private List<SortSpec> sort = List.of();
 
     @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")

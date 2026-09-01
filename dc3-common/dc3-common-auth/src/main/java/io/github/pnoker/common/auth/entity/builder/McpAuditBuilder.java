@@ -48,6 +48,12 @@ public interface McpAuditBuilder {
     @Mapping(target = "principalType", ignore = true)
     @Mapping(target = "riskLevel", ignore = true)
     @Mapping(target = "status", ignore = true)
+    @Mapping(target = "remark", ignore = true)
+    @Mapping(target = "creatorId", ignore = true)
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
     McpAuditVO buildVOByRecord(McpAuditCommand entityRecord);
 
     /**

@@ -20,6 +20,7 @@ import io.github.pnoker.common.agentic.entity.bo.ActionBO;
 import io.github.pnoker.common.agentic.entity.vo.ActionVO;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -32,6 +33,8 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {MapStructUtil.class})
 public interface ActionBuilder {
 
+    @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "userId", ignore = true)
     ActionBO buildBOByVO(ActionVO entityVO);
 
     /**

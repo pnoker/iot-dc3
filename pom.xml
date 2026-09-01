@@ -149,6 +149,7 @@
         <maven.javadoc.plugin>3.12.0</maven.javadoc.plugin>
         <maven.compiler.plugin>3.15.0</maven.compiler.plugin>
         <maven.resource.plugin>3.5.0</maven.resource.plugin>
+        <maven.jar.plugin>3.5.0</maven.jar.plugin>
         <maven.dependency.plugin>3.11.0</maven.dependency.plugin>
         <maven.version.plugin>2.21.0</maven.version.plugin>
         <maven.enforcer.plugin.version>3.6.3</maven.enforcer.plugin.version>
@@ -862,6 +863,10 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
             </plugin>
             <plugin>
@@ -1061,6 +1066,16 @@
                             <nonFilteredFileExtension>xls</nonFilteredFileExtension>
                             <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
                         </nonFilteredFileExtensions>
+                    </configuration>
+                </plugin>
+
+                <!-- Do not emit warnings or empty artifacts for test-only modules. -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven.jar.plugin}</version>
+                    <configuration>
+                        <skipIfEmpty>true</skipIfEmpty>
                     </configuration>
                 </plugin>
 

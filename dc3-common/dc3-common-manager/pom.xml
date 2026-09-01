@@ -48,11 +48,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-r2dbc</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-r2dbc-core</artifactId>
-        </dependency>
-
         <!-- gRPC Related -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

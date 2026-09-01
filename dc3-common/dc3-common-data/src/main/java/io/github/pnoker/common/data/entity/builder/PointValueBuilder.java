@@ -41,6 +41,11 @@ public interface PointValueBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
+    @Mapping(target = "messageId", ignore = true)
+    @Mapping(target = "schemaVersion", ignore = true)
+    @Mapping(target = "driverNode", ignore = true)
+    @Mapping(target = "sequence", ignore = true)
+    @Mapping(target = "fencingToken", ignore = true)
     PointValueBO buildBOByVO(PointValueVO entityVO);
 
     /**
@@ -57,6 +62,7 @@ public interface PointValueBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "quality", ignore = true)
     PointValueDO buildDOByBO(PointValueBO entityBO);
 
     /**

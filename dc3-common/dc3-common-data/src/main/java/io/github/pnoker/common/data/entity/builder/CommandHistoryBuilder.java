@@ -24,6 +24,7 @@ import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -45,6 +46,8 @@ public interface CommandHistoryBuilder {
      * @param entityVO CommandCallVO
      * @return CommandCallBO
      */
+    @Mapping(target = "source", ignore = true)
+    @Mapping(target = "sourceUserId", ignore = true)
     CommandCallBO buildBOByVO(CommandCallVO entityVO);
 
     /**

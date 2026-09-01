@@ -48,6 +48,10 @@ public interface McpConnectionBuilder {
      */
     @Mapping(target = "principalType", ignore = true)
     @Mapping(target = "grantType", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
     McpConnectionVO buildVOByRecord(McpConnectionRecord entityRecord);
 
     /**

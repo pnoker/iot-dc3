@@ -57,9 +57,11 @@ public class RuleQuery implements Serializable {
     private long offset;
 
     @Schema(description = "Maximum number of records to return.", example = "50", maximum = "200")
+    @Builder.Default
     private int limit = PageRequest.DEFAULT_LIMIT;
 
     @Schema(description = "Stable allow-listed sort fields.")
+    @Builder.Default
     private List<SortSpec> sort = List.of();
 
     /**

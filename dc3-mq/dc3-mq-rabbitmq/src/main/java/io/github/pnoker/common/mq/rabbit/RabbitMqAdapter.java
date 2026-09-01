@@ -122,7 +122,7 @@ public class RabbitMqAdapter implements BrokerAdapter {
                 new org.springframework.amqp.rabbit.connection.CorrelationData(UUID.randomUUID().toString());
         rabbitTemplate.send(exchangeOf(message.topic()), routingKeyOf(message), amqpMessage(message), correlationData);
         correlationData.getFuture().whenComplete((confirm, failure) -> {
-            boolean routed = Objects.isNull(failure) && Objects.nonNull(confirm) && confirm.isAck()
+            boolean routed = Objects.isNull(failure) && Objects.nonNull(confirm) && confirm.ack()
                     && Objects.isNull(correlationData.getReturned());
             confirmation.onConfirm(message, routed, failure);
         });
@@ -254,7 +254,7 @@ public class RabbitMqAdapter implements BrokerAdapter {
                 new org.springframework.amqp.rabbit.connection.CorrelationData(UUID.randomUUID().toString());
         rabbitTemplate.send(exchange, routingKey, new Message(source.getBody(), properties), correlationData);
         return Mono.fromFuture(correlationData.getFuture()).flatMap(confirm -> {
-            boolean routed = Objects.nonNull(confirm) && confirm.isAck() && Objects.isNull(correlationData.getReturned());
+            boolean routed = Objects.nonNull(confirm) && confirm.ack() && Objects.isNull(correlationData.getReturned());
             return routed ? Mono.empty() : Mono.error(new IllegalStateException("Rabbit retry publish was not confirmed"));
         });
     }

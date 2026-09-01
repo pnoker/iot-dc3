@@ -30,9 +30,11 @@ public class RuleStateQuery implements Serializable {
     private long offset;
 
     @Schema(description = "Maximum rows to return", example = "50")
+    @Builder.Default
     private int limit = PageRequest.DEFAULT_LIMIT;
 
     @Schema(description = "Whitelisted sort fields")
+    @Builder.Default
     private List<SortSpec> sort = List.of();
 
     @Schema(description = "Filter by rule identifier")

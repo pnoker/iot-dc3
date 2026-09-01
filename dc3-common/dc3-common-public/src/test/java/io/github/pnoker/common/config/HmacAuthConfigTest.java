@@ -28,7 +28,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class HmacAuthConfigTest {
 
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(HmacAuthConfig.class));
+            .withConfiguration(AutoConfigurations.of(HmacAuthConfig.class))
+            .withPropertyValues(EnvironmentConstant.AUTH_HMAC_SECRET_ENV + "=");
 
     @Test
     void hmacAuthSignerIsDisabledWhenNoSecretConfigured() {

@@ -44,6 +44,12 @@ public interface McpToolBuilder {
      * @return EntityVO
      */
     @Mapping(target = "riskLevel", ignore = true)
+    @Mapping(target = "creatorId", ignore = true)
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
     McpToolVO buildVOByRecord(McpToolRecord entityRecord);
 
     /**
