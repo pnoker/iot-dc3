@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import com.github.xingshuangs.iot.protocol.s7.enums.EPlcType;
@@ -36,18 +35,17 @@ import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.driver.bean.PlcS7PointVariable;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * S7 PLC driver service backed by the iot-communication library.
@@ -68,13 +66,15 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
     private Map<Long, MyS7PLC> connectMap;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -84,8 +84,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public void schedule() {
-    }
+    public void schedule() {}
 
     @Override
     public void event(MetadataEventDTO metadataEvent) {
@@ -93,8 +92,12 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
 
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
@@ -102,22 +105,37 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
                 if (Objects.nonNull(removed)) {
                     closeConnection(metadataEvent.getId(), removed);
                 }
-                log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}",
-                        driverCode, metadataEvent.getId(), operateType, Objects.nonNull(removed));
+                log.info(
+                        "Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}",
+                        driverCode,
+                        metadataEvent.getId(),
+                        operateType,
+                        Objects.nonNull(removed));
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
-        log.debug("Driver point read requested, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
+        log.debug(
+                "Driver point read requested, protocol={}, deviceId={}, pointId={}",
+                driverCode,
+                device.getId(),
                 point.getId());
         MyS7PLC myS7PLC = getS7PLC(device.getId(), driverConfig);
-        PlcS7PointVariable variable = buildVariable(pointConfig, point.getPointTypeFlag().getCode());
+        PlcS7PointVariable variable =
+                buildVariable(pointConfig, point.getPointTypeFlag().getCode());
 
         myS7PLC.lock.lock();
         try {
@@ -125,10 +143,19 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             return new ReadPointValue(device, point, String.valueOf(value));
         } catch (Exception e) {
             invalidateConnection(device.getId(), myS7PLC);
-            log.error("Driver point read failed, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
-                    point.getId(), e);
-            throw new ReadPointException("Driver point read failed, protocol={}, deviceId={}, pointId={}, message={}",
-                    driverCode, device.getId(), point.getId(), e.getMessage(), e);
+            log.error(
+                    "Driver point read failed, protocol={}, deviceId={}, pointId={}",
+                    driverCode,
+                    device.getId(),
+                    point.getId(),
+                    e);
+            throw new ReadPointException(
+                    "Driver point read failed, protocol={}, deviceId={}, pointId={}, message={}",
+                    driverCode,
+                    device.getId(),
+                    point.getId(),
+                    e.getMessage(),
+                    e);
         } finally {
             myS7PLC.lock.unlock();
         }
@@ -139,12 +166,21 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
     // ------------------------------------------------------------------------
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
-        log.debug("Driver point write requested, protocol={}, deviceId={}, pointId={}, valueLength={}",
-                driverCode, device.getId(), point.getId(), Objects.toString(writePointValue.getValue(), "").length());
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
+        log.debug(
+                "Driver point write requested, protocol={}, deviceId={}, pointId={}, valueLength={}",
+                driverCode,
+                device.getId(),
+                point.getId(),
+                Objects.toString(writePointValue.getValue(), "").length());
         MyS7PLC myS7PLC = getS7PLC(device.getId(), driverConfig);
-        PlcS7PointVariable variable = buildVariable(pointConfig, writePointValue.getType().getCode());
+        PlcS7PointVariable variable =
+                buildVariable(pointConfig, writePointValue.getType().getCode());
 
         myS7PLC.lock.lock();
         try {
@@ -152,10 +188,19 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             return true;
         } catch (Exception e) {
             invalidateConnection(device.getId(), myS7PLC);
-            log.error("Driver point write failed, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
-                    point.getId(), e);
-            throw new WritePointException("Driver point write failed, protocol={}, deviceId={}, pointId={}, message={}",
-                    driverCode, device.getId(), point.getId(), e.getMessage(), e);
+            log.error(
+                    "Driver point write failed, protocol={}, deviceId={}, pointId={}",
+                    driverCode,
+                    device.getId(),
+                    point.getId(),
+                    e);
+            throw new WritePointException(
+                    "Driver point write failed, protocol={}, deviceId={}, pointId={}, message={}",
+                    driverCode,
+                    device.getId(),
+                    point.getId(),
+                    e.getMessage(),
+                    e);
         } finally {
             myS7PLC.lock.unlock();
         }
@@ -185,19 +230,39 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
                 ePlcType = EPlcType.S1200;
             }
 
-            log.debug("Driver connection creating, protocol={}, deviceId={}, host={}, port={}, plcType={}",
-                    driverCode, deviceId, host, port, plcType);
+            log.debug(
+                    "Driver connection creating, protocol={}, deviceId={}, host={}, port={}, plcType={}",
+                    driverCode,
+                    deviceId,
+                    host,
+                    port,
+                    plcType);
             try {
                 S7PLC s7PLC = new S7PLC(ePlcType, host, port);
                 s7PLC.setEnableReconnect(true);
-                log.info("Driver connection established, protocol={}, deviceId={}, host={}, port={}, plcType={}",
-                        driverCode, deviceId, host, port, plcType);
+                log.info(
+                        "Driver connection established, protocol={}, deviceId={}, host={}, port={}, plcType={}",
+                        driverCode,
+                        deviceId,
+                        host,
+                        port,
+                        plcType);
                 return new MyS7PLC(new ReentrantLock(), s7PLC);
             } catch (Exception e) {
-                log.error("Driver connection failed, protocol={}, deviceId={}, host={}, port={}", driverCode, deviceId,
-                        host, port, e);
-                throw new ServiceException("Driver connection failed, protocol={}, deviceId={}, host={}, port={}",
-                        driverCode, deviceId, host, port, e);
+                log.error(
+                        "Driver connection failed, protocol={}, deviceId={}, host={}, port={}",
+                        driverCode,
+                        deviceId,
+                        host,
+                        port,
+                        e);
+                throw new ServiceException(
+                        "Driver connection failed, protocol={}, deviceId={}, host={}, port={}",
+                        driverCode,
+                        deviceId,
+                        host,
+                        port,
+                        e);
             }
         });
     }
@@ -333,7 +398,8 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "plcType", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -343,7 +409,8 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "byteOffset", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Getter
@@ -353,7 +420,5 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         private final ReentrantLock lock;
 
         private final S7PLC plc;
-
     }
-
 }

@@ -16,8 +16,6 @@
  */
 package io.github.pnoker.driver.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
@@ -31,6 +29,16 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
+import io.github.pnoker.common.utils.JsonUtil;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -40,17 +48,8 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Custom driver service implementation for the LoRaWAN driver.
@@ -73,21 +72,25 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonUtil.getJsonMapper();
     private final Map<String, String> dataByDevEui = new ConcurrentHashMap<>();
     private final Map<String, Map<String, String>> objectByDevEui = new ConcurrentHashMap<>();
+
     @Value("${dc3.driver.code}")
     private String driverCode;
+
     private MqttClient mqttClient;
     private volatile boolean connected;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -135,9 +138,7 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
             JsonNode objectNode = root.path("object");
             if (objectNode.isObject()) {
                 Map<String, String> fields = new HashMap<>();
-                Iterator<Map.Entry<String, JsonNode>> it = objectNode.fields();
-                while (it.hasNext()) {
-                    Map.Entry<String, JsonNode> entry = it.next();
+                for (Map.Entry<String, JsonNode> entry : objectNode.properties()) {
                     fields.put(entry.getKey(), entry.getValue().asText());
                 }
                 objectByDevEui.put(devEui, fields);
@@ -154,8 +155,11 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         String devEui = getRequiredConfig(pointConfig, "devEui");
         String field = getConfigValue(pointConfig, "field", "");
         String value;
@@ -166,15 +170,19 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
             value = Objects.isNull(fields) ? null : fields.get(field);
         }
         if (Objects.isNull(value)) {
-            throw new ReadPointException("No LoRaWAN uplink cached, protocol={}, devEui={}, field={}",
-                    driverCode, devEui, field);
+            throw new ReadPointException(
+                    "No LoRaWAN uplink cached, protocol={}, devEui={}, field={}", driverCode, devEui, field);
         }
         return new ReadPointValue(device, point, value);
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         try {
             String applicationId = getRequiredConfig(driverConfig, "applicationId");
             String devEui = getRequiredConfig(pointConfig, "devEui");
@@ -187,7 +195,8 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
         } catch (WritePointException e) {
             throw e;
         } catch (Exception e) {
-            throw new WritePointException("LoRaWAN write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new WritePointException(
+                    "LoRaWAN write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
         }
     }
 
@@ -218,7 +227,9 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
 
     private String getRequiredConfig(Map<String, AttributeBO> config, String code) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             throw new ConnectorException("Required attribute '{}' is missing", code);
         }
         return attr.getValue(String.class);
@@ -226,7 +237,9 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -238,7 +251,8 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
         checkRequired(driverConfig, "applicationId", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -247,7 +261,7 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
         checkRequired(pointConfig, "devEui", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.config;
 
 import io.github.pnoker.common.facade.local.PointCommandLocalFacade;
@@ -39,10 +38,18 @@ import org.springframework.context.annotation.FilterType;
  */
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.data.mode", havingValue = "local")
-@ComponentScan(basePackages = "io.github.pnoker.common.facade.local", useDefaultFilters = false,
-        includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
-                PointValueLocalFacade.class, PointCommandLocalFacade.class, StatusHealthLocalFacade.class,
-                FacadePointValueBuilder.class,}))
+@ComponentScan(
+        basePackages = "io.github.pnoker.common.facade.local",
+        useDefaultFilters = false,
+        includeFilters =
+                @ComponentScan.Filter(
+                        type = FilterType.ASSIGNABLE_TYPE,
+                        classes = {
+                            PointValueLocalFacade.class,
+                            PointCommandLocalFacade.class,
+                            StatusHealthLocalFacade.class,
+                            FacadePointValueBuilder.class,
+                        }))
 public class LocalFacadeDataAutoConfiguration {
 
     /**
@@ -51,5 +58,4 @@ public class LocalFacadeDataAutoConfiguration {
      */
     @SuppressWarnings("unused")
     private static final Class<?> CANARY = PointValueLocalFacade.class;
-
 }

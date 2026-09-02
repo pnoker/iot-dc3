@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.dto;
 
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * Data transfer object for metadata change events propagated via RabbitMQ.
@@ -61,12 +59,11 @@ public class MetadataEventDTO implements Serializable {
         this(null, id, metadataType, operateType);
     }
 
-    public MetadataEventDTO(Long tenantId, Long id, MetadataTypeEnum metadataType,
-                            MetadataOperateTypeEnum operateType) {
+    public MetadataEventDTO(
+            Long tenantId, Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType) {
         this.tenantId = tenantId;
         this.id = id;
         this.metadataType = metadataType;
         this.operateType = operateType;
     }
-
 }

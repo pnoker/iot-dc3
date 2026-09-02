@@ -14,10 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.test.contracts;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -25,8 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 /**
  * Reusable contract that asserts secret-bearing fields never leak through Lombok
@@ -38,8 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public abstract class SecretFieldContractTest {
 
-    private static final Set<String> DEFAULT_SENSITIVE = Set.of(
-            "apikey", "password", "secret", "token", "loginpassword", "saltpassword");
+    private static final Set<String> DEFAULT_SENSITIVE =
+            Set.of("apikey", "password", "secret", "token", "loginpassword", "saltpassword");
 
     private static Object newInstance(Class<?> type) throws ReflectiveOperationException {
         return type.getDeclaredConstructor().newInstance();
@@ -66,8 +64,7 @@ public abstract class SecretFieldContractTest {
             }
             current = current.getSuperclass();
         }
-        Arrays.stream(instance.getClass().getDeclaredFields()).forEach(field -> {
-        });
+        Arrays.stream(instance.getClass().getDeclaredFields()).forEach(field -> {});
     }
 
     /**
@@ -97,8 +94,7 @@ public abstract class SecretFieldContractTest {
             String rendered = String.valueOf(instance).toLowerCase();
             for (String forbidden : blocklist) {
                 assertThat(rendered)
-                        .as("toString() of %s must not contain field name %s",
-                                voClass.getSimpleName(), forbidden)
+                        .as("toString() of %s must not contain field name %s", voClass.getSimpleName(), forbidden)
                         .doesNotContain(forbidden + "=");
             }
         }

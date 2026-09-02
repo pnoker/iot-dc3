@@ -12,8 +12,8 @@ export interface TokenState {
   salt: string;
   tenant: string;
   username: string;
-  issuedAt: number;   // epoch seconds
-  expiresAt: number;  // epoch seconds
+  issuedAt: number; // epoch seconds
+  expiresAt: number; // epoch seconds
   /** 'oauth' tickets travel as Authorization: Bearer; classic login uses X-Auth-* headers */
   authType?: 'login' | 'oauth';
   /** scopes granted to an oauth ticket */

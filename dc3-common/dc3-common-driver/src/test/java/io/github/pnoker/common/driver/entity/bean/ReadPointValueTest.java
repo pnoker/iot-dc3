@@ -16,20 +16,19 @@
  */
 package io.github.pnoker.common.driver.entity.bean;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.EmptyException;
 import io.github.pnoker.common.exception.OutRangeException;
 import io.github.pnoker.common.exception.TypeException;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for {@link ReadPointValue} covering type conversion, numeric projection,
@@ -152,7 +151,8 @@ class ReadPointValueTest {
 
             // ArithmeticUtil.round with decimal=6 rounds to 6 decimal places
             assertThat(readPointValue.getFinalValue()).isEqualTo("2.718282");
-            assertThat(readPointValue.getNumericValue()).isCloseTo(2.718282, org.assertj.core.data.Offset.offset(0.000001));
+            assertThat(readPointValue.getNumericValue())
+                    .isCloseTo(2.718282, org.assertj.core.data.Offset.offset(0.000001));
         }
 
         @Test
@@ -249,7 +249,11 @@ class ReadPointValueTest {
 
         @Test
         void nullPointThrowsEmptyException() {
-            ReadPointValue readPointValue = ReadPointValue.builder().device(device).point(null).value("42").build();
+            ReadPointValue readPointValue = ReadPointValue.builder()
+                    .device(device)
+                    .point(null)
+                    .value("42")
+                    .build();
 
             assertThatThrownBy(readPointValue::getFinalValue).isInstanceOf(EmptyException.class);
         }
@@ -295,7 +299,11 @@ class ReadPointValueTest {
         @Test
         void builderValueCalculatesNumericValueWithoutCallOrderDependency() {
             pointWithType(PointTypeEnum.DOUBLE);
-            ReadPointValue readPointValue = ReadPointValue.builder().device(device).point(point).value("3.14").build();
+            ReadPointValue readPointValue = ReadPointValue.builder()
+                    .device(device)
+                    .point(point)
+                    .value("3.14")
+                    .build();
 
             assertThat(readPointValue.getNumericValue()).isCloseTo(3.14, org.assertj.core.data.Offset.offset(0.001));
             assertThat(readPointValue.getFinalValue()).isEqualTo("3.14");

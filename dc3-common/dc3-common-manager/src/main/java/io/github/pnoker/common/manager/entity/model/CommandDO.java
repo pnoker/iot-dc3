@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.model;
 
 import io.github.pnoker.common.entity.ext.JsonExt;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Persistence object for the dc3_command table.
@@ -39,6 +37,7 @@ public class CommandDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
     private Long id;
     private String commandName;
     private String commandCode;
@@ -59,5 +58,4 @@ public class CommandDO implements Serializable {
     private String operatorName;
     private LocalDateTime operateTime;
     private Byte deleted;
-
 }

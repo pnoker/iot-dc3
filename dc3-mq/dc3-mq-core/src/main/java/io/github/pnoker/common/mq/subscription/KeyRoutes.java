@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.subscription;
 
 import java.util.List;
@@ -97,6 +96,5 @@ public final class KeyRoutes<L> {
         return null;
     }
 
-    private record Route<L>(String keyPattern, L listener) {
-    }
+    private record Route<L>(String keyPattern, L listener) {}
 }

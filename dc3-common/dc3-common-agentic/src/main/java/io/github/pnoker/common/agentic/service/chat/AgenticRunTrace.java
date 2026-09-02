@@ -18,7 +18,6 @@ package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +39,8 @@ public class AgenticRunTrace {
 
     private final List<AgenticRunEvent> recordedEvents = Collections.synchronizedList(new ArrayList<>());
 
-    private final List<AgenticVisualizationSpec> recordedVisualizations = Collections.synchronizedList(new ArrayList<>());
+    private final List<AgenticVisualizationSpec> recordedVisualizations =
+            Collections.synchronizedList(new ArrayList<>());
 
     /**
      * Pending events.
@@ -155,5 +155,4 @@ public class AgenticRunTrace {
         drainPendingVisualizations();
         return recordedVisualizations();
     }
-
 }

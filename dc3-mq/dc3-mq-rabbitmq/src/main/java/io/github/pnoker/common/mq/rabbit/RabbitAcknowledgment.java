@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.rabbit;
 
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
-import org.springframework.amqp.AmqpException;
-
 import java.io.IOException;
+import org.springframework.amqp.AmqpException;
 
 /**
  * Port {@link Acknowledgment} backed by a RabbitMQ channel delivery tag. The batch

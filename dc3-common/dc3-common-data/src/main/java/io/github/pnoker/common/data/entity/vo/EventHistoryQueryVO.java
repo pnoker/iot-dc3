@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
+import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
-import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * VO for querying event records with pagination and filters.
@@ -46,7 +44,9 @@ public class EventHistoryQueryVO implements Serializable {
     @Schema(description = "Identifier of the device to filter by; must belong to the current tenant.", example = "1024")
     private String deviceId;
 
-    @Schema(description = "Identifier of the event definition to filter by; must belong to the current tenant.", example = "4096")
+    @Schema(
+            description = "Identifier of the event definition to filter by; must belong to the current tenant.",
+            example = "4096")
     private String eventId;
 
     @Schema(description = "Code of the event to filter by.", example = "HIGH_TEMP_ALARM")
@@ -63,5 +63,4 @@ public class EventHistoryQueryVO implements Serializable {
 
     @Schema(description = "Stable sort fields; defaults to occurTime DESC, id DESC.")
     private java.util.List<SortSpec> sort = java.util.List.of();
-
 }

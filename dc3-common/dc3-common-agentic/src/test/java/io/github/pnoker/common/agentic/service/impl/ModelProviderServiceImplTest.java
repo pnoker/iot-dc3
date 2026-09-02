@@ -2,11 +2,24 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.agentic.service.impl;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
@@ -21,11 +34,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ModelProviderServiceImplTest {
@@ -50,10 +58,12 @@ class ModelProviderServiceImplTest {
 
     @Test
     void saveRejectsNullEntity() {
-        StepVerifier.create(service.add(null, header)).expectErrorSatisfies(error -> {
-            assert error instanceof RequestException;
-            assert error.getMessage().contains("Provider name");
-        }).verify();
+        StepVerifier.create(service.add(null, header))
+                .expectErrorSatisfies(error -> {
+                    assert error instanceof RequestException;
+                    assert error.getMessage().contains("Provider name");
+                })
+                .verify();
     }
 
     @Test
@@ -61,10 +71,12 @@ class ModelProviderServiceImplTest {
         ModelProviderBO bo = new ModelProviderBO();
         bo.setName("   ");
         bo.setBaseUrl("https://api");
-        StepVerifier.create(service.add(bo, header)).expectErrorSatisfies(error -> {
-            assert error instanceof RequestException;
-            assert error.getMessage().contains("Provider name");
-        }).verify();
+        StepVerifier.create(service.add(bo, header))
+                .expectErrorSatisfies(error -> {
+                    assert error instanceof RequestException;
+                    assert error.getMessage().contains("Provider name");
+                })
+                .verify();
     }
 
     @Test
@@ -72,10 +84,12 @@ class ModelProviderServiceImplTest {
         ModelProviderBO bo = new ModelProviderBO();
         bo.setName("Anthropic");
         bo.setBaseUrl("  ");
-        StepVerifier.create(service.add(bo, header)).expectErrorSatisfies(error -> {
-            assert error instanceof RequestException;
-            assert error.getMessage().contains("base URL");
-        }).verify();
+        StepVerifier.create(service.add(bo, header))
+                .expectErrorSatisfies(error -> {
+                    assert error instanceof RequestException;
+                    assert error.getMessage().contains("base URL");
+                })
+                .verify();
     }
 
     @Test
@@ -83,17 +97,21 @@ class ModelProviderServiceImplTest {
         ModelProviderBO bo = new ModelProviderBO();
         bo.setName("Anthropic");
         bo.setBaseUrl("https://api");
-        StepVerifier.create(service.update(bo, header)).expectErrorSatisfies(error -> {
-            assert error instanceof RequestException;
-            assert error.getMessage().contains("Provider ID");
-        }).verify();
+        StepVerifier.create(service.update(bo, header))
+                .expectErrorSatisfies(error -> {
+                    assert error instanceof RequestException;
+                    assert error.getMessage().contains("Provider ID");
+                })
+                .verify();
     }
 
     @Test
     void updateRejectsUnknownProvider() {
         ModelProviderBO bo = provider(7L);
         when(modelProviderStore.get(7L, header)).thenReturn(Mono.empty());
-        StepVerifier.create(service.update(bo, header)).expectError(NotFoundException.class).verify();
+        StepVerifier.create(service.update(bo, header))
+                .expectError(NotFoundException.class)
+                .verify();
         verify(modelProviderStore, never()).update(any(), any());
         verify(chatClientFactory, never()).evict(any());
     }

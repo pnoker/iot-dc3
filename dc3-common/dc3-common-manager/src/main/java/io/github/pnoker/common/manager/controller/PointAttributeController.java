@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.controller;
 
 import io.github.pnoker.common.base.BaseController;
@@ -22,11 +21,12 @@ import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeBO;
 import io.github.pnoker.common.manager.entity.builder.PointAttributeBuilder;
 import io.github.pnoker.common.manager.entity.query.PointAttributeOffsetRequest;
-import io.github.pnoker.common.manager.repository.PointAttributeFilter;
 import io.github.pnoker.common.manager.entity.vo.PointAttributeVO;
+import io.github.pnoker.common.manager.repository.PointAttributeFilter;
 import io.github.pnoker.common.manager.service.ReactivePointAttributeService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -34,6 +34,7 @@ import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,16 +48,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-
 /**
  * Manages point attribute field definitions declared on profile templates, the configurable fields of a downward control instruction.
  *
  * @author pnoker
  * @since 2016.10.1
  */
-@Tag(name = "point_attribute", description = "Command attribute definitions: manage configurable parameters of device commands including name, type, default value, and validation rules")
+@Tag(
+        name = "point_attribute",
+        description =
+                "Command attribute definitions: manage configurable parameters of device commands including name, type, default value, and validation rules")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.POINT_ATTRIBUTE_URL_PREFIX)
@@ -74,27 +75,35 @@ public class PointAttributeController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('point_attribute', 'add')")
-    @Operation(summary = "Add Point Attribute", description = "Declare a new point attribute field on a profile template. " +
-            "A point attribute is a configurable field definition of a downward control instruction; returns the new attribute ID.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "false"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Add Point Attribute",
+            description =
+                    "Declare a new point attribute field on a profile template. "
+                            + "A point attribute is a configurable field definition of a downward control instruction; returns the new attribute ID.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "false"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/add")
     public Mono<PointAttributeVO> add(@Validated(Add.class) @RequestBody PointAttributeVO entityVO) {
-        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+        return getTenantId()
+                .zipWith(getUserId().defaultIfEmpty(0L))
+                .zipWith(getUserName().defaultIfEmpty(""))
                 .flatMap(tuple -> {
-            Long tenantId = tuple.getT1().getT1();
-            PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(tenantId);
-            entityBO.setCreatorId(tuple.getT1().getT2());
-            entityBO.setCreatorName(tuple.getT2());
-            entityBO.setOperatorId(tuple.getT1().getT2());
-            entityBO.setOperatorName(tuple.getT2());
-            return pointAttributeService.add(entityBO).map(pointAttributeBuilder::buildVOByBO);
-        });
+                    Long tenantId = tuple.getT1().getT1();
+                    PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
+                    entityBO.setTenantId(tenantId);
+                    entityBO.setCreatorId(tuple.getT1().getT2());
+                    entityBO.setCreatorName(tuple.getT2());
+                    entityBO.setOperatorId(tuple.getT1().getT2());
+                    entityBO.setOperatorName(tuple.getT2());
+                    return pointAttributeService.add(entityBO).map(pointAttributeBuilder::buildVOByBO);
+                });
     }
 
     /**
@@ -104,20 +113,45 @@ public class PointAttributeController implements BaseController {
      * @return delete-success status
      */
     @PreAuthorize("@perm.can('point_attribute', 'delete')")
-    @Operation(summary = "Delete Point Attribute", description = "Permanently delete a point attribute field definition by ID (tenant-scoped). " +
-            "Removes the field from its parent command; the action cannot be undone.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
-                    @ExtensionProperty(name = "destructive", value = "true"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Delete Point Attribute",
+            description = "Permanently delete a point attribute field definition by ID (tenant-scoped). "
+                    + "Removes the field from its parent command; the action cannot be undone.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                                @ExtensionProperty(name = "destructive", value = "true"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @DeleteMapping("/delete")
-    public Mono<Void> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id,
-                             @Parameter(description = "Current optimistic-lock version required as a deletion precondition.", example = "0") @NotNull @Min(0) @RequestParam("version") Integer version) {
-        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
-                .flatMap(tuple -> pointAttributeService.delete(tuple.getT1().getT1(), id, version,
-                        tuple.getT1().getT2(), tuple.getT2()).then());
+    public Mono<Void> delete(
+            @Parameter(
+                            description = "Primary key of the entity to delete. Must belong to the current tenant.",
+                            example = "1024")
+                    @NotNull
+                    @RequestParam(value = "id")
+                    Long id,
+            @Parameter(
+                            description = "Current optimistic-lock version required as a deletion precondition.",
+                            example = "0")
+                    @NotNull
+                    @Min(0)
+                    @RequestParam("version")
+                    Integer version) {
+        return getTenantId()
+                .zipWith(getUserId().defaultIfEmpty(0L))
+                .zipWith(getUserName().defaultIfEmpty(""))
+                .flatMap(tuple -> pointAttributeService
+                        .delete(
+                                tuple.getT1().getT1(),
+                                id,
+                                version,
+                                tuple.getT1().getT2(),
+                                tuple.getT2())
+                        .then());
     }
 
     /**
@@ -127,25 +161,33 @@ public class PointAttributeController implements BaseController {
      * @return update-success status
      */
     @PreAuthorize("@perm.can('point_attribute', 'update')")
-    @Operation(summary = "Update Point Attribute", description = "Modify an existing point attribute field definition (tenant-scoped). " +
-            "Use to rename or change the type/default of a field declared on a command in the profile template.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Update Point Attribute",
+            description =
+                    "Modify an existing point attribute field definition (tenant-scoped). "
+                            + "Use to rename or change the type/default of a field declared on a command in the profile template.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/update")
     public Mono<PointAttributeVO> update(@Validated(Update.class) @RequestBody PointAttributeVO entityVO) {
-        return getTenantId().zipWith(getUserId().defaultIfEmpty(0L)).zipWith(getUserName().defaultIfEmpty(""))
+        return getTenantId()
+                .zipWith(getUserId().defaultIfEmpty(0L))
+                .zipWith(getUserName().defaultIfEmpty(""))
                 .flatMap(tuple -> {
-            Long tenantId = tuple.getT1().getT1();
-            PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
-            entityBO.setTenantId(tenantId);
-            entityBO.setOperatorId(tuple.getT1().getT2());
-            entityBO.setOperatorName(tuple.getT2());
-            return pointAttributeService.update(entityBO).map(pointAttributeBuilder::buildVOByBO);
-        });
+                    Long tenantId = tuple.getT1().getT1();
+                    PointAttributeBO entityBO = pointAttributeBuilder.buildBOByVO(entityVO);
+                    entityBO.setTenantId(tenantId);
+                    entityBO.setOperatorId(tuple.getT1().getT2());
+                    entityBO.setOperatorName(tuple.getT2());
+                    return pointAttributeService.update(entityBO).map(pointAttributeBuilder::buildVOByBO);
+                });
     }
 
     /**
@@ -155,18 +197,30 @@ public class PointAttributeController implements BaseController {
      * @return the matched PointAttributeVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('point_attribute', 'get')")
-    @Operation(summary = "Get Point Attribute by ID", description = "Fetch one point attribute field definition by ID (tenant-scoped). " +
-            "Returns the attribute's name, type and default value as declared on its parent command.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Get Point Attribute by ID",
+            description = "Fetch one point attribute field definition by ID (tenant-scoped). "
+                    + "Returns the attribute's name, type and default value as declared on its parent command.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @GetMapping("/get_by_id")
-    public Mono<PointAttributeVO> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getTenantId().flatMap(tenantId -> pointAttributeService.getById(tenantId, id)
-                .map(pointAttributeBuilder::buildVOByBO));
+    public Mono<PointAttributeVO> getById(
+            @Parameter(
+                            description = "Primary key of the target record; must belong to the current tenant.",
+                            example = "1024")
+                    @NotNull
+                    @RequestParam(value = "id")
+                    Long id) {
+        return getTenantId()
+                .flatMap(tenantId ->
+                        pointAttributeService.getById(tenantId, id).map(pointAttributeBuilder::buildVOByBO));
     }
 
     /**
@@ -176,43 +230,79 @@ public class PointAttributeController implements BaseController {
      * @return a list of PointAttributeVO exposed by the driver; empty when the driver is not found
      */
     @PreAuthorize("@perm.can('point_attribute', 'list')")
-    @Operation(summary = "List Point Attributes by Driver ID", description = "Return every point attribute exposed by the commands of devices driven by a given driver (tenant-scoped). " +
-            "Use to enumerate which configurable command fields a driver-type adapter can send; returns an empty list when the driver is not found.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Point Attributes by Driver ID",
+            description =
+                    "Return every point attribute exposed by the commands of devices driven by a given driver (tenant-scoped). "
+                            + "Use to enumerate which configurable command fields a driver-type adapter can send; returns an empty list when the driver is not found.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @GetMapping("/list_by_driver_id")
-    public Mono<List<PointAttributeVO>> listByDriverId(@Parameter(description = "Identifier of the driver whose point attributes are enumerated; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "driver_id") Long driverId) {
-        return getTenantId().flatMap(tenantId -> pointAttributeService.listByDriverId(tenantId, driverId)
-                .map(pointAttributeBuilder::buildVOByBO).collectList());
+    public Mono<List<PointAttributeVO>> listByDriverId(
+            @Parameter(
+                            description =
+                                    "Identifier of the driver whose point attributes are enumerated; must belong to the current tenant.",
+                            example = "1024")
+                    @NotNull
+                    @RequestParam(value = "driver_id")
+                    Long driverId) {
+        return getTenantId()
+                .flatMap(tenantId -> pointAttributeService
+                        .listByDriverId(tenantId, driverId)
+                        .map(pointAttributeBuilder::buildVOByBO)
+                        .collectList());
     }
 
     /**
      * Page through point attribute field definitions for the current tenant with query filters.
      *
-     * @param entityQuery optional query filters; null treated as empty
+     * @param request     optional query filters; null treated as empty
      * @return a page of PointAttributeVO matching the query
      */
     @PreAuthorize("@perm.can('point_attribute', 'list')")
-    @Operation(summary = "List Point Attributes", description = "Page through point attribute field definitions for the current tenant with query filters. " +
-            "Returns a page of attributes; use for browsing command fields or selecting a target attribute to inspect or edit.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Point Attributes",
+            description =
+                    "Page through point attribute field definitions for the current tenant with query filters. "
+                            + "Returns a page of attributes; use for browsing command fields or selecting a target attribute to inspect or edit.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/list")
     public Mono<OffsetPage<PointAttributeVO>> list(@RequestBody(required = false) PointAttributeOffsetRequest request) {
         PointAttributeOffsetRequest query = request == null ? new PointAttributeOffsetRequest() : request;
-        return getTenantId().flatMap(tenantId -> pointAttributeService.list(new PointAttributeFilter(
-                        tenantId, query.attributeName(), query.attributeCode(), query.attributeTypeFlag(), query.driverId(),
-                        query.enableFlag(), query.version(), query.offset(), query.limit(), query.sort()))
-                .map(page -> OffsetPage.of(page.items().stream().map(pointAttributeBuilder::buildVOByBO).toList(),
-                        page.offset(), page.limit(), page.total())));
+        return getTenantId()
+                .flatMap(tenantId -> pointAttributeService
+                        .list(new PointAttributeFilter(
+                                tenantId,
+                                query.attributeName(),
+                                query.attributeCode(),
+                                query.attributeTypeFlag(),
+                                query.driverId(),
+                                query.enableFlag(),
+                                query.version(),
+                                query.offset(),
+                                query.limit(),
+                                query.sort()))
+                        .map(page -> OffsetPage.of(
+                                page.items().stream()
+                                        .map(pointAttributeBuilder::buildVOByBO)
+                                        .toList(),
+                                page.offset(),
+                                page.limit(),
+                                page.total())));
     }
-
 }

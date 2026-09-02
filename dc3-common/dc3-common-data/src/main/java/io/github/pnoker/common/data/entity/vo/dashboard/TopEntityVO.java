@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * One entry in a dashboard top-N ranking (e.g. device with the most point-value rows in
@@ -49,10 +47,14 @@ public class TopEntityVO implements Serializable {
      * Device / point / driver id — the service resolves the human-readable name
      * asynchronously on the frontend via existing getXxxByIds APIs.
      */
-    @Schema(description = "Identifier of the ranked entity (device, point or driver); resolved to a name on the frontend.", example = "1024")
+    @Schema(
+            description =
+                    "Identifier of the ranked entity (device, point or driver); resolved to a name on the frontend.",
+            example = "1024")
     private String entityId;
 
-    @Schema(description = "Aggregated count driving this entity's ranking within the queried time window.", example = "256")
+    @Schema(
+            description = "Aggregated count driving this entity's ranking within the queried time window.",
+            example = "256")
     private long count;
-
 }

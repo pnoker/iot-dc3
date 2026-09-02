@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -52,25 +51,42 @@ public class PointAttributeVO extends BaseVO {
     /**
      * Name
      */
-    @NotBlank(message = "Attribute name can't be empty", groups = {Add.class})
-    @Schema(description = "Point attribute name. Unique name within a driver for identifying a configurable data point property.", example = "Register Address", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid attribute name format",
+    @NotBlank(
+            message = "Attribute name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description =
+                    "Point attribute name. Unique name within a driver for identifying a configurable data point property.",
+            example = "Register Address",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid attribute name format",
             groups = {Add.class, Update.class})
     private String attributeName;
 
     /**
      * Code
      */
-    @NotBlank(message = "Attribute code can't be empty", groups = {Add.class})
-    @Schema(description = "Point attribute code. Stable business identifier; must not change once deployed.", example = "REG_ADDR", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid attribute code format",
+    @NotBlank(
+            message = "Attribute code can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Point attribute code. Stable business identifier; must not change once deployed.",
+            example = "REG_ADDR",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
+            message = "Invalid attribute code format",
             groups = {Add.class, Update.class})
     private String attributeCode;
 
     /**
      * Type
      */
-    @Schema(description = "Point attribute data type: STRING, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, or BOOLEAN.", example = "STRING")
+    @Schema(
+            description = "Point attribute data type: STRING, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, or BOOLEAN.",
+            example = "STRING")
     private AttributeTypeEnum attributeTypeFlag;
 
     /**
@@ -82,8 +98,13 @@ public class PointAttributeVO extends BaseVO {
     /**
      * Driver ID
      */
-    @Schema(description = "ID of the protocol driver this attribute belongs to.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Driver ID can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "ID of the protocol driver this attribute belongs to.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Driver ID can't be empty",
+            groups = {Add.class, Update.class})
     private String driverId;
 
     /**
@@ -109,5 +130,4 @@ public class PointAttributeVO extends BaseVO {
      */
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
-
 }

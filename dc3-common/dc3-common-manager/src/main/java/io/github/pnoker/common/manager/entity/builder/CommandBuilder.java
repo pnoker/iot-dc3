@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.builder;
 
 import io.github.pnoker.common.entity.ext.CommandExt;
@@ -28,15 +27,14 @@ import io.github.pnoker.common.manager.entity.vo.CommandVO;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * MapStruct builder converting between command BO, VO, and DO.
@@ -44,7 +42,9 @@ import java.util.Optional;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface CommandBuilder {
 
     /**
@@ -99,7 +99,8 @@ public interface CommandBuilder {
         }
         entityDO.setCommandExt(ext);
 
-        Optional.ofNullable(entityBO.getCommandTypeFlag()).ifPresent(value -> entityDO.setCommandTypeFlag(value.getIndex()));
+        Optional.ofNullable(entityBO.getCommandTypeFlag())
+                .ifPresent(value -> entityDO.setCommandTypeFlag(value.getIndex()));
         Optional.ofNullable(entityBO.getCallTypeFlag()).ifPresent(value -> entityDO.setCallTypeFlag(value.getIndex()));
         Optional.ofNullable(entityBO.getEnableFlag()).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
@@ -170,6 +171,4 @@ public interface CommandBuilder {
      * @return converted value
      */
     List<CommandVO> buildVOListByBOList(List<CommandBO> entityBOList);
-
-
 }

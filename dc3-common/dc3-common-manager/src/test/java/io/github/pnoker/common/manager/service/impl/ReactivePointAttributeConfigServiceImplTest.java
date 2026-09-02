@@ -1,4 +1,26 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.manager.service.impl;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -19,22 +41,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class ReactivePointAttributeConfigServiceImplTest {
     @Mock
     ReactivePointAttributeConfigStore store;
+
     @Mock
     ReactivePointAttributeService attributes;
+
     @Mock
     ReactiveDeviceService devices;
+
     @Mock
     ReactivePointService points;
+
     @Mock
     MetadataEventPublisher publisher;
 
@@ -44,7 +64,9 @@ class ReactivePointAttributeConfigServiceImplTest {
         validRelations();
         when(store.getByAttributeDevicePoint(7L, 11L, 12L, 13L)).thenReturn(Mono.just(value));
 
-        StepVerifier.create(service().add(value)).expectError(DuplicateException.class).verify();
+        StepVerifier.create(service().add(value))
+                .expectError(DuplicateException.class)
+                .verify();
         verify(store, never()).insert(any());
     }
 
@@ -56,7 +78,9 @@ class ReactivePointAttributeConfigServiceImplTest {
         point.setProfileId(99L);
         when(points.getById(7L, 13L)).thenReturn(Mono.just(point));
 
-        StepVerifier.create(service().add(value)).expectError(NotFoundException.class).verify();
+        StepVerifier.create(service().add(value))
+                .expectError(NotFoundException.class)
+                .verify();
         verify(store, never()).getByAttributeDevicePoint(any(), any(), any(), any());
         verify(store, never()).insert(any());
     }
@@ -86,7 +110,9 @@ class ReactivePointAttributeConfigServiceImplTest {
         when(devices.getById(7L, 12L)).thenReturn(Mono.just(device()));
         when(points.getById(7L, 13L)).thenReturn(Mono.just(point()));
 
-        StepVerifier.create(service().add(value)).expectError(NotFoundException.class).verify();
+        StepVerifier.create(service().add(value))
+                .expectError(NotFoundException.class)
+                .verify();
         verify(store, never()).insert(any());
     }
 

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
@@ -28,7 +27,9 @@ import org.mapstruct.Mapper;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface FacadeDriverBuilder {
 
     /**
@@ -38,5 +39,4 @@ public interface FacadeDriverBuilder {
      * @return to facade business object result
      */
     FacadeDriverBO toFacadeBO(DriverBO managerBO);
-
 }

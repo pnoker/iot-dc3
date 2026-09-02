@@ -14,30 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
-import io.github.pnoker.common.data.repository.ReactiveRuleStateLookup;
 import io.github.pnoker.common.data.entity.property.AlarmWindowProperties;
+import io.github.pnoker.common.data.repository.ReactiveRuleStateLookup;
 import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 /**
  * Integration test exercising the full short-window evaluation chain with
@@ -54,10 +52,13 @@ class WindowedAlarmPipelineIntegrationTest {
 
     private static final long TENANT_ID = 7L;
     private static final long POINT_ID = 11L;
+
     @Mock
     private RuleRegistry ruleRegistry;
+
     @Mock
     private ReactiveRuleStateLookup ruleStateLookup;
+
     private WindowSampleBuffer buffer;
     private LocalWindowDataSource localSource;
     private WindowedRuleEvaluator windowedEvaluator;
@@ -111,8 +112,13 @@ class WindowedAlarmPipelineIntegrationTest {
     private RuleFact factOnPoint() {
         // Use a synthetic fact that arrives just after the most recently
         // appended sample, so the evaluator's window includes it.
-        return new RuleFact(TENANT_ID, AlarmTargetTypeEnum.POINT, POINT_ID, null,
-                LocalDateTime.now().plusNanos(1), Map.of("numValue", 0));
+        return new RuleFact(
+                TENANT_ID,
+                AlarmTargetTypeEnum.POINT,
+                POINT_ID,
+                null,
+                LocalDateTime.now().plusNanos(1),
+                Map.of("numValue", 0));
     }
 
     @Test
@@ -122,7 +128,8 @@ class WindowedAlarmPipelineIntegrationTest {
         feed(85);
         feed(88);
         feed(90);
-        when(ruleRegistry.findCandidates(any())).thenReturn(Mono.just(List.of(rule("AVG", ">", BigDecimal.valueOf(80), 3))));
+        when(ruleRegistry.findCandidates(any()))
+                .thenReturn(Mono.just(List.of(rule("AVG", ">", BigDecimal.valueOf(80), 3))));
 
         List<RuleMatch> matches = engine.evaluate(factOnPoint()).collectList().block();
 
@@ -136,7 +143,8 @@ class WindowedAlarmPipelineIntegrationTest {
         feed(80);
         feed(82);
         feed(85);
-        when(ruleRegistry.findCandidates(any())).thenReturn(Mono.just(List.of(rule("AVG", ">", BigDecimal.valueOf(80), 5))));
+        when(ruleRegistry.findCandidates(any()))
+                .thenReturn(Mono.just(List.of(rule("AVG", ">", BigDecimal.valueOf(80), 5))));
 
         List<RuleMatch> matches = engine.evaluate(factOnPoint()).collectList().block();
 
@@ -152,7 +160,8 @@ class WindowedAlarmPipelineIntegrationTest {
         feed(85);
         feed(88);
         feed(90);
-        when(ruleRegistry.findCandidates(any())).thenReturn(Mono.just(List.of(rule("COUNT", ">", BigDecimal.valueOf(4), 1))));
+        when(ruleRegistry.findCandidates(any()))
+                .thenReturn(Mono.just(List.of(rule("COUNT", ">", BigDecimal.valueOf(4), 1))));
 
         List<RuleMatch> matches = engine.evaluate(factOnPoint()).collectList().block();
 
@@ -195,15 +204,15 @@ class WindowedAlarmPipelineIntegrationTest {
     void lastModeUsesFactValueDirectly() {
         // No buffer feed — LAST evaluates the current fact's named field
         // via ConditionEvaluator without reading the window.
-        when(ruleRegistry.findCandidates(any())).thenReturn(Mono.just(List.of(rule("LAST", ">", BigDecimal.valueOf(80), 1))));
+        when(ruleRegistry.findCandidates(any()))
+                .thenReturn(Mono.just(List.of(rule("LAST", ">", BigDecimal.valueOf(80), 1))));
 
         // factOnPoint() default value is 0 → don't fire
         assertThat(engine.evaluate(factOnPoint()).collectList().block()).isEmpty();
 
         // Build a fact that carries a numValue of 95
-        RuleFact firingFact = new RuleFact(TENANT_ID, AlarmTargetTypeEnum.POINT, POINT_ID, null,
-                LocalDateTime.now(), Map.of("numValue", 95));
+        RuleFact firingFact = new RuleFact(
+                TENANT_ID, AlarmTargetTypeEnum.POINT, POINT_ID, null, LocalDateTime.now(), Map.of("numValue", 95));
         assertThat(engine.evaluate(firingFact).collectList().block()).hasSize(1);
     }
-
 }

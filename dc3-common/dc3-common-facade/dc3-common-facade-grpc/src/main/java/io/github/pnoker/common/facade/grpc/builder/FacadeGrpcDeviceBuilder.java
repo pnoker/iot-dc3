@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.builder;
 
 import io.github.pnoker.api.center.manager.GrpcOffsetDeviceQuery;
@@ -29,10 +28,9 @@ import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import org.springframework.stereotype.Component;
-
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 /**
  * Converts between {@code dc3-common-facade-api} shapes and the protobuf types generated
@@ -50,16 +48,18 @@ public class FacadeGrpcDeviceBuilder {
 
     /** Convert the canonical facade query without dropping sort information. */
     public GrpcOffsetDeviceQuery toGrpcOffsetQuery(FacadeDeviceOffsetQuery query) {
-        PageRequest.Builder page = PageRequest.newBuilder()
-                .setOffset(query.offset()).setLimit(query.limit());
-        query.sort().forEach(spec -> page.addSort(io.github.pnoker.api.common.SortSpec.newBuilder()
-                .setField(spec.field())
-                .setDirection(spec.direction() == io.github.pnoker.db.r2dbc.core.page.SortSpec.Direction.DESC
-                        ? io.github.pnoker.api.common.SortDirection.SORT_DIRECTION_DESC
-                        : io.github.pnoker.api.common.SortDirection.SORT_DIRECTION_ASC)
-                .build()));
-        GrpcOffsetDeviceQuery.Builder builder = GrpcOffsetDeviceQuery.newBuilder()
-                .setTenantId(query.tenantId()).setPage(page.build());
+        PageRequest.Builder page =
+                PageRequest.newBuilder().setOffset(query.offset()).setLimit(query.limit());
+        query.sort()
+                .forEach(spec -> page.addSort(io.github.pnoker.api.common.SortSpec.newBuilder()
+                        .setField(spec.field())
+                        .setDirection(
+                                spec.direction() == io.github.pnoker.db.r2dbc.core.page.SortSpec.Direction.DESC
+                                        ? io.github.pnoker.api.common.SortDirection.SORT_DIRECTION_DESC
+                                        : io.github.pnoker.api.common.SortDirection.SORT_DIRECTION_ASC)
+                        .build()));
+        GrpcOffsetDeviceQuery.Builder builder =
+                GrpcOffsetDeviceQuery.newBuilder().setTenantId(query.tenantId()).setPage(page.build());
         StringOptional.ofNullable(query.deviceName()).ifPresent(builder::setDeviceName);
         StringOptional.ofNullable(query.deviceCode()).ifPresent(builder::setDeviceCode);
         LongOptional.ofNullable(query.driverId()).ifPresent(builder::setDriverId);
@@ -107,5 +107,4 @@ public class FacadeGrpcDeviceBuilder {
 
         return bo;
     }
-
 }

@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.StandardEnvironment;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ActiveQuartzProfileConfigTest {
 
@@ -43,13 +41,12 @@ class ActiveQuartzProfileConfigTest {
     @Test
     void postProcessEnvironmentSkipsQuartzProfileWhenDisabled() {
         StandardEnvironment environment = new StandardEnvironment();
-        environment.getPropertySources()
-                .addFirst(new MapPropertySource("test",
-                        Map.of(EnvironmentConstant.QUARTZ_AUTO_PROFILE, "false")));
+        environment
+                .getPropertySources()
+                .addFirst(new MapPropertySource("test", Map.of(EnvironmentConstant.QUARTZ_AUTO_PROFILE, "false")));
 
         config.postProcessEnvironment(environment, new SpringApplication());
 
         assertThat(environment.getActiveProfiles()).doesNotContain(EnvironmentConstant.QUARTZ_PROFILE);
     }
-
 }

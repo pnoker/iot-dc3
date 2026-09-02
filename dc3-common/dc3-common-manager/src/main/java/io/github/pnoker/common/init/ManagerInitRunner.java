@@ -14,15 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.manager.biz.ScheduleForManagerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -37,9 +36,12 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @AutoConfiguration
 @EnableAsync
-@ComponentScan(basePackages = {"io.github.pnoker.common.manager"},
-        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
-                pattern = "io\\.github\\.pnoker\\.common\\.manager\\.dal\\..*"))
+@ComponentScan(
+        basePackages = {"io.github.pnoker.common.manager"},
+        excludeFilters =
+                @ComponentScan.Filter(
+                        type = FilterType.REGEX,
+                        pattern = "io\\.github\\.pnoker\\.common\\.manager\\.dal\\..*"))
 @RequiredArgsConstructor
 public class ManagerInitRunner implements ApplicationRunner {
 
@@ -60,5 +62,4 @@ public class ManagerInitRunner implements ApplicationRunner {
             scheduler.initial();
         }
     }
-
 }

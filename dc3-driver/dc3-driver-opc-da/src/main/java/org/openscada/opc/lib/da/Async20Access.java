@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
 
+import java.net.UnknownHostException;
 import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.openscada.opc.dcom.common.EventHandler;
@@ -28,8 +28,6 @@ import org.openscada.opc.dcom.da.OPCDATASOURCE;
 import org.openscada.opc.dcom.da.ValueData;
 import org.openscada.opc.dcom.da.impl.OPCAsyncIO2;
 import org.openscada.opc.lib.common.NotConnectedException;
-
-import java.net.UnknownHostException;
 
 /**
  * @author pnoker
@@ -45,21 +43,22 @@ public class Async20Access extends AccessBase implements IOPCDataCallback {
 
     public Async20Access(final Server server, final int period, final boolean initialRefresh)
             throws IllegalArgumentException, UnknownHostException, NotConnectedException, JIException,
-            DuplicateGroupException {
+                    DuplicateGroupException {
         super(server, period);
         this.initialRefresh = initialRefresh;
     }
 
     public Async20Access(final Server server, final int period, final boolean initialRefresh, final String logTag)
             throws IllegalArgumentException, UnknownHostException, NotConnectedException, JIException,
-            DuplicateGroupException {
+                    DuplicateGroupException {
         super(server, period, logTag);
         this.initialRefresh = initialRefresh;
     }
 
     @Override
-    protected synchronized void start() throws JIException, IllegalArgumentException, UnknownHostException,
-            NotConnectedException, DuplicateGroupException {
+    protected synchronized void start()
+            throws JIException, IllegalArgumentException, UnknownHostException, NotConnectedException,
+                    DuplicateGroupException {
         if (isActive()) {
             return;
         }
@@ -97,12 +96,15 @@ public class Async20Access extends AccessBase implements IOPCDataCallback {
     }
 
     @Override
-    public void cancelComplete(final int transactionId, final int serverGroupHandle) {
-    }
+    public void cancelComplete(final int transactionId, final int serverGroupHandle) {}
 
     @Override
-    public void dataChange(final int transactionId, final int serverGroupHandle, final int masterQuality,
-                           final int masterErrorCode, final KeyedResultSet<Integer, ValueData> result) {
+    public void dataChange(
+            final int transactionId,
+            final int serverGroupHandle,
+            final int masterQuality,
+            final int masterErrorCode,
+            final KeyedResultSet<Integer, ValueData> result) {
         log.debug("OPC DA data change received, transactionId={}, itemCount={}", transactionId, result.size());
 
         final Group group = this.group;
@@ -113,21 +115,32 @@ public class Async20Access extends AccessBase implements IOPCDataCallback {
         for (final KeyedResult<Integer, ValueData> entry : result) {
             final Item item = group.findItemByClientHandle(entry.getKey());
             log.debug("Update for '{}'", item.getId());
-            updateItem(item, new ItemState(entry.getErrorCode(), entry.getValue().getValue(),
-                    entry.getValue().getTimestamp(), entry.getValue().getQuality()));
+            updateItem(
+                    item,
+                    new ItemState(
+                            entry.getErrorCode(),
+                            entry.getValue().getValue(),
+                            entry.getValue().getTimestamp(),
+                            entry.getValue().getQuality()));
         }
     }
 
     @Override
-    public void readComplete(final int transactionId, final int serverGroupHandle, final int masterQuality,
-                             final int masterErrorCode, final KeyedResultSet<Integer, ValueData> result) {
+    public void readComplete(
+            final int transactionId,
+            final int serverGroupHandle,
+            final int masterQuality,
+            final int masterErrorCode,
+            final KeyedResultSet<Integer, ValueData> result) {
         log.debug("readComplete - transId {}", transactionId);
     }
 
     @Override
-    public void writeComplete(final int transactionId, final int serverGroupHandle, final int masterErrorCode,
-                              final ResultSet<Integer> result) {
+    public void writeComplete(
+            final int transactionId,
+            final int serverGroupHandle,
+            final int masterErrorCode,
+            final ResultSet<Integer> result) {
         log.debug("writeComplete - transId {}", transactionId);
     }
-
 }

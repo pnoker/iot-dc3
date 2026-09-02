@@ -8,9 +8,7 @@ import { detectFormat, printAndExit } from '../utils/format.js';
  * Q2 — CLI TTY confirmation channel). All routes live under /api/v3/agentic.
  */
 export function registerSessionCommand(program: Command): void {
-  const session = program
-    .command('session')
-    .description('Agentic conversation sessions');
+  const session = program.command('session').description('Agentic conversation sessions');
 
   // dc3 session list
   session
@@ -22,7 +20,8 @@ export function registerSessionCommand(program: Command): void {
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post('/api/v3/agentic/session/list', {
-        offset: Number(opts.offset), limit: Number(opts.limit),
+        offset: Number(opts.offset),
+        limit: Number(opts.limit),
       });
       printAndExit(result, format);
     });
@@ -87,14 +86,9 @@ export function registerSessionCommand(program: Command): void {
 export function registerActionCommand(program: Command): void {
   const action = program
     .command('action')
-    .description(
-      'Pending agent tool calls and their approval loop (high-risk step-up)',
-    );
+    .description('Pending agent tool calls and their approval loop (high-risk step-up)');
 
-  const act = (
-    sub: 'confirm' | 'reject',
-    description: string,
-  ): void => {
+  const act = (sub: 'confirm' | 'reject', description: string): void => {
     action
       .command(`${sub} <action_id>`)
       .description(description)
@@ -127,12 +121,10 @@ export function registerActionCommand(program: Command): void {
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       try {
-        const params = new URLSearchParams({conversation_id: opts.conversationId});
+        const params = new URLSearchParams({ conversation_id: opts.conversationId });
         if (opts.offset !== undefined) params.set('offset', String(opts.offset));
         if (opts.limit !== undefined) params.set('limit', String(opts.limit));
-        const result = await dc3Client.get(
-          `/api/v3/agentic/action/pending?${params.toString()}`,
-        );
+        const result = await dc3Client.get(`/api/v3/agentic/action/pending?${params.toString()}`);
         printAndExit(result, format);
       } catch (err) {
         if (err instanceof AuthError) {

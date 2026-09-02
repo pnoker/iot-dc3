@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
@@ -43,8 +42,7 @@ public class ActiveThreadProfileConfig implements EnvironmentPostProcessor {
     /**
      * Creates the environment post processor.
      */
-    public ActiveThreadProfileConfig() {
-    }
+    public ActiveThreadProfileConfig() {}
 
     /**
      * Post-process environment to add the "thread" active profile
@@ -56,5 +54,4 @@ public class ActiveThreadProfileConfig implements EnvironmentPostProcessor {
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         environment.addActiveProfile(EnvironmentConstant.THREAD_PROFILE);
     }
-
 }

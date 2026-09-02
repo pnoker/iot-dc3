@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Rollup payload returned by GET /manager/dashboard/device/stats.
@@ -61,7 +59,8 @@ public class DeviceStatsVO implements Serializable {
      * Top-N profile bindings — key is stringified profile id. Note that one device may
      * bind to multiple profiles, so these counts are bindings, not unique devices.
      */
-    @Schema(description = "Top-N profile binding counts grouped by profile id (bucket key is the stringified profile id); counts are bindings, not unique devices")
+    @Schema(
+            description =
+                    "Top-N profile binding counts grouped by profile id (bucket key is the stringified profile id); counts are bindings, not unique devices")
     private List<BucketVO> byProfile = new ArrayList<>();
-
 }

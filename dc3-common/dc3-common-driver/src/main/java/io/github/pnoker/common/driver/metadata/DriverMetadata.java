@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.metadata;
 
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
@@ -23,16 +22,15 @@ import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.springframework.stereotype.Component;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.stereotype.Component;
 
 /**
  * In-memory holder for driver registration state and shared metadata used across the
@@ -142,8 +140,8 @@ public final class DriverMetadata {
     /**
      * Atomically replace owned devices and publish the new lease deadline.
      */
-    public synchronized void setDeviceLeases(Map<Long, Long> leases, long leaseUntilEpochMillis,
-                                             long assignmentVersion) {
+    public synchronized void setDeviceLeases(
+            Map<Long, Long> leases, long leaseUntilEpochMillis, long assignmentVersion) {
         deviceFencingTokens.clear();
         deviceIds.clear();
         if (Objects.nonNull(leases)) {
@@ -293,5 +291,4 @@ public final class DriverMetadata {
         driver = null;
         driverStatus = EntityStatusEnum.OFFLINE;
     }
-
 }

@@ -14,23 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
 import io.github.pnoker.common.data.biz.PointValueService;
-import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointVolumeBO;
 import io.github.pnoker.common.facade.local.builder.FacadePointValueBuilder;
+import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 import reactor.core.publisher.Mono;
-import io.github.pnoker.db.r2dbc.core.page.CursorPage;
 
 /**
  * In-process implementation: routes each call straight into {@link PointValueService}.
@@ -57,24 +54,32 @@ public class PointValueLocalFacade implements PointValueFacade {
                 .deviceId(deviceId)
                 .pointId(pointId)
                 .build();
-        return pointValueService.latest(query)
-                .flatMap(page -> page.items().stream().findFirst()
+        return pointValueService
+                .latest(query)
+                .flatMap(page -> page.items().stream()
+                        .findFirst()
                         .map(value -> Mono.just(facadePointValueBuilder.toFacadeBO(value)))
                         .orElseGet(Mono::empty));
     }
 
     @Override
-    public Mono<CursorPage<FacadePointValueBO>> history(Long tenantId, Long deviceId, Long pointId,
-                                                        String cursor, int limit) {
-        return pointValueService.history(tenantId, deviceId, pointId, cursor, limit)
-                .map(result -> CursorPage.of(result.items().stream()
-                        .map(facadePointValueBuilder::toFacadeBO).toList(), result.nextCursor()));
+    public Mono<CursorPage<FacadePointValueBO>> history(
+            Long tenantId, Long deviceId, Long pointId, String cursor, int limit) {
+        return pointValueService
+                .history(tenantId, deviceId, pointId, cursor, limit)
+                .map(result -> CursorPage.of(
+                        result.items().stream()
+                                .map(facadePointValueBuilder::toFacadeBO)
+                                .toList(),
+                        result.nextCursor()));
     }
 
     @Override
     public Mono<List<FacadePointVolumeBO>> pointVolumes(Long tenantId, long fromEpochMillis) {
-        return pointValueService.seriesVolumes(tenantId, java.time.Instant.ofEpochMilli(fromEpochMillis))
-                .map(rows -> rows.stream().map(row -> new FacadePointVolumeBO(row.deviceId(), row.pointId(), row.count())).toList());
+        return pointValueService
+                .seriesVolumes(tenantId, java.time.Instant.ofEpochMilli(fromEpochMillis))
+                .map(rows -> rows.stream()
+                        .map(row -> new FacadePointVolumeBO(row.deviceId(), row.pointId(), row.count()))
+                        .toList());
     }
-
 }

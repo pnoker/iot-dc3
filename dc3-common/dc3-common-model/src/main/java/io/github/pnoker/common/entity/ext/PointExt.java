@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -43,7 +42,9 @@ public class PointExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content payload of the point; the shape is discriminated by the type and version fields inherited from the owning point's tenant scope")
+    @Schema(
+            description =
+                    "Extended content payload of the point; the shape is discriminated by the type and version fields inherited from the owning point's tenant scope")
     private Content content;
 
     /**
@@ -56,9 +57,10 @@ public class PointExt extends BaseExt {
     @Schema(description = "Extended content payload for point metadata")
     public static class Content {
 
-        @Schema(description = "Reserved placeholder field for extended point content; carries no business meaning and may be null", example = "null")
+        @Schema(
+                description =
+                        "Reserved placeholder field for extended point content; carries no business meaning and may be null",
+                example = "null")
         private String keep;
-
     }
-
 }

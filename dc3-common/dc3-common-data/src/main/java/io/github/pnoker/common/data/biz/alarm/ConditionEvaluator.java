@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
 import io.github.pnoker.common.entity.ext.RuleExt;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
-
 import java.math.BigDecimal;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 /**
  * Stateless rule-condition evaluator. Extracted so both
@@ -128,10 +126,15 @@ public final class ConditionEvaluator {
             case "<=" -> condition.getThreshold() != null && actual.compareTo(condition.getThreshold()) <= 0;
             case "==" -> condition.getThreshold() != null && actual.compareTo(condition.getThreshold()) == 0;
             case "!=" -> condition.getThreshold() != null && actual.compareTo(condition.getThreshold()) != 0;
-            case "between" -> condition.getLow() != null && condition.getHigh() != null
-                    && actual.compareTo(condition.getLow()) >= 0 && actual.compareTo(condition.getHigh()) <= 0;
-            case "outside" -> condition.getLow() != null && condition.getHigh() != null
-                    && (actual.compareTo(condition.getLow()) < 0 || actual.compareTo(condition.getHigh()) > 0);
+            case "between" ->
+                condition.getLow() != null
+                        && condition.getHigh() != null
+                        && actual.compareTo(condition.getLow()) >= 0
+                        && actual.compareTo(condition.getHigh()) <= 0;
+            case "outside" ->
+                condition.getLow() != null
+                        && condition.getHigh() != null
+                        && (actual.compareTo(condition.getLow()) < 0 || actual.compareTo(condition.getHigh()) > 0);
             default -> false;
         };
     }
@@ -171,5 +174,4 @@ public final class ConditionEvaluator {
             default -> false;
         };
     }
-
 }

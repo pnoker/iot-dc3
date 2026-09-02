@@ -16,12 +16,19 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -29,14 +36,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ToolContext;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SystemAndContextToolTest {
@@ -46,7 +45,8 @@ class SystemAndContextToolTest {
 
     @Test
     void tenantToolReturnsOnlyBackendTenantContext() {
-        AgenticToolResult<TenantTool.CurrentTenantContext> result = new TenantTool().getCurrentTenantInfo(toolContext());
+        AgenticToolResult<TenantTool.CurrentTenantContext> result =
+                new TenantTool().getCurrentTenantInfo(toolContext());
 
         assertThat(result.success()).isTrue();
         assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
@@ -89,7 +89,8 @@ class SystemAndContextToolTest {
                     assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
                     assertThat(result.data().getDrivers().getTotal()).isEqualTo(4);
                     assertThat(result.data().getDevices().getOnline()).isEqualTo(117);
-                }).verifyComplete();
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -99,7 +100,8 @@ class SystemAndContextToolTest {
                     assertThat(result.success()).isFalse();
                     assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_UNAVAILABLE);
                     assertThat(result.data()).isNull();
-                }).verifyComplete();
+                })
+                .verifyComplete();
     }
 
     private ToolContext toolContext() {
@@ -116,5 +118,4 @@ class SystemAndContextToolTest {
         values.put(AgenticConstant.ToolContextKey.CONVERSATION_ID, "conv-1");
         return new ToolContext(values);
     }
-
 }

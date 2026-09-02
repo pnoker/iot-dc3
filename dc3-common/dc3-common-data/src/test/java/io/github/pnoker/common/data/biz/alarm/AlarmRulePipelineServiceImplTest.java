@@ -14,23 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
-
-import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
-import io.github.pnoker.common.data.entity.bo.RuleBO;
-import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import reactor.core.publisher.Flux;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,6 +23,20 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
+import io.github.pnoker.common.data.entity.bo.RuleBO;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,8 +57,8 @@ class AlarmRulePipelineServiceImplTest {
     // ---------- fixtures ----------
 
     private static RuleFact fact(Long tenantId, AlarmTargetTypeEnum targetType, Long entityId) {
-        return new RuleFact(tenantId, targetType, entityId, null,
-                LocalDateTime.of(2026, 5, 21, 12, 0), Map.of("value", 100));
+        return new RuleFact(
+                tenantId, targetType, entityId, null, LocalDateTime.of(2026, 5, 21, 12, 0), Map.of("value", 100));
     }
 
     private static RuleMatch match(RuleFact fact) {
@@ -119,11 +117,12 @@ class AlarmRulePipelineServiceImplTest {
                 null,
                 fact(7L, (AlarmTargetTypeEnum) null, 11L), // null target type
                 fact(null, AlarmTargetTypeEnum.POINT, 11L), // null tenantId
-                fact(7L, AlarmTargetTypeEnum.POINT, 11L));  // valid
+                fact(7L, AlarmTargetTypeEnum.POINT, 11L)); // valid
 
         RuleMatch m = match(fact(7L, AlarmTargetTypeEnum.POINT, 11L));
         when(ruleEngine.evaluate(any())).thenReturn(Flux.just(m));
-        when(ruleAlarmPersistenceService.ensureAlarm(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(ruleAlarmPersistenceService.ensureAlarm(any()))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
         when(ruleNotificationService.notifyBatch(anyList())).thenReturn(Flux.just(history(1L)));
 
         List<NotifyHistoryBO> result = service.processBatch(facts).collectList().block();
@@ -149,10 +148,13 @@ class AlarmRulePipelineServiceImplTest {
         when(ruleEngine.evaluate(f1)).thenReturn(Flux.just(m1));
         when(ruleEngine.evaluate(f2)).thenReturn(Flux.just(m2));
         when(ruleEngine.evaluate(f3)).thenReturn(Flux.just(m3));
-        when(ruleAlarmPersistenceService.ensureAlarm(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
-        when(ruleNotificationService.notifyBatch(anyList())).thenReturn(Flux.just(history(1L), history(2L), history(3L)));
+        when(ruleAlarmPersistenceService.ensureAlarm(any()))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(ruleNotificationService.notifyBatch(anyList()))
+                .thenReturn(Flux.just(history(1L), history(2L), history(3L)));
 
-        List<NotifyHistoryBO> result = service.processBatch(List.of(f1, f2, f3)).collectList().block();
+        List<NotifyHistoryBO> result =
+                service.processBatch(List.of(f1, f2, f3)).collectList().block();
 
         assertThat(result).hasSize(3);
         verify(ruleEngine, times(3)).evaluate(any());
@@ -167,7 +169,8 @@ class AlarmRulePipelineServiceImplTest {
         RuleFact fact = fact(7L, AlarmTargetTypeEnum.POINT, 11L);
         when(ruleEngine.evaluate(fact)).thenReturn(Flux.empty());
 
-        List<NotifyHistoryBO> result = service.processBatch(List.of(fact)).collectList().block();
+        List<NotifyHistoryBO> result =
+                service.processBatch(List.of(fact)).collectList().block();
 
         assertThat(result).isEmpty();
         verify(ruleAlarmPersistenceService, never()).ensureAlarm(any());

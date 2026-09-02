@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.netty.tcp;
 
 import io.github.pnoker.driver.service.netty.NettyServerHandler;
@@ -73,8 +72,11 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
             if (msg instanceof ByteBuf byteBuf) {
                 nettyServerHandler.read(context, byteBuf);
             } else {
-                log.warn("Driver message skipped, protocol={}, remoteAddress={}, reason=unsupportedMessageType, type={}", PROTOCOL,
-                        context.channel().remoteAddress(), msg == null ? null : msg.getClass().getName());
+                log.warn(
+                        "Driver message skipped, protocol={}, remoteAddress={}, reason=unsupportedMessageType, type={}",
+                        PROTOCOL,
+                        context.channel().remoteAddress(),
+                        msg == null ? null : msg.getClass().getName());
             }
         } finally {
             ReferenceCountUtil.release(msg);
@@ -97,8 +99,11 @@ public class NettyTcpServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     @SneakyThrows
     public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-        log.warn("Driver channel error, protocol={}, remoteAddress={}", PROTOCOL, context.channel().remoteAddress(), throwable);
+        log.warn(
+                "Driver channel error, protocol={}, remoteAddress={}",
+                PROTOCOL,
+                context.channel().remoteAddress(),
+                throwable);
         context.disconnect();
     }
-
 }

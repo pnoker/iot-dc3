@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da.browser;
-
-import org.jinterop.dcom.common.JIException;
-import org.jinterop.dcom.core.JIVariant;
-import org.openscada.opc.dcom.da.OPCBROWSETYPE;
-import org.openscada.opc.dcom.da.impl.OPCBrowseServerAddressSpace;
 
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.EnumSet;
+import org.jinterop.dcom.common.JIException;
+import org.jinterop.dcom.core.JIVariant;
+import org.openscada.opc.dcom.da.OPCBROWSETYPE;
+import org.openscada.opc.dcom.da.impl.OPCBrowseServerAddressSpace;
 
 /**
  * Browse through the flat server namespace
@@ -56,8 +54,9 @@ public class FlatBrowser extends BaseBrowser {
      * @throws UnknownHostException     UnknownHostException
      * @throws JIException              JIException
      */
-    public Collection<String> browse(final String filterCriteria, final EnumSet<Access> accessMask,
-                                     final int variantType) throws IllegalArgumentException, UnknownHostException, JIException {
+    public Collection<String> browse(
+            final String filterCriteria, final EnumSet<Access> accessMask, final int variantType)
+            throws IllegalArgumentException, UnknownHostException, JIException {
         return browse(OPCBROWSETYPE.OPC_FLAT, filterCriteria, accessMask, variantType);
     }
 
@@ -74,5 +73,4 @@ public class FlatBrowser extends BaseBrowser {
             throws IllegalArgumentException, UnknownHostException, JIException {
         return browse("", accessMask, JIVariant.VT_EMPTY);
     }
-
 }

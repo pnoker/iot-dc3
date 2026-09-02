@@ -14,8 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import com.github.xingshuangs.iot.protocol.melsec.service.McPLC;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
@@ -31,25 +38,16 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.driver.bean.MelsecPointVariable;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class MelsecDriverCustomServiceImplTest {
@@ -67,16 +65,38 @@ class MelsecDriverCustomServiceImplTest {
 
     private static Map<String, AttributeBO> driverConfig() {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("host", AttributeBO.builder().value("127.0.0.1").type(AttributeTypeEnum.STRING).build());
-        m.put("port", AttributeBO.builder().value("5000").type(AttributeTypeEnum.INT).build());
-        m.put("series", AttributeBO.builder().value("QnA").type(AttributeTypeEnum.STRING).build());
+        m.put(
+                "host",
+                AttributeBO.builder()
+                        .value("127.0.0.1")
+                        .type(AttributeTypeEnum.STRING)
+                        .build());
+        m.put(
+                "port",
+                AttributeBO.builder().value("5000").type(AttributeTypeEnum.INT).build());
+        m.put(
+                "series",
+                AttributeBO.builder()
+                        .value("QnA")
+                        .type(AttributeTypeEnum.STRING)
+                        .build());
         return m;
     }
 
     private static Map<String, AttributeBO> pointConfig(String address, int length) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("address", AttributeBO.builder().value(address).type(AttributeTypeEnum.STRING).build());
-        m.put("length", AttributeBO.builder().value(String.valueOf(length)).type(AttributeTypeEnum.INT).build());
+        m.put(
+                "address",
+                AttributeBO.builder()
+                        .value(address)
+                        .type(AttributeTypeEnum.STRING)
+                        .build());
+        m.put(
+                "length",
+                AttributeBO.builder()
+                        .value(String.valueOf(length))
+                        .type(AttributeTypeEnum.INT)
+                        .build());
         return m;
     }
 
@@ -131,8 +151,8 @@ class MelsecDriverCustomServiceImplTest {
         primeCachedPLC(11L);
         when(plc.readInt32("D100")).thenReturn(42);
 
-        ReadPointValue value = service.read(driverConfig(), pointConfig("D100", 0),
-                device(11L), point(PointTypeEnum.INT));
+        ReadPointValue value =
+                service.read(driverConfig(), pointConfig("D100", 0), device(11L), point(PointTypeEnum.INT));
 
         assertThat(value.getValue()).isEqualTo("42");
     }
@@ -142,8 +162,8 @@ class MelsecDriverCustomServiceImplTest {
         primeCachedPLC(12L);
         when(plc.readInt32(anyString())).thenThrow(new RuntimeException("plc offline"));
 
-        ReadPointValue value = service.read(driverConfig(), pointConfig("D100", 0),
-                device(12L), point(PointTypeEnum.INT));
+        ReadPointValue value =
+                service.read(driverConfig(), pointConfig("D100", 0), device(12L), point(PointTypeEnum.INT));
 
         assertThat(value).isNull();
         assertThat(connectionMap()).doesNotContainKey(12L);
@@ -154,8 +174,11 @@ class MelsecDriverCustomServiceImplTest {
     void writeDelegatesToMcPlc() throws Exception {
         primeCachedPLC(13L);
 
-        Boolean ok = service.write(driverConfig(), pointConfig("D100", 0),
-                device(13L), point(PointTypeEnum.INT),
+        Boolean ok = service.write(
+                driverConfig(),
+                pointConfig("D100", 0),
+                device(13L),
+                point(PointTypeEnum.INT),
                 WritePointValue.builder().value("7").type(PointTypeEnum.INT).build());
 
         assertThat(ok).isTrue();
@@ -165,10 +188,15 @@ class MelsecDriverCustomServiceImplTest {
     @Test
     void writeFailureInvalidatesCachedConnection() throws Exception {
         primeCachedPLC(14L);
-        doThrow(new RuntimeException("plc offline")).when(plc).writeInt32(anyString(), org.mockito.ArgumentMatchers.anyInt());
+        doThrow(new RuntimeException("plc offline"))
+                .when(plc)
+                .writeInt32(anyString(), org.mockito.ArgumentMatchers.anyInt());
 
-        Boolean ok = service.write(driverConfig(), pointConfig("D100", 0),
-                device(14L), point(PointTypeEnum.INT),
+        Boolean ok = service.write(
+                driverConfig(),
+                pointConfig("D100", 0),
+                device(14L),
+                point(PointTypeEnum.INT),
                 WritePointValue.builder().value("7").type(PointTypeEnum.INT).build());
 
         assertThat(ok).isFalse();
@@ -186,8 +214,8 @@ class MelsecDriverCustomServiceImplTest {
     }
 
     private void primeCachedPLC(Long deviceId) throws Exception {
-        Class<?> innerType = Class.forName(
-                "io.github.pnoker.driver.service.impl.MelsecDriverCustomServiceImpl$MyMcPLC");
+        Class<?> innerType =
+                Class.forName("io.github.pnoker.driver.service.impl.MelsecDriverCustomServiceImpl$MyMcPLC");
         Constructor<?> ctor = innerType.getDeclaredConstructor(ReentrantLock.class, McPLC.class);
         ctor.setAccessible(true);
         Object instance = ctor.newInstance(new ReentrantLock(), plc);

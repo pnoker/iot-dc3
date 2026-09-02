@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da;
 
 /**
@@ -24,9 +23,13 @@ package org.openscada.opc.dcom.da;
  * @since 2016.10.1
  */
 public enum OPCSERVERSTATE {
-
-    OPC_STATUS_RUNNING(1), OPC_STATUS_FAILED(2), OPC_STATUS_NOCONFIG(3), OPC_STATUS_SUSPENDED(4), OPC_STATUS_TEST(5),
-    OPC_STATUS_COMM_FAULT(6), OPC_STATUS_UNKNOWN(0);
+    OPC_STATUS_RUNNING(1),
+    OPC_STATUS_FAILED(2),
+    OPC_STATUS_NOCONFIG(3),
+    OPC_STATUS_SUSPENDED(4),
+    OPC_STATUS_TEST(5),
+    OPC_STATUS_COMM_FAULT(6),
+    OPC_STATUS_UNKNOWN(0);
 
     private int _id;
 
@@ -56,5 +59,4 @@ public enum OPCSERVERSTATE {
     public int id() {
         return this._id;
     }
-
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.auth.service.impl;
 
 import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
@@ -23,14 +39,18 @@ public class ReactiveTenantMembershipCommandServiceImpl implements ReactiveTenan
     @Override
     public Mono<TenantMembershipBO> add(TenantMembershipBO membership) {
         return Mono.defer(() -> {
-            if (membership == null || membership.getTenantId() == null || membership.getTenantId() <= 0
-                    || membership.getPrincipalId() == null || membership.getPrincipalId() <= 0) {
+            if (membership == null
+                    || membership.getTenantId() == null
+                    || membership.getTenantId() <= 0
+                    || membership.getPrincipalId() == null
+                    || membership.getPrincipalId() <= 0) {
                 return Mono.error(new RequestException("Tenant and principal are required"));
             }
             return store.insert(builder.buildDOByBO(membership))
                     .map(builder::buildBOByDO)
                     .switchIfEmpty(Mono.error(new RequestException("Failed to create tenant membership")))
-                    .onErrorMap(DataIntegrityViolationException.class,
+                    .onErrorMap(
+                            DataIntegrityViolationException.class,
                             error -> new DuplicateException("Tenant membership already exists"));
         });
     }

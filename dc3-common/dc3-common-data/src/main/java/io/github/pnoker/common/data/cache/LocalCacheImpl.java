@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
@@ -22,15 +21,14 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
 import com.github.benmanes.caffeine.cache.RemovalCause;
 import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * Thin Caffeine wrapper for process-local, TTL-bound operational state. Durable telemetry,
@@ -63,38 +61,41 @@ public class LocalCacheImpl {
      */
     @PostConstruct
     public void init() {
-        this.cache = Caffeine.newBuilder().maximumSize(200_000L).expireAfter(new Expiry<String, Entry>() {
-            @Override
-            @SuppressWarnings("NullableProblems")
-            public long expireAfterCreate(String key, Entry value, long currentTime) {
-                return value.ttlNanos;
-            }
+        this.cache = Caffeine.newBuilder()
+                .maximumSize(200_000L)
+                .expireAfter(new Expiry<String, Entry>() {
+                    @Override
+                    @SuppressWarnings("NullableProblems")
+                    public long expireAfterCreate(String key, Entry value, long currentTime) {
+                        return value.ttlNanos;
+                    }
 
-            @Override
-            @SuppressWarnings("NullableProblems")
-            public long expireAfterUpdate(String key, Entry value, long currentTime, long currentDuration) {
-                return value.ttlNanos;
-            }
+                    @Override
+                    @SuppressWarnings("NullableProblems")
+                    public long expireAfterUpdate(String key, Entry value, long currentTime, long currentDuration) {
+                        return value.ttlNanos;
+                    }
 
-            @Override
-            @SuppressWarnings("NullableProblems")
-            public long expireAfterRead(String key, Entry value, long currentTime, long currentDuration) {
-                return currentDuration;
-            }
-        }).removalListener((String key, Entry value, RemovalCause cause) -> {
-            // Only fire listeners for natural TTL expiries. Explicit
-            // cache.invalidate() / size-based eviction aren't
-            // "the key went offline" semantically.
-            if (cause != RemovalCause.EXPIRED || Objects.isNull(key) || Objects.isNull(value))
-                return;
-            for (ExpireListener listener : expireListeners) {
-                try {
-                    listener.onExpire(key, value.value);
-                } catch (Exception e) {
-                    log.warn("Expire listener failed, key={}", key, e);
-                }
-            }
-        }).build();
+                    @Override
+                    @SuppressWarnings("NullableProblems")
+                    public long expireAfterRead(String key, Entry value, long currentTime, long currentDuration) {
+                        return currentDuration;
+                    }
+                })
+                .removalListener((String key, Entry value, RemovalCause cause) -> {
+                    // Only fire listeners for natural TTL expiries. Explicit
+                    // cache.invalidate() / size-based eviction aren't
+                    // "the key went offline" semantically.
+                    if (cause != RemovalCause.EXPIRED || Objects.isNull(key) || Objects.isNull(value)) return;
+                    for (ExpireListener listener : expireListeners) {
+                        try {
+                            listener.onExpire(key, value.value);
+                        } catch (Exception e) {
+                            log.warn("Expire listener failed, key={}", key, e);
+                        }
+                    }
+                })
+                .build();
     }
 
     /**
@@ -172,8 +173,7 @@ public class LocalCacheImpl {
      * read / write); keep the handler short.
      */
     public void onExpire(ExpireListener listener) {
-        if (Objects.nonNull(listener))
-            expireListeners.add(listener);
+        if (Objects.nonNull(listener)) expireListeners.add(listener);
     }
 
     /**
@@ -190,10 +190,7 @@ public class LocalCacheImpl {
          * @param lastValue the entry's value as of eviction
          */
         void onExpire(String key, Object lastValue);
-
     }
 
-    private record Entry(Object value, long ttlNanos) {
-    }
-
+    private record Entry(Object value, long ttlNanos) {}
 }

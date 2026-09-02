@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.grpc.builder;
 
 import io.github.pnoker.api.common.GrpcBase;
@@ -23,12 +22,11 @@ import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.Optional;
 
 /**
  * MapStruct builder for point-attribute config gRPC message conversion.
@@ -36,7 +34,9 @@ import java.util.Optional;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcPointAttributeConfigBuilder {
 
     /**
@@ -65,14 +65,14 @@ public interface GrpcPointAttributeConfigBuilder {
      * @param entityGrpc entity grpc
      */
     @AfterMapping
-    default void afterProcess(PointAttributeConfigBO entityBO,
-                              @MappingTarget GrpcPointAttributeConfigDTO.Builder entityGrpc) {
+    default void afterProcess(
+            PointAttributeConfigBO entityBO, @MappingTarget GrpcPointAttributeConfigDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
         entityGrpc.setBase(grpcBase);
 
         Optional.ofNullable(entityBO.getEnableFlag())
-                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setEnableFlag(value.getIndex()),
                         () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
     }
-
 }

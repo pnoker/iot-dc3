@@ -17,7 +17,6 @@
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.exception.ConnectorException;
-
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -78,8 +77,7 @@ public final class MbusFrame {
      */
     public static final byte CI_RSP_UD = 0x72;
 
-    private MbusFrame() {
-    }
+    private MbusFrame() {}
 
     /**
      * Build a REQ_UD2 (request user data) long frame for the given primary address.

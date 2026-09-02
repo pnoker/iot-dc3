@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.security;
 
 import io.github.pnoker.common.auth.repository.ReactivePermissionStore;
 import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.common.security.PermissionProvider;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * Production PermissionProvider backed by the role-resource binding system.
@@ -60,8 +58,11 @@ public class AuthPermissionProvider implements PermissionProvider, PermissionCac
         if (entry != null && entry.isValid()) {
             return Mono.just(entry.resourceCodes);
         }
-        if (reactivePermissionStore == null) return Mono.error(new IllegalStateException("ReactivePermissionStore is not configured"));
-        return reactivePermissionStore.listResourceCodes(tenantId, principalId).collect(Collectors.toSet())
+        if (reactivePermissionStore == null)
+            return Mono.error(new IllegalStateException("ReactivePermissionStore is not configured"));
+        return reactivePermissionStore
+                .listResourceCodes(tenantId, principalId)
+                .collect(Collectors.toSet())
                 .doOnNext(codes -> cache.put(cacheKey, new CacheEntry(codes, CACHE_TTL_MS)));
     }
 
@@ -75,8 +76,11 @@ public class AuthPermissionProvider implements PermissionProvider, PermissionCac
         if (entry != null && entry.isValid()) {
             return Mono.just(entry.hasPermission(resourceCode));
         }
-        if (reactivePermissionStore == null) return Mono.error(new IllegalStateException("ReactivePermissionStore is not configured"));
-        return reactivePermissionStore.listResourceCodes(tenantId, principalId).collect(Collectors.toSet())
+        if (reactivePermissionStore == null)
+            return Mono.error(new IllegalStateException("ReactivePermissionStore is not configured"));
+        return reactivePermissionStore
+                .listResourceCodes(tenantId, principalId)
+                .collect(Collectors.toSet())
                 .doOnNext(codes -> cache.put(cacheKey, new CacheEntry(codes, CACHE_TTL_MS)))
                 .map(codes -> codes.contains(PermissionMethods.WILDCARD) || codes.contains(resourceCode));
     }

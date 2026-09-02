@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.entity.bo.PointValueBO;
@@ -23,17 +22,15 @@ import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 
 /**
  * Alarm rule trigger service implementation.
@@ -82,7 +79,9 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
 
         List<RuleFact> facts = new ArrayList<>();
         for (PointValueBO pointValue : pointValues) {
-            if (Objects.isNull(pointValue) || !isValidId(pointValue.getTenantId()) || !isValidId(pointValue.getPointId())) {
+            if (Objects.isNull(pointValue)
+                    || !isValidId(pointValue.getTenantId())
+                    || !isValidId(pointValue.getPointId())) {
                 continue;
             }
             LocalDateTime ts = factTime(pointValue.getCreateTime());
@@ -158,10 +157,15 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
      * @param fact the rule fact to evaluate
      */
     private Mono<Void> process(RuleFact fact) {
-        return alarmRulePipelineService.process(fact)
+        return alarmRulePipelineService
+                .process(fact)
                 .then()
-                .doOnError(e -> log.error("Alarm rule pipeline failed, tenantId={}, targetType={}, entityId={}",
-                        fact.getTenantId(), fact.getAlarmTargetTypeFlag(), fact.getEntityId(), e));
+                .doOnError(e -> log.error(
+                        "Alarm rule pipeline failed, tenantId={}, targetType={}, entityId={}",
+                        fact.getTenantId(),
+                        fact.getAlarmTargetTypeFlag(),
+                        fact.getEntityId(),
+                        e));
     }
 
     /**
@@ -183,5 +187,4 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
     private boolean isValidId(Long id) {
         return Objects.nonNull(id) && id > 0;
     }
-
 }

@@ -16,21 +16,20 @@
  */
 package io.github.pnoker.common.agentic.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class AgenticVisualizationUtilTest {
 
     @Test
     void numericSeriesFromNewestFirstBuildsChronologicalNumericRowsAndSummary() {
-        AgenticVisualizationUtil.NumericSeries series = AgenticVisualizationUtil.numericSeriesFromNewestFirst(
-                List.of("25.0", "true", "offline", "20.0"));
+        AgenticVisualizationUtil.NumericSeries series =
+                AgenticVisualizationUtil.numericSeriesFromNewestFirst(List.of("25.0", "true", "offline", "20.0"));
 
         assertThat(series.dataset()).hasSize(3);
         assertThat(series.dataset().get(0))
@@ -52,13 +51,12 @@ class AgenticVisualizationUtilTest {
 
     @Test
     void statBuildsWhitelistedStatVisualization() {
-        AgenticVisualizationSpec spec = AgenticVisualizationUtil.stat("s1", "Summary", "Window summary",
-                Map.of("latest", 23.5D), Map.of("pointId", 20L));
+        AgenticVisualizationSpec spec = AgenticVisualizationUtil.stat(
+                "s1", "Summary", "Window summary", Map.of("latest", 23.5D), Map.of("pointId", 20L));
 
         assertThat(spec.getType()).isEqualTo(AgenticConstant.Visualization.Type.STAT);
         assertThat(spec.getDataset()).hasSize(1);
         assertThat(spec.getDataset().get(0)).containsEntry("latest", 23.5D);
         assertThat(spec.getMeta()).containsEntry("pointId", 20L);
     }
-
 }

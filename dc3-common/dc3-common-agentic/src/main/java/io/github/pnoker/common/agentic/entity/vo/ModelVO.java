@@ -44,19 +44,28 @@ public class ModelVO {
     @Schema(description = "Whether the model supports streaming token-by-token responses via SSE.", example = "true")
     private boolean stream;
 
-    @Schema(description = "Whether the model supports tool/function calling for structured action invocation.", example = "true")
+    @Schema(
+            description = "Whether the model supports tool/function calling for structured action invocation.",
+            example = "true")
     private boolean toolCall;
 
     @Schema(description = "Whether the model supports vision (image) input in addition to text.", example = "false")
     private boolean vision;
 
-    @Schema(description = "Whether the model supports extended chain-of-thought reasoning before answering.", example = "false")
+    @Schema(
+            description = "Whether the model supports extended chain-of-thought reasoning before answering.",
+            example = "false")
     private boolean reasoning;
 
-    @Schema(description = "Sampling temperature controlling output randomness; higher values produce more creative responses. Valid range is typically 0.0–2.0.", example = "0.7")
+    @Schema(
+            description =
+                    "Sampling temperature controlling output randomness; higher values produce more creative responses. Valid range is typically 0.0–2.0.",
+            example = "0.7")
     private Double temperature;
 
-    @Schema(description = "Maximum number of tokens the model may generate in a single response. Capped by the model's context window limit.", example = "4096")
+    @Schema(
+            description =
+                    "Maximum number of tokens the model may generate in a single response. Capped by the model's context window limit.",
+            example = "4096")
     private Integer maxTokens;
-
 }

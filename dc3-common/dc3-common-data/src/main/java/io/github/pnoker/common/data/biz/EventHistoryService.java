@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.data.entity.bo.EventReportBO;
@@ -75,5 +74,4 @@ public interface EventHistoryService {
      * @return the matching event history page
      */
     Mono<OffsetPage<EventHistoryVO>> list(Long tenantId, EventHistoryQueryVO queryVO);
-
 }

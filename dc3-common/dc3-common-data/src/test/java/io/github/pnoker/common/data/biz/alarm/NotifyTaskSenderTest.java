@@ -14,8 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
@@ -27,18 +32,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class NotifyTaskSenderTest {
 
     @Mock
     private ReactiveMessageSender messageSender;
-
 
     @InjectMocks
     private NotifyTaskSender sender;
@@ -54,22 +52,24 @@ class NotifyTaskSenderTest {
         when(messageSender.sendConfirmed(any())).thenReturn(Mono.empty());
         sender.publish(task).block();
 
-        verify(messageSender).sendConfirmed(argThat(m -> m.getTopic() == MqTopic.NOTIFY_TASK
-                && "0".equals(m.getPartitionKey()) && m.getPayload() == task));
+        verify(messageSender)
+                .sendConfirmed(argThat(m -> m.getTopic() == MqTopic.NOTIFY_TASK
+                        && "0".equals(m.getPartitionKey())
+                        && m.getPayload() == task));
     }
 
     @Test
     void usesUnknownRoutingKeyWhenChannelTypeIsMissing() {
-        NotifyTaskDTO task = NotifyTaskDTO.builder()
-                .notifyHistoryId(1L)
-                .channelId(2L)
-                .build(); // channelTypeFlag missing
+        NotifyTaskDTO task =
+                NotifyTaskDTO.builder().notifyHistoryId(1L).channelId(2L).build(); // channelTypeFlag missing
 
         when(messageSender.sendConfirmed(any())).thenReturn(Mono.empty());
         sender.publish(task).block();
 
-        verify(messageSender).sendConfirmed(argThat(m -> m.getTopic() == MqTopic.NOTIFY_TASK
-                && "unknown".equals(m.getPartitionKey()) && m.getPayload() == task));
+        verify(messageSender)
+                .sendConfirmed(argThat(m -> m.getTopic() == MqTopic.NOTIFY_TASK
+                        && "unknown".equals(m.getPartitionKey())
+                        && m.getPayload() == task));
     }
 
     @Test
@@ -78,5 +78,4 @@ class NotifyTaskSenderTest {
         sender.publish(task).block();
         verify(messageSender, never()).sendConfirmed(any());
     }
-
 }

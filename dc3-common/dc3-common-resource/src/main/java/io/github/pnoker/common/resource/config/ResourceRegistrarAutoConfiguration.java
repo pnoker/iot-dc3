@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.resource.config;
 
 import io.github.pnoker.common.facade.api.ResourceRegistryFacade;
@@ -48,8 +47,8 @@ public class ResourceRegistrarAutoConfiguration {
      * whichever registrar instance is created for the active facade mode.
      */
     @Bean
-    public ApiEndpointScanner apiEndpointScanner(RequestMappingHandlerMapping requestMappingHandlerMapping,
-                                                 ResourceRegistrarProperties properties) {
+    public ApiEndpointScanner apiEndpointScanner(
+            RequestMappingHandlerMapping requestMappingHandlerMapping, ResourceRegistrarProperties properties) {
         return new ApiEndpointScanner(requestMappingHandlerMapping, properties);
     }
 
@@ -60,9 +59,11 @@ public class ResourceRegistrarAutoConfiguration {
      */
     @Bean
     @ConditionalOnBean(ResourceRegistryFacade.class)
-    public ResourceRegistrar resourceRegistrar(ApiEndpointScanner scanner, ResourceRegistryFacade facade,
-                                               ResourceRegistrarProperties properties, Environment environment) {
+    public ResourceRegistrar resourceRegistrar(
+            ApiEndpointScanner scanner,
+            ResourceRegistryFacade facade,
+            ResourceRegistrarProperties properties,
+            Environment environment) {
         return new ResourceRegistrar(scanner, facade, properties, environment);
     }
-
 }

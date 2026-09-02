@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.enums.WindowModeEnum;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 /**
@@ -52,14 +50,16 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
     private final Set<Long> warnedInvalidRules = ConcurrentHashMap.newKeySet();
 
     private static RuleExt.Window window(RuleBO rule) {
-        if (Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())) {
+        if (Objects.isNull(rule.getRuleExt())
+                || Objects.isNull(rule.getRuleExt().getContent())) {
             return null;
         }
         return rule.getRuleExt().getContent().getWindow();
     }
 
     private static RuleExt.Condition condition(RuleBO rule) {
-        if (Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())) {
+        if (Objects.isNull(rule.getRuleExt())
+                || Objects.isNull(rule.getRuleExt().getContent())) {
             return null;
         }
         return rule.getRuleExt().getContent().getCondition();
@@ -86,7 +86,9 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
 
     @Override
     public Mono<Boolean> recovers(RuleBO rule, RuleFact fact) {
-        if (Objects.isNull(rule) || Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())
+        if (Objects.isNull(rule)
+                || Objects.isNull(rule.getRuleExt())
+                || Objects.isNull(rule.getRuleExt().getContent())
                 || Objects.isNull(fact)) {
             return Mono.just(false);
         }
@@ -110,10 +112,11 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
         RuleExt.Window window = window(rule);
         WindowSpec spec = WindowSpecParser.parse(window);
         if (!spec.valid() && Objects.nonNull(rule.getId()) && warnedInvalidRules.add(rule.getId())) {
-            log.warn("Alarm rule evaluation skipped, reason=invalidWindowSpec, ruleId={}, detail={}",
-                    rule.getId(), spec.reason());
+            log.warn(
+                    "Alarm rule evaluation skipped, reason=invalidWindowSpec, ruleId={}, detail={}",
+                    rule.getId(),
+                    spec.reason());
         }
         return spec;
     }
-
 }

@@ -54,5 +54,4 @@ public class MessageBO extends BaseBO implements TenantOwned {
     private Long tenantId;
 
     private Long userId;
-
 }

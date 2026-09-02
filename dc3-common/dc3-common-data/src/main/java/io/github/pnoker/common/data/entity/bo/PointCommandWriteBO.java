@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.bo;
 
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import io.github.pnoker.common.enums.PointCommandSourceEnum;
 
 /**
  * Business object for submitting a point write command.
@@ -33,15 +32,14 @@ import io.github.pnoker.common.enums.PointCommandSourceEnum;
 @ToString
 public class PointCommandWriteBO {
 
-    public PointCommandWriteBO() {
-    }
+    public PointCommandWriteBO() {}
 
     public PointCommandWriteBO(Long deviceId, Long pointId, String value, String commandId) {
         this(deviceId, pointId, value, commandId, null);
     }
 
-    public PointCommandWriteBO(Long deviceId, Long pointId, String value, String commandId,
-                               PointCommandSourceEnum source) {
+    public PointCommandWriteBO(
+            Long deviceId, Long pointId, String value, String commandId, PointCommandSourceEnum source) {
         this.deviceId = deviceId;
         this.pointId = pointId;
         this.value = value;
@@ -70,5 +68,4 @@ public class PointCommandWriteBO {
     private String commandId;
 
     private PointCommandSourceEnum source;
-
 }

@@ -3,9 +3,7 @@ import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
 export function registerDashboardCommand(program: Command): void {
-  const dash = program
-    .command('dashboard')
-    .description('Dashboard and monitoring');
+  const dash = program.command('dashboard').description('Dashboard and monitoring');
 
   // dc3 dashboard stats
   dash
@@ -57,9 +55,7 @@ export function registerDashboardCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(
-        `/api/v3/data/dashboard/topology?mode=${opts.mode}`,
-      );
+      const result = await dc3Client.get(`/api/v3/data/dashboard/topology?mode=${opts.mode}`);
       printAndExit(result, format);
     });
 
@@ -85,9 +81,7 @@ export function registerDashboardCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(
-        `/api/v3/data/dashboard/stream?limit=${opts.limit}`,
-      );
+      const result = await dc3Client.get(`/api/v3/data/dashboard/stream?limit=${opts.limit}`);
       printAndExit(result, format);
     });
 
@@ -98,9 +92,7 @@ export function registerDashboardCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(
-        '/api/v3/manager/dashboard/driver/stats',
-      );
+      const result = await dc3Client.get('/api/v3/manager/dashboard/driver/stats');
       printAndExit(result, format);
     });
 

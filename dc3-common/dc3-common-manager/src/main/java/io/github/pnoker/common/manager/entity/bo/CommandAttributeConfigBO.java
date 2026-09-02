@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
@@ -84,5 +83,4 @@ public class CommandAttributeConfigBO extends BaseBO implements TenantOwned {
      *
      */
     private Integer version;
-
 }

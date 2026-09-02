@@ -31,6 +31,17 @@ For source-run Java processes, load runtime variables from:
 source dc3/env/dev.env.sh
 ```
 
+The root Makefile is the project-level command entry point. The Web application
+and TypeScript CLI retain independent pnpm packages and lockfiles. See
+[`docs/development.md`](docs/development.md) for the full command table:
+
+```bash
+make install-node   # install dc3-web and dc3-cli dependencies
+make dev-auth       # one backend service
+make dev            # auth, gateway, data, manager, agentic
+make check          # Java, Web, CLI, and Python quality gates
+```
+
 For Compose interpolation, copy the root template first:
 
 ```bash

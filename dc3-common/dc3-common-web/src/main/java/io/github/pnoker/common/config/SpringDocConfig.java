@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.swagger.v3.oas.models.Components;
@@ -52,6 +51,7 @@ public class SpringDocConfig {
      * them on every try-it-out call.
      */
     private static final String SCHEME_TENANT = "X-Auth-Tenant";
+
     private static final String SCHEME_LOGIN = "X-Auth-Login";
     private static final String SCHEME_TOKEN = "X-Auth-Token";
 
@@ -75,11 +75,11 @@ public class SpringDocConfig {
                         .title("IoT DC3 REST API")
                         .description("""
                                 IoT DC3 platform REST API documentation.
-                                
+
                                 Covers all service modules: auth (authentication and authorization),
                                 manager (device/driver/point/profile configuration), data (telemetry,
                                 events, commands, notifications), and agentic (AI chat and tools).
-                                
+
                                 Authentication: obtain a salt and token via /api/v3/auth/token/*, then
                                 use the Authorize button to set X-Auth-Tenant, X-Auth-Login, and
                                 X-Auth-Token. X-Auth-Token is a JSON object {"salt":"...","token":"..."}.
@@ -93,12 +93,12 @@ public class SpringDocConfig {
                                 .name("GNU Affero General Public License v3.0")
                                 .url("https://www.gnu.org/licenses/agpl-3.0.txt")))
                 .components(new Components()
-                        .addSecuritySchemes(SCHEME_TENANT, apiKeyHeader(SCHEME_TENANT,
-                                "Tenant code, e.g. 'default'."))
-                        .addSecuritySchemes(SCHEME_LOGIN, apiKeyHeader(SCHEME_LOGIN,
-                                "Login name, e.g. 'dc3'."))
-                        .addSecuritySchemes(SCHEME_TOKEN, apiKeyHeader(SCHEME_TOKEN,
-                                "Token envelope JSON: {\"salt\":\"...\",\"token\":\"...\"}.")))
+                        .addSecuritySchemes(SCHEME_TENANT, apiKeyHeader(SCHEME_TENANT, "Tenant code, e.g. 'default'."))
+                        .addSecuritySchemes(SCHEME_LOGIN, apiKeyHeader(SCHEME_LOGIN, "Login name, e.g. 'dc3'."))
+                        .addSecuritySchemes(
+                                SCHEME_TOKEN,
+                                apiKeyHeader(
+                                        SCHEME_TOKEN, "Token envelope JSON: {\"salt\":\"...\",\"token\":\"...\"}.")))
                 .addSecurityItem(new SecurityRequirement()
                         .addList(SCHEME_TENANT)
                         .addList(SCHEME_LOGIN)

@@ -14,8 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.receiver.rabbit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.command.CommandDedupCache;
 import io.github.pnoker.common.driver.command.DeviceLockManager;
@@ -31,6 +40,11 @@ import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
+import java.time.Instant;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,23 +55,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.time.Instant;
-import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PointCommandReceiverTest {
@@ -88,8 +85,15 @@ class PointCommandReceiverTest {
         DriverProperties properties = new DriverProperties();
         properties.setNode("node-a");
         commandExecutor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
-        receiver = new PointCommandReceiver(driverReadService, driverWriteService,
-                driverSenderService, dedupCache, new DeviceLockManager(), driverMetadata, properties, commandExecutor);
+        receiver = new PointCommandReceiver(
+                driverReadService,
+                driverWriteService,
+                driverSenderService,
+                dedupCache,
+                new DeviceLockManager(),
+                driverMetadata,
+                properties,
+                commandExecutor);
         lenient().when(driverMetadata.getFencingToken(10L)).thenReturn(77L);
         lenient().when(driverSenderService.pointCommandResultSender(any())).thenReturn(Mono.empty());
     }
@@ -129,7 +133,8 @@ class PointCommandReceiverTest {
 
     @Test
     void rejectsInvalidEnvelopeAsDeadLetter() {
-        StepVerifier.create(receiver.pointCommandReceive(received(null, false), ack)).verifyComplete();
+        StepVerifier.create(receiver.pointCommandReceive(received(null, false), ack))
+                .verifyComplete();
 
         verify(ack).reject(false);
         verifyNoInteractions(driverReadService, driverWriteService, driverSenderService);
@@ -137,12 +142,21 @@ class PointCommandReceiverTest {
 
     @Test
     void rejectsInvalidPayloadAsDeadLetter() {
-        PointCommandDTO command = new PointCommandDTO("bad-read", 100L, "node-a", 77L,
-                PointCommandTypeEnum.READ, new PointCommandPayload.ReadPayload(null, 20L),
-                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
-                Instant.now(), Instant.now().plusSeconds(10), 1);
+        PointCommandDTO command = new PointCommandDTO(
+                "bad-read",
+                100L,
+                "node-a",
+                77L,
+                PointCommandTypeEnum.READ,
+                new PointCommandPayload.ReadPayload(null, 20L),
+                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP,
+                null,
+                Instant.now(),
+                Instant.now().plusSeconds(10),
+                1);
 
-        StepVerifier.create(receiver.pointCommandReceive(received(command, false), ack)).verifyComplete();
+        StepVerifier.create(receiver.pointCommandReceive(received(command, false), ack))
+                .verifyComplete();
 
         verify(ack).reject(false);
         verifyNoInteractions(driverReadService, driverWriteService, driverSenderService);
@@ -150,7 +164,9 @@ class PointCommandReceiverTest {
 
     @Test
     void firstExecutionFailurePropagatesAndReleasesDedup() {
-        doThrow(new IllegalStateException("driver offline")).when(driverReadService).read(10L, 20L);
+        doThrow(new IllegalStateException("driver offline"))
+                .when(driverReadService)
+                .read(10L, 20L);
 
         StepVerifier.create(receiver.pointCommandReceive(received(readCommand("test-cmd-4"), false), ack))
                 .expectErrorMessage("driver offline")
@@ -163,7 +179,9 @@ class PointCommandReceiverTest {
 
     @Test
     void redeliveryExecutionFailurePublishesTerminalFailure() {
-        doThrow(new IllegalStateException("driver offline")).when(driverReadService).read(10L, 20L);
+        doThrow(new IllegalStateException("driver offline"))
+                .when(driverReadService)
+                .read(10L, 20L);
 
         StepVerifier.create(receiver.pointCommandReceive(received(readCommand("test-cmd-5"), true), ack))
                 .verifyComplete();
@@ -191,12 +209,21 @@ class PointCommandReceiverTest {
 
     @Test
     void expiredCommandPublishesExpiredResultWithoutDedupAcquisition() {
-        PointCommandDTO expired = new PointCommandDTO("exp-cmd", 100L, "node-a", 77L,
-                PointCommandTypeEnum.READ, new PointCommandPayload.ReadPayload(10L, 20L),
-                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
-                Instant.now().minusSeconds(60), Instant.now().minusSeconds(30), 1);
+        PointCommandDTO expired = new PointCommandDTO(
+                "exp-cmd",
+                100L,
+                "node-a",
+                77L,
+                PointCommandTypeEnum.READ,
+                new PointCommandPayload.ReadPayload(10L, 20L),
+                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP,
+                null,
+                Instant.now().minusSeconds(60),
+                Instant.now().minusSeconds(30),
+                1);
 
-        StepVerifier.create(receiver.pointCommandReceive(received(expired, false), ack)).verifyComplete();
+        StepVerifier.create(receiver.pointCommandReceive(received(expired, false), ack))
+                .verifyComplete();
 
         verifyNoInteractions(driverReadService, driverWriteService);
         ArgumentCaptor<PointCommandResultDTO> captor = ArgumentCaptor.forClass(PointCommandResultDTO.class);
@@ -259,16 +286,32 @@ class PointCommandReceiverTest {
     }
 
     private PointCommandDTO readCommand(String commandId) {
-        return new PointCommandDTO(commandId, 100L, "node-a", 77L, PointCommandTypeEnum.READ,
+        return new PointCommandDTO(
+                commandId,
+                100L,
+                "node-a",
+                77L,
+                PointCommandTypeEnum.READ,
                 new PointCommandPayload.ReadPayload(10L, 20L),
-                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
-                Instant.now(), Instant.now().plusSeconds(10), 1);
+                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP,
+                null,
+                Instant.now(),
+                Instant.now().plusSeconds(10),
+                1);
     }
 
     private PointCommandDTO writeCommand(String commandId) {
-        return new PointCommandDTO(commandId, 100L, "node-a", 77L, PointCommandTypeEnum.WRITE,
+        return new PointCommandDTO(
+                commandId,
+                100L,
+                "node-a",
+                77L,
+                PointCommandTypeEnum.WRITE,
                 new PointCommandPayload.WritePayload(10L, 20L, "42"),
-                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP, null,
-                Instant.now(), Instant.now().plusSeconds(10), 1);
+                io.github.pnoker.common.enums.PointCommandSourceEnum.HTTP,
+                null,
+                Instant.now(),
+                Instant.now().plusSeconds(10),
+                1);
     }
 }

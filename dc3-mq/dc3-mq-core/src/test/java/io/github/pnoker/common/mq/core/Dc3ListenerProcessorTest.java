@@ -14,16 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.core;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.pnoker.common.constant.common.RequestIdConstant;
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.OrderingGuarantee;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.adapter.BrokerCapabilities;
-import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
 import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireConfirmation;
@@ -34,6 +35,12 @@ import io.github.pnoker.common.mq.listener.MqReceived;
 import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
 import io.github.pnoker.common.utils.JsonUtil;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
@@ -42,15 +49,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import reactor.core.scheduler.Schedulers;
 import reactor.test.StepVerifier;
-
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class Dc3ListenerProcessorTest {
 
@@ -111,8 +109,8 @@ class Dc3ListenerProcessorTest {
     void batchUsesOneCompletionDecision() {
         CapturingAdapter adapter = register(new BatchListener());
 
-        StepVerifier.create(adapter.batchListener.onBatch(List.of(
-                        delivery("first", Map.of()), delivery("second", Map.of()))))
+        StepVerifier.create(adapter.batchListener.onBatch(
+                        List.of(delivery("first", Map.of()), delivery("second", Map.of()))))
                 .expectNext(DeliveryDisposition.DEAD_LETTER)
                 .verifyComplete();
     }
@@ -135,8 +133,7 @@ class Dc3ListenerProcessorTest {
         MdcListener listener = new MdcListener();
         CapturingAdapter adapter = register(listener);
 
-        StepVerifier.create(adapter.listener.onDelivery(delivery("value",
-                        Map.of(MqHeaders.REQUEST_ID, "request-42"))))
+        StepVerifier.create(adapter.listener.onDelivery(delivery("value", Map.of(MqHeaders.REQUEST_ID, "request-42"))))
                 .expectNext(DeliveryDisposition.ACK)
                 .verifyComplete();
 
@@ -162,12 +159,11 @@ class Dc3ListenerProcessorTest {
     }
 
     private WireMqDelivery delivery(String value, Map<String, String> headers) {
-        return new WireMqDelivery(JsonUtil.toJsonString(new Payload(value)).getBytes(StandardCharsets.UTF_8),
-                headers, false);
+        return new WireMqDelivery(
+                JsonUtil.toJsonString(new Payload(value)).getBytes(StandardCharsets.UTF_8), headers, false);
     }
 
-    private record Payload(String value) {
-    }
+    private record Payload(String value) {}
 
     private static final class CompletionListener {
         private final Sinks.Empty<Void> completion = Sinks.empty();
@@ -243,17 +239,14 @@ class Dc3ListenerProcessorTest {
 
         @Override
         public BrokerCapabilities capabilities() {
-            return new BrokerCapabilities(false, true, true, true, true, true, true,
-                    OrderingGuarantee.NONE);
+            return new BrokerCapabilities(false, true, true, true, true, true, true, OrderingGuarantee.NONE);
         }
 
         @Override
-        public void publish(WireMqMessage message) {
-        }
+        public void publish(WireMqMessage message) {}
 
         @Override
-        public void publish(WireMqMessage message, WireConfirmation confirmation) {
-        }
+        public void publish(WireMqMessage message, WireConfirmation confirmation) {}
 
         @Override
         public void subscribe(SubscriptionSpec spec, RawDeliveryListener listener) {

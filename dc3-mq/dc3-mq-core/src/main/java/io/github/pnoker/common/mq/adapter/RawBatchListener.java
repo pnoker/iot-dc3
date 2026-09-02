@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.adapter;
 
 import io.github.pnoker.common.constant.mq.DeliveryDisposition;
-import reactor.core.publisher.Mono;
-
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * Batch callback the core registers with the adapter. Every delivery in the batch

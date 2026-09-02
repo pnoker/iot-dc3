@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.sql.AbstractJdbcDriverCustomService;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Service;
 
 /**
  * Custom driver service implementation for the Oracle driver.
@@ -83,5 +81,4 @@ public class OracleDriverCustomServiceImpl extends AbstractJdbcDriverCustomServi
                 .issues(issues)
                 .build();
     }
-
 }

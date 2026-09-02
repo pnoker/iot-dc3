@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.bo.PointValueVolumeBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
-
+import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import java.time.Instant;
 import java.util.List;
 import reactor.core.publisher.Mono;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.CursorPage;
 
 /**
  * Business service for point value operations.
@@ -55,11 +53,11 @@ public interface PointValueService {
      * @param tenantId Tenant ID (required for tenant isolation)
      * @param deviceId Device ID
      * @param pointId  Point ID
-     * @param count    Number of values to retrieve
+     * @param cursor   Opaque cursor returned by the previous page
+     * @param limit    Number of values to retrieve
      * @return History values (each with create_time), newest first
      */
-    Mono<CursorPage<PointValueBO>> history(Long tenantId, Long deviceId, Long pointId,
-                                           String cursor, int limit);
+    Mono<CursorPage<PointValueBO>> history(Long tenantId, Long deviceId, Long pointId, String cursor, int limit);
 
     /**
      * Get latest point values with pagination and sorting
@@ -86,5 +84,4 @@ public interface PointValueService {
      * @return the volume rows, never {@code null}
      */
     Mono<List<PointValueVolumeBO>> seriesVolumes(Long tenantId, Instant from);
-
 }

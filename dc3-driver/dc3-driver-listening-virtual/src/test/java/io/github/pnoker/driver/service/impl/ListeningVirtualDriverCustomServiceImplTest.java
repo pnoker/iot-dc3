@@ -14,8 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -30,25 +38,15 @@ import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.github.pnoker.driver.service.netty.udp.NettyUdpServer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import java.lang.reflect.Field;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ListeningVirtualDriverCustomServiceImplTest {
@@ -92,8 +90,8 @@ class ListeningVirtualDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        service = new ListeningVirtualDriverCustomServiceImpl(driverMetadata, driverSenderService, nettyTcpServer,
-                nettyUdpServer, threadPoolExecutor);
+        service = new ListeningVirtualDriverCustomServiceImpl(
+                driverMetadata, driverSenderService, nettyTcpServer, nettyUdpServer, threadPoolExecutor);
         injectField("tcpPort", 6700);
         injectField("udpPort", 6800);
     }
@@ -156,8 +154,15 @@ class ListeningVirtualDriverCustomServiceImplTest {
         when(future.isSuccess()).thenReturn(true);
         NettyTcpServer.registerDeviceChannel(900L, channel);
 
-        Boolean ok = service.write(null, null, device, point,
-                WritePointValue.builder().value("hello").type(PointTypeEnum.STRING).build());
+        Boolean ok = service.write(
+                null,
+                null,
+                device,
+                point,
+                WritePointValue.builder()
+                        .value("hello")
+                        .type(PointTypeEnum.STRING)
+                        .build());
 
         assertThat(ok).isTrue();
         verify(channel).writeAndFlush(any(byte[].class));
@@ -175,8 +180,15 @@ class ListeningVirtualDriverCustomServiceImplTest {
         when(future.isSuccess()).thenReturn(false);
         NettyTcpServer.registerDeviceChannel(902L, channel);
 
-        Boolean ok = service.write(null, null, device, point,
-                WritePointValue.builder().value("hello").type(PointTypeEnum.STRING).build());
+        Boolean ok = service.write(
+                null,
+                null,
+                device,
+                point,
+                WritePointValue.builder()
+                        .value("hello")
+                        .type(PointTypeEnum.STRING)
+                        .build());
 
         assertThat(ok).isFalse();
     }
@@ -186,8 +198,15 @@ class ListeningVirtualDriverCustomServiceImplTest {
         DeviceBO device = device(901L);
         PointBO point = point(2L);
 
-        Boolean ok = service.write(null, null, device, point,
-                WritePointValue.builder().value("hello").type(PointTypeEnum.STRING).build());
+        Boolean ok = service.write(
+                null,
+                null,
+                device,
+                point,
+                WritePointValue.builder()
+                        .value("hello")
+                        .type(PointTypeEnum.STRING)
+                        .build());
 
         assertThat(ok).isFalse();
         // No channel was registered, so nothing was flushed.

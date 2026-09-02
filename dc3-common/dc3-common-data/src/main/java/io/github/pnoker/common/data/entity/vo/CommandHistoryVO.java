@@ -14,22 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.enums.CommandHistorySourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * View object for command history API responses.
@@ -70,7 +68,9 @@ public class CommandHistoryVO implements Serializable {
     @Schema(description = "Command parameter values", example = "{\"temperature\": \"50\"}")
     private String paramValues;
 
-    @Schema(description = "Result values returned from the device after command execution, keyed by parameter code.", example = "{\"status\": \"00\"}")
+    @Schema(
+            description = "Result values returned from the device after command execution, keyed by parameter code.",
+            example = "{\"status\": \"00\"}")
     private String resultValues;
 
     @Schema(description = "Command configuration snapshot", example = "{\"timeout\": 3000}")
@@ -100,7 +100,9 @@ public class CommandHistoryVO implements Serializable {
     @Schema(description = "Timestamp when the command execution completed (success or failure).")
     private LocalDateTime finishTime;
 
-    @Schema(description = "Timestamp when the command expires. If the device does not respond by this time, the command is considered failed.")
+    @Schema(
+            description =
+                    "Timestamp when the command expires. If the device does not respond by this time, the command is considered failed.")
     private LocalDateTime expireTime;
 
     @Schema(description = "Schema version")
@@ -111,5 +113,4 @@ public class CommandHistoryVO implements Serializable {
 
     @Schema(description = "Last operation time")
     private LocalDateTime operateTime;
-
 }

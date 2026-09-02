@@ -3,9 +3,7 @@ import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
 export function registerAlertCommand(program: Command): void {
-  const alert = program
-    .command('alert')
-    .description('Alarm/alert management');
+  const alert = program.command('alert').description('Alarm/alert management');
 
   // dc3 alert stats
   alert
@@ -29,13 +27,11 @@ export function registerAlertCommand(program: Command): void {
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const body: Record<string, unknown> = {
-        offset: Number(opts.offset), limit: Number(opts.limit),
+        offset: Number(opts.offset),
+        limit: Number(opts.limit),
       };
       if (opts.source) body.source = opts.source;
-      const result = await dc3Client.post(
-        '/api/v3/data/dashboard/alert/page',
-        body,
-      );
+      const result = await dc3Client.post('/api/v3/data/dashboard/alert/page', body);
       printAndExit(result, format);
     });
 
@@ -47,9 +43,7 @@ export function registerAlertCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(
-        `/api/v3/data/dashboard/alert/latest?limit=${opts.limit}`,
-      );
+      const result = await dc3Client.get(`/api/v3/data/dashboard/alert/latest?limit=${opts.limit}`);
       printAndExit(result, format);
     });
 
@@ -91,9 +85,7 @@ export function registerAlertCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(
-        `/api/v3/data/dashboard/alert/trend?days=${opts.days}`,
-      );
+      const result = await dc3Client.get(`/api/v3/data/dashboard/alert/trend?days=${opts.days}`);
       printAndExit(result, format);
     });
 
@@ -149,11 +141,7 @@ export function registerAlertCommand(program: Command): void {
     return qs.length ? `${base}?${qs.join('&')}` : base;
   };
 
-  const addGetAnalysis = (
-    name: string,
-    sub: string,
-    description: string,
-  ): void => {
+  const addGetAnalysis = (name: string, sub: string, description: string): void => {
     alert
       .command(name)
       .description(description)
@@ -186,7 +174,9 @@ export function registerAlertCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(appendQuery('/api/v3/data/dashboard/alert/change_impact', opts));
+      const result = await dc3Client.get(
+        appendQuery('/api/v3/data/dashboard/alert/change_impact', opts),
+      );
       printAndExit(result, format);
     });
 
@@ -222,9 +212,7 @@ export function registerAlertCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(
-        `/api/v3/data/dashboard/coverage/gap?limit=${opts.limit}`,
-      );
+      const result = await dc3Client.get(`/api/v3/data/dashboard/coverage/gap?limit=${opts.limit}`);
       printAndExit(result, format);
     });
 

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -49,22 +48,35 @@ public class EventAttributeConfigVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "ID of the event attribute whose value is being configured.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Event attribute ID can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "ID of the event attribute whose value is being configured.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Event attribute ID can't be empty",
+            groups = {Add.class, Update.class})
     private String attributeId;
 
     /**
      *
      */
-    @Schema(description = "The configured value overriding the attribute default for this specific device.", example = "CRITICAL", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(
+            description = "The configured value overriding the attribute default for this specific device.",
+            example = "CRITICAL",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Event attribute config value can't be empty")
     private String configValue;
 
     /**
      * Device ID
      */
-    @Schema(description = "ID of the device this configuration applies to.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Device ID can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "ID of the device this configuration applies to.",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Device ID can't be empty",
+            groups = {Add.class, Update.class})
     private String deviceId;
 
     /**
@@ -76,8 +88,13 @@ public class EventAttributeConfigVO extends BaseVO {
     /**
      * Event ID
      */
-    @Schema(description = "ID of the event this configuration is scoped to; must belong to the current tenant.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Event ID can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "ID of the event this configuration is scoped to; must belong to the current tenant.",
+            example = "4096",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Event ID can't be empty",
+            groups = {Add.class, Update.class})
     private String eventId;
 
     /**
@@ -97,5 +114,4 @@ public class EventAttributeConfigVO extends BaseVO {
      */
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
-
 }

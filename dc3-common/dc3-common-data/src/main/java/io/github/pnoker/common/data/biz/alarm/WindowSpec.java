@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.enums.WindowModeEnum;
-
 import java.time.Duration;
 
 /**
@@ -71,5 +69,4 @@ public record WindowSpec(WindowModeEnum mode, Duration duration, int minSamples,
     public static WindowSpec invalid(String reason) {
         return new WindowSpec(null, null, 0, false, reason);
     }
-
 }

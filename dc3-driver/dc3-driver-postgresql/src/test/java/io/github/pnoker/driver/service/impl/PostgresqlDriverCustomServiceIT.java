@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
@@ -24,21 +25,18 @@ import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 /**
  * Integration test for the PostgreSQL driver against a real PostgreSQL instance.
@@ -65,7 +63,10 @@ class PostgresqlDriverCustomServiceIT {
     }
 
     private static AttributeBO intAttr(int value) {
-        return AttributeBO.builder().value(String.valueOf(value)).type(AttributeTypeEnum.INT).build();
+        return AttributeBO.builder()
+                .value(String.valueOf(value))
+                .type(AttributeTypeEnum.INT)
+                .build();
     }
 
     private static Map<String, AttributeBO> driverConfig() {
@@ -95,8 +96,8 @@ class PostgresqlDriverCustomServiceIT {
         service = new PostgresqlDriverCustomServiceImpl();
         service.initial();
         try (Connection conn = DriverManager.getConnection(
-                POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
-             Statement st = conn.createStatement()) {
+                        POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
+                Statement st = conn.createStatement()) {
             st.execute("DROP TABLE IF EXISTS sensor");
             st.execute("CREATE TABLE sensor (id INT PRIMARY KEY, v VARCHAR(255))");
             st.execute("INSERT INTO sensor (id, v) VALUES (1, '42')");
@@ -119,18 +120,24 @@ class PostgresqlDriverCustomServiceIT {
         Map<String, AttributeBO> pointConfig = new HashMap<>();
         pointConfig.put("writeQuery", str("UPDATE sensor SET v = ? WHERE id = 1"));
 
-        Boolean result = service.write(driverConfig(), pointConfig, device(1L), point(1L),
-                WritePointValue.builder().value(maliciousValue).type(PointTypeEnum.STRING).build());
+        Boolean result = service.write(
+                driverConfig(),
+                pointConfig,
+                device(1L),
+                point(1L),
+                WritePointValue.builder()
+                        .value(maliciousValue)
+                        .type(PointTypeEnum.STRING)
+                        .build());
 
         assertThat(result).isTrue();
         // The table must still exist and store the payload verbatim — the injection was neutralised.
         try (Connection conn = DriverManager.getConnection(
-                POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery("SELECT v FROM sensor WHERE id = 1")) {
+                        POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
+                Statement st = conn.createStatement();
+                ResultSet rs = st.executeQuery("SELECT v FROM sensor WHERE id = 1")) {
             assertThat(rs.next()).isTrue();
             assertThat(rs.getString(1)).isEqualTo(maliciousValue);
         }
     }
-
 }

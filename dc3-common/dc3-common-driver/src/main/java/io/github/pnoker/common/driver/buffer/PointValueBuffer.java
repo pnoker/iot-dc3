@@ -14,14 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.buffer;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.pnoker.common.exception.ServiceException;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,6 +29,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * SQLite-backed DAO for the local point-value buffer. Owns a single-connection HikariCP
@@ -125,7 +123,8 @@ public class PointValueBuffer {
     }
 
     private void validateDurability() {
-        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+        try (Connection conn = dataSource.getConnection();
+                Statement stmt = conn.createStatement()) {
             String journalMode;
             try (ResultSet rs = stmt.executeQuery("PRAGMA journal_mode")) {
                 journalMode = rs.next() ? rs.getString(1) : null;
@@ -143,7 +142,8 @@ public class PointValueBuffer {
     }
 
     private void createTableIfNotExists() {
-        try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
+        try (Connection conn = dataSource.getConnection();
+                Statement stmt = conn.createStatement()) {
             stmt.execute(CREATE_TABLE_SQL);
             stmt.execute(CREATE_INDEX_NEXT_SQL);
             stmt.execute(CREATE_INDEX_CREATED_SQL);
@@ -168,7 +168,7 @@ public class PointValueBuffer {
             return;
         }
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(UPSERT_SQL)) {
+                PreparedStatement ps = conn.prepareStatement(UPSERT_SQL)) {
             conn.setAutoCommit(false);
             try {
                 for (BufferedPointValue record : records) {
@@ -210,7 +210,7 @@ public class PointValueBuffer {
     public List<BufferedPointValue> selectPending(int batchSize, long nowEpochSec) {
         List<BufferedPointValue> records = new ArrayList<>(batchSize);
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_PENDING_SQL)) {
+                PreparedStatement ps = conn.prepareStatement(SELECT_PENDING_SQL)) {
             ps.setLong(1, nowEpochSec);
             ps.setInt(2, batchSize);
             try (ResultSet rs = ps.executeQuery()) {
@@ -225,8 +225,7 @@ public class PointValueBuffer {
                             rs.getString("routing_key"),
                             rs.getInt("attempt"),
                             rs.getLong("next_attempt_at"),
-                            rs.getLong("created_at")
-                    ));
+                            rs.getLong("created_at")));
                 }
             }
         } catch (SQLException e) {
@@ -240,7 +239,7 @@ public class PointValueBuffer {
      */
     public void delete(String id) {
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
+                PreparedStatement ps = conn.prepareStatement(DELETE_SQL)) {
             ps.setString(1, id);
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -253,7 +252,7 @@ public class PointValueBuffer {
      */
     public void markRetry(String id, int attempt, long nextAttemptAt) {
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement ps = conn.prepareStatement(MARK_RETRY_SQL)) {
+                PreparedStatement ps = conn.prepareStatement(MARK_RETRY_SQL)) {
             ps.setInt(1, attempt);
             ps.setLong(2, nextAttemptAt);
             ps.setString(3, id);
@@ -268,8 +267,8 @@ public class PointValueBuffer {
      */
     public long count() {
         try (Connection conn = dataSource.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(COUNT_SQL)) {
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(COUNT_SQL)) {
             return rs.next() ? rs.getLong(1) : 0;
         } catch (SQLException e) {
             log.error("Buffer count failed", e);

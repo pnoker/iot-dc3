@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import com.zsmartsystems.zigbee.ZigBeeNetworkManager;
@@ -36,8 +35,8 @@ public class ZigbeeNetworkManagerFactory {
      * @return a network manager ready to be initialized by the driver lifecycle
      */
     public ZigBeeNetworkManager create(String serialPort, int baudRate) {
-        ZigBeeSerialPort serialPortConnection = new ZigBeeSerialPort(serialPort, baudRate,
-                ZigBeeSerialPort.FlowControl.FLOWCONTROL_OUT_XONOFF);
+        ZigBeeSerialPort serialPortConnection =
+                new ZigBeeSerialPort(serialPort, baudRate, ZigBeeSerialPort.FlowControl.FLOWCONTROL_OUT_XONOFF);
         return new ZigBeeNetworkManager(new ZigBeeDongleTelegesis(serialPortConnection));
     }
 }

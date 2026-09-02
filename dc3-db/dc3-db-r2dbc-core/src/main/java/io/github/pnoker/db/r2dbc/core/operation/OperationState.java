@@ -1,7 +1,22 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.db.r2dbc.core.operation;
 
 import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
-
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
@@ -31,11 +46,13 @@ public record OperationState(
         if (tenantId == null || tenantId <= 0) {
             throw new IllegalArgumentException("tenantId must be positive");
         }
-        if (idempotencyKey == null || idempotencyKey.isBlank()
+        if (idempotencyKey == null
+                || idempotencyKey.isBlank()
                 || idempotencyKey.codePoints().count() > MAX_IDEMPOTENCY_KEY_LENGTH
                 || !idempotencyKey.equals(idempotencyKey.trim())
                 || idempotencyKey.codePoints().anyMatch(Character::isISOControl)) {
-            throw new IllegalArgumentException("idempotencyKey must be 1..191 printable characters without surrounding whitespace");
+            throw new IllegalArgumentException(
+                    "idempotencyKey must be 1..191 printable characters without surrounding whitespace");
         }
         Objects.requireNonNull(status, "status must not be null");
         if (progress < 0 || progress > 100) {
@@ -69,18 +86,32 @@ public record OperationState(
     }
 
     public static OperationState pending(
-            UUID operationId, Long tenantId, String idempotencyKey, String requestHash, Instant now,
+            UUID operationId,
+            Long tenantId,
+            String idempotencyKey,
+            String requestHash,
+            Instant now,
             Instant expiresAt) {
-        return new OperationState(operationId, tenantId, idempotencyKey,
-                Status.PENDING, 0, now, now, expiresAt, requestHash.toLowerCase(java.util.Locale.ROOT), null, null);
+        return new OperationState(
+                operationId,
+                tenantId,
+                idempotencyKey,
+                Status.PENDING,
+                0,
+                now,
+                now,
+                expiresAt,
+                requestHash.toLowerCase(java.util.Locale.ROOT),
+                null,
+                null);
     }
 
     public OperationState transition(Status nextStatus, int nextProgress, Instant now) {
         return transition(nextStatus, nextProgress, result, error, now);
     }
 
-    public OperationState transition(Status nextStatus, int nextProgress, String nextResult, String nextError,
-                                     Instant now) {
+    public OperationState transition(
+            Status nextStatus, int nextProgress, String nextResult, String nextError, Instant now) {
         Objects.requireNonNull(nextStatus, "nextStatus must not be null");
         Objects.requireNonNull(now, "now must not be null");
         if (!canTransitionTo(nextStatus)) {
@@ -95,8 +126,18 @@ public record OperationState(
         if (nextStatus == Status.EXPIRED && (expiresAt == null || now.isBefore(expiresAt))) {
             throw new IllegalStateException("operation cannot expire before expiresAt");
         }
-        return new OperationState(operationId, tenantId, idempotencyKey, nextStatus,
-                nextProgress, createdAt, now, expiresAt, requestHash, nextResult, nextError);
+        return new OperationState(
+                operationId,
+                tenantId,
+                idempotencyKey,
+                nextStatus,
+                nextProgress,
+                createdAt,
+                now,
+                expiresAt,
+                requestHash,
+                nextResult,
+                nextError);
     }
 
     public static boolean isTransitionAllowed(Status current, Status next) {
@@ -104,8 +145,12 @@ public record OperationState(
         Objects.requireNonNull(next, "next status must not be null");
         return switch (current) {
             case PENDING -> next == Status.RUNNING || next == Status.CANCELLED || next == Status.EXPIRED;
-            case RUNNING -> next == Status.RUNNING || next == Status.SUCCEEDED || next == Status.FAILED
-                    || next == Status.CANCELLED || next == Status.EXPIRED;
+            case RUNNING ->
+                next == Status.RUNNING
+                        || next == Status.SUCCEEDED
+                        || next == Status.FAILED
+                        || next == Status.CANCELLED
+                        || next == Status.EXPIRED;
             case SUCCEEDED, FAILED, CANCELLED, EXPIRED -> false;
         };
     }

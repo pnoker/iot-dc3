@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.common.TimeConstant;
 import io.github.pnoker.common.data.biz.store.PointValueSampleConverter;
+import io.github.pnoker.common.data.repository.ReactiveTsdbStore;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.WindowModeEnum;
 import io.github.pnoker.common.tsdb.model.TsdbModel.AggregateFunction;
@@ -27,15 +27,12 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
 import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
 import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
-import io.github.pnoker.common.data.repository.ReactiveTsdbStore;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -69,8 +66,10 @@ public class TsdbWindowDataSource implements WindowDataSource {
     private final PointValueSampleConverter converter;
 
     private static boolean isPointFact(RuleFact fact) {
-        return Objects.nonNull(fact) && fact.getAlarmTargetTypeFlag() == AlarmTargetTypeEnum.POINT
-                && Objects.nonNull(fact.getTenantId()) && Objects.nonNull(fact.getEntityId());
+        return Objects.nonNull(fact)
+                && fact.getAlarmTargetTypeFlag() == AlarmTargetTypeEnum.POINT
+                && Objects.nonNull(fact.getTenantId())
+                && Objects.nonNull(fact.getEntityId());
     }
 
     private static Long longValue(Object value) {
@@ -92,8 +91,8 @@ public class TsdbWindowDataSource implements WindowDataSource {
         if (Objects.isNull(deviceId) || deviceId <= 0) {
             return Mono.just(AggregateOutcome.empty());
         }
-        LocalDateTime to = Objects.requireNonNullElse(fact.getFactTime(),
-                LocalDateTime.now(TimeConstant.DEFAULT_ZONEID));
+        LocalDateTime to =
+                Objects.requireNonNullElse(fact.getFactTime(), LocalDateTime.now(TimeConstant.DEFAULT_ZONEID));
         LocalDateTime from = to.minus(spec.duration());
 
         // Store failures propagate on purpose: swallowing them here would make
@@ -101,12 +100,17 @@ public class TsdbWindowDataSource implements WindowDataSource {
         // as non-exceeding — silent missed alarms. Failing the evaluation keeps
         // the breakage visible.
         SeriesKey series = new SeriesKey(fact.getTenantId(), deviceId, fact.getEntityId());
-        return tsdbStore.aggregate(SeriesFilter.of(series),
-                AggregateFunction.valueOf(mode.toAggregateFunction().name()),
-                new TimeWindow(converter.toInstant(from), converter.toInstant(to)),
-                null, DEADLINE)
+        return tsdbStore
+                .aggregate(
+                        SeriesFilter.of(series),
+                        AggregateFunction.valueOf(mode.toAggregateFunction().name()),
+                        new TimeWindow(converter.toInstant(from), converter.toInstant(to)),
+                        null,
+                        DEADLINE)
                 .flatMap(values -> Mono.justOrEmpty(values.get(series)))
-                .map(result -> new AggregateOutcome(Objects.isNull(result.value()) ? null : BigDecimal.valueOf(result.value()), result.sampleCount()))
+                .map(result -> new AggregateOutcome(
+                        Objects.isNull(result.value()) ? null : BigDecimal.valueOf(result.value()),
+                        result.sampleCount()))
                 .defaultIfEmpty(AggregateOutcome.empty());
     }
 
@@ -119,22 +123,23 @@ public class TsdbWindowDataSource implements WindowDataSource {
         if (Objects.isNull(deviceId) || deviceId <= 0) {
             return Flux.empty();
         }
-        LocalDateTime to = Objects.requireNonNullElse(fact.getFactTime(),
-                LocalDateTime.now(TimeConstant.DEFAULT_ZONEID));
+        LocalDateTime to =
+                Objects.requireNonNullElse(fact.getFactTime(), LocalDateTime.now(TimeConstant.DEFAULT_ZONEID));
         LocalDateTime from = to.minus(spec.duration());
         // Same propagation policy as aggregate(): silent empty = missed alarms.
         SeriesKey series = new SeriesKey(fact.getTenantId(), deviceId, fact.getEntityId());
         TimeWindow window = new TimeWindow(converter.toInstant(from), converter.toInstant(to));
 
-        return tsdbStore.history(SeriesFilter.of(series), window, null, SAMPLE_PAGE_SIZE, DEADLINE)
+        return tsdbStore
+                .history(SeriesFilter.of(series), window, null, SAMPLE_PAGE_SIZE, DEADLINE)
                 .expand(page -> Objects.isNull(page.nextCursor())
                         ? Mono.empty()
-                        : tsdbStore.history(SeriesFilter.of(series), window, page.nextCursor(), SAMPLE_PAGE_SIZE, DEADLINE))
+                        : tsdbStore.history(
+                                SeriesFilter.of(series), window, page.nextCursor(), SAMPLE_PAGE_SIZE, DEADLINE))
                 .concatMapIterable(page -> page.items())
                 .take((long) SAMPLE_PAGE_SIZE * 20)
                 .sort(Comparator.comparing(PointValueSample::deviceTime))
-                .map(sample -> new WindowSample(sample.numericValue(), sample.calValue(),
-                        converter.toWallClock(sample.deviceTime())));
+                .map(sample -> new WindowSample(
+                        sample.numericValue(), sample.calValue(), converter.toWallClock(sample.deviceTime())));
     }
-
 }

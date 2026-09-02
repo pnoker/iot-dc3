@@ -14,21 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * Query view object for paging the MCP tool catalog.
@@ -51,7 +49,11 @@ public class McpToolCatalogQueryVO implements Serializable {
     @Schema(description = "Zero-based result offset.", example = "0", minimum = "0")
     private Long offset;
 
-    @Schema(description = "Maximum number of results; bounded to 1..200.", example = "50", minimum = "1", maximum = "200")
+    @Schema(
+            description = "Maximum number of results; bounded to 1..200.",
+            example = "50",
+            minimum = "1",
+            maximum = "200")
     private Integer limit;
 
     @Schema(description = "Stable sort fields; only server-approved fields are accepted.")
@@ -62,5 +64,4 @@ public class McpToolCatalogQueryVO implements Serializable {
 
     @Schema(description = "Filter by tool risk level: LOW, MEDIUM or HIGH.", example = "LOW")
     private String riskLevel;
-
 }

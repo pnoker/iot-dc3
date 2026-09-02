@@ -14,33 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.store.impl;
-
-import io.github.pnoker.common.data.biz.store.PointValueSampleConverter;
-import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.entity.builder.PointValueBuilder;
-import io.github.pnoker.common.data.entity.model.PointValueDO;
-import io.github.pnoker.common.data.repository.ReactivePointValueLatestStore;
-import io.github.pnoker.common.data.repository.ReactivePointValueIngestOutbox;
-import reactor.core.publisher.Mono;
-import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.facade.api.DeviceFacade;
-import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
-import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
-import io.github.pnoker.common.data.repository.ReactiveTsdbStore;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InOrder;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -52,6 +26,30 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
+import io.github.pnoker.common.data.biz.store.PointValueSampleConverter;
+import io.github.pnoker.common.data.entity.builder.PointValueBuilder;
+import io.github.pnoker.common.data.entity.model.PointValueDO;
+import io.github.pnoker.common.data.repository.ReactivePointValueIngestOutbox;
+import io.github.pnoker.common.data.repository.ReactivePointValueLatestStore;
+import io.github.pnoker.common.data.repository.ReactiveTsdbStore;
+import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.facade.api.DeviceFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
+import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
+import java.time.LocalDateTime;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class PointValueIngestServiceImplTest {
@@ -108,15 +106,17 @@ class PointValueIngestServiceImplTest {
         // same-size DO list keeps the test off MapStruct internals.
         lenient().when(pointValueBuilder.buildDOListByBOList(anyList())).thenAnswer(invocation -> {
             List<PointValueBO> input = invocation.getArgument(0);
-            return input.stream().map(bo -> {
-                PointValueDO row = new PointValueDO();
-                row.setTenantId(bo.getTenantId());
-                row.setMessageId(bo.getMessageId());
-                row.setDeviceId(bo.getDeviceId());
-                row.setPointId(bo.getPointId());
-                row.setCreateTime(bo.getCreateTime());
-                return row;
-            }).toList();
+            return input.stream()
+                    .map(bo -> {
+                        PointValueDO row = new PointValueDO();
+                        row.setTenantId(bo.getTenantId());
+                        row.setMessageId(bo.getMessageId());
+                        row.setDeviceId(bo.getDeviceId());
+                        row.setPointId(bo.getPointId());
+                        row.setCreateTime(bo.getCreateTime());
+                        return row;
+                    })
+                    .toList();
         });
         lenient().when(pointValueBuilder.buildDOByBO(any())).thenAnswer(invocation -> {
             PointValueBO bo = invocation.getArgument(0);
@@ -125,12 +125,14 @@ class PointValueIngestServiceImplTest {
             row.setMessageId(bo.getMessageId());
             return row;
         });
-        lenient().when(deviceFacade.getActiveOwnerReactive(1L, 10L))
+        lenient()
+                .when(deviceFacade.getActiveOwnerReactive(1L, 10L))
                 .thenReturn(Mono.just(new FacadeDeviceOwnerBO(5L, "node-a", 7L)));
         lenient().when(reactiveTsdbStore.append(anyList())).thenReturn(Mono.just(1));
         lenient().when(latestStore.upsertBatch(anyList())).thenReturn(Mono.just(1));
-        lenient().when(ingestOutbox.enqueue(anyList(), any())).thenAnswer(invocation ->
-                Mono.just(invocation.getArgument(0)));
+        lenient()
+                .when(ingestOutbox.enqueue(anyList(), any()))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
         lenient().when(ingestOutbox.findPersisted(anyList())).thenReturn(reactor.core.publisher.Flux.empty());
         lenient().when(ingestOutbox.markPersisted(any(), any())).thenReturn(Mono.just(1));
         lenient().when(ingestOutbox.markProcessed(any())).thenReturn(Mono.just(1));
@@ -148,7 +150,8 @@ class PointValueIngestServiceImplTest {
 
     @Test
     void staleOwnerEnvelopeIsDroppedBeforeAnyWrite() {
-        when(deviceFacade.getActiveOwnerReactive(1L, 10L)).thenReturn(Mono.just(new FacadeDeviceOwnerBO(5L, "node-b", 9L)));
+        when(deviceFacade.getActiveOwnerReactive(1L, 10L))
+                .thenReturn(Mono.just(new FacadeDeviceOwnerBO(5L, "node-b", 9L)));
 
         List<PointValueBO> accepted = service.saveValues(List.of(value)).block();
 
@@ -168,7 +171,10 @@ class PointValueIngestServiceImplTest {
     @Test
     void incompleteSeriesKeyIsDropped() {
         PointValueBO broken = PointValueBO.builder()
-                .tenantId(1L).deviceId(10L).messageId("m-broken").build();
+                .tenantId(1L)
+                .deviceId(10L)
+                .messageId("m-broken")
+                .build();
 
         assertThat(service.saveValues(List.of(broken)).block()).isEmpty();
         verify(reactiveTsdbStore, never()).append(anyList());
@@ -210,8 +216,8 @@ class PointValueIngestServiceImplTest {
         row.setTenantId(1L);
         row.setMessageId("m-replay");
         when(ingestOutbox.claim(any(), any(Integer.class))).thenReturn(reactor.core.publisher.Flux.just(row));
-        when(pointValueBuilder.buildBOByDO(row)).thenReturn(value("m-replay", 20L, 7L,
-                LocalDateTime.parse("2026-08-20T10:00:00")));
+        when(pointValueBuilder.buildBOByDO(row))
+                .thenReturn(value("m-replay", 20L, 7L, LocalDateTime.parse("2026-08-20T10:00:00")));
         when(reactiveTsdbStore.append(anyList())).thenReturn(Mono.error(new IllegalStateException("tsdb down")));
         assertThat(service.replayPending().block()).isZero();
         verify(ingestOutbox).markFailed(eq(row), any(), eq("tsdb down"));
@@ -222,8 +228,7 @@ class PointValueIngestServiceImplTest {
         PointValueDO row = new PointValueDO();
         row.setTenantId(1L);
         row.setMessageId("m-replay-ok");
-        PointValueBO replayValue = value("m-replay-ok", 20L, 7L,
-                LocalDateTime.parse("2026-08-20T10:00:00"));
+        PointValueBO replayValue = value("m-replay-ok", 20L, 7L, LocalDateTime.parse("2026-08-20T10:00:00"));
         when(ingestOutbox.claim(any(), any(Integer.class))).thenReturn(reactor.core.publisher.Flux.just(row));
         when(pointValueBuilder.buildBOByDO(row)).thenReturn(replayValue);
         when(alarmRuleTriggerService.processPointValue(replayValue)).thenReturn(Mono.empty());
@@ -242,8 +247,7 @@ class PointValueIngestServiceImplTest {
         PointValueDO row = new PointValueDO();
         row.setTenantId(1L);
         row.setMessageId("m-replay-alarm-fail");
-        PointValueBO replayValue = value("m-replay-alarm-fail", 20L, 7L,
-                LocalDateTime.parse("2026-08-20T10:00:00"));
+        PointValueBO replayValue = value("m-replay-alarm-fail", 20L, 7L, LocalDateTime.parse("2026-08-20T10:00:00"));
         when(ingestOutbox.claim(any(), any(Integer.class))).thenReturn(reactor.core.publisher.Flux.just(row));
         when(pointValueBuilder.buildBOByDO(row)).thenReturn(replayValue);
         when(alarmRuleTriggerService.processPointValue(replayValue))
@@ -260,8 +264,7 @@ class PointValueIngestServiceImplTest {
         PointValueDO row = new PointValueDO();
         row.setTenantId(1L);
         row.setMessageId("m-replay-complete-fail");
-        PointValueBO replayValue = value("m-replay-complete-fail", 20L, 7L,
-                LocalDateTime.parse("2026-08-20T10:00:00"));
+        PointValueBO replayValue = value("m-replay-complete-fail", 20L, 7L, LocalDateTime.parse("2026-08-20T10:00:00"));
         when(ingestOutbox.claim(any(), any(Integer.class))).thenReturn(reactor.core.publisher.Flux.just(row));
         when(pointValueBuilder.buildBOByDO(row)).thenReturn(replayValue);
         when(ingestOutbox.markProcessed(row)).thenReturn(Mono.just(0));
@@ -274,7 +277,8 @@ class PointValueIngestServiceImplTest {
     @Test
     void duplicateMessageIdWithinBatchKeepsOnlyTheFirst() {
         PointValueBO duplicate = value("m-1", 21L, 7L, LocalDateTime.parse("2026-08-20T10:00:01"));
-        List<PointValueBO> accepted = service.saveValues(List.of(value, duplicate)).block();
+        List<PointValueBO> accepted =
+                service.saveValues(List.of(value, duplicate)).block();
 
         assertThat(accepted).containsExactly(value);
         ArgumentCaptor<List<PointValueSample>> samples = ArgumentCaptor.forClass(List.class);
@@ -285,7 +289,8 @@ class PointValueIngestServiceImplTest {
     @Test
     void nullMessageIdIsDroppedWithTheRestPersisted() {
         PointValueBO noMessageId = value(null, 21L, 7L, LocalDateTime.parse("2026-08-20T10:00:00"));
-        List<PointValueBO> accepted = service.saveValues(List.of(noMessageId, value)).block();
+        List<PointValueBO> accepted =
+                service.saveValues(List.of(noMessageId, value)).block();
 
         assertThat(accepted).containsExactly(value);
         verify(reactiveTsdbStore).append(anyList());
@@ -295,7 +300,8 @@ class PointValueIngestServiceImplTest {
     void upsertReceivesIngestOrderedRowsWhileAcceptedKeepsInputOrder() {
         // input order deliberately inverted relative to INGEST_ORDER (point asc)
         PointValueBO laterPoint = value("m-2", 21L, 7L, LocalDateTime.parse("2026-08-20T10:00:00"));
-        List<PointValueBO> accepted = service.saveValues(List.of(laterPoint, value)).block();
+        List<PointValueBO> accepted =
+                service.saveValues(List.of(laterPoint, value)).block();
 
         assertThat(accepted).containsExactly(laterPoint, value);
         ArgumentCaptor<List<PointValueSample>> appended = ArgumentCaptor.forClass(List.class);
@@ -316,10 +322,8 @@ class PointValueIngestServiceImplTest {
     void storeFailurePropagatesAndNothingIsMarked() {
         when(reactiveTsdbStore.append(anyList())).thenReturn(Mono.error(new IllegalStateException("store down")));
 
-        assertThatThrownBy(() -> service.saveValues(List.of(value)).block())
-                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> service.saveValues(List.of(value)).block()).isInstanceOf(IllegalStateException.class);
         verify(latestStore, never()).upsertBatch(anyList());
         verify(ingestOutbox, never()).markPersisted(any(), any());
     }
-
 }

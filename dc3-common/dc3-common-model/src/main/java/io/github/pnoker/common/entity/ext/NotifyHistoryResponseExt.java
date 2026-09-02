@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Map;
 
 /**
  * Notification delivery response Ext.
@@ -35,7 +33,9 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Notification delivery response extension object, embedded inside the notification history VO extension field")
+@Schema(
+        description =
+                "Notification delivery response extension object, embedded inside the notification history VO extension field")
 public class NotifyHistoryResponseExt extends BaseExt {
 
     /**
@@ -57,7 +57,9 @@ public class NotifyHistoryResponseExt extends BaseExt {
         /**
          * Provider message ID when the channel returns one.
          */
-        @Schema(description = "Provider-assigned message ID returned by the channel for this delivery, when available", example = "MSG-20250618-0001")
+        @Schema(
+                description = "Provider-assigned message ID returned by the channel for this delivery, when available",
+                example = "MSG-20250618-0001")
         private String providerMessageId;
 
         /**
@@ -77,7 +79,5 @@ public class NotifyHistoryResponseExt extends BaseExt {
          */
         @Schema(description = "Raw provider response payload as a key-value map")
         private Map<String, Object> payload;
-
     }
-
 }

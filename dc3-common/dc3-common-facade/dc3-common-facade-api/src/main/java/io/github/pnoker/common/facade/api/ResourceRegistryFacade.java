@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
@@ -35,5 +34,4 @@ public interface ResourceRegistryFacade {
      * the dc3_api and dc3_resource tables and returns counters.
      */
     Mono<FacadeResourceRegistrySyncResultBO> sync(FacadeResourceRegistrySyncCommandBO command);
-
 }

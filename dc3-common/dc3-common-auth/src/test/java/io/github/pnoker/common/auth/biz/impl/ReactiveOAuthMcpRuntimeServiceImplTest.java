@@ -1,11 +1,30 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.auth.biz.impl;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.auth.config.OAuthJwtKeyProvider;
 import io.github.pnoker.common.auth.config.OAuthProperties;
 import io.github.pnoker.common.auth.entity.builder.McpConnectionBuilder;
 import io.github.pnoker.common.auth.entity.builder.OAuthClientBuilder;
-import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
+import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.auth.exception.OAuthProtocolException;
 import io.github.pnoker.common.auth.repository.ReactiveOAuthMcpStore;
@@ -13,6 +32,10 @@ import io.github.pnoker.common.auth.service.ReactivePrincipalService;
 import io.github.pnoker.common.auth.service.ReactiveTenantMembershipService;
 import io.github.pnoker.common.auth.tool.McpOpenApiAggregator;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,32 +47,30 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Map;
-import java.util.Set;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class ReactiveOAuthMcpRuntimeServiceImplTest {
 
     @Mock
     private ReactiveOAuthMcpStore store;
+
     @Mock
     private ReactivePrincipalService principalService;
+
     @Mock
     private ReactiveTenantMembershipService membershipService;
+
     @Mock
     private OAuthJwtKeyProvider keyProvider;
+
     @Mock
     private TransactionalOperator transactionalOperator;
+
     @Mock
     private OAuthClientBuilder clientBuilder;
+
     @Mock
     private McpConnectionBuilder connectionBuilder;
+
     @Mock
     private McpOpenApiAggregator openApiAggregator;
 
@@ -72,7 +93,8 @@ class ReactiveOAuthMcpRuntimeServiceImplTest {
         OAuthAuthorizationRecord authorization = new OAuthAuthorizationRecord();
         authorization.setClientId("client-1");
         authorization.setAuthorizationCodeHash("stored-code-hash");
-        authorization.setAuthorizationCodeExpires(LocalDateTime.now(ZoneOffset.UTC).plusMinutes(1));
+        authorization.setAuthorizationCodeExpires(
+                LocalDateTime.now(ZoneOffset.UTC).plusMinutes(1));
         authorization.setTokenMetadata("{\"redirect_uri\":\"https://client.example/callback\"}");
 
         OAuthRegisteredClientRecord client = new OAuthRegisteredClientRecord();
@@ -83,15 +105,19 @@ class ReactiveOAuthMcpRuntimeServiceImplTest {
         when(store.getAuthorizationByCodeHash(any())).thenReturn(Mono.just(authorization));
         when(store.getClient("client-1")).thenReturn(Mono.just(client));
 
-        StepVerifier.create(service.token(Map.of(
-                        "grant_type", "authorization_code",
-                        "code", "one-time-code",
-                        "redirect_uri", "https://attacker.example/callback"), null))
+        StepVerifier.create(service.token(
+                        Map.of(
+                                "grant_type", "authorization_code",
+                                "code", "one-time-code",
+                                "redirect_uri", "https://attacker.example/callback"),
+                        null))
                 .expectErrorSatisfies(error -> {
                     org.assertj.core.api.Assertions.assertThat(error).isInstanceOf(OAuthProtocolException.class);
                     OAuthProtocolException protocol = (OAuthProtocolException) error;
-                    org.assertj.core.api.Assertions.assertThat(protocol.getError()).isEqualTo("invalid_grant");
-                    org.assertj.core.api.Assertions.assertThat(protocol.getDescription()).contains("redirect_uri");
+                    org.assertj.core.api.Assertions.assertThat(protocol.getError())
+                            .isEqualTo("invalid_grant");
+                    org.assertj.core.api.Assertions.assertThat(protocol.getDescription())
+                            .contains("redirect_uri");
                 })
                 .verify();
     }
@@ -102,7 +128,8 @@ class ReactiveOAuthMcpRuntimeServiceImplTest {
                 .expectErrorSatisfies(error -> {
                     org.assertj.core.api.Assertions.assertThat(error).isInstanceOf(OAuthProtocolException.class);
                     OAuthProtocolException protocol = (OAuthProtocolException) error;
-                    org.assertj.core.api.Assertions.assertThat(protocol.getError()).isEqualTo("invalid_client");
+                    org.assertj.core.api.Assertions.assertThat(protocol.getError())
+                            .isEqualTo("invalid_client");
                 })
                 .verify();
     }
@@ -131,7 +158,8 @@ class ReactiveOAuthMcpRuntimeServiceImplTest {
 
         when(store.getClient("client-1")).thenReturn(Mono.just(client));
         when(membershipService.isTenantMember(7L, 101L)).thenReturn(Mono.just(true));
-        when(store.getActiveConnection("client-1", 101L, 7L, "authorization_code")).thenReturn(Mono.just(connection));
+        when(store.getActiveConnection("client-1", 101L, 7L, "authorization_code"))
+                .thenReturn(Mono.just(connection));
         when(store.getConsent(11L, 101L, 7L)).thenReturn(Mono.empty());
         when(store.upsertConsent(any())).thenReturn(Mono.just(1));
         when(store.insertAuthorization(any())).thenReturn(Mono.just(1));
@@ -145,11 +173,14 @@ class ReactiveOAuthMcpRuntimeServiceImplTest {
         StepVerifier.create(service.authorize(request, principal))
                 .expectErrorSatisfies(error -> {
                     org.assertj.core.api.Assertions.assertThat(error).isInstanceOf(OAuthProtocolException.class);
-                    org.assertj.core.api.Assertions.assertThat(((OAuthProtocolException) error).getError()).isEqualTo("consent_required");
-                }).verify();
+                    org.assertj.core.api.Assertions.assertThat(((OAuthProtocolException) error).getError())
+                            .isEqualTo("consent_required");
+                })
+                .verify();
 
         StepVerifier.create(service.authorize(with(request, "consent", "approve"), principal))
-                .expectNextCount(1).verifyComplete();
+                .expectNextCount(1)
+                .verifyComplete();
         org.mockito.Mockito.verify(store).upsertConsent(any());
     }
 

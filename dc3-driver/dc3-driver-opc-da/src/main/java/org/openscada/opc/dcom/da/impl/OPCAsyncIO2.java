@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da.impl;
 
+import java.net.UnknownHostException;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.IJIComObject;
 import org.jinterop.dcom.core.JIArray;
@@ -28,8 +28,6 @@ import org.openscada.opc.dcom.common.ResultSet;
 import org.openscada.opc.dcom.common.impl.BaseCOMObject;
 import org.openscada.opc.dcom.da.Constants;
 import org.openscada.opc.dcom.da.OPCDATASOURCE;
-
-import java.net.UnknownHostException;
 
 /**
  *
@@ -129,7 +127,5 @@ public class OPCAsyncIO2 extends BaseCOMObject {
         public ResultSet<Integer> getResult() {
             return this.result;
         }
-
     }
-
 }

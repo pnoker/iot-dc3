@@ -14,23 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.grpc;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import io.github.pnoker.api.center.auth.GrpcLoginQuery;
 import io.github.pnoker.api.center.auth.GrpcTokenValidationDTO;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
 import io.github.pnoker.common.auth.biz.ReactiveTokenService;
-import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.utils.TimeUtil;
-import com.google.common.util.concurrent.MoreExecutors;
 import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * gRPC server handling token facade requests.
@@ -49,21 +46,26 @@ public class TokenServer extends TokenApiGrpc.TokenApiImplBase {
     public void checkValid(GrpcLoginQuery request, StreamObserver<GrpcTokenValidationDTO> responseObserver) {
         Context context = Context.current();
         AtomicBoolean terminated = new AtomicBoolean();
-        reactor.core.Disposable subscription = tokenService.checkValid(request.getName(), request.getToken(), request.getTenant())
-                .subscribe(entity -> {
-                    if (context.isCancelled() || !terminated.compareAndSet(false, true)) return;
-                    GrpcTokenValidationDTO.Builder builder = GrpcTokenValidationDTO.newBuilder()
-                            .setValid(entity.isValid());
-                    if (entity.isValid()) builder.setExpireTime(TimeUtil.completeFormat(entity.getExpireTime()));
-                    responseObserver.onNext(builder.build());
-                    responseObserver.onCompleted();
-                }, error -> {
-                    if (context.isCancelled() || !terminated.compareAndSet(false, true)) return;
-                    log.warn("checkValid failed", error);
-                    responseObserver.onError(io.grpc.Status.INTERNAL.withDescription("checkValid failed")
-                            .withCause(error).asRuntimeException());
-                });
+        reactor.core.Disposable subscription = tokenService
+                .checkValid(request.getName(), request.getToken(), request.getTenant())
+                .subscribe(
+                        entity -> {
+                            if (context.isCancelled() || !terminated.compareAndSet(false, true)) return;
+                            GrpcTokenValidationDTO.Builder builder =
+                                    GrpcTokenValidationDTO.newBuilder().setValid(entity.isValid());
+                            if (entity.isValid())
+                                builder.setExpireTime(TimeUtil.completeFormat(entity.getExpireTime()));
+                            responseObserver.onNext(builder.build());
+                            responseObserver.onCompleted();
+                        },
+                        error -> {
+                            if (context.isCancelled() || !terminated.compareAndSet(false, true)) return;
+                            log.warn("checkValid failed", error);
+                            responseObserver.onError(io.grpc.Status.INTERNAL
+                                    .withDescription("checkValid failed")
+                                    .withCause(error)
+                                    .asRuntimeException());
+                        });
         context.addListener(ignored -> subscription.dispose(), MoreExecutors.directExecutor());
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
@@ -35,10 +34,12 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = EnvironmentConstant.AUTH_HMAC_PREFIX)
 public class HmacAuthProperties {
 
+    /** Create HMAC signing properties with no configured secret. */
+    public HmacAuthProperties() {}
+
     /**
      * Shared HMAC secret. Must be configured via dc3.auth.hmac.secret property.
      * When blank, signing is disabled in dev/test only; pre/pro fail fast.
      */
     private String secret;
-
 }

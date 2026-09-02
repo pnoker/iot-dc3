@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.rabbit;
 
+import java.util.List;
+import java.util.Objects;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Declares the physical RabbitMQ topology (exchanges, queues, bindings) with arguments
@@ -49,41 +47,130 @@ public final class RabbitTopology {
      * Binding argument carried over from the pre-port layout; kept for wire identity.
      */
     private static final String BINDING_AUTO_DELETE = "x-auto-delete";
+
     private static final List<SharedQueue> SHARED_QUEUES = List.of(
-            new SharedQueue(RabbitNames.QUEUE_DRIVER_STATE, RabbitNames.EXCHANGE_STATE,
-                    "dc3.r.state.driver.*", 30_000, null, null, true),
-            new SharedQueue(RabbitNames.QUEUE_DEVICE_STATE, RabbitNames.EXCHANGE_STATE,
-                    "dc3.r.state.device.*", 30_000, null, null, true),
-            new SharedQueue(RabbitNames.QUEUE_DRIVER_ALARM, RabbitNames.EXCHANGE_ALARM,
-                    "dc3.r.alarm.driver.*", 30_000, null, null, true),
-            new SharedQueue(RabbitNames.QUEUE_DEVICE_ALARM, RabbitNames.EXCHANGE_ALARM,
-                    "dc3.r.alarm.device.*", 30_000, null, null, true),
-            new SharedQueue(RabbitNames.QUEUE_POINT_VALUE, RabbitNames.EXCHANGE_VALUE,
-                    "dc3.r.value.point.*", 604_800_000, RabbitNames.EXCHANGE_POINT_VALUE_DEAD, "#", true),
-            new SharedQueue(RabbitNames.QUEUE_POINT_VALUE_DEAD, RabbitNames.EXCHANGE_POINT_VALUE_DEAD,
-                    "#", 0, null, null, false),
-            new SharedQueue(RabbitNames.QUEUE_NOTIFY_TASK, RabbitNames.EXCHANGE_ALARM,
-                    "dc3.r.notify.task.*", 86_400_000, null, null, true),
-            new SharedQueue(RabbitNames.QUEUE_DRIVER_TIMEOUT_DELAY, RabbitNames.EXCHANGE_STATE_TIMEOUT_DELAY,
-                    RabbitNames.ROUTING_DRIVER_TIMEOUT_DELAY, 45_000,
-                    RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK, RabbitNames.ROUTING_DRIVER_TIMEOUT_CHECK, false),
-            new SharedQueue(RabbitNames.QUEUE_DRIVER_TIMEOUT_CHECK, RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK,
-                    RabbitNames.ROUTING_DRIVER_TIMEOUT_CHECK, 0, null, null, false),
-            new SharedQueue(RabbitNames.QUEUE_DEVICE_SCAN_TICK, RabbitNames.EXCHANGE_STATE_TIMEOUT_DELAY,
-                    RabbitNames.ROUTING_DEVICE_SCAN_TICK, 10_000,
-                    RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK, RabbitNames.ROUTING_DEVICE_SCAN, false),
-            new SharedQueue(RabbitNames.QUEUE_DEVICE_SCAN, RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK,
-                    RabbitNames.ROUTING_DEVICE_SCAN, 0, null, null, false),
-            new SharedQueue(RabbitNames.QUEUE_POINT_COMMAND_DEAD, RabbitNames.EXCHANGE_POINT_COMMAND_DEAD,
-                    "#", 0, null, null, false),
-            new SharedQueue(RabbitNames.QUEUE_COMMAND_DEAD, RabbitNames.EXCHANGE_COMMAND_DEAD,
-                    "#", 0, null, null, false),
-            new SharedQueue(RabbitNames.QUEUE_POINT_COMMAND_RESULT, RabbitNames.EXCHANGE_POINT_COMMAND_RESULT,
-                    "dc3.r.point_command_result.*", 60_000, null, null, false),
-            new SharedQueue(RabbitNames.QUEUE_COMMAND_RESULT, RabbitNames.EXCHANGE_COMMAND_RESULT,
-                    RabbitNames.ROUTING_COMMAND_RESULT_PREFIX + "*", 60_000, null, null, false),
-            new SharedQueue(RabbitNames.QUEUE_EVENT_REPORT, RabbitNames.EXCHANGE_EVENT,
-                    RabbitNames.ROUTING_EVENT_PREFIX + "*", 60_000, null, null, false));
+            new SharedQueue(
+                    RabbitNames.QUEUE_DRIVER_STATE,
+                    RabbitNames.EXCHANGE_STATE,
+                    "dc3.r.state.driver.*",
+                    30_000,
+                    null,
+                    null,
+                    true),
+            new SharedQueue(
+                    RabbitNames.QUEUE_DEVICE_STATE,
+                    RabbitNames.EXCHANGE_STATE,
+                    "dc3.r.state.device.*",
+                    30_000,
+                    null,
+                    null,
+                    true),
+            new SharedQueue(
+                    RabbitNames.QUEUE_DRIVER_ALARM,
+                    RabbitNames.EXCHANGE_ALARM,
+                    "dc3.r.alarm.driver.*",
+                    30_000,
+                    null,
+                    null,
+                    true),
+            new SharedQueue(
+                    RabbitNames.QUEUE_DEVICE_ALARM,
+                    RabbitNames.EXCHANGE_ALARM,
+                    "dc3.r.alarm.device.*",
+                    30_000,
+                    null,
+                    null,
+                    true),
+            new SharedQueue(
+                    RabbitNames.QUEUE_POINT_VALUE,
+                    RabbitNames.EXCHANGE_VALUE,
+                    "dc3.r.value.point.*",
+                    604_800_000,
+                    RabbitNames.EXCHANGE_POINT_VALUE_DEAD,
+                    "#",
+                    true),
+            new SharedQueue(
+                    RabbitNames.QUEUE_POINT_VALUE_DEAD,
+                    RabbitNames.EXCHANGE_POINT_VALUE_DEAD,
+                    "#",
+                    0,
+                    null,
+                    null,
+                    false),
+            new SharedQueue(
+                    RabbitNames.QUEUE_NOTIFY_TASK,
+                    RabbitNames.EXCHANGE_ALARM,
+                    "dc3.r.notify.task.*",
+                    86_400_000,
+                    null,
+                    null,
+                    true),
+            new SharedQueue(
+                    RabbitNames.QUEUE_DRIVER_TIMEOUT_DELAY,
+                    RabbitNames.EXCHANGE_STATE_TIMEOUT_DELAY,
+                    RabbitNames.ROUTING_DRIVER_TIMEOUT_DELAY,
+                    45_000,
+                    RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK,
+                    RabbitNames.ROUTING_DRIVER_TIMEOUT_CHECK,
+                    false),
+            new SharedQueue(
+                    RabbitNames.QUEUE_DRIVER_TIMEOUT_CHECK,
+                    RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK,
+                    RabbitNames.ROUTING_DRIVER_TIMEOUT_CHECK,
+                    0,
+                    null,
+                    null,
+                    false),
+            new SharedQueue(
+                    RabbitNames.QUEUE_DEVICE_SCAN_TICK,
+                    RabbitNames.EXCHANGE_STATE_TIMEOUT_DELAY,
+                    RabbitNames.ROUTING_DEVICE_SCAN_TICK,
+                    10_000,
+                    RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK,
+                    RabbitNames.ROUTING_DEVICE_SCAN,
+                    false),
+            new SharedQueue(
+                    RabbitNames.QUEUE_DEVICE_SCAN,
+                    RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK,
+                    RabbitNames.ROUTING_DEVICE_SCAN,
+                    0,
+                    null,
+                    null,
+                    false),
+            new SharedQueue(
+                    RabbitNames.QUEUE_POINT_COMMAND_DEAD,
+                    RabbitNames.EXCHANGE_POINT_COMMAND_DEAD,
+                    "#",
+                    0,
+                    null,
+                    null,
+                    false),
+            new SharedQueue(
+                    RabbitNames.QUEUE_COMMAND_DEAD, RabbitNames.EXCHANGE_COMMAND_DEAD, "#", 0, null, null, false),
+            new SharedQueue(
+                    RabbitNames.QUEUE_POINT_COMMAND_RESULT,
+                    RabbitNames.EXCHANGE_POINT_COMMAND_RESULT,
+                    "dc3.r.point_command_result.*",
+                    60_000,
+                    null,
+                    null,
+                    false),
+            new SharedQueue(
+                    RabbitNames.QUEUE_COMMAND_RESULT,
+                    RabbitNames.EXCHANGE_COMMAND_RESULT,
+                    RabbitNames.ROUTING_COMMAND_RESULT_PREFIX + "*",
+                    60_000,
+                    null,
+                    null,
+                    false),
+            new SharedQueue(
+                    RabbitNames.QUEUE_EVENT_REPORT,
+                    RabbitNames.EXCHANGE_EVENT,
+                    RabbitNames.ROUTING_EVENT_PREFIX + "*",
+                    60_000,
+                    null,
+                    null,
+                    false));
 
     private RabbitTopology() {
         throw new IllegalStateException("Utility class");
@@ -96,14 +183,22 @@ public final class RabbitTopology {
      * @param admin the rabbit admin to declare through
      */
     public static void declareSharedTopology(RabbitAdmin admin) {
-        for (String exchange : new String[]{
-                RabbitNames.EXCHANGE_STATE, RabbitNames.EXCHANGE_ALARM, RabbitNames.EXCHANGE_METADATA,
-                RabbitNames.EXCHANGE_POINT_COMMAND, RabbitNames.EXCHANGE_VALUE,
-                RabbitNames.EXCHANGE_STATE_TIMEOUT_DELAY, RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK,
-                RabbitNames.EXCHANGE_COMMAND, RabbitNames.EXCHANGE_COMMAND_RESULT,
-                RabbitNames.EXCHANGE_COMMAND_DEAD, RabbitNames.EXCHANGE_EVENT,
-                RabbitNames.EXCHANGE_POINT_VALUE_DEAD, RabbitNames.EXCHANGE_POINT_COMMAND_DEAD,
-                RabbitNames.EXCHANGE_POINT_COMMAND_RESULT}) {
+        for (String exchange : new String[] {
+            RabbitNames.EXCHANGE_STATE,
+            RabbitNames.EXCHANGE_ALARM,
+            RabbitNames.EXCHANGE_METADATA,
+            RabbitNames.EXCHANGE_POINT_COMMAND,
+            RabbitNames.EXCHANGE_VALUE,
+            RabbitNames.EXCHANGE_STATE_TIMEOUT_DELAY,
+            RabbitNames.EXCHANGE_STATE_TIMEOUT_CHECK,
+            RabbitNames.EXCHANGE_COMMAND,
+            RabbitNames.EXCHANGE_COMMAND_RESULT,
+            RabbitNames.EXCHANGE_COMMAND_DEAD,
+            RabbitNames.EXCHANGE_EVENT,
+            RabbitNames.EXCHANGE_POINT_VALUE_DEAD,
+            RabbitNames.EXCHANGE_POINT_COMMAND_DEAD,
+            RabbitNames.EXCHANGE_POINT_COMMAND_RESULT
+        }) {
             admin.declareExchange(new TopicExchange(exchange, true, false));
         }
         SHARED_QUEUES.forEach(def -> declare(admin, def, def.queueName()));
@@ -157,17 +252,21 @@ public final class RabbitTopology {
      * @param routingKey       exact routing key (service.node)
      * @param expiresMillis    lease-coupled queue expiry (x-expires)
      */
-    public static void declareDriverCommandQueue(RabbitAdmin admin, String queueName, String exchangeName,
-                                                 String deadExchangeName, String routingKey, int expiresMillis) {
+    public static void declareDriverCommandQueue(
+            RabbitAdmin admin,
+            String queueName,
+            String exchangeName,
+            String deadExchangeName,
+            String routingKey,
+            int expiresMillis) {
         Queue queue = QueueBuilder.durable(queueName)
                 .ttl(30_000)
                 .expires(expiresMillis)
                 .deadLetterExchange(deadExchangeName)
                 .deadLetterRoutingKey("#")
                 .build();
-        Binding binding = BindingBuilder.bind(queue)
-                .to(new TopicExchange(exchangeName))
-                .with(routingKey);
+        Binding binding =
+                BindingBuilder.bind(queue).to(new TopicExchange(exchangeName)).with(routingKey);
         binding.addArgument(BINDING_AUTO_DELETE, false);
         admin.declareQueue(queue);
         admin.declareBinding(binding);
@@ -203,7 +302,12 @@ public final class RabbitTopology {
      * @param deadRouting     dead-letter routing key
      * @param bindingArgument whether the binding carries the x-auto-delete argument
      */
-    private record SharedQueue(String queueName, String exchangeName, String routingKey, int ttlMillis,
-                               String deadExchange, String deadRouting, boolean bindingArgument) {
-    }
+    private record SharedQueue(
+            String queueName,
+            String exchangeName,
+            String routingKey,
+            int ttlMillis,
+            String deadExchange,
+            String deadRouting,
+            boolean bindingArgument) {}
 }

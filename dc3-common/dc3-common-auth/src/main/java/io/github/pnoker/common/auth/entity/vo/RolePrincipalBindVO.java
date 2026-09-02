@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -42,16 +41,26 @@ import lombok.ToString;
 @Schema(description = "Role principal bind view object")
 public class RolePrincipalBindVO extends BaseVO {
 
-    @Schema(description = "Identifier of the tenant this binding belongs to; all related role and principal must share the same tenant.", example = "1024")
+    @Schema(
+            description =
+                    "Identifier of the tenant this binding belongs to; all related role and principal must share the same tenant.",
+            example = "1024")
     private String tenantId;
 
-    @Schema(description = "Identifier of the role being bound to the principal; must exist within the current tenant.", example = "2048")
+    @Schema(
+            description = "Identifier of the role being bound to the principal; must exist within the current tenant.",
+            example = "2048")
     private String roleId;
 
-    @Schema(description = "Identifier of the principal (user, service account, or system identity) bound to the role; must belong to the current tenant.", example = "3072")
+    @Schema(
+            description =
+                    "Identifier of the principal (user, service account, or system identity) bound to the role; must belong to the current tenant.",
+            example = "3072")
     private String principalId;
 
-    @Schema(description = "Type of principal bound to the role, indicating whether it is a human user, service account, or internal system identity.", example = "USER")
+    @Schema(
+            description =
+                    "Type of principal bound to the role, indicating whether it is a human user, service account, or internal system identity.",
+            example = "USER")
     private PrincipalTypeEnum principalType;
-
 }

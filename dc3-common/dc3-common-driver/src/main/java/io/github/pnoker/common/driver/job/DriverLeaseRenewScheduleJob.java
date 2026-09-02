@@ -14,18 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.job;
 
 import io.github.pnoker.common.driver.grpc.client.DriverClient;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Renews runtime membership. Expired local leases automatically stop device work.
@@ -46,9 +45,13 @@ public class DriverLeaseRenewScheduleJob extends QuartzJobBean {
             log.debug("Skip overlapping driver lease renewal");
             return;
         }
-        driverClient.renewLease()
-                .doOnError(error -> log.error("Driver lease renewal failed, leaseValid={}, leaseUntilEpochMillis={}",
-                        driverMetadata.leaseValid(), driverMetadata.getLeaseUntilEpochMillis(), error))
+        driverClient
+                .renewLease()
+                .doOnError(error -> log.error(
+                        "Driver lease renewal failed, leaseValid={}, leaseUntilEpochMillis={}",
+                        driverMetadata.leaseValid(),
+                        driverMetadata.getLeaseUntilEpochMillis(),
+                        error))
                 .doFinally(signal -> renewalInFlight.set(false))
                 .subscribe();
     }

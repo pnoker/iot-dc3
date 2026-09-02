@@ -1,4 +1,26 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.manager.service.impl;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.DuplicateException;
@@ -19,19 +41,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class ReactiveEventAttributeConfigServiceImplTest {
-    @Mock ReactiveEventAttributeConfigStore store;
-    @Mock ReactiveEventAttributeService attributes;
-    @Mock ReactiveDeviceService devices;
-    @Mock ReactiveEventService events;
-    @Mock MetadataEventPublisher publisher;
+    @Mock
+    ReactiveEventAttributeConfigStore store;
+
+    @Mock
+    ReactiveEventAttributeService attributes;
+
+    @Mock
+    ReactiveDeviceService devices;
+
+    @Mock
+    ReactiveEventService events;
+
+    @Mock
+    MetadataEventPublisher publisher;
 
     @Test
     void addRejectsDuplicateWithinTenant() {
@@ -39,7 +64,9 @@ class ReactiveEventAttributeConfigServiceImplTest {
         validRelations();
         when(store.getByAttributeDeviceEvent(7L, 11L, 12L, 13L)).thenReturn(Mono.just(value));
 
-        StepVerifier.create(service().add(value)).expectError(DuplicateException.class).verify();
+        StepVerifier.create(service().add(value))
+                .expectError(DuplicateException.class)
+                .verify();
         verify(store, never()).insert(any());
     }
 
@@ -51,7 +78,9 @@ class ReactiveEventAttributeConfigServiceImplTest {
         event.setProfileId(99L);
         when(events.getById(7L, 13L)).thenReturn(Mono.just(event));
 
-        StepVerifier.create(service().add(value)).expectError(NotFoundException.class).verify();
+        StepVerifier.create(service().add(value))
+                .expectError(NotFoundException.class)
+                .verify();
         verify(store, never()).getByAttributeDeviceEvent(any(), any(), any(), any());
         verify(store, never()).insert(any());
     }
@@ -81,14 +110,55 @@ class ReactiveEventAttributeConfigServiceImplTest {
         when(devices.getById(7L, 12L)).thenReturn(Mono.just(device()));
         when(events.getById(7L, 13L)).thenReturn(Mono.just(event()));
 
-        StepVerifier.create(service().add(value)).expectError(NotFoundException.class).verify();
+        StepVerifier.create(service().add(value))
+                .expectError(NotFoundException.class)
+                .verify();
         verify(store, never()).insert(any());
     }
 
-    private ReactiveEventAttributeConfigServiceImpl service() { return new ReactiveEventAttributeConfigServiceImpl(store, attributes, devices, events, publisher); }
-    private void validRelations() { when(attributes.getById(7L, 11L)).thenReturn(Mono.just(attribute())); when(devices.getById(7L, 12L)).thenReturn(Mono.just(device())); when(events.getById(7L, 13L)).thenReturn(Mono.just(event())); }
-    private EventAttributeConfigBO value() { EventAttributeConfigBO value = new EventAttributeConfigBO(); value.setTenantId(7L); value.setAttributeId(11L); value.setDeviceId(12L); value.setEventId(13L); value.setEnableFlag(EnableFlagEnum.ENABLE); value.setConfigValue("x"); return value; }
-    private EventAttributeBO attribute() { EventAttributeBO value = new EventAttributeBO(); value.setTenantId(7L); value.setId(11L); value.setDriverId(21L); return value; }
-    private DeviceBO device() { DeviceBO value = new DeviceBO(); value.setTenantId(7L); value.setId(12L); value.setDriverId(21L); value.setProfileId(31L); return value; }
-    private EventBO event() { EventBO value = new EventBO(); value.setTenantId(7L); value.setId(13L); value.setProfileId(31L); return value; }
+    private ReactiveEventAttributeConfigServiceImpl service() {
+        return new ReactiveEventAttributeConfigServiceImpl(store, attributes, devices, events, publisher);
+    }
+
+    private void validRelations() {
+        when(attributes.getById(7L, 11L)).thenReturn(Mono.just(attribute()));
+        when(devices.getById(7L, 12L)).thenReturn(Mono.just(device()));
+        when(events.getById(7L, 13L)).thenReturn(Mono.just(event()));
+    }
+
+    private EventAttributeConfigBO value() {
+        EventAttributeConfigBO value = new EventAttributeConfigBO();
+        value.setTenantId(7L);
+        value.setAttributeId(11L);
+        value.setDeviceId(12L);
+        value.setEventId(13L);
+        value.setEnableFlag(EnableFlagEnum.ENABLE);
+        value.setConfigValue("x");
+        return value;
+    }
+
+    private EventAttributeBO attribute() {
+        EventAttributeBO value = new EventAttributeBO();
+        value.setTenantId(7L);
+        value.setId(11L);
+        value.setDriverId(21L);
+        return value;
+    }
+
+    private DeviceBO device() {
+        DeviceBO value = new DeviceBO();
+        value.setTenantId(7L);
+        value.setId(12L);
+        value.setDriverId(21L);
+        value.setProfileId(31L);
+        return value;
+    }
+
+    private EventBO event() {
+        EventBO value = new EventBO();
+        value.setTenantId(7L);
+        value.setId(13L);
+        value.setProfileId(31L);
+        return value;
+    }
 }

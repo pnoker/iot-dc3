@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.dto;
 
 import java.time.Instant;
@@ -38,8 +37,7 @@ public record EventReportDTO(
         String configSnapshot,
         String message,
         Instant occurTime,
-        int schemaVersion
-) {
+        int schemaVersion) {
 
     /**
      * Builder.
@@ -202,8 +200,19 @@ public record EventReportDTO(
          * @return the event report DTO
          */
         public EventReportDTO build() {
-            return new EventReportDTO(recordId, tenantId, deviceId, eventId, eventCode,
-                    eventTypeFlag, eventLevelFlag, paramValues, configSnapshot, message, occurTime, schemaVersion);
+            return new EventReportDTO(
+                    recordId,
+                    tenantId,
+                    deviceId,
+                    eventId,
+                    eventCode,
+                    eventTypeFlag,
+                    eventLevelFlag,
+                    paramValues,
+                    configSnapshot,
+                    message,
+                    occurTime,
+                    schemaVersion);
         }
     }
 }

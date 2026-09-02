@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.config;
 
 import io.github.pnoker.common.facade.local.DeviceLocalFacade;
@@ -42,16 +41,26 @@ import org.springframework.context.annotation.FilterType;
  */
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.manager.mode", havingValue = "local")
-@ComponentScan(basePackages = "io.github.pnoker.common.facade.local", useDefaultFilters = false,
-        includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                classes = {io.github.pnoker.common.facade.local.DeviceLocalFacade.class,
-                        io.github.pnoker.common.facade.local.DriverLocalFacade.class,
-                        io.github.pnoker.common.facade.local.PointLocalFacade.class,
-                        io.github.pnoker.common.facade.local.ProfileLocalFacade.class, FacadeDeviceBuilder.class,
-                        io.github.pnoker.common.facade.local.CommandLocalFacade.class,
-                        io.github.pnoker.common.facade.local.EventLocalFacade.class,
-                        FacadeDriverBuilder.class, FacadePointBuilder.class, FacadeProfileBuilder.class,
-                        FacadeCommandBuilder.class, FacadeEventBuilder.class,}))
+@ComponentScan(
+        basePackages = "io.github.pnoker.common.facade.local",
+        useDefaultFilters = false,
+        includeFilters =
+                @ComponentScan.Filter(
+                        type = FilterType.ASSIGNABLE_TYPE,
+                        classes = {
+                            io.github.pnoker.common.facade.local.DeviceLocalFacade.class,
+                            io.github.pnoker.common.facade.local.DriverLocalFacade.class,
+                            io.github.pnoker.common.facade.local.PointLocalFacade.class,
+                            io.github.pnoker.common.facade.local.ProfileLocalFacade.class,
+                            FacadeDeviceBuilder.class,
+                            io.github.pnoker.common.facade.local.CommandLocalFacade.class,
+                            io.github.pnoker.common.facade.local.EventLocalFacade.class,
+                            FacadeDriverBuilder.class,
+                            FacadePointBuilder.class,
+                            FacadeProfileBuilder.class,
+                            FacadeCommandBuilder.class,
+                            FacadeEventBuilder.class,
+                        }))
 public class LocalFacadeManagerAutoConfiguration {
 
     /**
@@ -60,5 +69,4 @@ public class LocalFacadeManagerAutoConfiguration {
      */
     @SuppressWarnings("unused")
     private static final Class<?> CANARY = DeviceLocalFacade.class;
-
 }

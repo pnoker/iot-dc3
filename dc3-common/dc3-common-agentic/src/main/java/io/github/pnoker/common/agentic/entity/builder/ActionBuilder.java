@@ -19,10 +19,9 @@ package io.github.pnoker.common.agentic.entity.builder;
 import io.github.pnoker.common.agentic.entity.bo.ActionBO;
 import io.github.pnoker.common.agentic.entity.vo.ActionVO;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
 
 /**
  * MapStruct builder converting between action BO and VO.
@@ -30,7 +29,9 @@ import java.util.List;
  * @author pnoker
  * @since 2026.5.11
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface ActionBuilder {
 
     @Mapping(target = "tenantId", ignore = true)
@@ -54,5 +55,4 @@ public interface ActionBuilder {
      * @return converted value
      */
     List<ActionVO> buildVOListByBOList(List<ActionBO> entityBOList);
-
 }

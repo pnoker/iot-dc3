@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.config;
 
 import io.github.pnoker.common.facade.grpc.CommandGrpcFacade;
@@ -61,47 +60,85 @@ import org.springframework.context.annotation.Import;
  * @since 2016.10.1
  */
 @AutoConfiguration
-@Import({GrpcStubConfig.class, GrpcFacadeAutoConfiguration.AuthGrpcFacadeConfiguration.class,
-        GrpcFacadeAutoConfiguration.ManagerGrpcFacadeConfiguration.class,
-        GrpcFacadeAutoConfiguration.DataGrpcFacadeConfiguration.class,})
-@ComponentScan(basePackages = "io.github.pnoker.common.facade.grpc", useDefaultFilters = false,
-        includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                classes = {GrpcFacadeSupport.class, RequestIdGrpcClientInterceptor.class,
-                        RequestIdGrpcServerInterceptor.class,}))
+@Import({
+    GrpcStubConfig.class,
+    GrpcFacadeAutoConfiguration.AuthGrpcFacadeConfiguration.class,
+    GrpcFacadeAutoConfiguration.ManagerGrpcFacadeConfiguration.class,
+    GrpcFacadeAutoConfiguration.DataGrpcFacadeConfiguration.class,
+})
+@ComponentScan(
+        basePackages = "io.github.pnoker.common.facade.grpc",
+        useDefaultFilters = false,
+        includeFilters =
+                @ComponentScan.Filter(
+                        type = FilterType.ASSIGNABLE_TYPE,
+                        classes = {
+                            GrpcFacadeSupport.class,
+                            RequestIdGrpcClientInterceptor.class,
+                            RequestIdGrpcServerInterceptor.class,
+                        }))
 @EnableConfigurationProperties(GrpcFacadeProperties.class)
 public class GrpcFacadeAutoConfiguration {
 
     @ConditionalOnProperty(name = "dc3.facade.auth.mode", havingValue = "grpc", matchIfMissing = true)
     @Configuration(proxyBeanMethods = false)
-    @ComponentScan(basePackages = "io.github.pnoker.common.facade.grpc", useDefaultFilters = false,
-            includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                    classes = {TenantGrpcFacade.class, UserGrpcFacade.class, TokenGrpcFacade.class,
-                            LocalCredentialGrpcFacade.class, ResourceRegistryGrpcFacade.class,
-                            PermissionGrpcFacade.class, McpRuntimeGrpcFacade.class,
-                            FacadeGrpcTenantBuilder.class, FacadeGrpcUserBuilder.class,
-                            FacadeGrpcLocalCredentialBuilder.class,}))
-    static class AuthGrpcFacadeConfiguration {
-    }
+    @ComponentScan(
+            basePackages = "io.github.pnoker.common.facade.grpc",
+            useDefaultFilters = false,
+            includeFilters =
+                    @ComponentScan.Filter(
+                            type = FilterType.ASSIGNABLE_TYPE,
+                            classes = {
+                                TenantGrpcFacade.class,
+                                UserGrpcFacade.class,
+                                TokenGrpcFacade.class,
+                                LocalCredentialGrpcFacade.class,
+                                ResourceRegistryGrpcFacade.class,
+                                PermissionGrpcFacade.class,
+                                McpRuntimeGrpcFacade.class,
+                                FacadeGrpcTenantBuilder.class,
+                                FacadeGrpcUserBuilder.class,
+                                FacadeGrpcLocalCredentialBuilder.class,
+                            }))
+    static class AuthGrpcFacadeConfiguration {}
 
     @ConditionalOnProperty(name = "dc3.facade.manager.mode", havingValue = "grpc", matchIfMissing = true)
     @Configuration(proxyBeanMethods = false)
-    @ComponentScan(basePackages = "io.github.pnoker.common.facade.grpc", useDefaultFilters = false,
-            includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                    classes = {DeviceGrpcFacade.class, DriverGrpcFacade.class, PointGrpcFacade.class,
-                            ProfileGrpcFacade.class, CommandGrpcFacade.class, EventGrpcFacade.class,
-                            FacadeGrpcDeviceBuilder.class, FacadeGrpcDriverBuilder.class,
-                            FacadeGrpcPointBuilder.class, FacadeGrpcProfileBuilder.class,
-                            FacadeGrpcCommandBuilder.class, FacadeGrpcEventBuilder.class,}))
-    static class ManagerGrpcFacadeConfiguration {
-    }
+    @ComponentScan(
+            basePackages = "io.github.pnoker.common.facade.grpc",
+            useDefaultFilters = false,
+            includeFilters =
+                    @ComponentScan.Filter(
+                            type = FilterType.ASSIGNABLE_TYPE,
+                            classes = {
+                                DeviceGrpcFacade.class,
+                                DriverGrpcFacade.class,
+                                PointGrpcFacade.class,
+                                ProfileGrpcFacade.class,
+                                CommandGrpcFacade.class,
+                                EventGrpcFacade.class,
+                                FacadeGrpcDeviceBuilder.class,
+                                FacadeGrpcDriverBuilder.class,
+                                FacadeGrpcPointBuilder.class,
+                                FacadeGrpcProfileBuilder.class,
+                                FacadeGrpcCommandBuilder.class,
+                                FacadeGrpcEventBuilder.class,
+                            }))
+    static class ManagerGrpcFacadeConfiguration {}
 
     @ConditionalOnProperty(name = "dc3.facade.data.mode", havingValue = "grpc", matchIfMissing = true)
     @Configuration(proxyBeanMethods = false)
-    @ComponentScan(basePackages = "io.github.pnoker.common.facade.grpc", useDefaultFilters = false,
-            includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                    classes = {PointValueGrpcFacade.class, PointCommandGrpcFacade.class,
-                            StatusHealthGrpcFacade.class, FacadeGrpcPointValueBuilder.class,}))
-    static class DataGrpcFacadeConfiguration {
-    }
-
+    @ComponentScan(
+            basePackages = "io.github.pnoker.common.facade.grpc",
+            useDefaultFilters = false,
+            includeFilters =
+                    @ComponentScan.Filter(
+                            type = FilterType.ASSIGNABLE_TYPE,
+                            classes = {
+                                PointValueGrpcFacade.class,
+                                PointCommandGrpcFacade.class,
+                                StatusHealthGrpcFacade.class,
+                                FacadeGrpcPointValueBuilder.class,
+                            }))
+    static class DataGrpcFacadeConfiguration {}
 }

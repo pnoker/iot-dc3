@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * Daily new-row counts for each stat-card entity, fixed length = days. Used by the home
@@ -55,5 +53,4 @@ public class GrowthVO implements Serializable {
 
     @Schema(description = "Daily new-profile counts, oldest first")
     private List<Long> profileDailyCounts;
-
 }

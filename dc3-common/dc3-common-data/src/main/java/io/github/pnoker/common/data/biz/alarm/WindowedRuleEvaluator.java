@@ -14,18 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.enums.WindowModeEnum;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Objects;
 import reactor.core.publisher.Mono;
 
 /**
@@ -77,7 +74,9 @@ public class WindowedRuleEvaluator {
     }
 
     private static RuleExt.Condition condition(RuleBO rule) {
-        if (Objects.isNull(rule) || Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())) {
+        if (Objects.isNull(rule)
+                || Objects.isNull(rule.getRuleExt())
+                || Objects.isNull(rule.getRuleExt().getContent())) {
             return null;
         }
         return rule.getRuleExt().getContent().getCondition();
@@ -101,14 +100,18 @@ public class WindowedRuleEvaluator {
      * condition holds.
      */
     public Mono<Boolean> recovers(RuleBO rule, RuleFact fact, WindowSpec spec) {
-        if (Objects.isNull(rule) || Objects.isNull(rule.getRuleExt())
+        if (Objects.isNull(rule)
+                || Objects.isNull(rule.getRuleExt())
                 || Objects.isNull(rule.getRuleExt().getContent())) {
             return Mono.just(false);
         }
         RuleExt.Recovery recovery = rule.getRuleExt().getContent().getRecovery();
         RuleExt.Condition condition = rule.getRuleExt().getContent().getCondition();
-        if (Objects.isNull(recovery) || !Boolean.TRUE.equals(recovery.getEnabled())
-                || Objects.isNull(condition) || Objects.isNull(spec) || !spec.valid()
+        if (Objects.isNull(recovery)
+                || !Boolean.TRUE.equals(recovery.getEnabled())
+                || Objects.isNull(condition)
+                || Objects.isNull(spec)
+                || !spec.valid()
                 || spec.mode() == WindowModeEnum.LAST) {
             return Mono.just(false);
         }
@@ -146,8 +149,10 @@ public class WindowedRuleEvaluator {
      * @param condition the condition to evaluate
      * @return true if the condition is met
      */
-    private Mono<Boolean> evaluateAggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode, RuleExt.Condition condition) {
-        return windowDataSource.aggregate(spec, fact, mode)
+    private Mono<Boolean> evaluateAggregate(
+            WindowSpec spec, RuleFact fact, WindowModeEnum mode, RuleExt.Condition condition) {
+        return windowDataSource
+                .aggregate(spec, fact, mode)
                 .map(outcome -> outcome.sampleCount() >= spec.minSamples()
                         && ConditionEvaluator.evaluate(condition, outcome.value()));
     }
@@ -162,17 +167,19 @@ public class WindowedRuleEvaluator {
      * @param condition the condition to evaluate
      * @return true if the condition is met
      */
-    private Mono<Boolean> evaluateFold(WindowSpec spec, RuleFact fact, WindowModeEnum mode, RuleExt.Condition condition) {
+    private Mono<Boolean> evaluateFold(
+            WindowSpec spec, RuleFact fact, WindowModeEnum mode, RuleExt.Condition condition) {
         return windowDataSource.samples(spec, fact).collectList().map(samples -> {
             if (samples.size() < spec.minSamples() || samples.isEmpty()) {
                 return false;
             }
             return switch (mode) {
-                case ALL -> samples.stream().allMatch(s -> ConditionEvaluator.evaluate(condition, sampleValue(condition, s)));
-                case ANY -> samples.stream().anyMatch(s -> ConditionEvaluator.evaluate(condition, sampleValue(condition, s)));
+                case ALL ->
+                    samples.stream().allMatch(s -> ConditionEvaluator.evaluate(condition, sampleValue(condition, s)));
+                case ANY ->
+                    samples.stream().anyMatch(s -> ConditionEvaluator.evaluate(condition, sampleValue(condition, s)));
                 default -> false;
             };
         });
     }
-
 }

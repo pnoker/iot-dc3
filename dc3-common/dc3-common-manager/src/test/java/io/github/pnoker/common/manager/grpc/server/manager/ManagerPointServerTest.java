@@ -1,7 +1,27 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.manager.grpc.server.manager;
 
-import io.github.pnoker.api.center.manager.GrpcOffsetPointQuery;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import io.github.pnoker.api.center.manager.GrpcOffsetPagePointDTO;
+import io.github.pnoker.api.center.manager.GrpcOffsetPointQuery;
 import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.api.common.PageRequest;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
@@ -10,10 +30,6 @@ import io.github.pnoker.common.manager.service.ReactivePointService;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.grpc.stub.StreamObserver;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 class ManagerPointServerTest {
 
@@ -25,13 +41,21 @@ class ManagerPointServerTest {
         point.setId(7L);
         GrpcPointDTO dto = GrpcPointDTO.newBuilder().build();
         when(builder.buildGrpcDTOByBO(point)).thenReturn(dto);
-        when(reactiveService.list(any())).thenReturn(reactor.core.publisher.Mono.just(
-                OffsetPage.of(java.util.List.of(point), 10, 20, 31)));
+        when(reactiveService.list(any()))
+                .thenReturn(reactor.core.publisher.Mono.just(OffsetPage.of(java.util.List.of(point), 10, 20, 31)));
         ManagerPointServer server = new ManagerPointServer(builder, reactiveService);
-        @SuppressWarnings("unchecked") StreamObserver<GrpcOffsetPagePointDTO> observer = mock(StreamObserver.class);
+        @SuppressWarnings("unchecked")
+        StreamObserver<GrpcOffsetPagePointDTO> observer = mock(StreamObserver.class);
 
-        server.list(GrpcOffsetPointQuery.newBuilder().setTenantId(3L)
-                .setPage(PageRequest.newBuilder().setOffset(10).setLimit(20).build()).build(), observer);
+        server.list(
+                GrpcOffsetPointQuery.newBuilder()
+                        .setTenantId(3L)
+                        .setPage(PageRequest.newBuilder()
+                                .setOffset(10)
+                                .setLimit(20)
+                                .build())
+                        .build(),
+                observer);
 
         verify(reactiveService).list(any());
         verify(observer).onNext(any(GrpcOffsetPagePointDTO.class));

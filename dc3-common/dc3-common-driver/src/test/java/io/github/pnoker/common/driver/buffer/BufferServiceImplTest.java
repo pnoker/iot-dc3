@@ -14,26 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.buffer;
-
-import io.github.pnoker.common.driver.entity.bean.PointValue;
-import io.github.pnoker.common.driver.entity.property.DriverProperties;
-import io.github.pnoker.common.mq.message.MqMessage;
-import io.github.pnoker.common.mq.sender.MessageSender;
-import io.github.pnoker.common.mq.sender.MqPublishException;
-import io.github.pnoker.common.mq.sender.SendConfirmation;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.nio.file.Path;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,6 +24,23 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+
+import io.github.pnoker.common.driver.entity.bean.PointValue;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.MessageSender;
+import io.github.pnoker.common.mq.sender.MqPublishException;
+import io.github.pnoker.common.mq.sender.SendConfirmation;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class BufferServiceImplTest {
@@ -73,11 +71,13 @@ class BufferServiceImplTest {
     @Test
     void publishPersistsBeforeSendAndDeletesOnlyAfterRoutedConfirm() {
         doAnswer(invocation -> {
-            assertThat(service.pendingCount()).isEqualTo(1);
-            SendConfirmation confirmation = invocation.getArgument(1);
-            confirmation.onConfirm(invocation.getArgument(0), true, null);
-            return null;
-        }).when(messageSender).sendAsync(any(MqMessage.class), any(SendConfirmation.class));
+                    assertThat(service.pendingCount()).isEqualTo(1);
+                    SendConfirmation confirmation = invocation.getArgument(1);
+                    confirmation.onConfirm(invocation.getArgument(0), true, null);
+                    return null;
+                })
+                .when(messageSender)
+                .sendAsync(any(MqMessage.class), any(SendConfirmation.class));
 
         service.publish(pointValue("id-1"), "rk");
 
@@ -87,10 +87,12 @@ class BufferServiceImplTest {
     @Test
     void nackRetainsRecordForRetry() {
         doAnswer(invocation -> {
-            SendConfirmation confirmation = invocation.getArgument(1);
-            confirmation.onConfirm(invocation.getArgument(0), false, new MqPublishException("broker nack"));
-            return null;
-        }).when(messageSender).sendAsync(any(MqMessage.class), any(SendConfirmation.class));
+                    SendConfirmation confirmation = invocation.getArgument(1);
+                    confirmation.onConfirm(invocation.getArgument(0), false, new MqPublishException("broker nack"));
+                    return null;
+                })
+                .when(messageSender)
+                .sendAsync(any(MqMessage.class), any(SendConfirmation.class));
 
         service.publish(pointValue("id-2"), "rk");
 
@@ -100,11 +102,13 @@ class BufferServiceImplTest {
     @Test
     void returnedMessageRetainsRecordDespiteAck() {
         doAnswer(invocation -> {
-            // routed=false covers the returned-message case: the outbox must retain the row
-            SendConfirmation confirmation = invocation.getArgument(1);
-            confirmation.onConfirm(invocation.getArgument(0), false, null);
-            return null;
-        }).when(messageSender).sendAsync(any(MqMessage.class), any(SendConfirmation.class));
+                    // routed=false covers the returned-message case: the outbox must retain the row
+                    SendConfirmation confirmation = invocation.getArgument(1);
+                    confirmation.onConfirm(invocation.getArgument(0), false, null);
+                    return null;
+                })
+                .when(messageSender)
+                .sendAsync(any(MqMessage.class), any(SendConfirmation.class));
 
         service.publish(pointValue("id-3"), "rk");
 
@@ -113,7 +117,8 @@ class BufferServiceImplTest {
 
     @Test
     void synchronousFailureRetainsRecord() {
-        doThrow(new MqPublishException("broker down")).when(messageSender)
+        doThrow(new MqPublishException("broker down"))
+                .when(messageSender)
                 .sendAsync(any(MqMessage.class), any(SendConfirmation.class));
 
         service.publish(pointValue("id-4"), "rk");
@@ -125,13 +130,15 @@ class BufferServiceImplTest {
     void batchPersistsEverythingBeforeFirstPublish() {
         AtomicInteger sends = new AtomicInteger();
         doAnswer(invocation -> {
-            if (sends.getAndIncrement() == 0) {
-                assertThat(service.pendingCount()).isEqualTo(2);
-            }
-            SendConfirmation confirmation = invocation.getArgument(1);
-            confirmation.onConfirm(invocation.getArgument(0), true, null);
-            return null;
-        }).when(messageSender).sendAsync(any(MqMessage.class), any(SendConfirmation.class));
+                    if (sends.getAndIncrement() == 0) {
+                        assertThat(service.pendingCount()).isEqualTo(2);
+                    }
+                    SendConfirmation confirmation = invocation.getArgument(1);
+                    confirmation.onConfirm(invocation.getArgument(0), true, null);
+                    return null;
+                })
+                .when(messageSender)
+                .sendAsync(any(MqMessage.class), any(SendConfirmation.class));
 
         service.publishBatch(List.of(pointValue("batch-1"), pointValue("batch-2")), "rk");
 
@@ -150,6 +157,11 @@ class BufferServiceImplTest {
     }
 
     private PointValue pointValue(String messageId) {
-        return PointValue.builder().messageId(messageId).deviceId(1L).pointId(2L).rawValue("42").build();
+        return PointValue.builder()
+                .messageId(messageId)
+                .deviceId(1L)
+                .pointId(2L)
+                .rawValue("42")
+                .build();
     }
 }

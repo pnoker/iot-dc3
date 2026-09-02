@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import lombok.AllArgsConstructor;
@@ -58,5 +57,4 @@ public class NotifyDecision {
     public static NotifyDecision skip(String reason) {
         return new NotifyDecision(false, reason);
     }
-
 }

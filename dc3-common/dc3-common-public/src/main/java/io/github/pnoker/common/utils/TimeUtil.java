@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.TimeConstant;
-import lombok.extern.slf4j.Slf4j;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Legacy {@link Date} formatting and time calculation with thread-safe formatters.
@@ -90,7 +88,10 @@ public class TimeUtil {
      * @return Formatted date string
      */
     public static String defaultFormat(Date date) {
-        return date.toInstant().atZone(TimeConstant.DEFAULT_ZONEID).toLocalDateTime().format(DEFAULT_DATE_FORMATTER);
+        return date.toInstant()
+                .atZone(TimeConstant.DEFAULT_ZONEID)
+                .toLocalDateTime()
+                .format(DEFAULT_DATE_FORMATTER);
     }
 
     /**
@@ -100,7 +101,10 @@ public class TimeUtil {
      * @return Formatted date string with milliseconds
      */
     public static String completeFormat(Date date) {
-        return date.toInstant().atZone(TimeConstant.DEFAULT_ZONEID).toLocalDateTime().format(COMPLETE_DATE_FORMATTER);
+        return date.toInstant()
+                .atZone(TimeConstant.DEFAULT_ZONEID)
+                .toLocalDateTime()
+                .format(COMPLETE_DATE_FORMATTER);
     }
 
     /**
@@ -134,5 +138,4 @@ public class TimeUtil {
             return null;
         }
     }
-
 }

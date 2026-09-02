@@ -14,8 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
@@ -26,11 +30,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PointCommandLocalFacadeTest {
@@ -47,7 +46,8 @@ class PointCommandLocalFacadeTest {
 
     @Test
     void readPopulatesDeviceAndPointIdAndReturnsTrue() {
-        when(pointCommandService.read(eq(1L), org.mockito.ArgumentMatchers.any())).thenReturn(reactor.core.publisher.Mono.just("cmd-1"));
+        when(pointCommandService.read(eq(1L), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(reactor.core.publisher.Mono.just("cmd-1"));
         String result = facade.submitRead(1L, 10L, 20L).block();
         assertThat(result).isEqualTo("cmd-1");
 
@@ -60,7 +60,8 @@ class PointCommandLocalFacadeTest {
 
     @Test
     void writePopulatesDeviceIdPointIdAndValueAndReturnsTrue() {
-        when(pointCommandService.write(eq(1L), org.mockito.ArgumentMatchers.any())).thenReturn(reactor.core.publisher.Mono.just("cmd-2"));
+        when(pointCommandService.write(eq(1L), org.mockito.ArgumentMatchers.any()))
+                .thenReturn(reactor.core.publisher.Mono.just("cmd-2"));
         String result = facade.submitWrite(1L, 10L, 20L, "42").block();
         assertThat(result).isEqualTo("cmd-2");
 

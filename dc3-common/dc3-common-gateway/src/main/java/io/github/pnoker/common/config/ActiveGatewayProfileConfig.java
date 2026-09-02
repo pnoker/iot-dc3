@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
@@ -41,5 +40,4 @@ public class ActiveGatewayProfileConfig implements EnvironmentPostProcessor {
         // This will enable gateway-specific configurations when the application starts
         environment.addActiveProfile(EnvironmentConstant.GATEWAY_PROFILE);
     }
-
 }

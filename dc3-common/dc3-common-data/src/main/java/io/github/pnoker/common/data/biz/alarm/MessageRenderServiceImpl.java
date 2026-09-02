@@ -14,21 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.entity.ext.MessageExt;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.springframework.stereotype.Service;
 
 /**
  * Structured message renderer.
@@ -43,8 +41,8 @@ public class MessageRenderServiceImpl implements MessageRenderService {
     private final AlarmTemplateRenderer alarmTemplateRenderer;
 
     @Override
-    public MessagePayload render(MessageBO message, NotifyChannelTypeEnum channelTypeFlag,
-                                 Map<String, Object> variables) {
+    public MessagePayload render(
+            MessageBO message, NotifyChannelTypeEnum channelTypeFlag, Map<String, Object> variables) {
         MessageExt.Template template = selectTemplate(message, channelTypeFlag);
         if (Objects.isNull(template)) {
             return new MessagePayload(channelTypeFlag, null, Map.of(), List.of());
@@ -65,7 +63,9 @@ public class MessageRenderServiceImpl implements MessageRenderService {
      * @return the matching template, or null
      */
     private MessageExt.Template selectTemplate(MessageBO message, NotifyChannelTypeEnum channelTypeFlag) {
-        if (Objects.isNull(message) || Objects.isNull(channelTypeFlag) || Objects.isNull(message.getMessageExt())
+        if (Objects.isNull(message)
+                || Objects.isNull(channelTypeFlag)
+                || Objects.isNull(message.getMessageExt())
                 || Objects.isNull(message.getMessageExt().getContent())
                 || Objects.isNull(message.getMessageExt().getContent().getTemplates())) {
             return null;
@@ -95,7 +95,8 @@ public class MessageRenderServiceImpl implements MessageRenderService {
      * @return the missing variable names, or empty when none declared
      */
     private List<String> missingVariables(MessageBO message, Map<String, Object> variables) {
-        if (Objects.isNull(message) || Objects.isNull(message.getMessageExt())
+        if (Objects.isNull(message)
+                || Objects.isNull(message.getMessageExt())
                 || Objects.isNull(message.getMessageExt().getContent())
                 || Objects.isNull(message.getMessageExt().getContent().getVariables())) {
             return List.of();
@@ -109,5 +110,4 @@ public class MessageRenderServiceImpl implements MessageRenderService {
         }
         return missing;
     }
-
 }

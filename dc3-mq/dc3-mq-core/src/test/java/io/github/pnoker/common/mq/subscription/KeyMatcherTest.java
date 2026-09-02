@@ -14,12 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.subscription;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for the topic-binding wildcard semantics of {@link KeyMatcher}: exact
@@ -42,7 +41,8 @@ class KeyMatcherTest {
     @Test
     void exactLiteralMatch() {
         assertThat(KeyMatcher.matches("driver.node1", "driver.node1")).isTrue();
-        assertThat(KeyMatcher.matches("dc3.driver.service", "dc3.driver.service")).isTrue();
+        assertThat(KeyMatcher.matches("dc3.driver.service", "dc3.driver.service"))
+                .isTrue();
         assertThat(KeyMatcher.matches("driver.node1", "driver.node2")).isFalse();
         assertThat(KeyMatcher.matches("driver", "driver.node1")).isFalse();
         assertThat(KeyMatcher.matches("driver.node1.extra", "driver.node1")).isFalse();

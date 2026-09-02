@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.message;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Singular;
-
 import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Singular;
 
 /**
  * Outbound message: logical topic + semantic partition key + payload object. The API

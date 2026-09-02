@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryQueryVO;
@@ -56,5 +55,4 @@ public interface PointCommandHistoryService {
      * @return paginated command history rows
      */
     Mono<OffsetPage<PointCommandHistoryVO>> list(Long tenantId, PointCommandHistoryQueryVO queryVO);
-
 }

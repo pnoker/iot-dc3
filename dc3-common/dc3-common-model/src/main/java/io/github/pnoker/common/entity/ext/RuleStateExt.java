@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * JSON extension object for rule runtime state metadata.
@@ -96,7 +94,5 @@ public class RuleStateExt extends BaseExt {
          */
         @Schema(description = "Runtime metadata that is not part of the matching key")
         private Map<String, Object> metadata;
-
     }
-
 }

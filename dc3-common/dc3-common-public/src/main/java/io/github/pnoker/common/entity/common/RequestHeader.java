@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.common;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -42,9 +40,11 @@ public class RequestHeader {
      */
     @Getter
     @Setter
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class TokenHeader {
+
+        /** Create an empty token header for deserialization. */
+        public TokenHeader() {}
 
         /**
          * Salt value for token encryption
@@ -55,7 +55,6 @@ public class RequestHeader {
          * JWT token string
          */
         private String token;
-
     }
 
     /**
@@ -63,9 +62,11 @@ public class RequestHeader {
      */
     @Getter
     @Setter
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class PrincipalHeader {
+
+        /** Create an empty principal header for deserialization. */
+        public PrincipalHeader() {}
 
         /**
          * Principal ID for authentication, authorization, and audit.
@@ -94,9 +95,23 @@ public class RequestHeader {
 
         /**
          * Legacy 7-arg shape kept for the many existing callers; scopes default null.
+         *
+         * @param principalId   authenticated principal identifier
+         * @param principalType authenticated principal type
+         * @param displayName   principal display name
+         * @param principalName principal account name
+         * @param tenantId      tenant identifier
+         * @param clientId      OAuth client identifier, or null for classic login
+         * @param connectionId  MCP connection identifier, or null when not applicable
          */
-        public PrincipalHeader(Long principalId, String principalType, String displayName,
-                               String principalName, Long tenantId, String clientId, Long connectionId) {
+        public PrincipalHeader(
+                Long principalId,
+                String principalType,
+                String displayName,
+                String principalName,
+                Long tenantId,
+                String clientId,
+                Long connectionId) {
             this.principalId = principalId;
             this.principalType = principalType;
             this.displayName = displayName;
@@ -148,7 +163,5 @@ public class RequestHeader {
         public String getUserName() {
             return principalName;
         }
-
     }
-
 }

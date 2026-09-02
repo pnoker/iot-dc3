@@ -14,9 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.security;
 
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -24,10 +26,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * SpEL-accessible permission check methods for use in {@code @PreAuthorize}.
@@ -55,6 +53,7 @@ public class PermissionMethods {
      * the role-resource data returned by the active {@link PermissionProvider}.
      */
     public static final String WILDCARD = "*";
+
     private final String serviceName;
 
     public PermissionMethods(@Value("${spring.application.name:unknown}") String serviceName) {

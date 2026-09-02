@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.quartz;
 
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import org.quartz.CronExpression;
 import org.quartz.CronScheduleBuilder;
 import org.quartz.DateBuilder;
@@ -29,9 +30,6 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleScheduleBuilder;
 import org.quartz.Trigger;
 import org.quartz.TriggerBuilder;
-
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Quartz Scheduler Service Utility
@@ -81,8 +79,9 @@ public class QuartzService {
             case HOUR -> TimeUnit.HOURS.toMillis(interval);
             case DAY -> TimeUnit.DAYS.toMillis(interval);
             case WEEK -> TimeUnit.DAYS.toMillis(interval * 7L);
-            case MONTH, YEAR -> throw new IllegalArgumentException(
-                    "Interval unit " + intervalUnit + " has variable length and is not supported");
+            case MONTH, YEAR ->
+                throw new IllegalArgumentException(
+                        "Interval unit " + intervalUnit + " has variable length and is not supported");
         };
     }
 
@@ -96,18 +95,25 @@ public class QuartzService {
      * @param jobClass     Job execution class
      * @throws SchedulerException SchedulerException
      */
-    public void createJobWithInterval(String group, String name, Integer interval,
-                                      DateBuilder.IntervalUnit intervalUnit, Class<? extends Job> jobClass) throws SchedulerException {
+    public void createJobWithInterval(
+            String group,
+            String name,
+            Integer interval,
+            DateBuilder.IntervalUnit intervalUnit,
+            Class<? extends Job> jobClass)
+            throws SchedulerException {
         validateIdentity(group, name, jobClass);
         if (Objects.isNull(interval) || interval <= 0) {
             throw new IllegalArgumentException("Interval must be greater than 0");
         }
         long intervalMillis = toMillis(interval, intervalUnit);
 
-        JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
+        JobDetail jobDetail =
+                JobBuilder.newJob(jobClass).withIdentity(name, group).build();
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(name, group)
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(intervalMillis)
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                        .withIntervalInMilliseconds(intervalMillis)
                         .repeatForever())
                 .startNow()
                 .build();
@@ -134,7 +140,8 @@ public class QuartzService {
             throw new IllegalArgumentException("Cron expression is invalid: " + cron);
         }
 
-        JobDetail jobDetail = JobBuilder.newJob(jobClass).withIdentity(name, group).build();
+        JobDetail jobDetail =
+                JobBuilder.newJob(jobClass).withIdentity(name, group).build();
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity(name, group)
                 .withSchedule(CronScheduleBuilder.cronSchedule(cron))
@@ -186,5 +193,4 @@ public class QuartzService {
             scheduler.deleteJob(jobKey);
         }
     }
-
 }

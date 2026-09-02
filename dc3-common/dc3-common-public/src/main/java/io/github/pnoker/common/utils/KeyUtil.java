@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
-import io.github.pnoker.common.constant.cache.TimeoutConstant;
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
@@ -26,16 +24,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.KeyGenerator;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -53,6 +41,15 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Calendar;
 import java.util.Date;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * AES/RSA encryption and JWT token utility.
@@ -108,9 +105,9 @@ public class KeyUtil {
      * @throws BadPaddingException                BadPaddingException
      * @throws InvalidAlgorithmParameterException InvalidAlgorithmParameterException
      */
-    public static String encryptAes(String content, String privateKey) throws NoSuchPaddingException,
-            NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException,
-            InvalidAlgorithmParameterException {
+    public static String encryptAes(String content, String privateKey)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException,
+                    BadPaddingException, InvalidAlgorithmParameterException {
         // Base64-encoded private key
         byte[] keyBytes = DecodeUtil.decode(privateKey);
         Key key = new SecretKeySpec(keyBytes, AlgorithmConstant.ALGORITHM_AES);
@@ -122,7 +119,10 @@ public class KeyUtil {
         cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(GCM_TAG_LENGTH_BITS, iv));
         byte[] ciphertext = cipher.doFinal(DecodeUtil.stringToByte(content));
         // Prepend IV so the ciphertext is self-contained: IV || ciphertext+tag
-        byte[] output = ByteBuffer.allocate(iv.length + ciphertext.length).put(iv).put(ciphertext).array();
+        byte[] output = ByteBuffer.allocate(iv.length + ciphertext.length)
+                .put(iv)
+                .put(ciphertext)
+                .array();
         return DecodeUtil.byteToString(DecodeUtil.encode(output));
     }
 
@@ -139,9 +139,9 @@ public class KeyUtil {
      * @throws BadPaddingException                BadPaddingException
      * @throws InvalidAlgorithmParameterException InvalidAlgorithmParameterException
      */
-    public static String decryptAes(String content, String privateKey) throws NoSuchPaddingException,
-            NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException,
-            InvalidAlgorithmParameterException {
+    public static String decryptAes(String content, String privateKey)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException,
+                    BadPaddingException, InvalidAlgorithmParameterException {
         // Base64-encoded private key
         byte[] keyBytes = DecodeUtil.decode(privateKey);
         Key key = new SecretKeySpec(keyBytes, AlgorithmConstant.ALGORITHM_AES);
@@ -190,12 +190,12 @@ public class KeyUtil {
      */
     public static String encryptRsa(String content, String publicKey)
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException,
-            BadPaddingException, InvalidKeySpecException {
+                    BadPaddingException, InvalidKeySpecException {
         // Base64-encoded public key
         byte[] keyBytes = DecodeUtil.decode(publicKey);
         KeySpec keySpec = new X509EncodedKeySpec(keyBytes);
-        RSAPublicKey pubKey = (RSAPublicKey) KeyFactory.getInstance(AlgorithmConstant.ALGORITHM_RSA)
-                .generatePublic(keySpec);
+        RSAPublicKey pubKey = (RSAPublicKey)
+                KeyFactory.getInstance(AlgorithmConstant.ALGORITHM_RSA).generatePublic(keySpec);
         // RSA encryption
         Cipher cipher = Cipher.getInstance(AlgorithmConstant.TRANSFORM_RSA_OAEP);
         cipher.init(Cipher.ENCRYPT_MODE, pubKey);
@@ -217,12 +217,12 @@ public class KeyUtil {
      */
     public static String decryptRsa(String content, String privateKey)
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException,
-            BadPaddingException, InvalidKeySpecException {
+                    BadPaddingException, InvalidKeySpecException {
         // Base64-encoded private key
         byte[] keyBytes = DecodeUtil.decode(privateKey);
         KeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-        RSAPrivateKey priKey = (RSAPrivateKey) KeyFactory.getInstance(AlgorithmConstant.ALGORITHM_RSA)
-                .generatePrivate(keySpec);
+        RSAPrivateKey priKey = (RSAPrivateKey)
+                KeyFactory.getInstance(AlgorithmConstant.ALGORITHM_RSA).generatePrivate(keySpec);
         // RSA decryption
         Cipher cipher = Cipher.getInstance(AlgorithmConstant.TRANSFORM_RSA_OAEP);
         cipher.init(Cipher.DECRYPT_MODE, priKey);
@@ -258,8 +258,7 @@ public class KeyUtil {
      */
     public static String generateToken(String subject, Long tenantId) {
         String securityKey = getSecurityKey();
-        SecretKey key = io.jsonwebtoken.security.Keys
-                .hmacShaKeyFor(DecodeUtil.stringToByte(securityKey));
+        SecretKey key = io.jsonwebtoken.security.Keys.hmacShaKeyFor(DecodeUtil.stringToByte(securityKey));
         JwtBuilder builder = Jwts.builder()
                 .issuer(securityKey + SymbolConstant.COLON + tenantId)
                 .subject(securityKey + SymbolConstant.COLON + subject)
@@ -279,8 +278,7 @@ public class KeyUtil {
      */
     public static Claims parserToken(String subject, String token, Long tenantId) {
         String securityKey = getSecurityKey();
-        SecretKey key = io.jsonwebtoken.security.Keys
-                .hmacShaKeyFor(DecodeUtil.stringToByte(securityKey));
+        SecretKey key = io.jsonwebtoken.security.Keys.hmacShaKeyFor(DecodeUtil.stringToByte(securityKey));
         JwtParser parser = Jwts.parser()
                 .requireIssuer(securityKey + SymbolConstant.COLON + tenantId)
                 .requireSubject(securityKey + SymbolConstant.COLON + subject)
@@ -288,5 +286,4 @@ public class KeyUtil {
                 .build();
         return parser.parseSignedClaims(token).getPayload();
     }
-
 }

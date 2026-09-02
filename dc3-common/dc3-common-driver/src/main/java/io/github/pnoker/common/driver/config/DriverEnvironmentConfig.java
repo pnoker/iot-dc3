@@ -14,12 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import io.github.pnoker.common.utils.EnvironmentUtil;
 import io.github.pnoker.common.utils.HostUtil;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
@@ -29,10 +31,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Spring environment post-processor that derives and injects runtime driver properties
@@ -71,5 +69,4 @@ public class DriverEnvironmentConfig implements EnvironmentPostProcessor {
         MutablePropertySources propertySources = environment.getPropertySources();
         propertySources.addFirst(new MapPropertySource("driver", source));
     }
-
 }

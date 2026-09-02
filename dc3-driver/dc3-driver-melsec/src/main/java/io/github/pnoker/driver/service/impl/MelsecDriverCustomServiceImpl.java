@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import com.github.xingshuangs.iot.protocol.melsec.enums.EMcSeries;
@@ -34,18 +33,17 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.driver.bean.MelsecPointVariable;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * Melsec MC driver service backed by the iot-communication library.
@@ -66,13 +64,15 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
 
     private Map<Long, MyMcPLC> connectMap;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -82,8 +82,7 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public void schedule() {
-    }
+    public void schedule() {}
 
     @Override
     public void event(MetadataEventDTO metadataEvent) {
@@ -91,8 +90,12 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
 
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
@@ -100,22 +103,37 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
                 if (Objects.nonNull(removed)) {
                     closeConnection(metadataEvent.getId(), removed);
                 }
-                log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}",
-                        driverCode, metadataEvent.getId(), operateType, Objects.nonNull(removed));
+                log.info(
+                        "Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}",
+                        driverCode,
+                        metadataEvent.getId(),
+                        operateType,
+                        Objects.nonNull(removed));
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
-        log.debug("Driver point read requested, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
+        log.debug(
+                "Driver point read requested, protocol={}, deviceId={}, pointId={}",
+                driverCode,
+                device.getId(),
                 point.getId());
         MyMcPLC myMcPLC = getMcPLC(device.getId(), driverConfig);
-        MelsecPointVariable variable = buildVariable(pointConfig, point.getPointTypeFlag().getCode());
+        MelsecPointVariable variable =
+                buildVariable(pointConfig, point.getPointTypeFlag().getCode());
 
         myMcPLC.lock.lock();
         try {
@@ -123,8 +141,12 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
             return new ReadPointValue(device, point, String.valueOf(value));
         } catch (Exception e) {
             invalidateConnection(device.getId(), myMcPLC);
-            log.error("Driver point read failed, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
-                    point.getId(), e);
+            log.error(
+                    "Driver point read failed, protocol={}, deviceId={}, pointId={}",
+                    driverCode,
+                    device.getId(),
+                    point.getId(),
+                    e);
             return null;
         } finally {
             myMcPLC.lock.unlock();
@@ -136,12 +158,21 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
     // ------------------------------------------------------------------------
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
-        log.debug("Driver point write requested, protocol={}, deviceId={}, pointId={}, valueLength={}",
-                driverCode, device.getId(), point.getId(), Objects.toString(writePointValue.getValue(), "").length());
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
+        log.debug(
+                "Driver point write requested, protocol={}, deviceId={}, pointId={}, valueLength={}",
+                driverCode,
+                device.getId(),
+                point.getId(),
+                Objects.toString(writePointValue.getValue(), "").length());
         MyMcPLC myMcPLC = getMcPLC(device.getId(), driverConfig);
-        MelsecPointVariable variable = buildVariable(pointConfig, writePointValue.getType().getCode());
+        MelsecPointVariable variable =
+                buildVariable(pointConfig, writePointValue.getType().getCode());
 
         myMcPLC.lock.lock();
         try {
@@ -149,8 +180,12 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
             return true;
         } catch (Exception e) {
             invalidateConnection(device.getId(), myMcPLC);
-            log.error("Driver point write failed, protocol={}, deviceId={}, pointId={}", driverCode, device.getId(),
-                    point.getId(), e);
+            log.error(
+                    "Driver point write failed, protocol={}, deviceId={}, pointId={}",
+                    driverCode,
+                    device.getId(),
+                    point.getId(),
+                    e);
             return false;
         } finally {
             myMcPLC.lock.unlock();
@@ -181,18 +216,38 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
                 eMcSeries = EMcSeries.QnA;
             }
 
-            log.debug("Driver connection creating, protocol={}, deviceId={}, host={}, port={}, series={}",
-                    driverCode, deviceId, host, port, series);
+            log.debug(
+                    "Driver connection creating, protocol={}, deviceId={}, host={}, port={}, series={}",
+                    driverCode,
+                    deviceId,
+                    host,
+                    port,
+                    series);
             try {
                 McPLC mcPLC = new McPLC(eMcSeries, host, port);
-                log.info("Driver connection established, protocol={}, deviceId={}, host={}, port={}, series={}",
-                        driverCode, deviceId, host, port, series);
+                log.info(
+                        "Driver connection established, protocol={}, deviceId={}, host={}, port={}, series={}",
+                        driverCode,
+                        deviceId,
+                        host,
+                        port,
+                        series);
                 return new MyMcPLC(new ReentrantLock(), mcPLC);
             } catch (Exception e) {
-                log.error("Driver connection failed, protocol={}, deviceId={}, host={}, port={}", driverCode, deviceId,
-                        host, port, e);
-                throw new ServiceException("Driver connection failed, protocol={}, deviceId={}, host={}, port={}",
-                        driverCode, deviceId, host, port, e);
+                log.error(
+                        "Driver connection failed, protocol={}, deviceId={}, host={}, port={}",
+                        driverCode,
+                        deviceId,
+                        host,
+                        port,
+                        e);
+                throw new ServiceException(
+                        "Driver connection failed, protocol={}, deviceId={}, host={}, port={}",
+                        driverCode,
+                        deviceId,
+                        host,
+                        port,
+                        e);
             }
         });
     }
@@ -206,7 +261,8 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
      */
     private MelsecPointVariable buildVariable(Map<String, AttributeBO> pointConfig, String type) {
         String address = pointConfig.get("address").getValue(String.class);
-        int length = pointConfig.containsKey("length") ? pointConfig.get("length").getValue(Integer.class) : 0;
+        int length =
+                pointConfig.containsKey("length") ? pointConfig.get("length").getValue(Integer.class) : 0;
         return new MelsecPointVariable(address, type, length);
     }
 
@@ -325,7 +381,8 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "series", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -334,7 +391,8 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "address", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Getter
@@ -344,7 +402,5 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
         private final ReentrantLock lock;
 
         private final McPLC plc;
-
     }
-
 }

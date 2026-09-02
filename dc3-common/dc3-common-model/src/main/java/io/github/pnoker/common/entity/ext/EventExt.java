@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,7 +38,9 @@ public class EventExt extends BaseExt {
     /**
      * Extended content.
      */
-    @Schema(description = "Structured payload carrying the event's extension content; serialized as JSON inside the extension object")
+    @Schema(
+            description =
+                    "Structured payload carrying the event's extension content; serialized as JSON inside the extension object")
     private Content content;
 
     /**
@@ -54,7 +55,5 @@ public class EventExt extends BaseExt {
 
         @Schema(description = "Reserved placeholder field for the event extension content", example = "reserved")
         private String keep;
-
     }
-
 }

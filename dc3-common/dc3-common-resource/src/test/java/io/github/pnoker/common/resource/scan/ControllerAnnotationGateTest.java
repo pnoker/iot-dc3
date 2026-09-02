@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.resource.scan;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class ControllerAnnotationGateTest {
 
@@ -29,8 +27,7 @@ class ControllerAnnotationGateTest {
 
     @Test
     void reportsDefectsForDefectiveControllerOnly() {
-        List<String> defects = gate.validatePackage(
-                "io.github.pnoker.common.resource.scan.gatefixtures");
+        List<String> defects = gate.validatePackage("io.github.pnoker.common.resource.scan.gatefixtures");
         // The well-formed controller contributes nothing; the defective one contributes ≥1.
         assertThat(defects).isNotEmpty();
         assertThat(defects).anyMatch(d -> d.startsWith("DefectiveController#get"));

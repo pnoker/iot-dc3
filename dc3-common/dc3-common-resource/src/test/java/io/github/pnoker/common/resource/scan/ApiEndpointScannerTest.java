@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.resource.scan;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.annotation.PublicEndpoint;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.config.ResourceRegistrarProperties;
 import io.swagger.v3.oas.annotations.Operation;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -32,10 +34,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ApiEndpointScannerTest {
 
@@ -54,7 +52,8 @@ class ApiEndpointScannerTest {
 
         List<FacadeScannedApiBO> apis = scanner.scan();
 
-        assertThat(apis).extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath)
+        assertThat(apis)
+                .extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath)
                 .containsExactlyInAnyOrder(
                         org.assertj.core.groups.Tuple.tuple("GET", "/api/sample/{id}"),
                         org.assertj.core.groups.Tuple.tuple("POST", "/api/sample"),
@@ -75,13 +74,15 @@ class ApiEndpointScannerTest {
 
         FacadeScannedApiBO created = apis.stream()
                 .filter(a -> "POST".equals(a.getMethod()))
-                .findFirst().orElseThrow();
+                .findFirst()
+                .orElseThrow();
         assertThat(created.getTitle()).isEqualTo("Add Device");
         assertThat(created.getRemark()).isEqualTo("Create a new device record");
 
         FacadeScannedApiBO fetched = apis.stream()
                 .filter(a -> "GET".equals(a.getMethod()))
-                .findFirst().orElseThrow();
+                .findFirst()
+                .orElseThrow();
         // No @Operation: title falls back to the handler method name, remark stays blank.
         assertThat(fetched.getTitle()).isEqualTo("get");
         assertThat(fetched.getRemark()).isEmpty();
@@ -95,7 +96,8 @@ class ApiEndpointScannerTest {
 
         List<FacadeScannedApiBO> apis = scanner.scan();
 
-        assertThat(apis).extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath)
+        assertThat(apis)
+                .extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath)
                 .containsExactly(org.assertj.core.groups.Tuple.tuple("PATCH", "/api/patch"));
     }
 
@@ -106,7 +108,8 @@ class ApiEndpointScannerTest {
 
         List<FacadeScannedApiBO> apis = scanner.scan();
 
-        assertThat(apis).extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath)
+        assertThat(apis)
+                .extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath)
                 .containsExactly(org.assertj.core.groups.Tuple.tuple("GET", "/mcp_tools"));
     }
 
@@ -119,8 +122,7 @@ class ApiEndpointScannerTest {
 
         List<FacadeScannedApiBO> apis = scanner.scan();
 
-        assertThat(apis).extracting(FacadeScannedApiBO::getPath)
-                .containsExactly("/api/sample");
+        assertThat(apis).extracting(FacadeScannedApiBO::getPath).containsExactly("/api/sample");
     }
 
     @Test
@@ -144,7 +146,8 @@ class ApiEndpointScannerTest {
 
         List<FacadeScannedApiBO> apis = scanner.scan();
 
-        assertThat(apis).extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath)
+        assertThat(apis)
+                .extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath)
                 .containsExactlyInAnyOrder(
                         org.assertj.core.groups.Tuple.tuple("GET", "/api/multi"),
                         org.assertj.core.groups.Tuple.tuple("POST", "/api/multi"));
@@ -165,8 +168,8 @@ class ApiEndpointScannerTest {
 
         List<FacadeScannedApiBO> apis = scanner.scan();
 
-        assertThat(apis).extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath,
-                        FacadeScannedApiBO::getApiName)
+        assertThat(apis)
+                .extracting(FacadeScannedApiBO::getMethod, FacadeScannedApiBO::getPath, FacadeScannedApiBO::getApiName)
                 .containsExactlyInAnyOrder(
                         org.assertj.core.groups.Tuple.tuple("GET", "/api/convention/get_by_id", "convention:get"),
                         org.assertj.core.groups.Tuple.tuple("POST", "/api/convention/list", "convention:list"),
@@ -186,7 +189,10 @@ class ApiEndpointScannerTest {
         try {
             Object bean = controllerClass.getDeclaredConstructor().newInstance();
             // detectHandlerMethods is protected on the abstract base
-            java.lang.reflect.Method detect = handlerMapping.getClass().getSuperclass().getSuperclass()
+            java.lang.reflect.Method detect = handlerMapping
+                    .getClass()
+                    .getSuperclass()
+                    .getSuperclass()
                     .getDeclaredMethod("detectHandlerMethods", Object.class);
             detect.setAccessible(true);
             detect.invoke(handlerMapping, bean);
@@ -246,8 +252,11 @@ class ApiEndpointScannerTest {
     @RestController
     @RequestMapping("/api/multi")
     static class MultiMethodController {
-        @RequestMapping(method = {org.springframework.web.bind.annotation.RequestMethod.GET,
-                org.springframework.web.bind.annotation.RequestMethod.POST})
+        @RequestMapping(
+                method = {
+                    org.springframework.web.bind.annotation.RequestMethod.GET,
+                    org.springframework.web.bind.annotation.RequestMethod.POST
+                })
         public String both() {
             return "ok";
         }

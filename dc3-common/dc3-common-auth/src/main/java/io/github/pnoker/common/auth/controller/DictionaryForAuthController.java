@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.controller;
 
 import io.github.pnoker.common.auth.biz.DictionaryForAuthService;
@@ -25,6 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,15 +33,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 /**
  * REST controller exposing auth-related dictionary lookup endpoints.
  *
  * @author pnoker
  * @since 2016.10.1
  */
-@Tag(name = "dictionary_auth", description = "Authorization dictionaries: manage lookup entries for identity types, permission categories, and other auth-related metadata classifications")
+@Tag(
+        name = "dictionary_auth",
+        description =
+                "Authorization dictionaries: manage lookup entries for identity types, permission categories, and other auth-related metadata classifications")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.DICTIONARY_URL_PREFIX)
@@ -56,17 +57,22 @@ public class DictionaryForAuthController implements BaseController {
      * @return the full set of tenant dictionary options (id and display label), unpaged
      */
     @PreAuthorize("@perm.can('dictionary_for_auth', 'get')")
-    @Operation(summary = "List Tenant Dictionary", description = "List tenants as dictionary options (id and display label) for Auth Center selection. " +
-            "Use to populate tenant pickers such as the membership switcher; returns the full option set without paging.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Tenant Dictionary",
+            description =
+                    "List tenants as dictionary options (id and display label) for Auth Center selection. "
+                            + "Use to populate tenant pickers such as the membership switcher; returns the full option set without paging.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @GetMapping("/list_tenant")
     public Mono<List<DictionaryOption>> listTenantOptions() {
         return dictionaryForAuthService.listTenantOptions();
     }
-
 }

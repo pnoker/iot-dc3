@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -25,13 +24,12 @@ import io.github.pnoker.common.entity.ext.RuleStateExt;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.RuleStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
 
 /**
  * View object for rule runtime state API responses.
@@ -64,22 +62,18 @@ public class RuleStateVO extends BaseVO {
     private RuleStatusEnum entityStateFlag;
 
     @Schema(description = "Timestamp when the rule first triggered after activation.")
-
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime firstTriggerTime;
 
     @Schema(description = "Timestamp of the most recent rule trigger.")
-
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime lastTriggerTime;
 
     @Schema(description = "Timestamp when the rule last transitioned from triggered to recovered state.")
-
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime lastRecoverTime;
 
     @Schema(description = "Timestamp when the last notification was dispatched for this rule.")
-
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime lastNotifyTime;
 
@@ -91,5 +85,4 @@ public class RuleStateVO extends BaseVO {
 
     @Schema(description = "Entity state extension information, serialized as JSON for custom runtime metadata.")
     private RuleStateExt entityStateExt;
-
 }

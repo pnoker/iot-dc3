@@ -14,8 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.grpc;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.api.center.auth.GrpcLoginQuery;
 import io.github.pnoker.api.center.auth.GrpcTokenValidationDTO;
@@ -26,6 +29,8 @@ import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
+import java.util.Date;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,13 +38,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
-
-import java.util.Date;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TokenServerTest {
@@ -56,7 +54,11 @@ class TokenServerTest {
         TokenServer tokenServer = new TokenServer(tokenService);
 
         String name = "dc3-token-" + UUID.randomUUID();
-        server = InProcessServerBuilder.forName(name).directExecutor().addService(tokenServer).build().start();
+        server = InProcessServerBuilder.forName(name)
+                .directExecutor()
+                .addService(tokenServer)
+                .build()
+                .start();
         channel = InProcessChannelBuilder.forName(name).directExecutor().build();
         stub = TokenApiGrpc.newBlockingStub(channel);
     }
@@ -88,8 +90,7 @@ class TokenServerTest {
 
     @Test
     void checkValidReportsInvalidPayloadForInvalidToken() {
-        when(tokenService.checkValid("alice", "token", "tenant-A"))
-                .thenReturn(Mono.just(new TokenValid(false, null)));
+        when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(Mono.just(new TokenValid(false, null)));
 
         GrpcTokenValidationDTO response = stub.checkValid(GrpcLoginQuery.newBuilder()
                 .setTenant("tenant-A")
@@ -107,10 +108,10 @@ class TokenServerTest {
                 .thenReturn(Mono.error(new IllegalStateException("not found")));
 
         assertThatThrownBy(() -> stub.checkValid(GrpcLoginQuery.newBuilder()
-                .setTenant("tenant-A")
-                .setName("alice")
-                .setToken("token")
-                .build()))
+                        .setTenant("tenant-A")
+                        .setName("alice")
+                        .setToken("token")
+                        .build()))
                 .hasMessageContaining("INTERNAL");
     }
 }

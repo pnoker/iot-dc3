@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -43,7 +42,9 @@ public class ApiExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content of the API interface; discriminated by Type and Version of the parent extension")
+    @Schema(
+            description =
+                    "Extended content of the API interface; discriminated by Type and Version of the parent extension")
     private Content content;
 
     /**
@@ -65,15 +66,17 @@ public class ApiExt extends BaseExt {
         /**
          * URL link.
          */
-        @Schema(description = "URL link of the API interface; must be a valid HTTP(S) endpoint", example = "https://example.com/api/device/temperature")
+        @Schema(
+                description = "URL link of the API interface; must be a valid HTTP(S) endpoint",
+                example = "https://example.com/api/device/temperature")
         private String url;
 
         /**
          * Description.
          */
-        @Schema(description = "Free-form description remark of the API interface", example = "Returns the latest temperature reading for a device")
+        @Schema(
+                description = "Free-form description remark of the API interface",
+                example = "Returns the latest temperature reading for a device")
         private String remark;
-
     }
-
 }

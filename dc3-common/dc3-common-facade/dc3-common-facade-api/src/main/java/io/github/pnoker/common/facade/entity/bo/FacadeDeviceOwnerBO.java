@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.entity.bo;
 
 /**
  * Active driver runtime owner used for targeted, fenced commands.
  */
-public record FacadeDeviceOwnerBO(Long driverId, String ownerNode, Long fencingToken) {
-}
+public record FacadeDeviceOwnerBO(Long driverId, String ownerNode, Long fencingToken) {}

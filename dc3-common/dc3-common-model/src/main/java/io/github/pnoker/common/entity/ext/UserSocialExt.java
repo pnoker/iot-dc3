@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,7 +34,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "User social extension object, holding social account information embedded inside user VO extension fields")
+@Schema(
+        description =
+                "User social extension object, holding social account information embedded inside user VO extension fields")
 public class UserSocialExt extends BaseExt {
 
     /**
@@ -71,7 +72,9 @@ public class UserSocialExt extends BaseExt {
         /**
          * Lark (Feishu) account.
          */
-        @Schema(description = "Lark (Feishu) identifier of the user's linked social account", example = "lark_user@example.com")
+        @Schema(
+                description = "Lark (Feishu) identifier of the user's linked social account",
+                example = "lark_user@example.com")
         private String lark;
 
         /**
@@ -83,9 +86,9 @@ public class UserSocialExt extends BaseExt {
         /**
          * Social home page URL.
          */
-        @Schema(description = "Public home page URL of the user's social profile", example = "https://example.com/user/home")
+        @Schema(
+                description = "Public home page URL of the user's social profile",
+                example = "https://example.com/user/home")
         private String homeUrl;
-
     }
-
 }

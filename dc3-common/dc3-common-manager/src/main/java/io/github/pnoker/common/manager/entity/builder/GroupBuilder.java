@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.builder;
 
 import io.github.pnoker.common.manager.entity.bo.GroupBO;
 import io.github.pnoker.common.manager.entity.vo.GroupVO;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.List;
-
 /** MapStruct builder converting between group business and API models. */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GroupBuilder {
 
     @Mapping(target = "tenantId", ignore = true)
@@ -37,5 +37,4 @@ public interface GroupBuilder {
     GroupVO buildVOByBO(GroupBO entityBO);
 
     List<GroupVO> buildVOListByBOList(List<GroupBO> entityBOList);
-
 }

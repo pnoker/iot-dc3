@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * JSON extension object for event attribute configuration.
@@ -71,7 +69,6 @@ public class EventAttributeExt extends BaseExt {
 
         @Schema(description = "Scope to which the attribute applies")
         private AppliesTo appliesTo;
-
     }
 
     /**
@@ -104,7 +101,6 @@ public class EventAttributeExt extends BaseExt {
 
         @Schema(description = "Variables expression used by the UI component")
         private String variables;
-
     }
 
     /**
@@ -125,7 +121,6 @@ public class EventAttributeExt extends BaseExt {
 
         @Schema(description = "Regular expression the attribute value must match", example = "^[a-zA-Z0-9_]+$")
         private String regex;
-
     }
 
     /**
@@ -140,7 +135,6 @@ public class EventAttributeExt extends BaseExt {
 
         @Schema(description = "Whether the attribute value is treated as a secret", example = "true")
         private Boolean secret;
-
     }
 
     /**
@@ -158,7 +152,5 @@ public class EventAttributeExt extends BaseExt {
 
         @Schema(description = "Event source types this attribute applies to")
         private List<String> eventSourceTypes;
-
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
@@ -30,16 +29,15 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * Custom driver service implementation for the IEC 60870-5-104 Driver.
@@ -64,6 +62,7 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
@@ -78,13 +77,15 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
         this.driverSenderService = driverSenderService;
     }
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -110,26 +111,41 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                               PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         // Protocol read is not implemented yet (see class WORK IN PROGRESS note). Fail fast so the
         // SDK records a read failure and applies backoff instead of echoing a fabricated/cached value.
-        throw new ReadPointException("IEC 104 read not implemented: protocol I/O is pending, protocol={}, deviceId={}",
-                driverCode, device.getId());
+        throw new ReadPointException(
+                "IEC 104 read not implemented: protocol I/O is pending, protocol={}, deviceId={}",
+                driverCode,
+                device.getId());
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         // Protocol write is not implemented yet (see class WORK IN PROGRESS note). Fail fast instead
         // of caching the value locally and reporting a fabricated write success.
-        throw new WritePointException("IEC 104 write not implemented: protocol I/O is pending, protocol={}, deviceId={}",
-                driverCode, device.getId());
+        throw new WritePointException(
+                "IEC 104 write not implemented: protocol I/O is pending, protocol={}, deviceId={}",
+                driverCode,
+                device.getId());
     }
 
     @Override
-    public Map<String, String> execute(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> commandConfig,
-                                       DeviceBO device, CommandRuntimeBO command, Map<String, String> paramValues) {
+    public Map<String, String> execute(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> commandConfig,
+            DeviceBO device,
+            CommandRuntimeBO command,
+            Map<String, String> paramValues) {
         Map<String, String> result = new LinkedHashMap<>();
         String sendCommand = getConfigValue(commandConfig, "sendCommand", "${value}");
         if (Objects.nonNull(paramValues)) {
@@ -160,7 +176,8 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "asduAddress", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -169,7 +186,7 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "ioa", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

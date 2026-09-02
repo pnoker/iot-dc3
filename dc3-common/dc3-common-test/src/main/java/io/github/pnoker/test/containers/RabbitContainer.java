@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.test.containers;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -30,18 +29,17 @@ public final class RabbitContainer {
 
     private static final DockerImageName IMAGE = DockerImageName.parse("rabbitmq:3.13-management");
 
-    private static final boolean REUSE_ENABLED = TestcontainersConfiguration.getInstance().environmentSupportsReuse();
+    private static final boolean REUSE_ENABLED =
+            TestcontainersConfiguration.getInstance().environmentSupportsReuse();
 
     @SuppressWarnings("resource")
-    private static final RabbitMQContainer INSTANCE = new RabbitMQContainer(IMAGE)
-            .withReuse(REUSE_ENABLED);
+    private static final RabbitMQContainer INSTANCE = new RabbitMQContainer(IMAGE).withReuse(REUSE_ENABLED);
 
     static {
         INSTANCE.start();
     }
 
-    private RabbitContainer() {
-    }
+    private RabbitContainer() {}
 
     /**
      * Instance.

@@ -14,22 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * Request view object for replacing an MCP connection's tool whitelist.
@@ -49,11 +47,17 @@ public class McpConnectionToolsReplaceVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "Connection id can't be empty", groups = {Update.class})
-    @Schema(description = "Primary key of the MCP connection to update.", requiredMode = Schema.RequiredMode.REQUIRED, example = "1024")
+    @NotNull(
+            message = "Connection id can't be empty",
+            groups = {Update.class})
+    @Schema(
+            description = "Primary key of the MCP connection to update.",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            example = "1024")
     private String connectionId;
 
-    @Schema(description = "New tool id whitelist; fully overwrites the previous one.", example = "[\"tool_read_device\"]")
+    @Schema(
+            description = "New tool id whitelist; fully overwrites the previous one.",
+            example = "[\"tool_read_device\"]")
     private List<String> toolIds;
-
 }

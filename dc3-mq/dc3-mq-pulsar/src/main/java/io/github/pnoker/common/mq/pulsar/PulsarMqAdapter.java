@@ -14,15 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.pulsar;
 
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.OrderingGuarantee;
 import io.github.pnoker.common.constant.mq.SubscriptionMode;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.adapter.BrokerCapabilities;
-import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
 import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireConfirmation;
@@ -32,6 +31,19 @@ import io.github.pnoker.common.mq.listener.MqPoisonException;
 import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.mq.subscription.KeyRoutes;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.client.api.Consumer;
 import org.apache.pulsar.client.api.Message;
@@ -44,21 +56,6 @@ import org.apache.pulsar.client.api.SubscriptionInitialPosition;
 import org.apache.pulsar.client.api.SubscriptionType;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Pulsar implementation of the broker port. Topics map to
@@ -204,19 +201,22 @@ public class PulsarMqAdapter implements BrokerAdapter {
                 .key(message.partitionKey())
                 .properties(message.headers())
                 .sendAsync()
-                .whenComplete((messageId, failure) -> confirmation.onConfirm(message,
-                        Objects.isNull(failure), failure));
+                .whenComplete(
+                        (messageId, failure) -> confirmation.onConfirm(message, Objects.isNull(failure), failure));
     }
 
     @Override
     public void subscribe(SubscriptionSpec spec, RawDeliveryListener listener) {
         String routeKey = routeKey(spec, subscriptionName(spec));
-        KeyRoutes<RawDeliveryListener> routes =
-                singleRoutes.computeIfAbsent(routeKey, key -> new KeyRoutes<>());
+        KeyRoutes<RawDeliveryListener> routes = singleRoutes.computeIfAbsent(routeKey, key -> new KeyRoutes<>());
         routes.add(spec.keyPattern(), listener);
         if (consumers.containsKey(routeKey)) {
-            log.info("Pulsar subscription joined shared consumer, topic={}, mode={}, delivery={}, subscription={}",
-                    spec.topic(), spec.mode(), spec.delivery(), subscriptionName(spec));
+            log.info(
+                    "Pulsar subscription joined shared consumer, topic={}, mode={}, delivery={}, subscription={}",
+                    spec.topic(),
+                    spec.mode(),
+                    spec.delivery(),
+                    subscriptionName(spec));
             return;
         }
         try {
@@ -224,8 +224,10 @@ public class PulsarMqAdapter implements BrokerAdapter {
             Consumer<byte[]> consumer = client.newConsumer()
                     .topic(topicName(spec.topic()))
                     .subscriptionName(subscriptionName(spec))
-                    .subscriptionType(spec.mode() == SubscriptionMode.BROADCAST
-                            ? SubscriptionType.Exclusive : SubscriptionType.Shared)
+                    .subscriptionType(
+                            spec.mode() == SubscriptionMode.BROADCAST
+                                    ? SubscriptionType.Exclusive
+                                    : SubscriptionType.Shared)
                     .subscriptionInitialPosition(SubscriptionInitialPosition.Latest)
                     .negativeAckRedeliveryDelay(100, TimeUnit.MILLISECONDS)
                     .messageListener((consumerRef, message) -> {
@@ -238,8 +240,11 @@ public class PulsarMqAdapter implements BrokerAdapter {
                     })
                     .subscribe();
             consumers.put(routeKey, consumer);
-            log.info("Pulsar subscription started, topic={}, mode={}, subscription={}",
-                    spec.topic(), spec.mode(), consumer.getSubscription());
+            log.info(
+                    "Pulsar subscription started, topic={}, mode={}, subscription={}",
+                    spec.topic(),
+                    spec.mode(),
+                    consumer.getSubscription());
         } catch (PulsarClientException e) {
             throw new IllegalStateException("Pulsar subscribe failed, topic=" + spec.topic(), e);
         }
@@ -251,8 +256,11 @@ public class PulsarMqAdapter implements BrokerAdapter {
         KeyRoutes<RawBatchListener> routes = batchRoutes.computeIfAbsent(routeKey, key -> new KeyRoutes<>());
         routes.add(spec.keyPattern(), listener);
         if (consumers.containsKey(routeKey)) {
-            log.info("Pulsar batch subscription joined shared consumer, topic={}, mode={}, subscription={}",
-                    spec.topic(), spec.mode(), subscriptionName(spec));
+            log.info(
+                    "Pulsar batch subscription joined shared consumer, topic={}, mode={}, subscription={}",
+                    spec.topic(),
+                    spec.mode(),
+                    subscriptionName(spec));
             return;
         }
         try {
@@ -269,8 +277,10 @@ public class PulsarMqAdapter implements BrokerAdapter {
             Thread thread = new Thread(pump, "dc3-mq-pulsar-batch-" + spec.topic());
             thread.setDaemon(true);
             thread.start();
-            log.info("Pulsar batch subscription started, topic={}, subscription={}",
-                    spec.topic(), consumer.getSubscription());
+            log.info(
+                    "Pulsar batch subscription started, topic={}, subscription={}",
+                    spec.topic(),
+                    consumer.getSubscription());
         } catch (PulsarClientException e) {
             throw new IllegalStateException("Pulsar subscribeBatch failed, topic=" + spec.topic(), e);
         }
@@ -312,12 +322,18 @@ public class PulsarMqAdapter implements BrokerAdapter {
     }
 
     private ExecutorService deliveryExecutorOf(SubscriptionSpec spec) {
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 2, 60, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(DELIVERY_QUEUE_CAPACITY), runnable -> {
-            Thread thread = new Thread(runnable, "dc3-mq-pulsar-deliver-" + spec.topic());
-            thread.setDaemon(true);
-            return thread;
-        }, new ThreadPoolExecutor.CallerRunsPolicy());
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(
+                1,
+                2,
+                60,
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(DELIVERY_QUEUE_CAPACITY),
+                runnable -> {
+                    Thread thread = new Thread(runnable, "dc3-mq-pulsar-deliver-" + spec.topic());
+                    thread.setDaemon(true);
+                    return thread;
+                },
+                new ThreadPoolExecutor.CallerRunsPolicy());
         executor.allowCoreThreadTimeOut(true);
         deliveryExecutors.add(executor);
         return executor;
@@ -327,13 +343,15 @@ public class PulsarMqAdapter implements BrokerAdapter {
      * Single delivery with the shared synchronous bounded-retry semantics, running on
      * the subscription's executor (never on the client listener thread).
      */
-    private void deliverSingle(SubscriptionSpec spec, Consumer<byte[]> consumer, Message<byte[]> message,
-                               String routeKey) {
+    private void deliverSingle(
+            SubscriptionSpec spec, Consumer<byte[]> consumer, Message<byte[]> message, String routeKey) {
         KeyRoutes<RawDeliveryListener> routes = singleRoutes.get(routeKey);
         RawDeliveryListener listener = Objects.isNull(routes) ? null : routes.next(message.getKey());
         if (Objects.isNull(listener)) {
-            log.debug("Pulsar message matched no listener in this JVM, acknowledging and skipping, topic={}, key={}",
-                    spec.topic(), message.getKey());
+            log.debug(
+                    "Pulsar message matched no listener in this JVM, acknowledging and skipping, topic={}, key={}",
+                    spec.topic(),
+                    message.getKey());
             acknowledge(consumer, List.of(message));
             return;
         }
@@ -355,31 +373,37 @@ public class PulsarMqAdapter implements BrokerAdapter {
                 });
     }
 
-    private Mono<Void> settle(MqTopic topic, Consumer<byte[]> consumer, List<Message<byte[]>> messages,
-                              DeliveryDisposition disposition) {
+    private Mono<Void> settle(
+            MqTopic topic, Consumer<byte[]> consumer, List<Message<byte[]>> messages, DeliveryDisposition disposition) {
         return switch (disposition) {
-            case ACK -> Mono.fromFuture(consumer.acknowledgeAsync(
-                    messages.stream().map(Message::getMessageId).toList()))
-                    .doOnSuccess(ignored -> messages.forEach(message -> deliveryAttempts.remove(message.getMessageId())));
-            case REQUEUE -> Flux.fromIterable(messages)
-                    .concatMap(message -> {
-                        int attempt = deliveryAttempts.merge(message.getMessageId(), 1, Integer::sum);
-                        if (attempt >= Math.max(1, retryProperties.getMaxRetries())) {
-                            return deadLetter(topic, consumer, List.of(message))
-                                    .doOnSuccess(ignored -> deliveryAttempts.remove(message.getMessageId()));
-                        }
-                        return Mono.fromRunnable(() -> consumer.negativeAcknowledge(message));
-                    })
-                    .then();
-            case DEAD_LETTER -> deadLetter(topic, consumer, messages)
-                    .doOnSuccess(ignored -> messages.forEach(message -> deliveryAttempts.remove(message.getMessageId())));
+            case ACK ->
+                Mono.fromFuture(consumer.acknowledgeAsync(
+                                messages.stream().map(Message::getMessageId).toList()))
+                        .doOnSuccess(ignored ->
+                                messages.forEach(message -> deliveryAttempts.remove(message.getMessageId())));
+            case REQUEUE ->
+                Flux.fromIterable(messages)
+                        .concatMap(message -> {
+                            int attempt = deliveryAttempts.merge(message.getMessageId(), 1, Integer::sum);
+                            if (attempt >= Math.max(1, retryProperties.getMaxRetries())) {
+                                return deadLetter(topic, consumer, List.of(message))
+                                        .doOnSuccess(ignored -> deliveryAttempts.remove(message.getMessageId()));
+                            }
+                            return Mono.fromRunnable(() -> consumer.negativeAcknowledge(message));
+                        })
+                        .then();
+            case DEAD_LETTER ->
+                deadLetter(topic, consumer, messages)
+                        .doOnSuccess(ignored ->
+                                messages.forEach(message -> deliveryAttempts.remove(message.getMessageId())));
         };
     }
 
     private Mono<Void> deadLetter(MqTopic topic, Consumer<byte[]> consumer, List<Message<byte[]>> messages) {
         Producer<byte[]> deadLetterProducer = producer(deadLetterTopicName(topic));
         return Flux.fromIterable(messages)
-                .concatMap(message -> Mono.fromFuture(deadLetterProducer.newMessage()
+                .concatMap(message -> Mono.fromFuture(deadLetterProducer
+                        .newMessage()
                         .value(message.getData())
                         .key(Objects.requireNonNullElse(message.getKey(), ""))
                         .properties(message.getProperties())
@@ -391,10 +415,7 @@ public class PulsarMqAdapter implements BrokerAdapter {
     private Producer<byte[]> producer(String topic) {
         return producers.computeIfAbsent(topic, key -> {
             try {
-                return client.newProducer()
-                        .topic(key)
-                        .enableBatching(false)
-                        .create();
+                return client.newProducer().topic(key).enableBatching(false).create();
             } catch (PulsarClientException e) {
                 throw new IllegalStateException("Pulsar producer create failed, topic=" + key, e);
             }
@@ -402,8 +423,7 @@ public class PulsarMqAdapter implements BrokerAdapter {
     }
 
     private WireMqDelivery deliveryOf(Message<byte[]> message) {
-        return new WireMqDelivery(message.getData(), headersOf(message),
-                message.getRedeliveryCount() > 0);
+        return new WireMqDelivery(message.getData(), headersOf(message), message.getRedeliveryCount() > 0);
     }
 
     /**
@@ -419,8 +439,8 @@ public class PulsarMqAdapter implements BrokerAdapter {
         private final String routeKey;
         private volatile boolean halted;
 
-        private BatchPump(SubscriptionSpec spec, Consumer<byte[]> consumer, KeyRoutes<RawBatchListener> routes,
-                          String routeKey) {
+        private BatchPump(
+                SubscriptionSpec spec, Consumer<byte[]> consumer, KeyRoutes<RawBatchListener> routes, String routeKey) {
             this.spec = spec;
             this.consumer = consumer;
             this.routes = routes;
@@ -457,8 +477,10 @@ public class PulsarMqAdapter implements BrokerAdapter {
             for (Message<byte[]> message : batch) {
                 RawBatchListener listener = routes.next(message.getKey());
                 if (Objects.isNull(listener)) {
-                    log.debug("Pulsar batch message matched no listener in this JVM, acknowledging and skipping, topic={}, key={}",
-                            spec.topic(), message.getKey());
+                    log.debug(
+                            "Pulsar batch message matched no listener in this JVM, acknowledging and skipping, topic={}, key={}",
+                            spec.topic(),
+                            message.getKey());
                     acknowledge(consumer, List.of(message));
                     continue;
                 }
@@ -470,11 +492,14 @@ public class PulsarMqAdapter implements BrokerAdapter {
         }
 
         private void deliverSubBatch(RawBatchListener listener, List<Message<byte[]>> subBatch) {
-            normalize(Mono.defer(() -> listener.onBatch(subBatch.stream().map(PulsarMqAdapter.this::deliveryOf).toList())),
-                    spec.topic())
+            normalize(
+                            Mono.defer(() -> listener.onBatch(subBatch.stream()
+                                    .map(PulsarMqAdapter.this::deliveryOf)
+                                    .toList())),
+                            spec.topic())
                     .flatMap(disposition -> settle(spec.topic(), consumer, subBatch, disposition))
-                    .doOnError(error -> log.error("Pulsar batch settlement failed, topic={}, size={}",
-                            spec.topic(), subBatch.size(), error))
+                    .doOnError(error -> log.error(
+                            "Pulsar batch settlement failed, topic={}, size={}", spec.topic(), subBatch.size(), error))
                     .subscribe();
         }
     }

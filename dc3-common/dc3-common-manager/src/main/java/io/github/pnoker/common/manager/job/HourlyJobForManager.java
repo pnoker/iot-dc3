@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.job;
 
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
@@ -44,5 +43,4 @@ public class HourlyJobForManager extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
         log.debug("Manager hourly job started, executionTime={}", LocalDateTimeUtil.now());
     }
-
 }

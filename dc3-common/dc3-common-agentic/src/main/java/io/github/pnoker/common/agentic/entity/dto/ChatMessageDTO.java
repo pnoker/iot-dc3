@@ -47,7 +47,8 @@ public class ChatMessageDTO {
     /**
      * Message content text.
      */
-    @Schema(description = "Text content of the message for this conversation turn.", example = "What is the current temperature of sensor 1024?")
+    @Schema(
+            description = "Text content of the message for this conversation turn.",
+            example = "What is the current temperature of sensor 1024?")
     private String content;
-
 }

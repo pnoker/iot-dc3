@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
@@ -26,6 +25,11 @@ import io.github.pnoker.common.security.GatewayJwtConverter;
 import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.common.security.PermissionProvider;
 import io.github.pnoker.common.utils.HmacAuthSigner;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -50,12 +54,6 @@ import org.springframework.security.web.server.authorization.HttpStatusServerAcc
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * WebFlux security configuration.
@@ -89,11 +87,12 @@ import java.util.stream.Collectors;
  * @since 2016.10.1
  */
 @AutoConfiguration
-@AutoConfigureAfter(name = {
-        "io.github.pnoker.common.init.AuthInitRunner",
-        "io.github.pnoker.common.facade.grpc.config.GrpcFacadeAutoConfiguration",
-        "io.github.pnoker.common.facade.local.config.LocalFacadeAuthAutoConfiguration"
-})
+@AutoConfigureAfter(
+        name = {
+            "io.github.pnoker.common.init.AuthInitRunner",
+            "io.github.pnoker.common.facade.grpc.config.GrpcFacadeAutoConfiguration",
+            "io.github.pnoker.common.facade.local.config.LocalFacadeAuthAutoConfiguration"
+        })
 @ConditionalOnMissingClass("org.springframework.cloud.gateway.handler.RoutePredicateHandlerMapping")
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
@@ -107,8 +106,7 @@ public class WebFluxSecurityConfig {
      */
     @Bean("perm")
     @ConditionalOnMissingBean(name = "perm")
-    public PermissionMethods permissionMethods(
-            @Value("${spring.application.name:unknown}") String serviceName) {
+    public PermissionMethods permissionMethods(@Value("${spring.application.name:unknown}") String serviceName) {
         return new PermissionMethods(serviceName);
     }
 
@@ -136,8 +134,7 @@ public class WebFluxSecurityConfig {
      */
     @Bean
     public GatewayJwtConverter gatewayJwtConverter(
-            HmacAuthSigner hmacAuthSigner,
-            PermissionProvider permissionProvider) {
+            HmacAuthSigner hmacAuthSigner, PermissionProvider permissionProvider) {
         return new GatewayJwtConverter(hmacAuthSigner, permissionProvider);
     }
 
@@ -165,8 +162,7 @@ public class WebFluxSecurityConfig {
 
         validateDocsSecurity(environment, hmacAuthSigner, docsInternalSignatureEnabled);
 
-        return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+        return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .authorizeExchange(spec -> spec
@@ -174,37 +170,50 @@ public class WebFluxSecurityConfig {
                         // before the security chain sees the path, so matchers must NOT include
                         // it. The auth center serves the token endpoints at /token/** under its
                         // /auth base-path; the chain matches the post-strip path /token/salt.
-                        .pathMatchers(HttpMethod.POST, "/token/salt").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/token/generate").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/token/change_password").permitAll()
-                        .pathMatchers(HttpMethod.GET, McpConstant.WELL_KNOWN_AUTHORIZATION_SERVER).permitAll()
-                        .pathMatchers(HttpMethod.GET, McpConstant.OAUTH2_JWKS).permitAll()
-                        .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_TOKEN).permitAll()
-                        .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_REVOKE).permitAll()
+                        .pathMatchers(HttpMethod.POST, "/token/salt")
+                        .permitAll()
+                        .pathMatchers(HttpMethod.POST, "/token/generate")
+                        .permitAll()
+                        .pathMatchers(HttpMethod.POST, "/token/change_password")
+                        .permitAll()
+                        .pathMatchers(HttpMethod.GET, McpConstant.WELL_KNOWN_AUTHORIZATION_SERVER)
+                        .permitAll()
+                        .pathMatchers(HttpMethod.GET, McpConstant.OAUTH2_JWKS)
+                        .permitAll()
+                        .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_TOKEN)
+                        .permitAll()
+                        .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_REVOKE)
+                        .permitAll()
                         // Dynamic Client Registration (RFC 7591) for external MCP clients. Open in
                         // dev/test for convenience; in pre/pro it stays closed unless explicitly
                         // enabled via dc3.oauth.dcr.enabled=true. Admin UI registration is unaffected
                         // — it goes through the @perm.can('mcp','add')-gated management endpoint.
                         .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_REGISTER)
                         .access((authentication, context) -> dcrAccess(environment, oauthDcrEnabled))
-                        .pathMatchers("/actuator/**").permitAll()
-                        .pathMatchers("/health/**").permitAll()
+                        .pathMatchers("/actuator/**")
+                        .permitAll()
+                        .pathMatchers("/health/**")
+                        .permitAll()
                         .pathMatchers("/v3/api-docs/**", "/v3/api-docs.yaml")
-                        .access((authentication, context) -> docsAccess(context.getExchange(), environment,
-                                hmacAuthSigner, docsPublicEnabled, docsInternalSignatureEnabled))
+                        .access((authentication, context) -> docsAccess(
+                                context.getExchange(),
+                                environment,
+                                hmacAuthSigner,
+                                docsPublicEnabled,
+                                docsInternalSignatureEnabled))
                         .pathMatchers("/swagger-ui.html", "/swagger-ui/**", "/webjars/**")
-                        .access((authentication, context) -> docsAccess(context.getExchange(), environment,
-                                hmacAuthSigner, docsPublicEnabled, docsInternalSignatureEnabled))
-                        .anyExchange().authenticated()
-                )
-                .addFilterAt(authenticationWebFilter(converter),
-                        SecurityWebFiltersOrder.AUTHENTICATION)
-                .exceptionHandling(spec -> spec
-                        .authenticationEntryPoint(
-                                new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED))
-                        .accessDeniedHandler(
-                                new HttpStatusServerAccessDeniedHandler(HttpStatus.FORBIDDEN))
-                )
+                        .access((authentication, context) -> docsAccess(
+                                context.getExchange(),
+                                environment,
+                                hmacAuthSigner,
+                                docsPublicEnabled,
+                                docsInternalSignatureEnabled))
+                        .anyExchange()
+                        .authenticated())
+                .addFilterAt(authenticationWebFilter(converter), SecurityWebFiltersOrder.AUTHENTICATION)
+                .exceptionHandling(
+                        spec -> spec.authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED))
+                                .accessDeniedHandler(new HttpStatusServerAccessDeniedHandler(HttpStatus.FORBIDDEN)))
                 .build();
     }
 
@@ -213,16 +222,16 @@ public class WebFluxSecurityConfig {
 
         AuthenticationWebFilter filter = new AuthenticationWebFilter(noOpAuthManager);
         filter.setServerAuthenticationConverter(converter);
-        filter.setSecurityContextRepository(
-                NoOpServerSecurityContextRepository.getInstance());
+        filter.setSecurityContextRepository(NoOpServerSecurityContextRepository.getInstance());
         return filter;
     }
 
-    private Mono<AuthorizationResult> docsAccess(ServerWebExchange exchange,
-                                                 Environment environment,
-                                                 HmacAuthSigner hmacAuthSigner,
-                                                 boolean docsPublicEnabled,
-                                                 boolean docsInternalSignatureEnabled) {
+    private Mono<AuthorizationResult> docsAccess(
+            ServerWebExchange exchange,
+            Environment environment,
+            HmacAuthSigner hmacAuthSigner,
+            boolean docsPublicEnabled,
+            boolean docsInternalSignatureEnabled) {
         if (!isProtectedEnvironment(environment) && docsPublicEnabled) {
             return Mono.just(new AuthorizationDecision(true));
         }
@@ -233,9 +242,19 @@ public class WebFluxSecurityConfig {
         String timestamp = exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.X_INTERNAL_TIMESTAMP);
         String nonce = exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.X_INTERNAL_NONCE);
         String sign = exchange.getRequest().getHeaders().getFirst(RequestConstant.Header.X_INTERNAL_SIGN);
-        boolean allowed = isFresh(timestamp) && Objects.nonNull(caller) && Objects.nonNull(nonce)
-                && hmacAuthSigner.verify(internalDocsPayload(caller, timestamp, nonce,
-                exchange.getRequest().getPath().pathWithinApplication().value()), sign);
+        boolean allowed = isFresh(timestamp)
+                && Objects.nonNull(caller)
+                && Objects.nonNull(nonce)
+                && hmacAuthSigner.verify(
+                        internalDocsPayload(
+                                caller,
+                                timestamp,
+                                nonce,
+                                exchange.getRequest()
+                                        .getPath()
+                                        .pathWithinApplication()
+                                        .value()),
+                        sign);
         return Mono.just(new AuthorizationDecision(allowed));
     }
 
@@ -245,8 +264,8 @@ public class WebFluxSecurityConfig {
         return Mono.just(new AuthorizationDecision(allow));
     }
 
-    private void validateDocsSecurity(Environment environment, HmacAuthSigner hmacAuthSigner,
-                                      boolean docsInternalSignatureEnabled) {
+    private void validateDocsSecurity(
+            Environment environment, HmacAuthSigner hmacAuthSigner, boolean docsInternalSignatureEnabled) {
         boolean apiDocsEnabled = environment.getProperty("springdoc.api-docs.enabled", Boolean.class, true);
         if (!isProtectedEnvironment(environment) || !apiDocsEnabled) {
             return;

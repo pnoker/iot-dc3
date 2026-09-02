@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
@@ -23,12 +22,11 @@ import io.github.pnoker.common.enums.McpAuditStatusEnum;
 import io.github.pnoker.common.enums.McpRiskLevelEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.List;
 
 /**
  * MapStruct builder converting an MCP audit command projection to its view object.
@@ -36,7 +34,9 @@ import java.util.List;
  * @author pnoker
  * @since 2026.6.19
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface McpAuditBuilder {
 
     /**
@@ -76,5 +76,4 @@ public interface McpAuditBuilder {
      * @return EntityVO Array
      */
     List<McpAuditVO> buildVOListByRecordList(List<McpAuditCommand> entityRecordList);
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,7 +34,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "JSON extension object for point attribute configuration, embedded inside point attribute VO extension fields")
+@Schema(
+        description =
+                "JSON extension object for point attribute configuration, embedded inside point attribute VO extension fields")
 public class PointAttributeExt extends BaseExt {
 
     /**
@@ -43,7 +44,9 @@ public class PointAttributeExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content payload, distinguished by the type and version fields of the base extension")
+    @Schema(
+            description =
+                    "Extended content payload, distinguished by the type and version fields of the base extension")
     private Content content;
 
     /**
@@ -56,9 +59,9 @@ public class PointAttributeExt extends BaseExt {
     @Schema(description = "Extended content payload for point attribute configuration")
     public static class Content {
 
-        @Schema(description = "Reserved placeholder string for future point attribute extension content; currently unused")
+        @Schema(
+                description =
+                        "Reserved placeholder string for future point attribute extension content; currently unused")
         private String keep;
-
     }
-
 }

@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.security;
 
 import io.github.pnoker.common.entity.common.RequestHeader;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-
 import java.io.Serial;
 import java.util.Collection;
 import java.util.Objects;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 
 /**
  * Spring Security Authentication token derived from the Gateway-issued
@@ -40,8 +38,8 @@ public class GatewayAuthenticationToken extends AbstractAuthenticationToken {
 
     private final RequestHeader.PrincipalHeader principalHeader;
 
-    public GatewayAuthenticationToken(RequestHeader.PrincipalHeader principalHeader,
-                                      Collection<? extends GrantedAuthority> authorities) {
+    public GatewayAuthenticationToken(
+            RequestHeader.PrincipalHeader principalHeader, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);
         this.principalHeader = Objects.requireNonNull(principalHeader, "principalHeader must not be null");
         setAuthenticated(true);

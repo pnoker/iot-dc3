@@ -14,15 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.contract;
 
-import org.junit.jupiter.api.Test;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,8 +28,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Repository-wide guardrails for the low-level common module boundaries.
@@ -42,12 +40,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CommonModuleBoundaryTest {
 
     private static final String MAIN_JAVA = "/src/main/java/";
-    private static final String COMMON_CONSTANT_SOURCE =
-            "dc3-common/dc3-common-constant/src/main/java/";
-    private static final Pattern DC3_PACKAGE = Pattern.compile(
-            "(?m)^package\\s+io\\.github\\.pnoker(?:\\.|;)");
-    private static final Pattern TOP_LEVEL_SHARED_TYPE = Pattern.compile(
-            "(?m)^public\\s+(?:enum\\s+[A-Za-z_$][A-Za-z0-9_$]*"
+    private static final String COMMON_CONSTANT_SOURCE = "dc3-common/dc3-common-constant/src/main/java/";
+    private static final Pattern DC3_PACKAGE = Pattern.compile("(?m)^package\\s+io\\.github\\.pnoker(?:\\.|;)");
+    private static final Pattern TOP_LEVEL_SHARED_TYPE =
+            Pattern.compile("(?m)^public\\s+(?:enum\\s+[A-Za-z_$][A-Za-z0-9_$]*"
                     + "|(?:final\\s+)?class\\s+[A-Za-z_$][A-Za-z0-9_$]*Constant)\\b");
 
     private static void inspectSharedTypePlacement(Path repository, Path path, List<String> violations) {
@@ -83,7 +79,8 @@ class CommonModuleBoundaryTest {
             NodeList dependencies = dependencyContainer.getChildNodes();
             for (int index = 0; index < dependencies.getLength(); index++) {
                 Node node = dependencies.item(index);
-                if (node instanceof Element dependency && "dependency".equals(dependency.getTagName())
+                if (node instanceof Element dependency
+                        && "dependency".equals(dependency.getTagName())
                         && "io.github.pnoker".equals(directChildText(dependency, "groupId"))) {
                     internal.add(directChildText(dependency, "artifactId"));
                 }
@@ -140,21 +137,15 @@ class CommonModuleBoundaryTest {
                     .forEach(path -> inspectSharedTypePlacement(repository, path, violations));
         }
 
-        assertThat(violations)
-                .as("Shared type placement violations")
-                .isEmpty();
+        assertThat(violations).as("Shared type placement violations").isEmpty();
     }
 
     @Test
     void foundationModulesKeepTheirDependencyFloor() throws Exception {
         Path common = findRepositoryRoot().resolve("dc3-common");
 
+        assertInternalDependencies(common.resolve("dc3-common-constant/pom.xml"), Set.of());
         assertInternalDependencies(
-                common.resolve("dc3-common-constant/pom.xml"),
-                Set.of());
-        assertInternalDependencies(
-                common.resolve("dc3-common-public/pom.xml"),
-                Set.of("dc3-common-constant", "dc3-common-exception"));
+                common.resolve("dc3-common-public/pom.xml"), Set.of("dc3-common-constant", "dc3-common-exception"));
     }
-
 }

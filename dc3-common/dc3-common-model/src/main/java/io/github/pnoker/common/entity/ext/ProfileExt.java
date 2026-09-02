@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -35,7 +34,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Profile/template JSON extension object embedded inside VO extension fields, carrying template-specific extended content")
+@Schema(
+        description =
+                "Profile/template JSON extension object embedded inside VO extension fields, carrying template-specific extended content")
 public class ProfileExt extends BaseExt {
 
     /**
@@ -43,7 +44,9 @@ public class ProfileExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content payload of the profile/template; interpretation is driven by the type and version fields of the parent BaseExt")
+    @Schema(
+            description =
+                    "Extended content payload of the profile/template; interpretation is driven by the type and version fields of the parent BaseExt")
     private Content content;
 
     /**
@@ -56,9 +59,10 @@ public class ProfileExt extends BaseExt {
     @Schema(description = "Extended content payload for the profile/template extension")
     public static class Content {
 
-        @Schema(description = "Placeholder field reserved for profile/template extended content; currently unused and kept for forward compatibility", example = "placeholder")
+        @Schema(
+                description =
+                        "Placeholder field reserved for profile/template extended content; currently unused and kept for forward compatibility",
+                example = "placeholder")
         private String keep;
-
     }
-
 }

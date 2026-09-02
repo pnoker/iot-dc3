@@ -14,26 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.gateway.mcp;
-
-import io.github.pnoker.common.constant.service.ManagerConstant;
-import org.junit.jupiter.api.Test;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import io.github.pnoker.common.constant.service.ManagerConstant;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 class McpGatewayPropertiesTest {
 
     @Test
     void backendBaseUrlReturnsConfiguredServiceUrlWithoutTrailingSlash() {
         McpGatewayProperties properties = new McpGatewayProperties();
-        properties.setBackendBaseUrls(new LinkedHashMap<>(Map.of(
-                ManagerConstant.SERVICE_NAME, "http://dc3-center-manager:8400/manager/"
-        )));
+        properties.setBackendBaseUrls(
+                new LinkedHashMap<>(Map.of(ManagerConstant.SERVICE_NAME, "http://dc3-center-manager:8400/manager/")));
 
         assertThat(properties.backendBaseUrl(ManagerConstant.SERVICE_NAME))
                 .isEqualTo("http://dc3-center-manager:8400/manager");
@@ -47,5 +44,4 @@ class McpGatewayPropertiesTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Unknown backend service");
     }
-
 }

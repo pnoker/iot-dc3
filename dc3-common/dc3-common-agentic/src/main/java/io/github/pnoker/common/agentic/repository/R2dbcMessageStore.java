@@ -2,16 +2,28 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.agentic.repository;
 
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
-import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
+import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -20,11 +32,6 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tools.jackson.databind.ObjectMapper;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Objects;
 
 /** Explicit SQL adapter for the agentic message store. */
 @Repository
@@ -40,11 +47,16 @@ public class R2dbcMessageStore implements ReactiveMessageStore {
     private final DatabaseClient databaseClient;
     private final TransactionalOperator transactionalOperator;
     private final ObjectMapper objectMapper;
+    private final R2dbcDialect dialect;
 
     @Override
-    public Mono<MessageBO> save(String conversationId, String role, AgenticMessageContent content,
-                                String model, AgenticMessageStatusEnum status,
-                                RequestHeader.PrincipalHeader header) {
+    public Mono<MessageBO> save(
+            String conversationId,
+            String role,
+            AgenticMessageContent content,
+            String model,
+            AgenticMessageStatusEnum status,
+            RequestHeader.PrincipalHeader header) {
         if (header == null) {
             return Mono.error(new IllegalArgumentException("header must not be null"));
         }
@@ -64,7 +76,8 @@ public class R2dbcMessageStore implements ReactiveMessageStore {
         String lockSql = "SELECT id FROM dc3_agentic.dc3_session"
                 + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id"
                 + " AND user_id = :user_id AND deleted = 0 FOR UPDATE";
-        Mono<Long> nextIndex = databaseClient.sql("SELECT COALESCE(MAX(message_index), -1) + 1 AS next_index FROM "
+        Mono<Long> nextIndex = databaseClient
+                .sql("SELECT COALESCE(MAX(message_index), -1) + 1 AS next_index FROM "
                         + TABLE + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id"
                         + " AND user_id = :user_id AND deleted = 0")
                 .bind("conversation_id", conversationId)
@@ -72,26 +85,37 @@ public class R2dbcMessageStore implements ReactiveMessageStore {
                 .bind("user_id", header.getUserId())
                 .map((row, metadata) -> row.get("next_index", Long.class))
                 .one();
-        return transactionalOperator.transactional(databaseClient.sql(lockSql)
+        return transactionalOperator
+                .transactional(databaseClient
+                        .sql(lockSql)
                         .bind("conversation_id", conversationId)
                         .bind("tenant_id", header.getTenantId())
                         .bind("user_id", header.getUserId())
-                        .fetch().all()
-                        .switchIfEmpty(Mono.error(new IllegalStateException("session must exist before saving a message")))
+                        .fetch()
+                        .all()
+                        .switchIfEmpty(
+                                Mono.error(new IllegalStateException("session must exist before saving a message")))
                         .then()
                         .then(nextIndex)
                         .flatMap(index -> insertWithIndex(conversationId, role, json, model, status, header, index)))
                 .switchIfEmpty(Mono.error(new IllegalStateException("message insert returned no row")));
     }
 
-    private Mono<MessageBO> insertWithIndex(String conversationId, String role, String json, String model,
-                                             AgenticMessageStatusEnum status,
-                                             RequestHeader.PrincipalHeader header, long index) {
+    private Mono<MessageBO> insertWithIndex(
+            String conversationId,
+            String role,
+            String json,
+            String model,
+            AgenticMessageStatusEnum status,
+            RequestHeader.PrincipalHeader header,
+            long index) {
         Instant now = Instant.now();
-        return databaseClient.sql("INSERT INTO " + TABLE
+        return databaseClient
+                .sql("INSERT INTO " + TABLE
                         + " (conversation_id, role, content, model, message_index, status, tenant_id, user_id, "
                         + "creator_id, creator_name, operator_id, operator_name, create_time, operate_time, deleted)"
-                        + " VALUES (:conversation_id, :role, :content, :model, :message_index, :status, :tenant_id, :user_id,"
+                        + " VALUES (:conversation_id, :role, " + dialect.jsonWriteExpression(":content")
+                        + ", :model, :message_index, :status, :tenant_id, :user_id,"
                         + " :creator_id, :creator_name, :operator_id, :operator_name, :create_time, :operate_time, 0)")
                 .bind("conversation_id", conversationId)
                 .bind("role", role == null ? "" : role)
@@ -107,13 +131,17 @@ public class R2dbcMessageStore implements ReactiveMessageStore {
                 .bind("operator_name", header.getUserName() == null ? "" : header.getUserName())
                 .bind("create_time", LocalDateTime.ofInstant(now, ZoneOffset.UTC))
                 .bind("operate_time", LocalDateTime.ofInstant(now, ZoneOffset.UTC))
-                .fetch().rowsUpdated()
-                .flatMap(rows -> rows == 1 ? findInserted(conversationId, header, Mono.just(index))
+                .fetch()
+                .rowsUpdated()
+                .flatMap(rows -> rows == 1
+                        ? findInserted(conversationId, header, Mono.just(index))
                         : Mono.error(new IllegalStateException("message insert affected " + rows + " rows")));
     }
 
-    private Mono<MessageBO> findInserted(String conversationId, RequestHeader.PrincipalHeader header, Mono<Long> index) {
-        return index.flatMap(value -> databaseClient.sql("SELECT " + COLUMNS + " FROM " + TABLE
+    private Mono<MessageBO> findInserted(
+            String conversationId, RequestHeader.PrincipalHeader header, Mono<Long> index) {
+        return index.flatMap(value -> databaseClient
+                .sql("SELECT " + COLUMNS + " FROM " + TABLE
                         + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id AND user_id = :user_id"
                         + " AND message_index = :message_index AND deleted = 0 ORDER BY id DESC LIMIT 1")
                 .bind("conversation_id", conversationId)
@@ -128,7 +156,8 @@ public class R2dbcMessageStore implements ReactiveMessageStore {
     public Flux<MessageBO> list(String conversationId, RequestHeader.PrincipalHeader header) {
         if (header == null) return Flux.error(new IllegalArgumentException("header must not be null"));
         if (conversationId == null || conversationId.isBlank()) return Flux.empty();
-        return databaseClient.sql("SELECT " + COLUMNS + " FROM " + TABLE
+        return databaseClient
+                .sql("SELECT " + COLUMNS + " FROM " + TABLE
                         + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id AND user_id = :user_id"
                         + " AND deleted = 0 ORDER BY message_index ASC, id ASC")
                 .bind("conversation_id", conversationId)
@@ -147,7 +176,8 @@ public class R2dbcMessageStore implements ReactiveMessageStore {
         if (limit < 1 || limit > 200) {
             return Flux.error(new IllegalArgumentException("limit must be between 1 and 200"));
         }
-        return databaseClient.sql("SELECT " + COLUMNS + " FROM " + TABLE
+        return databaseClient
+                .sql("SELECT " + COLUMNS + " FROM " + TABLE
                         + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id"
                         + " AND user_id = :user_id AND deleted = 0"
                         + " ORDER BY message_index DESC, id DESC LIMIT :limit")
@@ -167,14 +197,16 @@ public class R2dbcMessageStore implements ReactiveMessageStore {
         if (conversationId == null || conversationId.isBlank()) {
             return Mono.just(0L);
         }
-        return databaseClient.sql("UPDATE " + TABLE + " SET deleted = 1, operate_time = :operate_time"
+        return databaseClient
+                .sql("UPDATE " + TABLE + " SET deleted = 1, operate_time = :operate_time"
                         + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id"
                         + " AND user_id = :user_id AND deleted = 0")
                 .bind("operate_time", LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC))
                 .bind("conversation_id", conversationId)
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())
-                .fetch().rowsUpdated()
+                .fetch()
+                .rowsUpdated()
                 .map(Long::valueOf);
     }
 

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.property;
 
 import jakarta.validation.Valid;
@@ -65,8 +64,7 @@ public class AlarmCacheProperties {
         /**
          * Required by Spring property binding.
          */
-        public CacheTuning() {
-        }
+        public CacheTuning() {}
 
         /**
          * All-args constructor for programmatic tuning.
@@ -75,7 +73,5 @@ public class AlarmCacheProperties {
             this.maxSize = maxSize;
             this.ttlSeconds = ttlSeconds;
         }
-
     }
-
 }

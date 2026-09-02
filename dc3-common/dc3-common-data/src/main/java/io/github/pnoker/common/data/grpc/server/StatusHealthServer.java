@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.grpc.server;
 
 import io.github.pnoker.api.center.data.GrpcDriverStatusQuery;
@@ -27,8 +26,8 @@ import io.github.pnoker.api.center.data.GrpcSystemHealthDTO;
 import io.github.pnoker.api.center.data.GrpcTenantHealthQuery;
 import io.github.pnoker.api.center.data.StatusHealthApiGrpc;
 import io.github.pnoker.common.data.biz.SystemHealthService;
-import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
+import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
@@ -36,17 +35,14 @@ import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
-import io.github.pnoker.common.data.grpc.server.ReactiveGrpcServerSupport;
 import io.grpc.stub.StreamObserver;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.LinkedHashMap;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import reactor.core.publisher.Mono;
 
 /**
@@ -70,55 +66,98 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
 
     @Override
     public void deviceStatusesByIds(GrpcIdsStatusQuery request, StreamObserver<GrpcStatusMap> responseObserver) {
-        ReactiveGrpcServerSupport.subscribe(deviceFacade.listByIdsReactive(request.getTenantId(), request.getIdsList()).map(FacadeDeviceBO::getId).collectList()
-                .flatMap(ids -> entityStateStore.listStateFlags(request.getTenantId(), EntityTypeEnum.DEVICE, ids)
-                        .map(flags -> statusCodes(ids, flags)))
-                .map(statuses -> GrpcStatusMap.newBuilder().putAllData(statuses).build()), responseObserver);
+        ReactiveGrpcServerSupport.subscribe(
+                deviceFacade
+                        .listByIdsReactive(request.getTenantId(), request.getIdsList())
+                        .map(FacadeDeviceBO::getId)
+                        .collectList()
+                        .flatMap(ids -> entityStateStore
+                                .listStateFlags(request.getTenantId(), EntityTypeEnum.DEVICE, ids)
+                                .map(flags -> statusCodes(ids, flags)))
+                        .map(statuses ->
+                                GrpcStatusMap.newBuilder().putAllData(statuses).build()),
+                responseObserver);
     }
 
     @Override
-    public void deviceStatusesByProfileId(GrpcProfileStatusQuery request,
-                                          StreamObserver<GrpcStatusMap> responseObserver) {
-        ReactiveGrpcServerSupport.subscribe(deviceFacade.listByProfileIdReactive(request.getTenantId(), request.getProfileId()).map(FacadeDeviceBO::getId).collectList()
-                .flatMap(ids -> entityStateStore.listStateFlags(request.getTenantId(), EntityTypeEnum.DEVICE, ids)
-                        .map(flags -> statusCodes(ids, flags)))
-                .map(statuses -> GrpcStatusMap.newBuilder().putAllData(statuses).build()), responseObserver);
+    public void deviceStatusesByProfileId(
+            GrpcProfileStatusQuery request, StreamObserver<GrpcStatusMap> responseObserver) {
+        ReactiveGrpcServerSupport.subscribe(
+                deviceFacade
+                        .listByProfileIdReactive(request.getTenantId(), request.getProfileId())
+                        .map(FacadeDeviceBO::getId)
+                        .collectList()
+                        .flatMap(ids -> entityStateStore
+                                .listStateFlags(request.getTenantId(), EntityTypeEnum.DEVICE, ids)
+                                .map(flags -> statusCodes(ids, flags)))
+                        .map(statuses ->
+                                GrpcStatusMap.newBuilder().putAllData(statuses).build()),
+                responseObserver);
     }
 
     @Override
     public void driverStatusesByIds(GrpcIdsStatusQuery request, StreamObserver<GrpcStatusMap> responseObserver) {
-        ReactiveGrpcServerSupport.subscribe(driverFacade.listByIdsReactive(request.getTenantId(), request.getIdsList()).map(FacadeDriverBO::getId).collectList()
-                .flatMap(ids -> entityStateStore.listStateFlags(request.getTenantId(), EntityTypeEnum.DRIVER, ids)
-                        .map(flags -> statusCodes(ids, flags)))
-                .map(statuses -> GrpcStatusMap.newBuilder().putAllData(statuses).build()), responseObserver);
+        ReactiveGrpcServerSupport.subscribe(
+                driverFacade
+                        .listByIdsReactive(request.getTenantId(), request.getIdsList())
+                        .map(FacadeDriverBO::getId)
+                        .collectList()
+                        .flatMap(ids -> entityStateStore
+                                .listStateFlags(request.getTenantId(), EntityTypeEnum.DRIVER, ids)
+                                .map(flags -> statusCodes(ids, flags)))
+                        .map(statuses ->
+                                GrpcStatusMap.newBuilder().putAllData(statuses).build()),
+                responseObserver);
     }
 
     @Override
-    public void driverDeviceStatusSummary(GrpcDriverStatusQuery request,
-                                          StreamObserver<GrpcStringMap> responseObserver) {
-        ReactiveGrpcServerSupport.subscribe(driverFacade.getByIdReactive(request.getTenantId(), request.getDriverId()).flatMap(driver ->
-                        deviceFacade.listByDriverIdReactive(request.getTenantId(), request.getDriverId()).map(FacadeDeviceBO::getId).collectList()
-                                .flatMap(ids -> entityStateStore.listStateFlags(request.getTenantId(), EntityTypeEnum.DEVICE, ids)
-                                        .map(flags -> new FacadeDriverDeviceStatusSummaryBO(request.getDriverId(), ids.size(),
-                                                (int) ids.stream().filter(id -> EntityStatusEnum.ONLINE.getIndex().equals(flags.get(id))).count(),
-                                                (int) ids.stream().filter(id -> !EntityStatusEnum.ONLINE.getIndex().equals(flags.get(id))).count()))))
-                .map(summary -> GrpcStringMap.newBuilder().putAllData(summary.toMap()).build())
-                .switchIfEmpty(Mono.error(new io.github.pnoker.common.exception.NotFoundException("Driver"))), responseObserver);
+    public void driverDeviceStatusSummary(
+            GrpcDriverStatusQuery request, StreamObserver<GrpcStringMap> responseObserver) {
+        ReactiveGrpcServerSupport.subscribe(
+                driverFacade
+                        .getByIdReactive(request.getTenantId(), request.getDriverId())
+                        .flatMap(driver -> deviceFacade
+                                .listByDriverIdReactive(request.getTenantId(), request.getDriverId())
+                                .map(FacadeDeviceBO::getId)
+                                .collectList()
+                                .flatMap(ids -> entityStateStore
+                                        .listStateFlags(request.getTenantId(), EntityTypeEnum.DEVICE, ids)
+                                        .map(flags -> new FacadeDriverDeviceStatusSummaryBO(
+                                                request.getDriverId(),
+                                                ids.size(),
+                                                (int) ids.stream()
+                                                        .filter(id -> EntityStatusEnum.ONLINE
+                                                                .getIndex()
+                                                                .equals(flags.get(id)))
+                                                        .count(),
+                                                (int) ids.stream()
+                                                        .filter(id -> !EntityStatusEnum.ONLINE
+                                                                .getIndex()
+                                                                .equals(flags.get(id)))
+                                                        .count()))))
+                        .map(summary -> GrpcStringMap.newBuilder()
+                                .putAllData(summary.toMap())
+                                .build())
+                        .switchIfEmpty(Mono.error(new io.github.pnoker.common.exception.NotFoundException("Driver"))),
+                responseObserver);
     }
 
     @Override
     public void systemHealth(GrpcTenantHealthQuery request, StreamObserver<GrpcSystemHealthDTO> responseObserver) {
-        ReactiveGrpcServerSupport.subscribe(systemHealthService.snapshot(request.getTenantId())
-                .switchIfEmpty(Mono.error(new IllegalStateException("system health returned no value")))
-                .map(health -> {
-            GrpcSystemHealthDTO dto = GrpcSystemHealthDTO.newBuilder()
-                    .putAllCenter(nullToEmpty(health.getCenter()))
-                    .putAllInfra(nullToEmpty(health.getInfra()))
-                    .setDrivers(toGrpcSummary(health.getDrivers()))
-                    .setDevices(toGrpcSummary(health.getDevices()))
-                    .build();
-            return dto;
-        }), responseObserver);
+        ReactiveGrpcServerSupport.subscribe(
+                systemHealthService
+                        .snapshot(request.getTenantId())
+                        .switchIfEmpty(Mono.error(new IllegalStateException("system health returned no value")))
+                        .map(health -> {
+                            GrpcSystemHealthDTO dto = GrpcSystemHealthDTO.newBuilder()
+                                    .putAllCenter(nullToEmpty(health.getCenter()))
+                                    .putAllInfra(nullToEmpty(health.getInfra()))
+                                    .setDrivers(toGrpcSummary(health.getDrivers()))
+                                    .setDevices(toGrpcSummary(health.getDevices()))
+                                    .build();
+                            return dto;
+                        }),
+                responseObserver);
     }
 
     private Map<String, String> nullToEmpty(Map<String, String> source) {
@@ -129,7 +168,10 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
         if (Objects.isNull(summary)) {
             return GrpcFleetSummaryDTO.newBuilder().build();
         }
-        return GrpcFleetSummaryDTO.newBuilder().setTotal(summary.getTotal()).setOnline(summary.getOnline()).build();
+        return GrpcFleetSummaryDTO.newBuilder()
+                .setTotal(summary.getTotal())
+                .setOnline(summary.getOnline())
+                .build();
     }
 
     private Map<Long, String> statusCodes(Collection<Long> ids, Map<Long, Byte> flags) {
@@ -145,5 +187,4 @@ public class StatusHealthServer extends StatusHealthApiGrpc.StatusHealthApiImplB
         observer.onNext(response);
         observer.onCompleted();
     }
-
 }

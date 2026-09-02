@@ -14,16 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.exception.NotFoundException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.InputStream;
@@ -35,6 +29,10 @@ import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.Collection;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 /**
  * Imports SSL certificates into the JDK default keystore.
@@ -59,9 +57,10 @@ public class KeyStoreUtil {
      */
     public static void importKeystore(String crtFileName, String crtNameAlias) {
         DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
-        String[] resourcePaths = new String[]{"classpath:/ssl/", "file:./ssl/"};
+        String[] resourcePaths = new String[] {"classpath:/ssl/", "file:./ssl/"};
         String passphrase = "changeit";
-        try (InputStream inputStream = getResource(resourceLoader, resourcePaths, crtFileName).getInputStream()) {
+        try (InputStream inputStream =
+                getResource(resourceLoader, resourcePaths, crtFileName).getInputStream()) {
             KeyStoreUtil.importKeystore(inputStream, crtNameAlias, passphrase);
         } catch (Exception e) {
             throw new SecurityException(e);
@@ -144,5 +143,4 @@ public class KeyStoreUtil {
         }
         log.info("Certificate '{}' imported successfully", crtAliasName);
     }
-
 }

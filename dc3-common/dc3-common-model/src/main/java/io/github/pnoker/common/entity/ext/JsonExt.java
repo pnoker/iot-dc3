@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * JSON extension object for generic JSON-typed extension data.
@@ -62,7 +60,9 @@ public class JsonExt implements Serializable {
      * ,
      */
     @Builder.Default
-    @Schema(description = "Schema version of the JSON extension data, incremented on incompatible changes.", example = "1")
+    @Schema(
+            description = "Schema version of the JSON extension data, incremented on incompatible changes.",
+            example = "1")
     private Integer version = 1;
 
     /**
@@ -70,5 +70,4 @@ public class JsonExt implements Serializable {
      */
     @Schema(description = "Optional remark or human-readable description of the JSON extension data.")
     private String remark;
-
 }

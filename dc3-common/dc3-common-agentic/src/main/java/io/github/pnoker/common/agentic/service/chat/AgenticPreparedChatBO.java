@@ -18,7 +18,6 @@ package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
-
 import java.util.List;
 import java.util.Map;
 
@@ -28,12 +27,18 @@ import java.util.Map;
  * @author pnoker
  * @since 2016.10.1
  */
-public record AgenticPreparedChatBO(String userMessage, String conversationId,
-                                    String requestSystemContext, String model,
-                                    Map<String, Object> toolContext, Double temperature,
-                                    Integer maxTokens,
-                                    AgenticRunTrace runTrace,
-                                    boolean toolCallingEnabled, boolean reasoning,
-                                    List<Long> attachments, List<AgenticMessageContent.Context> contexts,
-                                    AgenticMessageContent.Tokens inputTokens, List<MessageBO> memoryHistory) {
-}
+public record AgenticPreparedChatBO(
+        String userMessage,
+        String conversationId,
+        String requestSystemContext,
+        String model,
+        Map<String, Object> toolContext,
+        Double temperature,
+        Integer maxTokens,
+        AgenticRunTrace runTrace,
+        boolean toolCallingEnabled,
+        boolean reasoning,
+        List<Long> attachments,
+        List<AgenticMessageContent.Context> contexts,
+        AgenticMessageContent.Tokens inputTokens,
+        List<MessageBO> memoryHistory) {}

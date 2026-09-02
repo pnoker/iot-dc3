@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
@@ -23,12 +22,11 @@ import io.github.pnoker.common.entity.dto.CommandCallResultDTO;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * RabbitMQ receiver for custom command call result receipts sent by drivers.
@@ -47,9 +45,8 @@ public class CommandResultReceiver {
      * Consume a command execution result and update the matching command history record
      * by record id with its status, error, and result values.
      *
-     * @param channel   the RabbitMQ channel for manual ack
      * @param message   the raw message carrying the delivery tag
-     * @param resultDTO the deserialized command result
+     * @param ack       acknowledgment handle for the message
      */
     @Dc3Listener(topic = MqTopic.COMMAND_RESULT)
     public Mono<Void> onResult(MqReceived<CommandCallResultDTO> message, Acknowledgment ack) {
@@ -65,17 +62,28 @@ public class CommandResultReceiver {
             return Mono.empty();
         }
         log.info("Receive command result: recordId={}, status={}", resultDTO.recordId(), resultDTO.status());
-        return historyStore.complete(tenantId, resultDTO.recordId(), resultDTO.status(),
-                        resultDTO.resultValues() == null ? null : io.github.pnoker.common.utils.JsonUtil.toJsonString(resultDTO.resultValues()),
-                        resultDTO.configSnapshot(), resultDTO.errorCode(), resultDTO.errorMessage(), resultDTO.finishedAt())
+        return historyStore
+                .complete(
+                        tenantId,
+                        resultDTO.recordId(),
+                        resultDTO.status(),
+                        resultDTO.resultValues() == null
+                                ? null
+                                : io.github.pnoker.common.utils.JsonUtil.toJsonString(resultDTO.resultValues()),
+                        resultDTO.configSnapshot(),
+                        resultDTO.errorCode(),
+                        resultDTO.errorMessage(),
+                        resultDTO.finishedAt())
                 .doOnNext(updated -> {
                     if (updated) {
-                        log.info("Updated command record status: recordId={}, status={}",
-                                resultDTO.recordId(), resultDTO.status());
+                        log.info(
+                                "Updated command record status: recordId={}, status={}",
+                                resultDTO.recordId(),
+                                resultDTO.status());
                     }
                 })
-                .doOnError(error -> log.error("Command result persistence failed, recordId={}",
-                        resultDTO.recordId(), error))
+                .doOnError(error ->
+                        log.error("Command result persistence failed, recordId={}", resultDTO.recordId(), error))
                 .then();
     }
 
@@ -87,5 +95,4 @@ public class CommandResultReceiver {
             return null;
         }
     }
-
 }

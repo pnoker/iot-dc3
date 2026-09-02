@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * One node in the topology Sankey. {@code id} is a prefixed string so the frontend can
@@ -47,14 +45,19 @@ public class TopologyNodeVO implements Serializable {
      * Prefixed id — one of {@code driver:{n}}, {@code device:{n}}, {@code profile:{n}},
      * {@code point:{n}}, {@code others:{layer}:{parentId}}.
      */
-    @Schema(description = "Prefixed id (driver:{n}, device:{n}, profile:{n}, point:{n} or others:{layer}:{parentId})", example = "driver:1024")
+    @Schema(
+            description = "Prefixed id (driver:{n}, device:{n}, profile:{n}, point:{n} or others:{layer}:{parentId})",
+            example = "driver:1024")
     private String id;
 
     /**
      * Human-readable label. For {@code others:*} nodes, {@code "Others (N)"} where N is
      * the count of hidden children.
      */
-    @Schema(description = "Human-readable label; for others:* nodes it is \"Others (N)\" where N is the hidden child count", example = "Driver Gateway A")
+    @Schema(
+            description =
+                    "Human-readable label; for others:* nodes it is \"Others (N)\" where N is the hidden child count",
+            example = "Driver Gateway A")
     private String name;
 
     /**
@@ -77,5 +80,4 @@ public class TopologyNodeVO implements Serializable {
      */
     @Schema(description = "Entities collapsed into this node; populated only on others:* nodes")
     private List<TopologyHiddenChildVO> hiddenChildren;
-
 }

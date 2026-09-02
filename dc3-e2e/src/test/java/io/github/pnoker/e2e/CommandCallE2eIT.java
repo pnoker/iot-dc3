@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.e2e;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
@@ -29,20 +31,16 @@ import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.e2e.harness.BaseE2eIT;
 import io.github.pnoker.e2e.harness.E2eStack;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 /**
  * Verifies the RabbitMQ custom command contract: dispatch to driver-specific
@@ -73,7 +71,8 @@ class CommandCallE2eIT extends BaseE2eIT {
         channel.confirmSelect();
         driverService = "e2e-driver-" + UUID.randomUUID().toString().substring(0, 8);
         commandQueue = RabbitConstant.QUEUE_COMMAND_PREFIX + driverService;
-        deadQueue = RabbitConstant.QUEUE_COMMAND_DEAD + "-" + UUID.randomUUID().toString().substring(0, 6);
+        deadQueue = RabbitConstant.QUEUE_COMMAND_DEAD + "-"
+                + UUID.randomUUID().toString().substring(0, 6);
     }
 
     @AfterEach
@@ -96,10 +95,11 @@ class CommandCallE2eIT extends BaseE2eIT {
 
     @Test
     void commandMessageRoutesToDriverSpecificQueue() throws Exception {
-        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_COMMAND,
-                BuiltinExchangeType.TOPIC, true, false, null);
+        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_COMMAND, BuiltinExchangeType.TOPIC, true, false, null);
         channel.queueDeclare(commandQueue, true, false, false, null);
-        channel.queueBind(commandQueue, RabbitConstant.TOPIC_EXCHANGE_COMMAND,
+        channel.queueBind(
+                commandQueue,
+                RabbitConstant.TOPIC_EXCHANGE_COMMAND,
                 RabbitConstant.ROUTING_COMMAND_PREFIX + driverService);
 
         CommandCallDTO dto = CommandCallDTO.builder()
@@ -114,13 +114,17 @@ class CommandCallE2eIT extends BaseE2eIT {
                 .build();
 
         byte[] body = JsonUtil.toJsonString(dto).getBytes(StandardCharsets.UTF_8);
-        channel.basicPublish(RabbitConstant.TOPIC_EXCHANGE_COMMAND,
-                RabbitConstant.ROUTING_COMMAND_PREFIX + driverService, null, body);
+        channel.basicPublish(
+                RabbitConstant.TOPIC_EXCHANGE_COMMAND,
+                RabbitConstant.ROUTING_COMMAND_PREFIX + driverService,
+                null,
+                body);
         assertThat(channel.waitForConfirms(2_000L)).isTrue();
 
         await().atMost(Duration.ofSeconds(3))
                 .pollInterval(Duration.ofMillis(100))
-                .untilAsserted(() -> assertThat(channel.messageCount(commandQueue)).isEqualTo(1));
+                .untilAsserted(
+                        () -> assertThat(channel.messageCount(commandQueue)).isEqualTo(1));
 
         GetResponse response = channel.basicGet(commandQueue, true);
         assertThat(response).isNotNull();
@@ -135,10 +139,9 @@ class CommandCallE2eIT extends BaseE2eIT {
 
     @Test
     void expiredCommandRoutesToDeadLetterQueue() throws Exception {
-        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_COMMAND,
-                BuiltinExchangeType.TOPIC, true, false, null);
-        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_COMMAND_DEAD,
-                BuiltinExchangeType.TOPIC, true, false, null);
+        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_COMMAND, BuiltinExchangeType.TOPIC, true, false, null);
+        channel.exchangeDeclare(
+                RabbitConstant.TOPIC_EXCHANGE_COMMAND_DEAD, BuiltinExchangeType.TOPIC, true, false, null);
 
         Map<String, Object> args = new HashMap<>();
         args.put(RabbitConstant.MESSAGE_TTL, 500);
@@ -146,7 +149,9 @@ class CommandCallE2eIT extends BaseE2eIT {
         args.put("x-dead-letter-routing-key", "#");
 
         channel.queueDeclare(commandQueue, true, false, false, args);
-        channel.queueBind(commandQueue, RabbitConstant.TOPIC_EXCHANGE_COMMAND,
+        channel.queueBind(
+                commandQueue,
+                RabbitConstant.TOPIC_EXCHANGE_COMMAND,
                 RabbitConstant.ROUTING_COMMAND_PREFIX + driverService);
 
         channel.queueDeclare(deadQueue, true, false, false, null);
@@ -163,8 +168,11 @@ class CommandCallE2eIT extends BaseE2eIT {
                 .build();
 
         byte[] body = JsonUtil.toJsonString(dto).getBytes(StandardCharsets.UTF_8);
-        channel.basicPublish(RabbitConstant.TOPIC_EXCHANGE_COMMAND,
-                RabbitConstant.ROUTING_COMMAND_PREFIX + driverService, null, body);
+        channel.basicPublish(
+                RabbitConstant.TOPIC_EXCHANGE_COMMAND,
+                RabbitConstant.ROUTING_COMMAND_PREFIX + driverService,
+                null,
+                body);
         assertThat(channel.waitForConfirms(2_000L)).isTrue();
 
         // Wait for TTL to expire and message to be dead-lettered
@@ -183,12 +191,14 @@ class CommandCallE2eIT extends BaseE2eIT {
 
     @Test
     void commandResultRoutesToResultQueue() throws Exception {
-        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT,
-                BuiltinExchangeType.TOPIC, true, false, null);
+        channel.exchangeDeclare(
+                RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT, BuiltinExchangeType.TOPIC, true, false, null);
 
         String resultQueue = RabbitConstant.QUEUE_COMMAND_RESULT;
         channel.queueDeclare(resultQueue, true, false, false, null);
-        channel.queueBind(resultQueue, RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT,
+        channel.queueBind(
+                resultQueue,
+                RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT,
                 RabbitConstant.ROUTING_COMMAND_RESULT + "." + driverService);
 
         CommandCallResultDTO result = CommandCallResultDTO.builder()
@@ -201,13 +211,17 @@ class CommandCallE2eIT extends BaseE2eIT {
                 .build();
 
         byte[] body = JsonUtil.toJsonString(result).getBytes(StandardCharsets.UTF_8);
-        channel.basicPublish(RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT,
-                RabbitConstant.ROUTING_COMMAND_RESULT + "." + driverService, null, body);
+        channel.basicPublish(
+                RabbitConstant.TOPIC_EXCHANGE_COMMAND_RESULT,
+                RabbitConstant.ROUTING_COMMAND_RESULT + "." + driverService,
+                null,
+                body);
         assertThat(channel.waitForConfirms(2_000L)).isTrue();
 
         await().atMost(Duration.ofSeconds(3))
                 .pollInterval(Duration.ofMillis(100))
-                .untilAsserted(() -> assertThat(channel.messageCount(resultQueue)).isEqualTo(1));
+                .untilAsserted(
+                        () -> assertThat(channel.messageCount(resultQueue)).isEqualTo(1));
 
         GetResponse response = channel.basicGet(resultQueue, true);
         assertThat(response).isNotNull();
@@ -222,8 +236,7 @@ class CommandCallE2eIT extends BaseE2eIT {
 
     @Test
     void multipleDriversReceiveOnlyTheirOwnCommands() throws Exception {
-        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_COMMAND,
-                BuiltinExchangeType.TOPIC, true, false, null);
+        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_COMMAND, BuiltinExchangeType.TOPIC, true, false, null);
 
         String driverA = "e2e-da-" + UUID.randomUUID().toString().substring(0, 6);
         String driverB = "e2e-db-" + UUID.randomUUID().toString().substring(0, 6);
@@ -232,10 +245,8 @@ class CommandCallE2eIT extends BaseE2eIT {
 
         channel.queueDeclare(qA, true, false, false, null);
         channel.queueDeclare(qB, true, false, false, null);
-        channel.queueBind(qA, RabbitConstant.TOPIC_EXCHANGE_COMMAND,
-                RabbitConstant.ROUTING_COMMAND_PREFIX + driverA);
-        channel.queueBind(qB, RabbitConstant.TOPIC_EXCHANGE_COMMAND,
-                RabbitConstant.ROUTING_COMMAND_PREFIX + driverB);
+        channel.queueBind(qA, RabbitConstant.TOPIC_EXCHANGE_COMMAND, RabbitConstant.ROUTING_COMMAND_PREFIX + driverA);
+        channel.queueBind(qB, RabbitConstant.TOPIC_EXCHANGE_COMMAND, RabbitConstant.ROUTING_COMMAND_PREFIX + driverB);
 
         CommandCallDTO dto = CommandCallDTO.builder()
                 .recordId(UUID.randomUUID().toString())
@@ -249,8 +260,8 @@ class CommandCallE2eIT extends BaseE2eIT {
         byte[] body = JsonUtil.toJsonString(dto).getBytes(StandardCharsets.UTF_8);
 
         // Route only to driver A
-        channel.basicPublish(RabbitConstant.TOPIC_EXCHANGE_COMMAND,
-                RabbitConstant.ROUTING_COMMAND_PREFIX + driverA, null, body);
+        channel.basicPublish(
+                RabbitConstant.TOPIC_EXCHANGE_COMMAND, RabbitConstant.ROUTING_COMMAND_PREFIX + driverA, null, body);
         assertThat(channel.waitForConfirms(2_000L)).isTrue();
 
         await().atMost(Duration.ofSeconds(3))

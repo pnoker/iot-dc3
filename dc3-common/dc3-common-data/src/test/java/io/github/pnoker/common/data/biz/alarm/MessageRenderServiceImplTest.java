@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.entity.ext.MessageExt;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class MessageRenderServiceImplTest {
 
@@ -35,11 +33,14 @@ class MessageRenderServiceImplTest {
     void rendersStructuredTemplateForSelectedChannel() {
         MessageBO message = message();
 
-        MessagePayload payload = service.render(message, NotifyChannelTypeEnum.FEISHU_BOT, Map.of(
-                "severity", "P1",
-                "deviceName", "Line A PLC",
-                "value", 86.5,
-                "unit", "C"));
+        MessagePayload payload = service.render(
+                message,
+                NotifyChannelTypeEnum.FEISHU_BOT,
+                Map.of(
+                        "severity", "P1",
+                        "deviceName", "Line A PLC",
+                        "value", 86.5,
+                        "unit", "C"));
 
         assertThat(payload.getPayloadType()).isEqualTo("CARD");
         assertThat(payload.getMissingVariables()).isEmpty();
@@ -51,9 +52,12 @@ class MessageRenderServiceImplTest {
     void keepsUnknownPlaceholdersAndReportsMissingVariables() {
         MessageBO message = message();
 
-        MessagePayload payload = service.render(message, NotifyChannelTypeEnum.FEISHU_BOT, Map.of(
-                "severity", "P1",
-                "deviceName", "Line A PLC"));
+        MessagePayload payload = service.render(
+                message,
+                NotifyChannelTypeEnum.FEISHU_BOT,
+                Map.of(
+                        "severity", "P1",
+                        "deviceName", "Line A PLC"));
 
         assertThat(payload.getMissingVariables()).containsExactly("value", "unit");
         assertThat(payload.getPayload()).containsEntry("summary", "Current value is ${value} ${unit}");
@@ -77,5 +81,4 @@ class MessageRenderServiceImplTest {
         message.setMessageExt(ext);
         return message;
     }
-
 }

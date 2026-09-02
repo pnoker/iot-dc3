@@ -1,7 +1,6 @@
 import { configManager } from './config-manager.js';
 import { tokenManager } from './token-manager.js';
 import { resolvePassword } from './credential-store.js';
-import { md5 } from '../utils/crypto.js';
 import { decodeJwt } from '../utils/jwt.js';
 
 /**
@@ -47,8 +46,7 @@ export class Dc3Client {
       ? tokenManager.buildHeaders(state)
       : { 'Content-Type': 'application/json' };
     Object.assign(headers, extraHeaders);
-    const isFormData =
-      typeof FormData !== 'undefined' && body instanceof FormData;
+    const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
     if (isFormData) {
       // Let fetch generate the multipart boundary and Content-Type header.
       delete headers['Content-Type'];
@@ -68,16 +66,10 @@ export class Dc3Client {
 
     // 401 fallback — renew and retry once
     if (res.status === 401 && retryOn401) {
-      const renewed = await this.renewToken(
-        profileName,
-        profile.tenant,
-        profile.username,
-      );
+      const renewed = await this.renewToken(profileName, profile.tenant, profile.username);
       if (renewed) {
         const newState = await tokenManager.getState(profileName);
-        const newHeaders = newState
-          ? tokenManager.buildHeaders(newState)
-          : headers;
+        const newHeaders = newState ? tokenManager.buildHeaders(newState) : headers;
         Object.assign(newHeaders, extraHeaders);
         if (isFormData) {
           delete newHeaders['Content-Type'];
@@ -134,11 +126,7 @@ export class Dc3Client {
    * Renew the token: salt → generate → persist.
    * Returns true on success, false if password is unavailable.
    */
-  async renewToken(
-    profileName: string,
-    tenant: string,
-    username: string,
-  ): Promise<boolean> {
+  async renewToken(profileName: string, tenant: string, username: string): Promise<boolean> {
     const current = await tokenManager.getState(profileName);
     if (current?.authType === 'oauth') {
       // OAuth tickets cannot be silently renewed without the client secret; expiry
@@ -160,10 +148,7 @@ export class Dc3Client {
         body: JSON.stringify({ name: username, tenant }),
       });
       if (!saltRes.ok) throw await this.buildError(saltRes);
-      const salt = (await saltRes.json()) as unknown;
-      if (typeof salt !== 'string' || salt.length === 0) {
-        throw new Error('Salt endpoint returned an invalid resource');
-      }
+      const salt = parseScalarResource(await saltRes.text(), 'Salt');
 
       // Step 2: Generate token
       const tokenRes = await fetch(`${gateway}/api/v3/auth/token/generate`, {
@@ -173,11 +158,11 @@ export class Dc3Client {
           name: username,
           tenant,
           salt,
-          password: md5(password),
+          password,
         }),
       });
       if (!tokenRes.ok) throw await this.buildError(tokenRes);
-      const token = parseTokenResource(await tokenRes.json());
+      const token = parseTokenResource(parseScalarResource(await tokenRes.text(), 'Token'));
 
       // Step 3: Parse and persist
       const jwtPayload = decodeJwt(token);
@@ -236,9 +221,7 @@ export class Dc3Client {
     const token = String(payload.access_token);
     const jwtPayload = decodeJwt(token);
     const scopes =
-      typeof payload.scope === 'string'
-        ? payload.scope.split(/\s+/).filter(Boolean)
-        : undefined;
+      typeof payload.scope === 'string' ? payload.scope.split(/\s+/).filter(Boolean) : undefined;
     await tokenManager.saveState(
       {
         token,
@@ -273,10 +256,7 @@ export class Dc3Client {
       body: JSON.stringify({ name: username, tenant }),
     });
     if (!saltRes.ok) throw await this.buildError(saltRes);
-    const salt = (await saltRes.json()) as unknown;
-    if (typeof salt !== 'string' || salt.length === 0) {
-      throw new Error('Salt endpoint returned an invalid resource');
-    }
+    const salt = parseScalarResource(await saltRes.text(), 'Salt');
 
     // Step 2: generate
     const tokenRes = await fetch(`${gateway}/api/v3/auth/token/generate`, {
@@ -286,11 +266,11 @@ export class Dc3Client {
         name: username,
         tenant,
         salt,
-        password: md5(password),
+        password,
       }),
     });
     if (!tokenRes.ok) throw await this.buildError(tokenRes);
-    const token = parseTokenResource(await tokenRes.json());
+    const token = parseTokenResource(parseScalarResource(await tokenRes.text(), 'Token'));
     const jwtPayload = decodeJwt(token);
     await tokenManager.saveState(
       {
@@ -314,10 +294,15 @@ export class Dc3Client {
     const state = await tokenManager.getState(profileName);
     if (state) {
       try {
-        await this.request('POST', '/api/v3/auth/token/cancel', {
-          name: state.username,
-          tenant: state.tenant,
-        }, false); // Don't retry on 401 for logout
+        await this.request(
+          'POST',
+          '/api/v3/auth/token/cancel',
+          {
+            name: state.username,
+            tenant: state.tenant,
+          },
+          false,
+        ); // Don't retry on 401 for logout
       } catch {
         // Cancel may fail if token already expired — that's fine
       }
@@ -373,13 +358,34 @@ export class ApiError extends Error {
   }
 }
 
-
 /** Validate the direct token resource returned by the auth endpoint. */
 export function parseTokenResource(value: unknown): string {
   if (typeof value !== 'string' || !/^eyJ[\w-]*\.[\w-]*\.[\w-]*$/u.test(value)) {
     throw new Error('Token endpoint returned an invalid resource');
   }
   return value;
+}
+
+/**
+ * Parse a scalar auth resource (salt, token). The auth endpoints answer as
+ * text/plain with a bare value; a JSON-encoded string is tolerated as well.
+ */
+export function parseScalarResource(body: string, label: string): string {
+  const trimmed = body.trim();
+  if (trimmed.startsWith('"')) {
+    try {
+      const parsed: unknown = JSON.parse(trimmed);
+      if (typeof parsed === 'string' && parsed.length > 0) {
+        return parsed;
+      }
+    } catch {
+      // Not JSON after all; fall back to the raw text below.
+    }
+  }
+  if (trimmed.length === 0) {
+    throw new Error(`${label} endpoint returned an invalid resource`);
+  }
+  return trimmed;
 }
 
 /** Singleton instance */

@@ -14,24 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.thread.entity.property.ThreadProperties;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.context.annotation.Bean;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.context.annotation.Bean;
 
 /**
  * Thread Pool Configuration Class
@@ -68,8 +66,12 @@ public class ThreadPoolConfig {
      */
     @Bean(destroyMethod = "shutdown")
     public ThreadPoolExecutor threadPoolExecutor() {
-        return new ThreadPoolExecutor(thread.getCorePoolSize(), thread.getMaximumPoolSize(), thread.getKeepAliveTime(),
-                TimeUnit.SECONDS, new LinkedBlockingQueue<>(thread.getMaximumPoolSize() * 2),
+        return new ThreadPoolExecutor(
+                thread.getCorePoolSize(),
+                thread.getMaximumPoolSize(),
+                thread.getKeepAliveTime(),
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(thread.getMaximumPoolSize() * 2),
                 r -> new Thread(r, "[T]" + thread.getPrefix() + threadPoolAtomic.getAndIncrement()),
                 new FailFastRejectedExecutionHandler());
     }
@@ -82,7 +84,8 @@ public class ThreadPoolConfig {
      */
     @Bean(destroyMethod = "shutdown")
     public ExecutorService virtualThreadExecutor() {
-        ThreadFactory factory = Thread.ofVirtual().name("[VT]" + thread.getPrefix(), 0).factory();
+        ThreadFactory factory =
+                Thread.ofVirtual().name("[VT]" + thread.getPrefix(), 0).factory();
 
         return Executors.newThreadPerTaskExecutor(factory);
     }
@@ -94,7 +97,8 @@ public class ThreadPoolConfig {
      */
     @Bean(destroyMethod = "shutdown")
     public ScheduledThreadPoolExecutor scheduledThreadPoolExecutor() {
-        return new ScheduledThreadPoolExecutor(thread.getCorePoolSize(),
+        return new ScheduledThreadPoolExecutor(
+                thread.getCorePoolSize(),
                 r -> new Thread(r, "[ST]" + thread.getPrefix() + scheduledThreadPoolAtomic.getAndIncrement()),
                 new FailFastRejectedExecutionHandler());
     }
@@ -122,7 +126,5 @@ public class ThreadPoolConfig {
             log.warn("Bounded executor rejected task, executor={}", executor);
             throw new RejectedExecutionException("Bounded executor capacity exhausted");
         }
-
     }
-
 }

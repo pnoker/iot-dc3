@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
@@ -32,11 +31,6 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -45,6 +39,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * SL651-2014 hydrological telemetry driver service.
@@ -95,13 +93,15 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         return sb.toString();
     }
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -112,8 +112,7 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public void schedule() {
-    }
+    public void schedule() {}
 
     @Override
     public void event(MetadataEventDTO metadataEvent) {
@@ -121,23 +120,34 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
 
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)) {
                 stopServer();
-                log.info("Driver server stopped due to device delete, protocol={}, deviceId={}",
-                        driverCode, metadataEvent.getId());
+                log.info(
+                        "Driver server stopped due to device delete, protocol={}, deviceId={}",
+                        driverCode,
+                        metadataEvent.getId());
             }
-            if (MetadataOperateTypeEnum.ADD.equals(operateType)
-                    || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
+            if (MetadataOperateTypeEnum.ADD.equals(operateType) || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 restartServer();
-                log.info("Driver server restarted due to device change, protocol={}, deviceId={}",
-                        driverCode, metadataEvent.getId());
+                log.info(
+                        "Driver server restarted due to device change, protocol={}, deviceId={}",
+                        driverCode,
+                        metadataEvent.getId());
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
@@ -146,14 +156,21 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
     // ------------------------------------------------------------------------
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         return null;
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         return false;
     }
 
@@ -169,10 +186,11 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
     private void startServer() {
         try {
             Class<?> serverClass = Class.forName("com.github.xingshuangs.iot.protocol.sl651.service.SL651Server");
-            Class<?> listenerClass = Class.forName("com.github.xingshuangs.iot.protocol.sl651.event.ISl651MessageListener");
+            Class<?> listenerClass =
+                    Class.forName("com.github.xingshuangs.iot.protocol.sl651.event.ISl651MessageListener");
             Object server = serverClass.getConstructor(String.class).newInstance(serverPwd);
-            Object listener = Proxy.newProxyInstance(listenerClass.getClassLoader(), new Class<?>[]{listenerClass},
-                    (proxy, method, args) -> {
+            Object listener = Proxy.newProxyInstance(
+                    listenerClass.getClassLoader(), new Class<?>[] {listenerClass}, (proxy, method, args) -> {
                         if ("onMessage".equals(method.getName()) && Objects.nonNull(args) && args.length == 3) {
                             handleSl651Message(args[1], args[2]);
                         }
@@ -241,8 +259,11 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
 
         if (!pointValues.isEmpty()) {
             driverSenderService.pointValueSender(pointValues);
-            log.debug("Driver SL651 point values forwarded, protocol={}, stationAddr={}, count={}",
-                    driverCode, stationAddr, pointValues.size());
+            log.debug(
+                    "Driver SL651 point values forwarded, protocol={}, stationAddr={}, count={}",
+                    driverCode,
+                    stationAddr,
+                    pointValues.size());
         }
     }
 
@@ -270,8 +291,12 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         String stationAddr = bytesToHex(invokeBytes(response, "getRemoteStationAddress"));
         String funcCode = bytesToHex(invokeBytes(response, "getFunctionCode"));
         List<String> elements = extractBodyElements(bodyResponses);
-        log.debug("Driver SL651 message received, protocol={}, stationAddr={}, funcCode={}, bodyCount={}",
-                driverCode, stationAddr, funcCode, elements.size());
+        log.debug(
+                "Driver SL651 message received, protocol={}, stationAddr={}, funcCode={}, bodyCount={}",
+                driverCode,
+                stationAddr,
+                funcCode,
+                elements.size());
         forwardTelemetry(stationAddr, elements);
     }
 
@@ -298,8 +323,11 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
             Object body = responses.get(i);
             List<String> bodyElements = invokeBodyElements(body);
             if (!bodyElements.isEmpty()) {
-                log.debug("Driver SL651 body decoded, protocol={}, bodyIndex={}, elementCount={}",
-                        driverCode, i, bodyElements.size());
+                log.debug(
+                        "Driver SL651 body decoded, protocol={}, bodyIndex={}, elementCount={}",
+                        driverCode,
+                        i,
+                        bodyElements.size());
                 elements.addAll(bodyElements);
             }
         }
@@ -326,7 +354,8 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "port", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -335,7 +364,7 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "index", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

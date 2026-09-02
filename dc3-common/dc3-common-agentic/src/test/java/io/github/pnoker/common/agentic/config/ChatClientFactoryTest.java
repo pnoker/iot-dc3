@@ -2,29 +2,34 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.agentic.config;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.lenient;
 
 import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
 import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import java.lang.reflect.Field;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
-import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
-
-import java.lang.reflect.Field;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class ChatClientFactoryTest {
@@ -52,23 +57,29 @@ class ChatClientFactoryTest {
         header.setPrincipalName("admin");
         lenient().when(modelConfigStore.findDefault(header)).thenReturn(reactor.core.publisher.Mono.empty());
         lenient().when(modelConfigStore.findByModel("gpt-4o", header)).thenReturn(reactor.core.publisher.Mono.empty());
-        lenient().when(modelConfigStore.findByModel("unknown-model", header)).thenReturn(reactor.core.publisher.Mono.empty());
+        lenient()
+                .when(modelConfigStore.findByModel("unknown-model", header))
+                .thenReturn(reactor.core.publisher.Mono.empty());
     }
 
     @Test
     void resolveModelUsesReactiveFallbackWhenNoModelConfigExists() {
         StepVerifier.create(factory.resolveModelReactive("  gpt-4o  ", header))
-                .expectNext("gpt-4o").verifyComplete();
+                .expectNext("gpt-4o")
+                .verifyComplete();
         StepVerifier.create(factory.resolveModelReactive("unknown-model", header))
-                .expectNext("gpt-4o").verifyComplete();
+                .expectNext("gpt-4o")
+                .verifyComplete();
     }
 
     @Test
     void supportsToolCallUsesFallbackCapabilityWhenNoModelConfigExists() {
         StepVerifier.create(factory.supportsToolCallReactive("gpt-4o", header))
-                .expectNext(true).verifyComplete();
+                .expectNext(true)
+                .verifyComplete();
         StepVerifier.create(factory.supportsToolCallReactive("unknown-model", header))
-                .expectNext(false).verifyComplete();
+                .expectNext(false)
+                .verifyComplete();
     }
 
     @Test

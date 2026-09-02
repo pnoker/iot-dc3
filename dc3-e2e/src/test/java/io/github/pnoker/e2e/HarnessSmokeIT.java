@@ -14,21 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.e2e;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import io.github.pnoker.e2e.harness.BaseE2eIT;
 import io.github.pnoker.e2e.harness.E2eStack;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 /**
  * Pins the E2E harness contract: the stack starts cleanly, exposes a reachable
@@ -42,9 +40,9 @@ class HarnessSmokeIT extends BaseE2eIT {
     @Test
     void postgresIsReachableAndAcceptsSimpleQueries() throws Exception {
         try (java.sql.Connection conn = DriverManager.getConnection(
-                E2eStack.postgresJdbcUrl(), E2eStack.postgresUsername(), E2eStack.postgresPassword());
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT 1")) {
+                        E2eStack.postgresJdbcUrl(), E2eStack.postgresUsername(), E2eStack.postgresPassword());
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT 1")) {
             assertThat(rs.next()).isTrue();
             assertThat(rs.getInt(1)).isEqualTo(1);
         }

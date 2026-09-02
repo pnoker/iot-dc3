@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.security;
 
-import reactor.core.publisher.Mono;
-
 import java.util.Set;
+import reactor.core.publisher.Mono;
 
 /**
  * SPI for checking whether an authenticated user holds a given resource permission.

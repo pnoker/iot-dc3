@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
@@ -41,7 +40,7 @@ public class EmailNotifyChannelAdapter implements NotifyChannelAdapter {
 
     @Override
     public Mono<NotifySendResult> send(NotifyChannelBO channel, MessagePayload payload) {
-        return Mono.just(NotifySendResult.skipped(channel.getCredentialRef(), "Email channel sender is not configured"));
+        return Mono.just(
+                NotifySendResult.skipped(channel.getCredentialRef(), "Email channel sender is not configured"));
     }
-
 }

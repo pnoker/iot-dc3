@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -50,31 +49,53 @@ import lombok.ToString;
 @Schema(description = "Event view object")
 public class EventVO extends BaseVO {
 
-    @NotBlank(message = "Event name can't be empty", groups = {Add.class})
-    @Schema(description = "Event name. Unique name within a tenant for identifying an alarm or status notification.", example = "High Temperature Alarm", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid event name format",
+    @NotBlank(
+            message = "Event name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Event name. Unique name within a tenant for identifying an alarm or status notification.",
+            example = "High Temperature Alarm",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid event name format",
             groups = {Add.class, Update.class})
     private String eventName;
 
-    @Schema(description = "Event code. Stable business identifier; must not change once deployed.", example = "HIGH_TEMP_ALARM")
+    @Schema(
+            description = "Event code. Stable business identifier; must not change once deployed.",
+            example = "HIGH_TEMP_ALARM")
     private String eventCode;
 
-    @Schema(description = "Event classification: INFO (informational), ALERT (requires attention), FAULT (malfunction), or LIFECYCLE (state transition).", example = "ALERT", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotNull(message = "Event type can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description =
+                    "Event classification: INFO (informational), ALERT (requires attention), FAULT (malfunction), or LIFECYCLE (state transition).",
+            example = "ALERT",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Event type can't be empty",
+            groups = {Add.class, Update.class})
     private EventTypeFlagEnum eventTypeFlag;
 
-    @Schema(description = "Event severity level: LOW, MEDIUM, HIGH, or CRITICAL.", example = "HIGH", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotNull(message = "Event level can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Event severity level: LOW, MEDIUM, HIGH, or CRITICAL.",
+            example = "HIGH",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Event level can't be empty",
+            groups = {Add.class, Update.class})
     private EventLevelEnum eventLevelFlag;
 
     @Schema(description = "Event extension information, serialized as JSON for custom metadata and trigger conditions.")
     private EventExt eventExt;
 
-    @Schema(description = "ID of the profile (device template) this event is defined in.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "ID of the profile (device template) this event is defined in.",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Profile ID can't be empty",
+            groups = {Add.class, Update.class})
     private String profileId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
@@ -85,5 +106,4 @@ public class EventVO extends BaseVO {
 
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.test.support;
 
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -27,8 +26,7 @@ import org.skyscreamer.jsonassert.JSONCompareMode;
  */
 public final class JsonAssertions {
 
-    private JsonAssertions() {
-    }
+    private JsonAssertions() {}
 
     /**
      * Strict comparison: object order is irrelevant but field set must match exactly.

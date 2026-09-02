@@ -1,11 +1,23 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.db.r2dbc.runtime.query;
 
 import io.github.pnoker.db.r2dbc.core.page.CursorPage;
 import io.github.pnoker.db.r2dbc.core.page.CursorRequest;
-import org.springframework.r2dbc.core.DatabaseClient;
-import org.springframework.transaction.reactive.TransactionalOperator;
-import reactor.core.publisher.Mono;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -14,6 +26,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Mono;
 
 /** Executes a bounded keyset page without exposing an unbounded result stream. */
 public final class R2dbcCursorExecutor {
@@ -23,8 +38,8 @@ public final class R2dbcCursorExecutor {
 
     public R2dbcCursorExecutor(DatabaseClient databaseClient, TransactionalOperator transactionalOperator) {
         this.databaseClient = Objects.requireNonNull(databaseClient, "databaseClient must not be null");
-        this.transactionalOperator = Objects.requireNonNull(
-                transactionalOperator, "transactionalOperator must not be null");
+        this.transactionalOperator =
+                Objects.requireNonNull(transactionalOperator, "transactionalOperator must not be null");
     }
 
     public <T> Mono<CursorPage<T>> execute(
@@ -38,15 +53,14 @@ public final class R2dbcCursorExecutor {
             R2dbcPageExecutor.requireSql(itemsSql, "itemsSql");
             Objects.requireNonNull(rowMapper, "rowMapper must not be null");
             Objects.requireNonNull(nextCursor, "nextCursor must not be null");
-            Map<String, ?> safeParameters = parameters == null
-                    ? Map.of()
-                    : Collections.unmodifiableMap(new LinkedHashMap<>(parameters));
+            Map<String, ?> safeParameters =
+                    parameters == null ? Map.of() : Collections.unmodifiableMap(new LinkedHashMap<>(parameters));
             if (safeParameters.containsKey("limit") || safeParameters.containsKey("cursor")) {
                 return Mono.error(new IllegalArgumentException("cursor and limit are reserved pagination parameters"));
             }
 
-            DatabaseClient.GenericExecuteSpec statement = R2dbcPageExecutor.bind(
-                    databaseClient.sql(itemsSql), safeParameters);
+            DatabaseClient.GenericExecuteSpec statement =
+                    R2dbcPageExecutor.bind(databaseClient.sql(itemsSql), safeParameters);
             statement = request.cursor() == null
                     ? statement.bindNull("cursor", String.class)
                     : statement.bind("cursor", request.cursor());
@@ -60,12 +74,9 @@ public final class R2dbcCursorExecutor {
         });
     }
 
-    private static <T> Mono<CursorPage<T>> page(
-            List<T> rows, int limit, Function<? super T, String> nextCursor) {
+    private static <T> Mono<CursorPage<T>> page(List<T> rows, int limit, Function<? super T, String> nextCursor) {
         boolean hasNext = rows.size() > limit;
-        List<T> items = hasNext
-                ? new ArrayList<>(rows.subList(0, limit))
-                : rows;
+        List<T> items = hasNext ? new ArrayList<>(rows.subList(0, limit)) : rows;
         if (!hasNext) {
             return Mono.just(new CursorPage<>(items, null, false));
         }

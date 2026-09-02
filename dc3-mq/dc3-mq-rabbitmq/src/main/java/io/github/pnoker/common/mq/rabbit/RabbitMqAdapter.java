@@ -14,17 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.rabbit;
 
 import com.rabbitmq.client.Channel;
 import io.github.pnoker.common.constant.mq.ConsumptionProfile;
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.OrderingGuarantee;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.adapter.BrokerCapabilities;
-import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
 import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireConfirmation;
@@ -33,25 +32,6 @@ import io.github.pnoker.common.mq.config.BatchConsumerProperties;
 import io.github.pnoker.common.mq.listener.MqPoisonException;
 import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
-import lombok.extern.slf4j.Slf4j;
-import org.aopalliance.aop.Advice;
-import org.springframework.amqp.AmqpRejectAndDontRequeueException;
-import org.springframework.amqp.ImmediateRequeueAmqpException;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageDeliveryMode;
-import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.api.ChannelAwareBatchMessageListener;
-import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
-import org.springframework.amqp.rabbit.listener.adapter.AbstractAdaptableMessageListener;
-import org.springframework.amqp.rabbit.retry.MessageBatchRecoverer;
-import org.springframework.amqp.listener.adapter.InvocationResult;
-import reactor.core.publisher.Mono;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +39,20 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageDeliveryMode;
+import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.listener.adapter.InvocationResult;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.adapter.AbstractAdaptableMessageListener;
+import org.springframework.amqp.rabbit.listener.api.ChannelAwareBatchMessageListener;
+import org.springframework.amqp.rabbit.listener.api.ChannelAwareMessageListener;
+import reactor.core.publisher.Mono;
 
 /**
  * RabbitMQ implementation of the broker port. Publishes pre-serialized wire messages
@@ -88,8 +82,12 @@ public class RabbitMqAdapter implements BrokerAdapter {
     private final List<SimpleMessageListenerContainer> containers = new CopyOnWriteArrayList<>();
     private volatile boolean stopped;
 
-    public RabbitMqAdapter(RabbitTemplate rabbitTemplate, RabbitAdmin rabbitAdmin, ConnectionFactory connectionFactory,
-                           BatchConsumerProperties batchProperties, int driverQueueExpiresMillis) {
+    public RabbitMqAdapter(
+            RabbitTemplate rabbitTemplate,
+            RabbitAdmin rabbitAdmin,
+            ConnectionFactory connectionFactory,
+            BatchConsumerProperties batchProperties,
+            int driverQueueExpiresMillis) {
         this.rabbitTemplate = rabbitTemplate;
         this.rabbitAdmin = rabbitAdmin;
         this.connectionFactory = connectionFactory;
@@ -119,10 +117,13 @@ public class RabbitMqAdapter implements BrokerAdapter {
     @Override
     public void publish(WireMqMessage message, WireConfirmation confirmation) {
         org.springframework.amqp.rabbit.connection.CorrelationData correlationData =
-                new org.springframework.amqp.rabbit.connection.CorrelationData(UUID.randomUUID().toString());
+                new org.springframework.amqp.rabbit.connection.CorrelationData(
+                        UUID.randomUUID().toString());
         rabbitTemplate.send(exchangeOf(message.topic()), routingKeyOf(message), amqpMessage(message), correlationData);
         correlationData.getFuture().whenComplete((confirm, failure) -> {
-            boolean routed = Objects.isNull(failure) && Objects.nonNull(confirm) && confirm.ack()
+            boolean routed = Objects.isNull(failure)
+                    && Objects.nonNull(confirm)
+                    && confirm.ack()
                     && Objects.isNull(correlationData.getReturned());
             confirmation.onConfirm(message, routed, failure);
         });
@@ -160,8 +161,12 @@ public class RabbitMqAdapter implements BrokerAdapter {
         container.setMissingQueuesFatal(false);
         containers.add(container);
         container.start();
-        log.info("RabbitMQ subscription started, topic={}, mode={}, delivery={}, queue={}",
-                spec.topic(), spec.mode(), spec.delivery(), queue);
+        log.info(
+                "RabbitMQ subscription started, topic={}, mode={}, delivery={}, queue={}",
+                spec.topic(),
+                spec.mode(),
+                spec.delivery(),
+                queue);
     }
 
     /**
@@ -201,7 +206,8 @@ public class RabbitMqAdapter implements BrokerAdapter {
         }
         List<WireMqDelivery> deliveries = new ArrayList<>(messages.size());
         for (Message message : messages) {
-            boolean redelivered = Boolean.TRUE.equals(message.getMessageProperties().getRedelivered());
+            boolean redelivered =
+                    Boolean.TRUE.equals(message.getMessageProperties().getRedelivered());
             deliveries.add(new WireMqDelivery(message.getBody(), headersOf(message), redelivered));
         }
         return deliveries;
@@ -218,11 +224,14 @@ public class RabbitMqAdapter implements BrokerAdapter {
                     return Mono.just(DeliveryDisposition.REQUEUE);
                 })
                 .flatMap(disposition -> switch (disposition) {
-            case ACK -> Mono.<Void>empty();
-            case REQUEUE -> retryOrDeadLetter(messages);
-            case DEAD_LETTER -> Mono.<Void>error(new AmqpRejectAndDontRequeueException("Listener rejected delivery"));
-        }).onErrorResume(MqPoisonException.class,
-                error -> Mono.error(new AmqpRejectAndDontRequeueException("Poison delivery rejected", error)));
+                    case ACK -> Mono.<Void>empty();
+                    case REQUEUE -> retryOrDeadLetter(messages);
+                    case DEAD_LETTER ->
+                        Mono.<Void>error(new AmqpRejectAndDontRequeueException("Listener rejected delivery"));
+                })
+                .onErrorResume(
+                        MqPoisonException.class,
+                        error -> Mono.error(new AmqpRejectAndDontRequeueException("Poison delivery rejected", error)));
     }
 
     private Mono<Void> retryOrDeadLetter(List<Message> messages) {
@@ -251,11 +260,14 @@ public class RabbitMqAdapter implements BrokerAdapter {
             properties.setCorrelationId(correlationId);
         }
         org.springframework.amqp.rabbit.connection.CorrelationData correlationData =
-                new org.springframework.amqp.rabbit.connection.CorrelationData(UUID.randomUUID().toString());
+                new org.springframework.amqp.rabbit.connection.CorrelationData(
+                        UUID.randomUUID().toString());
         rabbitTemplate.send(exchange, routingKey, new Message(source.getBody(), properties), correlationData);
         return Mono.fromFuture(correlationData.getFuture()).flatMap(confirm -> {
             boolean routed = Objects.nonNull(confirm) && confirm.ack() && Objects.isNull(correlationData.getReturned());
-            return routed ? Mono.empty() : Mono.error(new IllegalStateException("Rabbit retry publish was not confirmed"));
+            return routed
+                    ? Mono.empty()
+                    : Mono.error(new IllegalStateException("Rabbit retry publish was not confirmed"));
         });
     }
 
@@ -286,7 +298,10 @@ public class RabbitMqAdapter implements BrokerAdapter {
 
         protected void complete(Mono<DeliveryDisposition> completion, List<Message> messages, Channel channel) {
             Message message = messages.get(messages.size() - 1);
-            handleResult(new InvocationResult(terminal(completion, messages), null, Void.class, this, null), message, channel);
+            handleResult(
+                    new InvocationResult(terminal(completion, messages), null, Void.class, this, null),
+                    message,
+                    channel);
         }
 
         @Override
@@ -321,8 +336,10 @@ public class RabbitMqAdapter implements BrokerAdapter {
 
         @Override
         public void onMessage(Message message, Channel channel) {
-            complete(reactor.core.publisher.Mono.defer(() -> listener.onDelivery(deliveryOf(message))),
-                    List.of(message), channel);
+            complete(
+                    reactor.core.publisher.Mono.defer(() -> listener.onDelivery(deliveryOf(message))),
+                    List.of(message),
+                    channel);
         }
     }
 
@@ -339,8 +356,10 @@ public class RabbitMqAdapter implements BrokerAdapter {
         @Override
         public void onMessageBatch(List<Message> messages, Channel channel) {
             if (!messages.isEmpty()) {
-                complete(reactor.core.publisher.Mono.defer(() -> listener.onBatch(deliveriesOf(messages))),
-                        messages, channel);
+                complete(
+                        reactor.core.publisher.Mono.defer(() -> listener.onBatch(deliveriesOf(messages))),
+                        messages,
+                        channel);
             }
         }
     }
@@ -384,7 +403,7 @@ public class RabbitMqAdapter implements BrokerAdapter {
             case POINT_COMMAND_RESULT -> RabbitNames.EXCHANGE_POINT_COMMAND_RESULT;
             case STATE_TIMEOUT, DEVICE_SCAN -> RabbitNames.EXCHANGE_STATE_TIMEOUT_DELAY;
             case POINT_VALUE_DEAD, POINT_COMMAND_DEAD, COMMAND_DEAD ->
-                    throw new IllegalArgumentException("Dead-letter topics are not publishable: " + topic);
+                throw new IllegalArgumentException("Dead-letter topics are not publishable: " + topic);
         };
     }
 
@@ -404,10 +423,9 @@ public class RabbitMqAdapter implements BrokerAdapter {
             case STATE_TIMEOUT -> RabbitNames.ROUTING_DRIVER_TIMEOUT_DELAY;
             case DEVICE_SCAN -> RabbitNames.ROUTING_DEVICE_SCAN_TICK;
             case POINT_VALUE_DEAD, POINT_COMMAND_DEAD, COMMAND_DEAD ->
-                    throw new IllegalArgumentException("Dead-letter topics are not publishable: " + message.topic());
+                throw new IllegalArgumentException("Dead-letter topics are not publishable: " + message.topic());
         };
     }
-
 
     /**
      * Blank group resolves to the platform-shared queue (pre-port name); a named group
@@ -424,39 +442,53 @@ public class RabbitMqAdapter implements BrokerAdapter {
         String group = spec.group();
         String keyPattern = spec.keyPattern();
         return switch (spec.topic()) {
-            case STATE -> switch (keyPattern) {
-                case "driver.*" -> grouped(RabbitNames.QUEUE_DRIVER_STATE, group);
-                case "device.*" -> grouped(RabbitNames.QUEUE_DEVICE_STATE, group);
-                default -> throw new IllegalArgumentException(
-                        "STATE subscription requires keyPattern driver.* or device.*, got: " + keyPattern);
-            };
-            case ALARM -> switch (keyPattern) {
-                case "driver.*" -> grouped(RabbitNames.QUEUE_DRIVER_ALARM, group);
-                case "device.*" -> grouped(RabbitNames.QUEUE_DEVICE_ALARM, group);
-                case "task.*" -> grouped(RabbitNames.QUEUE_NOTIFY_TASK, group);
-                default -> throw new IllegalArgumentException(
-                        "ALARM subscription requires keyPattern driver.*, device.* or task.*, got: " + keyPattern);
-            };
+            case STATE ->
+                switch (keyPattern) {
+                    case "driver.*" -> grouped(RabbitNames.QUEUE_DRIVER_STATE, group);
+                    case "device.*" -> grouped(RabbitNames.QUEUE_DEVICE_STATE, group);
+                    default ->
+                        throw new IllegalArgumentException(
+                                "STATE subscription requires keyPattern driver.* or device.*, got: " + keyPattern);
+                };
+            case ALARM ->
+                switch (keyPattern) {
+                    case "driver.*" -> grouped(RabbitNames.QUEUE_DRIVER_ALARM, group);
+                    case "device.*" -> grouped(RabbitNames.QUEUE_DEVICE_ALARM, group);
+                    case "task.*" -> grouped(RabbitNames.QUEUE_NOTIFY_TASK, group);
+                    default ->
+                        throw new IllegalArgumentException(
+                                "ALARM subscription requires keyPattern driver.*, device.* or task.*, got: "
+                                        + keyPattern);
+                };
             case METADATA -> {
-                RabbitTopology.declareMetadataQueue(rabbitAdmin, group,
-                        RabbitNames.ROUTING_DRIVER_METADATA_PREFIX + keyPattern);
+                RabbitTopology.declareMetadataQueue(
+                        rabbitAdmin, group, RabbitNames.ROUTING_DRIVER_METADATA_PREFIX + keyPattern);
                 yield RabbitNames.QUEUE_DRIVER_METADATA_PREFIX + group;
             }
             case POINT_VALUE -> grouped(RabbitNames.QUEUE_POINT_VALUE, group);
             case EVENT -> grouped(RabbitNames.QUEUE_EVENT_REPORT, group);
             case COMMAND -> {
-                RabbitTopology.declareDriverCommandQueue(rabbitAdmin, RabbitNames.QUEUE_COMMAND_PREFIX + group,
-                        RabbitNames.EXCHANGE_COMMAND, RabbitNames.EXCHANGE_COMMAND_DEAD,
-                        RabbitNames.ROUTING_COMMAND_PREFIX + keyPattern, driverQueueExpiresMillis);
+                RabbitTopology.declareDriverCommandQueue(
+                        rabbitAdmin,
+                        RabbitNames.QUEUE_COMMAND_PREFIX + group,
+                        RabbitNames.EXCHANGE_COMMAND,
+                        RabbitNames.EXCHANGE_COMMAND_DEAD,
+                        RabbitNames.ROUTING_COMMAND_PREFIX + keyPattern,
+                        driverQueueExpiresMillis);
                 yield RabbitNames.QUEUE_COMMAND_PREFIX + group;
             }
             case POINT_COMMAND -> {
-                int expires = Objects.nonNull(spec.instanceTtl()) && !spec.instanceTtl().isZero()
+                int expires = Objects.nonNull(spec.instanceTtl())
+                                && !spec.instanceTtl().isZero()
                         ? (int) Math.min(spec.instanceTtl().toMillis(), Integer.MAX_VALUE)
                         : driverQueueExpiresMillis;
-                RabbitTopology.declareDriverCommandQueue(rabbitAdmin, RabbitNames.QUEUE_POINT_COMMAND_PREFIX + group,
-                        RabbitNames.EXCHANGE_POINT_COMMAND, RabbitNames.EXCHANGE_POINT_COMMAND_DEAD,
-                        RabbitNames.ROUTING_POINT_COMMAND_PREFIX + keyPattern, expires);
+                RabbitTopology.declareDriverCommandQueue(
+                        rabbitAdmin,
+                        RabbitNames.QUEUE_POINT_COMMAND_PREFIX + group,
+                        RabbitNames.EXCHANGE_POINT_COMMAND,
+                        RabbitNames.EXCHANGE_POINT_COMMAND_DEAD,
+                        RabbitNames.ROUTING_POINT_COMMAND_PREFIX + keyPattern,
+                        expires);
                 yield RabbitNames.QUEUE_POINT_COMMAND_PREFIX + group;
             }
             case COMMAND_RESULT -> grouped(RabbitNames.QUEUE_COMMAND_RESULT, group);

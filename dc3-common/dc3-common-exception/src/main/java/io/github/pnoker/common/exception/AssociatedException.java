@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.exception;
 
 import io.github.pnoker.common.enums.ErrorCode;
@@ -58,5 +57,4 @@ public class AssociatedException extends BusinessException {
     public ErrorCode getErrorCode() {
         return ErrorCode.FAILURE;
     }
-
 }

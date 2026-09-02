@@ -14,23 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.agentic.utils;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
-import org.junit.jupiter.api.Test;
-import org.springframework.ai.chat.model.ToolContext;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Test;
+import org.springframework.ai.chat.model.ToolContext;
 
 class AgenticToolContextUtilTest {
 
@@ -87,8 +85,10 @@ class AgenticToolContextUtilTest {
     @Test
     void requireTenantIdFromToolContextPrefersToolContextValue() {
         ToolContext ctx = toolContext(Map.of(
-                AgenticConstant.ToolContextKey.TENANT_ID, 99L,
-                AgenticConstant.ToolContextKey.USER_HEADER, userHeader(1L, 5L)));
+                AgenticConstant.ToolContextKey.TENANT_ID,
+                99L,
+                AgenticConstant.ToolContextKey.USER_HEADER,
+                userHeader(1L, 5L)));
         assertThat(AgenticToolContextUtil.requireTenantId(ctx)).isEqualTo(99L);
     }
 
@@ -109,8 +109,10 @@ class AgenticToolContextUtilTest {
     @Test
     void requireUserIdFromToolContextPrefersToolContextValue() {
         ToolContext ctx = toolContext(Map.of(
-                AgenticConstant.ToolContextKey.USER_ID, 88L,
-                AgenticConstant.ToolContextKey.USER_HEADER, userHeader(1L, 5L)));
+                AgenticConstant.ToolContextKey.USER_ID,
+                88L,
+                AgenticConstant.ToolContextKey.USER_HEADER,
+                userHeader(1L, 5L)));
         assertThat(AgenticToolContextUtil.requireUserId(ctx)).isEqualTo(88L);
     }
 
@@ -125,7 +127,7 @@ class AgenticToolContextUtilTest {
         assertThatThrownBy(() -> AgenticToolContextUtil.requireConversationId(toolContext(Map.of())))
                 .isInstanceOf(UnAuthorizedException.class);
         assertThatThrownBy(() -> AgenticToolContextUtil.requireConversationId(
-                toolContext(Map.of(AgenticConstant.ToolContextKey.CONVERSATION_ID, "   "))))
+                        toolContext(Map.of(AgenticConstant.ToolContextKey.CONVERSATION_ID, "   "))))
                 .isInstanceOf(UnAuthorizedException.class);
     }
 

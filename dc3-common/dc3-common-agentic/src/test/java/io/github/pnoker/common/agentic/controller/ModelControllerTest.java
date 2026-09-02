@@ -14,28 +14,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.agentic.controller;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.agentic.entity.builder.ModelConfigBuilder;
 import io.github.pnoker.common.agentic.entity.vo.ModelVO;
 import io.github.pnoker.common.agentic.service.ModelConfigService;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.security.GatewayAuthenticationToken;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.test.StepVerifier;
-import reactor.core.publisher.Mono;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class ModelControllerTest {
@@ -59,7 +57,8 @@ class ModelControllerTest {
         RequestHeader.PrincipalHeader header = header();
         when(modelConfigService.listOptions(header)).thenReturn(Mono.just(List.of(option)));
 
-        StepVerifier.create(controller.list()
+        StepVerifier.create(controller
+                        .list()
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(
                                 new GatewayAuthenticationToken(header, List.of()))))
                 .assertNext(response -> {
@@ -73,7 +72,8 @@ class ModelControllerTest {
     void deleteCallsServiceAndCompletesWithoutBody() {
         RequestHeader.PrincipalHeader header = header();
         when(modelConfigService.delete(42L, header)).thenReturn(Mono.empty());
-        StepVerifier.create(controller.delete(42L)
+        StepVerifier.create(controller
+                        .delete(42L)
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(
                                 new GatewayAuthenticationToken(header, List.of()))))
                 .verifyComplete();

@@ -14,8 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
@@ -26,6 +31,8 @@ import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
+import java.time.Instant;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,30 +42,30 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Instant;
-import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class DriverTimeoutCheckReceiverTest {
 
-    @Mock ReactiveEntityStateStore entityStateStore;
-    @Mock ReactiveEntityAlarmStore entityAlarmStore;
-    @Mock AlarmRuleTriggerService alarmRuleTriggerService;
-    @Mock TransactionalOperator transactionalOperator;
-    @Mock Acknowledgment acknowledgment;
+    @Mock
+    ReactiveEntityStateStore entityStateStore;
+
+    @Mock
+    ReactiveEntityAlarmStore entityAlarmStore;
+
+    @Mock
+    AlarmRuleTriggerService alarmRuleTriggerService;
+
+    @Mock
+    TransactionalOperator transactionalOperator;
+
+    @Mock
+    Acknowledgment acknowledgment;
 
     private DriverTimeoutCheckReceiver receiver;
 
     @BeforeEach
     void setUp() {
-        receiver = new DriverTimeoutCheckReceiver(entityStateStore, entityAlarmStore,
-                alarmRuleTriggerService, transactionalOperator);
+        receiver = new DriverTimeoutCheckReceiver(
+                entityStateStore, entityAlarmStore, alarmRuleTriggerService, transactionalOperator);
     }
 
     @Test
@@ -134,14 +141,29 @@ class DriverTimeoutCheckReceiverTest {
     }
 
     private ReactiveEntityStateStore.EntityStateLease lease(Long alarmId) {
-        return new ReactiveEntityStateStore.EntityStateLease(9L, 100L, EntityTypeEnum.DRIVER, 7L, 0L,
-                EntityStatusEnum.OFFLINE.getIndex(), EntityStatusEnum.ONLINE.getIndex(), 5L,
-                Instant.now().plusSeconds(300), 45, Instant.now(), alarmId, (byte) 0, "{}");
+        return new ReactiveEntityStateStore.EntityStateLease(
+                9L,
+                100L,
+                EntityTypeEnum.DRIVER,
+                7L,
+                0L,
+                EntityStatusEnum.OFFLINE.getIndex(),
+                EntityStatusEnum.ONLINE.getIndex(),
+                5L,
+                Instant.now().plusSeconds(300),
+                45,
+                Instant.now(),
+                alarmId,
+                (byte) 0,
+                "{}");
     }
 
     private DriverTimeoutCheckDTO timeoutCheck(Long driverId, Long tenantId, Long leaseVersion) {
-        return DriverTimeoutCheckDTO.builder().driverId(driverId).tenantId(tenantId)
-                .leaseVersion(leaseVersion).build();
+        return DriverTimeoutCheckDTO.builder()
+                .driverId(driverId)
+                .tenantId(tenantId)
+                .leaseVersion(leaseVersion)
+                .build();
     }
 
     private MqReceived<DriverTimeoutCheckDTO> received(DriverTimeoutCheckDTO value) {

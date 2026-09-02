@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.bo.ServiceAccountBO;
@@ -22,13 +21,12 @@ import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
 import io.github.pnoker.common.auth.entity.vo.ServiceAccountVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
+import java.util.Objects;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * MapStruct builder for service accounts.
@@ -36,7 +34,9 @@ import java.util.Objects;
  * @author pnoker
  * @since 2026.6.12
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface ServiceAccountBuilder {
 
     /**
@@ -105,6 +105,4 @@ public interface ServiceAccountBuilder {
      * @return converted value
      */
     List<ServiceAccountBO> buildBOListByDOList(List<ServiceAccountDO> entityDOList);
-
-
 }

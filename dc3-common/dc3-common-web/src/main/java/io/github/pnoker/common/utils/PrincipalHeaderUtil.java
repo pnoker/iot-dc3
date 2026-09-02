@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.security.GatewayAuthenticationToken;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * User Header Utility Class
@@ -57,8 +55,8 @@ public class PrincipalHeaderUtil {
                 .filter(auth -> auth instanceof GatewayAuthenticationToken)
                 .cast(GatewayAuthenticationToken.class)
                 .map(GatewayAuthenticationToken::getPrincipalHeader)
-                .switchIfEmpty(Mono.error(
-                        new UnAuthorizedException("Unable to get principal header from security context")));
+                .switchIfEmpty(
+                        Mono.error(new UnAuthorizedException("Unable to get principal header from security context")));
     }
 
     /**
@@ -70,8 +68,7 @@ public class PrincipalHeaderUtil {
         return getPrincipalHeader().flatMap(principalHeader -> {
             Long tenantId = principalHeader.getTenantId();
             if (Objects.isNull(tenantId)) {
-                return Mono.error(
-                        new UnAuthorizedException("Unable to get tenant id of principal header"));
+                return Mono.error(new UnAuthorizedException("Unable to get tenant id of principal header"));
             }
             return Mono.just(tenantId);
         });
@@ -86,8 +83,7 @@ public class PrincipalHeaderUtil {
         return getPrincipalHeader().flatMap(principalHeader -> {
             Long userId = principalHeader.getPrincipalId();
             if (Objects.isNull(userId)) {
-                return Mono.error(
-                        new UnAuthorizedException("Unable to get principal id of principal header"));
+                return Mono.error(new UnAuthorizedException("Unable to get principal id of principal header"));
             }
             return Mono.just(userId);
         });
@@ -102,8 +98,7 @@ public class PrincipalHeaderUtil {
         return getPrincipalHeader().flatMap(principalHeader -> {
             String nickName = principalHeader.getDisplayName();
             if (StringUtils.isEmpty(nickName)) {
-                return Mono.error(
-                        new UnAuthorizedException("Unable to get display name of principal header"));
+                return Mono.error(new UnAuthorizedException("Unable to get display name of principal header"));
             }
             return Mono.just(nickName);
         });
@@ -118,8 +113,7 @@ public class PrincipalHeaderUtil {
         return getPrincipalHeader().flatMap(principalHeader -> {
             String userName = principalHeader.getPrincipalName();
             if (StringUtils.isEmpty(userName)) {
-                return Mono.error(
-                        new UnAuthorizedException("Unable to get principal name of principal header"));
+                return Mono.error(new UnAuthorizedException("Unable to get principal name of principal header"));
             }
             return Mono.just(userName);
         });

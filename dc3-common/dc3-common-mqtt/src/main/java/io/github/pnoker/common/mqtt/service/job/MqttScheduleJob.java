@@ -14,12 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mqtt.service.job;
 
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
@@ -28,12 +32,6 @@ import org.quartz.JobExecutionException;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * MQTT Schedule Job
@@ -155,8 +153,11 @@ public class MqttScheduleJob extends QuartzJobBean {
         long speed = MESSAGE_COUNT.getAndSet(0) / interval;
         MESSAGE_SPEED.set(speed);
         if (speed >= batchSpeed) {
-            log.debug("MQTT receive rate sampled, messagesPerSecond={}, queuedMessages={}, intervalSeconds={}",
-                    speed, getMqttMessagesSize(), interval);
+            log.debug(
+                    "MQTT receive rate sampled, messagesPerSecond={}, queuedMessages={}, intervalSeconds={}",
+                    speed,
+                    getMqttMessagesSize(),
+                    interval);
         }
 
         // Process a private snapshot outside the lock so inbound MQTT threads are not
@@ -183,5 +184,4 @@ public class MqttScheduleJob extends QuartzJobBean {
             log.error("MQTT batch message handling failed, size={}", mqttMessages.size(), e);
         }
     }
-
 }

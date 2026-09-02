@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mqtt.handler;
 
 import io.github.pnoker.common.mqtt.entity.MessageHeader;
@@ -22,6 +21,7 @@ import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.mqtt.service.job.MqttScheduleJob;
+import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -30,8 +30,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ExecutorService;
 
 /**
  * MQTT Receive Handler
@@ -73,14 +71,22 @@ public class MqttReceiveHandler {
                 MessageHeader messageHeader = new MessageHeader(message.getHeaders());
                 String payload = message.getPayload().toString();
                 if (StringUtils.isEmpty(payload)) {
-                    log.error("MQTT inbound rejected, reason=emptyPayload, topic={}, qos={}",
-                            messageHeader.getMqttReceivedTopic(), messageHeader.getMqttReceivedQos());
+                    log.error(
+                            "MQTT inbound rejected, reason=emptyPayload, topic={}, qos={}",
+                            messageHeader.getMqttReceivedTopic(),
+                            messageHeader.getMqttReceivedQos());
                     return;
                 }
                 MqttScheduleJob.recordMessage();
-                MqttMessage mqttMessage = MqttMessage.builder().header(messageHeader).payload(payload).build();
-                log.debug("MQTT inbound received, topic={}, qos={}, payloadLength={}",
-                        messageHeader.getMqttReceivedTopic(), messageHeader.getMqttReceivedQos(), payload.length());
+                MqttMessage mqttMessage = MqttMessage.builder()
+                        .header(messageHeader)
+                        .payload(payload)
+                        .build();
+                log.debug(
+                        "MQTT inbound received, topic={}, qos={}, payloadLength={}",
+                        messageHeader.getMqttReceivedTopic(),
+                        messageHeader.getMqttReceivedQos(),
+                        payload.length());
 
                 // Determine whether to process data in batch based on transmission speed
                 Integer batchSpeed = mqttProperties.getBatch().getSpeed();
@@ -91,8 +97,10 @@ public class MqttReceiveHandler {
                     MqttScheduleJob.addMqttMessages(mqttMessage);
                 }
             } catch (Exception e) {
-                log.error("MQTT inbound dispatch failed, payloadType={}",
-                        message.getPayload().getClass().getSimpleName(), e);
+                log.error(
+                        "MQTT inbound dispatch failed, payloadType={}",
+                        message.getPayload().getClass().getSimpleName(),
+                        e);
             }
         };
     }
@@ -101,9 +109,11 @@ public class MqttReceiveHandler {
         try {
             mqttReceiveService.receiveValue(mqttMessage);
         } catch (Exception e) {
-            log.error("MQTT single message handling failed, topic={}, qos={}",
-                    mqttMessage.getHeader().getMqttReceivedTopic(), mqttMessage.getHeader().getMqttReceivedQos(), e);
+            log.error(
+                    "MQTT single message handling failed, topic={}, qos={}",
+                    mqttMessage.getHeader().getMqttReceivedTopic(),
+                    mqttMessage.getHeader().getMqttReceivedQos(),
+                    e);
         }
     }
-
 }

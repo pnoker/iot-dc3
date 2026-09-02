@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.bo;
 
 /**
@@ -25,5 +24,4 @@ package io.github.pnoker.common.entity.bo;
  * @author pnoker
  * @since 2026.8.20
  */
-public record PointValueVolumeBO(Long deviceId, Long pointId, long count) {
-}
+public record PointValueVolumeBO(Long deviceId, Long pointId, long count) {}

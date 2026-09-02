@@ -14,18 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
@@ -33,6 +25,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 /**
  * Feishu bot notification channel adapter.
@@ -45,8 +43,8 @@ public class FeishuBotNotifyChannelAdapter extends WebhookNotifyChannelAdapter {
 
     private static final String HMAC_SHA256 = "HmacSHA256";
 
-    public FeishuBotNotifyChannelAdapter(WebClient.Builder webClientBuilder,
-                                         NotifyCredentialResolver notifyCredentialResolver) {
+    public FeishuBotNotifyChannelAdapter(
+            WebClient.Builder webClientBuilder, NotifyCredentialResolver notifyCredentialResolver) {
         super(webClientBuilder, notifyCredentialResolver);
     }
 
@@ -58,8 +56,10 @@ public class FeishuBotNotifyChannelAdapter extends WebhookNotifyChannelAdapter {
     @Override
     public Mono<NotifySendResult> send(NotifyChannelBO channel, MessagePayload payload) {
         Optional<NotifyCredential> credentialOptional = notifyCredentialResolver.resolve(channel.getCredentialRef());
-        if (credentialOptional.isEmpty() || StringUtils.isBlank(credentialOptional.get().getWebhookUrl())) {
-            return Mono.just(NotifySendResult.failed(channel.getCredentialRef(), "Notify credential is not configured"));
+        if (credentialOptional.isEmpty()
+                || StringUtils.isBlank(credentialOptional.get().getWebhookUrl())) {
+            return Mono.just(
+                    NotifySendResult.failed(channel.getCredentialRef(), "Notify credential is not configured"));
         }
 
         NotifyCredential credential = credentialOptional.get();
@@ -75,8 +75,8 @@ public class FeishuBotNotifyChannelAdapter extends WebhookNotifyChannelAdapter {
         return postJson(channel.getCredentialRef(), credential, body);
     }
 
-    private Map<String, Object> buildFeishuBody(NotifyChannelBO channel, NotifyCredential credential,
-                                                MessagePayload payload) {
+    private Map<String, Object> buildFeishuBody(
+            NotifyChannelBO channel, NotifyCredential credential, MessagePayload payload) {
         Map<String, Object> body = buildFeishuMessage(payload);
         if (signEnabled(channel)) {
             if (StringUtils.isBlank(credential.getSecret())) {
@@ -154,5 +154,4 @@ public class FeishuBotNotifyChannelAdapter extends WebhookNotifyChannelAdapter {
             throw new IllegalStateException("Failed to sign Feishu bot request", e);
         }
     }
-
 }

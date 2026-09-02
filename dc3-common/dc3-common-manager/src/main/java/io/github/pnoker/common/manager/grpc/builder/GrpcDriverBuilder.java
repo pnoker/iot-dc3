@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.grpc.builder;
 
 import io.github.pnoker.api.common.GrpcBase;
@@ -28,12 +27,11 @@ import io.github.pnoker.common.optional.JsonOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.Optional;
 
 /**
  * MapStruct builder for driver gRPC message conversion.
@@ -41,7 +39,9 @@ import java.util.Optional;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcDriverBuilder {
 
     /**
@@ -83,10 +83,12 @@ public interface GrpcDriverBuilder {
         Optional.ofNullable(entityBO.getDriverExt())
                 .ifPresent(value -> entityGrpc.setDriverExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityBO.getDriverTypeFlag())
-                .ifPresentOrElse(value -> entityGrpc.setDriverTypeFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setDriverTypeFlag(value.getIndex()),
                         () -> entityGrpc.setDriverTypeFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(entityBO.getEnableFlag())
-                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setEnableFlag(value.getIndex()),
                         () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
     }
 
@@ -125,5 +127,4 @@ public interface GrpcDriverBuilder {
                 .ifPresent(entityBO::setDriverTypeFlag);
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
     }
-
 }

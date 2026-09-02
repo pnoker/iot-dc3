@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * One slice of the event-overview alarm type pie — type tag pulled from
@@ -44,10 +42,12 @@ public class AlertTypeBucketVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Alarm type tag sourced from alarm_ext.type; one of driver-offline, driver-state-flip, driver-alarm, device-offline, device-alarm.", example = "device-alarm")
+    @Schema(
+            description =
+                    "Alarm type tag sourced from alarm_ext.type; one of driver-offline, driver-state-flip, driver-alarm, device-offline, device-alarm.",
+            example = "device-alarm")
     private String type;
 
     @Schema(description = "Number of alarms aggregated under this type within the queried window.", example = "128")
     private long count;
-
 }

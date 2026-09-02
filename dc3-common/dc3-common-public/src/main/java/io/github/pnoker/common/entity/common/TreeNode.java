@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.common;
-
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Generic tree node with parent-child relationships.
@@ -31,7 +29,6 @@ import java.util.List;
  * @author pnoker
  * @since 2016.10.1
  */
-
 @Getter
 @Setter
 public class TreeNode implements Serializable {
@@ -39,11 +36,17 @@ public class TreeNode implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /** Node identifier. */
     private int id;
 
+    /** Parent node identifier. */
     private int parentId;
 
+    /** Mutable child-node collection. */
     private List<TreeNode> children = new ArrayList<>(16);
+
+    /** Create an empty tree node. */
+    public TreeNode() {}
 
     /**
      * Add child node to current node
@@ -53,5 +56,4 @@ public class TreeNode implements Serializable {
     public void add(TreeNode node) {
         children.add(node);
     }
-
 }

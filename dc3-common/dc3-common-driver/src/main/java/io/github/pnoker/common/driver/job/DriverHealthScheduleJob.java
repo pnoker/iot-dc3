@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.job;
 
 import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
@@ -24,14 +23,13 @@ import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
 
 /**
  * Scheduled job that periodically evaluates and reports driver health.
@@ -92,5 +90,4 @@ public class DriverHealthScheduleJob extends QuartzJobBean {
         }
         return DriverHealthState.fault();
     }
-
 }

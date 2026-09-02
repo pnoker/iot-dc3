@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.enums.PointCommandSourceEnum;
@@ -64,9 +63,8 @@ public interface PointCommandFacade {
      */
     Mono<String> submitWrite(Long tenantId, Long deviceId, Long pointId, String value);
 
-    default Mono<String> submitWrite(Long tenantId, Long deviceId, Long pointId, String value,
-                                      PointCommandSourceEnum source) {
+    default Mono<String> submitWrite(
+            Long tenantId, Long deviceId, Long pointId, String value, PointCommandSourceEnum source) {
         return submitWrite(tenantId, deviceId, pointId, value);
     }
-
 }

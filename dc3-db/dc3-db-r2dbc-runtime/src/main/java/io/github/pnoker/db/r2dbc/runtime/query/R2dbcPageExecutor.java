@@ -1,16 +1,31 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.db.r2dbc.runtime.query;
 
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
-import org.springframework.r2dbc.core.DatabaseClient;
-import reactor.core.publisher.Mono;
-
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.LinkedHashMap;
-import java.util.Collections;
 import java.util.function.BiFunction;
+import org.springframework.r2dbc.core.DatabaseClient;
+import reactor.core.publisher.Mono;
 
 /**
  * Executes the two statements required by an offset page.
@@ -40,9 +55,8 @@ public final class R2dbcPageExecutor {
             requireSql(countSql, "countSql");
             requireSql(itemsSql, "itemsSql");
             Objects.requireNonNull(rowMapper, "rowMapper must not be null");
-            Map<String, ?> safeParameters = parameters == null
-                    ? Map.of()
-                    : Collections.unmodifiableMap(new LinkedHashMap<>(parameters));
+            Map<String, ?> safeParameters =
+                    parameters == null ? Map.of() : Collections.unmodifiableMap(new LinkedHashMap<>(parameters));
             if (safeParameters.containsKey("offset") || safeParameters.containsKey("limit")) {
                 return Mono.error(new IllegalArgumentException("offset and limit are reserved pagination parameters"));
             }
@@ -71,9 +85,7 @@ public final class R2dbcPageExecutor {
                 throw new IllegalArgumentException("invalid SQL parameter name");
             }
             Object value = entry.getValue();
-            bound = value == null
-                    ? bound.bindNull(name, Object.class)
-                    : bound.bind(name, value);
+            bound = value == null ? bound.bindNull(name, Object.class) : bound.bind(name, value);
         }
         return bound;
     }

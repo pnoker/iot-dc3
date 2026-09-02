@@ -14,23 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc;
 
-import io.github.pnoker.api.center.auth.GrpcPermissionQuery;
 import io.github.pnoker.api.center.auth.GrpcPermissionCodesDTO;
+import io.github.pnoker.api.center.auth.GrpcPermissionQuery;
 import io.github.pnoker.api.center.auth.PermissionApiGrpc;
 import io.github.pnoker.common.facade.api.PermissionFacade;
 import io.github.pnoker.common.facade.grpc.config.GrpcFacadeProperties;
 import io.grpc.stub.StreamObserver;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /** Reactive gRPC {@link PermissionFacade}. */
 @Slf4j

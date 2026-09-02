@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -52,9 +51,9 @@ public class EventParamExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Reserved keep field retained for forward-compatible event param content", example = "reserved")
+        @Schema(
+                description = "Reserved keep field retained for forward-compatible event param content",
+                example = "reserved")
         private String keep;
-
     }
-
 }

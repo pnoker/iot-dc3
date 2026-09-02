@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -52,28 +51,43 @@ public class ProfileVO extends BaseVO {
     /**
      * Name
      */
-    @NotBlank(message = "Profile name can't be empty", groups = {Add.class})
-    @Schema(description = "Profile name. Unique name within a tenant.", example = "Modbus PLC Template", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid profile name format",
+    @NotBlank(
+            message = "Profile name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Profile name. Unique name within a tenant.",
+            example = "Modbus PLC Template",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid profile name format",
             groups = {Add.class, Update.class})
     private String profileName;
 
     /**
      * Code
      */
-    @Schema(description = "Profile code. Stable business identifier; must not change once deployed.", example = "PLC_TEMPLATE_V1")
+    @Schema(
+            description = "Profile code. Stable business identifier; must not change once deployed.",
+            example = "PLC_TEMPLATE_V1")
     private String profileCode;
 
     /**
      * Type
      */
-    @Schema(description = "Share scope of the profile: TENANT (shared within tenant), DRIVER (shared under driver), or USER (shared under user).", example = "TENANT")
+    @Schema(
+            description =
+                    "Share scope of the profile: TENANT (shared within tenant), DRIVER (shared under driver), or USER (shared under user).",
+            example = "TENANT")
     private ProfileShareTypeEnum profileShareFlag;
 
     /**
      * Type
      */
-    @Schema(description = "Origin of the profile: SYSTEM (created by system), DRIVER (created by driver), or USER (created by user).", example = "USER")
+    @Schema(
+            description =
+                    "Origin of the profile: SYSTEM (created by system), DRIVER (created by driver), or USER (created by user).",
+            example = "USER")
     private ProfileTypeEnum profileTypeFlag;
 
     /**
@@ -99,5 +113,4 @@ public class ProfileVO extends BaseVO {
      */
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
-
 }

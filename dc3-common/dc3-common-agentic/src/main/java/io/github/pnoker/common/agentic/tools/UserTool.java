@@ -47,14 +47,13 @@ public class UserTool {
         RequestHeader.PrincipalHeader header = AgenticToolContextUtil.requirePrincipalHeader(toolContext);
         Long userId = AgenticToolContextUtil.requireUserId(toolContext);
         log.debug("Agentic tool invoked, tool={}, userId={}", "getCurrentUserProfile", userId);
-        return AgenticToolResult.ok("Current user profile loaded",
+        return AgenticToolResult.ok(
+                "Current user profile loaded",
                 new CurrentUserProfile(userId, header.getUserName(), header.getNickName()));
     }
 
     /**
      * The acting user resolved from the ToolContext identity.
      */
-    public record CurrentUserProfile(Long userId, String username, String nickname) {
-    }
-
+    public record CurrentUserProfile(Long userId, String username, String nickname) {}
 }

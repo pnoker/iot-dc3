@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
 
 import java.util.HashMap;
@@ -60,5 +59,4 @@ public class AddFailedException extends Exception {
     public Map<String, Item> getItems() {
         return this._items;
     }
-
 }

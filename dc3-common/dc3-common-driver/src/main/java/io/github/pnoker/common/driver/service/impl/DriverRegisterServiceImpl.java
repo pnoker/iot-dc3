@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
@@ -58,12 +57,17 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
     @Override
     public Mono<Void> initial() {
         return Mono.defer(() -> {
-            RegisterBO entityBO = buildRegisterBOByProperty();
-            log.debug("Driver registration prepared, serviceName={}, driverCode={}, tenantCode={}",
-                    entityBO.getDriver().getServiceName(), entityBO.getDriver().getDriverCode(), entityBO.getTenant());
-            return driverClient.driverRegister(entityBO);
-        }).onErrorMap(error -> !(error instanceof ServiceException),
-                error -> new ServiceException("Driver initialization failed: {}", error.getMessage(), error));
+                    RegisterBO entityBO = buildRegisterBOByProperty();
+                    log.debug(
+                            "Driver registration prepared, serviceName={}, driverCode={}, tenantCode={}",
+                            entityBO.getDriver().getServiceName(),
+                            entityBO.getDriver().getDriverCode(),
+                            entityBO.getTenant());
+                    return driverClient.driverRegister(entityBO);
+                })
+                .onErrorMap(
+                        error -> !(error instanceof ServiceException),
+                        error -> new ServiceException("Driver initialization failed: {}", error.getMessage(), error));
     }
 
     /**
@@ -94,5 +98,4 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         entityBO.setEventAttributes(driverProperties.getEventAttribute());
         return entityBO;
     }
-
 }

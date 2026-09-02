@@ -64,5 +64,4 @@ public class ModelConfigBO extends BaseBO implements TenantOwned {
     private EnableFlagEnum enableFlag;
 
     private Long tenantId;
-
 }

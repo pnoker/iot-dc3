@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
-
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author pnoker
@@ -141,22 +139,24 @@ public class AutoReconnectController implements ServerConnectionStateListener {
 
         log.debug("Trigger reconnect");
 
-        this._connectTask = new Thread(new Runnable() {
+        this._connectTask = new Thread(
+                new Runnable() {
 
-            @Override
-            public void run() {
-                boolean result = false;
-                try {
-                    result = performReconnect(wait);
-                } finally {
-                    AutoReconnectController.this._connectTask = null;
-                    log.debug("OPC DA reconnect attempt completed, connected={}", result);
-                    if (!result) {
-                        triggerReconnect(true);
+                    @Override
+                    public void run() {
+                        boolean result = false;
+                        try {
+                            result = performReconnect(wait);
+                        } finally {
+                            AutoReconnectController.this._connectTask = null;
+                            log.debug("OPC DA reconnect attempt completed, connected={}", result);
+                            if (!result) {
+                                triggerReconnect(true);
+                            }
+                        }
                     }
-                }
-            }
-        }, "OPCReconnectThread");
+                },
+                "OPCReconnectThread");
         this._connectTask.setDaemon(true);
         this._connectTask.start();
     }
@@ -193,5 +193,4 @@ public class AutoReconnectController implements ServerConnectionStateListener {
             return false;
         }
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -42,40 +41,58 @@ public class TokenQuery {
     /**
      * Tenant
      */
-    @Schema(description = "Tenant code that scopes the authentication request; must match an existing tenant. Format: 2–32 alphanumeric or -_#@/.|characters.", example = "dc3-tenant-01")
+    @Schema(
+            description =
+                    "Tenant code that scopes the authentication request; must match an existing tenant. Format: 2–32 alphanumeric or -_#@/.|characters.",
+            example = "dc3-tenant-01")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid tenant code")
     private String tenant;
 
     /**
      *
      */
-    @Schema(description = "Username of the account being authenticated; must exist within the specified tenant. Format: 2–32 alphanumeric or -_#@/.|characters.", example = "alice")
+    @Schema(
+            description =
+                    "Username of the account being authenticated; must exist within the specified tenant. Format: 2–32 alphanumeric or -_#@/.|characters.",
+            example = "alice")
     @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid username")
     private String name;
 
     /**
      *
      */
-    @Schema(description = "Random salt string issued by the server during the login handshake; must be echoed back when submitting credentials.", example = "a3f9c2d1")
+    @Schema(
+            description =
+                    "Random salt string issued by the server during the login handshake; must be echoed back when submitting credentials.",
+            example = "a3f9c2d1")
     private String salt;
 
     /**
      *
      */
-    @Schema(description = "Credential submitted for authentication; the plaintext password, protected in transit by HTTPS. The salt is NOT mixed into the password — it is concatenated with the server-side key to sign the JWT.", example = "your-plaintext-password")
+    @Schema(
+            description =
+                    "Credential submitted for authentication; the plaintext password, protected in transit by HTTPS. The salt is NOT mixed into the password — it is concatenated with the server-side key to sign the JWT.",
+            example = "your-plaintext-password")
     private String password;
 
     /**
      *
      */
-    @Schema(description = "JWT or session token to be validated or invalidated; used by token-check and logout endpoints.", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
+    @Schema(
+            description =
+                    "JWT or session token to be validated or invalidated; used by token-check and logout endpoints.",
+            example =
+                    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhbGljZSJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
     private String token;
 
     /**
      * New password, used by the self-service password change flow; {@code password} carries
      * the current password in that flow.
      */
-    @Schema(description = "Replacement password for the self-service password change flow; {@code password} must carry the current credential in the same request.", example = "N3wP@ssw0rd!")
+    @Schema(
+            description =
+                    "Replacement password for the self-service password change flow; {@code password} must carry the current credential in the same request.",
+            example = "N3wP@ssw0rd!")
     private String newPassword;
-
 }

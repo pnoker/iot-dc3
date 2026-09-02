@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.bo;
 
 import io.github.pnoker.common.driver.support.TypedValueConverter;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * Represents a typed attribute value resolved from driver or point configuration.
@@ -66,5 +64,4 @@ public class AttributeBO implements Serializable {
     public <T> T getValue(Class<T> clazz) {
         return TypedValueConverter.convertAttributeValue(value, type, clazz);
     }
-
 }

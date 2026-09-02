@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.mqtt;
 
 import com.hivemq.client.mqtt.datatypes.MqttQos;
@@ -22,13 +21,13 @@ import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5Client;
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish;
 import com.hivemq.client.mqtt.mqtt5.message.subscribe.Mqtt5Subscribe;
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.OrderingGuarantee;
 import io.github.pnoker.common.constant.mq.SubscriptionMode;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.adapter.BrokerCapabilities;
-import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
 import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireConfirmation;
@@ -38,10 +37,6 @@ import io.github.pnoker.common.mq.listener.MqPoisonException;
 import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.mq.subscription.KeyRoutes;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
-import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,6 +50,9 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * MQTT 5 implementation of the broker port (EMQX / HiveMQ / NanoMQ / VerneMQ ...).
@@ -127,9 +125,10 @@ public class MqttMqAdapter implements BrokerAdapter {
 
     private static Map<String, String> headersOf(Mqtt5Publish publish) {
         Map<String, String> headers = new HashMap<>();
-        publish.getUserProperties().asList()
-                .forEach(property -> headers.put(property.getName().toString(),
-                        property.getValue().toString()));
+        publish.getUserProperties()
+                .asList()
+                .forEach(property -> headers.put(
+                        property.getName().toString(), property.getValue().toString()));
         return headers;
     }
 
@@ -166,7 +165,8 @@ public class MqttMqAdapter implements BrokerAdapter {
     }
 
     private static boolean isDeadLetterTopic(MqTopic topic) {
-        return topic == MqTopic.POINT_VALUE_DEAD || topic == MqTopic.POINT_COMMAND_DEAD
+        return topic == MqTopic.POINT_VALUE_DEAD
+                || topic == MqTopic.POINT_COMMAND_DEAD
                 || topic == MqTopic.COMMAND_DEAD;
     }
 
@@ -214,20 +214,24 @@ public class MqttMqAdapter implements BrokerAdapter {
 
     @Override
     public void publish(WireMqMessage message, WireConfirmation confirmation) {
-        publishClient.publish(publishOf(message))
-                .whenComplete((publish, failure) -> confirmation.onConfirm(message,
-                        Objects.isNull(failure), failure));
+        publishClient
+                .publish(publishOf(message))
+                .whenComplete((publish, failure) -> confirmation.onConfirm(message, Objects.isNull(failure), failure));
     }
 
     @Override
     public void subscribe(SubscriptionSpec spec, RawDeliveryListener listener) {
         String routeKey = routeKey(spec);
-        KeyRoutes<RawDeliveryListener> routes =
-                singleRoutes.computeIfAbsent(routeKey, key -> new KeyRoutes<>());
+        KeyRoutes<RawDeliveryListener> routes = singleRoutes.computeIfAbsent(routeKey, key -> new KeyRoutes<>());
         routes.add(spec.keyPattern(), listener);
-        if (subscriptions.stream().anyMatch(subscription -> subscription.routeKey().equals(routeKey))) {
-            log.info("MQTT subscription joined shared session, topic={}, mode={}, delivery={}, filter={}",
-                    spec.topic(), spec.mode(), spec.delivery(), filterOf(spec));
+        if (subscriptions.stream()
+                .anyMatch(subscription -> subscription.routeKey().equals(routeKey))) {
+            log.info(
+                    "MQTT subscription joined shared session, topic={}, mode={}, delivery={}, filter={}",
+                    spec.topic(),
+                    spec.mode(),
+                    spec.delivery(),
+                    filterOf(spec));
             return;
         }
         Mqtt5AsyncClient client = client("dc3-mq-sub-" + UUID.randomUUID());
@@ -235,8 +239,7 @@ public class MqttMqAdapter implements BrokerAdapter {
         subscriptions.add(new Subscription(client, dispatcher, routeKey));
         client.subscribe(subscribeOf(spec), dispatcher::accept, true);
         dispatcher.start();
-        log.info("MQTT subscription started, topic={}, mode={}, filter={}",
-                spec.topic(), spec.mode(), filterOf(spec));
+        log.info("MQTT subscription started, topic={}, mode={}, filter={}", spec.topic(), spec.mode(), filterOf(spec));
     }
 
     @Override
@@ -244,9 +247,14 @@ public class MqttMqAdapter implements BrokerAdapter {
         String routeKey = routeKey(spec);
         KeyRoutes<RawBatchListener> routes = batchRoutes.computeIfAbsent(routeKey, key -> new KeyRoutes<>());
         routes.add(spec.keyPattern(), listener);
-        if (subscriptions.stream().anyMatch(subscription -> subscription.routeKey().equals(routeKey))) {
-            log.info("MQTT batch subscription joined shared session, topic={}, mode={}, delivery={}, filter={}",
-                    spec.topic(), spec.mode(), spec.delivery(), filterOf(spec));
+        if (subscriptions.stream()
+                .anyMatch(subscription -> subscription.routeKey().equals(routeKey))) {
+            log.info(
+                    "MQTT batch subscription joined shared session, topic={}, mode={}, delivery={}, filter={}",
+                    spec.topic(),
+                    spec.mode(),
+                    spec.delivery(),
+                    filterOf(spec));
             return;
         }
         Mqtt5AsyncClient client = client("dc3-mq-sub-" + UUID.randomUUID());
@@ -254,8 +262,11 @@ public class MqttMqAdapter implements BrokerAdapter {
         subscriptions.add(new Subscription(client, dispatcher, routeKey));
         client.subscribe(subscribeOf(spec), dispatcher::accept, true);
         dispatcher.start();
-        log.info("MQTT batch subscription started, topic={}, mode={}, filter={}",
-                spec.topic(), spec.mode(), filterOf(spec));
+        log.info(
+                "MQTT batch subscription started, topic={}, mode={}, filter={}",
+                spec.topic(),
+                spec.mode(),
+                filterOf(spec));
     }
 
     /**
@@ -311,14 +322,12 @@ public class MqttMqAdapter implements BrokerAdapter {
      * A publish in flight through the internal queue together with its attempt number
      * (bounded client-side redelivery).
      */
-    private record Pending(Mqtt5Publish publish, int attempt) {
-    }
+    private record Pending(Mqtt5Publish publish, int attempt) {}
 
     /**
      * One broker session: the shared (or broadcast) client plus its dispatcher.
      */
-    private record Subscription(Mqtt5AsyncClient client, Dispatcher dispatcher, String routeKey) {
-    }
+    private record Subscription(Mqtt5AsyncClient client, Dispatcher dispatcher, String routeKey) {}
 
     /**
      * Per-session dispatch: single deliveries route each publish by key pattern with
@@ -339,8 +348,11 @@ public class MqttMqAdapter implements BrokerAdapter {
         private volatile boolean halted;
         private Thread thread;
 
-        private Dispatcher(SubscriptionSpec spec, KeyRoutes<RawDeliveryListener> singleRoutesOfSession,
-                           KeyRoutes<RawBatchListener> batchRoutesOfSession, String routeKey) {
+        private Dispatcher(
+                SubscriptionSpec spec,
+                KeyRoutes<RawDeliveryListener> singleRoutesOfSession,
+                KeyRoutes<RawBatchListener> batchRoutesOfSession,
+                String routeKey) {
             this.spec = spec;
             this.singleRoutesOfSession = singleRoutesOfSession;
             this.batchRoutesOfSession = batchRoutesOfSession;
@@ -363,13 +375,16 @@ public class MqttMqAdapter implements BrokerAdapter {
                 // full queue, which would drop the QoS-1 publish; on timeout the publish
                 // is left UNACKNOWLEDGED so the broker redelivers it
                 if (!incoming.offer(new Pending(publish, 1), ENQUEUE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
-                    log.error("MQTT dispatch queue full, leaving publish unacknowledged for broker redelivery, topic={}",
+                    log.error(
+                            "MQTT dispatch queue full, leaving publish unacknowledged for broker redelivery, topic={}",
                             publish.getTopic());
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                log.error("MQTT dispatch enqueue interrupted, leaving publish unacknowledged for broker redelivery, topic={}",
-                        publish.getTopic(), e);
+                log.error(
+                        "MQTT dispatch enqueue interrupted, leaving publish unacknowledged for broker redelivery, topic={}",
+                        publish.getTopic(),
+                        e);
             }
         }
 
@@ -399,8 +414,7 @@ public class MqttMqAdapter implements BrokerAdapter {
             }
             List<Pending> pendings = new ArrayList<>(List.of(first));
             long deadline = System.currentTimeMillis() + retryProperties.getReceiveTimeoutMillis();
-            while (pendings.size() < retryProperties.getBatchSize()
-                    && System.currentTimeMillis() < deadline) {
+            while (pendings.size() < retryProperties.getBatchSize() && System.currentTimeMillis() < deadline) {
                 Pending next = incoming.poll(10, TimeUnit.MILLISECONDS);
                 if (Objects.isNull(next)) {
                     break;
@@ -411,8 +425,10 @@ public class MqttMqAdapter implements BrokerAdapter {
             for (Pending pending : pendings) {
                 RawBatchListener listener = batchRoutesOfSession.next(keyOf(pending.publish()));
                 if (Objects.isNull(listener)) {
-                    log.debug("MQTT batch message matched no listener in this JVM, acknowledging and skipping, topic={}, key={}",
-                            spec.topic(), keyOf(pending.publish()));
+                    log.debug(
+                            "MQTT batch message matched no listener in this JVM, acknowledging and skipping, topic={}, key={}",
+                            spec.topic(),
+                            keyOf(pending.publish()));
                     pending.publish().acknowledge();
                     continue;
                 }
@@ -424,8 +440,11 @@ public class MqttMqAdapter implements BrokerAdapter {
         }
 
         private void deliverSubBatch(RawBatchListener listener, List<Pending> pendings) {
-            normalize(Mono.defer(() -> listener.onBatch(pendings.stream().map(MqttMqAdapter.this::deliveryOf).toList())),
-                    pendings.get(0).publish().getTopic().toString())
+            normalize(
+                            Mono.defer(() -> listener.onBatch(pendings.stream()
+                                    .map(MqttMqAdapter.this::deliveryOf)
+                                    .toList())),
+                            pendings.get(0).publish().getTopic().toString())
                     .flatMap(disposition -> settle(pendings, disposition))
                     .doOnError(error -> log.error("MQTT batch settlement failed, size={}", pendings.size(), error))
                     .subscribe();
@@ -434,15 +453,21 @@ public class MqttMqAdapter implements BrokerAdapter {
         private void deliverSingle(Pending pending) {
             RawDeliveryListener listener = singleRoutesOfSession.next(keyOf(pending.publish()));
             if (Objects.isNull(listener)) {
-                log.debug("MQTT message matched no listener in this JVM, acknowledging and skipping, topic={}, key={}",
-                        spec.topic(), keyOf(pending.publish()));
+                log.debug(
+                        "MQTT message matched no listener in this JVM, acknowledging and skipping, topic={}, key={}",
+                        spec.topic(),
+                        keyOf(pending.publish()));
                 pending.publish().acknowledge();
                 return;
             }
-            normalize(Mono.defer(() -> listener.onDelivery(deliveryOf(pending))), pending.publish().getTopic().toString())
+            normalize(
+                            Mono.defer(() -> listener.onDelivery(deliveryOf(pending))),
+                            pending.publish().getTopic().toString())
                     .flatMap(disposition -> settle(List.of(pending), disposition))
-                    .doOnError(error -> log.error("MQTT delivery settlement failed, topic={}",
-                            pending.publish().getTopic(), error))
+                    .doOnError(error -> log.error(
+                            "MQTT delivery settlement failed, topic={}",
+                            pending.publish().getTopic(),
+                            error))
                     .subscribe();
         }
 
@@ -460,11 +485,14 @@ public class MqttMqAdapter implements BrokerAdapter {
 
         private Mono<Void> settle(List<Pending> pendings, DeliveryDisposition disposition) {
             return switch (disposition) {
-                case ACK -> Mono.fromRunnable(() ->
-                        pendings.forEach(pending -> pending.publish().acknowledge()));
+                case ACK ->
+                    Mono.fromRunnable(
+                            () -> pendings.forEach(pending -> pending.publish().acknowledge()));
                 case REQUEUE -> Mono.fromRunnable(() -> pendings.forEach(this::requeue));
-                case DEAD_LETTER -> Flux.fromIterable(pendings)
-                        .concatMap(pending -> deadLetter(pending.publish())).then();
+                case DEAD_LETTER ->
+                    Flux.fromIterable(pendings)
+                            .concatMap(pending -> deadLetter(pending.publish()))
+                            .then();
             };
         }
 
@@ -474,7 +502,8 @@ public class MqttMqAdapter implements BrokerAdapter {
          */
         void requeue(Pending pending) {
             if (pending.attempt() >= maxAttempts()) {
-                log.error("MQTT reject(requeue) exhausted attempts, dead-lettering, topic={}",
+                log.error(
+                        "MQTT reject(requeue) exhausted attempts, dead-lettering, topic={}",
                         pending.publish().getTopic());
                 deadLetter(pending.publish());
                 return;
@@ -482,7 +511,8 @@ public class MqttMqAdapter implements BrokerAdapter {
             Pending next = new Pending(pending.publish(), pending.attempt() + 1);
             try {
                 if (!incoming.offer(next, ENQUEUE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
-                    log.error("MQTT dispatch queue full on requeue, dead-lettering, topic={}",
+                    log.error(
+                            "MQTT dispatch queue full on requeue, dead-lettering, topic={}",
                             pending.publish().getTopic());
                     deadLetter(pending.publish());
                 }
@@ -503,11 +533,11 @@ public class MqttMqAdapter implements BrokerAdapter {
          */
         private Mono<Void> deadLetter(Mqtt5Publish publish) {
             return Mono.fromFuture(publishClient.publish(Mqtt5Publish.builder()
-                        .topic(deadLetterTopic(spec.topic()))
-                        .qos(MqttQos.AT_LEAST_ONCE)
-                        .payload(publish.getPayload().orElse(null))
-                        .userProperties(publish.getUserProperties())
-                        .build()))
+                            .topic(deadLetterTopic(spec.topic()))
+                            .qos(MqttQos.AT_LEAST_ONCE)
+                            .payload(publish.getPayload().orElse(null))
+                            .userProperties(publish.getUserProperties())
+                            .build()))
                     .then(Mono.fromRunnable(publish::acknowledge));
         }
     }

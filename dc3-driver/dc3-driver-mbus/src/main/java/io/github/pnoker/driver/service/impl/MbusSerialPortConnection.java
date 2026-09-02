@@ -18,12 +18,11 @@ package io.github.pnoker.driver.service.impl;
 
 import com.fazecast.jSerialComm.SerialPort;
 import io.github.pnoker.common.exception.ConnectorException;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * jSerialComm serial port connection for M-Bus meters.
@@ -45,7 +44,8 @@ public class MbusSerialPortConnection {
     private InputStream inputStream;
     private OutputStream outputStream;
 
-    public MbusSerialPortConnection(String portName, int baudRate, int dataBits, int stopBits, int parity, int timeout) {
+    public MbusSerialPortConnection(
+            String portName, int baudRate, int dataBits, int stopBits, int parity, int timeout) {
         this.portName = portName;
         this.baudRate = baudRate;
         this.dataBits = dataBits;
@@ -72,8 +72,13 @@ public class MbusSerialPortConnection {
         }
         inputStream = serialPort.getInputStream();
         outputStream = serialPort.getOutputStream();
-        log.info("Serial port opened, portName={}, baudRate={}, dataBits={}, stopBits={}, parity={}",
-                portName, baudRate, dataBits, stopBits, parity);
+        log.info(
+                "Serial port opened, portName={}, baudRate={}, dataBits={}, stopBits={}, parity={}",
+                portName,
+                baudRate,
+                dataBits,
+                stopBits,
+                parity);
     }
 
     /**

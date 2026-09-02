@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.dto;
 
 import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
-
 import java.time.Instant;
 
 /**
@@ -43,14 +41,13 @@ public record PointCommandDTO(
         Long sourceUserId,
         Instant occurredAt,
         Instant expireAt,
-        int schemaVersion
-) {
+        int schemaVersion) {
 
     /**
      * Create a read command DTO with default source and timing.
      */
-    public static PointCommandDTO ofRead(String commandId, Long tenantId, String ownerNode,
-                                         Long fencingToken, Long deviceId, Long pointId) {
+    public static PointCommandDTO ofRead(
+            String commandId, Long tenantId, String ownerNode, Long fencingToken, Long deviceId, Long pointId) {
         return new PointCommandDTO(
                 commandId,
                 tenantId,
@@ -62,15 +59,20 @@ public record PointCommandDTO(
                 null,
                 Instant.now(),
                 Instant.now().plusSeconds(10),
-                1
-        );
+                1);
     }
 
     /**
      * Create a write command DTO with default source and timing.
      */
-    public static PointCommandDTO ofWrite(String commandId, Long tenantId, String ownerNode,
-                                          Long fencingToken, Long deviceId, Long pointId, String value) {
+    public static PointCommandDTO ofWrite(
+            String commandId,
+            Long tenantId,
+            String ownerNode,
+            Long fencingToken,
+            Long deviceId,
+            Long pointId,
+            String value) {
         return new PointCommandDTO(
                 commandId,
                 tenantId,
@@ -82,7 +84,6 @@ public record PointCommandDTO(
                 null,
                 Instant.now(),
                 Instant.now().plusSeconds(10),
-                1
-        );
+                1);
     }
 }

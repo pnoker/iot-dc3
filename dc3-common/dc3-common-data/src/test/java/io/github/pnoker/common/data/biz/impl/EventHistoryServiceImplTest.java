@@ -14,14 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.repository.ReactiveEventHistoryStore;
 import io.github.pnoker.common.data.entity.bo.EventReportBO;
 import io.github.pnoker.common.data.entity.builder.EventHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
+import io.github.pnoker.common.data.repository.ReactiveEventHistoryStore;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
@@ -29,20 +33,14 @@ import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.EventFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,7 +65,8 @@ class EventHistoryServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new EventHistoryServiceImpl(deviceFacade, eventFacade, alarmRuleTriggerService, eventHistoryStore, eventHistoryBuilder);
+        service = new EventHistoryServiceImpl(
+                deviceFacade, eventFacade, alarmRuleTriggerService, eventHistoryStore, eventHistoryBuilder);
     }
 
     @Test
@@ -97,8 +96,10 @@ class EventHistoryServiceImplTest {
         report.setParamValues(Map.of("value", "90"));
 
         when(deviceFacade.getByIdReactive(tenantId, deviceId)).thenReturn(Mono.just(device));
-        when(eventFacade.list(any())).thenReturn(Mono.just(new io.github.pnoker.db.r2dbc.core.page.OffsetPage<>(List.of(), 0, 1, 0, false)));
-        when(eventFacade.list(any())).thenReturn(Mono.just(io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(List.of(event), 0, 1, 1)));
+        when(eventFacade.list(any()))
+                .thenReturn(Mono.just(new io.github.pnoker.db.r2dbc.core.page.OffsetPage<>(List.of(), 0, 1, 0, false)));
+        when(eventFacade.list(any()))
+                .thenReturn(Mono.just(io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(List.of(event), 0, 1, 1)));
         when(eventHistoryStore.insert(any(EventHistoryDO.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         String recordId = service.report(tenantId, report).block();
@@ -109,5 +110,4 @@ class EventHistoryServiceImplTest {
         assertThat(recordCaptor.getValue().getEventId()).isEqualTo(eventId);
         assertThat(recordCaptor.getValue().getEventCode()).isEqualTo("overheat");
     }
-
 }

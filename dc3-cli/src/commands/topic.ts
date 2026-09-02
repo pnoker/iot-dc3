@@ -3,9 +3,7 @@ import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
 export function registerTopicCommand(program: Command): void {
-  const topic = program
-    .command('topic')
-    .description('MQTT topic management (read-only)');
+  const topic = program.command('topic').description('MQTT topic management (read-only)');
 
   topic
     .command('list')
@@ -16,7 +14,8 @@ export function registerTopicCommand(program: Command): void {
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post('/api/v3/manager/topic/list', {
-        offset: Number(opts.offset), limit: Number(opts.limit),
+        offset: Number(opts.offset),
+        limit: Number(opts.limit),
       });
       printAndExit(result, format);
     });

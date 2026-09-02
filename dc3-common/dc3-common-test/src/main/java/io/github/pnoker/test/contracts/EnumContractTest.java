@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.test.contracts;
 
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 /**
  * Reusable contract for IoT DC3 domain enums.
@@ -78,16 +76,13 @@ public abstract class EnumContractTest<E extends Enum<E>> {
 
         List<Object> indices = new ArrayList<>();
         for (E constant : constants) {
+            tests.add(DynamicTest.dynamicTest("%s has non-null index".formatted(constant.name()), () -> {
+                Object value = index.invoke(constant);
+                assertThat(value).as("index of %s", constant.name()).isNotNull();
+                indices.add(value);
+            }));
             tests.add(DynamicTest.dynamicTest(
-                    "%s has non-null index".formatted(constant.name()),
-                    () -> {
-                        Object value = index.invoke(constant);
-                        assertThat(value).as("index of %s", constant.name()).isNotNull();
-                        indices.add(value);
-                    }));
-            tests.add(DynamicTest.dynamicTest(
-                    "%s round-trips through %s".formatted(constant.name(), factory.getName()),
-                    () -> {
+                    "%s round-trips through %s".formatted(constant.name(), factory.getName()), () -> {
                         Object value = index.invoke(constant);
                         Object resolved = factory.invoke(null, value);
                         assertThat(resolved).isEqualTo(constant);
@@ -101,9 +96,10 @@ public abstract class EnumContractTest<E extends Enum<E>> {
             assertThat(indices).doesNotHaveDuplicates();
         }));
 
-        tests.add(DynamicTest.dynamicTest("name stability", () ->
-                assertThatNoException().isThrownBy(() ->
-                        Arrays.stream(constants).forEach(Enum::name))));
+        tests.add(DynamicTest.dynamicTest(
+                "name stability",
+                () -> assertThatNoException()
+                        .isThrownBy(() -> Arrays.stream(constants).forEach(Enum::name))));
 
         return tests;
     }
@@ -113,8 +109,7 @@ public abstract class EnumContractTest<E extends Enum<E>> {
             return enumClass().getMethod(indexAccessor());
         } catch (NoSuchMethodException e) {
             throw new AssertionError(
-                    "Enum %s does not expose %s()".formatted(enumClass().getName(), indexAccessor()),
-                    e);
+                    "Enum %s does not expose %s()".formatted(enumClass().getName(), indexAccessor()), e);
         }
     }
 
@@ -123,8 +118,8 @@ public abstract class EnumContractTest<E extends Enum<E>> {
             return enumClass().getMethod(factoryMethod(), indexType);
         } catch (NoSuchMethodException e) {
             throw new AssertionError(
-                    "Enum %s does not expose %s(%s)".formatted(
-                            enumClass().getName(), factoryMethod(), indexType.getSimpleName()),
+                    "Enum %s does not expose %s(%s)"
+                            .formatted(enumClass().getName(), factoryMethod(), indexType.getSimpleName()),
                     e);
         }
     }

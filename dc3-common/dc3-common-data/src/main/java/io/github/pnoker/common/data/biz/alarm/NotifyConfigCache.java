@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import com.github.benmanes.caffeine.cache.Cache;
@@ -23,15 +22,14 @@ import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
-import io.github.pnoker.common.data.repository.ReactiveNotifyConfigStore;
 import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-
+import io.github.pnoker.common.data.repository.ReactiveNotifyConfigStore;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
  * Caches notify-policy / message-template / channel / channel-bind entities so
@@ -86,8 +84,9 @@ public class NotifyConfigCache {
      */
     public Mono<NotifyBO> getNotify(Long id, Long tenantId) {
         if (!isValidId(id) || !isValidId(tenantId)) return Mono.empty();
-        return notifyCache.get(new NotifyKey(id, tenantId), key ->
-                configStore.getNotify(key.tenantId(), key.id()).cache());
+        return notifyCache.get(
+                new NotifyKey(id, tenantId),
+                key -> configStore.getNotify(key.tenantId(), key.id()).cache());
     }
 
     /**
@@ -98,8 +97,9 @@ public class NotifyConfigCache {
      */
     public Mono<MessageBO> getMessage(Long id, Long tenantId) {
         if (!isValidId(id) || !isValidId(tenantId)) return Mono.empty();
-        return messageCache.get(new MessageKey(id, tenantId), key ->
-                configStore.getMessage(key.tenantId(), key.id()).cache());
+        return messageCache.get(
+                new MessageKey(id, tenantId),
+                key -> configStore.getMessage(key.tenantId(), key.id()).cache());
     }
 
     /**
@@ -110,10 +110,13 @@ public class NotifyConfigCache {
      */
     public Mono<NotifyChannelBO> getChannel(Long id, Long tenantId) {
         if (!isValidId(id) || !isValidId(tenantId)) return Mono.empty();
-        return channelCache.get(new ChannelKey(id, tenantId), key ->
-                configStore.getChannel(key.tenantId(), key.id()).filter(channel ->
-                        Objects.equals(channel.getTenantId(), key.tenantId())
-                                && channel.getChannelTypeFlag() != null).cache());
+        return channelCache.get(
+                new ChannelKey(id, tenantId),
+                key -> configStore
+                        .getChannel(key.tenantId(), key.id())
+                        .filter(channel -> Objects.equals(channel.getTenantId(), key.tenantId())
+                                && channel.getChannelTypeFlag() != null)
+                        .cache());
     }
 
     /**
@@ -121,10 +124,16 @@ public class NotifyConfigCache {
      * an unmodifiable list to keep accidental mutation from corrupting the cache.
      */
     public Mono<List<NotifyChannelBindBO>> findEnabledBinds(NotifyBO notify) {
-        if (notify == null || !isValidId(notify.getId()) || !isValidId(notify.getTenantId())) return Mono.just(List.of());
+        if (notify == null || !isValidId(notify.getId()) || !isValidId(notify.getTenantId()))
+            return Mono.just(List.of());
         NotifyBindKey key = new NotifyBindKey(notify.getTenantId(), notify.getId());
-        return bindCache.get(key, k -> configStore.listEnabledBinds(k.tenantId(), k.notifyId())
-                .collectList().map(List::copyOf).cache());
+        return bindCache.get(
+                key,
+                k -> configStore
+                        .listEnabledBinds(k.tenantId(), k.notifyId())
+                        .collectList()
+                        .map(List::copyOf)
+                        .cache());
     }
 
     /**
@@ -178,16 +187,11 @@ public class NotifyConfigCache {
     /**
      * Cache key of one notify rule's channel bindings: tenant + notify id.
      */
-    public record NotifyBindKey(Long tenantId, Long notifyId) {
-    }
+    public record NotifyBindKey(Long tenantId, Long notifyId) {}
 
-    public record NotifyKey(Long id, Long tenantId) {
-    }
+    public record NotifyKey(Long id, Long tenantId) {}
 
-    public record MessageKey(Long id, Long tenantId) {
-    }
+    public record MessageKey(Long id, Long tenantId) {}
 
-    public record ChannelKey(Long id, Long tenantId) {
-    }
-
+    public record ChannelKey(Long id, Long tenantId) {}
 }

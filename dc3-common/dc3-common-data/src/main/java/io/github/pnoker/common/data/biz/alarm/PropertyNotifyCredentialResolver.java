@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.property.NotifyCredentialProperties;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 
 /**
  * Resolves notification credentials from deployment properties.
@@ -44,7 +42,8 @@ public class PropertyNotifyCredentialResolver implements NotifyCredentialResolve
             return Optional.empty();
         }
 
-        NotifyCredentialProperties.Credential credential = properties.getCredentials().get(credentialRef);
+        NotifyCredentialProperties.Credential credential =
+                properties.getCredentials().get(credentialRef);
         if (Objects.isNull(credential)) {
             return Optional.empty();
         }
@@ -53,5 +52,4 @@ public class PropertyNotifyCredentialResolver implements NotifyCredentialResolve
                 credential.getSecret(),
                 Objects.requireNonNullElse(credential.getHeaders(), Map.of())));
     }
-
 }

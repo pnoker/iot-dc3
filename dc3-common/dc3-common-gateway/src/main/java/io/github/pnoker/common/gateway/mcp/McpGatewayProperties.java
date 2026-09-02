@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.gateway.mcp;
 
 import jakarta.validation.constraints.NotEmpty;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Gateway MCP endpoint and backend invocation configuration.
@@ -69,5 +67,4 @@ public class McpGatewayProperties {
         }
         return Strings.CS.removeEnd(baseUrl, "/");
     }
-
 }

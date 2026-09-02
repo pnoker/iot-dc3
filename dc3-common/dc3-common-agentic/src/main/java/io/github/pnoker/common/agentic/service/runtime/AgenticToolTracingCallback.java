@@ -19,6 +19,9 @@ package io.github.pnoker.common.agentic.service.runtime;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.model.ToolContext;
@@ -28,10 +31,6 @@ import org.springframework.ai.tool.metadata.ToolMetadata;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Adds structured runtime tracing around Spring AI tool callbacks.
@@ -52,8 +51,8 @@ public class AgenticToolTracingCallback implements ToolCallback {
         this(delegate, objectMapper, null);
     }
 
-    public AgenticToolTracingCallback(ToolCallback delegate, ObjectMapper objectMapper,
-                                      AgenticToolTraceMetadata traceMetadata) {
+    public AgenticToolTracingCallback(
+            ToolCallback delegate, ObjectMapper objectMapper, AgenticToolTraceMetadata traceMetadata) {
         this.delegate = Objects.requireNonNull(delegate, "delegate");
         this.objectMapper = Objects.requireNonNull(objectMapper, "objectMapper");
         this.traceMetadata = traceMetadata;
@@ -83,8 +82,10 @@ public class AgenticToolTracingCallback implements ToolCallback {
             recordResult(toolContext, toolName, result);
             return result;
         } catch (RuntimeException e) {
-            AgenticToolContextUtil.recordToolError(toolContext, toolName, StringUtils.defaultIfBlank(e.getMessage(),
-                    AgenticConstant.ToolResult.MESSAGE_EXECUTION_FAILED));
+            AgenticToolContextUtil.recordToolError(
+                    toolContext,
+                    toolName,
+                    StringUtils.defaultIfBlank(e.getMessage(), AgenticConstant.ToolResult.MESSAGE_EXECUTION_FAILED));
             throw e;
         }
     }
@@ -93,39 +94,39 @@ public class AgenticToolTracingCallback implements ToolCallback {
         AgenticToolTraceMetadata metadata = Objects.nonNull(traceMetadata)
                 ? traceMetadata
                 : new AgenticToolTraceMetadata(AgenticConstant.RunEvent.TYPE_TOOL, toolName);
-        AgenticToolContextUtil.recordToolInvocation(toolContext, toolName, metadata.domain(),
-                StringUtils.defaultIfBlank(metadata.title(), toolName));
+        AgenticToolContextUtil.recordToolInvocation(
+                toolContext, toolName, metadata.domain(), StringUtils.defaultIfBlank(metadata.title(), toolName));
     }
 
     private void recordResult(ToolContext toolContext, String toolName, String result) {
         ToolResultSummary summary = parseResult(result);
-        AgenticToolContextUtil.recordToolResult(toolContext, toolName, summary.success(), summary.code(),
-                summary.message());
+        AgenticToolContextUtil.recordToolResult(
+                toolContext, toolName, summary.success(), summary.code(), summary.message());
         AgenticToolContextUtil.recordVisualizations(toolContext, parseVisualizations(result));
     }
 
     private ToolResultSummary parseResult(String result) {
         if (StringUtils.isBlank(result)) {
-            return new ToolResultSummary(true, AgenticConstant.ToolResult.CODE_OK,
-                    AgenticConstant.ToolResult.MESSAGE_COMPLETED);
+            return new ToolResultSummary(
+                    true, AgenticConstant.ToolResult.CODE_OK, AgenticConstant.ToolResult.MESSAGE_COMPLETED);
         }
         try {
             JsonNode root = objectMapper.readTree(result);
             if (Objects.isNull(root) || !root.isObject() || !root.has("success")) {
-                return new ToolResultSummary(true, AgenticConstant.ToolResult.CODE_OK,
-                        AgenticConstant.ToolResult.MESSAGE_COMPLETED);
+                return new ToolResultSummary(
+                        true, AgenticConstant.ToolResult.CODE_OK, AgenticConstant.ToolResult.MESSAGE_COMPLETED);
             }
             boolean success = root.path("success").asBoolean(false);
-            String code = StringUtils.defaultIfBlank(root.path("code").asString(),
+            String code = StringUtils.defaultIfBlank(
+                    root.path("code").asString(),
                     success ? AgenticConstant.ToolResult.CODE_OK : AgenticConstant.ToolResult.CODE_ERROR);
-            String message = StringUtils.defaultIfBlank(root.path("message").asString(),
-                    AgenticConstant.ToolResult.MESSAGE_COMPLETED);
+            String message = StringUtils.defaultIfBlank(
+                    root.path("message").asString(), AgenticConstant.ToolResult.MESSAGE_COMPLETED);
             return new ToolResultSummary(success, code, message);
         } catch (JacksonException e) {
-            log.debug("Agentic tool result trace parse skipped, tool={}, resultLen={}", toolName(),
-                    result.length(), e);
-            return new ToolResultSummary(true, AgenticConstant.ToolResult.CODE_OK,
-                    AgenticConstant.ToolResult.MESSAGE_COMPLETED);
+            log.debug("Agentic tool result trace parse skipped, tool={}, resultLen={}", toolName(), result.length(), e);
+            return new ToolResultSummary(
+                    true, AgenticConstant.ToolResult.CODE_OK, AgenticConstant.ToolResult.MESSAGE_COMPLETED);
         }
     }
 
@@ -148,8 +149,8 @@ public class AgenticToolTracingCallback implements ToolCallback {
             }
             return List.copyOf(specs);
         } catch (JacksonException e) {
-            log.debug("Agentic tool visualization parse skipped, tool={}, resultLen={}", toolName(),
-                    result.length(), e);
+            log.debug(
+                    "Agentic tool visualization parse skipped, tool={}, resultLen={}", toolName(), result.length(), e);
             return List.of();
         }
     }
@@ -161,7 +162,5 @@ public class AgenticToolTracingCallback implements ToolCallback {
                 : AgenticConstant.RunEvent.TYPE_TOOL;
     }
 
-    private record ToolResultSummary(boolean success, String code, String message) {
-    }
-
+    private record ToolResultSummary(boolean success, String code, String message) {}
 }

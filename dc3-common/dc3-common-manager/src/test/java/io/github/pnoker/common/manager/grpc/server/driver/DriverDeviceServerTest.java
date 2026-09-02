@@ -2,9 +2,9 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,11 +16,16 @@
  */
 package io.github.pnoker.common.manager.grpc.server.driver;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.api.common.GrpcDeviceDTO;
+import io.github.pnoker.api.common.driver.GrpcDeviceAttachDTO;
 import io.github.pnoker.api.common.driver.GrpcDeviceQuery;
 import io.github.pnoker.api.common.driver.GrpcOffsetDeviceQuery;
 import io.github.pnoker.api.common.driver.GrpcOffsetPageDeviceDTO;
-import io.github.pnoker.api.common.driver.GrpcDeviceAttachDTO;
 import io.github.pnoker.common.enums.CallTypeEnum;
 import io.github.pnoker.common.enums.CommandTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -44,18 +49,12 @@ import io.github.pnoker.common.manager.service.ReactiveEventAttributeConfigServi
 import io.github.pnoker.common.manager.service.ReactiveEventService;
 import io.github.pnoker.common.manager.service.ReactivePointAttributeConfigService;
 import io.github.pnoker.common.manager.service.ReactivePointService;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.grpc.stub.StreamObserver;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 class DriverDeviceServerTest {
 
@@ -71,11 +70,21 @@ class DriverDeviceServerTest {
         ReactiveCommandService commandService = mock(ReactiveCommandService.class);
         ReactiveEventAttributeConfigService eventConfigService = mock(ReactiveEventAttributeConfigService.class);
         ReactiveEventService eventService = mock(ReactiveEventService.class);
-        DriverDeviceServer server = new DriverDeviceServer(deviceBuilder,
-                mock(GrpcDriverAttributeConfigBuilder.class), mock(GrpcPointAttributeConfigBuilder.class),
-                mock(GrpcCommandAttributeConfigBuilder.class), mock(GrpcEventAttributeConfigBuilder.class),
-                deviceService, driverService, pointService, driverConfigService, pointConfigService,
-                commandConfigService, commandService, eventConfigService, eventService);
+        DriverDeviceServer server = new DriverDeviceServer(
+                deviceBuilder,
+                mock(GrpcDriverAttributeConfigBuilder.class),
+                mock(GrpcPointAttributeConfigBuilder.class),
+                mock(GrpcCommandAttributeConfigBuilder.class),
+                mock(GrpcEventAttributeConfigBuilder.class),
+                deviceService,
+                driverService,
+                pointService,
+                driverConfigService,
+                pointConfigService,
+                commandConfigService,
+                commandService,
+                eventConfigService,
+                eventService);
         DriverBO driver = new DriverBO();
         driver.setId(2L);
         driver.setTenantId(1L);
@@ -84,8 +93,8 @@ class DriverDeviceServerTest {
         device.setDriverId(2L);
         device.setTenantId(1L);
         when(driverService.getById(1L, 2L)).thenReturn(Mono.just(driver));
-        when(deviceService.list(org.mockito.ArgumentMatchers.any())).thenReturn(
-                Mono.just(new OffsetPage<>(List.of(device), 0, 50, 1, false)));
+        when(deviceService.list(org.mockito.ArgumentMatchers.any()))
+                .thenReturn(Mono.just(new OffsetPage<>(List.of(device), 0, 50, 1, false)));
         when(pointService.listByDeviceId(1L, 10L)).thenReturn(Flux.empty());
         when(driverConfigService.listByDeviceId(1L, 10L)).thenReturn(Flux.empty());
         when(pointConfigService.listByDeviceId(1L, 10L)).thenReturn(Flux.empty());
@@ -96,8 +105,15 @@ class DriverDeviceServerTest {
         when(deviceBuilder.buildGrpcDTOByBO(device)).thenReturn(GrpcDeviceDTO.getDefaultInstance());
         CapturingObserver<GrpcOffsetPageDeviceDTO> observer = new CapturingObserver<>();
 
-        server.list(GrpcOffsetDeviceQuery.newBuilder().setTenantId(1L).setDriverId(2L)
-                .setPage(io.github.pnoker.api.common.PageRequest.newBuilder().setOffset(0).setLimit(50)).build(), observer);
+        server.list(
+                GrpcOffsetDeviceQuery.newBuilder()
+                        .setTenantId(1L)
+                        .setDriverId(2L)
+                        .setPage(io.github.pnoker.api.common.PageRequest.newBuilder()
+                                .setOffset(0)
+                                .setLimit(50))
+                        .build(),
+                observer);
 
         assertThat(observer.error).isNull();
         assertThat(observer.completed).isTrue();
@@ -118,11 +134,21 @@ class DriverDeviceServerTest {
         ReactiveCommandService commandService = mock(ReactiveCommandService.class);
         ReactiveEventAttributeConfigService eventConfigService = mock(ReactiveEventAttributeConfigService.class);
         ReactiveEventService eventService = mock(ReactiveEventService.class);
-        DriverDeviceServer server = new DriverDeviceServer(deviceBuilder,
-                mock(GrpcDriverAttributeConfigBuilder.class), mock(GrpcPointAttributeConfigBuilder.class),
-                mock(GrpcCommandAttributeConfigBuilder.class), mock(GrpcEventAttributeConfigBuilder.class),
-                deviceService, driverService, pointService, driverConfigService, pointConfigService,
-                commandConfigService, commandService, eventConfigService, eventService);
+        DriverDeviceServer server = new DriverDeviceServer(
+                deviceBuilder,
+                mock(GrpcDriverAttributeConfigBuilder.class),
+                mock(GrpcPointAttributeConfigBuilder.class),
+                mock(GrpcCommandAttributeConfigBuilder.class),
+                mock(GrpcEventAttributeConfigBuilder.class),
+                deviceService,
+                driverService,
+                pointService,
+                driverConfigService,
+                pointConfigService,
+                commandConfigService,
+                commandService,
+                eventConfigService,
+                eventService);
         DriverBO driver = new DriverBO();
         driver.setId(2L);
         DeviceBO device = new DeviceBO();
@@ -135,15 +161,21 @@ class DriverDeviceServerTest {
         when(driverConfigService.listByDeviceId(1L, 10L)).thenReturn(Flux.empty());
         when(pointConfigService.listByDeviceId(1L, 10L)).thenReturn(Flux.empty());
         when(commandConfigService.listByDeviceId(1L, 10L)).thenReturn(Flux.empty());
-        when(commandService.listByDeviceId(1L, 10L)).thenReturn(Flux.just(
-                command(30L, EnableFlagEnum.ENABLE), command(31L, EnableFlagEnum.DISABLE)));
+        when(commandService.listByDeviceId(1L, 10L))
+                .thenReturn(Flux.just(command(30L, EnableFlagEnum.ENABLE), command(31L, EnableFlagEnum.DISABLE)));
         when(eventConfigService.listByDeviceId(1L, 10L)).thenReturn(Flux.empty());
-        when(eventService.listByDeviceId(1L, 10L)).thenReturn(Flux.just(
-                event(20L, EnableFlagEnum.ENABLE), event(21L, EnableFlagEnum.DISABLE)));
+        when(eventService.listByDeviceId(1L, 10L))
+                .thenReturn(Flux.just(event(20L, EnableFlagEnum.ENABLE), event(21L, EnableFlagEnum.DISABLE)));
         when(deviceBuilder.buildGrpcDTOByBO(device)).thenReturn(GrpcDeviceDTO.getDefaultInstance());
         CapturingObserver<GrpcDeviceAttachDTO> observer = new CapturingObserver<>();
 
-        server.getById(GrpcDeviceQuery.newBuilder().setTenantId(1L).setDriverId(2L).setDeviceId(10L).build(), observer);
+        server.getById(
+                GrpcDeviceQuery.newBuilder()
+                        .setTenantId(1L)
+                        .setDriverId(2L)
+                        .setDeviceId(10L)
+                        .build(),
+                observer);
 
         assertThat(observer.error).isNull();
         assertThat(observer.completed).isTrue();

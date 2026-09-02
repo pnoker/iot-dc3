@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.manager.controller;
 
 import io.github.pnoker.common.base.BaseController;
@@ -30,13 +46,18 @@ public class DictionaryForManagerController implements BaseController {
     private final DictionaryForManagerService dictionaryService;
 
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "List Driver Options", description = "Page through tenant-scoped driver options.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Driver Options",
+            description = "Page through tenant-scoped driver options.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/list_driver")
     public Mono<OffsetPage<DictionaryOption>> listDriverOptions(
             @RequestBody(required = false) DictionaryListRequest request) {
@@ -45,13 +66,18 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "List Profile Options", description = "Page through tenant-scoped profile options.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Profile Options",
+            description = "Page through tenant-scoped profile options.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/list_profile")
     public Mono<OffsetPage<DictionaryOption>> listProfileOptions(
             @RequestBody(required = false) DictionaryListRequest request) {
@@ -60,13 +86,18 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "List Profile Point Options", description = "Page through point options under a tenant-owned profile.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Profile Point Options",
+            description = "Page through point options under a tenant-owned profile.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/list_profile_point")
     public Mono<OffsetPage<DictionaryOption>> listProfilePointOptions(
             @RequestBody(required = false) DictionaryListRequest request) {
@@ -75,13 +106,18 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "List Device Point Options", description = "Page through point options under a tenant-owned device.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Device Point Options",
+            description = "Page through point options under a tenant-owned device.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/list_device_point")
     public Mono<OffsetPage<DictionaryOption>> listDevicePointOptions(
             @RequestBody(required = false) DictionaryListRequest request) {
@@ -90,13 +126,18 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "List Device Options", description = "Page through tenant-scoped device options.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Device Options",
+            description = "Page through tenant-scoped device options.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/list_device")
     public Mono<OffsetPage<DictionaryOption>> listDeviceOptions(
             @RequestBody(required = false) DictionaryListRequest request) {
@@ -105,18 +146,22 @@ public class DictionaryForManagerController implements BaseController {
     }
 
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
-    @Operation(summary = "List Driver Device Options", description = "Page through device options managed by a tenant-owned driver.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Driver Device Options",
+            description = "Page through device options managed by a tenant-owned driver.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/list_driver_device")
     public Mono<OffsetPage<DictionaryOption>> listDriverDeviceOptions(
             @RequestBody(required = false) DictionaryListRequest request) {
         DictionaryListRequest query = request == null ? new DictionaryListRequest() : request;
         return getTenantId().flatMap(tenantId -> dictionaryService.listDriverDeviceOptions(tenantId, query));
     }
-
 }

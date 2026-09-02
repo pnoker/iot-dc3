@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -52,7 +51,9 @@ public class ApiVO extends BaseVO {
     /**
      * Owning service name, populated by resource registrar
      */
-    @Schema(description = "Microservice name that owns this API endpoint (e.g. dc3-center-auth).", example = "dc3-center-auth")
+    @Schema(
+            description = "Microservice name that owns this API endpoint (e.g. dc3-center-auth).",
+            example = "dc3-center-auth")
     private String serviceName;
 
     /**
@@ -64,21 +65,33 @@ public class ApiVO extends BaseVO {
     /**
      * ApiName
      */
-    @NotBlank(message = "API name can't be empty", groups = {Add.class, Auth.class})
-    @Schema(description = "API endpoint display name. Unique name within a tenant.", example = "Get User by ID", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid API name", groups = {Add.class, Update.class})
+    @NotBlank(
+            message = "API name can't be empty",
+            groups = {Add.class, Auth.class})
+    @Schema(
+            description = "API endpoint display name. Unique name within a tenant.",
+            example = "Get User by ID",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
+            message = "Invalid API name",
+            groups = {Add.class, Update.class})
     private String apiName;
 
     /**
      * ApiCode, URLMD5
      */
-    @Schema(description = "API code. Stable business identifier used for permission matching.", example = "user_get_by_id")
+    @Schema(
+            description = "API code. Stable business identifier used for permission matching.",
+            example = "user_get_by_id")
     private String apiCode;
 
     /**
      * API grouping, usually the owning controller simple class name
      */
-    @Schema(description = "API group label for organizing endpoints into logical categories in the UI.", example = "User Management")
+    @Schema(
+            description = "API group label for organizing endpoints into logical categories in the UI.",
+            example = "User Management")
     private String apiGroup;
 
     /**
@@ -92,5 +105,4 @@ public class ApiVO extends BaseVO {
      */
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

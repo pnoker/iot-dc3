@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,15 +39,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 /**
  * REST controller exposing agentic action management endpoints.
  *
  * @author pnoker
  * @since 2016.10.1
  */
-@Tag(name = "action", description = "Agent action definitions: manage AI agent tool definitions including parameter schemas, execution handlers, and result formats for agentic workflow orchestration")
+@Tag(
+        name = "action",
+        description =
+                "Agent action definitions: manage AI agent tool definitions including parameter schemas, execution handlers, and result formats for agentic workflow orchestration")
 @RestController
 @RequestMapping(AgenticConstant.ACTION_URL_PREFIX)
 @RequiredArgsConstructor
@@ -63,23 +65,39 @@ public class ActionController implements BaseController {
      * @return an offset page of pending ActionVO entries with tool name and parameters
      */
     @PreAuthorize("@perm.can('action', 'get')")
-    @Operation(summary = "List Pending Agent Actions", description = "List agent tool calls awaiting human approval in the given conversation, scoped to the current tenant and user. " +
-            "Returns each pending action with its tool name and parameters so the user can confirm or reject before execution.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Pending Agent Actions",
+            description =
+                    "List agent tool calls awaiting human approval in the given conversation, scoped to the current tenant and user. "
+                            + "Returns each pending action with its tool name and parameters so the user can confirm or reject before execution.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @GetMapping("/pending")
-    public Mono<OffsetPage<ActionVO>> pending(@Parameter(description = "Unique identifier of the agentic conversation whose pending tool calls are to be listed; scoped to the current tenant and user.", example = "conv-20240618-abc123") @NotBlank @RequestParam(value = "conversation_id") String conversationId,
-                                              @Parameter(description = "Zero-based offset into the pending action collection.", example = "0")
-                                              @RequestParam(value = "offset", defaultValue = "0") long offset,
-                                              @Parameter(description = "Maximum number of pending actions to return (1-200).", example = "50")
-                                              @RequestParam(value = "limit", defaultValue = "50") int limit) {
+    public Mono<OffsetPage<ActionVO>> pending(
+            @Parameter(
+                            description =
+                                    "Unique identifier of the agentic conversation whose pending tool calls are to be listed; scoped to the current tenant and user.",
+                            example = "conv-20240618-abc123")
+                    @NotBlank
+                    @RequestParam(value = "conversation_id")
+                    String conversationId,
+            @Parameter(description = "Zero-based offset into the pending action collection.", example = "0")
+                    @RequestParam(value = "offset", defaultValue = "0")
+                    long offset,
+            @Parameter(description = "Maximum number of pending actions to return (1-200).", example = "50")
+                    @RequestParam(value = "limit", defaultValue = "50")
+                    int limit) {
         return getPrincipalHeader().flatMap(header -> {
             PageRequest pageRequest = new PageRequest(offset, limit);
-            return actionService.listPending(pageRequest.offset(), pageRequest.limit(), conversationId, header)
+            return actionService
+                    .listPending(pageRequest.offset(), pageRequest.limit(), conversationId, header)
                     .map(page -> {
                         List<ActionVO> items = actionBuilder.buildVOListByBOList(page.items());
                         return OffsetPage.of(items, page.offset(), page.limit(), page.total());
@@ -94,18 +112,31 @@ public class ActionController implements BaseController {
      * @return the ActionVO with its updated execution status
      */
     @PreAuthorize("@perm.can('action', 'list')")
-    @Operation(summary = "Confirm Agent Action", description = "Approve a pending agent tool call by id so the assistant may execute it. " +
-            "Returns the action with its updated execution status; call after the user accepts a proposed tool invocation.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Confirm Agent Action",
+            description =
+                    "Approve a pending agent tool call by id so the assistant may execute it. "
+                            + "Returns the action with its updated execution status; call after the user accepts a proposed tool invocation.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/confirm")
-    public Mono<ActionVO> confirm(@Parameter(description = "Unique identifier of the pending agent tool call to approve; the action must belong to the current tenant and be in pending state.", example = "action-20240618-xyz789") @NotBlank @RequestParam(value = "action_id") String actionId) {
-        return getPrincipalHeader().flatMap(header -> actionService.confirm(actionId, header)
-                .map(actionBuilder::buildVOByBO));
+    public Mono<ActionVO> confirm(
+            @Parameter(
+                            description =
+                                    "Unique identifier of the pending agent tool call to approve; the action must belong to the current tenant and be in pending state.",
+                            example = "action-20240618-xyz789")
+                    @NotBlank
+                    @RequestParam(value = "action_id")
+                    String actionId) {
+        return getPrincipalHeader()
+                .flatMap(header -> actionService.confirm(actionId, header).map(actionBuilder::buildVOByBO));
     }
 
     /**
@@ -115,18 +146,30 @@ public class ActionController implements BaseController {
      * @return the ActionVO with its updated rejected status
      */
     @PreAuthorize("@perm.can('action', 'list')")
-    @Operation(summary = "Reject Agent Action", description = "Decline a pending agent tool call by id so the assistant does not execute it. " +
-            "Returns the action with its updated rejected status; call when the user denies a proposed tool invocation.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Reject Agent Action",
+            description =
+                    "Decline a pending agent tool call by id so the assistant does not execute it. "
+                            + "Returns the action with its updated rejected status; call when the user denies a proposed tool invocation.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/reject")
-    public Mono<ActionVO> reject(@Parameter(description = "Unique identifier of the pending agent tool call to decline; the action must belong to the current tenant and be in pending state.", example = "action-20240618-xyz789") @NotBlank @RequestParam(value = "action_id") String actionId) {
-        return getPrincipalHeader().flatMap(header -> actionService.reject(actionId, header)
-                .map(actionBuilder::buildVOByBO));
+    public Mono<ActionVO> reject(
+            @Parameter(
+                            description =
+                                    "Unique identifier of the pending agent tool call to decline; the action must belong to the current tenant and be in pending state.",
+                            example = "action-20240618-xyz789")
+                    @NotBlank
+                    @RequestParam(value = "action_id")
+                    String actionId) {
+        return getPrincipalHeader()
+                .flatMap(header -> actionService.reject(actionId, header).map(actionBuilder::buildVOByBO));
     }
-
 }

@@ -14,14 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.repository;
 
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /** Reactive, tenant-scoped persistence port for entity alarms. */
 public interface ReactiveEntityAlarmStore {
@@ -37,5 +34,4 @@ public interface ReactiveEntityAlarmStore {
 
     /** Updates confirmation state only within the supplied tenant. */
     Mono<Boolean> updateConfirm(Long tenantId, Long alarmId, byte confirmFlag);
-
 }

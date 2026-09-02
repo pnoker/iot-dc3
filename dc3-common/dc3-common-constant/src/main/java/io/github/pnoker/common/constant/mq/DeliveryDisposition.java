@@ -14,13 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.mq;
 
 /** Terminal broker action selected by a completed business listener pipeline. */
 public enum DeliveryDisposition {
-
+    /** Acknowledge and remove the message from the broker queue. */
     ACK,
+
+    /** Reject and return the message to the broker queue for another attempt. */
     REQUEUE,
+
+    /** Reject without requeueing so broker dead-letter policy can handle the message. */
     DEAD_LETTER
 }

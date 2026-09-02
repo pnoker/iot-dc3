@@ -31,5 +31,4 @@ public record AgenticToolTraceMetadata(String domain, String title) {
         domain = StringUtils.defaultIfBlank(domain, AgenticConstant.RunEvent.TYPE_TOOL);
         title = StringUtils.defaultString(title);
     }
-
 }

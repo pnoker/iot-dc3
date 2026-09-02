@@ -14,13 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.tck;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.config.BatchConsumerProperties;
 import io.github.pnoker.common.mq.rabbit.RabbitMqAdapter;
+import java.time.Duration;
+import java.util.Objects;
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,9 +32,6 @@ import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-
-import java.time.Duration;
-import java.util.Objects;
 
 /**
  * RabbitMQ harness for the broker-neutral contract suite: disposable container,
@@ -96,11 +94,12 @@ class RabbitMqContractIT extends AbstractMqContractTest {
     @Override
     public void perInstanceSubscriptionExpiresAfterInstanceStops() {
         adapter();
-        Assertions.assertTrue(rabbitAdapter.capabilities().subscriptionExpiry(),
-                "rabbitmq declares subscriptionExpiry=true");
+        Assertions.assertTrue(
+                rabbitAdapter.capabilities().subscriptionExpiry(), "rabbitmq declares subscriptionExpiry=true");
 
         String group = "tck-ttl";
-        subscribeCollector(loadBalancePattern(MqTopic.POINT_COMMAND, group, "tck.*", Duration.ofMillis(600)),
+        subscribeCollector(
+                loadBalancePattern(MqTopic.POINT_COMMAND, group, "tck.*", Duration.ofMillis(600)),
                 delivery -> io.github.pnoker.common.constant.mq.DeliveryDisposition.ACK);
         shutdownAdapter();
 

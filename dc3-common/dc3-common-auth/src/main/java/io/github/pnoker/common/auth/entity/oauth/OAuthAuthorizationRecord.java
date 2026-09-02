@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.oauth;
 
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
 
 /**
  * OAuth authorization projection for authorization code, access token, refresh
@@ -83,5 +81,4 @@ public class OAuthAuthorizationRecord {
     private LocalDateTime revokedTime;
 
     private String revokeReason;
-
 }

@@ -34,5 +34,4 @@ public @interface AgenticToolMetadata {
     String domain();
 
     String title();
-
 }

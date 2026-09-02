@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * View object for topic API responses.
@@ -46,13 +44,19 @@ public class TopicVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "MQTT-style topic name used for message routing.", example = "/device/temperature_sensor_01/point/temperature")
+    @Schema(
+            description = "MQTT-style topic name used for message routing.",
+            example = "/device/temperature_sensor_01/point/temperature")
     private String topic;
 
-    @Schema(description = "Display name of the device this topic routes messages for; scoped to the current tenant.", example = "Temperature Sensor 01")
+    @Schema(
+            description = "Display name of the device this topic routes messages for; scoped to the current tenant.",
+            example = "Temperature Sensor 01")
     private String deviceName;
 
-    @Schema(description = "Display name of the data point this topic routes messages for; scoped to the parent device's tenant.", example = "Temperature")
+    @Schema(
+            description =
+                    "Display name of the data point this topic routes messages for; scoped to the parent device's tenant.",
+            example = "Temperature")
     private String pointName;
-
 }

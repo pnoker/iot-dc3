@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * One streamed frame emitted by the model runtime.
@@ -49,5 +48,4 @@ public record AgenticRuntimeStreamFrame(AgenticStreamDelta delta, String finishR
     public boolean hasFinishReason() {
         return StringUtils.isNotBlank(finishReason);
     }
-
 }

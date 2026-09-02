@@ -14,17 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.gateway.filter;
 
 import io.github.pnoker.common.constant.common.RequestConstant;
-import io.netty.channel.ConnectTimeoutException;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.gateway.security.OAuthTokenResolver;
 import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.HmacAuthSigner;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.netty.channel.ConnectTimeoutException;
+import java.net.ConnectException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -34,14 +34,12 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.http.ProblemDetail;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-
-import java.net.ConnectException;
 
 /**
  * Gateway filter that validates authentication headers.
@@ -71,26 +69,39 @@ public class AuthenticGatewayFilter implements GatewayFilter {
         return resolvePrincipalHeader(request)
                 .flatMap(userHeader -> {
                     String principalJson = JsonUtil.toJsonString(userHeader);
-                    ServerHttpRequest mutated = request.mutate().headers(headers -> {
-                        headers.set(RequestConstant.Header.X_AUTH_PRINCIPAL, principalJson);
-                        if (hmacAuthSigner.isEnabled()) {
-                            headers.set(RequestConstant.Header.X_AUTH_SIGN, hmacAuthSigner.sign(principalJson));
-                        } else {
-                            // Strip any inbound sign header so a downstream service can't be
-                            // tricked into trusting a client-supplied one.
-                            headers.remove(RequestConstant.Header.X_AUTH_SIGN);
-                        }
-                    }).build();
+                    ServerHttpRequest mutated = request.mutate()
+                            .headers(headers -> {
+                                headers.set(RequestConstant.Header.X_AUTH_PRINCIPAL, principalJson);
+                                if (hmacAuthSigner.isEnabled()) {
+                                    headers.set(RequestConstant.Header.X_AUTH_SIGN, hmacAuthSigner.sign(principalJson));
+                                } else {
+                                    // Strip any inbound sign header so a downstream service can't be
+                                    // tricked into trusting a client-supplied one.
+                                    headers.remove(RequestConstant.Header.X_AUTH_SIGN);
+                                }
+                            })
+                            .build();
                     return chain.filter(exchange.mutate().request(mutated).build());
-                }).onErrorResume(UnAuthorizedException.class, e -> {
-                    log.warn("Gateway request unauthorized, path={}", request.getURI().getRawPath(), e);
+                })
+                .onErrorResume(UnAuthorizedException.class, e -> {
+                    log.warn(
+                            "Gateway request unauthorized, path={}",
+                            request.getURI().getRawPath(),
+                            e);
                     return writeErrorResponse(exchange, HttpStatus.UNAUTHORIZED, e.getMessage());
-                }).onErrorResume(AuthenticGatewayFilter::isDownstreamUnreachable, e -> {
-                    log.error("Gateway route unreachable, path={}", request.getURI().getRawPath(), e);
+                })
+                .onErrorResume(AuthenticGatewayFilter::isDownstreamUnreachable, e -> {
+                    log.error(
+                            "Gateway route unreachable, path={}",
+                            request.getURI().getRawPath(),
+                            e);
                     return writeErrorResponse(exchange, HttpStatus.SERVICE_UNAVAILABLE, "Service Unavailable");
-                }).onErrorResume(e -> {
-                    log.error("Gateway authentication failed unexpectedly, path={}",
-                            request.getURI().getRawPath(), e);
+                })
+                .onErrorResume(e -> {
+                    log.error(
+                            "Gateway authentication failed unexpectedly, path={}",
+                            request.getURI().getRawPath(),
+                            e);
                     return writeErrorResponse(exchange, HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error");
                 });
     }
@@ -128,12 +139,16 @@ public class AuthenticGatewayFilter implements GatewayFilter {
         String authorization = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         OAuthTokenResolver resolver = oauthTokenResolver.getIfAvailable();
         if (resolver != null && OAuthTokenResolver.isBearer(authorization)) {
-            return Mono.defer(() -> Mono.just(resolver.resolve(
-                    authorization.substring(OAuthTokenResolver.BEARER_PREFIX.length()).trim())));
+            return Mono.defer(() -> Mono.just(resolver.resolve(authorization
+                    .substring(OAuthTokenResolver.BEARER_PREFIX.length())
+                    .trim())));
         }
-        return filterService.getTenantReactive(request)
-                .flatMap(tenant -> filterService.getLocalCredentialReactive(request, tenant.getId())
-                        .flatMap(credential -> filterService.checkValidReactive(request, tenant, credential)
+        return filterService
+                .getTenantReactive(request)
+                .flatMap(tenant -> filterService
+                        .getLocalCredentialReactive(request, tenant.getId())
+                        .flatMap(credential -> filterService
+                                .checkValidReactive(request, tenant, credential)
                                 .then(Mono.defer(() -> filterService.getUserReactive(credential, tenant)))));
     }
 
@@ -153,5 +168,4 @@ public class AuthenticGatewayFilter implements GatewayFilter {
         DataBuffer dataBuffer = response.bufferFactory().wrap(JsonUtil.toJsonBytes(problem));
         return response.writeWith(Mono.just(dataBuffer));
     }
-
 }

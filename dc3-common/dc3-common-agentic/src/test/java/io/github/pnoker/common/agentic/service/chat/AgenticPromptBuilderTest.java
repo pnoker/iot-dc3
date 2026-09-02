@@ -16,8 +16,18 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,17 +36,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.tool.ToolCallbackProvider;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * Verifies the boundary between prepared agentic requests and Spring AI prompt wiring.
@@ -113,9 +112,20 @@ class AgenticPromptBuilderTest {
     }
 
     private AgenticPreparedChatBO prepared(boolean toolCallingEnabled) {
-        return new AgenticPreparedChatBO("show me device status", "conversation",
-                null, "dc3-test-model", Map.of(), null, null, new AgenticRunTrace(), toolCallingEnabled,
-                false, List.of(), List.of(), AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
+        return new AgenticPreparedChatBO(
+                "show me device status",
+                "conversation",
+                null,
+                "dc3-test-model",
+                Map.of(),
+                null,
+                null,
+                new AgenticRunTrace(),
+                toolCallingEnabled,
+                false,
+                List.of(),
+                List.of(),
+                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0),
+                List.of());
     }
-
 }

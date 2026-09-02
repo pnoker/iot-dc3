@@ -28,6 +28,11 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -35,12 +40,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Custom driver service implementation for the Apache Kafka streaming data source driver.
@@ -62,16 +61,19 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
     private final DriverSenderService driverSenderService;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final Map<String, String> latestByKey = new ConcurrentHashMap<>();
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -96,7 +98,8 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
      *
      * @param record inbound consumer record
      */
-    @KafkaListener(topics = "${dc3.driver.kafka.topic:dc3-driver-kafka}",
+    @KafkaListener(
+            topics = "${dc3.driver.kafka.topic:dc3-driver-kafka}",
             groupId = "${dc3.driver.kafka.group-id:dc3-driver-kafka-group}")
     public void onMessage(ConsumerRecord<String, String> record) {
         String cacheKey = Objects.isNull(record.key()) || record.key().isEmpty() ? record.topic() : record.key();
@@ -105,8 +108,11 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         String cacheKey = resolveCacheKey(driverConfig, pointConfig);
         String value = latestByKey.get(cacheKey);
         if (Objects.isNull(value)) {
@@ -116,10 +122,15 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         try {
-            String topic = getConfigValue(pointConfig, "topic", getConfigValue(driverConfig, "topic", "dc3-driver-kafka"));
+            String topic =
+                    getConfigValue(pointConfig, "topic", getConfigValue(driverConfig, "topic", "dc3-driver-kafka"));
             String key = getConfigValue(pointConfig, "key", "");
             String value = writePointValue.getValue(String.class);
             if (key.isEmpty()) {
@@ -143,7 +154,9 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
 
     private String getRequiredConfig(Map<String, AttributeBO> config, String code) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             throw new ConnectorException("Required attribute '{}' is missing", code);
         }
         return attr.getValue(String.class);
@@ -151,7 +164,9 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -162,7 +177,8 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -170,7 +186,7 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

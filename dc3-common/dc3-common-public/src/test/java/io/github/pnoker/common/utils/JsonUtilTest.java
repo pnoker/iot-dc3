@@ -14,22 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
-import io.github.pnoker.common.exception.JsonException;
-import org.junit.jupiter.api.Test;
-import tools.jackson.core.type.TypeReference;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.github.pnoker.common.exception.JsonException;
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Test;
+import tools.jackson.core.type.TypeReference;
 
 class JsonUtilTest {
 
@@ -49,8 +47,7 @@ class JsonUtilTest {
     @Test
     void parseObjectFromInputStream() {
         Sample sample = JsonUtil.parseObject(
-                new ByteArrayInputStream("{\"name\":\"c\",\"age\":3}".getBytes(StandardCharsets.UTF_8)),
-                Sample.class);
+                new ByteArrayInputStream("{\"name\":\"c\",\"age\":3}".getBytes(StandardCharsets.UTF_8)), Sample.class);
         assertThat(sample).isEqualTo(new Sample("c", 3));
     }
 
@@ -74,8 +71,8 @@ class JsonUtilTest {
 
     @Test
     void parseArrayFromString() {
-        List<Sample> samples = JsonUtil.parseArray("[{\"name\":\"a\",\"age\":1},{\"name\":\"b\",\"age\":2}]",
-                Sample.class);
+        List<Sample> samples =
+                JsonUtil.parseArray("[{\"name\":\"a\",\"age\":1},{\"name\":\"b\",\"age\":2}]", Sample.class);
         assertThat(samples).containsExactly(new Sample("a", 1), new Sample("b", 2));
     }
 
@@ -88,10 +85,8 @@ class JsonUtilTest {
 
     @Test
     void parseObjectWithTypeReferenceForGenericMap() {
-        Map<String, Integer> map = JsonUtil.parseObject(
-                "{\"a\":1,\"b\":2}",
-                new TypeReference<Map<String, Integer>>() {
-                });
+        Map<String, Integer> map =
+                JsonUtil.parseObject("{\"a\":1,\"b\":2}", new TypeReference<Map<String, Integer>>() {});
         assertThat(map).containsExactlyInAnyOrderEntriesOf(Map.of("a", 1, "b", 2));
     }
 
@@ -133,6 +128,5 @@ class JsonUtilTest {
                 .hasCauseInstanceOf(IllegalStateException.class);
     }
 
-    record Sample(String name, int age) {
-    }
+    record Sample(String name, int age) {}
 }

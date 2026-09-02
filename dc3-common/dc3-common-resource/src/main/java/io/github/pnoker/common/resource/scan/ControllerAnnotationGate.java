@@ -14,9 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.resource.scan;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,11 +30,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Build-time gate: classpath-scans {@code @RestController} classes under a base package and runs
  * {@link ApiAnnotationValidator} on every handler method. Returns the aggregated defect list so a
@@ -41,9 +39,10 @@ import java.util.List;
 public class ControllerAnnotationGate {
 
     @SuppressWarnings("unchecked")
-    private static final Class<? extends Annotation>[] MAPPING_ANNOTATIONS = new Class[]{
-            RequestMapping.class, GetMapping.class, PostMapping.class,
-            PutMapping.class, DeleteMapping.class, PatchMapping.class};
+    private static final Class<? extends Annotation>[] MAPPING_ANNOTATIONS = new Class[] {
+        RequestMapping.class, GetMapping.class, PostMapping.class,
+        PutMapping.class, DeleteMapping.class, PatchMapping.class
+    };
 
     private final ApiAnnotationValidator validator = new ApiAnnotationValidator();
 
@@ -65,8 +64,7 @@ public class ControllerAnnotationGate {
      */
     public List<String> validatePackage(String basePackage) {
         List<String> defects = new ArrayList<>();
-        ClassPathScanningCandidateComponentProvider scanner =
-                new ClassPathScanningCandidateComponentProvider(false);
+        ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AnnotationTypeFilter(RestController.class));
         scanner.findCandidateComponents(basePackage).forEach(bean -> {
             Class<?> controller;

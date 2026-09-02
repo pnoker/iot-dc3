@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 /**
  * JSON extension object for notification channel binding metadata.
@@ -57,21 +55,26 @@ public class NotifyChannelBindExt extends BaseExt {
         /**
          * Message levels allowed for this channel binding, for example P0/P1.
          */
-        @Schema(description = "Message severity levels routed to this channel binding, e.g. P0/P1; empty means all levels")
+        @Schema(
+                description =
+                        "Message severity levels routed to this channel binding, e.g. P0/P1; empty means all levels")
         private List<String> levels;
 
         /**
          * Whether recovery notifications should be sent through this binding.
          */
-        @Schema(description = "Whether recovery notifications are sent through this binding when an alarm clears", example = "true")
+        @Schema(
+                description = "Whether recovery notifications are sent through this binding when an alarm clears",
+                example = "true")
         private Boolean sendRecovery;
 
         /**
          * Optional per-binding rate limit override.
          */
-        @Schema(description = "Optional per-binding rate limit override in milliseconds; null falls back to the channel default", example = "60000")
+        @Schema(
+                description =
+                        "Optional per-binding rate limit override in milliseconds; null falls back to the channel default",
+                example = "60000")
         private Long rateLimitOverrideMs;
-
     }
-
 }

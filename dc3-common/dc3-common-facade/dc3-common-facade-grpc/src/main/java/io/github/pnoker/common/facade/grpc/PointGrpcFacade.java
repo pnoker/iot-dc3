@@ -14,31 +14,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc;
 
-import io.github.pnoker.api.center.manager.GrpcOffsetPointQuery;
 import io.github.pnoker.api.center.manager.GrpcOffsetPagePointDTO;
+import io.github.pnoker.api.center.manager.GrpcOffsetPointQuery;
 import io.github.pnoker.api.center.manager.GrpcPointIdsQuery;
-import io.github.pnoker.api.center.manager.GrpcPointQuery;
 import io.github.pnoker.api.center.manager.GrpcPointListDTO;
+import io.github.pnoker.api.center.manager.GrpcPointQuery;
 import io.github.pnoker.api.center.manager.PointApiGrpc;
 import io.github.pnoker.api.common.GrpcPointDTO;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.query.FacadePointOffsetQuery;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcPointBuilder;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * gRPC PointFacade: forwards to Manager Center. Canonical reactive methods use the
@@ -51,7 +47,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PointGrpcFacade implements PointFacade {
 
-
     private final PointApiGrpc.PointApiStub pointApiStub;
 
     private final FacadeGrpcPointBuilder facadeGrpcPointBuilder;
@@ -63,7 +58,8 @@ public class PointGrpcFacade implements PointFacade {
         if (tenantId == null || id == null) {
             return Mono.empty();
         }
-        GrpcPointQuery request = GrpcPointQuery.newBuilder().setPointId(id).setTenantId(tenantId).build();
+        GrpcPointQuery request =
+                GrpcPointQuery.newBuilder().setPointId(id).setTenantId(tenantId).build();
         PointApiGrpc.PointApiStub stub = grpcFacadeSupport.withDeadline(pointApiStub);
         return ReactiveGrpcClientSupport.<GrpcPointQuery, GrpcPointDTO>unary(
                         "PointFacade.getById", observer -> stub.getById(request, observer))
@@ -79,11 +75,15 @@ public class PointGrpcFacade implements PointFacade {
         if (pointIds.isEmpty()) {
             return Flux.empty();
         }
-        GrpcPointIdsQuery request = GrpcPointIdsQuery.newBuilder().addAllPointIds(pointIds).setTenantId(tenantId).build();
+        GrpcPointIdsQuery request = GrpcPointIdsQuery.newBuilder()
+                .addAllPointIds(pointIds)
+                .setTenantId(tenantId)
+                .build();
         PointApiGrpc.PointApiStub stub = grpcFacadeSupport.withDeadline(pointApiStub);
         return ReactiveGrpcClientSupport.<GrpcPointIdsQuery, GrpcPointListDTO>unary(
                         "PointFacade.listByIds", observer -> stub.listByIds(request, observer))
-                .flatMapMany(response -> Flux.fromIterable(response.getItemsList()).map(facadeGrpcPointBuilder::toFacadeBO));
+                .flatMapMany(
+                        response -> Flux.fromIterable(response.getItemsList()).map(facadeGrpcPointBuilder::toFacadeBO));
     }
 
     @Override
@@ -96,9 +96,9 @@ public class PointGrpcFacade implements PointFacade {
                     if (!response.hasPage()) throw new IllegalStateException("PointFacade.list returned no page");
                     var page = response.getPage();
                     List<FacadePointBO> items = response.getItemsList().stream()
-                            .map(facadeGrpcPointBuilder::toFacadeBO).toList();
+                            .map(facadeGrpcPointBuilder::toFacadeBO)
+                            .toList();
                     return OffsetPage.of(items, page.getOffset(), page.getLimit(), page.getTotal());
                 });
     }
-
 }

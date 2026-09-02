@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.test.containers;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -32,11 +31,11 @@ import org.testcontainers.utility.TestcontainersConfiguration;
  */
 public final class PgTimescaleContainer {
 
-    private static final DockerImageName IMAGE = DockerImageName
-            .parse("timescale/timescaledb-ha:pg18")
-            .asCompatibleSubstituteFor("postgres");
+    private static final DockerImageName IMAGE =
+            DockerImageName.parse("timescale/timescaledb-ha:pg18").asCompatibleSubstituteFor("postgres");
 
-    private static final boolean REUSE_ENABLED = TestcontainersConfiguration.getInstance().environmentSupportsReuse();
+    private static final boolean REUSE_ENABLED =
+            TestcontainersConfiguration.getInstance().environmentSupportsReuse();
 
     @SuppressWarnings("resource")
     private static final PostgreSQLContainer<?> INSTANCE = new PostgreSQLContainer<>(IMAGE)
@@ -49,8 +48,7 @@ public final class PgTimescaleContainer {
         INSTANCE.start();
     }
 
-    private PgTimescaleContainer() {
-    }
+    private PgTimescaleContainer() {}
 
     /**
      * Instance.

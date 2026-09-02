@@ -14,8 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.grpc.client;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
 import io.github.pnoker.api.common.driver.GrpcDeviceLeaseDTO;
@@ -29,33 +32,32 @@ import io.github.pnoker.common.driver.entity.builder.GrpcPointAttributeBuilder;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.exception.ServiceException;
+import io.grpc.stub.StreamObserver;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Map;
-import io.grpc.stub.StreamObserver;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class DriverClientLeaseTest {
 
     @Mock
     private DriverApiGrpc.DriverApiStub stub;
+
     @Mock
     private DriverBuilder driverBuilder;
+
     @Mock
     private GrpcDriverAttributeBuilder driverAttributeBuilder;
+
     @Mock
     private GrpcPointAttributeBuilder pointAttributeBuilder;
+
     @Mock
     private GrpcCommandAttributeBuilder commandAttributeBuilder;
+
     @Mock
     private GrpcEventAttributeBuilder eventAttributeBuilder;
 
@@ -74,15 +76,21 @@ class DriverClientLeaseTest {
         driver.setTenantId(100L);
         metadata.setDriver(driver);
         metadata.setDeviceLeases(Map.of(99L, 400L), System.currentTimeMillis() + 60_000, 4L);
-        client = new DriverClient(stub, metadata, properties, driverBuilder, driverAttributeBuilder,
-                pointAttributeBuilder, commandAttributeBuilder, eventAttributeBuilder);
+        client = new DriverClient(
+                stub,
+                metadata,
+                properties,
+                driverBuilder,
+                driverAttributeBuilder,
+                pointAttributeBuilder,
+                commandAttributeBuilder,
+                eventAttributeBuilder);
     }
 
     @Test
     void changedLeaseSnapshotIsInstalledOnlyAfterAllBatchesComplete() {
         long deadline = System.currentTimeMillis() + 60_000;
-        stubResponses(response(deadline, 5L, false, lease(1L, 501L)),
-                response(deadline, 5L, true, lease(2L, 502L)));
+        stubResponses(response(deadline, 5L, false, lease(1L, 501L)), response(deadline, 5L, true, lease(2L, 502L)));
 
         client.renewLease().block();
 
@@ -105,17 +113,18 @@ class DriverClientLeaseTest {
 
     private void stubResponses(GrpcDriverLeaseDTO... responses) {
         org.mockito.Mockito.doAnswer(invocation -> {
-            StreamObserver<GrpcDriverLeaseDTO> observer = invocation.getArgument(1);
-            for (GrpcDriverLeaseDTO response : responses) {
-                observer.onNext(response);
-            }
-            observer.onCompleted();
-            return null;
-        }).when(stub).renewLease(any(), any());
+                    StreamObserver<GrpcDriverLeaseDTO> observer = invocation.getArgument(1);
+                    for (GrpcDriverLeaseDTO response : responses) {
+                        observer.onNext(response);
+                    }
+                    observer.onCompleted();
+                    return null;
+                })
+                .when(stub)
+                .renewLease(any(), any());
     }
 
-    private GrpcDriverLeaseDTO response(long deadline, long version, boolean complete,
-                                         GrpcDeviceLeaseDTO lease) {
+    private GrpcDriverLeaseDTO response(long deadline, long version, boolean complete, GrpcDeviceLeaseDTO lease) {
         return GrpcDriverLeaseDTO.newBuilder()
                 .setLeaseUntilEpochMillis(deadline)
                 .setAssignmentVersion(version)

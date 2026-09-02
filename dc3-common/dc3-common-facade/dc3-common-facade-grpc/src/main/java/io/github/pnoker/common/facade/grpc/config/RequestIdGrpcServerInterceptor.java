@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.config;
 
 import io.github.pnoker.common.constant.common.RequestIdConstant;
@@ -25,11 +24,10 @@ import io.grpc.ServerCallHandler;
 import io.grpc.ServerInterceptor;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
+import java.util.UUID;
 import org.slf4j.MDC;
 import org.springframework.grpc.server.GlobalServerInterceptor;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 /**
  * Companion to {@link RequestIdGrpcClientInterceptor}: reads the request id from the
@@ -71,8 +69,8 @@ public class RequestIdGrpcServerInterceptor implements ServerInterceptor {
             Metadata.Key.of(RequestIdConstant.HEADER, Metadata.ASCII_STRING_MARSHALLER);
 
     @Override
-    public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(ServerCall<ReqT, RespT> call, Metadata headers,
-                                                                 ServerCallHandler<ReqT, RespT> next) {
+    public <ReqT, RespT> ServerCall.Listener<ReqT> interceptCall(
+            ServerCall<ReqT, RespT> call, Metadata headers, ServerCallHandler<ReqT, RespT> next) {
         // Read the id supplied by the caller (set by RequestIdGrpcClientInterceptor upstream),
         // or mint one when absent so the call is still self-consistent in this service's logs.
         String requestId = headers.get(REQUEST_ID_KEY);

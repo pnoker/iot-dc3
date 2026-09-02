@@ -14,12 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.utils.MqttUtil;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,9 +38,6 @@ import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * MQTT Configuration Class
@@ -101,21 +99,26 @@ public class MqttConfig {
     public MessageProducer mqttInbound(MqttPahoClientFactory mqttClientFactory, MessageChannel mqttInboundChannel) {
         List<MqttProperties.Topic> receiveTopics = mqttProperties.getReceiveTopics();
         if (Objects.isNull(receiveTopics) || receiveTopics.isEmpty()) {
-            throw new IllegalStateException("MQTT receive topics must be configured when MqttReceiveService is present");
+            throw new IllegalStateException(
+                    "MQTT receive topics must be configured when MqttReceiveService is present");
         }
 
         List<MqttProperties.Topic> prefixedTopics = receiveTopics.stream()
                 .map(topic -> new MqttProperties.Topic(prefixedTopicName(topic.getName()), topic.getQos()))
                 .toList();
         MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(
-                mqttProperties.getClient() + "_in", mqttClientFactory,
+                mqttProperties.getClient() + "_in",
+                mqttClientFactory,
                 prefixedTopics.stream().map(MqttProperties.Topic::getName).toArray(String[]::new));
-        adapter.setQos(prefixedTopics.stream().mapToInt(MqttProperties.Topic::getQos).toArray());
+        adapter.setQos(
+                prefixedTopics.stream().mapToInt(MqttProperties.Topic::getQos).toArray());
         adapter.setOutputChannel(mqttInboundChannel);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setCompletionTimeout(mqttProperties.getCompletionTimeout());
-        log.info("MQTT inbound configured, clientId={}, topicCount={}",
-                mqttProperties.getClient() + "_in", prefixedTopics.size());
+        log.info(
+                "MQTT inbound configured, clientId={}, topicCount={}",
+                mqttProperties.getClient() + "_in",
+                prefixedTopics.size());
         return adapter;
     }
 
@@ -129,15 +132,17 @@ public class MqttConfig {
     @ServiceActivator(inputChannel = "mqttOutboundChannel")
     public MessageHandler mqttOutbound(MqttPahoClientFactory mqttClientFactory) {
         MqttProperties.Topic defaultSendTopic = mqttProperties.getDefaultSendTopic();
-        MqttProperties.Topic prefixedDefaultSendTopic = new MqttProperties.Topic(
-                prefixedTopicName(defaultSendTopic.getName()), defaultSendTopic.getQos());
-        MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(mqttProperties.getClient() + "_out",
-                mqttClientFactory);
+        MqttProperties.Topic prefixedDefaultSendTopic =
+                new MqttProperties.Topic(prefixedTopicName(defaultSendTopic.getName()), defaultSendTopic.getQos());
+        MqttPahoMessageHandler messageHandler =
+                new MqttPahoMessageHandler(mqttProperties.getClient() + "_out", mqttClientFactory);
         messageHandler.setAsync(true);
         messageHandler.setDefaultQos(prefixedDefaultSendTopic.getQos());
         messageHandler.setDefaultTopic(prefixedDefaultSendTopic.getName());
-        log.info("MQTT outbound configured, clientId={}, defaultQos={}",
-                mqttProperties.getClient() + "_out", prefixedDefaultSendTopic.getQos());
+        log.info(
+                "MQTT outbound configured, clientId={}, defaultQos={}",
+                mqttProperties.getClient() + "_out",
+                prefixedDefaultSendTopic.getQos());
         return messageHandler;
     }
 
@@ -148,5 +153,4 @@ public class MqttConfig {
         }
         return topicPrefix + topicName;
     }
-
 }

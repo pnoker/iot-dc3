@@ -2,9 +2,9 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -35,6 +35,8 @@ public final class UuidV7 {
      * Clock rollback is handled by retaining the last timestamp and advancing
      * the twelve-bit monotonic sequence. Sequence exhaustion waits for the
      * next millisecond rather than producing a duplicate identifier.
+     *
+     * @return a process-locally monotonic UUID version 7 value
      */
     public static synchronized UUID next() {
         long timestamp = System.currentTimeMillis();
@@ -55,9 +57,7 @@ public final class UuidV7 {
         }
         lastTimestamp = timestamp;
 
-        long mostSignificantBits = (timestamp << 16)
-                | (0x7L << 12)
-                | sequence;
+        long mostSignificantBits = (timestamp << 16) | (0x7L << 12) | sequence;
         long random = RANDOM.nextLong() & 0x3FFF_FFFF_FFFF_FFFFL;
         long leastSignificantBits = random | Long.MIN_VALUE;
         return new UUID(mostSignificantBits, leastSignificantBits);
@@ -67,6 +67,8 @@ public final class UuidV7 {
      * Generate a positive 63-bit identifier for legacy BIGINT columns while
      * retaining entropy from both UUID halves. New schemas should persist the
      * UUID itself; this method is only for aggregates that still use BIGINT.
+     *
+     * @return a positive non-zero 63-bit identifier
      */
     public static long nextLong() {
         UUID value = next();

@@ -14,30 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.CursorPage;
-import reactor.core.publisher.Mono;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import io.github.pnoker.common.facade.local.builder.FacadePointValueBuilder;
+import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class PointValueLocalFacadeTest {
@@ -105,13 +103,18 @@ class PointValueLocalFacadeTest {
 
     @Test
     void historyForwardsServiceResultUnchanged() {
-        when(pointValueService.history(1L, 2L, 3L, null, 10)).thenReturn(Mono.just(CursorPage.of(List.of(
-                PointValueBO.builder().calValue("23.5").build(),
-                PointValueBO.builder().calValue("24.0").build()), null)));
-        when(facadePointValueBuilder.toFacadeBO(any(PointValueBO.class))).thenAnswer(inv ->
-                FacadePointValueBO.builder().value(inv.<PointValueBO>getArgument(0).getCalValue()).build());
+        when(pointValueService.history(1L, 2L, 3L, null, 10))
+                .thenReturn(Mono.just(CursorPage.of(
+                        List.of(
+                                PointValueBO.builder().calValue("23.5").build(),
+                                PointValueBO.builder().calValue("24.0").build()),
+                        null)));
+        when(facadePointValueBuilder.toFacadeBO(any(PointValueBO.class)))
+                .thenAnswer(inv -> FacadePointValueBO.builder()
+                        .value(inv.<PointValueBO>getArgument(0).getCalValue())
+                        .build());
         assertThat(facade.history(1L, 2L, 3L, null, 10).block().items())
-                .map(FacadePointValueBO::getValue).containsExactly("23.5", "24.0");
+                .map(FacadePointValueBO::getValue)
+                .containsExactly("23.5", "24.0");
     }
-
 }

@@ -32,6 +32,4 @@ import org.springframework.context.annotation.ComponentScan;
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.agentic.enabled", havingValue = "true", matchIfMissing = true)
 @ComponentScan("io.github.pnoker.common.agentic")
-public class AgenticAutoConfiguration {
-
-}
+public class AgenticAutoConfiguration {}

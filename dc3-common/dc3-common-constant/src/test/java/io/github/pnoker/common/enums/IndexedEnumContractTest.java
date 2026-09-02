@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
 
-import io.github.pnoker.common.constant.common.SymbolConstant;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
@@ -35,8 +33,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 /**
  * Cross-cutting contract for every domain enum that uses the standard
@@ -59,12 +57,10 @@ class IndexedEnumContractTest {
 
     private static final String ENUM_PACKAGE = "io.github.pnoker.common.enums";
     private static final List<Class<? extends Enum<?>>> DOMAIN_ENUMS = discoverDomainEnums();
-    private static final List<Class<? extends Enum<?>>> INDEXED_ENUMS = DOMAIN_ENUMS.stream()
-            .filter(type -> hasMethod(type, "getIndex"))
-            .toList();
-    private static final List<Class<? extends Enum<?>>> CODED_ENUMS = DOMAIN_ENUMS.stream()
-            .filter(type -> hasMethod(type, "getCode"))
-            .toList();
+    private static final List<Class<? extends Enum<?>>> INDEXED_ENUMS =
+            DOMAIN_ENUMS.stream().filter(type -> hasMethod(type, "getIndex")).toList();
+    private static final List<Class<? extends Enum<?>>> CODED_ENUMS =
+            DOMAIN_ENUMS.stream().filter(type -> hasMethod(type, "getCode")).toList();
 
     private static List<Class<? extends Enum<?>>> discoverDomainEnums() {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
@@ -94,11 +90,10 @@ class IndexedEnumContractTest {
     }
 
     @SuppressWarnings("unchecked")
-    private static void addEnumClass(ClassLoader classLoader, Path path,
-                                     List<Class<? extends Enum<?>>> enums) {
+    private static void addEnumClass(ClassLoader classLoader, Path path, List<Class<? extends Enum<?>>> enums) {
         String fileName = path.getFileName().toString();
-        String className = ENUM_PACKAGE + SymbolConstant.DOT
-                + fileName.substring(0, fileName.length() - ".class".length());
+        String className =
+                ENUM_PACKAGE + SymbolConstant.DOT + fileName.substring(0, fileName.length() - ".class".length());
         try {
             Class<?> candidate = Class.forName(className, false, classLoader);
             if (candidate.isEnum()) {
@@ -123,9 +118,15 @@ class IndexedEnumContractTest {
             return type.getMethod(name, parameterTypes);
         } catch (NoSuchMethodException e) {
             throw new AssertionError(
-                    "Enum %s does not expose %s(%s)".formatted(
-                            type.getName(), name, String.join(",",
-                                    Stream.of(parameterTypes).map(Class::getSimpleName).toList())),
+                    "Enum %s does not expose %s(%s)"
+                            .formatted(
+                                    type.getName(),
+                                    name,
+                                    String.join(
+                                            ",",
+                                            Stream.of(parameterTypes)
+                                                    .map(Class::getSimpleName)
+                                                    .toList())),
                     e);
         }
     }
@@ -169,8 +170,7 @@ class IndexedEnumContractTest {
                         Byte index = (Byte) getIndex.invoke(constant);
                         assertThat(index).as(name + " getIndex").isNotNull();
                         assertThat(seen.add(index))
-                                .as("%s index %s must be unique within %s", name, index,
-                                        enumClass.getSimpleName())
+                                .as("%s index %s must be unique within %s", name, index, enumClass.getSimpleName())
                                 .isTrue();
                     }),
                     DynamicTest.dynamicTest(name + " round-trips through ofIndex", () -> {
@@ -180,13 +180,11 @@ class IndexedEnumContractTest {
                     }));
         });
 
-        Stream<DynamicTest> rejection = Stream.of(
-                DynamicTest.dynamicTest(
-                        enumClass.getSimpleName() + ".ofIndex returns null for unknown index",
-                        () -> {
-                            Byte unknown = unusedIndex(constants, getIndex);
-                            assertThat(ofIndex.invoke(null, unknown)).isNull();
-                        }));
+        Stream<DynamicTest> rejection = Stream.of(DynamicTest.dynamicTest(
+                enumClass.getSimpleName() + ".ofIndex returns null for unknown index", () -> {
+                    Byte unknown = unusedIndex(constants, getIndex);
+                    assertThat(ofIndex.invoke(null, unknown)).isNull();
+                }));
 
         return Stream.concat(perConstant, rejection);
     }

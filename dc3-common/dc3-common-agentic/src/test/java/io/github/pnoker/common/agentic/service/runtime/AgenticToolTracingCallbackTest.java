@@ -16,10 +16,15 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
@@ -28,20 +33,15 @@ import org.springframework.ai.tool.definition.DefaultToolDefinition;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.Map;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class AgenticToolTracingCallbackTest {
 
     @Test
     void recordsStructuredToolResultFromAgenticEnvelope() {
         Queue<AgenticRunEvent> events = new ConcurrentLinkedQueue<>();
         ToolContext context = new ToolContext(Map.of(AgenticConstant.ToolContextKey.RUN_EVENTS, events));
-        ToolCallback callback = new AgenticToolTracingCallback(new StubToolCallback(
-                "{\"success\":false,\"code\":\"INVALID_ARGUMENT\",\"message\":\"Device ID is required\"}"),
+        ToolCallback callback = new AgenticToolTracingCallback(
+                new StubToolCallback(
+                        "{\"success\":false,\"code\":\"INVALID_ARGUMENT\",\"message\":\"Device ID is required\"}"),
                 new ObjectMapper());
 
         String result = callback.call("{}", context);
@@ -86,9 +86,10 @@ class AgenticToolTracingCallbackTest {
         Queue<AgenticRunEvent> events = new ConcurrentLinkedQueue<>();
         ToolContext context = new ToolContext(Map.of(AgenticConstant.ToolContextKey.RUN_EVENTS, events));
         ToolCallbackProvider provider = new AgenticToolTracingCallbackProvider(
-                ToolCallbackProvider.from(new StubToolCallback(
-                        "{\"success\":true,\"code\":\"OK\",\"message\":\"Device loaded\"}")),
-                new ObjectMapper(), new MetadataFixtureTool());
+                ToolCallbackProvider.from(
+                        new StubToolCallback("{\"success\":true,\"code\":\"OK\",\"message\":\"Device loaded\"}")),
+                new ObjectMapper(),
+                new MetadataFixtureTool());
 
         String result = provider.getToolCallbacks()[0].call("{}", context);
 
@@ -151,7 +152,6 @@ class AgenticToolTracingCallbackTest {
         public String call(String toolInput, ToolContext toolContext) {
             return result;
         }
-
     }
 
     private static class ThrowingToolCallback extends StubToolCallback {
@@ -164,7 +164,6 @@ class AgenticToolTracingCallbackTest {
         public String call(String toolInput, ToolContext toolContext) {
             throw new IllegalStateException("backend unavailable");
         }
-
     }
 
     private static class MetadataFixtureTool {
@@ -173,7 +172,5 @@ class AgenticToolTracingCallbackTest {
         void lookupDeviceById() {
             // Metadata-only fixture.
         }
-
     }
-
 }

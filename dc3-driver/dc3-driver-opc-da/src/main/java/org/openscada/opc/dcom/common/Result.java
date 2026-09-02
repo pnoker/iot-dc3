@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.common;
 
 /**
@@ -29,8 +28,7 @@ public class Result<T> {
 
     private int errorCode;
 
-    public Result() {
-    }
+    public Result() {}
 
     public Result(final T value, final int errorCode) {
         this.value = value;
@@ -56,5 +54,4 @@ public class Result<T> {
     public boolean isFailed() {
         return this.errorCode != 0;
     }
-
 }

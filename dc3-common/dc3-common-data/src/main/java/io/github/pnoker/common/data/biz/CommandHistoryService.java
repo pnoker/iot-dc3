@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.data.entity.bo.CommandCallBO;
@@ -68,5 +67,4 @@ public interface CommandHistoryService {
      * @return the matching command history page
      */
     Mono<OffsetPage<CommandHistoryVO>> list(Long tenantId, CommandHistoryQueryVO queryVO);
-
 }

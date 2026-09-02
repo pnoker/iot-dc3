@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -54,19 +53,27 @@ public class NotifyHistoryVO extends BaseVO {
     @Schema(description = "ID of the message template used for this notification.", example = "4096")
     private String messageId;
 
-    @Schema(description = "ID of the notification channel through which this notification was delivered.", example = "512")
+    @Schema(
+            description = "ID of the notification channel through which this notification was delivered.",
+            example = "512")
     private String channelId;
 
     @Schema(description = "ID of the alarm associated with this notification.", example = "512")
     private String alarmId;
 
-    @Schema(description = "Channel type used to deliver this notification (e.g. EMAIL, SMS, WEBHOOK).", example = "EMAIL")
+    @Schema(
+            description = "Channel type used to deliver this notification (e.g. EMAIL, SMS, WEBHOOK).",
+            example = "EMAIL")
     private NotifyChannelTypeEnum channelTypeFlag;
 
-    @Schema(description = "Notification target address or identifier (e.g. email address, phone number, webhook URL).", example = "admin@example.com")
+    @Schema(
+            description = "Notification target address or identifier (e.g. email address, phone number, webhook URL).",
+            example = "admin@example.com")
     private String target;
 
-    @Schema(description = "Delivery status of this notification record (e.g. SUCCESS, FAILED, PENDING).", example = "SUCCESS")
+    @Schema(
+            description = "Delivery status of this notification record (e.g. SUCCESS, FAILED, PENDING).",
+            example = "SUCCESS")
     private NotifyHistoryStatusEnum statusFlag;
 
     @Schema(description = "Request payload sent to the notification channel, serialized as JSON.")
@@ -75,10 +82,11 @@ public class NotifyHistoryVO extends BaseVO {
     @Schema(description = "Response received from the notification channel, serialized as JSON.")
     private NotifyHistoryResponseExt responseExt;
 
-    @Schema(description = "Error message if the notification delivery failed. Null on success.", example = "SMTP connection refused")
+    @Schema(
+            description = "Error message if the notification delivery failed. Null on success.",
+            example = "SMTP connection refused")
     private String errorMessage;
 
     @Schema(description = "Number of delivery retries attempted for this notification.", example = "0")
     private Integer retryCount;
-
 }

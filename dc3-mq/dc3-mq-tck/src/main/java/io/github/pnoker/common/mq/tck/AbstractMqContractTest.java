@@ -14,27 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.tck;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.pnoker.common.constant.mq.ConsumptionProfile;
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.constant.mq.DeliveryMode;
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.SubscriptionMode;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
-import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.WireMqDelivery;
 import io.github.pnoker.common.mq.core.EnvelopeCodec;
 import io.github.pnoker.common.mq.core.MessageSenderImpl;
 import io.github.pnoker.common.mq.message.MqMessage;
 import io.github.pnoker.common.mq.sender.MessageSender;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
-import org.awaitility.Awaitility;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.slf4j.MDC;
-
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +43,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import org.awaitility.Awaitility;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 import reactor.core.publisher.Sinks;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Broker-neutral contract suite (docs/design/mq-abstraction.md §11). A broker adapter
@@ -79,8 +77,7 @@ public abstract class AbstractMqContractTest {
     /**
      * Hook to release broker resources between cases; the default is a no-op.
      */
-    protected void shutdownAdapter() {
-    }
+    protected void shutdownAdapter() {}
 
     @AfterEach
     void tearDown() {
@@ -101,8 +98,16 @@ public abstract class AbstractMqContractTest {
      * Load-balanced single-delivery subscription on a run-unique group.
      */
     protected final SubscriptionSpec loadBalance(MqTopic topic, String group) {
-        return new SubscriptionSpec(topic, SubscriptionMode.LOAD_BALANCE, ConsumptionProfile.LATENCY,
-                DeliveryMode.SINGLE, "", group + "-" + RUN, null, TestPayload.class, true);
+        return new SubscriptionSpec(
+                topic,
+                SubscriptionMode.LOAD_BALANCE,
+                ConsumptionProfile.LATENCY,
+                DeliveryMode.SINGLE,
+                "",
+                group + "-" + RUN,
+                null,
+                TestPayload.class,
+                true);
     }
 
     /**
@@ -115,34 +120,58 @@ public abstract class AbstractMqContractTest {
     /**
      * Load-balanced subscription with a key filter and an optional per-instance TTL.
      */
-    protected final SubscriptionSpec loadBalancePattern(MqTopic topic, String group, String keyPattern,
-                                                        java.time.Duration instanceTtl) {
-        return new SubscriptionSpec(topic, SubscriptionMode.LOAD_BALANCE, ConsumptionProfile.LATENCY,
-                DeliveryMode.SINGLE, keyPattern, group + "-" + RUN, instanceTtl, TestPayload.class, true);
+    protected final SubscriptionSpec loadBalancePattern(
+            MqTopic topic, String group, String keyPattern, java.time.Duration instanceTtl) {
+        return new SubscriptionSpec(
+                topic,
+                SubscriptionMode.LOAD_BALANCE,
+                ConsumptionProfile.LATENCY,
+                DeliveryMode.SINGLE,
+                keyPattern,
+                group + "-" + RUN,
+                instanceTtl,
+                TestPayload.class,
+                true);
     }
 
     /**
      * Broadcast single-delivery subscription with a run-unique group.
      */
     protected final SubscriptionSpec broadcast(MqTopic topic, String group) {
-        return new SubscriptionSpec(topic, SubscriptionMode.BROADCAST, ConsumptionProfile.LATENCY,
-                DeliveryMode.SINGLE, "tckbroadcast", group + "-" + RUN, null, TestPayload.class, true);
+        return new SubscriptionSpec(
+                topic,
+                SubscriptionMode.BROADCAST,
+                ConsumptionProfile.LATENCY,
+                DeliveryMode.SINGLE,
+                "tckbroadcast",
+                group + "-" + RUN,
+                null,
+                TestPayload.class,
+                true);
     }
 
     /**
      * Throughput-profile batch subscription on a run-unique group.
      */
     protected final SubscriptionSpec batchSpec(MqTopic topic) {
-        return new SubscriptionSpec(topic, SubscriptionMode.LOAD_BALANCE, ConsumptionProfile.THROUGHPUT,
-                DeliveryMode.BATCH, "", "tck-batch-" + RUN, null, TestPayload.class, true);
+        return new SubscriptionSpec(
+                topic,
+                SubscriptionMode.LOAD_BALANCE,
+                ConsumptionProfile.THROUGHPUT,
+                DeliveryMode.BATCH,
+                "",
+                "tck-batch-" + RUN,
+                null,
+                TestPayload.class,
+                true);
     }
 
     /**
      * Subscribe and collect received deliveries. When {@code each} is null, deliveries are
      * acknowledged immediately and recorded; otherwise the callback owns the acknowledgment.
      */
-    protected final List<Received> subscribeCollector(SubscriptionSpec spec,
-                                                      Function<WireMqDelivery, DeliveryDisposition> each) {
+    protected final List<Received> subscribeCollector(
+            SubscriptionSpec spec, Function<WireMqDelivery, DeliveryDisposition> each) {
         List<Received> received = new CopyOnWriteArrayList<>();
         adapter().subscribe(spec, delivery -> {
             received.add(new Received(delivery));
@@ -159,11 +188,12 @@ public abstract class AbstractMqContractTest {
      * Batch subscribe and collect received deliveries. When {@code batch} is null, the
      * first delivery's acknowledgment is used to ack the batch; otherwise the callback owns it.
      */
-    protected final List<Received> subscribeBatchCollector(SubscriptionSpec spec,
-                                                           Function<List<Received>, DeliveryDisposition> batch) {
+    protected final List<Received> subscribeBatchCollector(
+            SubscriptionSpec spec, Function<List<Received>, DeliveryDisposition> batch) {
         List<Received> received = new CopyOnWriteArrayList<>();
         adapter().subscribeBatch(spec, deliveries -> {
-            List<Received> batchReceived = deliveries.stream().map(Received::new).toList();
+            List<Received> batchReceived =
+                    deliveries.stream().map(Received::new).toList();
             received.addAll(batchReceived);
             if (Objects.nonNull(batch)) {
                 return reactor.core.publisher.Mono.just(batch.apply(batchReceived));
@@ -197,7 +227,9 @@ public abstract class AbstractMqContractTest {
      * Awaitility shorthand with the suite's default 15s timeout.
      */
     protected final void await(String description, java.util.function.BooleanSupplier condition) {
-        Awaitility.await(description).atMost(Duration.ofSeconds(15)).pollInterval(Duration.ofMillis(100))
+        Awaitility.await(description)
+                .atMost(Duration.ofSeconds(15))
+                .pollInterval(Duration.ofMillis(100))
                 .until(condition::getAsBoolean);
     }
 
@@ -267,7 +299,8 @@ public abstract class AbstractMqContractTest {
     @Test
     void rejectWithoutRequeueRoutesToTheDeadLetter() {
         List<Received> dead = subscribeCollector(loadBalance(MqTopic.POINT_COMMAND_DEAD, "tck-dlq-reader"), null);
-        subscribeCollector(loadBalancePattern(MqTopic.POINT_COMMAND, "tck-dlq", "tck.*"),
+        subscribeCollector(
+                loadBalancePattern(MqTopic.POINT_COMMAND, "tck-dlq", "tck.*"),
                 delivery -> DeliveryDisposition.DEAD_LETTER);
 
         TestPayload sent = payload("doomed");
@@ -313,7 +346,8 @@ public abstract class AbstractMqContractTest {
 
         shutdownAdapter();
         List<Received> redelivered = subscribeCollector(spec, null);
-        await("unsettled message redelivered after restart",
+        await(
+                "unsettled message redelivered after restart",
                 () -> redelivered.stream().anyMatch(received -> received.payload.equals(sent)));
     }
 
@@ -323,11 +357,10 @@ public abstract class AbstractMqContractTest {
         CountDownLatch confirmed = new CountDownLatch(1);
         AtomicInteger outcome = new AtomicInteger(-1);
 
-        sender().sendAsync(MqMessage.of(MqTopic.EVENT, "tckconfirm", payload("confirmed")),
-                (message, ok, cause) -> {
-                    outcome.set(ok ? 1 : 0);
-                    confirmed.countDown();
-                });
+        sender().sendAsync(MqMessage.of(MqTopic.EVENT, "tckconfirm", payload("confirmed")), (message, ok, cause) -> {
+            outcome.set(ok ? 1 : 0);
+            confirmed.countDown();
+        });
 
         assertThat(confirmed.await(10, TimeUnit.SECONDS)).isTrue();
         assertThat(outcome.get()).isEqualTo(1);
@@ -356,7 +389,9 @@ public abstract class AbstractMqContractTest {
 
         await("all batch messages delivered", () -> received.size() >= 10);
         int afterAck = received.size();
-        Awaitility.await().during(Duration.ofSeconds(1)).atMost(Duration.ofSeconds(2))
+        Awaitility.await()
+                .during(Duration.ofSeconds(1))
+                .atMost(Duration.ofSeconds(2))
                 .until(() -> received.size() == afterAck);
     }
 
@@ -370,8 +405,7 @@ public abstract class AbstractMqContractTest {
         TestPayload sent = payload("exhausted");
         sender().send(MqMessage.of(MqTopic.POINT_VALUE, "tckbatch", sent));
 
-        await("exhausted retries dead-letter the message",
-                () -> dead.stream().anyMatch(r -> r.payload.equals(sent)));
+        await("exhausted retries dead-letter the message", () -> dead.stream().anyMatch(r -> r.payload.equals(sent)));
     }
 
     @Test
@@ -398,8 +432,7 @@ public abstract class AbstractMqContractTest {
     /**
      * Simple wire payload with a unique marker per message.
      */
-    public record TestPayload(String id, String text) {
-    }
+    public record TestPayload(String id, String text) {}
 
     /**
      * Collector pairing received payloads with their headers.

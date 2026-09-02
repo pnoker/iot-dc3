@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.service.AlarmConstant;
@@ -23,10 +22,6 @@ import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
 import io.github.pnoker.common.data.entity.bo.RuleStateBO;
 import io.github.pnoker.common.entity.ext.NotifyChannelBindExt;
 import io.github.pnoker.common.entity.ext.NotifyExt;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
-import org.springframework.stereotype.Service;
-
 import java.time.DateTimeException;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -37,6 +32,9 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.springframework.stereotype.Service;
 
 /**
  * Deterministic notification policy engine.
@@ -48,8 +46,8 @@ import java.util.Objects;
 public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
 
     @Override
-    public NotifyDecision decide(RuleMatch match, NotifyBO notify, NotifyChannelBindBO bind, RuleStateBO state,
-                                 LocalDateTime now) {
+    public NotifyDecision decide(
+            RuleMatch match, NotifyBO notify, NotifyChannelBindBO bind, RuleStateBO state, LocalDateTime now) {
         if (Objects.isNull(match) || Objects.isNull(notify) || Objects.isNull(bind)) {
             return NotifyDecision.skip("Notification context is incomplete");
         }
@@ -101,7 +99,9 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
      */
     private boolean levelAllowed(RuleMatch match, NotifyChannelBindBO bind) {
         NotifyChannelBindExt.Content bindContent = bindContent(bind);
-        if (Objects.isNull(bindContent) || Objects.isNull(bindContent.getLevels()) || bindContent.getLevels().isEmpty()) {
+        if (Objects.isNull(bindContent)
+                || Objects.isNull(bindContent.getLevels())
+                || bindContent.getLevels().isEmpty()) {
             return true;
         }
         for (String level : bindContent.getLevels()) {
@@ -142,7 +142,8 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
             return bindContent.getRateLimitOverrideMs();
         }
         NotifyExt.Content notifyContent = content(notify);
-        if (Objects.nonNull(notifyContent) && Objects.nonNull(notifyContent.getRateLimit())
+        if (Objects.nonNull(notifyContent)
+                && Objects.nonNull(notifyContent.getRateLimit())
                 && Objects.nonNull(notifyContent.getRateLimit().getIntervalMs())) {
             return notifyContent.getRateLimit().getIntervalMs();
         }
@@ -159,7 +160,8 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
      */
     private boolean isSilenced(NotifyBO notify, LocalDateTime now) {
         NotifyExt.Content notifyContent = content(notify);
-        if (Objects.isNull(notifyContent) || Objects.isNull(notifyContent.getSilence())
+        if (Objects.isNull(notifyContent)
+                || Objects.isNull(notifyContent.getSilence())
                 || !Boolean.TRUE.equals(notifyContent.getSilence().getEnabled())
                 || Objects.isNull(notifyContent.getSilence().getWindows())) {
             return false;
@@ -186,9 +188,8 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
             return false;
         }
         try {
-            ZoneId zoneId = StringUtils.isNotBlank(window.getTimezone())
-                    ? ZoneId.of(window.getTimezone())
-                    : ZoneOffset.UTC;
+            ZoneId zoneId =
+                    StringUtils.isNotBlank(window.getTimezone()) ? ZoneId.of(window.getTimezone()) : ZoneOffset.UTC;
             ZonedDateTime zonedNow = now.atZone(ZoneOffset.UTC).withZoneSameInstant(zoneId);
             if (!dayAllowed(window.getDaysOfWeek(), zonedNow.getDayOfWeek())) {
                 return false;
@@ -224,8 +225,8 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
         }
         for (String day : daysOfWeek) {
             if (Strings.CI.equals(day, current.name())
-                    || Strings.CI.equals(day, current.getDisplayName(java.time.format.TextStyle.SHORT,
-                    Locale.ENGLISH))) {
+                    || Strings.CI.equals(
+                            day, current.getDisplayName(java.time.format.TextStyle.SHORT, Locale.ENGLISH))) {
                 return true;
             }
         }
@@ -245,5 +246,4 @@ public class NotifyPolicyEngineImpl implements NotifyPolicyEngine {
         }
         return bind.getBindExt().getContent();
     }
-
 }

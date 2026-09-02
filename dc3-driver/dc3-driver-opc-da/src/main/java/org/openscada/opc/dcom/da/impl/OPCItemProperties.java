@@ -14,9 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da.impl;
 
+import java.net.UnknownHostException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.IJIComObject;
 import org.jinterop.dcom.core.JIArray;
@@ -31,11 +34,6 @@ import org.openscada.opc.dcom.common.impl.BaseCOMObject;
 import org.openscada.opc.dcom.common.impl.Helper;
 import org.openscada.opc.dcom.da.Constants;
 import org.openscada.opc.dcom.da.PropertyDescription;
-
-import java.net.UnknownHostException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  *
@@ -134,8 +132,9 @@ public class OPCItemProperties extends BaseCOMObject {
         callObject.addInParamAsInt(properties.length, JIFlags.FLAG_NULL);
         callObject.addInParamAsArray(new JIArray(ids, true), JIFlags.FLAG_NULL);
 
-        callObject.addOutParamAsObject(new JIPointer(
-                        new JIArray(new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)), null, 1, true)),
+        callObject.addOutParamAsObject(
+                new JIPointer(new JIArray(
+                        new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)), null, 1, true)),
                 JIFlags.FLAG_NULL);
         callObject.addOutParamAsObject(new JIPointer(new JIArray(Integer.class, null, 1, true)), JIFlags.FLAG_NULL);
 
@@ -147,10 +146,9 @@ public class OPCItemProperties extends BaseCOMObject {
         KeyedResultSet<Integer, String> results = new KeyedResultSet<Integer, String>();
 
         for (int i = 0; i < properties.length; i++) {
-            results.add(new KeyedResult<Integer, String>(properties[i],
-                    ((JIString) itemIDs[i].getReferent()).getString(), errorCodes[i]));
+            results.add(new KeyedResult<Integer, String>(
+                    properties[i], ((JIString) itemIDs[i].getReferent()).getString(), errorCodes[i]));
         }
         return results;
     }
-
 }

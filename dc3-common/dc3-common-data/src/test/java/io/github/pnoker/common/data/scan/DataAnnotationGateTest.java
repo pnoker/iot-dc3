@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.scan;
 
-import io.github.pnoker.common.resource.scan.ControllerAnnotationGate;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import io.github.pnoker.common.resource.scan.ControllerAnnotationGate;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 /**
  * SP2 ratchet gate for the data service: every controller endpoint must carry a complete, legal
@@ -33,8 +31,8 @@ class DataAnnotationGateTest {
 
     @Test
     void allDataControllersAreFullyAnnotated() {
-        List<String> defects = new ControllerAnnotationGate()
-                .validatePackage("io.github.pnoker.common.data.controller");
+        List<String> defects =
+                new ControllerAnnotationGate().validatePackage("io.github.pnoker.common.data.controller");
         assertThat(defects)
                 .as("x-dc3-ai annotation defects in data controllers: %s", defects)
                 .isEmpty();

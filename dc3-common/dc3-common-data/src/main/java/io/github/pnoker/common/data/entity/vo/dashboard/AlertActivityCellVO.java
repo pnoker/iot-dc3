@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * One cell in the event-overview alarm heatmap (dow × hour). Service layer always returns
@@ -60,5 +58,4 @@ public class AlertActivityCellVO implements Serializable {
      */
     @Schema(description = "Number of alarms aggregated in this day-of-week/hour-of-day cell", example = "12")
     private long count;
-
 }

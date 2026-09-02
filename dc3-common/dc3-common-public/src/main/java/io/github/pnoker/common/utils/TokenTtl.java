@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.cache.TimeoutConstant;
 
 /**
- * Login-token lifetime, resolved once per JVM from {@code DC3_TOKEN_TTL_HOURS} / 
+ * Login-token lifetime, resolved once per JVM from {@code DC3_TOKEN_TTL_HOURS} /
  * {@code dc3.token.ttl-hours}, defaulting to {@link TimeoutConstant#TOKEN_CACHE_TIMEOUT}.
  *
  * <p>Both the token signer and every cache that must outlive tokens (e.g. denylist)

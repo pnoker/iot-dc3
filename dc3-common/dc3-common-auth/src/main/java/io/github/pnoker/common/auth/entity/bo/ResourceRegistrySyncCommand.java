@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.bo;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.List;
 
 /**
  * Command driving a resource-registry sync call.
@@ -55,5 +53,4 @@ public class ResourceRegistrySyncCommand {
      * Complete list of endpoints discovered by the registrar on the calling service.
      */
     private List<ResourceRegistryScannedApi> apis;
-
 }

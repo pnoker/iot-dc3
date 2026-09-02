@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.property;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.time.Duration;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import java.time.Duration;
 
 /**
  * Tunables for the in-memory window sample buffer used by short-window alarm
@@ -71,5 +69,4 @@ public class AlarmWindowProperties {
      */
     @NotNull
     private Duration bufferIdleExpiry = Duration.ofMinutes(30);
-
 }

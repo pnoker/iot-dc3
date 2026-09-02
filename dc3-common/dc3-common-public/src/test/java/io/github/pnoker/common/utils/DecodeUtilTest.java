@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Test;
 
 class DecodeUtilTest {
 
@@ -66,8 +64,7 @@ class DecodeUtilTest {
 
     @Test
     void sha256Base64UrlIsStableForFixedInput() {
-        assertThat(DecodeUtil.sha256Base64Url("dc3"))
-                .isEqualTo("kX52cdVLfEKzJk91xoQt-Wzq5fMP2aLUnZupMLr7ev0");
+        assertThat(DecodeUtil.sha256Base64Url("dc3")).isEqualTo("kX52cdVLfEKzJk91xoQt-Wzq5fMP2aLUnZupMLr7ev0");
     }
 
     @Test
@@ -90,19 +87,19 @@ class DecodeUtilTest {
         String original = "encoded-payload";
         byte[] encoded = DecodeUtil.encode(original);
         String encodedAsString = DecodeUtil.byteToString(encoded);
-        assertThat(DecodeUtil.byteToString(DecodeUtil.decode(encodedAsString)))
-                .isEqualTo(original);
+        assertThat(DecodeUtil.byteToString(DecodeUtil.decode(encodedAsString))).isEqualTo(original);
     }
 
     @Test
     void base64UrlEncodesWithoutPadding() {
-        assertThat(DecodeUtil.base64Url(new byte[]{0x01, 0x02, 0x03, 0x04})).isEqualTo("AQIDBA");
+        assertThat(DecodeUtil.base64Url(new byte[] {0x01, 0x02, 0x03, 0x04})).isEqualTo("AQIDBA");
     }
 
     @Test
     void base64UrlWithoutLeadingZeroRemovesSignExtensionOnly() {
-        assertThat(DecodeUtil.base64UrlWithoutLeadingZero(new byte[]{0x00, 0x01, 0x02})).isEqualTo("AQI");
-        assertThat(DecodeUtil.base64UrlWithoutLeadingZero(new byte[]{0x00})).isEqualTo("AA");
+        assertThat(DecodeUtil.base64UrlWithoutLeadingZero(new byte[] {0x00, 0x01, 0x02}))
+                .isEqualTo("AQI");
+        assertThat(DecodeUtil.base64UrlWithoutLeadingZero(new byte[] {0x00})).isEqualTo("AA");
     }
 
     @Test
@@ -115,21 +112,20 @@ class DecodeUtilTest {
 
     @Test
     void hexEncodingRoundTripsForBinary() {
-        String original = new String(new byte[]{(byte) 0xff, 0x00, 0x10}, StandardCharsets.ISO_8859_1);
-        String hex = DecodeUtil.enHexCode(new String(original.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8));
+        String original = new String(new byte[] {(byte) 0xff, 0x00, 0x10}, StandardCharsets.ISO_8859_1);
+        String hex =
+                DecodeUtil.enHexCode(new String(original.getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8));
         assertThat(hex).isNotBlank();
     }
 
     @Test
     void deHexCodeRejectsOddLengthInput() {
-        assertThatThrownBy(() -> DecodeUtil.deHexCode("abc"))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> DecodeUtil.deHexCode("abc")).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void md5RejectsNullInput() {
-        assertThatThrownBy(() -> DecodeUtil.md5(null))
-                .isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> DecodeUtil.md5(null)).isInstanceOf(NullPointerException.class);
     }
 
     @Test

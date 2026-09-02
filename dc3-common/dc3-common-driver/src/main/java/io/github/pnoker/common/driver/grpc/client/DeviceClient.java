@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.grpc.client;
 
 import io.github.pnoker.api.common.GrpcCommandAttributeConfigDTO;
@@ -22,15 +21,15 @@ import io.github.pnoker.api.common.GrpcCommandRuntimeDTO;
 import io.github.pnoker.api.common.GrpcDriverAttributeConfigDTO;
 import io.github.pnoker.api.common.GrpcEventAttributeConfigDTO;
 import io.github.pnoker.api.common.GrpcEventRuntimeDTO;
-import io.github.pnoker.api.common.PageRequest;
 import io.github.pnoker.api.common.GrpcPointAttributeConfigDTO;
+import io.github.pnoker.api.common.PageRequest;
 import io.github.pnoker.api.common.driver.DeviceApiGrpc;
+import io.github.pnoker.api.common.driver.GrpcDeviceAttachDTO;
 import io.github.pnoker.api.common.driver.GrpcDeviceQuery;
 import io.github.pnoker.api.common.driver.GrpcOffsetDeviceQuery;
 import io.github.pnoker.api.common.driver.GrpcOffsetPageDeviceDTO;
-import io.github.pnoker.api.common.driver.GrpcDeviceAttachDTO;
-import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.CommandRuntimeBO;
+import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.EventRuntimeBO;
 import io.github.pnoker.common.driver.entity.builder.DeviceBuilder;
 import io.github.pnoker.common.driver.entity.builder.GrpcCommandAttributeConfigBuilder;
@@ -42,25 +41,23 @@ import io.github.pnoker.common.driver.entity.dto.DriverAttributeConfigDTO;
 import io.github.pnoker.common.driver.entity.dto.EventAttributeConfigDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeConfigDTO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
-import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.entity.ext.CommandExt;
 import io.github.pnoker.common.enums.CallTypeEnum;
 import io.github.pnoker.common.enums.CommandTypeEnum;
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
-import io.github.pnoker.common.entity.ext.CommandExt;
-import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.optional.CollectionOptional;
+import io.github.pnoker.common.utils.JsonUtil;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * gRPC client used to query device metadata and device-specific attribute configuration
@@ -69,7 +66,6 @@ import java.util.stream.Collectors;
  * @author pnoker
  * @since 2016.10.1
  */
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -120,8 +116,8 @@ public class DeviceClient {
                     .setDriverId(driverMetadata.getDriver().getId())
                     .setDeviceId(id)
                     .build();
-            return ReactiveGrpcClientSupport.<GrpcDeviceQuery, GrpcDeviceAttachDTO>unary("get device metadata",
-                            observer -> deviceApiStub.getById(query, observer))
+            return ReactiveGrpcClientSupport.<GrpcDeviceQuery, GrpcDeviceAttachDTO>unary(
+                            "get device metadata", observer -> deviceApiStub.getById(query, observer))
                     .map(this::buildDTOByGrpcAttachDTO);
         });
     }
@@ -130,17 +126,21 @@ public class DeviceClient {
         GrpcOffsetDeviceQuery query = GrpcOffsetDeviceQuery.newBuilder()
                 .setTenantId(driverMetadata.getDriver().getTenantId())
                 .setDriverId(driverMetadata.getDriver().getId())
-                .setPage(PageRequest.newBuilder().setOffset(offset).setLimit(limit).build())
+                .setPage(PageRequest.newBuilder()
+                        .setOffset(offset)
+                        .setLimit(limit)
+                        .build())
                 .build();
         return ReactiveGrpcClientSupport.<GrpcOffsetDeviceQuery, GrpcOffsetPageDeviceDTO>unary(
                         "list device metadata", observer -> deviceApiStub.list(query, observer))
-                .map(response -> new DevicePage(response.getPage().getOffset(), response.getPage().getLimit(),
-                        response.getPage().getHasNext(), response.getItemsList()));
+                .map(response -> new DevicePage(
+                        response.getPage().getOffset(),
+                        response.getPage().getLimit(),
+                        response.getPage().getHasNext(),
+                        response.getItemsList()));
     }
 
-    private record DevicePage(long offset, int limit, boolean hasNext,
-                              List<GrpcDeviceAttachDTO> data) {
-    }
+    private record DevicePage(long offset, int limit, boolean hasNext, List<GrpcDeviceAttachDTO> data) {}
 
     DeviceBO buildDTOByGrpcAttachDTO(GrpcDeviceAttachDTO rDeviceAttachDTO) {
         DeviceBO deviceBO = deviceBuilder.buildDTOByGrpcDTO(rDeviceAttachDTO.getDevice());
@@ -148,23 +148,28 @@ public class DeviceClient {
 
         CollectionOptional.ofNullable(rDeviceAttachDTO.getDriverConfigsList()).ifPresent(value -> {
             Map<Long, DriverAttributeConfigDTO> driverAttributeConfigMap = value.stream()
-                    .collect(Collectors.toMap(GrpcDriverAttributeConfigDTO::getAttributeId,
+                    .collect(Collectors.toMap(
+                            GrpcDriverAttributeConfigDTO::getAttributeId,
                             grpcDriverAttributeConfigBuilder::buildDTOByGrpcDTO));
             deviceBO.setDriverAttributeConfigIdMap(driverAttributeConfigMap);
         });
 
         CollectionOptional.ofNullable(rDeviceAttachDTO.getPointConfigsList()).ifPresent(value -> {
             Map<Long, Map<Long, PointAttributeConfigDTO>> pointAttributeConfigMap = value.stream()
-                    .collect(Collectors.groupingBy(GrpcPointAttributeConfigDTO::getPointId,
-                            Collectors.toMap(GrpcPointAttributeConfigDTO::getAttributeId,
+                    .collect(Collectors.groupingBy(
+                            GrpcPointAttributeConfigDTO::getPointId,
+                            Collectors.toMap(
+                                    GrpcPointAttributeConfigDTO::getAttributeId,
                                     grpcPointAttributeConfigBuilder::buildDTOByGrpcDTO)));
             deviceBO.setPointAttributeConfigIdMap(pointAttributeConfigMap);
         });
 
         CollectionOptional.ofNullable(rDeviceAttachDTO.getCommandConfigsList()).ifPresent(value -> {
             Map<Long, Map<Long, CommandAttributeConfigDTO>> commandAttributeConfigMap = value.stream()
-                    .collect(Collectors.groupingBy(GrpcCommandAttributeConfigDTO::getCommandId,
-                            Collectors.toMap(GrpcCommandAttributeConfigDTO::getAttributeId,
+                    .collect(Collectors.groupingBy(
+                            GrpcCommandAttributeConfigDTO::getCommandId,
+                            Collectors.toMap(
+                                    GrpcCommandAttributeConfigDTO::getAttributeId,
                                     grpcCommandAttributeConfigBuilder::buildDTOByGrpcDTO)));
             deviceBO.setCommandAttributeConfigIdMap(commandAttributeConfigMap);
         });
@@ -175,8 +180,10 @@ public class DeviceClient {
 
         CollectionOptional.ofNullable(rDeviceAttachDTO.getEventConfigsList()).ifPresent(value -> {
             Map<Long, Map<Long, EventAttributeConfigDTO>> eventAttributeConfigMap = value.stream()
-                    .collect(Collectors.groupingBy(GrpcEventAttributeConfigDTO::getEventId,
-                            Collectors.toMap(GrpcEventAttributeConfigDTO::getAttributeId,
+                    .collect(Collectors.groupingBy(
+                            GrpcEventAttributeConfigDTO::getEventId,
+                            Collectors.toMap(
+                                    GrpcEventAttributeConfigDTO::getAttributeId,
                                     grpcEventAttributeConfigBuilder::buildDTOByGrpcDTO)));
             deviceBO.setEventAttributeConfigIdMap(eventAttributeConfigMap);
         });
@@ -207,9 +214,10 @@ public class DeviceClient {
                 CommandTypeEnum.ofIndex((byte) command.getCommandTypeFlag()),
                 CallTypeEnum.ofIndex((byte) command.getCallTypeFlag()),
                 command.getTimeout(),
-                command.getCommandExt().isBlank() ? null : JsonUtil.parseObject(command.getCommandExt(), CommandExt.class),
+                command.getCommandExt().isBlank()
+                        ? null
+                        : JsonUtil.parseObject(command.getCommandExt(), CommandExt.class),
                 EnableFlagEnum.ofIndex((byte) command.getEnableFlag()),
                 command.getVersion());
     }
-
 }

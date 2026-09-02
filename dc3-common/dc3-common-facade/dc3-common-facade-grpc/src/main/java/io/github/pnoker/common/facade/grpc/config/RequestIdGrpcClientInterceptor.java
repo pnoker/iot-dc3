@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.config;
 
 import io.github.pnoker.common.constant.common.RequestIdConstant;
@@ -66,8 +65,8 @@ public class RequestIdGrpcClientInterceptor implements ClientInterceptor {
             Metadata.Key.of(RequestIdConstant.HEADER, Metadata.ASCII_STRING_MARSHALLER);
 
     @Override
-    public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(MethodDescriptor<ReqT, RespT> method,
-                                                               CallOptions callOptions, Channel next) {
+    public <ReqT, RespT> ClientCall<ReqT, RespT> interceptCall(
+            MethodDescriptor<ReqT, RespT> method, CallOptions callOptions, Channel next) {
         String requestId = MDC.get(RequestIdConstant.MDC_KEY);
 
         // If MDC doesn't have requestId, try to get it from OpenTelemetry

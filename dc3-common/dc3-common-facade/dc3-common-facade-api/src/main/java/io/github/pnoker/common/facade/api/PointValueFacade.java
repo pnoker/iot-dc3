@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointVolumeBO;
 import io.github.pnoker.db.r2dbc.core.page.CursorPage;
-import reactor.core.publisher.Mono;
-
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral point value facade.
@@ -44,10 +42,7 @@ public interface PointValueFacade {
 
     Mono<FacadePointValueBO> lastValue(Long tenantId, Long deviceId, Long pointId);
 
-    Mono<CursorPage<FacadePointValueBO>> history(Long tenantId, Long deviceId, Long pointId,
-                                                 String cursor, int limit);
+    Mono<CursorPage<FacadePointValueBO>> history(Long tenantId, Long deviceId, Long pointId, String cursor, int limit);
 
     Mono<List<FacadePointVolumeBO>> pointVolumes(Long tenantId, long fromEpochMillis);
-
-
 }

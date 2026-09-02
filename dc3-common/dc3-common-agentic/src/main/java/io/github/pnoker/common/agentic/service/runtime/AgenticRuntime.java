@@ -44,5 +44,4 @@ public interface AgenticRuntime {
      * @return the final result and finish reason
      */
     Mono<AgenticRuntimeResult> call(AgenticPreparedChatBO prepared);
-
 }

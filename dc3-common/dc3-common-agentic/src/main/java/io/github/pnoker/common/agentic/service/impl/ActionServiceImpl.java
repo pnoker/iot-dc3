@@ -5,6 +5,14 @@
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.agentic.service.impl;
 
@@ -19,16 +27,15 @@ import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.facade.api.PointCommandFacade;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /** Implements the agentic action lifecycle. */
 @Slf4j
@@ -42,8 +49,8 @@ public class ActionServiceImpl implements ActionService {
     private final PointCommandFacade pointCommandFacade;
 
     @Override
-    public Mono<String> createWritePointValueAction(String conversationId, Long deviceId, Long pointId,
-                                                    String value, RequestHeader.PrincipalHeader header) {
+    public Mono<String> createWritePointValueAction(
+            String conversationId, Long deviceId, Long pointId, String value, RequestHeader.PrincipalHeader header) {
         Objects.requireNonNull(header, "header must not be null");
         if (conversationId == null || conversationId.isBlank()) {
             return Mono.error(new RequestException("Conversation ID is required"));
@@ -66,10 +73,9 @@ public class ActionServiceImpl implements ActionService {
         return actionStore.create(action).map(ActionBO::getActionId);
     }
 
-
     @Override
-    public Mono<OffsetPage<ActionBO>> listPending(long offset, int limit, String conversationId,
-                                                   RequestHeader.PrincipalHeader header) {
+    public Mono<OffsetPage<ActionBO>> listPending(
+            long offset, int limit, String conversationId, RequestHeader.PrincipalHeader header) {
         Objects.requireNonNull(header, "header must not be null");
         return actionStore.listPending(offset, limit, conversationId, header, Instant.now());
     }
@@ -77,8 +83,8 @@ public class ActionServiceImpl implements ActionService {
     @Override
     public Mono<ActionBO> confirm(String actionId, RequestHeader.PrincipalHeader header) {
         return getPending(actionId, header)
-                .flatMap(action -> actionStore.claimPending(actionId, header,
-                                AgenticActionStatusEnum.CONFIRMED, Instant.now())
+                .flatMap(action -> actionStore
+                        .claimPending(actionId, header, AgenticActionStatusEnum.CONFIRMED, Instant.now())
                         .switchIfEmpty(Mono.error(new RequestException("Agentic action is no longer pending"))))
                 .flatMap(action -> execute(action, header));
     }
@@ -86,8 +92,8 @@ public class ActionServiceImpl implements ActionService {
     @Override
     public Mono<ActionBO> reject(String actionId, RequestHeader.PrincipalHeader header) {
         return getPending(actionId, header)
-                .flatMap(action -> actionStore.claimPending(actionId, header,
-                                AgenticActionStatusEnum.REJECTED, Instant.now())
+                .flatMap(action -> actionStore
+                        .claimPending(actionId, header, AgenticActionStatusEnum.REJECTED, Instant.now())
                         .switchIfEmpty(Mono.error(new RequestException("Agentic action is no longer pending"))));
     }
 
@@ -98,7 +104,8 @@ public class ActionServiceImpl implements ActionService {
         if (header == null) {
             return Mono.error(new IllegalArgumentException("header must not be null"));
         }
-        return actionStore.find(actionId, header)
+        return actionStore
+                .find(actionId, header)
                 .switchIfEmpty(Mono.error(new NotFoundException("Agentic action does not exist")))
                 .flatMap(action -> {
                     if (action.getStatus() != AgenticActionStatusEnum.PENDING) {
@@ -114,19 +121,35 @@ public class ActionServiceImpl implements ActionService {
 
     private Mono<ActionBO> execute(ActionBO action, RequestHeader.PrincipalHeader header) {
         if (!ACTION_WRITE_POINT_VALUE.equals(action.getActionType())) {
-            return actionStore.updateExecutionResult(action.getActionId(), header,
-                    AgenticActionStatusEnum.FAILED, "Unsupported action type", Instant.now());
+            return actionStore.updateExecutionResult(
+                    action.getActionId(),
+                    header,
+                    AgenticActionStatusEnum.FAILED,
+                    "Unsupported action type",
+                    Instant.now());
         }
         Map<String, Object> payload = action.getPayload();
-        return pointCommandFacade.submitWrite(header.getTenantId(), longValue(payload.get("deviceId")),
-                        longValue(payload.get("pointId")), Objects.toString(payload.get("value"), ""),
+        return pointCommandFacade
+                .submitWrite(
+                        header.getTenantId(),
+                        longValue(payload.get("deviceId")),
+                        longValue(payload.get("pointId")),
+                        Objects.toString(payload.get("value"), ""),
                         PointCommandSourceEnum.AGENTIC)
-                .flatMap(commandId -> actionStore.updateExecutionResult(action.getActionId(), header,
-                        AgenticActionStatusEnum.EXECUTED, "Command accepted: " + commandId, Instant.now()))
+                .flatMap(commandId -> actionStore.updateExecutionResult(
+                        action.getActionId(),
+                        header,
+                        AgenticActionStatusEnum.EXECUTED,
+                        "Command accepted: " + commandId,
+                        Instant.now()))
                 .onErrorResume(exception -> {
                     log.warn("Action execution failed, actionId={}", action.getActionId(), exception);
-                    return actionStore.updateExecutionResult(action.getActionId(), header,
-                            AgenticActionStatusEnum.FAILED, exception.getMessage(), Instant.now());
+                    return actionStore.updateExecutionResult(
+                            action.getActionId(),
+                            header,
+                            AgenticActionStatusEnum.FAILED,
+                            exception.getMessage(),
+                            Instant.now());
                 });
     }
 

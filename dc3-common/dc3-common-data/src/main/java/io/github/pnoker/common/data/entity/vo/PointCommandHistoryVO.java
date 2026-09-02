@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,15 +21,14 @@ import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * View object for point command history API responses.
@@ -80,7 +78,9 @@ public class PointCommandHistoryVO implements Serializable {
     @Schema(description = "Error code if the point command execution failed. Null on success.", example = "ERR_TIMEOUT")
     private String errorCode;
 
-    @Schema(description = "Human-readable error message if the point command execution failed. Null on success.", example = "Connection timeout after 3000ms")
+    @Schema(
+            description = "Human-readable error message if the point command execution failed. Null on success.",
+            example = "Connection timeout after 3000ms")
     private String errorMessage;
 
     @Schema(description = "Source identifier", example = "HTTP")
@@ -109,5 +109,4 @@ public class PointCommandHistoryVO implements Serializable {
 
     @Schema(description = "Last operation time")
     private LocalDateTime operateTime;
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -26,13 +25,12 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PasswordAlgorithmEnum;
 import io.github.pnoker.common.enums.RequirePasswordChangeFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
 
 /**
  * View object for local login credentials.
@@ -60,34 +58,46 @@ public class LocalCredentialVO extends BaseVO {
 
     @ToString.Exclude
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Schema(description = "Hashed credential secret; write-only, never returned in responses.", example = "$2a$10$examplehashedpassword")
+    @Schema(
+            description = "Hashed credential secret; write-only, never returned in responses.",
+            example = "$2a$10$examplehashedpassword")
     private String password;
 
     @Schema(description = "Hashing algorithm applied to the stored password.", example = "BCRYPT")
     private PasswordAlgorithmEnum passwordAlgorithm;
 
-    @Schema(description = "Additional algorithm parameters for the password hash (e.g. cost factor, salt); stored as JSON.")
+    @Schema(
+            description =
+                    "Additional algorithm parameters for the password hash (e.g. cost factor, salt); stored as JSON.")
     private JsonExt passwordParams;
 
     @Schema(description = "Timestamp when the password was last changed.", example = "2025-01-15T10:30:00")
     private LocalDateTime passwordUpdatedTime;
 
-    @Schema(description = "Timestamp after which the password is considered expired and must be changed.", example = "2026-01-15T10:30:00")
+    @Schema(
+            description = "Timestamp after which the password is considered expired and must be changed.",
+            example = "2026-01-15T10:30:00")
     private LocalDateTime passwordExpireTime;
 
-    @Schema(description = "Number of consecutive failed authentication attempts since the last successful login.", example = "0")
+    @Schema(
+            description = "Number of consecutive failed authentication attempts since the last successful login.",
+            example = "0")
     private Integer failedAttempts;
 
-    @Schema(description = "Timestamp until which the credential is locked due to excessive failed attempts; null means not locked.", example = "2025-06-18T12:00:00")
+    @Schema(
+            description =
+                    "Timestamp until which the credential is locked due to excessive failed attempts; null means not locked.",
+            example = "2025-06-18T12:00:00")
     private LocalDateTime lockedUntil;
 
     @Schema(description = "Whether the user must change their password on next login.", example = "NOT_REQUIRED")
     private RequirePasswordChangeFlagEnum requirePasswordChange;
 
-    @Schema(description = "Whether this credential is active; disabled credentials cannot authenticate.", example = "ENABLE")
+    @Schema(
+            description = "Whether this credential is active; disabled credentials cannot authenticate.",
+            example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
     @Schema(description = "Additional credential metadata or extension attributes stored as JSON.")
     private JsonExt credentialExt;
-
 }

@@ -47,5 +47,4 @@ public class SessionBO extends BaseBO implements TenantOwned {
     private Long tenantId;
 
     private Long userId;
-
 }

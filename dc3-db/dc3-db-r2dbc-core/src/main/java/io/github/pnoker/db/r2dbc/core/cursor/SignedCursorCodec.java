@@ -1,7 +1,21 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.db.r2dbc.core.cursor;
 
-import javax.crypto.Mac;
-import javax.crypto.SecretKey;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -17,6 +31,8 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
 
 public final class SignedCursorCodec {
 
@@ -25,6 +41,7 @@ public final class SignedCursorCodec {
     private static final int MAGIC = 0x44433343;
     /** Version 2 stores expiry at the platform's UTC-microsecond precision. */
     private static final int VERSION = 2;
+
     private static final String HMAC_ALGORITHM = "HmacSHA256";
     private static final Duration MAX_CURSOR_LIFETIME = Duration.ofDays(365);
     private static final Base64.Encoder ENCODER = Base64.getUrlEncoder().withoutPadding();
@@ -54,8 +71,7 @@ public final class SignedCursorCodec {
             throw new IllegalArgumentException("cursor signing key does not exist");
         }
         Instant now = clock.instant().truncatedTo(ChronoUnit.MICROS);
-        if (!state.expiresAt().isAfter(now)
-                || state.expiresAt().isAfter(now.plus(MAX_CURSOR_LIFETIME))) {
+        if (!state.expiresAt().isAfter(now) || state.expiresAt().isAfter(now.plus(MAX_CURSOR_LIFETIME))) {
             throw new IllegalArgumentException("cursor expiration must be in the future");
         }
         byte[] payload = serialize(state);
@@ -151,12 +167,12 @@ public final class SignedCursorCodec {
             UUID tenantId = new UUID(input.readLong(), input.readLong());
             long expiryMicros = input.readLong();
             Instant expiresAt = Instant.ofEpochSecond(
-                    Math.floorDiv(expiryMicros, 1_000_000L),
-                    Math.floorMod(expiryMicros, 1_000_000L) * 1_000L);
+                    Math.floorDiv(expiryMicros, 1_000_000L), Math.floorMod(expiryMicros, 1_000_000L) * 1_000L);
             byte[] digest = input.readNBytes(CursorState.QUERY_DIGEST_LENGTH);
             int positionLength = input.readInt();
             if (digest.length != CursorState.QUERY_DIGEST_LENGTH
-                    || positionLength < 1 || positionLength > MAX_POSITION_BYTES) {
+                    || positionLength < 1
+                    || positionLength > MAX_POSITION_BYTES) {
                 throw invalidCursor();
             }
             byte[] position = input.readNBytes(positionLength);

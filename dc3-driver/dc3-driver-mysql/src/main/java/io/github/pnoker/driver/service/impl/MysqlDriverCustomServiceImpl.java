@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.sql.AbstractJdbcDriverCustomService;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Service;
 
 /**
  * Custom driver service implementation for the Mysql driver.
@@ -44,7 +42,8 @@ public class MysqlDriverCustomServiceImpl extends AbstractJdbcDriverCustomServic
         String host = getConfigValue(driverConfig, "host", "localhost");
         int port = getConfigIntValue(driverConfig, "port", getDefaultPort());
         String database = getRequiredConfig(driverConfig, "database");
-        return String.format("jdbc:mysql://%s:%d/%s?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
+        return String.format(
+                "jdbc:mysql://%s:%d/%s?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC",
                 host, port, database);
     }
 
@@ -71,5 +70,4 @@ public class MysqlDriverCustomServiceImpl extends AbstractJdbcDriverCustomServic
                 .issues(issues)
                 .build();
     }
-
 }

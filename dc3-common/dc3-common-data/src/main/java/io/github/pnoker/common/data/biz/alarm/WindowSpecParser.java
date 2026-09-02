@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
 import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.enums.WindowModeEnum;
-import org.apache.commons.lang3.StringUtils;
-
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Parses {@link RuleExt.Window} JSON into a {@link WindowSpec}. Both the rule
@@ -60,14 +58,13 @@ public final class WindowSpecParser {
         try {
             duration = Duration.parse(StringUtils.defaultIfBlank(window.getDuration(), "PT0S"));
         } catch (DateTimeParseException ignored) {
-            return WindowSpec.invalid("Invalid window duration '" + window.getDuration()
-                    + "', expected ISO-8601 like PT5M");
+            return WindowSpec.invalid(
+                    "Invalid window duration '" + window.getDuration() + "', expected ISO-8601 like PT5M");
         }
         if (mode.requiresDuration() && (duration.isZero() || duration.isNegative())) {
             return WindowSpec.invalid("Window duration must be positive for mode " + mode);
         }
-        return WindowSpec.ok(mode, mode == WindowModeEnum.LAST ? null : duration,
-                normalizedMinSamples(window, mode));
+        return WindowSpec.ok(mode, mode == WindowModeEnum.LAST ? null : duration, normalizedMinSamples(window, mode));
     }
 
     private static int normalizedMinSamples(RuleExt.Window window, WindowModeEnum mode) {
@@ -83,5 +80,4 @@ public final class WindowSpecParser {
         }
         return raw;
     }
-
 }

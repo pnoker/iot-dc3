@@ -1,23 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { md5, sha256 } from '../src/utils/crypto';
+import { sha256 } from '../src/utils/crypto';
 import { decodeJwt, isTokenExpired, tokenTtl } from '../src/utils/jwt';
 
 describe('crypto utils', () => {
-  it('md5 should produce correct hash', () => {
-    const result = md5('hello');
-    expect(result).toBe('5d41402abc4b2a76b9719d911017c592');
-    expect(result).toHaveLength(32);
-  });
-
   it('sha256 should produce correct hash', () => {
     const result = sha256('hello');
     expect(result).toBe('2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824');
     expect(result).toHaveLength(64);
-  });
-
-  it('md5 of empty string', () => {
-    const result = md5('');
-    expect(result).toBe('d41d8cd98f00b204e9800998ecf8427e');
   });
 });
 

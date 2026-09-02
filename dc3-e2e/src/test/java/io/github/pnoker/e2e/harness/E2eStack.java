@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.e2e.harness;
 
+import java.time.Duration;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -24,8 +24,6 @@ import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.TestcontainersConfiguration;
-
-import java.time.Duration;
 
 /**
  * Singleton container stack used by E2E tests.
@@ -44,12 +42,10 @@ import java.time.Duration;
  */
 public final class E2eStack {
 
-    private static final DockerImageName POSTGRES_IMAGE = DockerImageName
-            .parse("timescale/timescaledb-ha:pg18")
-            .asCompatibleSubstituteFor("postgres");
+    private static final DockerImageName POSTGRES_IMAGE =
+            DockerImageName.parse("timescale/timescaledb-ha:pg18").asCompatibleSubstituteFor("postgres");
 
-    private static final DockerImageName RABBIT_IMAGE = DockerImageName
-            .parse("rabbitmq:3.13-management");
+    private static final DockerImageName RABBIT_IMAGE = DockerImageName.parse("rabbitmq:3.13-management");
 
     private static final Network NETWORK = Network.newNetwork();
 
@@ -73,8 +69,7 @@ public final class E2eStack {
 
     private static volatile boolean started;
 
-    private E2eStack() {
-    }
+    private E2eStack() {}
 
     /**
      * Idempotent boot. The first invocation starts the containers; subsequent calls
@@ -137,9 +132,8 @@ public final class E2eStack {
 
     private static void ensureStarted() {
         if (!started) {
-            throw new IllegalStateException(
-                    "E2eStack has not been started. Call E2eStack.start() from a "
-                            + "@BeforeAll hook or extend BaseE2eIT.");
+            throw new IllegalStateException("E2eStack has not been started. Call E2eStack.start() from a "
+                    + "@BeforeAll hook or extend BaseE2eIT.");
         }
     }
 

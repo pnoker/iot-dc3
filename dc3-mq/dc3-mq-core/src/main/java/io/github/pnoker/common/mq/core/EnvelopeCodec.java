@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.core;
 
 import io.github.pnoker.common.constant.common.RequestIdConstant;
@@ -25,13 +24,12 @@ import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
-
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
 /**
  * Serializes business messages into the broker-neutral wire envelope: JSON body plus
@@ -68,7 +66,11 @@ public final class EnvelopeCodec {
             headers.put(MqHeaders.REQUEST_ID, requestId);
         }
         byte[] body = JsonUtil.toJsonString(payload).getBytes(StandardCharsets.UTF_8);
-        return new WireMqMessage(message.getTopic(), message.getPartitionKey(), body, headers,
+        return new WireMqMessage(
+                message.getTopic(),
+                message.getPartitionKey(),
+                body,
+                headers,
                 Objects.isNull(message.getDelay()) ? java.time.Duration.ZERO : message.getDelay());
     }
 

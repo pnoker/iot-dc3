@@ -14,8 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.receiver.rabbit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.event.metadata.MetadataEventPublisher;
@@ -30,6 +39,7 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,18 +47,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MetadataReceiverTest {
@@ -75,8 +73,8 @@ class MetadataReceiverTest {
     void setUp() {
         driverMetadata = new DriverMetadata();
         driverMetadata.setDeviceLeases(Map.of(99L, 1L), System.currentTimeMillis() + 60_000, 1L);
-        receiver = new MetadataReceiver(pointMetadata, driverMetadata, deviceMetadata, driverClient,
-                metadataEventPublisher);
+        receiver = new MetadataReceiver(
+                pointMetadata, driverMetadata, deviceMetadata, driverClient, metadataEventPublisher);
         lenient().when(deviceMetadata.refreshCache(anyLong())).thenReturn(Mono.empty());
         lenient().when(pointMetadata.refreshCache(anyLong())).thenReturn(Mono.empty());
         lenient().when(driverClient.refreshMetadata(anyLong())).thenReturn(Mono.empty());
@@ -105,8 +103,7 @@ class MetadataReceiverTest {
     @Test
     void deviceRefreshFailurePropagatesAndSkipsLocalEvent() {
         MetadataEventDTO event = event(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE, 10L);
-        when(deviceMetadata.refreshCache(10L))
-                .thenReturn(Mono.error(new IllegalStateException("manager unavailable")));
+        when(deviceMetadata.refreshCache(10L)).thenReturn(Mono.error(new IllegalStateException("manager unavailable")));
 
         StepVerifier.create(receiver.metadataReceive(received(event), ack))
                 .expectErrorMessage("manager unavailable")
@@ -181,7 +178,8 @@ class MetadataReceiverTest {
     void localPublisherFailurePropagates() {
         MetadataEventDTO event = event(MetadataTypeEnum.POINT, MetadataOperateTypeEnum.DELETE, 20L);
         doThrow(new IllegalStateException("local listener failed"))
-                .when(metadataEventPublisher).publishEvent(any());
+                .when(metadataEventPublisher)
+                .publishEvent(any());
 
         StepVerifier.create(receiver.metadataReceive(received(event), ack))
                 .expectErrorMessage("local listener failed")

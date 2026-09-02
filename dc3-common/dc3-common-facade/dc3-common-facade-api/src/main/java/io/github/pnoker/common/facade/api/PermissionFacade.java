@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
-import reactor.core.publisher.Mono;
-
 import java.util.Set;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral permission facade. Mirrors {@code api.center.auth.PermissionApi}.
@@ -37,5 +35,4 @@ public interface PermissionFacade {
      * @return full resource code set; empty when the principal has no grants
      */
     Mono<Set<String>> listPermissionCodes(Long tenantId, Long principalId);
-
 }

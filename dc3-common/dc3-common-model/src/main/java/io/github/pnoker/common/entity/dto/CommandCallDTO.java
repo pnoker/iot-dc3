@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.dto;
 
 import io.github.pnoker.common.enums.CommandHistorySourceEnum;
-
 import java.time.Instant;
 import java.util.Map;
 
@@ -41,8 +39,7 @@ public record CommandCallDTO(
         Long sourceUserId,
         Instant occurredAt,
         Instant expireAt,
-        int schemaVersion
-) {
+        int schemaVersion) {
 
     /**
      * Builder.
@@ -217,8 +214,20 @@ public record CommandCallDTO(
          * @return the command call DTO
          */
         public CommandCallDTO build() {
-            return new CommandCallDTO(recordId, tenantId, ownerNode, fencingToken, deviceId, commandId, commandCode,
-                    paramValues, source, sourceUserId, occurredAt, expireAt, schemaVersion);
+            return new CommandCallDTO(
+                    recordId,
+                    tenantId,
+                    ownerNode,
+                    fencingToken,
+                    deviceId,
+                    commandId,
+                    commandCode,
+                    paramValues,
+                    source,
+                    sourceUserId,
+                    occurredAt,
+                    expireAt,
+                    schemaVersion);
         }
     }
 }

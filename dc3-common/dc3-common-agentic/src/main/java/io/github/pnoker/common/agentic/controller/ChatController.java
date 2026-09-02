@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +35,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
 /**
  * OpenAI-compatible chat completion endpoint.
  * <p>
@@ -45,7 +44,10 @@ import java.util.Objects;
  * @author pnoker
  * @since 2016.10.1
  */
-@Tag(name = "chat", description = "AI chat operations: handle real-time chat interactions including message streaming, tool calling, and conversation context management with language models")
+@Tag(
+        name = "chat",
+        description =
+                "AI chat operations: handle real-time chat interactions including message streaming, tool calling, and conversation context management with language models")
 @RestController
 @RequestMapping(AgenticConstant.CHAT_URL_PREFIX)
 @RequiredArgsConstructor
@@ -63,14 +65,20 @@ public class ChatController implements BaseController {
      * @return a streaming SSE entity when stream is true, otherwise the completion resource as JSON
      */
     @PreAuthorize("@perm.can('chat', 'list')")
-    @Operation(summary = "Create Chat Completion", description = "Submit a chat prompt with conversation context and receive the assistant reply using the OpenAI-compatible completion format. "
-            + "When the request sets stream=true the reply is streamed token by token over SSE; otherwise it returns the full reply as a single JSON response.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "false"),
-                    @ExtensionProperty(name = "openWorld", value = "true")
-            }))
+    @Operation(
+            summary = "Create Chat Completion",
+            description =
+                    "Submit a chat prompt with conversation context and receive the assistant reply using the OpenAI-compatible completion format. "
+                            + "When the request sets stream=true the reply is streamed token by token over SSE; otherwise it returns the full reply as a single JSON response.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "false"),
+                                @ExtensionProperty(name = "openWorld", value = "true")
+                            }))
     @PostMapping("/completions")
     public Mono<ResponseEntity<?>> chatCompletion(@RequestBody ChatCompletionRequestVO request) {
         return getPrincipalHeader().flatMap(header -> {
@@ -79,11 +87,11 @@ public class ChatController implements BaseController {
                         .contentType(MediaType.TEXT_EVENT_STREAM)
                         .body(agenticChatService.streamChatCompletion(request, header)));
             }
-            return agenticChatService.chatCompletion(request, header)
+            return agenticChatService
+                    .chatCompletion(request, header)
                     .map(response -> ResponseEntity.ok()
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(response));
         });
     }
-
 }

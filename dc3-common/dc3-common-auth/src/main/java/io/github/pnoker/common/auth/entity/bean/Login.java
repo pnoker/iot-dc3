@@ -14,21 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.bean;
 
 import io.github.pnoker.common.valid.Auth;
 import io.github.pnoker.common.valid.Check;
 import io.github.pnoker.common.valid.Update;
 import jakarta.validation.constraints.NotBlank;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * Login request payload with user credentials.
@@ -46,21 +44,30 @@ public class Login implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotBlank(message = "Tenant can't be empty", groups = {Auth.class})
+    @NotBlank(
+            message = "Tenant can't be empty",
+            groups = {Auth.class})
     private String tenant;
 
-    @NotBlank(message = "Name can't be empty", groups = {Check.class, Auth.class, Update.class})
+    @NotBlank(
+            message = "Name can't be empty",
+            groups = {Check.class, Auth.class, Update.class})
     private String name;
 
-    @NotBlank(message = "Salt can't be empty", groups = {Check.class, Auth.class})
+    @NotBlank(
+            message = "Salt can't be empty",
+            groups = {Check.class, Auth.class})
     private String salt;
 
-    @NotBlank(message = "Password can't be empty", groups = {Auth.class})
+    @NotBlank(
+            message = "Password can't be empty",
+            groups = {Auth.class})
     @ToString.Exclude
     private String password;
 
-    @NotBlank(message = "Token can't be empty", groups = {Check.class})
+    @NotBlank(
+            message = "Token can't be empty",
+            groups = {Check.class})
     @ToString.Exclude
     private String token;
-
 }

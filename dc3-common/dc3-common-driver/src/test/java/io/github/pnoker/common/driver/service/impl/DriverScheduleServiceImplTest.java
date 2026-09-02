@@ -14,8 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
@@ -33,14 +40,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.SchedulerException;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class DriverScheduleServiceImplTest {
@@ -71,21 +70,24 @@ class DriverScheduleServiceImplTest {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
         properties.setSchedule(s);
         service.initialize();
-        verify(quartzService).createJobWithCron(
-                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.DRIVER_HEALTH_SCHEDULE_JOB),
-                eq(ScheduleConstant.DRIVER_HEALTH_SCHEDULE_CRON),
-                eq(DriverHealthScheduleJob.class));
-        verify(quartzService).createJobWithCron(
-                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.DRIVER_LEASE_RENEW_SCHEDULE_JOB),
-                eq(properties.getLease().getRenewCron()),
-                eq(DriverLeaseRenewScheduleJob.class));
-        verify(quartzService).createJobWithCron(
-                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.BUFFER_REPUBLISH_SCHEDULE_JOB),
-                eq(properties.getBuffer().getRepublishCron()),
-                eq(BufferRepublishScheduleJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.DRIVER_HEALTH_SCHEDULE_JOB),
+                        eq(ScheduleConstant.DRIVER_HEALTH_SCHEDULE_CRON),
+                        eq(DriverHealthScheduleJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.DRIVER_LEASE_RENEW_SCHEDULE_JOB),
+                        eq(properties.getLease().getRenewCron()),
+                        eq(DriverLeaseRenewScheduleJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.BUFFER_REPUBLISH_SCHEDULE_JOB),
+                        eq(properties.getBuffer().getRepublishCron()),
+                        eq(BufferRepublishScheduleJob.class));
         verify(quartzService).startScheduler();
     }
 
@@ -113,11 +115,12 @@ class DriverScheduleServiceImplTest {
         properties.setSchedule(s);
         properties.getHealth().getDevice().setCron("0/20 * * * * ?");
         service.initialize();
-        verify(quartzService).createJobWithCron(
-                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB),
-                eq("0/20 * * * * ?"),
-                eq(DeviceHealthScheduleJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB),
+                        eq("0/20 * * * * ?"),
+                        eq(DeviceHealthScheduleJob.class));
     }
 
     @Test
@@ -126,11 +129,12 @@ class DriverScheduleServiceImplTest {
         properties.setSchedule(s);
         properties.getHealth().getDevice().setEnabled(false);
         service.initialize();
-        verify(quartzService, never()).createJobWithCron(
-                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB),
-                any(),
-                eq(DeviceHealthScheduleJob.class));
+        verify(quartzService, never())
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB),
+                        any(),
+                        eq(DeviceHealthScheduleJob.class));
     }
 
     @Test
@@ -150,11 +154,12 @@ class DriverScheduleServiceImplTest {
         s.getRead().setCron("0 */1 * * * ?");
         properties.setSchedule(s);
         service.initialize();
-        verify(quartzService).createJobWithCron(
-                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.DRIVER_READ_SCHEDULE_JOB),
-                eq("0 */1 * * * ?"),
-                eq(DriverReadScheduleJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.DRIVER_READ_SCHEDULE_JOB),
+                        eq("0 */1 * * * ?"),
+                        eq(DriverReadScheduleJob.class));
     }
 
     @Test
@@ -175,11 +180,12 @@ class DriverScheduleServiceImplTest {
         s.getCustom().setCron("0 0/5 * * * ?");
         properties.setSchedule(s);
         service.initialize();
-        verify(quartzService).createJobWithCron(
-                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.DRIVER_CUSTOM_SCHEDULE_JOB),
-                eq("0 0/5 * * * ?"),
-                eq(DriverCustomScheduleJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.DRIVER_CUSTOM_SCHEDULE_JOB),
+                        eq("0 0/5 * * * ?"),
+                        eq(DriverCustomScheduleJob.class));
     }
 
     @Test
@@ -197,7 +203,8 @@ class DriverScheduleServiceImplTest {
     void initialWrapsSchedulerExceptionInServiceException() throws Exception {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
         properties.setSchedule(s);
-        doThrow(new SchedulerException("scheduler down")).when(quartzService)
+        doThrow(new SchedulerException("scheduler down"))
+                .when(quartzService)
                 .createJobWithCron(any(), any(), any(), any());
         assertThatThrownBy(() -> service.initialize())
                 .isInstanceOf(io.github.pnoker.common.exception.ServiceException.class)

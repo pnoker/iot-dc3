@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
 import io.github.pnoker.common.constant.mq.ConsumptionProfile;
@@ -26,14 +25,13 @@ import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqPoisonException;
 import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Point-value consumer. RabbitMQ itself is the durable buffer; the consumer receives
@@ -78,15 +76,18 @@ public class PointValueReceiver {
             values.add(value);
         }
 
-        return pointValueService.save(values)
+        return pointValueService
+                .save(values)
                 .doOnSuccess(ignored -> log.debug("Persisted point-value batch, size={}", values.size()));
     }
 
     private boolean valid(PointValueBO value) {
         return Objects.nonNull(value)
                 && Objects.equals(value.getSchemaVersion(), SUPPORTED_SCHEMA_VERSION)
-                && Objects.nonNull(value.getMessageId()) && !value.getMessageId().isBlank()
-                && Objects.nonNull(value.getDriverNode()) && !value.getDriverNode().isBlank()
+                && Objects.nonNull(value.getMessageId())
+                && !value.getMessageId().isBlank()
+                && Objects.nonNull(value.getDriverNode())
+                && !value.getDriverNode().isBlank()
                 && positive(value.getSequence())
                 && positive(value.getFencingToken())
                 && positive(value.getTenantId())

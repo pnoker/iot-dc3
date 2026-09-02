@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.auth.biz.ReactiveResourceRegistrySyncService;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistryScannedApi;
@@ -24,6 +26,7 @@ import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncResult;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResultBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,11 +35,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ResourceRegistryLocalFacadeTest {
@@ -71,7 +69,8 @@ class ResourceRegistryLocalFacadeTest {
         FacadeResourceRegistrySyncCommandBO commandBO = FacadeResourceRegistrySyncCommandBO.builder()
                 .serviceName("dc3-center-auth")
                 .deleteMissing(true)
-                .apis(List.of(api("GET", "/probe", "Sample.get", "Sample"),
+                .apis(List.of(
+                        api("GET", "/probe", "Sample.get", "Sample"),
                         api("POST", "/v3/point/write", "Point.write", "Point")))
                 .build();
 
@@ -83,12 +82,14 @@ class ResourceRegistryLocalFacadeTest {
                         .unchanged(4)
                         .build()));
 
-        java.util.concurrent.atomic.AtomicReference<FacadeResourceRegistrySyncResultBO> resultRef = new java.util.concurrent.atomic.AtomicReference<>();
-        StepVerifier.create(facade.sync(commandBO)).consumeNextWith(resultRef::set).verifyComplete();
+        java.util.concurrent.atomic.AtomicReference<FacadeResourceRegistrySyncResultBO> resultRef =
+                new java.util.concurrent.atomic.AtomicReference<>();
+        StepVerifier.create(facade.sync(commandBO))
+                .consumeNextWith(resultRef::set)
+                .verifyComplete();
         FacadeResourceRegistrySyncResultBO result = resultRef.get();
 
-        ArgumentCaptor<ResourceRegistrySyncCommand> captor =
-                ArgumentCaptor.forClass(ResourceRegistrySyncCommand.class);
+        ArgumentCaptor<ResourceRegistrySyncCommand> captor = ArgumentCaptor.forClass(ResourceRegistrySyncCommand.class);
         org.mockito.Mockito.verify(resourceRegistrySyncService).sync(captor.capture());
         ResourceRegistrySyncCommand passed = captor.getValue();
         assertThat(passed.getServiceName()).isEqualTo("dc3-center-auth");
@@ -118,8 +119,7 @@ class ResourceRegistryLocalFacadeTest {
 
         StepVerifier.create(facade.sync(commandBO)).expectNextCount(1).verifyComplete();
 
-        ArgumentCaptor<ResourceRegistrySyncCommand> captor =
-                ArgumentCaptor.forClass(ResourceRegistrySyncCommand.class);
+        ArgumentCaptor<ResourceRegistrySyncCommand> captor = ArgumentCaptor.forClass(ResourceRegistrySyncCommand.class);
         org.mockito.Mockito.verify(resourceRegistrySyncService).sync(captor.capture());
         assertThat(captor.getValue().getApis()).isEmpty();
     }
@@ -136,8 +136,7 @@ class ResourceRegistryLocalFacadeTest {
 
         StepVerifier.create(facade.sync(commandBO)).expectNextCount(1).verifyComplete();
 
-        ArgumentCaptor<ResourceRegistrySyncCommand> captor =
-                ArgumentCaptor.forClass(ResourceRegistrySyncCommand.class);
+        ArgumentCaptor<ResourceRegistrySyncCommand> captor = ArgumentCaptor.forClass(ResourceRegistrySyncCommand.class);
         org.mockito.Mockito.verify(resourceRegistrySyncService).sync(captor.capture());
         assertThat(captor.getValue().getApis()).isEmpty();
     }

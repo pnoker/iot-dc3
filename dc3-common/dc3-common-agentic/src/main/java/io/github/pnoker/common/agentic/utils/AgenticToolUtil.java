@@ -19,7 +19,6 @@ package io.github.pnoker.common.agentic.utils;
 import io.github.pnoker.common.constant.common.BaseConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -90,5 +89,4 @@ public class AgenticToolUtil {
     public static boolean hasItems(OffsetPage<?> page) {
         return Objects.nonNull(page) && !isEmpty(page.items());
     }
-
 }

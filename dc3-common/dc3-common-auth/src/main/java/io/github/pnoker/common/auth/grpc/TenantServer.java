@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcCodeQuery;
 import io.github.pnoker.api.center.auth.GrpcTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
-import io.github.pnoker.common.auth.entity.bo.TenantBO;
 import io.github.pnoker.common.auth.grpc.builder.GrpcTenantBuilder;
 import io.github.pnoker.common.auth.service.ReactiveTenantService;
 import io.grpc.Context;
@@ -48,23 +46,29 @@ public class TenantServer extends TenantApiGrpc.TenantApiImplBase {
     @Override
     public void getByCode(GrpcCodeQuery request, StreamObserver<GrpcTenantDTO> responseObserver) {
         Context grpcContext = Context.current();
-        Disposable subscription = tenantService.getByCode(request.getCode())
-                .switchIfEmpty(reactor.core.publisher.Mono.error(
-                        io.grpc.Status.NOT_FOUND.withDescription("Tenant not found").asRuntimeException()))
-                .subscribe(entityBO -> {
-                    if (grpcContext.isCancelled()) return;
-                    GrpcTenantDTO response = grpcTenantBuilder.buildGrpcDTOByBO(entityBO);
-                    responseObserver.onNext(response);
-                    responseObserver.onCompleted();
-                }, error -> {
-                    if (grpcContext.isCancelled()) return;
-                    log.warn("getByCode failed", error);
-                    responseObserver.onError(error instanceof io.grpc.StatusRuntimeException
-                            ? error
-                            : io.grpc.Status.INTERNAL.withDescription("getByCode failed").withCause(error)
-                            .asRuntimeException());
-                });
+        Disposable subscription = tenantService
+                .getByCode(request.getCode())
+                .switchIfEmpty(reactor.core.publisher.Mono.error(io.grpc.Status.NOT_FOUND
+                        .withDescription("Tenant not found")
+                        .asRuntimeException()))
+                .subscribe(
+                        entityBO -> {
+                            if (grpcContext.isCancelled()) return;
+                            GrpcTenantDTO response = grpcTenantBuilder.buildGrpcDTOByBO(entityBO);
+                            responseObserver.onNext(response);
+                            responseObserver.onCompleted();
+                        },
+                        error -> {
+                            if (grpcContext.isCancelled()) return;
+                            log.warn("getByCode failed", error);
+                            responseObserver.onError(
+                                    error instanceof io.grpc.StatusRuntimeException
+                                            ? error
+                                            : io.grpc.Status.INTERNAL
+                                                    .withDescription("getByCode failed")
+                                                    .withCause(error)
+                                                    .asRuntimeException());
+                        });
         grpcContext.addListener(context -> subscription.dispose(), Runnable::run);
     }
-
 }

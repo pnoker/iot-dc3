@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.coap.entity.property;
 
 import jakarta.validation.Valid;
@@ -68,9 +67,9 @@ public class CoapProperties {
     @NoArgsConstructor
     /** CoAP role of the endpoint: client (collect from devices), server (accept device pushes), or both. */
     public enum ModeEnum {
-
-        CLIENT, SERVER, BOTH,
-
+        CLIENT,
+        SERVER,
+        BOTH,
     }
 
     @Getter
@@ -87,7 +86,5 @@ public class CoapProperties {
         private String identityCertificatePath;
 
         private String identityPrivateKeyPath;
-
     }
-
 }

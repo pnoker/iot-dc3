@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 /**
@@ -48,9 +46,10 @@ public class AlarmRulePipelineServiceImpl implements AlarmRulePipelineService {
         if (fact == null) {
             return Flux.empty();
         }
-        return ruleEngine.evaluate(fact)
-                .concatMap(match -> ruleAlarmPersistenceService.ensureAlarm(match)
-                        .flatMapMany(ruleNotificationService::notify));
+        return ruleEngine
+                .evaluate(fact)
+                .concatMap(match ->
+                        ruleAlarmPersistenceService.ensureAlarm(match).flatMapMany(ruleNotificationService::notify));
     }
 
     @Override
@@ -78,9 +77,7 @@ public class AlarmRulePipelineServiceImpl implements AlarmRulePipelineService {
                 .concatMap(ruleEngine::evaluate)
                 .concatMap(match -> ruleAlarmPersistenceService.ensureAlarm(match))
                 .collectList()
-                .flatMapMany(matches -> matches.isEmpty()
-                        ? Flux.empty()
-                        : ruleNotificationService.notifyBatch(matches));
+                .flatMapMany(
+                        matches -> matches.isEmpty() ? Flux.empty() : ruleNotificationService.notifyBatch(matches));
     }
-
 }

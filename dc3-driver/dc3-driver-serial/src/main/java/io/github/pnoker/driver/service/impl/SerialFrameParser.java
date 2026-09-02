@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.exception.ReadPointException;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.HexFormat;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Configurable serial frame parser supporting frame headers, footers,
@@ -42,8 +40,8 @@ public class SerialFrameParser {
     private final int dataLength;
     private final ChecksumType checksumType;
 
-    public SerialFrameParser(String frameHeaderHex, String frameFooterHex,
-                             int dataOffset, int dataLength, String checksumTypeName) {
+    public SerialFrameParser(
+            String frameHeaderHex, String frameFooterHex, int dataOffset, int dataLength, String checksumTypeName) {
         this.frameHeader = isBlank(frameHeaderHex) ? null : hexToBytes(frameHeaderHex);
         this.frameFooter = isBlank(frameFooterHex) ? null : hexToBytes(frameFooterHex);
         this.dataOffset = Math.max(0, dataOffset);
@@ -194,8 +192,10 @@ public class SerialFrameParser {
             byte[] expectedChecksum = extractChecksum(raw, dataEnd, checksumLength);
             byte[] actualChecksum = computeChecksum(payload);
             if (!arrayEquals(expectedChecksum, actualChecksum)) {
-                throw new ReadPointException("Serial frame checksum mismatch: expected={}, actual={}",
-                        bytesToHex(expectedChecksum), bytesToHex(actualChecksum));
+                throw new ReadPointException(
+                        "Serial frame checksum mismatch: expected={}, actual={}",
+                        bytesToHex(expectedChecksum),
+                        bytesToHex(actualChecksum));
             }
         }
 
@@ -243,7 +243,7 @@ public class SerialFrameParser {
                 }
             }
         }
-        return new byte[]{(byte) (crc & 0xFF), (byte) ((crc >> 8) & 0xFF)};
+        return new byte[] {(byte) (crc & 0xFF), (byte) ((crc >> 8) & 0xFF)};
     }
 
     /**
@@ -254,7 +254,7 @@ public class SerialFrameParser {
         for (byte b : data) {
             xor ^= b;
         }
-        return new byte[]{xor};
+        return new byte[] {xor};
     }
 
     /**

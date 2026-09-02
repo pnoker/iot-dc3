@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
@@ -60,19 +59,19 @@ public class MqttUtil {
 
         // Configure TLS X509 certificate authentication
         if (MqttProperties.AuthTypeEnum.X509.equals(mqttProperties.getAuthType())) {
-            mqttConnectOptions
-                    .setSocketFactory(X509Util.getSSLSocketFactory(mqttProperties.getCaCrt(), mqttProperties.getClientCrt(),
-                            mqttProperties.getClientKey(), StringUtils.isEmpty(mqttProperties.getClientKeyPass())
-                                    ? StringUtils.EMPTY : mqttProperties.getClientKeyPass()));
-
+            mqttConnectOptions.setSocketFactory(X509Util.getSSLSocketFactory(
+                    mqttProperties.getCaCrt(),
+                    mqttProperties.getClientCrt(),
+                    mqttProperties.getClientKey(),
+                    StringUtils.isEmpty(mqttProperties.getClientKeyPass())
+                            ? StringUtils.EMPTY
+                            : mqttProperties.getClientKeyPass()));
         }
 
         // Disable HTTPS hostname verification
         mqttConnectOptions.setHttpsHostnameVerificationEnabled(false);
-        mqttConnectOptions.setServerURIs(new String[]{mqttProperties.getUrl()});
+        mqttConnectOptions.setServerURIs(new String[] {mqttProperties.getUrl()});
         mqttConnectOptions.setKeepAliveInterval(mqttProperties.getKeepAlive());
         return mqttConnectOptions;
-
     }
-
 }

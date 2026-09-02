@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.tck;
 
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.config.BatchConsumerProperties;
 import io.github.pnoker.common.mq.mqtt.MqttMqAdapter;
+import java.util.Objects;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
-
-import java.util.Objects;
 
 /**
  * MQTT 5 harness (HiveMQ CE) for the broker-neutral contract suite.
@@ -47,8 +45,7 @@ class MqttContractIT extends AbstractMqContractTest {
 
     // started manually (not via the extension) so the env override fully bypasses it
     private static final GenericContainer<?> HIVEMQ =
-            new GenericContainer<>(DockerImageName.parse("hivemq/hivemq-ce:latest"))
-                    .withExposedPorts(1883);
+            new GenericContainer<>(DockerImageName.parse("hivemq/hivemq-ce:latest")).withExposedPorts(1883);
     private MqttMqAdapter mqttAdapter;
 
     private static String host() {
@@ -98,15 +95,16 @@ class MqttContractIT extends AbstractMqContractTest {
     @Override
     public void perInstanceSubscriptionExpiresAfterInstanceStops() {
         adapter();
-        Assumptions.assumeTrue(mqttAdapter.capabilities().subscriptionExpiry(),
-                "mqtt declares subscriptionExpiry=false");
+        Assumptions.assumeTrue(
+                mqttAdapter.capabilities().subscriptionExpiry(), "mqtt declares subscriptionExpiry=false");
     }
 
     @Test
     @Override
     void messagesSurviveWhileNoConsumerIsRunning() {
         adapter();
-        org.junit.jupiter.api.Assumptions.assumeTrue(false,
+        org.junit.jupiter.api.Assumptions.assumeTrue(
+                false,
                 "MQTT 5 leaves retention for an offline shared subscription to the broker "
                         + "(design §13.8); HiveMQ CE drops such messages, so this case is "
                         + "a documented non-compliance rather than an adapter defect");

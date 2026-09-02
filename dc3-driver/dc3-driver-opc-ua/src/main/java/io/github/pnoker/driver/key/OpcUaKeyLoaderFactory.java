@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.key;
 
-import org.springframework.stereotype.Component;
-
 import java.nio.file.Path;
+import org.springframework.stereotype.Component;
 
 /**
  * Isolates filesystem and certificate generation from the driver lifecycle.

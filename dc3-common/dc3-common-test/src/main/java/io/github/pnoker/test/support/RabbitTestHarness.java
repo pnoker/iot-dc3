@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.test.support;
 
+import java.time.Duration;
+import java.util.concurrent.Callable;
 import lombok.RequiredArgsConstructor;
 import org.awaitility.Awaitility;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
-import java.time.Duration;
-import java.util.concurrent.Callable;
 
 /**
  * Minimal helper around {@link RabbitTemplate} that captures the publish + assert

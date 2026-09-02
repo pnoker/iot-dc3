@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -52,31 +51,44 @@ public class UserVO extends BaseVO {
     /**
      * Principal ID.
      */
-    @Schema(description = "ID of the security principal (identity carrier) this user profile extends.", example = "1024")
+    @Schema(
+            description = "ID of the security principal (identity carrier) this user profile extends.",
+            example = "1024")
     private String principalId;
 
     /**
      *
      */
-    @NotBlank(message = "Nick name can't be empty", groups = {Add.class, Auth.class})
+    @NotBlank(
+            message = "Nick name can't be empty",
+            groups = {Add.class, Auth.class})
     @Schema(description = "User nickname", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
-            message = "Invalid nick name", groups = {Add.class, Update.class})
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid nick name",
+            groups = {Add.class, Update.class})
     private String nickName;
 
     /**
      * Name
      */
-    @NotBlank(message = "User name can't be empty", groups = {Add.class, Auth.class})
+    @NotBlank(
+            message = "User name can't be empty",
+            groups = {Add.class, Auth.class})
     @Schema(description = "Username", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid user name",
+    @Pattern(
+            regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
+            message = "Invalid user name",
             groups = {Add.class, Update.class})
     private String userName;
 
     /**
      *
      */
-    @Pattern(regexp = "^1([3-9])\\d{9}$", message = "Invalid phone", groups = {Add.class, Update.class})
+    @Pattern(
+            regexp = "^1([3-9])\\d{9}$",
+            message = "Invalid phone",
+            groups = {Add.class, Update.class})
     @Schema(description = "Phone number", example = "13800138000")
     private String phone;
 
@@ -84,7 +96,9 @@ public class UserVO extends BaseVO {
      *
      */
     @Schema(description = "Email address", example = "user@example.com")
-    @Pattern(regexp = "^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\\.[A-Za-z0-9]+$", message = "Invalid email",
+    @Pattern(
+            regexp = "^[A-Za-z0-9_.-]+@[A-Za-z0-9]+\\.[A-Za-z0-9]+$",
+            message = "Invalid email",
             groups = {Add.class, Update.class})
     private String email;
 
@@ -105,5 +119,4 @@ public class UserVO extends BaseVO {
      */
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

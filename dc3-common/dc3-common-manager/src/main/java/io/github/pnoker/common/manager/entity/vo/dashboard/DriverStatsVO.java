@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Rollup payload returned by GET /manager/dashboard/driver/stats.
@@ -64,7 +62,8 @@ public class DriverStatsVO implements Serializable {
      * {@code dc3-driver-mqtt}); the frontend strips the {@code dc3-driver-} prefix before
      * rendering.
      */
-    @Schema(description = "Driver counts grouped by service name (bucket key is the raw service name, e.g. dc3-driver-modbus-tcp)")
+    @Schema(
+            description =
+                    "Driver counts grouped by service name (bucket key is the raw service name, e.g. dc3-driver-modbus-tcp)")
     private List<BucketVO> byService = new ArrayList<>();
-
 }

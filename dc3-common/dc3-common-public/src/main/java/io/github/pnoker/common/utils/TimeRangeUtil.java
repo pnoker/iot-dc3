@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.enums.TimeRangeKeyEnum;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -102,7 +100,8 @@ public final class TimeRangeUtil {
             return switch (rangeKey) {
                 case TODAY -> {
                     LocalDateTime midnight = LocalDate.now().atStartOfDay();
-                    long minutes = java.time.Duration.between(midnight, LocalDateTime.now()).toMinutes();
+                    long minutes = java.time.Duration.between(midnight, LocalDateTime.now())
+                            .toMinutes();
                     // round up to the next whole hour so bucketed queries cover the full
                     // day so far
                     int hours = (int) Math.max(1, (minutes + 59) / 60);
@@ -163,5 +162,4 @@ public final class TimeRangeUtil {
     public static Integer resolveDays(String rangeKeyCode, Integer days) {
         return resolveDays(TimeRangeKeyEnum.ofCode(rangeKeyCode), days);
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.center.manager;
 
 import org.springframework.boot.SpringApplication;
@@ -41,5 +40,4 @@ public class ManagerApplication {
     public static void main(String[] args) {
         SpringApplication.run(ManagerApplication.class, args);
     }
-
 }

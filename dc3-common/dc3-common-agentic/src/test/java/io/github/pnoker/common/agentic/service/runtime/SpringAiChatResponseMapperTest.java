@@ -16,18 +16,17 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.openai.core.JsonValue;
 import com.openai.models.chat.completions.ChatCompletionChunk;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class SpringAiChatResponseMapperTest {
 
@@ -53,5 +52,4 @@ class SpringAiChatResponseMapperTest {
         assertThat(delta.reasoningContent()).isEqualTo("Checking real platform data.");
         assertThat(delta.hasContent()).isTrue();
     }
-
 }

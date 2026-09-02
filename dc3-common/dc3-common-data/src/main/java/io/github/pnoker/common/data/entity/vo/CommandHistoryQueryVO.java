@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * VO for querying command records with pagination and filters.
@@ -47,13 +45,20 @@ public class CommandHistoryQueryVO implements Serializable {
     @Schema(description = "Filter by device ID; the device must belong to the current tenant.", example = "1024")
     private String deviceId;
 
-    @Schema(description = "Filter by command definition ID; the command must belong to the current tenant.", example = "4096")
+    @Schema(
+            description = "Filter by command definition ID; the command must belong to the current tenant.",
+            example = "4096")
     private String commandId;
 
-    @Schema(description = "Filter by exact command code, e.g. a driver-defined read/write opcode.", example = "READ_HOLDING_REG")
+    @Schema(
+            description = "Filter by exact command code, e.g. a driver-defined read/write opcode.",
+            example = "READ_HOLDING_REG")
     private String commandCode;
 
-    @Schema(description = "Filter by command lifecycle status (PENDING, SENT, SUCCESS, FAILED, TIMEOUT, EXPIRED, DEAD, DUPLICATE).", example = "SUCCESS")
+    @Schema(
+            description =
+                    "Filter by command lifecycle status (PENDING, SENT, SUCCESS, FAILED, TIMEOUT, EXPIRED, DEAD, DUPLICATE).",
+            example = "SUCCESS")
     private PointCommandStatusEnum status;
 
     @Schema(description = "Zero-based result offset.", example = "0")
@@ -64,5 +69,4 @@ public class CommandHistoryQueryVO implements Serializable {
 
     @Schema(description = "Stable, whitelisted sort fields.")
     private List<SortSpec> sort = List.of();
-
 }

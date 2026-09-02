@@ -21,7 +21,6 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
 
-
 /**
  * Service for managing agentic actions including write-point-value confirmation and rejection.
  *
@@ -40,8 +39,8 @@ public interface ActionService {
      * @param header authenticated caller principal and tenant
      * @return the created action id
      */
-    Mono<String> createWritePointValueAction(String conversationId, Long deviceId, Long pointId,
-                                              String value, RequestHeader.PrincipalHeader header);
+    Mono<String> createWritePointValueAction(
+            String conversationId, Long deviceId, Long pointId, String value, RequestHeader.PrincipalHeader header);
 
     /**
      * List pending, non-expired actions for a conversation.
@@ -52,8 +51,8 @@ public interface ActionService {
      * @param header authenticated caller principal and tenant
      * @return an offset page of pending actions
      */
-    Mono<OffsetPage<ActionBO>> listPending(long offset, int limit, String conversationId,
-                                           RequestHeader.PrincipalHeader header);
+    Mono<OffsetPage<ActionBO>> listPending(
+            long offset, int limit, String conversationId, RequestHeader.PrincipalHeader header);
 
     /**
      * Confirm a pending action and execute it. For a write-point-value action this
@@ -73,5 +72,4 @@ public interface ActionService {
      * @return the updated action
      */
     Mono<ActionBO> reject(String actionId, RequestHeader.PrincipalHeader header);
-
 }

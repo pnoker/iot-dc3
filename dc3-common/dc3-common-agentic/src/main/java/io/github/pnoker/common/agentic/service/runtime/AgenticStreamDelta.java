@@ -43,5 +43,4 @@ public record AgenticStreamDelta(String content, String reasoningContent) {
     public boolean hasContent() {
         return StringUtils.isNotEmpty(content) || StringUtils.isNotEmpty(reasoningContent);
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
@@ -48,14 +47,17 @@ public class ScheduleForDataServiceImpl implements ScheduleForDataService {
     @Override
     public void initial() {
         try {
-            quartzService.createJobWithCron(ScheduleConstant.DATA_SCHEDULE_GROUP, "hourly-job", "0 0 0/1 * * ?",
-                    HourlyJobForData.class);
-            quartzService.createJobWithInterval(ScheduleConstant.DATA_SCHEDULE_GROUP, "point-value-ingest-replay",
-                    5, org.quartz.DateBuilder.IntervalUnit.SECOND, PointValueIngestReplayJob.class);
+            quartzService.createJobWithCron(
+                    ScheduleConstant.DATA_SCHEDULE_GROUP, "hourly-job", "0 0 0/1 * * ?", HourlyJobForData.class);
+            quartzService.createJobWithInterval(
+                    ScheduleConstant.DATA_SCHEDULE_GROUP,
+                    "point-value-ingest-replay",
+                    5,
+                    org.quartz.DateBuilder.IntervalUnit.SECOND,
+                    PointValueIngestReplayJob.class);
             quartzService.startScheduler();
         } catch (SchedulerException e) {
             throw new ServiceException("Failed to initialize data scheduler", e);
         }
     }
-
 }

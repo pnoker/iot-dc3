@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
@@ -23,12 +22,11 @@ import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.github.pnoker.driver.coap.entity.CoapMessage;
 import io.github.pnoker.driver.coap.service.CoapReceiveService;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * CoAP Receive Service Implementation
@@ -48,9 +46,12 @@ public class CoapReceiveServiceImpl implements CoapReceiveService {
 
     @Override
     public void receiveValue(CoapMessage coapMessage) {
-        log.debug("CoAP message received, from={}:{}, uri={}, payloadLength={}",
-                coapMessage.getSourceAddress(), coapMessage.getSourcePort(),
-                coapMessage.getUriPath(), payloadLengthOf(coapMessage));
+        log.debug(
+                "CoAP message received, from={}:{}, uri={}, payloadLength={}",
+                coapMessage.getSourceAddress(),
+                coapMessage.getSourcePort(),
+                coapMessage.getUriPath(),
+                payloadLengthOf(coapMessage));
 
         PointValue pointValue = toPointValue(coapMessage);
         if (Objects.isNull(pointValue)) {
@@ -59,9 +60,12 @@ public class CoapReceiveServiceImpl implements CoapReceiveService {
         pointValue.setCreateTime(LocalDateTimeUtil.now());
         driverSenderService.pointValueSender(pointValue);
 
-        log.debug("CoAP point value forwarded, from={}:{}, deviceId={}, pointId={}",
-                coapMessage.getSourceAddress(), coapMessage.getSourcePort(),
-                pointValue.getDeviceId(), pointValue.getPointId());
+        log.debug(
+                "CoAP point value forwarded, from={}:{}, deviceId={}, pointId={}",
+                coapMessage.getSourceAddress(),
+                coapMessage.getSourcePort(),
+                pointValue.getDeviceId(),
+                pointValue.getPointId());
     }
 
     @Override
@@ -83,16 +87,23 @@ public class CoapReceiveServiceImpl implements CoapReceiveService {
     private PointValue toPointValue(CoapMessage coapMessage) {
         try {
             PointValue pointValue = JsonUtil.parseObject(coapMessage.getPayload(), PointValue.class);
-            if (Objects.isNull(pointValue) || Objects.isNull(pointValue.getDeviceId())
+            if (Objects.isNull(pointValue)
+                    || Objects.isNull(pointValue.getDeviceId())
                     || Objects.isNull(pointValue.getPointId())) {
-                log.warn("CoAP point value skipped, from={}:{}, reason=missingIdentity",
-                        coapMessage.getSourceAddress(), coapMessage.getSourcePort());
+                log.warn(
+                        "CoAP point value skipped, from={}:{}, reason=missingIdentity",
+                        coapMessage.getSourceAddress(),
+                        coapMessage.getSourcePort());
                 return null;
             }
             return pointValue;
         } catch (Exception e) {
-            log.warn("CoAP point value parse failed, from={}:{}, payloadLength={}",
-                    coapMessage.getSourceAddress(), coapMessage.getSourcePort(), payloadLengthOf(coapMessage), e);
+            log.warn(
+                    "CoAP point value parse failed, from={}:{}, payloadLength={}",
+                    coapMessage.getSourceAddress(),
+                    coapMessage.getSourcePort(),
+                    payloadLengthOf(coapMessage),
+                    e);
             return null;
         }
     }
@@ -101,5 +112,4 @@ public class CoapReceiveServiceImpl implements CoapReceiveService {
         String payload = coapMessage.getPayload();
         return payload == null ? 0 : payload.length();
     }
-
 }

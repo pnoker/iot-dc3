@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -50,39 +49,64 @@ import lombok.ToString;
 @Schema(description = "Command Param view object", example = "42")
 public class CommandParamVO extends BaseVO {
 
-    @NotBlank(message = "Param name can't be empty", groups = {Add.class})
-    @Schema(description = "Command parameter name. Unique name within a command.", example = "Register Address", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid param name format",
+    @NotBlank(
+            message = "Param name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Command parameter name. Unique name within a command.",
+            example = "Register Address",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid param name format",
             groups = {Add.class, Update.class})
     private String paramName;
 
-    @Schema(description = "Command parameter code. Stable business identifier; must not change once deployed.", example = "REG_ADDR", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotBlank(message = "Param code can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Command parameter code. Stable business identifier; must not change once deployed.",
+            example = "REG_ADDR",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(
+            message = "Param code can't be empty",
+            groups = {Add.class, Update.class})
     private String paramCode;
 
-    @Schema(description = "Parameter direction: INPUT (sent to device) or OUTPUT (received from device).", example = "INPUT", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotNull(message = "Param direction can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Parameter direction: INPUT (sent to device) or OUTPUT (received from device).",
+            example = "INPUT",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Param direction can't be empty",
+            groups = {Add.class, Update.class})
     private ParamDirectionTypeEnum paramDirectionFlag;
 
-    @Schema(description = "Parameter data type: STRING, INT, LONG, FLOAT, DOUBLE, or BOOL.", example = "INT", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotNull(message = "Param type can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Parameter data type: STRING, INT, LONG, FLOAT, DOUBLE, or BOOL.",
+            example = "INT",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Param type can't be empty",
+            groups = {Add.class, Update.class})
     private PointTypeEnum paramTypeFlag;
 
     @Schema(description = "Whether this parameter is REQUIRED or OPTIONAL for command execution.", example = "REQUIRED")
     private Boolean requiredFlag;
 
-    @Schema(description = "Default value pre-populated when the command is invoked without an explicit value.", example = "0")
+    @Schema(
+            description = "Default value pre-populated when the command is invoked without an explicit value.",
+            example = "0")
     private String defaultValue;
 
     @Schema(description = "Command parameter extension information, serialized as JSON for custom metadata.")
     private CommandParamExt paramExt;
 
-    @Schema(description = "ID of the parent command this parameter belongs to.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotNull(message = "Command ID can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "ID of the parent command this parameter belongs to.",
+            example = "4096",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Command ID can't be empty",
+            groups = {Add.class, Update.class})
     private String commandId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
@@ -93,5 +117,4 @@ public class CommandParamVO extends BaseVO {
 
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
-
 }

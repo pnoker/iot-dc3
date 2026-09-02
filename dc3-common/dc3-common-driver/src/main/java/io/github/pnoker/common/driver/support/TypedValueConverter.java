@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.support;
 
 import io.github.pnoker.common.driver.entity.bean.CalculatedPointValue;
@@ -26,12 +25,11 @@ import io.github.pnoker.common.exception.OutRangeException;
 import io.github.pnoker.common.exception.TypeException;
 import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.utils.ArithmeticUtil;
-import org.apache.commons.lang3.StringUtils;
-
 import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Shared conversion rules for driver attribute values, point write values, and raw
@@ -48,8 +46,7 @@ public final class TypedValueConverter {
 
     private static final byte DEFAULT_DECIMAL = 6;
 
-    private TypedValueConverter() {
-    }
+    private TypedValueConverter() {}
 
     /**
      * Converts a driver or point configuration attribute to the requested Java type.
@@ -104,33 +101,51 @@ public final class TypedValueConverter {
         return switch (type) {
             case STRING -> new CalculatedPointValue(requireValue(rawValue, type, "Point"), null);
             case BYTE -> {
-                byte value = exactByte(linearValue(multiple, rawValue, base, "Point", pointType.getCode()), rawValue,
-                        "Point", pointType.getCode());
+                byte value = exactByte(
+                        linearValue(multiple, rawValue, base, "Point", pointType.getCode()),
+                        rawValue,
+                        "Point",
+                        pointType.getCode());
                 yield new CalculatedPointValue(String.valueOf(value), (double) value);
             }
             case SHORT -> {
-                short value = exactShort(linearValue(multiple, rawValue, base, "Point", pointType.getCode()), rawValue,
-                        "Point", pointType.getCode());
+                short value = exactShort(
+                        linearValue(multiple, rawValue, base, "Point", pointType.getCode()),
+                        rawValue,
+                        "Point",
+                        pointType.getCode());
                 yield new CalculatedPointValue(String.valueOf(value), (double) value);
             }
             case INT -> {
-                int value = exactInt(linearValue(multiple, rawValue, base, "Point", pointType.getCode()), rawValue,
-                        "Point", pointType.getCode());
+                int value = exactInt(
+                        linearValue(multiple, rawValue, base, "Point", pointType.getCode()),
+                        rawValue,
+                        "Point",
+                        pointType.getCode());
                 yield new CalculatedPointValue(String.valueOf(value), (double) value);
             }
             case LONG -> {
-                long value = exactLong(linearValue(multiple, rawValue, base, "Point", pointType.getCode()), rawValue,
-                        "Point", pointType.getCode());
+                long value = exactLong(
+                        linearValue(multiple, rawValue, base, "Point", pointType.getCode()),
+                        rawValue,
+                        "Point",
+                        pointType.getCode());
                 yield new CalculatedPointValue(String.valueOf(value), (double) value);
             }
             case FLOAT -> {
-                float value = roundedFloat(linearValue(multiple, rawValue, base, "Point", pointType.getCode()),
-                        rawValue, decimal, "Point");
+                float value = roundedFloat(
+                        linearValue(multiple, rawValue, base, "Point", pointType.getCode()),
+                        rawValue,
+                        decimal,
+                        "Point");
                 yield new CalculatedPointValue(String.valueOf(value), (double) value);
             }
             case DOUBLE -> {
-                double value = roundedDouble(linearValue(multiple, rawValue, base, "Point", pointType.getCode()),
-                        rawValue, decimal, "Point");
+                double value = roundedDouble(
+                        linearValue(multiple, rawValue, base, "Point", pointType.getCode()),
+                        rawValue,
+                        decimal,
+                        "Point");
                 yield new CalculatedPointValue(String.valueOf(value), value);
             }
             case BOOLEAN -> {
@@ -178,8 +193,8 @@ public final class TypedValueConverter {
      * @param typeCode the type code, for error messages
      * @return the transformed value
      */
-    private static BigDecimal linearValue(BigDecimal multiple, String rawValue, BigDecimal base, String label,
-                                          String typeCode) {
+    private static BigDecimal linearValue(
+            BigDecimal multiple, String rawValue, BigDecimal base, String label, String typeCode) {
         BigDecimal value = decimal(rawValue, ScalarType.DOUBLE, label, typeCode);
         if (DEFAULT_MULTIPLE.compareTo(multiple) == 0 && DEFAULT_BASE.compareTo(base) == 0) {
             return value;
@@ -205,8 +220,12 @@ public final class TypedValueConverter {
     private static byte exactByte(BigDecimal value, String rawValue, String label, String typeCode) {
         if (value.compareTo(BigDecimal.valueOf(Byte.MIN_VALUE)) < 0
                 || value.compareTo(BigDecimal.valueOf(Byte.MAX_VALUE)) > 0) {
-            throw new OutRangeException("{} value out of byte range: {} ~ {}, current: {}", label, Byte.MIN_VALUE,
-                    Byte.MAX_VALUE, rawValue);
+            throw new OutRangeException(
+                    "{} value out of byte range: {} ~ {}, current: {}",
+                    label,
+                    Byte.MIN_VALUE,
+                    Byte.MAX_VALUE,
+                    rawValue);
         }
         if (!isInteger(value)) {
             throw new TypeException("{} value type is: {}, expected exact byte value: {}", label, typeCode, rawValue);
@@ -217,8 +236,12 @@ public final class TypedValueConverter {
     private static short exactShort(BigDecimal value, String rawValue, String label, String typeCode) {
         if (value.compareTo(BigDecimal.valueOf(Short.MIN_VALUE)) < 0
                 || value.compareTo(BigDecimal.valueOf(Short.MAX_VALUE)) > 0) {
-            throw new OutRangeException("{} value out of short range: {} ~ {}, current: {}", label, Short.MIN_VALUE,
-                    Short.MAX_VALUE, rawValue);
+            throw new OutRangeException(
+                    "{} value out of short range: {} ~ {}, current: {}",
+                    label,
+                    Short.MIN_VALUE,
+                    Short.MAX_VALUE,
+                    rawValue);
         }
         if (!isInteger(value)) {
             throw new TypeException("{} value type is: {}, expected exact short value: {}", label, typeCode, rawValue);
@@ -229,8 +252,12 @@ public final class TypedValueConverter {
     private static int exactInt(BigDecimal value, String rawValue, String label, String typeCode) {
         if (value.compareTo(BigDecimal.valueOf(Integer.MIN_VALUE)) < 0
                 || value.compareTo(BigDecimal.valueOf(Integer.MAX_VALUE)) > 0) {
-            throw new OutRangeException("{} value out of int range: {} ~ {}, current: {}", label, Integer.MIN_VALUE,
-                    Integer.MAX_VALUE, rawValue);
+            throw new OutRangeException(
+                    "{} value out of int range: {} ~ {}, current: {}",
+                    label,
+                    Integer.MIN_VALUE,
+                    Integer.MAX_VALUE,
+                    rawValue);
         }
         if (!isInteger(value)) {
             throw new TypeException("{} value type is: {}, expected exact int value: {}", label, typeCode, rawValue);
@@ -241,8 +268,12 @@ public final class TypedValueConverter {
     private static long exactLong(BigDecimal value, String rawValue, String label, String typeCode) {
         if (value.compareTo(BigDecimal.valueOf(Long.MIN_VALUE)) < 0
                 || value.compareTo(BigDecimal.valueOf(Long.MAX_VALUE)) > 0) {
-            throw new OutRangeException("{} value out of long range: {} ~ {}, current: {}", label, Long.MIN_VALUE,
-                    Long.MAX_VALUE, rawValue);
+            throw new OutRangeException(
+                    "{} value out of long range: {} ~ {}, current: {}",
+                    label,
+                    Long.MIN_VALUE,
+                    Long.MAX_VALUE,
+                    rawValue);
         }
         if (!isInteger(value)) {
             throw new TypeException("{} value type is: {}, expected exact long value: {}", label, typeCode, rawValue);
@@ -261,8 +292,12 @@ public final class TypedValueConverter {
     private static float finiteFloat(BigDecimal value, String rawValue, String label) {
         float result = value.floatValue();
         if (!Float.isFinite(result)) {
-            throw new OutRangeException("{} value out of float range: {} ~ {}, current: {}", label, -Float.MAX_VALUE,
-                    Float.MAX_VALUE, rawValue);
+            throw new OutRangeException(
+                    "{} value out of float range: {} ~ {}, current: {}",
+                    label,
+                    -Float.MAX_VALUE,
+                    Float.MAX_VALUE,
+                    rawValue);
         }
         return result;
     }
@@ -270,8 +305,12 @@ public final class TypedValueConverter {
     private static double finiteDouble(BigDecimal value, String rawValue, String label) {
         double result = value.doubleValue();
         if (!Double.isFinite(result)) {
-            throw new OutRangeException("{} value out of double range: {} ~ {}, current: {}", label, -Double.MAX_VALUE,
-                    Double.MAX_VALUE, rawValue);
+            throw new OutRangeException(
+                    "{} value out of double range: {} ~ {}, current: {}",
+                    label,
+                    -Double.MAX_VALUE,
+                    Double.MAX_VALUE,
+                    rawValue);
         }
         return result;
     }
@@ -281,8 +320,8 @@ public final class TypedValueConverter {
         return switch (raw) {
             case "true", "1" -> true;
             case "false", "0" -> false;
-            default -> throw new TypeException("{} value type is: {}, invalid boolean value: {}", label, typeCode,
-                    value);
+            default ->
+                throw new TypeException("{} value type is: {}, invalid boolean value: {}", label, typeCode, value);
         };
     }
 
@@ -300,8 +339,8 @@ public final class TypedValueConverter {
         Class<?> expected = boxedType(type);
         Class<?> primitive = primitiveType(type);
         if (!targetType.equals(expected) && !targetType.equals(primitive)) {
-            throw new TypeException("{} type is: {}, can't be cast to class: {}", label, typeCode,
-                    targetType.getName());
+            throw new TypeException(
+                    "{} type is: {}, can't be cast to class: {}", label, typeCode, targetType.getName());
         }
     }
 
@@ -365,7 +404,13 @@ public final class TypedValueConverter {
      * Set of supported scalar value types handled by the converter.
      */
     private enum ScalarType {
-        STRING, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN
+        STRING,
+        BYTE,
+        SHORT,
+        INT,
+        LONG,
+        FLOAT,
+        DOUBLE,
+        BOOLEAN
     }
-
 }

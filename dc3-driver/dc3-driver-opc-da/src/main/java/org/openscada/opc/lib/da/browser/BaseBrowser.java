@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da.browser;
 
+import java.net.UnknownHostException;
+import java.util.Collection;
+import java.util.EnumSet;
 import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.openscada.opc.dcom.common.impl.EnumString;
 import org.openscada.opc.dcom.da.OPCBROWSETYPE;
 import org.openscada.opc.dcom.da.impl.OPCBrowseServerAddressSpace;
-
-import java.net.UnknownHostException;
-import java.util.Collection;
-import java.util.EnumSet;
 
 /**
  * A class implementing base browsing
@@ -88,8 +86,11 @@ public class BaseBrowser {
      * @throws UnknownHostException     UnknownHostException
      * @throws JIException              JIException
      */
-    protected Collection<String> browse(final OPCBROWSETYPE type, final String filterCriteria,
-                                        final EnumSet<Access> accessMask, final int variantType)
+    protected Collection<String> browse(
+            final OPCBROWSETYPE type,
+            final String filterCriteria,
+            final EnumSet<Access> accessMask,
+            final int variantType)
             throws IllegalArgumentException, UnknownHostException, JIException {
         int accessMaskValue = 0;
 
@@ -102,7 +103,9 @@ public class BaseBrowser {
 
         log.debug("OPC DA browse started, batchSize={}", this._batchSize);
 
-        return this._browser.browse(type, filterCriteria, accessMaskValue, variantType).asCollection(this._batchSize);
+        return this._browser
+                .browse(type, filterCriteria, accessMaskValue, variantType)
+                .asCollection(this._batchSize);
     }
 
     /**
@@ -118,5 +121,4 @@ public class BaseBrowser {
             throws IllegalArgumentException, UnknownHostException, JIException {
         return this._browser.browseAccessPaths(itemId).asCollection(this._batchSize);
     }
-
 }

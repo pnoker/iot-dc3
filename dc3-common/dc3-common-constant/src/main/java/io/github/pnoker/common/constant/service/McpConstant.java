@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.service;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
-
 import java.util.List;
 import java.util.Map;
 
@@ -148,7 +146,6 @@ public class McpConstant {
         private OAuth() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -189,7 +186,6 @@ public class McpConstant {
         private Scope() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -275,7 +271,6 @@ public class McpConstant {
         private JsonRpc() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -626,7 +621,6 @@ public class McpConstant {
         private Field() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -693,15 +687,12 @@ public class McpConstant {
         /**
          * default input schema constant.
          */
-        public static final Map<String, Object> DEFAULT_INPUT_SCHEMA = Map.of(
-                TYPE, TYPE_OBJECT,
-                ADDITIONAL_PROPERTIES, true
-        );
+        public static final Map<String, Object> DEFAULT_INPUT_SCHEMA =
+                Map.of(TYPE, TYPE_OBJECT, ADDITIONAL_PROPERTIES, true);
 
         private ToolDefinition() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -737,7 +728,6 @@ public class McpConstant {
         private ToolResult() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -778,7 +768,6 @@ public class McpConstant {
         private Server() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -804,7 +793,6 @@ public class McpConstant {
         private RiskLevel() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -840,7 +828,6 @@ public class McpConstant {
         private Confirmation() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -876,7 +863,5 @@ public class McpConstant {
         private Audit() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
@@ -34,17 +33,16 @@ import io.github.pnoker.driver.service.netty.tcp.NettyTcpServer;
 import io.github.pnoker.driver.service.netty.udp.NettyUdpServer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * Implementation of custom driver service for the listening virtual driver.
@@ -69,20 +67,25 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
     private final NettyTcpServer nettyTcpServer;
     private final NettyUdpServer nettyUdpServer;
     private final ThreadPoolExecutor threadPoolExecutor;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
+
     @Value("${dc3.driver.custom.tcp.port}")
     private Integer tcpPort;
+
     @Value("${dc3.driver.custom.udp.port}")
     private Integer udpPort;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -124,11 +127,19 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode,
-                    metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode,
-                    metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
@@ -147,8 +158,11 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
      * @return null as data is received passively
      */
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                               PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         return null;
     }
 
@@ -168,18 +182,29 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
      * @return true if the write operation was processed
      */
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         Long deviceId = device.getId();
         Channel channel = NettyTcpServer.getDeviceChannel(deviceId);
         if (Objects.isNull(channel) || !channel.isActive()) {
-            log.warn("Driver point write skipped, protocol={}, deviceId={}, pointId={}, reason=channelMissing", PROTOCOL_TCP,
-                    deviceId, point.getId());
+            log.warn(
+                    "Driver point write skipped, protocol={}, deviceId={}, pointId={}, reason=channelMissing",
+                    PROTOCOL_TCP,
+                    deviceId,
+                    point.getId());
             return false;
         }
 
-        log.debug("Driver point write requested, protocol={}, deviceId={}, pointId={}, valueLength={}", PROTOCOL_TCP, deviceId,
-                point.getId(), Objects.toString(writePointValue.getValue(), "").length());
+        log.debug(
+                "Driver point write requested, protocol={}, deviceId={}, pointId={}, valueLength={}",
+                PROTOCOL_TCP,
+                deviceId,
+                point.getId(),
+                Objects.toString(writePointValue.getValue(), "").length());
         ChannelFuture future = channel.writeAndFlush(DecodeUtil.stringToByte(writePointValue.getValue()));
         if (Objects.isNull(future)) {
             return false;
@@ -187,14 +212,23 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
         try {
             boolean completed = future.await(WRITE_FLUSH_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             if (!completed || !future.isSuccess()) {
-                log.warn("Driver point write flush failed, protocol={}, deviceId={}, pointId={}, completed={}", PROTOCOL_TCP,
-                        deviceId, point.getId(), completed, future.cause());
+                log.warn(
+                        "Driver point write flush failed, protocol={}, deviceId={}, pointId={}, completed={}",
+                        PROTOCOL_TCP,
+                        deviceId,
+                        point.getId(),
+                        completed,
+                        future.cause());
                 return false;
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.warn("Driver point write interrupted, protocol={}, deviceId={}, pointId={}", PROTOCOL_TCP,
-                    deviceId, point.getId(), e);
+            log.warn(
+                    "Driver point write interrupted, protocol={}, deviceId={}, pointId={}",
+                    PROTOCOL_TCP,
+                    deviceId,
+                    point.getId(),
+                    e);
             return false;
         }
         return true;
@@ -205,7 +239,8 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -217,7 +252,7 @@ public class ListeningVirtualDriverCustomServiceImpl implements DriverCustomServ
         checkRequired(pointConfig, "type", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

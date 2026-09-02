@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.gateway.filter;
 
 import lombok.RequiredArgsConstructor;
@@ -48,5 +47,4 @@ public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<
     public GatewayFilter apply(Object config) {
         return authenticGatewayFilter;
     }
-
 }

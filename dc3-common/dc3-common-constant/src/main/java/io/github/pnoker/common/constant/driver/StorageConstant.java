@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.driver;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
-
 import io.github.pnoker.common.constant.common.PrefixConstant;
 import io.github.pnoker.common.constant.common.SuffixConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
@@ -34,11 +32,10 @@ public class StorageConstant {
     /**
      * Point value prefix
      */
-    public static final String POINT_VALUE_PREFIX = PrefixConstant.POINT + SuffixConstant.VALUE
-            + SymbolConstant.UNDERSCORE;
+    public static final String POINT_VALUE_PREFIX =
+            PrefixConstant.POINT + SuffixConstant.VALUE + SymbolConstant.UNDERSCORE;
 
     private StorageConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
-
 }

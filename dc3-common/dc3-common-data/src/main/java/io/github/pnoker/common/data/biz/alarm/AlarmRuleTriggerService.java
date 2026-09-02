@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
-
 import java.util.List;
 import reactor.core.publisher.Mono;
 
@@ -69,5 +67,4 @@ public interface AlarmRuleTriggerService {
      * @param entityDTO event report payload
      */
     Mono<Void> processEventReport(EventReportDTO entityDTO);
-
 }

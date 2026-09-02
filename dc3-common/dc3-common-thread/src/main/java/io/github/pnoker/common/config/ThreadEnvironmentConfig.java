@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.Ordered;
@@ -25,9 +26,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Maps legacy {@code server.thread.*} keys to the canonical {@code dc3.thread.*}
@@ -42,8 +40,7 @@ public class ThreadEnvironmentConfig implements EnvironmentPostProcessor {
     /**
      * Creates the environment post processor.
      */
-    public ThreadEnvironmentConfig() {
-    }
+    public ThreadEnvironmentConfig() {}
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
@@ -64,5 +61,4 @@ public class ThreadEnvironmentConfig implements EnvironmentPostProcessor {
             environment.getPropertySources().addLast(new MapPropertySource("legacyThreadAliases", aliases));
         }
     }
-
 }

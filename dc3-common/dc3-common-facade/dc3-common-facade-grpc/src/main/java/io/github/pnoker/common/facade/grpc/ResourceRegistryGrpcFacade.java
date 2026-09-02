@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcScannedApiDTO;
@@ -25,12 +24,11 @@ import io.github.pnoker.common.facade.api.ResourceRegistryFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResultBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Objects;
 import reactor.core.publisher.Mono;
 
 /**
@@ -51,31 +49,31 @@ public class ResourceRegistryGrpcFacade implements ResourceRegistryFacade {
         return Mono.defer(() -> {
             if (command == null) return Mono.error(new IllegalArgumentException("registry sync command is required"));
             GrpcSyncRequest.Builder request = GrpcSyncRequest.newBuilder()
-                .setServiceName(Objects.requireNonNullElse(command.getServiceName(), ""))
-                .setDeleteMissing(command.isDeleteMissing());
+                    .setServiceName(Objects.requireNonNullElse(command.getServiceName(), ""))
+                    .setDeleteMissing(command.isDeleteMissing());
             List<FacadeScannedApiBO> apis = command.getApis();
             if (Objects.nonNull(apis)) {
                 for (FacadeScannedApiBO api : apis) {
                     request.addApis(GrpcScannedApiDTO.newBuilder()
-                        .setMethod(Objects.requireNonNullElse(api.getMethod(), ""))
-                        .setPath(Objects.requireNonNullElse(api.getPath(), ""))
-                        .setApiName(Objects.requireNonNullElse(api.getApiName(), ""))
-                        .setTitle(Objects.requireNonNullElse(api.getTitle(), ""))
-                        .setRemark(Objects.requireNonNullElse(api.getRemark(), ""))
-                        .setApiGroup(Objects.requireNonNullElse(api.getApiGroup(), ""))
+                            .setMethod(Objects.requireNonNullElse(api.getMethod(), ""))
+                            .setPath(Objects.requireNonNullElse(api.getPath(), ""))
+                            .setApiName(Objects.requireNonNullElse(api.getApiName(), ""))
+                            .setTitle(Objects.requireNonNullElse(api.getTitle(), ""))
+                            .setRemark(Objects.requireNonNullElse(api.getRemark(), ""))
+                            .setApiGroup(Objects.requireNonNullElse(api.getApiGroup(), ""))
                             .build());
                 }
             }
             GrpcSyncRequest syncRequest = request.build();
-            return ReactiveGrpcClientSupport.<GrpcSyncRequest, GrpcSyncResultDTO>unary("ResourceRegistryFacade.sync",
-                        observer -> resourceRegistryApiStub.sync(syncRequest, observer))
-                .map(response -> FacadeResourceRegistrySyncResultBO.builder()
-                        .inserted(response.getInserted())
-                        .updated(response.getUpdated())
-                        .deleted(response.getDeleted())
-                        .unchanged(response.getUnchanged())
-                        .build());
+            return ReactiveGrpcClientSupport.<GrpcSyncRequest, GrpcSyncResultDTO>unary(
+                            "ResourceRegistryFacade.sync",
+                            observer -> resourceRegistryApiStub.sync(syncRequest, observer))
+                    .map(response -> FacadeResourceRegistrySyncResultBO.builder()
+                            .inserted(response.getInserted())
+                            .updated(response.getUpdated())
+                            .deleted(response.getDeleted())
+                            .unchanged(response.getUnchanged())
+                            .build());
         });
     }
-
 }

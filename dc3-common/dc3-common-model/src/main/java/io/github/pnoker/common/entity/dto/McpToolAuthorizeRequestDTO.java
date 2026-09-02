@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * Gateway-to-auth request that authorizes one MCP tool call, carrying the high-risk
@@ -62,5 +60,4 @@ public class McpToolAuthorizeRequestDTO implements Serializable {
     private String confirmId;
 
     private String idempotencyKey;
-
 }

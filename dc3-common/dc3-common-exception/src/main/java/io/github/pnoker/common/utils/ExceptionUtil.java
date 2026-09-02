@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
+import java.text.MessageFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
-import java.text.MessageFormat;
 
 /**
  * Utility methods for exception message formatting.
@@ -50,5 +48,4 @@ public class ExceptionUtil {
         }
         return message;
     }
-
 }

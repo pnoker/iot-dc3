@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.metadata;
 
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -47,5 +46,4 @@ public final class PointMetadata extends AbstractMetadataCache<PointBO> {
     public PointMetadata(DriverProperties driverProperties, PointClient pointClient) {
         super(driverProperties.getMetadata().getCache(), "point", pointClient::getById);
     }
-
 }

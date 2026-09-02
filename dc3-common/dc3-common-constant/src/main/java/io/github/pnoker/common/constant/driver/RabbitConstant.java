@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.driver;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
-
 
 /**
  * RabbitMQ exchange, queue, and routing key constants for the DC3 platform.
@@ -81,7 +79,6 @@ public class RabbitConstant {
      * Routing key prefix for driver metadata events.
      */
     public static final String ROUTING_DRIVER_METADATA_PREFIX = "dc3.r.metadata.driver.";
-
 
     /**
      * Routing key prefix for point commands.
@@ -391,5 +388,4 @@ public class RabbitConstant {
     private RabbitConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
-
 }

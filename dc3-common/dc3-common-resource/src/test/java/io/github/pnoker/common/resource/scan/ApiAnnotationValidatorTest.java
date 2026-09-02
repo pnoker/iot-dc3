@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.resource.scan;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class ApiAnnotationValidatorTest {
 
@@ -30,23 +28,24 @@ class ApiAnnotationValidatorTest {
 
     @Test
     void flagsMissingExtensionAndShortDescription() {
-        List<String> defects = validator.validate("dc3-center-manager:POST:/x",
-                ValidatorFixtures.opNoExtensionShortDescription());
+        List<String> defects =
+                validator.validate("dc3-center-manager:POST:/x", ValidatorFixtures.opNoExtensionShortDescription());
         assertThat(defects).anyMatch(d -> d.contains("x-dc3-ai"));
         assertThat(defects).anyMatch(d -> d.contains("description"));
     }
 
     @Test
     void flagsIllegalRiskAndNonBooleanFlag() {
-        List<String> defects = validator.validate("dc3-center-manager:POST:/y",
-                ValidatorFixtures.opIllegalRiskAndFlag());
+        List<String> defects =
+                validator.validate("dc3-center-manager:POST:/y", ValidatorFixtures.opIllegalRiskAndFlag());
         assertThat(defects).anyMatch(d -> d.contains("riskLevel"));
         assertThat(defects).anyMatch(d -> d.contains("destructive"));
     }
 
     @Test
     void passesAWellFormedOperation() {
-        assertThat(validator.validate("dc3-center-manager:POST:/z", ValidatorFixtures.opValid())).isEmpty();
+        assertThat(validator.validate("dc3-center-manager:POST:/z", ValidatorFixtures.opValid()))
+                .isEmpty();
     }
 
     @Test

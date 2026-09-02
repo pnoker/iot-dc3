@@ -1,17 +1,27 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.data.repository;
 
 import io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
-import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
-import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.r2dbc.core.DatabaseClient;
-import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Mono;
-
+import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -19,6 +29,11 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
 
 /** Explicit SQL adapter for dashboard alert reads and confirmation updates. */
 @Repository
@@ -35,8 +50,13 @@ public class R2dbcAlertStore implements ReactiveAlertStore {
     private final R2dbcDialect dialect;
 
     @Override
-    public Mono<OffsetPage<AlertItemRow>> list(Long tenantId, String source, Integer alarmTypeFlag,
-                                                 Integer confirmFlag, LocalDateTime from, PageRequest page) {
+    public Mono<OffsetPage<AlertItemRow>> list(
+            Long tenantId,
+            String source,
+            Integer alarmTypeFlag,
+            Integer confirmFlag,
+            LocalDateTime from,
+            PageRequest page) {
         if (!valid(tenantId)) {
             return Mono.just(OffsetPage.of(List.of(), page.offset(), page.limit(), 0));
         }
@@ -71,19 +91,23 @@ public class R2dbcAlertStore implements ReactiveAlertStore {
                 .bind("limit", page.limit())
                 .bind("offset", page.offset());
         for (String name : bindNames) {
-            Object value = switch (name) {
-                case "target_type" -> sourceIndex(source);
-                case "alarm_type" -> alarmTypeFlag;
-                case "confirm_flag" -> confirmFlag;
-                case "from_time" -> from;
-                default -> throw new IllegalStateException("unknown alert bind: " + name);
-            };
+            Object value =
+                    switch (name) {
+                        case "target_type" -> sourceIndex(source);
+                        case "alarm_type" -> alarmTypeFlag;
+                        case "confirm_flag" -> confirmFlag;
+                        case "from_time" -> from;
+                        default -> throw new IllegalStateException("unknown alert bind: " + name);
+                    };
             countSpec = countSpec.bind(name, value);
             rowsSpec = rowsSpec.bind(name, value);
         }
-        Mono<Long> total = countSpec.map((row, metadata) -> number(row.get("total"))).one().defaultIfEmpty(0L);
+        Mono<Long> total =
+                countSpec.map((row, metadata) -> number(row.get("total"))).one().defaultIfEmpty(0L);
         DatabaseClient.GenericExecuteSpec itemRows = rowsSpec;
-        return total.flatMap(totalCount -> itemRows.map(this::map).all().collectList()
+        return total.flatMap(totalCount -> itemRows.map(this::map)
+                        .all()
+                        .collectList()
                         .map(items -> OffsetPage.of(items, page.offset(), page.limit(), totalCount)))
                 .as(pageTransaction::transactional);
     }
@@ -96,12 +120,14 @@ public class R2dbcAlertStore implements ReactiveAlertStore {
         String sql = "UPDATE " + TABLE + " SET confirm_flag=:confirm_flag, operate_time=CURRENT_TIMESTAMP"
                 + " WHERE tenant_id=:tenant_id AND id=:id AND alarm_target_type_flag=:target_type"
                 + " AND confirm_flag<>:confirm_flag";
-        return databaseClient.sql(sql)
+        return databaseClient
+                .sql(sql)
                 .bind("confirm_flag", confirmFlag)
                 .bind("tenant_id", tenantId)
                 .bind("id", id)
                 .bind("target_type", sourceIndex(source))
-                .fetch().rowsUpdated()
+                .fetch()
+                .rowsUpdated()
                 .map(rows -> rows == 1);
     }
 
@@ -122,15 +148,17 @@ public class R2dbcAlertStore implements ReactiveAlertStore {
         if (sort == null || sort.isEmpty()) return "a.create_time DESC, a.id DESC";
         List<String> clauses = new ArrayList<>();
         for (SortSpec spec : sort) {
-            String column = switch (spec.field()) {
-                case "id" -> "a.id";
-                case "sourceId" -> "a.entity_id";
-                case "pointId" -> "a.point_id";
-                case "alarmTypeFlag" -> "a.alarm_type_flag";
-                case "confirmFlag" -> "a.confirm_flag";
-                case "createTime" -> "a.create_time";
-                default -> throw new IllegalArgumentException("alert sort field is not allowed: " + spec.field());
-            };
+            String column =
+                    switch (spec.field()) {
+                        case "id" -> "a.id";
+                        case "sourceId" -> "a.entity_id";
+                        case "pointId" -> "a.point_id";
+                        case "alarmTypeFlag" -> "a.alarm_type_flag";
+                        case "confirmFlag" -> "a.confirm_flag";
+                        case "createTime" -> "a.create_time";
+                        default ->
+                            throw new IllegalArgumentException("alert sort field is not allowed: " + spec.field());
+                    };
             clauses.add(column + (spec.direction() == SortSpec.Direction.ASC ? " ASC" : " DESC"));
         }
         if (clauses.stream().noneMatch(value -> value.startsWith("a.id "))) clauses.add("a.id DESC");
@@ -164,7 +192,8 @@ public class R2dbcAlertStore implements ReactiveAlertStore {
     private LocalDateTime time(Object value) {
         if (value instanceof LocalDateTime local) return local;
         if (value instanceof Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        if (value instanceof OffsetDateTime offset) return offset.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+        if (value instanceof OffsetDateTime offset)
+            return offset.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
         return null;
     }
 

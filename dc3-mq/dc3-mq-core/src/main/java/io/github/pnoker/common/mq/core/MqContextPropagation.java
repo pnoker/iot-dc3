@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.core;
 
 import io.github.pnoker.common.constant.common.RequestIdConstant;
 import io.micrometer.context.ContextRegistry;
-import org.slf4j.MDC;
-import reactor.core.publisher.Hooks;
-
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.slf4j.MDC;
+import reactor.core.publisher.Hooks;
 
 /** Registers the request-id MDC field as Reactor context state. */
 final class MqContextPropagation {
@@ -43,7 +41,8 @@ final class MqContextPropagation {
         boolean registered = registry.getThreadLocalAccessors().stream()
                 .anyMatch(accessor -> Objects.equals(accessor.key(), REQUEST_ID_CONTEXT_KEY));
         if (!registered) {
-            registry.registerThreadLocalAccessor(REQUEST_ID_CONTEXT_KEY,
+            registry.registerThreadLocalAccessor(
+                    REQUEST_ID_CONTEXT_KEY,
                     () -> MDC.get(RequestIdConstant.MDC_KEY),
                     value -> MDC.put(RequestIdConstant.MDC_KEY, value),
                     () -> MDC.remove(RequestIdConstant.MDC_KEY));

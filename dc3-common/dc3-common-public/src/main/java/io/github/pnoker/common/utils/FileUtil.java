@@ -14,14 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.FolderConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,6 +28,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Temp directory and random XLSX file name helpers.
@@ -98,7 +96,9 @@ public class FileUtil {
      * @return Temporary upload file path
      */
     public static Path getTempUploadFilePath(String fileName, String... segments) {
-        return Paths.get(getTempPath(segments), safePathPart(fileName)).toAbsolutePath().normalize();
+        return Paths.get(getTempPath(segments), safePathPart(fileName))
+                .toAbsolutePath()
+                .normalize();
     }
 
     /**
@@ -142,5 +142,4 @@ public class FileUtil {
         String sanitized = value.replaceAll("[^a-zA-Z0-9._-]", SymbolConstant.UNDERSCORE);
         return sanitized.isBlank() ? "upload" : sanitized;
     }
-
 }

@@ -14,29 +14,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc;
 
+import io.github.pnoker.api.center.data.GrpcPointValueCursorPage;
+import io.github.pnoker.api.center.data.GrpcPointValueDTO;
 import io.github.pnoker.api.center.data.GrpcPointValueHistoryQuery;
 import io.github.pnoker.api.center.data.GrpcPointValueQuery;
-import io.github.pnoker.api.center.data.GrpcPointVolumeQuery;
-import io.github.pnoker.api.center.data.GrpcPointValueDTO;
-import io.github.pnoker.api.center.data.GrpcPointValueCursorPage;
 import io.github.pnoker.api.center.data.GrpcPointVolumeList;
+import io.github.pnoker.api.center.data.GrpcPointVolumeQuery;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointVolumeBO;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcPointValueBuilder;
+import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import io.github.pnoker.db.r2dbc.core.page.CursorPage;
-
-import java.util.concurrent.TimeUnit;
-
-import java.util.List;
 
 /**
  * gRPC implementation: forwards each call to Data Center via
@@ -60,35 +57,46 @@ public class PointValueGrpcFacade implements PointValueFacade {
 
     @Override
     public Mono<FacadePointValueBO> lastValue(Long tenantId, Long deviceId, Long pointId) {
-        GrpcPointValueQuery request = GrpcPointValueQuery.newBuilder().setDeviceId(deviceId).setPointId(pointId)
-                .setTenantId(tenantId).build();
-        return ReactiveGrpcClientSupport.<GrpcPointValueQuery, GrpcPointValueDTO>
-                unary("getLastValue", observer -> deadlineStub().getLastValue(request, observer))
+        GrpcPointValueQuery request = GrpcPointValueQuery.newBuilder()
+                .setDeviceId(deviceId)
+                .setPointId(pointId)
+                .setTenantId(tenantId)
+                .build();
+        return ReactiveGrpcClientSupport.<GrpcPointValueQuery, GrpcPointValueDTO>unary(
+                        "getLastValue", observer -> deadlineStub().getLastValue(request, observer))
                 .map(facadeGrpcPointValueBuilder::toFacadeBO);
     }
 
     @Override
-    public Mono<CursorPage<FacadePointValueBO>> history(Long tenantId, Long deviceId, Long pointId,
-                                                        String cursor, int limit) {
-        GrpcPointValueHistoryQuery request = GrpcPointValueHistoryQuery.newBuilder().setDeviceId(deviceId)
-                .setPointId(pointId).setTenantId(tenantId).setCursor(cursor == null ? "" : cursor)
-                .setLimit(limit).build();
-        return ReactiveGrpcClientSupport.<GrpcPointValueHistoryQuery, GrpcPointValueCursorPage>
-                unary("listHistoryValues", observer -> deadlineStub().listHistoryValues(request, observer))
-                .map(response -> CursorPage.of(response.getDataList().stream()
-                            .map(facadeGrpcPointValueBuilder::toFacadeBO).toList(),
-                            response.getHasNext() ? response.getNextCursor() : null));
+    public Mono<CursorPage<FacadePointValueBO>> history(
+            Long tenantId, Long deviceId, Long pointId, String cursor, int limit) {
+        GrpcPointValueHistoryQuery request = GrpcPointValueHistoryQuery.newBuilder()
+                .setDeviceId(deviceId)
+                .setPointId(pointId)
+                .setTenantId(tenantId)
+                .setCursor(cursor == null ? "" : cursor)
+                .setLimit(limit)
+                .build();
+        return ReactiveGrpcClientSupport.<GrpcPointValueHistoryQuery, GrpcPointValueCursorPage>unary(
+                        "listHistoryValues", observer -> deadlineStub().listHistoryValues(request, observer))
+                .map(response -> CursorPage.of(
+                        response.getDataList().stream()
+                                .map(facadeGrpcPointValueBuilder::toFacadeBO)
+                                .toList(),
+                        response.getHasNext() ? response.getNextCursor() : null));
     }
 
     @Override
     public Mono<List<FacadePointVolumeBO>> pointVolumes(Long tenantId, long fromEpochMillis) {
-        GrpcPointVolumeQuery request = GrpcPointVolumeQuery.newBuilder().setTenantId(tenantId)
-                .setFromTime(fromEpochMillis).build();
-        return ReactiveGrpcClientSupport.<GrpcPointVolumeQuery, GrpcPointVolumeList>
-                unary("listSeriesVolumes", observer -> deadlineStub().listSeriesVolumes(request, observer))
+        GrpcPointVolumeQuery request = GrpcPointVolumeQuery.newBuilder()
+                .setTenantId(tenantId)
+                .setFromTime(fromEpochMillis)
+                .build();
+        return ReactiveGrpcClientSupport.<GrpcPointVolumeQuery, GrpcPointVolumeList>unary(
+                        "listSeriesVolumes", observer -> deadlineStub().listSeriesVolumes(request, observer))
                 .map(response -> response.getDataList().stream()
-                            .map(row -> new FacadePointVolumeBO(row.getDeviceId(), row.getPointId(), row.getCount()))
-                            .toList());
+                        .map(row -> new FacadePointVolumeBO(row.getDeviceId(), row.getPointId(), row.getCount()))
+                        .toList());
     }
 
     private PointValueApiGrpc.PointValueApiStub deadlineStub() {
@@ -96,5 +104,4 @@ public class PointValueGrpcFacade implements PointValueFacade {
                 ? pointValueApiStub.withDeadlineAfter(properties.getDeadlineMs(), TimeUnit.MILLISECONDS)
                 : pointValueApiStub;
     }
-
 }

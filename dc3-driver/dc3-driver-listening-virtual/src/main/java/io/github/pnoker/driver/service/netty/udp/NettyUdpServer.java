@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.netty.udp;
 
 import io.netty.bootstrap.Bootstrap;
@@ -26,12 +25,11 @@ import io.netty.channel.MultiThreadIoEventLoopGroup;
 import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import java.net.InetSocketAddress;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.net.InetSocketAddress;
 
 /**
  * Netty-based UDP server for listening to incoming UDP datagrams.
@@ -61,7 +59,8 @@ public class NettyUdpServer {
         EventLoopGroup group = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         try {
             Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(group)
+            bootstrap
+                    .group(group)
                     .channel(NioDatagramChannel.class)
                     .localAddress(new InetSocketAddress(port))
                     .handler(new ChannelInitializer<Channel>() {
@@ -78,5 +77,4 @@ public class NettyUdpServer {
             log.info("Driver listener stopped, protocol={}, port={}", PROTOCOL, port);
         }
     }
-
 }

@@ -14,14 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.builder;
 
 import io.github.pnoker.api.center.manager.GrpcOffsetPointQuery;
+import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.api.common.PageRequest;
 import io.github.pnoker.api.common.SortDirection;
 import io.github.pnoker.api.common.SortSpec;
-import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -33,11 +32,10 @@ import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 /**
  * Hand-rolled conversion between facade shapes and protobuf point types.
@@ -78,9 +76,13 @@ public class FacadeGrpcPointBuilder {
     }
 
     private SortSpec toGrpcSort(io.github.pnoker.db.r2dbc.core.page.SortSpec sort) {
-        return SortSpec.newBuilder().setField(sort.field()).setDirection(
-                sort.direction() == io.github.pnoker.db.r2dbc.core.page.SortSpec.Direction.ASC
-                        ? SortDirection.SORT_DIRECTION_ASC : SortDirection.SORT_DIRECTION_DESC).build();
+        return SortSpec.newBuilder()
+                .setField(sort.field())
+                .setDirection(
+                        sort.direction() == io.github.pnoker.db.r2dbc.core.page.SortSpec.Direction.ASC
+                                ? SortDirection.SORT_DIRECTION_ASC
+                                : SortDirection.SORT_DIRECTION_DESC)
+                .build();
     }
 
     /**
@@ -129,5 +131,4 @@ public class FacadeGrpcPointBuilder {
 
         return bo;
     }
-
 }

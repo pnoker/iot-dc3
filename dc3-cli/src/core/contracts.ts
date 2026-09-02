@@ -40,12 +40,7 @@ export interface OperationAccepted {
 }
 
 export type OperationStatus =
-  | 'PENDING'
-  | 'RUNNING'
-  | 'SUCCEEDED'
-  | 'FAILED'
-  | 'CANCELLED'
-  | 'EXPIRED';
+  'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED' | 'EXPIRED';
 
 export interface OperationView {
   operationId: string;

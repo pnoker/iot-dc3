@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -29,13 +28,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.math.BigDecimal;
 
 /**
  * View object for point API responses.
@@ -55,49 +53,80 @@ public class PointVO extends BaseVO {
     /**
      * Name
      */
-    @NotBlank(message = "Point name can't be empty", groups = {Add.class})
-    @Schema(description = "Data point name. Unique name within a tenant for identifying a specific measurable or controllable device attribute.", example = "Temperature", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid point name format",
+    @NotBlank(
+            message = "Point name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description =
+                    "Data point name. Unique name within a tenant for identifying a specific measurable or controllable device attribute.",
+            example = "Temperature",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid point name format",
             groups = {Add.class, Update.class})
     private String pointName;
 
     /**
      * Code
      */
-    @Schema(description = "Data point code. Stable business identifier; must not change once deployed.", example = "TEMP_001")
+    @Schema(
+            description = "Data point code. Stable business identifier; must not change once deployed.",
+            example = "TEMP_001")
     private String pointCode;
 
     /**
      * Type
      */
-    @Schema(description = "Value data type held by this point (e.g. STRING, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN).", example = "STRING", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Point type can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description =
+                    "Value data type held by this point (e.g. STRING, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN).",
+            example = "STRING",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Point type can't be empty",
+            groups = {Add.class, Update.class})
     private PointTypeEnum pointTypeFlag;
 
     /**
      *
      */
-    @Schema(description = "Read/write capability: READ_ONLY, WRITE_ONLY, or READ_WRITE.", example = "READ_ONLY", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Read/write flag can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Read/write capability: READ_ONLY, WRITE_ONLY, or READ_WRITE.",
+            example = "READ_ONLY",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Read/write flag can't be empty",
+            groups = {Add.class, Update.class})
     private RwTypeEnum rwFlag;
 
     /**
      *
      */
-    @Schema(description = "Base value applied before multiplier for raw-to-engineering-unit conversion.", example = "0.0")
+    @Schema(
+            description = "Base value applied before multiplier for raw-to-engineering-unit conversion.",
+            example = "0.0")
     private BigDecimal baseValue;
 
     /**
      *
      */
-    @Schema(description = "Multiplier for raw-to-engineering-unit conversion: engineeringValue = baseValue + rawValue * multiplier.", example = "1.0")
+    @Schema(
+            description =
+                    "Multiplier for raw-to-engineering-unit conversion: engineeringValue = baseValue + rawValue * multiplier.",
+            example = "1.0")
     private BigDecimal multiple;
 
     /**
      *
      */
-    @Schema(description = "Number of decimal places to retain when formatting the calculated value.", example = "2", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Value decimal can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Number of decimal places to retain when formatting the calculated value.",
+            example = "2",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Value decimal can't be empty",
+            groups = {Add.class, Update.class})
     private Byte valueDecimal;
 
     /**
@@ -109,8 +138,13 @@ public class PointVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "ID of the profile (device template) this data point belongs to.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "ID of the profile (device template) this data point belongs to.",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Profile ID can't be empty",
+            groups = {Add.class, Update.class})
     private String profileId;
 
     /**
@@ -136,5 +170,4 @@ public class PointVO extends BaseVO {
      */
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
-
 }

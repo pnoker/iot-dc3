@@ -5,14 +5,21 @@
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.SystemHealthService;
-import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
+import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
@@ -20,6 +27,13 @@ import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.api.TenantFacade;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceOffsetQuery;
 import io.github.pnoker.common.facade.entity.query.FacadeDriverOffsetQuery;
+import jakarta.annotation.PreDestroy;
+import java.time.Duration;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -27,14 +41,6 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import jakarta.annotation.PreDestroy;
-
-import java.time.Duration;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /** Reactive health aggregation for platform dependencies and tenant fleet status. */
 @Slf4j
@@ -56,7 +62,8 @@ public class SystemHealthServiceImpl implements SystemHealthService {
     private final DeviceFacade deviceFacade;
     private final ReactiveEntityStateStore entityStateStore;
     private final ExecutorService connectorExecutor = Executors.newVirtualThreadPerTaskExecutor();
-    private final reactor.core.scheduler.Scheduler connectorScheduler = Schedulers.fromExecutorService(connectorExecutor);
+    private final reactor.core.scheduler.Scheduler connectorScheduler =
+            Schedulers.fromExecutorService(connectorExecutor);
 
     @Override
     public Mono<SystemHealthVO> snapshot(Long tenantId) {
@@ -75,9 +82,12 @@ public class SystemHealthServiceImpl implements SystemHealthService {
     }
 
     private Mono<Map<String, String>> probeCenter(Long tenantId) {
-        Mono<String> auth = probe(() -> tenantFacade.getByCode(DefaultFlagEnum.DEFAULT.getCode()).map(value -> value != null));
-        Mono<String> manager = probe(() -> driverFacade.listReactive(new FacadeDriverOffsetQuery(
-                tenantId, null, null, null, null, null, null, null, null, null, 0, 1, List.of())).map(page -> page.total() >= 0));
+        Mono<String> auth = probe(
+                () -> tenantFacade.getByCode(DefaultFlagEnum.DEFAULT.getCode()).map(value -> value != null));
+        Mono<String> manager = probe(() -> driverFacade
+                .listReactive(new FacadeDriverOffsetQuery(
+                        tenantId, null, null, null, null, null, null, null, null, null, 0, 1, List.of()))
+                .map(page -> page.total() >= 0));
         return Mono.zip(auth, manager).map(tuple -> {
             Map<String, String> result = new LinkedHashMap<>();
             result.put(CENTER_AUTH, tuple.getT1());
@@ -88,7 +98,8 @@ public class SystemHealthServiceImpl implements SystemHealthService {
     }
 
     private Mono<Map<String, String>> probeInfra() {
-        Mono<String> database = probe(() -> databaseClient.sql("SELECT 1 AS healthy")
+        Mono<String> database = probe(() -> databaseClient
+                .sql("SELECT 1 AS healthy")
                 .map((row, metadata) -> row.get("healthy", Number.class))
                 .one()
                 .map(value -> value != null && value.intValue() == 1));
@@ -97,10 +108,11 @@ public class SystemHealthServiceImpl implements SystemHealthService {
                 return Mono.just(false);
             }
             return Mono.fromCallable(() -> {
-                try (var connection = rabbitConnectionFactory.createConnection()) {
-                    return connection != null && connection.isOpen();
-                }
-            }).subscribeOn(connectorScheduler);
+                        try (var connection = rabbitConnectionFactory.createConnection()) {
+                            return connection != null && connection.isOpen();
+                        }
+                    })
+                    .subscribeOn(connectorScheduler);
         });
         return Mono.zip(database, mq).map(tuple -> {
             Map<String, String> result = new LinkedHashMap<>();
@@ -114,7 +126,8 @@ public class SystemHealthServiceImpl implements SystemHealthService {
     private Mono<SystemHealthVO.FleetSummary> fleetDrivers(Long tenantId) {
         FacadeDriverOffsetQuery query = new FacadeDriverOffsetQuery(
                 tenantId, null, null, null, null, null, null, null, null, null, 0, 1, List.of());
-        return driverFacade.listReactive(query)
+        return driverFacade
+                .listReactive(query)
                 .flatMap(page -> fleetSummary(tenantId, EntityTypeEnum.DRIVER, page.total()))
                 .defaultIfEmpty(new SystemHealthVO.FleetSummary())
                 .timeout(PROBE_TIMEOUT)
@@ -122,9 +135,10 @@ public class SystemHealthServiceImpl implements SystemHealthService {
     }
 
     private Mono<SystemHealthVO.FleetSummary> fleetDevices(Long tenantId) {
-        FacadeDeviceOffsetQuery query = new FacadeDeviceOffsetQuery(
-                tenantId, null, null, null, null, null, null, null, null, 0, 1, List.of());
-        return deviceFacade.listReactive(query)
+        FacadeDeviceOffsetQuery query =
+                new FacadeDeviceOffsetQuery(tenantId, null, null, null, null, null, null, null, null, 0, 1, List.of());
+        return deviceFacade
+                .listReactive(query)
                 .flatMap(page -> fleetSummary(tenantId, EntityTypeEnum.DEVICE, page.total()))
                 .defaultIfEmpty(new SystemHealthVO.FleetSummary())
                 .timeout(PROBE_TIMEOUT)
@@ -132,12 +146,15 @@ public class SystemHealthServiceImpl implements SystemHealthService {
     }
 
     private Mono<SystemHealthVO.FleetSummary> fleetSummary(Long tenantId, EntityTypeEnum type, long total) {
-        return entityStateStore.countOnline(tenantId, type).map(online -> {
-            SystemHealthVO.FleetSummary summary = new SystemHealthVO.FleetSummary();
-            summary.setTotal((int) Math.min(Integer.MAX_VALUE, total));
-            summary.setOnline((int) Math.min(Integer.MAX_VALUE, online));
-            return summary;
-        }).defaultIfEmpty(new SystemHealthVO.FleetSummary());
+        return entityStateStore
+                .countOnline(tenantId, type)
+                .map(online -> {
+                    SystemHealthVO.FleetSummary summary = new SystemHealthVO.FleetSummary();
+                    summary.setTotal((int) Math.min(Integer.MAX_VALUE, total));
+                    summary.setOnline((int) Math.min(Integer.MAX_VALUE, online));
+                    return summary;
+                })
+                .defaultIfEmpty(new SystemHealthVO.FleetSummary());
     }
 
     private Mono<SystemHealthVO.FleetSummary> degraded(Throwable error, String component) {

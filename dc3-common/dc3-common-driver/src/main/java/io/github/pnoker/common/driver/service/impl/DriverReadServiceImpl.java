@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
@@ -29,12 +28,11 @@ import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.support.ConnectionBackoff;
 import io.github.pnoker.common.exception.ReadPointException;
+import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Default {@link DriverReadService} implementation that resolves metadata, delegates the
@@ -84,9 +82,11 @@ public class DriverReadServiceImpl implements DriverReadService {
             throw new ReadPointException("Failed to read point value, device[{}] is null", deviceId);
         }
 
-        if (Objects.isNull(pointId) || Objects.isNull(device.getPointIds()) || !device.getPointIds().contains(pointId)) {
-            throw new ReadPointException("Failed to read point value, device[{}] not contained point[{}]", deviceId,
-                    pointId);
+        if (Objects.isNull(pointId)
+                || Objects.isNull(device.getPointIds())
+                || !device.getPointIds().contains(pointId)) {
+            throw new ReadPointException(
+                    "Failed to read point value, device[{}] not contained point[{}]", deviceId, pointId);
         }
 
         Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
@@ -95,14 +95,14 @@ public class DriverReadServiceImpl implements DriverReadService {
         }
         Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
         if (Objects.isNull(pointConfig) || pointConfig.isEmpty()) {
-            throw new ReadPointException("Failed to read point value, point config is empty, deviceId={}, pointId={}",
-                    deviceId, pointId);
+            throw new ReadPointException(
+                    "Failed to read point value, point config is empty, deviceId={}, pointId={}", deviceId, pointId);
         }
 
         PointBO point = pointMetadata.getCache(pointId);
         if (Objects.isNull(point)) {
-            throw new ReadPointException("Failed to read point value, point is null, deviceId={}, pointId={}",
-                    deviceId, pointId);
+            throw new ReadPointException(
+                    "Failed to read point value, point is null, deviceId={}, pointId={}", deviceId, pointId);
         }
 
         try {
@@ -117,5 +117,4 @@ public class DriverReadServiceImpl implements DriverReadService {
             throw e;
         }
     }
-
 }

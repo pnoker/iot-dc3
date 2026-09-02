@@ -14,17 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.kafka;
 
 import io.github.pnoker.common.constant.mq.ConsumptionProfile;
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.OrderingGuarantee;
 import io.github.pnoker.common.constant.mq.SubscriptionMode;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.adapter.BrokerCapabilities;
-import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
 import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireConfirmation;
@@ -34,31 +33,6 @@ import io.github.pnoker.common.mq.listener.MqPoisonException;
 import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.mq.subscription.KeyRoutes;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.Consumer;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.header.Header;
-import org.apache.kafka.common.header.internals.RecordHeader;
-import org.apache.kafka.common.serialization.ByteArrayDeserializer;
-import org.apache.kafka.common.serialization.ByteArraySerializer;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.listener.AcknowledgingMessageListener;
-import org.springframework.kafka.listener.BatchAcknowledgingMessageListener;
-import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.kafka.listener.ConsumerAwareRebalanceListener;
-import org.springframework.kafka.listener.MessageListenerContainer;
-import org.springframework.kafka.support.Acknowledgment;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -74,6 +48,30 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.AcknowledgingMessageListener;
+import org.springframework.kafka.listener.BatchAcknowledgingMessageListener;
+import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.ConsumerAwareRebalanceListener;
+import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.MessageListenerContainer;
+import org.springframework.kafka.support.Acknowledgment;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Kafka implementation of the broker port. Topics map to {@code dc3.<topic>} (logical
@@ -104,6 +102,7 @@ public class KafkaMqAdapter implements BrokerAdapter {
      * Physical topic prefix; the design doc's namespace knob lands here in phase 3.
      */
     private static final String TOPIC_PREFIX = "dc3.";
+
     private static final Duration SUBSCRIPTION_READY_TIMEOUT = Duration.ofSeconds(30);
 
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
@@ -119,8 +118,8 @@ public class KafkaMqAdapter implements BrokerAdapter {
 
         private final int expectedConsumers;
         private final CountDownLatch latch = new CountDownLatch(1);
-        private final Set<Consumer<?, ?>> assignedConsumers = java.util.Collections.newSetFromMap(
-                new IdentityHashMap<>());
+        private final Set<Consumer<?, ?>> assignedConsumers =
+                java.util.Collections.newSetFromMap(new IdentityHashMap<>());
 
         private SubscriptionReady(int expectedConsumers) {
             this.expectedConsumers = expectedConsumers;
@@ -138,8 +137,10 @@ public class KafkaMqAdapter implements BrokerAdapter {
         }
     }
 
-    public KafkaMqAdapter(KafkaTemplate<String, byte[]> kafkaTemplate, Map<String, Object> baseConsumerConfig,
-                          BatchConsumerProperties retryProperties) {
+    public KafkaMqAdapter(
+            KafkaTemplate<String, byte[]> kafkaTemplate,
+            Map<String, Object> baseConsumerConfig,
+            BatchConsumerProperties retryProperties) {
         this.kafkaTemplate = kafkaTemplate;
         this.baseConsumerConfig = baseConsumerConfig;
         this.retryProperties = retryProperties;
@@ -155,9 +156,10 @@ public class KafkaMqAdapter implements BrokerAdapter {
     public static KafkaTemplate<String, byte[]> template(String bootstrapServers) {
         Map<String, Object> producer = new HashMap<>();
         producer.put(org.apache.kafka.clients.producer.ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        producer.put(org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-                StringSerializer.class);
-        producer.put(org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+        producer.put(
+                org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        producer.put(
+                org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                 ByteArraySerializer.class);
         producer.put(org.apache.kafka.clients.producer.ProducerConfig.ACKS_CONFIG, "all");
         producer.put(org.apache.kafka.clients.producer.ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
@@ -177,9 +179,11 @@ public class KafkaMqAdapter implements BrokerAdapter {
     public static Map<String, Object> consumerConfig(String bootstrapServers) {
         Map<String, Object> config = new HashMap<>();
         config.put(org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        config.put(org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+        config.put(
+                org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
                 StringDeserializer.class);
-        config.put(org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+        config.put(
+                org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
                 ByteArrayDeserializer.class);
         config.put(org.apache.kafka.clients.consumer.ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         // latest mirrors the rabbit fresh-queue semantics: a brand new consumer group only sees
@@ -230,7 +234,8 @@ public class KafkaMqAdapter implements BrokerAdapter {
 
     @Override
     public void publish(WireMqMessage message, WireConfirmation confirmation) {
-        kafkaTemplate.send(producerRecord(message))
+        kafkaTemplate
+                .send(producerRecord(message))
                 .whenComplete((result, failure) -> confirmation.onConfirm(message, Objects.isNull(failure), failure));
     }
 
@@ -241,22 +246,23 @@ public class KafkaMqAdapter implements BrokerAdapter {
         // BROADCAST subscription across three different (never-committed) group ids.
         String groupId = groupIdOf(spec);
         String routeKey = routeKey(spec, groupId);
-        KeyRoutes<RawDeliveryListener> routes =
-                singleRoutes.computeIfAbsent(routeKey, key -> new KeyRoutes<>());
+        KeyRoutes<RawDeliveryListener> routes = singleRoutes.computeIfAbsent(routeKey, key -> new KeyRoutes<>());
         routes.add(spec.keyPattern(), listener);
         if (containers.containsKey(routeKey)) {
-            log.info("Kafka subscription joined shared container, topic={}, mode={}, delivery={}, groupId={}",
-                    spec.topic(), spec.mode(), spec.delivery(), groupId);
+            log.info(
+                    "Kafka subscription joined shared container, topic={}, mode={}, delivery={}, groupId={}",
+                    spec.topic(),
+                    spec.mode(),
+                    spec.delivery(),
+                    groupId);
             return;
         }
         int concurrency = concurrency(spec);
         SubscriptionReady ready = new SubscriptionReady(concurrency);
-        ConcurrentMessageListenerContainer<String, byte[]> container =
-                new ConcurrentMessageListenerContainer<>(consumerFactory(groupId, false),
-                        containerProperties(spec, groupId, ready));
-        container.getContainerProperties().setMessageListener(
-                (AcknowledgingMessageListener<String, byte[]>) (record, springAck)
-                        -> deliverSingle(record, springAck, routeKey));
+        ConcurrentMessageListenerContainer<String, byte[]> container = new ConcurrentMessageListenerContainer<>(
+                consumerFactory(groupId, false), containerProperties(spec, groupId, ready));
+        container.getContainerProperties().setMessageListener((AcknowledgingMessageListener<String, byte[]>)
+                (record, springAck) -> deliverSingle(record, springAck, routeKey));
         start(spec, groupId, routeKey, container, concurrency, ready);
     }
 
@@ -267,18 +273,20 @@ public class KafkaMqAdapter implements BrokerAdapter {
         KeyRoutes<RawBatchListener> routes = batchRoutes.computeIfAbsent(routeKey, key -> new KeyRoutes<>());
         routes.add(spec.keyPattern(), listener);
         if (containers.containsKey(routeKey)) {
-            log.info("Kafka batch subscription joined shared container, topic={}, mode={}, delivery={}, groupId={}",
-                    spec.topic(), spec.mode(), spec.delivery(), groupId);
+            log.info(
+                    "Kafka batch subscription joined shared container, topic={}, mode={}, delivery={}, groupId={}",
+                    spec.topic(),
+                    spec.mode(),
+                    spec.delivery(),
+                    groupId);
             return;
         }
         int concurrency = concurrency(spec);
         SubscriptionReady ready = new SubscriptionReady(concurrency);
-        ConcurrentMessageListenerContainer<String, byte[]> container =
-                new ConcurrentMessageListenerContainer<>(consumerFactory(groupId, true),
-                        containerProperties(spec, groupId, ready));
-        container.getContainerProperties().setMessageListener(
-                (BatchAcknowledgingMessageListener<String, byte[]>) (records, springAck)
-                        -> deliverBatch(records, springAck, routeKey));
+        ConcurrentMessageListenerContainer<String, byte[]> container = new ConcurrentMessageListenerContainer<>(
+                consumerFactory(groupId, true), containerProperties(spec, groupId, ready));
+        container.getContainerProperties().setMessageListener((BatchAcknowledgingMessageListener<String, byte[]>)
+                (records, springAck) -> deliverBatch(records, springAck, routeKey));
         start(spec, groupId, routeKey, container, concurrency, ready);
     }
 
@@ -290,8 +298,11 @@ public class KafkaMqAdapter implements BrokerAdapter {
         KeyRoutes<RawDeliveryListener> routes = singleRoutes.get(routeKey);
         RawDeliveryListener listener = Objects.isNull(routes) ? null : routes.next(record.key());
         if (Objects.isNull(listener)) {
-            log.debug("Kafka record matched no listener in this JVM, acknowledging and skipping, topic={}, key={}, offset={}",
-                    record.topic(), record.key(), record.offset());
+            log.debug(
+                    "Kafka record matched no listener in this JVM, acknowledging and skipping, topic={}, key={}, offset={}",
+                    record.topic(),
+                    record.key(),
+                    record.offset());
             springAck.acknowledge();
             return;
         }
@@ -300,7 +311,9 @@ public class KafkaMqAdapter implements BrokerAdapter {
                 .doOnSuccess(ignored -> springAck.acknowledge())
                 .doOnError(error -> log.error(
                         "Kafka delivery settlement failed; offset remains uncommitted, topic={}, offset={}",
-                        record.topic(), record.offset(), error))
+                        record.topic(),
+                        record.offset(),
+                        error))
                 .subscribe();
     }
 
@@ -310,8 +323,8 @@ public class KafkaMqAdapter implements BrokerAdapter {
      * bounded-retry semantics; exhaustion dead-letters the sub-batch and commits only
      * when every dead-letter send succeeded.
      */
-    private void deliverBatch(Iterable<ConsumerRecord<String, byte[]>> records, Acknowledgment springAck,
-                              String routeKey) {
+    private void deliverBatch(
+            Iterable<ConsumerRecord<String, byte[]>> records, Acknowledgment springAck, String routeKey) {
         KeyRoutes<RawBatchListener> routes = batchRoutes.get(routeKey);
         if (Objects.isNull(routes) || routes.isEmpty()) {
             springAck.acknowledge();
@@ -323,8 +336,11 @@ public class KafkaMqAdapter implements BrokerAdapter {
             RawBatchListener listener = routes.next(record.key());
             if (Objects.isNull(listener)) {
                 dropped++;
-                log.debug("Kafka batch record matched no listener in this JVM, skipping, topic={}, key={}, offset={}",
-                        record.topic(), record.key(), record.offset());
+                log.debug(
+                        "Kafka batch record matched no listener in this JVM, skipping, topic={}, key={}, offset={}",
+                        record.topic(),
+                        record.key(),
+                        record.offset());
                 continue;
             }
             grouped.computeIfAbsent(listener, key -> new ArrayList<>()).add(record);
@@ -333,14 +349,18 @@ public class KafkaMqAdapter implements BrokerAdapter {
             log.debug("Kafka batch routing dropped {} unmatched record(s) in this JVM", dropped);
         }
         Flux.fromIterable(grouped.entrySet())
-                .concatMap(entry -> normalize(Mono.defer(() -> entry.getKey().onBatch(entry.getValue().stream()
-                                .map(this::deliveryOf).toList())),
-                        entry.getValue().get(0).topic(), entry.getValue().get(0).offset())
+                .concatMap(entry -> normalize(
+                                Mono.defer(() -> entry.getKey()
+                                        .onBatch(entry.getValue().stream()
+                                                .map(this::deliveryOf)
+                                                .toList())),
+                                entry.getValue().get(0).topic(),
+                                entry.getValue().get(0).offset())
                         .flatMap(disposition -> settle(entry.getValue(), disposition)))
                 .then()
                 .doOnSuccess(ignored -> springAck.acknowledge())
-                .doOnError(error -> log.error(
-                        "Kafka batch settlement failed; offsets remain uncommitted for redelivery", error))
+                .doOnError(error ->
+                        log.error("Kafka batch settlement failed; offsets remain uncommitted for redelivery", error))
                 .subscribe();
     }
 
@@ -351,8 +371,11 @@ public class KafkaMqAdapter implements BrokerAdapter {
                     return Mono.just(DeliveryDisposition.DEAD_LETTER);
                 })
                 .onErrorResume(error -> {
-                    log.warn("Kafka delivery failed, scheduling broker redelivery, topic={}, offset={}",
-                            topic, offset, error);
+                    log.warn(
+                            "Kafka delivery failed, scheduling broker redelivery, topic={}, offset={}",
+                            topic,
+                            offset,
+                            error);
                     return Mono.just(DeliveryDisposition.REQUEUE);
                 });
     }
@@ -360,10 +383,14 @@ public class KafkaMqAdapter implements BrokerAdapter {
     private Mono<Void> settle(List<ConsumerRecord<String, byte[]>> records, DeliveryDisposition disposition) {
         return switch (disposition) {
             case ACK -> Mono.empty();
-            case DEAD_LETTER -> Flux.fromIterable(records).concatMap(this::publishDead).then();
-            case REQUEUE -> Flux.fromIterable(records).concatMap(record ->
-                    redeliveryCount(record) >= Math.max(1, retryProperties.getMaxRetries())
-                            ? publishDead(record) : republish(record)).then();
+            case DEAD_LETTER ->
+                Flux.fromIterable(records).concatMap(this::publishDead).then();
+            case REQUEUE ->
+                Flux.fromIterable(records)
+                        .concatMap(record -> redeliveryCount(record) >= Math.max(1, retryProperties.getMaxRetries())
+                                ? publishDead(record)
+                                : republish(record))
+                        .then();
         };
     }
 
@@ -386,9 +413,13 @@ public class KafkaMqAdapter implements BrokerAdapter {
         containers.clear();
     }
 
-    private void start(SubscriptionSpec spec, String groupId, String routeKey,
-                       ConcurrentMessageListenerContainer<String, byte[]> container, int concurrency,
-                       SubscriptionReady ready) {
+    private void start(
+            SubscriptionSpec spec,
+            String groupId,
+            String routeKey,
+            ConcurrentMessageListenerContainer<String, byte[]> container,
+            int concurrency,
+            SubscriptionReady ready) {
         container.setAutoStartup(true);
         container.setConcurrency(concurrency);
         containers.put(routeKey, container);
@@ -399,16 +430,22 @@ public class KafkaMqAdapter implements BrokerAdapter {
                         + SUBSCRIPTION_READY_TIMEOUT.toSeconds() + " seconds: topic=" + spec.topic()
                         + ", groupId=" + groupId);
             }
-            log.info("Kafka subscription ready, topic={}, mode={}, delivery={}, groupId={}",
-                    spec.topic(), spec.mode(), spec.delivery(), groupId);
+            log.info(
+                    "Kafka subscription ready, topic={}, mode={}, delivery={}, groupId={}",
+                    spec.topic(),
+                    spec.mode(),
+                    spec.delivery(),
+                    groupId);
         } catch (InterruptedException error) {
             Thread.currentThread().interrupt();
             container.stop();
             containers.remove(routeKey, container);
             singleRoutes.remove(routeKey);
             batchRoutes.remove(routeKey);
-            throw new IllegalStateException("Interrupted while awaiting Kafka partition assignment: topic="
-                    + spec.topic() + ", groupId=" + groupId, error);
+            throw new IllegalStateException(
+                    "Interrupted while awaiting Kafka partition assignment: topic=" + spec.topic() + ", groupId="
+                            + groupId,
+                    error);
         } catch (RuntimeException error) {
             container.stop();
             containers.remove(routeKey, container);
@@ -426,7 +463,8 @@ public class KafkaMqAdapter implements BrokerAdapter {
         Map<String, Object> props = new HashMap<>(baseConsumerConfig);
         props.put(org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG, groupId);
         if (batch) {
-            props.put(org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG,
+            props.put(
+                    org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG,
                     Math.max(1, retryProperties.getBatchSize()));
         }
         return new DefaultKafkaConsumerFactory<>(props);
@@ -452,7 +490,8 @@ public class KafkaMqAdapter implements BrokerAdapter {
      * subscription is its own group.
      */
     private String groupIdOf(SubscriptionSpec spec) {
-        String base = spec.group().isBlank() ? TOPIC_PREFIX + spec.topic().name().toLowerCase() : spec.group();
+        String base =
+                spec.group().isBlank() ? TOPIC_PREFIX + spec.topic().name().toLowerCase() : spec.group();
         if (spec.mode() == SubscriptionMode.BROADCAST) {
             return base + "-" + UUID.randomUUID();
         }
@@ -466,17 +505,19 @@ public class KafkaMqAdapter implements BrokerAdapter {
     private Map<String, String> headersOf(ConsumerRecord<String, byte[]> record) {
         Map<String, String> headers = new HashMap<>();
         for (Header header : record.headers()) {
-            headers.put(header.key(), Objects.isNull(header.value()) ? null
-                    : new String(header.value(), StandardCharsets.UTF_8));
+            headers.put(
+                    header.key(),
+                    Objects.isNull(header.value()) ? null : new String(header.value(), StandardCharsets.UTF_8));
         }
         return headers;
     }
 
     private ProducerRecord<String, byte[]> producerRecord(WireMqMessage wire) {
-        ProducerRecord<String, byte[]> record = new ProducerRecord<>(topicName(wire.topic()),
-                wire.partitionKey(), wire.body());
-        wire.headers().forEach((key, value) -> record.headers().add(key,
-                Objects.isNull(value) ? null : value.getBytes(StandardCharsets.UTF_8)));
+        ProducerRecord<String, byte[]> record =
+                new ProducerRecord<>(topicName(wire.topic()), wire.partitionKey(), wire.body());
+        wire.headers()
+                .forEach((key, value) -> record.headers()
+                        .add(key, Objects.isNull(value) ? null : value.getBytes(StandardCharsets.UTF_8)));
         return record;
     }
 
@@ -491,8 +532,9 @@ public class KafkaMqAdapter implements BrokerAdapter {
                 target.headers().add(header);
             }
         }
-        target.headers().add(new RecordHeader(MqHeaders.REDELIVERY_COUNT,
-                String.valueOf(attempt).getBytes(StandardCharsets.UTF_8)));
+        target.headers()
+                .add(new RecordHeader(
+                        MqHeaders.REDELIVERY_COUNT, String.valueOf(attempt).getBytes(StandardCharsets.UTF_8)));
         return Mono.fromFuture(kafkaTemplate.send(target)).then();
     }
 

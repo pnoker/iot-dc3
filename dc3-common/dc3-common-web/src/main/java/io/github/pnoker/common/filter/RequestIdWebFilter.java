@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.filter;
 
 import io.github.pnoker.common.constant.common.RequestIdConstant;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanContext;
+import java.util.UUID;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -29,8 +29,6 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
-
-import java.util.UUID;
 
 /**
  * Propagates a per-request id so every log line within a request carries the same
@@ -54,9 +52,9 @@ import java.util.UUID;
  * The same id is echoed back on the response via {@code X-Request-Id}, so callers can
  * correlate a failing request with server logs and distributed traces.
  *
-     * <p><b>Why Reactor Context:</b> Reactor chains may change execution threads. Publishing the id in
-     * the Reactor {@link Context} keeps it attached to the subscriber rather than a specific thread,
-     * while the response header gives callers a transport-level correlation key.
+ * <p><b>Why Reactor Context:</b> Reactor chains may change execution threads. Publishing the id in
+ * the Reactor {@link Context} keeps it attached to the subscriber rather than a specific thread,
+ * while the response header gives callers a transport-level correlation key.
  *
  * @author pnoker
  * @since 2026.7.7
@@ -90,6 +88,7 @@ public class RequestIdWebFilter implements WebFilter {
         exchange.getResponse().getHeaders().add(RequestIdConstant.HEADER, finalRequestId);
         // Publish in the Reactor context so downstream reactive operators retain the
         // correlation id even when execution changes threads.
-        return chain.filter(exchange).contextWrite(ctx -> ctx.put(RequestIdConstant.REACTOR_CONTEXT_KEY, finalRequestId));
+        return chain.filter(exchange)
+                .contextWrite(ctx -> ctx.put(RequestIdConstant.REACTOR_CONTEXT_KEY, finalRequestId));
     }
 }

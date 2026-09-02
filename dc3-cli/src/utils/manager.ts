@@ -1,12 +1,12 @@
-import { InvalidArgumentError } from "commander";
-import { dc3Client } from "../core/client.js";
+import { InvalidArgumentError } from 'commander';
+import { dc3Client } from '../core/client.js';
 
 type ManagerResource = Record<string, unknown>;
 
 export function parseNonNegativeInteger(value: string): number {
   const parsed = Number(value);
   if (!Number.isSafeInteger(parsed) || parsed < 0) {
-    throw new InvalidArgumentError("must be a non-negative safe integer");
+    throw new InvalidArgumentError('must be a non-negative safe integer');
   }
   return parsed;
 }
@@ -14,7 +14,7 @@ export function parseNonNegativeInteger(value: string): number {
 export function parsePositiveInteger(value: string): number {
   const parsed = Number(value);
   if (!Number.isSafeInteger(parsed) || parsed < 1) {
-    throw new InvalidArgumentError("must be a positive safe integer");
+    throw new InvalidArgumentError('must be a positive safe integer');
   }
   return parsed;
 }

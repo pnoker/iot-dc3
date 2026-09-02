@@ -14,8 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
 import io.github.pnoker.common.data.biz.store.PointValueIngestService;
@@ -36,6 +48,11 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,28 +62,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.test.StepVerifier;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PointValueServiceImplTest {
@@ -130,10 +126,13 @@ class PointValueServiceImplTest {
                 .pointId(20L)
                 .messageId("m-1")
                 .build();
-        lenient().when(pointValueCursorCodec.encode(anyLong(), anyString(), any())).thenAnswer(invocation -> "cursor");
-        lenient().when(pointValueCursorCodec.decode(anyString(), anyLong(), anyString()))
-                .thenReturn(new io.github.pnoker.common.tsdb.model.TsdbModel.Cursor(at("2026-08-20T10:00:01"), "m-previous",
-                        new SeriesKey(1L, 10L, 20L)));
+        lenient()
+                .when(pointValueCursorCodec.encode(anyLong(), anyString(), any()))
+                .thenAnswer(invocation -> "cursor");
+        lenient()
+                .when(pointValueCursorCodec.decode(anyString(), anyLong(), anyString()))
+                .thenReturn(new io.github.pnoker.common.tsdb.model.TsdbModel.Cursor(
+                        at("2026-08-20T10:00:01"), "m-previous", new SeriesKey(1L, 10L, 20L)));
     }
 
     @Test
@@ -175,7 +174,12 @@ class PointValueServiceImplTest {
 
     @Test
     void batchSaveTriggersAlarmOnlyForAcceptedValues() {
-        PointValueBO accepted = PointValueBO.builder().tenantId(1L).deviceId(10L).pointId(21L).messageId("m-2").build();
+        PointValueBO accepted = PointValueBO.builder()
+                .tenantId(1L)
+                .deviceId(10L)
+                .pointId(21L)
+                .messageId("m-2")
+                .build();
         when(pointValueIngestService.saveValues(any())).thenReturn(Mono.just(List.of(accepted)));
         when(alarmRuleTriggerService.processPointValues(List.of(accepted))).thenReturn(Mono.empty());
 
@@ -188,7 +192,12 @@ class PointValueServiceImplTest {
 
     @Test
     void batchAlarmFailurePropagatesWithoutMarkingProcessed() {
-        PointValueBO accepted = PointValueBO.builder().tenantId(1L).deviceId(10L).pointId(21L).messageId("m-2").build();
+        PointValueBO accepted = PointValueBO.builder()
+                .tenantId(1L)
+                .deviceId(10L)
+                .pointId(21L)
+                .messageId("m-2")
+                .build();
         when(pointValueIngestService.saveValues(any())).thenReturn(Mono.just(List.of(accepted)));
         when(alarmRuleTriggerService.processPointValues(any()))
                 .thenReturn(Mono.error(new IllegalStateException("boom")));
@@ -227,12 +236,25 @@ class PointValueServiceImplTest {
         lenient().when(deviceFacade.getByIdReactive(1L, 10L)).thenReturn(Mono.just(device));
         lenient().when(pointFacade.getByIdReactive(1L, 20L)).thenReturn(Mono.just(point));
         SeriesKey series = new SeriesKey(1L, 10L, 20L);
-        PointValueSample sample = new PointValueSample(series, at("2026-08-20T10:00:00"),
-                at("2026-08-20T10:00:01"), "raw", "2.5", 2.5d, 0, "m-1", 1, "node", 1L, 1L, 5L);
+        PointValueSample sample = new PointValueSample(
+                series,
+                at("2026-08-20T10:00:00"),
+                at("2026-08-20T10:00:01"),
+                "raw",
+                "2.5",
+                2.5d,
+                0,
+                "m-1",
+                1,
+                "node",
+                1L,
+                1L,
+                5L);
         when(reactiveTsdbStore.history(eq(SeriesFilter.of(series)), any(), isNull(), eq(1), any()))
                 .thenReturn(Mono.just(new CursorPage<>(List.of(sample), null)));
 
-        List<PointValueBO> result = service.history(1L, 10L, 20L, null, 1).block().items();
+        List<PointValueBO> result =
+                service.history(1L, 10L, 20L, null, 1).block().items();
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getCalValue()).isEqualTo("2.5");
@@ -241,14 +263,17 @@ class PointValueServiceImplTest {
 
     @Test
     void latestKeepsPointOrderAndFillsMissingWithPlaceholder() {
-                FacadePointBO known = stubPoint(20L, 1L, 100L);
+        FacadePointBO known = stubPoint(20L, 1L, 100L);
         FacadePointBO missing = stubPoint(21L, 1L, 100L);
         when(pointFacade.listReactive(any())).thenReturn(Mono.just(OffsetPage.of(List.of(known, missing), 0, 50, 2)));
         when(deviceFacade.getByIdReactive(eq(1L), eq(10L))).thenReturn(Mono.just(stubDevice(10L, 1L, 100L)));
-        PointValueBO existing = PointValueBO.builder().tenantId(1L).deviceId(10L).pointId(20L).build();
-        when(pointValueLatestService.listLatest(eq(1L), eq(10L), any())).thenReturn(reactor.core.publisher.Flux.just(existing));
+        PointValueBO existing =
+                PointValueBO.builder().tenantId(1L).deviceId(10L).pointId(20L).build();
+        when(pointValueLatestService.listLatest(eq(1L), eq(10L), any()))
+                .thenReturn(reactor.core.publisher.Flux.just(existing));
 
-        PointValueQuery query = PointValueQuery.builder().tenantId(1L).deviceId(10L).build();
+        PointValueQuery query =
+                PointValueQuery.builder().tenantId(1L).deviceId(10L).build();
         OffsetPage<PointValueBO> page = service.latest(query).block();
 
         assertThat(page.items()).hasSize(2);
@@ -265,7 +290,8 @@ class PointValueServiceImplTest {
                 .thenReturn(Mono.just(new CursorPage<>(List.of(newest, older), null)));
 
         PointValueQuery query = PointValueQuery.builder().tenantId(1L).build();
-        io.github.pnoker.db.r2dbc.core.page.CursorPage<PointValueBO> page = service.page(query).block();
+        io.github.pnoker.db.r2dbc.core.page.CursorPage<PointValueBO> page =
+                service.page(query).block();
 
         ArgumentCaptor<SeriesFilter> filter = ArgumentCaptor.forClass(SeriesFilter.class);
         verify(reactiveTsdbStore).history(filter.capture(), any(), isNull(), anyInt(), any());
@@ -281,11 +307,17 @@ class PointValueServiceImplTest {
         when(reactiveTsdbStore.history(any(), any(), any(), eq(20), any()))
                 .thenReturn(Mono.just(new CursorPage<>(List.of(sample), null)));
 
-        String fingerprint = "tenant=1;series=*;rangeKey=;rangeHours=0;from=;sort=create_time.desc,tenant_id.desc,device_id.desc,point_id.desc,message_id.desc";
-        String cursor = pointValueCursorCodec.encode(1L, fingerprint,
-                new io.github.pnoker.common.tsdb.model.TsdbModel.Cursor(at("2026-08-20T10:00:01"), "m-previous", series));
-        PointValueQuery query = PointValueQuery.builder().tenantId(1L).limit(20).cursor(cursor).build();
-        io.github.pnoker.db.r2dbc.core.page.CursorPage<PointValueBO> page = service.page(query).block();
+        String fingerprint =
+                "tenant=1;series=*;rangeKey=;rangeHours=0;from=;sort=create_time.desc,tenant_id.desc,device_id.desc,point_id.desc,message_id.desc";
+        String cursor = pointValueCursorCodec.encode(
+                1L,
+                fingerprint,
+                new io.github.pnoker.common.tsdb.model.TsdbModel.Cursor(
+                        at("2026-08-20T10:00:01"), "m-previous", series));
+        PointValueQuery query =
+                PointValueQuery.builder().tenantId(1L).limit(20).cursor(cursor).build();
+        io.github.pnoker.db.r2dbc.core.page.CursorPage<PointValueBO> page =
+                service.page(query).block();
 
         assertThat(page.items()).hasSize(1);
         assertThat(page.items().getFirst().getNumValue()).isEqualTo(19d);
@@ -302,7 +334,9 @@ class PointValueServiceImplTest {
         when(reactiveTsdbStore.history(any(), any(), isNull(), eq(20), any()))
                 .thenReturn(Mono.just(new CursorPage<>(List.of(sample), next)));
 
-        PointValueQuery query = PointValueQuery.builder().tenantId(1L).limit(20)
+        PointValueQuery query = PointValueQuery.builder()
+                .tenantId(1L)
+                .limit(20)
                 .createTimeFrom(LocalDateTime.parse("2026-08-20T00:00:00"))
                 .build();
         service.page(query).block();
@@ -317,7 +351,8 @@ class PointValueServiceImplTest {
 
     @Test
     void pageRejectsOffsetPagination() {
-        PointValueQuery query = PointValueQuery.builder().tenantId(1L).offset(1).build();
+        PointValueQuery query =
+                PointValueQuery.builder().tenantId(1L).offset(1L).build();
         assertThatThrownBy(() -> service.page(query).block())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("offset is not supported for point-value history; use cursor");
@@ -326,11 +361,15 @@ class PointValueServiceImplTest {
 
     @Test
     void pageResolvesSeriesThroughProfileBindingsWhenOnlyPointFiltered() {
-        when(pointFacade.listReactive(any())).thenReturn(Mono.just(OffsetPage.of(List.of(stubPoint(20L, 1L, 100L)), 0, 200, 1)));
-        when(deviceFacade.listByProfileIdReactive(1L, 100L)).thenReturn(reactor.core.publisher.Flux.just(stubDevice(10L, 1L, 100L)));
-        when(reactiveTsdbStore.history(any(), any(), any(), anyInt(), any())).thenReturn(Mono.just(new CursorPage<>(List.of(), null)));
+        when(pointFacade.listReactive(any()))
+                .thenReturn(Mono.just(OffsetPage.of(List.of(stubPoint(20L, 1L, 100L)), 0, 200, 1)));
+        when(deviceFacade.listByProfileIdReactive(1L, 100L))
+                .thenReturn(reactor.core.publisher.Flux.just(stubDevice(10L, 1L, 100L)));
+        when(reactiveTsdbStore.history(any(), any(), any(), anyInt(), any()))
+                .thenReturn(Mono.just(new CursorPage<>(List.of(), null)));
 
-        PointValueQuery query = PointValueQuery.builder().tenantId(1L).pointName("temp").build();
+        PointValueQuery query =
+                PointValueQuery.builder().tenantId(1L).pointName("temp").build();
         service.page(query).block();
 
         ArgumentCaptor<SeriesFilter> filter = ArgumentCaptor.forClass(SeriesFilter.class);
@@ -341,12 +380,12 @@ class PointValueServiceImplTest {
     @Test
     void pageWithMissingScopedPointStillValidatesScopeFirst() {
         when(pointFacade.getByIdReactive(1L, 20L)).thenReturn(Mono.empty());
-        PointValueQuery query = PointValueQuery.builder().tenantId(1L).pointId(20L).build();
+        PointValueQuery query =
+                PointValueQuery.builder().tenantId(1L).pointId(20L).build();
 
         // Scope validation runs before any series resolution — a missing point
         // is a client error, not an empty page (pre-existing contract).
-        assertThatThrownBy(() -> service.page(query).block())
-                .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> service.page(query).block()).isInstanceOf(NotFoundException.class);
         verifyNoTsdbReads();
     }
 
@@ -355,7 +394,8 @@ class PointValueServiceImplTest {
         when(reactiveTsdbStore.seriesCounts(eq(1L), any(), any()))
                 .thenReturn(reactor.core.publisher.Flux.just(new SeriesCount(new SeriesKey(1L, 10L, 20L), 7L)));
 
-        List<PointValueVolumeBO> volumes = service.seriesVolumes(1L, Instant.EPOCH).block();
+        List<PointValueVolumeBO> volumes =
+                service.seriesVolumes(1L, Instant.EPOCH).block();
 
         assertThat(volumes).hasSize(1);
         assertThat(volumes.getFirst().deviceId()).isEqualTo(10L);
@@ -366,5 +406,4 @@ class PointValueServiceImplTest {
         verify(reactiveTsdbStore, never()).history(any(), any(), any(), anyInt(), any());
         verify(reactiveTsdbStore, never()).count(any(), any(), any());
     }
-
 }

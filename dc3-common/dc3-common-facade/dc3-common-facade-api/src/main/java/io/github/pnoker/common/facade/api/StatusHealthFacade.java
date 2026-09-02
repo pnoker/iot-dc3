@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
-
 import java.util.Collection;
 import java.util.Map;
 import reactor.core.publisher.Mono;
@@ -32,8 +30,12 @@ import reactor.core.publisher.Mono;
  */
 public interface StatusHealthFacade {
     Mono<Map<Long, String>> listDeviceStatusesByIdsReactive(Long tenantId, Collection<Long> deviceIds);
+
     Mono<Map<Long, String>> listDeviceStatusesByProfileIdReactive(Long tenantId, Long profileId);
+
     Mono<Map<Long, String>> listDriverStatusesByIdsReactive(Long tenantId, Collection<Long> driverIds);
+
     Mono<FacadeDriverDeviceStatusSummaryBO> getDriverDeviceStatusSummaryReactive(Long tenantId, Long driverId);
+
     Mono<FacadeSystemHealthBO> systemHealthReactive(Long tenantId);
 }

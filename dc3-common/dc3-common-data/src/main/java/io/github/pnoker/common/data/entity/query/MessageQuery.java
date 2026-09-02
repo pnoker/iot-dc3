@@ -14,25 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * Query parameters for alarm message template listing and filtering.
@@ -54,15 +52,32 @@ public class MessageQuery implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Zero-based number of records to skip.")
-    private long offset;
+    private Long offset;
 
     @Schema(description = "Maximum number of records to return.", maximum = "200")
     @Builder.Default
-    private int limit = PageRequest.DEFAULT_LIMIT;
+    private Integer limit = PageRequest.DEFAULT_LIMIT;
 
     @Schema(description = "Stable allow-listed sort fields.")
     @Builder.Default
     private List<SortSpec> sort = List.of();
+
+    /**
+     * Null-safe paging accessors: the runtime Jackson 3 mapper binds request bodies
+     * through the all-args constructor, leaving absent fields null. Boxed fields keep
+     * "unspecified" distinguishable from explicit (possibly invalid) values.
+     */
+    public long getOffset() {
+        return offset == null ? 0L : offset;
+    }
+
+    public int getLimit() {
+        return limit == null ? PageRequest.DEFAULT_LIMIT : limit;
+    }
+
+    public List<SortSpec> getSort() {
+        return sort == null ? List.of() : sort;
+    }
 
     /**
      * Tenant ID
@@ -73,13 +88,17 @@ public class MessageQuery implements Serializable {
     /**
      * Alarm message template title
      */
-    @Schema(description = "Filter by message template name. Supports partial matching.", example = "High Temp Alert Message")
+    @Schema(
+            description = "Filter by message template name. Supports partial matching.",
+            example = "High Temp Alert Message")
     private String messageName;
 
     /**
      * Alarm message template code
      */
-    @Schema(description = "Filter by message template code. Exact match on the stable business identifier.", example = "HIGH_TEMP_MSG")
+    @Schema(
+            description = "Filter by message template code. Exact match on the stable business identifier.",
+            example = "HIGH_TEMP_MSG")
     private String messageCode;
 
     /**
@@ -93,5 +112,4 @@ public class MessageQuery implements Serializable {
      */
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

@@ -51,7 +51,5 @@ public class TenantTool {
     /**
      * The tenant injected from the authenticated ToolContext (never agent-supplied).
      */
-    public record CurrentTenantContext(Long tenantId) {
-    }
-
+    public record CurrentTenantContext(Long tenantId) {}
 }

@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.auth;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -40,12 +38,13 @@ public class Keys {
      */
     @Getter
     @Setter
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Aes {
 
-        private String privateKey;
+        /** Create an empty AES key container for deserialization. */
+        public Aes() {}
 
+        private String privateKey;
     }
 
     /**
@@ -53,14 +52,14 @@ public class Keys {
      */
     @Getter
     @Setter
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Rsa {
+
+        /** Create an empty RSA key container for deserialization. */
+        public Rsa() {}
 
         private String publicKey;
 
         private String privateKey;
-
     }
-
 }

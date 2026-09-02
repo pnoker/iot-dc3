@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * VO for reporting an event from a device or external system.
@@ -42,20 +40,28 @@ public class EventReportVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Identifier of the reporting device; must belong to the current tenant.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(
+            description = "Identifier of the reporting device; must belong to the current tenant.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull
     private String deviceId;
 
-    @Schema(description = "Identifier of the event definition being reported; must belong to the current tenant.", example = "4096")
+    @Schema(
+            description = "Identifier of the event definition being reported; must belong to the current tenant.",
+            example = "4096")
     private String eventId;
 
-    @Schema(description = "Stable business code of the event; must match a defined event code.", example = "HIGH_TEMP_ALARM")
+    @Schema(
+            description = "Stable business code of the event; must match a defined event code.",
+            example = "HIGH_TEMP_ALARM")
     private String eventCode;
 
     @Schema(description = "Parameter values submitted with this event report, keyed by parameter code.")
     private Map<String, String> paramValues;
 
-    @Schema(description = "Free-text detail or payload accompanying the event report.", example = "Temperature exceeded the configured threshold")
+    @Schema(
+            description = "Free-text detail or payload accompanying the event report.",
+            example = "Temperature exceeded the configured threshold")
     private String message;
-
 }

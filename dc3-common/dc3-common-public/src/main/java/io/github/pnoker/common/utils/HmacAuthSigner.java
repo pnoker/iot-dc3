@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.HexFormat;
 import java.util.Objects;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * HMAC-SHA256 signer for the {@code X-Auth-Principal} header.
@@ -64,8 +62,10 @@ public class HmacAuthSigner {
         if (StringUtils.isBlank(secret)) {
             this.secret = null;
             this.enabled = false;
-            log.warn("HMAC principal signing disabled, property={}, environmentVariable={}, productionSafe=false",
-                    EnvironmentConstant.AUTH_HMAC_SECRET_PROPERTY, EnvironmentConstant.AUTH_HMAC_SECRET_ENV);
+            log.warn(
+                    "HMAC principal signing disabled, property={}, environmentVariable={}, productionSafe=false",
+                    EnvironmentConstant.AUTH_HMAC_SECRET_PROPERTY,
+                    EnvironmentConstant.AUTH_HMAC_SECRET_ENV);
         } else {
             this.secret = secret.getBytes(StandardCharsets.UTF_8);
             this.enabled = true;
@@ -125,5 +125,4 @@ public class HmacAuthSigner {
         }
         return diff == 0;
     }
-
 }

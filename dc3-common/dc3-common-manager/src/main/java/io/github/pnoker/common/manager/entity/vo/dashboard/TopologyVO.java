@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Payload for GET /manager/dashboard/topology — a 4-column Sankey graph (Driver → Device
@@ -58,5 +56,4 @@ public class TopologyVO implements Serializable {
 
     @Schema(description = "Tenant-wide total counts used for the footer summary")
     private TopologyStatsVO stats = new TopologyStatsVO();
-
 }

@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.common;
-
-import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import org.junit.jupiter.api.Test;
 
 class RequestHeaderTest {
 
@@ -45,8 +43,8 @@ class RequestHeaderTest {
 
     @Test
     void principalHeaderConstructsAndExposesFields() {
-        RequestHeader.PrincipalHeader user = new RequestHeader.PrincipalHeader(7L, "USER", "Alice", "alice", 1L,
-                null, null);
+        RequestHeader.PrincipalHeader user =
+                new RequestHeader.PrincipalHeader(7L, "USER", "Alice", "alice", 1L, null, null);
         assertThat(user.getUserId()).isEqualTo(7L);
         assertThat(user.getNickName()).isEqualTo("Alice");
         assertThat(user.getUserName()).isEqualTo("alice");

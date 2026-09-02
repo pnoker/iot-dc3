@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
@@ -32,10 +31,6 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -48,6 +43,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * Omron FINS protocol driver service implementation.
@@ -91,19 +89,20 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
 
     private Map<Long, Socket> clientMap;
 
-    public FinsDriverCustomServiceImpl(DriverMetadata driverMetadata,
-                                       DriverSenderService driverSenderService) {
+    public FinsDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
     }
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -135,27 +134,41 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 Socket removed = clientMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     closeSocket(removed);
-                    log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode, metadataEvent.getId(), operateType);
+                    log.info(
+                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                            driverCode,
+                            metadataEvent.getId(),
+                            operateType);
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         Socket socket = getConnector(device.getId(), driverConfig);
         String memoryArea = getConfigValue(pointConfig, "memoryArea", "D");
         int address = getConfigIntValue(pointConfig, "address", 0);
@@ -173,14 +186,23 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
         } catch (Exception e) {
             clientMap.remove(device.getId());
             closeSocket(socket);
-            throw new ReadPointException("FINS read failed, protocol={}, memoryArea={}, address={}, message={}",
-                    driverCode, memoryArea, address, e.getMessage(), e);
+            throw new ReadPointException(
+                    "FINS read failed, protocol={}, memoryArea={}, address={}, message={}",
+                    driverCode,
+                    memoryArea,
+                    address,
+                    e.getMessage(),
+                    e);
         }
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         Socket socket = getConnector(device.getId(), driverConfig);
         String memoryArea = getConfigValue(pointConfig, "memoryArea", "D");
         int address = getConfigIntValue(pointConfig, "address", 0);
@@ -196,8 +218,13 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
         } catch (Exception e) {
             clientMap.remove(device.getId());
             closeSocket(socket);
-            throw new WritePointException("FINS write failed, protocol={}, memoryArea={}, address={}, message={}",
-                    driverCode, memoryArea, address, e.getMessage(), e);
+            throw new WritePointException(
+                    "FINS write failed, protocol={}, memoryArea={}, address={}, message={}",
+                    driverCode,
+                    memoryArea,
+                    address,
+                    e.getMessage(),
+                    e);
         }
     }
 
@@ -217,12 +244,21 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                 Socket socket = new Socket();
                 socket.connect(new InetSocketAddress(host, port), timeout);
                 socket.setSoTimeout(timeout);
-                log.info("Driver FINS connection established, protocol={}, deviceId={}, host={}:{}",
-                        driverCode, deviceId, host, port);
+                log.info(
+                        "Driver FINS connection established, protocol={}, deviceId={}, host={}:{}",
+                        driverCode,
+                        deviceId,
+                        host,
+                        port);
                 return socket;
             } catch (IOException e) {
-                log.error("Driver FINS connection failed, protocol={}, deviceId={}, host={}, port={}",
-                        driverCode, deviceId, host, port, e);
+                log.error(
+                        "Driver FINS connection failed, protocol={}, deviceId={}, host={}, port={}",
+                        driverCode,
+                        deviceId,
+                        host,
+                        port,
+                        e);
                 return null;
             }
         });
@@ -237,8 +273,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
      * @param length       number of items to read
      * @return FINS frame bytes
      */
-    private byte[] buildMemoryReadFrame(Map<String, AttributeBO> driverConfig,
-                                        byte areaCode, int address, int length) {
+    private byte[] buildMemoryReadFrame(Map<String, AttributeBO> driverConfig, byte areaCode, int address, int length) {
         int srcNode = getConfigIntValue(driverConfig, "sourceNode", 1);
         int destNode = getConfigIntValue(driverConfig, "destNode", 2);
         int srcUnit = getConfigIntValue(driverConfig, "sourceUnit", 0);
@@ -279,8 +314,8 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
      * @param data         data bytes to write
      * @return FINS frame bytes
      */
-    private byte[] buildMemoryWriteFrame(Map<String, AttributeBO> driverConfig,
-                                         byte areaCode, int address, byte[] data) {
+    private byte[] buildMemoryWriteFrame(
+            Map<String, AttributeBO> driverConfig, byte areaCode, int address, byte[] data) {
         int srcNode = getConfigIntValue(driverConfig, "sourceNode", 1);
         int destNode = getConfigIntValue(driverConfig, "destNode", 2);
         int srcUnit = getConfigIntValue(driverConfig, "sourceUnit", 0);
@@ -347,7 +382,8 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
         if (read != 4) {
             throw new ReadPointException("FINS response TCP header incomplete, bytesRead={}", read);
         }
-        int responseLength = ByteBuffer.wrap(lengthHeader).order(ByteOrder.BIG_ENDIAN).getInt();
+        int responseLength =
+                ByteBuffer.wrap(lengthHeader).order(ByteOrder.BIG_ENDIAN).getInt();
         if (responseLength <= 0 || responseLength > 2048) {
             throw new ReadPointException("FINS invalid response length: {}", responseLength);
         }
@@ -403,13 +439,18 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
      */
     String decodeValue(byte[] data, String dataType) {
         return switch (dataType.toUpperCase()) {
-            case "INT16" -> String.valueOf(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getShort());
+            case "INT16" ->
+                String.valueOf(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getShort());
             case "UINT16" ->
-                    String.valueOf(Short.toUnsignedInt(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getShort()));
-            case "INT32" -> String.valueOf(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getInt());
+                String.valueOf(Short.toUnsignedInt(
+                        ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getShort()));
+            case "INT32" ->
+                String.valueOf(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getInt());
             case "UINT32" ->
-                    String.valueOf(Integer.toUnsignedLong(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getInt()));
-            case "FLOAT" -> String.valueOf(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getFloat());
+                String.valueOf(Integer.toUnsignedLong(
+                        ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getInt()));
+            case "FLOAT" ->
+                String.valueOf(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getFloat());
             case "STRING" -> new String(data).trim();
             case "BCD" -> bytesToBcdString(data);
             default -> bytesToHex(data);
@@ -464,7 +505,6 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                 } catch (NumberFormatException e) {
 
                     i = 0;
-
                 }
                 ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).putInt(i);
                 break;
@@ -531,8 +571,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
         int len = s.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i + 1), 16));
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
     }
@@ -548,7 +587,9 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -570,7 +611,8 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "protocol", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -580,7 +622,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "address", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

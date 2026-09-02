@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
 import io.github.pnoker.common.auth.repository.ReactivePermissionStore;
 import io.github.pnoker.common.facade.api.PermissionFacade;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 import reactor.core.publisher.Mono;
 
 /**
@@ -47,5 +45,4 @@ public class PermissionLocalFacade implements PermissionFacade {
         }
         return permissionStore.listResourceCodes(tenantId, principalId).collect(Collectors.toUnmodifiableSet());
     }
-
 }

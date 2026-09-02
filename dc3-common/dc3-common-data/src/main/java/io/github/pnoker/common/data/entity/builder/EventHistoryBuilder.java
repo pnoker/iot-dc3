@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.builder;
 
 import io.github.pnoker.common.data.entity.bo.EventReportBO;
@@ -25,12 +24,11 @@ import io.github.pnoker.common.enums.EventHistoryAcknowledgeFlagEnum;
 import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.List;
 
 /**
  * MapStruct builder converting between event history DO and VO.
@@ -43,7 +41,9 @@ import java.util.List;
  * @author pnoker
  * @since 2026.6.5
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface EventHistoryBuilder {
 
     /**
@@ -85,5 +85,4 @@ public interface EventHistoryBuilder {
      * @return converted value
      */
     List<EventHistoryVO> buildVOListByDOList(List<EventHistoryDO> entityDOList);
-
 }

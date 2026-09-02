@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.controller;
 
 import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
@@ -27,28 +26,27 @@ import io.github.pnoker.common.auth.service.ReactiveTenantMembershipCommandServi
 import io.github.pnoker.common.auth.service.ReactiveTenantMembershipService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
+import io.github.pnoker.common.enums.MembershipStatusEnum;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
-import io.github.pnoker.common.enums.MembershipStatusEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * REST controller exposing tenant membership management endpoints. Tenant-scoped: list and add are
@@ -57,7 +55,10 @@ import java.util.Objects;
  * @author pnoker
  * @since 2026.6.13
  */
-@Tag(name = "tenant_membership", description = "Tenant membership bindings: associate users, service accounts, and roles with tenants for access control within tenant scope")
+@Tag(
+        name = "tenant_membership",
+        description =
+                "Tenant membership bindings: associate users, service accounts, and roles with tenants for access control within tenant scope")
 @Slf4j
 @RestController
 @RequestMapping(AuthConstant.TENANT_MEMBERSHIP_URL_PREFIX)
@@ -75,28 +76,43 @@ public class TenantMembershipController implements BaseController {
     /**
      * Page through the memberships of the caller's tenant.
      *
-     * @param entityQuery optional membership query filters (tenant id is pinned server-side)
+     * @param request     optional membership query filters (tenant id is pinned server-side)
      * @return a page of TenantMembershipVO belonging to the caller's tenant
      */
     @PreAuthorize("@perm.can('tenant_membership', 'list')")
-    @Operation(summary = "List Tenant Memberships", description = "Page through the memberships of the caller's tenant, optionally filtered by query. " +
-            "Each row links a principal (user or service account) to the tenant; use to see who belongs to it.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Tenant Memberships",
+            description =
+                    "Page through the memberships of the caller's tenant, optionally filtered by query. "
+                            + "Each row links a principal (user or service account) to the tenant; use to see who belongs to it.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/list")
     public Mono<ResponseEntity<OffsetPage<TenantMembershipVO>>> list(
             @RequestBody(required = false) TenantMembershipOffsetRequest request) {
         TenantMembershipOffsetRequest query = request == null ? new TenantMembershipOffsetRequest() : request;
-        return getTenantId().flatMap(tenantId -> tenantMembershipService.list(new TenantMembershipFilter(
-                        tenantId, query.principalId(), query.principalType(), query.membershipStatus(),
-                        new PageRequest(query.offset(), query.limit(), query.sort())))
-                .map(page -> ResponseEntity.ok(OffsetPage.of(page.items().stream()
-                                .map(tenantMembershipBuilder::buildVOByBO).toList(),
-                        page.offset(), page.limit(), page.total()))));
+        return getTenantId()
+                .flatMap(tenantId -> tenantMembershipService
+                        .list(new TenantMembershipFilter(
+                                tenantId,
+                                query.principalId(),
+                                query.principalType(),
+                                query.membershipStatus(),
+                                new PageRequest(query.offset(), query.limit(), query.sort())))
+                        .map(page -> ResponseEntity.ok(OffsetPage.of(
+                                page.items().stream()
+                                        .map(tenantMembershipBuilder::buildVOByBO)
+                                        .toList(),
+                                page.offset(),
+                                page.limit(),
+                                page.total()))));
     }
 
     /**
@@ -106,14 +122,20 @@ public class TenantMembershipController implements BaseController {
      * @return add-success status
      */
     @PreAuthorize("@perm.can('tenant_membership', 'add')")
-    @Operation(summary = "Add Tenant Membership", description = "Attach a principal (user or service account) to the caller's tenant. " +
-            "The body tenant id is ignored and the membership is pinned to the caller; defaults to ACTIVE status and records an audit entry.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "false"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Add Tenant Membership",
+            description =
+                    "Attach a principal (user or service account) to the caller's tenant. "
+                            + "The body tenant id is ignored and the membership is pinned to the caller; defaults to ACTIVE status and records an audit entry.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "false"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/add")
     public Mono<ResponseEntity<TenantMembershipVO>> add(@RequestBody TenantMembershipVO entityVO) {
         return getPrincipalHeader().flatMap(header -> {
@@ -127,11 +149,11 @@ public class TenantMembershipController implements BaseController {
             entityBO.setCreatorName(header.getNickName());
             entityBO.setOperatorId(header.getUserId());
             entityBO.setOperatorName(header.getNickName());
-            return tenantMembershipCommandService.add(entityBO)
-                    .flatMap(saved -> auditLogService.log(header, "CREATE", "tenant_membership",
-                                    saved.getPrincipalId(), null, "SUCCESS", null)
-                            .thenReturn(ResponseEntity.status(201)
-                                    .body(tenantMembershipBuilder.buildVOByBO(saved))));
+            return tenantMembershipCommandService
+                    .add(entityBO)
+                    .flatMap(saved -> auditLogService
+                            .log(header, "CREATE", "tenant_membership", saved.getPrincipalId(), null, "SUCCESS", null)
+                            .thenReturn(ResponseEntity.status(201).body(tenantMembershipBuilder.buildVOByBO(saved))));
         });
     }
 
@@ -142,20 +164,31 @@ public class TenantMembershipController implements BaseController {
      * @return delete-success status
      */
     @PreAuthorize("@perm.can('tenant_membership', 'delete')")
-    @Operation(summary = "Delete Tenant Membership", description = "Remove a membership record by ID, verifying it belongs to the caller's tenant first. " +
-            "Returns 404 if the membership is owned by another tenant; logs a DELETE audit entry on success.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Delete Tenant Membership",
+            description = "Remove a membership record by ID, verifying it belongs to the caller's tenant first. "
+                    + "Returns 404 if the membership is owned by another tenant; logs a DELETE audit entry on success.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @DeleteMapping("/delete")
-    public Mono<ResponseEntity<Void>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return getPrincipalHeader().flatMap(header -> tenantMembershipCommandService
-                .delete(header.getTenantId(), id, header.getUserId(), header.getNickName())
-                .then(auditLogService.log(header, "DELETE", "tenant_membership", id,
-                        null, "SUCCESS", null))
-                .thenReturn(ResponseEntity.noContent().build()));
+    public Mono<ResponseEntity<Void>> delete(
+            @Parameter(
+                            description = "Primary key of the entity to delete. Must belong to the current tenant.",
+                            example = "1024")
+                    @NotNull
+                    @RequestParam(value = "id")
+                    Long id) {
+        return getPrincipalHeader()
+                .flatMap(header -> tenantMembershipCommandService
+                        .delete(header.getTenantId(), id, header.getUserId(), header.getNickName())
+                        .then(auditLogService.log(header, "DELETE", "tenant_membership", id, null, "SUCCESS", null))
+                        .thenReturn(ResponseEntity.noContent().build()));
     }
 }

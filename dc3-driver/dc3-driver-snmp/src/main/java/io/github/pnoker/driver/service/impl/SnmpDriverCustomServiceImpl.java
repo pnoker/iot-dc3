@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
@@ -32,6 +31,12 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
@@ -48,13 +53,6 @@ import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * SNMP driver service implementation.
@@ -79,19 +77,20 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
 
     private Map<Long, Snmp> clientMap;
 
-    public SnmpDriverCustomServiceImpl(DriverMetadata driverMetadata,
-                                       DriverSenderService driverSenderService) {
+    public SnmpDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
     }
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -138,8 +137,12 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
@@ -150,19 +153,29 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
                     } catch (IOException e) {
                         log.warn("SNMP client close failed, deviceId={}", metadataEvent.getId(), e);
                     }
-                    log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode, metadataEvent.getId(), operateType);
+                    log.info(
+                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                            driverCode,
+                            metadataEvent.getId(),
+                            operateType);
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         Snmp snmp = getConnector(device.getId());
         String oid = getConfigValue(pointConfig, "oid", "");
         try {
@@ -184,14 +197,18 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
             throw e;
         } catch (Exception e) {
             clientMap.remove(device.getId());
-            throw new ReadPointException("SNMP read failed, protocol={}, oid={}, message={}",
-                    driverCode, oid, e.getMessage(), e);
+            throw new ReadPointException(
+                    "SNMP read failed, protocol={}, oid={}, message={}", driverCode, oid, e.getMessage(), e);
         }
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         Snmp snmp = getConnector(device.getId());
         String oid = getConfigValue(pointConfig, "oid", "");
         String snmpType = getConfigValue(pointConfig, "snmpType", "OCTET_STRING");
@@ -212,8 +229,8 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
             throw e;
         } catch (Exception e) {
             clientMap.remove(device.getId());
-            throw new WritePointException("SNMP write failed, protocol={}, oid={}, message={}",
-                    driverCode, oid, e.getMessage(), e);
+            throw new WritePointException(
+                    "SNMP write failed, protocol={}, oid={}, message={}", driverCode, oid, e.getMessage(), e);
         }
     }
 
@@ -289,7 +306,9 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -312,7 +331,8 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "community", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -321,6 +341,7 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "oid", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 }

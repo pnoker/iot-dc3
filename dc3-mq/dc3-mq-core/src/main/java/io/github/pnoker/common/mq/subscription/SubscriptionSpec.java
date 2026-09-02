@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.subscription;
 
 import io.github.pnoker.common.constant.mq.ConsumptionProfile;
 import io.github.pnoker.common.constant.mq.DeliveryMode;
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.mq.SubscriptionMode;
-
 import java.time.Duration;
 
 /**
@@ -51,8 +49,7 @@ public record SubscriptionSpec(
         String group,
         Duration instanceTtl,
         Class<?> payloadType,
-        boolean deadLetterEnabled
-) {
+        boolean deadLetterEnabled) {
 
     /**
      * Convenience factory: load-balanced, latency-profile, single delivery on the
@@ -63,7 +60,15 @@ public record SubscriptionSpec(
      * @return a ready subscription declaration
      */
     public static SubscriptionSpec of(MqTopic topic, Class<?> payloadType) {
-        return new SubscriptionSpec(topic, SubscriptionMode.LOAD_BALANCE, ConsumptionProfile.LATENCY,
-                DeliveryMode.SINGLE, "", "", null, payloadType, true);
+        return new SubscriptionSpec(
+                topic,
+                SubscriptionMode.LOAD_BALANCE,
+                ConsumptionProfile.LATENCY,
+                DeliveryMode.SINGLE,
+                "",
+                "",
+                null,
+                payloadType,
+                true);
     }
 }

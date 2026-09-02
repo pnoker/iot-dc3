@@ -14,8 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
@@ -24,6 +30,10 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.jinterop.dcom.core.JIVariant;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,18 +47,6 @@ import org.openscada.opc.lib.da.Item;
 import org.openscada.opc.lib.da.ItemState;
 import org.openscada.opc.lib.da.Server;
 import org.openscada.opc.lib.da.UnknownGroupException;
-
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OpcDaDriverCustomServiceImplTest {
@@ -64,8 +62,15 @@ class OpcDaDriverCustomServiceImplTest {
 
     private static Map<String, AttributeBO> pointConfig(String group, String tag) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("group", AttributeBO.builder().value(group).type(AttributeTypeEnum.STRING).build());
-        m.put("tag", AttributeBO.builder().value(tag).type(AttributeTypeEnum.STRING).build());
+        m.put(
+                "group",
+                AttributeBO.builder()
+                        .value(group)
+                        .type(AttributeTypeEnum.STRING)
+                        .build());
+        m.put(
+                "tag",
+                AttributeBO.builder().value(tag).type(AttributeTypeEnum.STRING).build());
         return m;
     }
 
@@ -280,5 +285,4 @@ class OpcDaDriverCustomServiceImplTest {
         field.setAccessible(true);
         return (Map<Long, Server>) field.get(service);
     }
-
 }

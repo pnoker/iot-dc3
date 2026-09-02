@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.common;
 
 /**
@@ -31,5 +30,4 @@ public interface TenantOwned {
      * @return owning tenant identifier
      */
     Long getTenantId();
-
 }

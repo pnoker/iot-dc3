@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.api.common.GrpcBase;
@@ -24,7 +23,6 @@ import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.base.BaseDTO;
 import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -145,5 +143,4 @@ public class GrpcBuilderUtil {
         LongOptional.ofNullable(entityGrpc.getOperateTime())
                 .ifPresent(value -> entityDTO.setOperateTime(LocalDateTimeUtil.dateTime(value)));
     }
-
 }

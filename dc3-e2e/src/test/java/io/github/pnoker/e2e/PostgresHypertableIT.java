@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.e2e;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.e2e.harness.BaseE2eIT;
 import io.github.pnoker.e2e.harness.E2eStack;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -30,8 +28,8 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 /**
  * Validates the assumptions production point-value persistence relies on:
@@ -80,10 +78,10 @@ class PostgresHypertableIT extends BaseE2eIT {
             }
 
             try (Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(
-                         "SELECT time_bucket('1 minute', time), count(*), avg(cal_value), min(cal_value),"
-                                 + " max(cal_value) FROM dc3_point_value_e2e"
-                                 + " WHERE device_id = 1 AND point_id = 100 GROUP BY 1")) {
+                    ResultSet rs = stmt.executeQuery(
+                            "SELECT time_bucket('1 minute', time), count(*), avg(cal_value), min(cal_value),"
+                                    + " max(cal_value) FROM dc3_point_value_e2e"
+                                    + " WHERE device_id = 1 AND point_id = 100 GROUP BY 1")) {
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getInt(2)).isEqualTo(10);
                 assertThat(rs.getDouble(3)).isEqualTo(24.5, org.assertj.core.data.Offset.offset(0.0001));
@@ -93,9 +91,8 @@ class PostgresHypertableIT extends BaseE2eIT {
             }
 
             try (Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(
-                         "SELECT count(*) FROM timescaledb_information.hypertables"
-                                 + " WHERE hypertable_name = 'dc3_point_value_e2e'")) {
+                    ResultSet rs = stmt.executeQuery("SELECT count(*) FROM timescaledb_information.hypertables"
+                            + " WHERE hypertable_name = 'dc3_point_value_e2e'")) {
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getInt(1)).isEqualTo(1);
             }
@@ -143,34 +140,32 @@ class PostgresHypertableIT extends BaseE2eIT {
             }
 
             try (Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(
-                         "SELECT count(*) FROM pg_extension WHERE extname IN ('timescaledb', 'vector')")) {
+                    ResultSet rs = stmt.executeQuery(
+                            "SELECT count(*) FROM pg_extension WHERE extname IN ('timescaledb', 'vector')")) {
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getInt(1)).isEqualTo(2);
             }
 
             try (Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(
-                         "SELECT vector_dims(embedding) FROM dc3_embedding_e2e WHERE id = 1")) {
+                    ResultSet rs =
+                            stmt.executeQuery("SELECT vector_dims(embedding) FROM dc3_embedding_e2e WHERE id = 1")) {
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getInt(1)).isEqualTo(3);
             }
 
             try (Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(
-                         "SELECT name, embedding <-> '[0.11,0.19,0.31]'::vector AS distance"
-                                 + " FROM dc3_embedding_e2e ORDER BY embedding <-> '[0.11,0.19,0.31]'::vector"
-                                 + " LIMIT 1")) {
+                    ResultSet rs = stmt.executeQuery("SELECT name, embedding <-> '[0.11,0.19,0.31]'::vector AS distance"
+                            + " FROM dc3_embedding_e2e ORDER BY embedding <-> '[0.11,0.19,0.31]'::vector"
+                            + " LIMIT 1")) {
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getString(1)).isEqualTo("temperature");
                 assertThat(rs.getDouble(2)).isLessThan(0.03);
             }
 
             try (Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(
-                         "SELECT indexdef FROM pg_indexes"
-                                 + " WHERE tablename = 'dc3_embedding_e2e'"
-                                 + " AND indexname = 'dc3_embedding_e2e_hnsw_idx'")) {
+                    ResultSet rs = stmt.executeQuery("SELECT indexdef FROM pg_indexes"
+                            + " WHERE tablename = 'dc3_embedding_e2e'"
+                            + " AND indexname = 'dc3_embedding_e2e_hnsw_idx'")) {
                 assertThat(rs.next()).isTrue();
                 assertThat(rs.getString(1)).contains("USING hnsw", "vector_l2_ops");
             }
@@ -198,8 +193,8 @@ class PostgresHypertableIT extends BaseE2eIT {
                 ps.setTimestamp(1, null);
                 ps.setLong(2, 1L);
                 ps.setDouble(3, 1.0);
-                java.sql.SQLException caught = org.junit.jupiter.api.Assertions.assertThrows(
-                        java.sql.SQLException.class, ps::executeUpdate);
+                java.sql.SQLException caught =
+                        org.junit.jupiter.api.Assertions.assertThrows(java.sql.SQLException.class, ps::executeUpdate);
                 assertThat(caught.getMessage().toLowerCase()).contains("null");
             }
         }

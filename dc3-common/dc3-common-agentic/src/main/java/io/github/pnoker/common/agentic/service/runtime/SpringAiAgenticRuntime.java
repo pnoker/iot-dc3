@@ -50,8 +50,8 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
             ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
             return promptSpec.stream()
                     .chatResponse()
-                    .map(response -> new AgenticRuntimeStreamFrame(responseMapper.streamDelta(response),
-                            responseMapper.finishReasonOrNull(response)));
+                    .map(response -> new AgenticRuntimeStreamFrame(
+                            responseMapper.streamDelta(response), responseMapper.finishReasonOrNull(response)));
         });
     }
 
@@ -62,18 +62,14 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
         }
         return Mono.defer(() -> {
             ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
-            return promptSpec.stream()
-                    .chatResponse()
-                    .collectList()
-                    .map(responses -> {
-                        ChatResponse chatResponse = responses.isEmpty() ? null : responses.get(responses.size() - 1);
-                        if (chatResponse == null) {
-                            return new AgenticRuntimeResult("", null);
-                        }
-                        return new AgenticRuntimeResult(responseMapper.assistantContent(chatResponse),
-                                responseMapper.finishReasonOrNull(chatResponse));
-                    });
+            return promptSpec.stream().chatResponse().collectList().map(responses -> {
+                ChatResponse chatResponse = responses.isEmpty() ? null : responses.get(responses.size() - 1);
+                if (chatResponse == null) {
+                    return new AgenticRuntimeResult("", null);
+                }
+                return new AgenticRuntimeResult(
+                        responseMapper.assistantContent(chatResponse), responseMapper.finishReasonOrNull(chatResponse));
+            });
         });
     }
-
 }

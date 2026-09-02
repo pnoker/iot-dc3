@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.db.tck;
 
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -35,37 +34,36 @@ import org.testcontainers.utility.MountableFile;
 class PostgresDialectContractIT extends AbstractDbDialectContractTest {
 
     @Container
-    private static final PostgreSQLContainer<?> POSTGRES =
-            new PostgreSQLContainer<>(org.testcontainers.utility.DockerImageName
-                    .parse("timescale/timescaledb-ha:pg18")
-                    .asCompatibleSubstituteFor("postgres"))
-                    .withDatabaseName("dc3")
-                    .withUsername("dc3")
-                    .withPassword("dc3")
-                    // 00-iot-dc3-extensions (age, pgvector) is absent from this
-                    // image — only the production base image carries those; the
-                    // dialect contract does not touch them.
-                    .withCopyFileToContainer(
-                            MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/02-iot-dc3-auth.sql"),
-                            "/docker-entrypoint-initdb.d/02-iot-dc3-auth.sql")
-                    .withCopyFileToContainer(
-                            MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/03-iot-dc3-data.sql"),
-                            "/docker-entrypoint-initdb.d/03-iot-dc3-data.sql")
-                    .withCopyFileToContainer(
-                            MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/04-iot-dc3-manager.sql"),
-                            "/docker-entrypoint-initdb.d/04-iot-dc3-manager.sql")
-                    .withCopyFileToContainer(MountableFile.forHostPath(latestOnlySeed()),
-                            "/docker-entrypoint-initdb.d/05-iot-dc3-history.sql")
-                    .withCopyFileToContainer(
-                            MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/06-iot-dc3-agentic.sql"),
-                            "/docker-entrypoint-initdb.d/06-iot-dc3-agentic.sql")
-                    .withCopyFileToContainer(
-                            MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/08-iot-dc3-runtime.sql"),
-                            "/docker-entrypoint-initdb.d/08-iot-dc3-runtime.sql")
-                    // log-following is unreliable against podman; the listening
-                    // TCP port (5432) flips when the postmaster is ready
-                    .waitingFor(org.testcontainers.containers.wait.strategy.Wait.forListeningPort()
-                            .withStartupTimeout(java.time.Duration.ofMinutes(5)));
+    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>(
+                    org.testcontainers.utility.DockerImageName.parse("timescale/timescaledb-ha:pg18")
+                            .asCompatibleSubstituteFor("postgres"))
+            .withDatabaseName("dc3")
+            .withUsername("dc3")
+            .withPassword("dc3")
+            // 00-iot-dc3-extensions (age, pgvector) is absent from this
+            // image — only the production base image carries those; the
+            // dialect contract does not touch them.
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/02-iot-dc3-auth.sql"),
+                    "/docker-entrypoint-initdb.d/02-iot-dc3-auth.sql")
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/03-iot-dc3-data.sql"),
+                    "/docker-entrypoint-initdb.d/03-iot-dc3-data.sql")
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/04-iot-dc3-manager.sql"),
+                    "/docker-entrypoint-initdb.d/04-iot-dc3-manager.sql")
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath(latestOnlySeed()), "/docker-entrypoint-initdb.d/05-iot-dc3-history.sql")
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/06-iot-dc3-agentic.sql"),
+                    "/docker-entrypoint-initdb.d/06-iot-dc3-agentic.sql")
+            .withCopyFileToContainer(
+                    MountableFile.forHostPath("../../dc3/dependencies/postgres/initdb/08-iot-dc3-runtime.sql"),
+                    "/docker-entrypoint-initdb.d/08-iot-dc3-runtime.sql")
+            // log-following is unreliable against podman; the listening
+            // TCP port (5432) flips when the postmaster is ready
+            .waitingFor(org.testcontainers.containers.wait.strategy.Wait.forListeningPort()
+                    .withStartupTimeout(java.time.Duration.ofMinutes(5)));
 
     /**
      * The hypertable/cagg half of 05 needs the production base image's
@@ -74,15 +72,18 @@ class PostgresDialectContractIT extends AbstractDbDialectContractTest {
      */
     private static String latestOnlySeed() {
         try {
-            String seed = java.nio.file.Files.readString(java.nio.file.Path.of(
-                    "../../dc3/dependencies/postgres/initdb/05-iot-dc3-history.sql"));
+            String seed = java.nio.file.Files.readString(
+                    java.nio.file.Path.of("../../dc3/dependencies/postgres/initdb/05-iot-dc3-history.sql"));
             int start = seed.indexOf("CREATE TABLE dc3_point_latest");
             int end = seed.indexOf(";", seed.indexOf("idx_point_latest_driver")) + 1;
             java.nio.file.Path trimmed = java.nio.file.Files.createTempFile("dc3-tck-05", ".sql");
-            java.nio.file.Files.writeString(trimmed, "CREATE SCHEMA IF NOT EXISTS dc3_history;\nSET search_path TO dc3_history, public;\n"
-                    + seed.substring(start, end) + "\n");
+            java.nio.file.Files.writeString(
+                    trimmed,
+                    "CREATE SCHEMA IF NOT EXISTS dc3_history;\nSET search_path TO dc3_history, public;\n"
+                            + seed.substring(start, end) + "\n");
             // createTempFile defaults to 0600 — the container's psql user must read it
-            java.nio.file.Files.setPosixFilePermissions(trimmed, java.nio.file.attribute.PosixFilePermissions.fromString("rw-r--r--"));
+            java.nio.file.Files.setPosixFilePermissions(
+                    trimmed, java.nio.file.attribute.PosixFilePermissions.fromString("rw-r--r--"));
             return trimmed.toAbsolutePath().toString();
         } catch (Exception e) {
             throw new IllegalStateException(e);

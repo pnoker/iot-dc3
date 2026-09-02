@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Agentic message persistence status.
@@ -32,11 +30,13 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 public enum AgenticMessageStatusEnum {
-
+    /** Generation completed successfully. */
     COMPLETED((byte) 0, "completed", "Generation completed"),
 
+    /** Generation terminated with an error. */
     FAILED((byte) 1, "failed", "Generation failed"),
 
+    /** Generation was cancelled before completion. */
     CANCELLED((byte) 2, "cancelled", "Generation cancelled"),
     ;
 
@@ -94,5 +94,4 @@ public enum AgenticMessageStatusEnum {
             return null;
         }
     }
-
 }

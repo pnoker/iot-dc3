@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -49,28 +48,47 @@ import lombok.ToString;
 @Schema(description = "Event Param view object")
 public class EventParamVO extends BaseVO {
 
-    @NotBlank(message = "Param name can't be empty", groups = {Add.class})
-    @Schema(description = "Event parameter name. Unique name within an event definition.", example = "Temperature Value", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid param name format",
+    @NotBlank(
+            message = "Param name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Event parameter name. Unique name within an event definition.",
+            example = "Temperature Value",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid param name format",
             groups = {Add.class, Update.class})
     private String paramName;
 
-    @Schema(description = "Event parameter code. Stable business identifier; must not change once deployed.", example = "TEMP_VAL", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotBlank(message = "Param code can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Event parameter code. Stable business identifier; must not change once deployed.",
+            example = "TEMP_VAL",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank(
+            message = "Param code can't be empty",
+            groups = {Add.class, Update.class})
     private String paramCode;
 
-    @Schema(description = "Event parameter data type: STRING, INT, LONG, FLOAT, DOUBLE, or BOOL.", example = "FLOAT", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotNull(message = "Param type can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Event parameter data type: STRING, INT, LONG, FLOAT, DOUBLE, or BOOL.",
+            example = "FLOAT",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Param type can't be empty",
+            groups = {Add.class, Update.class})
     private PointTypeEnum paramTypeFlag;
 
     @Schema(description = "Event parameter extension information, serialized as JSON for custom metadata.")
     private EventParamExt paramExt;
 
-    @Schema(description = "ID of the parent event this parameter belongs to.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotNull(message = "Event ID can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "ID of the parent event this parameter belongs to.",
+            example = "4096",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Event ID can't be empty",
+            groups = {Add.class, Update.class})
     private String eventId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
@@ -81,5 +99,4 @@ public class EventParamVO extends BaseVO {
 
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
-
 }

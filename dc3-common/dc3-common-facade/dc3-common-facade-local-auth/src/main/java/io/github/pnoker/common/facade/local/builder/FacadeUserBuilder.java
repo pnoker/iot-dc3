@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.auth.entity.bo.UserBO;
@@ -23,12 +22,11 @@ import io.github.pnoker.common.entity.ext.UserSocialExt;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Objects;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.Objects;
 
 /**
  * FacadeUser ↔ auth UserBO mapper.
@@ -40,7 +38,9 @@ import java.util.Objects;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface FacadeUserBuilder {
 
     /**
@@ -71,5 +71,4 @@ public interface FacadeUserBuilder {
             facadeBO.setIdentityExt(JsonUtil.toJsonString(identity));
         }
     }
-
 }

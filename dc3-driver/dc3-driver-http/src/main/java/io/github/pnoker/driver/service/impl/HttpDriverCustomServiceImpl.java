@@ -14,11 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
@@ -34,6 +31,13 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
+import io.github.pnoker.common.utils.JsonUtil;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,13 +47,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
-
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * HTTP REST client driver service implementation.
@@ -67,7 +66,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class HttpDriverCustomServiceImpl implements DriverCustomService {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = JsonUtil.getJsonMapper();
     private static final String ATTR_BASE_URL = "baseUrl";
     private static final String ATTR_BODY_TEMPLATE = "bodyTemplate";
     private static final String ATTR_METHOD = "method";
@@ -85,13 +84,15 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
 
     private Map<Long, WebClient> clientMap;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -110,9 +111,7 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
         if (Objects.isNull(device) || Objects.isNull(device.getId())) {
             return DeviceHealthState.offline();
         }
-        return clientMap.containsKey(device.getId())
-                ? DeviceHealthState.online()
-                : DeviceHealthState.offline();
+        return clientMap.containsKey(device.getId()) ? DeviceHealthState.online() : DeviceHealthState.offline();
     }
 
     @Override
@@ -120,26 +119,40 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 WebClient removed = clientMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
-                    log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode, metadataEvent.getId(), operateType);
+                    log.info(
+                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                            driverCode,
+                            metadataEvent.getId(),
+                            operateType);
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         WebClient client = getConnector(device.getId(), driverConfig);
         try {
             String path = getConfigValue(pointConfig, ATTR_PATH, "");
@@ -168,8 +181,12 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         WebClient client = getConnector(device.getId(), driverConfig);
         try {
             String path = getConfigValue(pointConfig, ATTR_PATH, "");
@@ -204,20 +221,23 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
             String baseUrl = getConfigValue(driverConfig, ATTR_BASE_URL, "");
             int timeout = getConfigIntValue(driverConfig, ATTR_TIMEOUT, DEFAULT_TIMEOUT_MS);
 
-            log.debug("Driver connection creating, protocol={}, deviceId={}, baseUrl={}",
-                    driverCode, deviceId, baseUrl);
+            log.debug(
+                    "Driver connection creating, protocol={}, deviceId={}, baseUrl={}", driverCode, deviceId, baseUrl);
 
-            HttpClient httpClient = HttpClient.create()
-                    .responseTimeout(Duration.ofMillis(timeout));
+            HttpClient httpClient = HttpClient.create().responseTimeout(Duration.ofMillis(timeout));
 
             WebClient client = WebClient.builder()
                     .baseUrl(baseUrl)
                     .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .clientConnector(new org.springframework.http.client.reactive.ReactorClientHttpConnector(httpClient))
+                    .clientConnector(
+                            new org.springframework.http.client.reactive.ReactorClientHttpConnector(httpClient))
                     .build();
 
-            log.info("Driver connection established, protocol={}, deviceId={}, baseUrl={}",
-                    driverCode, deviceId, baseUrl);
+            log.info(
+                    "Driver connection established, protocol={}, deviceId={}, baseUrl={}",
+                    driverCode,
+                    deviceId,
+                    baseUrl);
             return client;
         });
     }
@@ -251,7 +271,9 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -271,7 +293,8 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, ATTR_BASE_URL, issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -281,7 +304,7 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, ATTR_METHOD, issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

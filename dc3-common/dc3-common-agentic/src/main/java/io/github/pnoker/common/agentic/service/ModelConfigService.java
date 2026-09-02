@@ -19,11 +19,8 @@ package io.github.pnoker.common.agentic.service;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
 import io.github.pnoker.common.agentic.entity.vo.ModelVO;
 import io.github.pnoker.common.entity.common.RequestHeader;
-
-import reactor.core.publisher.Mono;
-
 import java.util.List;
-
+import reactor.core.publisher.Mono;
 
 /**
  * Service for managing LLM model configuration options.
@@ -74,5 +71,4 @@ public interface ModelConfigService {
      * @param header authenticated caller principal and tenant
      */
     Mono<Void> delete(Long id, RequestHeader.PrincipalHeader header);
-
 }

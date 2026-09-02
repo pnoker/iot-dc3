@@ -14,15 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.support;
 
 import io.github.pnoker.common.tsdb.model.TsdbModel.Cursor;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
 import io.github.pnoker.db.r2dbc.core.cursor.CursorState;
 import io.github.pnoker.db.r2dbc.core.cursor.SignedCursorCodec;
-
-import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -37,6 +34,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import javax.crypto.spec.SecretKeySpec;
 
 /** Signs point-value cursors and binds them to tenant and query scope. */
 public final class PointValueCursorCodec {
@@ -52,12 +50,13 @@ public final class PointValueCursorCodec {
             throw new IllegalArgumentException("point-value cursor signing secret is required");
         }
         this.clock = Objects.requireNonNull(clock, "clock must not be null");
-        this.delegate = new SignedCursorCodec(Map.of(KEY_ID,
-                new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), HMAC_ALGORITHM)), clock);
+        this.delegate = new SignedCursorCodec(
+                Map.of(KEY_ID, new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), HMAC_ALGORITHM)), clock);
     }
 
     public String encodeCursor(long tenantId, long deviceId, long pointId, Cursor cursor) {
-        if (cursor == null || cursor.series() == null
+        if (cursor == null
+                || cursor.series() == null
                 || !cursor.series().equals(new SeriesKey(tenantId, deviceId, pointId))) {
             throw invalid();
         }
@@ -74,7 +73,10 @@ public final class PointValueCursorCodec {
 
     public String encode(long tenantId, String queryFingerprint, Cursor cursor) {
         validateScope(tenantId, queryFingerprint);
-        if (cursor == null || cursor.deviceTime() == null || cursor.messageId() == null || cursor.messageId().isBlank()) {
+        if (cursor == null
+                || cursor.deviceTime() == null
+                || cursor.messageId() == null
+                || cursor.messageId().isBlank()) {
             throw new IllegalArgumentException("Invalid history cursor state");
         }
         if (cursor.series() == null) {
@@ -82,7 +84,8 @@ public final class PointValueCursorCodec {
         }
         byte[] position = serializePosition(cursor);
         Instant expiresAt = clock.instant().truncatedTo(ChronoUnit.MICROS).plus(CURSOR_TTL);
-        return delegate.encode(new CursorState(KEY_ID, tenantUuid(tenantId), digest(queryFingerprint), position, expiresAt));
+        return delegate.encode(
+                new CursorState(KEY_ID, tenantUuid(tenantId), digest(queryFingerprint), position, expiresAt));
     }
 
     public Cursor decode(String token, long tenantId, String queryFingerprint) {
@@ -123,8 +126,8 @@ public final class PointValueCursorCodec {
                 throw new IllegalArgumentException("History cursor message id is too long");
             }
             Instant timestamp = cursor.deviceTime().truncatedTo(ChronoUnit.MICROS);
-            long epochMicros = Math.addExact(Math.multiplyExact(timestamp.getEpochSecond(), 1_000_000L),
-                    timestamp.getNano() / 1_000L);
+            long epochMicros = Math.addExact(
+                    Math.multiplyExact(timestamp.getEpochSecond(), 1_000_000L), timestamp.getNano() / 1_000L);
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             try (DataOutputStream output = new DataOutputStream(bytes)) {
                 output.writeLong(epochMicros);
@@ -138,8 +141,10 @@ public final class PointValueCursorCodec {
                     output.writeLong(series.pointId());
                 }
                 boolean hasWindow = cursor.windowFrom() != null || cursor.windowTo() != null;
-                if (hasWindow && (cursor.windowFrom() == null || cursor.windowTo() == null
-                        || !cursor.windowFrom().isBefore(cursor.windowTo()))) {
+                if (hasWindow
+                        && (cursor.windowFrom() == null
+                                || cursor.windowTo() == null
+                                || !cursor.windowFrom().isBefore(cursor.windowTo()))) {
                     throw new IllegalArgumentException("Invalid history cursor window");
                 }
                 output.writeBoolean(hasWindow);
@@ -161,8 +166,8 @@ public final class PointValueCursorCodec {
             if (length < 1 || length > 1024) throw invalid();
             byte[] message = input.readNBytes(length);
             if (message.length != length) throw invalid();
-            Instant timestamp = Instant.ofEpochSecond(Math.floorDiv(epochMicros, 1_000_000L),
-                    Math.floorMod(epochMicros, 1_000_000L) * 1_000L);
+            Instant timestamp = Instant.ofEpochSecond(
+                    Math.floorDiv(epochMicros, 1_000_000L), Math.floorMod(epochMicros, 1_000_000L) * 1_000L);
             String messageId = new String(message, StandardCharsets.UTF_8);
             if (messageId.isBlank()) throw invalid();
             SeriesKey series = null;
@@ -189,13 +194,12 @@ public final class PointValueCursorCodec {
 
     private static long epochMicros(Instant timestamp) {
         Instant truncated = timestamp.truncatedTo(ChronoUnit.MICROS);
-        return Math.addExact(Math.multiplyExact(truncated.getEpochSecond(), 1_000_000L),
-                truncated.getNano() / 1_000L);
+        return Math.addExact(Math.multiplyExact(truncated.getEpochSecond(), 1_000_000L), truncated.getNano() / 1_000L);
     }
 
     private static Instant instantOfMicros(long epochMicros) {
-        return Instant.ofEpochSecond(Math.floorDiv(epochMicros, 1_000_000L),
-                Math.floorMod(epochMicros, 1_000_000L) * 1_000L);
+        return Instant.ofEpochSecond(
+                Math.floorDiv(epochMicros, 1_000_000L), Math.floorMod(epochMicros, 1_000_000L) * 1_000L);
     }
 
     private static UUID tenantUuid(long tenantId) {

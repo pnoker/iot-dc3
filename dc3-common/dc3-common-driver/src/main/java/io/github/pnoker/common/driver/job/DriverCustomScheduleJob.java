@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.job;
 
 import io.github.pnoker.common.driver.service.DriverCustomService;
@@ -52,5 +51,4 @@ public class DriverCustomScheduleJob extends QuartzJobBean {
             log.error("Failed to execute custom schedule job", e);
         }
     }
-
 }

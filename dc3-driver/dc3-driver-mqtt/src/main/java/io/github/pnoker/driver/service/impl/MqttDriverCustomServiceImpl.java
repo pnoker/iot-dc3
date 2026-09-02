@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
@@ -32,6 +31,11 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.driver.service.MqttSendService;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -43,12 +47,6 @@ import org.springframework.integration.mqtt.event.MqttIntegrationEvent;
 import org.springframework.integration.mqtt.event.MqttSubscribedEvent;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Custom driver service implementation for the MQTT driver.
@@ -87,6 +85,7 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
      * ONLINE with a diagnostic note.
      */
     private final ObjectProvider<MqttPahoMessageDrivenChannelAdapter> inboundAdapterProvider;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
@@ -164,11 +163,15 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
     public void onApplicationEvent(MqttIntegrationEvent event) {
         if (event instanceof MqttSubscribedEvent) {
             brokerConnected = Boolean.TRUE;
-            log.info("MQTT broker connected and subscribed, protocol={}, source={}", driverCode,
+            log.info(
+                    "MQTT broker connected and subscribed, protocol={}, source={}",
+                    driverCode,
                     Objects.toString(event.getSource(), "?"));
         } else if (event instanceof MqttConnectionFailedEvent) {
             brokerConnected = Boolean.FALSE;
-            log.error("MQTT broker connection failed, protocol={}, source={}", driverCode,
+            log.error(
+                    "MQTT broker connection failed, protocol={}, source={}",
+                    driverCode,
                     Objects.toString(event.getSource(), "?"));
         }
     }
@@ -200,12 +203,20 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             // to do something for device event
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode,
-                    metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             // to do something for point event
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode,
-                    metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
@@ -225,8 +236,11 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
      * @return null (data is received asynchronously)
      */
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                               PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         /*
          * Hint: The logic here is for reference only; please modify it according to the
          * actual application scenario.
@@ -255,8 +269,12 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
      * @return true if the write operation succeeded, false otherwise
      */
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WritePointValue values) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue values) {
         /*
          * Hint: The logic here is for reference only; please modify it according to the
          * actual application scenario.
@@ -270,26 +288,39 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
          */
         String commandTopic = pointConfig.get("commandTopic").getValue(String.class);
         String value = values.getValue();
-        log.debug("Driver point write requested, protocol={}, deviceId={}, pointId={}, topic={}, valueLength={}", driverCode,
-                device.getId(), point.getId(), commandTopic, Objects.toString(value, "").length());
+        log.debug(
+                "Driver point write requested, protocol={}, deviceId={}, pointId={}, topic={}, valueLength={}",
+                driverCode,
+                device.getId(),
+                point.getId(),
+                commandTopic,
+                Objects.toString(value, "").length());
         try {
             int commandQos = pointConfig.get("commandQos").getValue(Integer.class);
             mqttSendService.sendToMqtt(commandTopic, commandQos, value);
         } catch (Exception e) {
-            log.debug("MQTT command QoS unavailable, fallback to default, deviceId={}, pointId={}, topic={}",
-                    device.getId(), point.getId(), commandTopic, e);
+            log.debug(
+                    "MQTT command QoS unavailable, fallback to default, deviceId={}, pointId={}, topic={}",
+                    device.getId(),
+                    point.getId(),
+                    commandTopic,
+                    e);
             mqttSendService.sendToMqtt(commandTopic, value);
         }
         return true;
     }
 
     @Override
-    public Map<String, String> execute(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> commandConfig,
-                                       DeviceBO device, CommandRuntimeBO command, Map<String, String> paramValues) {
+    public Map<String, String> execute(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> commandConfig,
+            DeviceBO device,
+            CommandRuntimeBO command,
+            Map<String, String> paramValues) {
         String commandTopic = getConfigValue(commandConfig, COMMAND_TOPIC);
         if (StringUtils.isBlank(commandTopic)) {
-            throw new IllegalStateException("MQTT command topic is blank, deviceId=" + device.getId()
-                    + ", commandId=" + command.id());
+            throw new IllegalStateException(
+                    "MQTT command topic is blank, deviceId=" + device.getId() + ", commandId=" + command.id());
         }
 
         Map<String, String> context = new LinkedHashMap<>();
@@ -319,8 +350,13 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
             result.put("qos", String.valueOf(commandQos));
         }
         result.put("payload", payload);
-        log.info("MQTT command executed, deviceId={}, commandId={}, topic={}, qos={}, payloadLength={}",
-                device.getId(), command.id(), commandTopic, commandQos, payload.length());
+        log.info(
+                "MQTT command executed, deviceId={}, commandId={}, topic={}, qos={}, payloadLength={}",
+                device.getId(),
+                command.id(),
+                commandTopic,
+                commandQos,
+                payload.length());
         return result;
     }
 
@@ -353,7 +389,8 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -361,7 +398,7 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

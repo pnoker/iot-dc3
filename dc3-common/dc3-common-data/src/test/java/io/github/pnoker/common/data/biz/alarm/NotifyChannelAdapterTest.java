@@ -14,30 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
-import org.junit.jupiter.api.Test;
-import org.springframework.web.reactive.function.client.WebClient;
-
 import java.util.Map;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+import org.springframework.web.reactive.function.client.WebClient;
 
 class NotifyChannelAdapterTest {
 
     @Test
     void webhookAdapterFailsWhenCredentialIsMissing() {
-        WebhookNotifyChannelAdapter adapter = new WebhookNotifyChannelAdapter(WebClient.builder(),
-                credentialRef -> Optional.empty());
+        WebhookNotifyChannelAdapter adapter =
+                new WebhookNotifyChannelAdapter(WebClient.builder(), credentialRef -> Optional.empty());
         NotifyChannelBO channel = new NotifyChannelBO();
         channel.setCredentialRef("secret:webhook:missing");
 
-        NotifySendResult result = adapter.send(channel, new MessagePayload(null, "JSON", Map.of("text", "hello"),
-                java.util.List.of())).block();
+        NotifySendResult result = adapter.send(
+                        channel, new MessagePayload(null, "JSON", Map.of("text", "hello"), java.util.List.of()))
+                .block();
 
         assertThat(result.getStatusFlag()).isEqualTo(NotifyHistoryStatusEnum.FAILED);
         assertThat(result.getErrorMessage()).contains("credential");
@@ -45,20 +44,22 @@ class NotifyChannelAdapterTest {
 
     @Test
     void feishuAdapterFailsWhenSigningSecretIsMissing() {
-        FeishuBotNotifyChannelAdapter adapter = new FeishuBotNotifyChannelAdapter(WebClient.builder(),
+        FeishuBotNotifyChannelAdapter adapter = new FeishuBotNotifyChannelAdapter(
+                WebClient.builder(),
                 credentialRef -> Optional.of(new NotifyCredential("https://example.invalid/webhook", "", Map.of())));
         NotifyChannelBO channel = new NotifyChannelBO();
         channel.setCredentialRef("secret:feishu:missing-secret");
-        io.github.pnoker.common.entity.ext.NotifyChannelExt ext = new io.github.pnoker.common.entity.ext.NotifyChannelExt();
-        ext.setContent(new io.github.pnoker.common.entity.ext.NotifyChannelExt.Content(true, "v1", false, true,
-                Map.of()));
+        io.github.pnoker.common.entity.ext.NotifyChannelExt ext =
+                new io.github.pnoker.common.entity.ext.NotifyChannelExt();
+        ext.setContent(
+                new io.github.pnoker.common.entity.ext.NotifyChannelExt.Content(true, "v1", false, true, Map.of()));
         channel.setChannelExt(ext);
 
-        NotifySendResult result = adapter.send(channel, new MessagePayload(null, "CARD", Map.of("title", "hello"),
-                java.util.List.of())).block();
+        NotifySendResult result = adapter.send(
+                        channel, new MessagePayload(null, "CARD", Map.of("title", "hello"), java.util.List.of()))
+                .block();
 
         assertThat(result.getStatusFlag()).isEqualTo(NotifyHistoryStatusEnum.FAILED);
         assertThat(result.getErrorMessage()).contains("secret");
     }
-
 }

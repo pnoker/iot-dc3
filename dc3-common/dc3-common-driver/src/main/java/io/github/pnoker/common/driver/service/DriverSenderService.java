@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
@@ -23,11 +22,10 @@ import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
-import reactor.core.publisher.Mono;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import reactor.core.publisher.Mono;
 
 /**
  * Service contract for publishing driver, device, and point-value messages to RabbitMQ.
@@ -78,8 +76,8 @@ public interface DriverSenderService {
      * @param timeoutUnit      timeout unit
      * @param stateDescription structured diagnostics description
      */
-    void deviceStatusSender(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit,
-                            String stateDescription);
+    void deviceStatusSender(
+            Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit, String stateDescription);
 
     /**
      * Publishes a driver-level ALARM event. Used by protocol drivers when a connection /
@@ -131,5 +129,4 @@ public interface DriverSenderService {
      * @param entityDTO event report payload
      */
     void eventReportSender(EventReportDTO entityDTO);
-
 }

@@ -14,8 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.sql;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import com.zaxxer.hikari.HikariDataSource;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
@@ -34,26 +41,17 @@ import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class JdbcDriverCustomServiceTest {
@@ -140,8 +138,8 @@ class JdbcDriverCustomServiceTest {
         when(connection.prepareStatement(writeQuery)).thenReturn(preparedStatement);
         when(preparedStatement.executeUpdate()).thenReturn(1);
 
-        Boolean result = service.write(driverConfig(), writeConfig(writeQuery), device(1L), point(1L),
-                writeValue(maliciousValue));
+        Boolean result = service.write(
+                driverConfig(), writeConfig(writeQuery), device(1L), point(1L), writeValue(maliciousValue));
 
         assertThat(result).isTrue();
         // The query reaches the driver verbatim — the value is never concatenated into it.
@@ -156,11 +154,19 @@ class JdbcDriverCustomServiceTest {
     void writeRejectsQueryWithoutExactlyOnePlaceholder() {
         service.connectMap.put(1L, dataSource);
 
-        assertThatThrownBy(() -> service.write(driverConfig(),
-                writeConfig("UPDATE sensor SET v = 'x' WHERE id = 1"), device(1L), point(1L), writeValue("x")))
+        assertThatThrownBy(() -> service.write(
+                        driverConfig(),
+                        writeConfig("UPDATE sensor SET v = 'x' WHERE id = 1"),
+                        device(1L),
+                        point(1L),
+                        writeValue("x")))
                 .isInstanceOf(WritePointException.class);
-        assertThatThrownBy(() -> service.write(driverConfig(),
-                writeConfig("UPDATE sensor SET v = ?, w = ? WHERE id = 1"), device(1L), point(1L), writeValue("x")))
+        assertThatThrownBy(() -> service.write(
+                        driverConfig(),
+                        writeConfig("UPDATE sensor SET v = ?, w = ? WHERE id = 1"),
+                        device(1L),
+                        point(1L),
+                        writeValue("x")))
                 .isInstanceOf(WritePointException.class);
 
         // Configuration errors must not touch or invalidate the pool.
@@ -175,8 +181,8 @@ class JdbcDriverCustomServiceTest {
         when(dataSource.getConnection()).thenThrow(new SQLException("boom"));
         when(dataSource.isClosed()).thenReturn(false);
 
-        assertThatThrownBy(() -> service.write(driverConfig(), writeConfig(writeQuery),
-                device(1L), point(1L), writeValue("x")))
+        assertThatThrownBy(() ->
+                        service.write(driverConfig(), writeConfig(writeQuery), device(1L), point(1L), writeValue("x")))
                 .isInstanceOf(WritePointException.class);
 
         assertThat(service.connectMap).doesNotContainKey(1L);
@@ -379,14 +385,16 @@ class JdbcDriverCustomServiceTest {
 
     @Test
     void validatePointRequiresReadQueryForReadOnlyPoint() {
-        ValidationReport report = service.validatePoint(writeConfig("UPDATE t SET v = ?"), point(1L, RwTypeEnum.READ_ONLY));
+        ValidationReport report =
+                service.validatePoint(writeConfig("UPDATE t SET v = ?"), point(1L, RwTypeEnum.READ_ONLY));
 
         assertThat(report.isPassed()).isFalse();
     }
 
     @Test
     void validatePointPassesForWriteOnlyPointWithWriteQuery() {
-        ValidationReport report = service.validatePoint(writeConfig("UPDATE t SET v = ?"), point(1L, RwTypeEnum.WRITE_ONLY));
+        ValidationReport report =
+                service.validatePoint(writeConfig("UPDATE t SET v = ?"), point(1L, RwTypeEnum.WRITE_ONLY));
 
         assertThat(report.isPassed()).isTrue();
     }
@@ -402,10 +410,14 @@ class JdbcDriverCustomServiceTest {
     void validatePointRequiresBothQueriesForReadWritePoint() {
         Map<String, AttributeBO> config = readConfig("SELECT 1");
 
-        assertThat(service.validatePoint(config, point(1L, RwTypeEnum.READ_WRITE)).isPassed()).isFalse();
+        assertThat(service.validatePoint(config, point(1L, RwTypeEnum.READ_WRITE))
+                        .isPassed())
+                .isFalse();
 
         config.put("writeQuery", str("UPDATE t SET v = ?"));
-        assertThat(service.validatePoint(config, point(1L, RwTypeEnum.READ_WRITE)).isPassed()).isTrue();
+        assertThat(service.validatePoint(config, point(1L, RwTypeEnum.READ_WRITE))
+                        .isPassed())
+                .isTrue();
     }
 
     @Test
@@ -446,5 +458,4 @@ class JdbcDriverCustomServiceTest {
             return 0;
         }
     }
-
 }

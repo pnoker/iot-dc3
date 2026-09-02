@@ -14,14 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.contract;
 
-import org.junit.jupiter.api.Test;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,8 +27,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Repository-wide guardrails against tests that can pass without verifying production behaviour.
@@ -43,19 +41,23 @@ class RepositoryTestQualityGateTest {
     private static final String THIS_FILE = "RepositoryTestQualityGateTest.java";
     private static final List<ForbiddenPattern> FORBIDDEN_PATTERNS = List.of(
             new ForbiddenPattern("disabled test", Pattern.compile("@(Disabled|Ignore)\\b")),
-            new ForbiddenPattern("constant boolean assertion", Pattern.compile(
-                    "assert(?:True\\(true\\)|False\\(false\\)|That\\((?:true|false)\\)\\.is(?:True|False)\\(\\))")),
-            new ForbiddenPattern("no-op schedule test", Pattern.compile(
-                    "void\\s+schedule(?:DoesNothing|IsNoOp)\\s*\\(")),
-            new ForbiddenPattern("fixture helper self-test", Pattern.compile(
-                    "void\\s+(?:driverConfigContains|pointConfigContains)\\w*\\s*\\(")),
-            new ForbiddenPattern("comment-only assertion", Pattern.compile(
-                    "No exception thrown is the assertion", Pattern.CASE_INSENSITIVE)));
+            new ForbiddenPattern(
+                    "constant boolean assertion",
+                    Pattern.compile(
+                            "assert(?:True\\(true\\)|False\\(false\\)|That\\((?:true|false)\\)\\.is(?:True|False)\\(\\))")),
+            new ForbiddenPattern(
+                    "no-op schedule test", Pattern.compile("void\\s+schedule(?:DoesNothing|IsNoOp)\\s*\\(")),
+            new ForbiddenPattern(
+                    "fixture helper self-test",
+                    Pattern.compile("void\\s+(?:driverConfigContains|pointConfigContains)\\w*\\s*\\(")),
+            new ForbiddenPattern(
+                    "comment-only assertion",
+                    Pattern.compile("No exception thrown is the assertion", Pattern.CASE_INSENSITIVE)));
     private static final Pattern ONLINE_TEST_ASSERTS_OFFLINE = Pattern.compile(
             "(?s)void\\s+(?:healthReturnsOnline|healthIsOnline|\\w+OnlineWhen\\w*)\\s*\\([^)]*\\)\\s*\\{"
                     + ".{0,2000}?assertThat\\([^;]*EntityStatusEnum\\.OFFLINE");
-    private static final Set<String> REQUIRED_CROSS_CUTTING_COVERAGE = Set.of(
-            "dc3-common-api", "dc3-common-facade-grpc", "dc3-common-sql");
+    private static final Set<String> REQUIRED_CROSS_CUTTING_COVERAGE =
+            Set.of("dc3-common-api", "dc3-common-facade-grpc", "dc3-common-sql");
 
     private static void inspect(Path repository, Path path, List<String> violations) {
         try {
@@ -66,8 +68,8 @@ class RepositoryTestQualityGateTest {
                 }
             }
             if (ONLINE_TEST_ASSERTS_OFFLINE.matcher(source).find()) {
-                violations.add("%s: online health test asserts OFFLINE"
-                        .formatted(normalized(repository.relativize(path))));
+                violations.add(
+                        "%s: online health test asserts OFFLINE".formatted(normalized(repository.relativize(path))));
             }
         } catch (IOException e) {
             throw new IllegalStateException("Failed to inspect " + path, e);
@@ -114,7 +116,8 @@ class RepositoryTestQualityGateTest {
         try (Stream<Path> paths = Files.walk(repository)) {
             paths.filter(Files::isRegularFile)
                     .filter(path -> normalized(path).contains(TEST_JAVA))
-                    .filter(path -> path.toString().endsWith("Test.java") || path.toString().endsWith("Tests.java"))
+                    .filter(path -> path.toString().endsWith("Test.java")
+                            || path.toString().endsWith("Tests.java"))
                     .filter(path -> !path.getFileName().toString().equals(THIS_FILE))
                     .forEach(path -> inspect(repository, path, violations));
         }
@@ -127,10 +130,9 @@ class RepositoryTestQualityGateTest {
     @Test
     void aggregateCoverageMustIncludeEveryDriverAndCrossCuttingRuntimeModule() throws Exception {
         Path repository = findRepositoryRoot();
-        Set<String> driverModules = childTexts(
-                repository.resolve("dc3-driver/pom.xml"), "modules", "module");
-        Set<String> coveredModules = childTexts(
-                repository.resolve("dc3-coverage/pom.xml"), "dependencies", "artifactId");
+        Set<String> driverModules = childTexts(repository.resolve("dc3-driver/pom.xml"), "modules", "module");
+        Set<String> coveredModules =
+                childTexts(repository.resolve("dc3-coverage/pom.xml"), "dependencies", "artifactId");
 
         assertThat(driverModules).as("Driver reactor must not be empty").isNotEmpty();
         assertThat(coveredModules)
@@ -142,6 +144,5 @@ class RepositoryTestQualityGateTest {
                 .contains("**/entity/builder/*BuilderImpl.class");
     }
 
-    private record ForbiddenPattern(String reason, Pattern pattern) {
-    }
+    private record ForbiddenPattern(String reason, Pattern pattern) {}
 }

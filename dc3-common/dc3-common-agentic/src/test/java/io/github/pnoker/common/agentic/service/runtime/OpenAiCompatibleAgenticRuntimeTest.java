@@ -16,12 +16,11 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
-import com.openai.models.chat.completions.ChatCompletionMessageParam;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import com.openai.models.chat.completions.ChatCompletionMessageParam;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 class OpenAiCompatibleAgenticRuntimeTest {
 
@@ -29,20 +28,23 @@ class OpenAiCompatibleAgenticRuntimeTest {
     void assistantToolCallMessagePreservesReasoningContentForProviderContinuation() {
         OpenAiCompatibleAgenticRuntime runtime = new OpenAiCompatibleAgenticRuntime(null, null, null, null);
 
-        ChatCompletionMessageParam message = runtime.assistantToolCallMessage(null, "real reasoning",
-                List.of(new OpenAiCompatibleAgenticRuntime.ToolCall("call_1", "searchDrivers",
-                        "{\"driverName\":\"Virtual - Edge Acceptance Lab\"}")));
+        ChatCompletionMessageParam message = runtime.assistantToolCallMessage(
+                null,
+                "real reasoning",
+                List.of(new OpenAiCompatibleAgenticRuntime.ToolCall(
+                        "call_1", "searchDrivers", "{\"driverName\":\"Virtual - Edge Acceptance Lab\"}")));
 
         assertThat(message.isAssistant()).isTrue();
-        assertThat(message.asAssistant()._additionalProperties().get("reasoning_content").convert(String.class))
+        assertThat(message.asAssistant()
+                        ._additionalProperties()
+                        .get("reasoning_content")
+                        .convert(String.class))
                 .isEqualTo("real reasoning");
         assertThat(message.asAssistant().toolCalls()).hasValueSatisfying(toolCalls -> {
             assertThat(toolCalls).hasSize(1);
             assertThat(toolCalls.get(0).asFunction().id()).isEqualTo("call_1");
             assertThat(toolCalls.get(0).asFunction().function().name()).isEqualTo("searchDrivers");
-            assertThat(toolCalls.get(0).asFunction().function().arguments())
-                    .contains("Virtual - Edge Acceptance Lab");
+            assertThat(toolCalls.get(0).asFunction().function().arguments()).contains("Virtual - Edge Acceptance Lab");
         });
     }
-
 }

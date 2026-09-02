@@ -14,8 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.zsmartsystems.zigbee.CommandResult;
 import com.zsmartsystems.zigbee.IeeeAddress;
@@ -38,41 +43,42 @@ import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class ZigbeeDriverCustomServiceImplTest {
 
     @Mock
     private DriverMetadata driverMetadata;
+
     @Mock
     private DriverSenderService driverSenderService;
+
     @Mock
     private ZigbeeNetworkManagerFactory networkManagerFactory;
+
     @Mock
     private ZigBeeNetworkManager networkManager;
+
     @Mock
     private ZigBeeNode node;
+
     @Mock
     private ZigBeeEndpoint endpoint;
+
     @Mock
     private ZclCluster cluster;
+
     @Mock
     private ZclAttribute attribute;
+
     @Mock
     private CommandResult commandResult;
 
@@ -182,7 +188,11 @@ class ZigbeeDriverCustomServiceImplTest {
         when(attribute.writeValue("42")).thenReturn(CompletableFuture.completedFuture(commandResult));
         when(commandResult.isSuccess()).thenReturn(true);
 
-        boolean written = service.write(driverConfig(), pointConfig(), device(), point(),
+        boolean written = service.write(
+                driverConfig(),
+                pointConfig(),
+                device(),
+                point(),
                 WritePointValue.builder().type(PointTypeEnum.STRING).value("42").build());
 
         assertThat(written).isTrue();
@@ -196,8 +206,15 @@ class ZigbeeDriverCustomServiceImplTest {
         when(attribute.writeValue("42")).thenReturn(CompletableFuture.completedFuture(commandResult));
         when(commandResult.isSuccess()).thenReturn(false);
 
-        assertThatThrownBy(() -> service.write(driverConfig(), pointConfig(), device(), point(),
-                WritePointValue.builder().type(PointTypeEnum.STRING).value("42").build()))
+        assertThatThrownBy(() -> service.write(
+                        driverConfig(),
+                        pointConfig(),
+                        device(),
+                        point(),
+                        WritePointValue.builder()
+                                .type(PointTypeEnum.STRING)
+                                .value("42")
+                                .build()))
                 .isInstanceOf(WritePointException.class)
                 .hasMessageContaining("write rejected");
     }

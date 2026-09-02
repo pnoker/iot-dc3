@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
+import java.time.Duration;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import java.time.Duration;
 
 /**
  * Shared OkHttp client properties.
@@ -36,6 +34,9 @@ import java.time.Duration;
 @Validated
 @ConfigurationProperties(prefix = EnvironmentConstant.HTTP_CLIENT_PREFIX)
 public class OkHttpProperties {
+
+    /** Create OkHttp properties with the documented defaults. */
+    public OkHttpProperties() {}
 
     /**
      * Whether OkHttp should retry recoverable connection failures.
@@ -71,5 +72,4 @@ public class OkHttpProperties {
      * Socket write timeout.
      */
     private Duration writeTimeout = Duration.ofSeconds(15);
-
 }

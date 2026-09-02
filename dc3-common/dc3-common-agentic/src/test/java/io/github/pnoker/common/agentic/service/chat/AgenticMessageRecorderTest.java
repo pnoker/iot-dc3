@@ -16,13 +16,20 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+
+import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
-import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.repository.ReactiveMessageStore;
-import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,14 +38,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class AgenticMessageRecorderTest {
@@ -53,10 +52,14 @@ class AgenticMessageRecorderTest {
     @BeforeEach
     void setUp() {
         recorder = new AgenticMessageRecorder(messageStore);
-        org.mockito.Mockito.lenient().when(messageStore.save(org.mockito.ArgumentMatchers.anyString(),
-                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any(),
-                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any(),
-                org.mockito.ArgumentMatchers.any()))
+        org.mockito.Mockito.lenient()
+                .when(messageStore.save(
+                        org.mockito.ArgumentMatchers.anyString(),
+                        org.mockito.ArgumentMatchers.anyString(),
+                        org.mockito.ArgumentMatchers.any(),
+                        org.mockito.ArgumentMatchers.anyString(),
+                        org.mockito.ArgumentMatchers.any(),
+                        org.mockito.ArgumentMatchers.any()))
                 .thenReturn(Mono.just(new MessageBO()));
         userHeader = new RequestHeader.PrincipalHeader();
         userHeader.setTenantId(1L);
@@ -67,15 +70,22 @@ class AgenticMessageRecorderTest {
     @Test
     void persistAssistantMessageSavesTraceOnlyMessage() {
         AgenticRunTrace runTrace = new AgenticRunTrace();
-        runTrace.recordPendingEvent(new AgenticRunEvent("tool", "lookupDevice", "Device loaded", "OK",
-                1000L, "result", "success", "OK"));
+        runTrace.recordPendingEvent(
+                new AgenticRunEvent("tool", "lookupDevice", "Device loaded", "OK", 1000L, "result", "success", "OK"));
         AgenticPreparedChatBO prepared = prepared(runTrace, false, List.of());
 
-        StepVerifier.create(recorder.persistAssistantMessage(prepared, "", userHeader)).verifyComplete();
+        StepVerifier.create(recorder.persistAssistantMessage(prepared, "", userHeader))
+                .verifyComplete();
 
         ArgumentCaptor<AgenticMessageContent> captor = ArgumentCaptor.forClass(AgenticMessageContent.class);
-        verify(messageStore).save(eq("conversation"), eq("assistant"), captor.capture(),
-                eq("dc3-test-model"), eq(AgenticMessageStatusEnum.COMPLETED), eq(userHeader));
+        verify(messageStore)
+                .save(
+                        eq("conversation"),
+                        eq("assistant"),
+                        captor.capture(),
+                        eq("dc3-test-model"),
+                        eq(AgenticMessageStatusEnum.COMPLETED),
+                        eq(userHeader));
         AgenticMessageContent content = captor.getValue();
         assertThat(content.getText()).isEmpty();
         assertThat(content.getTools()).containsExactly("lookupDevice");
@@ -87,16 +97,25 @@ class AgenticMessageRecorderTest {
     void persistAssistantMessageSavesReasoningOnlyMessage() {
         AgenticPreparedChatBO prepared = prepared(new AgenticRunTrace(), true, List.of());
 
-        StepVerifier.create(recorder.persistAssistantMessage(prepared, "", "查询驱动列表前，先确认租户上下文。", userHeader)).verifyComplete();
+        StepVerifier.create(recorder.persistAssistantMessage(prepared, "", "查询驱动列表前，先确认租户上下文。", userHeader))
+                .verifyComplete();
 
         ArgumentCaptor<AgenticMessageContent> captor = ArgumentCaptor.forClass(AgenticMessageContent.class);
-        verify(messageStore).save(eq("conversation"), eq("assistant"), captor.capture(),
-                eq("dc3-test-model"), eq(AgenticMessageStatusEnum.COMPLETED), eq(userHeader));
+        verify(messageStore)
+                .save(
+                        eq("conversation"),
+                        eq("assistant"),
+                        captor.capture(),
+                        eq("dc3-test-model"),
+                        eq(AgenticMessageStatusEnum.COMPLETED),
+                        eq(userHeader));
         AgenticMessageContent content = captor.getValue();
         assertThat(content.getText()).isEmpty();
         assertThat(content.getReasoning()).isTrue();
         assertThat(content.getReasoningContent()).isEqualTo("查询驱动列表前，先确认租户上下文。");
-        assertThat(content.getTraces()).extracting(AgenticMessageContent.Trace::getType).containsExactly("reasoning");
+        assertThat(content.getTraces())
+                .extracting(AgenticMessageContent.Trace::getType)
+                .containsExactly("reasoning");
     }
 
     @Test
@@ -105,32 +124,51 @@ class AgenticMessageRecorderTest {
         runTrace.recordPendingVisualization(visualization());
         AgenticPreparedChatBO prepared = prepared(runTrace, false, List.of());
 
-        StepVerifier.create(recorder.persistAssistantMessage(prepared, "", userHeader)).verifyComplete();
+        StepVerifier.create(recorder.persistAssistantMessage(prepared, "", userHeader))
+                .verifyComplete();
 
         ArgumentCaptor<AgenticMessageContent> captor = ArgumentCaptor.forClass(AgenticMessageContent.class);
-        verify(messageStore).save(eq("conversation"), eq("assistant"), captor.capture(),
-                eq("dc3-test-model"), eq(AgenticMessageStatusEnum.COMPLETED), eq(userHeader));
+        verify(messageStore)
+                .save(
+                        eq("conversation"),
+                        eq("assistant"),
+                        captor.capture(),
+                        eq("dc3-test-model"),
+                        eq(AgenticMessageStatusEnum.COMPLETED),
+                        eq(userHeader));
         AgenticMessageContent content = captor.getValue();
         assertThat(content.getText()).isEmpty();
         assertThat(content.getCharts()).hasSize(1);
         assertThat(content.getCharts().get(0).getType()).isEqualTo("line");
     }
 
-
     @Test
     void persistAssistantMessageSkipsCompletelyEmptyMessage() {
         AgenticPreparedChatBO prepared = prepared(new AgenticRunTrace(), false, List.of());
 
-        StepVerifier.create(recorder.persistAssistantMessage(prepared, " ", userHeader)).verifyComplete();
+        StepVerifier.create(recorder.persistAssistantMessage(prepared, " ", userHeader))
+                .verifyComplete();
 
         verifyNoInteractions(messageStore);
     }
 
-    private AgenticPreparedChatBO prepared(AgenticRunTrace runTrace, boolean reasoning,
-                                           List<AgenticMessageContent.Context> contexts) {
-        return new AgenticPreparedChatBO("hello", "conversation", null, "dc3-test-model",
-                Map.of(), null, null, runTrace, true, reasoning, List.of(), contexts,
-                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
+    private AgenticPreparedChatBO prepared(
+            AgenticRunTrace runTrace, boolean reasoning, List<AgenticMessageContent.Context> contexts) {
+        return new AgenticPreparedChatBO(
+                "hello",
+                "conversation",
+                null,
+                "dc3-test-model",
+                Map.of(),
+                null,
+                null,
+                runTrace,
+                true,
+                reasoning,
+                List.of(),
+                contexts,
+                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0),
+                List.of());
     }
 
     private AgenticVisualizationSpec visualization() {
@@ -142,5 +180,4 @@ class AgenticMessageRecorderTest {
         visualization.setEncode(AgenticVisualizationSpec.Encode.xy("index", "value"));
         return visualization;
     }
-
 }

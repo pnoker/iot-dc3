@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.ConfirmFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * One row in the alert list panel on the home page. Source is either {@code device} (with
@@ -71,7 +69,8 @@ public class AlertItemVO implements Serializable {
      * Human-readable message extracted from alarm_ext->>'content'. Populated by the
      * paging / list endpoints; latest(size=N) leaves it null.
      */
-    @Schema(description = "human-readable alarm message", example = "Device Temperature Sensor A1 is offline for more than 5 minutes")
+    @Schema(
+            description = "human-readable alarm message",
+            example = "Device Temperature Sensor A1 is offline for more than 5 minutes")
     private String message;
-
 }

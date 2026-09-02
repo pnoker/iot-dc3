@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.mqtt.config;
 
 import io.github.pnoker.common.mq.config.BatchConsumerProperties;
@@ -41,9 +40,10 @@ public class MqttMqAdapterConfiguration {
      * every subscription session and the publisher on context shutdown.
      */
     @Bean(destroyMethod = "stop")
-    public MqttMqAdapter mqttMqAdapter(@Value("${dc3.mq.mqtt.host:localhost}") String host,
-                                       @Value("${dc3.mq.mqtt.port:1883}") int port,
-                                       BatchConsumerProperties batchProperties) {
+    public MqttMqAdapter mqttMqAdapter(
+            @Value("${dc3.mq.mqtt.host:localhost}") String host,
+            @Value("${dc3.mq.mqtt.port:1883}") int port,
+            BatchConsumerProperties batchProperties) {
         return new MqttMqAdapter(host, port, batchProperties);
     }
 }

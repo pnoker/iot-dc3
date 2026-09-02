@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.entity.bo;
 
 import lombok.AllArgsConstructor;
@@ -38,16 +37,11 @@ import lombok.ToString;
 @AllArgsConstructor
 public class FacadeResourceRegistrySyncResultBO {
 
-
     private int inserted;
-
 
     private int updated;
 
-
     private int deleted;
 
-
     private int unchanged;
-
 }

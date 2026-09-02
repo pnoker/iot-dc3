@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.dto;
 
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
-
 import java.time.Instant;
 
 /**
@@ -36,8 +34,7 @@ public record PointCommandResultDTO(
         String errorCode,
         String errorMessage,
         Instant finishedAt,
-        int schemaVersion
-) {
+        int schemaVersion) {
 
     /**
      * Builder.
@@ -152,8 +149,8 @@ public record PointCommandResultDTO(
          * @return the point command result DTO
          */
         public PointCommandResultDTO build() {
-            return new PointCommandResultDTO(commandId, tenantId, status, responseValue, errorCode, errorMessage,
-                    finishedAt, schemaVersion);
+            return new PointCommandResultDTO(
+                    commandId, tenantId, status, responseValue, errorCode, errorMessage, finishedAt, schemaVersion);
         }
     }
 }

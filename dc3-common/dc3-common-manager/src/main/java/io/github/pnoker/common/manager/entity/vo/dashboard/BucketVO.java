@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * Generic count bucket used by the manager dashboard breakdown endpoints: a string key
@@ -48,10 +46,11 @@ public class BucketVO implements Serializable {
      * Human-readable bucket key (e.g. "ENABLE", "DISABLE", "GATEWAY", or an entity id
      * rendered as string).
      */
-    @Schema(description = "Human-readable bucket key (status name, type name, or stringified entity id)", example = "ENABLE")
+    @Schema(
+            description = "Human-readable bucket key (status name, type name, or stringified entity id)",
+            example = "ENABLE")
     private String key;
 
     @Schema(description = "Row count for this bucket", example = "12")
     private long count;
-
 }

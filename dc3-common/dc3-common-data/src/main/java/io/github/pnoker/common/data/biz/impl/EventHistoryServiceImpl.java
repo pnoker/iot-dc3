@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
@@ -25,6 +24,7 @@ import io.github.pnoker.common.data.entity.builder.EventHistoryBuilder;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
+import io.github.pnoker.common.data.repository.ReactiveEventHistoryStore;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EventHistoryAcknowledgeFlagEnum;
@@ -36,18 +36,16 @@ import io.github.pnoker.common.facade.api.EventFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
 import io.github.pnoker.common.facade.entity.query.FacadeEventOffsetQuery;
-import io.github.pnoker.common.data.repository.ReactiveEventHistoryStore;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.List;
 
 /**
  * Business service implementation for event report operations.
@@ -72,7 +70,8 @@ public class EventHistoryServiceImpl implements EventHistoryService {
 
     @Override
     public Mono<String> report(Long tenantId, EventReportBO entityBO) {
-        return validateEventScopeReactive(tenantId, entityBO.getDeviceId(), entityBO.getEventId(), entityBO.getEventCode())
+        return validateEventScopeReactive(
+                        tenantId, entityBO.getDeviceId(), entityBO.getEventId(), entityBO.getEventCode())
                 .flatMap(event -> {
                     String recordId = UUID.randomUUID().toString();
                     LocalDateTime now = LocalDateTime.now(java.time.ZoneOffset.UTC);
@@ -84,7 +83,10 @@ public class EventHistoryServiceImpl implements EventHistoryService {
                     recordDO.setEventCode(event.getEventCode());
                     recordDO.setEventTypeFlag(event.getEventTypeFlag().getIndex());
                     recordDO.setEventLevelFlag(event.getEventLevelFlag().getIndex());
-                    recordDO.setParamValues(entityBO.getParamValues() == null ? null : JsonUtil.toJsonString(entityBO.getParamValues()));
+                    recordDO.setParamValues(
+                            entityBO.getParamValues() == null
+                                    ? null
+                                    : JsonUtil.toJsonString(entityBO.getParamValues()));
                     recordDO.setMessage(entityBO.getMessage());
                     recordDO.setOccurTime(now);
                     recordDO.setReceiveTime(now);
@@ -96,7 +98,8 @@ public class EventHistoryServiceImpl implements EventHistoryService {
 
     @Override
     public Mono<String> report(EventReportDTO entityDTO) {
-        return validateEventScopeReactive(entityDTO.tenantId(), entityDTO.deviceId(), entityDTO.eventId(), entityDTO.eventCode())
+        return validateEventScopeReactive(
+                        entityDTO.tenantId(), entityDTO.deviceId(), entityDTO.eventId(), entityDTO.eventCode())
                 .flatMap(event -> {
                     LocalDateTime now = LocalDateTime.now(java.time.ZoneOffset.UTC);
                     EventHistoryDO recordDO = new EventHistoryDO();
@@ -107,15 +110,19 @@ public class EventHistoryServiceImpl implements EventHistoryService {
                     recordDO.setEventCode(event.getEventCode());
                     recordDO.setEventTypeFlag(entityDTO.eventTypeFlag());
                     recordDO.setEventLevelFlag(entityDTO.eventLevelFlag());
-                    recordDO.setParamValues(entityDTO.paramValues() == null ? null : JsonUtil.toJsonString(entityDTO.paramValues()));
+                    recordDO.setParamValues(
+                            entityDTO.paramValues() == null ? null : JsonUtil.toJsonString(entityDTO.paramValues()));
                     recordDO.setConfigSnapshot(entityDTO.configSnapshot());
                     recordDO.setMessage(entityDTO.message());
-                    recordDO.setOccurTime(entityDTO.occurTime() == null ? now
-                            : LocalDateTime.ofInstant(entityDTO.occurTime(), java.time.ZoneOffset.UTC));
+                    recordDO.setOccurTime(
+                            entityDTO.occurTime() == null
+                                    ? now
+                                    : LocalDateTime.ofInstant(entityDTO.occurTime(), java.time.ZoneOffset.UTC));
                     recordDO.setReceiveTime(now);
                     recordDO.setAcknowledgeFlag(EventHistoryAcknowledgeFlagEnum.NO.getIndex());
                     recordDO.setSchemaVersion((short) entityDTO.schemaVersion());
-                    return eventHistoryStore.insert(recordDO)
+                    return eventHistoryStore
+                            .insert(recordDO)
                             .then(alarmRuleTriggerService.processEventReport(entityDTO))
                             .thenReturn(entityDTO.recordId());
                 });
@@ -131,15 +138,32 @@ public class EventHistoryServiceImpl implements EventHistoryService {
         EventHistoryQueryVO query = queryVO == null ? new EventHistoryQueryVO() : queryVO;
         Long deviceId = parseId(query.getDeviceId());
         Long eventId = parseId(query.getEventId());
-        Byte eventType = query.getEventTypeFlag() == null ? null : query.getEventTypeFlag().getIndex();
-        return eventHistoryStore.list(tenantId, deviceId, eventId, query.getEventCode(), eventType,
-                        query.getOffset(), query.getLimit(), query.getSort())
-                .map(page -> OffsetPage.of(page.items().stream().map(eventHistoryBuilder::buildVOByDO).toList(),
-                        page.offset(), page.limit(), page.total()));
+        Byte eventType = query.getEventTypeFlag() == null
+                ? null
+                : query.getEventTypeFlag().getIndex();
+        return eventHistoryStore
+                .list(
+                        tenantId,
+                        deviceId,
+                        eventId,
+                        query.getEventCode(),
+                        eventType,
+                        query.getOffset(),
+                        query.getLimit(),
+                        query.getSort())
+                .map(page -> OffsetPage.of(
+                        page.items().stream()
+                                .map(eventHistoryBuilder::buildVOByDO)
+                                .toList(),
+                        page.offset(),
+                        page.limit(),
+                        page.total()));
     }
 
-    private Mono<FacadeEventBO> validateEventScopeReactive(Long tenantId, Long deviceId, Long eventId, String eventCode) {
-        return deviceFacade.getByIdReactive(tenantId, deviceId)
+    private Mono<FacadeEventBO> validateEventScopeReactive(
+            Long tenantId, Long deviceId, Long eventId, String eventCode) {
+        return deviceFacade
+                .getByIdReactive(tenantId, deviceId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Device does not exist")))
                 .flatMap(device -> {
                     if (EnableFlagEnum.DISABLE.equals(device.getEnableFlag())) {
@@ -151,7 +175,8 @@ public class EventHistoryServiceImpl implements EventHistoryService {
                                 if (EnableFlagEnum.DISABLE.equals(event.getEnableFlag())) {
                                     return Mono.error(new ServiceException("Event is disabled"));
                                 }
-                                if (device.getProfileId() == null || !Objects.equals(device.getProfileId(), event.getProfileId())) {
+                                if (device.getProfileId() == null
+                                        || !Objects.equals(device.getProfileId(), event.getProfileId())) {
                                     return Mono.error(new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH));
                                 }
                                 return Mono.just(event);
@@ -169,20 +194,38 @@ public class EventHistoryServiceImpl implements EventHistoryService {
      * @param eventCode the event code, used as fallback
      * @return the resolved event, or {@code null} when none matches
      */
-    private Mono<FacadeEventBO> resolveEventReactive(Long tenantId, FacadeDeviceBO device, Long eventId, String eventCode) {
+    private Mono<FacadeEventBO> resolveEventReactive(
+            Long tenantId, FacadeDeviceBO device, Long eventId, String eventCode) {
         if (eventId != null) {
             return eventFacade.getById(tenantId, eventId);
         }
         if (eventCode == null || eventCode.isBlank()) {
             return Mono.error(new ServiceException("Event id or code is required"));
         }
-        return eventFacade.list(new FacadeEventOffsetQuery(tenantId, null, eventCode, null, null,
-                device.getProfileId(), null, null, null, 0L, 1, List.of())).flatMapMany(page -> reactor.core.publisher.Flux.fromIterable(page.items())).next();
+        return eventFacade
+                .list(new FacadeEventOffsetQuery(
+                        tenantId,
+                        null,
+                        eventCode,
+                        null,
+                        null,
+                        device.getProfileId(),
+                        null,
+                        null,
+                        null,
+                        0L,
+                        1,
+                        List.of()))
+                .flatMapMany(page -> reactor.core.publisher.Flux.fromIterable(page.items()))
+                .next();
     }
 
     private Long parseId(String value) {
         if (value == null || value.isBlank()) return null;
-        try { return Long.valueOf(value); } catch (NumberFormatException exception) { throw new IllegalArgumentException("invalid numeric id: " + value, exception); }
+        try {
+            return Long.valueOf(value);
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException("invalid numeric id: " + value, exception);
+        }
     }
-
 }

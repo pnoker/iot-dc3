@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mqtt.entity.property;
 
 import jakarta.validation.Valid;
@@ -23,14 +22,13 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
 
 /**
  * MQTT Properties Configuration Class
@@ -97,9 +95,10 @@ public class MqttProperties {
      */
     @NoArgsConstructor
     public enum AuthTypeEnum {
-
-        NONE, CLIENT_ID, USERNAME, X509,
-
+        NONE,
+        CLIENT_ID,
+        USERNAME,
+        X509,
     }
 
     @Getter
@@ -115,7 +114,6 @@ public class MqttProperties {
         @Min(0)
         @Max(2)
         private Integer qos;
-
     }
 
     @Getter
@@ -129,7 +127,5 @@ public class MqttProperties {
         @NotNull(message = "MQTT batch interval can't be empty")
         @Min(value = 1, message = "MQTT batch interval must be greater than 0")
         private Integer interval = 5;
-
     }
-
 }

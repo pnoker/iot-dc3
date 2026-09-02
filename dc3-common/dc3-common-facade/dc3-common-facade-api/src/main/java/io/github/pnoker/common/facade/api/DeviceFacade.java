@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceOffsetQuery;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-
 import java.util.Collection;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -47,10 +45,14 @@ import reactor.core.publisher.Mono;
  */
 public interface DeviceFacade {
     Mono<FacadeDeviceBO> getByIdReactive(Long tenantId, Long id);
-    Flux<FacadeDeviceBO> listByIdsReactive(Long tenantId, Collection<Long> ids);
-    Mono<OffsetPage<FacadeDeviceBO>> listReactive(FacadeDeviceOffsetQuery query);
-    Flux<FacadeDeviceBO> listByProfileIdReactive(Long tenantId, Long profileId);
-    Flux<FacadeDeviceBO> listByDriverIdReactive(Long tenantId, Long driverId);
-    Mono<FacadeDeviceOwnerBO> getActiveOwnerReactive(Long tenantId, Long deviceId);
 
+    Flux<FacadeDeviceBO> listByIdsReactive(Long tenantId, Collection<Long> ids);
+
+    Mono<OffsetPage<FacadeDeviceBO>> listReactive(FacadeDeviceOffsetQuery query);
+
+    Flux<FacadeDeviceBO> listByProfileIdReactive(Long tenantId, Long profileId);
+
+    Flux<FacadeDeviceBO> listByDriverIdReactive(Long tenantId, Long driverId);
+
+    Mono<FacadeDeviceOwnerBO> getActiveOwnerReactive(Long tenantId, Long deviceId);
 }

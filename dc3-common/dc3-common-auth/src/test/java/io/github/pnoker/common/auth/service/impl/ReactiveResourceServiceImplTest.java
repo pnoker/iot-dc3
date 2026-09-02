@@ -1,4 +1,27 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.auth.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.builder.ResourceBuilder;
@@ -8,6 +31,7 @@ import io.github.pnoker.common.auth.repository.ResourceFilter;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -16,20 +40,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.anyLong;
-
 @ExtendWith(MockitoExtension.class)
 class ReactiveResourceServiceImplTest {
 
-    @Mock ReactiveResourceStore store;
-    @Mock ResourceBuilder builder;
+    @Mock
+    ReactiveResourceStore store;
+
+    @Mock
+    ResourceBuilder builder;
 
     @Test
     void listTreeDoesNotTruncateAndSortsChildren() {
@@ -46,11 +64,13 @@ class ReactiveResourceServiceImplTest {
             return result;
         });
 
-        StepVerifier.create(service().listTree(new ResourceFilter(null, null, List.of(), List.of(), null, null,
-                        new PageRequest(0, 1))))
+        StepVerifier.create(service()
+                        .listTree(new ResourceFilter(
+                                null, null, List.of(), List.of(), null, null, new PageRequest(0, 1))))
                 .assertNext(root -> {
                     assertThat(root.getId()).isEqualTo(1L);
-                    assertThat(root.getChildren()).extracting(ResourceBO::getResourceName)
+                    assertThat(root.getChildren())
+                            .extracting(ResourceBO::getResourceName)
                             .containsExactly("A", "B");
                 })
                 .verifyComplete();
@@ -60,7 +80,8 @@ class ReactiveResourceServiceImplTest {
     void addMapsDatabaseDuplicateToDomainError() {
         ResourceBO resource = validResource();
         when(store.existsDuplicate(resource)).thenReturn(Mono.just(false));
-        when(store.insert(resource)).thenReturn(Mono.error(new org.springframework.dao.DuplicateKeyException("duplicate")));
+        when(store.insert(resource))
+                .thenReturn(Mono.error(new org.springframework.dao.DuplicateKeyException("duplicate")));
 
         StepVerifier.create(service().add(resource))
                 .expectError(DuplicateException.class)

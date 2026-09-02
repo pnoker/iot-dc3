@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da;
 
 /**
@@ -24,9 +23,13 @@ package org.openscada.opc.dcom.da;
  * @since 2016.10.1
  */
 public enum OPCENUMSCOPE {
-
-    OPC_ENUM_PRIVATE_CONNECTIONS(1), OPC_ENUM_PUBLIC_CONNECTIONS(2), OPC_ENUM_ALL_CONNECTIONS(3), OPC_ENUM_PRIVATE(4),
-    OPC_ENUM_PUBLIC(5), OPC_ENUM_ALL(6), OPC_ENUM_UNKNOWN(0);
+    OPC_ENUM_PRIVATE_CONNECTIONS(1),
+    OPC_ENUM_PUBLIC_CONNECTIONS(2),
+    OPC_ENUM_ALL_CONNECTIONS(3),
+    OPC_ENUM_PRIVATE(4),
+    OPC_ENUM_PUBLIC(5),
+    OPC_ENUM_ALL(6),
+    OPC_ENUM_UNKNOWN(0);
 
     private int _id;
 
@@ -56,5 +59,4 @@ public enum OPCENUMSCOPE {
     public int id() {
         return this._id;
     }
-
 }

@@ -14,28 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.agentic.service.impl;
-
-import io.github.pnoker.common.agentic.entity.bo.ActionBO;
-import io.github.pnoker.common.agentic.repository.ReactiveActionStore;
-import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.common.enums.AgenticActionStatusEnum;
-import io.github.pnoker.common.enums.PointCommandSourceEnum;
-import io.github.pnoker.common.exception.RequestException;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.common.facade.api.PointCommandFacade;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,6 +22,25 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import io.github.pnoker.common.agentic.entity.bo.ActionBO;
+import io.github.pnoker.common.agentic.repository.ReactiveActionStore;
+import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.enums.AgenticActionStatusEnum;
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
+import io.github.pnoker.common.exception.RequestException;
+import io.github.pnoker.common.facade.api.PointCommandFacade;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.test.StepVerifier;
 
 /**
@@ -106,12 +104,18 @@ class ActionServiceImplTest {
         ActionBO executed = pendingAction();
         executed.setStatus(AgenticActionStatusEnum.EXECUTED);
         when(actionStore.find("action-1", header)).thenReturn(reactor.core.publisher.Mono.just(action));
-        when(actionStore.claimPending(eq("action-1"), eq(header), eq(AgenticActionStatusEnum.CONFIRMED), any(Instant.class)))
+        when(actionStore.claimPending(
+                        eq("action-1"), eq(header), eq(AgenticActionStatusEnum.CONFIRMED), any(Instant.class)))
                 .thenReturn(reactor.core.publisher.Mono.just(claimed));
         when(pointCommandFacade.submitWrite(1L, 10L, 20L, "42", PointCommandSourceEnum.AGENTIC))
                 .thenReturn(reactor.core.publisher.Mono.just("cmd-1"));
-        when(actionStore.updateExecutionResult(eq("action-1"), eq(header), eq(AgenticActionStatusEnum.EXECUTED),
-                eq("Command accepted: cmd-1"), any(Instant.class))).thenReturn(reactor.core.publisher.Mono.just(executed));
+        when(actionStore.updateExecutionResult(
+                        eq("action-1"),
+                        eq(header),
+                        eq(AgenticActionStatusEnum.EXECUTED),
+                        eq("Command accepted: cmd-1"),
+                        any(Instant.class)))
+                .thenReturn(reactor.core.publisher.Mono.just(executed));
 
         StepVerifier.create(service.confirm("action-1", header))
                 .expectNext(executed)
@@ -122,11 +126,13 @@ class ActionServiceImplTest {
     void confirmRaceReturnsRequestErrorAndDoesNotDispatchCommand() {
         ActionBO action = pendingAction();
         when(actionStore.find("action-1", header)).thenReturn(reactor.core.publisher.Mono.just(action));
-        when(actionStore.claimPending(eq("action-1"), eq(header), eq(AgenticActionStatusEnum.CONFIRMED), any(Instant.class)))
+        when(actionStore.claimPending(
+                        eq("action-1"), eq(header), eq(AgenticActionStatusEnum.CONFIRMED), any(Instant.class)))
                 .thenReturn(reactor.core.publisher.Mono.empty());
 
         StepVerifier.create(service.confirm("action-1", header))
-                .expectErrorSatisfies(error -> assertThat(error).isInstanceOf(RequestException.class)
+                .expectErrorSatisfies(error -> assertThat(error)
+                        .isInstanceOf(RequestException.class)
                         .hasMessage("Agentic action is no longer pending"))
                 .verify();
 
@@ -140,8 +146,8 @@ class ActionServiceImplTest {
         when(actionStore.find("action-1", header)).thenReturn(reactor.core.publisher.Mono.just(action));
 
         StepVerifier.create(service.reject("action-1", header))
-                .expectErrorSatisfies(error -> assertThat(error).isInstanceOf(RequestException.class)
-                        .hasMessage("Agentic action has expired"))
+                .expectErrorSatisfies(error ->
+                        assertThat(error).isInstanceOf(RequestException.class).hasMessage("Agentic action has expired"))
                 .verify();
 
         verify(actionStore, never()).claimPending(any(), any(), any(), any());
@@ -155,12 +161,18 @@ class ActionServiceImplTest {
         ActionBO failed = pendingAction();
         failed.setStatus(AgenticActionStatusEnum.FAILED);
         when(actionStore.find("action-1", header)).thenReturn(reactor.core.publisher.Mono.just(action));
-        when(actionStore.claimPending(eq("action-1"), eq(header), eq(AgenticActionStatusEnum.CONFIRMED), any(Instant.class)))
+        when(actionStore.claimPending(
+                        eq("action-1"), eq(header), eq(AgenticActionStatusEnum.CONFIRMED), any(Instant.class)))
                 .thenReturn(reactor.core.publisher.Mono.just(claimed));
         when(pointCommandFacade.submitWrite(1L, 10L, 20L, "42", PointCommandSourceEnum.AGENTIC))
                 .thenReturn(reactor.core.publisher.Mono.error(new IllegalStateException("broker unavailable")));
-        when(actionStore.updateExecutionResult(eq("action-1"), eq(header), eq(AgenticActionStatusEnum.FAILED),
-                eq("broker unavailable"), any(Instant.class))).thenReturn(reactor.core.publisher.Mono.just(failed));
+        when(actionStore.updateExecutionResult(
+                        eq("action-1"),
+                        eq(header),
+                        eq(AgenticActionStatusEnum.FAILED),
+                        eq("broker unavailable"),
+                        any(Instant.class)))
+                .thenReturn(reactor.core.publisher.Mono.just(failed));
 
         StepVerifier.create(service.confirm("action-1", header))
                 .expectNext(failed)

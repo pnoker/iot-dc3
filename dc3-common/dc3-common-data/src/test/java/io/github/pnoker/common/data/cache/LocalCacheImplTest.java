@@ -14,21 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.cache;
 
-import org.awaitility.Awaitility;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
+import org.awaitility.Awaitility;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class LocalCacheImplTest {
 
@@ -104,7 +102,9 @@ class LocalCacheImplTest {
         cache.setKey("ephemeral", "v", 50, TimeUnit.MILLISECONDS);
         // Caffeine evaluates expiry lazily on access; touch the cache once expiry has
         // elapsed so the removal listener fires.
-        Awaitility.await().atMost(Duration.ofSeconds(2)).pollInterval(Duration.ofMillis(60))
+        Awaitility.await()
+                .atMost(Duration.ofSeconds(2))
+                .pollInterval(Duration.ofMillis(60))
                 .untilAsserted(() -> {
                     cache.getKey("ephemeral");
                     assertThat(lastKey.get()).isEqualTo("ephemeral");

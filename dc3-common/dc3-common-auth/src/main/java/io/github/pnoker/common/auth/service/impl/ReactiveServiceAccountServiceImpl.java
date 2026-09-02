@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.auth.service.impl;
 
 import io.github.pnoker.common.auth.entity.bo.ServiceAccountBO;
@@ -25,14 +41,19 @@ public class ReactiveServiceAccountServiceImpl implements ReactiveServiceAccount
     @Override
     public Mono<ServiceAccountBO> getById(Long tenantId, Long id) {
         if (!valid(tenantId, id)) return Mono.error(new RequestException("Service account ID is required"));
-        return store.getById(tenantId, id).map(builder::buildBOByDO)
+        return store.getById(tenantId, id)
+                .map(builder::buildBOByDO)
                 .switchIfEmpty(Mono.error(new NotFoundException("Service account")));
     }
 
     @Override
     public Mono<OffsetPage<ServiceAccountBO>> list(ServiceAccountFilter filter) {
-        return store.list(filter).map(page -> OffsetPage.of(page.items().stream().map(builder::buildBOByDO).toList(),
-                page.offset(), page.limit(), page.total()));
+        return store.list(filter)
+                .map(page -> OffsetPage.of(
+                        page.items().stream().map(builder::buildBOByDO).toList(),
+                        page.offset(),
+                        page.limit(),
+                        page.total()));
     }
 
     @Override
@@ -40,28 +61,41 @@ public class ReactiveServiceAccountServiceImpl implements ReactiveServiceAccount
         if (account == null || !valid(account.getTenantId(), account.getOwnerPrincipalId())) {
             return Mono.error(new RequestException("Tenant and owner principal are required"));
         }
-        return membershipService.requireTenantMember(account.getTenantId(), account.getOwnerPrincipalId())
-                .then(store.insert(account)).map(builder::buildBOByDO)
+        return membershipService
+                .requireTenantMember(account.getTenantId(), account.getOwnerPrincipalId())
+                .then(store.insert(account))
+                .map(builder::buildBOByDO)
                 .switchIfEmpty(Mono.error(new NotFoundException("Service account")))
-                .onErrorMap(DataIntegrityViolationException.class, error -> new RequestException("Service account already exists"));
+                .onErrorMap(
+                        DataIntegrityViolationException.class,
+                        error -> new RequestException("Service account already exists"));
     }
 
     @Override
     public Mono<ServiceAccountBO> update(Long tenantId, ServiceAccountBO account) {
-        if (account == null || !valid(tenantId, account.getId())) return Mono.error(new RequestException("Service account update is invalid"));
+        if (account == null || !valid(tenantId, account.getId()))
+            return Mono.error(new RequestException("Service account update is invalid"));
         account.setTenantId(tenantId);
-        return membershipService.requireTenantMember(tenantId, account.getOwnerPrincipalId())
-                .then(store.update(tenantId, account)).map(builder::buildBOByDO)
+        return membershipService
+                .requireTenantMember(tenantId, account.getOwnerPrincipalId())
+                .then(store.update(tenantId, account))
+                .map(builder::buildBOByDO)
                 .switchIfEmpty(Mono.error(new NotFoundException("Service account")))
-                .onErrorMap(DataIntegrityViolationException.class, error -> new RequestException("Service account already exists"));
+                .onErrorMap(
+                        DataIntegrityViolationException.class,
+                        error -> new RequestException("Service account already exists"));
     }
 
     @Override
     public Mono<Void> delete(Long tenantId, Long id, Long operatorId, String operatorName) {
         if (!valid(tenantId, id)) return Mono.error(new RequestException("Service account ID is required"));
         return store.delete(tenantId, id, operatorId, operatorName)
-                .flatMap(deleted -> Boolean.TRUE.equals(deleted) ? Mono.<Void>empty() : Mono.error(new NotFoundException("Service account")));
+                .flatMap(deleted -> Boolean.TRUE.equals(deleted)
+                        ? Mono.<Void>empty()
+                        : Mono.error(new NotFoundException("Service account")));
     }
 
-    private boolean valid(Long tenantId, Long id) { return tenantId != null && tenantId > 0 && id != null && id > 0; }
+    private boolean valid(Long tenantId, Long id) {
+        return tenantId != null && tenantId > 0 && id != null && id > 0;
+    }
 }

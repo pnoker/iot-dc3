@@ -2,17 +2,25 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published
- * by the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.manager.service.impl;
 
 import io.github.pnoker.common.entity.event.MetadataEvent;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.ConflictException;
+import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
@@ -22,13 +30,12 @@ import io.github.pnoker.common.manager.repository.ReactiveDeviceStore;
 import io.github.pnoker.common.manager.service.ReactiveDeviceService;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 /** Default reactive device application service. */
 @Service
@@ -45,11 +52,13 @@ public class ReactiveDeviceServiceImpl implements ReactiveDeviceService {
             if (device.getDeviceCode() == null || device.getDeviceCode().isBlank()) {
                 device.setDeviceCode(CodeUtil.getCode());
             }
-            return deviceStore.getByName(device.getTenantId(), device.getDeviceName())
-                    .flatMap(existing -> Mono.<DeviceBO>error(new DuplicateException(
-                            "Failed to create device: device has been duplicated")))
+            return deviceStore
+                    .getByName(device.getTenantId(), device.getDeviceName())
+                    .flatMap(existing -> Mono.<DeviceBO>error(
+                            new DuplicateException("Failed to create device: device has been duplicated")))
                     .switchIfEmpty(Mono.defer(() -> deviceStore.insert(device)))
-                    .onErrorMap(DataIntegrityViolationException.class,
+                    .onErrorMap(
+                            DataIntegrityViolationException.class,
                             error -> new DuplicateException("Failed to create device: device code is already in use"))
                     .doOnSuccess(saved -> publish(saved, MetadataOperateTypeEnum.ADD));
         });
@@ -62,15 +71,17 @@ public class ReactiveDeviceServiceImpl implements ReactiveDeviceService {
             if (device.getId() == null || device.getVersion() == null || device.getVersion() < 0) {
                 return Mono.error(new RequestException("Device ID and version are required for update"));
             }
-            return deviceStore.get(device.getTenantId(), device.getId())
+            return deviceStore
+                    .get(device.getTenantId(), device.getId())
                     .switchIfEmpty(Mono.error(new NotFoundException("Device does not exist")))
                     .flatMap(current -> {
                         if (device.getDeviceName().equals(current.getDeviceName())) {
                             return Mono.just(current);
                         }
-                        return deviceStore.getByName(device.getTenantId(), device.getDeviceName())
-                                .flatMap(existing -> Mono.<DeviceBO>error(new DuplicateException(
-                                        "Failed to update device: device has been duplicated")))
+                        return deviceStore
+                                .getByName(device.getTenantId(), device.getDeviceName())
+                                .flatMap(existing -> Mono.<DeviceBO>error(
+                                        new DuplicateException("Failed to update device: device has been duplicated")))
                                 .switchIfEmpty(Mono.just(current));
                     })
                     .flatMap(ignored -> deviceStore.update(device, device.getVersion()))
@@ -84,13 +95,14 @@ public class ReactiveDeviceServiceImpl implements ReactiveDeviceService {
         if (tenantId == null || id == null) {
             return Mono.error(new RequestException("Tenant ID and device ID are required"));
         }
-        return deviceStore.get(tenantId, id)
+        return deviceStore
+                .get(tenantId, id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Device does not exist")))
                 .flatMap(device -> deviceStore.delete(tenantId, id, expectedVersion, operatorId, operatorName))
                 .filter(Boolean.TRUE::equals)
                 .switchIfEmpty(Mono.error(new ConflictException("Device version conflict")))
-                .doOnSuccess(ignored -> metadataEventPublisher.publishEvent(
-                        new MetadataEvent(this, tenantId, id, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE)));
+                .doOnSuccess(ignored -> metadataEventPublisher.publishEvent(new MetadataEvent(
+                        this, tenantId, id, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE)));
     }
 
     @Override
@@ -122,9 +134,13 @@ public class ReactiveDeviceServiceImpl implements ReactiveDeviceService {
     }
 
     private void validateWrite(DeviceBO device) {
-        if (device == null || device.getTenantId() == null || device.getTenantId() <= 0
-                || device.getDeviceName() == null || device.getDeviceName().isBlank()
-                || device.getDriverId() == null || device.getDriverId() <= 0) {
+        if (device == null
+                || device.getTenantId() == null
+                || device.getTenantId() <= 0
+                || device.getDeviceName() == null
+                || device.getDeviceName().isBlank()
+                || device.getDriverId() == null
+                || device.getDriverId() <= 0) {
             throw new RequestException("Tenant ID, device name and driver ID are required");
         }
         device.setDeviceName(device.getDeviceName().trim());
@@ -132,8 +148,8 @@ public class ReactiveDeviceServiceImpl implements ReactiveDeviceService {
 
     private void publish(DeviceBO device, MetadataOperateTypeEnum operation) {
         if (device != null) {
-            metadataEventPublisher.publishEvent(new MetadataEvent(this, device.getTenantId(), device.getId(), MetadataTypeEnum.DEVICE,
-                    operation));
+            metadataEventPublisher.publishEvent(
+                    new MetadataEvent(this, device.getTenantId(), device.getId(), MetadataTypeEnum.DEVICE, operation));
         }
     }
 }

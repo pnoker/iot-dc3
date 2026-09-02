@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.gateway.service;
 
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -31,17 +30,11 @@ import reactor.core.publisher.Mono;
  */
 public interface FilterService {
 
-
-
-
-
     Mono<FacadeTenantBO> getTenantReactive(ServerHttpRequest request);
 
     Mono<FacadeLocalCredentialBO> getLocalCredentialReactive(ServerHttpRequest request, Long tenantId);
 
     Mono<RequestHeader.PrincipalHeader> getUserReactive(FacadeLocalCredentialBO credential, FacadeTenantBO tenant);
 
-    Mono<Void> checkValidReactive(ServerHttpRequest request, FacadeTenantBO tenant,
-                                  FacadeLocalCredentialBO credential);
-
+    Mono<Void> checkValidReactive(ServerHttpRequest request, FacadeTenantBO tenant, FacadeLocalCredentialBO credential);
 }

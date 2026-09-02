@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.manager.service;
 
 import io.github.pnoker.common.exception.NotFoundException;
@@ -24,10 +40,12 @@ public class DeviceImportSchemaService {
         }
         return Mono.zip(driverService.getById(tenantId, driverId), profileService.getById(tenantId, profileId))
                 .switchIfEmpty(Mono.error(new NotFoundException("Resource does not exist")))
-                .then(Mono.zip(driverAttributeService.listByDriverId(tenantId, driverId).collectList(),
+                .then(Mono.zip(
+                        driverAttributeService
+                                .listByDriverId(tenantId, driverId)
+                                .collectList(),
                         pointAttributeService.listByDriverId(tenantId, driverId).collectList(),
                         pointService.listByProfileId(tenantId, profileId).collectList()))
-                .map(tuple -> workbookCodec.manifest(driverId, profileId, tuple.getT1(), tuple.getT2(),
-                        tuple.getT3()));
+                .map(tuple -> workbookCodec.manifest(driverId, profileId, tuple.getT1(), tuple.getT2(), tuple.getT3()));
     }
 }

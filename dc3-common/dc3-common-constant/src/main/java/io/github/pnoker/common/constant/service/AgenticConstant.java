@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.service;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
-
 
 /**
  * Agentic service related constants.
@@ -114,7 +112,6 @@ public class AgenticConstant {
         private ToolContextKey() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -175,12 +172,14 @@ public class AgenticConstant {
          */
         public static final String FINISH_REASON_ERROR = "error";
 
+        /**
+         * Finish reason for a response cancelled before normal completion.
+         */
         public static final String FINISH_REASON_CANCELLED = "cancelled";
 
         private Chat() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -253,7 +252,6 @@ public class AgenticConstant {
             private Type() {
                 throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
             }
-
         }
 
         /**
@@ -274,9 +272,7 @@ public class AgenticConstant {
             private Scale() {
                 throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
             }
-
         }
-
     }
 
     /**
@@ -295,7 +291,6 @@ public class AgenticConstant {
         private Session() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -374,7 +369,6 @@ public class AgenticConstant {
         private RunEvent() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -433,7 +427,6 @@ public class AgenticConstant {
         private ToolResult() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -462,7 +455,6 @@ public class AgenticConstant {
         private ToolLimit() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -497,7 +489,5 @@ public class AgenticConstant {
         private ToolMessage() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
-
 }

@@ -10,6 +10,7 @@
 | 选型指南 | [db-dialects.md](./db-dialects.md) 关系库选型 | 有效 |
 | 选型指南 | [tsdb-stores.md](./tsdb-stores.md) 时序存储选型 | 有效 |
 | 选型指南 | [mq-brokers.md](./mq-brokers.md) 消息中间件选型 | 有效 |
+| 开发工具 | [development.md](./development.md) Make 开发、启动与质量命令 | 有效 |
 | 设计/架构 | [design/relational-r2dbc.md](./design/relational-r2dbc.md) R2DBC 关系访问层 | 已落地，待全量实库/拓扑验收 |
 | 质量/测试 | [r2dbc-migration-test-handoff.md](./r2dbc-migration-test-handoff.md) R2DBC 全平台测试交接 | 待执行，发布硬门禁 |
 | 设计/架构 | [design/tsdb-abstraction.md](./design/tsdb-abstraction.md) 时序存储 Port | 已落地 |

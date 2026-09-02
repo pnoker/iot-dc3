@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.init;
 
 import io.github.pnoker.common.driver.buffer.BufferService;
@@ -22,6 +21,7 @@ import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverRegisterService;
 import io.github.pnoker.common.driver.service.DriverScheduleService;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -31,8 +31,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.ComponentScan;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
-
-import java.time.Duration;
 
 /**
  * Application startup runner that completes the standard driver bootstrap sequence:
@@ -102,16 +100,19 @@ public class DriverInitRunner implements ApplicationRunner {
      * @throws InterruptedException if the backoff sleep is interrupted
      */
     private Mono<Void> registerWithRetry() {
-        return driverRegisterService.initial()
+        return driverRegisterService
+                .initial()
                 .retryWhen(Retry.backoff(REGISTER_MAX_ATTEMPTS - 1, REGISTER_INITIAL_BACKOFF)
                         .maxBackoff(REGISTER_MAX_BACKOFF)
                         .doBeforeRetry(signal -> log.warn(
                                 "Driver registration failed, attempt={}, maxAttempts={}, retryDelayMillis={}",
-                                signal.totalRetries() + 1, REGISTER_MAX_ATTEMPTS,
-                                Math.min(REGISTER_INITIAL_BACKOFF.toMillis()
-                                        * (1L << Math.min(signal.totalRetries(), 30)),
-                                        REGISTER_MAX_BACKOFF.toMillis()), signal.failure()))
+                                signal.totalRetries() + 1,
+                                REGISTER_MAX_ATTEMPTS,
+                                Math.min(
+                                        REGISTER_INITIAL_BACKOFF.toMillis()
+                                                * (1L << Math.min(signal.totalRetries(), 30)),
+                                        REGISTER_MAX_BACKOFF.toMillis()),
+                                signal.failure()))
                         .onRetryExhaustedThrow((spec, signal) -> signal.failure()));
     }
-
 }

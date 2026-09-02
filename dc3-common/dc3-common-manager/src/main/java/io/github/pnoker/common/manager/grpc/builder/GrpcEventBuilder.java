@@ -14,24 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.grpc.builder;
 
 import io.github.pnoker.api.common.GrpcBase;
 import io.github.pnoker.api.common.GrpcEventDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.enums.EventLevelEnum;
-import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.manager.entity.bo.EventBO;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.Optional;
 
 /**
  * MapStruct builder for event gRPC message conversion.
@@ -39,7 +35,9 @@ import java.util.Optional;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcEventBuilder {
 
     /**
@@ -80,14 +78,16 @@ public interface GrpcEventBuilder {
         Optional.ofNullable(entityBO.getEventExt())
                 .ifPresent(value -> entityGrpc.setEventExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityBO.getEventTypeFlag())
-                .ifPresentOrElse(value -> entityGrpc.setEventTypeFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setEventTypeFlag(value.getIndex()),
                         () -> entityGrpc.setEventTypeFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(entityBO.getEventLevelFlag())
-                .ifPresentOrElse(value -> entityGrpc.setEventLevelFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setEventLevelFlag(value.getIndex()),
                         () -> entityGrpc.setEventLevelFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(entityBO.getEnableFlag())
-                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setEnableFlag(value.getIndex()),
                         () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
     }
-
 }

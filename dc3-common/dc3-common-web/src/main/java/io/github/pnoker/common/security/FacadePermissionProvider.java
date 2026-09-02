@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.security;
 
 import io.github.pnoker.common.facade.api.PermissionFacade;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-
-import java.util.Set;
 
 /**
  * {@link PermissionProvider} backed by the active facade implementation.
@@ -50,5 +48,4 @@ public class FacadePermissionProvider implements PermissionProvider {
         }
         return permissionFacade.listPermissionCodes(tenantId, principalId);
     }
-
 }

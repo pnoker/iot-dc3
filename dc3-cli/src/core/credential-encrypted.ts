@@ -21,8 +21,8 @@ const ALGORITHM = 'aes-256-gcm';
 interface EncryptedData {
   iv: string;
   tag: string;
-  data: string;     // hex-encoded ciphertext
-  entries: Record<string, string>;  // identifier → password
+  data: string; // hex-encoded ciphertext
+  entries: Record<string, string>; // identifier → password
 }
 
 function deriveKey(): Buffer {
@@ -43,11 +43,7 @@ export class EncryptedFileStore implements CredentialStore {
       const raw = await readFile(ENC_PATH, 'utf8');
       const enc: EncryptedData = JSON.parse(raw);
       const key = deriveKey();
-      const decipher = createDecipheriv(
-        ALGORITHM,
-        key,
-        Buffer.from(enc.iv, 'hex'),
-      );
+      const decipher = createDecipheriv(ALGORITHM, key, Buffer.from(enc.iv, 'hex'));
       decipher.setAuthTag(Buffer.from(enc.tag, 'hex'));
       const decrypted = Buffer.concat([
         decipher.update(Buffer.from(enc.data, 'hex')),
@@ -64,10 +60,7 @@ export class EncryptedFileStore implements CredentialStore {
     const iv = randomBytes(16);
     const cipher = createCipheriv(ALGORITHM, key, iv);
     const plaintext = JSON.stringify(entries);
-    const encrypted = Buffer.concat([
-      cipher.update(plaintext, 'utf8'),
-      cipher.final(),
-    ]);
+    const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
     const tag = cipher.getAuthTag();
     const data: EncryptedData = {
       iv: iv.toString('hex'),

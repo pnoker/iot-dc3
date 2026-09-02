@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.auth.repository;
 
 import io.github.pnoker.common.auth.entity.bo.IdentityAuditLogBO;
@@ -8,16 +24,15 @@ import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
-
-import java.time.Instant;
-import java.util.List;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 /** Explicit SQL adapter for append-only identity audit events. */
 @Repository
@@ -37,10 +52,10 @@ public class R2dbcAuditLogStore implements ReactiveAuditLogStore, ReactiveAuditL
             return Mono.error(new IllegalArgumentException("audit tenantId is required"));
         }
         long id = event.getId() == null ? uuidV7Long() : event.getId();
-        LocalDateTime createTime = event.getCreateTime() == null
-                ? LocalDateTime.now(ZoneOffset.UTC)
-                : event.getCreateTime();
-        DatabaseClient.GenericExecuteSpec statement = databaseClient.sql("INSERT INTO " + TABLE
+        LocalDateTime createTime =
+                event.getCreateTime() == null ? LocalDateTime.now(ZoneOffset.UTC) : event.getCreateTime();
+        DatabaseClient.GenericExecuteSpec statement = databaseClient
+                .sql("INSERT INTO " + TABLE
                         + " (id,tenant_id,principal_id,principal_type,action,resource_type,resource_id,resource_name,status,error_code,detail_ext,create_time,deleted)"
                         + " VALUES (:id,:tenant_id,:principal_id,:principal_type,:action,:resource_type,:resource_id,:resource_name,:status,:error_code,"
                         + dialect.jsonWriteExpression(":detail_ext") + ",:create_time,0)")
@@ -56,9 +71,12 @@ public class R2dbcAuditLogStore implements ReactiveAuditLogStore, ReactiveAuditL
                 .bind("error_code", text(event.getErrorCode(), ""))
                 .bind("detail_ext", json(event.getDetailExt()))
                 .bind("create_time", dialect.bindInstant(createTime.toInstant(ZoneOffset.UTC)));
-        return statement.fetch().rowsUpdated().flatMap(rows -> rows == 1
-                ? Mono.empty()
-                : Mono.error(new IllegalStateException("audit insert affected " + rows + " rows")));
+        return statement
+                .fetch()
+                .rowsUpdated()
+                .flatMap(rows -> rows == 1
+                        ? Mono.empty()
+                        : Mono.error(new IllegalStateException("audit insert affected " + rows + " rows")));
     }
 
     @Override
@@ -70,27 +88,44 @@ public class R2dbcAuditLogStore implements ReactiveAuditLogStore, ReactiveAuditL
         StringBuilder predicate = new StringBuilder(" WHERE tenant_id=:tenant_id AND deleted=0");
         if (filter.principalId() != null) predicate.append(" AND principal_id=:principal_id");
         if (filter.action() != null && !filter.action().isBlank()) predicate.append(" AND action=:action");
-        if (filter.resourceType() != null && !filter.resourceType().isBlank()) predicate.append(" AND resource_type=:resource_type");
+        if (filter.resourceType() != null && !filter.resourceType().isBlank())
+            predicate.append(" AND resource_type=:resource_type");
         if (filter.resourceId() != null) predicate.append(" AND resource_id=:resource_id");
         if (filter.status() != null && !filter.status().isBlank()) predicate.append(" AND status=:status");
         String fingerprint = fingerprint(filter);
-        IdentityAuditCursorCodec.Position position = filter.cursor() == null || filter.cursor().isBlank()
-                ? null : cursorCodec.decode(filter.cursor(), filter.tenantId(), fingerprint);
+        IdentityAuditCursorCodec.Position position =
+                filter.cursor() == null || filter.cursor().isBlank()
+                        ? null
+                        : cursorCodec.decode(filter.cursor(), filter.tenantId(), fingerprint);
         if (position != null) predicate.append(" AND (create_time,id)<(:cursor_time,:cursor_id)");
-        DatabaseClient.GenericExecuteSpec statement = databaseClient.sql("SELECT id,tenant_id,principal_id,principal_type,action,resource_type,resource_id,resource_name,status,error_code,detail_ext,create_time,deleted FROM " + TABLE + predicate + " ORDER BY create_time DESC,id DESC LIMIT :limit")
-                .bind("tenant_id", filter.tenantId()).bind("limit", limit + 1);
+        DatabaseClient.GenericExecuteSpec statement = databaseClient
+                .sql(
+                        "SELECT id,tenant_id,principal_id,principal_type,action,resource_type,resource_id,resource_name,status,error_code,detail_ext,create_time,deleted FROM "
+                                + TABLE + predicate + " ORDER BY create_time DESC,id DESC LIMIT :limit")
+                .bind("tenant_id", filter.tenantId())
+                .bind("limit", limit + 1);
         if (filter.principalId() != null) statement = statement.bind("principal_id", filter.principalId());
-        if (filter.action() != null && !filter.action().isBlank()) statement = statement.bind("action", filter.action().trim());
-        if (filter.resourceType() != null && !filter.resourceType().isBlank()) statement = statement.bind("resource_type", filter.resourceType().trim());
+        if (filter.action() != null && !filter.action().isBlank())
+            statement = statement.bind("action", filter.action().trim());
+        if (filter.resourceType() != null && !filter.resourceType().isBlank())
+            statement = statement.bind("resource_type", filter.resourceType().trim());
         if (filter.resourceId() != null) statement = statement.bind("resource_id", filter.resourceId());
-        if (filter.status() != null && !filter.status().isBlank()) statement = statement.bind("status", filter.status().trim());
-        if (position != null) statement = statement.bind("cursor_time", dialect.bindInstant(position.time())).bind("cursor_id", position.id());
+        if (filter.status() != null && !filter.status().isBlank())
+            statement = statement.bind("status", filter.status().trim());
+        if (position != null)
+            statement = statement
+                    .bind("cursor_time", dialect.bindInstant(position.time()))
+                    .bind("cursor_id", position.id());
         return statement.map(this::map).all().collectList().map(rows -> {
             boolean hasNext = rows.size() > limit;
             List<IdentityAuditLogDO> items = hasNext ? rows.subList(0, limit) : rows;
-            String next = hasNext ? cursorCodec.encode(filter.tenantId(), fingerprint,
-                    items.get(items.size() - 1).getCreateTime().toInstant(ZoneOffset.UTC),
-                    items.get(items.size() - 1).getId()) : null;
+            String next = hasNext
+                    ? cursorCodec.encode(
+                            filter.tenantId(),
+                            fingerprint,
+                            items.get(items.size() - 1).getCreateTime().toInstant(ZoneOffset.UTC),
+                            items.get(items.size() - 1).getId())
+                    : null;
             return new CursorPage<>(items, next, hasNext);
         });
     }
@@ -136,7 +171,8 @@ public class R2dbcAuditLogStore implements ReactiveAuditLogStore, ReactiveAuditL
 
     private LocalDateTime time(Object raw) {
         if (raw instanceof LocalDateTime value) return value;
-        if (raw instanceof java.time.OffsetDateTime value) return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+        if (raw instanceof java.time.OffsetDateTime value)
+            return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
         if (raw instanceof Instant value) return LocalDateTime.ofInstant(value, ZoneOffset.UTC);
         return null;
     }

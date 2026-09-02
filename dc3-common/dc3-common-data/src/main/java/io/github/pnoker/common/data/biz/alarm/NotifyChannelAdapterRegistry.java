@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
-import org.springframework.stereotype.Service;
-
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.stereotype.Service;
 
 /**
  * Notification channel adapter registry.
@@ -52,5 +50,4 @@ public class NotifyChannelAdapterRegistry {
     public Optional<NotifyChannelAdapter> find(NotifyChannelTypeEnum channelTypeFlag) {
         return Optional.ofNullable(adapters.get(channelTypeFlag));
     }
-
 }

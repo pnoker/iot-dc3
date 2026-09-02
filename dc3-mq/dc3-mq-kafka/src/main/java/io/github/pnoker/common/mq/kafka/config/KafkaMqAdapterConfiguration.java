@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.kafka.config;
 
 import io.github.pnoker.common.mq.config.BatchConsumerProperties;
 import io.github.pnoker.common.mq.kafka.KafkaMqAdapter;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaTemplate;
-
-import java.util.Map;
 
 /**
  * Activates the Kafka adapter when {@code dc3.mq.type=kafka}. Bootstrap servers come
@@ -46,7 +44,9 @@ public class KafkaMqAdapterConfiguration {
     @Bean
     @ConditionalOnMissingBean(KafkaTemplate.class)
     public KafkaTemplate<String, byte[]> kafkaMqTemplate(
-            @Value("${dc3.mq.kafka.bootstrap-servers:${DC3_MQ_KAFKA_BOOTSTRAP:${spring.kafka.bootstrap-servers:localhost:9092}}}") String bootstrapServers) {
+            @Value(
+                            "${dc3.mq.kafka.bootstrap-servers:${DC3_MQ_KAFKA_BOOTSTRAP:${spring.kafka.bootstrap-servers:localhost:9092}}}")
+                    String bootstrapServers) {
         return KafkaMqAdapter.template(bootstrapServers);
     }
 
@@ -55,9 +55,12 @@ public class KafkaMqAdapterConfiguration {
      * listener container it registered on context shutdown.
      */
     @Bean(destroyMethod = "stop")
-    public KafkaMqAdapter kafkaMqAdapter(KafkaTemplate<String, byte[]> kafkaTemplate,
-                                         @Value("${dc3.mq.kafka.bootstrap-servers:${DC3_MQ_KAFKA_BOOTSTRAP:${spring.kafka.bootstrap-servers:localhost:9092}}}")
-                                         String bootstrapServers, BatchConsumerProperties batchProperties) {
+    public KafkaMqAdapter kafkaMqAdapter(
+            KafkaTemplate<String, byte[]> kafkaTemplate,
+            @Value(
+                            "${dc3.mq.kafka.bootstrap-servers:${DC3_MQ_KAFKA_BOOTSTRAP:${spring.kafka.bootstrap-servers:localhost:9092}}}")
+                    String bootstrapServers,
+            BatchConsumerProperties batchProperties) {
         Map<String, Object> consumerConfig = KafkaMqAdapter.consumerConfig(bootstrapServers);
         return new KafkaMqAdapter(kafkaTemplate, consumerConfig, batchProperties);
     }

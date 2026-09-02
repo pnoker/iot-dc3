@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import java.time.LocalDateTime;
@@ -38,5 +37,4 @@ public record WindowSample(Double numValue, String calValue, LocalDateTime times
     public boolean isNumeric() {
         return numValue != null;
     }
-
 }

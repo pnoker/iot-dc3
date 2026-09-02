@@ -14,8 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.data.job.HourlyJobForData;
@@ -27,12 +32,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.SchedulerException;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 /**
  * Point-value ingestion no longer has a Quartz tick (RabbitMQ consumer batches drive it),
@@ -59,23 +58,26 @@ class ScheduleForDataServiceImplTest {
     void initialRegistersHourlyJobAndStartsScheduler() throws Exception {
         service.initial();
 
-        verify(quartzService).createJobWithCron(
-                eq(ScheduleConstant.DATA_SCHEDULE_GROUP),
-                eq("hourly-job"),
-                eq("0 0 0/1 * * ?"),
-                eq(HourlyJobForData.class));
-        verify(quartzService).createJobWithInterval(
-                eq(ScheduleConstant.DATA_SCHEDULE_GROUP),
-                eq("point-value-ingest-replay"),
-                eq(5),
-                eq(org.quartz.DateBuilder.IntervalUnit.SECOND),
-                eq(io.github.pnoker.common.data.job.PointValueIngestReplayJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DATA_SCHEDULE_GROUP),
+                        eq("hourly-job"),
+                        eq("0 0 0/1 * * ?"),
+                        eq(HourlyJobForData.class));
+        verify(quartzService)
+                .createJobWithInterval(
+                        eq(ScheduleConstant.DATA_SCHEDULE_GROUP),
+                        eq("point-value-ingest-replay"),
+                        eq(5),
+                        eq(org.quartz.DateBuilder.IntervalUnit.SECOND),
+                        eq(io.github.pnoker.common.data.job.PointValueIngestReplayJob.class));
         verify(quartzService).startScheduler();
     }
 
     @Test
     void initialThrowsServiceExceptionOnSchedulerFailure() throws Exception {
-        doThrow(new SchedulerException("scheduler down")).when(quartzService)
+        doThrow(new SchedulerException("scheduler down"))
+                .when(quartzService)
                 .createJobWithCron(any(), any(), any(), any());
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.initial())
                 .isInstanceOf(ServiceException.class)

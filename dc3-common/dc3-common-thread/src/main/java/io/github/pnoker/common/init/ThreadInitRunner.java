@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.thread.entity.property.ThreadProperties;
@@ -40,8 +39,7 @@ public class ThreadInitRunner implements ApplicationRunner {
     /**
      * Creates the thread init runner.
      */
-    public ThreadInitRunner() {
-    }
+    public ThreadInitRunner() {}
 
     /**
      * Initialize thread components during application startup
@@ -53,5 +51,4 @@ public class ThreadInitRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         // nothing to do
     }
-
 }

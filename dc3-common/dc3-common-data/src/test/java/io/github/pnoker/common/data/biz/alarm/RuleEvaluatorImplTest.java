@@ -14,24 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
-
-import io.github.pnoker.common.data.entity.bo.RuleBO;
-import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import io.github.pnoker.common.data.entity.bo.RuleBO;
+import io.github.pnoker.common.entity.ext.RuleExt;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 
 class RuleEvaluatorImplTest {
@@ -145,13 +143,6 @@ class RuleEvaluatorImplTest {
     }
 
     private RuleFact fact(Map<String, Object> values) {
-        return new RuleFact(
-                1L,
-                AlarmTargetTypeEnum.POINT,
-                1001L,
-                2001L,
-                LocalDateTime.now(),
-                values);
+        return new RuleFact(1L, AlarmTargetTypeEnum.POINT, 1001L, 2001L, LocalDateTime.now(), values);
     }
-
 }

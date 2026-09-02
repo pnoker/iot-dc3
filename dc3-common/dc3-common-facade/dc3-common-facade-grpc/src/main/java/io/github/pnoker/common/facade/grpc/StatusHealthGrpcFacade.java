@@ -14,30 +14,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.data.GrpcDriverStatusQuery;
 import io.github.pnoker.api.center.data.GrpcIdsStatusQuery;
 import io.github.pnoker.api.center.data.GrpcProfileStatusQuery;
 import io.github.pnoker.api.center.data.GrpcStatusMap;
-import io.github.pnoker.api.center.data.GrpcStringMap;
 import io.github.pnoker.api.center.data.GrpcSystemHealthDTO;
 import io.github.pnoker.api.center.data.GrpcTenantHealthQuery;
 import io.github.pnoker.api.center.data.StatusHealthApiGrpc;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import io.grpc.stub.ClientResponseObserver;
 import io.grpc.stub.StreamObserver;
-import reactor.core.publisher.Mono;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
  * gRPC StatusHealthFacade: forwards to Data Center via {@link StatusHealthApiGrpc}.
@@ -62,7 +59,8 @@ public class StatusHealthGrpcFacade implements StatusHealthFacade {
     public Mono<Map<Long, String>> listDeviceStatusesByProfileIdReactive(Long tenantId, Long profileId) {
         GrpcProfileStatusQuery request = GrpcProfileStatusQuery.newBuilder()
                 .setTenantId(Objects.requireNonNullElse(tenantId, 0L))
-                .setProfileId(Objects.requireNonNullElse(profileId, 0L)).build();
+                .setProfileId(Objects.requireNonNullElse(profileId, 0L))
+                .build();
         return unaryReactive(request, statusHealthApiStub::deviceStatusesByProfileId)
                 .map(GrpcStatusMap::getDataMap);
     }
@@ -77,23 +75,25 @@ public class StatusHealthGrpcFacade implements StatusHealthFacade {
     public Mono<FacadeDriverDeviceStatusSummaryBO> getDriverDeviceStatusSummaryReactive(Long tenantId, Long driverId) {
         GrpcDriverStatusQuery request = GrpcDriverStatusQuery.newBuilder()
                 .setTenantId(Objects.requireNonNullElse(tenantId, 0L))
-                .setDriverId(Objects.requireNonNullElse(driverId, 0L)).build();
+                .setDriverId(Objects.requireNonNullElse(driverId, 0L))
+                .build();
         return unaryReactive(request, statusHealthApiStub::driverDeviceStatusSummary)
                 .map(response -> FacadeDriverDeviceStatusSummaryBO.fromMap(response.getDataMap()))
                 .onErrorResume(error -> io.grpc.Status.fromThrowable(error).getCode() == io.grpc.Status.Code.NOT_FOUND
-                        ? Mono.empty() : Mono.error(error));
+                        ? Mono.empty()
+                        : Mono.error(error));
     }
 
     @Override
     public Mono<FacadeSystemHealthBO> systemHealthReactive(Long tenantId) {
         GrpcTenantHealthQuery request = GrpcTenantHealthQuery.newBuilder()
-                .setTenantId(Objects.requireNonNullElse(tenantId, 0L)).build();
-        return unaryReactive(request, statusHealthApiStub::systemHealth)
-                .map(this::toFacadeHealth);
+                .setTenantId(Objects.requireNonNullElse(tenantId, 0L))
+                .build();
+        return unaryReactive(request, statusHealthApiStub::systemHealth).map(this::toFacadeHealth);
     }
 
-    private <Request, Response> Mono<Response> unaryReactive(Request request,
-                                                               java.util.function.BiConsumer<Request, StreamObserver<Response>> invocation) {
+    private <Request, Response> Mono<Response> unaryReactive(
+            Request request, java.util.function.BiConsumer<Request, StreamObserver<Response>> invocation) {
         return Mono.create(sink -> {
             java.util.concurrent.atomic.AtomicReference<io.grpc.stub.ClientCallStreamObserver<Request>> callRef =
                     new java.util.concurrent.atomic.AtomicReference<>();
@@ -118,8 +118,7 @@ public class StatusHealthGrpcFacade implements StatusHealthFacade {
                 }
 
                 @Override
-                public void onCompleted() {
-                    }
+                public void onCompleted() {}
             };
             sink.onCancel(() -> {
                 cancelled.set(true);
@@ -137,14 +136,13 @@ public class StatusHealthGrpcFacade implements StatusHealthFacade {
     }
 
     private GrpcIdsStatusQuery idsQuery(Long tenantId, Collection<Long> ids) {
-        GrpcIdsStatusQuery.Builder builder = GrpcIdsStatusQuery.newBuilder()
-                .setTenantId(Objects.requireNonNullElse(tenantId, 0L));
+        GrpcIdsStatusQuery.Builder builder =
+                GrpcIdsStatusQuery.newBuilder().setTenantId(Objects.requireNonNullElse(tenantId, 0L));
         if (Objects.nonNull(ids)) {
             builder.addAllIds(ids.stream().filter(Objects::nonNull).distinct().toList());
         }
         return builder.build();
     }
-
 
     private FacadeSystemHealthBO toFacadeHealth(GrpcSystemHealthDTO dto) {
         if (Objects.isNull(dto)) {
@@ -153,12 +151,10 @@ public class StatusHealthGrpcFacade implements StatusHealthFacade {
         FacadeSystemHealthBO health = new FacadeSystemHealthBO();
         health.setCenter(dto.getCenterMap());
         health.setInfra(dto.getInfraMap());
-        health.setDrivers(new FacadeSystemHealthBO.FleetSummary(dto.getDrivers().getTotal(),
-                dto.getDrivers().getOnline()));
-        health.setDevices(new FacadeSystemHealthBO.FleetSummary(dto.getDevices().getTotal(),
-                dto.getDevices().getOnline()));
+        health.setDrivers(new FacadeSystemHealthBO.FleetSummary(
+                dto.getDrivers().getTotal(), dto.getDrivers().getOnline()));
+        health.setDevices(new FacadeSystemHealthBO.FleetSummary(
+                dto.getDevices().getTotal(), dto.getDevices().getOnline()));
         return health;
     }
-
-
 }

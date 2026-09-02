@@ -23,11 +23,10 @@ import io.github.pnoker.common.facade.api.CommandFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import io.github.pnoker.common.facade.entity.query.FacadeCommandOffsetQuery;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 import reactor.core.publisher.Mono;
 
 /**
@@ -44,34 +43,63 @@ public class CommandTool {
 
     public Mono<AgenticToolResult<FacadeCommandBO>> lookupCommandByIdReactive(Long commandId, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        return commandFacade.getById(tenantId, commandId)
+        return commandFacade
+                .getById(tenantId, commandId)
                 .map(value -> AgenticToolResult.ok("Command loaded", value))
                 .defaultIfEmpty(AgenticToolResult.notFound("Command not found for ID: " + commandId));
     }
 
-    public Mono<AgenticToolResult<List<FacadeCommandBO>>> lookupCommandsByIdsReactive(List<Long> commandIds, ToolContext toolContext) {
+    public Mono<AgenticToolResult<List<FacadeCommandBO>>> lookupCommandsByIdsReactive(
+            List<Long> commandIds, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         List<Long> ids = AgenticToolUtil.normalizeIds(commandIds);
         if (ids.isEmpty()) return Mono.just(AgenticToolResult.invalid("No valid command IDs provided."));
-        return commandFacade.listByIds(tenantId, ids).collectList().map(values -> values.isEmpty()
-                ? AgenticToolResult.empty("No commands found for IDs: " + ids, List.of())
-                : AgenticToolResult.ok("Commands loaded", values));
+        return commandFacade
+                .listByIds(tenantId, ids)
+                .collectList()
+                .map(values -> values.isEmpty()
+                        ? AgenticToolResult.empty("No commands found for IDs: " + ids, List.of())
+                        : AgenticToolResult.ok("Commands loaded", values));
     }
 
-    public Mono<AgenticToolResult<OffsetPage<FacadeCommandBO>>> searchCommandsReactive(String commandName, Long profileId, long offset, int limit, ToolContext toolContext) {
+    public Mono<AgenticToolResult<OffsetPage<FacadeCommandBO>>> searchCommandsReactive(
+            String commandName, Long profileId, long offset, int limit, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        return Mono.defer(() -> commandFacade.list(new FacadeCommandOffsetQuery(tenantId, commandName, null, null, null, profileId, null, null, null, offset, limit, List.of())))
-                .map(value -> value.items().isEmpty() ? AgenticToolResult.empty("No commands found.", value) : AgenticToolResult.ok("Command page loaded", value));
+        return Mono.defer(() -> commandFacade.list(new FacadeCommandOffsetQuery(
+                        tenantId,
+                        commandName,
+                        null,
+                        null,
+                        null,
+                        profileId,
+                        null,
+                        null,
+                        null,
+                        offset,
+                        limit,
+                        List.of())))
+                .map(value -> value.items().isEmpty()
+                        ? AgenticToolResult.empty("No commands found.", value)
+                        : AgenticToolResult.ok("Command page loaded", value));
     }
 
-    public Mono<AgenticToolResult<OffsetPage<FacadeCommandBO>>> listCommandsByDeviceIdReactive(Long deviceId, long offset, int limit, ToolContext toolContext) {
+    public Mono<AgenticToolResult<OffsetPage<FacadeCommandBO>>> listCommandsByDeviceIdReactive(
+            Long deviceId, long offset, int limit, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        return Mono.defer(() -> commandFacade.list(new FacadeCommandOffsetQuery(tenantId, null, null, null, null, null, null, null, deviceId, offset, limit, List.of()))).map(value -> value.items().isEmpty() ? AgenticToolResult.empty("No commands found for device ID: " + deviceId, value) : AgenticToolResult.ok("Command page loaded for device " + deviceId, value));
+        return Mono.defer(() -> commandFacade.list(new FacadeCommandOffsetQuery(
+                        tenantId, null, null, null, null, null, null, null, deviceId, offset, limit, List.of())))
+                .map(value -> value.items().isEmpty()
+                        ? AgenticToolResult.empty("No commands found for device ID: " + deviceId, value)
+                        : AgenticToolResult.ok("Command page loaded for device " + deviceId, value));
     }
 
-    public Mono<AgenticToolResult<OffsetPage<FacadeCommandBO>>> listCommandsByProfileIdReactive(Long profileId, long offset, int limit, ToolContext toolContext) {
+    public Mono<AgenticToolResult<OffsetPage<FacadeCommandBO>>> listCommandsByProfileIdReactive(
+            Long profileId, long offset, int limit, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
-        return Mono.defer(() -> commandFacade.list(new FacadeCommandOffsetQuery(tenantId, null, null, null, null, profileId, null, null, null, offset, limit, List.of()))).map(value -> value.items().isEmpty() ? AgenticToolResult.empty("No commands found for profile ID: " + profileId, value) : AgenticToolResult.ok("Command page loaded for profile " + profileId, value));
+        return Mono.defer(() -> commandFacade.list(new FacadeCommandOffsetQuery(
+                        tenantId, null, null, null, null, profileId, null, null, null, offset, limit, List.of())))
+                .map(value -> value.items().isEmpty()
+                        ? AgenticToolResult.empty("No commands found for profile ID: " + profileId, value)
+                        : AgenticToolResult.ok("Command page loaded for profile " + profileId, value));
     }
-
 }

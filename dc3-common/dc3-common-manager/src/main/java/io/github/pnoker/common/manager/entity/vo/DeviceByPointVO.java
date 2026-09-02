@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.List;
 
 /**
  * View object for device-with-points API responses.
@@ -33,7 +31,6 @@ import java.util.List;
  * @author pnoker
  * @since 2016.10.1
  */
-
 @Getter
 @Setter
 @ToString
@@ -46,7 +43,9 @@ public class DeviceByPointVO {
     /**
      *
      */
-    @Schema(description = "Number of devices associated with the given point; scoped to the current tenant.", example = "1024")
+    @Schema(
+            description = "Number of devices associated with the given point; scoped to the current tenant.",
+            example = "1024")
     private Long count;
 
     /**
@@ -54,5 +53,4 @@ public class DeviceByPointVO {
      */
     @Schema(description = "Devices bound to the given point; only devices visible to the current tenant are returned.")
     private List<DeviceVO> devices;
-
 }

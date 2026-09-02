@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
@@ -44,8 +43,7 @@ public class ActiveQuartzProfileConfig implements EnvironmentPostProcessor {
     /**
      * Creates the environment post processor.
      */
-    public ActiveQuartzProfileConfig() {
-    }
+    public ActiveQuartzProfileConfig() {}
 
     /**
      * Post-process environment to add the {@code quartz} active profile.
@@ -55,12 +53,11 @@ public class ActiveQuartzProfileConfig implements EnvironmentPostProcessor {
      */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        if (Boolean.FALSE.equals(environment.getProperty(EnvironmentConstant.QUARTZ_AUTO_PROFILE, Boolean.class,
-                Boolean.TRUE))) {
+        if (Boolean.FALSE.equals(
+                environment.getProperty(EnvironmentConstant.QUARTZ_AUTO_PROFILE, Boolean.class, Boolean.TRUE))) {
             log.debug("Skipping quartz profile activation, {}=false", EnvironmentConstant.QUARTZ_AUTO_PROFILE);
             return;
         }
         environment.addActiveProfile(EnvironmentConstant.QUARTZ_PROFILE);
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
@@ -23,12 +22,11 @@ import io.github.pnoker.common.entity.dto.DeviceStateDTO;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * RabbitMQ receiver for device state events.
@@ -47,30 +45,34 @@ public class DeviceStateReceiver {
      * Consume a device state message and forward it as a heartbeat to the device state
      * service.
      *
-     * @param channel   the RabbitMQ channel for manual ack
      * @param message   the raw message carrying the delivery tag
-     * @param entityDTO the deserialized device state
+     * @param ack       acknowledgment handle for the message
      */
     @Dc3Listener(topic = MqTopic.STATE, keyPattern = "device.*")
     public Mono<Void> deviceStateReceive(MqReceived<DeviceStateDTO> message, Acknowledgment ack) {
         DeviceStateDTO entityDTO = message.payload();
-        log.debug("Device state received, tenantId={}, driverId={}, deviceId={}, status={}",
+        log.debug(
+                "Device state received, tenantId={}, driverId={}, deviceId={}, status={}",
                 Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
                 Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
                 Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId(),
                 Objects.isNull(entityDTO) ? null : entityDTO.getStatus());
-        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())
-                || Objects.isNull(entityDTO.getDriverId()) || Objects.isNull(entityDTO.getTenantId())
-                || Objects.isNull(entityDTO.getStatus()) || Objects.isNull(entityDTO.getTimeoutUnit())
+        if (Objects.isNull(entityDTO)
+                || Objects.isNull(entityDTO.getDeviceId())
+                || Objects.isNull(entityDTO.getDriverId())
+                || Objects.isNull(entityDTO.getTenantId())
+                || Objects.isNull(entityDTO.getStatus())
+                || Objects.isNull(entityDTO.getTimeoutUnit())
                 || entityDTO.getTimeout() <= 0) {
-            log.warn("Invalid device state, some required fields are null, deviceId={}, driverId={}",
+            log.warn(
+                    "Invalid device state, some required fields are null, deviceId={}, driverId={}",
                     Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId(),
                     Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
             ack.reject(false);
             return Mono.empty();
         }
-        return deviceStateService.heartbeat(entityDTO)
+        return deviceStateService
+                .heartbeat(entityDTO)
                 .doOnError(error -> log.error("Device state persistence failed", error));
     }
-
 }

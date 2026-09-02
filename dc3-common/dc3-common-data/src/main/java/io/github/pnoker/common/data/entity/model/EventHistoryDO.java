@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.model;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Persistence object for the dc3_event_history table.
@@ -76,5 +74,4 @@ public class EventHistoryDO implements Serializable {
     private LocalDateTime createTime;
 
     private LocalDateTime operateTime;
-
 }

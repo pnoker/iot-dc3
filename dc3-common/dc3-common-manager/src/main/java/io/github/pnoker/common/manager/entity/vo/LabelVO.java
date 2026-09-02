@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -51,16 +50,26 @@ public class LabelVO extends BaseVO {
     /**
      * Label name.
      */
-    @NotBlank(message = "Label name can't be empty", groups = {Add.class})
-    @Schema(description = "Label name. Unique name within a tenant.", example = "Production Line A", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid label name format",
+    @NotBlank(
+            message = "Label name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Label name. Unique name within a tenant.",
+            example = "Production Line A",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid label name format",
             groups = {Add.class, Update.class})
     private String labelName;
 
     /**
      * Label code.
      */
-    @Schema(description = "Stable business code of the label; optional human-readable identifier distinct from labelName.", example = "LINE_A")
+    @Schema(
+            description =
+                    "Stable business code of the label; optional human-readable identifier distinct from labelName.",
+            example = "LINE_A")
     private String labelCode;
 
     /**
@@ -72,14 +81,21 @@ public class LabelVO extends BaseVO {
     /**
      * Entity type flag.
      */
-    @Schema(description = "Type of the entity this label is attached to (e.g. DEVICE, POINT, DRIVER, PROFILE, COMMAND, EVENT).", example = "DEVICE", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description =
+                    "Type of the entity this label is attached to (e.g. DEVICE, POINT, DRIVER, PROFILE, COMMAND, EVENT).",
+            example = "DEVICE",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Entity type flag can't be empty",
+            groups = {Add.class, Update.class})
     private EntityTypeEnum entityTypeFlag;
 
     /**
      * Enable status flag.
      */
-    @Schema(description = "Whether the label is active; ENABLE to use it, DISABLE to hide it from selection.", example = "ENABLE")
+    @Schema(
+            description = "Whether the label is active; ENABLE to use it, DISABLE to hide it from selection.",
+            example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

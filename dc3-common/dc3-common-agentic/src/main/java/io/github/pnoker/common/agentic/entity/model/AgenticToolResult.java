@@ -18,7 +18,6 @@ package io.github.pnoker.common.agentic.entity.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -29,8 +28,8 @@ import java.util.Objects;
  * @since 2016.10.1
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public record AgenticToolResult<T>(boolean success, String code, String message, T data,
-                                   List<AgenticVisualizationSpec> visualizations) {
+public record AgenticToolResult<T>(
+        boolean success, String code, String message, T data, List<AgenticVisualizationSpec> visualizations) {
 
     public AgenticToolResult {
         visualizations = List.copyOf(Objects.requireNonNullElse(visualizations, List.of()));
@@ -57,8 +56,7 @@ public record AgenticToolResult<T>(boolean success, String code, String message,
      * @param visualizations visualizations
      * @return ok result
      */
-    public static <T> AgenticToolResult<T> ok(String message, T data,
-                                              List<AgenticVisualizationSpec> visualizations) {
+    public static <T> AgenticToolResult<T> ok(String message, T data, List<AgenticVisualizationSpec> visualizations) {
         return new AgenticToolResult<>(true, AgenticConstant.ToolResult.CODE_OK, message, data, visualizations);
     }
 
@@ -82,8 +80,8 @@ public record AgenticToolResult<T>(boolean success, String code, String message,
      * @return invalid result
      */
     public static <T> AgenticToolResult<T> invalid(String message) {
-        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_INVALID_ARGUMENT, message, null,
-                List.of());
+        return new AgenticToolResult<>(
+                false, AgenticConstant.ToolResult.CODE_INVALID_ARGUMENT, message, null, List.of());
     }
 
     /**
@@ -118,5 +116,4 @@ public record AgenticToolResult<T>(boolean success, String code, String message,
     public static <T> AgenticToolResult<T> error(String message) {
         return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_ERROR, message, null, List.of());
     }
-
 }

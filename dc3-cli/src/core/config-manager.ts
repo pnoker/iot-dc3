@@ -108,9 +108,7 @@ export class ConfigManager {
     const profileName = config.current_profile;
     const profile = config.profiles[profileName];
     if (!profile) {
-      throw new Error(
-        `Profile "${profileName}" not found. Run: dc3 config init`,
-      );
+      throw new Error(`Profile "${profileName}" not found. Run: dc3 config init`);
     }
     return profile;
   }
@@ -153,7 +151,9 @@ export class ConfigManager {
   async switchProfile(name: string): Promise<void> {
     const config = await this.load();
     if (!config.profiles[name]) {
-      throw new Error(`Profile "${name}" not found. Available: ${Object.keys(config.profiles).join(', ')}`);
+      throw new Error(
+        `Profile "${name}" not found. Available: ${Object.keys(config.profiles).join(', ')}`,
+      );
     }
     config.current_profile = name;
     await writeConfig(config);

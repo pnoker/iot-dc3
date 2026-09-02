@@ -2,9 +2,9 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -14,14 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.controller;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.auth.biz.ReactiveTokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.auth.entity.query.TokenQuery;
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.exception.UnAuthorizedException;
+import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,13 +33,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.mock.http.server.reactive.MockServerHttpResponse;
-import reactor.test.StepVerifier;
 import reactor.core.publisher.Mono;
-
-import java.util.Date;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class TokenControllerTest {
@@ -73,7 +71,8 @@ class TokenControllerTest {
 
     @Test
     void generateSaltSignalsUnauthorizedWhenServiceReturnsNull() {
-        when(tokenService.generateSalt("alice", "tenant-A")).thenReturn(Mono.error(new UnAuthorizedException("invalid")));
+        when(tokenService.generateSalt("alice", "tenant-A"))
+                .thenReturn(Mono.error(new UnAuthorizedException("invalid")));
 
         StepVerifier.create(controller.generateSalt(query()))
                 .expectError(UnAuthorizedException.class)
@@ -99,19 +98,22 @@ class TokenControllerTest {
 
     @Test
     void generateTokenSignalsUnauthorizedWhenServiceReturnsNull() {
-        when(tokenService.generateToken("alice", "hash", "tenant-A")).thenReturn(Mono.error(new UnAuthorizedException("invalid")));
+        when(tokenService.generateToken("alice", "hash", "tenant-A"))
+                .thenReturn(Mono.error(new UnAuthorizedException("invalid")));
         ServerHttpResponse httpResponse = new MockServerHttpResponse();
 
         StepVerifier.create(controller.generateToken(query(), httpResponse))
                 .expectError(UnAuthorizedException.class)
                 .verify();
 
-        assertThat(httpResponse.getCookies().getFirst(RequestConstant.Header.TOKEN_COOKIE)).isNull();
+        assertThat(httpResponse.getCookies().getFirst(RequestConstant.Header.TOKEN_COOKIE))
+                .isNull();
     }
 
     @Test
     void changePasswordReturnsTrue() {
-        when(tokenService.changePassword("alice", "hash", "new-hash", "tenant-A")).thenReturn(Mono.empty());
+        when(tokenService.changePassword("alice", "hash", "new-hash", "tenant-A"))
+                .thenReturn(Mono.empty());
 
         StepVerifier.create(controller.changePassword(query()))
                 .expectNext(Boolean.TRUE)
@@ -123,8 +125,7 @@ class TokenControllerTest {
         when(tokenService.tryCancelToken("alice", "tenant-A")).thenReturn(Mono.just(true));
         ServerHttpResponse httpResponse = new MockServerHttpResponse();
 
-        StepVerifier.create(controller.cancelToken(query(), httpResponse))
-                .verifyComplete();
+        StepVerifier.create(controller.cancelToken(query(), httpResponse)).verifyComplete();
 
         ResponseCookie cookie = httpResponse.getCookies().getFirst(RequestConstant.Header.TOKEN_COOKIE);
         assertThat(cookie).isNotNull();
@@ -147,9 +148,7 @@ class TokenControllerTest {
         TokenValid valid = new TokenValid(true, new Date(1_700_000_000_000L));
         when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(Mono.just(valid));
 
-        StepVerifier.create(controller.checkValid(query()))
-                .expectNext(valid)
-                .verifyComplete();
+        StepVerifier.create(controller.checkValid(query())).expectNext(valid).verifyComplete();
     }
 
     @Test
@@ -157,8 +156,6 @@ class TokenControllerTest {
         TokenValid invalid = new TokenValid(false, null);
         when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(Mono.just(invalid));
 
-        StepVerifier.create(controller.checkValid(query()))
-                .expectNext(invalid)
-                .verifyComplete();
+        StepVerifier.create(controller.checkValid(query())).expectNext(invalid).verifyComplete();
     }
 }

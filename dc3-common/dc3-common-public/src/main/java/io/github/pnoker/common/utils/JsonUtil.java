@@ -14,11 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.exception.JsonException;
+import java.io.DataInput;
+import java.io.File;
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.type.TypeReference;
@@ -27,14 +33,6 @@ import tools.jackson.databind.JavaType;
 import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
-
-import java.io.DataInput;
-import java.io.File;
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * JSON serialization/deserialization utility based on Jackson.
@@ -385,7 +383,10 @@ public final class JsonUtil {
      */
     public static <T> String toPrettyJsonString(T type, Class<?> serializationView) {
         try {
-            return OBJECT_MAPPER.writerWithView(serializationView).withDefaultPrettyPrinter().writeValueAsString(type);
+            return OBJECT_MAPPER
+                    .writerWithView(serializationView)
+                    .withDefaultPrettyPrinter()
+                    .writeValueAsString(type);
         } catch (Exception e) {
             throw new JsonException(e);
         }
@@ -423,5 +424,4 @@ public final class JsonUtil {
             return false;
         }
     }
-
 }

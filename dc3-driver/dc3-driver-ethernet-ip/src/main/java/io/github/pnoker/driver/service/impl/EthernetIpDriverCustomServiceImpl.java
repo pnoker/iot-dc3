@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
@@ -33,10 +32,6 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -49,6 +44,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * EtherNet/IP CIP driver service implementation.
@@ -73,6 +71,7 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
@@ -98,13 +97,15 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
         return sb.toString();
     }
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -134,8 +135,12 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
@@ -144,22 +149,36 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
                     try {
                         removed.close();
                     } catch (IOException e) {
-                        log.warn("Driver connection closure failed, protocol={}, deviceId={}, operation={}",
-                                driverCode, metadataEvent.getId(), operateType, e);
+                        log.warn(
+                                "Driver connection closure failed, protocol={}, deviceId={}, operation={}",
+                                driverCode,
+                                metadataEvent.getId(),
+                                operateType,
+                                e);
                     }
-                    log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}",
-                            driverCode, metadataEvent.getId(), operateType);
+                    log.info(
+                            "Driver connection invalidated, protocol={}, deviceId={}, operateType={}",
+                            driverCode,
+                            metadataEvent.getId(),
+                            operateType);
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         Socket socket = getConnector(device.getId(), driverConfig);
         try {
             String tagName = getRequiredConfig(pointConfig, "tagName");
@@ -175,13 +194,18 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
             throw e;
         } catch (Exception e) {
             invalidateConnector(device.getId(), socket);
-            throw new ReadPointException("EtherNet/IP read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new ReadPointException(
+                    "EtherNet/IP read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
         }
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         Socket socket = getConnector(device.getId(), driverConfig);
         try {
             String tagName = getRequiredConfig(pointConfig, "tagName");
@@ -193,7 +217,8 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
             return response != null && response.length > 0;
         } catch (Exception e) {
             invalidateConnector(device.getId(), socket);
-            throw new WritePointException("EtherNet/IP write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new WritePointException(
+                    "EtherNet/IP write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
         }
     }
 
@@ -207,12 +232,20 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
                 Socket socket = new Socket(host, port);
                 socket.setSoTimeout(timeout);
                 // TODO: Send RegisterSession and ForwardOpen CIP commands to establish I/O connection
-                log.info("EtherNet/IP connection established, protocol={}, deviceId={}, host={}:{}",
-                        driverCode, deviceId, host, port);
+                log.info(
+                        "EtherNet/IP connection established, protocol={}, deviceId={}, host={}:{}",
+                        driverCode,
+                        deviceId,
+                        host,
+                        port);
                 return socket;
             } catch (IOException e) {
-                throw new ConnectorException("EtherNet/IP connection failed, protocol={}, deviceId={}, message={}",
-                        driverCode, deviceId, e.getMessage(), e);
+                throw new ConnectorException(
+                        "EtherNet/IP connection failed, protocol={}, deviceId={}, message={}",
+                        driverCode,
+                        deviceId,
+                        e.getMessage(),
+                        e);
             }
         });
     }
@@ -273,7 +306,8 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
         InputStream in = socket.getInputStream();
         byte[] respHeader = new byte[24];
         readFully(in, respHeader);
-        int dataLen = ByteBuffer.wrap(respHeader, 2, 2).order(ByteOrder.LITTLE_ENDIAN).getShort() & 0xFFFF;
+        int dataLen =
+                ByteBuffer.wrap(respHeader, 2, 2).order(ByteOrder.LITTLE_ENDIAN).getShort() & 0xFFFF;
         if (dataLen > 0) {
             byte[] data = new byte[dataLen];
             readFully(in, data);
@@ -341,7 +375,6 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
                 } catch (NumberFormatException e) {
 
                     buf.order(ByteOrder.LITTLE_ENDIAN).putInt(0);
-
                 }
             }
             case "REAL" -> {
@@ -372,7 +405,9 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
 
     private String getRequiredConfig(Map<String, AttributeBO> config, String code) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             throw new ConnectorException("Required attribute '{}' is missing", code);
         }
         return attr.getValue(String.class);
@@ -380,7 +415,9 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -402,7 +439,8 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "slot", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -411,7 +449,7 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "tagName", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

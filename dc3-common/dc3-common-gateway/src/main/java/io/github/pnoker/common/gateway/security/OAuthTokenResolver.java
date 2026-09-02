@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.gateway.security;
 
 import io.github.pnoker.common.constant.common.RequestConstant;
@@ -23,10 +22,9 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.OAuthJwtVerifier;
 import io.jsonwebtoken.Claims;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.Arrays;
 
 /**
  * Verifies an OAuth RS256 bearer ticket and projects it onto the shared
@@ -108,10 +106,11 @@ public class OAuthTokenResolver {
         }
         String scope = claims.get(McpConstant.Field.SCOPE, String.class);
         if (StringUtils.isNotBlank(scope)) {
-            header.setScopes(Arrays.stream(scope.split("\\s+")).map(String::trim)
-                    .filter(StringUtils::isNotBlank).toList());
+            header.setScopes(Arrays.stream(scope.split("\\s+"))
+                    .map(String::trim)
+                    .filter(StringUtils::isNotBlank)
+                    .toList());
         }
         return header;
     }
-
 }

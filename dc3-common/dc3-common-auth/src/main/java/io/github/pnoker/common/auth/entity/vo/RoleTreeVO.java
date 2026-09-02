@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Tree-shaped variant of {@link RoleVO} — adds nested children so the frontend's
@@ -41,11 +39,12 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(description = "Tree-shaped role view object; extends RoleVO with a nested children list for rendering hierarchical role selectors.")
+@Schema(
+        description =
+                "Tree-shaped role view object; extends RoleVO with a nested children list for rendering hierarchical role selectors.")
 public class RoleTreeVO extends RoleVO {
 
     @Schema(description = "Direct child roles in the hierarchy tree; empty list when the role is a leaf node.")
     @ToString.Exclude
     private List<RoleTreeVO> children = new ArrayList<>();
-
 }

@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
@@ -35,8 +33,7 @@ import java.util.Objects;
  */
 final class RuleFactValues {
 
-    private RuleFactValues() {
-    }
+    private RuleFactValues() {}
 
     static Map<String, Object> point(PointValueBO pointValue) {
         return RuleValueMap.from(new PointSnapshot(
@@ -96,8 +93,7 @@ final class RuleFactValues {
             Byte eventLevelFlag,
             Map<String, String> paramValues,
             String message,
-            LocalDateTime occurTime) {
-    }
+            LocalDateTime occurTime) {}
 
     private record PointSnapshot(
             String messageId,
@@ -109,8 +105,7 @@ final class RuleFactValues {
             String value,
             Double numValue,
             LocalDateTime createTime,
-            LocalDateTime operateTime) {
-    }
+            LocalDateTime operateTime) {}
 
     private record DeviceAlarmSnapshot(
             Long deviceId,
@@ -119,16 +114,8 @@ final class RuleFactValues {
             String statusName,
             String message,
             Long alarmId,
-            LocalDateTime createTime) {
-    }
+            LocalDateTime createTime) {}
 
     private record DriverAlarmSnapshot(
-            Long driverId,
-            String status,
-            String statusName,
-            String message,
-            Long alarmId,
-            LocalDateTime createTime) {
-    }
-
+            Long driverId, String status, String statusName, String message, Long alarmId, LocalDateTime createTime) {}
 }

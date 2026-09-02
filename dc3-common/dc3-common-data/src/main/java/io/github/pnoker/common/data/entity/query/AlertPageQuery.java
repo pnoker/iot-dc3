@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * Request body for {@code POST /dashboard/alert/page}. Replaces the earlier
@@ -75,5 +73,4 @@ public class AlertPageQuery implements Serializable {
 
     @Schema(description = "Whitelisted sort fields")
     private java.util.List<SortSpec> sort = java.util.List.of();
-
 }

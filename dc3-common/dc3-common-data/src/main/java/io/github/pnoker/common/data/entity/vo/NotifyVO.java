@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -47,37 +46,52 @@ public class NotifyVO extends BaseVO {
     /**
      * Alarm notification template name
      */
-    @Schema(description = "Notification template name; must be unique within the current tenant.", example = "Over Temperature Alert")
+    @Schema(
+            description = "Notification template name; must be unique within the current tenant.",
+            example = "Over Temperature Alert")
     private String notifyName;
 
     /**
      * Alarm notification template code
      */
-    @Schema(description = "Stable business code identifying this notification template; should not change once deployed.", example = "OVER_TEMP")
+    @Schema(
+            description =
+                    "Stable business code identifying this notification template; should not change once deployed.",
+            example = "OVER_TEMP")
     private String notifyCode;
 
     /**
      * Auto confirm flag
      */
-    @Schema(description = "Whether alarms raised by this template are auto-confirmed (AUTO) or require manual confirmation (MANUAL).", example = "AUTO")
+    @Schema(
+            description =
+                    "Whether alarms raised by this template are auto-confirmed (AUTO) or require manual confirmation (MANUAL).",
+            example = "AUTO")
     private AutoConfirmFlagEnum autoConfirmFlag;
 
     /**
      * Alarm notification interval, milliseconds
      */
-    @Schema(description = "Minimum cooldown interval, in seconds, between successive notification deliveries to prevent alert storms.", example = "300")
+    @Schema(
+            description =
+                    "Minimum cooldown interval, in seconds, between successive notification deliveries to prevent alert storms.",
+            example = "300")
     private Long notifyInterval;
 
     /**
      * Alarm notification template configuration
      */
-    @Schema(description = "Notification extension information, serialized as JSON for custom delivery logic (channels, templates, recipients).")
+    @Schema(
+            description =
+                    "Notification extension information, serialized as JSON for custom delivery logic (channels, templates, recipients).")
     private NotifyExt notifyExt;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Whether this notification template is active: ENABLE (0) to enable or DISABLE (1) to disable.", example = "ENABLE")
+    @Schema(
+            description =
+                    "Whether this notification template is active: ENABLE (0) to enable or DISABLE (1) to disable.",
+            example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

@@ -1,16 +1,31 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.common.exception.ServiceException;
 import io.grpc.Status;
 import io.grpc.stub.ClientCallStreamObserver;
 import io.grpc.stub.ClientResponseObserver;
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.Flux;
-
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 final class ReactiveGrpcClientSupport {
 
@@ -48,8 +63,8 @@ final class ReactiveGrpcClientSupport {
                         return;
                     }
                     String description = Objects.requireNonNullElse(status.getDescription(), error.getMessage());
-                    sink.error(new ServiceException(operation + " transport failed: [" + status.getCode() + "] " + description,
-                            error));
+                    sink.error(new ServiceException(
+                            operation + " transport failed: [" + status.getCode() + "] " + description, error));
                 }
 
                 @Override
@@ -79,22 +94,38 @@ final class ReactiveGrpcClientSupport {
                 if (requestStream != null) requestStream.cancel(operation + " cancelled", null);
             });
             ClientResponseObserver<Q, S> observer = new ClientResponseObserver<>() {
-                @Override public void beforeStart(ClientCallStreamObserver<Q> requestStream) {
+                @Override
+                public void beforeStart(ClientCallStreamObserver<Q> requestStream) {
                     call.set(requestStream);
                     if (cancelled.get()) requestStream.cancel(operation + " cancelled", null);
                 }
-                @Override public void onNext(S response) { if (!cancelled.get()) sink.next(response); }
-                @Override public void onError(Throwable error) {
+
+                @Override
+                public void onNext(S response) {
+                    if (!cancelled.get()) sink.next(response);
+                }
+
+                @Override
+                public void onError(Throwable error) {
                     if (cancelled.get()) return;
                     Status status = Status.fromThrowable(error);
-                    if (status.getCode() == Status.Code.NOT_FOUND) { sink.complete(); return; }
+                    if (status.getCode() == Status.Code.NOT_FOUND) {
+                        sink.complete();
+                        return;
+                    }
                     String description = Objects.requireNonNullElse(status.getDescription(), error.getMessage());
-                    sink.error(new ServiceException(operation + " transport failed: [" + status.getCode() + "] " + description, error));
+                    sink.error(new ServiceException(
+                            operation + " transport failed: [" + status.getCode() + "] " + description, error));
                 }
-                @Override public void onCompleted() { if (!cancelled.get()) sink.complete(); }
+
+                @Override
+                public void onCompleted() {
+                    if (!cancelled.get()) sink.complete();
+                }
             };
-            try { invocation.accept(observer); }
-            catch (RuntimeException error) {
+            try {
+                invocation.accept(observer);
+            } catch (RuntimeException error) {
                 ClientCallStreamObserver<Q> requestStream = call.get();
                 if (requestStream != null) requestStream.cancel(operation + " setup failed", error);
                 sink.error(error);

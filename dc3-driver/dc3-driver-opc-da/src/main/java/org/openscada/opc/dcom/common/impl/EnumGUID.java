@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.common.impl;
 
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.IJIComObject;
 import org.jinterop.dcom.core.JIArray;
 import org.jinterop.dcom.core.JICallBuilder;
 import org.jinterop.dcom.core.JIFlags;
 import rpc.core.UUID;
-
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  *
@@ -114,8 +112,7 @@ public class EnumGUID extends BaseCOMObject {
         int i = 0;
         do {
             i = next(data, batchSize);
-        }
-        while (i == batchSize);
+        } while (i == batchSize);
 
         return data;
     }
@@ -123,5 +120,4 @@ public class EnumGUID extends BaseCOMObject {
     public Collection<UUID> asCollection() throws JIException {
         return asCollection(DEFAULT_BATCH_SIZE);
     }
-
 }

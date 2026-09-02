@@ -1,23 +1,38 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.auth.repository;
 
 import io.github.pnoker.common.auth.entity.model.LocalCredentialDO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
-import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.r2dbc.core.DatabaseClient;
-import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Mono;
-
+import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
 
 /** Explicit SQL adapter for local credentials joined through active memberships. */
 @Repository
@@ -38,66 +53,93 @@ public class R2dbcLocalCredentialStore implements ReactiveLocalCredentialStore {
     @Override
     public Mono<LocalCredentialDO> getById(Long tenantId, Long id) {
         if (!valid(tenantId, id)) return Mono.empty();
-        return databaseClient.sql("SELECT " + COLUMNS + " FROM " + TABLE + " c WHERE c.id=:id AND c.deleted=0"
-                        + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
-                        + " AND m.principal_id=c.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
-                .bind("tenant_id", tenantId).bind("id", id).map(this::map).one();
+        return databaseClient
+                .sql(
+                        "SELECT " + COLUMNS + " FROM " + TABLE + " c WHERE c.id=:id AND c.deleted=0"
+                                + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
+                                + " AND m.principal_id=c.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
+                .bind("tenant_id", tenantId)
+                .bind("id", id)
+                .map(this::map)
+                .one();
     }
 
     @Override
     public Mono<LocalCredentialDO> getByLoginName(Long tenantId, String loginNameNormalized) {
         if (!valid(tenantId) || loginNameNormalized == null || loginNameNormalized.isBlank()) return Mono.empty();
-        return databaseClient.sql("SELECT " + COLUMNS + " FROM " + TABLE + " c WHERE c.login_name_normalized=:login_name"
-                        + " AND c.credential_type='PASSWORD' AND c.enable_flag=0 AND c.deleted=0"
-                        + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
-                        + " AND m.principal_id=c.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
-                .bind("tenant_id", tenantId).bind("login_name", loginNameNormalized).map(this::map).one();
+        return databaseClient
+                .sql(
+                        "SELECT " + COLUMNS + " FROM " + TABLE + " c WHERE c.login_name_normalized=:login_name"
+                                + " AND c.credential_type='PASSWORD' AND c.enable_flag=0 AND c.deleted=0"
+                                + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
+                                + " AND m.principal_id=c.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
+                .bind("tenant_id", tenantId)
+                .bind("login_name", loginNameNormalized)
+                .map(this::map)
+                .one();
     }
 
     @Override
     public Mono<Boolean> existsByLoginName(Long tenantId, String loginNameNormalized) {
         if (!valid(tenantId) || loginNameNormalized == null || loginNameNormalized.isBlank()) return Mono.just(false);
-        return databaseClient.sql("SELECT 1 FROM " + TABLE + " c WHERE c.login_name_normalized=:login_name"
-                        + " AND c.credential_type='PASSWORD' AND c.deleted=0"
-                        + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
-                        + " AND m.principal_id=c.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
-                .bind("tenant_id", tenantId).bind("login_name", loginNameNormalized)
-                .map((row, metadata) -> Boolean.TRUE).one().defaultIfEmpty(false);
+        return databaseClient
+                .sql(
+                        "SELECT 1 FROM " + TABLE + " c WHERE c.login_name_normalized=:login_name"
+                                + " AND c.credential_type='PASSWORD' AND c.deleted=0"
+                                + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
+                                + " AND m.principal_id=c.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
+                .bind("tenant_id", tenantId)
+                .bind("login_name", loginNameNormalized)
+                .map((row, metadata) -> Boolean.TRUE)
+                .one()
+                .defaultIfEmpty(false);
     }
 
     @Override
     public Mono<OffsetPage<LocalCredentialDO>> list(LocalCredentialFilter filter) {
         if (filter == null) return Mono.error(new IllegalArgumentException("local credential filter is required"));
         StringBuilder where = new StringBuilder(" WHERE c.deleted=0 AND EXISTS (SELECT 1 FROM ")
-                .append(MEMBERSHIP).append(" m WHERE m.tenant_id=:tenant_id AND m.principal_id=c.principal_id")
+                .append(MEMBERSHIP)
+                .append(" m WHERE m.tenant_id=:tenant_id AND m.principal_id=c.principal_id")
                 .append(" AND m.membership_status='ACTIVE' AND m.deleted=0)");
         if (filter.principalId() != null) where.append(" AND c.principal_id=:principal_id");
         if (filter.loginName() != null) where.append(" AND c.login_name_normalized LIKE :login_name");
         if (filter.credentialType() != null) where.append(" AND c.credential_type=:credential_type");
         if (filter.enableFlag() != null) where.append(" AND c.enable_flag=:enable_flag");
         String condition = where.toString();
-        DatabaseClient.GenericExecuteSpec count = databaseClient.sql("SELECT COUNT(*) AS total FROM " + TABLE + " c" + condition);
-        DatabaseClient.GenericExecuteSpec rows = databaseClient.sql("SELECT " + COLUMNS + " FROM " + TABLE + " c" + condition
-                        + " ORDER BY " + orderBy(filter.page().sort()) + " LIMIT :limit OFFSET :offset")
-                .bind("limit", filter.page().limit()).bind("offset", filter.page().offset());
+        DatabaseClient.GenericExecuteSpec count =
+                databaseClient.sql("SELECT COUNT(*) AS total FROM " + TABLE + " c" + condition);
+        DatabaseClient.GenericExecuteSpec rows = databaseClient
+                .sql("SELECT " + COLUMNS + " FROM " + TABLE + " c" + condition + " ORDER BY "
+                        + orderBy(filter.page().sort()) + " LIMIT :limit OFFSET :offset")
+                .bind("limit", filter.page().limit())
+                .bind("offset", filter.page().offset());
         count = bind(count, filter);
         rows = bind(rows, filter);
         Mono<Long> total = count.map((row, metadata) -> {
-            Number value = row.get("total", Number.class);
-            return value == null ? 0L : value.longValue();
-        }).one().defaultIfEmpty(0L);
+                    Number value = row.get("total", Number.class);
+                    return value == null ? 0L : value.longValue();
+                })
+                .one()
+                .defaultIfEmpty(0L);
         DatabaseClient.GenericExecuteSpec itemRows = rows;
-        return total.flatMap(totalCount -> itemRows.map(this::map).all().collectList()
-                        .map(items -> OffsetPage.of(items, filter.page().offset(), filter.page().limit(), totalCount)))
+        return total.flatMap(totalCount -> itemRows.map(this::map)
+                        .all()
+                        .collectList()
+                        .map(items -> OffsetPage.of(
+                                items, filter.page().offset(), filter.page().limit(), totalCount)))
                 .as(pageTransaction::transactional);
     }
 
-    private DatabaseClient.GenericExecuteSpec bind(DatabaseClient.GenericExecuteSpec query, LocalCredentialFilter filter) {
+    private DatabaseClient.GenericExecuteSpec bind(
+            DatabaseClient.GenericExecuteSpec query, LocalCredentialFilter filter) {
         query = query.bind("tenant_id", filter.tenantId());
         if (filter.principalId() != null) query = query.bind("principal_id", filter.principalId());
         if (filter.loginName() != null) query = query.bind("login_name", "%" + filter.loginName() + "%");
-        if (filter.credentialType() != null) query = query.bind("credential_type", filter.credentialType().getValue());
-        if (filter.enableFlag() != null) query = query.bind("enable_flag", filter.enableFlag().getIndex());
+        if (filter.credentialType() != null)
+            query = query.bind("credential_type", filter.credentialType().getValue());
+        if (filter.enableFlag() != null)
+            query = query.bind("enable_flag", filter.enableFlag().getIndex());
         return query;
     }
 
@@ -135,12 +177,17 @@ public class R2dbcLocalCredentialStore implements ReactiveLocalCredentialStore {
 
     private JsonExt json(String raw) {
         if (raw == null) return null;
-        try { return JsonUtil.parseObject(raw, JsonExt.class); } catch (RuntimeException ignored) { return null; }
+        try {
+            return JsonUtil.parseObject(raw, JsonExt.class);
+        } catch (RuntimeException ignored) {
+            return null;
+        }
     }
 
     private LocalDateTime time(Object raw) {
         if (raw instanceof LocalDateTime value) return value;
-        if (raw instanceof OffsetDateTime value) return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+        if (raw instanceof OffsetDateTime value)
+            return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
         if (raw instanceof Instant value) return LocalDateTime.ofInstant(value, ZoneOffset.UTC);
         return null;
     }
@@ -149,22 +196,30 @@ public class R2dbcLocalCredentialStore implements ReactiveLocalCredentialStore {
         if (sort == null || sort.isEmpty()) return "c.login_name ASC,c.id ASC";
         List<String> clauses = new ArrayList<>();
         for (SortSpec spec : sort) {
-            String column = switch (spec.field()) {
-                case "id" -> "c.id";
-                case "loginName" -> "c.login_name";
-                case "credentialType" -> "c.credential_type";
-                case "enableFlag" -> "c.enable_flag";
-                case "passwordUpdatedTime" -> "c.password_updated_time";
-                case "createTime" -> "c.create_time";
-                case "operateTime" -> "c.operate_time";
-                default -> throw new IllegalArgumentException("unsupported local credential sort field: " + spec.field());
-            };
+            String column =
+                    switch (spec.field()) {
+                        case "id" -> "c.id";
+                        case "loginName" -> "c.login_name";
+                        case "credentialType" -> "c.credential_type";
+                        case "enableFlag" -> "c.enable_flag";
+                        case "passwordUpdatedTime" -> "c.password_updated_time";
+                        case "createTime" -> "c.create_time";
+                        case "operateTime" -> "c.operate_time";
+                        default ->
+                            throw new IllegalArgumentException(
+                                    "unsupported local credential sort field: " + spec.field());
+                    };
             clauses.add(column + " " + spec.direction().name());
         }
         if (clauses.stream().noneMatch(value -> value.startsWith("c.id "))) clauses.add("c.id ASC");
         return String.join(",", clauses);
     }
 
-    private boolean valid(Long tenantId) { return tenantId != null && tenantId > 0; }
-    private boolean valid(Long tenantId, Long id) { return valid(tenantId) && id != null && id > 0; }
+    private boolean valid(Long tenantId) {
+        return tenantId != null && tenantId > 0;
+    }
+
+    private boolean valid(Long tenantId, Long id) {
+        return valid(tenantId) && id != null && id > 0;
+    }
 }

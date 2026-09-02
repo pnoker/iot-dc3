@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -65,7 +64,9 @@ public class UserIdentityExt extends BaseExt {
         /**
          * Gender.
          */
-        @Schema(description = "Gender of the user; free-form text such as 'male', 'female' or 'other'", example = "male")
+        @Schema(
+                description = "Gender of the user; free-form text such as 'male', 'female' or 'other'",
+                example = "male")
         private String gender;
 
         /**
@@ -77,9 +78,9 @@ public class UserIdentityExt extends BaseExt {
         /**
          * Identification number.
          */
-        @Schema(description = "Government-issued identification number of the user (e.g. national ID or passport)", example = "110101199001011234")
+        @Schema(
+                description = "Government-issued identification number of the user (e.g. national ID or passport)",
+                example = "110101199001011234")
         private String idNumber;
-
     }
-
 }

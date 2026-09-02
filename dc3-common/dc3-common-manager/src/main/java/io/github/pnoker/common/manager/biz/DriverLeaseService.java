@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.biz;
 
 import io.github.pnoker.common.manager.entity.bo.DeviceLeaseBO;
 import io.github.pnoker.common.manager.entity.bo.DriverLeaseGrantBO;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -47,8 +45,14 @@ public interface DriverLeaseService {
      * @param knownAssignmentVersion assignment version already observed by the runtime
      * @return renewed lease expiry, current assignment version, and whether the runtime must reload assignments
      */
-    Mono<DriverLeaseGrantBO> renew(Long tenantId, Long driverId, String node, String client,
-                                   String host, int leaseSeconds, long knownAssignmentVersion);
+    Mono<DriverLeaseGrantBO> renew(
+            Long tenantId,
+            Long driverId,
+            String node,
+            String client,
+            String host,
+            int leaseSeconds,
+            long knownAssignmentVersion);
 
     /**
      * Lists the active device assignments owned by one runtime node using an exclusive device-ID cursor.
@@ -60,8 +64,7 @@ public interface DriverLeaseService {
      * @param limit         page size from 1 through 2000
      * @return assignments ordered by device ID
      */
-    Flux<DeviceLeaseBO> listOwnedLeases(Long tenantId, Long driverId, String node,
-                                        long afterDeviceId, int limit);
+    Flux<DeviceLeaseBO> listOwnedLeases(Long tenantId, Long driverId, String node, long afterDeviceId, int limit);
 
     /**
      * Returns the current fencing generation for one tenant-owned logical driver.

@@ -91,5 +91,4 @@ public class AgenticProperties {
      * are stored under tenant/user/conversation subfolders.
      */
     private String attachmentStoragePath = "dc3/data/upload/agentic/attachment";
-
 }

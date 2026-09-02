@@ -14,20 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 class OkHttpConfigTest {
 
-    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(OkHttpConfig.class));
+    private final ApplicationContextRunner contextRunner =
+            new ApplicationContextRunner().withConfiguration(AutoConfigurations.of(OkHttpConfig.class));
 
     @Test
     void okHttpClientIsCreatedWithDefaults() {
@@ -65,10 +64,12 @@ class OkHttpConfigTest {
 
     @Test
     void okHttpClientBacksOffWhenUserBeanExists() {
-        OkHttpClient customClient = new OkHttpClient.Builder().callTimeout(java.time.Duration.ofSeconds(1)).build();
+        OkHttpClient customClient = new OkHttpClient.Builder()
+                .callTimeout(java.time.Duration.ofSeconds(1))
+                .build();
 
-        contextRunner.withBean(OkHttpClient.class, () -> customClient)
+        contextRunner
+                .withBean(OkHttpClient.class, () -> customClient)
                 .run(context -> assertThat(context.getBean(OkHttpClient.class)).isSameAs(customClient));
     }
-
 }

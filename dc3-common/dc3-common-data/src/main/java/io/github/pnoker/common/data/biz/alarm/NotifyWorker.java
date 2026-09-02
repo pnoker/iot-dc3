@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.mq.MqTopic;
-import io.github.pnoker.common.data.repository.ReactiveNotifyHistoryStore;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
+import io.github.pnoker.common.data.repository.ReactiveNotifyHistoryStore;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.NotifyHistoryResponseExt;
@@ -30,16 +29,15 @@ import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
  * Consumes {@link NotifyTaskDTO} payloads from {@code dc3.q.notify.task},
@@ -87,18 +85,21 @@ public class NotifyWorker {
     @Dc3Listener(topic = MqTopic.NOTIFY_TASK)
     public Mono<Void> onNotifyTask(MqReceived<NotifyTaskDTO> message, Acknowledgment ack) {
         NotifyTaskDTO task = message.payload();
-        if (Objects.isNull(task) || Objects.isNull(task.getNotifyHistoryId())
-                || Objects.isNull(task.getChannelId()) || Objects.isNull(task.getTenantId())
+        if (Objects.isNull(task)
+                || Objects.isNull(task.getNotifyHistoryId())
+                || Objects.isNull(task.getChannelId())
+                || Objects.isNull(task.getTenantId())
                 || task.getTenantId() <= 0) {
-            log.error("Notify task rejected, reason=invalidEnvelope, historyId={}, channelId={}",
+            log.error(
+                    "Notify task rejected, reason=invalidEnvelope, historyId={}, channelId={}",
                     Objects.nonNull(task) ? task.getNotifyHistoryId() : null,
                     Objects.nonNull(task) ? task.getChannelId() : null);
             ack.reject(false);
             return Mono.empty();
         }
         return dispatch(task)
-                .doOnError(error -> log.error("Notify task persistence failed, historyId={}",
-                        task.getNotifyHistoryId(), error));
+                .doOnError(error ->
+                        log.error("Notify task persistence failed, historyId={}", task.getNotifyHistoryId(), error));
     }
 
     /**
@@ -108,54 +109,63 @@ public class NotifyWorker {
      * @param task the notify task to dispatch
      */
     private Mono<Void> dispatch(NotifyTaskDTO task) {
-        return notifyConfigCache.getChannel(task.getChannelId(), task.getTenantId())
+        return notifyConfigCache
+                .getChannel(task.getChannelId(), task.getTenantId())
                 .switchIfEmpty(Mono.error(new MissingNotifyChannelException(task.getChannelId())))
                 .flatMap(channel -> dispatch(channel, task))
-                .onErrorResume(MissingNotifyChannelException.class, error -> persistTerminal(task,
-                        NotifySendResult.skipped("notify-channel" + SymbolConstant.COLON + task.getChannelId(),
-                                "Notify channel not found or tenant mismatch")));
+                .onErrorResume(
+                        MissingNotifyChannelException.class,
+                        error -> persistTerminal(
+                                task,
+                                NotifySendResult.skipped(
+                                        "notify-channel" + SymbolConstant.COLON + task.getChannelId(),
+                                        "Notify channel not found or tenant mismatch")));
     }
 
     private Mono<Void> dispatch(NotifyChannelBO channel, NotifyTaskDTO task) {
         if (!EnableFlagEnum.ENABLE.equals(channel.getEnableFlag())) {
-            return persistTerminal(task, NotifySendResult.skipped(channel.getCredentialRef(), "Notify channel is disabled"));
+            return persistTerminal(
+                    task, NotifySendResult.skipped(channel.getCredentialRef(), "Notify channel is disabled"));
         }
         NotifyChannelTypeEnum type = channel.getChannelTypeFlag();
         NotifyChannelAdapter adapter = notifyChannelAdapterRegistry.find(type).orElse(null);
         if (Objects.isNull(adapter)) {
-            return persistTerminal(task, NotifySendResult.failed(channel.getCredentialRef(),
-                    "Notify channel adapter is missing for type=" + type));
+            return persistTerminal(
+                    task,
+                    NotifySendResult.failed(
+                            channel.getCredentialRef(), "Notify channel adapter is missing for type=" + type));
         }
 
-        MessagePayload payload = new MessagePayload(type, task.getPayloadType(),
+        MessagePayload payload = new MessagePayload(
+                type,
+                task.getPayloadType(),
                 Objects.requireNonNullElse(task.getPayload(), Map.of()),
                 Objects.requireNonNullElse(task.getMissingVariables(), List.of()));
-        return Mono.defer(() -> adapter.send(channel, payload))
-                .flatMap(result -> {
-                    if (NotifyHistoryStatusEnum.SUCCESS.equals(result.getStatusFlag())
-                            || NotifyHistoryStatusEnum.SKIPPED.equals(result.getStatusFlag())) {
-                        return persistTerminal(task, result);
-                    }
-                    int nextAttempt = Objects.requireNonNullElse(task.getRetryCount(), 0) + 1;
-                    if (nextAttempt >= MAX_ATTEMPTS) {
-                        return persistTerminal(task, result);
-                    }
-                    return persistRetrying(task, result, nextAttempt).then(Mono.defer(() -> {
-                        NotifyTaskDTO retry = NotifyTaskDTO.builder()
-                .notifyHistoryId(task.getNotifyHistoryId())
-                .tenantId(task.getTenantId())
-                .channelId(task.getChannelId())
-                .channelTypeFlag(task.getChannelTypeFlag())
-                .payloadType(task.getPayloadType())
-                .payload(task.getPayload())
-                .missingVariables(task.getMissingVariables())
-                .retryCount(nextAttempt)
-                .createTime(LocalDateTime.now(ZoneOffset.UTC))
-                .build();
-                        Mono<Void> publication = notifyTaskSender.publish(retry);
-                        return publication == null ? Mono.empty() : publication;
-                    }));
-                });
+        return Mono.defer(() -> adapter.send(channel, payload)).flatMap(result -> {
+            if (NotifyHistoryStatusEnum.SUCCESS.equals(result.getStatusFlag())
+                    || NotifyHistoryStatusEnum.SKIPPED.equals(result.getStatusFlag())) {
+                return persistTerminal(task, result);
+            }
+            int nextAttempt = Objects.requireNonNullElse(task.getRetryCount(), 0) + 1;
+            if (nextAttempt >= MAX_ATTEMPTS) {
+                return persistTerminal(task, result);
+            }
+            return persistRetrying(task, result, nextAttempt).then(Mono.defer(() -> {
+                NotifyTaskDTO retry = NotifyTaskDTO.builder()
+                        .notifyHistoryId(task.getNotifyHistoryId())
+                        .tenantId(task.getTenantId())
+                        .channelId(task.getChannelId())
+                        .channelTypeFlag(task.getChannelTypeFlag())
+                        .payloadType(task.getPayloadType())
+                        .payload(task.getPayload())
+                        .missingVariables(task.getMissingVariables())
+                        .retryCount(nextAttempt)
+                        .createTime(LocalDateTime.now(ZoneOffset.UTC))
+                        .build();
+                Mono<Void> publication = notifyTaskSender.publish(retry);
+                return publication == null ? Mono.empty() : publication;
+            }));
+        });
     }
 
     private static final class MissingNotifyChannelException extends RuntimeException {
@@ -169,10 +179,18 @@ public class NotifyWorker {
      * place — the row id was assigned when the PENDING row was inserted.
      */
     private Mono<Void> persistTerminal(NotifyTaskDTO task, NotifySendResult result) {
-        return notifyHistoryStore.updateDelivery(task.getTenantId(), task.getNotifyHistoryId(), result.getStatusFlag().getIndex(),
-                        Objects.toString(result.getTarget(), ""), toResponseExt(result),
-                        Objects.toString(result.getErrorMessage(), ""), task.getRetryCount())
-                .flatMap(updated -> updated ? Mono.<Void>empty() : Mono.error(new IllegalStateException("notify history row not found")));
+        return notifyHistoryStore
+                .updateDelivery(
+                        task.getTenantId(),
+                        task.getNotifyHistoryId(),
+                        result.getStatusFlag().getIndex(),
+                        Objects.toString(result.getTarget(), ""),
+                        toResponseExt(result),
+                        Objects.toString(result.getErrorMessage(), ""),
+                        task.getRetryCount())
+                .flatMap(updated -> updated
+                        ? Mono.<Void>empty()
+                        : Mono.error(new IllegalStateException("notify history row not found")));
     }
 
     /**
@@ -180,10 +198,18 @@ public class NotifyWorker {
      * the dashboard reflects in-flight attempts.
      */
     private Mono<Void> persistRetrying(NotifyTaskDTO task, NotifySendResult result, int attempt) {
-        return notifyHistoryStore.updateDelivery(task.getTenantId(), task.getNotifyHistoryId(), NotifyHistoryStatusEnum.RETRYING.getIndex(),
-                        Objects.toString(result.getTarget(), ""), toResponseExt(result),
-                        Objects.toString(result.getErrorMessage(), ""), attempt)
-                .flatMap(updated -> updated ? Mono.<Void>empty() : Mono.error(new IllegalStateException("notify history row not found")));
+        return notifyHistoryStore
+                .updateDelivery(
+                        task.getTenantId(),
+                        task.getNotifyHistoryId(),
+                        NotifyHistoryStatusEnum.RETRYING.getIndex(),
+                        Objects.toString(result.getTarget(), ""),
+                        toResponseExt(result),
+                        Objects.toString(result.getErrorMessage(), ""),
+                        attempt)
+                .flatMap(updated -> updated
+                        ? Mono.<Void>empty()
+                        : Mono.error(new IllegalStateException("notify history row not found")));
     }
 
     private JsonExt toResponseExt(NotifySendResult result) {
@@ -202,5 +228,4 @@ public class NotifyWorker {
                 .remark(io.github.pnoker.common.utils.JsonUtil.toJsonString(ext.getContent()))
                 .build();
     }
-
 }

@@ -1,14 +1,29 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.db.r2dbc.core.operation;
-
-import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.time.Instant;
+import java.util.UUID;
+import org.junit.jupiter.api.Test;
 
 class OperationStateTest {
 
@@ -18,42 +33,59 @@ class OperationStateTest {
 
     @Test
     void allowsOnlyForwardTransitionsAndRequiresCompletedProgress() {
-        OperationState pending = OperationState.pending(OPERATION_ID, TENANT_ID, "request-1", "a".repeat(64), NOW, null);
+        OperationState pending =
+                OperationState.pending(OPERATION_ID, TENANT_ID, "request-1", "a".repeat(64), NOW, null);
         OperationState running = pending.transition(OperationState.Status.RUNNING, 10, NOW.plusSeconds(1));
         OperationState progressed = running.transition(OperationState.Status.RUNNING, 60, NOW.plusMillis(1500));
         OperationState succeeded = progressed.transition(OperationState.Status.SUCCEEDED, 100, NOW.plusSeconds(2));
 
         assertEquals(OperationState.Status.SUCCEEDED, succeeded.status());
-        assertThrows(IllegalStateException.class,
+        assertThrows(
+                IllegalStateException.class,
                 () -> succeeded.transition(OperationState.Status.RUNNING, 20, NOW.plusSeconds(3)));
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(
+                IllegalArgumentException.class,
                 () -> running.transition(OperationState.Status.SUCCEEDED, 99, NOW.plusSeconds(2)));
-        assertTrue(OperationState.isTransitionAllowed(
-                OperationState.Status.PENDING, OperationState.Status.RUNNING));
-        assertFalse(OperationState.isTransitionAllowed(
-                OperationState.Status.SUCCEEDED, OperationState.Status.RUNNING));
-        assertThrows(IllegalArgumentException.class,
+        assertTrue(OperationState.isTransitionAllowed(OperationState.Status.PENDING, OperationState.Status.RUNNING));
+        assertFalse(OperationState.isTransitionAllowed(OperationState.Status.SUCCEEDED, OperationState.Status.RUNNING));
+        assertThrows(
+                IllegalArgumentException.class,
                 () -> progressed.transition(OperationState.Status.RUNNING, 59, NOW.plusSeconds(2)));
     }
 
     @Test
     void supportsCancellationAndRejectsMalformedKeys() {
-        OperationState pending = OperationState.pending(OPERATION_ID, TENANT_ID, "request-1", "a".repeat(64), NOW, null);
-        assertEquals(OperationState.Status.CANCELLED,
-                pending.transition(OperationState.Status.CANCELLED, 0, NOW.plusSeconds(1)).status());
-        assertThrows(IllegalArgumentException.class,
+        OperationState pending =
+                OperationState.pending(OPERATION_ID, TENANT_ID, "request-1", "a".repeat(64), NOW, null);
+        assertEquals(
+                OperationState.Status.CANCELLED,
+                pending.transition(OperationState.Status.CANCELLED, 0, NOW.plusSeconds(1))
+                        .status());
+        assertThrows(
+                IllegalArgumentException.class,
                 () -> OperationState.pending(OPERATION_ID, TENANT_ID, "\n", "a".repeat(64), NOW, null));
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(
+                IllegalArgumentException.class,
                 () -> OperationState.pending(OPERATION_ID, TENANT_ID, " request-1", "a".repeat(64), NOW, null));
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(
+                IllegalArgumentException.class,
                 () -> OperationState.pending(OPERATION_ID, TENANT_ID, "😀".repeat(192), "a".repeat(64), NOW, null));
     }
 
     @Test
     void normalizesAllPersistedTimesToUtcMicroseconds() {
-        OperationState state = new OperationState(OPERATION_ID, TENANT_ID, "request-1",
-                OperationState.Status.PENDING, 0,
-                NOW.plusNanos(1234), NOW.plusNanos(5678), NOW.plusNanos(9999), "a".repeat(64), null, null);
+        OperationState state = new OperationState(
+                OPERATION_ID,
+                TENANT_ID,
+                "request-1",
+                OperationState.Status.PENDING,
+                0,
+                NOW.plusNanos(1234),
+                NOW.plusNanos(5678),
+                NOW.plusNanos(9999),
+                "a".repeat(64),
+                null,
+                null);
 
         assertEquals(NOW.plusNanos(1_000), state.createdAt());
         assertEquals(NOW.plusNanos(5_000), state.updatedAt());
@@ -64,12 +96,13 @@ class OperationStateTest {
     void requiresFailureDetailsAndKeepsTerminalPayloadsConsistent() {
         OperationState running = OperationState.pending(OPERATION_ID, TENANT_ID, "request-1", "a".repeat(64), NOW, null)
                 .transition(OperationState.Status.RUNNING, 10, NOW.plusSeconds(1));
-        OperationState failed = running.transition(OperationState.Status.FAILED, 10, null,
-                "{\"code\":\"IMPORT_FAILED\"}", NOW.plusSeconds(2));
+        OperationState failed = running.transition(
+                OperationState.Status.FAILED, 10, null, "{\"code\":\"IMPORT_FAILED\"}", NOW.plusSeconds(2));
 
         assertEquals("{\"code\":\"IMPORT_FAILED\"}", failed.error());
-        assertThrows(IllegalArgumentException.class, () -> running.transition(
-                OperationState.Status.FAILED, 10, null, null, NOW.plusSeconds(2)));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> running.transition(OperationState.Status.FAILED, 10, null, null, NOW.plusSeconds(2)));
     }
 
     @Test
@@ -79,7 +112,8 @@ class OperationStateTest {
         OperationState running = pending.transition(OperationState.Status.RUNNING, 10, NOW.plusSeconds(1));
 
         assertEquals(requestHash, running.requestHash());
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(
+                IllegalArgumentException.class,
                 () -> OperationState.pending(OPERATION_ID, TENANT_ID, "request-1", "not-a-digest", NOW, null));
     }
 }

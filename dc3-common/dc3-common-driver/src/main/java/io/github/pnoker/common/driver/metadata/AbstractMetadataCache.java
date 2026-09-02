@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.metadata;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
@@ -23,15 +22,13 @@ import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.exception.ServiceException;
-import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
-
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 /**
  * Shared scaffolding for the driver-side metadata caches ({@link DeviceMetadata},
@@ -74,27 +71,25 @@ public abstract class AbstractMetadataCache<V> {
      * @param name       short label used in log lines to distinguish this cache
      * @param loader     source-of-truth function invoked on cache miss for a given key
      */
-    protected AbstractMetadataCache(DriverProperties.MetadataProperties.CacheProperties cacheProps,
-                                    String name,
-                                    Function<Long, Mono<V>> loader) {
+    protected AbstractMetadataCache(
+            DriverProperties.MetadataProperties.CacheProperties cacheProps,
+            String name,
+            Function<Long, Mono<V>> loader) {
         this.name = name;
         this.loadTimeoutSeconds = cacheProps.getLoadTimeoutSeconds();
 
-        RemovalListener<Long, V> removalListener = (key, value, cause) ->
-                log.debug("Evict {} cache, id={}, cause={}", name, key, cause);
+        RemovalListener<Long, V> removalListener =
+                (key, value, cause) -> log.debug("Evict {} cache, id={}, cause={}", name, key, cause);
 
-        Caffeine<Long, V> builder = Caffeine.newBuilder()
-                .maximumSize(cacheProps.getMaxSize())
-                .<Long, V>removalListener(removalListener);
+        Caffeine<Long, V> builder =
+                Caffeine.newBuilder().maximumSize(cacheProps.getMaxSize()).<Long, V>removalListener(removalListener);
         if (cacheProps.isRecordStats()) {
             builder.recordStats();
         }
 
         this.cache = builder.buildAsync((id, executor) -> {
             log.debug("Load {} metadata, id={}", name, id);
-            return loader.apply(id)
-                    .doOnSuccess(value -> postLoad(id, value))
-                    .toFuture();
+            return loader.apply(id).doOnSuccess(value -> postLoad(id, value)).toFuture();
         });
     }
 
@@ -154,7 +149,8 @@ public abstract class AbstractMetadataCache<V> {
     public Mono<V> refreshCache(long id) {
         return Mono.defer(() -> Mono.fromFuture(cache.synchronous().refresh(id)))
                 .timeout(Duration.ofSeconds(loadTimeoutSeconds))
-                .onErrorMap(error -> !(error instanceof ServiceException),
+                .onErrorMap(
+                        error -> !(error instanceof ServiceException),
                         error -> new ServiceException("Failed to refresh {} cache, id={}", name, id, error));
     }
 
@@ -179,5 +175,4 @@ public abstract class AbstractMetadataCache<V> {
     public CacheStats stats() {
         return cache.synchronous().stats();
     }
-
 }

@@ -5,6 +5,14 @@
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.agentic.entity.builder;
 
@@ -12,17 +20,19 @@ import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.vo.MessageVO;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-
 /** Maps reactive message projections to API resources. */
-@Mapper(componentModel = "spring", implementationName = "AgenticMessageBuilderImpl", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        implementationName = "AgenticMessageBuilderImpl",
+        uses = {MapStructUtil.class})
 public interface MessageBuilder {
 
     @Mapping(target = "content", ignore = true)
@@ -33,8 +43,8 @@ public interface MessageBuilder {
 
     @AfterMapping
     default void afterProcess(MessageBO entityBO, @MappingTarget MessageVO entityVO) {
-        AgenticMessageContent content = Objects.nonNull(entityBO.getContent())
-                ? entityBO.getContent() : AgenticMessageContent.ofText("");
+        AgenticMessageContent content =
+                Objects.nonNull(entityBO.getContent()) ? entityBO.getContent() : AgenticMessageContent.ofText("");
         entityVO.setContent(StringUtils.defaultString(content.getText()));
         entityVO.setContentExt(content);
     }

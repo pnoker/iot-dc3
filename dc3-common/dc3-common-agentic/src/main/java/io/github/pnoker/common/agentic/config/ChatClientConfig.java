@@ -56,7 +56,7 @@ public class ChatClientConfig {
 
     public static final String TOOL_SYSTEM_PROMPT = """
             Platform data access and platform actions are available through native tool calls attached to this request.
-            
+
             - Tenant and user context lookup.
             - Device, driver, profile, and point metadata lookup.
             - Point-value read, history, read-command, and pending write action preparation.
@@ -92,11 +92,16 @@ public class ChatClientConfig {
      * @return agentic tool callback provider result
      */
     @Bean
-    public ToolCallbackProvider agenticToolCallbackProvider(TenantTool tenantTool, UserTool userTool,
-                                                            DeviceTool deviceTool, DriverTool driverTool,
-                                                            ProfileTool profileTool, PointTool pointTool,
-                                                            PointValueTool pointValueTool, SystemTool systemTool,
-                                                            ObjectMapper objectMapper) {
+    public ToolCallbackProvider agenticToolCallbackProvider(
+            TenantTool tenantTool,
+            UserTool userTool,
+            DeviceTool deviceTool,
+            DriverTool driverTool,
+            ProfileTool profileTool,
+            PointTool pointTool,
+            PointValueTool pointValueTool,
+            SystemTool systemTool,
+            ObjectMapper objectMapper) {
         ToolCallbackProvider provider = MethodToolCallbackProvider.builder()
                 .toolObjects(tenantTool, userTool, systemTool)
                 .build();
@@ -113,5 +118,4 @@ public class ChatClientConfig {
     public ChatClient.Builder agenticChatClientBuilder(@Qualifier("openAiChatModel") ChatModel chatModel) {
         return ChatClient.builder(chatModel);
     }
-
 }

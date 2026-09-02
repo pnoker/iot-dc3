@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.netty.tcp;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -29,14 +28,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Netty-based TCP server for handling device connections and data exchange.
@@ -62,6 +60,7 @@ public class NettyTcpServer {
      * </p>
      */
     private static final Map<Long, Channel> DEVICE_CHANNEL_MAP = new ConcurrentHashMap<>(16);
+
     private final NettyTcpServerHandler nettyTcpServerHandler;
 
     /**
@@ -110,13 +109,15 @@ public class NettyTcpServer {
         EventLoopGroup group = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
-            bootstrap.group(group)
+            bootstrap
+                    .group(group)
                     .channel(NioServerSocketChannel.class)
                     .localAddress(new InetSocketAddress(port))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
-                            socketChannel.pipeline()
+                            socketChannel
+                                    .pipeline()
                                     .addLast(new StringEncoder())
                                     .addLast(new ByteArrayEncoder())
                                     .addLast(new WriteTimeoutHandler(30), nettyTcpServerHandler);
@@ -130,5 +131,4 @@ public class NettyTcpServer {
             log.info("Driver listener stopped, protocol={}, port={}", PROTOCOL, port);
         }
     }
-
 }

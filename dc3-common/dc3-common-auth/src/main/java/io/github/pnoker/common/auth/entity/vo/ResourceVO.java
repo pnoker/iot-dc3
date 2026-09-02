@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -54,35 +53,53 @@ public class ResourceVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "ID of the parent resource in the hierarchy. Null for top-level resources.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Resource parent id can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "ID of the parent resource in the hierarchy. Null for top-level resources.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Resource parent id can't be empty",
+            groups = {Add.class, Update.class})
     private String parentResourceId;
 
     /**
      * Name
      */
-    @NotBlank(message = "Role name can't be empty", groups = {Add.class, Auth.class})
-    @Schema(description = "Resource display name shown in the permission tree.", example = "Device List API", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid role name",
+    @NotBlank(
+            message = "Role name can't be empty",
+            groups = {Add.class, Auth.class})
+    @Schema(
+            description = "Resource display name shown in the permission tree.",
+            example = "Device List API",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
+            message = "Invalid role name",
             groups = {Add.class, Update.class})
     private String resourceName;
 
     /**
      * Code
      */
-    @Schema(description = "Resource permission code used for access control matching (e.g. device:list).", example = "device:list")
+    @Schema(
+            description = "Resource permission code used for access control matching (e.g. device:list).",
+            example = "device:list")
     private String resourceCode;
 
     /**
      * Service name.
      */
-    @Schema(description = "Microservice name that exposes this resource (e.g. dc3-center-manager).", example = "dc3-center-manager")
+    @Schema(
+            description = "Microservice name that exposes this resource (e.g. dc3-center-manager).",
+            example = "dc3-center-manager")
     private String serviceName;
 
     /**
      * Type
      */
-    @Schema(description = "Classification of the resource (driver, profile, point, device, data, menu, or API).", example = "API")
+    @Schema(
+            description = "Classification of the resource (driver, profile, point, device, data, menu, or API).",
+            example = "API")
     private ResourceTypeEnum resourceTypeFlag;
 
     /**
@@ -101,8 +118,13 @@ public class ResourceVO extends BaseVO {
     /**
      * Entity ID
      */
-    @Schema(description = "ID of the entity (API or menu) this resource secures.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "ID of the entity (API or menu) this resource secures.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Entity ID can't be empty",
+            groups = {Add.class, Update.class})
     private String entityId;
 
     /**
@@ -116,5 +138,4 @@ public class ResourceVO extends BaseVO {
      */
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

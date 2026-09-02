@@ -2,9 +2,17 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.agentic.service.impl;
 
@@ -18,15 +26,13 @@ import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Objects;
 
 /** Reactive model provider application service. */
 @Service
@@ -57,7 +63,8 @@ public class ModelProviderServiceImpl implements ModelProviderService {
                 return Mono.error(new RequestException("Provider ID is required"));
             }
             validate(entityBO);
-            return modelProviderStore.get(entityBO.getId(), header)
+            return modelProviderStore
+                    .get(entityBO.getId(), header)
                     .switchIfEmpty(Mono.error(new NotFoundException("Provider does not exist")))
                     .map(existing -> normalize(entityBO, existing, header))
                     .flatMap(value -> modelProviderStore.update(value, header))
@@ -68,12 +75,11 @@ public class ModelProviderServiceImpl implements ModelProviderService {
 
     @Override
     public Mono<Void> delete(Long id, RequestHeader.PrincipalHeader header) {
-        return modelProviderStore.delete(id, header)
-                .flatMap(deleted -> {
-                    if (!deleted) return Mono.error(new NotFoundException("Provider does not exist"));
-                    chatClientFactory.evict(id);
-                    return Mono.<Void>empty();
-                });
+        return modelProviderStore.delete(id, header).flatMap(deleted -> {
+            if (!deleted) return Mono.error(new NotFoundException("Provider does not exist"));
+            chatClientFactory.evict(id);
+            return Mono.<Void>empty();
+        });
     }
 
     private void validate(ModelProviderBO entityBO) {
@@ -85,16 +91,20 @@ public class ModelProviderServiceImpl implements ModelProviderService {
         }
     }
 
-    private ModelProviderBO normalize(ModelProviderBO source, ModelProviderBO existing,
-                                      RequestHeader.PrincipalHeader header) {
+    private ModelProviderBO normalize(
+            ModelProviderBO source, ModelProviderBO existing, RequestHeader.PrincipalHeader header) {
         ModelProviderBO value = new ModelProviderBO();
         value.setId(source.getId());
         value.setName(source.getName().trim());
-        value.setProviderType(source.getProviderType() == null ? AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE
-                : source.getProviderType());
+        value.setProviderType(
+                source.getProviderType() == null
+                        ? AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE
+                        : source.getProviderType());
         value.setBaseUrl(source.getBaseUrl().trim());
-        value.setApiKey(StringUtils.isBlank(source.getApiKey()) && existing != null ? existing.getApiKey()
-                : StringUtils.defaultString(source.getApiKey()));
+        value.setApiKey(
+                StringUtils.isBlank(source.getApiKey()) && existing != null
+                        ? existing.getApiKey()
+                        : StringUtils.defaultString(source.getApiKey()));
         value.setDefaultFlag(source.getDefaultFlag() == null ? DefaultFlagEnum.NOT_DEFAULT : source.getDefaultFlag());
         value.setEnableFlag(source.getEnableFlag() == null ? EnableFlagEnum.ENABLE : source.getEnableFlag());
         value.setRemark(StringUtils.defaultString(source.getRemark()));

@@ -14,22 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
-
-import io.github.pnoker.common.data.entity.bo.RuleBO;
-import io.github.pnoker.common.data.repository.ReactiveRuleStore;
-import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
-import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +22,18 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import io.github.pnoker.common.data.entity.bo.RuleBO;
+import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
+import io.github.pnoker.common.data.repository.ReactiveRuleStore;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import java.time.LocalDateTime;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class RuleRegistryTest {
@@ -64,7 +61,8 @@ class RuleRegistryTest {
 
     @Test
     void cachesAcrossRepeatedLookups() {
-        when(ruleStore.listEnabledCandidates(anyLong(), any(), anyLong())).thenReturn(reactor.core.publisher.Flux.just(rule(1L)));
+        when(ruleStore.listEnabledCandidates(anyLong(), any(), anyLong()))
+                .thenReturn(reactor.core.publisher.Flux.just(rule(1L)));
 
         // Same fact twice → only one DB lookup; the second call is a cache hit.
         registry.findCandidates(fact(7L, 11L)).block();
@@ -75,7 +73,8 @@ class RuleRegistryTest {
 
     @Test
     void distinctEntitiesGetSeparateCacheEntries() {
-        when(ruleStore.listEnabledCandidates(anyLong(), any(), anyLong())).thenReturn(reactor.core.publisher.Flux.just(rule(1L)));
+        when(ruleStore.listEnabledCandidates(anyLong(), any(), anyLong()))
+                .thenReturn(reactor.core.publisher.Flux.just(rule(1L)));
 
         registry.findCandidates(fact(7L, 11L)).block();
         registry.findCandidates(fact(7L, 12L)).block();
@@ -118,9 +117,10 @@ class RuleRegistryTest {
         // not trip the underlying lookup either — the engine guards against
         // bad input upstream.
         assertThat(registry.findCandidates(null).block()).isEmpty();
-        assertThat(registry.findCandidates(new RuleFact(null, AlarmTargetTypeEnum.POINT, 11L,
-                null, LocalDateTime.now(), Map.of())).block()).isEmpty();
+        assertThat(registry.findCandidates(
+                                new RuleFact(null, AlarmTargetTypeEnum.POINT, 11L, null, LocalDateTime.now(), Map.of()))
+                        .block())
+                .isEmpty();
         verify(ruleStore, times(0)).listEnabledCandidates(anyLong(), any(), anyLong());
     }
-
 }

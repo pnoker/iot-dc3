@@ -18,11 +18,8 @@ package io.github.pnoker.common.agentic.service;
 
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.entity.common.RequestHeader;
-
-import reactor.core.publisher.Mono;
-
 import java.util.List;
-
+import reactor.core.publisher.Mono;
 
 /**
  * Service for managing LLM model provider registrations.
@@ -65,5 +62,4 @@ public interface ModelProviderService {
      * @param header authenticated caller principal and tenant
      */
     Mono<Void> delete(Long id, RequestHeader.PrincipalHeader header);
-
 }

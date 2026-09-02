@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.grpc.client.config;
 
 import io.github.pnoker.api.common.driver.DeviceApiGrpc;
@@ -49,5 +48,4 @@ public class DriverClientStubConfig {
     public PointApiGrpc.PointApiStub pointApiStub(GrpcChannelFactory channels) {
         return PointApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.security;
 
 import org.junit.jupiter.api.Test;
@@ -30,7 +29,8 @@ class PermissionMethodsTest {
     void canUsesWildcardFromReactiveSecurityContext() {
         TestingAuthenticationToken auth = authenticated(PermissionMethods.WILDCARD);
 
-        StepVerifier.create(permissionMethods.can("menu", "list")
+        StepVerifier.create(permissionMethods
+                        .can("menu", "list")
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth)))
                 .expectNext(true)
                 .verifyComplete();
@@ -40,7 +40,8 @@ class PermissionMethodsTest {
     void canMatchesServiceScopedPermission() {
         TestingAuthenticationToken auth = authenticated("dc3-center-auth:menu:list");
 
-        StepVerifier.create(permissionMethods.can("menu", "list")
+        StepVerifier.create(permissionMethods
+                        .can("menu", "list")
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth)))
                 .expectNext(true)
                 .verifyComplete();
@@ -50,7 +51,8 @@ class PermissionMethodsTest {
     void canRejectsMissingPermission() {
         TestingAuthenticationToken auth = authenticated("dc3-center-auth:menu:get");
 
-        StepVerifier.create(permissionMethods.can("menu", "list")
+        StepVerifier.create(permissionMethods
+                        .can("menu", "list")
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth)))
                 .expectNext(false)
                 .verifyComplete();
@@ -67,7 +69,8 @@ class PermissionMethodsTest {
     void anyMatchesOneServiceScopedPermission() {
         TestingAuthenticationToken auth = authenticated("dc3-center-auth:menu:list");
 
-        StepVerifier.create(permissionMethods.any("menu:get", "menu:list")
+        StepVerifier.create(permissionMethods
+                        .any("menu:get", "menu:list")
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth)))
                 .expectNext(true)
                 .verifyComplete();

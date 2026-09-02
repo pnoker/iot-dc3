@@ -14,12 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.bo;
 
 /**
  * Lease response returned to a driver runtime instance.
  */
-public record DriverLeaseGrantBO(long leaseUntilEpochMillis,
-                                 long assignmentVersion, boolean assignmentsChanged) {
-}
+public record DriverLeaseGrantBO(long leaseUntilEpochMillis, long assignmentVersion, boolean assignmentsChanged) {}

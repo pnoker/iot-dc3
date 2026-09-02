@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -43,7 +42,9 @@ public class ResourceExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content, distinguished by the type and version fields inherited from the base extension")
+    @Schema(
+            description =
+                    "Extended content, distinguished by the type and version fields inherited from the base extension")
     private Content content;
 
     /**
@@ -56,9 +57,10 @@ public class ResourceExt extends BaseExt {
     @Schema(description = "Resource extension content payload")
     public static class Content {
 
-        @Schema(description = "Placeholder reserved for future resource extension content; ignored by current parsing logic", example = "")
+        @Schema(
+                description =
+                        "Placeholder reserved for future resource extension content; ignored by current parsing logic",
+                example = "")
         private String keep;
-
     }
-
 }

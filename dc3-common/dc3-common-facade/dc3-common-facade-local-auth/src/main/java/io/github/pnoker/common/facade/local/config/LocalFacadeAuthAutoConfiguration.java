@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.config;
 
 import io.github.pnoker.common.facade.local.builder.FacadeLocalCredentialBuilder;
@@ -38,17 +37,24 @@ import org.springframework.context.annotation.FilterType;
  */
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.auth.mode", havingValue = "local")
-@ComponentScan(basePackages = "io.github.pnoker.common.facade.local", useDefaultFilters = false,
-        includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                classes = {
-                        io.github.pnoker.common.facade.local.TenantLocalFacade.class,
-                        io.github.pnoker.common.facade.local.TokenLocalFacade.class,
-                        io.github.pnoker.common.facade.local.UserLocalFacade.class,
-                        io.github.pnoker.common.facade.local.LocalCredentialLocalFacade.class,
-                        io.github.pnoker.common.facade.local.ResourceRegistryLocalFacade.class,
-                        io.github.pnoker.common.facade.local.PermissionLocalFacade.class,
-                        io.github.pnoker.common.facade.local.McpRuntimeLocalFacade.class,
-                        FacadeTenantBuilder.class, FacadeUserBuilder.class, FacadeLocalCredentialBuilder.class,}))
+@ComponentScan(
+        basePackages = "io.github.pnoker.common.facade.local",
+        useDefaultFilters = false,
+        includeFilters =
+                @ComponentScan.Filter(
+                        type = FilterType.ASSIGNABLE_TYPE,
+                        classes = {
+                            io.github.pnoker.common.facade.local.TenantLocalFacade.class,
+                            io.github.pnoker.common.facade.local.TokenLocalFacade.class,
+                            io.github.pnoker.common.facade.local.UserLocalFacade.class,
+                            io.github.pnoker.common.facade.local.LocalCredentialLocalFacade.class,
+                            io.github.pnoker.common.facade.local.ResourceRegistryLocalFacade.class,
+                            io.github.pnoker.common.facade.local.PermissionLocalFacade.class,
+                            io.github.pnoker.common.facade.local.McpRuntimeLocalFacade.class,
+                            FacadeTenantBuilder.class,
+                            FacadeUserBuilder.class,
+                            FacadeLocalCredentialBuilder.class,
+                        }))
 public class LocalFacadeAuthAutoConfiguration {
 
     /**
@@ -56,5 +62,4 @@ public class LocalFacadeAuthAutoConfiguration {
      */
     @SuppressWarnings("unused")
     private static final Class<?> CANARY = io.github.pnoker.common.facade.local.TenantLocalFacade.class;
-
 }

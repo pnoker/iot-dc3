@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.tck;
 
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.config.BatchConsumerProperties;
 import io.github.pnoker.common.mq.pulsar.PulsarMqAdapter;
+import java.util.Objects;
 import org.apache.pulsar.client.api.PulsarClient;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
-
-import java.util.Objects;
 
 /**
  * Pulsar harness for the broker-neutral contract suite. By default a disposable
@@ -44,11 +42,11 @@ class PulsarContractIT extends AbstractMqContractTest {
     // "Namespace not found" — so readiness waits on the admin API instead.
     private static final org.testcontainers.containers.GenericContainer<?> PULSAR =
             new org.testcontainers.containers.GenericContainer<>(
-                    org.testcontainers.utility.DockerImageName.parse("apachepulsar/pulsar:4.1.3"))
+                            org.testcontainers.utility.DockerImageName.parse("apachepulsar/pulsar:4.1.3"))
                     .withCommand("bin/pulsar", "standalone", "-nfw")
                     .withExposedPorts(6650, 8080)
-                    .waitingFor(org.testcontainers.containers.wait.strategy.Wait
-                            .forHttp("/admin/v2/namespaces/public/default")
+                    .waitingFor(org.testcontainers.containers.wait.strategy.Wait.forHttp(
+                                    "/admin/v2/namespaces/public/default")
                             .forPort(8080)
                             .withStartupTimeout(java.time.Duration.ofMinutes(5)));
     private PulsarMqAdapter pulsarAdapter;
@@ -97,7 +95,7 @@ class PulsarContractIT extends AbstractMqContractTest {
     @Override
     public void perInstanceSubscriptionExpiresAfterInstanceStops() {
         adapter();
-        Assumptions.assumeTrue(pulsarAdapter.capabilities().subscriptionExpiry(),
-                "pulsar declares subscriptionExpiry=false");
+        Assumptions.assumeTrue(
+                pulsarAdapter.capabilities().subscriptionExpiry(), "pulsar declares subscriptionExpiry=false");
     }
 }

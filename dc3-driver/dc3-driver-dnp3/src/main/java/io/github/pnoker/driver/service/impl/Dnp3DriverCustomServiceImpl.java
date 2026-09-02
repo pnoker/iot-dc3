@@ -34,14 +34,6 @@ import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
 import io.stepfunc.dnp3.*;
 import io.stepfunc.dnp3.Runtime;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.joou.UByte;
-import org.joou.ULong;
-import org.joou.UShort;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +42,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.joou.UByte;
+import org.joou.ULong;
+import org.joou.UShort;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * Custom driver service implementation for the DNP3 (IEEE 1815) master driver.
@@ -77,18 +76,21 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
     private Map<Long, Dnp3Connection> connectionMap;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -122,55 +124,65 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)
                 && (MetadataOperateTypeEnum.DELETE.equals(operateType)
-                || MetadataOperateTypeEnum.UPDATE.equals(operateType))) {
+                        || MetadataOperateTypeEnum.UPDATE.equals(operateType))) {
             Dnp3Connection removed = connectionMap.remove(metadataEvent.getId());
             if (Objects.nonNull(removed)) {
                 removed.close();
-                log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                        driverCode, metadataEvent.getId(), operateType);
+                log.info(
+                        "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                        driverCode,
+                        metadataEvent.getId(),
+                        operateType);
             }
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         Dnp3Connection connection = getConnection(device.getId(), driverConfig);
         int pointIndex = getRequiredIntConfig(pointConfig, "pointIndex");
         String pointType = getConfigValue(pointConfig, "pointType", POINT_TYPE_BINARY_INPUT);
         try {
             CountDownLatch latch = new CountDownLatch(1);
             CacheReadHandler handler = new CacheReadHandler(connection.cache(), latch);
-            connection.channel().readWithHandler(connection.associationId(),
-                            Request.classRequest(true, true, true, true), handler)
+            connection
+                    .channel()
+                    .readWithHandler(connection.associationId(), Request.classRequest(true, true, true, true), handler)
                     .exceptionally(ex -> {
-                        log.warn("DNP3 poll failed, protocol={}, deviceId={}",
-                                driverCode, device.getId(), ex);
+                        log.warn("DNP3 poll failed, protocol={}, deviceId={}", driverCode, device.getId(), ex);
                         return null;
                     });
             if (!latch.await(POLL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
-                throw new ReadPointException("DNP3 poll timed out, protocol={}, deviceId={}",
-                        driverCode, device.getId());
+                throw new ReadPointException(
+                        "DNP3 poll timed out, protocol={}, deviceId={}", driverCode, device.getId());
             }
-            String value = connection.cache()
-                    .getOrDefault(pointType, Map.of())
-                    .get(pointIndex);
+            String value = connection.cache().getOrDefault(pointType, Map.of()).get(pointIndex);
             if (Objects.isNull(value)) {
-                throw new ReadPointException("DNP3 point not found, protocol={}, pointType={}, pointIndex={}",
-                        driverCode, pointType, pointIndex);
+                throw new ReadPointException(
+                        "DNP3 point not found, protocol={}, pointType={}, pointIndex={}",
+                        driverCode,
+                        pointType,
+                        pointIndex);
             }
             return new ReadPointValue(device, point, value);
         } catch (ReadPointException e) {
             throw e;
         } catch (Exception e) {
-            throw new ReadPointException("DNP3 read failed, protocol={}, message={}",
-                    driverCode, e.getMessage(), e);
+            throw new ReadPointException("DNP3 read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
         }
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         Dnp3Connection connection = getConnection(device.getId(), driverConfig);
         int pointIndex = getRequiredIntConfig(pointConfig, "pointIndex");
         String pointType = getConfigValue(pointConfig, "pointType", POINT_TYPE_BINARY_INPUT);
@@ -179,15 +191,17 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
             CommandSet commandSet = new CommandSet();
             if (POINT_TYPE_BINARY_OUTPUT.equals(pointType)) {
                 boolean on = Boolean.parseBoolean(rawValue);
-                commandSet.addG12V1U8(UByte.valueOf(pointIndex),
+                commandSet.addG12V1U8(
+                        UByte.valueOf(pointIndex),
                         Group12Var1.fromCode(ControlCode.fromOpType(on ? OpType.LATCH_ON : OpType.LATCH_OFF)));
             } else if (POINT_TYPE_ANALOG_OUTPUT.equals(pointType)) {
                 commandSet.addG41V1U16(UShort.valueOf(pointIndex), Integer.parseInt(rawValue));
             } else {
-                throw new WritePointException("DNP3 write unsupported point type, protocol={}, pointType={}",
-                        driverCode, pointType);
+                throw new WritePointException(
+                        "DNP3 write unsupported point type, protocol={}, pointType={}", driverCode, pointType);
             }
-            connection.channel()
+            connection
+                    .channel()
                     .operate(connection.associationId(), CommandMode.DIRECT_OPERATE, commandSet)
                     .toCompletableFuture()
                     .get(POLL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
@@ -195,8 +209,7 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
         } catch (WritePointException e) {
             throw e;
         } catch (Exception e) {
-            throw new WritePointException("DNP3 write failed, protocol={}, message={}",
-                    driverCode, e.getMessage(), e);
+            throw new WritePointException("DNP3 write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
         }
     }
 
@@ -215,26 +228,33 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
             EndpointList endpoints = new EndpointList(host + ":" + port);
             ConnectStrategy connectStrategy = new ConnectStrategy();
             AtomicReference<ClientState> state = new AtomicReference<>(ClientState.DISABLED);
-            MasterChannel channel = MasterChannel.createTcpChannel(runtime, LinkErrorMode.CLOSE, channelConfig,
-                    endpoints, connectStrategy, new ClientStateListener() {
+            MasterChannel channel = MasterChannel.createTcpChannel(
+                    runtime, LinkErrorMode.CLOSE, channelConfig, endpoints, connectStrategy, new ClientStateListener() {
                         @Override
                         public void onChange(ClientState clientState) {
                             state.set(clientState);
-                            log.debug("DNP3 client state changed, protocol={}, deviceId={}, state={}",
-                                    driverCode, deviceId, clientState);
+                            log.debug(
+                                    "DNP3 client state changed, protocol={}, deviceId={}, state={}",
+                                    driverCode,
+                                    deviceId,
+                                    clientState);
                         }
                     });
             Map<String, Map<Integer, String>> cache = new ConcurrentHashMap<>();
-            AssociationConfig associationConfig = new AssociationConfig(
-                    EventClasses.all(), EventClasses.none(), Classes.all(), EventClasses.none());
+            AssociationConfig associationConfig =
+                    new AssociationConfig(EventClasses.all(), EventClasses.none(), Classes.all(), EventClasses.none());
             AssociationId associationId = channel.addAssociation(
                     UShort.valueOf(outstationAddress),
                     associationConfig,
                     new CacheReadHandler(cache, null),
                     new CurrentTimeAssociationHandler(),
                     new NoopAssociationInformation());
-            log.info("Driver connection established, protocol={}, deviceId={}, host={}:{}",
-                    driverCode, deviceId, host, port);
+            log.info(
+                    "Driver connection established, protocol={}, deviceId={}, host={}:{}",
+                    driverCode,
+                    deviceId,
+                    host,
+                    port);
             return new Dnp3Connection(runtime, channel, associationId, cache, state);
         } catch (Exception e) {
             throw new ConnectorException("Failed to create DNP3 channel: {}:{}", host, port, e);
@@ -243,7 +263,9 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
 
     private String getRequiredConfig(Map<String, AttributeBO> config, String code) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             throw new ConnectorException("Required attribute '{}' is missing", code);
         }
         return attr.getValue(String.class);
@@ -259,7 +281,9 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -279,7 +303,8 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "host", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -288,7 +313,8 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "pointIndex", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     /**
@@ -302,8 +328,12 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
         private final Map<String, Map<Integer, String>> cache;
         private final AtomicReference<ClientState> state;
 
-        Dnp3Connection(Runtime runtime, MasterChannel channel, AssociationId associationId,
-                       Map<String, Map<Integer, String>> cache, AtomicReference<ClientState> state) {
+        Dnp3Connection(
+                Runtime runtime,
+                MasterChannel channel,
+                AssociationId associationId,
+                Map<String, Map<Integer, String>> cache,
+                AtomicReference<ClientState> state) {
             this.runtime = runtime;
             this.channel = channel;
             this.associationId = associationId;

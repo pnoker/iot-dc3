@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.bo.dashboard;
 
 import lombok.Getter;
@@ -40,5 +39,4 @@ public class TopologyDeviceRow {
     private long driverId;
 
     private long profileCount;
-
 }

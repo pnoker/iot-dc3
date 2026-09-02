@@ -14,8 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.receiver.rabbit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.command.CommandDedupCache;
 import io.github.pnoker.common.driver.command.DeviceLockManager;
@@ -32,8 +40,13 @@ import io.github.pnoker.common.entity.dto.CommandCallResultDTO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
-import org.junit.jupiter.api.BeforeEach;
+import java.time.Instant;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -42,21 +55,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.time.Instant;
-import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CommandReceiverTest {
@@ -87,8 +85,15 @@ class CommandReceiverTest {
         DriverProperties properties = new DriverProperties();
         properties.setNode("node-a");
         commandExecutor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
-        receiver = new CommandReceiver(driverCustomService, driverSenderService, deviceMetadata,
-                dedupCache, new DeviceLockManager(), driverMetadata, properties, commandExecutor);
+        receiver = new CommandReceiver(
+                driverCustomService,
+                driverSenderService,
+                deviceMetadata,
+                dedupCache,
+                new DeviceLockManager(),
+                driverMetadata,
+                properties,
+                commandExecutor);
         lenient().when(driverMetadata.getFencingToken(10L)).thenReturn(77L);
         lenient().when(driverSenderService.commandResultSender(any())).thenReturn(Mono.empty());
     }
@@ -105,8 +110,10 @@ class CommandReceiverTest {
         CommandRuntimeBO command = commandRuntime();
         device.setCommandRuntimeIdMap(Map.of(20L, command));
         when(deviceMetadata.getCache(10L)).thenReturn(device);
-        Map<String, AttributeBO> driverConfig = Map.of("host", AttributeBO.builder().value("127.0.0.1").build());
-        Map<String, AttributeBO> commandConfig = Map.of("address", AttributeBO.builder().value("A1").build());
+        Map<String, AttributeBO> driverConfig =
+                Map.of("host", AttributeBO.builder().value("127.0.0.1").build());
+        Map<String, AttributeBO> commandConfig =
+                Map.of("address", AttributeBO.builder().value("A1").build());
         when(deviceMetadata.getDriverConfig(10L)).thenReturn(driverConfig);
         when(deviceMetadata.getCommandConfig(10L, 20L)).thenReturn(commandConfig);
         when(driverCustomService.execute(eq(driverConfig), eq(commandConfig), eq(device), eq(command), any()))
@@ -253,7 +260,6 @@ class CommandReceiverTest {
     }
 
     private CommandRuntimeBO commandRuntime() {
-        return new CommandRuntimeBO(20L, "Setpoint", "setpoint", null, null,
-                5, null, null, 1);
+        return new CommandRuntimeBO(20L, "Setpoint", "setpoint", null, null, 5, null, null, 1);
     }
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.service;
 
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
@@ -31,9 +30,12 @@ import reactor.core.publisher.Mono;
 public interface NotifyService {
 
     Mono<NotifyBO> add(NotifyBO value);
-    Mono<Boolean> delete(Long tenantId, Long id);
-    Mono<NotifyBO> update(NotifyBO value);
-    Mono<NotifyBO> getById(Long tenantId, Long id);
-    Mono<OffsetPage<NotifyBO>> list(Long tenantId, NotifyQuery query);
 
+    Mono<Boolean> delete(Long tenantId, Long id);
+
+    Mono<NotifyBO> update(NotifyBO value);
+
+    Mono<NotifyBO> getById(Long tenantId, Long id);
+
+    Mono<OffsetPage<NotifyBO>> list(Long tenantId, NotifyQuery query);
 }

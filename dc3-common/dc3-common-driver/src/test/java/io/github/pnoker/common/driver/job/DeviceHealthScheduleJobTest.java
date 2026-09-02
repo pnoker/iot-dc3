@@ -14,8 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.job;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -27,24 +35,14 @@ import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.JobExecutionContext;
-
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DeviceHealthScheduleJobTest {
@@ -78,8 +76,8 @@ class DeviceHealthScheduleJobTest {
         driverProperties.getHealth().getDevice().setTimeout(60);
         driverProperties.getHealth().getDevice().setTimeoutUnit(TimeUnit.SECONDS);
         driverMetadata = new DriverMetadata();
-        job = new DeviceHealthScheduleJob(driverProperties, driverMetadata, deviceMetadata, driverCustomService,
-                driverSenderService);
+        job = new DeviceHealthScheduleJob(
+                driverProperties, driverMetadata, deviceMetadata, driverCustomService, driverSenderService);
     }
 
     @Test
@@ -92,8 +90,8 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(eq(10L), eq(EntityStatusEnum.ONLINE), eq(60),
-                eq(TimeUnit.SECONDS), isNull());
+        verify(driverSenderService)
+                .deviceStatusSender(eq(10L), eq(EntityStatusEnum.ONLINE), eq(60), eq(TimeUnit.SECONDS), isNull());
     }
 
     @Test
@@ -106,8 +104,8 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(eq(11L), eq(EntityStatusEnum.OFFLINE), eq(60),
-                eq(TimeUnit.SECONDS), isNull());
+        verify(driverSenderService)
+                .deviceStatusSender(eq(11L), eq(EntityStatusEnum.OFFLINE), eq(60), eq(TimeUnit.SECONDS), isNull());
     }
 
     @Test
@@ -120,8 +118,8 @@ class DeviceHealthScheduleJobTest {
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(eq(16L), eq(EntityStatusEnum.FAULT), eq(60),
-                eq(TimeUnit.SECONDS), isNull());
+        verify(driverSenderService)
+                .deviceStatusSender(eq(16L), eq(EntityStatusEnum.FAULT), eq(60), eq(TimeUnit.SECONDS), isNull());
     }
 
     @Test
@@ -130,12 +128,14 @@ class DeviceHealthScheduleJobTest {
         installDeviceLease(12L);
         when(deviceMetadata.getCache(12L)).thenReturn(device);
         when(deviceMetadata.getDriverConfig(12L)).thenReturn(Map.of());
-        doThrow(new IllegalStateException("session down")).when(driverCustomService).health(Map.of(), device);
+        doThrow(new IllegalStateException("session down"))
+                .when(driverCustomService)
+                .health(Map.of(), device);
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(eq(12L), eq(EntityStatusEnum.OFFLINE), eq(60),
-                eq(TimeUnit.SECONDS), isNull());
+        verify(driverSenderService)
+                .deviceStatusSender(eq(12L), eq(EntityStatusEnum.OFFLINE), eq(60), eq(TimeUnit.SECONDS), isNull());
     }
 
     @Test
@@ -144,13 +144,12 @@ class DeviceHealthScheduleJobTest {
         installDeviceLease(15L);
         when(deviceMetadata.getCache(15L)).thenReturn(device);
         when(deviceMetadata.getDriverConfig(15L)).thenReturn(Map.of());
-        when(driverCustomService.health(Map.of(), device))
-                .thenReturn(DeviceHealthState.online(2, TimeUnit.MINUTES));
+        when(driverCustomService.health(Map.of(), device)).thenReturn(DeviceHealthState.online(2, TimeUnit.MINUTES));
 
         job.executeInternal(jobContext);
 
-        verify(driverSenderService).deviceStatusSender(eq(15L), eq(EntityStatusEnum.ONLINE), eq(2),
-                eq(TimeUnit.MINUTES), isNull());
+        verify(driverSenderService)
+                .deviceStatusSender(eq(15L), eq(EntityStatusEnum.ONLINE), eq(2), eq(TimeUnit.MINUTES), isNull());
     }
 
     @Test
@@ -182,5 +181,4 @@ class DeviceHealthScheduleJobTest {
     private void installDeviceLease(long deviceId) {
         driverMetadata.setDeviceLeases(Map.of(deviceId, 1L), System.currentTimeMillis() + 60_000, 1L);
     }
-
 }

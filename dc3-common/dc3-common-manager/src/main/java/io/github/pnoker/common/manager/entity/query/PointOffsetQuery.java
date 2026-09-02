@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.manager.entity.query;
 
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -5,15 +21,20 @@ import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import java.util.List;
 import java.util.Set;
 
 /** Canonical offset-based point query. Tenant scope is always supplied by the request context. */
 public record PointOffsetQuery(
-        @Schema(description = "Zero-based result offset", minimum = "0") Long offset,
-        @Schema(description = "Maximum number of items", minimum = "1", maximum = "200") Integer limit,
-        @Schema(description = "Stable sort fields and directions") List<SortSpec> sort,
+        @Schema(description = "Zero-based result offset", minimum = "0")
+        Long offset,
+
+        @Schema(description = "Maximum number of items", minimum = "1", maximum = "200")
+        Integer limit,
+
+        @Schema(description = "Stable sort fields and directions")
+        List<SortSpec> sort,
+
         @Schema(description = "Partial point name filter") String pointName,
         @Schema(description = "Exact point code filter") String pointCode,
         @Schema(description = "Point value type") PointTypeEnum pointTypeFlag,

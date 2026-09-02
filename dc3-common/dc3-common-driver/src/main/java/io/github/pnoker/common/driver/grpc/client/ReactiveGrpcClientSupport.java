@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.grpc.client;
 
 import io.github.pnoker.common.exception.ServiceException;
 import io.grpc.Status;
 import io.grpc.stub.ClientCallStreamObserver;
 import io.grpc.stub.ClientResponseObserver;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
-import reactor.core.publisher.Mono;
-
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Mono;
 
 final class ReactiveGrpcClientSupport {
 
@@ -54,8 +52,8 @@ final class ReactiveGrpcClientSupport {
                 public void onError(Throwable error) {
                     Status status = Status.fromThrowable(error);
                     String description = Objects.requireNonNullElse(status.getDescription(), error.getMessage());
-                    sink.error(new ServiceException(operation + " transport failed: [" + status.getCode() + "] "
-                            + description, error));
+                    sink.error(new ServiceException(
+                            operation + " transport failed: [" + status.getCode() + "] " + description, error));
                 }
 
                 @Override
@@ -76,42 +74,45 @@ final class ReactiveGrpcClientSupport {
     }
 
     static <Q, S> Flux<S> stream(String operation, Consumer<ClientResponseObserver<Q, S>> invocation) {
-        return Flux.create(sink -> {
-            AtomicReference<ClientCallStreamObserver<Q>> call = new AtomicReference<>();
-            ClientResponseObserver<Q, S> observer = new ClientResponseObserver<>() {
-                @Override
-                public void beforeStart(ClientCallStreamObserver<Q> requestStream) {
-                    call.set(requestStream);
-                    sink.onCancel(() -> requestStream.cancel(operation + " cancelled", null));
-                }
+        return Flux.create(
+                sink -> {
+                    AtomicReference<ClientCallStreamObserver<Q>> call = new AtomicReference<>();
+                    ClientResponseObserver<Q, S> observer = new ClientResponseObserver<>() {
+                        @Override
+                        public void beforeStart(ClientCallStreamObserver<Q> requestStream) {
+                            call.set(requestStream);
+                            sink.onCancel(() -> requestStream.cancel(operation + " cancelled", null));
+                        }
 
-                @Override
-                public void onNext(S response) {
-                    sink.next(response);
-                }
+                        @Override
+                        public void onNext(S response) {
+                            sink.next(response);
+                        }
 
-                @Override
-                public void onError(Throwable error) {
-                    Status status = Status.fromThrowable(error);
-                    String description = Objects.requireNonNullElse(status.getDescription(), error.getMessage());
-                    sink.error(new ServiceException(operation + " transport failed: [" + status.getCode() + "] "
-                            + description, error));
-                }
+                        @Override
+                        public void onError(Throwable error) {
+                            Status status = Status.fromThrowable(error);
+                            String description =
+                                    Objects.requireNonNullElse(status.getDescription(), error.getMessage());
+                            sink.error(new ServiceException(
+                                    operation + " transport failed: [" + status.getCode() + "] " + description, error));
+                        }
 
-                @Override
-                public void onCompleted() {
-                    sink.complete();
-                }
-            };
-            try {
-                invocation.accept(observer);
-            } catch (RuntimeException error) {
-                ClientCallStreamObserver<Q> requestStream = call.get();
-                if (requestStream != null) {
-                    requestStream.cancel(operation + " setup failed", error);
-                }
-                sink.error(error);
-            }
-        }, FluxSink.OverflowStrategy.BUFFER);
+                        @Override
+                        public void onCompleted() {
+                            sink.complete();
+                        }
+                    };
+                    try {
+                        invocation.accept(observer);
+                    } catch (RuntimeException error) {
+                        ClientCallStreamObserver<Q> requestStream = call.get();
+                        if (requestStream != null) {
+                            requestStream.cancel(operation + " setup failed", error);
+                        }
+                        sink.error(error);
+                    }
+                },
+                FluxSink.OverflowStrategy.BUFFER);
     }
 }

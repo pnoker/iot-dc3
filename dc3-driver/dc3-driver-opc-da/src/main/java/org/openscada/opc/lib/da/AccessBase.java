@@ -14,14 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
-
-import lombok.extern.slf4j.Slf4j;
-import org.jinterop.dcom.common.JIException;
-import org.openscada.opc.lib.common.NotConnectedException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -29,6 +22,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import lombok.extern.slf4j.Slf4j;
+import org.jinterop.dcom.common.JIException;
+import org.openscada.opc.lib.common.NotConnectedException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author pnoker
@@ -65,8 +63,9 @@ public abstract class AccessBase implements ServerConnectionStateListener {
 
     private int period = 0;
 
-    public AccessBase(final Server server, final int period) throws IllegalArgumentException, UnknownHostException,
-            NotConnectedException, JIException, DuplicateGroupException {
+    public AccessBase(final Server server, final int period)
+            throws IllegalArgumentException, UnknownHostException, NotConnectedException, JIException,
+                    DuplicateGroupException {
         super();
         this.server = server;
         this.period = period;
@@ -177,8 +176,9 @@ public abstract class AccessBase implements ServerConnectionStateListener {
         }
     }
 
-    protected synchronized void start() throws JIException, IllegalArgumentException, UnknownHostException,
-            NotConnectedException, DuplicateGroupException {
+    protected synchronized void start()
+            throws JIException, IllegalArgumentException, UnknownHostException, NotConnectedException,
+                    DuplicateGroupException {
         if (isActive()) {
             return;
         }
@@ -299,5 +299,4 @@ public abstract class AccessBase implements ServerConnectionStateListener {
         notifyStateListenersError(e);
         this.server.dispose();
     }
-
 }

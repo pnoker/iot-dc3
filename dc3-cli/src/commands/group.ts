@@ -14,7 +14,8 @@ export function registerGroupCommand(program: Command): void {
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post('/api/v3/manager/group/list', {
-        offset: Number(opts.offset), limit: Number(opts.limit),
+        offset: Number(opts.offset),
+        limit: Number(opts.limit),
       });
       printAndExit(result, format);
     });
@@ -25,9 +26,7 @@ export function registerGroupCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(
-        `/api/v3/manager/group/get_by_id?id=${id}`,
-      );
+      const result = await dc3Client.get(`/api/v3/manager/group/get_by_id?id=${id}`);
       printAndExit(result, format);
     });
 

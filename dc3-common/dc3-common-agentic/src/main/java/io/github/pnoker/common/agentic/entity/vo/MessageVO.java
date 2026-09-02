@@ -39,16 +39,23 @@ public class MessageVO extends BaseVO {
     @Schema(description = "ID of the conversation session this message belongs to.", example = "conv_xyz789")
     private String conversationId;
 
-    @Schema(description = "Role of the message sender: user (human input), assistant (AI response), or system (instruction).", example = "assistant")
+    @Schema(
+            description =
+                    "Role of the message sender: user (human input), assistant (AI response), or system (instruction).",
+            example = "assistant")
     private String role;
 
-    @Schema(description = "Plain-text message body representing the conversation turn.", example = "What is the current temperature of device 1024?")
+    @Schema(
+            description = "Plain-text message body representing the conversation turn.",
+            example = "What is the current temperature of device 1024?")
     private String content;
 
     @Schema(description = "Structured content extension including tool calls, citations, or rich media fragments.")
     private AgenticMessageContent contentExt;
 
-    @Schema(description = "Identifier of the AI model that generated this message (e.g. gpt-4o, claude-3.5-sonnet).", example = "gpt-4o")
+    @Schema(
+            description = "Identifier of the AI model that generated this message (e.g. gpt-4o, claude-3.5-sonnet).",
+            example = "gpt-4o")
     private String model;
 
     @Schema(description = "Zero-based ordinal position of this message within the conversation history.", example = "0")
@@ -56,5 +63,4 @@ public class MessageVO extends BaseVO {
 
     @Schema(description = "Generation lifecycle status: COMPLETED, FAILED, or CANCELLED.", example = "COMPLETED")
     private AgenticMessageStatusEnum status;
-
 }

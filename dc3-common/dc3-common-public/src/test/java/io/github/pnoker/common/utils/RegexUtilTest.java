@@ -14,31 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 class RegexUtilTest {
 
     @ParameterizedTest
     @CsvSource({
-            "0,        true",
-            "0.1,      true",
-            "-1.5,     true",
-            "1e10,     true",
-            "1.2.3,    false",
-            "abc,      false"
+        "0,        true",
+        "0.1,      true",
+        "-1.5,     true",
+        "1e10,     true",
+        "1.2.3,    false",
+        "abc,      false"
     })
     void isNumericMatchesBigDecimalParseability(String input, boolean expected) {
         assertThat(RegexUtil.isNumeric(input)).isEqualTo(expected);
@@ -111,14 +109,7 @@ class RegexUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "8600, true",
-            "8700, true",
-            "8799, true",
-            "8599, false",
-            "8800, false",
-            "0,    false"
-    })
+    @CsvSource({"8600, true", "8700, true", "8799, true", "8599, false", "8800, false", "0,    false"})
     void isDriverPortChecksRange(int port, boolean expected) {
         assertThat(RegexUtil.isDriverPort(port)).isEqualTo(expected);
     }

@@ -60,9 +60,7 @@ function selectStore(storeType: string): CredentialStore {
  * Try to get the password from the configured store.
  * Returns null if not available or not found.
  */
-export async function resolvePassword(
-  identifier: string,
-): Promise<string | null> {
+export async function resolvePassword(identifier: string): Promise<string | null> {
   try {
     const profile = await configManager.getActiveProfile();
     const store = selectStore(profile.credential_store);
@@ -78,10 +76,7 @@ export async function resolvePassword(
 /**
  * Save password to the configured store.
  */
-export async function savePasswordToStore(
-  identifier: string,
-  password: string,
-): Promise<void> {
+export async function savePasswordToStore(identifier: string, password: string): Promise<void> {
   const profile = await configManager.getActiveProfile();
   const store = selectStore(profile.credential_store);
   if (await store.isAvailable()) {
@@ -92,9 +87,7 @@ export async function savePasswordToStore(
 /**
  * Delete password from the configured store.
  */
-export async function deletePasswordFromStore(
-  identifier: string,
-): Promise<void> {
+export async function deletePasswordFromStore(identifier: string): Promise<void> {
   try {
     const profile = await configManager.getActiveProfile();
     const store = selectStore(profile.credential_store);

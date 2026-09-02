@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
@@ -34,13 +33,12 @@ import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * RabbitMQ receiver for driver timeout check messages.
@@ -70,21 +68,28 @@ public class DriverTimeoutCheckReceiver {
      * expiry to avoid racing a newer heartbeat, marks an expired driver offline and
      * raises a driver alarm.
      *
-     * @param channel the RabbitMQ channel for manual ack
      * @param message the raw message carrying the delivery tag
-     * @param dto     the driver timeout check carrying tenant, driver id, and lease version
+     * @param ack     acknowledgment handle for the message
      */
     @Dc3Listener(topic = MqTopic.STATE_TIMEOUT)
     public Mono<Void> driverTimeoutCheck(MqReceived<DriverTimeoutCheckDTO> message, Acknowledgment ack) {
         DriverTimeoutCheckDTO dto = message.payload();
-        if (Objects.isNull(dto) || Objects.isNull(dto.getDriverId()) || Objects.isNull(dto.getTenantId())
+        if (Objects.isNull(dto)
+                || Objects.isNull(dto.getDriverId())
+                || Objects.isNull(dto.getTenantId())
                 || Objects.isNull(dto.getLeaseVersion())) {
             ack.reject(false);
             return Mono.empty();
         }
-        return transactionalOperator.transactional(entityStateStore.claimExpired(dto.getTenantId(),
-                        EntityTypeEnum.DRIVER, dto.getDriverId(), dto.getLeaseVersion(), OFFLINE_RENEW_SECONDS)
-                .flatMap(this::persistOrResumeAlarm))
+        return transactionalOperator
+                .transactional(entityStateStore
+                        .claimExpired(
+                                dto.getTenantId(),
+                                EntityTypeEnum.DRIVER,
+                                dto.getDriverId(),
+                                dto.getLeaseVersion(),
+                                OFFLINE_RENEW_SECONDS)
+                        .flatMap(this::persistOrResumeAlarm))
                 .flatMap(context -> alarmRuleTriggerService.processDriverAlarm(context.alarm()))
                 .doOnError(error -> log.error("Driver timeout check failed.", error))
                 .then();
@@ -106,7 +111,9 @@ public class DriverTimeoutCheckReceiver {
                         .build()))
                 .doOnSuccess(ignored -> log.info(
                         "Driver timeout check confirmed OFFLINE: driverId={}, tenantId={}, prevStatus={}",
-                        state.entityId(), state.tenantId(), previous));
+                        state.entityId(),
+                        state.tenantId(),
+                        previous));
     }
 
     private Mono<Long> persistAlarm(ReactiveEntityStateStore.EntityStateLease state, String alarmMessage) {
@@ -121,14 +128,25 @@ public class DriverTimeoutCheckReceiver {
         alarm.setAlarmTypeFlag(AlarmTypeEnum.OFFLINE.getIndex());
         alarm.setAlarmSourceFlag(AlarmSourceTypeEnum.STATE_TIMEOUT.getIndex());
         alarm.setAlarmLevelFlag(AlarmMessageLevelEnum.P1.getIndex());
-        alarm.setAlarmExt(JsonExt.builder().type("driver-offline").content(alarmMessage).version(1).build());
+        alarm.setAlarmExt(JsonExt.builder()
+                .type("driver-offline")
+                .content(alarmMessage)
+                .version(1)
+                .build());
         alarm.setExpiredTime(0L);
         alarm.setConfirmFlag((byte) 0);
         alarm.setTenantId(state.tenantId());
-        return entityAlarmStore.insert(alarm)
-                .flatMap(saved -> entityStateStore.markAlarm(state.tenantId(), EntityTypeEnum.DRIVER, state.entityId(),
-                                state.leaseVersion(), saved.getId())
-                        .flatMap(updated -> updated ? Mono.just(saved.getId())
+        return entityAlarmStore
+                .insert(alarm)
+                .flatMap(saved -> entityStateStore
+                        .markAlarm(
+                                state.tenantId(),
+                                EntityTypeEnum.DRIVER,
+                                state.entityId(),
+                                state.leaseVersion(),
+                                saved.getId())
+                        .flatMap(updated -> updated
+                                ? Mono.just(saved.getId())
                                 : Mono.error(new IllegalStateException("driver timeout alarm lost lease ownership"))));
     }
 
@@ -137,6 +155,5 @@ public class DriverTimeoutCheckReceiver {
         return Objects.isNull(status) ? "unknown" : status.getCode();
     }
 
-    private record DriverAlarmContext(DriverAlarmDTO alarm) {
-    }
+    private record DriverAlarmContext(DriverAlarmDTO alarm) {}
 }

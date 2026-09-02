@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
-
-import lombok.extern.slf4j.Slf4j;
-import org.jinterop.dcom.common.JIException;
-import org.openscada.opc.dcom.common.impl.OPCCommon;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.jinterop.dcom.common.JIException;
+import org.openscada.opc.dcom.common.impl.OPCCommon;
 
 /**
  * An error message resolver that will lookup the error code using the server interface
@@ -69,5 +67,4 @@ public class ErrorMessageResolver {
         }
         return message;
     }
-
 }

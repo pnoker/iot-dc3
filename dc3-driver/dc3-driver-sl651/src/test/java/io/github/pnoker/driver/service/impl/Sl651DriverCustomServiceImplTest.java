@@ -14,8 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -26,19 +29,14 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class Sl651DriverCustomServiceImplTest {
@@ -68,9 +66,15 @@ class Sl651DriverCustomServiceImplTest {
         device.setId(10L);
         device.setDeviceCode("01020304");
         when(deviceMetadata.getCache(10L)).thenReturn(device);
-        when(deviceMetadata.getPointConfig(10L)).thenReturn(Map.of(
-                20L, Map.of("index", AttributeBO.builder().value("1").type(AttributeTypeEnum.INT).build())
-        ));
+        when(deviceMetadata.getPointConfig(10L))
+                .thenReturn(Map.of(
+                        20L,
+                        Map.of(
+                                "index",
+                                AttributeBO.builder()
+                                        .value("1")
+                                        .type(AttributeTypeEnum.INT)
+                                        .build())));
         PointBO point = new PointBO();
         point.setId(20L);
         when(pointMetadata.getCache(20L)).thenReturn(point);

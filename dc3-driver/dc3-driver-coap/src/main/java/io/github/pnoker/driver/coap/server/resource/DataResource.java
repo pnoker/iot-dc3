@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.coap.server.resource;
 
 import io.github.pnoker.driver.coap.entity.CoapMessage;
@@ -52,7 +51,10 @@ public class DataResource extends CoapResource {
             }
 
             CoapMessage message = CoapMessage.builder()
-                    .sourceAddress(exchange.getSourceContext().getPeerAddress().getAddress().getHostAddress())
+                    .sourceAddress(exchange.getSourceContext()
+                            .getPeerAddress()
+                            .getAddress()
+                            .getHostAddress())
                     .sourcePort(exchange.getSourceContext().getPeerAddress().getPort())
                     .uriPath(exchange.getRequestOptions().getUriPathString())
                     .payload(payload)
@@ -60,14 +62,20 @@ public class DataResource extends CoapResource {
                     .method("POST")
                     .build();
 
-            log.debug("CoAP POST received, source={}:{}, path={}, payloadLength={}",
-                    message.getSourceAddress(), message.getSourcePort(), message.getUriPath(), payload.length());
+            log.debug(
+                    "CoAP POST received, source={}:{}, path={}, payloadLength={}",
+                    message.getSourceAddress(),
+                    message.getSourcePort(),
+                    message.getUriPath(),
+                    payload.length());
 
             coapReceiveService.receiveValue(message);
             exchange.respond(CoAP.ResponseCode.CHANGED);
         } catch (Exception e) {
-            log.error("CoAP POST handling failed, path={}",
-                    exchange.getRequestOptions().getUriPathString(), e);
+            log.error(
+                    "CoAP POST handling failed, path={}",
+                    exchange.getRequestOptions().getUriPathString(),
+                    e);
             exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
@@ -76,5 +84,4 @@ public class DataResource extends CoapResource {
     public void handleGET(CoapExchange exchange) {
         exchange.respond(CoAP.ResponseCode.CONTENT, "CoAP Data Resource is active");
     }
-
 }

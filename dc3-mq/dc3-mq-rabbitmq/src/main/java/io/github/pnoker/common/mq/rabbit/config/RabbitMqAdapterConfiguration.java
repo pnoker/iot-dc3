@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.rabbit.config;
 
 import io.github.pnoker.common.mq.config.BatchConsumerProperties;
@@ -79,15 +78,22 @@ public class RabbitMqAdapterConfiguration {
                 // Never render the body: it can contain telemetry, commands or credentials.
                 Message returnedMessage = returned.getMessage();
                 int bodyLength = returnedMessage != null && returnedMessage.getBody() != null
-                        ? returnedMessage.getBody().length : 0;
-                log.error("RabbitMQ message returned, exchange={}, routingKey={}, replyCode={}, replyText={}, bodyLength={}",
-                        returned.getExchange(), returned.getRoutingKey(), returned.getReplyCode(),
-                        returned.getReplyText(), bodyLength);
+                        ? returnedMessage.getBody().length
+                        : 0;
+                log.error(
+                        "RabbitMQ message returned, exchange={}, routingKey={}, replyCode={}, replyText={}, bodyLength={}",
+                        returned.getExchange(),
+                        returned.getRoutingKey(),
+                        returned.getReplyCode(),
+                        returned.getReplyText(),
+                        bodyLength);
             });
             rabbitTemplate.setConfirmCallback((correlationData, ack, cause) -> {
                 if (!ack) {
-                    log.error("RabbitMQ publisher confirm NACK, correlationId={}, cause={}",
-                            correlationData != null ? correlationData.getId() : null, cause);
+                    log.error(
+                            "RabbitMQ publisher confirm NACK, correlationId={}, cause={}",
+                            correlationData != null ? correlationData.getId() : null,
+                            cause);
                 }
             });
         };
@@ -107,11 +113,13 @@ public class RabbitMqAdapterConfiguration {
      * every listener container it registered on context shutdown.
      */
     @Bean(destroyMethod = "stop")
-    public RabbitMqAdapter rabbitMqAdapter(RabbitTemplate rabbitTemplate, RabbitAdmin rabbitAdmin,
-                                           ConnectionFactory connectionFactory, BatchConsumerProperties batchProperties,
-                                           @Value("${dc3.driver.lease.queue-expires-millis:300000}")
-                                           int driverQueueExpiresMillis) {
-        return new RabbitMqAdapter(rabbitTemplate, rabbitAdmin, connectionFactory, batchProperties,
-                driverQueueExpiresMillis);
+    public RabbitMqAdapter rabbitMqAdapter(
+            RabbitTemplate rabbitTemplate,
+            RabbitAdmin rabbitAdmin,
+            ConnectionFactory connectionFactory,
+            BatchConsumerProperties batchProperties,
+            @Value("${dc3.driver.lease.queue-expires-millis:300000}") int driverQueueExpiresMillis) {
+        return new RabbitMqAdapter(
+                rabbitTemplate, rabbitAdmin, connectionFactory, batchProperties, driverQueueExpiresMillis);
     }
 }

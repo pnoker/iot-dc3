@@ -19,14 +19,13 @@ package io.github.pnoker.common.agentic.entity.bo;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.enums.AgenticActionStatusEnum;
+import java.time.LocalDateTime;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
-import java.util.Map;
 
 /**
  * Business object for agentic action operations.
@@ -60,5 +59,4 @@ public class ActionBO extends BaseBO implements TenantOwned {
     private Long tenantId;
 
     private Long userId;
-
 }

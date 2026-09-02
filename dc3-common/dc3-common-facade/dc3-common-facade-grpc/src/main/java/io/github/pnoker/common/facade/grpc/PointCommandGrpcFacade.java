@@ -1,21 +1,36 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.data.GrpcPointCommandAccepted;
 import io.github.pnoker.api.center.data.GrpcPointValueCommandQuery;
 import io.github.pnoker.api.center.data.GrpcPointValueWriteCommand;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.enums.PointCommandSourceEnum;
+import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.PointCommandFacade;
 import io.github.pnoker.common.facade.grpc.config.GrpcFacadeProperties;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 /** Reactive gRPC facade for asynchronous point command submission. */
 @Component
@@ -47,8 +62,8 @@ public class PointCommandGrpcFacade implements PointCommandFacade {
     }
 
     @Override
-    public Mono<String> submitWrite(Long tenantId, Long deviceId, Long pointId, String value,
-                                    PointCommandSourceEnum source) {
+    public Mono<String> submitWrite(
+            Long tenantId, Long deviceId, Long pointId, String value, PointCommandSourceEnum source) {
         GrpcPointValueWriteCommand request = GrpcPointValueWriteCommand.newBuilder()
                 .setTenantId(Objects.requireNonNull(tenantId, "tenantId"))
                 .setDeviceId(Objects.requireNonNull(deviceId, "deviceId"))
@@ -62,14 +77,21 @@ public class PointCommandGrpcFacade implements PointCommandFacade {
     private Mono<String> invoke(String operation, Object request, boolean read) {
         return Mono.create(sink -> {
             StreamObserver<GrpcPointCommandAccepted> observer = new StreamObserver<>() {
-                @Override public void onNext(GrpcPointCommandAccepted response) {
+                @Override
+                public void onNext(GrpcPointCommandAccepted response) {
                     if (!response.getCommandId().isBlank()) sink.success(response.getCommandId());
                     else sink.error(new ServiceException(operation + " returned an empty command id"));
                 }
-                @Override public void onError(Throwable error) {
-                    sink.error(Status.fromThrowable(error).withDescription(operation + " transport failed").asRuntimeException());
+
+                @Override
+                public void onError(Throwable error) {
+                    sink.error(Status.fromThrowable(error)
+                            .withDescription(operation + " transport failed")
+                            .asRuntimeException());
                 }
-                @Override public void onCompleted() { }
+
+                @Override
+                public void onCompleted() {}
             };
             PointValueApiGrpc.PointValueApiStub stub = properties.getDeadlineMs() > 0
                     ? pointValueApiStub.withDeadlineAfter(properties.getDeadlineMs(), TimeUnit.MILLISECONDS)

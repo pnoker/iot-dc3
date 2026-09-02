@@ -14,13 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.metadata;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.grpc.client.DeviceClient;
 import io.github.pnoker.common.exception.ServiceException;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,13 +33,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DeviceMetadataTest {
@@ -51,8 +49,7 @@ class DeviceMetadataTest {
         driverProperties = new DriverProperties();
         driverProperties.getMetadata().getCache().setRecordStats(true);
         driverMetadata = new DriverMetadata();
-        driverMetadata.setDeviceLeases(Map.of(10L, 1L, 11L, 2L),
-                System.currentTimeMillis() + 60_000, 1L);
+        driverMetadata.setDeviceLeases(Map.of(10L, 1L, 11L, 2L), System.currentTimeMillis() + 60_000, 1L);
         deviceMetadata = new DeviceMetadata(driverProperties, driverMetadata, deviceClient);
     }
 
@@ -62,9 +59,7 @@ class DeviceMetadataTest {
         device.setId(10L);
         when(deviceClient.getById(10L)).thenReturn(Mono.just(device));
 
-        StepVerifier.create(deviceMetadata.refreshCache(10L))
-                .expectNext(device)
-                .verifyComplete();
+        StepVerifier.create(deviceMetadata.refreshCache(10L)).expectNext(device).verifyComplete();
 
         DeviceBO cached = deviceMetadata.getCache(10L);
         assertThat(cached).isSameAs(device);
@@ -128,8 +123,12 @@ class DeviceMetadataTest {
         device11.setId(11L);
         when(deviceClient.getById(10L)).thenReturn(Mono.just(device10));
         when(deviceClient.getById(11L)).thenReturn(Mono.just(device11));
-        StepVerifier.create(deviceMetadata.refreshCache(10L)).expectNext(device10).verifyComplete();
-        StepVerifier.create(deviceMetadata.refreshCache(11L)).expectNext(device11).verifyComplete();
+        StepVerifier.create(deviceMetadata.refreshCache(10L))
+                .expectNext(device10)
+                .verifyComplete();
+        StepVerifier.create(deviceMetadata.refreshCache(11L))
+                .expectNext(device11)
+                .verifyComplete();
 
         deviceMetadata.clearCache();
         deviceMetadata.getCache(10L);
@@ -138,5 +137,4 @@ class DeviceMetadataTest {
         verify(deviceClient, times(2)).getById(10L);
         verify(deviceClient, times(2)).getById(11L);
     }
-
 }

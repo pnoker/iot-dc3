@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
-import io.github.pnoker.common.entity.common.TreeNode;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import io.github.pnoker.common.entity.common.TreeNode;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 class TreeUtilTest {
 

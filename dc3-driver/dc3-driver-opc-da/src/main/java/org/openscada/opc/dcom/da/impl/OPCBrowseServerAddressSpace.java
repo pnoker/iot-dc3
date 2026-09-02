@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da.impl;
 
+import java.net.UnknownHostException;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.IJIComObject;
 import org.jinterop.dcom.core.JICallBuilder;
@@ -30,8 +30,6 @@ import org.openscada.opc.dcom.da.Constants;
 import org.openscada.opc.dcom.da.OPCBROWSEDIRECTION;
 import org.openscada.opc.dcom.da.OPCBROWSETYPE;
 import org.openscada.opc.dcom.da.OPCNAMESPACETYPE;
-
-import java.net.UnknownHostException;
 
 /**
  * Implementation for <code>IOPCBrowseServerAddressSpace</code>
@@ -90,11 +88,11 @@ public class OPCBrowseServerAddressSpace extends BaseCOMObject {
         callObject.addInParamAsString(position, JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR);
 
         getCOMObject().call(callObject);
-
     }
 
-    public EnumString browse(final OPCBROWSETYPE browseType, final String filterCriteria, final int accessRights,
-                             final int dataType) throws JIException, IllegalArgumentException, UnknownHostException {
+    public EnumString browse(
+            final OPCBROWSETYPE browseType, final String filterCriteria, final int accessRights, final int dataType)
+            throws JIException, IllegalArgumentException, UnknownHostException {
         JICallBuilder callObject = new JICallBuilder(true);
         callObject.setOpnum(2);
 
@@ -148,12 +146,11 @@ public class OPCBrowseServerAddressSpace extends BaseCOMObject {
         callObject.setOpnum(3);
 
         callObject.addInParamAsString(item, JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR);
-        callObject.addOutParamAsObject(new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)),
-                JIFlags.FLAG_NULL);
+        callObject.addOutParamAsObject(
+                new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)), JIFlags.FLAG_NULL);
 
         Object[] result = getCOMObject().call(callObject);
 
         return ((JIString) ((JIPointer) result[0]).getReferent()).getString();
     }
-
 }

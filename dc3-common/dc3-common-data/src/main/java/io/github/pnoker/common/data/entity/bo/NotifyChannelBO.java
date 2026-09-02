@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
@@ -54,5 +53,4 @@ public class NotifyChannelBO extends BaseBO implements TenantOwned {
     private EnableFlagEnum enableFlag;
 
     private Long tenantId;
-
 }

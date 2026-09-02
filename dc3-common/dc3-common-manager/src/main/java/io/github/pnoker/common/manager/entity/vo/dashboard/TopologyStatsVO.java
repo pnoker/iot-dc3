@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * Total counts across the tenant (not just the Top-N rendered in the Sankey). Frontend
@@ -59,7 +57,9 @@ public class TopologyStatsVO implements Serializable {
      * server computed volumes over a time window (volume mode). null for cardinality mode
      * so the frontend footer can skip it.
      */
-    @Schema(description = "Short human-readable range label (e.g. 24h, 7d); present only in volume mode, null in cardinality mode", example = "24h")
+    @Schema(
+            description =
+                    "Short human-readable range label (e.g. 24h, 7d); present only in volume mode, null in cardinality mode",
+            example = "24h")
     private String rangeLabel;
-
 }

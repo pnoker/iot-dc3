@@ -32,7 +32,7 @@ dc3:
 3. 软删除行只在明确的恢复/审计查询中出现，普通查询必须 `deleted = 0`。
 4. 更新和删除同时检查 `tenant_id`、`id`、`version`（适用时），受影响行数为零即报告并发冲突或资源不存在。
 5. JSON 统一使用 `JSONB`；写入通过命名参数和 `CAST(... AS JSONB)`，禁止字符串拼接。
-6. 时间统一为 UTC 微秒精度；应用边界使用 `Instant`，数据库列使用 `TIMESTAMPTZ(6)`。
+6. 时间统一为 UTC 微秒精度；数据库列使用 `TIMESTAMPTZ(6)`。新增代码的应用边界使用 `Instant`；迁移域遗留的 `LocalDateTime` 字段按 UTC 读写，属于必须随触碰收敛的迁移债务，不得新增。
 7. 分页统一为 `offset`/`limit`/`sort` 的 `OffsetPage(items, offset, limit, total, hasNext)`；历史样本使用签名 cursor。
 
 ## 验证

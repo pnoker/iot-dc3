@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.manager.service.impl;
 
 import io.github.pnoker.common.entity.event.MetadataEvent;
@@ -24,6 +40,11 @@ import io.github.pnoker.db.r2dbc.core.operation.OperationState;
 import io.github.pnoker.db.r2dbc.core.tenant.TenantScope;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -33,12 +54,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import tools.jackson.databind.ObjectMapper;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @Component
@@ -67,10 +82,13 @@ public class DeviceImportWorker {
 
     @PostConstruct
     void start() {
-        subscription = queue.asFlux().concatMap(this::processSafely).subscribe(
-                ignored -> { }, error -> log.error("Device import worker stopped unexpectedly", error));
+        subscription = queue.asFlux()
+                .concatMap(this::processSafely)
+                .subscribe(ignored -> {}, error -> log.error("Device import worker stopped unexpectedly", error));
         recoverySubscription = Flux.interval(Duration.ZERO, RECOVERY_SCAN_INTERVAL)
-                .concatMap(ignored -> jobStore.listRecoverable(Instant.now()).doOnNext(this::enqueue).then()
+                .concatMap(ignored -> jobStore.listRecoverable(Instant.now())
+                        .doOnNext(this::enqueue)
+                        .then()
                         .onErrorResume(error -> {
                             log.error("Device import recovery scan failed", error);
                             return Mono.empty();
@@ -86,8 +104,8 @@ public class DeviceImportWorker {
 
     void enqueue(UUID operationId) {
         Sinks.EmitResult result = queue.tryEmitNext(operationId);
-        if (result.isFailure()) log.warn("Device import operation could not be queued, operationId={}, result={}",
-                operationId, result);
+        if (result.isFailure())
+            log.warn("Device import operation could not be queued, operationId={}, result={}", operationId, result);
     }
 
     Mono<Void> processSafely(UUID operationId) {
@@ -102,7 +120,8 @@ public class DeviceImportWorker {
 
     private Mono<Void> process(DeviceImportJob job) {
         TenantScope scope = new TenantScope(job.tenantId());
-        return operationRepository.findById(scope, job.operationId())
+        return operationRepository
+                .findById(scope, job.operationId())
                 .flatMap(state -> {
                     if (state.status() == OperationState.Status.PENDING) {
                         OperationState running = state.transition(OperationState.Status.RUNNING, 5, Instant.now());
@@ -111,8 +130,10 @@ public class DeviceImportWorker {
                     if (state.status() == OperationState.Status.RUNNING) return Mono.just(state);
                     return jobStore.delete(job.operationId(), job.tenantId()).then(Mono.empty());
                 })
-                .flatMap(running -> schemaService.load(job.tenantId(), job.driverId(), job.profileId())
-                        .flatMap(manifest -> fileScheduler.call(() -> workbookCodec.parse(job.content(), manifest))
+                .flatMap(running -> schemaService
+                        .load(job.tenantId(), job.driverId(), job.profileId())
+                        .flatMap(manifest -> fileScheduler
+                                .call(() -> workbookCodec.parse(job.content(), manifest))
                                 .map(rows -> new ParsedImport(manifest, rows))))
                 .flatMap(parsed -> commit(job, parsed));
     }
@@ -122,29 +143,35 @@ public class DeviceImportWorker {
         Mono<List<DeviceBO>> write = Flux.fromIterable(parsed.rows())
                 .concatMap(row -> insertRow(job, parsed.manifest(), row))
                 .collectList()
-                .flatMap(devices -> operationRepository.findById(scope, job.operationId())
+                .flatMap(devices -> operationRepository
+                        .findById(scope, job.operationId())
                         .switchIfEmpty(Mono.error(new IllegalStateException("Device import operation does not exist")))
                         .flatMap(current -> {
                             if (current.status() != OperationState.Status.RUNNING) {
                                 return Mono.error(new IllegalStateException("Device import operation is not running"));
                             }
-                            String result = json(Map.of("imported", devices.size(), "deviceIds",
+                            String result = json(Map.of(
+                                    "imported",
+                                    devices.size(),
+                                    "deviceIds",
                                     devices.stream().map(DeviceBO::getId).toList()));
-                            OperationState succeeded = current.transition(OperationState.Status.SUCCEEDED, 100,
-                                    result, null, Instant.now());
-                            return operationRepository.transition(scope, job.operationId(), current.status(), succeeded)
+                            OperationState succeeded = current.transition(
+                                    OperationState.Status.SUCCEEDED, 100, result, null, Instant.now());
+                            return operationRepository
+                                    .transition(scope, job.operationId(), current.status(), succeeded)
                                     .then(jobStore.delete(job.operationId(), job.tenantId()))
                                     .thenReturn(devices);
                         }));
-        return transactionalOperator.transactional(write)
+        return transactionalOperator
+                .transactional(write)
                 .doOnSuccess(devices -> devices.forEach(this::publishMetadata))
                 .then();
     }
 
     private void publishMetadata(DeviceBO device) {
         try {
-            metadataEventPublisher.publishEvent(new MetadataEvent(this, device.getId(), MetadataTypeEnum.DEVICE,
-                    MetadataOperateTypeEnum.ADD));
+            metadataEventPublisher.publishEvent(
+                    new MetadataEvent(this, device.getId(), MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD));
         } catch (RuntimeException error) {
             log.error("Device import committed but metadata notification failed, deviceId={}", device.getId(), error);
         }
@@ -163,13 +190,15 @@ public class DeviceImportWorker {
         device.setCreatorName(job.operatorName());
         device.setOperatorId(job.operatorId());
         device.setOperatorName(job.operatorName());
-        return deviceStore.insert(device)
+        return deviceStore
+                .insert(device)
                 .flatMap(saved -> insertConfigs(job, manifest, row, saved).thenReturn(saved));
     }
 
-    private Mono<Void> insertConfigs(DeviceImportJob job, DeviceImportManifest manifest, DeviceImportRow row,
-                                     DeviceBO device) {
-        Flux<DriverAttributeConfigBO> driverConfigs = Flux.range(0, manifest.driverAttributes().size())
+    private Mono<Void> insertConfigs(
+            DeviceImportJob job, DeviceImportManifest manifest, DeviceImportRow row, DeviceBO device) {
+        Flux<DriverAttributeConfigBO> driverConfigs = Flux.range(
+                        0, manifest.driverAttributes().size())
                 .map(index -> {
                     DriverAttributeConfigBO config = new DriverAttributeConfigBO();
                     config.setAttributeId(manifest.driverAttributes().get(index).id());
@@ -184,23 +213,27 @@ public class DeviceImportWorker {
         int valueIndex = 0;
         for (DeviceImportManifest.PointColumn point : manifest.points()) {
             for (DeviceImportManifest.AttributeColumn attribute : point.attributes()) {
-                pointValues.add(new PointConfigValue(point.id(), attribute.id(),
-                        row.pointAttributeValues().get(valueIndex++)));
+                pointValues.add(new PointConfigValue(
+                        point.id(), attribute.id(), row.pointAttributeValues().get(valueIndex++)));
             }
         }
-        Flux<PointAttributeConfigBO> pointConfigs = Flux.fromIterable(pointValues).map(value -> {
-            PointAttributeConfigBO config = new PointAttributeConfigBO();
-            config.setAttributeId(value.attributeId());
-            config.setConfigValue(value.value());
-            config.setDeviceId(device.getId());
-            config.setPointId(value.pointId());
-            config.setConfigExt(new JsonExt());
-            config.setTenantId(job.tenantId());
-            audit(config, job, row.remark());
-            return config;
-        });
-        return driverConfigs.concatMap(driverConfigStore::insert).then()
-                .thenMany(pointConfigs.concatMap(pointConfigStore::insert)).then();
+        Flux<PointAttributeConfigBO> pointConfigs = Flux.fromIterable(pointValues)
+                .map(value -> {
+                    PointAttributeConfigBO config = new PointAttributeConfigBO();
+                    config.setAttributeId(value.attributeId());
+                    config.setConfigValue(value.value());
+                    config.setDeviceId(device.getId());
+                    config.setPointId(value.pointId());
+                    config.setConfigExt(new JsonExt());
+                    config.setTenantId(job.tenantId());
+                    audit(config, job, row.remark());
+                    return config;
+                });
+        return driverConfigs
+                .concatMap(driverConfigStore::insert)
+                .then()
+                .thenMany(pointConfigs.concatMap(pointConfigStore::insert))
+                .then();
     }
 
     private void audit(io.github.pnoker.common.entity.base.BaseBO config, DeviceImportJob job, String remark) {
@@ -213,21 +246,27 @@ public class DeviceImportWorker {
 
     private Mono<Void> fail(DeviceImportJob job, Throwable error) {
         UUID operationId = job.operationId();
-        return operationRepository.findById(new TenantScope(job.tenantId()), operationId)
-                        .flatMap(current -> {
-                            if (current.status() != OperationState.Status.PENDING
-                                    && current.status() != OperationState.Status.RUNNING) return Mono.empty();
-                            OperationState failed = current.transition(OperationState.Status.FAILED,
-                                    current.progress(), null, json(Map.of(
-                                            "type", "about:blank",
-                                            "title", "Device import failed",
-                                            "status", 422,
-                                            "code", "DEVICE_IMPORT_FAILED",
-                                            "detail", safeMessage(error))), Instant.now());
-                            return operationRepository.transition(new TenantScope(job.tenantId()), operationId,
-                                            current.status(), failed)
-                                    .then(jobStore.delete(operationId, job.tenantId()));
-                        }).as(transactionalOperator::transactional)
+        return operationRepository
+                .findById(new TenantScope(job.tenantId()), operationId)
+                .flatMap(current -> {
+                    if (current.status() != OperationState.Status.PENDING
+                            && current.status() != OperationState.Status.RUNNING) return Mono.empty();
+                    OperationState failed = current.transition(
+                            OperationState.Status.FAILED,
+                            current.progress(),
+                            null,
+                            json(Map.of(
+                                    "type", "about:blank",
+                                    "title", "Device import failed",
+                                    "status", 422,
+                                    "code", "DEVICE_IMPORT_FAILED",
+                                    "detail", safeMessage(error))),
+                            Instant.now());
+                    return operationRepository
+                            .transition(new TenantScope(job.tenantId()), operationId, current.status(), failed)
+                            .then(jobStore.delete(operationId, job.tenantId()));
+                })
+                .as(transactionalOperator::transactional)
                 .doOnSuccess(ignored -> log.warn("Device import failed, operationId={}", operationId, error))
                 .then();
     }
@@ -245,9 +284,7 @@ public class DeviceImportWorker {
         }
     }
 
-    private record ParsedImport(DeviceImportManifest manifest, List<DeviceImportRow> rows) {
-    }
+    private record ParsedImport(DeviceImportManifest manifest, List<DeviceImportRow> rows) {}
 
-    private record PointConfigValue(Long pointId, Long attributeId, String value) {
-    }
+    private record PointConfigValue(Long pointId, Long attributeId, String value) {}
 }

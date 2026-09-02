@@ -14,16 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.tsdb.spi;
 
 import io.github.pnoker.common.tsdb.model.TsdbModel.*;
-
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -119,8 +116,8 @@ public interface TsdbStore {
      * @param deadline read deadline
      * @return one descending page
      */
-    Mono<CursorPage<PointValueSample>> history(SeriesFilter filter, TimeWindow window,
-                                               Cursor cursor, int pageSize, TsdbDeadline deadline);
+    Mono<CursorPage<PointValueSample>> history(
+            SeriesFilter filter, TimeWindow window, Cursor cursor, int pageSize, TsdbDeadline deadline);
 
     /**
      * S6/S15: single-window aggregate per series (NULL-skipping for AVG/MIN/MAX/SUM;
@@ -134,8 +131,8 @@ public interface TsdbStore {
      * @param deadline   read deadline
      * @return aggregate grouped by series
      */
-    Mono<Map<SeriesKey, WindowAggregate>> aggregate(SeriesFilter filter, AggregateFunction fn,
-                                                    TimeWindow window, Double percentile, TsdbDeadline deadline);
+    Mono<Map<SeriesKey, WindowAggregate>> aggregate(
+            SeriesFilter filter, AggregateFunction fn, TimeWindow window, Double percentile, TsdbDeadline deadline);
 
     /**
      * S7/S15/S16: per-bucket aggregates over the window, buckets ascending, per series.
@@ -151,10 +148,13 @@ public interface TsdbStore {
      * @param deadline    read deadline
      * @return per-bucket aggregates, buckets ascending, per series
      */
-    Mono<Map<SeriesKey, List<BucketAggregate>>> bucketedAggregate(SeriesFilter filter,
-                                                                  AggregateFunction fn, TimeWindow window,
-                                                                  Duration bucketWidth, Double percentile,
-                                                                  TsdbDeadline deadline);
+    Mono<Map<SeriesKey, List<BucketAggregate>>> bucketedAggregate(
+            SeriesFilter filter,
+            AggregateFunction fn,
+            TimeWindow window,
+            Duration bucketWidth,
+            Double percentile,
+            TsdbDeadline deadline);
 
     /**
      * S8: sample count inside the window for the filter (all three scopes).
@@ -177,8 +177,8 @@ public interface TsdbStore {
      * @param deadline    read deadline
      * @return time-bucketed counts, buckets ascending
      */
-    Mono<List<BucketAggregate>> bucketedCount(long tenantId, TimeWindow window,
-                                               Duration bucketWidth, TsdbDeadline deadline);
+    Mono<List<BucketAggregate>> bucketedCount(
+            long tenantId, TimeWindow window, Duration bucketWidth, TsdbDeadline deadline);
 
     /**
      * S13-②: tenant-wide grouped counts, descending, top {@code limit}.
@@ -190,8 +190,8 @@ public interface TsdbStore {
      * @param deadline  read deadline
      * @return grouped counts, descending
      */
-    Mono<List<DimensionCount>> countByDimension(long tenantId, TimeWindow window,
-                                                GroupDimension dimension, int limit, TsdbDeadline deadline);
+    Mono<List<DimensionCount>> countByDimension(
+            long tenantId, TimeWindow window, GroupDimension dimension, int limit, TsdbDeadline deadline);
 
     /**
      * S13-⑤: per-series counts (grouped by tenant, device, point) inside the
@@ -224,8 +224,8 @@ public interface TsdbStore {
      * @param deadline   read deadline
      * @return latency histogram bins
      */
-    Mono<List<LatencyBin>> latencyHistogram(long tenantId, TimeWindow window,
-                                             List<Long> binEdgesMs, TsdbDeadline deadline);
+    Mono<List<LatencyBin>> latencyHistogram(
+            long tenantId, TimeWindow window, List<Long> binEdgesMs, TsdbDeadline deadline);
 
     // ===== operations =====
 
@@ -259,8 +259,8 @@ public interface TsdbStore {
      * @param deadline    read deadline
      * @return aligned-bucket Pearson correlation
      */
-    Mono<CorrelationResult> correlation(SeriesKey a, SeriesKey b, TimeWindow window,
-                                        Duration alignBucket, TsdbDeadline deadline);
+    Mono<CorrelationResult> correlation(
+            SeriesKey a, SeriesKey b, TimeWindow window, Duration alignBucket, TsdbDeadline deadline);
 
     /**
      * S16 tiered-rollup support levels.
@@ -341,6 +341,5 @@ public interface TsdbStore {
             OrderingGuarantee ordering,
             Precision precision,
             boolean backfill,
-            boolean correlation) {
-    }
+            boolean correlation) {}
 }

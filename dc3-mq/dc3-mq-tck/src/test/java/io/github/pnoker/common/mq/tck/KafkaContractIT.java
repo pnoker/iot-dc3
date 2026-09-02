@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.tck;
 
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
 import io.github.pnoker.common.mq.config.BatchConsumerProperties;
 import io.github.pnoker.common.mq.kafka.KafkaMqAdapter;
+import java.util.Objects;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.images.builder.Transferable;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
-
-import java.util.Objects;
 
 /**
  * Kafka harness for the broker-neutral contract suite. By default a disposable KRaft
@@ -64,8 +62,8 @@ class KafkaContractIT extends AbstractMqContractTest {
             properties.setRetryInitialIntervalMillis(100);
             properties.setRetryMultiplier(2);
             properties.setRetryMaxIntervalMillis(200);
-            kafkaAdapter = new KafkaMqAdapter(KafkaMqAdapter.template(bootstrap),
-                    KafkaMqAdapter.consumerConfig(bootstrap), properties);
+            kafkaAdapter = new KafkaMqAdapter(
+                    KafkaMqAdapter.template(bootstrap), KafkaMqAdapter.consumerConfig(bootstrap), properties);
         }
         return kafkaAdapter;
     }
@@ -86,7 +84,8 @@ class KafkaContractIT extends AbstractMqContractTest {
     @Override
     public void perInstanceSubscriptionExpiresAfterInstanceStops() {
         adapter();
-        Assumptions.assumeTrue(kafkaAdapter.capabilities().subscriptionExpiry(),
+        Assumptions.assumeTrue(
+                kafkaAdapter.capabilities().subscriptionExpiry(),
                 "kafka declares subscriptionExpiry=false; documented cleanup policy applies");
     }
 
@@ -98,10 +97,11 @@ class KafkaContractIT extends AbstractMqContractTest {
 
         @Override
         protected void containerIsStarting(com.github.dockerjava.api.command.InspectContainerResponse containerInfo) {
-            String advertisedHost = switch (getHost()) {
-                case "0.0.0.0", "::" -> "localhost";
-                default -> getHost();
-            };
+            String advertisedHost =
+                    switch (getHost()) {
+                        case "0.0.0.0", "::" -> "localhost";
+                        default -> getHost();
+                    };
             String command = "#!/bin/bash\n"
                     + "export KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://" + advertisedHost + ":" + getMappedPort(9092)
                     + ",BROKER://localhost:9093,CONTROLLER://localhost:9094\n"

@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.builder;
 
 import io.github.pnoker.api.center.auth.GrpcUserDTO;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
-import org.springframework.stereotype.Component;
-
 import java.util.Objects;
+import org.springframework.stereotype.Component;
 
 /**
  * {@code GrpcUserDTO} → {@link FacadeUserBO}. {@code socialExt}/{@code identityExt} stay
@@ -59,5 +57,4 @@ public class FacadeGrpcUserBuilder {
 
         return bo;
     }
-
 }

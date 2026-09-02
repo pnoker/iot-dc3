@@ -65,7 +65,7 @@ public class MbusRecord {
 
     @Override
     public String toString() {
-        return "MbusRecord{dif=0x" + Integer.toHexString(dif) + ", vif=0x" + Integer.toHexString(vif)
-                + ", valueBytes=" + Arrays.toString(valueBytes) + '}';
+        return "MbusRecord{dif=0x" + Integer.toHexString(dif) + ", vif=0x" + Integer.toHexString(vif) + ", valueBytes="
+                + Arrays.toString(valueBytes) + '}';
     }
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.property;
 
 import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
@@ -28,15 +27,14 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Spring configuration properties for a driver instance.
@@ -67,7 +65,9 @@ public class DriverProperties {
      * Driver display name.
      */
     @NotBlank(message = "Driver name can't be empty")
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5\\s_#@/.|\\-]{1,63}$", message = "Invalid driver name format")
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5\\s_#@/.|\\-]{1,63}$",
+            message = "Invalid driver name format")
     private String name;
 
     /**
@@ -205,9 +205,7 @@ public class DriverProperties {
              * default — flip on when diagnosing cache behavior in production.
              */
             private boolean recordStats = false;
-
         }
-
     }
 
     /**
@@ -222,7 +220,6 @@ public class DriverProperties {
          */
         @Valid
         private DeviceHealthProperties device = new DeviceHealthProperties();
-
     }
 
     /**
@@ -256,7 +253,6 @@ public class DriverProperties {
          */
         @NotNull
         private TimeUnit timeoutUnit = TimeUnit.SECONDS;
-
     }
 
     /**
@@ -299,9 +295,7 @@ public class DriverProperties {
              * SDK's intent.
              */
             private String cron = "0 */15 * * * ?";
-
         }
-
     }
 
     /**
@@ -343,7 +337,6 @@ public class DriverProperties {
          */
         @Min(1)
         private long maxBackoffSeconds = 600;
-
     }
 
     /**
@@ -367,5 +360,4 @@ public class DriverProperties {
         @Min(60000)
         private int queueExpiresMillis = 300000;
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.base;
 
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -25,17 +24,15 @@ import io.github.pnoker.common.security.GatewayAuthenticationToken;
 import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.common.security.PermissionProvider;
 import io.github.pnoker.common.utils.PrincipalHeaderUtil;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Base Controller Interface
@@ -131,9 +128,8 @@ public interface BaseController {
      * @return Mono that completes empty on success, errors on denial
      */
     default Mono<Void> requireAnyPermission(PermissionProvider provider, String... resourceCodes) {
-        Set<String> required = Arrays.stream(resourceCodes)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+        Set<String> required =
+                Arrays.stream(resourceCodes).filter(Objects::nonNull).collect(Collectors.toSet());
         if (required.isEmpty()) {
             return Mono.empty();
         }
@@ -151,25 +147,21 @@ public interface BaseController {
                     if (granted) {
                         return Mono.<Void>empty();
                     }
-                    return Mono.error(new AccessDeniedException(
-                            "Access denied: none of the required permissions are granted"));
+                    return Mono.error(
+                            new AccessDeniedException("Access denied: none of the required permissions are granted"));
                 })
                 // Fallback: SecurityContext not available — use provider directly
-                .switchIfEmpty(Mono.defer(() ->
-                        getTenantId().flatMap(tenantId ->
-                                getUserId().flatMap(principalId ->
-                                        Flux.fromIterable(required)
-                                                .flatMap(code -> provider.hasPermission(tenantId, principalId, code))
-                                                .any(granted -> granted)
-                                                .flatMap(hasPermission -> {
-                                                    if (Boolean.TRUE.equals(hasPermission)) {
-                                                        return Mono.empty();
-                                                    }
-                                                    return Mono.error(new AccessDeniedException(
-                                                            "Access denied: none of the required permissions are granted"));
-                                                })
-                                )
-                        )));
+                .switchIfEmpty(Mono.defer(() -> getTenantId()
+                        .flatMap(tenantId -> getUserId()
+                                .flatMap(principalId -> Flux.fromIterable(required)
+                                        .flatMap(code -> provider.hasPermission(tenantId, principalId, code))
+                                        .any(granted -> granted)
+                                        .flatMap(hasPermission -> {
+                                            if (Boolean.TRUE.equals(hasPermission)) {
+                                                return Mono.empty();
+                                            }
+                                            return Mono.error(new AccessDeniedException(
+                                                    "Access denied: none of the required permissions are granted"));
+                                        })))));
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.base;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -23,15 +22,14 @@ import io.github.pnoker.common.constant.common.TimeConstant;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * Base view object providing common fields.
@@ -53,8 +51,13 @@ public class BaseVO implements Serializable {
     /**
      * Primary key ID
      */
-    @Schema(description = "Unique primary key of the record; required on update requests.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Primary key ID can't be empty", groups = {Update.class})
+    @Schema(
+            description = "Unique primary key of the record; required on update requests.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Primary key ID can't be empty",
+            groups = {Update.class})
     private String id;
 
     /**
@@ -97,8 +100,9 @@ public class BaseVO implements Serializable {
     /**
      * Operate Time
      */
-    @Schema(description = "Timestamp when the record was last updated; server-populated.", example = "2025-09-01 12:00:00")
+    @Schema(
+            description = "Timestamp when the record was last updated; server-populated.",
+            example = "2025-09-01 12:00:00")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime operateTime;
-
 }

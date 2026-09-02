@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.thread.entity.property;
 
 import jakarta.validation.constraints.AssertTrue;
@@ -66,8 +65,7 @@ public class ThreadProperties {
     /**
      * Creates the thread properties with defaults.
      */
-    public ThreadProperties() {
-    }
+    public ThreadProperties() {}
 
     /**
      * Validate that the maximum pool size is not smaller than the core pool size.
@@ -78,5 +76,4 @@ public class ThreadProperties {
     public boolean isPoolSizeValid() {
         return maximumPoolSize >= corePoolSize;
     }
-
 }

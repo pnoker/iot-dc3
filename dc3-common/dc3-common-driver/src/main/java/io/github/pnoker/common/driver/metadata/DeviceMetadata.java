@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.metadata;
 
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -29,12 +28,11 @@ import io.github.pnoker.common.driver.entity.dto.PointAttributeConfigDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.grpc.client.DeviceClient;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Device metadata cache that loads device definitions and resolves driver and point
@@ -70,9 +68,7 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
      *                         ids when the upstream loader returns {@code null}
      * @param deviceClient     gRPC client used to resolve a {@link DeviceBO} by id
      */
-    public DeviceMetadata(DriverProperties driverProperties,
-                          DriverMetadata driverMetadata,
-                          DeviceClient deviceClient) {
+    public DeviceMetadata(DriverProperties driverProperties, DriverMetadata driverMetadata, DeviceClient deviceClient) {
         super(driverProperties.getMetadata().getCache(), "device", deviceClient::getById);
         this.driverMetadata = driverMetadata;
     }
@@ -115,17 +111,20 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
         }
 
         Map<Long, DriverAttributeConfigDTO> attributeConfigMap = device.getDriverAttributeConfigIdMap();
-        if (attributeConfigMap == null || attributeConfigMap.isEmpty()
+        if (attributeConfigMap == null
+                || attributeConfigMap.isEmpty()
                 || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
-            log.warn("Driver config incomplete, deviceId={}, required={}, configured={}",
-                    deviceId, attributeMap.keySet(),
+            log.warn(
+                    "Driver config incomplete, deviceId={}, required={}, configured={}",
+                    deviceId,
+                    attributeMap.keySet(),
                     attributeConfigMap == null ? "[]" : attributeConfigMap.keySet());
             return Map.of();
         }
 
-        return attributeMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(entry -> entry.getValue().getAttributeCode(),
+        return attributeMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getValue().getAttributeCode(),
                         entry -> AttributeBO.builder()
                                 .type(entry.getValue().getAttributeTypeFlag())
                                 .value(attributeConfigMap.get(entry.getKey()).getConfigValue())
@@ -158,17 +157,19 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
             return Map.of();
         }
 
-        return pointAttributeConfigMap.entrySet()
-                .stream()
+        return pointAttributeConfigMap.entrySet().stream()
                 .filter(entry -> MapUtils.isNotEmpty(entry.getValue())
                         && entry.getValue().keySet().containsAll(attributeMap.keySet()))
-                .collect(Collectors.toMap(Map.Entry::getKey,
-                        entryMap -> attributeMap.entrySet()
-                                .stream()
-                                .collect(Collectors.toMap(entry -> entry.getValue().getAttributeCode(),
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entryMap -> attributeMap.entrySet().stream()
+                                .collect(Collectors.toMap(
+                                        entry -> entry.getValue().getAttributeCode(),
                                         entry -> AttributeBO.builder()
                                                 .type(entry.getValue().getAttributeTypeFlag())
-                                                .value(entryMap.getValue().get(entry.getKey()).getConfigValue())
+                                                .value(entryMap.getValue()
+                                                        .get(entry.getKey())
+                                                        .getConfigValue())
                                                 .build()))));
     }
 
@@ -195,23 +196,29 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
 
         Map<Long, Map<Long, PointAttributeConfigDTO>> pointAttributeConfigMap = device.getPointAttributeConfigIdMap();
         if (MapUtils.isEmpty(pointAttributeConfigMap)) {
-            log.warn("Point config unavailable, deviceId={}, pointId={}, reason=empty point-attribute-config map",
-                    deviceId, pointId);
+            log.warn(
+                    "Point config unavailable, deviceId={}, pointId={}, reason=empty point-attribute-config map",
+                    deviceId,
+                    pointId);
             return Map.of();
         }
 
         Map<Long, PointAttributeConfigDTO> attributeConfigMap = pointAttributeConfigMap.get(pointId);
-        if (attributeConfigMap == null || attributeConfigMap.isEmpty()
+        if (attributeConfigMap == null
+                || attributeConfigMap.isEmpty()
                 || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
-            log.warn("Point config incomplete, deviceId={}, pointId={}, required={}, configured={}",
-                    deviceId, pointId, attributeMap.keySet(),
+            log.warn(
+                    "Point config incomplete, deviceId={}, pointId={}, required={}, configured={}",
+                    deviceId,
+                    pointId,
+                    attributeMap.keySet(),
                     attributeConfigMap == null ? "[]" : attributeConfigMap.keySet());
             return Map.of();
         }
 
-        return attributeMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(entry -> entry.getValue().getAttributeCode(),
+        return attributeMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getValue().getAttributeCode(),
                         entry -> AttributeBO.builder()
                                 .type(entry.getValue().getAttributeTypeFlag())
                                 .value(attributeConfigMap.get(entry.getKey()).getConfigValue())
@@ -245,17 +252,19 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
             return Map.of();
         }
 
-        return commandAttributeConfigMap.entrySet()
-                .stream()
+        return commandAttributeConfigMap.entrySet().stream()
                 .filter(entry -> MapUtils.isNotEmpty(entry.getValue())
                         && entry.getValue().keySet().containsAll(attributeMap.keySet()))
-                .collect(Collectors.toMap(Map.Entry::getKey,
-                        entryMap -> attributeMap.entrySet()
-                                .stream()
-                                .collect(Collectors.toMap(entry -> entry.getValue().getAttributeCode(),
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entryMap -> attributeMap.entrySet().stream()
+                                .collect(Collectors.toMap(
+                                        entry -> entry.getValue().getAttributeCode(),
                                         entry -> AttributeBO.builder()
                                                 .type(entry.getValue().getAttributeTypeFlag())
-                                                .value(entryMap.getValue().get(entry.getKey()).getConfigValue())
+                                                .value(entryMap.getValue()
+                                                        .get(entry.getKey())
+                                                        .getConfigValue())
                                                 .build()))));
     }
 
@@ -275,31 +284,39 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
 
         DeviceBO device = getCache(deviceId);
         if (device == null) {
-            log.warn("Command config unavailable, deviceId={}, commandId={}, reason=device cache miss",
-                    deviceId, commandId);
+            log.warn(
+                    "Command config unavailable, deviceId={}, commandId={}, reason=device cache miss",
+                    deviceId,
+                    commandId);
             return Map.of();
         }
 
         Map<Long, Map<Long, CommandAttributeConfigDTO>> commandAttributeConfigMap =
                 device.getCommandAttributeConfigIdMap();
         if (MapUtils.isEmpty(commandAttributeConfigMap)) {
-            log.warn("Command config unavailable, deviceId={}, commandId={}, reason=empty command-attribute-config map",
-                    deviceId, commandId);
+            log.warn(
+                    "Command config unavailable, deviceId={}, commandId={}, reason=empty command-attribute-config map",
+                    deviceId,
+                    commandId);
             return Map.of();
         }
 
         Map<Long, CommandAttributeConfigDTO> attributeConfigMap = commandAttributeConfigMap.get(commandId);
-        if (attributeConfigMap == null || attributeConfigMap.isEmpty()
+        if (attributeConfigMap == null
+                || attributeConfigMap.isEmpty()
                 || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
-            log.warn("Command config incomplete, deviceId={}, commandId={}, required={}, configured={}",
-                    deviceId, commandId, attributeMap.keySet(),
+            log.warn(
+                    "Command config incomplete, deviceId={}, commandId={}, required={}, configured={}",
+                    deviceId,
+                    commandId,
+                    attributeMap.keySet(),
                     attributeConfigMap == null ? "[]" : attributeConfigMap.keySet());
             return Map.of();
         }
 
-        return attributeMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(entry -> entry.getValue().getAttributeCode(),
+        return attributeMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getValue().getAttributeCode(),
                         entry -> AttributeBO.builder()
                                 .type(entry.getValue().getAttributeTypeFlag())
                                 .value(attributeConfigMap.get(entry.getKey()).getConfigValue())
@@ -326,24 +343,25 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
             return Map.of();
         }
 
-        Map<Long, Map<Long, EventAttributeConfigDTO>> eventAttributeConfigMap =
-                device.getEventAttributeConfigIdMap();
+        Map<Long, Map<Long, EventAttributeConfigDTO>> eventAttributeConfigMap = device.getEventAttributeConfigIdMap();
         if (MapUtils.isEmpty(eventAttributeConfigMap)) {
             log.warn("Event config unavailable, deviceId={}, reason=empty event-attribute-config map", deviceId);
             return Map.of();
         }
 
-        return eventAttributeConfigMap.entrySet()
-                .stream()
+        return eventAttributeConfigMap.entrySet().stream()
                 .filter(entry -> MapUtils.isNotEmpty(entry.getValue())
                         && entry.getValue().keySet().containsAll(attributeMap.keySet()))
-                .collect(Collectors.toMap(Map.Entry::getKey,
-                        entryMap -> attributeMap.entrySet()
-                                .stream()
-                                .collect(Collectors.toMap(entry -> entry.getValue().getAttributeCode(),
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entryMap -> attributeMap.entrySet().stream()
+                                .collect(Collectors.toMap(
+                                        entry -> entry.getValue().getAttributeCode(),
                                         entry -> AttributeBO.builder()
                                                 .type(entry.getValue().getAttributeTypeFlag())
-                                                .value(entryMap.getValue().get(entry.getKey()).getConfigValue())
+                                                .value(entryMap.getValue()
+                                                        .get(entry.getKey())
+                                                        .getConfigValue())
                                                 .build()))));
     }
 
@@ -367,30 +385,34 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
             return Map.of();
         }
 
-        Map<Long, Map<Long, EventAttributeConfigDTO>> eventAttributeConfigMap =
-                device.getEventAttributeConfigIdMap();
+        Map<Long, Map<Long, EventAttributeConfigDTO>> eventAttributeConfigMap = device.getEventAttributeConfigIdMap();
         if (MapUtils.isEmpty(eventAttributeConfigMap)) {
-            log.warn("Event config unavailable, deviceId={}, eventId={}, reason=empty event-attribute-config map",
-                    deviceId, eventId);
+            log.warn(
+                    "Event config unavailable, deviceId={}, eventId={}, reason=empty event-attribute-config map",
+                    deviceId,
+                    eventId);
             return Map.of();
         }
 
         Map<Long, EventAttributeConfigDTO> attributeConfigMap = eventAttributeConfigMap.get(eventId);
-        if (attributeConfigMap == null || attributeConfigMap.isEmpty()
+        if (attributeConfigMap == null
+                || attributeConfigMap.isEmpty()
                 || !attributeConfigMap.keySet().containsAll(attributeMap.keySet())) {
-            log.warn("Event config incomplete, deviceId={}, eventId={}, required={}, configured={}",
-                    deviceId, eventId, attributeMap.keySet(),
+            log.warn(
+                    "Event config incomplete, deviceId={}, eventId={}, required={}, configured={}",
+                    deviceId,
+                    eventId,
+                    attributeMap.keySet(),
                     attributeConfigMap == null ? "[]" : attributeConfigMap.keySet());
             return Map.of();
         }
 
-        return attributeMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(entry -> entry.getValue().getAttributeCode(),
+        return attributeMap.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getValue().getAttributeCode(),
                         entry -> AttributeBO.builder()
                                 .type(entry.getValue().getAttributeTypeFlag())
                                 .value(attributeConfigMap.get(entry.getKey()).getConfigValue())
                                 .build()));
     }
-
 }

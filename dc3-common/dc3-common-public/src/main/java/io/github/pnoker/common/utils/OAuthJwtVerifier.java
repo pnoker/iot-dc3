@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 
@@ -45,6 +43,8 @@ public final class OAuthJwtVerifier {
     public interface KeySource {
 
         /**
+         * Resolve the verification key identified by the token header.
+         *
          * @param kid key id from the JWT header, never null
          * @return the RSA public key, or null when the kid is unknown (caller rejects)
          */

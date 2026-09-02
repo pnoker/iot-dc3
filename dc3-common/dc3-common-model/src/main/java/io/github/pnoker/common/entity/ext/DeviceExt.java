@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * JSON extension object for device metadata and configuration.
@@ -59,9 +57,10 @@ public class DeviceExt extends BaseExt {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        @Schema(description = "Reserved configuration field used to retain arbitrary custom device data that does not fit a typed field", example = "custom")
+        @Schema(
+                description =
+                        "Reserved configuration field used to retain arbitrary custom device data that does not fit a typed field",
+                example = "custom")
         private String keep;
-
     }
-
 }

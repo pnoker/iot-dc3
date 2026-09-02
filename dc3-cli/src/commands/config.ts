@@ -3,9 +3,7 @@ import { configManager } from '../core/config-manager.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
 export function registerConfigCommand(program: Command): void {
-  const config = program
-    .command('config')
-    .description('Configuration management');
+  const config = program.command('config').description('Configuration management');
 
   // dc3 config set <key> <value>
   config
@@ -21,26 +19,17 @@ export function registerConfigCommand(program: Command): void {
       switch (key) {
         case 'gateway':
           await configManager.setProfile(profileName, { gateway: value });
-          printAndExit(
-            { ok: true, key, value, message: `gateway set to ${value}` },
-            format,
-          );
+          printAndExit({ ok: true, key, value, message: `gateway set to ${value}` }, format);
           break;
         case 'auth.tenant':
         case 'tenant':
           await configManager.setProfile(profileName, { tenant: value });
-          printAndExit(
-            { ok: true, key, value, message: `tenant set to ${value}` },
-            format,
-          );
+          printAndExit({ ok: true, key, value, message: `tenant set to ${value}` }, format);
           break;
         case 'auth.username':
         case 'username':
           await configManager.setProfile(profileName, { username: value });
-          printAndExit(
-            { ok: true, key, value, message: `username set to ${value}` },
-            format,
-          );
+          printAndExit({ ok: true, key, value, message: `username set to ${value}` }, format);
           break;
         case 'auth.store':
         case 'credential_store':
@@ -68,11 +57,7 @@ export function registerConfigCommand(program: Command): void {
             const settingKey = key.replace('settings.', '');
             if (settingKey === 'output_format') {
               if (!['json', 'table', 'yaml'].includes(value)) {
-                printAndExit(
-                  { ok: false, message: `Invalid format: ${value}` },
-                  format,
-                  1,
-                );
+                printAndExit({ ok: false, message: `Invalid format: ${value}` }, format, 1);
               }
               await configManager.setSetting('output_format', value as 'json' | 'table' | 'yaml');
             } else if (settingKey === 'color') {
@@ -82,23 +67,12 @@ export function registerConfigCommand(program: Command): void {
             } else if (settingKey === 'retry_count') {
               await configManager.setSetting('retry_count', parseInt(value, 10));
             } else {
-              printAndExit(
-                { ok: false, message: `Unknown setting: ${settingKey}` },
-                format,
-                1,
-              );
+              printAndExit({ ok: false, message: `Unknown setting: ${settingKey}` }, format, 1);
             }
           } else {
-            printAndExit(
-              { ok: false, message: `Unknown config key: ${key}` },
-              format,
-              1,
-            );
+            printAndExit({ ok: false, message: `Unknown config key: ${key}` }, format, 1);
           }
-          printAndExit(
-            { ok: true, key, value, message: `${key} set to ${value}` },
-            format,
-          );
+          printAndExit({ ok: true, key, value, message: `${key} set to ${value}` }, format);
       }
     });
 
@@ -161,11 +135,7 @@ export function registerConfigCommand(program: Command): void {
           if (ks in settings) {
             console.log(String(settings[ks]));
           } else {
-            printAndExit(
-              { ok: false, message: `Unknown config key: ${key}` },
-              format,
-              1,
-            );
+            printAndExit({ ok: false, message: `Unknown config key: ${key}` }, format, 1);
           }
         }
       }
@@ -203,9 +173,7 @@ export function registerConfigCommand(program: Command): void {
     });
 
   // dc3 config profile
-  const profileCmd = config
-    .command('profile')
-    .description('Manage configuration profiles');
+  const profileCmd = config.command('profile').description('Manage configuration profiles');
 
   profileCmd
     .command('use <name>')

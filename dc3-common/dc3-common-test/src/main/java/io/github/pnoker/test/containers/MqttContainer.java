@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.test.containers;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -34,7 +33,8 @@ public final class MqttContainer {
 
     private static final DockerImageName IMAGE = DockerImageName.parse("eclipse-mosquitto:2.0");
 
-    private static final boolean REUSE_ENABLED = TestcontainersConfiguration.getInstance().environmentSupportsReuse();
+    private static final boolean REUSE_ENABLED =
+            TestcontainersConfiguration.getInstance().environmentSupportsReuse();
 
     private static final String CONFIG = """
             listener 1883
@@ -45,8 +45,7 @@ public final class MqttContainer {
     private static final GenericContainer<?> INSTANCE = new GenericContainer<>(IMAGE)
             .withExposedPorts(1883)
             .withCopyToContainer(
-                    org.testcontainers.images.builder.Transferable.of(CONFIG),
-                    "/mosquitto/config/mosquitto.conf")
+                    org.testcontainers.images.builder.Transferable.of(CONFIG), "/mosquitto/config/mosquitto.conf")
             .waitingFor(Wait.forLogMessage(".*mosquitto version.*\\n", 1))
             .withReuse(REUSE_ENABLED);
 
@@ -54,8 +53,7 @@ public final class MqttContainer {
         INSTANCE.start();
     }
 
-    private MqttContainer() {
-    }
+    private MqttContainer() {}
 
     /**
      * Instance.

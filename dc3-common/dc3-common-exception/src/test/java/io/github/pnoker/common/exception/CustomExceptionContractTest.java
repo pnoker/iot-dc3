@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.exception;
 
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 /**
  * Reusable contract for the dc3-common-exception family. Every custom exception
@@ -61,40 +59,40 @@ class CustomExceptionContractTest {
 
     @TestFactory
     Stream<DynamicTest> exceptionsExposeAllThreeConstructorVariants() {
-        return EXCEPTIONS.stream().flatMap(exceptionClass -> Stream.of(
-                DynamicTest.dynamicTest(
-                        exceptionClass.getSimpleName() + " no-arg leaves message and cause null",
-                        () -> {
-                            RuntimeException exception = exceptionClass.getDeclaredConstructor().newInstance();
-                            assertThat(exception.getMessage()).isNull();
-                            assertThat(exception.getCause()).isNull();
-                        }),
-                DynamicTest.dynamicTest(
-                        exceptionClass.getSimpleName() + " cause constructor wires throwable",
-                        () -> {
-                            Throwable cause = new IllegalStateException("root");
-                            RuntimeException exception = exceptionClass
-                                    .getDeclaredConstructor(Throwable.class)
-                                    .newInstance(cause);
-                            assertThat(exception.getCause()).isSameAs(cause);
-                        }),
-                DynamicTest.dynamicTest(
-                        exceptionClass.getSimpleName() + " template constructor formats placeholders",
-                        () -> {
-                            RuntimeException exception = exceptionClass
-                                    .getDeclaredConstructor(String.class, Object[].class)
-                                    .newInstance("hello {} number {}", new Object[]{"world", 42});
-                            assertThat(exception.getMessage()).isEqualTo("hello world number 42");
-                        }),
-                DynamicTest.dynamicTest(
-                        exceptionClass.getSimpleName() + " template constructor preserves trailing cause",
-                        () -> {
-                            Throwable cause = new IllegalStateException("root");
-                            RuntimeException exception = exceptionClass
-                                    .getDeclaredConstructor(String.class, Object[].class)
-                                    .newInstance("hello {}", new Object[]{"world", cause});
-                            assertThat(exception.getMessage()).isEqualTo("hello world");
-                            assertThat(exception.getCause()).isSameAs(cause);
-                        })));
+        return EXCEPTIONS.stream()
+                .flatMap(exceptionClass -> Stream.of(
+                        DynamicTest.dynamicTest(
+                                exceptionClass.getSimpleName() + " no-arg leaves message and cause null", () -> {
+                                    RuntimeException exception = exceptionClass
+                                            .getDeclaredConstructor()
+                                            .newInstance();
+                                    assertThat(exception.getMessage()).isNull();
+                                    assertThat(exception.getCause()).isNull();
+                                }),
+                        DynamicTest.dynamicTest(
+                                exceptionClass.getSimpleName() + " cause constructor wires throwable", () -> {
+                                    Throwable cause = new IllegalStateException("root");
+                                    RuntimeException exception = exceptionClass
+                                            .getDeclaredConstructor(Throwable.class)
+                                            .newInstance(cause);
+                                    assertThat(exception.getCause()).isSameAs(cause);
+                                }),
+                        DynamicTest.dynamicTest(
+                                exceptionClass.getSimpleName() + " template constructor formats placeholders", () -> {
+                                    RuntimeException exception = exceptionClass
+                                            .getDeclaredConstructor(String.class, Object[].class)
+                                            .newInstance("hello {} number {}", new Object[] {"world", 42});
+                                    assertThat(exception.getMessage()).isEqualTo("hello world number 42");
+                                }),
+                        DynamicTest.dynamicTest(
+                                exceptionClass.getSimpleName() + " template constructor preserves trailing cause",
+                                () -> {
+                                    Throwable cause = new IllegalStateException("root");
+                                    RuntimeException exception = exceptionClass
+                                            .getDeclaredConstructor(String.class, Object[].class)
+                                            .newInstance("hello {}", new Object[] {"world", cause});
+                                    assertThat(exception.getMessage()).isEqualTo("hello world");
+                                    assertThat(exception.getCause()).isSameAs(cause);
+                                })));
     }
 }

@@ -14,22 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.tool;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.github.pnoker.common.utils.JsonUtil;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Builds MCP tool input schemas from static OpenAPI specs shipped on the auth classpath
@@ -60,7 +59,7 @@ public class McpOpenApiAggregator {
     private static final String SPECS_LOCATION = "classpath*:openapi/openapi-*.json";
     private static final String SERVICE_PREFIX = "dc3-center-";
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonUtil.getJsonMapper();
 
     private static String text(JsonNode node) {
         return node.isTextual() && StringUtils.isNotBlank(node.asText()) ? node.asText() : null;
@@ -185,8 +184,11 @@ public class McpOpenApiAggregator {
         ArrayNode required = objectMapper.createArrayNode();
 
         // Request body: only merge object-shaped JSON bodies so their fields become properties.
-        JsonNode bodySchema = operation.path("requestBody").path("content")
-                .path("application/json").path("schema");
+        JsonNode bodySchema = operation
+                .path("requestBody")
+                .path("content")
+                .path("application/json")
+                .path("schema");
         if (!bodySchema.isMissingNode() && !bodySchema.isEmpty()) {
             JsonNode resolved = resolveRefs(bodySchema, root, 0);
             JsonNode bodyProps = resolved.path("properties");
@@ -207,7 +209,8 @@ public class McpOpenApiAggregator {
                 }
                 JsonNode paramSchema = resolveRefs(parameter.path("schema"), root, 0);
                 ObjectNode property = paramSchema.isObject()
-                        ? ((ObjectNode) paramSchema).deepCopy() : objectMapper.createObjectNode();
+                        ? ((ObjectNode) paramSchema).deepCopy()
+                        : objectMapper.createObjectNode();
                 String description = parameter.path("description").asText("");
                 if (!description.isEmpty() && !property.has("description")) {
                     property.put("description", description);

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.builder;
 
 import io.github.pnoker.api.common.GrpcBase;
@@ -28,12 +27,11 @@ import io.github.pnoker.common.optional.JsonOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.Optional;
 
 /**
  * MapStruct mapper for converting command attribute definitions between gRPC DTOs and
@@ -42,7 +40,9 @@ import java.util.Optional;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcCommandAttributeBuilder {
 
     /**
@@ -112,18 +112,20 @@ public interface GrpcCommandAttributeBuilder {
      * @param entityGrpc entity grpc
      */
     @AfterMapping
-    default void afterProcess(CommandAttributeDTO entityDTO, @MappingTarget GrpcCommandAttributeDTO.Builder entityGrpc) {
+    default void afterProcess(
+            CommandAttributeDTO entityDTO, @MappingTarget GrpcCommandAttributeDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByDTO(entityDTO);
         entityGrpc.setBase(grpcBase);
 
         Optional.ofNullable(entityDTO.getAttributeExt())
                 .ifPresent(value -> entityGrpc.setAttributeExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityDTO.getAttributeTypeFlag())
-                .ifPresentOrElse(value -> entityGrpc.setAttributeTypeFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setAttributeTypeFlag(value.getIndex()),
                         () -> entityGrpc.setAttributeTypeFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(entityDTO.getEnableFlag())
-                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setEnableFlag(value.getIndex()),
                         () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
     }
-
 }

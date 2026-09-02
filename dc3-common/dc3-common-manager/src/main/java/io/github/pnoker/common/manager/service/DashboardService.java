@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.service;
 
 import io.github.pnoker.common.manager.entity.vo.dashboard.DeviceStatsVO;
@@ -82,5 +81,4 @@ public interface DashboardService {
      *                 to {@code "7d"} when blank.
      */
     Mono<TopologyVO> topology(Long tenantId, String mode, String rangeKey);
-
 }

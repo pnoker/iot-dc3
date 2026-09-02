@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.enums.WindowModeEnum;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -64,29 +62,42 @@ public class LocalWindowDataSource implements WindowDataSource {
         if (numericCount == 0) {
             return new AggregateOutcome(null, count);
         }
-        BigDecimal value = switch (mode) {
-            case SUM -> samples.stream().filter(WindowSample::isNumeric)
-                    .map(s -> BigDecimal.valueOf(s.numValue()))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            case MIN -> samples.stream().filter(WindowSample::isNumeric)
-                    .map(s -> BigDecimal.valueOf(s.numValue()))
-                    .min(BigDecimal::compareTo).orElse(null);
-            case MAX -> samples.stream().filter(WindowSample::isNumeric)
-                    .map(s -> BigDecimal.valueOf(s.numValue()))
-                    .max(BigDecimal::compareTo).orElse(null);
-            case AVG -> samples.stream().filter(WindowSample::isNumeric)
-                    .map(s -> BigDecimal.valueOf(s.numValue()))
-                    .reduce(BigDecimal.ZERO, BigDecimal::add)
-                    .divide(BigDecimal.valueOf(numericCount), AVG_SCALE, RoundingMode.HALF_UP);
-            default -> null;
-        };
+        BigDecimal value =
+                switch (mode) {
+                    case SUM ->
+                        samples.stream()
+                                .filter(WindowSample::isNumeric)
+                                .map(s -> BigDecimal.valueOf(s.numValue()))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                    case MIN ->
+                        samples.stream()
+                                .filter(WindowSample::isNumeric)
+                                .map(s -> BigDecimal.valueOf(s.numValue()))
+                                .min(BigDecimal::compareTo)
+                                .orElse(null);
+                    case MAX ->
+                        samples.stream()
+                                .filter(WindowSample::isNumeric)
+                                .map(s -> BigDecimal.valueOf(s.numValue()))
+                                .max(BigDecimal::compareTo)
+                                .orElse(null);
+                    case AVG ->
+                        samples.stream()
+                                .filter(WindowSample::isNumeric)
+                                .map(s -> BigDecimal.valueOf(s.numValue()))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                                .divide(BigDecimal.valueOf(numericCount), AVG_SCALE, RoundingMode.HALF_UP);
+                    default -> null;
+                };
         return new AggregateOutcome(value, count);
     }
 
     @Override
     public Flux<WindowSample> samples(WindowSpec spec, RuleFact fact) {
-        if (Objects.isNull(spec) || Objects.isNull(spec.duration())
-                || Objects.isNull(fact) || Objects.isNull(fact.getEntityId())
+        if (Objects.isNull(spec)
+                || Objects.isNull(spec.duration())
+                || Objects.isNull(fact)
+                || Objects.isNull(fact.getEntityId())
                 || Objects.isNull(fact.getAlarmTargetTypeFlag())) {
             return Flux.empty();
         }
@@ -95,5 +106,4 @@ public class LocalWindowDataSource implements WindowDataSource {
         WindowSampleKey key = WindowSampleKey.of(fact.getTenantId(), fact.getAlarmTargetTypeFlag(), fact.getEntityId());
         return Flux.defer(() -> Flux.fromIterable(windowSampleBuffer.snapshot(key, from, to)));
     }
-
 }

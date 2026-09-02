@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
+import java.util.concurrent.TimeUnit;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * OkHttp client auto-configuration.
@@ -36,6 +34,9 @@ import java.util.concurrent.TimeUnit;
 @EnableConfigurationProperties(OkHttpProperties.class)
 public class OkHttpConfig {
 
+    /** Create the shared OkHttp auto-configuration. */
+    public OkHttpConfig() {}
+
     /**
      * Configure OkHttpClient bean with optimized settings
      *
@@ -45,9 +46,12 @@ public class OkHttpConfig {
     @Bean
     @ConditionalOnMissingBean
     public OkHttpClient okHttpClient(OkHttpProperties properties) {
-        ConnectionPool pool = new ConnectionPool(properties.getMaxIdleConnections(),
-                properties.getKeepAliveDuration().toMillis(), TimeUnit.MILLISECONDS);
-        return new OkHttpClient.Builder().retryOnConnectionFailure(properties.isRetryOnConnectionFailure())
+        ConnectionPool pool = new ConnectionPool(
+                properties.getMaxIdleConnections(),
+                properties.getKeepAliveDuration().toMillis(),
+                TimeUnit.MILLISECONDS);
+        return new OkHttpClient.Builder()
+                .retryOnConnectionFailure(properties.isRetryOnConnectionFailure())
                 .connectionPool(pool)
                 .callTimeout(properties.getCallTimeout())
                 .connectTimeout(properties.getConnectTimeout())
@@ -55,5 +59,4 @@ public class OkHttpConfig {
                 .writeTimeout(properties.getWriteTimeout())
                 .build();
     }
-
 }

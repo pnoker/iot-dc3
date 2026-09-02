@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.list.impl;
 
+import java.net.UnknownHostException;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.IJIComObject;
 import org.jinterop.dcom.core.JIArray;
@@ -31,8 +31,6 @@ import org.openscada.opc.dcom.common.impl.Helper;
 import org.openscada.opc.dcom.list.ClassDetails;
 import org.openscada.opc.dcom.list.Constants;
 import rpc.core.UUID;
-
-import java.net.UnknownHostException;
 
 /**
  * This class implements the IOPCServerList (aka OPCEnum) service.
@@ -82,10 +80,10 @@ public class OPCServerList extends BaseCOMObject {
 
         callObject.addInParamAsUUID(clsId.getCLSID(), JIFlags.FLAG_NULL);
 
-        callObject.addOutParamAsObject(new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)),
-                JIFlags.FLAG_NULL);
-        callObject.addOutParamAsObject(new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)),
-                JIFlags.FLAG_NULL);
+        callObject.addOutParamAsObject(
+                new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)), JIFlags.FLAG_NULL);
+        callObject.addOutParamAsObject(
+                new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)), JIFlags.FLAG_NULL);
 
         Object[] result = Helper.callRespectSFALSE(getCOMObject(), callObject);
 
@@ -148,5 +146,4 @@ public class OPCServerList extends BaseCOMObject {
 
         return new EnumGUID((IJIComObject) result[0]);
     }
-
 }

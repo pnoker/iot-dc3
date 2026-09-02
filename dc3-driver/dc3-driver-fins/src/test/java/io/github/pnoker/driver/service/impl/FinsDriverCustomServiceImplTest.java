@@ -14,24 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class FinsDriverCustomServiceImplTest {
@@ -54,10 +52,8 @@ class FinsDriverCustomServiceImplTest {
         ValidationReport report = service.validate(new HashMap<>());
 
         assertThat(report.isPassed()).isFalse();
-        assertThat(report.getIssues()).extracting("attributeCode")
-                .contains("host", "port", "protocol");
-        report.getIssues().forEach(issue -> assertThat(issue.getLevel())
-                .isEqualTo(ValidationReport.IssueLevel.ERROR));
+        assertThat(report.getIssues()).extracting("attributeCode").contains("host", "port", "protocol");
+        report.getIssues().forEach(issue -> assertThat(issue.getLevel()).isEqualTo(ValidationReport.IssueLevel.ERROR));
     }
 
     @Test
@@ -68,8 +64,7 @@ class FinsDriverCustomServiceImplTest {
         ValidationReport report = service.validatePoint(new HashMap<>(), point);
 
         assertThat(report.isPassed()).isFalse();
-        assertThat(report.getIssues()).extracting("attributeCode")
-                .contains("memoryArea", "address");
+        assertThat(report.getIssues()).extracting("attributeCode").contains("memoryArea", "address");
     }
 
     @Test
@@ -111,5 +106,4 @@ class FinsDriverCustomServiceImplTest {
         assertThat(encoded).hasSize(4);
         assertThat(service.decodeValue(encoded, "INT32")).isEqualTo("70000");
     }
-
 }

@@ -174,7 +174,7 @@ COMMENT ON COLUMN dc3_platform_lock.expires_at IS 'Lease expiration timestamp in
 
 INSERT INTO dc3_schema_fingerprint
     (fingerprint_version, ddl_hash, schema_contract, id_format, time_format, json_format)
-VALUES (2, 'bf799fdba88ca7a5be72b7111fd7584a4cea20609f158daa9e53af75b4106840', 'r2dbc-flag-day-v1', 'uuidv7', 'utc-micros', 'canonical-v1')
+VALUES (2, '3652a1bb3718b0033f748a612e8105898e41fdb87e86e46a3b710ac09f56bce2', 'r2dbc-flag-day-v1', 'uuidv7-bigint', 'utc-micros', 'canonical-v1')
 ON CONFLICT (fingerprint_version) DO NOTHING;
 
 -- The compose default role owns the database; deployments with a dedicated

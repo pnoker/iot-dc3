@@ -1,5 +1,18 @@
 /*
  * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.manager.repository;
 
@@ -8,18 +21,27 @@ import io.github.pnoker.common.enums.ProfileShareTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
-
 import java.util.List;
 import java.util.Set;
 
 /** Immutable, tenant-bound profile list criteria. */
-public record ProfileFilter(Long tenantId, String profileName, String profileCode,
-                            ProfileShareTypeEnum profileShareFlag, ProfileTypeEnum profileTypeFlag,
-                            EnableFlagEnum enableFlag, Long groupId, Long labelId, Integer version,
-                            Long deviceId, long offset, int limit, List<SortSpec> sort) {
+public record ProfileFilter(
+        Long tenantId,
+        String profileName,
+        String profileCode,
+        ProfileShareTypeEnum profileShareFlag,
+        ProfileTypeEnum profileTypeFlag,
+        EnableFlagEnum enableFlag,
+        Long groupId,
+        Long labelId,
+        Integer version,
+        Long deviceId,
+        long offset,
+        int limit,
+        List<SortSpec> sort) {
 
-    private static final Set<String> SORT_FIELDS = Set.of(
-            "id", "profileName", "profileCode", "createTime", "operateTime", "version");
+    private static final Set<String> SORT_FIELDS =
+            Set.of("id", "profileName", "profileCode", "createTime", "operateTime", "version");
 
     public ProfileFilter {
         if (tenantId == null || tenantId <= 0) {

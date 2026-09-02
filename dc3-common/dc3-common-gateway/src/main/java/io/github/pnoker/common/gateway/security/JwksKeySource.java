@@ -14,13 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.gateway.security;
 
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.OAuthJwtVerifier;
-import lombok.extern.slf4j.Slf4j;
-
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -34,6 +31,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Resolves RSA public keys from the auth center's JWKS document with a small cache.
@@ -52,9 +50,8 @@ public class JwksKeySource implements OAuthJwtVerifier.KeySource {
 
     private final Duration refreshInterval;
 
-    private final HttpClient httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(5))
-            .build();
+    private final HttpClient httpClient =
+            HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
 
     private volatile Map<String, RSAPublicKey> cachedKeys = Map.of();
 
@@ -104,7 +101,9 @@ public class JwksKeySource implements OAuthJwtVerifier.KeySource {
                 return Map.of();
             }
             JwksDocument document = JsonUtil.parseObject(response.body(), JwksDocument.class);
-            if (document == null || document.getKeys() == null || document.getKeys().isEmpty()) {
+            if (document == null
+                    || document.getKeys() == null
+                    || document.getKeys().isEmpty()) {
                 log.warn("JWKS document from {} contains no keys", jwksUri);
                 return Map.of();
             }
@@ -131,15 +130,17 @@ public class JwksKeySource implements OAuthJwtVerifier.KeySource {
     }
 
     private RSAPublicKey parseKey(JwkKey key) {
-        if (key == null || !"RSA".equals(key.getKty())
-                || key.getKid() == null || key.getN() == null || key.getE() == null) {
+        if (key == null
+                || !"RSA".equals(key.getKty())
+                || key.getKid() == null
+                || key.getN() == null
+                || key.getE() == null) {
             return null;
         }
         try {
             BigInteger modulus = new BigInteger(1, URL_DECODER.decode(key.getN()));
             BigInteger exponent = new BigInteger(1, URL_DECODER.decode(key.getE()));
-            return (RSAPublicKey) KeyFactory.getInstance("RSA")
-                    .generatePublic(new RSAPublicKeySpec(modulus, exponent));
+            return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(modulus, exponent));
         } catch (Exception e) {
             log.warn("Skipping unusable JWKS key {}: {}", key.getKid(), e.getMessage());
             return null;

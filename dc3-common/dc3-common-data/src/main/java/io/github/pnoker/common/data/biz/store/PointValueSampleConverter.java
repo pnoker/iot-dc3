@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.store;
 
 import io.github.pnoker.common.constant.common.TimeConstant;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
-import org.springframework.stereotype.Component;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.stereotype.Component;
 
 /**
  * Boundary converter between the business {@link PointValueBO} (wall-clock
@@ -46,7 +44,9 @@ public class PointValueSampleConverter {
      * BO wall-clock → absolute instant, pinned to the platform zone.
      */
     public Instant toInstant(LocalDateTime wallClock) {
-        return Objects.isNull(wallClock) ? null : wallClock.atZone(TimeConstant.DEFAULT_ZONEID).toInstant();
+        return Objects.isNull(wallClock)
+                ? null
+                : wallClock.atZone(TimeConstant.DEFAULT_ZONEID).toInstant();
     }
 
     /**
@@ -65,11 +65,16 @@ public class PointValueSampleConverter {
                 new SeriesKey(valueBO.getTenantId(), valueBO.getDeviceId(), valueBO.getPointId()),
                 toInstant(valueBO.getCreateTime()),
                 toInstant(valueBO.getOperateTime()),
-                valueBO.getRawValue(), valueBO.getCalValue(), valueBO.getNumValue(),
+                valueBO.getRawValue(),
+                valueBO.getCalValue(),
+                valueBO.getNumValue(),
                 0,
-                valueBO.getMessageId(), valueBO.getSchemaVersion(),
-                valueBO.getDriverNode(), valueBO.getSequence(),
-                valueBO.getFencingToken(), valueBO.getDriverId());
+                valueBO.getMessageId(),
+                valueBO.getSchemaVersion(),
+                valueBO.getDriverNode(),
+                valueBO.getSequence(),
+                valueBO.getFencingToken(),
+                valueBO.getDriverId());
     }
 
     /**

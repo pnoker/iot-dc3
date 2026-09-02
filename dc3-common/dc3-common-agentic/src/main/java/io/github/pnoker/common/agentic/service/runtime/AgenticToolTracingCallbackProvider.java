@@ -18,18 +18,17 @@ package io.github.pnoker.common.agentic.service.runtime;
 
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.databind.ObjectMapper;
-
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Wraps Spring AI tool callbacks with structured tracing.
@@ -45,12 +44,12 @@ public class AgenticToolTracingCallbackProvider implements ToolCallbackProvider 
         this(delegate, objectMapper, new Object[0]);
     }
 
-    public AgenticToolTracingCallbackProvider(ToolCallbackProvider delegate, ObjectMapper objectMapper,
-                                              Object... toolObjects) {
+    public AgenticToolTracingCallbackProvider(
+            ToolCallbackProvider delegate, ObjectMapper objectMapper, Object... toolObjects) {
         Map<String, AgenticToolTraceMetadata> metadataByName = resolveMetadata(toolObjects);
         this.callbacks = Arrays.stream(delegate.getToolCallbacks())
-                .map(callback -> new AgenticToolTracingCallback(callback, objectMapper,
-                        metadataByName.get(toolName(callback))))
+                .map(callback ->
+                        new AgenticToolTracingCallback(callback, objectMapper, metadataByName.get(toolName(callback))))
                 .toArray(ToolCallback[]::new);
     }
 
@@ -73,8 +72,8 @@ public class AgenticToolTracingCallbackProvider implements ToolCallbackProvider 
                 if (Objects.isNull(metadata)) {
                     continue;
                 }
-                AgenticToolTraceMetadata traceMetadata = new AgenticToolTraceMetadata(metadata.domain(),
-                        metadata.title());
+                AgenticToolTraceMetadata traceMetadata =
+                        new AgenticToolTraceMetadata(metadata.domain(), metadata.title());
                 metadataByName.put(method.getName(), traceMetadata);
                 Tool tool = method.getAnnotation(Tool.class);
                 if (Objects.nonNull(tool) && StringUtils.isNotBlank(tool.name())) {
@@ -92,5 +91,4 @@ public class AgenticToolTracingCallbackProvider implements ToolCallbackProvider 
         }
         return definition.name();
     }
-
 }

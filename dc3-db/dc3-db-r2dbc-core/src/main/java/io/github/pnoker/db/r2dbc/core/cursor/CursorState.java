@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.db.r2dbc.core.cursor;
 
 import java.time.Instant;
@@ -27,8 +43,8 @@ public final class CursorState {
         if (position.length == 0 || position.length > SignedCursorCodec.MAX_POSITION_BYTES) {
             throw new IllegalArgumentException("position length is invalid");
         }
-        this.expiresAt = Objects.requireNonNull(expiresAt, "expiresAt must not be null")
-                .truncatedTo(ChronoUnit.MICROS);
+        this.expiresAt =
+                Objects.requireNonNull(expiresAt, "expiresAt must not be null").truncatedTo(ChronoUnit.MICROS);
     }
 
     public String keyId() {

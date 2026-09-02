@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
@@ -30,15 +29,14 @@ import io.github.pnoker.common.enums.ResourceTypeEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * MapStruct builder converting between resource BO, VO, and DO.
@@ -46,7 +44,9 @@ import java.util.Optional;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface ResourceBuilder {
 
     /**
@@ -191,8 +191,6 @@ public interface ResourceBuilder {
      */
     List<ResourceVO> buildVOListByBOList(List<ResourceBO> entityBOList);
 
-
-
     /**
      * Convert bo list to tree view object list.
      *
@@ -234,5 +232,4 @@ public interface ResourceBuilder {
         }
         return out;
     }
-
 }

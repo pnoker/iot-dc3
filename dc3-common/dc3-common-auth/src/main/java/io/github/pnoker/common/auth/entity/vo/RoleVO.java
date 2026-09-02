@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -52,16 +51,29 @@ public class RoleVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "ID of the parent role in the role hierarchy; use 0 to indicate a top-level role. Must belong to the same tenant.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Role parent id can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description =
+                    "ID of the parent role in the role hierarchy; use 0 to indicate a top-level role. Must belong to the same tenant.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Role parent id can't be empty",
+            groups = {Add.class, Update.class})
     private String parentRoleId;
 
     /**
      * Name
      */
-    @NotBlank(message = "Role name can't be empty", groups = {Add.class, Auth.class})
-    @Schema(description = "Role display name. Unique name within a tenant.", example = "Administrator", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid role name",
+    @NotBlank(
+            message = "Role name can't be empty",
+            groups = {Add.class, Auth.class})
+    @Schema(
+            description = "Role display name. Unique name within a tenant.",
+            example = "Administrator",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
+            message = "Invalid role name",
             groups = {Add.class, Update.class})
     private String roleName;
 
@@ -82,5 +94,4 @@ public class RoleVO extends BaseVO {
      */
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * One entity that got collapsed into an {@code others:*} bucket. Has enough to route on
@@ -54,7 +52,8 @@ public class TopologyHiddenChildVO implements Serializable {
     /**
      * {@code driver | device | point}. Profile layer does not get collapsed.
      */
-    @Schema(description = "Entity type: driver, device or point (the profile layer is never collapsed)", example = "device")
+    @Schema(
+            description = "Entity type: driver, device or point (the profile layer is never collapsed)",
+            example = "device")
     private String type;
-
 }

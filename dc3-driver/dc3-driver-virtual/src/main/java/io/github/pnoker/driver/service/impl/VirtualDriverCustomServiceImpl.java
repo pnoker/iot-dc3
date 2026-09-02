@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
@@ -35,12 +34,6 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -51,6 +44,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * Custom driver service implementation for the Virtual Driver.
@@ -79,16 +77,19 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
     private final DeviceMetadata deviceMetadata;
     private final DriverSenderService driverSenderService;
     private final AtomicLong lastEventReportMillis = new AtomicLong();
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -150,12 +151,20 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             // to do something for device event
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode,
-                    metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             // to do something for point event
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode,
-                    metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
@@ -178,8 +187,11 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
      * @return the read value wrapped in a ReadPointValue object
      */
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                               PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         /*
          * Read device point data logic
          *
@@ -193,7 +205,8 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
             return new ReadPointValue(device, point, "abcd1234");
         }
         if (PointTypeEnum.BOOLEAN.equals(point.getPointTypeFlag())) {
-            return new ReadPointValue(device, point, String.valueOf(ThreadLocalRandom.current().nextBoolean()));
+            return new ReadPointValue(
+                    device, point, String.valueOf(ThreadLocalRandom.current().nextBoolean()));
         }
 
         double value = ThreadLocalRandom.current().nextDouble() * 100;
@@ -216,8 +229,12 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
      * @return true if the write operation succeeded, false otherwise
      */
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         /*
          * Write device point data logic
          *
@@ -230,8 +247,12 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Map<String, String> execute(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> commandConfig,
-                                       DeviceBO device, CommandRuntimeBO command, Map<String, String> paramValues) {
+    public Map<String, String> execute(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> commandConfig,
+            DeviceBO device,
+            CommandRuntimeBO command,
+            Map<String, String> paramValues) {
         Map<String, String> context = new LinkedHashMap<>();
         if (Objects.nonNull(paramValues)) {
             context.putAll(paramValues);
@@ -253,8 +274,13 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
         Map<String, String> result = parseResponse(response);
         result.putIfAbsent("payload", payload);
         result.putIfAbsent("response", response);
-        log.info("Virtual command executed, deviceId={}, commandId={}, payloadLength={}, responseLength={}, resultCount={}",
-                device.getId(), command.id(), payload.length(), response.length(), result.size());
+        log.info(
+                "Virtual command executed, deviceId={}, commandId={}, payloadLength={}, responseLength={}, resultCount={}",
+                device.getId(),
+                command.id(),
+                payload.length(),
+                response.length(),
+                result.size());
         return result;
     }
 
@@ -305,8 +331,7 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
     private boolean shouldReportEvent() {
         long now = System.currentTimeMillis();
         long previous = lastEventReportMillis.get();
-        return now - previous >= EVENT_REPORT_INTERVAL_MILLIS
-                && lastEventReportMillis.compareAndSet(previous, now);
+        return now - previous >= EVENT_REPORT_INTERVAL_MILLIS && lastEventReportMillis.compareAndSet(previous, now);
     }
 
     private void reportDeviceEvents(Long deviceId) {
@@ -324,8 +349,12 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
 
             EventReportDTO report = buildEventReport(device, event, eventConfig);
             driverSenderService.eventReportSender(report);
-            log.info("Virtual event reported, deviceId={}, eventId={}, eventCode={}, parameterCount={}",
-                    device.getId(), event.id(), report.eventCode(), report.paramValues().size());
+            log.info(
+                    "Virtual event reported, deviceId={}, eventId={}, eventCode={}, parameterCount={}",
+                    device.getId(),
+                    event.id(),
+                    report.eventCode(),
+                    report.paramValues().size());
         }
     }
 
@@ -338,7 +367,8 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
                 .toList();
     }
 
-    private EventReportDTO buildEventReport(DeviceBO device, EventRuntimeBO event, Map<String, AttributeBO> eventConfig) {
+    private EventReportDTO buildEventReport(
+            DeviceBO device, EventRuntimeBO event, Map<String, AttributeBO> eventConfig) {
         Map<String, Object> rawEvent = new LinkedHashMap<>();
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("value", String.valueOf(ThreadLocalRandom.current().nextInt(0, 100)));
@@ -347,10 +377,10 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
         rawEvent.put("eventCode", event.eventCode());
         rawEvent.put("payload", payload);
 
-        String eventCode = valueToString(resolvePath(rawEvent,
-                StringUtils.defaultIfBlank(getConfigValue(eventConfig, EVENT_CODE_PATH), "$.eventCode")));
-        Object payloadValue = resolvePath(rawEvent,
-                StringUtils.defaultIfBlank(getConfigValue(eventConfig, PAYLOAD_PATH), "$.payload"));
+        String eventCode = valueToString(resolvePath(
+                rawEvent, StringUtils.defaultIfBlank(getConfigValue(eventConfig, EVENT_CODE_PATH), "$.eventCode")));
+        Object payloadValue = resolvePath(
+                rawEvent, StringUtils.defaultIfBlank(getConfigValue(eventConfig, PAYLOAD_PATH), "$.payload"));
 
         return EventReportDTO.builder()
                 .recordId(UUID.randomUUID().toString())
@@ -403,7 +433,11 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
         eventConfig.forEach((attributeCode, attribute) -> {
             Map<String, String> item = new LinkedHashMap<>();
             if (Objects.nonNull(attribute)) {
-                item.put("type", Objects.nonNull(attribute.getType()) ? attribute.getType().getCode() : null);
+                item.put(
+                        "type",
+                        Objects.nonNull(attribute.getType())
+                                ? attribute.getType().getCode()
+                                : null);
                 item.put("configValue", attribute.getValue());
             }
             snapshot.put(attributeCode, item);
@@ -416,7 +450,8 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -424,7 +459,7 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

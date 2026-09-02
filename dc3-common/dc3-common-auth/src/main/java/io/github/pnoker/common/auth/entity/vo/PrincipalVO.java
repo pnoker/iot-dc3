@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,13 +23,12 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PrincipalSourceTypeEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
 
 /**
  * View object for principals.
@@ -47,28 +45,43 @@ import java.time.LocalDateTime;
 @Schema(description = "Principal view object")
 public class PrincipalVO extends BaseVO {
 
-    @Schema(description = "Classification of the principal: USER for human accounts, SERVICE_ACCOUNT for machine identities, SYSTEM for internal system identities.", example = "USER")
+    @Schema(
+            description =
+                    "Classification of the principal: USER for human accounts, SERVICE_ACCOUNT for machine identities, SYSTEM for internal system identities.",
+            example = "USER")
     private PrincipalTypeEnum principalType;
 
-    @Schema(description = "Unique login name or identifier used to authenticate the principal within its tenant.", example = "alice")
+    @Schema(
+            description = "Unique login name or identifier used to authenticate the principal within its tenant.",
+            example = "alice")
     private String principalName;
 
     @Schema(description = "Human-readable display name shown in the UI for this principal.", example = "Alice Wang")
     private String displayName;
 
-    @Schema(description = "Origin of the principal identity: LOCAL for locally managed accounts, EXTERNAL for federated/SSO identities, SYSTEM for built-in system principals.", example = "LOCAL")
+    @Schema(
+            description =
+                    "Origin of the principal identity: LOCAL for locally managed accounts, EXTERNAL for federated/SSO identities, SYSTEM for built-in system principals.",
+            example = "LOCAL")
     private PrincipalSourceTypeEnum sourceType;
 
-    @Schema(description = "Whether this principal is currently active and permitted to authenticate; ENABLE means active, DISABLE means deactivated.", example = "ENABLE")
+    @Schema(
+            description =
+                    "Whether this principal is currently active and permitted to authenticate; ENABLE means active, DISABLE means deactivated.",
+            example = "ENABLE")
     private EnableFlagEnum enableFlag;
 
-    @Schema(description = "Whether this principal is locked out due to security policy (e.g. repeated failed logins); ENABLE means locked, DISABLE means not locked.", example = "DISABLE")
+    @Schema(
+            description =
+                    "Whether this principal is locked out due to security policy (e.g. repeated failed logins); ENABLE means locked, DISABLE means not locked.",
+            example = "DISABLE")
     private EnableFlagEnum lockedFlag;
 
     @Schema(description = "Timestamp of the principal's most recent successful authentication.")
     private LocalDateTime lastLoginTime;
 
-    @Schema(description = "Extended JSON metadata for this principal (e.g. profile attributes, preferences, or provider-specific claims); structure varies by principal type.")
+    @Schema(
+            description =
+                    "Extended JSON metadata for this principal (e.g. profile attributes, preferences, or provider-specific claims); structure varies by principal type.")
     private JsonExt principalExt;
-
 }

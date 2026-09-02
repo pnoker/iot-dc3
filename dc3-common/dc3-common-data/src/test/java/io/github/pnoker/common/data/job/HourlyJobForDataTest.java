@@ -14,14 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.job;
-
-import org.junit.jupiter.api.Test;
-import org.quartz.JobExecutionContext;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.mock;
+
+import org.junit.jupiter.api.Test;
+import org.quartz.JobExecutionContext;
 
 /**
  * Migrated from the deleted PointValueJobTest — the hourly maintenance job has nothing to do

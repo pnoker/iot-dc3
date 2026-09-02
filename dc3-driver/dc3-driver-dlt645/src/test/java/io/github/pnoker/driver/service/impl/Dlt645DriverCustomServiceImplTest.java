@@ -16,20 +16,19 @@
  */
 package io.github.pnoker.driver.service.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashMap;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 class Dlt645DriverCustomServiceImplTest {
@@ -79,10 +78,9 @@ class Dlt645DriverCustomServiceImplTest {
     @Test
     void buildReadRequestHasValidStructureAndChecksum() {
         byte[] address = Dlt645Frame.encodeAddress("000000000001");
-        byte[] frame = Dlt645Frame.buildReadRequest(address, new int[]{0x00, 0x01, 0x00, 0x00});
+        byte[] frame = Dlt645Frame.buildReadRequest(address, new int[] {0x00, 0x01, 0x00, 0x00});
         assertThat(frame[0] & 0xFF).isEqualTo(0x68);
         assertThat(frame[frame.length - 1] & 0xFF).isEqualTo(0x16);
         assertThat(Dlt645Frame.verifyChecksum(frame)).isTrue();
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.resource.scan.gatefixtures;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,13 +32,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/gate/ok")
 public class WellFormedController {
 
-    @Operation(summary = "Get Thing",
+    @Operation(
+            summary = "Get Thing",
             description = "Fetch one thing by id; read-only, safe to call freely under the tenant.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")}))
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @GetMapping("/get")
     public String get(@Parameter(description = "Primary key of the target record") @RequestParam("id") Long id) {
         return "ok";

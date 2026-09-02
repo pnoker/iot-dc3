@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.service;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
@@ -30,9 +29,12 @@ import reactor.core.publisher.Mono;
  */
 public interface NotifyChannelBindService {
     Mono<NotifyChannelBindBO> add(NotifyChannelBindBO value);
-    Mono<Boolean> delete(Long tenantId, Long id);
-    Mono<NotifyChannelBindBO> update(NotifyChannelBindBO value);
-    Mono<NotifyChannelBindBO> getById(Long tenantId, Long id);
-    Mono<OffsetPage<NotifyChannelBindBO>> list(Long tenantId, NotifyChannelBindQuery query);
 
+    Mono<Boolean> delete(Long tenantId, Long id);
+
+    Mono<NotifyChannelBindBO> update(NotifyChannelBindBO value);
+
+    Mono<NotifyChannelBindBO> getById(Long tenantId, Long id);
+
+    Mono<OffsetPage<NotifyChannelBindBO>> list(Long tenantId, NotifyChannelBindQuery query);
 }

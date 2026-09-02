@@ -1,4 +1,23 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.manager.service.impl;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
@@ -7,6 +26,7 @@ import io.github.pnoker.common.manager.repository.ReactiveDeviceStore;
 import io.github.pnoker.common.manager.repository.ReactivePointAttributeConfigStore;
 import io.github.pnoker.common.manager.repository.ReactivePointStore;
 import io.github.pnoker.common.manager.repository.ReactiveProfileStore;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -15,18 +35,20 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.List;
-
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class ReactivePointServiceImplTest {
 
-    @Mock private ReactivePointStore pointStore;
-    @Mock private ReactiveProfileStore profileStore;
-    @Mock private ReactiveDeviceStore deviceStore;
-    @Mock private ReactivePointAttributeConfigStore pointAttributeConfigStore;
+    @Mock
+    private ReactivePointStore pointStore;
+
+    @Mock
+    private ReactiveProfileStore profileStore;
+
+    @Mock
+    private ReactiveDeviceStore deviceStore;
+
+    @Mock
+    private ReactivePointAttributeConfigStore pointAttributeConfigStore;
 
     @Test
     void listsOnlyTenantScopedNonNullUnits() {
@@ -56,8 +78,10 @@ class ReactivePointServiceImplTest {
 
         StepVerifier.create(service().getDeviceStatisticsByPointId(7L, 3L))
                 .assertNext(result -> {
-                    org.assertj.core.api.Assertions.assertThat(result.getCount()).isEqualTo(1L);
-                    org.assertj.core.api.Assertions.assertThat(result.getDevices()).containsExactly(device);
+                    org.assertj.core.api.Assertions.assertThat(result.getCount())
+                            .isEqualTo(1L);
+                    org.assertj.core.api.Assertions.assertThat(result.getDevices())
+                            .containsExactly(device);
                 })
                 .verifyComplete();
     }
@@ -70,7 +94,9 @@ class ReactivePointServiceImplTest {
         when(deviceStore.get(7L, 11L)).thenReturn(Mono.just(device));
         when(pointStore.countByDeviceId(7L, 11L)).thenReturn(Mono.just(4L));
 
-        StepVerifier.create(service().getCountByDeviceId(7L, 11L)).expectNext(4L).verifyComplete();
+        StepVerifier.create(service().getCountByDeviceId(7L, 11L))
+                .expectNext(4L)
+                .verifyComplete();
     }
 
     @Test
@@ -88,9 +114,12 @@ class ReactivePointServiceImplTest {
 
         StepVerifier.create(service().getPointConfigByDeviceId(7L, 11L))
                 .assertNext(result -> {
-                    org.assertj.core.api.Assertions.assertThat(result.getConfigCount()).isEqualTo(1L);
-                    org.assertj.core.api.Assertions.assertThat(result.getUnConfigCount()).isEqualTo(1L);
-                    org.assertj.core.api.Assertions.assertThat(result.getPoints()).containsExactly(configured);
+                    org.assertj.core.api.Assertions.assertThat(result.getConfigCount())
+                            .isEqualTo(1L);
+                    org.assertj.core.api.Assertions.assertThat(result.getUnConfigCount())
+                            .isEqualTo(1L);
+                    org.assertj.core.api.Assertions.assertThat(result.getPoints())
+                            .containsExactly(configured);
                 })
                 .verifyComplete();
     }

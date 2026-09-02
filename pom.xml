@@ -154,6 +154,11 @@
         <maven.version.plugin>2.21.0</maven.version.plugin>
         <maven.enforcer.plugin.version>3.6.3</maven.enforcer.plugin.version>
         <maven.central.plugin.version>0.11.0</maven.central.plugin.version>
+        <maven.antrun.plugin.version>3.1.0</maven.antrun.plugin.version>
+        <maven.checkstyle.plugin.version>3.6.0</maven.checkstyle.plugin.version>
+        <checkstyle.version>14.1.0</checkstyle.version>
+        <spotless.version>3.10.1</spotless.version>
+        <palantir.java.format.version>2.97.0</palantir.java.format.version>
 
         <!-- DC3 version (self-reference for internal dependency management) -->
         <dc3.version>2026.5.22</dc3.version>
@@ -168,7 +173,12 @@
         <mockito.javaagent.argLine>
             -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
         </mockito.javaagent.argLine>
-
+        <!-- Forked test JVMs get explicit heaps. With -T parallel module builds the
+             JVM default (25% of host RAM per fork) lets several forks push CI runners
+             into the OOM killer, which surfaces as "forked VM terminated without
+             properly saying goodbye". -->
+        <surefire.fork.heap>-Xmx512m</surefire.fork.heap>
+        <failsafe.fork.heap>-Xmx768m</failsafe.fork.heap>
     </properties>
 
 
@@ -876,6 +886,18 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
         </plugins>
 
         <pluginManagement>
@@ -898,6 +920,99 @@
                                     </requireMavenVersion>
                                 </rules>
                             </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Generate a Java-comment version of the canonical COPYRIGHT file. -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>${maven.antrun.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>generate-java-copyright-header</id>
+                            <phase>initialize</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <target>
+                                    <loadfile property="dc3.copyright.body"
+                                              srcFile="${maven.multiModuleProjectDirectory}/COPYRIGHT">
+                                        <filterchain>
+                                            <prefixlines prefix=" *"/>
+                                            <tokenfilter>
+                                                <replaceregex pattern="^ \*([^\n])" replace=" * \1" flags="gm"/>
+                                            </tokenfilter>
+                                        </filterchain>
+                                    </loadfile>
+                                    <mkdir dir="${project.build.directory}/dc3"/>
+                                    <echo file="${project.build.directory}/dc3/java-copyright-header.txt">/*
+${dc3.copyright.body}
+ */
+</echo>
+                                </target>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Deterministic Java formatting and canonical license headers. -->
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>${spotless.version}</version>
+                    <configuration>
+                        <java>
+                            <palantirJavaFormat>
+                                <version>${palantir.java.format.version}</version>
+                                <formatJavadoc>false</formatJavadoc>
+                            </palantirJavaFormat>
+                            <licenseHeader>
+                                <file>${project.build.directory}/dc3/java-copyright-header.txt</file>
+                            </licenseHeader>
+                        </java>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>spotless-check</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Naming and public API documentation checks. -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>${maven.checkstyle.plugin.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>${checkstyle.version}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <configLocation>${maven.multiModuleProjectDirectory}/checkstyle.xml</configLocation>
+                        <suppressionsLocation>${maven.multiModuleProjectDirectory}/checkstyle-suppressions.xml</suppressionsLocation>
+                        <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <cacheFile>${project.build.directory}/checkstyle-cachefile</cacheFile>
+                        <consoleOutput>true</consoleOutput>
+                        <failsOnError>true</failsOnError>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>checkstyle-check</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
                         </execution>
                     </executions>
                 </plugin>
@@ -1126,7 +1241,7 @@
                     <version>${surefire.version}</version>
                     <configuration>
                         <skip>${skip.unit.tests}</skip>
-                        <argLine>@{argLine} ${mockito.javaagent.argLine} -Xshare:off -Duser.language=en
+                        <argLine>@{argLine} ${mockito.javaagent.argLine} ${surefire.fork.heap} -Xshare:off -Duser.language=en
                             -Duser.country=US
                         </argLine>
                         <includes>
@@ -1151,7 +1266,7 @@
                              repackages the module artifact into a fat jar that is not directly
                              loadable on the Failsafe classpath. -->
                         <classesDirectory>${project.build.outputDirectory}</classesDirectory>
-                        <argLine>@{failsafe.argLine} ${mockito.javaagent.argLine} -Xshare:off -Duser.language=en
+                        <argLine>@{failsafe.argLine} ${mockito.javaagent.argLine} ${failsafe.fork.heap} -Xshare:off -Duser.language=en
                             -Duser.country=US
                         </argLine>
                         <includes>

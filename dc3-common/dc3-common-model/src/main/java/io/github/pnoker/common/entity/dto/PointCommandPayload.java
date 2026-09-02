@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -30,21 +29,18 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = PointCommandPayload.ReadPayload.class, name = "ReadPayload"),
-        @JsonSubTypes.Type(value = PointCommandPayload.WritePayload.class, name = "WritePayload")
+    @JsonSubTypes.Type(value = PointCommandPayload.ReadPayload.class, name = "ReadPayload"),
+    @JsonSubTypes.Type(value = PointCommandPayload.WritePayload.class, name = "WritePayload")
 })
-public sealed interface PointCommandPayload
-        permits PointCommandPayload.ReadPayload, PointCommandPayload.WritePayload {
+public sealed interface PointCommandPayload permits PointCommandPayload.ReadPayload, PointCommandPayload.WritePayload {
 
     /**
      * Read command payload: which device and point to read from.
      */
-    record ReadPayload(Long deviceId, Long pointId) implements PointCommandPayload {
-    }
+    record ReadPayload(Long deviceId, Long pointId) implements PointCommandPayload {}
 
     /**
      * Write command payload: which device/point to write to and the value.
      */
-    record WritePayload(Long deviceId, Long pointId, String value) implements PointCommandPayload {
-    }
+    record WritePayload(Long deviceId, Long pointId, String value) implements PointCommandPayload {}
 }

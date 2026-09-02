@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.builder;
 
 import io.github.pnoker.api.common.GrpcCommandAttributeConfigDTO;
@@ -34,7 +33,9 @@ import org.mapstruct.MappingTarget;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcCommandAttributeConfigBuilder {
 
     /**
@@ -61,11 +62,10 @@ public interface GrpcCommandAttributeConfigBuilder {
      * @param entityDTO  transfer object
      */
     @AfterMapping
-    default void afterProcess(GrpcCommandAttributeConfigDTO entityGrpc,
-                              @MappingTarget CommandAttributeConfigDTO entityDTO) {
+    default void afterProcess(
+            GrpcCommandAttributeConfigDTO entityGrpc, @MappingTarget CommandAttributeConfigDTO entityDTO) {
         GrpcBuilderUtil.buildBaseDTOByGrpcBase(entityGrpc.getBase(), entityDTO);
 
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityDTO::setEnableFlag);
     }
-
 }

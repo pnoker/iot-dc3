@@ -17,7 +17,8 @@ Auth、Agentic、Manager 和 Data 的关系数据已经统一到同一个 R2DBC 
 
 ## 2. 数据格式与边界
 
-- ID 使用 UUIDv7 逻辑标识；时间使用 UTC `Instant`，数据库精度为微秒。
+- 业务聚合 ID 使用 `BIGINT`，由 `UuidV7.nextLong()` 生成（UUIDv7 的 64 位时间有序投影）；操作、消息与游标等运行时标识使用原生 UUIDv7（`dc3_operation`、`dc3_idempotency` 等运行时表）。原生 UUID 全链路（业务表、protobuf、Web、CLI）仍是未裁决的后续架构决策；在架构评审通过前，不得引入双 ID 字段、别名或转换层。
+- 时间列统一 `TIMESTAMPTZ`，数据库精度为微秒。新增代码的业务边界使用 UTC `Instant`；迁移域仍存在的 `LocalDateTime` 字段承载的仍是绝对时间（按 UTC 读写 `TIMESTAMPTZ` 列），属于迁移债务——触碰相关 store 时必须顺手收敛为 `Instant`，且不得新增 `LocalDateTime` 持久化字段。
 - 扩展字段统一规范化 JSONB；Repository 在 `Row` 边界固定使用 `row.get(column, String.class)` 解码，再交给 JSON mapper，禁止依赖驱动对象的 `toString()`；命名参数绑定，禁止 SQL 字符串拼接用户输入。
 - 资源成功响应直接返回 JSON；列表返回 `items`；错误返回 RFC 9457 `application/problem+json`。
 - gRPC 单条 RPC 直接返回 DTO，集合 RPC 返回 `items`；资源不存在使用 `NOT_FOUND`，请求错误使用 `INVALID_ARGUMENT`。

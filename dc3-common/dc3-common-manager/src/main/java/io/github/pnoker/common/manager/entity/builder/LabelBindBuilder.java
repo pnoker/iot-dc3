@@ -14,19 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.builder;
 
 import io.github.pnoker.common.manager.entity.bo.LabelBindBO;
 import io.github.pnoker.common.manager.entity.vo.LabelBindVO;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.List;
-
 /** MapStruct builder converting between label binding business and API models. */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface LabelBindBuilder {
 
     @Mapping(target = "tenantId", ignore = true)
@@ -37,5 +37,4 @@ public interface LabelBindBuilder {
     LabelBindVO buildVOByBO(LabelBindBO entityBO);
 
     List<LabelBindVO> buildVOListByBOList(List<LabelBindBO> entityBOList);
-
 }

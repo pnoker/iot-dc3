@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
-
-import java.util.Collection;
 import io.github.pnoker.common.facade.entity.query.FacadeDriverOffsetQuery;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.util.Collection;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -39,11 +37,8 @@ import reactor.core.publisher.Mono;
 public interface DriverFacade {
 
     Mono<FacadeDriverBO> getByIdReactive(Long tenantId, Long id);
+
     Flux<FacadeDriverBO> listByIdsReactive(Long tenantId, Collection<Long> ids);
+
     Mono<OffsetPage<FacadeDriverBO>> listReactive(FacadeDriverOffsetQuery query);
-
-
-
-
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.grpc.builder;
 
 import io.github.pnoker.api.center.manager.GrpcOffsetProfileQuery;
@@ -25,17 +24,15 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ProfileShareTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
-import io.github.pnoker.common.manager.repository.ProfileFilter;
 import io.github.pnoker.common.manager.grpc.GrpcPageUtil;
+import io.github.pnoker.common.manager.repository.ProfileFilter;
 import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import org.springframework.stereotype.Component;
-
 import java.util.Objects;
 import java.util.Optional;
-import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * MapStruct builder for profile gRPC message conversion.
@@ -49,13 +46,22 @@ public class GrpcProfileBuilder {
     /** Convert the canonical offset request into a validated repository filter. */
     public ProfileFilter buildFilterByGrpcQuery(GrpcOffsetProfileQuery request) {
         var page = GrpcPageUtil.require(request.hasPage() ? request.getPage() : null);
-        return new ProfileFilter(request.getTenantId(), request.getProfileName(), request.getProfileCode(),
-                request.hasProfileShareFlag() ? ProfileShareTypeEnum.ofIndex((byte) request.getProfileShareFlag()) : null,
+        return new ProfileFilter(
+                request.getTenantId(),
+                request.getProfileName(),
+                request.getProfileCode(),
+                request.hasProfileShareFlag()
+                        ? ProfileShareTypeEnum.ofIndex((byte) request.getProfileShareFlag())
+                        : null,
                 request.hasProfileTypeFlag() ? ProfileTypeEnum.ofIndex((byte) request.getProfileTypeFlag()) : null,
                 request.hasEnableFlag() ? EnableFlagEnum.ofIndex((byte) request.getEnableFlag()) : null,
-                request.hasGroupId() ? request.getGroupId() : null, request.hasLabelId() ? request.getLabelId() : null,
-                request.hasVersion() ? request.getVersion() : null, request.hasDeviceId() ? request.getDeviceId() : null,
-                page.offset(), page.limit(), page.sort());
+                request.hasGroupId() ? request.getGroupId() : null,
+                request.hasLabelId() ? request.getLabelId() : null,
+                request.hasVersion() ? request.getVersion() : null,
+                request.hasDeviceId() ? request.getDeviceId() : null,
+                page.offset(),
+                page.limit(),
+                page.sort());
     }
 
     /**
@@ -72,15 +78,18 @@ public class GrpcProfileBuilder {
         StringOptional.ofNullable(entityBO.getProfileName()).ifPresent(builder::setProfileName);
         StringOptional.ofNullable(entityBO.getProfileCode()).ifPresent(builder::setProfileCode);
         Optional.ofNullable(entityBO.getProfileShareFlag())
-                .ifPresentOrElse(value -> builder.setProfileShareFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> builder.setProfileShareFlag(value.getIndex()),
                         () -> builder.setProfileShareFlag(DefaultConstant.DEFAULT_INT));
         Optional.ofNullable(entityBO.getProfileTypeFlag())
-                .ifPresentOrElse(value -> builder.setProfileTypeFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> builder.setProfileTypeFlag(value.getIndex()),
                         () -> builder.setProfileTypeFlag(DefaultConstant.DEFAULT_INT));
         Optional.ofNullable(entityBO.getProfileExt())
                 .ifPresent(value -> builder.setProfileExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityBO.getEnableFlag())
-                .ifPresentOrElse(value -> builder.setEnableFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> builder.setEnableFlag(value.getIndex()),
                         () -> builder.setEnableFlag(DefaultConstant.DEFAULT_INT));
         StringOptional.ofNullable(entityBO.getSignature()).ifPresent(builder::setSignature);
         if (Objects.nonNull(entityBO.getVersion())) {
@@ -89,5 +98,4 @@ public class GrpcProfileBuilder {
         LongOptional.ofNullable(entityBO.getTenantId()).ifPresent(builder::setTenantId);
         return builder.build();
     }
-
 }

@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.bo;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.List;
 
 /**
  * Business object for point configuration grouped by device.
@@ -31,7 +29,6 @@ import java.util.List;
  * @author pnoker
  * @since 2016.10.1
  */
-
 @Getter
 @Setter
 @ToString
@@ -53,5 +50,4 @@ public class PointConfigByDeviceBO {
      *
      */
     private List<PointBO> points;
-
 }

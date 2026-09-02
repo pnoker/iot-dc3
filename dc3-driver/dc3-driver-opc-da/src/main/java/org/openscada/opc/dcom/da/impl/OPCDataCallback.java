@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da.impl;
 
+import java.util.LinkedList;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.JIArray;
@@ -37,9 +38,6 @@ import org.openscada.opc.dcom.da.Constants;
 import org.openscada.opc.dcom.da.IOPCDataCallback;
 import org.openscada.opc.dcom.da.ValueData;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  *
  * @author pnoker
@@ -57,12 +55,20 @@ public class OPCDataCallback extends EventHandlerImpl {
         super();
     }
 
-    public Object[] OnDataChange(final int transactionId, final int serverGroupHandle, final int masterQuality,
-                                 final int masterErrorCode, final int count, final JIArray clientHandles, final JIArray values,
-                                 final JIArray qualities, final JIArray timestamps, final JIArray errors) {
+    public Object[] OnDataChange(
+            final int transactionId,
+            final int serverGroupHandle,
+            final int masterQuality,
+            final int masterErrorCode,
+            final int count,
+            final JIArray clientHandles,
+            final JIArray values,
+            final JIArray qualities,
+            final JIArray timestamps,
+            final JIArray errors) {
         final IOPCDataCallback callback = this.callback;
         if (callback == null) {
-            return new Object[]{org.openscada.opc.dcom.common.Constants.S_OK};
+            return new Object[] {org.openscada.opc.dcom.common.Constants.S_OK};
         }
 
         // get arrays for more readable code later ;-)
@@ -86,19 +92,30 @@ public class OPCDataCallback extends EventHandlerImpl {
         try {
             callback.dataChange(transactionId, serverGroupHandle, masterQuality, masterErrorCode, result);
         } catch (final Throwable e) {
-            log.error("OPC DA data-change callback failed, transactionId={}, serverGroupHandle={}",
-                    transactionId, serverGroupHandle, e);
+            log.error(
+                    "OPC DA data-change callback failed, transactionId={}, serverGroupHandle={}",
+                    transactionId,
+                    serverGroupHandle,
+                    e);
         }
 
         // The client must always return S_OK
-        return new Object[]{org.openscada.opc.dcom.common.Constants.S_OK};
+        return new Object[] {org.openscada.opc.dcom.common.Constants.S_OK};
     }
 
-    public synchronized Object[] OnReadComplete(final int transactionId, final int serverGroupHandle,
-                                                final int masterQuality, final int masterErrorCode, final int count, final JIArray clientHandles,
-                                                final JIArray values, final JIArray qualities, final JIArray timestamps, final JIArray errors) {
+    public synchronized Object[] OnReadComplete(
+            final int transactionId,
+            final int serverGroupHandle,
+            final int masterQuality,
+            final int masterErrorCode,
+            final int count,
+            final JIArray clientHandles,
+            final JIArray values,
+            final JIArray qualities,
+            final JIArray timestamps,
+            final JIArray errors) {
         if (this.callback == null) {
-            return new Object[]{org.openscada.opc.dcom.common.Constants.S_OK};
+            return new Object[] {org.openscada.opc.dcom.common.Constants.S_OK};
         }
 
         // get arrays for more readable code later ;-)
@@ -122,18 +139,26 @@ public class OPCDataCallback extends EventHandlerImpl {
         try {
             this.callback.readComplete(transactionId, serverGroupHandle, masterQuality, masterErrorCode, result);
         } catch (final Throwable e) {
-            log.error("OPC DA read-complete callback failed, transactionId={}, serverGroupHandle={}",
-                    transactionId, serverGroupHandle, e);
+            log.error(
+                    "OPC DA read-complete callback failed, transactionId={}, serverGroupHandle={}",
+                    transactionId,
+                    serverGroupHandle,
+                    e);
         }
 
         // The client must always return S_OK
-        return new Object[]{org.openscada.opc.dcom.common.Constants.S_OK};
+        return new Object[] {org.openscada.opc.dcom.common.Constants.S_OK};
     }
 
-    public synchronized Object[] OnWriteComplete(final int transactionId, final int serverGroupHandle,
-                                                 final int masterErrorCode, final int count, final JIArray clientHandles, final JIArray errors) {
+    public synchronized Object[] OnWriteComplete(
+            final int transactionId,
+            final int serverGroupHandle,
+            final int masterErrorCode,
+            final int count,
+            final JIArray clientHandles,
+            final JIArray errors) {
         if (this.callback == null) {
-            return new Object[]{org.openscada.opc.dcom.common.Constants.S_OK};
+            return new Object[] {org.openscada.opc.dcom.common.Constants.S_OK};
         }
 
         // get arrays for more readable code later ;-)
@@ -150,23 +175,26 @@ public class OPCDataCallback extends EventHandlerImpl {
         try {
             this.callback.writeComplete(transactionId, serverGroupHandle, masterErrorCode, result);
         } catch (final Throwable e) {
-            log.error("OPC DA write-complete callback failed, transactionId={}, serverGroupHandle={}",
-                    transactionId, serverGroupHandle, e);
+            log.error(
+                    "OPC DA write-complete callback failed, transactionId={}, serverGroupHandle={}",
+                    transactionId,
+                    serverGroupHandle,
+                    e);
         }
 
         // The client must always return S_OK
-        return new Object[]{org.openscada.opc.dcom.common.Constants.S_OK};
+        return new Object[] {org.openscada.opc.dcom.common.Constants.S_OK};
     }
 
     public synchronized Object[] OnCancelComplete(final int transactionId, final int serverGroupHandle) {
         if (this.callback == null) {
-            return new Object[]{org.openscada.opc.dcom.common.Constants.S_OK};
+            return new Object[] {org.openscada.opc.dcom.common.Constants.S_OK};
         }
 
         this.callback.cancelComplete(transactionId, serverGroupHandle);
 
         // The client must always return S_OK
-        return new Object[]{org.openscada.opc.dcom.common.Constants.S_OK};
+        return new Object[] {org.openscada.opc.dcom.common.Constants.S_OK};
     }
 
     public synchronized JILocalCoClass getCoClass() throws JIException {
@@ -174,8 +202,8 @@ public class OPCDataCallback extends EventHandlerImpl {
             return this.coClass;
         }
 
-        this.coClass = new JILocalCoClass(new JILocalInterfaceDefinition(Constants.IOPCDataCallback_IID, false), this,
-                false);
+        this.coClass =
+                new JILocalCoClass(new JILocalInterfaceDefinition(Constants.IOPCDataCallback_IID, false), this, false);
 
         JILocalParamsDescriptor params;
         JILocalMethodDescriptor method;
@@ -245,5 +273,4 @@ public class OPCDataCallback extends EventHandlerImpl {
     public void setCallback(final IOPCDataCallback callback) {
         this.callback = callback;
     }
-
 }

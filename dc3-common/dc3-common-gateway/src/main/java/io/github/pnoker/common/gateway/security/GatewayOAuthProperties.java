@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.gateway.security;
 
+import java.time.Duration;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import java.time.Duration;
 
 /**
  * Gateway-side verification of OAuth RS256 access tickets (Bearer tokens) on API routes.
@@ -63,5 +61,4 @@ public class GatewayOAuthProperties {
      * How long a fetched JWKS document is reused before refresh.
      */
     private Duration jwksCacheTtl = Duration.ofMinutes(5);
-
 }

@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.bo;
 
 import io.github.pnoker.common.entity.ext.JsonExt;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
 
 /**
  * Business object for identity and authorization audit log entries.
@@ -98,5 +96,4 @@ public class IdentityAuditLogBO {
      * Create time
      */
     private LocalDateTime createTime;
-
 }

@@ -1032,12 +1032,12 @@ BEGIN
             OR NEW.deleted IS DISTINCT FROM OLD.deleted
             OR NEW.enable_flag IS DISTINCT FROM OLD.enable_flag)
     THEN
-        INSERT INTO dc3_driver_device_revision (tenant_id, driver_id, revision)
+        INSERT INTO dc3_manager.dc3_driver_device_revision (tenant_id, driver_id, revision)
         VALUES (OLD.tenant_id, OLD.driver_id, 1)
         ON CONFLICT
             (tenant_id, driver_id) DO
         UPDATE SET
-            revision = dc3_driver_device_revision.revision + 1;
+            revision = dc3_manager.dc3_driver_device_revision.revision + 1;
     END IF;
     IF TG_OP IN ('INSERT', 'UPDATE') AND NEW.deleted = 0 AND NEW.enable_flag = 0
         AND (TG_OP = 'INSERT'
@@ -1046,12 +1046,12 @@ BEGIN
             OR NEW.deleted IS DISTINCT FROM OLD.deleted
             OR NEW.enable_flag IS DISTINCT FROM OLD.enable_flag)
     THEN
-        INSERT INTO dc3_driver_device_revision (tenant_id, driver_id, revision)
+        INSERT INTO dc3_manager.dc3_driver_device_revision (tenant_id, driver_id, revision)
         VALUES (NEW.tenant_id, NEW.driver_id, 1)
         ON CONFLICT
             (tenant_id, driver_id) DO
         UPDATE SET
-            revision = dc3_driver_device_revision.revision + 1;
+            revision = dc3_manager.dc3_driver_device_revision.revision + 1;
     END IF;
     RETURN NULL;
 END;

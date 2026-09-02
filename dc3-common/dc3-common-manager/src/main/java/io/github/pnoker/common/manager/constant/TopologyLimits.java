@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.constant;
 
 /**
@@ -76,5 +75,4 @@ public final class TopologyLimits {
     private TopologyLimits() {
         // utility class — never instantiated
     }
-
 }

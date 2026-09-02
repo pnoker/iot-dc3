@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.bean;
 
 import lombok.Getter;
@@ -41,5 +40,4 @@ public class PlcS7PointVariable {
             this.address = String.format("DB%d.%d", dbNum, byteOffset);
         }
     }
-
 }

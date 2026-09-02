@@ -16,6 +16,8 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
+import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
+
 import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.config.ChatClientConfig;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
@@ -31,19 +33,16 @@ import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.RequestException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
-import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
  * Converts an API chat request into validated, tenant-scoped orchestration state.
@@ -71,57 +70,76 @@ public class AgenticChatRequestPreparer {
      * asynchronous boundary here is the message store; no database publisher is
      * subscribed from an imperative callback.
      */
-    public Mono<AgenticPreparedChatBO> prepareReactive(ChatCompletionRequestVO request,
-                                                       RequestHeader.PrincipalHeader userHeader,
-                                                       String mode) {
+    public Mono<AgenticPreparedChatBO> prepareReactive(
+            ChatCompletionRequestVO request, RequestHeader.PrincipalHeader userHeader, String mode) {
         validateRequest(request);
         String rawUserMessage = extractLastUserMessage(request);
         List<Long> attachments = normalizeAttachments(request);
         String conversationId = resolveConversationId(request);
         AgenticRunTrace runTrace = new AgenticRunTrace();
         Map<String, Object> toolContext = buildToolContext(userHeader, conversationId, runTrace);
-        return chatClientFactory.resolveModelReactive(request.getModel(), userHeader)
-                .flatMap(model -> chatClientFactory.supportsToolCallReactive(model, userHeader)
+        return chatClientFactory
+                .resolveModelReactive(request.getModel(), userHeader)
+                .flatMap(model -> chatClientFactory
+                        .supportsToolCallReactive(model, userHeader)
                         .flatMap(modelSupportsToolCall -> {
                             boolean toolCallingEnabled = properties.isToolCallingEnabled() && modelSupportsToolCall;
-                            Mono<String> attachmentPublisher = attachmentService.summarize(attachments, userHeader)
+                            Mono<String> attachmentPublisher = attachmentService
+                                    .summarize(attachments, userHeader)
                                     .onErrorResume(error -> {
-                                        log.warn("Agentic attachment summary failed, conversationId={}",
-                                                sanitize(conversationId), error);
+                                        log.warn(
+                                                "Agentic attachment summary failed, conversationId={}",
+                                                sanitize(conversationId),
+                                                error);
                                         return Mono.just("");
                                     });
                             Mono<List<MessageBO>> memoryPublisher = properties.isMemoryEnabled()
-                                    ? messageStore.loadHistory(conversationId, userHeader, properties.getHistoryWindowSize())
-                                    .collectList()
-                                    .onErrorResume(error -> {
-                                        log.warn("Agentic memory history load failed, conversationId={}",
-                                                sanitize(conversationId), error);
-                                        return Mono.just(List.of());
-                                    })
+                                    ? messageStore
+                                            .loadHistory(conversationId, userHeader, properties.getHistoryWindowSize())
+                                            .collectList()
+                                            .onErrorResume(error -> {
+                                                log.warn(
+                                                        "Agentic memory history load failed, conversationId={}",
+                                                        sanitize(conversationId),
+                                                        error);
+                                                return Mono.just(List.of());
+                                            })
                                     : Mono.just(List.of());
                             return attachmentPublisher.flatMap(attachmentContext -> {
                                 List<AgenticMessageContent.Context> contexts = buildContexts(attachmentContext);
                                 String requestSystemContext = buildRequestSystemContext(contexts);
                                 return memoryPublisher.flatMap(memoryHistory -> {
-                                    AgenticMessageContent.Tokens inputTokens = buildInputTokens(rawUserMessage, contexts,
-                                            memoryHistory, toolCallingEnabled);
-                                    log.debug("Agentic memory loaded, conversationId={}, memoryEnabled={}, count={}",
-                                            sanitize(conversationId), properties.isMemoryEnabled(), memoryHistory.size());
-                                    return touchSessionReactive(conversationId, userHeader,
-                                            buildSessionExt(request, model))
-                                            .thenReturn(new AgenticPreparedChatBO(rawUserMessage, conversationId,
-                                                    requestSystemContext, model, toolContext, request.getTemperature(),
-                                                    request.getMaxTokens(), runTrace, toolCallingEnabled,
-                                                    Boolean.TRUE.equals(request.getReasoning()), attachments, contexts,
-                                                    inputTokens, memoryHistory));
+                                    AgenticMessageContent.Tokens inputTokens = buildInputTokens(
+                                            rawUserMessage, contexts, memoryHistory, toolCallingEnabled);
+                                    log.debug(
+                                            "Agentic memory loaded, conversationId={}, memoryEnabled={}, count={}",
+                                            sanitize(conversationId),
+                                            properties.isMemoryEnabled(),
+                                            memoryHistory.size());
+                                    return touchSessionReactive(
+                                                    conversationId, userHeader, buildSessionExt(request, model))
+                                            .thenReturn(new AgenticPreparedChatBO(
+                                                    rawUserMessage,
+                                                    conversationId,
+                                                    requestSystemContext,
+                                                    model,
+                                                    toolContext,
+                                                    request.getTemperature(),
+                                                    request.getMaxTokens(),
+                                                    runTrace,
+                                                    toolCallingEnabled,
+                                                    Boolean.TRUE.equals(request.getReasoning()),
+                                                    attachments,
+                                                    contexts,
+                                                    inputTokens,
+                                                    memoryHistory));
                                 });
                             });
-                        })
-                );
+                        }));
     }
 
-    private Map<String, Object> buildToolContext(RequestHeader.PrincipalHeader userHeader, String conversationId,
-                                                 AgenticRunTrace runTrace) {
+    private Map<String, Object> buildToolContext(
+            RequestHeader.PrincipalHeader userHeader, String conversationId, AgenticRunTrace runTrace) {
         Map<String, Object> toolContext = new HashMap<>();
         toolContext.put(AgenticConstant.ToolContextKey.TENANT_ID, userHeader.getTenantId());
         toolContext.put(AgenticConstant.ToolContextKey.USER_ID, userHeader.getUserId());
@@ -149,8 +167,7 @@ public class AgenticChatRequestPreparer {
     }
 
     private String extractLastUserMessage(ChatCompletionRequestVO request) {
-        return request.getMessages()
-                .stream()
+        return request.getMessages().stream()
                 .filter(message -> Objects.nonNull(message) && "user".equals(message.getRole()))
                 .map(ChatMessageDTO::getContent)
                 .filter(StringUtils::isNotBlank)
@@ -190,9 +207,11 @@ public class AgenticChatRequestPreparer {
         return sections.isEmpty() ? null : String.join("\n\n", sections);
     }
 
-    private AgenticMessageContent.Tokens buildInputTokens(String userMessage, List<AgenticMessageContent.Context> contexts,
-                                                          List<MessageBO> memoryHistory,
-                                                          boolean toolCallingEnabled) {
+    private AgenticMessageContent.Tokens buildInputTokens(
+            String userMessage,
+            List<AgenticMessageContent.Context> contexts,
+            List<MessageBO> memoryHistory,
+            boolean toolCallingEnabled) {
         int textTokens = AgenticTokenEstimatorUtil.estimate(userMessage);
         int contextTokens = contexts.stream()
                 .map(AgenticMessageContent.Context::getContent)
@@ -201,8 +220,13 @@ public class AgenticChatRequestPreparer {
         int systemTokens = AgenticTokenEstimatorUtil.estimate(ChatClientConfig.BASE_SYSTEM_PROMPT)
                 + (toolCallingEnabled ? AgenticTokenEstimatorUtil.estimate(ChatClientConfig.TOOL_SYSTEM_PROMPT) : 0);
         int memoryTokens = estimateMemoryTokens(memoryHistory);
-        return AgenticMessageContent.Tokens.of(textTokens + contextTokens + systemTokens + memoryTokens, 0,
-                textTokens, contextTokens, systemTokens, memoryTokens);
+        return AgenticMessageContent.Tokens.of(
+                textTokens + contextTokens + systemTokens + memoryTokens,
+                0,
+                textTokens,
+                contextTokens,
+                systemTokens,
+                memoryTokens);
     }
 
     private int estimateMemoryTokens(List<MessageBO> history) {
@@ -210,7 +234,9 @@ public class AgenticChatRequestPreparer {
             return 0;
         }
         return history.stream()
-                .map(message -> Objects.nonNull(message.getContent()) ? message.getContent().getText() : null)
+                .map(message -> Objects.nonNull(message.getContent())
+                        ? message.getContent().getText()
+                        : null)
                 .map(StringUtils::defaultString)
                 .filter(StringUtils::isNotBlank)
                 .mapToInt(AgenticTokenEstimatorUtil::estimate)
@@ -218,8 +244,10 @@ public class AgenticChatRequestPreparer {
     }
 
     private SessionExt buildSessionExt(ChatCompletionRequestVO request, String model) {
-        if (Objects.isNull(request.getReasoning()) && Objects.isNull(request.getTemperature())
-                && Objects.isNull(request.getMaxTokens()) && StringUtils.isBlank(model)) {
+        if (Objects.isNull(request.getReasoning())
+                && Objects.isNull(request.getTemperature())
+                && Objects.isNull(request.getMaxTokens())
+                && StringUtils.isBlank(model)) {
             return null;
         }
         SessionExt sessionExt = new SessionExt();
@@ -230,11 +258,16 @@ public class AgenticChatRequestPreparer {
         return sessionExt;
     }
 
-    private Mono<Void> touchSessionReactive(String conversationId,
-                                             RequestHeader.PrincipalHeader userHeader, SessionExt sessionExt) {
-        return sessionService.touch(conversationId, userHeader, sessionExt)
-                .doOnError(error -> log.warn("Agentic session touch failed, tenantId={}, userId={}, conversationId={}",
-                        userHeader.getTenantId(), userHeader.getUserId(), sanitize(conversationId), error))
+    private Mono<Void> touchSessionReactive(
+            String conversationId, RequestHeader.PrincipalHeader userHeader, SessionExt sessionExt) {
+        return sessionService
+                .touch(conversationId, userHeader, sessionExt)
+                .doOnError(error -> log.warn(
+                        "Agentic session touch failed, tenantId={}, userId={}, conversationId={}",
+                        userHeader.getTenantId(),
+                        userHeader.getUserId(),
+                        sanitize(conversationId),
+                        error))
                 .then();
     }
 
@@ -242,7 +275,9 @@ public class AgenticChatRequestPreparer {
         if (Objects.isNull(request.getAttachments()) || request.getAttachments().isEmpty()) {
             return List.of();
         }
-        return request.getAttachments().stream().filter(Objects::nonNull).distinct().toList();
+        return request.getAttachments().stream()
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
     }
-
 }

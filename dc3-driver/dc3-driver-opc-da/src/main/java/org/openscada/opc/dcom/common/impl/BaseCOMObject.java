@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.common.impl;
 
 import org.jinterop.dcom.core.IJIComObject;
@@ -41,5 +40,4 @@ public class BaseCOMObject {
     protected synchronized IJIComObject getCOMObject() {
         return this.comObject;
     }
-
 }

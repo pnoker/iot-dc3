@@ -32,11 +32,6 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -46,6 +41,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * Custom driver service implementation for the DL/T 645-2007 smart meter driver.
@@ -65,18 +64,21 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
     private Map<Long, Dlt645SerialPortConnection> connectMap;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -109,26 +111,40 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 Dlt645SerialPortConnection removed = connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     removed.close();
-                    log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode, metadataEvent.getId(), operateType);
+                    log.info(
+                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                            driverCode,
+                            metadataEvent.getId(),
+                            operateType);
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         Dlt645SerialPortConnection conn = getConnector(device.getId(), driverConfig);
         try {
             int[] di = parseDi(getRequiredConfig(pointConfig, "di"));
@@ -140,10 +156,11 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
                 throw new ReadPointException("Empty DL/T 645 response, protocol={}", driverCode);
             }
             byte control = Dlt645Frame.control(response);
-            if (control != Dlt645Frame.CONTROL_READ_RESPONSE
-                    && control != Dlt645Frame.CONTROL_READ_RESPONSE_MORE) {
-                throw new ReadPointException("Unexpected DL/T 645 response control code, protocol={}, control={}",
-                        driverCode, String.format("0x%02X", control));
+            if (control != Dlt645Frame.CONTROL_READ_RESPONSE && control != Dlt645Frame.CONTROL_READ_RESPONSE_MORE) {
+                throw new ReadPointException(
+                        "Unexpected DL/T 645 response control code, protocol={}, control={}",
+                        driverCode,
+                        String.format("0x%02X", control));
             }
             byte[] data = Dlt645Frame.parse(response);
             String value = formatReadValue(data, getConfigValue(pointConfig, "dataFormat", "HEX"));
@@ -153,13 +170,18 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
             throw e;
         } catch (Exception e) {
             invalidateConnector(device.getId(), conn);
-            throw new ReadPointException("DL/T 645 read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new ReadPointException(
+                    "DL/T 645 read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
         }
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         Dlt645SerialPortConnection conn = getConnector(device.getId(), driverConfig);
         try {
             int[] di = parseDi(getRequiredConfig(pointConfig, "di"));
@@ -177,7 +199,8 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
             return Dlt645Frame.control(response) == Dlt645Frame.CONTROL_WRITE_RESPONSE;
         } catch (Exception e) {
             invalidateConnector(device.getId(), conn);
-            throw new WritePointException("DL/T 645 write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new WritePointException(
+                    "DL/T 645 write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
         }
     }
 
@@ -190,10 +213,14 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
             int parity = getConfigIntValue(driverConfig, "parity", 2);
             int timeout = getConfigIntValue(driverConfig, "timeout", 1000);
 
-            log.debug("Driver connection creating, protocol={}, deviceId={}, port={}, baudRate={}",
-                    driverCode, deviceId, port, baudRate);
-            Dlt645SerialPortConnection conn = new Dlt645SerialPortConnection(port, baudRate, dataBits, stopBits, parity,
-                    timeout);
+            log.debug(
+                    "Driver connection creating, protocol={}, deviceId={}, port={}, baudRate={}",
+                    driverCode,
+                    deviceId,
+                    port,
+                    baudRate);
+            Dlt645SerialPortConnection conn =
+                    new Dlt645SerialPortConnection(port, baudRate, dataBits, stopBits, parity, timeout);
             conn.open();
             log.info("Driver connection established, protocol={}, deviceId={}, port={}", driverCode, deviceId, port);
             return conn;
@@ -202,7 +229,7 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
 
     private int[] parseDi(String di) {
         byte[] bytes = parseHex(di, 4);
-        return new int[]{bytes[0] & 0xFF, bytes[1] & 0xFF, bytes[2] & 0xFF, bytes[3] & 0xFF};
+        return new int[] {bytes[0] & 0xFF, bytes[1] & 0xFF, bytes[2] & 0xFF, bytes[3] & 0xFF};
     }
 
     private byte[] parseHex(String hex, int expectedLength) {
@@ -307,7 +334,9 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
 
     private String getRequiredConfig(Map<String, AttributeBO> config, String code) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             throw new ConnectorException("Required attribute '{}' is missing", code);
         }
         return attr.getValue(String.class);
@@ -315,7 +344,9 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -336,7 +367,8 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "meterAddress", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -345,7 +377,7 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "di", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

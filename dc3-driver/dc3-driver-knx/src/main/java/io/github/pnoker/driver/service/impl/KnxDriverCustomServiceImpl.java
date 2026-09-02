@@ -32,6 +32,13 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,14 +50,6 @@ import tuwien.auto.calimero.link.KNXNetworkLinkIP;
 import tuwien.auto.calimero.link.medium.KNXMediumSettings;
 import tuwien.auto.calimero.process.ProcessCommunicator;
 import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Custom driver service implementation for the KNX smart building driver.
@@ -70,18 +69,21 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
     private Map<Long, KnxLink> linkMap;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -115,30 +117,37 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)
                 && (MetadataOperateTypeEnum.DELETE.equals(operateType)
-                || MetadataOperateTypeEnum.UPDATE.equals(operateType))) {
+                        || MetadataOperateTypeEnum.UPDATE.equals(operateType))) {
             KnxLink removed = linkMap.remove(metadataEvent.getId());
             if (Objects.nonNull(removed)) {
                 removed.close();
-                log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                        driverCode, metadataEvent.getId(), operateType);
+                log.info(
+                        "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                        driverCode,
+                        metadataEvent.getId(),
+                        operateType);
             }
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         KnxLink link = getLink(device.getId(), driverConfig);
         try {
             GroupAddress groupAddress = parseGroupAddress(getRequiredConfig(pointConfig, "groupAddress"));
             String dataType = getConfigValue(pointConfig, "dataType", "BOOL");
             String dpt = getConfigValue(pointConfig, "dpt", "");
-            String value = switch (dataType.toUpperCase()) {
-                case "UINT" -> String.valueOf(link.communicator().readUnsigned(groupAddress, dpt));
-                case "FLOAT" -> String.valueOf(link.communicator().readFloat(groupAddress));
-                case "CONTROL" -> String.valueOf(link.communicator().readControl(groupAddress));
-                default -> String.valueOf(link.communicator().readBool(groupAddress));
-            };
+            String value =
+                    switch (dataType.toUpperCase()) {
+                        case "UINT" -> String.valueOf(link.communicator().readUnsigned(groupAddress, dpt));
+                        case "FLOAT" -> String.valueOf(link.communicator().readFloat(groupAddress));
+                        case "CONTROL" -> String.valueOf(link.communicator().readControl(groupAddress));
+                        default -> String.valueOf(link.communicator().readBool(groupAddress));
+                    };
             return new ReadPointValue(device, point, value);
         } catch (ReadPointException e) {
             invalidateLink(device.getId(), link);
@@ -150,8 +159,12 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         KnxLink link = getLink(device.getId(), driverConfig);
         try {
             GroupAddress groupAddress = parseGroupAddress(getRequiredConfig(pointConfig, "groupAddress"));
@@ -185,12 +198,16 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
                         ? new InetSocketAddress(0)
                         : new InetSocketAddress(InetAddress.getByName(localHost), 0);
                 InetSocketAddress remote = new InetSocketAddress(InetAddress.getByName(remoteHost), remotePort);
-                KNXMediumSettings settings = KNXMediumSettings.create(KNXMediumSettings.MEDIUM_TP1,
-                        new IndividualAddress(deviceAddress));
+                KNXMediumSettings settings =
+                        KNXMediumSettings.create(KNXMediumSettings.MEDIUM_TP1, new IndividualAddress(deviceAddress));
                 KNXNetworkLink link = KNXNetworkLinkIP.newTunnelingLink(local, remote, useNat, settings);
                 ProcessCommunicator communicator = new ProcessCommunicatorImpl(link);
-                log.info("Driver connection established, protocol={}, deviceId={}, remote={}:{}",
-                        driverCode, deviceId, remoteHost, remotePort);
+                log.info(
+                        "Driver connection established, protocol={}, deviceId={}, remote={}:{}",
+                        driverCode,
+                        deviceId,
+                        remoteHost,
+                        remotePort);
                 return new KnxLink(link, communicator);
             } catch (Exception e) {
                 throw new ConnectorException("Failed to open KNX link: {}:{}", remoteHost, remotePort, e);
@@ -219,7 +236,9 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
 
     private String getRequiredConfig(Map<String, AttributeBO> config, String code) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             throw new ConnectorException("Required attribute '{}' is missing", code);
         }
         return attr.getValue(String.class);
@@ -227,7 +246,9 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -255,7 +276,8 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "remoteHost", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -264,7 +286,8 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "groupAddress", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     /**

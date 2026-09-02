@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.receiver.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
@@ -31,12 +30,11 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * RabbitMQ consumer that keeps local metadata caches in sync with platform metadata
@@ -66,47 +64,62 @@ public class MetadataReceiver {
      * @param message broker-neutral metadata delivery
      * @param ack     poison-message disposition selector
      */
-    @Dc3Listener(topic = MqTopic.METADATA, mode = SubscriptionMode.BROADCAST, group = "${dc3.driver.client}", keyPattern = "${dc3.driver.service}")
+    @Dc3Listener(
+            topic = MqTopic.METADATA,
+            mode = SubscriptionMode.BROADCAST,
+            group = "${dc3.driver.client}",
+            keyPattern = "${dc3.driver.service}")
     public Mono<Void> metadataReceive(MqReceived<MetadataEventDTO> message, Acknowledgment ack) {
         MetadataEventDTO entityDTO = message.payload();
         return Mono.defer(() -> {
-            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getId())
-                    || Objects.isNull(entityDTO.getMetadataType())
-                    || Objects.isNull(entityDTO.getOperateType())) {
-                log.error("Invalid driver metadata: id={}, type={}, operate={}",
-                        Objects.nonNull(entityDTO) ? entityDTO.getId() : null,
+                    if (Objects.isNull(entityDTO)
+                            || Objects.isNull(entityDTO.getId())
+                            || Objects.isNull(entityDTO.getMetadataType())
+                            || Objects.isNull(entityDTO.getOperateType())) {
+                        log.error(
+                                "Invalid driver metadata: id={}, type={}, operate={}",
+                                Objects.nonNull(entityDTO) ? entityDTO.getId() : null,
+                                Objects.nonNull(entityDTO) ? entityDTO.getMetadataType() : null,
+                                Objects.nonNull(entityDTO) ? entityDTO.getOperateType() : null);
+                        ack.reject(false);
+                        return Mono.empty();
+                    }
+
+                    log.debug(
+                            "Receive driver metadata: id={}, type={}, operate={}",
+                            entityDTO.getId(),
+                            entityDTO.getMetadataType(),
+                            entityDTO.getOperateType());
+
+                    if (MetadataTypeEnum.DEVICE.equals(entityDTO.getMetadataType())) {
+                        return processDevice(entityDTO);
+                    }
+                    if (MetadataTypeEnum.POINT.equals(entityDTO.getMetadataType())) {
+                        return processPoint(entityDTO);
+                    }
+                    if (MetadataTypeEnum.DRIVER.equals(entityDTO.getMetadataType())) {
+                        return processDriver(entityDTO);
+                    }
+                    if (MetadataTypeEnum.COMMAND.equals(entityDTO.getMetadataType())
+                            || MetadataTypeEnum.EVENT.equals(entityDTO.getMetadataType())) {
+                        log.debug(
+                                "Driver metadata event forwarded, type={}, id={}",
+                                entityDTO.getMetadataType(),
+                                entityDTO.getId());
+                        return publishEvent(entityDTO);
+                    }
+                    log.error(
+                            "Driver metadata event rejected, reason=unsupportedType, type={}",
+                            entityDTO.getMetadataType());
+                    ack.reject(false);
+                    return Mono.empty();
+                })
+                .doOnError(error -> log.error(
+                        "Driver metadata consume failed, metadataType={}, operateType={}, id={}",
                         Objects.nonNull(entityDTO) ? entityDTO.getMetadataType() : null,
-                        Objects.nonNull(entityDTO) ? entityDTO.getOperateType() : null);
-                ack.reject(false);
-                return Mono.empty();
-            }
-
-            log.debug("Receive driver metadata: id={}, type={}, operate={}",
-                    entityDTO.getId(), entityDTO.getMetadataType(), entityDTO.getOperateType());
-
-            if (MetadataTypeEnum.DEVICE.equals(entityDTO.getMetadataType())) {
-                return processDevice(entityDTO);
-            }
-            if (MetadataTypeEnum.POINT.equals(entityDTO.getMetadataType())) {
-                return processPoint(entityDTO);
-            }
-            if (MetadataTypeEnum.DRIVER.equals(entityDTO.getMetadataType())) {
-                return processDriver(entityDTO);
-            }
-            if (MetadataTypeEnum.COMMAND.equals(entityDTO.getMetadataType())
-                    || MetadataTypeEnum.EVENT.equals(entityDTO.getMetadataType())) {
-                log.debug("Driver metadata event forwarded, type={}, id={}",
-                        entityDTO.getMetadataType(), entityDTO.getId());
-                return publishEvent(entityDTO);
-            }
-            log.error("Driver metadata event rejected, reason=unsupportedType, type={}",
-                    entityDTO.getMetadataType());
-            ack.reject(false);
-            return Mono.empty();
-        }).doOnError(error -> log.error("Driver metadata consume failed, metadataType={}, operateType={}, id={}",
-                Objects.nonNull(entityDTO) ? entityDTO.getMetadataType() : null,
-                Objects.nonNull(entityDTO) ? entityDTO.getOperateType() : null,
-                Objects.nonNull(entityDTO) ? entityDTO.getId() : null, error));
+                        Objects.nonNull(entityDTO) ? entityDTO.getOperateType() : null,
+                        Objects.nonNull(entityDTO) ? entityDTO.getId() : null,
+                        error));
     }
 
     private Mono<Void> processDevice(MetadataEventDTO event) {
@@ -164,8 +177,7 @@ public class MetadataReceiver {
     }
 
     private Mono<Void> publishEvent(MetadataEventDTO event) {
-        return Mono.fromRunnable(() -> metadataEventPublisher.publishEvent(
-                new MetadataEvent(this, event.getTenantId(), event.getId(), event.getMetadataType(), event.getOperateType())));
+        return Mono.fromRunnable(() -> metadataEventPublisher.publishEvent(new MetadataEvent(
+                this, event.getTenantId(), event.getId(), event.getMetadataType(), event.getOperateType())));
     }
-
 }

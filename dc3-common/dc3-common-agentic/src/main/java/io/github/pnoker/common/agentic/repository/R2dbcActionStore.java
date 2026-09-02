@@ -5,6 +5,14 @@
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.agentic.repository;
 
@@ -12,9 +20,14 @@ import io.github.pnoker.common.agentic.entity.bo.ActionBO;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticActionStatusEnum;
 import io.github.pnoker.common.utils.UuidV7;
+import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -22,11 +35,6 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.Map;
 
 /** Explicit SQL adapter for agentic actions. */
 @Repository
@@ -38,12 +46,12 @@ public class R2dbcActionStore implements ReactiveActionStore {
     private static final String COLUMNS = "id, action_id, conversation_id, action_type, title, description, payload, "
             + "status, expire_time, tenant_id, user_id, remark, creator_id, creator_name, create_time, "
             + "operator_id, operator_name, operate_time";
-    private static final TypeReference<Map<String, Object>> PAYLOAD_TYPE = new TypeReference<>() {
-    };
+    private static final TypeReference<Map<String, Object>> PAYLOAD_TYPE = new TypeReference<>() {};
 
     private final DatabaseClient databaseClient;
     private final PageTransaction pageTransaction;
     private final ObjectMapper objectMapper;
+    private final R2dbcDialect dialect;
 
     @Override
     public Mono<ActionBO> create(ActionBO action) {
@@ -62,10 +70,12 @@ public class R2dbcActionStore implements ReactiveActionStore {
         String sql = "INSERT INTO " + TABLE
                 + " (id, action_id, conversation_id, action_type, title, description, payload, status, expire_time, "
                 + "tenant_id, user_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted) "
-                + "VALUES (:id, :action_id, :conversation_id, :action_type, :title, :description, :payload, "
+                + "VALUES (:id, :action_id, :conversation_id, :action_type, :title, :description, "
+                + dialect.jsonWriteExpression(":payload") + ", "
                 + ":status, :expire_time, :tenant_id, :user_id, :remark, :creator_id, :creator_name, :create_time, "
                 + ":operator_id, :operator_name, :operate_time, 0)";
-        DatabaseClient.GenericExecuteSpec statement = databaseClient.sql(sql)
+        DatabaseClient.GenericExecuteSpec statement = databaseClient
+                .sql(sql)
                 .bind("id", action.getId())
                 .bind("action_id", action.getActionId())
                 .bind("conversation_id", valueOrEmpty(action.getConversationId()))
@@ -88,7 +98,8 @@ public class R2dbcActionStore implements ReactiveActionStore {
         } else {
             statement = statement.bind("expire_time", action.getExpireTime());
         }
-        return statement.fetch()
+        return statement
+                .fetch()
                 .rowsUpdated()
                 .flatMap(rows -> rows == 1
                         ? find(action.getActionId(), principal(action))
@@ -101,7 +112,8 @@ public class R2dbcActionStore implements ReactiveActionStore {
             return Mono.error(new IllegalArgumentException("actionId must not be blank"));
         }
         validateHeader(header);
-        return databaseClient.sql("SELECT " + COLUMNS + " FROM " + TABLE
+        return databaseClient
+                .sql("SELECT " + COLUMNS + " FROM " + TABLE
                         + " WHERE action_id = :action_id AND tenant_id = :tenant_id AND user_id = :user_id"
                         + " AND deleted = 0")
                 .bind("action_id", actionId)
@@ -112,8 +124,8 @@ public class R2dbcActionStore implements ReactiveActionStore {
     }
 
     @Override
-    public Mono<OffsetPage<ActionBO>> listPending(long offset, int limit, String conversationId,
-                                                  RequestHeader.PrincipalHeader header, Instant now) {
+    public Mono<OffsetPage<ActionBO>> listPending(
+            long offset, int limit, String conversationId, RequestHeader.PrincipalHeader header, Instant now) {
         validateHeader(header);
         if (conversationId == null || conversationId.isBlank()) {
             return Mono.just(OffsetPage.of(java.util.List.of(), offset, limit, 0));
@@ -121,10 +133,11 @@ public class R2dbcActionStore implements ReactiveActionStore {
         new PageRequest(offset, limit);
         LocalDateTime current = utc(now, Instant.now());
         String predicate = " FROM " + TABLE
-                        + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id AND user_id = :user_id"
-                        + " AND status = :status AND deleted = 0"
-                        + " AND (expire_time IS NULL OR expire_time >= :now)";
-        DatabaseClient.GenericExecuteSpec itemStatement = databaseClient.sql("SELECT " + COLUMNS + predicate
+                + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id AND user_id = :user_id"
+                + " AND status = :status AND deleted = 0"
+                + " AND (expire_time IS NULL OR expire_time >= :now)";
+        DatabaseClient.GenericExecuteSpec itemStatement = databaseClient
+                .sql("SELECT " + COLUMNS + predicate
                         + " ORDER BY create_time DESC, id DESC LIMIT :limit OFFSET :offset")
                 .bind("conversation_id", conversationId)
                 .bind("tenant_id", header.getTenantId())
@@ -133,31 +146,35 @@ public class R2dbcActionStore implements ReactiveActionStore {
                 .bind("now", current)
                 .bind("limit", limit)
                 .bind("offset", offset);
-        DatabaseClient.GenericExecuteSpec countStatement = databaseClient.sql("SELECT COUNT(*) AS total" + predicate)
+        DatabaseClient.GenericExecuteSpec countStatement = databaseClient
+                .sql("SELECT COUNT(*) AS total" + predicate)
                 .bind("conversation_id", conversationId)
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())
                 .bind("status", AgenticActionStatusEnum.PENDING.getIndex())
                 .bind("now", current);
-        Mono<Long> total = countStatement.map((row, metadata) -> {
-            Number value = row.get("total", Number.class);
-            return value == null ? 0L : value.longValue();
-        }).one();
-        Mono<java.util.List<ActionBO>> items = itemStatement.map(this::map).all().collectList();
-        return total.flatMap(totalCount -> items
-                        .map(pageItems -> OffsetPage.of(pageItems, offset, limit, totalCount)))
+        Mono<Long> total = countStatement
+                .map((row, metadata) -> {
+                    Number value = row.get("total", Number.class);
+                    return value == null ? 0L : value.longValue();
+                })
+                .one();
+        Mono<java.util.List<ActionBO>> items =
+                itemStatement.map(this::map).all().collectList();
+        return total.flatMap(totalCount -> items.map(pageItems -> OffsetPage.of(pageItems, offset, limit, totalCount)))
                 .as(pageTransaction::transactional);
     }
 
     @Override
-    public Mono<ActionBO> claimPending(String actionId, RequestHeader.PrincipalHeader header,
-                                       AgenticActionStatusEnum nextStatus, Instant now) {
+    public Mono<ActionBO> claimPending(
+            String actionId, RequestHeader.PrincipalHeader header, AgenticActionStatusEnum nextStatus, Instant now) {
         validateHeader(header);
         if (nextStatus == null || nextStatus == AgenticActionStatusEnum.PENDING) {
             return Mono.error(new IllegalArgumentException("nextStatus must be a terminal action status"));
         }
         LocalDateTime current = utc(now, Instant.now());
-        return databaseClient.sql("UPDATE " + TABLE + " SET status = :next_status, operator_id = :operator_id, "
+        return databaseClient
+                .sql("UPDATE " + TABLE + " SET status = :next_status, operator_id = :operator_id, "
                         + "operator_name = :operator_name, operate_time = :operate_time"
                         + " WHERE action_id = :action_id AND tenant_id = :tenant_id AND user_id = :user_id"
                         + " AND status = :pending_status AND deleted = 0"
@@ -177,13 +194,18 @@ public class R2dbcActionStore implements ReactiveActionStore {
     }
 
     @Override
-    public Mono<ActionBO> updateExecutionResult(String actionId, RequestHeader.PrincipalHeader header,
-                                                 AgenticActionStatusEnum status, String remark, Instant now) {
+    public Mono<ActionBO> updateExecutionResult(
+            String actionId,
+            RequestHeader.PrincipalHeader header,
+            AgenticActionStatusEnum status,
+            String remark,
+            Instant now) {
         validateHeader(header);
         if (status != AgenticActionStatusEnum.EXECUTED && status != AgenticActionStatusEnum.FAILED) {
             return Mono.error(new IllegalArgumentException("execution result must be EXECUTED or FAILED"));
         }
-        return databaseClient.sql("UPDATE " + TABLE + " SET status = :status, remark = :remark, operator_id = :operator_id, "
+        return databaseClient
+                .sql("UPDATE " + TABLE + " SET status = :status, remark = :remark, operator_id = :operator_id, "
                         + "operator_name = :operator_name, operate_time = :operate_time"
                         + " WHERE action_id = :action_id AND tenant_id = :tenant_id AND user_id = :user_id"
                         + " AND status = :confirmed_status AND deleted = 0")

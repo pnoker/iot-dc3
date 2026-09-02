@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.data.service.impl;
 
 import io.github.pnoker.common.data.biz.alarm.NotifyConfigCache;
@@ -26,20 +42,101 @@ public class NotifyChannelServiceImpl implements NotifyChannelService {
     private final NotifyChannelBuilder builder;
     private final ReactiveNotifyAdminStore store;
     private final NotifyConfigCache cache;
-    @Override public Mono<NotifyChannelBO> add(NotifyChannelBO value) { return Mono.defer(() -> { validate(value); NotifyChannelDO data = builder.buildDOByBO(value); return store.existsChannelCode(value(value.getTenantId()), data.getChannelCode(), null).flatMap(exists -> exists ? Mono.<NotifyChannelBO>error(new DuplicateException("Notify channel has been duplicated")) : store.insertChannel(data).map(builder::buildBOByDO).switchIfEmpty(Mono.error(new AddException("Failed to create notify channel")))).doOnSuccess(result -> { if (result != null) cache.invalidateChannel(result.getId()); }).onErrorMap(DataIntegrityViolationException.class, error -> new DuplicateException("Notify channel has been duplicated")); }); }
-    @Override public Mono<Boolean> delete(Long tenantId, Long id) { return store.getChannel(value(tenantId), value(id)).switchIfEmpty(Mono.error(new NotFoundException("Notify channel does not exist"))).flatMap(existing -> store.hasChannelBindings(value(tenantId), value(id)).flatMap(has -> has ? Mono.<Boolean>error(new AssociatedException("Failed to remove notify channel: bindings exist")) : store.deleteChannel(value(tenantId), value(id)))).flatMap(ok -> ok ? Mono.just(true) : Mono.error(new DeleteException("Failed to remove notify channel"))).doOnSuccess(ok -> cache.invalidateChannel(id)); }
-    @Override public Mono<NotifyChannelBO> update(NotifyChannelBO value) { return Mono.defer(() -> { validate(value); NotifyChannelDO data = builder.buildDOByBO(value); return store.getChannel(value(value.getTenantId()), value(value.getId())).switchIfEmpty(Mono.error(new NotFoundException("Notify channel does not exist"))).then(store.existsChannelCode(value(value.getTenantId()), data.getChannelCode(), value.getId())).flatMap(exists -> exists ? Mono.<NotifyChannelBO>error(new DuplicateException("Notify channel has been duplicated")) : store.updateChannel(data).map(builder::buildBOByDO).switchIfEmpty(Mono.error(new UpdateException("Failed to update notify channel")))).doOnSuccess(result -> { if (result != null) cache.invalidateChannel(result.getId()); }).onErrorMap(DataIntegrityViolationException.class, error -> new DuplicateException("Notify channel has been duplicated")); }); }
-    @Override public Mono<NotifyChannelBO> getById(Long tenantId, Long id) { return store.getChannel(value(tenantId), value(id)).switchIfEmpty(Mono.error(new NotFoundException("Notify channel does not exist"))).map(builder::buildBOByDO); }
-    @Override public Mono<OffsetPage<NotifyChannelBO>> list(Long tenantId, NotifyChannelQuery query) {
+
+    @Override
+    public Mono<NotifyChannelBO> add(NotifyChannelBO value) {
+        return Mono.defer(() -> {
+            validate(value);
+            NotifyChannelDO data = builder.buildDOByBO(value);
+            return store.existsChannelCode(value(value.getTenantId()), data.getChannelCode(), null)
+                    .flatMap(exists -> exists
+                            ? Mono.<NotifyChannelBO>error(new DuplicateException("Notify channel has been duplicated"))
+                            : store.insertChannel(data)
+                                    .map(builder::buildBOByDO)
+                                    .switchIfEmpty(Mono.error(new AddException("Failed to create notify channel"))))
+                    .doOnSuccess(result -> {
+                        if (result != null) cache.invalidateChannel(result.getId());
+                    })
+                    .onErrorMap(
+                            DataIntegrityViolationException.class,
+                            error -> new DuplicateException("Notify channel has been duplicated"));
+        });
+    }
+
+    @Override
+    public Mono<Boolean> delete(Long tenantId, Long id) {
+        return store.getChannel(value(tenantId), value(id))
+                .switchIfEmpty(Mono.error(new NotFoundException("Notify channel does not exist")))
+                .flatMap(existing -> store.hasChannelBindings(value(tenantId), value(id))
+                        .flatMap(has -> has
+                                ? Mono.<Boolean>error(
+                                        new AssociatedException("Failed to remove notify channel: bindings exist"))
+                                : store.deleteChannel(value(tenantId), value(id))))
+                .flatMap(
+                        ok -> ok ? Mono.just(true) : Mono.error(new DeleteException("Failed to remove notify channel")))
+                .doOnSuccess(ok -> cache.invalidateChannel(id));
+    }
+
+    @Override
+    public Mono<NotifyChannelBO> update(NotifyChannelBO value) {
+        return Mono.defer(() -> {
+            validate(value);
+            NotifyChannelDO data = builder.buildDOByBO(value);
+            return store.getChannel(value(value.getTenantId()), value(value.getId()))
+                    .switchIfEmpty(Mono.error(new NotFoundException("Notify channel does not exist")))
+                    .then(store.existsChannelCode(value(value.getTenantId()), data.getChannelCode(), value.getId()))
+                    .flatMap(exists -> exists
+                            ? Mono.<NotifyChannelBO>error(new DuplicateException("Notify channel has been duplicated"))
+                            : store.updateChannel(data)
+                                    .map(builder::buildBOByDO)
+                                    .switchIfEmpty(Mono.error(new UpdateException("Failed to update notify channel"))))
+                    .doOnSuccess(result -> {
+                        if (result != null) cache.invalidateChannel(result.getId());
+                    })
+                    .onErrorMap(
+                            DataIntegrityViolationException.class,
+                            error -> new DuplicateException("Notify channel has been duplicated"));
+        });
+    }
+
+    @Override
+    public Mono<NotifyChannelBO> getById(Long tenantId, Long id) {
+        return store.getChannel(value(tenantId), value(id))
+                .switchIfEmpty(Mono.error(new NotFoundException("Notify channel does not exist")))
+                .map(builder::buildBOByDO);
+    }
+
+    @Override
+    public Mono<OffsetPage<NotifyChannelBO>> list(Long tenantId, NotifyChannelQuery query) {
         return Mono.defer(() -> {
             requireTenant(tenantId);
             NotifyChannelQuery request = query == null ? new NotifyChannelQuery() : query;
             PageRequest page = new PageRequest(request.getOffset(), request.getLimit(), request.getSort());
-            return store.listChannel(tenantId, request.getChannelName(), request.getChannelCode(), request.getChannelTypeFlag(), request.getEnableFlag(), page)
-                    .map(result -> OffsetPage.of(result.items().stream().map(builder::buildBOByDO).toList(), result.offset(), result.limit(), result.total()));
+            return store.listChannel(
+                            tenantId,
+                            request.getChannelName(),
+                            request.getChannelCode(),
+                            request.getChannelTypeFlag(),
+                            request.getEnableFlag(),
+                            page)
+                    .map(result -> OffsetPage.of(
+                            result.items().stream().map(builder::buildBOByDO).toList(),
+                            result.offset(),
+                            result.limit(),
+                            result.total()));
         });
     }
-    private void validate(NotifyChannelBO value) { if (value == null || value.getTenantId() == null || value.getTenantId() <= 0) throw new IllegalArgumentException("tenantId is required"); }
-    private long value(Long value) { return value == null ? 0 : value; }
-    private void requireTenant(Long tenantId) { if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId is required"); }
+
+    private void validate(NotifyChannelBO value) {
+        if (value == null || value.getTenantId() == null || value.getTenantId() <= 0)
+            throw new IllegalArgumentException("tenantId is required");
+    }
+
+    private long value(Long value) {
+        return value == null ? 0 : value;
+    }
+
+    private void requireTenant(Long tenantId) {
+        if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId is required");
+    }
 }

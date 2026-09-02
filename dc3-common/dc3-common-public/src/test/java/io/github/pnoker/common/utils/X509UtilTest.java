@@ -14,24 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
-import io.github.pnoker.common.exception.ConnectorException;
-import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
-import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.PEMEncryptor;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
-import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import javax.net.ssl.SSLSocketFactory;
-import javax.security.auth.x500.X500Principal;
+import io.github.pnoker.common.exception.ConnectorException;
 import java.io.Writer;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -43,9 +31,19 @@ import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import javax.net.ssl.SSLSocketFactory;
+import javax.security.auth.x500.X500Principal;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMEncryptor;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class X509UtilTest {
 
@@ -66,10 +64,12 @@ class X509UtilTest {
         X500Principal subject = new X500Principal("CN=dc3-test");
         Instant now = Instant.now();
         JcaX509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(
-                subject, BigInteger.ONE,
+                subject,
+                BigInteger.ONE,
                 Date.from(now.minus(1, ChronoUnit.DAYS)),
                 Date.from(now.plus(365, ChronoUnit.DAYS)),
-                subject, keyPair.getPublic());
+                subject,
+                keyPair.getPublic());
         ContentSigner signer = new JcaContentSignerBuilder("SHA256withRSA").build(keyPair.getPrivate());
         return new JcaX509CertificateConverter()
                 .setProvider(BouncyCastleProvider.PROVIDER_NAME)
@@ -78,7 +78,7 @@ class X509UtilTest {
 
     private static Path writeCertificate(Path file, X509Certificate cert) throws Exception {
         try (Writer writer = Files.newBufferedWriter(file);
-             JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
+                JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
             pemWriter.writeObject(cert);
         }
         return file;
@@ -89,7 +89,7 @@ class X509UtilTest {
                 .setProvider(BouncyCastleProvider.PROVIDER_NAME)
                 .build(password.toCharArray());
         try (Writer writer = Files.newBufferedWriter(file);
-             JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
+                JcaPEMWriter pemWriter = new JcaPEMWriter(writer)) {
             pemWriter.writeObject(keyPair.getPrivate(), encryptor);
         }
         return file;
@@ -103,8 +103,8 @@ class X509UtilTest {
         Path certFile = writeCertificate(dir.resolve("client.crt"), cert);
         Path keyFile = writeEncryptedKey(dir.resolve("client.key"), keyPair, KEY_PASSWORD);
 
-        SSLSocketFactory factory = X509Util.getSSLSocketFactory(
-                caFile.toString(), certFile.toString(), keyFile.toString(), KEY_PASSWORD);
+        SSLSocketFactory factory =
+                X509Util.getSSLSocketFactory(caFile.toString(), certFile.toString(), keyFile.toString(), KEY_PASSWORD);
 
         assertThat(factory).isNotNull();
     }
@@ -118,8 +118,7 @@ class X509UtilTest {
         Path keyFile = writeEncryptedKey(dir.resolve("client.key"), keyPair, KEY_PASSWORD);
 
         assertThatThrownBy(() -> X509Util.getSSLSocketFactory(
-                caFile.toString(), certFile.toString(), keyFile.toString(), "wrong-password"))
+                        caFile.toString(), certFile.toString(), keyFile.toString(), "wrong-password"))
                 .isInstanceOf(ConnectorException.class);
     }
-
 }

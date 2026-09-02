@@ -1,21 +1,36 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.data.repository;
 
 import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
-import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.r2dbc.core.DatabaseClient;
-import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import org.springframework.transaction.reactive.TransactionalOperator;
-
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /** Explicit SQL adapter for the tenant-scoped latest-value projection. */
 @Repository
@@ -34,21 +49,31 @@ public class R2dbcPointValueLatestStore implements ReactivePointValueLatestStore
     @Override
     public Mono<PointValueDO> latest(Long tenantId, Long deviceId, Long pointId) {
         if (!validKey(tenantId, deviceId, pointId)) return Mono.empty();
-        return databaseClient.sql("SELECT " + COLUMNS + " FROM " + TABLE
+        return databaseClient
+                .sql("SELECT " + COLUMNS + " FROM " + TABLE
                         + " WHERE tenant_id=:tenant_id AND device_id=:device_id AND point_id=:point_id LIMIT 1")
-                .bind("tenant_id", tenantId).bind("device_id", deviceId).bind("point_id", pointId)
-                .map(this::map).one();
+                .bind("tenant_id", tenantId)
+                .bind("device_id", deviceId)
+                .bind("point_id", pointId)
+                .map(this::map)
+                .one();
     }
 
     @Override
     public Flux<PointValueDO> listLatest(Long tenantId, Long deviceId, List<Long> pointIds) {
-        List<Long> ids = pointIds == null ? List.of() : pointIds.stream().filter(Objects::nonNull).distinct().toList();
+        List<Long> ids = pointIds == null
+                ? List.of()
+                : pointIds.stream().filter(Objects::nonNull).distinct().toList();
         if (!validKey(tenantId, deviceId) || ids.isEmpty()) return Flux.empty();
-        String placeholders = IntStream.range(0, ids.size()).mapToObj(i -> ":point_id_" + i)
-                .reduce((left, right) -> left + "," + right).orElseThrow();
-        DatabaseClient.GenericExecuteSpec spec = databaseClient.sql("SELECT " + COLUMNS + " FROM " + TABLE
+        String placeholders = IntStream.range(0, ids.size())
+                .mapToObj(i -> ":point_id_" + i)
+                .reduce((left, right) -> left + "," + right)
+                .orElseThrow();
+        DatabaseClient.GenericExecuteSpec spec = databaseClient
+                .sql("SELECT " + COLUMNS + " FROM " + TABLE
                         + " WHERE tenant_id=:tenant_id AND device_id=:device_id AND point_id IN (" + placeholders + ")")
-                .bind("tenant_id", tenantId).bind("device_id", deviceId);
+                .bind("tenant_id", tenantId)
+                .bind("device_id", deviceId);
         for (int i = 0; i < ids.size(); i++) spec = spec.bind("point_id_" + i, ids.get(i));
         return spec.map(this::map).all();
     }
@@ -57,27 +82,41 @@ public class R2dbcPointValueLatestStore implements ReactivePointValueLatestStore
     public Flux<PointValueDO> listLatestStream(Long tenantId, int limit) {
         if (tenantId == null || tenantId <= 0 || limit < 1) return Flux.empty();
         int bounded = Math.min(limit, 500);
-        return databaseClient.sql("SELECT " + COLUMNS + " FROM " + TABLE
-                        + " WHERE tenant_id=:tenant_id ORDER BY create_time DESC, device_id ASC, point_id ASC LIMIT :limit")
-                .bind("tenant_id", tenantId).bind("limit", bounded).map(this::map).all();
+        return databaseClient
+                .sql(
+                        "SELECT " + COLUMNS + " FROM " + TABLE
+                                + " WHERE tenant_id=:tenant_id ORDER BY create_time DESC, device_id ASC, point_id ASC LIMIT :limit")
+                .bind("tenant_id", tenantId)
+                .bind("limit", bounded)
+                .map(this::map)
+                .all();
     }
 
     @Override
     public Mono<Integer> upsertBatch(List<PointValueDO> values) {
-        List<PointValueDO> rows = values == null ? List.of() : values.stream().filter(Objects::nonNull).toList();
+        List<PointValueDO> rows = values == null
+                ? List.of()
+                : values.stream().filter(Objects::nonNull).toList();
         if (rows.isEmpty()) return Mono.just(0);
-        return transactionalOperator.transactional(Flux.fromIterable(rows).concatMap(this::upsert).reduce(0, Integer::sum));
+        return transactionalOperator.transactional(
+                Flux.fromIterable(rows).concatMap(this::upsert).reduce(0, Integer::sum));
     }
 
     private Mono<Integer> upsert(PointValueDO value) {
         requireKey(value);
         String sql = "postgres".equalsIgnoreCase(dialect.name()) ? postgresUpsert() : mysqlUpsert();
-        DatabaseClient.GenericExecuteSpec spec = databaseClient.sql(sql)
-                .bind("tenant_id", value.getTenantId()).bind("device_id", value.getDeviceId())
-                .bind("point_id", value.getPointId()).bind("message_id", value.getMessageId())
-                .bind("schema_version", value.getSchemaVersion()).bind("driver_node", value.getDriverNode())
-                .bind("sequence", value.getSequence()).bind("fencing_token", value.getFencingToken())
-                .bind("raw_value", value.getRawValue()).bind("cal_value", value.getCalValue())
+        DatabaseClient.GenericExecuteSpec spec = databaseClient
+                .sql(sql)
+                .bind("tenant_id", value.getTenantId())
+                .bind("device_id", value.getDeviceId())
+                .bind("point_id", value.getPointId())
+                .bind("message_id", value.getMessageId())
+                .bind("schema_version", value.getSchemaVersion())
+                .bind("driver_node", value.getDriverNode())
+                .bind("sequence", value.getSequence())
+                .bind("fencing_token", value.getFencingToken())
+                .bind("raw_value", value.getRawValue())
+                .bind("cal_value", value.getCalValue())
                 .bind("driver_id", value.getDriverId());
         spec = bindTime(spec, "create_time", value.getCreateTime());
         spec = bindTime(spec, "operate_time", value.getOperateTime());
@@ -115,19 +154,27 @@ public class R2dbcPointValueLatestStore implements ReactivePointValueLatestStore
 
     private PointValueDO map(io.r2dbc.spi.Row row, io.r2dbc.spi.RowMetadata metadata) {
         PointValueDO value = new PointValueDO();
-        value.setTenantId(number(row, "tenant_id", Long.class)); value.setDeviceId(number(row, "device_id", Long.class));
-        value.setPointId(number(row, "point_id", Long.class)); value.setMessageId(row.get("message_id", String.class));
-        value.setSchemaVersion(number(row, "schema_version", Integer.class)); value.setDriverNode(row.get("driver_node", String.class));
-        value.setSequence(number(row, "sequence", Long.class)); value.setFencingToken(number(row, "fencing_token", Long.class));
-        value.setRawValue(row.get("raw_value", String.class)); value.setCalValue(row.get("cal_value", String.class));
-        value.setNumValue(number(row, "num_value", Double.class)); value.setDriverId(number(row, "driver_id", Long.class));
-        value.setCreateTime(time(row.get("create_time"))); value.setOperateTime(time(row.get("operate_time")));
+        value.setTenantId(number(row, "tenant_id", Long.class));
+        value.setDeviceId(number(row, "device_id", Long.class));
+        value.setPointId(number(row, "point_id", Long.class));
+        value.setMessageId(row.get("message_id", String.class));
+        value.setSchemaVersion(number(row, "schema_version", Integer.class));
+        value.setDriverNode(row.get("driver_node", String.class));
+        value.setSequence(number(row, "sequence", Long.class));
+        value.setFencingToken(number(row, "fencing_token", Long.class));
+        value.setRawValue(row.get("raw_value", String.class));
+        value.setCalValue(row.get("cal_value", String.class));
+        value.setNumValue(number(row, "num_value", Double.class));
+        value.setDriverId(number(row, "driver_id", Long.class));
+        value.setCreateTime(time(row.get("create_time")));
+        value.setOperateTime(time(row.get("operate_time")));
         return value;
     }
 
     private LocalDateTime time(Object value) {
         if (value instanceof LocalDateTime local) return local;
-        if (value instanceof OffsetDateTime offset) return offset.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+        if (value instanceof OffsetDateTime offset)
+            return offset.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
         if (value instanceof java.time.Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
         return null;
     }
@@ -145,17 +192,28 @@ public class R2dbcPointValueLatestStore implements ReactivePointValueLatestStore
         throw new IllegalStateException("Column " + name + " is not numeric: " + raw.getClass());
     }
 
-    private <T> DatabaseClient.GenericExecuteSpec bindNullable(DatabaseClient.GenericExecuteSpec spec, String name, T value, Class<T> type) {
+    private <T> DatabaseClient.GenericExecuteSpec bindNullable(
+            DatabaseClient.GenericExecuteSpec spec, String name, T value, Class<T> type) {
         return value == null ? spec.bindNull(name, type) : spec.bind(name, value);
     }
 
-    private DatabaseClient.GenericExecuteSpec bindTime(DatabaseClient.GenericExecuteSpec spec, String name, LocalDateTime value) {
+    private DatabaseClient.GenericExecuteSpec bindTime(
+            DatabaseClient.GenericExecuteSpec spec, String name, LocalDateTime value) {
         return "postgres".equalsIgnoreCase(dialect.name())
                 ? spec.bind(name, value.atOffset(ZoneOffset.UTC))
                 : spec.bind(name, value);
     }
 
-    private boolean validKey(Long tenantId, Long deviceId) { return tenantId != null && tenantId > 0 && deviceId != null && deviceId > 0; }
-    private boolean validKey(Long tenantId, Long deviceId, Long pointId) { return validKey(tenantId, deviceId) && pointId != null && pointId > 0; }
-    private void requireKey(PointValueDO value) { if (!validKey(value.getTenantId(), value.getDeviceId(), value.getPointId())) throw new IllegalArgumentException("tenantId, deviceId and pointId are required"); }
+    private boolean validKey(Long tenantId, Long deviceId) {
+        return tenantId != null && tenantId > 0 && deviceId != null && deviceId > 0;
+    }
+
+    private boolean validKey(Long tenantId, Long deviceId, Long pointId) {
+        return validKey(tenantId, deviceId) && pointId != null && pointId > 0;
+    }
+
+    private void requireKey(PointValueDO value) {
+        if (!validKey(value.getTenantId(), value.getDeviceId(), value.getPointId()))
+            throw new IllegalArgumentException("tenantId, deviceId and pointId are required");
+    }
 }

@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.message;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
-
 import java.time.Duration;
 import java.util.Map;
 
@@ -30,6 +28,5 @@ import java.util.Map;
  * @author pnoker
  * @since 2026.8.19
  */
-public record WireMqMessage(MqTopic topic, String partitionKey, byte[] body, Map<String, String> headers,
-                            Duration delay) {
-}
+public record WireMqMessage(
+        MqTopic topic, String partitionKey, byte[] body, Map<String, String> headers, Duration delay) {}

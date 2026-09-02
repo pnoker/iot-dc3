@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.builder;
 
 import io.github.pnoker.common.data.entity.bo.CommandCallBO;
@@ -23,10 +22,9 @@ import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
 import io.github.pnoker.common.utils.MapStructUtil;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
 
 /**
  * MapStruct builder converting between command history DO and VO.
@@ -37,7 +35,9 @@ import java.util.List;
  * @author pnoker
  * @since 2026.6.5
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface CommandHistoryBuilder {
 
     /**
@@ -73,8 +73,10 @@ public interface CommandHistoryBuilder {
      * @return converted value
      */
     default OffsetPage<CommandHistoryVO> buildVOPageByDOPage(OffsetPage<CommandHistoryDO> entityPageDO) {
-        return OffsetPage.of(entityPageDO.items().stream().map(this::buildVOByDO).toList(),
-                entityPageDO.offset(), entityPageDO.limit(), entityPageDO.total());
+        return OffsetPage.of(
+                entityPageDO.items().stream().map(this::buildVOByDO).toList(),
+                entityPageDO.offset(),
+                entityPageDO.limit(),
+                entityPageDO.total());
     }
-
 }

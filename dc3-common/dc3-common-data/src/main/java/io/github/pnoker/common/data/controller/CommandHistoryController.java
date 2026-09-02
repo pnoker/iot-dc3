@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.controller;
 
 import io.github.pnoker.common.base.BaseController;
@@ -50,7 +49,10 @@ import reactor.core.publisher.Mono;
  * @author pnoker
  * @since 2026.5.23
  */
-@Tag(name = "command_history", description = "Command execution audit trail: query historical records of commands sent to devices including execution status, timestamps, and response data")
+@Tag(
+        name = "command_history",
+        description =
+                "Command execution audit trail: query historical records of commands sent to devices including execution status, timestamps, and response data")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.COMMAND_HISTORY_URL_PREFIX)
@@ -69,18 +71,24 @@ public class CommandHistoryController implements BaseController {
      * @return the ID of the newly created command-call history record; use it to poll execution result and response data
      */
     @PreAuthorize("@perm.can('command_history', 'add')")
-    @Operation(summary = "Call Command", description = "Send a downward control command to a device for the current tenant and " +
-            "record the call in command history. Returns the new history record ID; use it to poll the execution result and response data.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
-                    @ExtensionProperty(name = "destructive", value = "true"),
-                    @ExtensionProperty(name = "idempotent", value = "false"),
-                    @ExtensionProperty(name = "openWorld", value = "true")
-            }))
+    @Operation(
+            summary = "Call Command",
+            description =
+                    "Send a downward control command to a device for the current tenant and "
+                            + "record the call in command history. Returns the new history record ID; use it to poll the execution result and response data.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                                @ExtensionProperty(name = "destructive", value = "true"),
+                                @ExtensionProperty(name = "idempotent", value = "false"),
+                                @ExtensionProperty(name = "openWorld", value = "true")
+                            }))
     @PostMapping("/call")
     public Mono<String> call(@Validated @RequestBody CommandCallVO entityVO) {
-        return getTenantId().flatMap(tenantId -> commandHistoryService.call(tenantId,
-                commandHistoryBuilder.buildBOByVO(entityVO)));
+        return getTenantId()
+                .flatMap(tenantId -> commandHistoryService.call(tenantId, commandHistoryBuilder.buildBOByVO(entityVO)));
     }
 
     /**
@@ -91,18 +99,33 @@ public class CommandHistoryController implements BaseController {
      * @return the matched CommandHistoryVO; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('command_history', 'get')")
-    @Operation(summary = "Get Command History by Record ID", description = "Fetch one command-call history record by its record ID " +
-            "(tenant-scoped), including execution status, timestamps and the device response. Use to check the outcome of a command issued via Call Command.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Get Command History by Record ID",
+            description =
+                    "Fetch one command-call history record by its record ID "
+                            + "(tenant-scoped), including execution status, timestamps and the device response. Use to check the outcome of a command issued via Call Command.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @GetMapping("/get_by_record_id")
-    public Mono<CommandHistoryVO> getByRecordId(@Parameter(description = "Record ID returned by the Call Command endpoint; must resolve to a command-call history entry owned by the current tenant", example = "cmd_20260523_a1b2c3d4") @NotBlank @RequestParam String recordId) {
-        return getTenantId().flatMap(tenantId -> commandHistoryService.getByRecordId(tenantId, recordId)
-                .switchIfEmpty(Mono.error(new NotFoundException("Command history does not exist"))));
+    public Mono<CommandHistoryVO> getByRecordId(
+            @Parameter(
+                            description =
+                                    "Record ID returned by the Call Command endpoint; must resolve to a command-call history entry owned by the current tenant",
+                            example = "cmd_20260523_a1b2c3d4")
+                    @NotBlank
+                    @RequestParam
+                    String recordId) {
+        return getTenantId()
+                .flatMap(tenantId -> commandHistoryService
+                        .getByRecordId(tenantId, recordId)
+                        .switchIfEmpty(Mono.error(new NotFoundException("Command history does not exist"))));
     }
 
     /**
@@ -113,17 +136,22 @@ public class CommandHistoryController implements BaseController {
      * @return a page of CommandHistoryVO matching the query
      */
     @PreAuthorize("@perm.can('command_history', 'list')")
-    @Operation(summary = "List Command History Records", description = "Page through command-call history for the current tenant with " +
-            "filters such as device, command and execution status over a time window. Returns a page of records; use to audit which commands ran and their results.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Command History Records",
+            description =
+                    "Page through command-call history for the current tenant with "
+                            + "filters such as device, command and execution status over a time window. Returns a page of records; use to audit which commands ran and their results.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/list")
     public Mono<OffsetPage<CommandHistoryVO>> list(@RequestBody(required = false) CommandHistoryQueryVO queryVO) {
         return getTenantId().flatMap(tenantId -> commandHistoryService.list(tenantId, queryVO));
     }
-
 }

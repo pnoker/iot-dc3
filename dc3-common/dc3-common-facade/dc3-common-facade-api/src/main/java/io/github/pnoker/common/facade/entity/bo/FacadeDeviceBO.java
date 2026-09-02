@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
@@ -43,31 +42,21 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class FacadeDeviceBO extends BaseBO {
 
-
     private String deviceName;
-
 
     private String deviceCode;
 
-
     private Long driverId;
-
 
     private DeviceExt deviceExt;
 
-
     private EnableFlagEnum enableFlag;
-
 
     private Long tenantId;
 
-
     private String signature;
-
 
     private Integer version;
 
-
     private Long profileId;
-
 }

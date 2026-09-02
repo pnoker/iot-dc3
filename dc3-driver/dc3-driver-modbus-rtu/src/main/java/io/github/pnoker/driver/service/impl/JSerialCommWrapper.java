@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.serotonin.modbus4j.serial.SerialPortWrapper;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.InputStream;
 import java.io.OutputStream;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * jSerialComm implementation of the modbus4j SerialPortWrapper interface.
@@ -63,8 +61,13 @@ public class JSerialCommWrapper implements SerialPortWrapper {
         if (!serialPort.openPort()) {
             throw new Exception("Failed to open serial port: " + portName);
         }
-        log.info("Serial port opened, port={}, baudRate={}, dataBits={}, stopBits={}, parity={}",
-                portName, baudRate, dataBits, stopBits, parity);
+        log.info(
+                "Serial port opened, port={}, baudRate={}, dataBits={}, stopBits={}, parity={}",
+                portName,
+                baudRate,
+                dataBits,
+                stopBits,
+                parity);
     }
 
     @Override
@@ -104,5 +107,4 @@ public class JSerialCommWrapper implements SerialPortWrapper {
     public int getParity() {
         return parity;
     }
-
 }

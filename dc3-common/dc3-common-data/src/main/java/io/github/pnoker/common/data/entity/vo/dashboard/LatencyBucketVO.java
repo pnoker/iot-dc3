@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * One bin of the acquisition-to-storage latency histogram. The {@code bin} index is
@@ -44,10 +42,12 @@ public class LatencyBucketVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Latency bin index mapped by the frontend to a range: 0=<100ms, 1=100-500ms, 2=500ms-1s, 3=1-5s, 4=5-30s, 5=>=30s", example = "2")
+    @Schema(
+            description =
+                    "Latency bin index mapped by the frontend to a range: 0=<100ms, 1=100-500ms, 2=500ms-1s, 3=1-5s, 4=5-30s, 5=>=30s",
+            example = "2")
     private int bin;
 
     @Schema(description = "Number of samples that fell into this latency bin", example = "128")
     private long count;
-
 }

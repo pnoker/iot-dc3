@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da.impl;
 
+import java.net.UnknownHostException;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.IJIComObject;
 import org.jinterop.dcom.core.JICallBuilder;
@@ -30,8 +30,6 @@ import org.openscada.opc.dcom.common.impl.OPCCommon;
 import org.openscada.opc.dcom.da.Constants;
 import org.openscada.opc.dcom.da.OPCENUMSCOPE;
 import org.openscada.opc.dcom.da.OPCSERVERSTATUS;
-
-import java.net.UnknownHostException;
 
 /**
  *
@@ -62,8 +60,14 @@ public class OPCServer extends BaseCOMObject {
         return OPCSERVERSTATUS.fromStruct((JIStruct) ((JIPointer) result[0]).getReferent());
     }
 
-    public OPCGroupStateMgt addGroup(final String name, final boolean active, final int updateRate,
-                                     final int clientHandle, final Integer timeBias, final Float percentDeadband, final int localeID)
+    public OPCGroupStateMgt addGroup(
+            final String name,
+            final boolean active,
+            final int updateRate,
+            final int clientHandle,
+            final Integer timeBias,
+            final Float percentDeadband,
+            final int localeID)
             throws JIException, IllegalArgumentException, UnknownHostException {
         JICallBuilder callObject = new JICallBuilder(true);
         callObject.setOpnum(0);
@@ -178,5 +182,4 @@ public class OPCServer extends BaseCOMObject {
             return null;
         }
     }
-
 }

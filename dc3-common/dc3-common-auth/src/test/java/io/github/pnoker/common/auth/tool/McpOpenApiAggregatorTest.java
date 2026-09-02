@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.tool;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import io.github.pnoker.common.utils.JsonUtil;
+import org.junit.jupiter.api.Test;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Covers {@link McpOpenApiAggregator#buildOperationSchema} — the merge of JSON request body
@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class McpOpenApiAggregatorTest {
 
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = JsonUtil.getJsonMapper();
 
     private final McpOpenApiAggregator aggregator = new McpOpenApiAggregator();
 
@@ -63,7 +63,8 @@ class McpOpenApiAggregatorTest {
         assertThat(props.get("keyword").get("description").asText()).isEqualTo("search keyword");
         assertThat(props.has("page")).isTrue();
         // deviceName (body required), tenantId (path always), keyword (query required) — page is optional.
-        assertThat(schema.get("required")).extracting(JsonNode::asText)
+        assertThat(schema.get("required"))
+                .extracting(JsonNode::asText)
                 .containsExactlyInAnyOrder("deviceName", "tenantId", "keyword");
     }
 
@@ -88,7 +89,8 @@ class McpOpenApiAggregatorTest {
     void operationWithoutBodyOrParametersReturnsNull() throws Exception {
         JsonNode operation = mapper.readTree("{}");
 
-        assertThat(aggregator.buildOperationSchema(operation, mapper.createObjectNode())).isNull();
+        assertThat(aggregator.buildOperationSchema(operation, mapper.createObjectNode()))
+                .isNull();
     }
 
     @Test
@@ -102,6 +104,7 @@ class McpOpenApiAggregatorTest {
                 """);
 
         // Only query/path params count; a header-only operation yields no schema.
-        assertThat(aggregator.buildOperationSchema(operation, mapper.createObjectNode())).isNull();
+        assertThat(aggregator.buildOperationSchema(operation, mapper.createObjectNode()))
+                .isNull();
     }
 }

@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.builder;
 
 import io.github.pnoker.api.center.manager.GrpcOffsetProfileQuery;
+import io.github.pnoker.api.common.GrpcProfileDTO;
 import io.github.pnoker.api.common.PageRequest;
 import io.github.pnoker.api.common.SortDirection;
-import io.github.pnoker.api.common.GrpcProfileDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.ext.ProfileExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -28,16 +27,14 @@ import io.github.pnoker.common.enums.ProfileShareTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
 import io.github.pnoker.common.facade.entity.query.FacadeProfileOffsetQuery;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import org.springframework.stereotype.Component;
-
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * Converts between facade profile shapes and protobuf profile DTOs.
@@ -51,8 +48,11 @@ public class FacadeGrpcProfileBuilder {
     /** Convert the canonical offset query to protobuf. */
     public GrpcOffsetProfileQuery toGrpcOffsetQuery(FacadeProfileOffsetQuery query) {
         GrpcOffsetProfileQuery.Builder builder = GrpcOffsetProfileQuery.newBuilder()
-                .setPage(PageRequest.newBuilder().setOffset(query.offset()).setLimit(query.limit())
-                        .addAllSort(query.sort().stream().map(this::toGrpcSort).toList()).build())
+                .setPage(PageRequest.newBuilder()
+                        .setOffset(query.offset())
+                        .setLimit(query.limit())
+                        .addAllSort(query.sort().stream().map(this::toGrpcSort).toList())
+                        .build())
                 .setTenantId(query.tenantId());
         StringOptional.ofNullable(query.profileName()).ifPresent(builder::setProfileName);
         StringOptional.ofNullable(query.profileCode()).ifPresent(builder::setProfileCode);
@@ -67,8 +67,13 @@ public class FacadeGrpcProfileBuilder {
     }
 
     private io.github.pnoker.api.common.SortSpec toGrpcSort(SortSpec sort) {
-        return io.github.pnoker.api.common.SortSpec.newBuilder().setField(sort.field()).setDirection(
-                sort.direction() == SortSpec.Direction.ASC ? SortDirection.SORT_DIRECTION_ASC : SortDirection.SORT_DIRECTION_DESC).build();
+        return io.github.pnoker.api.common.SortSpec.newBuilder()
+                .setField(sort.field())
+                .setDirection(
+                        sort.direction() == SortSpec.Direction.ASC
+                                ? SortDirection.SORT_DIRECTION_ASC
+                                : SortDirection.SORT_DIRECTION_DESC)
+                .build();
     }
 
     /**
@@ -100,5 +105,4 @@ public class FacadeGrpcProfileBuilder {
                 .ifPresent(value -> bo.setProfileExt(JsonUtil.parseObject(value, ProfileExt.class)));
         return bo;
     }
-
 }

@@ -40,8 +40,20 @@ jobs:
       - name: Validate PostgreSQL initialization schema
         run: python3 dc3/bin/check_postgres_init.py
 
+      - name: Validate R2DBC migration gate
+        run: python3 dc3/bin/check_r2dbc_migration.py
+
+      - name: Validate schema fingerprint distribution
+        run: python3 dc3/bin/schema_fingerprint.py --check
+
       - name: Validate repository documentation
         run: python3 dc3/bin/check_documentation.py
+
+      - name: Validate Java formatting and copyright headers
+        run: mvn -B -DskipTests initialize spotless:check --no-transfer-progress
+
+      - name: Validate Java naming and Javadoc structure
+        run: mvn -B -DskipTests checkstyle:check --no-transfer-progress
 
       - name: Compile
         run: |
@@ -51,7 +63,8 @@ jobs:
       - name: Validate Javadoc
         run: |
           set -euo pipefail
-          mvn -B -DskipTests -pl dc3-common/dc3-common-public -am install --no-transfer-progress
-          mvn -B -DskipTests -Ddoclint=all \
+          mvn -B -DskipTests -Dspotless.check.skip=true -Dcheckstyle.skip=true \
+            -pl dc3-common/dc3-common-public -am install --no-transfer-progress
+          mvn -B -DskipTests -Ddoclint=all -Dmaven.javadoc.failOnWarnings=true \
             -pl dc3-common/dc3-common-constant,dc3-common/dc3-common-public \
             javadoc:javadoc --no-transfer-progress

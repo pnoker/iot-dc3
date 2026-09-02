@@ -342,13 +342,14 @@ aggregate XML. Do not claim a relative regression gate unless the build implemen
 ## CLI conventions (`dc3-cli/`)
 
 Standalone TypeScript package (pnpm + tsup + vitest, binary name `dc3`). It has no Java/build coupling to the Maven
-build; it talks to the running backend through the HTTP gateway only.
+build; it talks to the running backend through the HTTP gateway only. It owns an independent package and lockfile;
+the repository does not use a root pnpm workspace.
 
 ```bash
-pnpm --dir dc3-cli install            # deps (esbuild build script is pre-approved in pnpm-workspace.yaml)
-pnpm --dir dc3-cli build              # tsup → dist/ (bin: dc3)
-pnpm --dir dc3-cli test               # vitest run
-pnpm --dir dc3-cli lint               # eslint src --fix
+(cd dc3-cli && corepack pnpm install) # install the CLI's independent dependencies
+(cd dc3-cli && corepack pnpm build)   # tsup → dist/ (bin: dc3)
+(cd dc3-cli && corepack pnpm test)    # vitest run
+(cd dc3-cli && corepack pnpm lint)    # eslint src --fix
 ```
 
 - The CLI mirrors backend CRUD verb conventions: command surfaces use `get/list/add/update/delete`; list endpoints that

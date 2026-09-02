@@ -14,13 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
-import lombok.extern.slf4j.Slf4j;
-
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -34,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Local host IP, hostname, and MAC address lookup.
@@ -185,12 +183,11 @@ public class HostUtil {
             if (Objects.nonNull(mac)) {
                 StringBuilder stringBuilder = new StringBuilder();
                 for (int i = 0; i < mac.length; i++) {
-                    stringBuilder.append(String.format("%02X%s", mac[i],
-                            (i < mac.length - 1) ? SymbolConstant.HYPHEN : ""));
+                    stringBuilder.append(
+                            String.format("%02X%s", mac[i], (i < mac.length - 1) ? SymbolConstant.HYPHEN : ""));
                 }
                 macList.add(stringBuilder.toString());
             }
         }
     }
-
 }

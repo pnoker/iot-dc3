@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.bo.OAuthClientRegistrationBO;
@@ -24,14 +23,13 @@ import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
 import io.github.pnoker.common.enums.OAuthClientTypeEnum;
 import io.github.pnoker.common.enums.OAuthGrantTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * MapStruct builder converting an OAuth registered client projection to its view object.
@@ -39,7 +37,9 @@ import java.util.Objects;
  * @author pnoker
  * @since 2026.6.19
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface OAuthClientBuilder {
 
     /**
@@ -102,8 +102,8 @@ public interface OAuthClientBuilder {
      * @param entityBO business object
      */
     @AfterMapping
-    default void afterProcess(OAuthClientRegistrationRequestVO entityVO,
-                              @MappingTarget OAuthClientRegistrationBO entityBO) {
+    default void afterProcess(
+            OAuthClientRegistrationRequestVO entityVO, @MappingTarget OAuthClientRegistrationBO entityBO) {
         entityBO.setClientType(
                 OAuthClientTypeEnum.ofValue(StringUtils.upperCase(StringUtils.trimToNull(entityVO.getClientType()))));
         if (Objects.nonNull(entityVO.getGrantTypes())) {
@@ -127,5 +127,4 @@ public interface OAuthClientBuilder {
         String raw = StringUtils.upperCase(StringUtils.trimToNull(entityVO.getClientType()));
         return Objects.nonNull(raw) && Objects.isNull(OAuthClientTypeEnum.ofValue(raw));
     }
-
 }

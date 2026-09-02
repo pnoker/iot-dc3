@@ -14,14 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
 import io.github.pnoker.common.data.biz.PointCommandService;
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
 import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
-import io.github.pnoker.common.facade.api.PointCommandFacade;
 import io.github.pnoker.common.enums.PointCommandSourceEnum;
+import io.github.pnoker.common.facade.api.PointCommandFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -64,8 +63,8 @@ public class PointCommandLocalFacade implements PointCommandFacade {
     }
 
     @Override
-    public Mono<String> submitWrite(Long tenantId, Long deviceId, Long pointId, String value,
-                                    PointCommandSourceEnum source) {
+    public Mono<String> submitWrite(
+            Long tenantId, Long deviceId, Long pointId, String value, PointCommandSourceEnum source) {
         PointCommandWriteBO writeBO = new PointCommandWriteBO();
         writeBO.setDeviceId(deviceId);
         writeBO.setPointId(pointId);
@@ -73,5 +72,4 @@ public class PointCommandLocalFacade implements PointCommandFacade {
         writeBO.setSource(source);
         return pointCommandService.write(tenantId, writeBO);
     }
-
 }

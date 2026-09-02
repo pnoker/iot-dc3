@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
@@ -34,6 +33,13 @@ import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.exception.WritePointException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
@@ -49,14 +55,6 @@ import org.openscada.opc.lib.da.Server;
 import org.openscada.opc.lib.da.UnknownGroupException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Custom driver service implementation for the OPC DA driver.
@@ -82,6 +80,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     private final ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
     /**
@@ -89,13 +88,15 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
      */
     private Map<Long, Server> connectMap;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -114,8 +115,12 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode,
-                    metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
 
             // Remove stale connection when device is updated or deleted
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
@@ -125,29 +130,47 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
                     try {
                         removed.dispose();
                     } catch (Exception e) {
-                        log.warn("Driver connection disconnect failed, protocol={}, deviceId={}", driverCode,
-                                metadataEvent.getId(), e);
+                        log.warn(
+                                "Driver connection disconnect failed, protocol={}, deviceId={}",
+                                driverCode,
+                                metadataEvent.getId(),
+                                e);
                     }
                 }
-                log.info("Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}", driverCode,
-                        metadataEvent.getId(), operateType, Objects.nonNull(removed));
+                log.info(
+                        "Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}",
+                        driverCode,
+                        metadataEvent.getId(),
+                        operateType,
+                        Objects.nonNull(removed));
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode,
-                    metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                               PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         Server server = getConnector(device.getId(), driverConfig);
         return new ReadPointValue(device, point, readValue(device.getId(), server, pointConfig));
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         Server server = getConnector(device.getId(), driverConfig);
         return writeValue(device.getId(), server, pointConfig, writePointValue);
     }
@@ -166,25 +189,50 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
             String clsId = driverConfig.get("clsId").getValue(String.class);
             String user = driverConfig.get("username").getValue(String.class);
             String password = driverConfig.get("password").getValue(String.class);
-            log.debug("Driver connection creating, protocol={}, deviceId={}, host={}, clsId={}, usernamePresent={}", driverCode,
-                    deviceId, host, clsId, Objects.nonNull(user));
+            log.debug(
+                    "Driver connection creating, protocol={}, deviceId={}, host={}, clsId={}, usernamePresent={}",
+                    driverCode,
+                    deviceId,
+                    host,
+                    clsId,
+                    Objects.nonNull(user));
             ConnectionInformation connectionInformation = new ConnectionInformation(host, clsId, user, password);
             Server server = new Server(connectionInformation, scheduledThreadPoolExecutor);
             try {
                 server.connect();
-                log.info("Driver connection established, protocol={}, deviceId={}, host={}, clsId={}", driverCode, deviceId,
-                        host, clsId);
+                log.info(
+                        "Driver connection established, protocol={}, deviceId={}, host={}, clsId={}",
+                        driverCode,
+                        deviceId,
+                        host,
+                        clsId);
             } catch (AlreadyConnectedException | UnknownHostException | JIException e) {
                 try {
                     server.dispose();
                 } catch (Exception e1) {
-                    log.warn("Driver connection dispose failed after connect error, protocol={}, deviceId={}, host={}, clsId={}", driverCode,
-                            deviceId, host, clsId, e1);
+                    log.warn(
+                            "Driver connection dispose failed after connect error, protocol={}, deviceId={}, host={}, clsId={}",
+                            driverCode,
+                            deviceId,
+                            host,
+                            clsId,
+                            e1);
                 }
-                log.error("Driver connection failed, protocol={}, deviceId={}, host={}, clsId={}", driverCode, deviceId, host,
-                        clsId, e);
-                throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, host={}, clsId={}, message={}",
-                        deviceId, host, clsId, e.getMessage(), e);
+                log.error(
+                        "Driver connection failed, protocol={}, deviceId={}, host={}, clsId={}",
+                        driverCode,
+                        deviceId,
+                        host,
+                        clsId,
+                        e);
+                throw new ConnectorException(
+                        "Driver connection failed, protocol=" + driverCode
+                                + ", deviceId={}, host={}, clsId={}, message={}",
+                        deviceId,
+                        host,
+                        clsId,
+                        e.getMessage(),
+                        e);
             }
             return server;
         });
@@ -197,8 +245,9 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
      * @param pointConfig point configuration (group, tag)
      * @return the resolved Item
      */
-    public Item getItem(Server server, Map<String, AttributeBO> pointConfig) throws NotConnectedException, JIException,
-            UnknownHostException, DuplicateGroupException, AddFailedException {
+    public Item getItem(Server server, Map<String, AttributeBO> pointConfig)
+            throws NotConnectedException, JIException, UnknownHostException, DuplicateGroupException,
+                    AddFailedException {
         Group group;
         String groupName = pointConfig.get("group").getValue(String.class);
         try {
@@ -221,11 +270,15 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         try {
             Item item = getItem(server, pointConfig);
             return readItem(item);
-        } catch (NotConnectedException | JIException | AddFailedException | DuplicateGroupException
-                 | UnknownHostException e) {
+        } catch (NotConnectedException
+                | JIException
+                | AddFailedException
+                | DuplicateGroupException
+                | UnknownHostException e) {
             invalidateConnector(deviceId, server);
             log.error("Driver point read failed, protocol={}", driverCode, e);
-            throw new ReadPointException("Driver point read failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
+            throw new ReadPointException(
+                    "Driver point read failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
     }
 
@@ -276,15 +329,20 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
      * @return true if the write succeeded
      * @throws WritePointException if writing fails (server is disposed on error)
      */
-    private boolean writeValue(Long deviceId, Server server, Map<String, AttributeBO> pointConfig, WritePointValue writePointValue) {
+    private boolean writeValue(
+            Long deviceId, Server server, Map<String, AttributeBO> pointConfig, WritePointValue writePointValue) {
         try {
             Item item = getItem(server, pointConfig);
             return writeItem(item, writePointValue);
-        } catch (NotConnectedException | AddFailedException | DuplicateGroupException | UnknownHostException
-                 | JIException e) {
+        } catch (NotConnectedException
+                | AddFailedException
+                | DuplicateGroupException
+                | UnknownHostException
+                | JIException e) {
             invalidateConnector(deviceId, server);
             log.error("Driver point write failed, protocol={}", driverCode, e);
-            throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
+            throw new WritePointException(
+                    "Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
     }
 
@@ -358,7 +416,8 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "password", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -368,7 +427,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "tag", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

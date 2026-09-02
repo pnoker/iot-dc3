@@ -14,21 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.integration.endpoint.MessageProducerSupport;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.messaging.MessageChannel;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MqttConfigTest {
 
@@ -42,8 +40,8 @@ class MqttConfigTest {
         properties.setClient("tenant/app/node");
         properties.setTopicPrefix("dc3/tenant/app/");
         properties.setDefaultSendTopic(new MqttProperties.Topic("command", 1));
-        properties.setReceiveTopics(List.of(new MqttProperties.Topic("data", 1),
-                new MqttProperties.Topic("dc3/tenant/app/status", 0)));
+        properties.setReceiveTopics(
+                List.of(new MqttProperties.Topic("data", 1), new MqttProperties.Topic("dc3/tenant/app/status", 0)));
         config = new MqttConfig(properties);
     }
 
@@ -51,12 +49,12 @@ class MqttConfigTest {
     void inboundUsesProvidedChannelAndDoesNotMutateConfiguredTopics() {
         MessageChannel inboundChannel = config.mqttInboundChannel();
 
-        MqttPahoMessageDrivenChannelAdapter adapter =
-                (MqttPahoMessageDrivenChannelAdapter) config.mqttInbound(new DefaultMqttPahoClientFactory(),
-                        inboundChannel);
+        MqttPahoMessageDrivenChannelAdapter adapter = (MqttPahoMessageDrivenChannelAdapter)
+                config.mqttInbound(new DefaultMqttPahoClientFactory(), inboundChannel);
 
         assertThat(((MessageProducerSupport) adapter).getOutputChannel()).isSameAs(inboundChannel);
-        assertThat(properties.getReceiveTopics()).extracting(MqttProperties.Topic::getName)
+        assertThat(properties.getReceiveTopics())
+                .extracting(MqttProperties.Topic::getName)
                 .containsExactly("data", "dc3/tenant/app/status");
     }
 
@@ -76,5 +74,4 @@ class MqttConfigTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("MQTT receive topics must be configured");
     }
-
 }

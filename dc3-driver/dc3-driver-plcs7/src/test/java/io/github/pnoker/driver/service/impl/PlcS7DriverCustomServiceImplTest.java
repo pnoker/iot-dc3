@@ -14,8 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import com.github.xingshuangs.iot.protocol.s7.service.S7PLC;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
@@ -33,27 +42,16 @@ import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.driver.bean.PlcS7PointVariable;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class PlcS7DriverCustomServiceImplTest {
@@ -71,17 +69,44 @@ class PlcS7DriverCustomServiceImplTest {
 
     private static Map<String, AttributeBO> driverConfig(String host, int port) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeEnum.STRING).build());
-        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeEnum.INT).build());
-        m.put("plcType", AttributeBO.builder().value("S1200").type(AttributeTypeEnum.STRING).build());
+        m.put(
+                "host",
+                AttributeBO.builder().value(host).type(AttributeTypeEnum.STRING).build());
+        m.put(
+                "port",
+                AttributeBO.builder()
+                        .value(String.valueOf(port))
+                        .type(AttributeTypeEnum.INT)
+                        .build());
+        m.put(
+                "plcType",
+                AttributeBO.builder()
+                        .value("S1200")
+                        .type(AttributeTypeEnum.STRING)
+                        .build());
         return m;
     }
 
     private static Map<String, AttributeBO> pointConfig(int dbNum, int byteOffset, int bitOffset) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("dbNum", AttributeBO.builder().value(String.valueOf(dbNum)).type(AttributeTypeEnum.INT).build());
-        m.put("byteOffset", AttributeBO.builder().value(String.valueOf(byteOffset)).type(AttributeTypeEnum.INT).build());
-        m.put("bitOffset", AttributeBO.builder().value(String.valueOf(bitOffset)).type(AttributeTypeEnum.INT).build());
+        m.put(
+                "dbNum",
+                AttributeBO.builder()
+                        .value(String.valueOf(dbNum))
+                        .type(AttributeTypeEnum.INT)
+                        .build());
+        m.put(
+                "byteOffset",
+                AttributeBO.builder()
+                        .value(String.valueOf(byteOffset))
+                        .type(AttributeTypeEnum.INT)
+                        .build());
+        m.put(
+                "bitOffset",
+                AttributeBO.builder()
+                        .value(String.valueOf(bitOffset))
+                        .type(AttributeTypeEnum.INT)
+                        .build());
         return m;
     }
 
@@ -177,8 +202,8 @@ class PlcS7DriverCustomServiceImplTest {
         primeCachedPLC(10L);
         when(plc.readInt32("DB1.0")).thenReturn(42);
 
-        ReadPointValue r = service.read(driverConfig("h", 102), pointConfig(1, 0, 0),
-                device(10L), point(PointTypeEnum.INT));
+        ReadPointValue r =
+                service.read(driverConfig("h", 102), pointConfig(1, 0, 0), device(10L), point(PointTypeEnum.INT));
 
         assertThat(r.getValue()).isEqualTo("42");
         verify(plc, times(1)).readInt32("DB1.0");
@@ -189,8 +214,8 @@ class PlcS7DriverCustomServiceImplTest {
         primeCachedPLC(11L);
         when(plc.readBoolean("DB2.3.5")).thenReturn(true);
 
-        ReadPointValue r = service.read(driverConfig("h", 102), pointConfig(2, 3, 5),
-                device(11L), point(PointTypeEnum.BOOLEAN));
+        ReadPointValue r =
+                service.read(driverConfig("h", 102), pointConfig(2, 3, 5), device(11L), point(PointTypeEnum.BOOLEAN));
 
         assertThat(r.getValue()).isEqualTo("true");
         verify(plc, times(1)).readBoolean("DB2.3.5");
@@ -201,8 +226,8 @@ class PlcS7DriverCustomServiceImplTest {
         primeCachedPLC(12L);
         when(plc.readFloat32("DB5.10")).thenReturn(3.14f);
 
-        ReadPointValue r = service.read(driverConfig("h", 102), pointConfig(5, 10, 0),
-                device(12L), point(PointTypeEnum.FLOAT));
+        ReadPointValue r =
+                service.read(driverConfig("h", 102), pointConfig(5, 10, 0), device(12L), point(PointTypeEnum.FLOAT));
 
         assertThat(r.getValue()).isEqualTo("3.14");
         verify(plc, times(1)).readFloat32("DB5.10");
@@ -213,8 +238,8 @@ class PlcS7DriverCustomServiceImplTest {
         primeCachedPLC(13L);
         when(plc.readInt32(anyString())).thenThrow(new RuntimeException("plc offline"));
 
-        assertThatThrownBy(() -> service.read(driverConfig("h", 102), pointConfig(1, 0, 0),
-                device(13L), point(PointTypeEnum.INT)))
+        assertThatThrownBy(() -> service.read(
+                        driverConfig("h", 102), pointConfig(1, 0, 0), device(13L), point(PointTypeEnum.INT)))
                 .isInstanceOf(ReadPointException.class);
 
         assertThat(connectionMap()).doesNotContainKey(13L);
@@ -229,8 +254,11 @@ class PlcS7DriverCustomServiceImplTest {
     void writeIntDelegatesToS7PLC() throws Exception {
         primeCachedPLC(20L);
 
-        Boolean ok = service.write(driverConfig("h", 102), pointConfig(1, 4, 0),
-                device(20L), point(PointTypeEnum.INT),
+        Boolean ok = service.write(
+                driverConfig("h", 102),
+                pointConfig(1, 4, 0),
+                device(20L),
+                point(PointTypeEnum.INT),
                 writePointValue("123", PointTypeEnum.INT));
 
         assertThat(ok).isTrue();
@@ -241,8 +269,11 @@ class PlcS7DriverCustomServiceImplTest {
     void writeFloatDelegatesToS7PLC() throws Exception {
         primeCachedPLC(21L);
 
-        Boolean ok = service.write(driverConfig("h", 102), pointConfig(3, 8, 0),
-                device(21L), point(PointTypeEnum.FLOAT),
+        Boolean ok = service.write(
+                driverConfig("h", 102),
+                pointConfig(3, 8, 0),
+                device(21L),
+                point(PointTypeEnum.FLOAT),
                 writePointValue("2.5", PointTypeEnum.FLOAT));
 
         assertThat(ok).isTrue();
@@ -253,8 +284,11 @@ class PlcS7DriverCustomServiceImplTest {
     void writeBooleanDelegatesToS7PLC() throws Exception {
         primeCachedPLC(22L);
 
-        Boolean ok = service.write(driverConfig("h", 102), pointConfig(1, 0, 3),
-                device(22L), point(PointTypeEnum.BOOLEAN),
+        Boolean ok = service.write(
+                driverConfig("h", 102),
+                pointConfig(1, 0, 3),
+                device(22L),
+                point(PointTypeEnum.BOOLEAN),
                 writePointValue("true", PointTypeEnum.BOOLEAN));
 
         assertThat(ok).isTrue();
@@ -264,11 +298,16 @@ class PlcS7DriverCustomServiceImplTest {
     @Test
     void writeThrowsAndInvalidatesConnectionWhenPlcThrows() throws Exception {
         primeCachedPLC(23L);
-        doThrow(new RuntimeException("plc offline")).when(plc).writeInt32(anyString(), org.mockito.ArgumentMatchers.anyInt());
+        doThrow(new RuntimeException("plc offline"))
+                .when(plc)
+                .writeInt32(anyString(), org.mockito.ArgumentMatchers.anyInt());
 
-        assertThatThrownBy(() -> service.write(driverConfig("h", 102), pointConfig(1, 0, 0),
-                device(23L), point(PointTypeEnum.INT),
-                writePointValue("1", PointTypeEnum.INT)))
+        assertThatThrownBy(() -> service.write(
+                        driverConfig("h", 102),
+                        pointConfig(1, 0, 0),
+                        device(23L),
+                        point(PointTypeEnum.INT),
+                        writePointValue("1", PointTypeEnum.INT)))
                 .isInstanceOf(WritePointException.class);
 
         assertThat(connectionMap()).doesNotContainKey(23L);
@@ -297,8 +336,7 @@ class PlcS7DriverCustomServiceImplTest {
     // ------------------------------------------------------------------------
 
     private void primeCachedPLC(Long deviceId) throws Exception {
-        Class<?> innerType = Class.forName(
-                "io.github.pnoker.driver.service.impl.PlcS7DriverCustomServiceImpl$MyS7PLC");
+        Class<?> innerType = Class.forName("io.github.pnoker.driver.service.impl.PlcS7DriverCustomServiceImpl$MyS7PLC");
         Constructor<?> ctor = innerType.getDeclaredConstructor(ReentrantLock.class, S7PLC.class);
         ctor.setAccessible(true);
         Object instance = ctor.newInstance(new ReentrantLock(), plc);
@@ -311,5 +349,4 @@ class PlcS7DriverCustomServiceImplTest {
         field.setAccessible(true);
         return (Map) field.get(service);
     }
-
 }

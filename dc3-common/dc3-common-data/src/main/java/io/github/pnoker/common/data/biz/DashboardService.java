@@ -14,16 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.data.entity.vo.dashboard.*;
-import reactor.core.publisher.Mono;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
-import reactor.core.publisher.Mono;
-
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * Dashboard aggregation service — powers the home page's live feed, trend chart, top-N
@@ -105,8 +102,13 @@ public interface DashboardService {
     /**
      * Paged alert list using the canonical offset pagination contract.
      */
-    Mono<OffsetPage<AlertItemVO>> alertPage(Long tenantId, String source, Integer alarmTypeFlag,
-                                            Integer confirmFlag, java.time.LocalDateTime from, PageRequest page);
+    Mono<OffsetPage<AlertItemVO>> alertPage(
+            Long tenantId,
+            String source,
+            Integer alarmTypeFlag,
+            Integer confirmFlag,
+            java.time.LocalDateTime from,
+            PageRequest page);
 
     /**
      * Flip confirm_flag = 1 on a single event row. Returns true when the row was actually
@@ -123,9 +125,10 @@ public interface DashboardService {
      * Bulk confirm / unconfirm. {@code confirm} chooses the direction (true = set to 1,
      * false = set to 0). Returns the number of rows actually changed across all entries.
      */
-    Mono<Integer> bulkConfirmAlert(Long tenantId,
-                                   java.util.List<io.github.pnoker.common.data.entity.vo.dashboard.AlertBulkConfirmVO.Item> items,
-                                   boolean confirm);
+    Mono<Integer> bulkConfirmAlert(
+            Long tenantId,
+            java.util.List<io.github.pnoker.common.data.entity.vo.dashboard.AlertBulkConfirmVO.Item> items,
+            boolean confirm);
 
     /**
      * Daily event trend for the last {@code days} days, split by device/driver source.
@@ -207,5 +210,4 @@ public interface DashboardService {
      * Points declared but never reported — config-vs-reality gap.
      */
     Mono<CoverageGapVO> coverageGap(Long tenantId, int limit);
-
 }

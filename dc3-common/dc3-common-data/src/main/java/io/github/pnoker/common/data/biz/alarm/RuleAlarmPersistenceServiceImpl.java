@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.common.DefaultConstant;
@@ -29,15 +28,14 @@ import io.github.pnoker.common.enums.AlarmSourceTypeEnum;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
+import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Rule alarm persistence service implementation.
@@ -76,10 +74,12 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
                     if (!Strings.CI.equals(AlarmConstant.MATCH_TYPE_FIRING, match.getMatchType())) {
                         return Mono.just(match);
                     }
-                    return persistEntityAlarm(match).map(alarm -> {
-                        fact.setAlarmId(alarm.getId());
-                        return match;
-                    }).defaultIfEmpty(match);
+                    return persistEntityAlarm(match)
+                            .map(alarm -> {
+                                fact.setAlarmId(alarm.getId());
+                                return match;
+                            })
+                            .defaultIfEmpty(match);
                 }));
     }
 
@@ -97,15 +97,16 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
         Long entityId = fact.getEntityId();
 
         if (!isValidId(entityId)) {
-            log.warn("Skip rule entity alarm because entityId is missing, ruleId={}, targetType={}",
-                    match.getRule().getId(), targetType);
+            log.warn(
+                    "Skip rule entity alarm because entityId is missing, ruleId={}, targetType={}",
+                    match.getRule().getId(),
+                    targetType);
             return Mono.empty();
         }
 
         Long driverId = longValue(fact.value("driverId"));
         Long deviceId = longValue(fact.value("deviceId"));
-        Long pointId = AlarmTargetTypeEnum.POINT.equals(targetType) ? entityId
-                : longValue(fact.value("pointId"));
+        Long pointId = AlarmTargetTypeEnum.POINT.equals(targetType) ? entityId : longValue(fact.value("pointId"));
 
         if (AlarmTargetTypeEnum.DEVICE.equals(targetType) || AlarmTargetTypeEnum.POINT.equals(targetType)) {
             if (!isValidId(deviceId)) {
@@ -132,9 +133,14 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
         entity.setExpiredTime(DefaultConstant.DEFAULT_ID);
         entity.setConfirmFlag((byte) 0);
         entity.setTenantId(Objects.requireNonNullElse(fact.getTenantId(), DefaultConstant.DEFAULT_ID));
-        return entityAlarmStore.insert(entity)
-                .doOnError(error -> log.warn("Failed to persist entity alarm, ruleId={}, targetType={}, entityId={}",
-                        match.getRule().getId(), targetType, entityId, error));
+        return entityAlarmStore
+                .insert(entity)
+                .doOnError(error -> log.warn(
+                        "Failed to persist entity alarm, ruleId={}, targetType={}, entityId={}",
+                        match.getRule().getId(),
+                        targetType,
+                        entityId,
+                        error));
     }
 
     private JsonExt alarmExt(RuleMatch match) {
@@ -149,7 +155,8 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
     }
 
     private String message(RuleMatch match) {
-        String ruleName = StringUtils.defaultIfBlank(match.getRule().getRuleName(), match.getRule().getRuleCode());
+        String ruleName = StringUtils.defaultIfBlank(
+                match.getRule().getRuleName(), match.getRule().getRuleCode());
         String eventType = StringUtils.defaultIfBlank(match.getEventType(), AlarmConstant.EXT_RULE_EVENT);
         return String.format("Rule %s fired: %s", ruleName, eventType);
     }
@@ -160,8 +167,8 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
         if (source == null) source = fact.value("eventId");
         if (source == null) source = fact.getAlarmId();
         if (source == null) source = fact.getFactTime();
-        return "rule:" + match.getRule().getId() + ":" + fact.getAlarmTargetTypeFlag().getIndex()
-                + ":" + fact.getEntityId() + ":" + source;
+        return "rule:" + match.getRule().getId() + ":"
+                + fact.getAlarmTargetTypeFlag().getIndex() + ":" + fact.getEntityId() + ":" + source;
     }
 
     private RuleAlarmEventExt ruleAlarmEventExt(RuleMatch match) {
@@ -190,8 +197,10 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
      */
     private Mono<Long> getFiringAlarmId(RuleMatch match) {
         RuleFact fact = match.getFact();
-        if (!isValidId(match.getRule().getId()) || !isValidId(fact.getTenantId())
-                || Objects.isNull(fact.getAlarmTargetTypeFlag()) || !isValidId(fact.getEntityId())) {
+        if (!isValidId(match.getRule().getId())
+                || !isValidId(fact.getTenantId())
+                || Objects.isNull(fact.getAlarmTargetTypeFlag())
+                || !isValidId(fact.getEntityId())) {
             return Mono.empty();
         }
         return ruleStateLookup.getFiringAlarmId(
@@ -221,5 +230,4 @@ public class RuleAlarmPersistenceServiceImpl implements RuleAlarmPersistenceServ
     private boolean isValidId(Long id) {
         return Objects.nonNull(id) && id > 0;
     }
-
 }

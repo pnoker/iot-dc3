@@ -14,9 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
 
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledExecutorService;
 import lombok.extern.slf4j.Slf4j;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.JIClsid;
@@ -33,14 +39,6 @@ import org.openscada.opc.lib.common.ConnectionInformation;
 import org.openscada.opc.lib.common.NotConnectedException;
 import org.openscada.opc.lib.da.browser.FlatBrowser;
 import org.openscada.opc.lib.da.browser.TreeBrowser;
-
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author pnoker
@@ -108,18 +106,26 @@ public class Server {
 
         try {
             if (this.connectionInformation.getClsid() != null) {
-                this.session = JISession.createSession(this.connectionInformation.getDomain(),
-                        this.connectionInformation.getUser(), this.connectionInformation.getPassword());
+                this.session = JISession.createSession(
+                        this.connectionInformation.getDomain(),
+                        this.connectionInformation.getUser(),
+                        this.connectionInformation.getPassword());
                 this.session.setGlobalSocketTimeout(socketTimeout);
                 this.session.useSessionSecurity(true);
-                this.comServer = new JIComServer(JIClsid.valueOf(this.connectionInformation.getClsid()),
-                        this.connectionInformation.getHost(), this.session);
+                this.comServer = new JIComServer(
+                        JIClsid.valueOf(this.connectionInformation.getClsid()),
+                        this.connectionInformation.getHost(),
+                        this.session);
             } else if (this.connectionInformation.getProgId() != null) {
-                this.session = JISession.createSession(this.connectionInformation.getDomain(),
-                        this.connectionInformation.getUser(), this.connectionInformation.getPassword());
+                this.session = JISession.createSession(
+                        this.connectionInformation.getDomain(),
+                        this.connectionInformation.getUser(),
+                        this.connectionInformation.getPassword());
                 this.session.setGlobalSocketTimeout(socketTimeout);
-                this.comServer = new JIComServer(JIProgId.valueOf(this.connectionInformation.getProgId()),
-                        this.connectionInformation.getHost(), this.session);
+                this.comServer = new JIComServer(
+                        JIProgId.valueOf(this.connectionInformation.getProgId()),
+                        this.connectionInformation.getHost(),
+                        this.session);
             } else {
                 throw new IllegalArgumentException("Neither clsid nor progid is valid!");
             }
@@ -149,20 +155,22 @@ public class Server {
     protected void cleanup() {
         log.debug("Destroying DCOM session...");
         final JISession destructSession = this.session;
-        final Thread destructor = new Thread(new Runnable() {
+        final Thread destructor = new Thread(
+                new Runnable() {
 
-            @Override
-            public void run() {
-                final long ts = System.currentTimeMillis();
-                try {
-                    log.debug("Starting destruction of DCOM session");
-                    JISession.destroySession(destructSession);
-                    log.debug("Destructed DCOM session");
-                } catch (final Throwable e) {
-                    log.error("Failed to destruct DCOM session", e);
-                }
-            }
-        }, "UtgardSessionDestructor");
+                    @Override
+                    public void run() {
+                        final long ts = System.currentTimeMillis();
+                        try {
+                            log.debug("Starting destruction of DCOM session");
+                            JISession.destroySession(destructSession);
+                            log.debug("Destructed DCOM session");
+                        } catch (final Throwable e) {
+                            log.error("Failed to destruct DCOM session", e);
+                        }
+                    }
+                },
+                "UtgardSessionDestructor");
         destructor.setName("OPCSessionDestructor");
         destructor.setDaemon(true);
         destructor.start();
@@ -225,15 +233,22 @@ public class Server {
      * @throws JIException              JIException
      * @throws DuplicateGroupException  If a group with this name already exists
      */
-    public synchronized Group addGroup(final String name) throws NotConnectedException, IllegalArgumentException,
-            UnknownHostException, JIException, DuplicateGroupException {
+    public synchronized Group addGroup(final String name)
+            throws NotConnectedException, IllegalArgumentException, UnknownHostException, JIException,
+                    DuplicateGroupException {
         if (!isConnected()) {
             throw new NotConnectedException();
         }
 
         try {
-            final OPCGroupStateMgt groupMgt = this.server.addGroup(name, this.defaultActive, this.defaultUpdateRate, 0,
-                    this.defaultTimeBias, this.defaultPercentDeadband, this.defaultLocaleID);
+            final OPCGroupStateMgt groupMgt = this.server.addGroup(
+                    name,
+                    this.defaultActive,
+                    this.defaultUpdateRate,
+                    0,
+                    this.defaultTimeBias,
+                    this.defaultPercentDeadband,
+                    this.defaultLocaleID);
             return getGroup(groupMgt);
         } catch (final JIException e) {
             if (e.getErrorCode() == 0xC004000C) {
@@ -256,8 +271,9 @@ public class Server {
      * @throws JIException              JIException
      * @throws DuplicateGroupException  DuplicateGroupException
      */
-    public Group addGroup() throws IllegalArgumentException, UnknownHostException, NotConnectedException, JIException,
-            DuplicateGroupException {
+    public Group addGroup()
+            throws IllegalArgumentException, UnknownHostException, NotConnectedException, JIException,
+                    DuplicateGroupException {
         return addGroup(null);
     }
 
@@ -272,8 +288,9 @@ public class Server {
      * @throws UnknownGroupException    If the group was not found
      * @throws NotConnectedException    If the server is not connected
      */
-    public Group findGroup(final String name) throws IllegalArgumentException, UnknownHostException, JIException,
-            UnknownGroupException, NotConnectedException {
+    public Group findGroup(final String name)
+            throws IllegalArgumentException, UnknownHostException, JIException, UnknownGroupException,
+                    NotConnectedException {
         if (!isConnected()) {
             throw new NotConnectedException();
         }
@@ -391,8 +408,8 @@ public class Server {
     }
 
     protected void notifyConnectionStateChange(final boolean connected) {
-        final List<ServerConnectionStateListener> list = new ArrayList<ServerConnectionStateListener>(
-                this.stateListeners);
+        final List<ServerConnectionStateListener> list =
+                new ArrayList<ServerConnectionStateListener>(this.stateListeners);
         for (final ServerConnectionStateListener listener : list) {
             listener.connectionStateChanged(connected);
         }
@@ -418,5 +435,4 @@ public class Server {
             this.groups.remove(group.getServerHandle());
         }
     }
-
 }

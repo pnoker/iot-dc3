@@ -1,22 +1,35 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.db.r2dbc.runtime.operation;
 
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.operation.OperationRepository;
 import io.github.pnoker.db.r2dbc.core.operation.OperationState;
-import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import io.github.pnoker.db.r2dbc.core.tenant.TenantScope;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.util.Objects;
+import java.util.UUID;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.Objects;
-import java.util.UUID;
 
 /** R2DBC implementation for the runtime operation/idempotency tables. */
 public final class R2dbcOperationRepository implements OperationRepository {
@@ -26,12 +39,11 @@ public final class R2dbcOperationRepository implements OperationRepository {
     private final R2dbcDialect dialect;
     private final String table;
 
-    public R2dbcOperationRepository(DatabaseClient databaseClient,
-                                    TransactionalOperator transactionalOperator,
-                                    R2dbcDialect dialect) {
+    public R2dbcOperationRepository(
+            DatabaseClient databaseClient, TransactionalOperator transactionalOperator, R2dbcDialect dialect) {
         this.databaseClient = Objects.requireNonNull(databaseClient, "databaseClient must not be null");
-        this.transactionalOperator = Objects.requireNonNull(
-                transactionalOperator, "transactionalOperator must not be null");
+        this.transactionalOperator =
+                Objects.requireNonNull(transactionalOperator, "transactionalOperator must not be null");
         this.dialect = Objects.requireNonNull(dialect, "dialect must not be null");
         this.table = dialect.quoteIdentifier(dialect.operationTable());
     }
@@ -44,8 +56,9 @@ public final class R2dbcOperationRepository implements OperationRepository {
                     + " (operation_id, tenant_id, idempotency_key, request_hash, status, progress, created_at, updated_at, expires_at)"
                     + " VALUES (:operation_id, :tenant_id, :idempotency_key, :request_hash, :status, :progress,"
                     + " :created_at, :updated_at, :expires_at)";
-            DatabaseClient.GenericExecuteSpec statement = databaseClient.sql(sql)
-                    .bind("operation_id", dialectUuid(state.operationId()))
+            DatabaseClient.GenericExecuteSpec statement = databaseClient
+                    .sql(sql)
+                    .bind("operation_id", state.operationId())
                     .bind("tenant_id", state.tenantId())
                     .bind("idempotency_key", state.idempotencyKey())
                     .bind("request_hash", state.requestHash())
@@ -56,11 +69,16 @@ public final class R2dbcOperationRepository implements OperationRepository {
             statement = state.expiresAt() == null
                     ? statement.bindNull("expires_at", Object.class)
                     : statement.bind("expires_at", dialect.bindInstant(state.expiresAt()));
-            return transactionalOperator.transactional(statement.fetch().rowsUpdated()
+            return transactionalOperator
+                    .transactional(statement
+                            .fetch()
+                            .rowsUpdated()
                             .flatMap(rows -> rows == 1
                                     ? findById(tenant, state.operationId())
-                                    : Mono.error(new IllegalStateException("operation insert affected " + rows + " rows"))))
-                    .onErrorResume(DataIntegrityViolationException.class,
+                                    : Mono.error(
+                                            new IllegalStateException("operation insert affected " + rows + " rows"))))
+                    .onErrorResume(
+                            DataIntegrityViolationException.class,
                             error -> findByIdempotencyKey(tenant, state.idempotencyKey())
                                     .flatMap(existing -> sameRequest(existing, state)
                                             ? Mono.just(existing)
@@ -74,11 +92,11 @@ public final class R2dbcOperationRepository implements OperationRepository {
     public Mono<OperationState> findById(TenantScope tenant, UUID operationId) {
         Objects.requireNonNull(tenant, "tenant must not be null");
         Objects.requireNonNull(operationId, "operationId must not be null");
-        return one("SELECT operation_id, tenant_id, idempotency_key, request_hash, status, progress, result, error,"
-                + " created_at, updated_at, expires_at FROM " + table
-                + " WHERE tenant_id = :tenant_id AND operation_id = :operation_id", statement -> statement
-                .bind("tenant_id", tenant.tenantId())
-                .bind("operation_id", dialectUuid(operationId)));
+        return one(
+                "SELECT operation_id, tenant_id, idempotency_key, request_hash, status, progress, result, error,"
+                        + " created_at, updated_at, expires_at FROM " + table
+                        + " WHERE tenant_id = :tenant_id AND operation_id = :operation_id",
+                statement -> statement.bind("tenant_id", tenant.tenantId()).bind("operation_id", operationId));
     }
 
     @Override
@@ -86,18 +104,18 @@ public final class R2dbcOperationRepository implements OperationRepository {
         return Mono.defer(() -> {
             Objects.requireNonNull(tenant, "tenant must not be null");
             validateKey(idempotencyKey);
-            return one("SELECT operation_id, tenant_id, idempotency_key, request_hash, status, progress, result, error,"
-                    + " created_at, updated_at, expires_at FROM " + table
-                    + " WHERE tenant_id = :tenant_id AND idempotency_key = :idempotency_key", statement -> statement
-                    .bind("tenant_id", tenant.tenantId())
-                    .bind("idempotency_key", idempotencyKey));
+            return one(
+                    "SELECT operation_id, tenant_id, idempotency_key, request_hash, status, progress, result, error,"
+                            + " created_at, updated_at, expires_at FROM " + table
+                            + " WHERE tenant_id = :tenant_id AND idempotency_key = :idempotency_key",
+                    statement ->
+                            statement.bind("tenant_id", tenant.tenantId()).bind("idempotency_key", idempotencyKey));
         });
     }
 
     @Override
-    public Mono<OperationState> transition(TenantScope tenant, UUID operationId,
-                                           OperationState.Status expectedStatus,
-                                           OperationState nextState) {
+    public Mono<OperationState> transition(
+            TenantScope tenant, UUID operationId, OperationState.Status expectedStatus, OperationState nextState) {
         return Mono.defer(() -> {
             Objects.requireNonNull(tenant, "tenant must not be null");
             Objects.requireNonNull(operationId, "operationId must not be null");
@@ -107,25 +125,29 @@ public final class R2dbcOperationRepository implements OperationRepository {
                 throw new IllegalArgumentException("next state operationId does not match operationId");
             }
             if (!OperationState.isTransitionAllowed(expectedStatus, nextState.status())) {
-                throw new IllegalStateException("invalid operation transition: " + expectedStatus
-                        + " -> " + nextState.status());
+                throw new IllegalStateException(
+                        "invalid operation transition: " + expectedStatus + " -> " + nextState.status());
             }
             String sql = "UPDATE " + table + " SET status = :status, progress = :progress, updated_at = :updated_at,"
                     + " result = " + dialect.jsonWriteExpression(":result") + ", error = "
                     + dialect.jsonWriteExpression(":error")
                     + " WHERE tenant_id = :tenant_id AND operation_id = :operation_id AND status = :expected_status";
-            DatabaseClient.GenericExecuteSpec update = databaseClient.sql(sql)
+            DatabaseClient.GenericExecuteSpec update = databaseClient
+                    .sql(sql)
                     .bind("status", nextState.status().name())
                     .bind("progress", nextState.progress())
                     .bind("updated_at", dialect.bindInstant(nextState.updatedAt()))
                     .bind("tenant_id", tenant.tenantId())
-                    .bind("operation_id", dialectUuid(operationId))
+                    .bind("operation_id", operationId)
                     .bind("expected_status", expectedStatus.name());
-            update = nextState.result() == null ? update.bindNull("result", String.class)
+            update = nextState.result() == null
+                    ? update.bindNull("result", String.class)
                     : update.bind("result", nextState.result());
-            update = nextState.error() == null ? update.bindNull("error", String.class)
+            update = nextState.error() == null
+                    ? update.bindNull("error", String.class)
                     : update.bind("error", nextState.error());
-            return transactionalOperator.transactional(update.fetch().rowsUpdated()
+            return transactionalOperator.transactional(update.fetch()
+                    .rowsUpdated()
                     .flatMap(rows -> rows == 1
                             ? findById(tenant, operationId)
                             : Mono.error(new OptimisticLockingFailureException(
@@ -133,9 +155,9 @@ public final class R2dbcOperationRepository implements OperationRepository {
         });
     }
 
-    private Mono<OperationState> one(String sql,
-                                      java.util.function.Function<DatabaseClient.GenericExecuteSpec,
-                                              DatabaseClient.GenericExecuteSpec> binder) {
+    private Mono<OperationState> one(
+            String sql,
+            java.util.function.Function<DatabaseClient.GenericExecuteSpec, DatabaseClient.GenericExecuteSpec> binder) {
         return binder.apply(databaseClient.sql(sql))
                 .map((row, metadata) -> new OperationState(
                         uuid(row.get("operation_id")),
@@ -152,10 +174,6 @@ public final class R2dbcOperationRepository implements OperationRepository {
                 .one();
     }
 
-    private Object dialectUuid(UUID value) {
-        return dialect.name().equals("postgres") ? value : uuidBytes(value);
-    }
-
     private static void requireTenant(TenantScope tenant, OperationState state) {
         Objects.requireNonNull(tenant, "tenant must not be null");
         Objects.requireNonNull(state, "state must not be null");
@@ -165,8 +183,11 @@ public final class R2dbcOperationRepository implements OperationRepository {
     }
 
     private static void validateKey(String key) {
-        if (key == null || key.isBlank() || key.codePoints().count() > OperationState.MAX_IDEMPOTENCY_KEY_LENGTH
-                || !key.equals(key.trim()) || key.codePoints().anyMatch(Character::isISOControl)) {
+        if (key == null
+                || key.isBlank()
+                || key.codePoints().count() > OperationState.MAX_IDEMPOTENCY_KEY_LENGTH
+                || !key.equals(key.trim())
+                || key.codePoints().anyMatch(Character::isISOControl)) {
             throw new IllegalArgumentException("idempotencyKey is invalid");
         }
     }
@@ -205,32 +226,7 @@ public final class R2dbcOperationRepository implements OperationRepository {
         if (value instanceof UUID uuid) {
             return uuid;
         }
-        if (value instanceof byte[] bytes) {
-            if (bytes.length != 16) {
-                throw new IllegalStateException("binary UUID must contain exactly 16 bytes");
-            }
-            long most = 0;
-            long least = 0;
-            for (int index = 0; index < 8; index++) {
-                most = (most << 8) | (bytes[index] & 0xffL);
-                least = (least << 8) | (bytes[index + 8] & 0xffL);
-            }
-            return new UUID(most, least);
-        }
         return UUID.fromString(Objects.toString(value));
-    }
-
-    private static byte[] uuidBytes(UUID value) {
-        byte[] bytes = new byte[16];
-        long most = value.getMostSignificantBits();
-        long least = value.getLeastSignificantBits();
-        for (int index = 7; index >= 0; index--) {
-            bytes[index] = (byte) most;
-            most >>>= 8;
-            bytes[index + 8] = (byte) least;
-            least >>>= 8;
-        }
-        return bytes;
     }
 
     private static Instant optionalInstant(Object value) {
@@ -243,9 +239,6 @@ public final class R2dbcOperationRepository implements OperationRepository {
         }
         if (value instanceof OffsetDateTime offsetDateTime) {
             return DatabaseInstant.normalize(offsetDateTime.toInstant());
-        }
-        if (value instanceof LocalDateTime localDateTime) {
-            return DatabaseInstant.normalize(localDateTime.toInstant(ZoneOffset.UTC));
         }
         throw new IllegalStateException("operation timestamp has unsupported type: "
                 + (value == null ? "null" : value.getClass().getName()));

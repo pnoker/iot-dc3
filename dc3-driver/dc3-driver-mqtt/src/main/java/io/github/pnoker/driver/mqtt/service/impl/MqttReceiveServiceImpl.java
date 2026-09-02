@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.mqtt.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
@@ -30,17 +29,16 @@ import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 
 /**
  * MQTT message receive service implementation.
@@ -79,7 +77,10 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
     @Override
     public void receiveValue(MqttMessage mqttMessage) {
         // do something to process your mqtt messages
-        log.debug("MQTT message received, topic={}, qos={}, payloadLength={}", topicOf(mqttMessage), qosOf(mqttMessage),
+        log.debug(
+                "MQTT message received, topic={}, qos={}, payloadLength={}",
+                topicOf(mqttMessage),
+                qosOf(mqttMessage),
                 payloadLengthOf(mqttMessage));
         reportConfiguredEvents(mqttMessage);
 
@@ -88,8 +89,11 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
             return;
         }
         driverSenderService.pointValueSender(pointValue);
-        log.debug("MQTT point value forwarded, topic={}, deviceId={}, pointId={}", topicOf(mqttMessage),
-                pointValue.getDeviceId(), pointValue.getPointId());
+        log.debug(
+                "MQTT point value forwarded, topic={}, deviceId={}, pointId={}",
+                topicOf(mqttMessage),
+                pointValue.getDeviceId(),
+                pointValue.getPointId());
     }
 
     /**
@@ -120,8 +124,11 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         try {
             return doReportConfiguredEvents(mqttMessage);
         } catch (Exception e) {
-            log.warn("MQTT event report failed, topic={}, payloadLength={}", topicOf(mqttMessage),
-                    payloadLengthOf(mqttMessage), e);
+            log.warn(
+                    "MQTT event report failed, topic={}, payloadLength={}",
+                    topicOf(mqttMessage),
+                    payloadLengthOf(mqttMessage),
+                    e);
             return 0;
         }
     }
@@ -140,7 +147,8 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         int reported = 0;
         for (Long deviceId : driverMetadata.getDeviceIds()) {
             DeviceBO device = deviceMetadata.getCache(deviceId);
-            if (Objects.isNull(device) || Objects.isNull(device.getEventAttributeConfigIdMap())
+            if (Objects.isNull(device)
+                    || Objects.isNull(device.getEventAttributeConfigIdMap())
                     || device.getEventAttributeConfigIdMap().isEmpty()) {
                 continue;
             }
@@ -155,7 +163,8 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
                 }
 
                 EventRuntimeBO event = Objects.isNull(device.getEventRuntimeIdMap())
-                        ? null : device.getEventRuntimeIdMap().get(eventId);
+                        ? null
+                        : device.getEventRuntimeIdMap().get(eventId);
                 EventReportDTO report = buildEventReport(device, event, eventConfig, payloadRoot, topic);
                 if (Objects.isNull(report)) {
                     continue;
@@ -163,27 +172,36 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
 
                 driverSenderService.eventReportSender(report);
                 reported++;
-                log.info("MQTT event reported, topic={}, deviceId={}, eventId={}, eventCode={}, parameterCount={}",
-                        topic, device.getId(), eventId, report.eventCode(), report.paramValues().size());
+                log.info(
+                        "MQTT event reported, topic={}, deviceId={}, eventId={}, eventCode={}, parameterCount={}",
+                        topic,
+                        device.getId(),
+                        eventId,
+                        report.eventCode(),
+                        report.paramValues().size());
             }
         }
         return reported;
     }
 
-    private EventReportDTO buildEventReport(DeviceBO device, EventRuntimeBO event, Map<String, AttributeBO> eventConfig,
-                                            Object payloadRoot, String topic) {
+    private EventReportDTO buildEventReport(
+            DeviceBO device,
+            EventRuntimeBO event,
+            Map<String, AttributeBO> eventConfig,
+            Object payloadRoot,
+            String topic) {
         if (Objects.isNull(event)) {
             return null;
         }
 
-        String eventCode = valueToString(resolvePath(payloadRoot,
-                StringUtils.defaultIfBlank(getConfigValue(eventConfig, EVENT_CODE_PATH), "$.eventCode")));
+        String eventCode = valueToString(resolvePath(
+                payloadRoot, StringUtils.defaultIfBlank(getConfigValue(eventConfig, EVENT_CODE_PATH), "$.eventCode")));
         if (StringUtils.isNotBlank(eventCode) && !Objects.equals(eventCode, event.eventCode())) {
             return null;
         }
 
-        Object payloadValue = resolvePath(payloadRoot,
-                StringUtils.defaultIfBlank(getConfigValue(eventConfig, PAYLOAD_PATH), "$.payload"));
+        Object payloadValue = resolvePath(
+                payloadRoot, StringUtils.defaultIfBlank(getConfigValue(eventConfig, PAYLOAD_PATH), "$.payload"));
         return EventReportDTO.builder()
                 .recordId(UUID.randomUUID().toString())
                 .tenantId(device.getTenantId())
@@ -203,15 +221,19 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
     private PointValue toPointValue(MqttMessage mqttMessage) {
         try {
             PointValue pointValue = JsonUtil.parseObject(mqttMessage.getPayload(), PointValue.class);
-            if (Objects.isNull(pointValue) || Objects.isNull(pointValue.getDeviceId())
+            if (Objects.isNull(pointValue)
+                    || Objects.isNull(pointValue.getDeviceId())
                     || Objects.isNull(pointValue.getPointId())) {
                 return null;
             }
             pointValue.setCreateTime(LocalDateTimeUtil.now());
             return pointValue;
         } catch (Exception e) {
-            log.warn("MQTT point value parse failed, topic={}, payloadLength={}", topicOf(mqttMessage),
-                    payloadLengthOf(mqttMessage), e);
+            log.warn(
+                    "MQTT point value parse failed, topic={}, payloadLength={}",
+                    topicOf(mqttMessage),
+                    payloadLengthOf(mqttMessage),
+                    e);
             return null;
         }
     }
@@ -265,7 +287,11 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         eventConfig.forEach((attributeCode, attribute) -> {
             Map<String, String> item = new LinkedHashMap<>();
             if (Objects.nonNull(attribute)) {
-                item.put("type", Objects.nonNull(attribute.getType()) ? attribute.getType().getCode() : null);
+                item.put(
+                        "type",
+                        Objects.nonNull(attribute.getType())
+                                ? attribute.getType().getCode()
+                                : null);
                 item.put("configValue", attribute.getValue());
             }
             snapshot.put(attributeCode, item);
@@ -332,5 +358,4 @@ public class MqttReceiveServiceImpl implements MqttReceiveService {
         String payload = mqttMessage.getPayload();
         return Objects.isNull(payload) ? 0 : payload.length();
     }
-
 }

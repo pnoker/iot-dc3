@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.cache;
 
 import com.github.benmanes.caffeine.cache.Cache;
@@ -22,10 +21,9 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.utils.TokenTtl;
 import jakarta.annotation.PostConstruct;
-import org.springframework.stereotype.Component;
-
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import org.springframework.stereotype.Component;
 
 /**
  * In-memory denylist of cancelled tokens, keyed by (loginName, tenantCode).
@@ -96,5 +94,4 @@ public class TokenDenylistCache {
     private String buildKey(String loginName, String tenantCode) {
         return tenantCode + SymbolConstant.COLON + loginName;
     }
-
 }

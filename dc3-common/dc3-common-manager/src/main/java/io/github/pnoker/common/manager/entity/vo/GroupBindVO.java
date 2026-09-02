@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -50,21 +49,26 @@ public class GroupBindVO extends BaseVO {
      * Entity type flag.
      */
     @Schema(description = "Entity type enum", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Entity type flag can't be empty", groups = {Add.class, Update.class})
+    @NotNull(
+            message = "Entity type flag can't be empty",
+            groups = {Add.class, Update.class})
     private EntityTypeEnum entityTypeFlag;
 
     /**
      * Group ID.
      */
     @Schema(description = "ID of the group to bind.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Group ID can't be empty", groups = {Add.class, Update.class})
+    @NotNull(
+            message = "Group ID can't be empty",
+            groups = {Add.class, Update.class})
     private String groupId;
 
     /**
      * Entity ID.
      */
     @Schema(description = "Associated entity ID", example = "1000", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Entity ID can't be empty", groups = {Add.class, Update.class})
+    @NotNull(
+            message = "Entity ID can't be empty",
+            groups = {Add.class, Update.class})
     private String entityId;
-
 }

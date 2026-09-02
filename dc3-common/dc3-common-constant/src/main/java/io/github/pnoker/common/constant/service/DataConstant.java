@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.service;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
-
 
 /**
  * Constants for the data service module.
@@ -183,7 +181,6 @@ public class DataConstant {
         private PointValue() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
@@ -206,7 +203,5 @@ public class DataConstant {
         private Health() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
-
 }

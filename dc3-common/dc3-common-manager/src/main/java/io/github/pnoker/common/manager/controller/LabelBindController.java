@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.controller;
 
 import io.github.pnoker.common.base.BaseController;
@@ -24,8 +23,8 @@ import io.github.pnoker.common.manager.entity.builder.LabelBindBuilder;
 import io.github.pnoker.common.manager.entity.query.LabelBindListRequest;
 import io.github.pnoker.common.manager.entity.vo.LabelBindVO;
 import io.github.pnoker.common.manager.repository.BindingFilter;
-import io.github.pnoker.common.manager.service.ReactiveLabelBindService;
 import io.github.pnoker.common.manager.service.ReactiveEntityTenantService;
+import io.github.pnoker.common.manager.service.ReactiveLabelBindService;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
@@ -56,7 +55,10 @@ import reactor.core.publisher.Mono;
  * @author pnoker
  * @since 2026.5.11
  */
-@Tag(name = "label_bind", description = "Label tag bindings: assign and remove labels on devices, drivers, and other entities to enable categorization and filtered queries")
+@Tag(
+        name = "label_bind",
+        description =
+                "Label tag bindings: assign and remove labels on devices, drivers, and other entities to enable categorization and filtered queries")
 @Slf4j
 @RestController
 @RequestMapping(ManagerConstant.LABEL_BIND_URL_PREFIX)
@@ -76,13 +78,19 @@ public class LabelBindController implements BaseController {
      * @return the created label binding
      */
     @PreAuthorize("@perm.can('label_bind', 'add')")
-    @Operation(summary = "Add Label Binding", description = "Attach a label to an entity for the current tenant. The label and target entity must share the same entity type and tenant; returns the created binding.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "false"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Add Label Binding",
+            description =
+                    "Attach a label to an entity for the current tenant. The label and target entity must share the same entity type and tenant; returns the created binding.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "false"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/add")
     public Mono<ResponseEntity<LabelBindVO>> add(@Validated(Add.class) @RequestBody LabelBindVO entityVO) {
         return getTenantId()
@@ -95,10 +103,13 @@ public class LabelBindController implements BaseController {
                     entityBO.setCreatorName(tuple.getT2());
                     entityBO.setOperatorId(tuple.getT1().getT2());
                     entityBO.setOperatorName(tuple.getT2());
-                    return entityTenantService.requireEntityTenant(entityBO.getTenantId(), entityBO.getEntityTypeFlag(), entityBO.getEntityId())
+                    return entityTenantService
+                            .requireEntityTenant(
+                                    entityBO.getTenantId(), entityBO.getEntityTypeFlag(), entityBO.getEntityId())
                             .then(labelBindService.add(entityBO))
                             .map(labelBindBuilder::buildVOByBO)
-                            .map(created -> ResponseEntity.status(HttpStatus.CREATED).body(created));
+                            .map(created ->
+                                    ResponseEntity.status(HttpStatus.CREATED).body(created));
                 });
     }
 
@@ -109,19 +120,31 @@ public class LabelBindController implements BaseController {
      * @return an empty response after deletion
      */
     @PreAuthorize("@perm.can('label_bind', 'delete')")
-    @Operation(summary = "Delete Label Binding", description = "Permanently remove one tenant-owned label binding by ID.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
-                    @ExtensionProperty(name = "destructive", value = "true"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Delete Label Binding",
+            description = "Permanently remove one tenant-owned label binding by ID.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                                @ExtensionProperty(name = "destructive", value = "true"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @DeleteMapping("/delete")
-    public Mono<ResponseEntity<Void>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<ResponseEntity<Void>> delete(
+            @Parameter(
+                            description = "Primary key of the entity to delete. Must belong to the current tenant.",
+                            example = "1024")
+                    @NotNull
+                    @RequestParam(value = "id")
+                    Long id) {
         return getTenantId()
                 .zipWith(getUserId().defaultIfEmpty(0L))
                 .zipWith(getUserName().defaultIfEmpty(""))
-                .flatMap(tuple -> labelBindService.delete(tuple.getT1().getT1(), id, tuple.getT1().getT2(), tuple.getT2())
+                .flatMap(tuple -> labelBindService
+                        .delete(tuple.getT1().getT1(), id, tuple.getT1().getT2(), tuple.getT2())
                         .thenReturn(ResponseEntity.noContent().build()));
     }
 
@@ -132,13 +155,19 @@ public class LabelBindController implements BaseController {
      * @return the updated label binding
      */
     @PreAuthorize("@perm.can('label_bind', 'update')")
-    @Operation(summary = "Update Label Binding", description = "Modify an existing label binding for the current tenant. The new label and entity must match the binding's entity type and tenant scope.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Update Label Binding",
+            description =
+                    "Modify an existing label binding for the current tenant. The new label and entity must match the binding's entity type and tenant scope.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/update")
     public Mono<ResponseEntity<LabelBindVO>> update(@Validated(Update.class) @RequestBody LabelBindVO entityVO) {
         return getTenantId()
@@ -149,7 +178,9 @@ public class LabelBindController implements BaseController {
                     entityBO.setTenantId(tuple.getT1().getT1());
                     entityBO.setOperatorId(tuple.getT1().getT2());
                     entityBO.setOperatorName(tuple.getT2());
-                    return entityTenantService.requireEntityTenant(entityBO.getTenantId(), entityBO.getEntityTypeFlag(), entityBO.getEntityId())
+                    return entityTenantService
+                            .requireEntityTenant(
+                                    entityBO.getTenantId(), entityBO.getEntityTypeFlag(), entityBO.getEntityId())
                             .then(labelBindService.update(entityBO))
                             .map(labelBindBuilder::buildVOByBO)
                             .map(ResponseEntity::ok);
@@ -163,15 +194,26 @@ public class LabelBindController implements BaseController {
      * @return the matched label binding
      */
     @PreAuthorize("@perm.can('label_bind', 'get')")
-    @Operation(summary = "Get Label Binding by ID", description = "Fetch one label binding by ID for the current tenant.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Get Label Binding by ID",
+            description = "Fetch one label binding by ID for the current tenant.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @GetMapping("/get_by_id")
-    public Mono<LabelBindVO> getById(@Parameter(description = "Primary key of the target record; must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
+    public Mono<LabelBindVO> getById(
+            @Parameter(
+                            description = "Primary key of the target record; must belong to the current tenant.",
+                            example = "1024")
+                    @NotNull
+                    @RequestParam(value = "id")
+                    Long id) {
         return getTenantId()
                 .flatMap(tenantId -> labelBindService.getById(tenantId, id))
                 .map(labelBindBuilder::buildVOByBO);
@@ -184,13 +226,19 @@ public class LabelBindController implements BaseController {
      * @return a page of label bindings matching the query
      */
     @PreAuthorize("@perm.can('label_bind', 'list')")
-    @Operation(summary = "List Label Bindings", description = "Page through label bindings for the current tenant with optional label, entity type, and entity filters.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Label Bindings",
+            description =
+                    "Page through label bindings for the current tenant with optional label, entity type, and entity filters.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/list")
     public Mono<OffsetPage<LabelBindVO>> list(@RequestBody(required = false) LabelBindListRequest request) {
         LabelBindListRequest query = request == null ? new LabelBindListRequest() : request;
@@ -210,5 +258,4 @@ public class LabelBindController implements BaseController {
                         page.total(),
                         page.hasNext()));
     }
-
 }

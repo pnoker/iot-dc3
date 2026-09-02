@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.support;
 
 import java.util.Map;
@@ -34,14 +33,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class ConnectionBackoff {
 
-    private static final long INITIAL_DELAY_MS = 1000;   // 1 second
-    private static final long MAX_DELAY_MS = 300_000;      // 5 minutes
+    private static final long INITIAL_DELAY_MS = 1000; // 1 second
+    private static final long MAX_DELAY_MS = 300_000; // 5 minutes
     private static final double MULTIPLIER = 2.0;
 
-    private static final Map<Long, State> states = new ConcurrentHashMap<>();
+    private static final Map<Long, State> STATES_BY_DEVICE_ID = new ConcurrentHashMap<>();
 
-    private ConnectionBackoff() {
-    }
+    private ConnectionBackoff() {}
 
     /**
      * Check whether a connection attempt should be allowed for the given device.
@@ -50,7 +48,7 @@ public final class ConnectionBackoff {
      * @return {@code true} if the backoff window has expired or no backoff is active
      */
     public static boolean shouldAttempt(Long deviceId) {
-        State state = states.get(deviceId);
+        State state = STATES_BY_DEVICE_ID.get(deviceId);
         if (state == null) {
             return true;
         }
@@ -63,7 +61,7 @@ public final class ConnectionBackoff {
      * @param deviceId unique device identifier
      */
     public static void recordSuccess(Long deviceId) {
-        states.remove(deviceId);
+        STATES_BY_DEVICE_ID.remove(deviceId);
     }
 
     /**
@@ -72,10 +70,10 @@ public final class ConnectionBackoff {
      * @param deviceId unique device identifier
      */
     public static void recordFailure(Long deviceId) {
-        State current = states.get(deviceId);
-        long nextDelay = (current == null) ? INITIAL_DELAY_MS
-                : Math.min((long) (current.delay * MULTIPLIER), MAX_DELAY_MS);
-        states.put(deviceId, new State(System.currentTimeMillis() + nextDelay, nextDelay));
+        State current = STATES_BY_DEVICE_ID.get(deviceId);
+        long nextDelay =
+                (current == null) ? INITIAL_DELAY_MS : Math.min((long) (current.delay * MULTIPLIER), MAX_DELAY_MS);
+        STATES_BY_DEVICE_ID.put(deviceId, new State(System.currentTimeMillis() + nextDelay, nextDelay));
     }
 
     /**
@@ -85,7 +83,7 @@ public final class ConnectionBackoff {
      * @return remaining milliseconds, or 0 if no backoff is active
      */
     public static long remainingDelay(Long deviceId) {
-        State state = states.get(deviceId);
+        State state = STATES_BY_DEVICE_ID.get(deviceId);
         if (state == null) {
             return 0;
         }
@@ -97,7 +95,7 @@ public final class ConnectionBackoff {
      * state, so this is required to restore a clean slate between isolated test cases.
      */
     public static void clear() {
-        states.clear();
+        STATES_BY_DEVICE_ID.clear();
     }
 
     /**

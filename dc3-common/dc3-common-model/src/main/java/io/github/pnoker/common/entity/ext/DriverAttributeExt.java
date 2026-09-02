@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -54,9 +53,9 @@ public class DriverAttributeExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Reserved free-form extension field for future driver attribute metadata", example = "reserved")
+        @Schema(
+                description = "Reserved free-form extension field for future driver attribute metadata",
+                example = "reserved")
         private String keep;
-
     }
-
 }

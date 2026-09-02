@@ -1,22 +1,37 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.auth.repository;
 
 import io.github.pnoker.common.auth.entity.model.UserDO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
-import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.r2dbc.core.DatabaseClient;
-import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Mono;
-
+import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Mono;
 
 /** Explicit SQL adapter for tenant-scoped users joined through active memberships. */
 @Repository
@@ -36,35 +51,50 @@ public class R2dbcUserStore implements ReactiveUserStore {
     @Override
     public Mono<UserDO> getById(Long tenantId, Long id) {
         if (!valid(tenantId, id)) return Mono.empty();
-        return query(COLUMNS + " FROM " + TABLE + " u WHERE u.id=:id AND u.deleted=0"
-                        + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
-                        + " AND m.principal_id=u.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
-                .bind("tenant_id", tenantId).bind("id", id).map(this::map).one();
+        return query(
+                        COLUMNS + " FROM " + TABLE + " u WHERE u.id=:id AND u.deleted=0"
+                                + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
+                                + " AND m.principal_id=u.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
+                .bind("tenant_id", tenantId)
+                .bind("id", id)
+                .map(this::map)
+                .one();
     }
 
     @Override
     public Mono<UserDO> getByUserName(Long tenantId, String userName) {
         if (!valid(tenantId) || userName == null || userName.isBlank()) return Mono.empty();
-        return query(COLUMNS + " FROM " + TABLE + " u WHERE u.user_name=:user_name AND u.deleted=0"
-                        + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
-                        + " AND m.principal_id=u.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
-                .bind("tenant_id", tenantId).bind("user_name", userName.trim()).map(this::map).one();
+        return query(
+                        COLUMNS + " FROM " + TABLE + " u WHERE u.user_name=:user_name AND u.deleted=0"
+                                + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
+                                + " AND m.principal_id=u.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
+                .bind("tenant_id", tenantId)
+                .bind("user_name", userName.trim())
+                .map(this::map)
+                .one();
     }
 
     @Override
     public Mono<UserDO> getByPrincipalId(Long tenantId, Long principalId) {
         if (!valid(tenantId, principalId)) return Mono.empty();
-        return query(COLUMNS + " FROM " + TABLE + " u WHERE u.principal_id=:principal_id AND u.deleted=0"
-                        + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
-                        + " AND m.principal_id=u.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
-                .bind("tenant_id", tenantId).bind("principal_id", principalId).map(this::map).one();
+        return query(
+                        COLUMNS + " FROM " + TABLE + " u WHERE u.principal_id=:principal_id AND u.deleted=0"
+                                + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
+                                + " AND m.principal_id=u.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
+                .bind("tenant_id", tenantId)
+                .bind("principal_id", principalId)
+                .map(this::map)
+                .one();
     }
 
     @Override
     public Mono<OffsetPage<UserDO>> list(UserFilter filter) {
         if (filter == null) return Mono.error(new IllegalArgumentException("user filter is required"));
-        StringBuilder predicate = new StringBuilder(" FROM ").append(TABLE).append(" u WHERE u.deleted=0")
-                .append(" AND EXISTS (SELECT 1 FROM ").append(MEMBERSHIP)
+        StringBuilder predicate = new StringBuilder(" FROM ")
+                .append(TABLE)
+                .append(" u WHERE u.deleted=0")
+                .append(" AND EXISTS (SELECT 1 FROM ")
+                .append(MEMBERSHIP)
                 .append(" m WHERE m.tenant_id=:tenant_id AND m.principal_id=u.principal_id")
                 .append(" AND m.membership_status='ACTIVE' AND m.deleted=0)");
         if (filter.principalId() != null) predicate.append(" AND u.principal_id=:principal_id");
@@ -73,16 +103,25 @@ public class R2dbcUserStore implements ReactiveUserStore {
         if (filter.phone() != null) predicate.append(" AND u.phone LIKE :phone");
         if (filter.email() != null) predicate.append(" AND u.email LIKE :email");
         if (filter.enableFlag() != null) predicate.append(" AND u.enable_flag=:enable_flag");
-        DatabaseClient.GenericExecuteSpec count = bind(databaseClient.sql("SELECT COUNT(*) AS total" + predicate), filter);
-        DatabaseClient.GenericExecuteSpec rows = bind(databaseClient.sql("SELECT " + COLUMNS + predicate
-                + " ORDER BY " + orderBy(filter.page().sort()) + " LIMIT :limit OFFSET :offset"), filter)
-                .bind("limit", filter.page().limit()).bind("offset", filter.page().offset());
+        DatabaseClient.GenericExecuteSpec count =
+                bind(databaseClient.sql("SELECT COUNT(*) AS total" + predicate), filter);
+        DatabaseClient.GenericExecuteSpec rows = bind(
+                        databaseClient.sql("SELECT " + COLUMNS + predicate + " ORDER BY "
+                                + orderBy(filter.page().sort()) + " LIMIT :limit OFFSET :offset"),
+                        filter)
+                .bind("limit", filter.page().limit())
+                .bind("offset", filter.page().offset());
         Mono<Long> total = count.map((row, metadata) -> {
-            Number value = row.get("total", Number.class);
-            return value == null ? 0L : value.longValue();
-        }).one().defaultIfEmpty(0L);
-        return total.flatMap(totalCount -> rows.map(this::map).all().collectList()
-                        .map(items -> OffsetPage.of(items, filter.page().offset(), filter.page().limit(), totalCount)))
+                    Number value = row.get("total", Number.class);
+                    return value == null ? 0L : value.longValue();
+                })
+                .one()
+                .defaultIfEmpty(0L);
+        return total.flatMap(totalCount -> rows.map(this::map)
+                        .all()
+                        .collectList()
+                        .map(items -> OffsetPage.of(
+                                items, filter.page().offset(), filter.page().limit(), totalCount)))
                 .as(pageTransaction::transactional);
     }
 
@@ -93,7 +132,8 @@ public class R2dbcUserStore implements ReactiveUserStore {
         if (filter.userName() != null) query = query.bind("user_name", "%" + filter.userName() + "%");
         if (filter.phone() != null) query = query.bind("phone", "%" + filter.phone() + "%");
         if (filter.email() != null) query = query.bind("email", "%" + filter.email() + "%");
-        if (filter.enableFlag() != null) query = query.bind("enable_flag", filter.enableFlag().getIndex());
+        if (filter.enableFlag() != null)
+            query = query.bind("enable_flag", filter.enableFlag().getIndex());
         return query;
     }
 
@@ -127,12 +167,17 @@ public class R2dbcUserStore implements ReactiveUserStore {
 
     private JsonExt json(String raw) {
         if (raw == null) return null;
-        try { return JsonUtil.parseObject(raw, JsonExt.class); } catch (RuntimeException ignored) { return null; }
+        try {
+            return JsonUtil.parseObject(raw, JsonExt.class);
+        } catch (RuntimeException ignored) {
+            return null;
+        }
     }
 
     private LocalDateTime time(Object raw) {
         if (raw instanceof LocalDateTime value) return value;
-        if (raw instanceof OffsetDateTime value) return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+        if (raw instanceof OffsetDateTime value)
+            return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
         if (raw instanceof java.time.Instant value) return LocalDateTime.ofInstant(value, ZoneOffset.UTC);
         return null;
     }
@@ -141,17 +186,28 @@ public class R2dbcUserStore implements ReactiveUserStore {
         if (sort == null || sort.isEmpty()) return "u.user_name ASC,u.id ASC";
         List<String> clauses = new ArrayList<>();
         for (SortSpec spec : sort) {
-            String column = switch (spec.field()) {
-                case "id" -> "u.id"; case "userName" -> "u.user_name"; case "nickName" -> "u.nick_name";
-                case "phone" -> "u.phone"; case "email" -> "u.email"; case "createTime" -> "u.create_time";
-                case "operateTime" -> "u.operate_time"; default -> throw new IllegalArgumentException("unsupported user sort field: " + spec.field());
-            };
+            String column =
+                    switch (spec.field()) {
+                        case "id" -> "u.id";
+                        case "userName" -> "u.user_name";
+                        case "nickName" -> "u.nick_name";
+                        case "phone" -> "u.phone";
+                        case "email" -> "u.email";
+                        case "createTime" -> "u.create_time";
+                        case "operateTime" -> "u.operate_time";
+                        default -> throw new IllegalArgumentException("unsupported user sort field: " + spec.field());
+                    };
             clauses.add(column + " " + spec.direction().name());
         }
         if (clauses.stream().noneMatch(value -> value.startsWith("u.id "))) clauses.add("u.id ASC");
         return String.join(",", clauses);
     }
 
-    private boolean valid(Long tenantId) { return tenantId != null && tenantId > 0; }
-    private boolean valid(Long tenantId, Long id) { return valid(tenantId) && id != null && id > 0; }
+    private boolean valid(Long tenantId) {
+        return tenantId != null && tenantId > 0;
+    }
+
+    private boolean valid(Long tenantId, Long id) {
+        return valid(tenantId) && id != null && id > 0;
+    }
 }

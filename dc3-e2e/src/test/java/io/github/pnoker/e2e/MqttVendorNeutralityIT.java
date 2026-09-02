@@ -14,11 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.e2e;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
 import io.github.pnoker.common.utils.MqttUtil;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.junit.jupiter.api.Named;
@@ -29,15 +36,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.DockerImageName;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Locks the device-access plane's vendor neutrality (design §7.1): the MQTT driver
@@ -56,21 +54,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 @EnabledIfEnvironmentVariable(named = "DC3_E2E", matches = "(?i)true|1|yes|on")
 class MqttVendorNeutralityIT {
 
-    private static final GenericContainer<?> HIVEMQ = new GenericContainer<>(
-            DockerImageName.parse("hivemq/hivemq-ce:latest"))
-            .withExposedPorts(1883);
+    private static final GenericContainer<?> HIVEMQ =
+            new GenericContainer<>(DockerImageName.parse("hivemq/hivemq-ce:latest")).withExposedPorts(1883);
 
     // the image ships /mosquitto-no-auth.conf exactly for anonymous local testing
     private static final GenericContainer<?> MOSQUITTO = new GenericContainer<>(
-            DockerImageName.parse("eclipse-mosquitto:2"))
+                    DockerImageName.parse("eclipse-mosquitto:2"))
             .withCommand("mosquitto", "-c", "/mosquitto-no-auth.conf")
             .withExposedPorts(1883);
 
     static Stream<Arguments> brokers() {
-        return List.of(
-                Named.of("HiveMQ CE", HIVEMQ),
-                Named.of("Eclipse Mosquitto", MOSQUITTO)
-        ).stream().map(Arguments::of);
+        return List.of(Named.of("HiveMQ CE", HIVEMQ), Named.of("Eclipse Mosquitto", MOSQUITTO)).stream()
+                .map(Arguments::of);
     }
 
     @ParameterizedTest(name = "round trip on {0}")
@@ -87,14 +82,15 @@ class MqttVendorNeutralityIT {
         String topic = "dc3/e2e/vendor/" + UUID.randomUUID();
         CompletableFuture<String> received = new CompletableFuture<>();
 
-        MqttClient client = new MqttClient(properties.getUrl(), properties.getClient(),
-                new MemoryPersistence());
+        MqttClient client = new MqttClient(properties.getUrl(), properties.getClient(), new MemoryPersistence());
         try {
             client.connect(MqttUtil.getMqttConnectOptions(properties));
             assertThat(client.isConnected()).isTrue();
 
-            client.subscribe(topic, 1, (name, message) ->
-                    received.complete(new String(message.getPayload(), StandardCharsets.UTF_8)));
+            client.subscribe(
+                    topic,
+                    1,
+                    (name, message) -> received.complete(new String(message.getPayload(), StandardCharsets.UTF_8)));
             client.publish(topic, "vendor-neutral".getBytes(StandardCharsets.UTF_8), 1, false);
 
             assertThat(received.get(10, TimeUnit.SECONDS)).isEqualTo("vendor-neutral");

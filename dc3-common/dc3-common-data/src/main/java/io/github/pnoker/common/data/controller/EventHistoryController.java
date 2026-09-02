@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.controller;
 
 import io.github.pnoker.common.base.BaseController;
@@ -31,6 +30,7 @@ import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,15 +43,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
 /**
  * REST controller for event report management.
  *
  * @author pnoker
  * @since 2026.5.23
  */
-@Tag(name = "event_history", description = "Device event audit trail: query historical records of device alarms, state changes, and status transitions with timestamps and event payloads")
+@Tag(
+        name = "event_history",
+        description =
+                "Device event audit trail: query historical records of device alarms, state changes, and status transitions with timestamps and event payloads")
 @Slf4j
 @RestController
 @RequestMapping(DataConstant.EVENT_HISTORY_URL_PREFIX)
@@ -70,16 +71,23 @@ public class EventHistoryController implements BaseController {
      * @return the ID of the newly created event history record
      */
     @PreAuthorize("@perm.can('event_history', 'list')")
-    @Operation(summary = "Report Device Event", description = "Record a device event (alarm, state change, or status transition) reported by a device for the current tenant and return the new record ID. Use when a device reports an event that must be appended to the audit trail.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "false"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Report Device Event",
+            description =
+                    "Record a device event (alarm, state change, or status transition) reported by a device for the current tenant and return the new record ID. Use when a device reports an event that must be appended to the audit trail.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "false"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/report")
     public Mono<String> report(@Validated @RequestBody EventReportVO entityVO) {
-        return getTenantId().flatMap(tenantId -> eventHistoryService.report(tenantId, eventHistoryBuilder.buildBOByVO(entityVO)));
+        return getTenantId()
+                .flatMap(tenantId -> eventHistoryService.report(tenantId, eventHistoryBuilder.buildBOByVO(entityVO)));
     }
 
     /**
@@ -89,15 +97,28 @@ public class EventHistoryController implements BaseController {
      * @return the matched EventHistoryVO with event type, payload and timestamp; fails if not found or not tenant-owned
      */
     @PreAuthorize("@perm.can('event_history', 'get')")
-    @Operation(summary = "Get Event History by Record ID", description = "Fetch a single device event record by its record ID, tenant-scoped. Returns the event type, payload, and timestamp; use to inspect one specific reported event.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Get Event History by Record ID",
+            description =
+                    "Fetch a single device event record by its record ID, tenant-scoped. Returns the event type, payload, and timestamp; use to inspect one specific reported event.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @GetMapping("/get_by_record_id")
-    public Mono<EventHistoryVO> getByRecordId(@Parameter(description = "Identifier of the event history record to fetch; must belong to the current tenant.", example = "1024") @NotBlank @RequestParam(name = "record_id") String recordId) {
+    public Mono<EventHistoryVO> getByRecordId(
+            @Parameter(
+                            description =
+                                    "Identifier of the event history record to fetch; must belong to the current tenant.",
+                            example = "1024")
+                    @NotBlank
+                    @RequestParam(name = "record_id")
+                    String recordId) {
         return getTenantId().flatMap(tenantId -> eventHistoryService.getByRecordId(tenantId, recordId));
     }
 
@@ -109,17 +130,23 @@ public class EventHistoryController implements BaseController {
      * @return a page of EventHistoryVO matching the query, ordered by event time
      */
     @PreAuthorize("@perm.can('event_history', 'list')")
-    @Operation(summary = "List Event History Records", description = "Page through device event records (alarms, state changes, status transitions) for the current tenant, filtered by the query body. Use to browse the append-only event audit trail; results are ordered by event time.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List Event History Records",
+            description =
+                    "Page through device event records (alarms, state changes, status transitions) for the current tenant, filtered by the query body. Use to browse the append-only event audit trail; results are ordered by event time.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/list")
     public Mono<OffsetPage<EventHistoryVO>> list(@RequestBody(required = false) EventHistoryQueryVO queryVO) {
-        return getTenantId().flatMap(tenantId -> eventHistoryService.list(tenantId,
-                Objects.isNull(queryVO) ? new EventHistoryQueryVO() : queryVO));
+        return getTenantId()
+                .flatMap(tenantId -> eventHistoryService.list(
+                        tenantId, Objects.isNull(queryVO) ? new EventHistoryQueryVO() : queryVO));
     }
-
 }

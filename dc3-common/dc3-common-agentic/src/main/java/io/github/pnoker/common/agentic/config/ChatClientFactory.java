@@ -2,11 +2,21 @@
  * Copyright 2016-present the IoT DC3 original author or authors.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.agentic.config;
+
+import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 
 import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.AnthropicClientAsync;
@@ -22,6 +32,9 @@ import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
 import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -35,12 +48,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-
-import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
-
 /**
  * Resolves tenant-scoped model configuration reactively and caches transport clients.
  * Database access is completed before prompt construction; synchronous cache reads never
@@ -50,11 +57,9 @@ import static io.github.pnoker.common.utils.LogSanitizer.sanitize;
 @Component
 public class ChatClientFactory {
 
-    private record ConfigKey(Long tenantId, String model) {
-    }
+    private record ConfigKey(Long tenantId, String model) {}
 
-    private record ProviderKey(Long tenantId, Long providerId) {
-    }
+    private record ProviderKey(Long tenantId, Long providerId) {}
 
     private final Map<ProviderKey, ChatClient> clientCache = new ConcurrentHashMap<>();
     private final Map<ProviderKey, ModelProviderBO> providerCache = new ConcurrentHashMap<>();
@@ -68,10 +73,11 @@ public class ChatClientFactory {
     @Value("${spring.ai.openai.chat.options.model:gpt-4o}")
     private String fallbackModel;
 
-    public ChatClientFactory(ReactiveModelProviderStore modelProviderStore,
-                             ReactiveModelConfigStore modelConfigStore,
-                             ChatClient.Builder fallbackBuilder,
-                             AgenticProperties properties) {
+    public ChatClientFactory(
+            ReactiveModelProviderStore modelProviderStore,
+            ReactiveModelConfigStore modelConfigStore,
+            ChatClient.Builder fallbackBuilder,
+            AgenticProperties properties) {
         this.modelProviderStore = modelProviderStore;
         this.modelConfigStore = modelConfigStore;
         this.fallbackBuilder = fallbackBuilder;
@@ -100,8 +106,10 @@ public class ChatClientFactory {
         ModelConfigBO config = configCache.get(new ConfigKey(tenantId, model));
         if (config == null) config = defaultConfigCache.get(tenantId);
         if (config == null) {
-            log.debug("Agentic model config cache miss, using fallback ChatClient, tenantId={}, model={}",
-                    tenantId, sanitize(model));
+            log.debug(
+                    "Agentic model config cache miss, using fallback ChatClient, tenantId={}, model={}",
+                    tenantId,
+                    sanitize(model));
             return fallbackBuilder.build();
         }
         return getOrCreateByProvider(tenantId, config.getProviderId());
@@ -122,7 +130,8 @@ public class ChatClientFactory {
         ModelConfigBO config = configCache.get(new ConfigKey(tenantId, model));
         if (config == null) config = defaultConfigCache.get(tenantId);
         if (config != null) return Boolean.TRUE.equals(config.getToolCall());
-        return StringUtils.isNotBlank(fallbackModel) && Strings.CS.equals(model, fallbackModel)
+        return StringUtils.isNotBlank(fallbackModel)
+                && Strings.CS.equals(model, fallbackModel)
                 && properties.isFallbackToolCallingEnabled();
     }
 
@@ -134,11 +143,13 @@ public class ChatClientFactory {
             return remove;
         });
         configCache.entrySet().removeIf(entry -> Objects.equals(entry.getValue().getProviderId(), providerId));
-        defaultConfigCache.entrySet().removeIf(entry -> Objects.equals(entry.getValue().getProviderId(), providerId));
+        defaultConfigCache
+                .entrySet()
+                .removeIf(entry -> Objects.equals(entry.getValue().getProviderId(), providerId));
     }
 
-    public ChatOptions.Builder<?> buildChatOptionsBuilder(String model, Long tenantId, Double temperature,
-                                                           Integer maxTokens) {
+    public ChatOptions.Builder<?> buildChatOptionsBuilder(
+            String model, Long tenantId, Double temperature, Integer maxTokens) {
         if (StringUtils.isBlank(model) && temperature == null && maxTokens == null) return null;
         AgenticModelProviderTypeEnum providerType = resolveProviderType(model, tenantId);
         if (AgenticModelProviderTypeEnum.ANTHROPIC.equals(providerType)) {
@@ -164,7 +175,9 @@ public class ChatClientFactory {
         ProviderKey key = new ProviderKey(header.getTenantId(), config.getProviderId());
         ModelProviderBO cached = providerCache.get(key);
         if (cached != null) return Mono.just(cached);
-        return modelProviderStore.get(config.getProviderId(), header).doOnNext(provider -> providerCache.put(key, provider));
+        return modelProviderStore
+                .get(config.getProviderId(), header)
+                .doOnNext(provider -> providerCache.put(key, provider));
     }
 
     private void cacheConfig(ModelConfigBO config) {
@@ -178,8 +191,10 @@ public class ChatClientFactory {
         String fallback = StringUtils.trimToNull(fallbackModel);
         if (StringUtils.isNotBlank(fallback)) {
             if (StringUtils.isNotBlank(candidate) && !Strings.CS.equals(candidate, fallback)) {
-                log.warn("Agentic requested model is not configured, falling back to Spring AI model, requestedModel={}, fallbackModel={}",
-                        sanitize(candidate), sanitize(fallback));
+                log.warn(
+                        "Agentic requested model is not configured, falling back to Spring AI model, requestedModel={}, fallbackModel={}",
+                        sanitize(candidate),
+                        sanitize(fallback));
             }
             return fallback;
         }
@@ -190,20 +205,28 @@ public class ChatClientFactory {
         ProviderKey key = new ProviderKey(tenantId, providerId);
         return clientCache.computeIfAbsent(key, ignored -> {
             ModelProviderBO provider = providerCache.get(key);
-            if (provider == null || provider.getEnableFlag() == null || provider.getEnableFlag().getIndex() != 0) {
+            if (provider == null
+                    || provider.getEnableFlag() == null
+                    || provider.getEnableFlag().getIndex() != 0) {
                 log.warn("Agentic provider cache miss or disabled, tenantId={}, providerId={}", tenantId, providerId);
                 return fallbackBuilder.build();
             }
             ChatClient client = AgenticModelProviderTypeEnum.ANTHROPIC.equals(provider.getProviderType())
-                    ? buildAnthropicClient(provider) : buildOpenAiClient(provider);
-            log.info("Agentic ChatClient created, tenantId={}, providerId={}, name={}, type={}, baseUrl={}",
-                    tenantId, providerId, provider.getName(), provider.getProviderType(), provider.getBaseUrl());
+                    ? buildAnthropicClient(provider)
+                    : buildOpenAiClient(provider);
+            log.info(
+                    "Agentic ChatClient created, tenantId={}, providerId={}, name={}, type={}, baseUrl={}",
+                    tenantId,
+                    providerId,
+                    provider.getName(),
+                    provider.getProviderType(),
+                    provider.getBaseUrl());
             return client;
         });
     }
 
-    private <B extends ChatOptions.Builder<B>> B applyCommonOptions(B builder, String model, Double temperature,
-                                                                    Integer maxTokens) {
+    private <B extends ChatOptions.Builder<B>> B applyCommonOptions(
+            B builder, String model, Double temperature, Integer maxTokens) {
         if (StringUtils.isNotBlank(model)) builder.model(model);
         if (temperature != null) builder.temperature(temperature);
         if (maxTokens != null) builder.maxTokens(maxTokens);
@@ -212,21 +235,33 @@ public class ChatClientFactory {
 
     private ChatClient buildOpenAiClient(ModelProviderBO provider) {
         OpenAIClient syncClient = OpenAIOkHttpClient.builder()
-                .baseUrl(provider.getBaseUrl()).apiKey(provider.getApiKey()).build();
+                .baseUrl(provider.getBaseUrl())
+                .apiKey(provider.getApiKey())
+                .build();
         OpenAIClientAsync asyncClient = OpenAIOkHttpClientAsync.builder()
-                .baseUrl(provider.getBaseUrl()).apiKey(provider.getApiKey()).build();
+                .baseUrl(provider.getBaseUrl())
+                .apiKey(provider.getApiKey())
+                .build();
         OpenAiChatModel model = OpenAiChatModel.builder()
-                .openAiClient(syncClient).openAiClientAsync(asyncClient).build();
+                .openAiClient(syncClient)
+                .openAiClientAsync(asyncClient)
+                .build();
         return ChatClient.builder(model).build();
     }
 
     private ChatClient buildAnthropicClient(ModelProviderBO provider) {
         AnthropicClient syncClient = AnthropicOkHttpClient.builder()
-                .baseUrl(provider.getBaseUrl()).apiKey(provider.getApiKey()).build();
+                .baseUrl(provider.getBaseUrl())
+                .apiKey(provider.getApiKey())
+                .build();
         AnthropicClientAsync asyncClient = AnthropicOkHttpClientAsync.builder()
-                .baseUrl(provider.getBaseUrl()).apiKey(provider.getApiKey()).build();
+                .baseUrl(provider.getBaseUrl())
+                .apiKey(provider.getApiKey())
+                .build();
         AnthropicChatModel model = AnthropicChatModel.builder()
-                .anthropicClient(syncClient).anthropicClientAsync(asyncClient).build();
+                .anthropicClient(syncClient)
+                .anthropicClientAsync(asyncClient)
+                .build();
         return ChatClient.builder(model).build();
     }
 }

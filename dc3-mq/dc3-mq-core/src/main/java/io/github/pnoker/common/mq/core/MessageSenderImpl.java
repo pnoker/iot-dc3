@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.core;
 
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
@@ -22,11 +21,8 @@ import io.github.pnoker.common.mq.message.MqMessage;
 import io.github.pnoker.common.mq.message.WireMqMessage;
 import io.github.pnoker.common.mq.sender.MessageSender;
 import io.github.pnoker.common.mq.sender.MqPublishException;
-import io.github.pnoker.common.mq.sender.SendConfirmation;
 import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
+import io.github.pnoker.common.mq.sender.SendConfirmation;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
@@ -34,6 +30,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Core {@link MessageSender} implementation: serializes, stamps headers, negotiates the
@@ -64,15 +62,15 @@ public class MessageSenderImpl implements MessageSender, ReactiveMessageSender {
     @Override
     public void sendAsync(MqMessage message, SendConfirmation confirmation) {
         WireMqMessage wire = EnvelopeCodec.prepare(message);
-        adapter.publish(wire, (envelope, confirmed, cause) ->
-                confirmation.onConfirm(message, confirmed, cause));
+        adapter.publish(wire, (envelope, confirmed, cause) -> confirmation.onConfirm(message, confirmed, cause));
     }
 
     @Override
     public void sendConfirmed(MqMessage message, Duration timeout) {
         WireMqMessage wire = EnvelopeCodec.prepare(message);
         if (!adapter.capabilities().publisherConfirm()) {
-            log.debug("Broker has no publisher confirmation, degrading sendConfirmed to plain send, topic={}",
+            log.debug(
+                    "Broker has no publisher confirmation, degrading sendConfirmed to plain send, topic={}",
                     message.getTopic());
             adapter.publish(wire);
             return;
@@ -83,8 +81,7 @@ public class MessageSenderImpl implements MessageSender, ReactiveMessageSender {
             if (confirmed) {
                 routed.complete(true);
             } else {
-                failure.complete(cause != null ? cause
-                        : new MqPublishException("Broker did not confirm the publish"));
+                failure.complete(cause != null ? cause : new MqPublishException("Broker did not confirm the publish"));
             }
         });
         try {
@@ -131,15 +128,20 @@ public class MessageSenderImpl implements MessageSender, ReactiveMessageSender {
             adapter.publish(wire);
             return;
         }
-        log.info("Broker has no native delayed delivery, scheduling locally, topic={}, delayMillis={}",
-                message.getTopic(), wire.delay().toMillis());
-        DELAY_FALLBACK.schedule(() -> {
-            try {
-                adapter.publish(new WireMqMessage(wire.topic(), wire.partitionKey(), wire.body(),
-                        wire.headers(), Duration.ZERO));
-            } catch (Exception e) {
-                log.error("Delayed fallback re-send failed, topic={}", wire.topic(), e);
-            }
-        }, wire.delay().toMillis(), TimeUnit.MILLISECONDS);
+        log.info(
+                "Broker has no native delayed delivery, scheduling locally, topic={}, delayMillis={}",
+                message.getTopic(),
+                wire.delay().toMillis());
+        DELAY_FALLBACK.schedule(
+                () -> {
+                    try {
+                        adapter.publish(new WireMqMessage(
+                                wire.topic(), wire.partitionKey(), wire.body(), wire.headers(), Duration.ZERO));
+                    } catch (Exception e) {
+                        log.error("Delayed fallback re-send failed, topic={}", wire.topic(), e);
+                    }
+                },
+                wire.delay().toMillis(),
+                TimeUnit.MILLISECONDS);
     }
 }

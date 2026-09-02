@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.builder;
 
 import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.data.entity.vo.PointValueVO;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
 
 /**
  * MapStruct builder converting between point value BO, VO, and DO.
@@ -32,7 +30,9 @@ import java.util.List;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface PointValueBuilder {
 
     /**

@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * VO for submitting a custom command call.
@@ -42,17 +40,24 @@ public class CommandCallVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Identifier of the target device; must belong to the current tenant.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(
+            description = "Identifier of the target device; must belong to the current tenant.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull
     private String deviceId;
 
-    @Schema(description = "Identifier of the command being invoked; must reference a command accessible to the current tenant.", example = "4096")
+    @Schema(
+            description =
+                    "Identifier of the command being invoked; must reference a command accessible to the current tenant.",
+            example = "4096")
     private String commandId;
 
-    @Schema(description = "Command code. Stable business identifier matching the command definition.", example = "READ_HOLDING_REG")
+    @Schema(
+            description = "Command code. Stable business identifier matching the command definition.",
+            example = "READ_HOLDING_REG")
     private String commandCode;
 
     @Schema(description = "Parameter values for this command invocation, keyed by parameter code.")
     private Map<String, String> paramValues;
-
 }

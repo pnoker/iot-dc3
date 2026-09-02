@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -57,16 +56,28 @@ public class GroupVO extends BaseVO {
     /**
      * Group type flag.
      */
-    @Schema(description = "Type of entity this group categorizes, e.g. DEVICE, POINT, DRIVER. Required on add/update.", example = "DEVICE", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Group type flag can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Type of entity this group categorizes, e.g. DEVICE, POINT, DRIVER. Required on add/update.",
+            example = "DEVICE",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Group type flag can't be empty",
+            groups = {Add.class, Update.class})
     private EntityTypeEnum groupTypeFlag;
 
     /**
      * Group name.
      */
-    @NotBlank(message = "Group name can't be empty", groups = {Add.class})
-    @Schema(description = "Group name. Unique name within a tenant.", example = "Line 1 Devices", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid group name format",
+    @NotBlank(
+            message = "Group name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Group name. Unique name within a tenant.",
+            example = "Line 1 Devices",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid group name format",
             groups = {Add.class, Update.class})
     private String groupName;
 
@@ -93,5 +104,4 @@ public class GroupVO extends BaseVO {
      */
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

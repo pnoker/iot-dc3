@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.receiver.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
@@ -35,18 +34,17 @@ import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
 import io.github.pnoker.common.utils.JsonUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
-
 import java.time.Instant;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * RabbitMQ consumer that dispatches custom command calls to the driver
@@ -64,6 +62,7 @@ public class CommandReceiver {
      * Message schema version stamped on outbound command results.
      */
     private static final int SCHEMA_VERSION = 1;
+
     private final DriverCustomService driverCustomService;
     private final DriverSenderService driverSenderService;
     private final DeviceMetadata deviceMetadata;
@@ -73,10 +72,15 @@ public class CommandReceiver {
     private final DriverProperties driverProperties;
     private final Scheduler commandScheduler;
 
-    public CommandReceiver(DriverCustomService driverCustomService, DriverSenderService driverSenderService,
-                           DeviceMetadata deviceMetadata, CommandDedupCache dedupCache,
-                           DeviceLockManager deviceLockManager, DriverMetadata driverMetadata,
-                           DriverProperties driverProperties, ThreadPoolExecutor threadPoolExecutor) {
+    public CommandReceiver(
+            DriverCustomService driverCustomService,
+            DriverSenderService driverSenderService,
+            DeviceMetadata deviceMetadata,
+            CommandDedupCache dedupCache,
+            DeviceLockManager deviceLockManager,
+            DriverMetadata driverMetadata,
+            DriverProperties driverProperties,
+            ThreadPoolExecutor threadPoolExecutor) {
         this.driverCustomService = driverCustomService;
         this.driverSenderService = driverSenderService;
         this.deviceMetadata = deviceMetadata;
@@ -98,15 +102,22 @@ public class CommandReceiver {
      * @param message broker-neutral delivery carrying the command call
      * @param ack     poison-message disposition selector
      */
-    @Dc3Listener(topic = MqTopic.COMMAND, group = "${dc3.driver.client}", keyPattern = "${dc3.driver.service}.${dc3.driver.node}")
+    @Dc3Listener(
+            topic = MqTopic.COMMAND,
+            group = "${dc3.driver.client}",
+            keyPattern = "${dc3.driver.service}.${dc3.driver.node}")
     public Mono<Void> commandReceive(MqReceived<CommandCallDTO> message, Acknowledgment ack) {
         CommandCallDTO entityDTO = message.payload();
         return Mono.defer(() -> {
-            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.recordId())
+            if (Objects.isNull(entityDTO)
+                    || Objects.isNull(entityDTO.recordId())
                     || Objects.isNull(entityDTO.tenantId())
-                    || Objects.isNull(entityDTO.ownerNode()) || Objects.isNull(entityDTO.fencingToken())
-                    || Objects.isNull(entityDTO.deviceId()) || Objects.isNull(entityDTO.commandId())) {
-                log.error("Custom command rejected, reason=invalidEnvelope, recordId={}, tenantId={}, deviceId={}, commandId={}",
+                    || Objects.isNull(entityDTO.ownerNode())
+                    || Objects.isNull(entityDTO.fencingToken())
+                    || Objects.isNull(entityDTO.deviceId())
+                    || Objects.isNull(entityDTO.commandId())) {
+                log.error(
+                        "Custom command rejected, reason=invalidEnvelope, recordId={}, tenantId={}, deviceId={}, commandId={}",
                         Objects.isNull(entityDTO) ? null : entityDTO.recordId(),
                         Objects.isNull(entityDTO) ? null : entityDTO.tenantId(),
                         Objects.isNull(entityDTO) ? null : entityDTO.deviceId(),
@@ -115,8 +126,11 @@ public class CommandReceiver {
                 return Mono.empty();
             }
 
-            log.debug("Custom command received, recordId={}, deviceId={}, commandId={}",
-                    entityDTO.recordId(), entityDTO.deviceId(), entityDTO.commandId());
+            log.debug(
+                    "Custom command received, recordId={}, deviceId={}, commandId={}",
+                    entityDTO.recordId(),
+                    entityDTO.deviceId(),
+                    entityDTO.commandId());
 
             String recordId = entityDTO.recordId();
             Long tenantId = entityDTO.tenantId();
@@ -124,56 +138,99 @@ public class CommandReceiver {
             Long commandId = entityDTO.commandId();
             String dedupKey = "command:" + recordId;
 
-            return dedupCache.result(dedupKey, CommandCallResultDTO.class)
+            return dedupCache
+                    .result(dedupKey, CommandCallResultDTO.class)
                     .map(this::publishResult)
-                    .orElseGet(() -> processNewCommand(entityDTO, dedupKey, tenantId, deviceId, commandId,
-                            message.redelivered()));
+                    .orElseGet(() -> processNewCommand(
+                            entityDTO, dedupKey, tenantId, deviceId, commandId, message.redelivered()));
         });
     }
 
-    private Mono<Void> processNewCommand(CommandCallDTO entityDTO, String dedupKey, Long tenantId, Long deviceId,
-                                         Long commandId, boolean redelivered) {
+    private Mono<Void> processNewCommand(
+            CommandCallDTO entityDTO,
+            String dedupKey,
+            Long tenantId,
+            Long deviceId,
+            Long commandId,
+            boolean redelivered) {
         String recordId = entityDTO.recordId();
 
         if (!Objects.equals(driverProperties.getNode(), entityDTO.ownerNode())
                 || !Objects.equals(driverMetadata.getFencingToken(deviceId), entityDTO.fencingToken())) {
-            log.warn("Reject stale-owner custom command, recordId={}, deviceId={}, fencingToken={}",
-                    recordId, deviceId, entityDTO.fencingToken());
-            return publishResult(result(recordId, tenantId, PointCommandStatusEnum.FAILED,
-                    null, null, "STALE_OWNER", "Device ownership lease changed"));
+            log.warn(
+                    "Reject stale-owner custom command, recordId={}, deviceId={}, fencingToken={}",
+                    recordId,
+                    deviceId,
+                    entityDTO.fencingToken());
+            return publishResult(result(
+                    recordId,
+                    tenantId,
+                    PointCommandStatusEnum.FAILED,
+                    null,
+                    null,
+                    "STALE_OWNER",
+                    "Device ownership lease changed"));
         }
 
         if (Objects.nonNull(entityDTO.expireAt()) && Instant.now().isAfter(entityDTO.expireAt())) {
-            log.warn("Custom command rejected, reason=expired, recordId={}, expireAt={}",
-                    recordId, entityDTO.expireAt());
-            return publishResult(result(recordId, tenantId, PointCommandStatusEnum.EXPIRED,
-                    null, null, "EXPIRED", "Command expired before execution"));
+            log.warn(
+                    "Custom command rejected, reason=expired, recordId={}, expireAt={}",
+                    recordId,
+                    entityDTO.expireAt());
+            return publishResult(result(
+                    recordId,
+                    tenantId,
+                    PointCommandStatusEnum.EXPIRED,
+                    null,
+                    null,
+                    "EXPIRED",
+                    "Command expired before execution"));
         }
 
         if (!dedupCache.tryAcquire(dedupKey)) {
             log.warn("Duplicate command detected: recordId={}", recordId);
-            return publishResult(result(recordId, tenantId, PointCommandStatusEnum.DUPLICATE,
-                    null, null, "DUPLICATE", "Command already processing"));
+            return publishResult(result(
+                    recordId,
+                    tenantId,
+                    PointCommandStatusEnum.DUPLICATE,
+                    null,
+                    null,
+                    "DUPLICATE",
+                    "Command already processing"));
         }
 
         Mono<CommandCallResultDTO> execution = Mono.fromSupplier(() -> deviceLockManager.runExclusive(deviceId, () -> {
-                DeviceBO device = deviceMetadata.getCache(deviceId);
-                if (Objects.isNull(device)) {
-                    throw new IllegalStateException("Device not found in cache: " + deviceId);
-                }
-                CommandRuntimeBO command = Objects.isNull(device.getCommandRuntimeIdMap())
-                        ? null : device.getCommandRuntimeIdMap().get(commandId);
-                if (Objects.isNull(command)) {
-                    throw new IllegalStateException("Command not found in device metadata: " + commandId);
-                }
-                Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
-                Map<String, AttributeBO> commandConfig = deviceMetadata.getCommandConfig(deviceId, commandId);
-                Map<String, String> resultValues = driverCustomService.execute(driverConfig, commandConfig, device, command,
-                        Objects.nonNull(entityDTO.paramValues()) ? entityDTO.paramValues() : Collections.emptyMap());
-                return new CommandExecutionResult(resultValues, buildConfigSnapshot(commandConfig));
-                })).subscribeOn(commandScheduler)
-                .map(commandExecution -> result(recordId, tenantId, PointCommandStatusEnum.SUCCESS,
-                        commandExecution.resultValues(), commandExecution.configSnapshot(), null, null))
+                    DeviceBO device = deviceMetadata.getCache(deviceId);
+                    if (Objects.isNull(device)) {
+                        throw new IllegalStateException("Device not found in cache: " + deviceId);
+                    }
+                    CommandRuntimeBO command = Objects.isNull(device.getCommandRuntimeIdMap())
+                            ? null
+                            : device.getCommandRuntimeIdMap().get(commandId);
+                    if (Objects.isNull(command)) {
+                        throw new IllegalStateException("Command not found in device metadata: " + commandId);
+                    }
+                    Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
+                    Map<String, AttributeBO> commandConfig = deviceMetadata.getCommandConfig(deviceId, commandId);
+                    Map<String, String> resultValues = driverCustomService.execute(
+                            driverConfig,
+                            commandConfig,
+                            device,
+                            command,
+                            Objects.nonNull(entityDTO.paramValues())
+                                    ? entityDTO.paramValues()
+                                    : Collections.emptyMap());
+                    return new CommandExecutionResult(resultValues, buildConfigSnapshot(commandConfig));
+                }))
+                .subscribeOn(commandScheduler)
+                .map(commandExecution -> result(
+                        recordId,
+                        tenantId,
+                        PointCommandStatusEnum.SUCCESS,
+                        commandExecution.resultValues(),
+                        commandExecution.configSnapshot(),
+                        null,
+                        null))
                 .onErrorResume(error -> handleExecutionFailure(entityDTO, dedupKey, redelivered, error));
 
         return execution.flatMap(commandResult -> {
@@ -182,27 +239,39 @@ public class CommandReceiver {
         });
     }
 
-    private Mono<CommandCallResultDTO> handleExecutionFailure(CommandCallDTO command, String dedupKey,
-                                                               boolean redelivered, Throwable error) {
+    private Mono<CommandCallResultDTO> handleExecutionFailure(
+            CommandCallDTO command, String dedupKey, boolean redelivered, Throwable error) {
         if (!redelivered) {
             log.warn("Custom command failed, requeueing, recordId={}", command.recordId(), error);
             dedupCache.release(dedupKey);
             return Mono.error(error);
         }
         log.error("Custom command failed on redelivery, sending FAILED, recordId={}", command.recordId(), error);
-        return Mono.just(result(command.recordId(), command.tenantId(), PointCommandStatusEnum.FAILED,
-                null, null, "DRIVER_ERROR", error.getMessage()));
+        return Mono.just(result(
+                command.recordId(),
+                command.tenantId(),
+                PointCommandStatusEnum.FAILED,
+                null,
+                null,
+                "DRIVER_ERROR",
+                error.getMessage()));
     }
 
     private Mono<Void> publishResult(CommandCallResultDTO result) {
-        return driverSenderService.commandResultSender(result)
-                .doOnError(error -> log.error("Failed to publish command result, recordId={}",
-                        result.recordId(), error));
+        return driverSenderService
+                .commandResultSender(result)
+                .doOnError(
+                        error -> log.error("Failed to publish command result, recordId={}", result.recordId(), error));
     }
 
-    private CommandCallResultDTO result(String recordId, Long tenantId, PointCommandStatusEnum status,
-                                        Map<String, String> resultValues, String configSnapshot,
-                                        String errorCode, String errorMessage) {
+    private CommandCallResultDTO result(
+            String recordId,
+            Long tenantId,
+            PointCommandStatusEnum status,
+            Map<String, String> resultValues,
+            String configSnapshot,
+            String errorCode,
+            String errorMessage) {
         return CommandCallResultDTO.builder()
                 .recordId(recordId)
                 .tenantId(tenantId)
@@ -232,7 +301,11 @@ public class CommandReceiver {
         commandConfig.forEach((attributeCode, attribute) -> {
             Map<String, String> item = new LinkedHashMap<>();
             if (Objects.nonNull(attribute)) {
-                item.put("type", Objects.nonNull(attribute.getType()) ? attribute.getType().getCode() : null);
+                item.put(
+                        "type",
+                        Objects.nonNull(attribute.getType())
+                                ? attribute.getType().getCode()
+                                : null);
                 item.put("configValue", attribute.getValue());
             }
             snapshot.put(attributeCode, item);
@@ -248,7 +321,5 @@ public class CommandReceiver {
      * @param resultValues   map of point name to value produced by the driver
      * @param configSnapshot JSON snapshot of the command config in effect at execution time
      */
-    private record CommandExecutionResult(Map<String, String> resultValues, String configSnapshot) {
-    }
-
+    private record CommandExecutionResult(Map<String, String> resultValues, String configSnapshot) {}
 }

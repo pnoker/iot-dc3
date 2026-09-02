@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.bean;
 
 import io.github.pnoker.common.enums.EntityStatusEnum;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,10 +27,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Device health result returned by protocol drivers.
@@ -169,5 +167,4 @@ public class DeviceHealthState implements Serializable {
                 .timeoutUnit(timeoutUnit)
                 .build();
     }
-
 }

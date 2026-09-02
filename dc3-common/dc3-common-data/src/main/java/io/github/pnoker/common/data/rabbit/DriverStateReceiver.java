@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
@@ -23,12 +22,11 @@ import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * RabbitMQ receiver for driver state events.
@@ -47,26 +45,29 @@ public class DriverStateReceiver {
      * Consume a driver state message and forward it as a heartbeat to the driver state
      * service.
      *
-     * @param channel   the RabbitMQ channel for manual ack
      * @param message   the raw message carrying the delivery tag
-     * @param entityDTO the deserialized driver state
+     * @param ack       acknowledgment handle for the message
      */
     @Dc3Listener(topic = MqTopic.STATE, keyPattern = "driver.*")
     public Mono<Void> driverStateReceive(MqReceived<DriverStateDTO> message, Acknowledgment ack) {
         DriverStateDTO entityDTO = message.payload();
-        log.debug("Driver state received, tenantId={}, driverId={}, status={}",
+        log.debug(
+                "Driver state received, tenantId={}, driverId={}, status={}",
                 Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
                 Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
                 Objects.isNull(entityDTO) ? null : entityDTO.getStatus());
-        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())
-                || Objects.isNull(entityDTO.getTenantId()) || Objects.isNull(entityDTO.getStatus())) {
-            log.warn("Invalid driver state, some required fields are null, driverId={}",
+        if (Objects.isNull(entityDTO)
+                || Objects.isNull(entityDTO.getDriverId())
+                || Objects.isNull(entityDTO.getTenantId())
+                || Objects.isNull(entityDTO.getStatus())) {
+            log.warn(
+                    "Invalid driver state, some required fields are null, driverId={}",
                     Objects.isNull(entityDTO) ? null : entityDTO.getDriverId());
             ack.reject(false);
             return Mono.empty();
         }
-        return driverStateService.heartbeat(entityDTO)
+        return driverStateService
+                .heartbeat(entityDTO)
                 .doOnError(error -> log.error("Driver state persistence failed", error));
     }
-
 }

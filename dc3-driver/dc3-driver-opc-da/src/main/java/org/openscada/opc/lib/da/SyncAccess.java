@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
-
-import lombok.extern.slf4j.Slf4j;
-import org.jinterop.dcom.common.JIException;
-import org.openscada.opc.lib.common.NotConnectedException;
 
 import java.net.UnknownHostException;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.jinterop.dcom.common.JIException;
+import org.openscada.opc.lib.common.NotConnectedException;
 
 /**
  * @author pnoker
@@ -36,13 +34,15 @@ public class SyncAccess extends AccessBase implements Runnable {
 
     private Throwable lastError = null;
 
-    public SyncAccess(final Server server, final int period) throws IllegalArgumentException, UnknownHostException,
-            NotConnectedException, JIException, DuplicateGroupException {
+    public SyncAccess(final Server server, final int period)
+            throws IllegalArgumentException, UnknownHostException, NotConnectedException, JIException,
+                    DuplicateGroupException {
         super(server, period);
     }
 
-    public SyncAccess(final Server server, final int period, final String logTag) throws IllegalArgumentException,
-            UnknownHostException, NotConnectedException, JIException, DuplicateGroupException {
+    public SyncAccess(final Server server, final int period, final String logTag)
+            throws IllegalArgumentException, UnknownHostException, NotConnectedException, JIException,
+                    DuplicateGroupException {
         super(server, period, logTag);
     }
 
@@ -88,12 +88,12 @@ public class SyncAccess extends AccessBase implements Runnable {
         for (Map.Entry<Item, ItemState> entry : result.entrySet()) {
             updateItem(entry.getKey(), entry.getValue());
         }
-
     }
 
     @Override
-    protected synchronized void start() throws JIException, IllegalArgumentException, UnknownHostException,
-            NotConnectedException, DuplicateGroupException {
+    protected synchronized void start()
+            throws JIException, IllegalArgumentException, UnknownHostException, NotConnectedException,
+                    DuplicateGroupException {
         super.start();
 
         this.runner = new Thread(this, "UtgardSyncReader");
@@ -108,5 +108,4 @@ public class SyncAccess extends AccessBase implements Runnable {
         this.runner = null;
         this.items.clear();
     }
-
 }

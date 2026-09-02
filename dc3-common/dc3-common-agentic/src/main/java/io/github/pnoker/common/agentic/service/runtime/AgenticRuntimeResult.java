@@ -17,10 +17,9 @@
 package io.github.pnoker.common.agentic.service.runtime;
 
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Locale;
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Final model result produced by the agentic runtime.
@@ -36,5 +35,4 @@ public record AgenticRuntimeResult(String content, String finishReason) {
                 ? finishReason.trim().toLowerCase(Locale.ROOT)
                 : AgenticConstant.Chat.FINISH_REASON_STOP;
     }
-
 }

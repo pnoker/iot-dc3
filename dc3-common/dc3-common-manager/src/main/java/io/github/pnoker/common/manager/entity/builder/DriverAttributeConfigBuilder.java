@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.builder;
 
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -22,13 +21,12 @@ import io.github.pnoker.common.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.model.DriverAttributeConfigDO;
 import io.github.pnoker.common.manager.entity.vo.DriverAttributeConfigVO;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * MapStruct builder converting between driver attribute config BO, VO, and DO.
@@ -36,7 +34,9 @@ import java.util.Optional;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface DriverAttributeConfigBuilder {
 
     /**
@@ -132,7 +132,4 @@ public interface DriverAttributeConfigBuilder {
      * @return EntityVO Array
      */
     List<DriverAttributeConfigVO> buildVOListByBOList(List<DriverAttributeConfigBO> entityBOList);
-
-
-
 }

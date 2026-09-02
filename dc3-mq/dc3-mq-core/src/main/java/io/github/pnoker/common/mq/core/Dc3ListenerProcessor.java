@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.core;
 
+import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.constant.mq.DeliveryMode;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
-import io.github.pnoker.common.constant.mq.DeliveryDisposition;
 import io.github.pnoker.common.mq.adapter.RawBatchListener;
 import io.github.pnoker.common.mq.adapter.RawDeliveryListener;
 import io.github.pnoker.common.mq.adapter.WireMqDelivery;
@@ -28,17 +27,6 @@ import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
 import io.github.pnoker.common.mq.subscription.SubscriptionSpec;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.SmartInitializingSingleton;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.ResolvableType;
-import org.springframework.core.env.Environment;
-import org.reactivestreams.Publisher;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -48,6 +36,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.ResolvableType;
+import org.springframework.core.env.Environment;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Processes {@link Dc3Listener @Dc3Listener} methods after all singletons exist and
@@ -68,6 +66,7 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
      * Cache of classes already scanned for listener methods.
      */
     private final Map<Class<?>, List<Method>> listenerMethodCache = new ConcurrentHashMap<>();
+
     private ApplicationContext applicationContext;
 
     public Dc3ListenerProcessor(BrokerAdapter adapter) {
@@ -105,8 +104,9 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
     private List<Method> listenerMethods(Class<?> targetClass) {
         return listenerMethodCache.computeIfAbsent(targetClass, clazz -> {
             List<Method> methods = new ArrayList<>();
-            for (Class<?> current = clazz; Objects.nonNull(current) && current != Object.class;
-                 current = current.getSuperclass()) {
+            for (Class<?> current = clazz;
+                    Objects.nonNull(current) && current != Object.class;
+                    current = current.getSuperclass()) {
                 for (Method method : current.getDeclaredMethods()) {
                     if (method.isAnnotationPresent(Dc3Listener.class) && !Modifier.isStatic(method.getModifiers())) {
                         method.setAccessible(true);
@@ -124,10 +124,11 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
         String group = environment.resolvePlaceholders(annotation.group());
 
         ResolvableType parameter = ResolvableType.forMethodParameter(method, 0);
-        Class<?> acknowledgmentType = ResolvableType.forMethodParameter(method, 1).toClass();
+        Class<?> acknowledgmentType =
+                ResolvableType.forMethodParameter(method, 1).toClass();
         if (acknowledgmentType != Acknowledgment.class) {
-            throw new IllegalStateException("Second parameter of @Dc3Listener method must be Acknowledgment: "
-                    + method);
+            throw new IllegalStateException(
+                    "Second parameter of @Dc3Listener method must be Acknowledgment: " + method);
         }
 
         boolean batch = parameter.toClass() == List.class;
@@ -135,8 +136,7 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
         if (batch) {
             ResolvableType received = parameter.getGeneric(0);
             if (received.toClass() != MqReceived.class) {
-                throw new IllegalStateException(
-                        "Batch @Dc3Listener parameter must be List<MqReceived<T>>: " + method);
+                throw new IllegalStateException("Batch @Dc3Listener parameter must be List<MqReceived<T>>: " + method);
             }
             payloadType = received.getGeneric(0).resolve(Object.class);
         } else if (parameter.toClass() == MqReceived.class) {
@@ -146,8 +146,15 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
                     "@Dc3Listener parameter must be MqReceived<T> or List<MqReceived<T>>: " + method);
         }
 
-        SubscriptionSpec spec = new SubscriptionSpec(annotation.topic(), annotation.mode(), annotation.profile(),
-                batch ? DeliveryMode.BATCH : annotation.delivery(), keyPattern, group, null, payloadType,
+        SubscriptionSpec spec = new SubscriptionSpec(
+                annotation.topic(),
+                annotation.mode(),
+                annotation.profile(),
+                batch ? DeliveryMode.BATCH : annotation.delivery(),
+                keyPattern,
+                group,
+                null,
+                payloadType,
                 annotation.deadLetter());
 
         if (batch) {
@@ -155,9 +162,14 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
         } else {
             adapter.subscribe(spec, deliveryBridge(bean, method, payloadType));
         }
-        log.info("Dc3Listener registered, bean={}, method={}, topic={}, mode={}, delivery={}, keyPattern={}",
-                method.getDeclaringClass().getSimpleName(), method.getName(), annotation.topic(),
-                annotation.mode(), spec.delivery(), keyPattern);
+        log.info(
+                "Dc3Listener registered, bean={}, method={}, topic={}, mode={}, delivery={}, keyPattern={}",
+                method.getDeclaringClass().getSimpleName(),
+                method.getName(),
+                annotation.topic(),
+                annotation.mode(),
+                spec.delivery(),
+                keyPattern);
     }
 
     @SuppressWarnings("unchecked")
@@ -196,14 +208,14 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
         try {
             Object result = method.invoke(bean, argument, acknowledgment);
             if (result instanceof Publisher<?> publisher) {
-                return Flux.from(publisher).then()
+                return Flux.from(publisher)
+                        .then()
                         .then(Mono.fromSupplier(acknowledgment::dispositionOrAck))
                         .onErrorResume(error -> {
                             if (error instanceof ConflictingDeliveryDispositionException) {
                                 return Mono.error(error);
                             }
-                            return acknowledgment.disposition().map(Mono::just)
-                                    .orElseGet(() -> Mono.error(error));
+                            return acknowledgment.disposition().map(Mono::just).orElseGet(() -> Mono.error(error));
                         });
             } else if (result != null) {
                 throw new IllegalStateException("@Dc3Listener method must return void or Publisher: " + method);
@@ -253,8 +265,7 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
 
     private static final class ConflictingDeliveryDispositionException extends IllegalStateException {
 
-        private ConflictingDeliveryDispositionException(DeliveryDisposition existing,
-                                                        DeliveryDisposition selected) {
+        private ConflictingDeliveryDispositionException(DeliveryDisposition existing, DeliveryDisposition selected) {
             super("Conflicting delivery dispositions: " + existing + " and " + selected);
         }
     }

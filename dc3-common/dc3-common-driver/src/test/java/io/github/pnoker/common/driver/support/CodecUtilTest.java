@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.support;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class CodecUtilTest {
 
@@ -86,18 +84,18 @@ class CodecUtilTest {
 
     @Test
     void byteReverseInvertsOrder() {
-        byte[] reversed = CodecUtil.byteReverse(new byte[]{1, 2, 3, 4});
+        byte[] reversed = CodecUtil.byteReverse(new byte[] {1, 2, 3, 4});
         assertThat(reversed).containsExactly(4, 3, 2, 1);
     }
 
     @Test
     void byteReverseHandlesEmptyArray() {
-        assertThat(CodecUtil.byteReverse(new byte[]{})).isEmpty();
+        assertThat(CodecUtil.byteReverse(new byte[] {})).isEmpty();
     }
 
     @Test
     void mergerBytesConcatenatesArraysInOrder() {
-        byte[] merged = CodecUtil.mergerBytes(new byte[]{1, 2}, new byte[]{3}, new byte[]{4, 5});
+        byte[] merged = CodecUtil.mergerBytes(new byte[] {1, 2}, new byte[] {3}, new byte[] {4, 5});
         assertThat(merged).containsExactly(1, 2, 3, 4, 5);
     }
 
@@ -108,13 +106,13 @@ class CodecUtilTest {
 
     @Test
     void xorBytesComputesCumulativeXor() {
-        byte result = CodecUtil.xorBytes(new byte[]{0x01, 0x02}, new byte[]{0x03});
+        byte result = CodecUtil.xorBytes(new byte[] {0x01, 0x02}, new byte[] {0x03});
         assertThat(result).isEqualTo((byte) (0x01 ^ 0x02 ^ 0x03));
     }
 
     @Test
     void sumBytesComputesAdditiveChecksumAcrossArrays() {
-        byte result = CodecUtil.sumBytes(new byte[]{0x01, 0x02}, new byte[]{0x03, 0x04});
+        byte result = CodecUtil.sumBytes(new byte[] {0x01, 0x02}, new byte[] {0x03, 0x04});
         assertThat(result).isEqualTo((byte) (0x01 + 0x02 + 0x03 + 0x04));
     }
 

@@ -14,23 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.grpc.builder;
 
 import io.github.pnoker.api.common.GrpcBase;
 import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
-import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
+import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.Optional;
-
 
 /**
  * MapStruct builder for point gRPC message conversion.
@@ -38,7 +35,9 @@ import java.util.Optional;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcPointBuilder {
 
     /**
@@ -80,14 +79,16 @@ public interface GrpcPointBuilder {
         Optional.ofNullable(entityBO.getPointExt())
                 .ifPresent(value -> entityGrpc.setPointExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityBO.getPointTypeFlag())
-                .ifPresentOrElse(value -> entityGrpc.setPointTypeFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setPointTypeFlag(value.getIndex()),
                         () -> entityGrpc.setPointTypeFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(entityBO.getRwFlag())
-                .ifPresentOrElse(value -> entityGrpc.setRwFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setRwFlag(value.getIndex()),
                         () -> entityGrpc.setRwFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(entityBO.getEnableFlag())
-                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setEnableFlag(value.getIndex()),
                         () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
     }
-
 }

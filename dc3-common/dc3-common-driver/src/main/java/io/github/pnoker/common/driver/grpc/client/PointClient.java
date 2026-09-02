@@ -14,11 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.grpc.client;
 
-import io.github.pnoker.api.common.PageRequest;
 import io.github.pnoker.api.common.GrpcPointDTO;
+import io.github.pnoker.api.common.PageRequest;
 import io.github.pnoker.api.common.driver.GrpcOffsetPagePointDTO;
 import io.github.pnoker.api.common.driver.GrpcOffsetPointQuery;
 import io.github.pnoker.api.common.driver.GrpcPointQuery;
@@ -26,13 +25,12 @@ import io.github.pnoker.api.common.driver.PointApiGrpc;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.entity.builder.PointBuilder;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 /**
  * gRPC client used to query point metadata associated with the current driver.
@@ -40,7 +38,6 @@ import java.util.List;
  * @author pnoker
  * @since 2016.10.1
  */
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -82,8 +79,8 @@ public class PointClient {
                     .setDriverId(driverMetadata.getDriver().getId())
                     .setPointId(id)
                     .build();
-                    return ReactiveGrpcClientSupport.<GrpcPointQuery, GrpcPointDTO>unary("get point metadata",
-                            observer -> pointApiStub.getById(query, observer))
+            return ReactiveGrpcClientSupport.<GrpcPointQuery, GrpcPointDTO>unary(
+                            "get point metadata", observer -> pointApiStub.getById(query, observer))
                     .map(pointBuilder::buildDTOByGrpcDTO);
         });
     }
@@ -92,15 +89,19 @@ public class PointClient {
         GrpcOffsetPointQuery query = GrpcOffsetPointQuery.newBuilder()
                 .setTenantId(driverMetadata.getDriver().getTenantId())
                 .setDriverId(driverMetadata.getDriver().getId())
-                .setPage(PageRequest.newBuilder().setOffset(offset).setLimit(limit).build())
+                .setPage(PageRequest.newBuilder()
+                        .setOffset(offset)
+                        .setLimit(limit)
+                        .build())
                 .build();
         return ReactiveGrpcClientSupport.<GrpcOffsetPointQuery, GrpcOffsetPagePointDTO>unary(
                         "list point metadata", observer -> pointApiStub.list(query, observer))
-                .map(response -> new PointPage(response.getPage().getOffset(), response.getPage().getLimit(),
-                        response.getPage().getHasNext(), response.getItemsList()));
+                .map(response -> new PointPage(
+                        response.getPage().getOffset(),
+                        response.getPage().getLimit(),
+                        response.getPage().getHasNext(),
+                        response.getItemsList()));
     }
 
-    private record PointPage(long offset, int limit, boolean hasNext, List<GrpcPointDTO> data) {
-    }
-
+    private record PointPage(long offset, int limit, boolean hasNext, List<GrpcPointDTO> data) {}
 }

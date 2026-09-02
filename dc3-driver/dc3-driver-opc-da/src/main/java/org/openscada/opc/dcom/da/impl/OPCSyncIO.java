@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da.impl;
 
 import org.jinterop.dcom.common.JIException;
@@ -61,8 +60,8 @@ public class OPCSyncIO extends BaseCOMObject {
         callObject.addInParamAsInt(serverHandles.length, JIFlags.FLAG_NULL);
         callObject.addInParamAsArray(new JIArray(serverHandles, true), JIFlags.FLAG_NULL);
 
-        callObject.addOutParamAsObject(new JIPointer(new JIArray(OPCITEMSTATE.getStruct(), null, 1, true)),
-                JIFlags.FLAG_NULL);
+        callObject.addOutParamAsObject(
+                new JIPointer(new JIArray(OPCITEMSTATE.getStruct(), null, 1, true)), JIFlags.FLAG_NULL);
         callObject.addOutParamAsObject(new JIPointer(new JIArray(Integer.class, null, 1, true)), JIFlags.FLAG_NULL);
 
         Object result[] = Helper.callRespectSFALSE(getCOMObject(), callObject);
@@ -72,8 +71,8 @@ public class OPCSyncIO extends BaseCOMObject {
         Integer[] errorCodes = (Integer[]) ((JIArray) ((JIPointer) result[1]).getReferent()).getArrayInstance();
 
         for (int i = 0; i < serverHandles.length; i++) {
-            results.add(new KeyedResult<Integer, OPCITEMSTATE>(serverHandles[i], OPCITEMSTATE.fromStruct(states[i]),
-                    errorCodes[i]));
+            results.add(new KeyedResult<Integer, OPCITEMSTATE>(
+                    serverHandles[i], OPCITEMSTATE.fromStruct(states[i]), errorCodes[i]));
         }
 
         return results;
@@ -109,5 +108,4 @@ public class OPCSyncIO extends BaseCOMObject {
         }
         return results;
     }
-
 }

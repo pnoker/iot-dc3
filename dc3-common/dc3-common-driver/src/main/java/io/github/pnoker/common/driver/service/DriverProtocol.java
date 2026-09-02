@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service;
 
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
@@ -22,7 +21,6 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
-
 import java.util.Map;
 
 /**
@@ -50,8 +48,11 @@ public interface DriverProtocol {
      * @param point        point descriptor with type flag, scaling, unit
      * @return the freshly read sample wrapped in a {@link ReadPointValue}
      */
-    ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                        PointBO point);
+    ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point);
 
     /**
      * Write one point value to the device.
@@ -65,7 +66,10 @@ public interface DriverProtocol {
      * @return {@code true} when the device acknowledged the write; otherwise
      * either return {@code false} or throw a domain exception
      */
-    Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                  PointBO point, WritePointValue writePointValue);
-
+    Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue);
 }

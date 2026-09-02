@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.config;
 
 import io.github.pnoker.common.mq.adapter.BrokerAdapter;
@@ -22,14 +21,13 @@ import io.github.pnoker.common.mq.core.Dc3ListenerProcessor;
 import io.github.pnoker.common.mq.core.MessageSenderImpl;
 import io.github.pnoker.common.mq.sender.MessageSender;
 import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-
-import java.util.Objects;
 
 /**
  * Wires the messaging port: requires exactly one {@link BrokerAdapter} on the classpath
@@ -53,9 +51,8 @@ public class MqAutoConfiguration {
     public MessageSender messageSender(ObjectProvider<BrokerAdapter> adapterProvider) {
         BrokerAdapter adapter = adapterProvider.getIfAvailable();
         if (Objects.isNull(adapter)) {
-            throw new IllegalStateException(
-                    "No BrokerAdapter bean found: add exactly one dc3-mq-* adapter dependency "
-                            + "(selected by dc3.mq.type, default rabbitmq)");
+            throw new IllegalStateException("No BrokerAdapter bean found: add exactly one dc3-mq-* adapter dependency "
+                    + "(selected by dc3.mq.type, default rabbitmq)");
         }
         log.info("MQ port negotiated, broker={}, capabilities={}", adapter.type(), adapter.capabilities());
         if (!adapter.capabilities().delayedMessage()) {
@@ -89,8 +86,7 @@ public class MqAutoConfiguration {
     public Dc3ListenerProcessor dc3ListenerProcessor(ObjectProvider<BrokerAdapter> adapterProvider) {
         BrokerAdapter adapter = adapterProvider.getIfAvailable();
         if (Objects.isNull(adapter)) {
-            throw new IllegalStateException(
-                    "No BrokerAdapter bean found: add exactly one dc3-mq-* adapter dependency");
+            throw new IllegalStateException("No BrokerAdapter bean found: add exactly one dc3-mq-* adapter dependency");
         }
         return new Dc3ListenerProcessor(adapter);
     }

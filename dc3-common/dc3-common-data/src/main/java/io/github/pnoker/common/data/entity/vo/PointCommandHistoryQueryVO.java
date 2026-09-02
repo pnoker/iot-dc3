@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
@@ -22,15 +21,14 @@ import io.github.pnoker.common.enums.PointCommandTypeEnum;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * Query view object for point command list API.
@@ -52,10 +50,14 @@ public class PointCommandHistoryQueryVO implements Serializable {
     @Schema(description = "Identifier of the device to filter by; must belong to the current tenant.", example = "1024")
     private String deviceId;
 
-    @Schema(description = "Identifier of the data point to filter by; must belong to the current tenant.", example = "2048")
+    @Schema(
+            description = "Identifier of the data point to filter by; must belong to the current tenant.",
+            example = "2048")
     private String pointId;
 
-    @Schema(description = "Lifecycle status of the command to filter by (e.g. pending, success, failed).", example = "SUCCESS")
+    @Schema(
+            description = "Lifecycle status of the command to filter by (e.g. pending, success, failed).",
+            example = "SUCCESS")
     private PointCommandStatusEnum status;
 
     @Schema(description = "Type of the point command to filter by (e.g. read, write).", example = "READ")
@@ -69,5 +71,4 @@ public class PointCommandHistoryQueryVO implements Serializable {
 
     @Schema(description = "Stable, whitelisted sort fields.")
     private List<SortSpec> sort = List.of();
-
 }

@@ -55,5 +55,4 @@ public class AgenticTokenEstimatorUtil {
         }
         return Math.max(1, (int) Math.ceil(ascii / 4.0 + nonAscii / 1.8));
     }
-
 }

@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.bo.IdentityAuditLogBO;
 import io.github.pnoker.common.auth.entity.model.IdentityAuditLogDO;
 import io.github.pnoker.common.auth.entity.vo.IdentityAuditLogVO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import org.mapstruct.Mapper;
-
 import java.util.List;
+import org.mapstruct.Mapper;
 
 /**
  * MapStruct builder converting between identity audit log DO, BO, and VO.
@@ -31,7 +29,9 @@ import java.util.List;
  * @author pnoker
  * @since 2026.6.14
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface IdentityAuditLogBuilder {
 
     /**
@@ -65,5 +65,4 @@ public interface IdentityAuditLogBuilder {
      * @return EntityVO Array
      */
     List<IdentityAuditLogVO> buildVOListByBOList(List<IdentityAuditLogBO> entityBOList);
-
 }

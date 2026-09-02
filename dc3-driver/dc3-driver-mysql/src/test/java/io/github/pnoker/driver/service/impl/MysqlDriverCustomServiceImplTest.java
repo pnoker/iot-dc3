@@ -14,22 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class MysqlDriverCustomServiceImplTest {
@@ -56,7 +54,9 @@ class MysqlDriverCustomServiceImplTest {
     void validatePassesWhenAllRequiredAttributesPresent() {
         Map<String, AttributeBO> config = new HashMap<>();
         config.put("host", string("localhost"));
-        config.put("port", AttributeBO.builder().value("3306").type(AttributeTypeEnum.INT).build());
+        config.put(
+                "port",
+                AttributeBO.builder().value("3306").type(AttributeTypeEnum.INT).build());
         config.put("database", string("dc3"));
         config.put("username", string("root"));
         config.put("password", string("secret"));

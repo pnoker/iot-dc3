@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -23,17 +25,13 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class HttpDriverCustomServiceImplTest {
@@ -69,8 +67,12 @@ class HttpDriverCustomServiceImplTest {
     @Test
     void validatePassesWhenBaseUrlPresent() {
         Map<String, AttributeBO> driverConfig = new HashMap<>();
-        driverConfig.put("baseUrl",
-                AttributeBO.builder().value("http://localhost:8080").type(AttributeTypeEnum.STRING).build());
+        driverConfig.put(
+                "baseUrl",
+                AttributeBO.builder()
+                        .value("http://localhost:8080")
+                        .type(AttributeTypeEnum.STRING)
+                        .build());
 
         ValidationReport report = service.validate(driverConfig);
 
@@ -91,5 +93,4 @@ class HttpDriverCustomServiceImplTest {
         service.schedule();
         verifyNoInteractions(driverSenderService);
     }
-
 }

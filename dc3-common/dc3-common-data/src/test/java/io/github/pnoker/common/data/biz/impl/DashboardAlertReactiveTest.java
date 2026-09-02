@@ -1,33 +1,20 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.data.biz.impl;
-
-import io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.AlertCountersRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.BucketRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.HourCountRow;
-import io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow;
-import io.github.pnoker.common.data.entity.vo.dashboard.AlertBulkConfirmVO;
-import io.github.pnoker.common.data.repository.ReactiveAlertAnalyticsStore;
-import io.github.pnoker.common.data.repository.ReactiveAlertStore;
-import io.github.pnoker.common.data.biz.store.PointValueLatestService;
-import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.facade.api.DeviceFacade;
-import io.github.pnoker.common.facade.api.PointFacade;
-import io.github.pnoker.common.facade.api.DriverFacade;
-import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
-import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.Flux;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,6 +22,34 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import io.github.pnoker.common.data.biz.store.PointValueLatestService;
+import io.github.pnoker.common.data.entity.bo.dashboard.AlertCountersRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.BucketRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.HourCountRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow;
+import io.github.pnoker.common.data.entity.vo.dashboard.AlertBulkConfirmVO;
+import io.github.pnoker.common.data.repository.ReactiveAlertAnalyticsStore;
+import io.github.pnoker.common.data.repository.ReactiveAlertStore;
+import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.facade.api.DeviceFacade;
+import io.github.pnoker.common.facade.api.DriverFacade;
+import io.github.pnoker.common.facade.api.PointFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
+import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class DashboardAlertReactiveTest {
@@ -44,7 +59,6 @@ class DashboardAlertReactiveTest {
 
     @Mock
     private ReactiveAlertAnalyticsStore alertAnalyticsStore;
-
 
     @Mock
     private PointValueLatestService pointValueLatestService;
@@ -63,11 +77,23 @@ class DashboardAlertReactiveTest {
 
     @Test
     void latestStreamUsesReactiveProjectionAndBulkMetadataLookups() {
-        PointValueBO value = PointValueBO.builder().deviceId(7L).pointId(8L).driverId(9L)
-                .rawValue("41").calValue("41").numValue(41d).build();
-        FacadeDeviceBO device = new FacadeDeviceBO(); device.setId(7L); device.setDeviceName("device");
-        FacadePointBO point = new FacadePointBO(); point.setId(8L); point.setPointName("point");
-        FacadeDriverBO driver = new FacadeDriverBO(); driver.setId(9L); driver.setDriverName("driver");
+        PointValueBO value = PointValueBO.builder()
+                .deviceId(7L)
+                .pointId(8L)
+                .driverId(9L)
+                .rawValue("41")
+                .calValue("41")
+                .numValue(41d)
+                .build();
+        FacadeDeviceBO device = new FacadeDeviceBO();
+        device.setId(7L);
+        device.setDeviceName("device");
+        FacadePointBO point = new FacadePointBO();
+        point.setId(8L);
+        point.setPointName("point");
+        FacadeDriverBO driver = new FacadeDriverBO();
+        driver.setId(9L);
+        driver.setDriverName("driver");
         when(pointValueLatestService.listLatestStream(3L, 20)).thenReturn(Flux.just(value));
         when(deviceFacade.listByIdsReactive(eq(3L), any())).thenReturn(Flux.just(device));
         when(pointFacade.listByIdsReactive(eq(3L), any())).thenReturn(Flux.just(point));
@@ -94,7 +120,8 @@ class DashboardAlertReactiveTest {
         when(alertStore.list(eq(9L), eq("device"), eq(1), eq(0), any(), eq(request)))
                 .thenReturn(Mono.just(OffsetPage.of(List.of(row), 20, 10, 21)));
 
-        var result = service.alertPage(9L, "device", 1, 0, java.time.LocalDateTime.now(), request).block();
+        var result = service.alertPage(9L, "device", 1, 0, java.time.LocalDateTime.now(), request)
+                .block();
 
         assertEquals(20, result.offset());
         assertEquals(21, result.total());
@@ -104,7 +131,8 @@ class DashboardAlertReactiveTest {
 
     @Test
     void invalidSourceIsRejectedInsteadOfExpandingScope() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(
+                IllegalArgumentException.class,
                 () -> service.alertPage(9L, "invalid", null, null, null, PageRequest.firstPage()));
     }
 

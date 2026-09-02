@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
@@ -35,10 +34,6 @@ import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.mq.message.MqMessage;
 import io.github.pnoker.common.mq.sender.MessageSender;
 import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +41,9 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 /**
  * Implements point-value dispatch to the data center via RabbitMQ.
@@ -116,8 +114,12 @@ public class DriverSenderServiceImpl implements DriverSenderService {
      */
     @Override
     public void deviceStatusSender(Long deviceId, EntityStatusEnum status) {
-        sendDeviceStatus(deviceId, status, driverProperties.getHealth().getDevice().getTimeout(),
-                driverProperties.getHealth().getDevice().getTimeoutUnit(), null);
+        sendDeviceStatus(
+                deviceId,
+                status,
+                driverProperties.getHealth().getDevice().getTimeout(),
+                driverProperties.getHealth().getDevice().getTimeoutUnit(),
+                null);
     }
 
     /**
@@ -132,8 +134,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
      * Report a device status with an explicit lease timeout and structured description.
      */
     @Override
-    public void deviceStatusSender(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit,
-                                   String stateDescription) {
+    public void deviceStatusSender(
+            Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit, String stateDescription) {
         sendDeviceStatus(deviceId, status, timeout, timeoutUnit, stateDescription);
     }
 
@@ -146,7 +148,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     public void driverAlarmSender(String message) {
         DriverBO driver = driverMetadata.getDriver();
         if (Objects.isNull(driver)) {
-            log.warn("Driver alarm publish skipped, reason=driverNotRegistered, messageLength={}",
+            log.warn(
+                    "Driver alarm publish skipped, reason=driverNotRegistered, messageLength={}",
                     Objects.nonNull(message) ? message.length() : 0);
             return;
         }
@@ -155,8 +158,11 @@ public class DriverSenderServiceImpl implements DriverSenderService {
                 .driverId(driver.getId())
                 .message(message)
                 .build();
-        log.info("Driver alarm published, tenantId={}, driverId={}, messageLength={}",
-                driver.getTenantId(), driver.getId(), Objects.nonNull(message) ? message.length() : 0);
+        log.info(
+                "Driver alarm published, tenantId={}, driverId={}, messageLength={}",
+                driver.getTenantId(),
+                driver.getId(),
+                Objects.nonNull(message) ? message.length() : 0);
         messageSender.send(MqMessage.of(MqTopic.ALARM, "driver." + driverProperties.getService(), alarm));
     }
 
@@ -171,17 +177,19 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         if (Objects.isNull(deviceId)) {
             return;
         }
-        DeviceAlarmDTO alarm = DeviceAlarmDTO.builder()
-                .deviceId(deviceId)
-                .message(message)
-                .build();
+        DeviceAlarmDTO alarm =
+                DeviceAlarmDTO.builder().deviceId(deviceId).message(message).build();
         DriverBO driver = driverMetadata.getDriver();
         if (Objects.nonNull(driver)) {
             alarm.setDriverId(driver.getId());
             alarm.setTenantId(driver.getTenantId());
         }
-        log.info("Device alarm published, tenantId={}, driverId={}, deviceId={}, messageLength={}",
-                alarm.getTenantId(), alarm.getDriverId(), deviceId, Objects.nonNull(message) ? message.length() : 0);
+        log.info(
+                "Device alarm published, tenantId={}, driverId={}, deviceId={}, messageLength={}",
+                alarm.getTenantId(),
+                alarm.getDriverId(),
+                deviceId,
+                Objects.nonNull(message) ? message.length() : 0);
         messageSender.send(MqMessage.of(MqTopic.ALARM, "device." + driverProperties.getService(), alarm));
     }
 
@@ -197,8 +205,10 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         }
         DriverBO driver = driverMetadata.getDriver();
         if (Objects.isNull(driver)) {
-            log.error("Reject point value before driver registration, deviceId={}, pointId={}",
-                    entityDTO.getDeviceId(), entityDTO.getPointId());
+            log.error(
+                    "Reject point value before driver registration, deviceId={}, pointId={}",
+                    entityDTO.getDeviceId(),
+                    entityDTO.getPointId());
             return;
         }
         if (!stampPointValue(entityDTO, driver)) {
@@ -217,8 +227,11 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         }
         Long fencingToken = driverMetadata.getFencingToken(pointValue.getDeviceId());
         if (Objects.isNull(fencingToken)) {
-            log.error("Reject point value without active device lease, deviceId={}, pointId={}, node={}",
-                    pointValue.getDeviceId(), pointValue.getPointId(), driverProperties.getNode());
+            log.error(
+                    "Reject point value without active device lease, deviceId={}, pointId={}, node={}",
+                    pointValue.getDeviceId(),
+                    pointValue.getPointId(),
+                    driverProperties.getNode());
             return false;
         }
         pointValue.setMessageId(UUID.randomUUID().toString());
@@ -227,9 +240,14 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         pointValue.setSequence(pointValueSequence.incrementAndGet());
         pointValue.setFencingToken(fencingToken);
         if (log.isDebugEnabled()) {
-            log.debug("Point value staged, messageId={}, tenantId={}, driverId={}, deviceId={}, pointId={}, sequence={}",
-                    pointValue.getMessageId(), pointValue.getTenantId(), pointValue.getDriverId(),
-                    pointValue.getDeviceId(), pointValue.getPointId(), pointValue.getSequence());
+            log.debug(
+                    "Point value staged, messageId={}, tenantId={}, driverId={}, deviceId={}, pointId={}, sequence={}",
+                    pointValue.getMessageId(),
+                    pointValue.getTenantId(),
+                    pointValue.getDriverId(),
+                    pointValue.getDeviceId(),
+                    pointValue.getPointId(),
+                    pointValue.getSequence());
         }
         return true;
     }
@@ -311,8 +329,8 @@ public class DriverSenderServiceImpl implements DriverSenderService {
      * @param timeoutUnit      lease timeout unit
      * @param stateDescription optional structured description, may be null
      */
-    private void sendDeviceStatus(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit,
-                                  String stateDescription) {
+    private void sendDeviceStatus(
+            Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit, String stateDescription) {
         DeviceStateDTO deviceState = new DeviceStateDTO(deviceId, status, timeout, timeoutUnit);
         if (Objects.nonNull(stateDescription)) {
             deviceState.setStateDescription(stateDescription);
@@ -331,5 +349,4 @@ public class DriverSenderServiceImpl implements DriverSenderService {
     private void sendConfirmed(MqTopic topic, String partitionKey, Object payload) {
         messageSender.sendConfirmed(MqMessage.of(topic, partitionKey, payload), Duration.ofSeconds(5));
     }
-
 }

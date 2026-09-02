@@ -1,18 +1,28 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.db.r2dbc.core.dialect;
 
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
-public record StandardR2dbcDialect(
-        String name,
-        String schemaFingerprintTable,
-        char identifierQuote,
-        boolean supportsInsertReturning) implements R2dbcDialect {
+/** PostgreSQL conventions for the SQL fragments that cannot be expressed portably. */
+public record StandardR2dbcDialect(String name, String schemaFingerprintTable) implements R2dbcDialect {
 
     private static final Pattern IDENTIFIER = Pattern.compile("[A-Za-z_][A-Za-z0-9_]*");
 
@@ -22,9 +32,6 @@ public record StandardR2dbcDialect(
         }
         if (schemaFingerprintTable == null || schemaFingerprintTable.isBlank()) {
             throw new IllegalArgumentException("schema fingerprint table must not be blank");
-        }
-        if (identifierQuote != '"' && identifierQuote != '`') {
-            throw new IllegalArgumentException("unsupported identifier quote");
         }
     }
 
@@ -37,24 +44,8 @@ public record StandardR2dbcDialect(
                         throw new IllegalArgumentException("invalid SQL identifier");
                     }
                 })
-                .map(part -> identifierQuote + part + identifierQuote)
+                .map(part -> '"' + part + '"')
                 .collect(Collectors.joining("."));
-    }
-
-    @Override
-    public String jsonWriteExpression(String namedParameter) {
-        // PostgreSQL stores canonical structured payloads as JSONB; MySQL/MariaDB
-        // accept the text value directly and validate it against their JSON type.
-        return identifierQuote == '`' ? jsonParameter(namedParameter) : "CAST(" + jsonParameter(namedParameter) + " AS JSONB)";
-    }
-
-    @Override
-    public String jsonTextExpression(String column, String path) {
-        if (identifierQuote == '`') {
-            return "JSON_UNQUOTE(JSON_EXTRACT(" + column + ",'$." + path + "'))";
-        }
-        String pgPath = String.join(",", path.split("\\.", -1)).replace("'", "''");
-        return column + "#>>'{" + pgPath + "}'";
     }
 
     @Override
@@ -66,8 +57,8 @@ public record StandardR2dbcDialect(
     }
 
     @Override
-    public Object bindInstant(Instant instant) {
-        Objects.requireNonNull(instant, "instant must not be null");
-        return identifierQuote == '`' ? LocalDateTime.ofInstant(instant, ZoneOffset.UTC) : instant;
+    public String jsonTextExpression(String column, String path) {
+        String pgPath = String.join(",", path.split("\\.", -1)).replace("'", "''");
+        return column + "#>>'{" + pgPath + "}'";
     }
 }

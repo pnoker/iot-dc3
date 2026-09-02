@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -52,9 +51,9 @@ public class CommandParamExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Free-form string carrying extra command param data not covered by the typed fields", example = "extra metadata")
+        @Schema(
+                description = "Free-form string carrying extra command param data not covered by the typed fields",
+                example = "extra metadata")
         private String keep;
-
     }
-
 }

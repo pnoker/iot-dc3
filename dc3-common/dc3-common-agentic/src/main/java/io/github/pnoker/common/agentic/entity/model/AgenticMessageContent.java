@@ -18,13 +18,12 @@ package io.github.pnoker.common.agentic.entity.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Structured content persisted for an agentic chat message.
@@ -129,8 +128,15 @@ public class AgenticMessageContent implements Serializable {
          * @param code    code
          * @return of result
          */
-        public static Trace of(String type, String title, String detail, String name, Long created, String phase,
-                               String status, String code) {
+        public static Trace of(
+                String type,
+                String title,
+                String detail,
+                String name,
+                Long created,
+                String phase,
+                String status,
+                String code) {
             Trace trace = new Trace();
             trace.setType(type);
             trace.setTitle(title);
@@ -142,7 +148,6 @@ public class AgenticMessageContent implements Serializable {
             trace.setCreated(created);
             return trace;
         }
-
     }
 
     /**
@@ -174,7 +179,6 @@ public class AgenticMessageContent implements Serializable {
             context.setContent(content);
             return context;
         }
-
     }
 
     /**
@@ -212,8 +216,8 @@ public class AgenticMessageContent implements Serializable {
          * @param memory  memory
          * @return of result
          */
-        public static Tokens of(Integer input, Integer output, Integer text, Integer context, Integer system,
-                                Integer memory) {
+        public static Tokens of(
+                Integer input, Integer output, Integer text, Integer context, Integer system, Integer memory) {
             Tokens tokens = new Tokens();
             tokens.setInput(input);
             tokens.setOutput(output);
@@ -223,6 +227,5 @@ public class AgenticMessageContent implements Serializable {
             tokens.setMemory(memory);
             return tokens;
         }
-
     }
 }

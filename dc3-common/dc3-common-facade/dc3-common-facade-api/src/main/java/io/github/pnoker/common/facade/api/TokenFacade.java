@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import reactor.core.publisher.Mono;
@@ -40,5 +39,4 @@ public interface TokenFacade {
      * @return {@code true} when the token is valid and unexpired for the identity
      */
     Mono<Boolean> checkValid(String tenant, String name, String token);
-
 }

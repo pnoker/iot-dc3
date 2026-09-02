@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -232,5 +230,4 @@ public class ArithmeticUtil {
         }
         return round(Double.toString(value), scale).doubleValue();
     }
-
 }

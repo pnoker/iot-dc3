@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Map;
 
 /**
  * Notify channel Ext.
@@ -33,7 +31,9 @@ import java.util.Map;
  * @author pnoker
  * @since 2016.10.1
  */
-@Schema(description = "Notify channel extension object. Holds non-sensitive channel configuration; secrets are referenced by credentialRef.")
+@Schema(
+        description =
+                "Notify channel extension object. Holds non-sensitive channel configuration; secrets are referenced by credentialRef.")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -65,7 +65,10 @@ public class NotifyChannelExt extends BaseExt {
         /**
          * Message card version used by card-capable channels.
          */
-        @Schema(description = "Message card template version for card-capable channels (e.g. DingTalk interactive cards).", example = "1.0")
+        @Schema(
+                description =
+                        "Message card template version for card-capable channels (e.g. DingTalk interactive cards).",
+                example = "1.0")
         private String cardVersion;
 
         /**
@@ -83,9 +86,9 @@ public class NotifyChannelExt extends BaseExt {
         /**
          * Provider-specific non-sensitive options.
          */
-        @Schema(description = "Provider-specific non-sensitive options; keys are provider-defined and values must never contain secrets (use credentialRef for secrets).")
+        @Schema(
+                description =
+                        "Provider-specific non-sensitive options; keys are provider-defined and values must never contain secrets (use credentialRef for secrets).")
         private Map<String, Object> options;
-
     }
-
 }

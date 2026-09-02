@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.resource;
 
 import io.github.pnoker.common.facade.api.ResourceRegistryFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.config.ResourceRegistrarProperties;
 import io.github.pnoker.common.resource.scan.ApiEndpointScanner;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +27,6 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import reactor.core.publisher.Mono;
-
 
 /**
  * Drives a one-shot sync of the local HTTP endpoint inventory to the auth resource tables
@@ -85,16 +82,23 @@ public class ResourceRegistrar {
         }
         return Mono.fromSupplier(scanner::scan)
                 .flatMap(apis -> facade.sync(FacadeResourceRegistrySyncCommandBO.builder()
-                        .serviceName(serviceName)
-                        .deleteMissing(properties.isDeleteMissing())
-                        .apis(apis)
-                        .build())
+                                .serviceName(serviceName)
+                                .deleteMissing(properties.isDeleteMissing())
+                                .apis(apis)
+                                .build())
                         .doOnNext(result -> log.info(
                                 "Resource registrar synchronized, serviceName={}, endpointCount={}, inserted={}, updated={}, deleted={}, unchanged={}",
-                                serviceName, apis.size(), result.getInserted(), result.getUpdated(), result.getDeleted(), result.getUnchanged())))
+                                serviceName,
+                                apis.size(),
+                                result.getInserted(),
+                                result.getUpdated(),
+                                result.getDeleted(),
+                                result.getUnchanged())))
                 .then()
-                .onErrorResume(error -> properties.isFailFast() ? Mono.error(error) : Mono.fromRunnable(() ->
-                        log.error("Resource registrar synchronization failed, serviceName={}", serviceName, error)));
+                .onErrorResume(error -> properties.isFailFast()
+                        ? Mono.error(error)
+                        : Mono.fromRunnable(() -> log.error(
+                                "Resource registrar synchronization failed, serviceName={}", serviceName, error)));
     }
 
     /**
@@ -104,5 +108,4 @@ public class ResourceRegistrar {
         String name = properties.getServiceName();
         return StringUtils.isBlank(name) ? environment.getProperty("spring.application.name") : name;
     }
-
 }

@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.common.SymbolConstant;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Node ID generation and environment tag builder.
@@ -71,5 +69,4 @@ public class EnvironmentUtil {
     public static boolean isDev(String env) {
         return EnvironmentConstant.ENV_DEV.equals(env);
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.builder;
 
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
@@ -31,7 +30,9 @@ import org.mapstruct.Mapping;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface PointCommandBuilder {
 
     /**
@@ -51,5 +52,4 @@ public interface PointCommandBuilder {
      */
     @Mapping(target = "source", ignore = true)
     PointCommandWriteBO buildBOByVO(PointCommandWriteVO entityVO);
-
 }

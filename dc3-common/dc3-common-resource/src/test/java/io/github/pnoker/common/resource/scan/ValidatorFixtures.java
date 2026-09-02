@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.resource.scan;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,10 +21,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.lang.reflect.Method;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.lang.reflect.Method;
 
 /**
  * Test helper that returns {@link Operation} instances via reflection over annotated dummy methods,
@@ -84,9 +82,7 @@ class ValidatorFixtures {
 
     private static Operation getOperation(String methodName) {
         try {
-            return ValidatorFixtures.class
-                    .getDeclaredMethod(methodName)
-                    .getAnnotation(Operation.class);
+            return ValidatorFixtures.class.getDeclaredMethod(methodName).getAnnotation(Operation.class);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("Fixture method not found: " + methodName, e);
         }
@@ -95,65 +91,68 @@ class ValidatorFixtures {
     @Operation(
             description = "short"
             // no extensions → missing x-dc3-ai
-    )
-    private void noExtensionShortDescription() {
-    }
+            )
+    private void noExtensionShortDescription() {}
 
     @Operation(
             description = "This is a valid description that exceeds twenty characters",
-            extensions = @Extension(
-                    name = "x-dc3-ai",
-                    properties = {
-                            @ExtensionProperty(name = "riskLevel", value = "foo"),
-                            @ExtensionProperty(name = "destructive", value = "maybe"),
-                            @ExtensionProperty(name = "idempotent", value = "true")
-                    }
-            )
-    )
-    private void illegalRiskAndFlag() {
-    }
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "foo"),
+                                @ExtensionProperty(name = "destructive", value = "maybe"),
+                                @ExtensionProperty(name = "idempotent", value = "true")
+                            }))
+    private void illegalRiskAndFlag() {}
 
     // --- reflection helper ---
 
     @Operation(
             description = "This is a valid description that exceeds twenty characters",
-            extensions = @Extension(
-                    name = "x-dc3-ai",
-                    properties = {
-                            @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                            @ExtensionProperty(name = "destructive", value = "false"),
-                            @ExtensionProperty(name = "idempotent", value = "true"),
-                            @ExtensionProperty(name = "openWorld", value = "false"),
-                            @ExtensionProperty(name = "hidden", value = "false")
-                    }
-            )
-    )
-    private void valid() {
-    }
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false"),
+                                @ExtensionProperty(name = "hidden", value = "false")
+                            }))
+    private void valid() {}
 
-    @Operation(description = "Valid operation description exceeding twenty characters",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false"),
-                    @ExtensionProperty(name = "hidden", value = "false")}))
+    @Operation(
+            description = "Valid operation description exceeding twenty characters",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false"),
+                                @ExtensionProperty(name = "hidden", value = "false")
+                            }))
     @SuppressWarnings("unused")
-    private void undescribedParams(@RequestBody BodyMissingSchema body,
-                                   @RequestParam("id") Long id) {
-    }
+    private void undescribedParams(@RequestBody BodyMissingSchema body, @RequestParam("id") Long id) {}
 
-    @Operation(description = "Valid operation description exceeding twenty characters",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false"),
-                    @ExtensionProperty(name = "hidden", value = "false")}))
+    @Operation(
+            description = "Valid operation description exceeding twenty characters",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false"),
+                                @ExtensionProperty(name = "hidden", value = "false")
+                            }))
     @SuppressWarnings("unused")
-    private void describedParams(@RequestBody BodyWithSchema body,
-                                 @Parameter(description = "Primary key of the target record") @RequestParam("id") Long id) {
-    }
+    private void describedParams(
+            @RequestBody BodyWithSchema body,
+            @Parameter(description = "Primary key of the target record") @RequestParam("id") Long id) {}
 
     /**
      * Request body whose field is missing @Schema(description).

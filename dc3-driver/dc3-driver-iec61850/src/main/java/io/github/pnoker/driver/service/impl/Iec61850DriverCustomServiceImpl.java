@@ -32,18 +32,17 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.openmuc.openiec61850.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.openmuc.openiec61850.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * Custom driver service implementation for the IEC 61850 MMS client driver.
@@ -62,18 +61,21 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
     private Map<Long, Iec61850Association> associationMap;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -107,19 +109,25 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)
                 && (MetadataOperateTypeEnum.DELETE.equals(operateType)
-                || MetadataOperateTypeEnum.UPDATE.equals(operateType))) {
+                        || MetadataOperateTypeEnum.UPDATE.equals(operateType))) {
             Iec61850Association removed = associationMap.remove(metadataEvent.getId());
             if (Objects.nonNull(removed)) {
                 removed.client().close();
-                log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                        driverCode, metadataEvent.getId(), operateType);
+                log.info(
+                        "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                        driverCode,
+                        metadataEvent.getId(),
+                        operateType);
             }
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         Iec61850Association association = getAssociation(device.getId(), driverConfig);
         try {
             ModelNode node = resolveNode(association, pointConfig);
@@ -133,13 +141,18 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
             throw e;
         } catch (Exception e) {
             invalidateAssociation(device.getId(), association);
-            throw new ReadPointException("IEC 61850 read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new ReadPointException(
+                    "IEC 61850 read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
         }
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         Iec61850Association association = getAssociation(device.getId(), driverConfig);
         try {
             ModelNode node = resolveNode(association, pointConfig);
@@ -157,11 +170,13 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
             throw e;
         } catch (Exception e) {
             invalidateAssociation(device.getId(), association);
-            throw new WritePointException("IEC 61850 write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new WritePointException(
+                    "IEC 61850 write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
         }
     }
 
-    private ModelNode resolveNode(Iec61850Association association, Map<String, AttributeBO> pointConfig) throws Exception {
+    private ModelNode resolveNode(Iec61850Association association, Map<String, AttributeBO> pointConfig)
+            throws Exception {
         String objectReference = getRequiredConfig(pointConfig, "objectReference");
         String fcName = getConfigValue(pointConfig, "functionalConstraint", "MX");
         ServerModel serverModel = association.serverModel();
@@ -202,8 +217,12 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
                 ClientSap sap = new ClientSap();
                 ClientAssociation client = sap.associate(InetAddress.getByName(host), port, null, null);
                 ServerModel serverModel = client.retrieveModel();
-                log.info("Driver connection established, protocol={}, deviceId={}, host={}:{}",
-                        driverCode, deviceId, host, port);
+                log.info(
+                        "Driver connection established, protocol={}, deviceId={}, host={}:{}",
+                        driverCode,
+                        deviceId,
+                        host,
+                        port);
                 return new Iec61850Association(client, serverModel);
             } catch (Exception e) {
                 throw new ConnectorException("Failed to associate IEC 61850 server: {}:{}", host, port, e);
@@ -224,7 +243,9 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
 
     private String getRequiredConfig(Map<String, AttributeBO> config, String code) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             throw new ConnectorException("Required attribute '{}' is missing", code);
         }
         return attr.getValue(String.class);
@@ -232,7 +253,9 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -252,7 +275,8 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "host", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -261,7 +285,8 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "objectReference", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     /**

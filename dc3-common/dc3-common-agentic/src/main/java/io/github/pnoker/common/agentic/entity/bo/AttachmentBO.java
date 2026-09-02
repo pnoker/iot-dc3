@@ -50,5 +50,4 @@ public class AttachmentBO extends BaseBO implements TenantOwned {
     private Long tenantId;
 
     private Long userId;
-
 }

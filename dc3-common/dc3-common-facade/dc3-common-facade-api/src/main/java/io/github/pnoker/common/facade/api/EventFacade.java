@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
 import io.github.pnoker.common.facade.entity.query.FacadeEventOffsetQuery;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.util.Collection;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Collection;
 
 /**
  * Protocol-neutral event facade. Single-record and bulk lookups are tenant-scoped.
@@ -38,5 +36,4 @@ public interface EventFacade {
     Flux<FacadeEventBO> listByIds(Long tenantId, Collection<Long> ids);
 
     Mono<OffsetPage<FacadeEventBO>> list(FacadeEventOffsetQuery query);
-
 }

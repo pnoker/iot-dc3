@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.grpc;
 
-import io.github.pnoker.api.center.auth.GrpcPermissionQuery;
 import io.github.pnoker.api.center.auth.GrpcPermissionCodesDTO;
+import io.github.pnoker.api.center.auth.GrpcPermissionQuery;
 import io.github.pnoker.api.center.auth.PermissionApiGrpc;
 import io.github.pnoker.common.auth.repository.ReactivePermissionStore;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 
 /**
  * gRPC server handling permission-code lookup requests.
@@ -41,22 +39,28 @@ public class PermissionServer extends PermissionApiGrpc.PermissionApiImplBase {
     private final ReactivePermissionStore permissionStore;
 
     @Override
-    public void listPermissionCodes(GrpcPermissionQuery request,
-                                    StreamObserver<GrpcPermissionCodesDTO> responseObserver) {
-        permissionStore.listResourceCodes(request.getTenantId(), request.getPrincipalId())
+    public void listPermissionCodes(
+            GrpcPermissionQuery request, StreamObserver<GrpcPermissionCodesDTO> responseObserver) {
+        permissionStore
+                .listResourceCodes(request.getTenantId(), request.getPrincipalId())
                 .collectList()
-                .subscribe(codes -> {
-                    GrpcPermissionCodesDTO.Builder builder = GrpcPermissionCodesDTO.newBuilder();
-                    codes.forEach(builder::addCodes);
-                    responseObserver.onNext(builder.build());
-                    responseObserver.onCompleted();
-                }, error -> {
-                    log.warn("listPermissionCodes failed, tenant={}, principal={}",
-                            request.getTenantId(), request.getPrincipalId(), error);
-                    responseObserver.onError(io.grpc.Status.INTERNAL
-                            .withDescription("permission lookup failed")
-                            .withCause(error).asRuntimeException());
-                });
+                .subscribe(
+                        codes -> {
+                            GrpcPermissionCodesDTO.Builder builder = GrpcPermissionCodesDTO.newBuilder();
+                            codes.forEach(builder::addCodes);
+                            responseObserver.onNext(builder.build());
+                            responseObserver.onCompleted();
+                        },
+                        error -> {
+                            log.warn(
+                                    "listPermissionCodes failed, tenant={}, principal={}",
+                                    request.getTenantId(),
+                                    request.getPrincipalId(),
+                                    error);
+                            responseObserver.onError(io.grpc.Status.INTERNAL
+                                    .withDescription("permission lookup failed")
+                                    .withCause(error)
+                                    .asRuntimeException());
+                        });
     }
-
 }

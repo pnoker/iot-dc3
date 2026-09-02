@@ -14,21 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.pnoker.common.constant.common.TimeConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * View object for point value API responses.
@@ -68,19 +66,27 @@ public class PointValueVO implements Serializable {
     /**
      * Processed value
      */
-    @Schema(description = "Calculated (engineering) value after applying base value, multiplier, and decimal formatting.", example = "25.5")
+    @Schema(
+            description =
+                    "Calculated (engineering) value after applying base value, multiplier, and decimal formatting.",
+            example = "25.5")
     private String calValue;
 
     /**
      * Numeric projection of calValue for aggregation queries.
      */
-    @Schema(description = "Numeric representation of the calculated value for sorting and aggregation.", example = "25.5")
+    @Schema(
+            description = "Numeric representation of the calculated value for sorting and aggregation.",
+            example = "25.5")
     private Double numValue;
 
     /**
      * Whether the latest-value query returned a real sampled value.
      */
-    @Schema(description = "Whether the latest-value query returned a real sampled value (true) or a fallback placeholder (false).", example = "true")
+    @Schema(
+            description =
+                    "Whether the latest-value query returned a real sampled value (true) or a fallback placeholder (false).",
+            example = "true")
     private Boolean hasLatestValue = Boolean.TRUE;
 
     /**
@@ -98,15 +104,18 @@ public class PointValueVO implements Serializable {
     /**
      * Create Time
      */
-    @Schema(description = "Timestamp (ISO-8601) when this point value was first created.", example = "2025-09-01T12:00:00")
+    @Schema(
+            description = "Timestamp (ISO-8601) when this point value was first created.",
+            example = "2025-09-01T12:00:00")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime createTime;
 
     /**
      * Operate Time
      */
-    @Schema(description = "Timestamp (ISO-8601) of the most recent update or refresh of this point value.", example = "2025-09-01T12:30:00")
+    @Schema(
+            description = "Timestamp (ISO-8601) of the most recent update or refresh of this point value.",
+            example = "2025-09-01T12:30:00")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime operateTime;
-
 }

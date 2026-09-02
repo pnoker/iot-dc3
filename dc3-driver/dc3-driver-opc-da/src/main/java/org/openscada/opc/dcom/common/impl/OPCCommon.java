@@ -14,9 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.common.impl;
 
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collection;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.IJIComObject;
 import org.jinterop.dcom.core.JIArray;
@@ -24,10 +26,6 @@ import org.jinterop.dcom.core.JICallBuilder;
 import org.jinterop.dcom.core.JIFlags;
 import org.jinterop.dcom.core.JIPointer;
 import org.jinterop.dcom.core.JIString;
-
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.Collection;
 
 /**
  *
@@ -66,8 +64,8 @@ public class OPCCommon extends BaseCOMObject {
 
         callObject.addInParamAsInt(errorCode, JIFlags.FLAG_NULL);
         callObject.addInParamAsInt(localeID, JIFlags.FLAG_NULL);
-        callObject.addOutParamAsObject(new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)),
-                JIFlags.FLAG_NULL);
+        callObject.addOutParamAsObject(
+                new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)), JIFlags.FLAG_NULL);
 
         Object[] result = getCOMObject().call(callObject);
         return ((JIString) ((JIPointer) result[0]).getReferent()).getString();
@@ -96,5 +94,4 @@ public class OPCCommon extends BaseCOMObject {
 
         return Arrays.asList(intArray);
     }
-
 }

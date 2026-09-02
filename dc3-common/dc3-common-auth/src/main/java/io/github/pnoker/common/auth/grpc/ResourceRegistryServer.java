@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcScannedApiDTO;
@@ -24,15 +23,14 @@ import io.github.pnoker.api.center.auth.ResourceRegistryApiGrpc;
 import io.github.pnoker.common.auth.biz.ReactiveResourceRegistrySyncService;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistryScannedApi;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncCommand;
-import io.grpc.stub.StreamObserver;
 import io.grpc.Status;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
+import io.grpc.stub.StreamObserver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 /**
  * gRPC server handling resource registration requests.
@@ -70,24 +68,33 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
                     .deleteMissing(request.getDeleteMissing())
                     .apis(toScannedApis(request.getApisList()))
                     .build();
-            resourceRegistrySyncService.sync(command).subscribe(result -> {
-                responseObserver.onNext(GrpcSyncResultDTO.newBuilder()
-                                .setInserted(result.getInserted())
-                                .setUpdated(result.getUpdated())
-                                .setDeleted(result.getDeleted())
-                                .setUnchanged(result.getUnchanged())
-                        .build());
-                responseObserver.onCompleted();
-            }, error -> {
-                log.error("Resource registry synchronization failed, serviceName={}", request.getServiceName(), error);
-                responseObserver.onError(status(error).withDescription(error.getMessage()).withCause(error)
-                        .asRuntimeException());
-            });
+            resourceRegistrySyncService
+                    .sync(command)
+                    .subscribe(
+                            result -> {
+                                responseObserver.onNext(GrpcSyncResultDTO.newBuilder()
+                                        .setInserted(result.getInserted())
+                                        .setUpdated(result.getUpdated())
+                                        .setDeleted(result.getDeleted())
+                                        .setUnchanged(result.getUnchanged())
+                                        .build());
+                                responseObserver.onCompleted();
+                            },
+                            error -> {
+                                log.error(
+                                        "Resource registry synchronization failed, serviceName={}",
+                                        request.getServiceName(),
+                                        error);
+                                responseObserver.onError(status(error)
+                                        .withDescription(error.getMessage())
+                                        .withCause(error)
+                                        .asRuntimeException());
+                            });
             return;
         } catch (Exception e) {
             log.error("Resource registry synchronization failed, serviceName={}", request.getServiceName(), e);
-            responseObserver.onError(status(e).withDescription(e.getMessage()).withCause(e)
-                    .asRuntimeException());
+            responseObserver.onError(
+                    status(e).withDescription(e.getMessage()).withCause(e).asRuntimeException());
         }
     }
 
@@ -96,5 +103,4 @@ public class ResourceRegistryServer extends ResourceRegistryApiGrpc.ResourceRegi
         if (error instanceof IllegalArgumentException) return Status.INVALID_ARGUMENT;
         return Status.INTERNAL;
     }
-
 }

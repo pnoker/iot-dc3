@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.bo;
 
 import io.github.pnoker.common.driver.entity.dto.CommandAttributeConfigDTO;
@@ -24,14 +23,13 @@ import io.github.pnoker.common.driver.entity.dto.PointAttributeConfigDTO;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.ext.DeviceExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import java.util.Map;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Business object that describes a device assigned to the current driver, including the
@@ -125,5 +123,4 @@ public class DeviceBO extends BaseBO {
 
     /** Event runtime definitions keyed by event identifier. */
     private Map<Long, EventRuntimeBO> eventRuntimeIdMap;
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.builder;
 
 import io.github.pnoker.common.entity.ext.DeviceExt;
@@ -28,15 +27,14 @@ import io.github.pnoker.common.manager.entity.vo.DeviceVO;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * MapStruct builder converting between device BO, VO, and DO.
@@ -44,7 +42,9 @@ import java.util.Optional;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface DeviceBuilder {
 
     /**
@@ -170,8 +170,6 @@ public interface DeviceBuilder {
      */
     List<DeviceVO> buildVOListByBOList(List<DeviceBO> entityBOList);
 
-
-
     /**
      * Convert bo to vo point.
      *
@@ -179,5 +177,4 @@ public interface DeviceBuilder {
      * @return converted value
      */
     DeviceByPointVO buildVOPointByBO(DeviceByPointBO deviceByPointBO);
-
 }

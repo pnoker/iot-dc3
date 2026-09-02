@@ -14,8 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.quartz.QuartzService;
 import org.junit.jupiter.api.Test;
@@ -23,29 +27,23 @@ import org.quartz.Scheduler;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 class QuartzConfigTest {
 
-    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(QuartzConfig.class));
+    private final ApplicationContextRunner contextRunner =
+            new ApplicationContextRunner().withConfiguration(AutoConfigurations.of(QuartzConfig.class));
 
     @Test
     void quartzServiceIsCreatedWhenSchedulerExists() {
         Scheduler scheduler = mock(Scheduler.class);
 
-        contextRunner.withBean(Scheduler.class, () -> scheduler)
-                .run(context -> {
-                    when(scheduler.isShutdown()).thenReturn(true);
+        contextRunner.withBean(Scheduler.class, () -> scheduler).run(context -> {
+            when(scheduler.isShutdown()).thenReturn(true);
 
-                    context.getBean(QuartzService.class).startScheduler();
+            context.getBean(QuartzService.class).startScheduler();
 
-                    assertThat(context).hasSingleBean(QuartzService.class);
-                    verify(scheduler).isShutdown();
-                });
+            assertThat(context).hasSingleBean(QuartzService.class);
+            verify(scheduler).isShutdown();
+        });
     }
 
     @Test
@@ -58,9 +56,9 @@ class QuartzConfigTest {
         Scheduler scheduler = mock(Scheduler.class);
         QuartzService customService = new QuartzService(scheduler);
 
-        contextRunner.withBean(Scheduler.class, () -> scheduler)
+        contextRunner
+                .withBean(Scheduler.class, () -> scheduler)
                 .withBean(QuartzService.class, () -> customService)
                 .run(context -> assertThat(context.getBean(QuartzService.class)).isSameAs(customService));
     }
-
 }

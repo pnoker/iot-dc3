@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * JSON extension object for command attribute configuration.
@@ -32,7 +30,10 @@ import java.util.Map;
  * @author pnoker
  * @since 2016.10.1
  */
-@Schema(description = "Command attribute extension. JSON extension object describing the configuration of a single command attribute, including UI rendering, validation rules, security and applicability scope.", example = "READ")
+@Schema(
+        description =
+                "Command attribute extension. JSON extension object describing the configuration of a single command attribute, including UI rendering, validation rules, security and applicability scope.",
+        example = "READ")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -50,14 +51,19 @@ public class CommandAttributeExt extends BaseExt {
     /**
      * Attribute-value retention strategy hint.
      */
-    @Schema(description = "Command attribute content. Detailed configuration of a command attribute, grouped into retention, UI, validation, security and applicability sections.")
+    @Schema(
+            description =
+                    "Command attribute content. Detailed configuration of a command attribute, grouped into retention, UI, validation, security and applicability sections.")
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Retention strategy for the attribute value, indicating whether and how the value is kept.", example = "true")
+        @Schema(
+                description =
+                        "Retention strategy for the attribute value, indicating whether and how the value is kept.",
+                example = "true")
         private String keep;
 
         @Schema(description = "UI rendering configuration for the attribute.")
@@ -71,13 +77,15 @@ public class CommandAttributeExt extends BaseExt {
 
         @Schema(description = "Applicability scope describing which command and call types the attribute applies to.")
         private AppliesTo appliesTo;
-
     }
 
     /**
      * Front-end rendering hints for the attribute input.
      */
-    @Schema(description = "UI rendering configuration. Describes how the command attribute is displayed and edited in the front-end form.", example = "form")
+    @Schema(
+            description =
+                    "UI rendering configuration. Describes how the command attribute is displayed and edited in the front-end form.",
+            example = "form")
     @Getter
     @Setter
     @NoArgsConstructor
@@ -104,7 +112,6 @@ public class CommandAttributeExt extends BaseExt {
 
         @Schema(description = "Associated variables used during rendering or value substitution.", example = "${value}")
         private String variables;
-
     }
 
     /**
@@ -125,28 +132,32 @@ public class CommandAttributeExt extends BaseExt {
 
         @Schema(description = "Regular expression that the attribute value must match.", example = "^[a-zA-Z0-9_]+$")
         private String regex;
-
     }
 
     /**
      * Access-control hints for the attribute.
      */
-    @Schema(description = "Security configuration. Security-related settings for the command attribute.", example = "basic")
+    @Schema(
+            description = "Security configuration. Security-related settings for the command attribute.",
+            example = "basic")
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Security {
 
-        @Schema(description = "Whether the attribute value is sensitive and should be masked or protected.", example = "true")
+        @Schema(
+                description = "Whether the attribute value is sensitive and should be masked or protected.",
+                example = "true")
         private Boolean secret;
-
     }
 
     /**
      * Applicability scoping of the attribute (which entities/contexts it targets).
      */
-    @Schema(description = "Applicability scope. Defines the command and call types the attribute applies to.", example = "READ")
+    @Schema(
+            description = "Applicability scope. Defines the command and call types the attribute applies to.",
+            example = "READ")
     @Getter
     @Setter
     @NoArgsConstructor
@@ -158,7 +169,5 @@ public class CommandAttributeExt extends BaseExt {
 
         @Schema(description = "List of call type flags the attribute applies to.")
         private List<String> callTypeFlags;
-
     }
-
 }

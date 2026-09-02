@@ -22,15 +22,14 @@ import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * System-health tool exposed to the LLM via Spring AI @Tool.
@@ -51,7 +50,9 @@ public class SystemTool {
      * @param toolContext tool context
      * @return get system health result
      */
-    @Tool(description = "Get a system health snapshot: center services, infrastructure, driver fleet, and device fleet.")
+    @Tool(
+            description =
+                    "Get a system health snapshot: center services, infrastructure, driver fleet, and device fleet.")
     @AgenticToolMetadata(domain = "system", title = "Get system health")
     public Mono<AgenticToolResult<FacadeSystemHealthBO>> getSystemHealth(ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
@@ -62,8 +63,8 @@ public class SystemTool {
         }
         return facade.systemHealthReactive(tenantId)
                 .map(health -> Objects.isNull(health)
-                        ? AgenticToolResult.<FacadeSystemHealthBO>unavailable(AgenticConstant.ToolMessage.SYSTEM_HEALTH_UNAVAILABLE)
+                        ? AgenticToolResult.<FacadeSystemHealthBO>unavailable(
+                                AgenticConstant.ToolMessage.SYSTEM_HEALTH_UNAVAILABLE)
                         : AgenticToolResult.ok("System health loaded", health));
     }
-
 }

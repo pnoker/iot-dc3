@@ -22,11 +22,10 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
-import org.springframework.ai.chat.model.ToolContext;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
+import org.springframework.ai.chat.model.ToolContext;
 
 /**
  * Accessors for the explicit Spring AI tool context passed into platform tools.
@@ -60,7 +59,8 @@ public class AgenticToolContextUtil {
     }
 
     private static void validatePrincipalHeader(RequestHeader.PrincipalHeader userHeader) {
-        if (Objects.isNull(userHeader) || Objects.isNull(userHeader.getTenantId())
+        if (Objects.isNull(userHeader)
+                || Objects.isNull(userHeader.getTenantId())
                 || Objects.isNull(userHeader.getPrincipalId())) {
             throw new UnAuthorizedException("Unable to get agentic principal header");
         }
@@ -116,8 +116,8 @@ public class AgenticToolContextUtil {
      * @param domain      domain
      * @param description description
      */
-    public static void recordToolInvocation(ToolContext toolContext, String toolName, String domain,
-                                            String description) {
+    public static void recordToolInvocation(
+            ToolContext toolContext, String toolName, String domain, String description) {
         recordRunEvent(toolContext, AgenticRunEvent.toolStart(toolName, domain, description));
     }
 
@@ -130,8 +130,8 @@ public class AgenticToolContextUtil {
      * @param code        code
      * @param message     message
      */
-    public static void recordToolResult(ToolContext toolContext, String toolName, boolean success, String code,
-                                        String message) {
+    public static void recordToolResult(
+            ToolContext toolContext, String toolName, boolean success, String code, String message) {
         recordRunEvent(toolContext, AgenticRunEvent.toolResult(toolName, success, code, message));
     }
 
@@ -198,5 +198,4 @@ public class AgenticToolContextUtil {
         }
         return toolContext.getContext().get(key);
     }
-
 }

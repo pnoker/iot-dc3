@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.data.biz.DriverAlarmService;
@@ -27,12 +26,11 @@ import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import io.github.pnoker.common.enums.AlarmSourceTypeEnum;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.AlarmTypeEnum;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * Business service implementation for driver alarm event persistence.
@@ -55,7 +53,8 @@ public class DriverAlarmServiceImpl implements DriverAlarmService {
     @Override
     public Mono<Void> alarm(DriverAlarmDTO entityDTO) {
         if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())) {
-            log.warn("Driver alarm dropped, reason=missingDriverId, tenantId={}",
+            log.warn(
+                    "Driver alarm dropped, reason=missingDriverId, tenantId={}",
                     Objects.nonNull(entityDTO) ? entityDTO.getTenantId() : null);
             return Mono.empty();
         }
@@ -82,15 +81,17 @@ public class DriverAlarmServiceImpl implements DriverAlarmService {
         // Driver-reported alarms default to P2; rule-driven severity is set when
         // the rule pipeline writes a follow-up entity_alarm row.
         entity.setAlarmLevelFlag(AlarmMessageLevelEnum.P2.getIndex());
-        entity.setAlarmExt(JsonExt.builder().type("driver-alarm").content(msg).version(1).build());
+        entity.setAlarmExt(
+                JsonExt.builder().type("driver-alarm").content(msg).version(1).build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
         entity.setTenantId(tenantId);
-        return entityAlarmStore.insert(entity)
+        return entityAlarmStore
+                .insert(entity)
                 .flatMap(saved -> {
                     entityDTO.setAlarmId(saved.getId());
                     return alarmRuleTriggerService.processDriverAlarm(entityDTO);
-                }).then();
+                })
+                .then();
     }
-
 }

@@ -14,8 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.gateway.filter;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.constant.common.RequestConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -24,6 +27,8 @@ import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.gateway.service.FilterService;
 import io.github.pnoker.common.utils.HmacAuthSigner;
+import java.net.ConnectException;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,25 +43,19 @@ import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.net.ConnectException;
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class AuthenticGatewayFilterTest {
 
     @Mock
     private FilterService filterService;
+
     private RequestHeader.PrincipalHeader user;
     private FacadeLocalCredentialBO credential;
     private FacadeTenantBO tenant;
 
     private static MockServerWebExchange exchange() {
-        return MockServerWebExchange.from(MockServerHttpRequest.get("/api/manager/devices").build());
+        return MockServerWebExchange.from(
+                MockServerHttpRequest.get("/api/manager/devices").build());
     }
 
     private static GatewayFilterChain capturingChain(AtomicReference<ServerWebExchange> capture) {
@@ -67,13 +66,13 @@ class AuthenticGatewayFilterTest {
     }
 
     private AuthenticGatewayFilter filter(boolean signingEnabled) {
-        return new AuthenticGatewayFilter(filterService,
-                new HmacAuthSigner(signingEnabled ? "test-secret" : null),
-                provider(null));
+        return new AuthenticGatewayFilter(
+                filterService, new HmacAuthSigner(signingEnabled ? "test-secret" : null), provider(null));
     }
 
-    private static org.springframework.beans.factory.ObjectProvider<io.github.pnoker.common.gateway.security.OAuthTokenResolver> provider(
-            io.github.pnoker.common.gateway.security.OAuthTokenResolver resolver) {
+    private static org.springframework.beans.factory.ObjectProvider<
+                    io.github.pnoker.common.gateway.security.OAuthTokenResolver>
+            provider(io.github.pnoker.common.gateway.security.OAuthTokenResolver resolver) {
         return new org.springframework.beans.factory.ObjectProvider<>() {
             @Override
             public io.github.pnoker.common.gateway.security.OAuthTokenResolver getObject() {
@@ -118,8 +117,7 @@ class AuthenticGatewayFilterTest {
         filter(false).filter(initial, capturingChain(capture)).block();
 
         HttpHeaders forwarded = capture.get().getRequest().getHeaders();
-        assertThat(forwarded.getFirst(RequestConstant.Header.X_AUTH_PRINCIPAL))
-                .contains("\"principalName\":\"alice\"");
+        assertThat(forwarded.getFirst(RequestConstant.Header.X_AUTH_PRINCIPAL)).contains("\"principalName\":\"alice\"");
         assertThat(forwarded.getFirst(RequestConstant.Header.X_AUTH_SIGN)).isNull();
     }
 
@@ -202,22 +200,31 @@ class AuthenticGatewayFilterTest {
         io.github.pnoker.common.gateway.security.OAuthTokenResolver resolver =
                 org.mockito.Mockito.mock(io.github.pnoker.common.gateway.security.OAuthTokenResolver.class);
         RequestHeader.PrincipalHeader serviceAccount = new RequestHeader.PrincipalHeader(
-                1L, "SERVICE_ACCOUNT", null, "cli-e2e", 1L, null, null,
+                1L,
+                "SERVICE_ACCOUNT",
+                null,
+                "cli-e2e",
+                1L,
+                null,
+                null,
                 java.util.List.of("mcp:tools:list", "mcp:tools:call"));
         when(resolver.resolve(org.mockito.ArgumentMatchers.anyString())).thenReturn(serviceAccount);
 
         AtomicReference<ServerWebExchange> capture = new AtomicReference<>();
-        MockServerWebExchange initial = MockServerWebExchange.from(MockServerHttpRequest.get("/api/v3/manager/device/list")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer rs256-ticket")
-                .build());
+        MockServerWebExchange initial =
+                MockServerWebExchange.from(MockServerHttpRequest.get("/api/v3/manager/device/list")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer rs256-ticket")
+                        .build());
 
         new AuthenticGatewayFilter(filterService, new HmacAuthSigner(null), provider(resolver))
-                .filter(initial, capturingChain(capture)).block();
+                .filter(initial, capturingChain(capture))
+                .block();
 
         HttpHeaders forwarded = capture.get().getRequest().getHeaders();
         assertThat(forwarded.getFirst(RequestConstant.Header.X_AUTH_PRINCIPAL))
                 .contains("SERVICE_ACCOUNT")
                 .contains("mcp:tools:call");
-        org.mockito.Mockito.verify(filterService, org.mockito.Mockito.never()).getTenantReactive(org.mockito.ArgumentMatchers.any());
+        org.mockito.Mockito.verify(filterService, org.mockito.Mockito.never())
+                .getTenantReactive(org.mockito.ArgumentMatchers.any());
     }
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
@@ -23,12 +22,11 @@ import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * RabbitMQ receiver for event reports published by protocol drivers.
@@ -46,29 +44,32 @@ public class EventReportReceiver {
     /**
      * Consume an event report message and forward it to the event history service.
      *
-     * @param channel   the RabbitMQ channel for manual ack
      * @param message   the raw message carrying the delivery tag
-     * @param entityDTO the deserialized event report
+     * @param ack       acknowledgment handle for the message
      */
     @Dc3Listener(topic = MqTopic.EVENT)
     public Mono<Void> onEventReport(MqReceived<EventReportDTO> message, Acknowledgment ack) {
         EventReportDTO entityDTO = message.payload();
-        log.debug("Event report received, recordId={}, deviceId={}, eventId={}",
+        log.debug(
+                "Event report received, recordId={}, deviceId={}, eventId={}",
                 Objects.isNull(entityDTO) ? null : entityDTO.recordId(),
                 Objects.isNull(entityDTO) ? null : entityDTO.deviceId(),
                 Objects.isNull(entityDTO) ? null : entityDTO.eventId());
-        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.recordId())
-                || Objects.isNull(entityDTO.deviceId()) || Objects.isNull(entityDTO.eventId())) {
-            log.warn("Invalid event report, some required fields are null, recordId={}, deviceId={}, eventId={}",
+        if (Objects.isNull(entityDTO)
+                || Objects.isNull(entityDTO.recordId())
+                || Objects.isNull(entityDTO.deviceId())
+                || Objects.isNull(entityDTO.eventId())) {
+            log.warn(
+                    "Invalid event report, some required fields are null, recordId={}, deviceId={}, eventId={}",
                     Objects.isNull(entityDTO) ? null : entityDTO.recordId(),
                     Objects.isNull(entityDTO) ? null : entityDTO.deviceId(),
                     Objects.isNull(entityDTO) ? null : entityDTO.eventId());
             ack.reject(false);
             return Mono.empty();
         }
-        return eventHistoryService.report(entityDTO)
+        return eventHistoryService
+                .report(entityDTO)
                 .doOnError(error -> log.error("Event report processing failed.", error))
                 .then();
     }
-
 }

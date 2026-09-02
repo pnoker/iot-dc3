@@ -14,8 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
@@ -32,6 +38,10 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ReadPointException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,31 +55,24 @@ import org.sputnikdev.bluetooth.manager.BluetoothManager;
 import org.sputnikdev.bluetooth.manager.CharacteristicGovernor;
 import org.sputnikdev.bluetooth.manager.DeviceGovernor;
 
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class BleDriverCustomServiceImplTest {
 
     @Mock
     private DriverMetadata driverMetadata;
+
     @Mock
     private DriverSenderService driverSenderService;
+
     @Mock
     private BleManagerFactory managerFactory;
+
     @Mock
     private BluetoothManager bluetoothManager;
+
     @Mock
     private DeviceGovernor deviceGovernor;
+
     @Mock
     private CharacteristicGovernor characteristicGovernor;
 
@@ -111,11 +114,10 @@ class BleDriverCustomServiceImplTest {
     private static Stream<Arguments> encodedValues() {
         return Stream.of(
                 Arguments.of("UTF8", "hello".getBytes(StandardCharsets.UTF_8), "hello"),
-                Arguments.of("HEX", new byte[]{0x01, (byte) 0xAF}, "01AF"),
-                Arguments.of("INT16", new byte[]{0x00, 0x2A}, "42"),
-                Arguments.of("UINT16", new byte[]{(byte) 0xFF, (byte) 0xFF}, "65535"),
-                Arguments.of("FLOAT", new byte[]{0x3F, (byte) 0xA0, 0x00, 0x00}, "1.25")
-        );
+                Arguments.of("HEX", new byte[] {0x01, (byte) 0xAF}, "01AF"),
+                Arguments.of("INT16", new byte[] {0x00, 0x2A}, "42"),
+                Arguments.of("UINT16", new byte[] {(byte) 0xFF, (byte) 0xFF}, "65535"),
+                Arguments.of("FLOAT", new byte[] {0x3F, (byte) 0xA0, 0x00, 0x00}, "1.25"));
     }
 
     @BeforeEach
@@ -203,7 +205,11 @@ class BleDriverCustomServiceImplTest {
         initializeConnectedDevice();
         when(characteristicGovernor.write(any(byte[].class))).thenReturn(true);
 
-        boolean written = service.write(driverConfig(), pointConfig("UTF8"), device(), point(),
+        boolean written = service.write(
+                driverConfig(),
+                pointConfig("UTF8"),
+                device(),
+                point(),
                 WritePointValue.builder().type(PointTypeEnum.STRING).value("开启").build());
 
         assertThat(written).isTrue();
@@ -223,7 +229,8 @@ class BleDriverCustomServiceImplTest {
     private void initializeConnectedDevice() {
         when(managerFactory.create()).thenReturn(bluetoothManager);
         when(bluetoothManager.getDeviceGovernor(any(URL.class), eq(true))).thenReturn(deviceGovernor);
-        when(bluetoothManager.getCharacteristicGovernor(any(URL.class), eq(true))).thenReturn(characteristicGovernor);
+        when(bluetoothManager.getCharacteristicGovernor(any(URL.class), eq(true)))
+                .thenReturn(characteristicGovernor);
         service.initial();
     }
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.exception.ConnectorException;
@@ -67,8 +66,7 @@ public final class Dlt645Frame {
      */
     public static final byte RESPONSE_OFFSET = 0x33;
 
-    private Dlt645Frame() {
-    }
+    private Dlt645Frame() {}
 
     /**
      * Encode a 12-digit BCD address string into its 6-byte form.
@@ -97,7 +95,7 @@ public final class Dlt645Frame {
      * @return complete request frame
      */
     public static byte[] buildReadRequest(byte[] address, int[] di) {
-        byte[] data = new byte[]{(byte) di[0], (byte) di[1], (byte) di[2], (byte) di[3]};
+        byte[] data = new byte[] {(byte) di[0], (byte) di[1], (byte) di[2], (byte) di[3]};
         return build(address, CONTROL_READ, data);
     }
 
@@ -111,8 +109,8 @@ public final class Dlt645Frame {
      * @param payload      value bytes to write (raw, not yet +0x33)
      * @return complete request frame
      */
-    public static byte[] buildWriteRequest(byte[] address, byte[] password, byte[] operatorCode, int[] di,
-                                           byte[] payload) {
+    public static byte[] buildWriteRequest(
+            byte[] address, byte[] password, byte[] operatorCode, int[] di, byte[] payload) {
         byte[] data = new byte[4 + 4 + 4 + payload.length];
         System.arraycopy(password, 0, data, 0, 4);
         System.arraycopy(operatorCode, 0, data, 4, 4);
@@ -152,7 +150,8 @@ public final class Dlt645Frame {
      */
     public static byte[] parse(byte[] response) {
         if (response == null || response.length < 13) {
-            throw new ConnectorException("DL/T 645 response too short: {} bytes", response == null ? 0 : response.length);
+            throw new ConnectorException(
+                    "DL/T 645 response too short: {} bytes", response == null ? 0 : response.length);
         }
         if ((response[0] & 0xFF) != (START & 0xFF) || (response[response.length - 1] & 0xFF) != (END & 0xFF)) {
             throw new ConnectorException("DL/T 645 response has invalid frame delimiters");

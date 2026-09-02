@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * A (source, eventType) pair that fired repeatedly in the window — i.e. is "flapping".
@@ -55,5 +53,4 @@ public class FlappingSourceVO implements Serializable {
 
     @Schema(description = "number of times this source/type fired in the window", example = "8")
     private long count;
-
 }

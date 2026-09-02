@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.builder;
 
 import io.github.pnoker.api.center.data.GrpcPointValueDTO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import io.github.pnoker.common.optional.StringOptional;
-import org.springframework.stereotype.Component;
-
 import java.util.Objects;
+import org.springframework.stereotype.Component;
 
 /**
  * Converts between {@code dc3-common-facade-api} shapes and the protobuf types generated
@@ -48,7 +46,8 @@ public class FacadeGrpcPointValueBuilder {
             return null;
         }
 
-        FacadePointValueBO bo = FacadePointValueBO.builder().createTime(dto.getCreateTime()).build();
+        FacadePointValueBO bo =
+                FacadePointValueBO.builder().createTime(dto.getCreateTime()).build();
 
         if (dto.getDeviceId() > 0) {
             bo.setDeviceId(dto.getDeviceId());
@@ -62,5 +61,4 @@ public class FacadeGrpcPointValueBuilder {
 
         return bo;
     }
-
 }

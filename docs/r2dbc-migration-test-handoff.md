@@ -648,8 +648,8 @@ pnpm test:e2e:sweep
 先执行：
 
 ```bash
-pnpm --dir dc3-cli build
-pnpm --dir dc3-cli test
+(cd dc3-cli && corepack pnpm build)
+(cd dc3-cli && corepack pnpm test)
 ```
 
 再用构建后的真实 `dc3` 命令连接两个拓扑的 Gateway，覆盖：
@@ -733,9 +733,8 @@ pnpm test:guard
 pnpm test:ci
 pnpm build
 
-cd ..
-pnpm --dir dc3-cli build
-pnpm --dir dc3-cli test
+(cd dc3-cli && corepack pnpm build)
+(cd dc3-cli && corepack pnpm test)
 ```
 
 要求：

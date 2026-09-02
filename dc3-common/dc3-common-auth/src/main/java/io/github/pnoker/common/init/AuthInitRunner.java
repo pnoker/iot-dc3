@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.auth.config.OAuthProperties;
@@ -36,9 +35,12 @@ import org.springframework.context.annotation.FilterType;
  */
 @Slf4j
 @AutoConfiguration
-@ComponentScan(basePackages = {"io.github.pnoker.common.auth"},
-        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX,
-                pattern = "io\\.github\\.pnoker\\.common\\.auth\\.dal\\..*"))
+@ComponentScan(
+        basePackages = {"io.github.pnoker.common.auth"},
+        excludeFilters =
+                @ComponentScan.Filter(
+                        type = FilterType.REGEX,
+                        pattern = "io\\.github\\.pnoker\\.common\\.auth\\.dal\\..*"))
 @EnableConfigurationProperties(OAuthProperties.class)
 public class AuthInitRunner implements ApplicationRunner {
 
@@ -47,5 +49,4 @@ public class AuthInitRunner implements ApplicationRunner {
         // Currently no initialization tasks are required
         // This method can be extended to add future authentication initialization logic
     }
-
 }

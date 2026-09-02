@@ -14,24 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.query;
 
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * Point value query parameters.
@@ -54,16 +52,36 @@ public class PointValueQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Zero-based result offset; supported by latest snapshots only (history uses cursor)", example = "0", minimum = "0")
-    private long offset;
+    @Schema(
+            description = "Zero-based result offset; supported by latest snapshots only (history uses cursor)",
+            example = "0",
+            minimum = "0")
+    private Long offset;
 
     @Builder.Default
     @Schema(description = "Maximum number of records to return", example = "50", minimum = "1", maximum = "200")
-    private int limit = PageRequest.DEFAULT_LIMIT;
+    private Integer limit = PageRequest.DEFAULT_LIMIT;
 
     @Builder.Default
     @Schema(description = "Stable allow-listed sort fields")
     private List<SortSpec> sort = List.of();
+
+    /**
+     * Null-safe paging accessors: the runtime Jackson 3 mapper binds request bodies
+     * through the all-args constructor, leaving absent fields null. Boxed fields keep
+     * "unspecified" distinguishable from explicit (possibly invalid) values.
+     */
+    public long getOffset() {
+        return offset == null ? 0L : offset;
+    }
+
+    public int getLimit() {
+        return limit == null ? PageRequest.DEFAULT_LIMIT : limit;
+    }
+
+    public List<SortSpec> getSort() {
+        return sort == null ? List.of() : sort;
+    }
 
     @Schema(description = "Opaque signed cursor returned by the previous history page")
     private String cursor;
@@ -94,5 +112,4 @@ public class PointValueQuery implements Serializable {
 
     @Schema(description = "Preset time range key: today, 24h, 7d, or 30d", example = "24h")
     private String rangeKey;
-
 }

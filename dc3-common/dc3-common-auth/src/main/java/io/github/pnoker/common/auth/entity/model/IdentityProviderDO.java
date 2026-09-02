@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.model;
 
 import io.github.pnoker.common.entity.ext.JsonExt;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Persistence object for identity providers.
@@ -39,6 +37,7 @@ public class IdentityProviderDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
     private Long id;
     private Long tenantId;
     private String providerCode;
@@ -51,8 +50,10 @@ public class IdentityProviderDO implements Serializable {
     private String userInfoUri;
     private String jwksUri;
     private String clientId;
+
     @ToString.Exclude
     private String clientSecretRef;
+
     private String scopes;
     private String redirectUri;
     private String subjectClaim;
@@ -70,5 +71,4 @@ public class IdentityProviderDO implements Serializable {
     private String operatorName;
     private LocalDateTime operateTime;
     private Byte deleted;
-
 }

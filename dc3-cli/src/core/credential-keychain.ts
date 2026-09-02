@@ -70,7 +70,7 @@ export class KeychainStore implements CredentialStore {
       // Remove existing entry first (upsert)
       await execAsync(
         `security delete-generic-password -a "${identifier}" -s "dc3-cli" 2>/dev/null; ` +
-        `security add-generic-password -a "${identifier}" -s "dc3-cli" -w "${password}" -U`,
+          `security add-generic-password -a "${identifier}" -s "dc3-cli" -w "${password}" -U`,
         { timeout: 10000 },
       );
     } else if (process.platform === 'linux') {
@@ -82,9 +82,9 @@ export class KeychainStore implements CredentialStore {
       const escapedTarget = `dc3-cli-${identifier.replace(/[^a-zA-Z0-9]/g, '-')}`;
       await execAsync(
         `powershell -Command "` +
-        `$cred = New-Object System.Management.Automation.PSCredential('${identifier}', ` +
-        `(ConvertTo-SecureString '${password}' -AsPlainText -Force)); ` +
-        `New-StoredCredential -Target '${escapedTarget}' -Credentials $cred -Persist LocalMachine"`,
+          `$cred = New-Object System.Management.Automation.PSCredential('${identifier}', ` +
+          `(ConvertTo-SecureString '${password}' -AsPlainText -Force)); ` +
+          `New-StoredCredential -Target '${escapedTarget}' -Credentials $cred -Persist LocalMachine"`,
         { timeout: 10000 },
       );
     }
@@ -93,15 +93,13 @@ export class KeychainStore implements CredentialStore {
   async deletePassword(identifier: string): Promise<void> {
     try {
       if (process.platform === 'darwin') {
-        await execAsync(
-          `security delete-generic-password -a "${identifier}" -s "dc3-cli"`,
-          { timeout: 5000 },
-        );
+        await execAsync(`security delete-generic-password -a "${identifier}" -s "dc3-cli"`, {
+          timeout: 5000,
+        });
       } else if (process.platform === 'linux') {
-        await execAsync(
-          `secret-tool clear service dc3-cli account "${identifier}"`,
-          { timeout: 5000 },
-        );
+        await execAsync(`secret-tool clear service dc3-cli account "${identifier}"`, {
+          timeout: 5000,
+        });
       } else if (process.platform === 'win32') {
         const escapedTarget = `dc3-cli-${identifier.replace(/[^a-zA-Z0-9]/g, '-')}`;
         await execAsync(

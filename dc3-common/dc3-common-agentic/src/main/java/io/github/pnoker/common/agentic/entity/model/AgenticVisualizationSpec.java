@@ -18,14 +18,13 @@ package io.github.pnoker.common.agentic.entity.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Safe, structured visualization contract emitted by platform tools and
@@ -98,7 +97,6 @@ public class AgenticVisualizationSpec implements Serializable {
             encode.setY(y);
             return encode;
         }
-
     }
 
     /**
@@ -119,7 +117,5 @@ public class AgenticVisualizationSpec implements Serializable {
         private Object value;
 
         private String label;
-
     }
-
 }

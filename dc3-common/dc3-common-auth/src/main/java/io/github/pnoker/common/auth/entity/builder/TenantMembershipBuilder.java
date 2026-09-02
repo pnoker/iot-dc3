@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
@@ -23,12 +22,11 @@ import io.github.pnoker.common.auth.entity.vo.TenantMembershipVO;
 import io.github.pnoker.common.enums.MembershipStatusEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Objects;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.Objects;
 
 /**
  * MapStruct builder for tenant memberships.
@@ -36,7 +34,9 @@ import java.util.Objects;
  * @author pnoker
  * @since 2026.6.13
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface TenantMembershipBuilder {
 
     /**
@@ -103,5 +103,4 @@ public interface TenantMembershipBuilder {
         entityBO.setPrincipalType(PrincipalTypeEnum.ofValue(entityDO.getPrincipalType()));
         entityBO.setMembershipStatus(MembershipStatusEnum.ofValue(entityDO.getMembershipStatus()));
     }
-
 }

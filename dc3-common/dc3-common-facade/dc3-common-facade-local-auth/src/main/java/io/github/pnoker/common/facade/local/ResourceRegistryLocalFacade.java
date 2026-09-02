@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
 import io.github.pnoker.common.auth.biz.ReactiveResourceRegistrySyncService;
@@ -24,13 +23,12 @@ import io.github.pnoker.common.facade.api.ResourceRegistryFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResultBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
@@ -74,13 +72,14 @@ public class ResourceRegistryLocalFacade implements ResourceRegistryFacade {
                     .deleteMissing(command.isDeleteMissing())
                     .apis(toScannedApis(command.getApis()))
                     .build();
-            return resourceRegistrySyncService.sync(cmd).map(result -> FacadeResourceRegistrySyncResultBO.builder()
-                    .inserted(result.getInserted())
-                    .updated(result.getUpdated())
-                    .deleted(result.getDeleted())
-                    .unchanged(result.getUnchanged())
-                    .build());
+            return resourceRegistrySyncService
+                    .sync(cmd)
+                    .map(result -> FacadeResourceRegistrySyncResultBO.builder()
+                            .inserted(result.getInserted())
+                            .updated(result.getUpdated())
+                            .deleted(result.getDeleted())
+                            .unchanged(result.getUnchanged())
+                            .build());
         });
     }
-
 }

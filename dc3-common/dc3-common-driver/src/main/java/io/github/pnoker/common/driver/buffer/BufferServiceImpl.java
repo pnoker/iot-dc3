@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.buffer;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
@@ -24,12 +23,11 @@ import io.github.pnoker.common.mq.message.MqMessage;
 import io.github.pnoker.common.mq.sender.MessageSender;
 import io.github.pnoker.common.utils.JsonUtil;
 import jakarta.annotation.PreDestroy;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * SQLite-backed durable point-value outbox. Values are persisted before the first
@@ -97,12 +95,11 @@ public class BufferServiceImpl implements BufferService {
                 .map(pointValue -> toRecord(pointValue, partitionKey, pointValue.getMessageId(), 0, now))
                 .toList();
         requireBuffer().upsertBatch(records);
-        pointValues.forEach(pointValue -> publishPersisted(
-                pointValue, partitionKey, pointValue.getMessageId(), 1));
+        pointValues.forEach(pointValue -> publishPersisted(pointValue, partitionKey, pointValue.getMessageId(), 1));
     }
 
-    private BufferedPointValue toRecord(PointValue pointValue, String partitionKey, String correlationId,
-                                        int attempt, long now) {
+    private BufferedPointValue toRecord(
+            PointValue pointValue, String partitionKey, String correlationId, int attempt, long now) {
         DriverProperties.BufferProperties config = driverProperties.getBuffer();
         return new BufferedPointValue(
                 correlationId,
@@ -134,8 +131,12 @@ public class BufferServiceImpl implements BufferService {
             pointValue = JsonUtil.parseObject(record.payloadJson(), PointValue.class);
         } catch (Exception e) {
             buffer.markRetry(record.id(), record.attempt(), epochSecond() + config.getMaxBackoffSeconds());
-            log.error("Outbox payload corrupted and retained, id={}, deviceId={}, pointId={}",
-                    record.id(), record.deviceId(), record.pointId(), e);
+            log.error(
+                    "Outbox payload corrupted and retained, id={}, deviceId={}, pointId={}",
+                    record.id(),
+                    record.deviceId(),
+                    record.pointId(),
+                    e);
             return;
         }
 
@@ -159,8 +160,8 @@ public class BufferServiceImpl implements BufferService {
 
     private void publishPersisted(PointValue pointValue, String partitionKey, String correlationId, int attempt) {
         try {
-            messageSender.sendAsync(MqMessage.of(MqTopic.POINT_VALUE, partitionKey, pointValue),
-                    (message, confirmed, cause) -> {
+            messageSender.sendAsync(
+                    MqMessage.of(MqTopic.POINT_VALUE, partitionKey, pointValue), (message, confirmed, cause) -> {
                         if (confirmed) {
                             buffer.delete(correlationId);
                             return;
@@ -176,8 +177,12 @@ public class BufferServiceImpl implements BufferService {
         DriverProperties.BufferProperties config = driverProperties.getBuffer();
         long backoff = backoffSeconds(attempt, config);
         buffer.markRetry(correlationId, attempt, epochSecond() + backoff);
-        log.warn("Point value publish unconfirmed, id={}, attempt={}, retryInSeconds={}",
-                correlationId, attempt, backoff, failure);
+        log.warn(
+                "Point value publish unconfirmed, id={}, attempt={}, retryInSeconds={}",
+                correlationId,
+                attempt,
+                backoff,
+                failure);
     }
 
     private long backoffSeconds(int attempt, DriverProperties.BufferProperties config) {

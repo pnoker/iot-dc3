@@ -14,8 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import io.github.pnoker.common.driver.buffer.BufferService;
 import io.github.pnoker.common.driver.entity.bean.PointValue;
@@ -24,19 +27,14 @@ import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.mq.sender.MessageSender;
 import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class DriverSenderServiceImplTest {
@@ -64,7 +62,8 @@ class DriverSenderServiceImplTest {
         driver.setTenantId(1L);
         metadata.setDriver(driver);
         metadata.setDeviceLeases(Map.of(10L, 77L), System.currentTimeMillis() + 10_000, 5L);
-        service = new DriverSenderServiceImpl(properties, metadata, messageSender, reactiveMessageSender, bufferService);
+        service =
+                new DriverSenderServiceImpl(properties, metadata, messageSender, reactiveMessageSender, bufferService);
     }
 
     @Test
@@ -79,8 +78,7 @@ class DriverSenderServiceImplTest {
         service.pointValueSender(value);
 
         ArgumentCaptor<PointValue> captor = ArgumentCaptor.forClass(PointValue.class);
-        verify(bufferService).publish(captor.capture(),
-                org.mockito.ArgumentMatchers.eq("tenant/driver"));
+        verify(bufferService).publish(captor.capture(), org.mockito.ArgumentMatchers.eq("tenant/driver"));
         PointValue sent = captor.getValue();
         assertThat(sent.getMessageId()).isNotBlank();
         assertThat(sent.getSchemaVersion()).isEqualTo(1);
@@ -95,23 +93,25 @@ class DriverSenderServiceImplTest {
     void rejectsTelemetryAfterLeaseExpiry() {
         metadata.renewLeaseDeadline(System.currentTimeMillis() - 1);
 
-        service.pointValueSender(PointValue.builder().deviceId(10L).pointId(30L).rawValue("42").build());
+        service.pointValueSender(
+                PointValue.builder().deviceId(10L).pointId(30L).rawValue("42").build());
 
-        verify(bufferService, never()).publish(org.mockito.ArgumentMatchers.any(),
-                org.mockito.ArgumentMatchers.anyString());
+        verify(bufferService, never())
+                .publish(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyString());
     }
 
     @Test
     void stampsAndPersistsListAsOneOutboxBatch() {
-        PointValue first = PointValue.builder().deviceId(10L).pointId(30L).rawValue("1").build();
-        PointValue second = PointValue.builder().deviceId(10L).pointId(31L).rawValue("2").build();
+        PointValue first =
+                PointValue.builder().deviceId(10L).pointId(30L).rawValue("1").build();
+        PointValue second =
+                PointValue.builder().deviceId(10L).pointId(31L).rawValue("2").build();
 
         service.pointValueSender(List.of(first, second));
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<PointValue>> captor = ArgumentCaptor.forClass(List.class);
-        verify(bufferService).publishBatch(captor.capture(),
-                org.mockito.ArgumentMatchers.eq("tenant/driver"));
+        verify(bufferService).publishBatch(captor.capture(), org.mockito.ArgumentMatchers.eq("tenant/driver"));
         assertThat(captor.getValue()).hasSize(2);
         assertThat(first.getMessageId()).isNotBlank().isNotEqualTo(second.getMessageId());
         assertThat(first.getSequence()).isLessThan(second.getSequence());
@@ -120,7 +120,7 @@ class DriverSenderServiceImplTest {
             assertThat(value.getDriverId()).isEqualTo(20L);
             assertThat(value.getTenantId()).isEqualTo(1L);
         });
-        verify(bufferService, never()).publish(org.mockito.ArgumentMatchers.any(),
-                org.mockito.ArgumentMatchers.anyString());
+        verify(bufferService, never())
+                .publish(org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyString());
     }
 }

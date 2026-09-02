@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
@@ -23,12 +22,11 @@ import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
 import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * RabbitMQ receiver for device alarm events.
@@ -46,25 +44,26 @@ public class DeviceAlarmReceiver {
     /**
      * Consume a device alarm message and forward it to the alarm service for processing.
      *
-     * @param channel   the RabbitMQ channel for manual ack
      * @param message   the raw message carrying the delivery tag
-     * @param entityDTO the deserialized device alarm
+     * @param ack       acknowledgment handle for the message
      */
     @Dc3Listener(topic = MqTopic.ALARM, keyPattern = "device.*")
     public Mono<Void> deviceAlarmReceive(MqReceived<DeviceAlarmDTO> message, Acknowledgment ack) {
         DeviceAlarmDTO entityDTO = message.payload();
-        log.debug("Device alarm received, tenantId={}, driverId={}, deviceId={}",
+        log.debug(
+                "Device alarm received, tenantId={}, driverId={}, deviceId={}",
                 Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
                 Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
                 Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId());
         if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())) {
-            log.warn("Invalid device alarm, deviceId is null, deviceId={}",
+            log.warn(
+                    "Invalid device alarm, deviceId is null, deviceId={}",
                     Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId());
             ack.reject(false);
             return Mono.empty();
         }
-        return deviceAlarmService.alarm(entityDTO)
+        return deviceAlarmService
+                .alarm(entityDTO)
                 .doOnError(error -> log.error("Device alarm processing failed.", error));
     }
-
 }

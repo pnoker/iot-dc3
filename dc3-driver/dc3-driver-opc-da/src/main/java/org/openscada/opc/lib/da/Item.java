@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
 
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +70,8 @@ public class Item {
     }
 
     public Integer write(final JIVariant value) throws JIException {
-        return this._group.write(new WriteRequest[]{new WriteRequest(this, value)}).get(this);
+        return this._group
+                .write(new WriteRequest[] {new WriteRequest(this, value)})
+                .get(this);
     }
-
 }

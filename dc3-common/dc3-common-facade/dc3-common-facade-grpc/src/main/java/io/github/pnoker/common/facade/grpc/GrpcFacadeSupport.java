@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.common.facade.grpc.config.GrpcFacadeProperties;
 import io.grpc.stub.AbstractStub;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * Shared guardrails for blocking gRPC facade calls.
@@ -51,5 +49,4 @@ public class GrpcFacadeSupport {
         }
         return stub.withDeadlineAfter(deadlineMs, TimeUnit.MILLISECONDS);
     }
-
 }

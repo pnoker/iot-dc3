@@ -14,8 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.grpc.server.driver;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.api.common.GrpcCommandAttributeDTO;
 import io.github.pnoker.api.common.GrpcDriverAttributeDTO;
@@ -24,8 +27,8 @@ import io.github.pnoker.api.common.GrpcDriverQuery;
 import io.github.pnoker.api.common.GrpcEventAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
-import io.github.pnoker.api.common.driver.GrpcDriverLeaseRequest;
 import io.github.pnoker.api.common.driver.GrpcDriverLeaseDTO;
+import io.github.pnoker.api.common.driver.GrpcDriverLeaseRequest;
 import io.github.pnoker.api.common.driver.GrpcDriverRegistrationDTO;
 import io.github.pnoker.common.manager.biz.DriverLeaseService;
 import io.github.pnoker.common.manager.biz.ReactiveDriverRegisterService;
@@ -50,6 +53,9 @@ import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,14 +64,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DriverDriverServerTest {
@@ -112,13 +110,26 @@ class DriverDriverServerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        DriverDriverServer driverServer = new DriverDriverServer(grpcDriverBuilder, grpcDriverAttributeBuilder,
-                grpcPointAttributeBuilder, grpcCommandAttributeBuilder, grpcEventAttributeBuilder,
-                driverRegisterService, driverService, driverAttributeService, pointAttributeService,
-                commandAttributeService, eventAttributeService, driverLeaseService);
+        DriverDriverServer driverServer = new DriverDriverServer(
+                grpcDriverBuilder,
+                grpcDriverAttributeBuilder,
+                grpcPointAttributeBuilder,
+                grpcCommandAttributeBuilder,
+                grpcEventAttributeBuilder,
+                driverRegisterService,
+                driverService,
+                driverAttributeService,
+                pointAttributeService,
+                commandAttributeService,
+                eventAttributeService,
+                driverLeaseService);
 
         String name = "dc3-driver-metadata-" + UUID.randomUUID();
-        server = InProcessServerBuilder.forName(name).directExecutor().addService(driverServer).build().start();
+        server = InProcessServerBuilder.forName(name)
+                .directExecutor()
+                .addService(driverServer)
+                .build()
+                .start();
         channel = InProcessChannelBuilder.forName(name).directExecutor().build();
         stub = DriverApiGrpc.newBlockingStub(channel);
     }
@@ -149,7 +160,8 @@ class DriverDriverServerTest {
         eventAttribute.setTenantId(100L);
 
         when(driverService.getById(100L, 7L)).thenReturn(Mono.just(driver));
-        when(grpcDriverBuilder.buildGrpcDTOByBO(driver)).thenReturn(GrpcDriverDTO.newBuilder().build());
+        when(grpcDriverBuilder.buildGrpcDTOByBO(driver))
+                .thenReturn(GrpcDriverDTO.newBuilder().build());
         when(driverAttributeService.listByDriverId(100L, 7L)).thenReturn(Flux.just(driverAttribute));
         when(pointAttributeService.listByDriverId(100L, 7L)).thenReturn(Flux.just(pointAttribute));
         when(commandAttributeService.listByDriverId(100L, 7L)).thenReturn(Flux.just(commandAttribute));
@@ -163,7 +175,8 @@ class DriverDriverServerTest {
         when(grpcEventAttributeBuilder.buildGrpcDTOByBO(eventAttribute))
                 .thenReturn(GrpcEventAttributeDTO.newBuilder().build());
 
-        GrpcDriverRegistrationDTO response = stub.getById(GrpcDriverQuery.newBuilder().setTenantId(100L).setDriverId(7L).build());
+        GrpcDriverRegistrationDTO response = stub.getById(
+                GrpcDriverQuery.newBuilder().setTenantId(100L).setDriverId(7L).build());
 
         assertThat(response.getDriverAttributesCount()).isEqualTo(1);
         assertThat(response.getPointAttributesCount()).isEqualTo(1);
@@ -174,12 +187,18 @@ class DriverDriverServerTest {
     @Test
     void renewLeaseStreamsBoundedAssignmentPages() {
         GrpcDriverLeaseRequest request = GrpcDriverLeaseRequest.newBuilder()
-                .setTenantId(100L).setDriverId(7L).setNode("node-a")
-                .setClient("client-a").setHost("host-a").setLeaseSeconds(30).build();
+                .setTenantId(100L)
+                .setDriverId(7L)
+                .setNode("node-a")
+                .setClient("client-a")
+                .setHost("host-a")
+                .setLeaseSeconds(30)
+                .build();
         when(driverLeaseService.renew(100L, 7L, "node-a", "client-a", "host-a", 30, 0))
                 .thenReturn(Mono.just(new DriverLeaseGrantBO(123_456L, 9L, true)));
         List<DeviceLeaseBO> first = java.util.stream.LongStream.rangeClosed(1, 1001)
-                .mapToObj(id -> new DeviceLeaseBO(7L, id, "node-a", id + 1000)).toList();
+                .mapToObj(id -> new DeviceLeaseBO(7L, id, "node-a", id + 1000))
+                .toList();
         when(driverLeaseService.getAssignmentVersion(100L, 7L)).thenReturn(Mono.just(9L));
         when(driverLeaseService.listOwnedLeases(100L, 7L, "node-a", 0L, 1001)).thenReturn(Flux.fromIterable(first));
         when(driverLeaseService.listOwnedLeases(100L, 7L, "node-a", 1000L, 1001))
@@ -200,7 +219,10 @@ class DriverDriverServerTest {
     void getByIdReturnsNoResourceWhenDriverMissing() {
         when(driverService.getById(100L, 404L)).thenReturn(Mono.empty());
 
-        assertThatThrownBy(() -> stub.getById(GrpcDriverQuery.newBuilder().setTenantId(100L).setDriverId(404L).build()))
+        assertThatThrownBy(() -> stub.getById(GrpcDriverQuery.newBuilder()
+                        .setTenantId(100L)
+                        .setDriverId(404L)
+                        .build()))
                 .hasMessageContaining("NOT_FOUND");
     }
 
@@ -208,7 +230,10 @@ class DriverDriverServerTest {
     void getByIdReturnsFailureWhenLookupThrows() {
         when(driverService.getById(100L, 7L)).thenReturn(Mono.error(new IllegalStateException("metadata unavailable")));
 
-        assertThatThrownBy(() -> stub.getById(GrpcDriverQuery.newBuilder().setTenantId(100L).setDriverId(7L).build()))
+        assertThatThrownBy(() -> stub.getById(GrpcDriverQuery.newBuilder()
+                        .setTenantId(100L)
+                        .setDriverId(7L)
+                        .build()))
                 .hasMessageContaining("metadata unavailable");
     }
 }

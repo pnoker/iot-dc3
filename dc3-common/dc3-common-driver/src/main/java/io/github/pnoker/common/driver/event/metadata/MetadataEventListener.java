@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.event.metadata;
 
 import io.github.pnoker.common.driver.service.DriverCustomService;
@@ -51,7 +50,10 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
      */
     @Override
     public void onApplicationEvent(MetadataEvent metadataEvent) {
-        log.debug("Metadata event listener received: id={}, type={}", metadataEvent.getId(), metadataEvent.getMetadataType());
+        log.debug(
+                "Metadata event listener received: id={}, type={}",
+                metadataEvent.getId(),
+                metadataEvent.getMetadataType());
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             MetadataEventDTO entityEvent = new MetadataEventDTO();
@@ -79,5 +81,4 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
             driverCustomService.event(entityEvent);
         }
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.bo.PrincipalBO;
@@ -24,13 +23,12 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PrincipalSourceTypeEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
+import java.util.Objects;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * MapStruct builder for principals.
@@ -38,7 +36,9 @@ import java.util.Objects;
  * @author pnoker
  * @since 2026.6.12
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface PrincipalBuilder {
 
     /**
@@ -133,6 +133,4 @@ public interface PrincipalBuilder {
      * @return converted value
      */
     List<PrincipalVO> buildVOListByBOList(List<PrincipalBO> entityBOList);
-
-
 }

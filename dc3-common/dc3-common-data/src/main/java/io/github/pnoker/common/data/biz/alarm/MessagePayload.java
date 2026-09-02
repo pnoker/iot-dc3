@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * Rendered notification payload for a channel adapter.
@@ -47,5 +45,4 @@ public class MessagePayload {
     private Map<String, Object> payload;
 
     private List<String> missingVariables;
-
 }

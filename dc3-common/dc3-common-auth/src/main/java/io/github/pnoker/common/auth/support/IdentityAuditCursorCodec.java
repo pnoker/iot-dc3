@@ -1,9 +1,23 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.auth.support;
 
 import io.github.pnoker.db.r2dbc.core.cursor.CursorState;
 import io.github.pnoker.db.r2dbc.core.cursor.SignedCursorCodec;
-
-import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -14,10 +28,10 @@ import java.security.MessageDigest;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
+import javax.crypto.spec.SecretKeySpec;
 
 /** Signs identity-audit cursors and binds them to tenant and exact filters. */
 public final class IdentityAuditCursorCodec {
@@ -34,16 +48,16 @@ public final class IdentityAuditCursorCodec {
             throw new IllegalArgumentException("identity-audit cursor signing secret is required");
         }
         this.clock = clock;
-        this.delegate = new SignedCursorCodec(Map.of(KEY_ID,
-                new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), ALGORITHM)), clock);
+        this.delegate = new SignedCursorCodec(
+                Map.of(KEY_ID, new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), ALGORITHM)), clock);
     }
 
     public String encode(long tenantId, String queryFingerprint, Instant time, long id) {
         validateTenant(tenantId);
         if (time == null || id <= 0) throw invalid();
         Instant expiry = clock.instant().truncatedTo(ChronoUnit.MICROS).plus(TTL);
-        return delegate.encode(new CursorState(KEY_ID, tenantUuid(tenantId), digest(queryFingerprint),
-                position(time, id), expiry));
+        return delegate.encode(
+                new CursorState(KEY_ID, tenantUuid(tenantId), digest(queryFingerprint), position(time, id), expiry));
     }
 
     public Position decode(String token, long tenantId, String queryFingerprint) {
@@ -59,7 +73,8 @@ public final class IdentityAuditCursorCodec {
     private static byte[] position(Instant time, long id) {
         try {
             Instant instant = time.truncatedTo(ChronoUnit.MICROS);
-            long micros = Math.addExact(Math.multiplyExact(instant.getEpochSecond(), 1_000_000L), instant.getNano() / 1_000L);
+            long micros =
+                    Math.addExact(Math.multiplyExact(instant.getEpochSecond(), 1_000_000L), instant.getNano() / 1_000L);
             ByteArrayOutputStream bytes = new ByteArrayOutputStream(16);
             try (DataOutputStream output = new DataOutputStream(bytes)) {
                 output.writeLong(micros);
@@ -76,8 +91,8 @@ public final class IdentityAuditCursorCodec {
             long micros = input.readLong();
             long id = input.readLong();
             if (id <= 0 || input.available() != 0) throw invalid();
-            Instant instant = Instant.ofEpochSecond(Math.floorDiv(micros, 1_000_000L),
-                    Math.floorMod(micros, 1_000_000L) * 1_000L);
+            Instant instant = Instant.ofEpochSecond(
+                    Math.floorDiv(micros, 1_000_000L), Math.floorMod(micros, 1_000_000L) * 1_000L);
             return new Position(instant, id);
         } catch (IOException | RuntimeException error) {
             throw invalid();
@@ -105,6 +120,5 @@ public final class IdentityAuditCursorCodec {
         return new IllegalArgumentException("Invalid identity audit cursor");
     }
 
-    public record Position(Instant time, long id) {
-    }
+    public record Position(Instant time, long id) {}
 }

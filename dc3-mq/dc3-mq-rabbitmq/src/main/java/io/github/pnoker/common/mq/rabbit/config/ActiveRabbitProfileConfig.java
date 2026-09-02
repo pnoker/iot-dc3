@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.rabbit.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
@@ -38,8 +37,8 @@ public class ActiveRabbitProfileConfig implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        if (Boolean.FALSE.equals(environment.getProperty(EnvironmentConstant.RABBITMQ_AUTO_PROFILE, Boolean.class,
-                Boolean.TRUE))) {
+        if (Boolean.FALSE.equals(
+                environment.getProperty(EnvironmentConstant.RABBITMQ_AUTO_PROFILE, Boolean.class, Boolean.TRUE))) {
             log.debug("Skipping rabbitmq profile activation, {}=false", EnvironmentConstant.RABBITMQ_AUTO_PROFILE);
             return;
         }

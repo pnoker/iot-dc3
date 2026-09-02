@@ -14,22 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pnoker.common.constant.service.McpConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * Supported OAuth dynamic client registration fields for MCP clients.
@@ -61,19 +59,24 @@ public class OAuthClientRegistrationRequestVO implements Serializable {
     @JsonProperty(McpConstant.Field.GRANT_TYPES)
     private List<String> grantTypes;
 
-    @Schema(description = "Allowed redirect URIs for the authorization code flow.", example = "[\"https://example.com/callback\"]")
+    @Schema(
+            description = "Allowed redirect URIs for the authorization code flow.",
+            example = "[\"https://example.com/callback\"]")
     @JsonProperty(McpConstant.Field.REDIRECT_URIS)
     private List<String> redirectUris;
 
-    @Schema(description = "Space-separated list of OAuth scopes the client may request.", example = "mcp:read mcp:write")
+    @Schema(
+            description = "Space-separated list of OAuth scopes the client may request.",
+            example = "mcp:read mcp:write")
     private String scope;
 
     @Schema(description = "Tenant the client belongs to; defaults to the caller tenant.", example = "1")
     @JsonProperty(McpConstant.Field.TENANT_ID)
     private String tenantId;
 
-    @Schema(description = "Service-account principal id when the client acts on behalf of a service account.", example = "2048")
+    @Schema(
+            description = "Service-account principal id when the client acts on behalf of a service account.",
+            example = "2048")
     @JsonProperty(McpConstant.Field.SERVICE_ACCOUNT_PRINCIPAL_ID)
     private String serviceAccountPrincipalId;
-
 }

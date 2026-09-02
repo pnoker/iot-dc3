@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.buffer;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 /**
  * Verifies the SQLite DAO against a temporary on-disk database.
@@ -94,9 +92,7 @@ class PointValueBufferTest {
         PointValueBuffer buffer = newBuffer(tmp);
         long now = epoch();
 
-        buffer.upsertBatch(List.of(
-                rec("batch-1", 10L, 20L, 0, now, now),
-                rec("batch-2", 11L, 21L, 0, now, now)));
+        buffer.upsertBatch(List.of(rec("batch-1", 10L, 20L, 0, now, now), rec("batch-2", 11L, 21L, 0, now, now)));
 
         assertThat(buffer.selectPending(10, now))
                 .extracting(BufferedPointValue::id)
@@ -128,7 +124,8 @@ class PointValueBufferTest {
         return buffer;
     }
 
-    private BufferedPointValue rec(String id, Long deviceId, Long pointId, int attempt, long nextAttemptAt, long createdAt) {
+    private BufferedPointValue rec(
+            String id, Long deviceId, Long pointId, int attempt, long nextAttemptAt, long createdAt) {
         return new BufferedPointValue(id, deviceId, pointId, 1L, 2L, "{}", "rk", attempt, nextAttemptAt, createdAt);
     }
 }

@@ -2,17 +2,12 @@ import { Command, Option } from 'commander';
 import { configManager } from '../core/config-manager.js';
 import { tokenManager } from '../core/token-manager.js';
 import { dc3Client, AuthError } from '../core/client.js';
-import {
-  savePasswordToStore,
-  deletePasswordFromStore,
-} from '../core/credential-store.js';
+import { savePasswordToStore, deletePasswordFromStore } from '../core/credential-store.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 import { prompt, passwordPrompt } from '../utils/prompt.js';
 
 export function registerAuthCommand(program: Command): void {
-  const auth = program
-    .command('auth')
-    .description('Authentication management');
+  const auth = program.command('auth').description('Authentication management');
 
   // dc3 auth login
   auth
@@ -24,7 +19,10 @@ export function registerAuthCommand(program: Command): void {
     .option('--store <type>', 'Credential store type: keychain, encrypted, env, prompt', 'keychain')
     .option('--no-save', 'Do not save password (token expiry will require manual re-login)')
     .addOption(
-      new Option('--oauth', 'OAuth client_credentials login (requires a registered MCP client)').hideHelp(),
+      new Option(
+        '--oauth',
+        'OAuth client_credentials login (requires a registered MCP client)',
+      ).hideHelp(),
     )
     .option('--client-id <id>', 'Registered OAuth client id (with --oauth)')
     .option('--client-secret <secret>', 'Registered OAuth client secret (with --oauth)')
@@ -42,12 +40,7 @@ export function registerAuthCommand(program: Command): void {
         const username = options.username || (await prompt('Username: '));
         const password = options.password || (await passwordPrompt('Password: '));
 
-        const token = await dc3Client.login(
-          tenant.trim(),
-          username.trim(),
-          password,
-          profileName,
-        );
+        const token = await dc3Client.login(tenant.trim(), username.trim(), password, profileName);
 
         // Save profile config
         await configManager.setProfile(profileName, {
@@ -58,17 +51,12 @@ export function registerAuthCommand(program: Command): void {
 
         // Save password (unless --no-save)
         if (!options.noSave) {
-          await savePasswordToStore(
-            `${username.trim()}@${tenant.trim()}`,
-            password,
-          );
+          await savePasswordToStore(`${username.trim()}@${tenant.trim()}`, password);
         }
 
         // Get expiry info for display
         const state = await tokenManager.getState(profileName);
-        const expiresAt = state
-          ? new Date(state.expiresAt * 1000).toLocaleString()
-          : 'unknown';
+        const expiresAt = state ? new Date(state.expiresAt * 1000).toLocaleString() : 'unknown';
 
         // Clear password from memory
         (password as unknown as string).split('').fill('\0');
@@ -136,19 +124,13 @@ export function registerAuthCommand(program: Command): void {
       const state = await tokenManager.getState(profileName);
 
       if (!state) {
-        printAndExit(
-          { ok: true, message: 'Already logged out' },
-          format,
-        );
+        printAndExit({ ok: true, message: 'Already logged out' }, format);
       }
 
       await dc3Client.logout(profileName);
       await deletePasswordFromStore(`${state!.username}@${state!.tenant}`);
 
-      printAndExit(
-        { ok: true, message: 'Logged out successfully' },
-        format,
-      );
+      printAndExit({ ok: true, message: 'Logged out successfully' }, format);
     });
 
   // dc3 auth status
@@ -171,7 +153,9 @@ export function registerAuthCommand(program: Command): void {
             username: state.username,
             authenticated: !isExpired,
             expires_at: new Date(state.expiresAt * 1000).toISOString(),
-            remaining: isExpired ? 'expired' : `${Math.floor((state.expiresAt * 1000 - Date.now()) / 3600000)}h`,
+            remaining: isExpired
+              ? 'expired'
+              : `${Math.floor((state.expiresAt * 1000 - Date.now()) / 3600000)}h`,
           };
         }
         printAndExit(
@@ -222,11 +206,7 @@ export function registerAuthCommand(program: Command): void {
       const state = await tokenManager.getState(profileName);
 
       if (!state) {
-        printAndExit(
-          { error: 'Not logged in. Run: dc3 auth login' },
-          'json',
-          1,
-        );
+        printAndExit({ error: 'Not logged in. Run: dc3 auth login' }, 'json', 1);
       }
 
       if (options.header) {

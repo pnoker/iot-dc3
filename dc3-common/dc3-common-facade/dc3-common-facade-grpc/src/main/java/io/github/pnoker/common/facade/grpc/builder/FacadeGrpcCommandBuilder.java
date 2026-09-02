@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.builder;
 
 import io.github.pnoker.api.center.manager.GrpcOffsetCommandQuery;
+import io.github.pnoker.api.common.GrpcCommandDTO;
 import io.github.pnoker.api.common.PageRequest;
 import io.github.pnoker.api.common.SortDirection;
-import io.github.pnoker.api.common.GrpcCommandDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.entity.ext.CommandExt;
 import io.github.pnoker.common.enums.CallTypeEnum;
@@ -32,10 +31,9 @@ import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import org.springframework.stereotype.Component;
-
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 /**
  * Hand-rolled conversion between facade shapes and protobuf command types.
@@ -47,13 +45,20 @@ import java.util.Optional;
 public class FacadeGrpcCommandBuilder {
 
     public GrpcOffsetCommandQuery toGrpcOffsetQuery(FacadeCommandOffsetQuery query) {
-        PageRequest.Builder page = PageRequest.newBuilder().setOffset(query.offset()).setLimit(query.limit());
+        PageRequest.Builder page =
+                PageRequest.newBuilder().setOffset(query.offset()).setLimit(query.limit());
         if (query.sort() != null) {
-            query.sort().forEach(spec -> page.addSort(io.github.pnoker.api.common.SortSpec.newBuilder()
-                    .setField(spec.field()).setDirection(spec.direction() == io.github.pnoker.db.r2dbc.core.page.SortSpec.Direction.DESC
-                            ? SortDirection.SORT_DIRECTION_DESC : SortDirection.SORT_DIRECTION_ASC).build()));
+            query.sort()
+                    .forEach(spec -> page.addSort(io.github.pnoker.api.common.SortSpec.newBuilder()
+                            .setField(spec.field())
+                            .setDirection(
+                                    spec.direction() == io.github.pnoker.db.r2dbc.core.page.SortSpec.Direction.DESC
+                                            ? SortDirection.SORT_DIRECTION_DESC
+                                            : SortDirection.SORT_DIRECTION_ASC)
+                            .build()));
         }
-        GrpcOffsetCommandQuery.Builder builder = GrpcOffsetCommandQuery.newBuilder().setPage(page).setTenantId(query.tenantId());
+        GrpcOffsetCommandQuery.Builder builder =
+                GrpcOffsetCommandQuery.newBuilder().setPage(page).setTenantId(query.tenantId());
         Optional.ofNullable(query.commandName()).ifPresent(builder::setCommandName);
         Optional.ofNullable(query.commandCode()).ifPresent(builder::setCommandCode);
         Optional.ofNullable(query.commandTypeFlag()).ifPresent(value -> builder.setCommandTypeFlag(value.getIndex()));
@@ -108,5 +113,4 @@ public class FacadeGrpcCommandBuilder {
 
         return bo;
     }
-
 }

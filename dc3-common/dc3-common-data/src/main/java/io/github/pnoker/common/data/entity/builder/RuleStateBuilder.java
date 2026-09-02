@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.builder;
 
 import io.github.pnoker.common.data.entity.bo.RuleStateBO;
@@ -26,14 +25,13 @@ import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.RuleStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * MapStruct builder converting between rule runtime state BO, VO, and DO.
@@ -41,7 +39,9 @@ import java.util.Optional;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface RuleStateBuilder {
 
     /**
@@ -91,8 +91,7 @@ public interface RuleStateBuilder {
         entityDO.setEntityStateExt(ext);
 
         AlarmTargetTypeEnum alarmTargetTypeFlag = entityBO.getAlarmTargetTypeFlag();
-        Optional.ofNullable(alarmTargetTypeFlag)
-                .ifPresent(value -> entityDO.setAlarmTargetTypeFlag(value.getIndex()));
+        Optional.ofNullable(alarmTargetTypeFlag).ifPresent(value -> entityDO.setAlarmTargetTypeFlag(value.getIndex()));
 
         RuleStatusEnum entityStateFlag = entityBO.getEntityStateFlag();
         Optional.ofNullable(entityStateFlag).ifPresent(value -> entityDO.setEntityStateFlag(value.getIndex()));
@@ -165,5 +164,4 @@ public interface RuleStateBuilder {
      * @return converted value
      */
     List<RuleStateVO> buildVOListByBOList(List<RuleStateBO> entityBOList);
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -47,15 +46,24 @@ public class RoleResourceBindVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "Identifier of the role to bind; must belong to the current tenant.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Role id can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Identifier of the role to bind; must belong to the current tenant.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Role id can't be empty",
+            groups = {Add.class, Update.class})
     private String roleId;
 
     /**
      * ID
      */
-    @Schema(description = "Identifier of the resource to bind to the role; must belong to the current tenant.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Resource id can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Identifier of the resource to bind to the role; must belong to the current tenant.",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Resource id can't be empty",
+            groups = {Add.class, Update.class})
     private String resourceId;
-
 }

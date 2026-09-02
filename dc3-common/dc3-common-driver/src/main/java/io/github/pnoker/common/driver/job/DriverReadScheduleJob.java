@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.job;
 
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -22,6 +21,10 @@ import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -30,11 +33,6 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Quartz job that iterates through enabled devices and points and triggers periodic
@@ -92,7 +90,8 @@ public class DriverReadScheduleJob extends QuartzJobBean {
      * @return true if the device can be read
      */
     private boolean isReadableDevice(DeviceBO entityBO) {
-        return Objects.nonNull(entityBO) && EnableFlagEnum.ENABLE.equals(entityBO.getEnableFlag())
+        return Objects.nonNull(entityBO)
+                && EnableFlagEnum.ENABLE.equals(entityBO.getEnableFlag())
                 && Objects.nonNull(entityBO.getProfileId())
                 && CollectionUtils.isNotEmpty(entityBO.getPointIds())
                 && MapUtils.isNotEmpty(entityBO.getDriverAttributeConfigIdMap())
@@ -120,5 +119,4 @@ public class DriverReadScheduleJob extends QuartzJobBean {
             log.error("Driver point read schedule failed, deviceId={}, pointId={}", deviceId, pointId, e);
         }
     }
-
 }

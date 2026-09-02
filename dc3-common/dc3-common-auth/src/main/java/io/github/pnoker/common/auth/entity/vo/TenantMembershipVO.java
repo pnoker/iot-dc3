@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -23,13 +22,12 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.MembershipStatusEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
 
 /**
  * View object for tenant memberships.
@@ -49,7 +47,9 @@ public class TenantMembershipVO extends BaseVO {
     @Schema(description = "Identifier of the tenant this membership belongs to.", example = "1024")
     private String tenantId;
 
-    @Schema(description = "Identifier of the principal (user or service account) attached to the tenant.", example = "2048")
+    @Schema(
+            description = "Identifier of the principal (user or service account) attached to the tenant.",
+            example = "2048")
     private String principalId;
 
     @Schema(description = "Classification of the principal: USER, SERVICE_ACCOUNT, or SYSTEM.", example = "USER")
@@ -61,6 +61,8 @@ public class TenantMembershipVO extends BaseVO {
     @Schema(description = "Timestamp when the principal joined (was attached to) the tenant.")
     private LocalDateTime joinedTime;
 
-    @Schema(description = "Extended JSON metadata for this membership (e.g. custom roles, invitation context); structure is tenant-defined.")
+    @Schema(
+            description =
+                    "Extended JSON metadata for this membership (e.g. custom roles, invitation context); structure is tenant-defined.")
     private JsonExt membershipExt;
 }

@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * JSON extension object for rule configuration.
@@ -94,7 +92,6 @@ public class RuleExt extends BaseExt {
          */
         @Schema(description = "Business labels for filtering and dashboards.")
         private List<String> labels;
-
     }
 
     /**
@@ -116,7 +113,9 @@ public class RuleExt extends BaseExt {
         /**
          * Operator code, for example >, >=, <, <=, ==, !=, between, outside, silence.
          */
-        @Schema(description = "Operator code, for example >, >=, <, <=, ==, !=, between, outside, silence.", example = ">")
+        @Schema(
+                description = "Operator code, for example >, >=, <, <=, ==, !=, between, outside, silence.",
+                example = ">")
         private String operator;
 
         /**
@@ -148,7 +147,6 @@ public class RuleExt extends BaseExt {
          */
         @Schema(description = "Display unit for value comparisons.", example = "°C")
         private String unit;
-
     }
 
     /**
@@ -164,7 +162,9 @@ public class RuleExt extends BaseExt {
         /**
          * Evaluation mode, for example LAST, ALL, ANY, AVG, MIN, MAX, SUM, COUNT.
          */
-        @Schema(description = "Evaluation mode, for example LAST, ALL, ANY, AVG, MIN, MAX, SUM, COUNT.", example = "AVG")
+        @Schema(
+                description = "Evaluation mode, for example LAST, ALL, ANY, AVG, MIN, MAX, SUM, COUNT.",
+                example = "AVG")
         private String mode;
 
         /**
@@ -178,7 +178,6 @@ public class RuleExt extends BaseExt {
          */
         @Schema(description = "Minimum samples required in the window.", example = "3")
         private Integer minSamples;
-
     }
 
     /**
@@ -214,7 +213,5 @@ public class RuleExt extends BaseExt {
          */
         @Schema(description = "ISO-8601 duration that must remain recovered.", example = "PT5M")
         private String duration;
-
     }
-
 }

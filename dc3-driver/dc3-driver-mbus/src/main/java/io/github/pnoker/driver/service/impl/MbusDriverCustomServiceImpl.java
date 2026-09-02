@@ -32,17 +32,16 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * Custom driver service implementation for the M-Bus (Meter-Bus) driver.
@@ -62,18 +61,21 @@ public class MbusDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
     private Map<Long, MbusSerialPortConnection> connectMap;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -106,26 +108,40 @@ public class MbusDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 MbusSerialPortConnection removed = connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     removed.close();
-                    log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode, metadataEvent.getId(), operateType);
+                    log.info(
+                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                            driverCode,
+                            metadataEvent.getId(),
+                            operateType);
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         MbusSerialPortConnection conn = getConnector(device.getId(), driverConfig);
         try {
             int address = getConfigIntValue(driverConfig, "primaryAddress", 0);
@@ -138,14 +154,19 @@ public class MbusDriverCustomServiceImpl implements DriverCustomService {
                 throw new ReadPointException("Empty M-Bus response, protocol={}", driverCode);
             }
             if (MbusFrame.control(response) != MbusFrame.CONTROL_RSP_UD) {
-                throw new ReadPointException("Unexpected M-Bus response control code, protocol={}, control={}",
-                        driverCode, String.format("0x%02X", MbusFrame.control(response)));
+                throw new ReadPointException(
+                        "Unexpected M-Bus response control code, protocol={}, control={}",
+                        driverCode,
+                        String.format("0x%02X", MbusFrame.control(response)));
             }
             byte[] data = MbusFrame.parse(response);
             List<MbusRecord> records = MbusFrame.parseRecords(data);
             if (records.isEmpty() || recordIndex >= records.size()) {
-                throw new ReadPointException("M-Bus record not found, protocol={}, recordIndex={}, recordCount={}",
-                        driverCode, recordIndex, records.size());
+                throw new ReadPointException(
+                        "M-Bus record not found, protocol={}, recordIndex={}, recordCount={}",
+                        driverCode,
+                        recordIndex,
+                        records.size());
             }
             String value = MbusFrame.decodeValue(records.get(recordIndex), dataFormat);
             return new ReadPointValue(device, point, value);
@@ -159,8 +180,12 @@ public class MbusDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         MbusSerialPortConnection conn = getConnector(device.getId(), driverConfig);
         try {
             int address = getConfigIntValue(driverConfig, "primaryAddress", 0);
@@ -182,10 +207,14 @@ public class MbusDriverCustomServiceImpl implements DriverCustomService {
             int stopBits = getConfigIntValue(driverConfig, "stopBits", 1);
             int parity = getConfigIntValue(driverConfig, "parity", 2);
             int timeout = getConfigIntValue(driverConfig, "timeout", 1000);
-            log.debug("Driver connection creating, protocol={}, deviceId={}, port={}, baudRate={}",
-                    driverCode, deviceId, port, baudRate);
-            MbusSerialPortConnection conn = new MbusSerialPortConnection(port, baudRate, dataBits, stopBits, parity,
-                    timeout);
+            log.debug(
+                    "Driver connection creating, protocol={}, deviceId={}, port={}, baudRate={}",
+                    driverCode,
+                    deviceId,
+                    port,
+                    baudRate);
+            MbusSerialPortConnection conn =
+                    new MbusSerialPortConnection(port, baudRate, dataBits, stopBits, parity, timeout);
             conn.open();
             log.info("Driver connection established, protocol={}, deviceId={}, port={}", driverCode, deviceId, port);
             return conn;
@@ -205,7 +234,9 @@ public class MbusDriverCustomServiceImpl implements DriverCustomService {
 
     private String getRequiredConfig(Map<String, AttributeBO> config, String code) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             throw new ConnectorException("Required attribute '{}' is missing", code);
         }
         return attr.getValue(String.class);
@@ -213,7 +244,9 @@ public class MbusDriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -233,7 +266,8 @@ public class MbusDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "port", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -242,7 +276,7 @@ public class MbusDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "recordIndex", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

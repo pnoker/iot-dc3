@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -51,36 +50,56 @@ public class DriverVO extends BaseVO {
     /**
      * Name
      */
-    @NotBlank(message = "Driver name can't be empty", groups = {Add.class})
-    @Schema(description = "Driver name. Unique within a tenant.", example = "Modbus TCP Driver",
+    @NotBlank(
+            message = "Driver name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Driver name. Unique within a tenant.",
+            example = "Modbus TCP Driver",
             requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid driver name format",
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid driver name format",
             groups = {Add.class, Update.class})
     private String driverName;
 
     /**
      * Driver ID
      */
-    @Schema(description = "Driver code. Stable routing identifier; must not change once deployed.", example = "dc3-driver-modbus-tcp")
+    @Schema(
+            description = "Driver code. Stable routing identifier; must not change once deployed.",
+            example = "dc3-driver-modbus-tcp")
     private String driverCode;
 
     /**
      * Driver service name
      */
-    @NotBlank(message = "Service name can't be empty", groups = {Add.class})
-    @Schema(description = "Service name registered for this driver.", example = "dc3-driver-modbus-tcp",
+    @NotBlank(
+            message = "Service name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Service name registered for this driver.",
+            example = "dc3-driver-modbus-tcp",
             requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9\\-_#@/.|]{1,31}$", message = "Invalid service name format",
+    @Pattern(
+            regexp = "^[A-Za-z0-9][A-Za-z0-9\\-_#@/.|]{1,31}$",
+            message = "Invalid service name format",
             groups = {Add.class, Update.class})
     private String serviceName;
 
     /**
      *
      */
-    @NotBlank(message = "Service host can't be empty", groups = {Add.class})
-    @Pattern(regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$",
-            message = "Invalid service host format", groups = {Add.class, Update.class})
-    @Schema(description = "Driver service host (IPv4).", example = "192.168.1.100",
+    @NotBlank(
+            message = "Service host can't be empty",
+            groups = {Add.class})
+    @Pattern(
+            regexp = "^((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}$",
+            message = "Invalid service host format",
+            groups = {Add.class, Update.class})
+    @Schema(
+            description = "Driver service host (IPv4).",
+            example = "192.168.1.100",
             requiredMode = Schema.RequiredMode.REQUIRED)
     private String serviceHost;
 
@@ -113,5 +132,4 @@ public class DriverVO extends BaseVO {
      */
     @Schema(description = "Optimistic-lock version number.", example = "1")
     private Integer version;
-
 }

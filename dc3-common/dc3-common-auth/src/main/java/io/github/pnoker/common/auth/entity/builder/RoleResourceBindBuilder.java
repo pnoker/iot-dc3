@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.common.auth.entity.model.RoleResourceBindDO;
 import io.github.pnoker.common.auth.entity.vo.RoleResourceBindVO;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
 
 /**
  * MapStruct builder converting between role-resource binding BO, VO, and DO.
@@ -32,7 +30,9 @@ import java.util.List;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface RoleResourceBindBuilder {
 
     /**
@@ -99,7 +99,4 @@ public interface RoleResourceBindBuilder {
      * @return EntityVO Array
      */
     List<RoleResourceBindVO> buildVOListByBOList(List<RoleResourceBindBO> entityBOList);
-
-
-
 }

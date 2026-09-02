@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service;
 
 /**
@@ -33,6 +32,11 @@ package io.github.pnoker.common.driver.service;
  * @author pnoker
  * @since 2016.10.1
  */
-public interface DriverCustomService extends DriverLifecycle, DriverMetadataListener, DriverHealth, DeviceHealth, DriverProtocol, DriverCommand, DriverValidator {
-
-}
+public interface DriverCustomService
+        extends DriverLifecycle,
+                DriverMetadataListener,
+                DriverHealth,
+                DeviceHealth,
+                DriverProtocol,
+                DriverCommand,
+                DriverValidator {}

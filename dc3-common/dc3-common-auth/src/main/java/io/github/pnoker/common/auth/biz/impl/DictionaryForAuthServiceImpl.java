@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.biz.impl;
 
 import io.github.pnoker.common.auth.biz.DictionaryForAuthService;
 import io.github.pnoker.common.auth.repository.ReactiveTenantDictionaryStore;
 import io.github.pnoker.common.entity.option.DictionaryOption;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import reactor.core.publisher.Mono;
 
 /**
@@ -42,9 +40,10 @@ public class DictionaryForAuthServiceImpl implements DictionaryForAuthService {
 
     @Override
     public Mono<List<DictionaryOption>> listTenantOptions() {
-        return tenantStore.listEnabled()
-                .map(tenant -> DictionaryOption.leaf(tenant.getTenantName(), tenant.getId().toString()))
+        return tenantStore
+                .listEnabled()
+                .map(tenant -> DictionaryOption.leaf(
+                        tenant.getTenantName(), tenant.getId().toString()))
                 .collectList();
     }
-
 }

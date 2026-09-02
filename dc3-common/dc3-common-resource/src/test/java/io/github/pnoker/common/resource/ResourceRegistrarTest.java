@@ -14,8 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.resource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.facade.api.ResourceRegistryFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
@@ -23,6 +29,7 @@ import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResult
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.config.ResourceRegistrarProperties;
 import io.github.pnoker.common.resource.scan.ApiEndpointScanner;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,15 +39,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ResourceRegistrarTest {
@@ -97,8 +95,11 @@ class ResourceRegistrarTest {
         properties.setServiceName(null);
         when(environment.getProperty("spring.application.name")).thenReturn(null);
 
-        StepVerifier.create(registrar.register()).expectErrorSatisfies(error ->
-                assertThat(error).isInstanceOf(IllegalStateException.class).hasMessageContaining("service name")).verify();
+        StepVerifier.create(registrar.register())
+                .expectErrorSatisfies(error -> assertThat(error)
+                        .isInstanceOf(IllegalStateException.class)
+                        .hasMessageContaining("service name"))
+                .verify();
         verifyNoInteractions(scanner, facade);
     }
 
@@ -178,7 +179,9 @@ class ResourceRegistrarTest {
         properties.setFailFast(true);
         when(scanner.scan()).thenThrow(new RuntimeException("scan boom"));
 
-        StepVerifier.create(registrar.register()).expectErrorMessage("scan boom").verify();
+        StepVerifier.create(registrar.register())
+                .expectErrorMessage("scan boom")
+                .verify();
         verify(facade, never()).sync(any());
     }
 
@@ -199,6 +202,8 @@ class ResourceRegistrarTest {
         when(scanner.scan()).thenReturn(List.of());
         when(facade.sync(any())).thenThrow(new RuntimeException("downstream offline"));
 
-        StepVerifier.create(registrar.register()).expectErrorMessage("downstream offline").verify();
+        StepVerifier.create(registrar.register())
+                .expectErrorMessage("downstream offline")
+                .verify();
     }
 }

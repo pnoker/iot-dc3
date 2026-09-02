@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
 import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.data.repository.ReactivePointCommandStore;
-import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.annotation.Dc3Listener;
 import io.github.pnoker.common.mq.listener.Acknowledgment;
@@ -28,8 +26,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 /**
  * RabbitMQ receiver for point command messages that have been rejected into the
@@ -62,20 +58,23 @@ public class PointCommandDeadReceiver {
         }
         try {
             Long tenantId = Long.valueOf(tenantHeader);
-            return pointCommandStore.markDead(tenantId, correlationId, "DLX",
-                            "Message rejected to dead letter queue", java.time.Instant.now())
+            return pointCommandStore
+                    .markDead(
+                            tenantId,
+                            correlationId,
+                            "DLX",
+                            "Message rejected to dead letter queue",
+                            java.time.Instant.now())
                     .doOnNext(updated -> {
                         if (!updated) {
                             ack.reject(false);
                         }
                     })
-                    .doOnError(error -> log.error("Dead letter processing failed, commandId={}",
-                            correlationId, error))
+                    .doOnError(error -> log.error("Dead letter processing failed, commandId={}", correlationId, error))
                     .then();
         } catch (NumberFormatException error) {
             ack.reject(false);
             return Mono.empty();
         }
     }
-
 }

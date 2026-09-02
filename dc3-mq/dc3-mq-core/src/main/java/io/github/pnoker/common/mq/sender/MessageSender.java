@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mq.sender;
 
 import io.github.pnoker.common.mq.message.MqMessage;
-
 import java.time.Duration;
 
 /**

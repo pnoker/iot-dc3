@@ -16,12 +16,11 @@
  */
 package io.github.pnoker.common.auth.config;
 
+import java.time.Duration;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import java.time.Duration;
 
 /**
  * Configuration properties for the OAuth runtime.
@@ -99,7 +98,5 @@ public class OAuthProperties {
          * Base64-encoded X509 public key. Blank means an ephemeral key pair is generated.
          */
         private String publicKey = "";
-
     }
-
 }

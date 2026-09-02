@@ -1,13 +1,29 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.manager.service.impl;
 
+import io.github.pnoker.common.exception.DuplicateException;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.manager.entity.bo.LabelBindBO;
 import io.github.pnoker.common.manager.repository.BindingFilter;
 import io.github.pnoker.common.manager.repository.ReactiveLabelBindStore;
 import io.github.pnoker.common.manager.repository.ReactiveLabelStore;
 import io.github.pnoker.common.manager.service.ReactiveLabelBindService;
-import io.github.pnoker.common.exception.DuplicateException;
-import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,7 +46,8 @@ public class ReactiveLabelBindServiceImpl implements ReactiveLabelBindService {
             return validateOwner(value)
                     .then(Mono.defer(() -> ensureUnique(value)))
                     .then(Mono.defer(() -> labelBindStore.insert(value)))
-                    .onErrorMap(DataIntegrityViolationException.class,
+                    .onErrorMap(
+                            DataIntegrityViolationException.class,
                             error -> new DuplicateException("Entity has been bound to the label"));
         });
     }
@@ -39,20 +56,23 @@ public class ReactiveLabelBindServiceImpl implements ReactiveLabelBindService {
     public Mono<LabelBindBO> update(LabelBindBO value) {
         return Mono.defer(() -> {
             validate(value, false);
-            return labelBindStore.get(value.getTenantId(), value.getId())
+            return labelBindStore
+                    .get(value.getTenantId(), value.getId())
                     .switchIfEmpty(Mono.error(new NotFoundException("Label bind does not exist")))
                     .then(Mono.defer(() -> validateOwner(value)))
                     .then(Mono.defer(() -> ensureUnique(value)))
                     .then(Mono.defer(() -> labelBindStore.update(value)))
                     .switchIfEmpty(Mono.error(new RequestException("Label bind update failed")))
-                    .onErrorMap(DataIntegrityViolationException.class,
+                    .onErrorMap(
+                            DataIntegrityViolationException.class,
                             error -> new DuplicateException("Entity has been bound to the label"));
         });
     }
 
     @Override
     public Mono<Boolean> delete(Long tenantId, Long id, Long operatorId, String operatorName) {
-        return labelBindStore.get(tenantId, id)
+        return labelBindStore
+                .get(tenantId, id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Label bind does not exist")))
                 .then(labelBindStore.delete(tenantId, id, operatorId, operatorName))
                 .filter(Boolean.TRUE::equals)
@@ -61,7 +81,8 @@ public class ReactiveLabelBindServiceImpl implements ReactiveLabelBindService {
 
     @Override
     public Mono<LabelBindBO> getById(Long tenantId, Long id) {
-        return labelBindStore.get(tenantId, id)
+        return labelBindStore
+                .get(tenantId, id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Label bind does not exist")));
     }
 
@@ -71,14 +92,16 @@ public class ReactiveLabelBindServiceImpl implements ReactiveLabelBindService {
     }
 
     private Mono<Void> validateOwner(LabelBindBO value) {
-        return labelStore.get(value.getTenantId(), value.getLabelId())
+        return labelStore
+                .get(value.getTenantId(), value.getLabelId())
                 .filter(label -> label.getEntityTypeFlag() == value.getEntityTypeFlag())
                 .switchIfEmpty(Mono.error(new NotFoundException("Resource does not exist")))
                 .then();
     }
 
     private Mono<Void> ensureUnique(LabelBindBO value) {
-        return labelBindStore.getByEntity(
+        return labelBindStore
+                .getByEntity(
                         value.getTenantId(),
                         value.getEntityTypeFlag().getIndex(),
                         value.getLabelId(),
@@ -101,5 +124,4 @@ public class ReactiveLabelBindServiceImpl implements ReactiveLabelBindService {
             throw new RequestException("Tenant, entity type, label and entity are required");
         }
     }
-
 }

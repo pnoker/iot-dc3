@@ -14,8 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.mqtt.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
@@ -34,6 +39,8 @@ import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.mqtt.entity.MessageHeader;
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,22 +48,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class MqttReceiveServiceImplTest {
 
     @Mock
     private DriverSenderService driverSenderService;
+
     @Mock
     private DeviceClient deviceClient;
+
     private DriverMetadata driverMetadata;
     private DeviceMetadata deviceMetadata;
     private MqttReceiveServiceImpl service;
@@ -97,8 +97,8 @@ class MqttReceiveServiceImplTest {
 
     @Test
     void singleReceiveStampsCreateTimeAndForwardsToSender() {
-        MqttMessage msg = mqttMessage("dc3/temp", 1,
-                "{\"deviceId\":10,\"pointId\":20,\"rawValue\":\"23.5\",\"calValue\":\"23.5\"}");
+        MqttMessage msg = mqttMessage(
+                "dc3/temp", 1, "{\"deviceId\":10,\"pointId\":20,\"rawValue\":\"23.5\",\"calValue\":\"23.5\"}");
 
         service.receiveValue(msg);
 
@@ -113,10 +113,10 @@ class MqttReceiveServiceImplTest {
 
     @Test
     void batchReceiveStampsEachAndForwardsListInOrder() {
-        MqttMessage one = mqttMessage("dc3/temp", 1,
-                "{\"deviceId\":10,\"pointId\":1,\"rawValue\":\"1\",\"calValue\":\"1\"}");
-        MqttMessage two = mqttMessage("dc3/temp", 1,
-                "{\"deviceId\":10,\"pointId\":2,\"rawValue\":\"2\",\"calValue\":\"2\"}");
+        MqttMessage one =
+                mqttMessage("dc3/temp", 1, "{\"deviceId\":10,\"pointId\":1,\"rawValue\":\"1\",\"calValue\":\"1\"}");
+        MqttMessage two =
+                mqttMessage("dc3/temp", 1, "{\"deviceId\":10,\"pointId\":2,\"rawValue\":\"2\",\"calValue\":\"2\"}");
 
         service.receiveValues(List.of(one, two));
 
@@ -147,22 +147,24 @@ class MqttReceiveServiceImplTest {
         driverMetadata.setEventAttributeIdMap(Map.of(
                 1L, eventAttribute(1L, "sourceTopic"),
                 2L, eventAttribute(2L, "eventCodePath"),
-                3L, eventAttribute(3L, "payloadPath")
-        ));
+                3L, eventAttribute(3L, "payloadPath")));
 
         DeviceBO device = new DeviceBO();
         device.setId(10L);
         device.setTenantId(1L);
         device.setDeviceCode("device-a");
-        device.setEventAttributeConfigIdMap(Map.of(20L, Map.of(
-                1L, eventConfig(1L, 10L, 20L, "dc3/event/device-a"),
-                2L, eventConfig(2L, 10L, 20L, "$.eventCode"),
-                3L, eventConfig(3L, 10L, 20L, "$.payload")
-        )));
+        device.setEventAttributeConfigIdMap(Map.of(
+                20L,
+                Map.of(
+                        1L, eventConfig(1L, 10L, 20L, "dc3/event/device-a"),
+                        2L, eventConfig(2L, 10L, 20L, "$.eventCode"),
+                        3L, eventConfig(3L, 10L, 20L, "$.payload"))));
         device.setEventRuntimeIdMap(Map.of(20L, eventRuntime()));
         when(deviceClient.getById(10L)).thenReturn(reactor.core.publisher.Mono.just(device));
 
-        MqttMessage msg = mqttMessage("dc3/event/device-a", 1,
+        MqttMessage msg = mqttMessage(
+                "dc3/event/device-a",
+                1,
                 "{\"eventCode\":\"alarm\",\"payload\":{\"temperature\": \"92\", \"source\":\"mqtt\"}}");
 
         service.receiveValue(msg);
@@ -175,7 +177,10 @@ class MqttReceiveServiceImplTest {
         assertThat(report.eventId()).isEqualTo(20L);
         assertThat(report.eventCode()).isEqualTo("alarm");
         assertThat(report.paramValues()).containsEntry("temperature", "92").containsEntry("source", "mqtt");
-        assertThat(report.configSnapshot()).contains("sourceTopic").contains("eventCodePath").contains("payloadPath");
+        assertThat(report.configSnapshot())
+                .contains("sourceTopic")
+                .contains("eventCodePath")
+                .contains("payloadPath");
     }
 
     @Test
@@ -184,22 +189,24 @@ class MqttReceiveServiceImplTest {
         driverMetadata.setEventAttributeIdMap(Map.of(
                 1L, eventAttribute(1L, "sourceTopic"),
                 2L, eventAttribute(2L, "eventCodePath"),
-                3L, eventAttribute(3L, "payloadPath")
-        ));
+                3L, eventAttribute(3L, "payloadPath")));
 
         DeviceBO device = new DeviceBO();
         device.setId(10L);
         device.setTenantId(1L);
         device.setDeviceCode("device-a");
-        device.setEventAttributeConfigIdMap(Map.of(20L, Map.of(
-                1L, eventConfig(1L, 10L, 20L, "dc3/event/device-a"),
-                2L, eventConfig(2L, 10L, 20L, "$.eventCode"),
-                3L, eventConfig(3L, 10L, 20L, "$.payload")
-        )));
+        device.setEventAttributeConfigIdMap(Map.of(
+                20L,
+                Map.of(
+                        1L, eventConfig(1L, 10L, 20L, "dc3/event/device-a"),
+                        2L, eventConfig(2L, 10L, 20L, "$.eventCode"),
+                        3L, eventConfig(3L, 10L, 20L, "$.payload"))));
         device.setEventRuntimeIdMap(Map.of(20L, eventRuntime()));
         when(deviceClient.getById(10L)).thenReturn(reactor.core.publisher.Mono.just(device));
 
-        MqttMessage msg = mqttMessage("dc3/event/device-a", 1,
+        MqttMessage msg = mqttMessage(
+                "dc3/event/device-a",
+                1,
                 "{\"deviceId\":10,\"pointId\":30,\"rawValue\":\"92\",\"eventCode\":\"alarm\",\"payload\":{\"temperature\":\"92\"}}");
 
         service.receiveValue(msg);
@@ -217,20 +224,22 @@ class MqttReceiveServiceImplTest {
         driverMetadata.setEventAttributeIdMap(Map.of(
                 1L, eventAttribute(1L, "sourceTopic"),
                 2L, eventAttribute(2L, "eventCodePath"),
-                3L, eventAttribute(3L, "payloadPath")
-        ));
+                3L, eventAttribute(3L, "payloadPath")));
 
         DeviceBO device = new DeviceBO();
         device.setId(10L);
         device.setTenantId(1L);
-        device.setEventAttributeConfigIdMap(Map.of(20L, Map.of(
-                1L, eventConfig(1L, 10L, 20L, "dc3/event/device-a"),
-                2L, eventConfig(2L, 10L, 20L, "$.eventCode"),
-                3L, eventConfig(3L, 10L, 20L, "$.payload")
-        )));
+        device.setEventAttributeConfigIdMap(Map.of(
+                20L,
+                Map.of(
+                        1L, eventConfig(1L, 10L, 20L, "dc3/event/device-a"),
+                        2L, eventConfig(2L, 10L, 20L, "$.eventCode"),
+                        3L, eventConfig(3L, 10L, 20L, "$.payload"))));
         when(deviceClient.getById(10L)).thenReturn(reactor.core.publisher.Mono.just(device));
 
-        MqttMessage msg = mqttMessage("dc3/event/device-a", 1,
+        MqttMessage msg = mqttMessage(
+                "dc3/event/device-a",
+                1,
                 "{\"deviceId\":10,\"pointId\":30,\"rawValue\":\"92\",\"eventCode\":\"alarm\",\"payload\":{\"temperature\":\"92\"}}");
 
         service.receiveValue(msg);
@@ -240,8 +249,8 @@ class MqttReceiveServiceImplTest {
     }
 
     private EventRuntimeBO eventRuntime() {
-        return new EventRuntimeBO(20L, "Alarm", "alarm", EventTypeFlagEnum.ALERT,
-                EventLevelEnum.HIGH, EnableFlagEnum.ENABLE, 1);
+        return new EventRuntimeBO(
+                20L, "Alarm", "alarm", EventTypeFlagEnum.ALERT, EventLevelEnum.HIGH, EnableFlagEnum.ENABLE, 1);
     }
 
     private void installDeviceLease() {

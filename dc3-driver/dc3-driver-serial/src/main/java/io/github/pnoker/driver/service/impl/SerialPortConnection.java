@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import com.fazecast.jSerialComm.SerialPort;
 import io.github.pnoker.common.exception.ConnectorException;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Wrapper for a jSerialComm serial port connection.
@@ -81,8 +79,13 @@ public class SerialPortConnection {
 
         inputStream = serialPort.getInputStream();
         outputStream = serialPort.getOutputStream();
-        log.info("Serial port opened, portName={}, baudRate={}, dataBits={}, stopBits={}, parity={}",
-                portName, baudRate, dataBits, stopBits, parity);
+        log.info(
+                "Serial port opened, portName={}, baudRate={}, dataBits={}, stopBits={}, parity={}",
+                portName,
+                baudRate,
+                dataBits,
+                stopBits,
+                parity);
     }
 
     /**
@@ -231,5 +234,4 @@ public class SerialPortConnection {
         System.arraycopy(buffer, 0, result, 0, totalRead);
         return result;
     }
-
 }

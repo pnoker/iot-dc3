@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -51,18 +50,26 @@ public class TenantVO extends BaseVO {
     /**
      * TenantName
      */
-    @NotBlank(message = "Tenant name can't be empty", groups = {Add.class, Auth.class})
+    @NotBlank(
+            message = "Tenant name can't be empty",
+            groups = {Add.class, Auth.class})
     @Schema(description = "Tenant name", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
-            message = "Invalid tenant name", groups = {Add.class, Update.class})
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid tenant name",
+            groups = {Add.class, Update.class})
     private String tenantName;
 
     /**
      * TenantCode
      */
-    @NotBlank(message = "Tenant code can't be empty", groups = {Add.class})
+    @NotBlank(
+            message = "Tenant code can't be empty",
+            groups = {Add.class})
     @Schema(description = "Tenant code", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid tenant code",
+    @Pattern(
+            regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
+            message = "Invalid tenant code",
             groups = {Add.class, Update.class})
     private String tenantCode;
 
@@ -77,5 +84,4 @@ public class TenantVO extends BaseVO {
      */
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

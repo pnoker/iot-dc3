@@ -16,18 +16,17 @@
  */
 package io.github.pnoker.common.agentic.service.chat;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.codec.ServerSentEvent;
 import tools.jackson.databind.ObjectMapper;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class AgenticChatResponseCodecTest {
 
@@ -50,12 +49,13 @@ class AgenticChatResponseCodecTest {
     @Test
     void streamEventsFlushesRunEventsWithoutContentChunk() {
         AgenticRunTrace runTrace = new AgenticRunTrace();
-        runTrace.pendingEvents().offer(new AgenticRunEvent("tool", "searchDevices", "Search devices", "device",
-                1000L, "start", "running", null));
+        runTrace.pendingEvents()
+                .offer(new AgenticRunEvent(
+                        "tool", "searchDevices", "Search devices", "device", 1000L, "start", "running", null));
         AgenticPreparedChatBO prepared = prepared(runTrace);
 
-        List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
-                AgenticStreamDelta.empty());
+        List<ServerSentEvent<String>> events =
+                codec.streamEvents(prepared, "chatcmpl-test", 1L, AgenticStreamDelta.empty());
 
         assertThat(events).hasSize(1);
         assertThat(events.get(0).data()).contains("\"object\":\"agentic.event\"");
@@ -67,14 +67,16 @@ class AgenticChatResponseCodecTest {
     @Test
     void streamEventsKeepsRunEventsBeforeContentChunk() {
         AgenticRunTrace runTrace = new AgenticRunTrace();
-        runTrace.pendingEvents().offer(new AgenticRunEvent("tool", "lookupDeviceById", "Query device by ID", "device",
-                1000L, "start", "running", null));
-        runTrace.pendingEvents().offer(new AgenticRunEvent("tool", "lookupDeviceById", "Device loaded", "OK",
-                1100L, "result", "success", "OK"));
+        runTrace.pendingEvents()
+                .offer(new AgenticRunEvent(
+                        "tool", "lookupDeviceById", "Query device by ID", "device", 1000L, "start", "running", null));
+        runTrace.pendingEvents()
+                .offer(new AgenticRunEvent(
+                        "tool", "lookupDeviceById", "Device loaded", "OK", 1100L, "result", "success", "OK"));
         AgenticPreparedChatBO prepared = prepared(runTrace);
 
-        List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
-                new AgenticStreamDelta("Device loaded", null));
+        List<ServerSentEvent<String>> events =
+                codec.streamEvents(prepared, "chatcmpl-test", 1L, new AgenticStreamDelta("Device loaded", null));
 
         assertThat(events).hasSize(3);
         assertThat(events.get(0).data()).contains("\"object\":\"agentic.event\"");
@@ -89,8 +91,8 @@ class AgenticChatResponseCodecTest {
     void streamEventsSerializesReasoningContentChunk() {
         AgenticPreparedChatBO prepared = prepared(new AgenticRunTrace(), true);
 
-        List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
-                new AgenticStreamDelta("", "Checking platform data."));
+        List<ServerSentEvent<String>> events = codec.streamEvents(
+                prepared, "chatcmpl-test", 1L, new AgenticStreamDelta("", "Checking platform data."));
 
         assertThat(events).hasSize(1);
         assertThat(events.get(0).data()).contains("\"object\":\"chat.completion.chunk\"");
@@ -104,8 +106,8 @@ class AgenticChatResponseCodecTest {
         runTrace.recordPendingVisualization(visualization());
         AgenticPreparedChatBO prepared = prepared(runTrace);
 
-        List<ServerSentEvent<String>> events = codec.streamEvents(prepared, "chatcmpl-test", 1L,
-                new AgenticStreamDelta("Analysis ready", null));
+        List<ServerSentEvent<String>> events =
+                codec.streamEvents(prepared, "chatcmpl-test", 1L, new AgenticStreamDelta("Analysis ready", null));
 
         assertThat(events).hasSize(2);
         assertThat(events.get(0).data()).contains("\"object\":\"agentic.visualization\"");
@@ -120,8 +122,7 @@ class AgenticChatResponseCodecTest {
         runTrace.recordPendingVisualization(visualization());
         AgenticPreparedChatBO prepared = prepared(runTrace);
 
-        String json = new ObjectMapper().writeValueAsString(codec.blockingResponse(prepared,
-                "Analysis ready", "stop"));
+        String json = new ObjectMapper().writeValueAsString(codec.blockingResponse(prepared, "Analysis ready", "stop"));
 
         assertThat(json).contains("\"content_ext\"");
         assertThat(json).contains("\"charts\"");
@@ -133,9 +134,21 @@ class AgenticChatResponseCodecTest {
     }
 
     private AgenticPreparedChatBO prepared(AgenticRunTrace runTrace, boolean reasoning) {
-        return new AgenticPreparedChatBO("hello", "conversation", null, "dc3-test-model",
-                Map.of(), null, null, runTrace, true, reasoning, List.of(), List.of(),
-                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0), List.of());
+        return new AgenticPreparedChatBO(
+                "hello",
+                "conversation",
+                null,
+                "dc3-test-model",
+                Map.of(),
+                null,
+                null,
+                runTrace,
+                true,
+                reasoning,
+                List.of(),
+                List.of(),
+                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0),
+                List.of());
     }
 
     private AgenticVisualizationSpec visualization() {
@@ -146,5 +159,4 @@ class AgenticChatResponseCodecTest {
         visualization.setEncode(AgenticVisualizationSpec.Encode.xy("index", "value"));
         return visualization;
     }
-
 }

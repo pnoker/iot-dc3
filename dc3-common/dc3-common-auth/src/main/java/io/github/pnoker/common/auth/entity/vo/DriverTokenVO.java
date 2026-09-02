@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,13 +21,12 @@ import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ExpireTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
 
 /**
  * View object for driver token API responses.
@@ -48,38 +46,51 @@ public class DriverTokenVO extends BaseVO {
     /**
      * Driver ID
      */
-    @Schema(description = "Driver code. Stable routing identifier for the driver this token authenticates.", example = "dc3-driver-modbus-tcp")
+    @Schema(
+            description = "Driver code. Stable routing identifier for the driver this token authenticates.",
+            example = "dc3-driver-modbus-tcp")
     private String driverCode;
 
     /**
      * AppID
      */
-    @Schema(description = "Application ID issued to the driver during registration; used as the client identifier in token exchange.", example = "app_abc123")
+    @Schema(
+            description =
+                    "Application ID issued to the driver during registration; used as the client identifier in token exchange.",
+            example = "app_abc123")
     private String driverAppId;
 
     /**
      * AppKey
      */
-    @Schema(description = "Application key (secret) issued to the driver; used as the client secret in token exchange.", example = "sk-xxxx")
+    @Schema(
+            description = "Application key (secret) issued to the driver; used as the client secret in token exchange.",
+            example = "sk-xxxx")
     @ToString.Exclude
     private String driverAppKey;
 
     /**
      *
      */
-    @Schema(description = "Expiration policy applied to this driver token; determines how long the token remains valid before requiring renewal.", example = "PERMANENT")
+    @Schema(
+            description =
+                    "Expiration policy applied to this driver token; determines how long the token remains valid before requiring renewal.",
+            example = "PERMANENT")
     private ExpireTypeEnum expireFlag;
 
     /**
      *
      */
-    @Schema(description = "Token expiration timestamp. After this time the token is invalid and must be refreshed.", example = "2026-12-31T23:59:59")
+    @Schema(
+            description = "Token expiration timestamp. After this time the token is invalid and must be refreshed.",
+            example = "2026-12-31T23:59:59")
     private LocalDateTime expireTime;
 
     /**
      * Enable flag
      */
-    @Schema(description = "Whether this driver token is active; disabled tokens are rejected during authentication.", example = "ENABLE")
+    @Schema(
+            description = "Whether this driver token is active; disabled tokens are rejected during authentication.",
+            example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

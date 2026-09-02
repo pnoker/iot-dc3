@@ -14,12 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.common.enums.ErrorCode;
-import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ConflictException;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,10 +35,6 @@ import org.springframework.mock.http.server.reactive.MockServerHttpResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.test.StepVerifier;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class ExceptionConfigTest {
 
@@ -58,6 +57,20 @@ class ExceptionConfigTest {
                     assertThat(problem.detail()).isEqualTo("Internal server error");
                 })
                 .verifyComplete();
+    }
+
+    @Test
+    void illegalArgumentProducesOutOfRangeProblemDetails() {
+        ServerHttpResponse response = new MockServerHttpResponse();
+        StepVerifier.create(handler.illegalArgumentException(
+                        new IllegalArgumentException("limit must be between 1 and 200"), request, response))
+                .assertNext(problem -> {
+                    assertThat(problem.status()).isEqualTo(422);
+                    assertThat(problem.code()).isEqualTo(ErrorCode.OUT_OF_RANGE.getCode());
+                    assertThat(problem.detail()).isEqualTo("limit must be between 1 and 200");
+                })
+                .verifyComplete();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT);
     }
 
     @Test
@@ -141,9 +154,10 @@ class ExceptionConfigTest {
         // overkill for this contract test.
         org.springframework.validation.BindingResult bindingResult =
                 mock(org.springframework.validation.BindingResult.class);
-        when(bindingResult.getFieldErrors()).thenReturn(java.util.List.of(
-                new org.springframework.validation.FieldError("user", "name", "must not be blank"),
-                new org.springframework.validation.FieldError("user", "age", "must be positive")));
+        when(bindingResult.getFieldErrors())
+                .thenReturn(java.util.List.of(
+                        new org.springframework.validation.FieldError("user", "name", "must not be blank"),
+                        new org.springframework.validation.FieldError("user", "age", "must be positive")));
         MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
         when(exception.getBindingResult()).thenReturn(bindingResult);
 

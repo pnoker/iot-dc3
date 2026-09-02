@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.optional;
 
 import io.github.pnoker.common.utils.JsonUtil;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.function.Consumer;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Optional wrapper that checks for non-empty valid JSON strings.
@@ -70,5 +68,4 @@ public final class JsonOptional {
             emptyAction.run();
         }
     }
-
 }

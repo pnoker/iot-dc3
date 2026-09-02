@@ -14,25 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.query.FacadePointOffsetQuery;
 import io.github.pnoker.common.facade.local.builder.FacadePointBuilder;
-import io.github.pnoker.common.manager.service.ReactivePointService;
 import io.github.pnoker.common.manager.repository.PointFilter;
+import io.github.pnoker.common.manager.service.ReactivePointService;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import org.springframework.beans.factory.annotation.Autowired;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -47,7 +43,6 @@ import reactor.core.publisher.Mono;
 @Component
 public class PointLocalFacade implements PointFacade {
 
-
     private final ReactivePointService reactivePointService;
 
     private final FacadePointBuilder facadePointBuilder;
@@ -60,7 +55,6 @@ public class PointLocalFacade implements PointFacade {
     }
 
     /** Constructor retained for focused unit tests of the synchronous legacy methods. */
-
     @Override
     public Mono<FacadePointBO> getByIdReactive(Long tenantId, Long id) {
         if (reactivePointService == null) {
@@ -83,13 +77,29 @@ public class PointLocalFacade implements PointFacade {
         if (reactivePointService == null) {
             return Mono.error(new IllegalStateException("Reactive point service is not configured"));
         }
-        PointFilter filter = new PointFilter(query.tenantId(), query.pointName(), query.pointCode(),
-                query.pointTypeFlag(), query.rwFlag(), query.profileId(), query.enableFlag(), query.groupId(),
-                query.labelId(), query.version(), query.deviceId(), query.offset(), query.limit(), query.sort());
-        return reactivePointService.list(filter)
-                .map(page -> OffsetPage.of(page.items().stream().map(facadePointBuilder::toFacadeBO).toList(),
-                        page.offset(), page.limit(), page.total()));
+        PointFilter filter = new PointFilter(
+                query.tenantId(),
+                query.pointName(),
+                query.pointCode(),
+                query.pointTypeFlag(),
+                query.rwFlag(),
+                query.profileId(),
+                query.enableFlag(),
+                query.groupId(),
+                query.labelId(),
+                query.version(),
+                query.deviceId(),
+                query.offset(),
+                query.limit(),
+                query.sort());
+        return reactivePointService
+                .list(filter)
+                .map(page -> OffsetPage.of(
+                        page.items().stream()
+                                .map(facadePointBuilder::toFacadeBO)
+                                .toList(),
+                        page.offset(),
+                        page.limit(),
+                        page.total()));
     }
-
-
 }

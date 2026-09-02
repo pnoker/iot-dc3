@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * One day's MTTA (mean time to acknowledge) statistic, computed as (operate_time -
@@ -61,5 +59,4 @@ public class MttaTrendVO implements Serializable {
      */
     @Schema(description = "count of confirmed events used in the percentile calculation for this day", example = "28")
     private long confirmedCount;
-
 }

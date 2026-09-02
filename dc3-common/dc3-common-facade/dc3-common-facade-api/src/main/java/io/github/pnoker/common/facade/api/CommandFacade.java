@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
 import io.github.pnoker.common.facade.entity.query.FacadeCommandOffsetQuery;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.util.Collection;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Collection;
 
 /**
  * Protocol-neutral command facade. Single-record and bulk lookups are tenant-scoped.
@@ -38,5 +36,4 @@ public interface CommandFacade {
     Flux<FacadeCommandBO> listByIds(Long tenantId, Collection<Long> ids);
 
     Mono<OffsetPage<FacadeCommandBO>> list(FacadeCommandOffsetQuery query);
-
 }

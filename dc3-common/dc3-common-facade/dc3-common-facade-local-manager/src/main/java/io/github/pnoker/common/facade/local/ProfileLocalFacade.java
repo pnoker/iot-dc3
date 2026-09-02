@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
 import io.github.pnoker.common.facade.api.ProfileFacade;
@@ -24,14 +23,10 @@ import io.github.pnoker.common.facade.local.builder.FacadeProfileBuilder;
 import io.github.pnoker.common.manager.repository.ProfileFilter;
 import io.github.pnoker.common.manager.service.ReactiveProfileService;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.util.Collection;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -45,17 +40,16 @@ import reactor.core.publisher.Mono;
 @Component
 public class ProfileLocalFacade implements ProfileFacade {
 
-
     private final ReactiveProfileService reactiveProfileService;
 
     private final FacadeProfileBuilder facadeProfileBuilder;
 
     @org.springframework.beans.factory.annotation.Autowired
-    public ProfileLocalFacade(ReactiveProfileService reactiveProfileService, FacadeProfileBuilder facadeProfileBuilder) {
+    public ProfileLocalFacade(
+            ReactiveProfileService reactiveProfileService, FacadeProfileBuilder facadeProfileBuilder) {
         this.reactiveProfileService = reactiveProfileService;
         this.facadeProfileBuilder = facadeProfileBuilder;
     }
-
 
     @Override
     public Mono<FacadeProfileBO> getByIdReactive(Long tenantId, Long id) {
@@ -64,8 +58,12 @@ public class ProfileLocalFacade implements ProfileFacade {
 
     @Override
     public Flux<FacadeProfileBO> listByIdsReactive(Long tenantId, Collection<Long> ids) {
-        List<Long> normalized = ids == null ? List.of() : ids.stream()
-                .filter(value -> value != null && value > 0).distinct().toList();
+        List<Long> normalized = ids == null
+                ? List.of()
+                : ids.stream()
+                        .filter(value -> value != null && value > 0)
+                        .distinct()
+                        .toList();
         return reactiveProfileService.listByIds(tenantId, normalized).map(facadeProfileBuilder::toFacadeBO);
     }
 
@@ -76,13 +74,28 @@ public class ProfileLocalFacade implements ProfileFacade {
 
     @Override
     public Mono<OffsetPage<FacadeProfileBO>> listReactive(FacadeProfileOffsetQuery query) {
-        ProfileFilter filter = new ProfileFilter(query.tenantId(), query.profileName(), query.profileCode(),
-                query.profileShareFlag(), query.profileTypeFlag(), query.enableFlag(), query.groupId(),
-                query.labelId(), query.version(), query.deviceId(), query.offset(), query.limit(), query.sort());
-        return reactiveProfileService.list(filter)
-                .map(page -> OffsetPage.of(page.items().stream().map(facadeProfileBuilder::toFacadeBO).toList(),
-                        page.offset(), page.limit(), page.total()));
+        ProfileFilter filter = new ProfileFilter(
+                query.tenantId(),
+                query.profileName(),
+                query.profileCode(),
+                query.profileShareFlag(),
+                query.profileTypeFlag(),
+                query.enableFlag(),
+                query.groupId(),
+                query.labelId(),
+                query.version(),
+                query.deviceId(),
+                query.offset(),
+                query.limit(),
+                query.sort());
+        return reactiveProfileService
+                .list(filter)
+                .map(page -> OffsetPage.of(
+                        page.items().stream()
+                                .map(facadeProfileBuilder::toFacadeBO)
+                                .toList(),
+                        page.offset(),
+                        page.limit(),
+                        page.total()));
     }
-
-
 }

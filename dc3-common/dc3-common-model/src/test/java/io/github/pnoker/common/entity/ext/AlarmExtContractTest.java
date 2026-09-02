@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class AlarmExtContractTest {
 
@@ -87,15 +85,11 @@ class AlarmExtContractTest {
 
     @Test
     void notifyChannelContentRoundTripsWithoutSecrets() {
-        NotifyChannelExt.Content content = new NotifyChannelExt.Content(
-                true,
-                "interactive-card-v1",
-                false,
-                true,
-                Map.of("locale", "zh-CN"));
+        NotifyChannelExt.Content content =
+                new NotifyChannelExt.Content(true, "interactive-card-v1", false, true, Map.of("locale", "zh-CN"));
 
-        NotifyChannelExt.Content parsed = JsonUtil.parseObject(
-                JsonUtil.toJsonString(content), NotifyChannelExt.Content.class);
+        NotifyChannelExt.Content parsed =
+                JsonUtil.parseObject(JsonUtil.toJsonString(content), NotifyChannelExt.Content.class);
 
         assertThat(parsed.getSignEnabled()).isTrue();
         assertThat(parsed.getOptions()).containsEntry("locale", "zh-CN");
@@ -112,8 +106,7 @@ class AlarmExtContractTest {
                 "FIRING",
                 Map.of("dedupKey", "tenant:rule:point"));
 
-        RuleStateExt.Content parsed = JsonUtil.parseObject(
-                JsonUtil.toJsonString(content), RuleStateExt.Content.class);
+        RuleStateExt.Content parsed = JsonUtil.parseObject(JsonUtil.toJsonString(content), RuleStateExt.Content.class);
 
         assertThat(parsed.getRuleCode()).isEqualTo("temperature-high");
         assertThat(parsed.getLabels()).containsExactly("temperature", "line-a");
@@ -135,8 +128,8 @@ class AlarmExtContractTest {
                 "FIRING",
                 Map.of("deviceId", 10L, "numValue", 86.5));
 
-        RuleAlarmEventExt.Content parsed = JsonUtil.parseObject(
-                JsonUtil.toJsonString(content), RuleAlarmEventExt.Content.class);
+        RuleAlarmEventExt.Content parsed =
+                JsonUtil.parseObject(JsonUtil.toJsonString(content), RuleAlarmEventExt.Content.class);
 
         assertThat(parsed.getRuleCode()).isEqualTo("temperature-high");
         assertThat(parsed.getTargetType()).isEqualTo(AlarmTargetTypeEnum.POINT);
@@ -151,21 +144,17 @@ class AlarmExtContractTest {
                 "CARD",
                 Map.of("deviceName", "Line A PLC", "value", 86.5),
                 Map.of("msg_type", "interactive"));
-        NotifyHistoryResponseExt.Content response = new NotifyHistoryResponseExt.Content(
-                "om_123",
-                200,
-                "ok",
-                Map.of("code", 0));
+        NotifyHistoryResponseExt.Content response =
+                new NotifyHistoryResponseExt.Content("om_123", 200, "ok", Map.of("code", 0));
 
-        NotifyHistoryRequestExt.Content parsedRequest = JsonUtil.parseObject(
-                JsonUtil.toJsonString(request), NotifyHistoryRequestExt.Content.class);
-        NotifyHistoryResponseExt.Content parsedResponse = JsonUtil.parseObject(
-                JsonUtil.toJsonString(response), NotifyHistoryResponseExt.Content.class);
+        NotifyHistoryRequestExt.Content parsedRequest =
+                JsonUtil.parseObject(JsonUtil.toJsonString(request), NotifyHistoryRequestExt.Content.class);
+        NotifyHistoryResponseExt.Content parsedResponse =
+                JsonUtil.parseObject(JsonUtil.toJsonString(response), NotifyHistoryResponseExt.Content.class);
 
         assertThat(parsedRequest.getTitle()).isEqualTo("P1 Temperature Alarm");
         assertThat(parsedRequest.getPayload()).containsEntry("msg_type", "interactive");
         assertThat(parsedResponse.getProviderMessageId()).isEqualTo("om_123");
         assertThat(parsedResponse.getPayload()).containsEntry("code", 0);
     }
-
 }

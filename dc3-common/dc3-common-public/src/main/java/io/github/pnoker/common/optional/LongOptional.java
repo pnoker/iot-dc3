@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.optional;
 
 import io.github.pnoker.common.constant.common.DefaultConstant;
-
 import java.util.Objects;
 import java.util.function.LongConsumer;
 
@@ -70,5 +68,4 @@ public final class LongOptional {
             emptyAction.run();
         }
     }
-
 }

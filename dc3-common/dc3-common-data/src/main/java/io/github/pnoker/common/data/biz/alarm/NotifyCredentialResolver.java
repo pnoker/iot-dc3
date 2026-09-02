@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import java.util.Optional;
@@ -34,5 +33,4 @@ public interface NotifyCredentialResolver {
      * @return credential if configured
      */
     Optional<NotifyCredential> resolve(String credentialRef);
-
 }

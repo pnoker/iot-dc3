@@ -14,10 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.log;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,22 +26,21 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 /**
  * Repository-wide source gate for stable, safe and consistently English application logs.
  */
 class LoggingPolicyTest {
 
-    private static final Pattern FORBIDDEN_PRINT = Pattern.compile(
-            "System\\.(?:out|err)\\.(?:print|println|printf)\\s*\\(|\\.printStackTrace\\s*\\(");
-    private static final Pattern LOG_CALL = Pattern.compile(
-            "\\b(?:log|logger|LOGGER)\\.(?:trace|debug|info|warn|error)\\s*\\(");
+    private static final Pattern FORBIDDEN_PRINT =
+            Pattern.compile("System\\.(?:out|err)\\.(?:print|println|printf)\\s*\\(|\\.printStackTrace\\s*\\(");
+    private static final Pattern LOG_CALL =
+            Pattern.compile("\\b(?:log|logger|LOGGER)\\.(?:trace|debug|info|warn|error)\\s*\\(");
     private static final Pattern STRING_LITERAL = Pattern.compile("\"(?:\\\\.|[^\"\\\\])*\"", Pattern.DOTALL);
     private static final Pattern HAN_CHARACTER = Pattern.compile("\\p{IsHan}");
-    private static final Pattern RAW_SENSITIVE_FIELD = Pattern.compile(
-            "(?i)\\b(?:payload|body|response|headers|principalHeader)\\s*=\\s*\\{\\}");
+    private static final Pattern RAW_SENSITIVE_FIELD =
+            Pattern.compile("(?i)\\b(?:payload|body|response|headers|principalHeader)\\s*=\\s*\\{\\}");
 
     private static void inspect(Path repository, Path path, List<String> violations) {
         try {
@@ -194,8 +192,6 @@ class LoggingPolicyTest {
                     .forEach(path -> inspect(repository, path, violations));
         }
 
-        assertThat(violations)
-                .as("Logging policy violations")
-                .isEmpty();
+        assertThat(violations).as("Logging policy violations").isEmpty();
     }
 }

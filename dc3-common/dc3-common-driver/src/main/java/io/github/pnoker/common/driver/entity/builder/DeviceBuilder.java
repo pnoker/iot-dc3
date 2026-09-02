@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.builder;
 
 import io.github.pnoker.api.common.GrpcDeviceDTO;
@@ -37,7 +36,9 @@ import org.mapstruct.MappingTarget;
  * @author pnoker
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface DeviceBuilder {
 
     /**
@@ -77,10 +78,10 @@ public interface DeviceBuilder {
         GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
 
         CollectionOptional.ofNullable(entityGrpc.getProfileIdsList())
-                .ifPresent(value -> entityBO.setProfileId(value.stream().findFirst().orElse(null)));
+                .ifPresent(value ->
+                        entityBO.setProfileId(value.stream().findFirst().orElse(null)));
         JsonOptional.ofNullable(entityGrpc.getDeviceExt())
                 .ifPresent(value -> entityBO.setDeviceExt(JsonUtil.parseObject(value, DeviceExt.class)));
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
     }
-
 }

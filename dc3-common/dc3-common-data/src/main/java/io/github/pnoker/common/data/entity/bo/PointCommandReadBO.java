@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.bo;
 
+import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import io.github.pnoker.common.enums.PointCommandSourceEnum;
 
 /**
  * Business object for submitting a point read command.
@@ -33,8 +32,7 @@ import io.github.pnoker.common.enums.PointCommandSourceEnum;
 @ToString
 public class PointCommandReadBO {
 
-    public PointCommandReadBO() {
-    }
+    public PointCommandReadBO() {}
 
     public PointCommandReadBO(Long deviceId, Long pointId, String commandId) {
         this(deviceId, pointId, commandId, null);
@@ -63,5 +61,4 @@ public class PointCommandReadBO {
     private String commandId;
 
     private PointCommandSourceEnum source;
-
 }

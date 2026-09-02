@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * View object for point command read API responses.
@@ -45,11 +43,17 @@ public class PointCommandReadVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "ID of the device to read the point value from.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(
+            description = "ID of the device to read the point value from.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Device ID can't be empty")
     private String deviceId;
 
-    @Schema(description = "ID of the data point to read.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(
+            description = "ID of the data point to read.",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Point ID can't be empty")
     private String pointId;
 
@@ -58,7 +62,9 @@ public class PointCommandReadVO implements Serializable {
      * When provided and already exists, returns the existing command status.
      * When omitted, the server generates a new UUID.
      */
-    @Schema(description = "ID of the read command to invoke.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(
+            description = "ID of the read command to invoke.",
+            example = "4096",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     private String commandId;
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -41,7 +40,9 @@ public class DriverExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Driver configuration content payload; a structured object carrying driver-specific settings, not a scalar value")
+    @Schema(
+            description =
+                    "Driver configuration content payload; a structured object carrying driver-specific settings, not a scalar value")
     private Content content;
 
     /**
@@ -54,9 +55,10 @@ public class DriverExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Reserved configuration value retained for the driver; free-form string used to pass driver-specific hints", example = "keep")
+        @Schema(
+                description =
+                        "Reserved configuration value retained for the driver; free-form string used to pass driver-specific hints",
+                example = "keep")
         private String keep;
-
     }
-
 }

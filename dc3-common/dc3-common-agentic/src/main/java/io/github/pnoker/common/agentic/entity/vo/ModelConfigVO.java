@@ -33,16 +33,23 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString(callSuper = true)
-@Schema(description = "Model configuration response, describing a single AI model and its capability flags within the current tenant.")
+@Schema(
+        description =
+                "Model configuration response, describing a single AI model and its capability flags within the current tenant.")
 public class ModelConfigVO extends BaseVO {
 
-    @Schema(description = "Model identifier string as used by the provider API (e.g. OpenAI model name).", example = "gpt-4o")
+    @Schema(
+            description = "Model identifier string as used by the provider API (e.g. OpenAI model name).",
+            example = "gpt-4o")
     private String model;
 
     @Schema(description = "Human-readable display name for the model, shown in the UI.", example = "GPT-4o")
     private String label;
 
-    @Schema(description = "Identifier of the model provider this configuration belongs to; must belong to the current tenant.", example = "1024")
+    @Schema(
+            description =
+                    "Identifier of the model provider this configuration belongs to; must belong to the current tenant.",
+            example = "1024")
     private String providerId;
 
     @Schema(description = "Display name of the model provider, denormalised for read convenience.", example = "OpenAI")
@@ -60,13 +67,18 @@ public class ModelConfigVO extends BaseVO {
     @Schema(description = "Whether the model supports chain-of-thought reasoning output.", example = "false")
     private Boolean reasoning;
 
-    @Schema(description = "Sampling temperature controlling output randomness; typically in the range 0.0–2.0.", example = "0.7")
+    @Schema(
+            description = "Sampling temperature controlling output randomness; typically in the range 0.0–2.0.",
+            example = "0.7")
     private Double temperature;
 
     @Schema(description = "Maximum number of tokens the model will generate in a single response.", example = "4096")
     private Integer maxTokens;
 
-    @Schema(description = "Whether this model is marked as the tenant default; only one model per tenant should be DEFAULT.", example = "NOT_DEFAULT")
+    @Schema(
+            description =
+                    "Whether this model is marked as the tenant default; only one model per tenant should be DEFAULT.",
+            example = "NOT_DEFAULT")
     private DefaultFlagEnum defaultFlag;
 
     @Schema(description = "Enabled/disabled status of this model configuration within the tenant.", example = "ENABLE")
@@ -74,5 +86,4 @@ public class ModelConfigVO extends BaseVO {
 
     @Schema(description = "Identifier of the tenant this model configuration belongs to.", example = "1024")
     private String tenantId;
-
 }

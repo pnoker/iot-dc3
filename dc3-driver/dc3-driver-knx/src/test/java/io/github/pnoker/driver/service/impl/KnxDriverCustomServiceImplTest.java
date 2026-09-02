@@ -16,19 +16,18 @@
  */
 package io.github.pnoker.driver.service.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashMap;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class KnxDriverCustomServiceImplTest {
@@ -62,5 +61,4 @@ class KnxDriverCustomServiceImplTest {
         assertThat(report.isPassed()).isFalse();
         assertThat(report.getIssues()).isNotEmpty();
     }
-
 }

@@ -1,4 +1,21 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.auth.service.impl;
+
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.bo.ResourceTreeBO;
 import io.github.pnoker.common.auth.entity.builder.ResourceBuilder;
@@ -12,17 +29,16 @@ import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -40,15 +56,19 @@ public class ReactiveResourceServiceImpl implements ReactiveResourceService {
     @Override
     public Mono<ResourceBO> getById(Long id) {
         if (!valid(id)) return Mono.error(new RequestException("Resource ID is required"));
-        return Mono.defer(() -> store.getById(id)).map(builder::buildBOByDO)
+        return Mono.defer(() -> store.getById(id))
+                .map(builder::buildBOByDO)
                 .switchIfEmpty(Mono.error(new NotFoundException("Resource")));
     }
 
     @Override
     public Mono<OffsetPage<ResourceBO>> list(ResourceFilter filter) {
-        return Mono.defer(() -> store.list(filter)).map(page -> OffsetPage.of(
-                page.items().stream().map(builder::buildBOByDO).toList(),
-                page.offset(), page.limit(), page.total()));
+        return Mono.defer(() -> store.list(filter))
+                .map(page -> OffsetPage.of(
+                        page.items().stream().map(builder::buildBOByDO).toList(),
+                        page.offset(),
+                        page.limit(),
+                        page.total()));
     }
 
     @Override
@@ -74,9 +94,11 @@ public class ReactiveResourceServiceImpl implements ReactiveResourceService {
                     .flatMap(duplicate -> duplicate
                             ? Mono.<ResourceBO>error(new DuplicateException("Resource has been duplicated"))
                             : Mono.defer(() -> store.insert(resource))
-                            .switchIfEmpty(Mono.error(new ServiceException("Resource insert returned no row")))
-                            .doOnSuccess(saved -> invalidateAll()).map(builder::buildBOByDO))
-                    .onErrorMap(DuplicateKeyException.class,
+                                    .switchIfEmpty(Mono.error(new ServiceException("Resource insert returned no row")))
+                                    .doOnSuccess(saved -> invalidateAll())
+                                    .map(builder::buildBOByDO))
+                    .onErrorMap(
+                            DuplicateKeyException.class,
                             error -> new DuplicateException("Resource code is already in use"));
         });
     }
@@ -108,9 +130,11 @@ public class ReactiveResourceServiceImpl implements ReactiveResourceService {
                     .flatMap(duplicate -> duplicate
                             ? Mono.<ResourceBO>error(new DuplicateException("Resource has been duplicated"))
                             : Mono.defer(() -> store.update(resource))
-                            .doOnSuccess(saved -> invalidateAll()).map(builder::buildBOByDO))
+                                    .doOnSuccess(saved -> invalidateAll())
+                                    .map(builder::buildBOByDO))
                     .switchIfEmpty(Mono.error(new NotFoundException("Resource")))
-                    .onErrorMap(DuplicateKeyException.class,
+                    .onErrorMap(
+                            DuplicateKeyException.class,
                             error -> new DuplicateException("Resource code is already in use"));
         });
     }
@@ -122,8 +146,8 @@ public class ReactiveResourceServiceImpl implements ReactiveResourceService {
                 .flatMap(hasChildren -> hasChildren
                         ? Mono.<Boolean>error(new RequestException("Resource with children cannot be deleted"))
                         : Mono.defer(() -> store.delete(id, operatorId, operatorName))
-                        .defaultIfEmpty(false)
-                        .doOnSuccess(deleted -> invalidateAll()))
+                                .defaultIfEmpty(false)
+                                .doOnSuccess(deleted -> invalidateAll()))
                 .flatMap(deleted -> Boolean.TRUE.equals(deleted)
                         ? Mono.<Void>empty()
                         : Mono.error(new NotFoundException("Resource")));
@@ -144,11 +168,13 @@ public class ReactiveResourceServiceImpl implements ReactiveResourceService {
         List<ResourceTreeBO> roots = new ArrayList<>();
         rows.forEach(node -> {
             ResourceTreeBO parent = node.getParentResourceId() == null || node.getParentResourceId() == 0L
-                    ? null : byId.get(node.getParentResourceId());
-            if (parent == null) roots.add(node); else parent.addChild(node);
+                    ? null
+                    : byId.get(node.getParentResourceId());
+            if (parent == null) roots.add(node);
+            else parent.addChild(node);
         });
-        Comparator<ResourceTreeBO> order = Comparator
-                .comparing(ResourceTreeBO::getResourceTypeFlag, Comparator.nullsLast(Comparator.naturalOrder()))
+        Comparator<ResourceTreeBO> order = Comparator.comparing(
+                        ResourceTreeBO::getResourceTypeFlag, Comparator.nullsLast(Comparator.naturalOrder()))
                 .thenComparing(ResourceTreeBO::getResourceName, Comparator.nullsLast(String::compareTo))
                 .thenComparing(ResourceTreeBO::getId, Comparator.nullsLast(Long::compareTo));
         sort(roots, order);
@@ -171,7 +197,10 @@ public class ReactiveResourceServiceImpl implements ReactiveResourceService {
             throw new RequestException("Resource entity ID is invalid");
         }
         resource.setResourceName(resource.getResourceName().trim());
-        resource.setServiceName(resource.getServiceName() == null ? "" : resource.getServiceName().trim());
+        resource.setServiceName(
+                resource.getServiceName() == null
+                        ? ""
+                        : resource.getServiceName().trim());
     }
 
     private boolean valid(Long id) {

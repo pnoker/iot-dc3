@@ -1,3 +1,19 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.data.repository;
 
 import io.github.pnoker.common.data.entity.bo.MessageBO;
@@ -14,17 +30,16 @@ import io.github.pnoker.common.data.entity.model.NotifyChannelDO;
 import io.github.pnoker.common.data.entity.model.NotifyDO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 
 /** Explicit SQL adapter for notification configuration reads. */
 @Repository
@@ -49,8 +64,12 @@ public class R2dbcNotifyConfigStore implements ReactiveNotifyConfigStore {
         String sql = "SELECT id,notify_name,notify_code,auto_confirm_flag,notify_interval,notify_ext,enable_flag,"
                 + "tenant_id,remark,creator_id,creator_name,create_time,operator_id,operator_name,operate_time,deleted"
                 + " FROM " + NOTIFY_TABLE + " WHERE tenant_id=:tenant_id AND id=:id AND deleted=0 LIMIT 1";
-        return databaseClient.sql(sql).bind("tenant_id", tenantId).bind("id", id)
-                .map((row, metadata) -> notifyBuilder.buildBOByDO(mapNotify(row))).one();
+        return databaseClient
+                .sql(sql)
+                .bind("tenant_id", tenantId)
+                .bind("id", id)
+                .map((row, metadata) -> notifyBuilder.buildBOByDO(mapNotify(row)))
+                .one();
     }
 
     @Override
@@ -59,8 +78,12 @@ public class R2dbcNotifyConfigStore implements ReactiveNotifyConfigStore {
         String sql = "SELECT id,message_name,message_code,message_level,message_ext,enable_flag,tenant_id,remark,"
                 + "creator_id,creator_name,create_time,operator_id,operator_name,operate_time,deleted"
                 + " FROM " + MESSAGE_TABLE + " WHERE tenant_id=:tenant_id AND id=:id AND deleted=0 LIMIT 1";
-        return databaseClient.sql(sql).bind("tenant_id", tenantId).bind("id", id)
-                .map((row, metadata) -> messageBuilder.buildBOByDO(mapMessage(row))).one();
+        return databaseClient
+                .sql(sql)
+                .bind("tenant_id", tenantId)
+                .bind("id", id)
+                .map((row, metadata) -> messageBuilder.buildBOByDO(mapMessage(row)))
+                .one();
     }
 
     @Override
@@ -69,8 +92,12 @@ public class R2dbcNotifyConfigStore implements ReactiveNotifyConfigStore {
         String sql = "SELECT id,channel_name,channel_code,channel_type_flag,credential_ref,channel_ext,enable_flag,"
                 + "tenant_id,remark,creator_id,creator_name,create_time,operator_id,operator_name,operate_time,deleted"
                 + " FROM " + CHANNEL_TABLE + " WHERE tenant_id=:tenant_id AND id=:id AND deleted=0 LIMIT 1";
-        return databaseClient.sql(sql).bind("tenant_id", tenantId).bind("id", id)
-                .map((row, metadata) -> notifyChannelBuilder.buildBOByDO(mapChannel(row))).one();
+        return databaseClient
+                .sql(sql)
+                .bind("tenant_id", tenantId)
+                .bind("id", id)
+                .map((row, metadata) -> notifyChannelBuilder.buildBOByDO(mapChannel(row)))
+                .one();
     }
 
     @Override
@@ -79,8 +106,12 @@ public class R2dbcNotifyConfigStore implements ReactiveNotifyConfigStore {
         String sql = "SELECT id,notify_id,channel_id,bind_ext,enable_flag,tenant_id,remark,creator_id,creator_name,"
                 + "create_time,operator_id,operator_name,operate_time,deleted FROM " + BIND_TABLE
                 + " WHERE tenant_id=:tenant_id AND notify_id=:notify_id AND enable_flag=0 AND deleted=0 ORDER BY id";
-        return databaseClient.sql(sql).bind("tenant_id", tenantId).bind("notify_id", notifyId)
-                .map((row, metadata) -> notifyChannelBindBuilder.buildBOByDO(mapBind(row))).all();
+        return databaseClient
+                .sql(sql)
+                .bind("tenant_id", tenantId)
+                .bind("notify_id", notifyId)
+                .map((row, metadata) -> notifyChannelBindBuilder.buildBOByDO(mapBind(row)))
+                .all();
     }
 
     private NotifyDO mapNotify(io.r2dbc.spi.Row row) {
@@ -184,7 +215,8 @@ public class R2dbcNotifyConfigStore implements ReactiveNotifyConfigStore {
     private LocalDateTime time(Object value) {
         if (value instanceof LocalDateTime local) return local;
         if (value instanceof Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        if (value instanceof OffsetDateTime offset) return offset.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+        if (value instanceof OffsetDateTime offset)
+            return offset.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
         return null;
     }
 

@@ -14,8 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import io.github.pnoker.common.driver.entity.bean.DriverHealthState;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
@@ -31,6 +39,8 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.driver.service.MqttSendService;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,18 +50,6 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.integration.mqtt.event.MqttConnectionFailedEvent;
 import org.springframework.integration.mqtt.event.MqttSubscribedEvent;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class MqttDriverCustomServiceImplTest {
@@ -98,12 +96,15 @@ class MqttDriverCustomServiceImplTest {
     @BeforeEach
     void setUp() {
         // Publish-only driver: no inbound adapter configured.
-        service = new MqttDriverCustomServiceImpl(driverMetadata, driverSenderService, mqttSendService,
-                adapterProvider(null));
+        service = new MqttDriverCustomServiceImpl(
+                driverMetadata, driverSenderService, mqttSendService, adapterProvider(null));
     }
 
     private MqttDriverCustomServiceImpl serviceWithAdapter() {
-        return new MqttDriverCustomServiceImpl(driverMetadata, driverSenderService, mqttSendService,
+        return new MqttDriverCustomServiceImpl(
+                driverMetadata,
+                driverSenderService,
+                mqttSendService,
                 adapterProvider(mock(MqttPahoMessageDrivenChannelAdapter.class)));
     }
 
@@ -121,10 +122,12 @@ class MqttDriverCustomServiceImplTest {
 
     @Test
     void deviceAndPointEventsAreLoggedOnly() {
-        assertThatNoException().isThrownBy(
-                () -> service.event(metadataEvent(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD, 1L)));
-        assertThatNoException().isThrownBy(
-                () -> service.event(metadataEvent(MetadataTypeEnum.POINT, MetadataOperateTypeEnum.UPDATE, 2L)));
+        assertThatNoException()
+                .isThrownBy(
+                        () -> service.event(metadataEvent(MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.ADD, 1L)));
+        assertThatNoException()
+                .isThrownBy(
+                        () -> service.event(metadataEvent(MetadataTypeEnum.POINT, MetadataOperateTypeEnum.UPDATE, 2L)));
         verifyNoInteractions(mqttSendService, driverSenderService, driverMetadata);
     }
 
@@ -136,12 +139,25 @@ class MqttDriverCustomServiceImplTest {
     @Test
     void writePublishesWithConfiguredQosWhenAvailable() {
         Map<String, AttributeBO> pointConfig = new HashMap<>();
-        pointConfig.put("commandTopic",
-                AttributeBO.builder().value("dc3/cmd/temp").type(AttributeTypeEnum.STRING).build());
-        pointConfig.put("commandQos", AttributeBO.builder().value("1").type(AttributeTypeEnum.INT).build());
+        pointConfig.put(
+                "commandTopic",
+                AttributeBO.builder()
+                        .value("dc3/cmd/temp")
+                        .type(AttributeTypeEnum.STRING)
+                        .build());
+        pointConfig.put(
+                "commandQos",
+                AttributeBO.builder().value("1").type(AttributeTypeEnum.INT).build());
 
-        Boolean ok = service.write(null, pointConfig, device(1L), point(1L),
-                WritePointValue.builder().value("23.5").type(PointTypeEnum.STRING).build());
+        Boolean ok = service.write(
+                null,
+                pointConfig,
+                device(1L),
+                point(1L),
+                WritePointValue.builder()
+                        .value("23.5")
+                        .type(PointTypeEnum.STRING)
+                        .build());
 
         assertThat(ok).isTrue();
         verify(mqttSendService).sendToMqtt("dc3/cmd/temp", 1, "23.5");
@@ -151,12 +167,23 @@ class MqttDriverCustomServiceImplTest {
     @Test
     void writeFallsBackToDefaultQosWhenLookupFails() {
         Map<String, AttributeBO> pointConfig = new HashMap<>();
-        pointConfig.put("commandTopic",
-                AttributeBO.builder().value("dc3/cmd/temp").type(AttributeTypeEnum.STRING).build());
+        pointConfig.put(
+                "commandTopic",
+                AttributeBO.builder()
+                        .value("dc3/cmd/temp")
+                        .type(AttributeTypeEnum.STRING)
+                        .build());
         // commandQos missing entirely → service catches NPE and falls back
 
-        Boolean ok = service.write(null, pointConfig, device(1L), point(1L),
-                WritePointValue.builder().value("23.5").type(PointTypeEnum.STRING).build());
+        Boolean ok = service.write(
+                null,
+                pointConfig,
+                device(1L),
+                point(1L),
+                WritePointValue.builder()
+                        .value("23.5")
+                        .type(PointTypeEnum.STRING)
+                        .build());
 
         assertThat(ok).isTrue();
         verify(mqttSendService).sendToMqtt("dc3/cmd/temp", "23.5");
@@ -165,15 +192,30 @@ class MqttDriverCustomServiceImplTest {
     @Test
     void writeFallsBackToDefaultQosWhenQosTypeIsWrong() {
         Map<String, AttributeBO> pointConfig = new HashMap<>();
-        pointConfig.put("commandTopic",
-                AttributeBO.builder().value("dc3/cmd/temp").type(AttributeTypeEnum.STRING).build());
+        pointConfig.put(
+                "commandTopic",
+                AttributeBO.builder()
+                        .value("dc3/cmd/temp")
+                        .type(AttributeTypeEnum.STRING)
+                        .build());
         // commandQos present but as STRING -> AttributeBO.getValue(Integer.class) throws
         // TypeException, service catches and falls back to default-QoS overload.
-        pointConfig.put("commandQos",
-                AttributeBO.builder().value("not-a-number").type(AttributeTypeEnum.STRING).build());
+        pointConfig.put(
+                "commandQos",
+                AttributeBO.builder()
+                        .value("not-a-number")
+                        .type(AttributeTypeEnum.STRING)
+                        .build());
 
-        Boolean ok = service.write(null, pointConfig, device(1L), point(1L),
-                WritePointValue.builder().value("23.5").type(PointTypeEnum.STRING).build());
+        Boolean ok = service.write(
+                null,
+                pointConfig,
+                device(1L),
+                point(1L),
+                WritePointValue.builder()
+                        .value("23.5")
+                        .type(PointTypeEnum.STRING)
+                        .build());
 
         assertThat(ok).isTrue();
         verify(mqttSendService).sendToMqtt("dc3/cmd/temp", "23.5");
@@ -212,5 +254,4 @@ class MqttDriverCustomServiceImplTest {
         assertThat(health.getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
         assertThat(health.getDescription()).contains("no inbound adapter");
     }
-
 }

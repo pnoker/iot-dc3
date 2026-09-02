@@ -3,9 +3,7 @@ import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
 export function registerChatCommand(program: Command): void {
-  const chat = program
-    .command('chat')
-    .description('AI chat (agentic service)');
+  const chat = program.command('chat').description('AI chat (agentic service)');
 
   // dc3 chat <prompt>
   chat
@@ -30,9 +28,7 @@ export function registerChatCommand(program: Command): void {
       const conversationId = opts.conversationId || undefined;
       const body: Record<string, unknown> = {
         stream: opts.stream,
-        messages: prompt
-          ? [{ role: 'user', content: prompt }]
-          : [],
+        messages: prompt ? [{ role: 'user', content: prompt }] : [],
       };
       if (conversationId) body.conversationId = conversationId;
       if (opts.model) body.model = opts.model;
@@ -83,8 +79,7 @@ export function registerChatCommand(program: Command): void {
               }
               try {
                 const parsed = JSON.parse(data);
-                const content =
-                  parsed.choices?.[0]?.delta?.content || '';
+                const content = parsed.choices?.[0]?.delta?.content || '';
                 if (content) {
                   process.stdout.write(content);
                 }
@@ -98,10 +93,7 @@ export function registerChatCommand(program: Command): void {
         process.exit(0);
       } else {
         const format = detectFormat(opts.format);
-        const result = await dc3Client.post(
-          '/api/v3/agentic/chat/completions',
-          body,
-        );
+        const result = await dc3Client.post('/api/v3/agentic/chat/completions', body);
         printAndExit(result, format);
       }
     });

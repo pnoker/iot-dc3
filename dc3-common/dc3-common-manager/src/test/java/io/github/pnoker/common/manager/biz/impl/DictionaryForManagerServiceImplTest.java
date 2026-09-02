@@ -1,4 +1,26 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package io.github.pnoker.common.manager.biz.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
@@ -10,6 +32,7 @@ import io.github.pnoker.common.manager.service.ReactivePointService;
 import io.github.pnoker.common.manager.service.ReactiveProfileService;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -17,14 +40,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DictionaryForManagerServiceImplTest {
@@ -49,11 +64,7 @@ class DictionaryForManagerServiceImplTest {
         when(driverService.list(any(DriverFilter.class)))
                 .thenReturn(Mono.just(OffsetPage.of(List.of(driver), 20, 10, 21)));
         DictionaryListRequest request = new DictionaryListRequest(
-                20L,
-                10,
-                List.of(new SortSpec("label", SortSpec.Direction.ASC)),
-                "Modbus",
-                null);
+                20L, 10, List.of(new SortSpec("label", SortSpec.Direction.ASC)), "Modbus", null);
 
         StepVerifier.create(service().listDriverOptions(9L, request))
                 .assertNext(page -> {
@@ -71,8 +82,7 @@ class DictionaryForManagerServiceImplTest {
         verify(driverService).list(filter.capture());
         assertThat(filter.getValue().tenantId()).isEqualTo(9L);
         assertThat(filter.getValue().driverName()).isEqualTo("Modbus");
-        assertThat(filter.getValue().sort())
-                .containsExactly(new SortSpec("driverName", SortSpec.Direction.ASC));
+        assertThat(filter.getValue().sort()).containsExactly(new SortSpec("driverName", SortSpec.Direction.ASC));
     }
 
     @Test
@@ -92,12 +102,8 @@ class DictionaryForManagerServiceImplTest {
         device.setId(3L);
         device.setDeviceName("Boiler");
         when(deviceService.list(any())).thenReturn(Mono.just(OffsetPage.of(List.of(device), 0, 50, 1)));
-        DictionaryListRequest request = new DictionaryListRequest(
-                0L,
-                50,
-                List.of(new SortSpec("value", SortSpec.Direction.DESC)),
-                null,
-                null);
+        DictionaryListRequest request =
+                new DictionaryListRequest(0L, 50, List.of(new SortSpec("value", SortSpec.Direction.DESC)), null, null);
 
         StepVerifier.create(service().listDeviceOptions(9L, request))
                 .expectNextCount(1)
@@ -111,5 +117,4 @@ class DictionaryForManagerServiceImplTest {
     private DictionaryForManagerServiceImpl service() {
         return new DictionaryForManagerServiceImpl(driverService, profileService, deviceService, pointService);
     }
-
 }

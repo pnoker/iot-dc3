@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.lwm2m;
 
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
 
 /**
  * LwM2M Observation Handler.
@@ -59,15 +57,24 @@ public class Lwm2mObservationHandler {
             return;
         }
 
-        log.debug("LwM2M observation received: endpoint={}, path=/{}/{}/{}, value={}",
-                endpoint, objectId, objectInstanceId, resourceId, value);
+        log.debug(
+                "LwM2M observation received: endpoint={}, path=/{}/{}/{}, value={}",
+                endpoint,
+                objectId,
+                objectInstanceId,
+                resourceId,
+                value);
 
         // TODO: Implement device/point lookup from driver metadata using endpoint and resource path.
         //  The current driver metadata model uses deviceId-based lookups, not endpoint-based.
         //  A future enhancement should maintain an endpoint -> deviceId mapping and
         //  objectId/objectInstanceId/resourceId -> pointId mapping to enable automatic
         //  point value forwarding from observed resources.
-        log.debug("LwM2M observation value received but auto-forwarding not yet implemented: endpoint={}, path=/{}/{}/{}",
-                endpoint, objectId, objectInstanceId, resourceId);
+        log.debug(
+                "LwM2M observation value received but auto-forwarding not yet implemented: endpoint={}, path=/{}/{}/{}",
+                endpoint,
+                objectId,
+                objectInstanceId,
+                resourceId);
     }
 }

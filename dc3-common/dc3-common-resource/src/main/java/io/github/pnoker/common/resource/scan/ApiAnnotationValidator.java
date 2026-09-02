@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.resource.scan;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,11 +21,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,6 +28,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Reports x-dc3-ai / description defects on an {@code @Operation} so a build or CI step can list
@@ -138,7 +136,8 @@ public class ApiAnnotationValidator {
     /**
      * Walk a request-body type's instance fields, requiring @Schema(description) on each; recurse into nested project types.
      */
-    private void collectBodyDefects(String apiCode, Class<?> type, Set<Class<?>> visited, int depth, List<String> defects) {
+    private void collectBodyDefects(
+            String apiCode, Class<?> type, Set<Class<?>> visited, int depth, List<String> defects) {
         if (type == null || depth > MAX_BODY_DEPTH || !visited.add(type)) {
             return;
         }

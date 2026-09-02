@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
@@ -33,15 +32,14 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.driver.lwm2m.Lwm2mServerManager;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * LwM2M Driver Custom Service Implementation.
@@ -72,13 +70,15 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -118,20 +118,31 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)) {
                 cleanupDevice(metadataEvent.getId());
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         String endpoint = getConfigValue(driverConfig, "endpoint", "");
         if (endpoint.isEmpty()) {
             log.warn("LwM2M read failed: endpoint not configured, deviceId={}", device.getId());
@@ -142,13 +153,23 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
         int objectInstanceId = getConfigIntValue(pointConfig, "objectInstanceId", 0);
         int resourceId = getConfigIntValue(pointConfig, "resourceId", 0);
 
-        log.debug("LwM2M read: endpoint={}, path=/{}/{}/{}, deviceId={}, pointId={}",
-                endpoint, objectId, objectInstanceId, resourceId, device.getId(), point.getId());
+        log.debug(
+                "LwM2M read: endpoint={}, path=/{}/{}/{}, deviceId={}, pointId={}",
+                endpoint,
+                objectId,
+                objectInstanceId,
+                resourceId,
+                device.getId(),
+                point.getId());
 
         String value = lwm2mServerManager.read(endpoint, objectId, objectInstanceId, resourceId);
         if (Objects.isNull(value)) {
-            log.warn("LwM2M read returned empty value: endpoint={}, path=/{}/{}/{}",
-                    endpoint, objectId, objectInstanceId, resourceId);
+            log.warn(
+                    "LwM2M read returned empty value: endpoint={}, path=/{}/{}/{}",
+                    endpoint,
+                    objectId,
+                    objectInstanceId,
+                    resourceId);
             return null;
         }
 
@@ -156,8 +177,12 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         String endpoint = getConfigValue(driverConfig, "endpoint", "");
         if (endpoint.isEmpty()) {
             log.warn("LwM2M write failed: endpoint not configured, deviceId={}", device.getId());
@@ -169,8 +194,14 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
         int resourceId = getConfigIntValue(pointConfig, "resourceId", 0);
         String value = writePointValue.getValue(String.class);
 
-        log.debug("LwM2M write: endpoint={}, path=/{}/{}/{}, deviceId={}, pointId={}",
-                endpoint, objectId, objectInstanceId, resourceId, device.getId(), point.getId());
+        log.debug(
+                "LwM2M write: endpoint={}, path=/{}/{}/{}, deviceId={}, pointId={}",
+                endpoint,
+                objectId,
+                objectInstanceId,
+                resourceId,
+                device.getId(),
+                point.getId());
 
         return lwm2mServerManager.write(endpoint, objectId, objectInstanceId, resourceId, value);
     }
@@ -192,7 +223,9 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String key, String defaultValue) {
         AttributeBO attribute = config.get(key);
-        if (Objects.isNull(attribute) || Objects.isNull(attribute.getValue()) || attribute.getValue().isEmpty()) {
+        if (Objects.isNull(attribute)
+                || Objects.isNull(attribute.getValue())
+                || attribute.getValue().isEmpty()) {
             return defaultValue;
         }
         return attribute.getValue(String.class);
@@ -218,7 +251,8 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "serverPort", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -229,7 +263,7 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "resourceId", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

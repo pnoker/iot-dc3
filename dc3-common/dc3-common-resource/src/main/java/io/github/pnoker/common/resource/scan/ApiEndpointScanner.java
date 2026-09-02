@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.resource.scan;
 
 import io.github.pnoker.common.annotation.PublicEndpoint;
@@ -22,6 +21,14 @@ import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
 import io.github.pnoker.common.resource.config.ResourceRegistrarProperties;
 import io.swagger.v3.oas.annotations.Operation;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,15 +38,6 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.reactive.result.method.RequestMappingInfo;
 import org.springframework.web.reactive.result.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.util.pattern.PathPattern;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Walks the WebFlux handler mappings and turns every HTTP endpoint into a
@@ -53,14 +51,13 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class ApiEndpointScanner {
 
-    private static final Set<RequestMethod> SUPPORTED_METHODS = Set.of(RequestMethod.GET, RequestMethod.POST,
-            RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE);
+    private static final Set<RequestMethod> SUPPORTED_METHODS =
+            Set.of(RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.PATCH, RequestMethod.DELETE);
 
-    private static final List<String> DEFAULT_EXCLUDES = List.of("/actuator/**", "/error", "/error/**",
-            "/favicon.ico");
+    private static final List<String> DEFAULT_EXCLUDES = List.of("/actuator/**", "/error", "/error/**", "/favicon.ico");
 
-    private static final Pattern PERMISSION_CAN_PATTERN = Pattern.compile(
-            "@perm\\.can\\(\\s*['\"]([^'\"]+)['\"]\\s*,\\s*['\"]([^'\"]+)['\"]\\s*\\)");
+    private static final Pattern PERMISSION_CAN_PATTERN =
+            Pattern.compile("@perm\\.can\\(\\s*['\"]([^'\"]+)['\"]\\s*,\\s*['\"]([^'\"]+)['\"]\\s*\\)");
 
     private final RequestMappingHandlerMapping handlerMapping;
 
@@ -159,13 +156,14 @@ public class ApiEndpointScanner {
                 if (out.containsKey(key)) {
                     continue;
                 }
-                boolean isSingleGet = "GET".equals(method.name())
-                        && (path.contains("{") || path.contains("*"));
+                boolean isSingleGet = "GET".equals(method.name()) && (path.contains("{") || path.contains("*"));
                 Operation operation = handler.getMethodAnnotation(Operation.class);
                 String title = operation != null && StringUtils.isNotBlank(operation.summary())
-                        ? operation.summary() : handler.getMethod().getName();
+                        ? operation.summary()
+                        : handler.getMethod().getName();
                 String remark = operation != null ? StringUtils.defaultString(operation.description()) : "";
-                out.put(key,
+                out.put(
+                        key,
                         FacadeScannedApiBO.builder()
                                 .method(method.name())
                                 .path(path)
@@ -198,5 +196,4 @@ public class ApiEndpointScanner {
         }
         return false;
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import com.serotonin.modbus4j.ModbusFactory;
@@ -44,16 +43,15 @@ import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.exception.WritePointException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * Custom driver service implementation for the Modbus RTU driver.
@@ -84,8 +82,10 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
      * swap in a mock factory; production keeps the single default instance.
      */
     private static ModbusFactory modbusFactory = new ModbusFactory();
+
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
     /**
@@ -98,13 +98,15 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
      */
     private Map<Long, ConsecutiveFailure> failureMap;
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -128,9 +130,7 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
         // If connection exists and is initialized, it's online
         ModbusMaster existing = connectMap.get(deviceId);
         if (existing != null) {
-            return existing.isInitialized()
-                    ? DeviceHealthState.online()
-                    : DeviceHealthState.offline();
+            return existing.isInitialized() ? DeviceHealthState.online() : DeviceHealthState.offline();
         }
         // If in backoff, report offline without attempting a new connection
         ConsecutiveFailure failure = failureMap.get(deviceId);
@@ -153,8 +153,12 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}", driverCode,
-                    metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
 
             // Remove stale connection when device is updated or deleted
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
@@ -162,22 +166,36 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
                 ModbusMaster removed = connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     removed.destroy();
-                    log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}", driverCode,
-                            metadataEvent.getId(), operateType);
+                    log.info(
+                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                            driverCode,
+                            metadataEvent.getId(),
+                            operateType);
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}", driverCode,
-                    metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                               PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         ModbusMaster modbusMaster = getConnector(device.getId(), driverConfig);
         try {
-            return new ReadPointValue(device, point, readValue(modbusMaster, pointConfig, point.getPointTypeFlag().getCode()));
+            return new ReadPointValue(
+                    device,
+                    point,
+                    readValue(
+                            modbusMaster, pointConfig, point.getPointTypeFlag().getCode()));
         } catch (ReadPointException e) {
             invalidateConnector(device.getId(), modbusMaster);
             throw e;
@@ -185,8 +203,12 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig, DeviceBO device,
-                         PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         ModbusMaster modbusMaster = getConnector(device.getId(), driverConfig);
         try {
             return writeValue(modbusMaster, pointConfig, writePointValue);
@@ -210,7 +232,9 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
         if (failure != null && failure.shouldBackoff()) {
             throw new ConnectorException(
                     "Driver connection in backoff after {} consecutive failures, protocol={}, deviceId={}",
-                    failure.count, driverCode, deviceId);
+                    failure.count,
+                    driverCode,
+                    deviceId);
         }
 
         return connectMap.computeIfAbsent(deviceId, id -> {
@@ -219,30 +243,50 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
             int dataBits = driverConfig.get("dataBits").getValue(Integer.class);
             int stopBits = driverConfig.get("stopBits").getValue(Integer.class);
             int parity = driverConfig.get("parity").getValue(Integer.class);
-            log.debug("Driver connection creating, protocol={}, deviceId={}, port={}, baudRate={}", driverCode, deviceId,
-                    port, baudRate);
+            log.debug(
+                    "Driver connection creating, protocol={}, deviceId={}, port={}, baudRate={}",
+                    driverCode,
+                    deviceId,
+                    port,
+                    baudRate);
             JSerialCommWrapper wrapper = new JSerialCommWrapper(port, baudRate, dataBits, stopBits, parity);
             ModbusMaster modbusMaster = modbusFactory.createRtuMaster(wrapper);
             try {
                 modbusMaster.init();
-                log.info("Driver connection established, protocol={}, deviceId={}, port={}, baudRate={}", driverCode,
-                        deviceId, port, baudRate);
+                log.info(
+                        "Driver connection established, protocol={}, deviceId={}, port={}, baudRate={}",
+                        driverCode,
+                        deviceId,
+                        port,
+                        baudRate);
                 // Successful connection clears failure tracking
                 failureMap.remove(deviceId);
             } catch (ModbusInitException e) {
                 try {
                     modbusMaster.destroy();
                 } catch (Exception e1) {
-                    log.warn("Driver connection destroy failed after init error, protocol={}, deviceId={}, port={}", driverCode,
-                            deviceId, port, e1);
+                    log.warn(
+                            "Driver connection destroy failed after init error, protocol={}, deviceId={}, port={}",
+                            driverCode,
+                            deviceId,
+                            port,
+                            e1);
                 }
                 // Record failure for backoff
-                failureMap.compute(deviceId, (k, v) ->
-                        v == null ? new ConsecutiveFailure() : v.increment());
-                log.error("Driver connection failed, protocol={}, deviceId={}, port={}, baudRate={}", driverCode, deviceId,
-                        port, baudRate, e);
-                throw new ConnectorException("Driver connection failed, protocol=" + driverCode + ", deviceId={}, port={}, message={}",
-                        deviceId, port, e.getMessage(), e);
+                failureMap.compute(deviceId, (k, v) -> v == null ? new ConsecutiveFailure() : v.increment());
+                log.error(
+                        "Driver connection failed, protocol={}, deviceId={}, port={}, baudRate={}",
+                        driverCode,
+                        deviceId,
+                        port,
+                        baudRate,
+                        e);
+                throw new ConnectorException(
+                        "Driver connection failed, protocol=" + driverCode + ", deviceId={}, port={}, message={}",
+                        deviceId,
+                        port,
+                        e.getMessage(),
+                        e);
             }
             return modbusMaster;
         });
@@ -280,8 +324,11 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
                 Number inputRegisterValue = getMasterValue(modbusMaster, inputRegister);
                 return String.valueOf(inputRegisterValue);
             default:
-                log.warn("Unsupported Modbus function code, slaveId={}, functionCode={}, offset={}", slaveId,
-                        functionCode, offset);
+                log.warn(
+                        "Unsupported Modbus function code, slaveId={}, functionCode={}, offset={}",
+                        slaveId,
+                        functionCode,
+                        offset);
                 throw new UnSupportException("Unsupported Modbus read function code: " + functionCode);
         }
     }
@@ -300,8 +347,8 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
             return modbusMaster.getValue(locator);
         } catch (ModbusTransportException | ErrorResponseException e) {
             log.error("Driver point read failed, protocol={}", driverCode, e);
-            throw new ReadPointException("Driver point read failed, protocol=" + driverCode + ", message={}", e.getMessage(),
-                    e);
+            throw new ReadPointException(
+                    "Driver point read failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
     }
 
@@ -315,7 +362,8 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
      * @param writePointValue value to write
      * @return true if write succeeded, false if failed or unsupported function code
      */
-    private boolean writeValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, WritePointValue writePointValue) {
+    private boolean writeValue(
+            ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, WritePointValue writePointValue) {
         int slaveId = pointConfig.get("slaveId").getValue(Integer.class);
         int functionCode = pointConfig.get("functionCode").getValue(Integer.class);
         int offset = pointConfig.get("offset").getValue(Integer.class);
@@ -324,13 +372,16 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
                 WriteCoilResponse coilResponse = setMasterValue(modbusMaster, slaveId, offset, writePointValue);
                 return !coilResponse.isException();
             case 3:
-                BaseLocator<Number> locator = BaseLocator.holdingRegister(slaveId, offset,
-                        getValueType(writePointValue.getType().getCode()));
+                BaseLocator<Number> locator = BaseLocator.holdingRegister(
+                        slaveId, offset, getValueType(writePointValue.getType().getCode()));
                 setMasterValue(modbusMaster, locator, writePointValue);
                 return true;
             default:
-                log.warn("Unsupported Modbus write function code, slaveId={}, functionCode={}, offset={}", slaveId,
-                        functionCode, offset);
+                log.warn(
+                        "Unsupported Modbus write function code, slaveId={}, functionCode={}, offset={}",
+                        slaveId,
+                        functionCode,
+                        offset);
                 return false;
         }
     }
@@ -368,14 +419,20 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
      * @return the coil write response
      * @throws WritePointException if a transport error occurs
      */
-    private WriteCoilResponse setMasterValue(ModbusMaster modbusMaster, int slaveId, int offset, WritePointValue writePointValue) {
+    private WriteCoilResponse setMasterValue(
+            ModbusMaster modbusMaster, int slaveId, int offset, WritePointValue writePointValue) {
         try {
-            WriteCoilRequest coilRequest = new WriteCoilRequest(slaveId, offset, writePointValue.getValue(Boolean.class));
+            WriteCoilRequest coilRequest =
+                    new WriteCoilRequest(slaveId, offset, writePointValue.getValue(Boolean.class));
             return (WriteCoilResponse) modbusMaster.send(coilRequest);
         } catch (ModbusTransportException e) {
             log.error("Driver point write failed, protocol={}, slaveId={}, offset={}", driverCode, slaveId, offset, e);
-            throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", slaveId={}, offset={}, message={}",
-                    slaveId, offset, e.getMessage(), e);
+            throw new WritePointException(
+                    "Driver point write failed, protocol=" + driverCode + ", slaveId={}, offset={}, message={}",
+                    slaveId,
+                    offset,
+                    e.getMessage(),
+                    e);
         }
     }
 
@@ -388,24 +445,27 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
      * @param <T>             value type determined by the locator
      * @throws WritePointException if a transport or error response occurs
      */
-    private <T> void setMasterValue(ModbusMaster modbusMaster, BaseLocator<T> locator, WritePointValue writePointValue) {
+    private <T> void setMasterValue(
+            ModbusMaster modbusMaster, BaseLocator<T> locator, WritePointValue writePointValue) {
         try {
-            PointTypeEnum valueType = PointTypeEnum.ofCode(writePointValue.getType().getCode());
+            PointTypeEnum valueType =
+                    PointTypeEnum.ofCode(writePointValue.getType().getCode());
             if (Objects.isNull(valueType)) {
                 throw new UnSupportException("Unsupported type of " + writePointValue.getType());
             }
-            Number value = switch (valueType) {
-                case INT -> writePointValue.getValue(Integer.class);
-                case LONG -> writePointValue.getValue(Long.class);
-                case FLOAT -> writePointValue.getValue(Float.class);
-                case DOUBLE -> writePointValue.getValue(Double.class);
-                default -> writePointValue.getValue(Float.class);
-            };
+            Number value =
+                    switch (valueType) {
+                        case INT -> writePointValue.getValue(Integer.class);
+                        case LONG -> writePointValue.getValue(Long.class);
+                        case FLOAT -> writePointValue.getValue(Float.class);
+                        case DOUBLE -> writePointValue.getValue(Double.class);
+                        default -> writePointValue.getValue(Float.class);
+                    };
             modbusMaster.setValue(locator, value);
         } catch (ModbusTransportException | ErrorResponseException e) {
             log.error("Driver point write failed, protocol={}", driverCode, e);
-            throw new WritePointException("Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(),
-                    e);
+            throw new WritePointException(
+                    "Driver point write failed, protocol=" + driverCode + ", message={}", e.getMessage(), e);
         }
     }
 
@@ -428,7 +488,8 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "parity", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -439,7 +500,8 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "offset", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     /**
@@ -468,5 +530,4 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
                     && (System.currentTimeMillis() - firstFailureTime) < FAILURE_BACKOFF_MS;
         }
     }
-
 }

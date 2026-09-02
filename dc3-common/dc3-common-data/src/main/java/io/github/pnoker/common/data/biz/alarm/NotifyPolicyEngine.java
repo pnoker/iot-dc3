@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
 import io.github.pnoker.common.data.entity.bo.RuleStateBO;
-
 import java.time.LocalDateTime;
 
 /**
@@ -41,7 +39,6 @@ public interface NotifyPolicyEngine {
      * @param now    decision time
      * @return decision
      */
-    NotifyDecision decide(RuleMatch match, NotifyBO notify, NotifyChannelBindBO bind, RuleStateBO state,
-                          LocalDateTime now);
-
+    NotifyDecision decide(
+            RuleMatch match, NotifyBO notify, NotifyChannelBindBO bind, RuleStateBO state, LocalDateTime now);
 }

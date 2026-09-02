@@ -5,6 +5,14 @@
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.common.agentic.service.impl;
 
@@ -16,6 +24,18 @@ import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.RequestException;
+import io.github.pnoker.common.utils.UuidV7;
+import jakarta.annotation.PostConstruct;
+import java.io.IOException;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,20 +46,6 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.io.IOException;
-import java.nio.channels.AsynchronousFileChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Objects;
-import io.github.pnoker.common.utils.UuidV7;
-import jakarta.annotation.PostConstruct;
-import java.util.concurrent.atomic.AtomicLong;
 
 /** Reactive attachment upload, listing, and metadata summarization. */
 @Slf4j
@@ -57,7 +63,9 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @PostConstruct
     void initializeStorageRoot() {
-        storageRoot = Paths.get(properties.getAttachmentStoragePath()).toAbsolutePath().normalize();
+        storageRoot = Paths.get(properties.getAttachmentStoragePath())
+                .toAbsolutePath()
+                .normalize();
         try {
             Files.createDirectories(storageRoot);
         } catch (IOException exception) {
@@ -65,10 +73,11 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
     }
 
-
     @Override
     public Mono<AttachmentBO> upload(String conversationId, FilePart filePart, RequestHeader.PrincipalHeader header) {
-        if (StringUtils.isBlank(conversationId) || filePart == null || StringUtils.isBlank(filePart.filename())
+        if (StringUtils.isBlank(conversationId)
+                || filePart == null
+                || StringUtils.isBlank(filePart.filename())
                 || header == null) {
             return Mono.error(new RequestException("Attachment data is required"));
         }
@@ -82,27 +91,35 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
         AtomicLong bytes = new AtomicLong();
         Path finalPath = path;
-        Mono<Void> write = Mono.usingWhen(open(finalPath), channel -> {
-            Flux<DataBuffer> bounded = filePart.content().handle((buffer, sink) -> {
-                long next = bytes.addAndGet(buffer.readableByteCount());
-                if (next > MAX_BYTES) {
-                    DataBufferUtils.release(buffer);
-                    sink.error(new RequestException("Attachment size exceeds 10 MB"));
-                } else {
-                    sink.next(buffer);
-                }
-            });
-            return DataBufferUtils.write(bounded, channel)
-                    .doOnNext(DataBufferUtils.releaseConsumer())
-                    .then();
-        }, channel -> close(channel), (channel, error) -> close(channel), channel -> close(channel));
-        return Mono.usingWhen(Mono.just(finalPath), ignored -> write
-                        .then(sessionService.touch(conversationId, header, null))
-                        .then(Mono.defer(() -> saveAttachment(conversationId, filePart, header, bytes.get(), finalPath))),
-                ignored -> Mono.empty(),
-                (ignored, error) -> deleteFile(finalPath),
-                ignored -> deleteFile(finalPath))
-                .onErrorMap(error -> error instanceof RequestException ? error
+        Mono<Void> write = Mono.usingWhen(
+                open(finalPath),
+                channel -> {
+                    Flux<DataBuffer> bounded = filePart.content().handle((buffer, sink) -> {
+                        long next = bytes.addAndGet(buffer.readableByteCount());
+                        if (next > MAX_BYTES) {
+                            DataBufferUtils.release(buffer);
+                            sink.error(new RequestException("Attachment size exceeds 10 MB"));
+                        } else {
+                            sink.next(buffer);
+                        }
+                    });
+                    return DataBufferUtils.write(bounded, channel)
+                            .doOnNext(DataBufferUtils.releaseConsumer())
+                            .then();
+                },
+                channel -> close(channel),
+                (channel, error) -> close(channel),
+                channel -> close(channel));
+        return Mono.usingWhen(
+                        Mono.just(finalPath),
+                        ignored -> write.then(sessionService.touch(conversationId, header, null))
+                                .then(Mono.defer(() ->
+                                        saveAttachment(conversationId, filePart, header, bytes.get(), finalPath))),
+                        ignored -> Mono.empty(),
+                        (ignored, error) -> deleteFile(finalPath),
+                        ignored -> deleteFile(finalPath))
+                .onErrorMap(error -> error instanceof RequestException
+                        ? error
                         : new RequestException("Attachment file save failed", error));
     }
 
@@ -115,7 +132,8 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public Mono<String> summarize(List<Long> attachmentIds, RequestHeader.PrincipalHeader header) {
         if (attachmentIds == null || attachmentIds.isEmpty()) return Mono.just("");
-        return attachmentStore.findByIds(attachmentIds, header)
+        return attachmentStore
+                .findByIds(attachmentIds, header)
                 .map(item -> "- id=" + item.getId() + ", name=" + item.getFileName() + ", contentType="
                         + item.getContentType() + ", size=" + item.getSize() + " bytes")
                 .collectList()
@@ -123,8 +141,8 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     private Mono<AsynchronousFileChannel> open(Path path) {
-        return Mono.fromCallable(() -> AsynchronousFileChannel.open(path, StandardOpenOption.CREATE_NEW,
-                StandardOpenOption.WRITE));
+        return Mono.fromCallable(
+                () -> AsynchronousFileChannel.open(path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE));
     }
 
     private Mono<Void> close(AsynchronousFileChannel channel) {
@@ -139,24 +157,26 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private Path resolveFilePath(String conversationId, RequestHeader.PrincipalHeader header, String fileName) {
         Path root = storageRoot == null
-                ? Paths.get(properties.getAttachmentStoragePath()).toAbsolutePath().normalize()
+                ? Paths.get(properties.getAttachmentStoragePath())
+                        .toAbsolutePath()
+                        .normalize()
                 : storageRoot;
         String prefix = "tenant_" + safePathPart(String.valueOf(header.getTenantId()))
                 + "_user_" + safePathPart(String.valueOf(header.getUserId()))
                 + "_conversation_" + safePathPart(conversationId);
-        Path path = root.resolve(prefix + SymbolConstant.HYPHEN + UuidV7.next()
-                + SymbolConstant.HYPHEN + safePathPart(fileName)).normalize();
+        Path path = root.resolve(
+                        prefix + SymbolConstant.HYPHEN + UuidV7.next() + SymbolConstant.HYPHEN + safePathPart(fileName))
+                .normalize();
         if (!path.startsWith(root)) throw new RequestException("Attachment file path is invalid");
         return path;
     }
 
     private String safePathPart(String value) {
-        return StringUtils.defaultIfBlank(value, "attachment")
-                .replaceAll("[^a-zA-Z0-9._-]", SymbolConstant.UNDERSCORE);
+        return StringUtils.defaultIfBlank(value, "attachment").replaceAll("[^a-zA-Z0-9._-]", SymbolConstant.UNDERSCORE);
     }
 
-    private Mono<AttachmentBO> saveAttachment(String conversationId, FilePart filePart,
-                                               RequestHeader.PrincipalHeader header, long size, Path path) {
+    private Mono<AttachmentBO> saveAttachment(
+            String conversationId, FilePart filePart, RequestHeader.PrincipalHeader header, long size, Path path) {
         AttachmentBO attachment = new AttachmentBO();
         attachment.setConversationId(conversationId);
         attachment.setFileName(filePart.filename());

@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
-
-import io.github.pnoker.common.entity.auth.Keys;
-import io.jsonwebtoken.Claims;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import io.github.pnoker.common.entity.auth.Keys;
+import io.jsonwebtoken.Claims;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 class KeyUtilTest {
 
@@ -53,8 +51,7 @@ class KeyUtilTest {
 
     @Test
     void aesEncryptionRejectsBlankPrivateKey() {
-        assertThatThrownBy(() -> KeyUtil.encryptAes("payload", ""))
-                .isInstanceOf(Exception.class);
+        assertThatThrownBy(() -> KeyUtil.encryptAes("payload", "")).isInstanceOf(Exception.class);
     }
 
     @Test

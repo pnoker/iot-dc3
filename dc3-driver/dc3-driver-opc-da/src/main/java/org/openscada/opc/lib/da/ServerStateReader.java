@@ -14,11 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
-
-import lombok.extern.slf4j.Slf4j;
-import org.openscada.opc.dcom.da.OPCSERVERSTATUS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +22,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.openscada.opc.dcom.da.OPCSERVERSTATUS;
 
 /**
  * @author pnoker
@@ -67,13 +65,17 @@ public class ServerStateReader {
             return;
         }
 
-        this._job = this._scheduler.scheduleAtFixedRate(new Runnable() {
+        this._job = this._scheduler.scheduleAtFixedRate(
+                new Runnable() {
 
-            @Override
-            public void run() {
-                once();
-            }
-        }, 1000, 1000, TimeUnit.MILLISECONDS);
+                    @Override
+                    public void run() {
+                        once();
+                    }
+                },
+                1000,
+                1000,
+                TimeUnit.MILLISECONDS);
     }
 
     public synchronized void stop() {
@@ -98,5 +100,4 @@ public class ServerStateReader {
     public void removeListener(final ServerStateListener listener) {
         this._listeners.remove(listener);
     }
-
 }

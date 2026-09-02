@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.coap.client;
 
 import io.github.pnoker.driver.coap.entity.CoapResult;
 import io.github.pnoker.driver.coap.entity.property.CoapProperties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapClient;
@@ -27,9 +28,6 @@ import org.eclipse.californium.core.config.CoapConfig;
 import org.eclipse.californium.elements.config.Configuration;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 /**
  * CoAP Client Manager
@@ -100,7 +98,8 @@ public class CoapClientManager implements DisposableBean {
         synchronized (client) {
             client.setURI(uri + path);
             try {
-                org.eclipse.californium.core.CoapResponse response = client.put(payload, MediaTypeRegistry.APPLICATION_JSON);
+                org.eclipse.californium.core.CoapResponse response =
+                        client.put(payload, MediaTypeRegistry.APPLICATION_JSON);
                 if (response == null) {
                     log.warn("CoAP PUT timed out, uri={}, path={}", uri, path);
                     return null;
@@ -148,5 +147,4 @@ public class CoapClientManager implements DisposableBean {
                 .success(response.isSuccess())
                 .build();
     }
-
 }

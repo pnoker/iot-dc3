@@ -17,9 +17,8 @@
 package io.github.pnoker.common.agentic.entity.model;
 
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import org.apache.commons.lang3.StringUtils;
-
 import java.time.Instant;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Runtime event emitted while an agentic turn is executing.
@@ -27,8 +26,15 @@ import java.time.Instant;
  * @author pnoker
  * @since 2016.10.1
  */
-public record AgenticRunEvent(String type, String name, String title, String detail, long timestamp, String phase,
-                              String status, String code) {
+public record AgenticRunEvent(
+        String type,
+        String name,
+        String title,
+        String detail,
+        long timestamp,
+        String phase,
+        String status,
+        String code) {
 
     public AgenticRunEvent {
         type = StringUtils.defaultIfBlank(type, AgenticConstant.RunEvent.TYPE_EVENT);
@@ -50,8 +56,15 @@ public record AgenticRunEvent(String type, String name, String title, String det
      * @return tool start result
      */
     public static AgenticRunEvent toolStart(String toolName, String domain, String title) {
-        return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_TOOL, toolName, title, domain, now(),
-                AgenticConstant.RunEvent.PHASE_START, AgenticConstant.RunEvent.STATUS_RUNNING, null);
+        return new AgenticRunEvent(
+                AgenticConstant.RunEvent.TYPE_TOOL,
+                toolName,
+                title,
+                domain,
+                now(),
+                AgenticConstant.RunEvent.PHASE_START,
+                AgenticConstant.RunEvent.STATUS_RUNNING,
+                null);
     }
 
     /**
@@ -64,15 +77,22 @@ public record AgenticRunEvent(String type, String name, String title, String det
      * @return tool result result
      */
     public static AgenticRunEvent toolResult(String toolName, boolean success, String code, String message) {
-        String normalizedCode = StringUtils.defaultIfBlank(code,
-                success ? AgenticConstant.ToolResult.CODE_OK : AgenticConstant.ToolResult.CODE_ERROR);
+        String normalizedCode = StringUtils.defaultIfBlank(
+                code, success ? AgenticConstant.ToolResult.CODE_OK : AgenticConstant.ToolResult.CODE_ERROR);
         String status = success
                 ? (AgenticConstant.ToolResult.CODE_EMPTY.equals(normalizedCode)
-                ? AgenticConstant.RunEvent.STATUS_EMPTY : AgenticConstant.RunEvent.STATUS_SUCCESS)
+                        ? AgenticConstant.RunEvent.STATUS_EMPTY
+                        : AgenticConstant.RunEvent.STATUS_SUCCESS)
                 : AgenticConstant.RunEvent.STATUS_FAILED;
-        return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_TOOL, toolName,
+        return new AgenticRunEvent(
+                AgenticConstant.RunEvent.TYPE_TOOL,
+                toolName,
                 StringUtils.defaultIfBlank(message, AgenticConstant.ToolResult.MESSAGE_COMPLETED),
-                normalizedCode, now(), AgenticConstant.RunEvent.PHASE_RESULT, status, normalizedCode);
+                normalizedCode,
+                now(),
+                AgenticConstant.RunEvent.PHASE_RESULT,
+                status,
+                normalizedCode);
     }
 
     /**
@@ -83,10 +103,15 @@ public record AgenticRunEvent(String type, String name, String title, String det
      * @return tool error result
      */
     public static AgenticRunEvent toolError(String toolName, String message) {
-        return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_TOOL, toolName,
+        return new AgenticRunEvent(
+                AgenticConstant.RunEvent.TYPE_TOOL,
+                toolName,
                 StringUtils.defaultIfBlank(message, AgenticConstant.ToolResult.MESSAGE_EXECUTION_FAILED),
-                AgenticConstant.ToolResult.CODE_ERROR, now(), AgenticConstant.RunEvent.PHASE_ERROR,
-                AgenticConstant.RunEvent.STATUS_FAILED, AgenticConstant.ToolResult.CODE_ERROR);
+                AgenticConstant.ToolResult.CODE_ERROR,
+                now(),
+                AgenticConstant.RunEvent.PHASE_ERROR,
+                AgenticConstant.RunEvent.STATUS_FAILED,
+                AgenticConstant.ToolResult.CODE_ERROR);
     }
 
     /**
@@ -95,9 +120,15 @@ public record AgenticRunEvent(String type, String name, String title, String det
      * @return reasoning requested result
      */
     public static AgenticRunEvent reasoningRequested() {
-        return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_REASONING, AgenticConstant.RunEvent.NAME_AGENTIC,
-                "Thinking", "Reasoning mode requested for this model.", now(),
-                AgenticConstant.RunEvent.PHASE_START, AgenticConstant.RunEvent.STATUS_RUNNING, null);
+        return new AgenticRunEvent(
+                AgenticConstant.RunEvent.TYPE_REASONING,
+                AgenticConstant.RunEvent.NAME_AGENTIC,
+                "Thinking",
+                "Reasoning mode requested for this model.",
+                now(),
+                AgenticConstant.RunEvent.PHASE_START,
+                AgenticConstant.RunEvent.STATUS_RUNNING,
+                null);
     }
 
     /**
@@ -107,21 +138,30 @@ public record AgenticRunEvent(String type, String name, String title, String det
      * @return request failed result
      */
     public static AgenticRunEvent requestFailed(String message) {
-        return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_ERROR, AgenticConstant.RunEvent.NAME_AGENTIC,
+        return new AgenticRunEvent(
+                AgenticConstant.RunEvent.TYPE_ERROR,
+                AgenticConstant.RunEvent.NAME_AGENTIC,
                 AgenticConstant.ToolMessage.REQUEST_FAILED,
-                StringUtils.defaultIfBlank(message, AgenticConstant.ToolMessage.REQUEST_FAILED), now(),
-                AgenticConstant.RunEvent.PHASE_ERROR, AgenticConstant.RunEvent.STATUS_FAILED,
+                StringUtils.defaultIfBlank(message, AgenticConstant.ToolMessage.REQUEST_FAILED),
+                now(),
+                AgenticConstant.RunEvent.PHASE_ERROR,
+                AgenticConstant.RunEvent.STATUS_FAILED,
                 AgenticConstant.ToolResult.CODE_ERROR);
     }
 
     public static AgenticRunEvent requestCancelled() {
-        return new AgenticRunEvent(AgenticConstant.RunEvent.TYPE_EVENT, AgenticConstant.RunEvent.NAME_AGENTIC,
-                "Request cancelled", "The client cancelled the response stream.", now(),
-                AgenticConstant.RunEvent.PHASE_RESULT, "cancelled", "CANCELLED");
+        return new AgenticRunEvent(
+                AgenticConstant.RunEvent.TYPE_EVENT,
+                AgenticConstant.RunEvent.NAME_AGENTIC,
+                "Request cancelled",
+                "The client cancelled the response stream.",
+                now(),
+                AgenticConstant.RunEvent.PHASE_RESULT,
+                "cancelled",
+                "CANCELLED");
     }
 
     private static long now() {
         return Instant.now().toEpochMilli();
     }
-
 }
