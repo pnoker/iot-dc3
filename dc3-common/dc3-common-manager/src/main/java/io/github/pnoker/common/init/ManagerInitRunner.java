@@ -29,7 +29,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 /**
  * Manager Initialization Runner for DC3 IoT Platform. This class is responsible for
  * initializing manager-related components and services during application startup. It
- * configures component scanning for manager packages and sets up MyBatis mapper scanning.
+ * configures component scanning for manager packages.
  *
  * @author pnoker
  * @since 2016.10.1

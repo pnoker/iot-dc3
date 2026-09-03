@@ -37,6 +37,9 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-db-r2dbc-runtime</artifactId>
+        </dependency><dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-postgres-auth</artifactId>
         </dependency>
         <!-- DC3 Common Related -->
         <dependency>

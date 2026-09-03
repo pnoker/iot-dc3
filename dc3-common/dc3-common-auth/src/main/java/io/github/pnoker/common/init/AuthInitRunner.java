@@ -28,7 +28,7 @@ import org.springframework.context.annotation.FilterType;
 /**
  * Authentication Initialization Runner for DC3 IoT Platform. This class handles
  * authentication initialization tasks during application startup, configuring component
- * scanning for authentication-related classes and MyBatis mappers.
+ * scanning for authentication-related classes.
  *
  * @author pnoker
  * @since 2016.10.1

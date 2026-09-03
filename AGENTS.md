@@ -179,8 +179,7 @@ CRUD-shaped names reflect result cardinality across Service, Controller, Facade,
 | return many  | `listXxx(...)` | `/list_xxx` | `ListXxx` |
 
 - Base CRUD comes from `BaseService<B,Q>`: `add`, `delete`, `update`, `getById`, and `list(Q)`.
-- Reserve `select*` for raw Mapper/Manager persistence operations.
-- Reserve MyBatis-Plus `remove*` for the Manager layer; business deletion uses `delete*`.
+- Reserve `select*` for raw store persistence operations.
 - Do not introduce `find*`, `query*`, or `fetch*` as primary CRUD verbs.
 - HTTP paths are lowercase snake_case and mirror Java names.
 - Use `getStatusByPage(Q)` for status maps and `dispatchRead`/`dispatchWrite` for command dispatch, following existing

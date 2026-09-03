@@ -39,6 +39,9 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-db-r2dbc-runtime</artifactId>
+        </dependency><dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-postgres-agentic</artifactId>
         </dependency>
         <!-- Agentic domain logic (controllers, tools, config) -->
         <dependency>
