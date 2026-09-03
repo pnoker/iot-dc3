@@ -26,7 +26,7 @@ export POSTGRES_USERNAME=dc3
 export POSTGRES_PASSWORD=dc3dc3dc3
 export POSTGRES_DB=dc3
 export DC3_R2DBC_URL=r2dbc:postgresql://localhost:35432/dc3
-export DC3_SCHEMA_FINGERPRINT=3652a1bb3718b0033f748a612e8105898e41fdb87e86e46a3b710ac09f56bce2
+export DC3_SCHEMA_FINGERPRINT=e81e356228d14b552ee42781893a748b2c5c3eae3ddda1ea3c32d58adb83107e
 export DC3_SCHEMA_CONTRACT=r2dbc-flag-day-v1
 
 # Message broker selection (docs/mq-brokers.md); rabbitmq is the default

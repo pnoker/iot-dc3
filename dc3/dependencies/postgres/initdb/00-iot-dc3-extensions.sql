@@ -18,15 +18,11 @@
 -- ----------------------------
 -- Database extensions
 -- ----------------------------
-CREATE
-EXTENSION IF NOT EXISTS timescaledb;
-CREATE
-EXTENSION IF NOT EXISTS vector;
-CREATE
-EXTENSION IF NOT EXISTS age;
+CREATE EXTENSION IF NOT EXISTS timescaledb;
+CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS age;
 
 -- Validate that the AGE shared library can be loaded during bootstrap.
 -- Application sessions that use Cypher should still LOAD age and include
 -- ag_catalog in their search_path before issuing AGE queries.
-LOAD
-'age';
+LOAD 'age';

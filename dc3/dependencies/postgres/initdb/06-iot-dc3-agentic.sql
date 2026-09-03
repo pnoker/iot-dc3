@@ -62,36 +62,21 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_session IS 'Agentic chat session metadata';
-COMMENT
-ON COLUMN dc3_session.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_session.conversation_id IS 'Conversation ID';
-COMMENT
-ON COLUMN dc3_session.title IS 'Session title';
-COMMENT
-ON COLUMN dc3_session.session_ext IS 'Session extension metadata and chat preferences, e.g. model, reasoningEnabled, temperature, maxTokens, requireConfirmation';
-COMMENT
-ON COLUMN dc3_session.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_session.user_id IS 'User ID';
-COMMENT
-ON COLUMN dc3_session.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_session.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_session.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_session.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_session.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_session.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_session.operate_time IS 'Operation time';
-COMMENT
-ON COLUMN dc3_session.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT ON TABLE dc3_session IS 'Agentic chat session metadata';
+COMMENT ON COLUMN dc3_session.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_session.conversation_id IS 'Conversation ID';
+COMMENT ON COLUMN dc3_session.title IS 'Session title';
+COMMENT ON COLUMN dc3_session.session_ext IS 'Session extension metadata and chat preferences, e.g. model, reasoningEnabled, temperature, maxTokens, requireConfirmation';
+COMMENT ON COLUMN dc3_session.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_session.user_id IS 'User ID';
+COMMENT ON COLUMN dc3_session.remark IS 'Description';
+COMMENT ON COLUMN dc3_session.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_session.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_session.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_session.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_session.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_session.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_session.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_message
@@ -133,42 +118,24 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_message IS 'Agentic persisted conversation messages';
-COMMENT
-ON COLUMN dc3_message.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_message.conversation_id IS 'Conversation ID';
-COMMENT
-ON COLUMN dc3_message.role IS 'Message role, e.g. user/assistant/system';
-COMMENT
-ON COLUMN dc3_message.content IS 'Structured message content';
-COMMENT
-ON COLUMN dc3_message.model IS 'Model identifier used for this message';
-COMMENT
-ON COLUMN dc3_message.message_index IS 'Monotonic message order inside one conversation';
-COMMENT
-ON COLUMN dc3_message.status IS 'Message status flag';
-COMMENT
-ON COLUMN dc3_message.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_message.user_id IS 'User ID';
-COMMENT
-ON COLUMN dc3_message.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_message.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_message.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_message.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_message.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_message.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_message.operate_time IS 'Operation time';
-COMMENT
-ON COLUMN dc3_message.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT ON TABLE dc3_message IS 'Agentic persisted conversation messages';
+COMMENT ON COLUMN dc3_message.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_message.conversation_id IS 'Conversation ID';
+COMMENT ON COLUMN dc3_message.role IS 'Message role, e.g. user/assistant/system';
+COMMENT ON COLUMN dc3_message.content IS 'Structured message content';
+COMMENT ON COLUMN dc3_message.model IS 'Model identifier used for this message';
+COMMENT ON COLUMN dc3_message.message_index IS 'Monotonic message order inside one conversation';
+COMMENT ON COLUMN dc3_message.status IS 'Message status flag';
+COMMENT ON COLUMN dc3_message.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_message.user_id IS 'User ID';
+COMMENT ON COLUMN dc3_message.remark IS 'Description';
+COMMENT ON COLUMN dc3_message.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_message.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_message.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_message.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_message.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_message.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_message.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_attachment
@@ -206,40 +173,23 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_attachment IS 'Agentic uploaded attachment metadata and file location';
-COMMENT
-ON COLUMN dc3_attachment.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_attachment.conversation_id IS 'Conversation ID';
-COMMENT
-ON COLUMN dc3_attachment.file_name IS 'Original uploaded file name';
-COMMENT
-ON COLUMN dc3_attachment.content_type IS 'MIME content type';
-COMMENT
-ON COLUMN dc3_attachment.size IS 'File size in bytes';
-COMMENT
-ON COLUMN dc3_attachment.file_path IS 'Stored file path';
-COMMENT
-ON COLUMN dc3_attachment.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_attachment.user_id IS 'User ID';
-COMMENT
-ON COLUMN dc3_attachment.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_attachment.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_attachment.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_attachment.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_attachment.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_attachment.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_attachment.operate_time IS 'Operation time';
-COMMENT
-ON COLUMN dc3_attachment.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT ON TABLE dc3_attachment IS 'Agentic uploaded attachment metadata and file location';
+COMMENT ON COLUMN dc3_attachment.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_attachment.conversation_id IS 'Conversation ID';
+COMMENT ON COLUMN dc3_attachment.file_name IS 'Original uploaded file name';
+COMMENT ON COLUMN dc3_attachment.content_type IS 'MIME content type';
+COMMENT ON COLUMN dc3_attachment.size IS 'File size in bytes';
+COMMENT ON COLUMN dc3_attachment.file_path IS 'Stored file path';
+COMMENT ON COLUMN dc3_attachment.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_attachment.user_id IS 'User ID';
+COMMENT ON COLUMN dc3_attachment.remark IS 'Description';
+COMMENT ON COLUMN dc3_attachment.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_attachment.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_attachment.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_attachment.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_attachment.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_attachment.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_attachment.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_action
@@ -281,46 +231,26 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_action IS 'Agentic pending and executed actions';
-COMMENT
-ON COLUMN dc3_action.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_action.action_id IS 'Stable action identifier exposed to clients';
-COMMENT
-ON COLUMN dc3_action.conversation_id IS 'Conversation ID';
-COMMENT
-ON COLUMN dc3_action.action_type IS 'Action type, e.g. write/control/read';
-COMMENT
-ON COLUMN dc3_action.title IS 'Action title';
-COMMENT
-ON COLUMN dc3_action.description IS 'Action description shown to the operator';
-COMMENT
-ON COLUMN dc3_action.payload IS 'Action payload, free-form structured data';
-COMMENT
-ON COLUMN dc3_action.status IS 'Action status flag';
-COMMENT
-ON COLUMN dc3_action.expire_time IS 'Optional expiration deadline';
-COMMENT
-ON COLUMN dc3_action.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_action.user_id IS 'User ID';
-COMMENT
-ON COLUMN dc3_action.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_action.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_action.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_action.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_action.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_action.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_action.operate_time IS 'Operation time';
-COMMENT
-ON COLUMN dc3_action.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT ON TABLE dc3_action IS 'Agentic pending and executed actions';
+COMMENT ON COLUMN dc3_action.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_action.action_id IS 'Stable action identifier exposed to clients';
+COMMENT ON COLUMN dc3_action.conversation_id IS 'Conversation ID';
+COMMENT ON COLUMN dc3_action.action_type IS 'Action type, e.g. write/control/read';
+COMMENT ON COLUMN dc3_action.title IS 'Action title';
+COMMENT ON COLUMN dc3_action.description IS 'Action description shown to the operator';
+COMMENT ON COLUMN dc3_action.payload IS 'Action payload, free-form structured data';
+COMMENT ON COLUMN dc3_action.status IS 'Action status flag';
+COMMENT ON COLUMN dc3_action.expire_time IS 'Optional expiration deadline';
+COMMENT ON COLUMN dc3_action.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_action.user_id IS 'User ID';
+COMMENT ON COLUMN dc3_action.remark IS 'Description';
+COMMENT ON COLUMN dc3_action.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_action.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_action.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_action.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_action.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_action.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_action.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_model_provider
@@ -357,40 +287,23 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_model_provider IS 'Agentic model provider connection metadata';
-COMMENT
-ON COLUMN dc3_model_provider.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_model_provider.name IS 'Provider name, unique';
-COMMENT
-ON COLUMN dc3_model_provider.provider_type IS 'Provider type, 0: openai-compatible, 1: anthropic';
-COMMENT
-ON COLUMN dc3_model_provider.base_url IS 'API base URL';
-COMMENT
-ON COLUMN dc3_model_provider.api_key IS 'API key';
-COMMENT
-ON COLUMN dc3_model_provider.default_flag IS 'Default flag, 1: default, 0: not default';
-COMMENT
-ON COLUMN dc3_model_provider.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT
-ON COLUMN dc3_model_provider.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_model_provider.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_model_provider.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_model_provider.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_model_provider.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_model_provider.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_model_provider.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_model_provider.operate_time IS 'Operation time';
-COMMENT
-ON COLUMN dc3_model_provider.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT ON TABLE dc3_model_provider IS 'Agentic model provider connection metadata';
+COMMENT ON COLUMN dc3_model_provider.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_model_provider.name IS 'Provider name, unique';
+COMMENT ON COLUMN dc3_model_provider.provider_type IS 'Provider type, 0: openai-compatible, 1: anthropic';
+COMMENT ON COLUMN dc3_model_provider.base_url IS 'API base URL';
+COMMENT ON COLUMN dc3_model_provider.api_key IS 'API key';
+COMMENT ON COLUMN dc3_model_provider.default_flag IS 'Default flag, 1: default, 0: not default';
+COMMENT ON COLUMN dc3_model_provider.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT ON COLUMN dc3_model_provider.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_model_provider.remark IS 'Description';
+COMMENT ON COLUMN dc3_model_provider.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_model_provider.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_model_provider.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_model_provider.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_model_provider.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_model_provider.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_model_provider.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_model_config
@@ -433,50 +346,28 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_model_config IS 'Agentic model option metadata';
-COMMENT
-ON COLUMN dc3_model_config.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_model_config.model IS 'Model identifier';
-COMMENT
-ON COLUMN dc3_model_config.label IS 'Display label';
-COMMENT
-ON COLUMN dc3_model_config.provider_id IS 'Foreign key to dc3_model_provider';
-COMMENT
-ON COLUMN dc3_model_config.stream IS 'Whether streaming responses are supported';
-COMMENT
-ON COLUMN dc3_model_config.tool_call IS 'Whether tool calling is supported';
-COMMENT
-ON COLUMN dc3_model_config.vision IS 'Whether vision input is supported';
-COMMENT
-ON COLUMN dc3_model_config.reasoning IS 'Whether reasoning mode is supported';
-COMMENT
-ON COLUMN dc3_model_config.temperature IS 'Default sampling temperature';
-COMMENT
-ON COLUMN dc3_model_config.max_tokens IS 'Default maximum tokens';
-COMMENT
-ON COLUMN dc3_model_config.default_flag IS 'Default flag, 1: default, 0: not default';
-COMMENT
-ON COLUMN dc3_model_config.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT
-ON COLUMN dc3_model_config.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_model_config.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_model_config.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_model_config.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_model_config.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_model_config.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_model_config.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_model_config.operate_time IS 'Operation time';
-COMMENT
-ON COLUMN dc3_model_config.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT ON TABLE dc3_model_config IS 'Agentic model option metadata';
+COMMENT ON COLUMN dc3_model_config.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_model_config.model IS 'Model identifier';
+COMMENT ON COLUMN dc3_model_config.label IS 'Display label';
+COMMENT ON COLUMN dc3_model_config.provider_id IS 'Foreign key to dc3_model_provider';
+COMMENT ON COLUMN dc3_model_config.stream IS 'Whether streaming responses are supported';
+COMMENT ON COLUMN dc3_model_config.tool_call IS 'Whether tool calling is supported';
+COMMENT ON COLUMN dc3_model_config.vision IS 'Whether vision input is supported';
+COMMENT ON COLUMN dc3_model_config.reasoning IS 'Whether reasoning mode is supported';
+COMMENT ON COLUMN dc3_model_config.temperature IS 'Default sampling temperature';
+COMMENT ON COLUMN dc3_model_config.max_tokens IS 'Default maximum tokens';
+COMMENT ON COLUMN dc3_model_config.default_flag IS 'Default flag, 1: default, 0: not default';
+COMMENT ON COLUMN dc3_model_config.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT ON COLUMN dc3_model_config.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_model_config.remark IS 'Description';
+COMMENT ON COLUMN dc3_model_config.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_model_config.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_model_config.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_model_config.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_model_config.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_model_config.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_model_config.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Records of dc3_model_provider

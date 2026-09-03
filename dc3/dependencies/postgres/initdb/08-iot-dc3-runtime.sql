@@ -152,7 +152,6 @@ COMMENT ON TABLE dc3_idempotency IS 'Tenant-scoped idempotency keys and operatio
 COMMENT ON COLUMN dc3_idempotency.tenant_id IS 'Owning tenant identifier';
 COMMENT ON COLUMN dc3_idempotency.idempotency_key IS 'Client supplied idempotency key';
 COMMENT ON COLUMN dc3_idempotency.request_hash IS 'Canonical request SHA-256';
-COMMENT ON COLUMN dc3_idempotency.request_hash IS 'Canonical request SHA-256';
 COMMENT ON COLUMN dc3_idempotency.operation_id IS 'Associated operation UUID';
 COMMENT ON COLUMN dc3_idempotency.status IS 'Idempotency lifecycle status';
 COMMENT ON COLUMN dc3_idempotency.response IS 'Canonical response JSON';
@@ -171,11 +170,6 @@ COMMENT ON COLUMN dc3_platform_lock.lock_name IS 'Logical lock name';
 COMMENT ON COLUMN dc3_platform_lock.fencing_token IS 'Monotonically increasing fencing token';
 COMMENT ON COLUMN dc3_platform_lock.holder IS 'Current holder UUID';
 COMMENT ON COLUMN dc3_platform_lock.expires_at IS 'Lease expiration timestamp in UTC';
-
-INSERT INTO dc3_schema_fingerprint
-    (fingerprint_version, ddl_hash, schema_contract, id_format, time_format, json_format)
-VALUES (2, '3652a1bb3718b0033f748a612e8105898e41fdb87e86e46a3b710ac09f56bce2', 'r2dbc-flag-day-v1', 'uuidv7-bigint', 'utc-micros', 'canonical-v1')
-ON CONFLICT (fingerprint_version) DO NOTHING;
 
 -- The compose default role owns the database; deployments with a dedicated
 -- runtime role can grant these tables explicitly during provisioning.
@@ -236,3 +230,8 @@ COMMENT ON COLUMN dc3_point_value_ingest_outbox.claimed_at IS 'Current claim tim
 COMMENT ON COLUMN dc3_point_value_ingest_outbox.claimed_by IS 'Current claim owner';
 COMMENT ON COLUMN dc3_point_value_ingest_outbox.processed_at IS 'Alert processing completion time';
 COMMENT ON COLUMN dc3_point_value_ingest_outbox.last_error IS 'Last processing error';
+
+INSERT INTO dc3_schema_fingerprint
+    (fingerprint_version, ddl_hash, schema_contract, id_format, time_format, json_format)
+VALUES (2, 'e81e356228d14b552ee42781893a748b2c5c3eae3ddda1ea3c32d58adb83107e', 'r2dbc-flag-day-v1', 'uuidv7-bigint', 'utc-micros', 'canonical-v1')
+ON CONFLICT (fingerprint_version) DO NOTHING;

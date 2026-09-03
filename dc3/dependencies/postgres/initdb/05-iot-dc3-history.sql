@@ -61,38 +61,22 @@ CREATE INDEX idx_point_value_tenant_time ON dc3_point_value (tenant_id, create_t
 -- Coverage-gap checks probe existence by tenant and point without a time bound.
 CREATE INDEX idx_point_value_tenant_point ON dc3_point_value (tenant_id, point_id);
 
-COMMENT
-ON TABLE dc3_point_value IS 'Device point history hypertable; single source of truth across all point types';
-COMMENT
-ON COLUMN dc3_point_value.message_id IS 'Immutable event identity';
-COMMENT
-ON COLUMN dc3_point_value.schema_version IS 'Point-value wire schema version';
-COMMENT
-ON COLUMN dc3_point_value.driver_node IS 'Producing driver runtime node';
-COMMENT
-ON COLUMN dc3_point_value.sequence IS 'Monotonic sequence within the producing driver node';
-COMMENT
-ON COLUMN dc3_point_value.fencing_token IS 'Manager-issued ownership fencing token';
-COMMENT
-ON COLUMN dc3_point_value.device_id IS 'Device ID';
-COMMENT
-ON COLUMN dc3_point_value.point_id IS 'Point ID';
-COMMENT
-ON COLUMN dc3_point_value.raw_value IS 'Raw value as captured from the device';
-COMMENT
-ON COLUMN dc3_point_value.cal_value IS 'Calculated/transformed value';
-COMMENT
-ON COLUMN dc3_point_value.num_value IS 'Best-effort numeric projection of cal_value (NULL for non-numeric payloads)';
-COMMENT
-ON COLUMN dc3_point_value.quality IS 'OPC-UA style quality code, 0 = GOOD';
-COMMENT
-ON COLUMN dc3_point_value.driver_id IS 'Driver ID';
-COMMENT
-ON COLUMN dc3_point_value.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_point_value.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_point_value.operate_time IS 'Operation time';
+COMMENT ON TABLE dc3_point_value IS 'Device point history hypertable; single source of truth across all point types';
+COMMENT ON COLUMN dc3_point_value.message_id IS 'Immutable event identity';
+COMMENT ON COLUMN dc3_point_value.schema_version IS 'Point-value wire schema version';
+COMMENT ON COLUMN dc3_point_value.driver_node IS 'Producing driver runtime node';
+COMMENT ON COLUMN dc3_point_value.sequence IS 'Monotonic sequence within the producing driver node';
+COMMENT ON COLUMN dc3_point_value.fencing_token IS 'Manager-issued ownership fencing token';
+COMMENT ON COLUMN dc3_point_value.device_id IS 'Device ID';
+COMMENT ON COLUMN dc3_point_value.point_id IS 'Point ID';
+COMMENT ON COLUMN dc3_point_value.raw_value IS 'Raw value as captured from the device';
+COMMENT ON COLUMN dc3_point_value.cal_value IS 'Calculated/transformed value';
+COMMENT ON COLUMN dc3_point_value.num_value IS 'Best-effort numeric projection of cal_value (NULL for non-numeric payloads)';
+COMMENT ON COLUMN dc3_point_value.quality IS 'OPC-UA style quality code, 0 = GOOD';
+COMMENT ON COLUMN dc3_point_value.driver_id IS 'Driver ID';
+COMMENT ON COLUMN dc3_point_value.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_point_value.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_point_value.operate_time IS 'Operation time';
 
 SELECT *
 FROM public.create_hypertable('dc3_point_value', public.by_range('create_time', INTERVAL '1 day'));
@@ -147,33 +131,18 @@ CREATE TABLE dc3_point_latest
 
 CREATE INDEX idx_point_latest_driver ON dc3_point_latest (tenant_id, driver_id);
 
-COMMENT
-ON TABLE dc3_point_latest IS 'Transactional latest point value projection shared by all Data Center replicas';
-COMMENT
-ON COLUMN dc3_point_latest.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_point_latest.device_id IS 'Device ID';
-COMMENT
-ON COLUMN dc3_point_latest.point_id IS 'Point ID';
-COMMENT
-ON COLUMN dc3_point_latest.message_id IS 'Immutable event identity';
-COMMENT
-ON COLUMN dc3_point_latest.schema_version IS 'Point-value wire schema version';
-COMMENT
-ON COLUMN dc3_point_latest.driver_node IS 'Producing driver runtime node';
-COMMENT
-ON COLUMN dc3_point_latest.sequence IS 'Monotonic sequence within the producing driver node';
-COMMENT
-ON COLUMN dc3_point_latest.fencing_token IS 'Manager-issued ownership fencing token';
-COMMENT
-ON COLUMN dc3_point_latest.raw_value IS 'Raw value as captured from the device';
-COMMENT
-ON COLUMN dc3_point_latest.cal_value IS 'Calculated/transformed value';
-COMMENT
-ON COLUMN dc3_point_latest.num_value IS 'Best-effort numeric projection of cal_value (NULL for non-numeric payloads)';
-COMMENT
-ON COLUMN dc3_point_latest.driver_id IS 'Driver ID';
-COMMENT
-ON COLUMN dc3_point_latest.create_time IS 'Device acquisition time';
-COMMENT
-ON COLUMN dc3_point_latest.operate_time IS 'Platform persistence time';
+COMMENT ON TABLE dc3_point_latest IS 'Transactional latest point value projection shared by all Data Center replicas';
+COMMENT ON COLUMN dc3_point_latest.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_point_latest.device_id IS 'Device ID';
+COMMENT ON COLUMN dc3_point_latest.point_id IS 'Point ID';
+COMMENT ON COLUMN dc3_point_latest.message_id IS 'Immutable event identity';
+COMMENT ON COLUMN dc3_point_latest.schema_version IS 'Point-value wire schema version';
+COMMENT ON COLUMN dc3_point_latest.driver_node IS 'Producing driver runtime node';
+COMMENT ON COLUMN dc3_point_latest.sequence IS 'Monotonic sequence within the producing driver node';
+COMMENT ON COLUMN dc3_point_latest.fencing_token IS 'Manager-issued ownership fencing token';
+COMMENT ON COLUMN dc3_point_latest.raw_value IS 'Raw value as captured from the device';
+COMMENT ON COLUMN dc3_point_latest.cal_value IS 'Calculated/transformed value';
+COMMENT ON COLUMN dc3_point_latest.num_value IS 'Best-effort numeric projection of cal_value (NULL for non-numeric payloads)';
+COMMENT ON COLUMN dc3_point_latest.driver_id IS 'Driver ID';
+COMMENT ON COLUMN dc3_point_latest.create_time IS 'Device acquisition time';
+COMMENT ON COLUMN dc3_point_latest.operate_time IS 'Platform persistence time';
