@@ -55,7 +55,9 @@ jobs:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
           queries: +security-and-quality
-          config-file: .github/codeql/codeql-config.yml
+          paths-ignore: |
+            **/target/**
+            **/node_modules/**
 
       - name: Build Java for CodeQL
         if: matrix.build-mode == 'manual'
