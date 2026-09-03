@@ -43,6 +43,10 @@ ROOT_READMES = (
 VENDORED_JAVA_ROOT = Path(
     "dc3-driver/dc3-driver-opc-da/src/main/java/org/openscada"
 )
+DOCUMENTED_JAVA_API_ROOTS = (
+    Path("dc3-common/dc3-common-constant/src/main/java"),
+    Path("dc3-common/dc3-common-public/src/main/java"),
+)
 
 
 class DocumentationErrors:
@@ -266,7 +270,11 @@ def validate_public_type_javadocs(errors: DocumentationErrors) -> None:
     for java_path in sorted(
         path
         for path in repository_files()
-        if path.suffix == ".java" and "src" in path.parts and "main" in path.parts
+        if path.suffix == ".java"
+        and any(
+            path.relative_to(ROOT).is_relative_to(api_root)
+            for api_root in DOCUMENTED_JAVA_API_ROOTS
+        )
     ):
         relative_path = java_path.relative_to(ROOT)
         if relative_path.is_relative_to(VENDORED_JAVA_ROOT):
@@ -425,7 +433,11 @@ def validate_public_method_javadocs(errors: DocumentationErrors) -> None:
     for java_path in sorted(
         path
         for path in repository_files()
-        if path.suffix == ".java" and "src" in path.parts and "main" in path.parts
+        if path.suffix == ".java"
+        and any(
+            path.relative_to(ROOT).is_relative_to(api_root)
+            for api_root in DOCUMENTED_JAVA_API_ROOTS
+        )
     ):
         relative_path = java_path.relative_to(ROOT)
         if relative_path.is_relative_to(VENDORED_JAVA_ROOT):

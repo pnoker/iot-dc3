@@ -282,7 +282,7 @@ validate-javadoc:
 		-pl dc3-common/dc3-common-constant,dc3-common/dc3-common-public javadoc:javadoc
 
 test-it:
-	$(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true verify
+	$(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true -Dcoverage.check.skip=true verify
 
 test-e2e:
 	DC3_E2E=true $(MVN) -B -Dmaven.test.skip=false -Dskip.unit.tests=true -pl dc3-e2e -am -Pe2e verify

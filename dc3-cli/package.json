@@ -29,8 +29,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint src --fix",
-    "lint:check": "eslint src",
+    "lint": "eslint src test --fix",
+    "lint:check": "eslint src test",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "prepublishOnly": "pnpm build"

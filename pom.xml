@@ -169,7 +169,7 @@
         <!-- Test execution toggles (consumed by surefire/failsafe) -->
         <skip.unit.tests>false</skip.unit.tests>
         <skip.integration.tests>false</skip.integration.tests>
-        <mockito.version>5.20.0</mockito.version>
+        <mockito.version>5.23.0</mockito.version>
         <mockito.javaagent.argLine>
             -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
         </mockito.javaagent.argLine>
@@ -1002,6 +1002,7 @@ ${dc3.copyright.body}
                         <suppressionsLocation>${maven.multiModuleProjectDirectory}/checkstyle-suppressions.xml</suppressionsLocation>
                         <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
                         <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                        <excludeGeneratedSources>true</excludeGeneratedSources>
                         <cacheFile>${project.build.directory}/checkstyle-cachefile</cacheFile>
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>

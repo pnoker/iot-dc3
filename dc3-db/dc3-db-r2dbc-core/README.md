@@ -1,4 +1,4 @@
-# DC3 DB R2DBC Core
+# DC3 DB R2DBC Core (`dc3-db-r2dbc-core`)
 
 Framework-neutral contracts for the relational persistence layer: offset/cursor
 pagination primitives, sort whitelists, signed cursor codec, tenant scope,

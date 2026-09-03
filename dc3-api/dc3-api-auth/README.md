@@ -13,7 +13,7 @@
 | `LocalCredentialApi`  | `GetByLoginName`                                                       | resolve local credentials                |
 | `PermissionApi`       | `ListPermissionCodes`                                                  | resolve effective permission codes       |
 | `ResourceRegistryApi` | `Sync`                                                                 | synchronize annotated API/menu resources |
-| `McpRuntimeApi`       | `Introspect`, `ListTools`, `ResolveTool`, `AuthorizeToolCall`, `Audit` | authorize and audit MCP tools            |
+| `McpRuntimeApi`       | `ListTools`, `CallTool`, `Audit`                                      | authorize and audit MCP tools            |
 
 Every RPC returns its typed payload directly. Failures use standard gRPC status codes and metadata; callers never
 inspect an application-level response envelope.
