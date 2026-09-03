@@ -283,25 +283,11 @@ def validate_public_type_javadocs(errors: DocumentationErrors) -> None:
         if not declaration:
             continue
 
-        lines = content[: declaration.start()].splitlines()
-        index = len(lines) - 1
+        lines = content.splitlines()
+        declaration_index = content[: declaration.start()].count("\n")
+        index = _annotation_block_start(lines, declaration_index) - 1
         while index >= 0 and not lines[index].strip():
             index -= 1
-
-        # Skip annotations between the type Javadoc and declaration, including
-        # multiline annotation arguments.
-        while index >= 0:
-            stripped = lines[index].strip()
-            if stripped.startswith("@"):
-                index -= 1
-            elif stripped.endswith(")"):
-                while index >= 0 and not lines[index].strip().startswith("@"):
-                    index -= 1
-                index -= 1
-            else:
-                break
-            while index >= 0 and not lines[index].strip():
-                index -= 1
 
         has_javadoc = index >= 0 and lines[index].strip().endswith("*/")
         if has_javadoc:
