@@ -16,7 +16,7 @@
 
 # builder
 # Build context is the repository root so that dc3/dependencies/ (nginx
-# configs, SSL certs) is reachable at runtime.
+# configs) is reachable at runtime.
 FROM pnoker/dc3-node:2025.9 AS builder
 LABEL dc3.author=pnokers
 LABEL dc3.author.email=pnokers.icloud.com
@@ -28,7 +28,8 @@ WORKDIR /build
 COPY dc3-web/ ./
 
 RUN corepack enable && corepack prepare pnpm@11.24.0 --activate
-RUN pnpm install --frozen-lockfile
+RUN apk add --no-cache git
+RUN pnpm install --frozen-lockfile --ignore-scripts
 RUN pnpm build
 
 # runtime
@@ -40,11 +41,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 COPY dc3/dependencies/nginx/ /etc/nginx/
 COPY --from=builder /build/dist/ /usr/share/nginx/html/
-# nginx.conf references /etc/letsencrypt/live/dc3.site/ (the acme.sh layout),
-# so the certs shipped under nginx/certs/ are placed there.
-COPY dc3/dependencies/nginx/certs/ /etc/letsencrypt/live/
-
-EXPOSE 80 443
+EXPOSE 80
 VOLUME /var/log/nginx
 
 CMD envsubst '${APP_API_HOST} ${APP_API_PORT}' < /etc/nginx/location/default.env > /etc/nginx/location/default.conf ; nginx -g "daemon off;"
