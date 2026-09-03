@@ -92,8 +92,28 @@ def repository_files() -> tuple[Path, ...]:
     return tuple(files)
 
 
+@cache
+def maven_module_poms() -> tuple[Path, ...]:
+    """Return POMs declared by the root Maven reactor and its aggregators."""
+    module_poms: list[Path] = []
+    pending = [ROOT / "pom.xml"]
+    visited: set[Path] = set()
+    while pending:
+        pom_path = pending.pop()
+        if pom_path in visited or not pom_path.is_file():
+            continue
+        visited.add(pom_path)
+        module_poms.append(pom_path)
+        root = ET.parse(pom_path).getroot()
+        for module in root.findall("m:modules/m:module", MAVEN_NAMESPACE):
+            if not module.text:
+                continue
+            pending.append(pom_path.parent / module.text / "pom.xml")
+    return tuple(module_poms)
+
+
 def validate_module_readmes(errors: DocumentationErrors) -> None:
-    for pom_path in sorted(path for path in repository_files() if path.name == "pom.xml"):
+    for pom_path in sorted(maven_module_poms()):
 
         readme_path = pom_path.parent / "README.md"
         errors.require(
