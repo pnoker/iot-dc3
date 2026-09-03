@@ -47,6 +47,22 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-postgres-agentic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-postgres-auth</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-postgres-data</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-postgres-manager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-data</artifactId>
         </dependency>
         <dependency>
