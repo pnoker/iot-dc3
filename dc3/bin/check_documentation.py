@@ -43,6 +43,10 @@ ROOT_READMES = (
 VENDORED_JAVA_ROOT = Path(
     "dc3-driver/dc3-driver-opc-da/src/main/java/org/openscada"
 )
+DOCUMENTED_JAVA_API_ROOTS = (
+    Path("dc3-common/dc3-common-constant/src/main/java"),
+    Path("dc3-common/dc3-common-public/src/main/java"),
+)
 
 
 class DocumentationErrors:
@@ -88,8 +92,28 @@ def repository_files() -> tuple[Path, ...]:
     return tuple(files)
 
 
+@cache
+def maven_module_poms() -> tuple[Path, ...]:
+    """Return POMs declared by the root Maven reactor and its aggregators."""
+    module_poms: list[Path] = []
+    pending = [ROOT / "pom.xml"]
+    visited: set[Path] = set()
+    while pending:
+        pom_path = pending.pop()
+        if pom_path in visited or not pom_path.is_file():
+            continue
+        visited.add(pom_path)
+        module_poms.append(pom_path)
+        root = ET.parse(pom_path).getroot()
+        for module in root.findall("m:modules/m:module", MAVEN_NAMESPACE):
+            if not module.text:
+                continue
+            pending.append(pom_path.parent / module.text / "pom.xml")
+    return tuple(module_poms)
+
+
 def validate_module_readmes(errors: DocumentationErrors) -> None:
-    for pom_path in sorted(path for path in repository_files() if path.name == "pom.xml"):
+    for pom_path in sorted(maven_module_poms()):
 
         readme_path = pom_path.parent / "README.md"
         errors.require(
@@ -266,7 +290,11 @@ def validate_public_type_javadocs(errors: DocumentationErrors) -> None:
     for java_path in sorted(
         path
         for path in repository_files()
-        if path.suffix == ".java" and "src" in path.parts and "main" in path.parts
+        if path.suffix == ".java"
+        and any(
+            path.relative_to(ROOT).is_relative_to(api_root)
+            for api_root in DOCUMENTED_JAVA_API_ROOTS
+        )
     ):
         relative_path = java_path.relative_to(ROOT)
         if relative_path.is_relative_to(VENDORED_JAVA_ROOT):
@@ -425,7 +453,11 @@ def validate_public_method_javadocs(errors: DocumentationErrors) -> None:
     for java_path in sorted(
         path
         for path in repository_files()
-        if path.suffix == ".java" and "src" in path.parts and "main" in path.parts
+        if path.suffix == ".java"
+        and any(
+            path.relative_to(ROOT).is_relative_to(api_root)
+            for api_root in DOCUMENTED_JAVA_API_ROOTS
+        )
     ):
         relative_path = java_path.relative_to(ROOT)
         if relative_path.is_relative_to(VENDORED_JAVA_ROOT):

@@ -1,4 +1,4 @@
-# DC3 DB R2DBC Postgres
+# DC3 DB R2DBC Postgres (`dc3-db-r2dbc-postgres`)
 
 The only supported relational adapter. Activated by `dc3.db.type=postgres`,
 it registers the PostgreSQL dialect (identifier quoting, JSONB conventions)

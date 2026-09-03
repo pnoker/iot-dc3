@@ -29,8 +29,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "lint": "eslint src --fix",
-    "lint:check": "eslint src",
+    "lint": "eslint src test --fix",
+    "lint:check": "eslint src test",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
     "prepublishOnly": "pnpm build"
@@ -50,7 +50,7 @@
     "prettier": "^3.4.0",
     "tsup": "^8.4.0",
     "typescript": "^5.7.0",
-    "vitest": "^2.1.0"
+    "vitest": "^3.2.6"
   },
   "engines": {
     "node": ">=20.0.0"

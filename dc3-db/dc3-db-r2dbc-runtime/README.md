@@ -1,4 +1,4 @@
-# DC3 DB R2DBC Runtime
+# DC3 DB R2DBC Runtime (`dc3-db-r2dbc-runtime`)
 
 Spring Boot runtime for the relational persistence layer: wires the single
 R2DBC `ConnectionFactory` pool, reactive transaction manager, page-transaction

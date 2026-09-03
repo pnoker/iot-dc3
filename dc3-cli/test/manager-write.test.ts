@@ -7,7 +7,7 @@ import { registerEventCommand } from "../src/commands/event.js";
 import { registerPointCommand } from "../src/commands/point.js";
 import { registerProfileCommand } from "../src/commands/profile.js";
 
-type Register = (program: Command) => void;
+type Register = (_program: Command) => void;
 type FetchCall = { url: string; init: RequestInit };
 
 const fetchCalls: FetchCall[] = [];

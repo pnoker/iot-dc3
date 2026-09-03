@@ -39,7 +39,7 @@ jobs:
           DC3_E2E: "true"
         run: |
           set -euo pipefail
-          make test-e2e
+          make test-e2e MVN_SETTINGS=
 
       - name: Upload failsafe reports
         if: always()
