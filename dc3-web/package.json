@@ -85,7 +85,7 @@
     "globals": "^17.11.0",
     "happy-dom": "^20.11.0",
     "jsdom": "^30.0.1",
-    "lint-staged": "^17.3.0",
+    "lint-staged": "^17.4.1",
     "playwright": "^1.62.1",
     "sass": "^1.103.1",
     "typescript": "~6.0.3",
