@@ -24,9 +24,12 @@ import reactor.core.publisher.Mono;
 /** Reactive latest-value read/write boundary over the relational projection. */
 public interface PointValueLatestService {
 
+    /** Load the latest point value for the series. */
     Mono<PointValueBO> latest(Long tenantId, Long deviceId, Long pointId);
 
+    /** Stream the latest point values for the tenant. */
     Flux<PointValueBO> listLatest(Long tenantId, Long deviceId, List<Long> pointIds);
 
+    /** Stream the latest point values as a continuous feed. */
     Flux<PointValueBO> listLatestStream(Long tenantId, int limit);
 }

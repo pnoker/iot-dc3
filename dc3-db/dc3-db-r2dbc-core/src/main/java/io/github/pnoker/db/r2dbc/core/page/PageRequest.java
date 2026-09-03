@@ -41,6 +41,7 @@ public record PageRequest(long offset, int limit, List<SortSpec> sort) {
         this(offset, limit, List.of());
     }
 
+    /** Create a request for the first page. */
     public static PageRequest firstPage() {
         return new PageRequest(0, DEFAULT_LIMIT);
     }

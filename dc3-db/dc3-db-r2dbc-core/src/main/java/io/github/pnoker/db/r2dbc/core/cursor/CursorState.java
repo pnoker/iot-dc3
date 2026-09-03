@@ -21,6 +21,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
+/** Opaque cursor pagination state bound to a signing key, tenant, query digest and expiry. */
 
 public final class CursorState {
 
@@ -47,22 +48,27 @@ public final class CursorState {
                 Objects.requireNonNull(expiresAt, "expiresAt must not be null").truncatedTo(ChronoUnit.MICROS);
     }
 
+    /** Return the signing key id. */
     public String keyId() {
         return keyId;
     }
 
+    /** Return the tenant bound to the cursor. */
     public UUID tenantId() {
         return tenantId;
     }
 
+    /** Return the digest binding the cursor to its query. */
     public byte[] queryDigest() {
         return Arrays.copyOf(queryDigest, queryDigest.length);
     }
 
+    /** Return the opaque pagination position. */
     public byte[] position() {
         return Arrays.copyOf(position, position.length);
     }
 
+    /** Return the cursor expiry instant. */
     public Instant expiresAt() {
         return expiresAt;
     }

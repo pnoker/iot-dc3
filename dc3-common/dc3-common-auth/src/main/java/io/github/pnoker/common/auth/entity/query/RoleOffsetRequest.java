@@ -22,6 +22,7 @@ import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
+/** Paged query for role records. */
 @Schema(description = "Role list request using zero-based offset pagination")
 public record RoleOffsetRequest(
         @Schema(description = "Zero-based result offset") Long offset,

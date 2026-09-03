@@ -19,11 +19,13 @@ package io.github.pnoker.db.r2dbc.core.time;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
+/** UTC microsecond instant normalization shared by persistence layers. */
 
 public final class DatabaseInstant {
 
     private DatabaseInstant() {}
 
+    /** Normalize the instant to UTC microseconds. */
     public static Instant normalize(Instant instant) {
         return Objects.requireNonNull(instant, "instant must not be null").truncatedTo(ChronoUnit.MICROS);
     }

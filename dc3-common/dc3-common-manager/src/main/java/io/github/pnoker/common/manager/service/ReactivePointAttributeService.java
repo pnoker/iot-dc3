@@ -26,23 +26,33 @@ import reactor.core.publisher.Mono;
 
 /** Reactive point attribute application service. */
 public interface ReactivePointAttributeService {
+    /** Add one point attribute. */
     Mono<PointAttributeBO> add(PointAttributeBO value);
 
+    /** Update one point attribute and emit the updated row. */
     Mono<PointAttributeBO> update(PointAttributeBO value);
 
+    /** Delete the point attribute, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Resolve the point attribute by its id. */
     Mono<PointAttributeBO> getById(Long tenantId, Long id);
 
+    /** Resolve the point attribute by its name and driver id. */
     Mono<PointAttributeBO> getByNameAndDriverId(Long tenantId, String name, Long driverId);
 
+    /** List point attributes matched by driver id. */
     Flux<PointAttributeBO> listByDriverId(Long tenantId, Long driverId);
 
+    /** Page point attributes matching the tenant-scoped filters. */
     Mono<OffsetPage<PointAttributeBO>> list(PointAttributeFilter filter);
 
+    /** Delete the records matched by ids. */
     Mono<Boolean> deleteByIds(Long tenantId, Collection<Long> ids, Long operatorId, String operatorName);
 
+    /** Save the batch, inserting or updating as needed. */
     Mono<List<PointAttributeBO>> saveBatch(List<PointAttributeBO> values);
 
+    /** Update one batch and emit the updated row. */
     Mono<List<PointAttributeBO>> updateBatch(List<PointAttributeBO> values);
 }

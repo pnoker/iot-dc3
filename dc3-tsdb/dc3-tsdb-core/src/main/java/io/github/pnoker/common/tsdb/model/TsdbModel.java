@@ -280,6 +280,7 @@ public final class TsdbModel {
             this(deviceTime, messageId, series, null, null);
         }
 
+        /** Return the cursor narrowed to the time window. */
         public Cursor withWindow(TimeWindow window) {
             return new Cursor(deviceTime, messageId, series, window.from(), window.toExclusive());
         }

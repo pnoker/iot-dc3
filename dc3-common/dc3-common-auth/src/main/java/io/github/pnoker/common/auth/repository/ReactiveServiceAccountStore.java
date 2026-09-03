@@ -23,13 +23,18 @@ import reactor.core.publisher.Mono;
 
 /** Non-blocking persistence port for service-account aggregates. */
 public interface ReactiveServiceAccountStore {
+    /** Resolve the service account by its id. */
     Mono<ServiceAccountDO> getById(Long tenantId, Long id);
 
+    /** Page service accounts matching the tenant-scoped filters. */
     Mono<OffsetPage<ServiceAccountDO>> list(ServiceAccountFilter filter);
 
+    /** Insert one service account and emit the stored row. */
     Mono<ServiceAccountDO> insert(ServiceAccountBO account);
 
+    /** Update one service account and emit the updated row. */
     Mono<ServiceAccountDO> update(Long tenantId, ServiceAccountBO account);
 
+    /** Delete the service account, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 }

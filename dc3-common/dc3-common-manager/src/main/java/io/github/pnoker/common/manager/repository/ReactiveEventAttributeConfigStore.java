@@ -20,22 +20,31 @@ import io.github.pnoker.common.manager.entity.bo.EventAttributeConfigBO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Reactive persistence port for event attribute config records. */
 
 public interface ReactiveEventAttributeConfigStore {
+    /** Load the event attribute config scoped to the tenant by id. */
     Mono<EventAttributeConfigBO> get(Long tenantId, Long id);
 
+    /** Resolve the event attribute config by its attribute device event. */
     Mono<EventAttributeConfigBO> getByAttributeDeviceEvent(
             Long tenantId, Long attributeId, Long deviceId, Long eventId);
 
+    /** List event attribute configs matched by device id. */
     Flux<EventAttributeConfigBO> listByDeviceId(Long tenantId, Long deviceId);
 
+    /** List event attribute configs matched by device id and event id. */
     Flux<EventAttributeConfigBO> listByDeviceIdAndEventId(Long tenantId, Long deviceId, Long eventId);
 
+    /** Insert one event attribute config and emit the stored row. */
     Mono<EventAttributeConfigBO> insert(EventAttributeConfigBO value);
 
+    /** Update one event attribute config and emit the updated row. */
     Mono<EventAttributeConfigBO> update(EventAttributeConfigBO value, int expectedVersion);
 
+    /** Delete the event attribute config, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Page event attribute configs matching the tenant-scoped filters. */
     Mono<OffsetPage<EventAttributeConfigBO>> list(EventAttributeConfigFilter filter);
 }

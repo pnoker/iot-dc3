@@ -23,13 +23,18 @@ import reactor.core.publisher.Mono;
 
 /** Reactive application service for groups. */
 public interface ReactiveGroupService {
+    /** Add one group. */
     Mono<GroupBO> add(GroupBO group);
 
+    /** Update one group and emit the updated row. */
     Mono<GroupBO> update(GroupBO group);
 
+    /** Delete the group, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 
+    /** Resolve the group by its id. */
     Mono<GroupBO> getById(Long tenantId, Long id);
 
+    /** Page groups matching the tenant-scoped filters. */
     Mono<OffsetPage<GroupBO>> list(GroupFilter filter);
 }

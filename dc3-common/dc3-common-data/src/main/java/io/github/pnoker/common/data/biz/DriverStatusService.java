@@ -23,9 +23,12 @@ import reactor.core.publisher.Mono;
 /** Reactive business service for tenant-scoped driver status. */
 public interface DriverStatusService {
 
+    /** List driver status matching the request. */
     Mono<Map<String, String>> list(FacadeDriverOffsetQuery query);
 
+    /** Count online devices matching the request. */
     Mono<Long> countOnlineDevices(Long tenantId, Long driverId);
 
+    /** Count offline devices matching the request. */
     Mono<Long> countOfflineDevices(Long tenantId, Long driverId);
 }

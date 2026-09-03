@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+/** RFC 7807-style problem payload for transport-neutral error reporting. */
 
 public record ProblemDetails(
         URI type,

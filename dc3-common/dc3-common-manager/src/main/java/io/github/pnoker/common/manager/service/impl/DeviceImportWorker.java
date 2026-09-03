@@ -55,6 +55,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import tools.jackson.databind.ObjectMapper;
 
+/** Worker executing claimed device import jobs. */
 @Slf4j
 @Component
 @RequiredArgsConstructor

@@ -25,17 +25,24 @@ import reactor.core.publisher.Mono;
 
 /** Reactive application service for command parameters. */
 public interface ReactiveCommandParamService {
+    /** Add one command param. */
     Mono<CommandParamBO> add(CommandParamBO value);
 
+    /** Update one command param and emit the updated row. */
     Mono<CommandParamBO> update(CommandParamBO value);
 
+    /** Delete the command param, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Resolve the command param by its id. */
     Mono<CommandParamBO> getById(Long tenantId, Long id);
 
+    /** List command params matched by command id. */
     Flux<CommandParamBO> listByCommandId(Long tenantId, Long commandId);
 
+    /** List command params matched by ids. */
     Flux<CommandParamBO> listByIds(Long tenantId, Collection<Long> ids);
 
+    /** Page command params matching the tenant-scoped filters. */
     Mono<OffsetPage<CommandParamBO>> list(CommandParamFilter filter);
 }

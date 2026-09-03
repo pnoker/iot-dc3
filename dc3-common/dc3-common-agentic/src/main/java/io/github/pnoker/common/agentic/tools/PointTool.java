@@ -35,6 +35,7 @@ import reactor.core.publisher.Mono;
 public class PointTool {
     private final PointFacade pointFacade;
 
+    /** Look up the point by id. */
     public Mono<AgenticToolResult<FacadePointBO>> lookupPointByIdReactive(Long pointId, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
         if (pointId == null || pointId <= 0) return Mono.just(AgenticToolResult.invalid("Point ID must be positive."));
@@ -44,6 +45,7 @@ public class PointTool {
                 .defaultIfEmpty(AgenticToolResult.notFound("Point not found for ID: " + pointId));
     }
 
+    /** Look up the points for the given ids. */
     public Mono<AgenticToolResult<List<FacadePointBO>>> lookupPointsByIdsReactive(
             List<Long> pointIds, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
@@ -57,12 +59,14 @@ public class PointTool {
                         : AgenticToolResult.ok("Points loaded", values));
     }
 
+    /** Search points matching the request. */
     public Mono<AgenticToolResult<OffsetPage<FacadePointBO>>> searchPointsReactive(
             String pointName, Long profileId, long offset, int limit, ToolContext context) {
         return listReactive(
                 null, profileId, pointName, offset, limit, context, "No points found.", "Point page loaded");
     }
 
+    /** List point tools matched by device id. */
     public Mono<AgenticToolResult<OffsetPage<FacadePointBO>>> listPointsByDeviceIdReactive(
             Long deviceId, long offset, int limit, ToolContext context) {
         return listReactive(
@@ -76,6 +80,7 @@ public class PointTool {
                 "Point page loaded for device " + deviceId);
     }
 
+    /** List point tools matched by profile id. */
     public Mono<AgenticToolResult<OffsetPage<FacadePointBO>>> listPointsByProfileIdReactive(
             Long profileId, long offset, int limit, ToolContext context) {
         return listReactive(

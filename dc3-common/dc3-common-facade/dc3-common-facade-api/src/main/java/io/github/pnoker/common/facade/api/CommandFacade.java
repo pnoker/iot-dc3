@@ -31,9 +31,12 @@ import reactor.core.publisher.Mono;
  */
 public interface CommandFacade {
 
+    /** Resolve the command by its id. */
     Mono<FacadeCommandBO> getById(Long tenantId, Long id);
 
+    /** List commands matched by ids. */
     Flux<FacadeCommandBO> listByIds(Long tenantId, Collection<Long> ids);
 
+    /** Page commands matching the tenant-scoped filters. */
     Mono<OffsetPage<FacadeCommandBO>> list(FacadeCommandOffsetQuery query);
 }

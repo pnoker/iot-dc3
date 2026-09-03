@@ -24,6 +24,7 @@ import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
+/** Paged query for resource records. */
 @Schema(description = "Resource list request using zero-based offset pagination")
 public record ResourceOffsetRequest(
         @Schema(description = "Zero-based result offset") Long offset,

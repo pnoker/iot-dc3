@@ -37,37 +37,54 @@ import reactor.core.publisher.Mono;
 /** Reactive, tenant-scoped aggregate reads for dashboard alerts. */
 public interface ReactiveAlertAnalyticsStore {
 
+    /** Emit the tenant's headline alert counters. */
     Mono<AlertCountersRow> countAll(long tenantId);
 
+    /** Emit alert counts grouped by type. */
     Flux<BucketRow> countByType(long tenantId);
 
+    /** Emit alert counts grouped by source. */
     Flux<SourceStatsRow> countBySource(long tenantId);
 
+    /** Emit per-hour alert counts since the given time. */
     Flux<HourCountRow> hourlyCounts(long tenantId, LocalDateTime from);
 
+    /** Emit today's alert counts grouped by source. */
     Flux<SourceStatsRow> todayBySource(long tenantId, LocalDateTime from);
 
+    /** Emit the daily alert trend since the given time. */
     Flux<AlertTrendRow> dailyTrend(long tenantId, LocalDateTime from);
 
+    /** Emit the noisiest alert sources since the given time. */
     Flux<SourceCountRow> topSources(long tenantId, LocalDateTime from, int limit);
 
+    /** Emit heatmap activity cells for alert bursts since the given time. */
     Flux<ActivityCellRow> activityHeatmap(long tenantId, LocalDateTime from);
 
+    /** Emit the alert type distribution since the given time. */
     Flux<BucketRow> typeDistribution(long tenantId, LocalDateTime from);
 
+    /** Emit alert-storm sources above the minimum count since the given time. */
     Flux<SourceCountRow> stormSources(long tenantId, LocalDateTime from, int minCount, int limit);
 
+    /** Emit flapping sources above the minimum count since the given time. */
     Flux<FlappingRow> flappingSources(long tenantId, LocalDateTime from, int minCount, int limit);
 
+    /** Emit correlated alarm pairs inside the time window since the given time. */
     Flux<CorrelationPairRow> correlationPairs(long tenantId, LocalDateTime from, int windowSec, int limit);
 
+    /** Emit peer alarm counts for cross-entity correlation. */
     Flux<PeerAlarmRow> peerAlarmCounts(long tenantId, LocalDateTime from);
 
+    /** Emit open-alert aging buckets for the tenant. */
     Mono<AgingBucketRow> agingBuckets(long tenantId);
 
+    /** Emit the mean-time-to-acknowledge trend per day since the given time. */
     Flux<MttaTrendRow> mttaByDay(long tenantId, LocalDateTime from);
 
+    /** Emit per-protocol health rows for the tenant. */
     Flux<ProtocolHealthRow> protocolHealth(long tenantId);
 
+    /** Emit the most recent alert state changes since the given time. */
     Flux<RecentChangeRow> recentChanges(long tenantId, LocalDateTime from, int limit);
 }

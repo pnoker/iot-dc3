@@ -26,6 +26,7 @@ import reactor.core.publisher.Mono;
 /** Reactive persistence port for the single source of truth, {@code dc3_message}. */
 public interface ReactiveMessageStore {
 
+    /** Save the message, inserting or updating as needed. */
     Mono<MessageBO> save(
             String conversationId,
             String role,
@@ -34,9 +35,12 @@ public interface ReactiveMessageStore {
             AgenticMessageStatusEnum status,
             RequestHeader.PrincipalHeader header);
 
+    /** Stream messages matching the request. */
     Flux<MessageBO> list(String conversationId, RequestHeader.PrincipalHeader header);
 
+    /** Stream the conversation history newest-first for the principal. */
     Flux<MessageBO> loadHistory(String conversationId, RequestHeader.PrincipalHeader header, int limit);
 
+    /** Delete the records matched by conversation id. */
     Mono<Long> deleteByConversationId(String conversationId, RequestHeader.PrincipalHeader header);
 }

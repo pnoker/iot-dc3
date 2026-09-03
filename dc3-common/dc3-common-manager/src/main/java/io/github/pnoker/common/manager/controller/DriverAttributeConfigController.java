@@ -52,6 +52,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/** REST controller exposing driver attribute config endpoints. */
 @Tag(name = "driver_attribute_config", description = "Per-device driver attribute configuration")
 @RestController
 @RequestMapping(ManagerConstant.DRIVER_ATTRIBUTE_CONFIG_URL_PREFIX)
@@ -62,6 +63,7 @@ public class DriverAttributeConfigController implements BaseController {
     private final ReactiveDriverAttributeService attributeService;
     private final ReactiveDeviceService deviceService;
 
+    /** Add one driver attribute config and return the stored view. */
     @PreAuthorize("@perm.can('driver_attribute_config', 'add')")
     @Operation(
             summary = "Add Driver Attribute Configuration",
@@ -92,6 +94,7 @@ public class DriverAttributeConfigController implements BaseController {
                 .map(builder::buildVOByBO);
     }
 
+    /** Delete the driver attribute config. */
     @PreAuthorize("@perm.can('driver_attribute_config', 'delete')")
     @Operation(
             summary = "Delete Driver Attribute Configuration",
@@ -130,6 +133,7 @@ public class DriverAttributeConfigController implements BaseController {
                         .then());
     }
 
+    /** Update one driver attribute config and emit the updated row. */
     @PreAuthorize("@perm.can('driver_attribute_config', 'update')")
     @Operation(
             summary = "Update Driver Attribute Configuration",
@@ -158,6 +162,7 @@ public class DriverAttributeConfigController implements BaseController {
                 .map(builder::buildVOByBO);
     }
 
+    /** Resolve the driver attribute config by its id. */
     @PreAuthorize("@perm.can('driver_attribute_config', 'get')")
     @Operation(
             summary = "Get Driver Attribute Configuration",
@@ -181,6 +186,7 @@ public class DriverAttributeConfigController implements BaseController {
                 .flatMap(tenantId -> configService.getById(tenantId, id).map(builder::buildVOByBO));
     }
 
+    /** Resolve the driver attribute config by its device id and attribute id. */
     @PreAuthorize("@perm.can('driver_attribute_config', 'get')")
     @Operation(
             summary = "Get Driver Attribute Configuration by Device and Attribute",
@@ -208,6 +214,7 @@ public class DriverAttributeConfigController implements BaseController {
                         .map(builder::buildVOByBO));
     }
 
+    /** List driver attribute configs matched by device id. */
     @PreAuthorize("@perm.can('driver_attribute_config', 'list')")
     @Operation(
             summary = "List Driver Attribute Configurations by Device",
@@ -233,6 +240,7 @@ public class DriverAttributeConfigController implements BaseController {
                         .collectList());
     }
 
+    /** Page driver attribute configs matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('driver_attribute_config', 'list')")
     @Operation(
             summary = "List Driver Attribute Configurations",

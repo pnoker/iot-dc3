@@ -26,23 +26,33 @@ import reactor.core.publisher.Mono;
 
 /** Reactive driver attribute application service. */
 public interface ReactiveDriverAttributeService {
+    /** Add one driver attribute. */
     Mono<DriverAttributeBO> add(DriverAttributeBO value);
 
+    /** Update one driver attribute and emit the updated row. */
     Mono<DriverAttributeBO> update(DriverAttributeBO value);
 
+    /** Delete the driver attribute, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Resolve the driver attribute by its id. */
     Mono<DriverAttributeBO> getById(Long tenantId, Long id);
 
+    /** Resolve the driver attribute by its name and driver id. */
     Mono<DriverAttributeBO> getByNameAndDriverId(Long tenantId, String name, Long driverId);
 
+    /** List driver attributes matched by driver id. */
     Flux<DriverAttributeBO> listByDriverId(Long tenantId, Long driverId);
 
+    /** Page driver attributes matching the tenant-scoped filters. */
     Mono<OffsetPage<DriverAttributeBO>> list(DriverAttributeFilter filter);
 
+    /** Delete the records matched by ids. */
     Mono<Boolean> deleteByIds(Long tenantId, Collection<Long> ids, Long operatorId, String operatorName);
 
+    /** Save the batch, inserting or updating as needed. */
     Mono<List<DriverAttributeBO>> saveBatch(List<DriverAttributeBO> values);
 
+    /** Update one batch and emit the updated row. */
     Mono<List<DriverAttributeBO>> updateBatch(List<DriverAttributeBO> values);
 }

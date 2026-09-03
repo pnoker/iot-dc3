@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Set;
 
+/** Paged query for point attribute config records. */
 @Schema(description = "Point attribute config list request using zero-based offset pagination")
 public record PointAttributeConfigOffsetRequest(
         @Schema(description = "Zero-based result offset") Long offset,

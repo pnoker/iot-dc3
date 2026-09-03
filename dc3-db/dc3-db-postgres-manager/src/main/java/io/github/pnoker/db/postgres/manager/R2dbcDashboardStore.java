@@ -35,6 +35,7 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
+/** Reactive persistence port for dashboard records. */
 @Repository
 @ConditionalOnClass(DatabaseClient.class)
 @RequiredArgsConstructor

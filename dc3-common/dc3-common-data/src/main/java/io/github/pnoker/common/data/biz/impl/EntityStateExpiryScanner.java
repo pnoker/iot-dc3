@@ -64,6 +64,7 @@ public class EntityStateExpiryScanner {
         messageSender.send(MqMessage.of(MqTopic.DEVICE_SCAN, "", TICK_BODY));
     }
 
+    /** Scan for expired entity leases and mark them offline. */
     @Dc3Listener(topic = MqTopic.DEVICE_SCAN)
     public Mono<Void> onScanTick(MqReceived<Object> message, Acknowledgment ack) {
         return scanExpiredDevices()

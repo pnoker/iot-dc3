@@ -22,17 +22,24 @@ import reactor.core.publisher.Mono;
 
 /** Reactive persistence port for tenant-scoped labels. */
 public interface ReactiveLabelStore {
+    /** Page labels matching the tenant-scoped filters. */
     Mono<OffsetPage<LabelBO>> list(LabelFilter filter);
 
+    /** Load the label scoped to the tenant by id. */
     Mono<LabelBO> get(Long tenantId, Long id);
 
+    /** Resolve the label by its name. */
     Mono<LabelBO> getByName(Long tenantId, String name, byte entityType);
 
+    /** Report whether the label has active bindings. */
     Mono<Boolean> hasActiveBindings(Long tenantId, Long labelId);
 
+    /** Insert one label and emit the stored row. */
     Mono<LabelBO> insert(LabelBO label);
 
+    /** Update one label and emit the updated row. */
     Mono<LabelBO> update(LabelBO label);
 
+    /** Delete the label, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 }

@@ -22,7 +22,9 @@ import reactor.core.publisher.Mono;
 /** Non-blocking write port for tenant memberships. */
 public interface ReactiveTenantMembershipCommandStore {
 
+    /** Insert one tenant membership command and emit the stored row. */
     Mono<TenantMembershipDO> insert(TenantMembershipDO membership);
 
+    /** Delete the tenant membership command, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 }

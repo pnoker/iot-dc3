@@ -24,8 +24,10 @@ import reactor.core.publisher.Mono;
 
 /** Reactive query port for MCP administration projections. */
 public interface ReactiveMcpCatalogStore {
+    /** Page tools matching the tenant-scoped filters. */
     Mono<OffsetPage<McpToolRecord>> listTools(String keyword, String riskLevel, PageRequest page);
 
+    /** Page audits matching the tenant-scoped filters. */
     Mono<OffsetPage<McpAuditCommand>> listAudit(
             Long tenantId, Long principalId, String toolId, String status, String riskLevel, PageRequest page);
 }

@@ -29,7 +29,9 @@ import reactor.core.publisher.Mono;
  */
 public interface ReactiveAgenticTool {
 
+    /** Tool definition exposed to the chat model. */
     ToolDefinition definition();
 
+    /** Execute the tool for the JSON arguments within the given context. */
     Mono<?> call(String arguments, ToolContext context);
 }

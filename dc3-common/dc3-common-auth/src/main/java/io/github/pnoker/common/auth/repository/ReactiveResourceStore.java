@@ -22,26 +22,37 @@ import io.github.pnoker.common.enums.ResourceTypeEnum;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Reactive persistence port for resource records. */
 
 public interface ReactiveResourceStore {
 
+    /** Resolve the resource by its id. */
     Mono<ResourceDO> getById(Long id);
 
+    /** Page resources matching the tenant-scoped filters. */
     Mono<OffsetPage<ResourceDO>> list(ResourceFilter filter);
 
+    /** Emit the resource tree for the tenant. */
     Flux<ResourceDO> listTree(ResourceFilter filter);
 
+    /** Insert one resource and emit the stored row. */
     Mono<ResourceDO> insert(ResourceBO resource);
 
+    /** Update one resource and emit the updated row. */
     Mono<ResourceDO> update(ResourceBO resource);
 
+    /** Delete the resource, reporting whether a row was removed. */
     Mono<Boolean> delete(Long id, Long operatorId, String operatorName);
 
+    /** Check whether a duplicate row already exists. */
     Mono<Boolean> existsDuplicate(ResourceBO resource);
 
+    /** Report whether the resource has children. */
     Mono<Boolean> hasChildren(Long id);
 
+    /** Report whether the candidate descends from the root. */
     Mono<Boolean> isDescendant(Long rootId, Long candidateId);
 
+    /** Resolve the resource by its type and entity. */
     Mono<ResourceDO> getByTypeAndEntity(ResourceTypeEnum resourceType, Long entityId);
 }

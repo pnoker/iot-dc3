@@ -28,7 +28,9 @@ import org.mapstruct.Mapper;
         uses = {MapStructUtil.class})
 public interface SessionBuilder {
 
+    /** Convert the business object into its value-object form. */
     SessionVO buildVOByBO(SessionBO entityBO);
 
+    /** Convert the business objects into their value-object forms. */
     List<SessionVO> buildVOListByBOList(List<SessionBO> entityBOList);
 }

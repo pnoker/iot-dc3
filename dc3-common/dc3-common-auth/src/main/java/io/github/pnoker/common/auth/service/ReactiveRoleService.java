@@ -22,17 +22,24 @@ import io.github.pnoker.common.auth.repository.RoleFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Business service covering role use cases. */
 
 public interface ReactiveRoleService {
+    /** Resolve the role by its id. */
     Mono<RoleBO> getById(Long tenantId, Long id);
 
+    /** Page roles matching the tenant-scoped filters. */
     Mono<OffsetPage<RoleBO>> list(RoleFilter filter);
 
+    /** Emit the role tree for the tenant. */
     Flux<RoleTreeBO> listTree(RoleFilter filter);
 
+    /** Add one role. */
     Mono<RoleBO> add(RoleBO role);
 
+    /** Update one role and emit the updated row. */
     Mono<RoleBO> update(Long tenantId, RoleBO role);
 
+    /** Delete the role. */
     Mono<Void> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 }

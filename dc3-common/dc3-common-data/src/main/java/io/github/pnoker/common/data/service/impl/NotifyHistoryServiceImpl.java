@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/** Default notify history service implementation. */
 @Service
 @RequiredArgsConstructor
 public class NotifyHistoryServiceImpl implements NotifyHistoryService {

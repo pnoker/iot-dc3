@@ -31,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/** Default topic service implementation. */
 @Service
 @RequiredArgsConstructor
 public class ReactiveTopicServiceImpl implements ReactiveTopicService {

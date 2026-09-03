@@ -20,17 +20,24 @@ import io.github.pnoker.common.auth.entity.bo.ApiBO;
 import io.github.pnoker.common.auth.entity.model.ApiDO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
+/** Reactive persistence port for api records. */
 
 public interface ReactiveApiStore {
+    /** Resolve the api by its id. */
     Mono<ApiDO> getById(Long id);
 
+    /** Page apis matching the tenant-scoped filters. */
     Mono<OffsetPage<ApiDO>> list(ApiFilter filter);
 
+    /** Insert one api and emit the stored row. */
     Mono<ApiDO> insert(ApiBO api);
 
+    /** Update one api and emit the updated row. */
     Mono<ApiDO> update(ApiBO api);
 
+    /** Delete the api, reporting whether a row was removed. */
     Mono<Boolean> delete(Long id, Long operatorId, String operatorName);
 
+    /** Check whether a duplicate row already exists. */
     Mono<Boolean> existsDuplicate(ApiBO api);
 }

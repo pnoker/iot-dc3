@@ -45,6 +45,7 @@ public class RuleRegistry {
                 .build();
     }
 
+    /** Emit the cached enabled rule candidates matching the fact. */
     public Mono<List<RuleBO>> findCandidates(RuleFact fact) {
         if (fact == null
                 || fact.getTenantId() == null
@@ -63,10 +64,12 @@ public class RuleRegistry {
                         .cache());
     }
 
+    /** Drop the tenant's cached rule candidates. */
     public void invalidateTenant(Long tenantId) {
         if (tenantId != null) cache.asMap().keySet().removeIf(key -> Objects.equals(key.tenantId(), tenantId));
     }
 
+    /** Drop every cached rule candidate. */
     public void invalidateAll() {
         cache.invalidateAll();
     }

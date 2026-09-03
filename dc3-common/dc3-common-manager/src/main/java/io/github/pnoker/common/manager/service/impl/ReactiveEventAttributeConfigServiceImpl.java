@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/** Default event attribute config service implementation. */
 @Service
 @RequiredArgsConstructor
 public class ReactiveEventAttributeConfigServiceImpl implements ReactiveEventAttributeConfigService {

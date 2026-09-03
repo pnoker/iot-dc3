@@ -19,6 +19,7 @@ package io.github.pnoker.common.manager.entity.query;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
+/** Request payload for device import template handling. */
 @Schema(description = "Device import template context")
 public record DeviceImportTemplateRequest(
         @NotNull @Schema(description = "Driver identifier", example = "1024")

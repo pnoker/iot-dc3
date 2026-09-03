@@ -24,15 +24,21 @@ import reactor.core.publisher.Mono;
 /** Read-only option query service for manager entities. */
 public interface DictionaryForManagerService {
 
+    /** Page driver options matching the tenant-scoped filters. */
     Mono<OffsetPage<DictionaryOption>> listDriverOptions(Long tenantId, DictionaryListRequest request);
 
+    /** Page profile options matching the tenant-scoped filters. */
     Mono<OffsetPage<DictionaryOption>> listProfileOptions(Long tenantId, DictionaryListRequest request);
 
+    /** Page profile point options matching the tenant-scoped filters. */
     Mono<OffsetPage<DictionaryOption>> listProfilePointOptions(Long tenantId, DictionaryListRequest request);
 
+    /** Page device point options matching the tenant-scoped filters. */
     Mono<OffsetPage<DictionaryOption>> listDevicePointOptions(Long tenantId, DictionaryListRequest request);
 
+    /** Page device options matching the tenant-scoped filters. */
     Mono<OffsetPage<DictionaryOption>> listDeviceOptions(Long tenantId, DictionaryListRequest request);
 
+    /** Page driver device options matching the tenant-scoped filters. */
     Mono<OffsetPage<DictionaryOption>> listDriverDeviceOptions(Long tenantId, DictionaryListRequest request);
 }

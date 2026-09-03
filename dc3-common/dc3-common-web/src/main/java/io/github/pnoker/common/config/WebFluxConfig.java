@@ -34,6 +34,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @AutoConfiguration
 public class WebFluxConfig implements WebFluxConfigurer {
 
+    /** Create the shared WebClient builder. */
     @Bean
     @ConditionalOnMissingBean
     public WebClient.Builder webClientBuilder() {

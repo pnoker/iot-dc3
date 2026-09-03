@@ -21,13 +21,18 @@ import reactor.core.publisher.Mono;
 
 /** Fully reactive token lifecycle contract. */
 public interface ReactiveTokenService {
+    /** Emit the salt seed used to hash the login password. */
     Mono<String> generateSalt(String loginName, String tenantCode);
 
+    /** Emit a login token for valid credentials. */
     Mono<String> generateToken(String loginName, String password, String tenantCode);
 
+    /** Rotate the local credential password after verifying the current one. */
     Mono<Void> changePassword(String loginName, String currentPassword, String newPassword, String tenantCode);
 
+    /** Best-effort cancel of the login token, reporting whether it was active. */
     Mono<Boolean> tryCancelToken(String loginName, String tenantCode);
 
+    /** Validate the login token against the stored material. */
     Mono<TokenValid> checkValid(String loginName, String token, String tenantCode);
 }

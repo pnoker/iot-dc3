@@ -35,6 +35,7 @@ import reactor.core.publisher.Mono;
 public class EventTool {
     private final EventFacade eventFacade;
 
+    /** Look up the event by id. */
     public Mono<AgenticToolResult<FacadeEventBO>> lookupEventByIdReactive(Long eventId, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
         if (eventId == null || eventId <= 0) return Mono.just(AgenticToolResult.invalid("Event ID must be positive."));
@@ -44,6 +45,7 @@ public class EventTool {
                 .defaultIfEmpty(AgenticToolResult.notFound("Event not found for ID: " + eventId));
     }
 
+    /** Look up the events for the given ids. */
     public Mono<AgenticToolResult<List<FacadeEventBO>>> lookupEventsByIdsReactive(
             List<Long> eventIds, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
@@ -57,6 +59,7 @@ public class EventTool {
                         : AgenticToolResult.ok("Events loaded", values));
     }
 
+    /** Search events matching the request. */
     public Mono<AgenticToolResult<OffsetPage<FacadeEventBO>>> searchEventsReactive(
             String eventName, Long profileId, long offset, int limit, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
@@ -67,6 +70,7 @@ public class EventTool {
                         : AgenticToolResult.ok("Event page loaded", page));
     }
 
+    /** List event tools matched by device id. */
     public Mono<AgenticToolResult<OffsetPage<FacadeEventBO>>> listEventsByDeviceIdReactive(
             Long deviceId, long offset, int limit, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
@@ -77,6 +81,7 @@ public class EventTool {
                         : AgenticToolResult.ok("Event page loaded for device " + deviceId, page));
     }
 
+    /** List event tools matched by profile id. */
     public Mono<AgenticToolResult<OffsetPage<FacadeEventBO>>> listEventsByProfileIdReactive(
             Long profileId, long offset, int limit, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);

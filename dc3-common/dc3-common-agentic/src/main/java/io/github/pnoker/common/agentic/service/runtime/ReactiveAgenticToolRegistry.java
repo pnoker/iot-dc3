@@ -247,6 +247,7 @@ public class ReactiveAgenticToolRegistry {
         this.objectMapper = objectMapper;
     }
 
+    /** Return the registered tools keyed by name. */
     public Map<String, ReactiveAgenticTool> tools() {
         if (objectMapper == null) {
             return Map.of();

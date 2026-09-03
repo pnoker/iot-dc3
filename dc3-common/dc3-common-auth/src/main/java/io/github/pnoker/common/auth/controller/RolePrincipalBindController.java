@@ -62,6 +62,7 @@ public class RolePrincipalBindController implements BaseController {
     private final RoleBuilder roleBuilder;
     private final UserBuilder userBuilder;
 
+    /** Add one role principal binding and return the stored view. */
     @PreAuthorize("@perm.can('role_principal_bind', 'add')")
     @Operation(
             summary = "Bind Principal to Role",
@@ -91,6 +92,7 @@ public class RolePrincipalBindController implements BaseController {
         });
     }
 
+    /** Delete the role principal binding. */
     @PreAuthorize("@perm.can('role_principal_bind', 'delete')")
     @Operation(
             summary = "Delete Role-principal Binding",
@@ -114,6 +116,7 @@ public class RolePrincipalBindController implements BaseController {
                 .thenReturn(ResponseEntity.noContent().build());
     }
 
+    /** Page role principal bindings matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('role_principal_bind', 'list')")
     @Operation(
             summary = "List Role-principal Bindings",
@@ -148,6 +151,7 @@ public class RolePrincipalBindController implements BaseController {
                                 page.total()))));
     }
 
+    /** List role principal bindings matched by principal. */
     @PreAuthorize("@perm.can('role_principal_bind', 'list')")
     @Operation(
             summary = "List Roles by Principal",
@@ -175,6 +179,7 @@ public class RolePrincipalBindController implements BaseController {
                         .map(ResponseEntity::ok));
     }
 
+    /** List role principal bindings matched by role. */
     @PreAuthorize("@perm.can('role_principal_bind', 'list')")
     @Operation(
             summary = "List Users by Role",

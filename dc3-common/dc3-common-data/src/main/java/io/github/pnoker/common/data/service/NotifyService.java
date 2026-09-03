@@ -29,13 +29,18 @@ import reactor.core.publisher.Mono;
  */
 public interface NotifyService {
 
+    /** Add one notify configuration. */
     Mono<NotifyBO> add(NotifyBO value);
 
+    /** Delete the notify configuration, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id);
 
+    /** Update one notify configuration and emit the updated row. */
     Mono<NotifyBO> update(NotifyBO value);
 
+    /** Resolve the notify configuration by its id. */
     Mono<NotifyBO> getById(Long tenantId, Long id);
 
+    /** Page notify configurations matching the tenant-scoped filters. */
     Mono<OffsetPage<NotifyBO>> list(Long tenantId, NotifyQuery query);
 }

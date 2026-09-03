@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
+/** Encode and verify signed cursor tokens carrying {@link CursorState}. */
 
 public final class SignedCursorCodec {
 
@@ -64,6 +65,7 @@ public final class SignedCursorCodec {
         this.clock = Objects.requireNonNull(clock, "clock must not be null");
     }
 
+    /** Encode a signed cursor for the tenant and query fingerprint. */
     public String encode(CursorState state) {
         Objects.requireNonNull(state, "state must not be null");
         SecretKey key = keys.get(state.keyId());
@@ -79,6 +81,7 @@ public final class SignedCursorCodec {
         return ENCODER.encodeToString(payload) + "." + ENCODER.encodeToString(signature);
     }
 
+    /** Decode and verify a cursor token for the tenant and query fingerprint. */
     public CursorState decode(String token, UUID expectedTenantId, byte[] expectedQueryDigest) {
         Objects.requireNonNull(expectedTenantId, "expectedTenantId must not be null");
         byte[] expectedDigest = CursorState.copyDigest(expectedQueryDigest);

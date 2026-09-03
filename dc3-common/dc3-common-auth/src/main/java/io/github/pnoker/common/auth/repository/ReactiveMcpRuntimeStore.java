@@ -27,25 +27,35 @@ import reactor.core.publisher.Mono;
 
 /** R2DBC persistence port for the MCP authorization hot path. */
 public interface ReactiveMcpRuntimeStore {
+    /** Resolve the mcp runtime by its access token jti. */
     Mono<OAuthAuthorizationRecord> getAuthorizationByAccessTokenJti(String jti);
 
+    /** Load the connection for the request. */
     Mono<McpConnectionRecord> getConnection(Long id);
 
+    /** Resolve the tool record for the principal's connection and tool name. */
     Mono<McpToolRecord> resolveTool(
             Long tenantId, Long principalId, Long connectionId, String toolName, boolean allowHighRisk);
 
+    /** Stream tools matching the request. */
     Flux<McpToolRecord> listTools(Long tenantId, Long principalId, Long connectionId, boolean allowHighRisk);
 
+    /** Stamp the connection's last-used time. */
     Mono<Boolean> touchConnection(Long id, LocalDateTime usedAt);
 
+    /** Load the idempotent consumption record by its key. */
     Mono<McpToolConfirmationRecord> getConsumedByIdempotency(Long connectionId, String key);
 
+    /** Resolve the idempotent consumption record by its key. */
     Mono<McpToolConfirmationRecord> getByIdempotency(Long connectionId, String key);
 
+    /** Load the confirmation for the request. */
     Mono<McpToolConfirmationRecord> getConfirmation(String confirmId);
 
+    /** Insert one confirmation and emit the stored row. */
     Mono<Integer> insertConfirmation(McpToolConfirmationRecord confirmation);
 
+    /** Consume the pending confirmation, returning the rows updated. */
     Mono<Integer> consumeConfirmation(Long id, LocalDateTime consumedAt);
     /** Atomically claims a pending confirmation after re-checking its full security binding. */
     default Mono<Integer> consumeConfirmation(
@@ -59,5 +69,6 @@ public interface ReactiveMcpRuntimeStore {
         return Mono.error(new UnsupportedOperationException("atomic confirmation claim is not implemented"));
     }
 
+    /** Insert one audit and emit the stored row. */
     Mono<Integer> insertAudit(McpAuditCommand command);
 }

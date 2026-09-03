@@ -26,23 +26,33 @@ import reactor.core.publisher.Mono;
 
 /** Reactive event attribute application service. */
 public interface ReactiveEventAttributeService {
+    /** Add one event attribute. */
     Mono<EventAttributeBO> add(EventAttributeBO value);
 
+    /** Update one event attribute and emit the updated row. */
     Mono<EventAttributeBO> update(EventAttributeBO value);
 
+    /** Delete the event attribute, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Resolve the event attribute by its id. */
     Mono<EventAttributeBO> getById(Long tenantId, Long id);
 
+    /** Resolve the event attribute by its name and driver id. */
     Mono<EventAttributeBO> getByNameAndDriverId(Long tenantId, String name, Long driverId);
 
+    /** List event attributes matched by driver id. */
     Flux<EventAttributeBO> listByDriverId(Long tenantId, Long driverId);
 
+    /** Page event attributes matching the tenant-scoped filters. */
     Mono<OffsetPage<EventAttributeBO>> list(EventAttributeFilter filter);
 
+    /** Delete the records matched by ids. */
     Mono<Boolean> deleteByIds(Long tenantId, Collection<Long> ids, Long operatorId, String operatorName);
 
+    /** Save the batch, inserting or updating as needed. */
     Mono<List<EventAttributeBO>> saveBatch(List<EventAttributeBO> values);
 
+    /** Update one batch and emit the updated row. */
     Mono<List<EventAttributeBO>> updateBatch(List<EventAttributeBO> values);
 }

@@ -29,13 +29,17 @@ import org.mapstruct.Mapping;
         uses = {MapStructUtil.class})
 public interface AttachmentBuilder {
 
+    /** Convert the value object into its business-object form. */
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "userId", ignore = true)
     AttachmentBO buildBOByVO(AttachmentVO entityVO);
 
+    /** Convert the value objects into their business-object forms. */
     List<AttachmentBO> buildBOListByVOList(List<AttachmentVO> entityVOList);
 
+    /** Convert the business object into its value-object form. */
     AttachmentVO buildVOByBO(AttachmentBO entityBO);
 
+    /** Convert the business objects into their value-object forms. */
     List<AttachmentVO> buildVOListByBOList(List<AttachmentBO> entityBOList);
 }

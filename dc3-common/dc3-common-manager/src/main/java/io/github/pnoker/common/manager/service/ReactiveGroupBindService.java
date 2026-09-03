@@ -20,15 +20,21 @@ import io.github.pnoker.common.manager.entity.bo.GroupBindBO;
 import io.github.pnoker.common.manager.repository.BindingFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
+/** Business service covering group bind use cases. */
 
 public interface ReactiveGroupBindService {
+    /** Add one group binding. */
     Mono<GroupBindBO> add(GroupBindBO value);
 
+    /** Update one group binding and emit the updated row. */
     Mono<GroupBindBO> update(GroupBindBO value);
 
+    /** Delete the group binding, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 
+    /** Resolve the group binding by its id. */
     Mono<GroupBindBO> getById(Long tenantId, Long id);
 
+    /** Page group bindings matching the tenant-scoped filters. */
     Mono<OffsetPage<GroupBindBO>> list(BindingFilter filter);
 }

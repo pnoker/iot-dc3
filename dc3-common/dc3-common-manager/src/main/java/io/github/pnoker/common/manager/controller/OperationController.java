@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/** REST controller exposing operation endpoints. */
 @Tag(name = "operations", description = "Durable asynchronous manager operations")
 @RestController
 @RequestMapping("/operations")
@@ -44,6 +45,7 @@ public class OperationController implements BaseController {
 
     private final ReactiveDeviceImportService deviceImportService;
 
+    /** Resolve the operation by its id. */
     @PreAuthorize("@perm.can('device', 'add')")
     @Operation(
             summary = "Get Operation by ID",

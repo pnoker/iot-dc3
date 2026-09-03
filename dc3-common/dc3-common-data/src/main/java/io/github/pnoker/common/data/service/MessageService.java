@@ -28,13 +28,18 @@ import reactor.core.publisher.Mono;
  * @since 2016.10.1
  */
 public interface MessageService {
+    /** Add one message. */
     Mono<MessageBO> add(MessageBO value);
 
+    /** Delete the message, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id);
 
+    /** Update one message and emit the updated row. */
     Mono<MessageBO> update(MessageBO value);
 
+    /** Resolve the message by its id. */
     Mono<MessageBO> getById(Long tenantId, Long id);
 
+    /** Page messages matching the tenant-scoped filters. */
     Mono<OffsetPage<MessageBO>> list(Long tenantId, MessageQuery query);
 }

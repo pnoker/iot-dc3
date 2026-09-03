@@ -36,9 +36,12 @@ import reactor.core.publisher.Mono;
  */
 public interface DriverFacade {
 
+    /** Resolve the driver by its id. */
     Mono<FacadeDriverBO> getByIdReactive(Long tenantId, Long id);
 
+    /** List drivers matched by ids. */
     Flux<FacadeDriverBO> listByIdsReactive(Long tenantId, Collection<Long> ids);
 
+    /** Page drivers matching the tenant-scoped filters. */
     Mono<OffsetPage<FacadeDriverBO>> listReactive(FacadeDriverOffsetQuery query);
 }

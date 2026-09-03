@@ -23,11 +23,15 @@ import reactor.core.publisher.Mono;
 /** Persistence port for users; every tenant-scoped operation carries tenantId explicitly. */
 public interface ReactiveUserStore {
 
+    /** Resolve the user by its id. */
     Mono<UserDO> getById(Long tenantId, Long id);
 
+    /** Resolve the user by its user name. */
     Mono<UserDO> getByUserName(Long tenantId, String userName);
 
+    /** Resolve the user by its principal id. */
     Mono<UserDO> getByPrincipalId(Long tenantId, Long principalId);
 
+    /** Page users matching the tenant-scoped filters. */
     Mono<OffsetPage<UserDO>> list(UserFilter filter);
 }

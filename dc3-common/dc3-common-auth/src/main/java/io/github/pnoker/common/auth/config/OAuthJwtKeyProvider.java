@@ -51,6 +51,7 @@ public final class OAuthJwtKeyProvider implements OAuthJwtVerifier.KeySource {
         return verificationKey();
     }
 
+    /** Return the active RSA verification key. */
     public RSAPublicKey verificationKey() {
         RSAPublicKey current = cached;
         if (current != null) {

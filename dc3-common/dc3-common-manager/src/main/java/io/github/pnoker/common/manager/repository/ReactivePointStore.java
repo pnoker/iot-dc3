@@ -24,26 +24,37 @@ import reactor.core.publisher.Mono;
 
 /** Reactive persistence port for tenant-scoped points. */
 public interface ReactivePointStore {
+    /** Load the point scoped to the tenant by id. */
     Mono<PointBO> get(Long tenantId, Long id);
 
+    /** Check whether a record exists for the given name or code. */
     Mono<Boolean> existsByNameOrCode(
             Long tenantId, Long profileId, String pointName, String pointCode, Long excludingId);
 
+    /** Insert one point and emit the stored row. */
     Mono<PointBO> insert(PointBO value);
 
+    /** Update one point and emit the updated row. */
     Mono<PointBO> update(PointBO value, int expectedVersion);
 
+    /** Delete the point, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Page points matching the tenant-scoped filters. */
     Mono<OffsetPage<PointBO>> list(PointFilter filter);
 
+    /** List points matched by ids. */
     Flux<PointBO> listByIds(Long tenantId, List<Long> ids);
 
+    /** List points matched by profile id. */
     Flux<PointBO> listByProfileId(Long tenantId, Long profileId);
 
+    /** List points matched by device id. */
     Flux<PointBO> listByDeviceId(Long tenantId, Long deviceId);
 
+    /** List points matched by point id. */
     Flux<Long> listConfiguredDeviceIdsByPointId(Long tenantId, Long pointId);
 
+    /** Count records matched by device id. */
     Mono<Long> countByDeviceId(Long tenantId, Long deviceId);
 }

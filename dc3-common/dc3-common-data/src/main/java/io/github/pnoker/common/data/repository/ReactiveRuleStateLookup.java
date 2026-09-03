@@ -21,7 +21,9 @@ import reactor.core.publisher.Mono;
 /** Reactive tenant-scoped reads used by the alarm rule pipeline. */
 public interface ReactiveRuleStateLookup {
 
+    /** Report whether the rule state lookup has firing state. */
     Mono<Boolean> hasFiringState(long tenantId, long ruleId, byte alarmTargetTypeFlag, long entityId);
 
+    /** Load the firing alarm id scoped to the tenant by id. */
     Mono<Long> getFiringAlarmId(long tenantId, long ruleId, byte alarmTargetTypeFlag, long entityId);
 }

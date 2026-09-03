@@ -23,11 +23,15 @@ import reactor.core.publisher.Mono;
 
 /** Reactive tenant-scoped user read service. */
 public interface ReactiveUserService {
+    /** Resolve the user by its id. */
     Mono<UserBO> getById(Long tenantId, Long id);
 
+    /** Resolve the user by its user name. */
     Mono<UserBO> getByUserName(Long tenantId, String userName);
 
+    /** Resolve the user by its principal id. */
     Mono<UserBO> getByPrincipalId(Long tenantId, Long principalId);
 
+    /** Page users matching the tenant-scoped filters. */
     Mono<OffsetPage<UserBO>> list(UserFilter filter);
 }

@@ -25,13 +25,18 @@ import reactor.core.publisher.Mono;
 /** Persistence port for the platform principal catalog. */
 public interface ReactivePrincipalStore {
 
+    /** Resolve the principal by its id. */
     Mono<PrincipalDO> getById(Long tenantId, Long id);
 
+    /** Page principals matching the tenant-scoped filters. */
     Mono<OffsetPage<PrincipalDO>> list(Long tenantId, PrincipalFilter filter);
 
+    /** List principals matched by ids. */
     Flux<PrincipalDO> listByIds(Long tenantId, Collection<Long> ids);
 
+    /** Update one enable flag and emit the updated row. */
     Mono<PrincipalDO> updateEnableFlag(Long tenantId, Long id, byte enableFlag, Long operatorId, String operatorName);
 
+    /** Stamp the principal's last-login time, reporting whether it exists. */
     Mono<Boolean> touchLastLogin(Long id);
 }

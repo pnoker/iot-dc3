@@ -54,6 +54,7 @@ public final class PointValueCursorCodec {
                 Map.of(KEY_ID, new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), HMAC_ALGORITHM)), clock);
     }
 
+    /** Encode a cursor bound to the point-value series scope. */
     public String encodeCursor(long tenantId, long deviceId, long pointId, Cursor cursor) {
         if (cursor == null
                 || cursor.series() == null
@@ -63,6 +64,7 @@ public final class PointValueCursorCodec {
         return encode(tenantId, scopeFingerprint(tenantId, deviceId, pointId), cursor);
     }
 
+    /** Decode a cursor token bound to the point-value series scope. */
     public Cursor decodeCursor(String token, long tenantId, long deviceId, long pointId) {
         Cursor cursor = decode(token, tenantId, scopeFingerprint(tenantId, deviceId, pointId));
         if (cursor.series() != null && !cursor.series().equals(new SeriesKey(tenantId, deviceId, pointId))) {
@@ -71,6 +73,7 @@ public final class PointValueCursorCodec {
         return cursor;
     }
 
+    /** Encode a signed cursor for the tenant and query fingerprint. */
     public String encode(long tenantId, String queryFingerprint, Cursor cursor) {
         validateScope(tenantId, queryFingerprint);
         if (cursor == null
@@ -88,6 +91,7 @@ public final class PointValueCursorCodec {
                 new CursorState(KEY_ID, tenantUuid(tenantId), digest(queryFingerprint), position, expiresAt));
     }
 
+    /** Decode and verify a cursor token for the tenant and query fingerprint. */
     public Cursor decode(String token, long tenantId, String queryFingerprint) {
         validateScope(tenantId, queryFingerprint);
         try {
@@ -104,6 +108,7 @@ public final class PointValueCursorCodec {
                 + ";sort=create_time.desc,tenant_id.desc,device_id.desc,point_id.desc,message_id.desc";
     }
 
+    /** Require a non-blank query fingerprint, returning it unchanged. */
     public static String normalizeFingerprint(String query) {
         if (query == null || query.isBlank()) {
             throw new IllegalArgumentException("cursor query fingerprint is required");

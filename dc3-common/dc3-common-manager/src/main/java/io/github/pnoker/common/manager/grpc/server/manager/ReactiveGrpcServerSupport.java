@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Helpers bridging reactive publishers onto gRPC stream observers. */
 
 public final class ReactiveGrpcServerSupport {
 
@@ -36,6 +37,7 @@ public final class ReactiveGrpcServerSupport {
         throw new IllegalStateException("utility class");
     }
 
+    /** Bridge the reactive publisher onto the gRPC stream observer, disposing on cancel. */
     public static <T> void subscribe(Mono<T> publisher, StreamObserver<T> observer) {
         AtomicReference<Disposable> subscription = new AtomicReference<>();
         if (observer instanceof ServerCallStreamObserver<?> serverObserver) {
@@ -49,6 +51,7 @@ public final class ReactiveGrpcServerSupport {
         }
     }
 
+    /** Bridge the reactive publisher onto the gRPC stream observer, disposing on cancel. */
     public static <T> void subscribe(Flux<T> publisher, StreamObserver<T> observer) {
         AtomicReference<Disposable> subscription = new AtomicReference<>();
         if (observer instanceof ServerCallStreamObserver<?> serverObserver) {
@@ -69,6 +72,7 @@ public final class ReactiveGrpcServerSupport {
         }
     }
 
+    /** Map the throwable to the closest gRPC status with its message. */
     public static RuntimeException toStatus(Throwable error) {
         String description =
                 Objects.requireNonNullElse(error.getMessage(), error.getClass().getSimpleName());

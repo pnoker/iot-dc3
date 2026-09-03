@@ -53,6 +53,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/** REST controller exposing point attribute config endpoints. */
 @Tag(name = "point_attribute_config", description = "Per-device point attribute configuration")
 @RestController
 @RequestMapping(ManagerConstant.POINT_ATTRIBUTE_CONFIG_URL_PREFIX)
@@ -64,6 +65,7 @@ public class PointAttributeConfigController implements BaseController {
     private final ReactivePointService pointService;
     private final ReactiveDeviceService deviceService;
 
+    /** Add one point attribute config and return the stored view. */
     @PreAuthorize("@perm.can('point_attribute_config', 'add')")
     @Operation(
             summary = "Add Point Attribute Configuration",
@@ -94,6 +96,7 @@ public class PointAttributeConfigController implements BaseController {
                 .map(builder::buildVOByBO);
     }
 
+    /** Delete the point attribute config. */
     @PreAuthorize("@perm.can('point_attribute_config', 'delete')")
     @Operation(
             summary = "Delete Point Attribute Configuration",
@@ -132,6 +135,7 @@ public class PointAttributeConfigController implements BaseController {
                         .then());
     }
 
+    /** Update one point attribute config and emit the updated row. */
     @PreAuthorize("@perm.can('point_attribute_config', 'update')")
     @Operation(
             summary = "Update Point Attribute Configuration",
@@ -160,6 +164,7 @@ public class PointAttributeConfigController implements BaseController {
                 .map(builder::buildVOByBO);
     }
 
+    /** Resolve the point attribute config by its id. */
     @PreAuthorize("@perm.can('point_attribute_config', 'get')")
     @Operation(
             summary = "Get Point Attribute Configuration",
@@ -183,6 +188,7 @@ public class PointAttributeConfigController implements BaseController {
                 .flatMap(tenantId -> configService.getById(tenantId, id).map(builder::buildVOByBO));
     }
 
+    /** Resolve the point attribute config by its tuple. */
     @PreAuthorize("@perm.can('point_attribute_config', 'get')")
     @Operation(
             summary = "Get Point Attribute Configuration by Device and Point",
@@ -213,6 +219,7 @@ public class PointAttributeConfigController implements BaseController {
                         .map(builder::buildVOByBO));
     }
 
+    /** List point attribute configs matched by device id. */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
     @Operation(
             summary = "List Point Attribute Configurations by Device",
@@ -238,6 +245,7 @@ public class PointAttributeConfigController implements BaseController {
                         .collectList());
     }
 
+    /** List point attribute configs matched by device id and point id. */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
     @Operation(
             summary = "List Point Attribute Configurations by Device and Point",
@@ -264,6 +272,7 @@ public class PointAttributeConfigController implements BaseController {
                         .collectList());
     }
 
+    /** Page point attribute configs matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('point_attribute_config', 'list')")
     @Operation(
             summary = "List Point Attribute Configurations",

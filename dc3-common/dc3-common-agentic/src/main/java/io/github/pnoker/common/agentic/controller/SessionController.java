@@ -59,6 +59,7 @@ public class SessionController implements BaseController {
     private final SessionService sessionService;
     private final SessionBuilder sessionBuilder;
 
+    /** Page sessions matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('session', 'list')")
     @Operation(
             summary = "List Sessions",
@@ -94,6 +95,7 @@ public class SessionController implements BaseController {
                                 page.hasNext())));
     }
 
+    /** Load the session for the request. */
     @PreAuthorize("@perm.can('session', 'get')")
     @Operation(
             summary = "Get Session",
@@ -121,6 +123,7 @@ public class SessionController implements BaseController {
                         .doOnNext(this::sanitizeSession));
     }
 
+    /** Delete the session. */
     @PreAuthorize("@perm.can('session', 'delete')")
     @Operation(
             summary = "Delete Session",
@@ -145,6 +148,7 @@ public class SessionController implements BaseController {
                 .flatMap(header -> sessionService.delete(conversationId, header).then());
     }
 
+    /** Update one session and emit the updated row. */
     @PreAuthorize("@perm.can('session', 'update')")
     @Operation(
             summary = "Update Session",

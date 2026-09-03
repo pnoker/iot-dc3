@@ -63,6 +63,7 @@ public class ResourceController implements BaseController {
     private final ReactiveResourceService resourceService;
     private final ReactiveAdminChecker adminChecker;
 
+    /** Add one resource and return the stored view. */
     @PreAuthorize("@perm.can('resource', 'add')")
     @Operation(
             summary = "Add Resource",
@@ -92,6 +93,7 @@ public class ResourceController implements BaseController {
                         .map(saved -> ResponseEntity.status(201).body(resourceBuilder.buildVOByBO(saved))));
     }
 
+    /** Delete the resource. */
     @PreAuthorize("@perm.can('resource', 'delete')")
     @Operation(
             summary = "Delete Resource by ID",
@@ -116,6 +118,7 @@ public class ResourceController implements BaseController {
                 .thenReturn(ResponseEntity.noContent().build());
     }
 
+    /** Update one resource and emit the updated row. */
     @PreAuthorize("@perm.can('resource', 'update')")
     @Operation(
             summary = "Update Resource",
@@ -143,6 +146,7 @@ public class ResourceController implements BaseController {
                         .map(saved -> ResponseEntity.ok(resourceBuilder.buildVOByBO(saved))));
     }
 
+    /** Resolve the resource by its id. */
     @PreAuthorize("@perm.can('resource', 'get')")
     @Operation(
             summary = "Get Resource by ID",
@@ -162,6 +166,7 @@ public class ResourceController implements BaseController {
         return resourceService.getById(id).map(resource -> ResponseEntity.ok(resourceBuilder.buildVOByBO(resource)));
     }
 
+    /** Page resources matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('resource', 'list')")
     @Operation(
             summary = "List Resources",
@@ -200,6 +205,7 @@ public class ResourceController implements BaseController {
                         page.total())));
     }
 
+    /** Emit the resource tree for the tenant. */
     @PreAuthorize("@perm.can('resource', 'list')")
     @Operation(
             summary = "List Resource Tree",

@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/** gRPC facade exposing token operations. */
 @Component
 @RequiredArgsConstructor
 public class TokenGrpcFacade implements TokenFacade {

@@ -34,6 +34,7 @@ import org.mapstruct.Mapping;
         uses = {MapStructUtil.class})
 public interface ActionBuilder {
 
+    /** Convert the value object into its business-object form. */
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "userId", ignore = true)
     ActionBO buildBOByVO(ActionVO entityVO);
@@ -46,6 +47,7 @@ public interface ActionBuilder {
      */
     List<ActionBO> buildBOListByVOList(List<ActionVO> entityVOList);
 
+    /** Convert the business object into its value-object form. */
     ActionVO buildVOByBO(ActionBO entityBO);
 
     /**

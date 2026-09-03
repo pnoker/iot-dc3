@@ -27,10 +27,13 @@ import reactor.core.publisher.Mono;
  */
 public interface OperationRepository {
 
+    /** Create the import workbook embedding the hidden schema manifest. */
     Mono<OperationState> create(TenantScope tenant, OperationState state);
 
+    /** Resolve the operation by its id. */
     Mono<OperationState> findById(TenantScope tenant, UUID operationId);
 
+    /** Resolve the operation by its idempotency key. */
     Mono<OperationState> findByIdempotencyKey(TenantScope tenant, String idempotencyKey);
 
     /**

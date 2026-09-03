@@ -34,6 +34,7 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
+/** Reactive persistence port for mcp catalog records. */
 @Repository
 @ConditionalOnClass({DatabaseClient.class, PageTransaction.class})
 @RequiredArgsConstructor

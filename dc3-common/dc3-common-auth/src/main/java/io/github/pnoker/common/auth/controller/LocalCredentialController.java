@@ -59,6 +59,7 @@ public class LocalCredentialController implements BaseController {
     private final ReactiveLocalCredentialService reactiveLocalCredentialService;
     private final ReactiveLocalCredentialCommandService reactiveLocalCredentialCommandService;
 
+    /** Add one local credential and return the stored view. */
     @PreAuthorize("@perm.can('local_credential', 'add')")
     @Operation(
             summary = "Add Local Credential",
@@ -84,6 +85,7 @@ public class LocalCredentialController implements BaseController {
         });
     }
 
+    /** Delete the local credential. */
     @PreAuthorize("@perm.can('local_credential', 'delete')")
     @Operation(
             summary = "Delete Local Credential",
@@ -110,6 +112,7 @@ public class LocalCredentialController implements BaseController {
                         .thenReturn(ResponseEntity.noContent().build()));
     }
 
+    /** Update one local credential and emit the updated row. */
     @PreAuthorize("@perm.can('local_credential', 'update')")
     @Operation(
             summary = "Update Local Credential",
@@ -136,6 +139,7 @@ public class LocalCredentialController implements BaseController {
         });
     }
 
+    /** Reset the credential password to the supplied raw value. */
     @PreAuthorize("@perm.can('local_credential', 'update')")
     @Operation(
             summary = "Reset Local Credential Password",
@@ -166,6 +170,7 @@ public class LocalCredentialController implements BaseController {
                         .map(saved -> ResponseEntity.ok(localCredentialBuilder.buildVOByBO(saved))));
     }
 
+    /** Resolve the local credential by its id. */
     @PreAuthorize("@perm.can('local_credential', 'get')")
     @Operation(
             summary = "Get Local Credential by ID",
@@ -192,6 +197,7 @@ public class LocalCredentialController implements BaseController {
                         .map(credential -> ResponseEntity.ok(localCredentialBuilder.buildVOByBO(credential))));
     }
 
+    /** Check whether the login name is available. */
     @PreAuthorize("@perm.can('local_credential', 'get')")
     @Operation(
             summary = "Check Login Name Availability",
@@ -216,6 +222,7 @@ public class LocalCredentialController implements BaseController {
                 .map(ResponseEntity::ok);
     }
 
+    /** Page local credentials matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('local_credential', 'list')")
     @Operation(
             summary = "List Local Credentials",

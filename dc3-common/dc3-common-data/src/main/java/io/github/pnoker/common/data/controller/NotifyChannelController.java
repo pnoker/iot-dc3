@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/** REST controller exposing notify channel endpoints. */
 @Tag(name = "notify_channel", description = "Notification delivery channels")
 @RestController
 @RequestMapping(DataConstant.NOTIFY_CHANNEL_URL_PREFIX)
@@ -52,6 +53,7 @@ public class NotifyChannelController implements BaseController {
     private final NotifyChannelBuilder builder;
     private final NotifyChannelService service;
 
+    /** Add one notify configuration channel and return the stored view. */
     @Operation(
             summary = "Add channel",
             description = "Create a tenant-scoped notification channel.",
@@ -71,6 +73,7 @@ public class NotifyChannelController implements BaseController {
         });
     }
 
+    /** Delete the notify configuration channel. */
     @Operation(
             summary = "Delete channel",
             description = "Delete a tenant-scoped notification channel.",
@@ -82,6 +85,7 @@ public class NotifyChannelController implements BaseController {
         return getTenantId().flatMap(tenant -> service.delete(tenant, id).then());
     }
 
+    /** Update one notify configuration channel and emit the updated row. */
     @Operation(
             summary = "Update channel",
             description = "Update a tenant-scoped notification channel.",
@@ -101,6 +105,7 @@ public class NotifyChannelController implements BaseController {
         });
     }
 
+    /** Resolve the notify configuration channel by its id. */
     @Operation(
             summary = "Get channel",
             description = "Return one tenant-scoped notification channel.",
@@ -113,6 +118,7 @@ public class NotifyChannelController implements BaseController {
         return getTenantId().flatMap(tenant -> service.getById(tenant, id).map(builder::buildVOByBO));
     }
 
+    /** Page notify configuration channels matching the tenant-scoped filters. */
     @Operation(
             summary = "List channels",
             description = "List tenant-scoped notification channels.",

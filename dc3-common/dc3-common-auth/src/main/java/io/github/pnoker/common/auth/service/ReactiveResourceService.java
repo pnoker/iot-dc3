@@ -20,17 +20,24 @@ import io.github.pnoker.common.auth.entity.bo.*;
 import io.github.pnoker.common.auth.repository.ResourceFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.*;
+/** Business service covering resource use cases. */
 
 public interface ReactiveResourceService {
+    /** Resolve the resource by its id. */
     Mono<ResourceBO> getById(Long id);
 
+    /** Page resources matching the tenant-scoped filters. */
     Mono<OffsetPage<ResourceBO>> list(ResourceFilter filter);
 
+    /** Emit the resource tree for the tenant. */
     Flux<ResourceTreeBO> listTree(ResourceFilter filter);
 
+    /** Add one resource. */
     Mono<ResourceBO> add(ResourceBO resource);
 
+    /** Update one resource and emit the updated row. */
     Mono<ResourceBO> update(ResourceBO resource);
 
+    /** Delete the resource. */
     Mono<Void> delete(Long id, Long operatorId, String operatorName);
 }

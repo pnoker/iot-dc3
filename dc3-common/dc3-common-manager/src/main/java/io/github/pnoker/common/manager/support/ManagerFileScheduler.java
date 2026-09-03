@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
+/** Scheduler driving periodic manager maintenance. */
 @Component
 public final class ManagerFileScheduler {
 
@@ -32,6 +33,7 @@ public final class ManagerFileScheduler {
             Thread.ofVirtual().name("dc3-manager-file-", 0).factory());
     private final Scheduler scheduler = Schedulers.fromExecutorService(executor, "dc3-manager-file");
 
+    /** Execute the tool for the JSON arguments within the given context. */
     public <T> Mono<T> call(Callable<T> task) {
         return Mono.fromCallable(task).subscribeOn(scheduler);
     }

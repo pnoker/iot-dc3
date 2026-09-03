@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/** REST controller exposing message endpoints. */
 @Tag(name = "message", description = "Alarm message templates")
 @RestController("dataMessageController")
 @RequestMapping(DataConstant.MESSAGE_URL_PREFIX)
@@ -52,6 +53,7 @@ public class MessageController implements BaseController {
     private final MessageBuilder builder;
     private final MessageService service;
 
+    /** Add one message and return the stored view. */
     @Operation(
             summary = "Add message",
             description = "Create a tenant-scoped alarm message template.",
@@ -71,6 +73,7 @@ public class MessageController implements BaseController {
         });
     }
 
+    /** Delete the message. */
     @Operation(
             summary = "Delete message",
             description = "Delete a tenant-scoped alarm message template.",
@@ -82,6 +85,7 @@ public class MessageController implements BaseController {
         return getTenantId().flatMap(tenant -> service.delete(tenant, id).then());
     }
 
+    /** Update one message and emit the updated row. */
     @Operation(
             summary = "Update message",
             description = "Update a tenant-scoped alarm message template.",
@@ -101,6 +105,7 @@ public class MessageController implements BaseController {
         });
     }
 
+    /** Resolve the message by its id. */
     @Operation(
             summary = "Get message",
             description = "Return one tenant-scoped alarm message template.",
@@ -113,6 +118,7 @@ public class MessageController implements BaseController {
         return getTenantId().flatMap(tenant -> service.getById(tenant, id).map(builder::buildVOByBO));
     }
 
+    /** Page messages matching the tenant-scoped filters. */
     @Operation(
             summary = "List messages",
             description = "List tenant-scoped alarm message templates.",

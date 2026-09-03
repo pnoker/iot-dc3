@@ -23,9 +23,12 @@ import reactor.core.publisher.Mono;
 
 /** Reactive notification delivery history service. */
 public interface NotifyHistoryService {
+    /** Resolve the notify configuration history by its id. */
     Mono<NotifyHistoryBO> getById(Long tenantId, Long id);
 
+    /** Page notify configuration histories matching the tenant-scoped filters. */
     Mono<OffsetPage<NotifyHistoryBO>> list(Long tenantId, NotifyHistoryQuery query);
 
+    /** Delete the notify configuration history, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id);
 }

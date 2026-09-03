@@ -22,19 +22,27 @@ import reactor.core.publisher.Mono;
 
 /** Reactive persistence port for tenant-scoped groups. */
 public interface ReactiveGroupStore {
+    /** Page groups matching the tenant-scoped filters. */
     Mono<OffsetPage<GroupBO>> list(GroupFilter filter);
 
+    /** Load the group scoped to the tenant by id. */
     Mono<GroupBO> get(Long tenantId, Long id);
 
+    /** Resolve the group by its name. */
     Mono<GroupBO> getByName(Long tenantId, byte type, Long parentId, String name);
 
+    /** Report whether the group has children. */
     Mono<Boolean> hasChildren(Long tenantId, Long id);
 
+    /** Report whether the group has active bindings. */
     Mono<Boolean> hasActiveBindings(Long tenantId, Long id);
 
+    /** Insert one group and emit the stored row. */
     Mono<GroupBO> insert(GroupBO group);
 
+    /** Update one group and emit the updated row. */
     Mono<GroupBO> update(GroupBO group);
 
+    /** Delete the group, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 }

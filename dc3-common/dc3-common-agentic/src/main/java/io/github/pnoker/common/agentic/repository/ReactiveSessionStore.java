@@ -26,10 +26,13 @@ import reactor.core.publisher.Mono;
 /** Reactive persistence port for agentic conversation sessions. */
 public interface ReactiveSessionStore {
 
+    /** Create or refresh the session and emit the stored state. */
     Mono<SessionBO> touch(String conversationId, SessionExt sessionExt, RequestHeader.PrincipalHeader header);
 
+    /** Load the session for the request. */
     Mono<SessionBO> get(String conversationId, RequestHeader.PrincipalHeader header);
 
+    /** Page sessions matching the tenant-scoped filters. */
     Mono<OffsetPage<SessionBO>> list(
             long offset,
             int limit,
@@ -37,8 +40,10 @@ public interface ReactiveSessionStore {
             java.util.List<SortSpec> sort,
             RequestHeader.PrincipalHeader header);
 
+    /** Update one session and emit the updated row. */
     Mono<SessionBO> update(
             String conversationId, SessionExt sessionExt, String title, RequestHeader.PrincipalHeader header);
 
+    /** Delete the session. */
     Mono<Long> delete(String conversationId, RequestHeader.PrincipalHeader header);
 }

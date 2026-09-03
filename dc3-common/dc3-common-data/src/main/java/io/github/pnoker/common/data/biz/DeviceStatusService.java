@@ -23,7 +23,9 @@ import reactor.core.publisher.Mono;
 /** Reactive business service for tenant-scoped device status. */
 public interface DeviceStatusService {
 
+    /** List device status matching the request. */
     Mono<Map<String, String>> list(FacadeDeviceOffsetQuery query);
 
+    /** List device status matched by profile id. */
     Mono<Map<String, String>> listByProfileId(Long tenantId, Long profileId);
 }

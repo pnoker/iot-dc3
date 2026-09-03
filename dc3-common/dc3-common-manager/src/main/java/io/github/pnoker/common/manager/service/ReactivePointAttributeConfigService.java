@@ -21,22 +21,31 @@ import io.github.pnoker.common.manager.repository.PointAttributeConfigFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Business service covering point attribute config use cases. */
 
 public interface ReactivePointAttributeConfigService {
+    /** Add one point attribute config. */
     Mono<PointAttributeConfigBO> add(PointAttributeConfigBO value);
 
+    /** Update one point attribute config and emit the updated row. */
     Mono<PointAttributeConfigBO> update(PointAttributeConfigBO value);
 
+    /** Delete the point attribute config, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Resolve the point attribute config by its id. */
     Mono<PointAttributeConfigBO> getById(Long tenantId, Long id);
 
+    /** Resolve the point attribute config by its attribute id and device id and point id. */
     Mono<PointAttributeConfigBO> getByAttributeIdAndDeviceIdAndPointId(
             Long tenantId, Long attributeId, Long deviceId, Long pointId);
 
+    /** List point attribute configs matched by device id. */
     Flux<PointAttributeConfigBO> listByDeviceId(Long tenantId, Long deviceId);
 
+    /** List point attribute configs matched by device id and point id. */
     Flux<PointAttributeConfigBO> listByDeviceIdAndPointId(Long tenantId, Long deviceId, Long pointId);
 
+    /** Page point attribute configs matching the tenant-scoped filters. */
     Mono<OffsetPage<PointAttributeConfigBO>> list(PointAttributeConfigFilter filter);
 }

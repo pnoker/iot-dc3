@@ -24,19 +24,27 @@ import reactor.core.publisher.Mono;
 
 /** Reactive persistence port for tenant-scoped event attributes. */
 public interface ReactiveEventAttributeStore {
+    /** Load the event attribute scoped to the tenant by id. */
     Mono<EventAttributeBO> get(Long tenantId, Long id);
 
+    /** Resolve the event attribute by its code and driver. */
     Mono<EventAttributeBO> getByCodeAndDriver(Long tenantId, String attributeCode, Long driverId);
 
+    /** List event attributes matched by driver id. */
     Flux<EventAttributeBO> listByDriverId(Long tenantId, Long driverId);
 
+    /** Insert one event attribute and emit the stored row. */
     Mono<EventAttributeBO> insert(EventAttributeBO value);
 
+    /** Update one event attribute and emit the updated row. */
     Mono<EventAttributeBO> update(EventAttributeBO value, int expectedVersion);
 
+    /** Delete the event attribute, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Delete the records matched by ids. */
     Mono<Boolean> deleteByIds(Long tenantId, Collection<Long> ids, Long operatorId, String operatorName);
 
+    /** Page event attributes matching the tenant-scoped filters. */
     Mono<OffsetPage<EventAttributeBO>> list(EventAttributeFilter filter);
 }

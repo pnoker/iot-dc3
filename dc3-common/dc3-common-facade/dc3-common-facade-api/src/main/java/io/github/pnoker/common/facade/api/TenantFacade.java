@@ -27,5 +27,6 @@ import reactor.core.publisher.Mono;
  */
 public interface TenantFacade {
 
+    /** Resolve the tenant by its code. */
     Mono<FacadeTenantBO> getByCode(String code);
 }

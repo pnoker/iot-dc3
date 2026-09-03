@@ -24,9 +24,12 @@ import reactor.core.publisher.Mono;
 
 /** Reactive MCP runtime facade used by the gateway. */
 public interface McpRuntimeFacade {
+    /** List tools matching the request. */
     Mono<McpToolListResponseDTO> listTools(String token);
 
+    /** Authorize and execute one MCP tool call. */
     Mono<McpCallToolResponseDTO> callTool(McpCallToolRequestDTO request);
 
+    /** Persist one MCP tool-call audit record. */
     Mono<Void> audit(McpAuditCommandDTO command);
 }

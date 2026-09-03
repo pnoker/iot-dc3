@@ -29,12 +29,16 @@ import org.mapstruct.Mapping;
         uses = {MapStructUtil.class})
 public interface LabelBindBuilder {
 
+    /** Convert the value object into its business-object form. */
     @Mapping(target = "tenantId", ignore = true)
     LabelBindBO buildBOByVO(LabelBindVO entityVO);
 
+    /** Convert the value objects into their business-object forms. */
     List<LabelBindBO> buildBOListByVOList(List<LabelBindVO> entityVOList);
 
+    /** Convert the business object into its value-object form. */
     LabelBindVO buildVOByBO(LabelBindBO entityBO);
 
+    /** Convert the business objects into their value-object forms. */
     List<LabelBindVO> buildVOListByBOList(List<LabelBindBO> entityBOList);
 }

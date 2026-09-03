@@ -35,12 +35,15 @@ import org.mapstruct.MappingTarget;
         uses = {MapStructUtil.class})
 public interface MessageBuilder {
 
+    /** Convert the business object into its value-object form. */
     @Mapping(target = "content", ignore = true)
     @Mapping(target = "contentExt", source = "content")
     MessageVO buildVOByBO(MessageBO entityBO);
 
+    /** Convert the business objects into their value-object forms. */
     List<MessageVO> buildVOListByBOList(List<MessageBO> entityBOList);
 
+    /** Post-process the mapped target after MapStruct copies the fields. */
     @AfterMapping
     default void afterProcess(MessageBO entityBO, @MappingTarget MessageVO entityVO) {
         AgenticMessageContent content =

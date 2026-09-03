@@ -45,6 +45,7 @@ import reactor.core.publisher.Mono;
 @RestControllerAdvice
 public class ExceptionConfig {
 
+    /** Translate password-change-required failures to RFC 9457 responses. */
     @ExceptionHandler(PasswordChangeRequiredException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Mono<ProblemDetailsResponse> passwordChangeRequiredException(
@@ -52,6 +53,7 @@ public class ExceptionConfig {
         return problem(response, request, exception.getErrorCode(), exception.getMessage());
     }
 
+    /** Translate business failures to RFC 9457 responses with their error code. */
     @ExceptionHandler(BusinessException.class)
     public Mono<ProblemDetailsResponse> businessException(
             BusinessException exception, ServerHttpRequest request, ServerHttpResponse response) {
@@ -60,6 +62,7 @@ public class ExceptionConfig {
         return problem(response, request, errorCode, exception.getMessage());
     }
 
+    /** Translate framework status exceptions to RFC 9457 responses. */
     @ExceptionHandler(ResponseStatusException.class)
     public Mono<ProblemDetailsResponse> responseStatusException(
             ResponseStatusException exception, ServerHttpRequest request, ServerHttpResponse response) {
@@ -70,6 +73,7 @@ public class ExceptionConfig {
         return problem(response, request, errorCode, detail, Map.of(), status.value());
     }
 
+    /** Translate request validation failures to RFC 9457 responses with field errors. */
     @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
     public Mono<ProblemDetailsResponse> methodArgumentNotValidException(
             BindException exception, ServerHttpRequest request, ServerHttpResponse response) {
@@ -96,6 +100,7 @@ public class ExceptionConfig {
         return problem(response, request, ErrorCode.OUT_OF_RANGE, exception.getMessage());
     }
 
+    /** Translate missing tenant scope to a 500 system error. */
     @ExceptionHandler(TenantNotScopedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Mono<ProblemDetailsResponse> tenantNotScopedException(
@@ -103,6 +108,7 @@ public class ExceptionConfig {
         return problem(response, request, ErrorCode.FAILURE, "System error: tenant scope missing");
     }
 
+    /** Translate unhandled exceptions to a 500 system error without leaking details. */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Mono<ProblemDetailsResponse> globalException(

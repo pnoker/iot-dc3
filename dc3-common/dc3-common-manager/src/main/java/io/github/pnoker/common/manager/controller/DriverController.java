@@ -49,6 +49,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/** REST controller exposing driver endpoints. */
 @Tag(name = "driver", description = "Protocol driver lifecycle")
 @RestController
 @RequestMapping(ManagerConstant.DRIVER_URL_PREFIX)
@@ -58,6 +59,7 @@ public class DriverController implements BaseController {
     private final DriverBuilder driverBuilder;
     private final ReactiveDriverService reactiveDriverService;
 
+    /** Add one driver and return the stored view. */
     @PreAuthorize("@perm.can('driver', 'add')")
     @Operation(
             summary = "Add Driver",
@@ -87,6 +89,7 @@ public class DriverController implements BaseController {
         });
     }
 
+    /** Delete the driver. */
     @PreAuthorize("@perm.can('driver', 'delete')")
     @Operation(
             summary = "Delete Driver",
@@ -119,6 +122,7 @@ public class DriverController implements BaseController {
                         .thenReturn(ResponseEntity.noContent().build()));
     }
 
+    /** Update one driver and emit the updated row. */
     @PreAuthorize("@perm.can('driver', 'update')")
     @Operation(
             summary = "Update Driver",
@@ -146,6 +150,7 @@ public class DriverController implements BaseController {
         });
     }
 
+    /** Resolve the driver by its id. */
     @PreAuthorize("@perm.can('driver', 'get')")
     @Operation(
             summary = "Get Driver by ID",
@@ -169,6 +174,7 @@ public class DriverController implements BaseController {
                 .flatMap(tenantId -> reactiveDriverService.getById(tenantId, id).map(driverBuilder::buildVOByBO));
     }
 
+    /** List drivers matched by ids. */
     @PreAuthorize("@perm.can('driver', 'list')")
     @Operation(
             summary = "List Drivers by IDs",
@@ -190,6 +196,7 @@ public class DriverController implements BaseController {
                         .collectMap(driver -> String.valueOf(driver.getId()), driverBuilder::buildVOByBO));
     }
 
+    /** Resolve the driver by its service name. */
     @PreAuthorize("@perm.can('driver', 'get')")
     @Operation(
             summary = "Get Driver by Service Name",
@@ -217,6 +224,7 @@ public class DriverController implements BaseController {
                         .map(driverBuilder::buildVOByBO));
     }
 
+    /** Page drivers matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('driver', 'list')")
     @Operation(
             summary = "List Drivers",

@@ -21,9 +21,12 @@ import reactor.core.publisher.Mono;
 
 /** Atomic user lifecycle commands spanning principal, user and membership rows. */
 public interface ReactiveUserCommandService {
+    /** Add one user command. */
     Mono<UserBO> add(Long tenantId, UserBO user, Long operatorId, String operatorName);
 
+    /** Update one user command and emit the updated row. */
     Mono<UserBO> update(Long tenantId, UserBO user, Long operatorId, String operatorName);
 
+    /** Delete the user command, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long userId, Long operatorId, String operatorName);
 }

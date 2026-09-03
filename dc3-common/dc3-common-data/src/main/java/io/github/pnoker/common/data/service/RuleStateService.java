@@ -24,9 +24,12 @@ import reactor.core.publisher.Mono;
 /** Reactive rule runtime state service. */
 public interface RuleStateService {
 
+    /** Resolve the rule state by its id. */
     Mono<RuleStateBO> getById(Long tenantId, Long id);
 
+    /** Page rule states matching the tenant-scoped filters. */
     Mono<OffsetPage<RuleStateBO>> list(Long tenantId, RuleStateQuery query);
 
+    /** Delete the rule state, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id);
 }

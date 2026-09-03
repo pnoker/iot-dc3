@@ -23,11 +23,15 @@ import reactor.core.publisher.Mono;
 
 /** Non-blocking persistence port for tenant memberships. */
 public interface ReactiveTenantMembershipStore {
+    /** Resolve the tenant membership by its id. */
     Mono<TenantMembershipDO> getById(Long tenantId, Long id);
 
+    /** Resolve the tenant membership by its tenant and principal. */
     Mono<TenantMembershipDO> getByTenantAndPrincipal(Long tenantId, Long principalId);
 
+    /** Stream principal ids matching the request. */
     Flux<Long> listPrincipalIds(Long tenantId);
 
+    /** Page tenant memberships matching the tenant-scoped filters. */
     Mono<OffsetPage<TenantMembershipDO>> list(TenantMembershipFilter filter);
 }

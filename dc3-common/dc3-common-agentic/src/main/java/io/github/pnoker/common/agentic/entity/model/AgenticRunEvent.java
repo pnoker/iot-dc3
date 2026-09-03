@@ -149,6 +149,7 @@ public record AgenticRunEvent(
                 AgenticConstant.ToolResult.CODE_ERROR);
     }
 
+    /** Create the cancelled-run event. */
     public static AgenticRunEvent requestCancelled() {
         return new AgenticRunEvent(
                 AgenticConstant.RunEvent.TYPE_EVENT,

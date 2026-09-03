@@ -53,6 +53,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/** REST controller exposing event attribute config endpoints. */
 @Tag(name = "event_attribute_config", description = "Per-device event attribute configuration")
 @RestController
 @RequestMapping(ManagerConstant.EVENT_ATTRIBUTE_CONFIG_URL_PREFIX)
@@ -64,6 +65,7 @@ public class EventAttributeConfigController implements BaseController {
     private final ReactiveEventService eventService;
     private final ReactiveDeviceService deviceService;
 
+    /** Add one event attribute config and return the stored view. */
     @PreAuthorize("@perm.can('event_attribute_config', 'add')")
     @Operation(
             summary = "Add Event Attribute Configuration",
@@ -94,6 +96,7 @@ public class EventAttributeConfigController implements BaseController {
                 .map(builder::buildVOByBO);
     }
 
+    /** Delete the event attribute config. */
     @PreAuthorize("@perm.can('event_attribute_config', 'delete')")
     @Operation(
             summary = "Delete Event Attribute Configuration",
@@ -132,6 +135,7 @@ public class EventAttributeConfigController implements BaseController {
                         .then());
     }
 
+    /** Update one event attribute config and emit the updated row. */
     @PreAuthorize("@perm.can('event_attribute_config', 'update')")
     @Operation(
             summary = "Update Event Attribute Configuration",
@@ -160,6 +164,7 @@ public class EventAttributeConfigController implements BaseController {
                 .map(builder::buildVOByBO);
     }
 
+    /** Resolve the event attribute config by its id. */
     @PreAuthorize("@perm.can('event_attribute_config', 'get')")
     @Operation(
             summary = "Get Event Attribute Configuration",
@@ -183,6 +188,7 @@ public class EventAttributeConfigController implements BaseController {
                 .flatMap(tenantId -> configService.getById(tenantId, id).map(builder::buildVOByBO));
     }
 
+    /** Resolve the event attribute config by its tuple. */
     @PreAuthorize("@perm.can('event_attribute_config', 'get')")
     @Operation(
             summary = "Get Event Attribute Configuration by Device and Event",
@@ -213,6 +219,7 @@ public class EventAttributeConfigController implements BaseController {
                         .map(builder::buildVOByBO));
     }
 
+    /** List event attribute configs matched by device id. */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
     @Operation(
             summary = "List Event Attribute Configurations by Device",
@@ -238,6 +245,7 @@ public class EventAttributeConfigController implements BaseController {
                         .collectList());
     }
 
+    /** List event attribute configs matched by device id and event id. */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
     @Operation(
             summary = "List Event Attribute Configurations by Device and Event",
@@ -264,6 +272,7 @@ public class EventAttributeConfigController implements BaseController {
                         .collectList());
     }
 
+    /** Page event attribute configs matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('event_attribute_config', 'list')")
     @Operation(
             summary = "List Event Attribute Configurations",

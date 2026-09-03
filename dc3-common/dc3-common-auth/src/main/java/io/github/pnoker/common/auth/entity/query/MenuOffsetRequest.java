@@ -23,6 +23,7 @@ import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
+/** Paged query for menu records. */
 @Schema(description = "Menu list request using zero-based offset pagination")
 public record MenuOffsetRequest(
         @Schema(description = "Zero-based result offset") Long offset,

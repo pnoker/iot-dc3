@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Set;
 
+/** Paged query for driver attribute config records. */
 @Schema(description = "Driver attribute config list request using zero-based offset pagination")
 public record DriverAttributeConfigOffsetRequest(
         @Schema(description = "Zero-based result offset") Long offset,

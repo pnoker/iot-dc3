@@ -24,22 +24,31 @@ import reactor.core.publisher.Mono;
 
 /** Reactive persistence port for tenant-scoped events. */
 public interface ReactiveEventStore {
+    /** Load the event scoped to the tenant by id. */
     Mono<EventBO> get(Long tenantId, Long id);
 
+    /** Check whether a record exists for the given name or code. */
     Mono<Boolean> existsByNameOrCode(
             Long tenantId, Long profileId, String eventName, String eventCode, Long excludingId);
 
+    /** Insert one event and emit the stored row. */
     Mono<EventBO> insert(EventBO value);
 
+    /** Update one event and emit the updated row. */
     Mono<EventBO> update(EventBO value, int expectedVersion);
 
+    /** Delete the event, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** List events matched by ids. */
     Flux<EventBO> listByIds(Long tenantId, List<Long> ids);
 
+    /** List events matched by profile id. */
     Flux<EventBO> listByProfileId(Long tenantId, Long profileId);
 
+    /** List events matched by device id. */
     Flux<EventBO> listByDeviceId(Long tenantId, Long deviceId);
 
+    /** Page events matching the tenant-scoped filters. */
     Mono<OffsetPage<EventBO>> list(EventFilter filter);
 }

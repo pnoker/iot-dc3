@@ -35,40 +35,57 @@ import reactor.core.publisher.Mono;
 
 /** Reactive MCP runtime boundary consumed by the gRPC server. */
 public interface ReactiveOAuthMcpRuntimeService {
+    /** Emit the OAuth 2.1 authorization server metadata document. */
     Mono<Map<String, Object>> authorizationServerMetadata();
 
+    /** Emit the JSON Web Key Set used to verify issued tokens. */
     Mono<Map<String, Object>> jwks();
 
+    /** Register one OAuth client through dynamic client registration. */
     Mono<OAuthClientRegistrationResponseVO> registerClient(
             OAuthClientRegistrationBO request, RequestHeader.PrincipalHeader principalHeader);
 
+    /** Stream clients matching the request. */
     Flux<OAuthClientVO> listClients(RequestHeader.PrincipalHeader principalHeader);
 
+    /** Start the authorization-code flow and emit the redirect URI. */
     Mono<URI> authorize(Map<String, String> params, RequestHeader.PrincipalHeader principalHeader);
 
+    /** Exchange an authorization grant for tokens on the token endpoint. */
     Mono<Map<String, Object>> token(Map<String, String> form, String authorizationHeader);
 
+    /** Introspect a bearer token and emit its MCP principal claims. */
     Mono<McpIntrospectResponseDTO> introspect(String token);
 
+    /** Revoke a token on the revocation endpoint. */
     Mono<Map<String, Object>> revoke(Map<String, String> form, String authorizationHeader);
 
+    /** Reload the MCP tool catalog from registered gateways, emitting the number of refreshed tools. */
     Mono<Integer> refreshToolCatalog();
 
+    /** List connections matching the request. */
     Mono<List<McpConnectionVO>> listConnections(RequestHeader.PrincipalHeader principalHeader);
 
+    /** Create one MCP connection for the principal. */
     Mono<McpConnectionVO> createConnection(
             McpConnectionAddBO connection, RequestHeader.PrincipalHeader principalHeader);
 
+    /** Revoke one MCP connection and its bound tokens. */
     Mono<Void> revokeConnection(Long connectionId, RequestHeader.PrincipalHeader principalHeader);
 
+    /** Replace the tools bound to an MCP connection. */
     Mono<Void> replaceConnectionTools(
             Long connectionId, List<String> toolIds, RequestHeader.PrincipalHeader principalHeader);
 
+    /** Stream connection tool ids matching the request. */
     Flux<String> listConnectionToolIds(Long connectionId, RequestHeader.PrincipalHeader principalHeader);
 
+    /** List tools matching the request. */
     Mono<McpToolListResponseDTO> listTools(String token);
 
+    /** Authorize and execute one MCP tool call. */
     Mono<McpCallToolResponseDTO> callTool(McpCallToolRequestDTO request);
 
+    /** Persist one MCP tool-call audit record. */
     Mono<Void> audit(McpAuditCommandDTO command);
 }

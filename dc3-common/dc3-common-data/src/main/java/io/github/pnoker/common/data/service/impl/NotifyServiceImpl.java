@@ -36,6 +36,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/** Default notify service implementation. */
 @Service
 @RequiredArgsConstructor
 public class NotifyServiceImpl implements NotifyService {

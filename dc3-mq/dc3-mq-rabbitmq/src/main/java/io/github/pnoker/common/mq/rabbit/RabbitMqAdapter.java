@@ -296,6 +296,7 @@ public class RabbitMqAdapter implements BrokerAdapter {
             return true;
         }
 
+        /** Settle the delivery with a broker ack or reject. */
         protected void complete(Mono<DeliveryDisposition> completion, List<Message> messages, Channel channel) {
             Message message = messages.get(messages.size() - 1);
             handleResult(

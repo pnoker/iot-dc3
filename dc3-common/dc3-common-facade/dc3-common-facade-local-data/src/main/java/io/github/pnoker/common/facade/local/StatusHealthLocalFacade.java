@@ -34,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/** In-process facade for status health operations. */
 @Component
 @RequiredArgsConstructor
 public class StatusHealthLocalFacade implements StatusHealthFacade {

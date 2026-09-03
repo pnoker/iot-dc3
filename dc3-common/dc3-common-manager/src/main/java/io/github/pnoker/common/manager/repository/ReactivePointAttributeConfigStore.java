@@ -20,22 +20,31 @@ import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Reactive persistence port for point attribute config records. */
 
 public interface ReactivePointAttributeConfigStore {
+    /** Load the point attribute config scoped to the tenant by id. */
     Mono<PointAttributeConfigBO> get(Long tenantId, Long id);
 
+    /** Resolve the point attribute config by its attribute device point. */
     Mono<PointAttributeConfigBO> getByAttributeDevicePoint(
             Long tenantId, Long attributeId, Long deviceId, Long pointId);
 
+    /** List point attribute configs matched by device id. */
     Flux<PointAttributeConfigBO> listByDeviceId(Long tenantId, Long deviceId);
 
+    /** List point attribute configs matched by device id and point id. */
     Flux<PointAttributeConfigBO> listByDeviceIdAndPointId(Long tenantId, Long deviceId, Long pointId);
 
+    /** Insert one point attribute config and emit the stored row. */
     Mono<PointAttributeConfigBO> insert(PointAttributeConfigBO value);
 
+    /** Update one point attribute config and emit the updated row. */
     Mono<PointAttributeConfigBO> update(PointAttributeConfigBO value, int expectedVersion);
 
+    /** Delete the point attribute config, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Page point attribute configs matching the tenant-scoped filters. */
     Mono<OffsetPage<PointAttributeConfigBO>> list(PointAttributeConfigFilter filter);
 }

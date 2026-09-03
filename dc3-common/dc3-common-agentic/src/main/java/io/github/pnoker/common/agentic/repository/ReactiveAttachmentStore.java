@@ -25,9 +25,12 @@ import reactor.core.publisher.Mono;
 /** Reactive persistence port for attachment metadata. */
 public interface ReactiveAttachmentStore {
 
+    /** Save the attachment, inserting or updating as needed. */
     Mono<AttachmentBO> save(AttachmentBO attachment);
 
+    /** Stream attachments matching the request. */
     Flux<AttachmentBO> list(String conversationId, RequestHeader.PrincipalHeader header);
 
+    /** Load the attachments for the given ids. */
     Flux<AttachmentBO> findByIds(Collection<Long> ids, RequestHeader.PrincipalHeader header);
 }

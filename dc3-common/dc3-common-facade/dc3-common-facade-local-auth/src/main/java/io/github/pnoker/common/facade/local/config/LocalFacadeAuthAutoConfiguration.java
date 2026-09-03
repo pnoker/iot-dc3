@@ -35,6 +35,7 @@ import org.springframework.context.annotation.FilterType;
  * @author pnoker
  * @since 2016.10.1
  */
+/** Auto-configuration wiring the auth local facades. */
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.auth.mode", havingValue = "local")
 @ComponentScan(

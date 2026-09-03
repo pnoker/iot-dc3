@@ -22,11 +22,15 @@ import reactor.core.publisher.Mono;
 
 /** Non-blocking persistence port for tenant-scoped local credentials. */
 public interface ReactiveLocalCredentialStore {
+    /** Resolve the local credential by its id. */
     Mono<LocalCredentialDO> getById(Long tenantId, Long id);
 
+    /** Resolve the local credential by its login name. */
     Mono<LocalCredentialDO> getByLoginName(Long tenantId, String loginNameNormalized);
 
+    /** Check whether a record exists for the given login name. */
     Mono<Boolean> existsByLoginName(Long tenantId, String loginNameNormalized);
 
+    /** Page local credentials matching the tenant-scoped filters. */
     Mono<OffsetPage<LocalCredentialDO>> list(LocalCredentialFilter filter);
 }

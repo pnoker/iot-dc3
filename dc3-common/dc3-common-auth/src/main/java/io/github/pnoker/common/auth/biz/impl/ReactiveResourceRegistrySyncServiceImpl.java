@@ -50,6 +50,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/** Default resource registry sync service implementation. */
 @Slf4j
 @Service
 @RequiredArgsConstructor

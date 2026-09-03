@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
+/** Spring configuration registering postgres r2dbc dialect beans. */
 @AutoConfiguration
 @ConditionalOnProperty(prefix = "dc3.db", name = "type", havingValue = "postgres")
 public class PostgresR2dbcDialectConfiguration {

@@ -25,10 +25,13 @@ import reactor.core.publisher.Mono;
 /** Reactive tenant-scoped persistence port for event history. */
 public interface ReactiveEventHistoryStore {
 
+    /** Insert one event history entry and emit the stored row. */
     Mono<EventHistoryDO> insert(EventHistoryDO event);
 
+    /** Resolve the event history entry by its record id. */
     Mono<EventHistoryDO> findByRecordId(Long tenantId, String recordId);
 
+    /** Page event history entries matching the tenant-scoped filters. */
     Mono<OffsetPage<EventHistoryDO>> list(
             Long tenantId,
             Long deviceId,

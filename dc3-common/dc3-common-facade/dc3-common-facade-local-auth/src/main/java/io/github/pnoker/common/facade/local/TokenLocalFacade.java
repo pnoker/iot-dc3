@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/** In-process facade for token operations. */
 @Component
 @RequiredArgsConstructor
 public class TokenLocalFacade implements TokenFacade {

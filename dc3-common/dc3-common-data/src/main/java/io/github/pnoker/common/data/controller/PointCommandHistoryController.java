@@ -50,6 +50,7 @@ public class PointCommandHistoryController implements BaseController {
 
     private final PointCommandHistoryService pointCommandHistoryService;
 
+    /** Resolve the point command history entry by its command id. */
     @PreAuthorize("@perm.can('point_command_history', 'get')")
     @Operation(
             summary = "Get Point Command History by Command ID",
@@ -73,6 +74,7 @@ public class PointCommandHistoryController implements BaseController {
                         .switchIfEmpty(Mono.error(new NotFoundException("Point command history does not exist"))));
     }
 
+    /** Page point command history entries matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('point_command_history', 'list')")
     @Operation(
             summary = "List Point Command History",

@@ -24,17 +24,24 @@ import reactor.core.publisher.Mono;
 
 /** Non-blocking persistence port for role-principal bindings. */
 public interface ReactiveRolePrincipalBindStore {
+    /** Resolve the role principal binding by its id. */
     Mono<RolePrincipalBindDO> getById(Long tenantId, Long id);
 
+    /** Page role principal bindings matching the tenant-scoped filters. */
     Mono<OffsetPage<RolePrincipalBindDO>> list(RolePrincipalBindFilter filter);
 
+    /** Insert one role principal binding and emit the stored row. */
     Mono<RolePrincipalBindDO> insert(RolePrincipalBindBO binding);
 
+    /** Delete the role principal binding, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 
+    /** Check whether the role principal binding exists under the tenant. */
     Mono<Boolean> exists(Long tenantId, Long roleId, Long principalId, Long excludedId);
 
+    /** Stream role ids matching the request. */
     Flux<Long> listRoleIds(Long tenantId, Long principalId);
 
+    /** Stream principal ids matching the request. */
     Flux<Long> listPrincipalIds(Long tenantId, Long roleId, String principalType);
 }

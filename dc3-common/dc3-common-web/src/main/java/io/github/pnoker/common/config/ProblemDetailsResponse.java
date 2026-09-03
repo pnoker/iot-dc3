@@ -39,6 +39,7 @@ public record ProblemDetailsResponse(
         errors = errors == null ? Map.of() : Map.copyOf(errors);
     }
 
+    /** Create the response from the problem fields. */
     public static ProblemDetailsResponse of(
             int status, String code, String title, String detail, String instance, String traceId) {
         return new ProblemDetailsResponse("about:blank", title, status, code, detail, instance, traceId, Map.of());

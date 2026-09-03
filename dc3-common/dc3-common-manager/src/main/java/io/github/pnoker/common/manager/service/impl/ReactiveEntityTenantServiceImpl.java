@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/** Default entity tenant service implementation. */
 @Service
 @RequiredArgsConstructor
 public class ReactiveEntityTenantServiceImpl implements ReactiveEntityTenantService {
@@ -31,6 +32,7 @@ public class ReactiveEntityTenantServiceImpl implements ReactiveEntityTenantServ
     private final ReactivePointService points;
     private final ReactiveDeviceService devices;
 
+    /** Require the entity's tenant id, failing when unset. */
     public Mono<Void> requireEntityTenant(Long tenant, EntityTypeEnum type, Long id) {
         if (type == null) return Mono.error(new NotFoundException("Resource does not exist"));
         return switch (type) {

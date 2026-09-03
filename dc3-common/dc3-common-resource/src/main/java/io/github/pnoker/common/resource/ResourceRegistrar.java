@@ -65,6 +65,7 @@ public class ResourceRegistrar {
         });
     }
 
+    /** Register the driver runtime and return its metadata snapshot. */
     public Mono<Void> register() {
         if (!properties.isEnabled()) {
             log.info("Resource registrar disabled; skipping endpoint registration");

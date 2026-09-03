@@ -33,6 +33,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/** Default api service implementation. */
 @Service
 @RequiredArgsConstructor
 public class ReactiveApiServiceImpl implements ReactiveApiService {

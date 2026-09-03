@@ -42,6 +42,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tools.jackson.databind.ObjectMapper;
 
+/** Reactive persistence port for point attribute config records. */
 @Repository
 @ConditionalOnClass({DatabaseClient.class, TransactionalOperator.class})
 @RequiredArgsConstructor

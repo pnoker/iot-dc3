@@ -35,6 +35,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
+/** POI codec for the device import workbook template. */
 @Component
 public class DeviceImportWorkbookCodec {
 
@@ -42,6 +43,7 @@ public class DeviceImportWorkbookCodec {
     private static final String MANIFEST_SHEET = "_dc3_manifest";
     private static final int MAX_IMPORT_ROWS = 10_000;
 
+    /** Create the import workbook embedding the hidden schema manifest. */
     public byte[] create(DeviceImportManifest manifest) {
         try (Workbook workbook = new XSSFWorkbook();
                 ByteArrayOutputStream output = new ByteArrayOutputStream()) {
@@ -70,6 +72,7 @@ public class DeviceImportWorkbookCodec {
         }
     }
 
+    /** Parse and validate the workbook against the expected manifest, emitting device rows. */
     public List<DeviceImportRow> parse(byte[] content, DeviceImportManifest expected) {
         try (Workbook workbook = new XSSFWorkbook(new ByteArrayInputStream(content))) {
             Sheet manifestSheet = workbook.getSheet(MANIFEST_SHEET);
@@ -130,6 +133,7 @@ public class DeviceImportWorkbookCodec {
         return true;
     }
 
+    /** Build the import manifest for the driver/profile attribute schema. */
     public DeviceImportManifest manifest(
             Long driverId,
             Long profileId,

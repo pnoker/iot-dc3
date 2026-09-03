@@ -28,11 +28,15 @@ import org.mapstruct.Mapper;
         uses = {MapStructUtil.class})
 public interface ModelConfigBuilder {
 
+    /** Convert the value object into its business-object form. */
     ModelConfigBO buildBOByVO(ModelConfigVO entityVO);
 
+    /** Convert the value objects into their business-object forms. */
     List<ModelConfigBO> buildBOListByVOList(List<ModelConfigVO> entityVOList);
 
+    /** Convert the business object into its value-object form. */
     ModelConfigVO buildVOByBO(ModelConfigBO entityBO);
 
+    /** Convert the business objects into their value-object forms. */
     List<ModelConfigVO> buildVOListByBOList(List<ModelConfigBO> entityBOList);
 }

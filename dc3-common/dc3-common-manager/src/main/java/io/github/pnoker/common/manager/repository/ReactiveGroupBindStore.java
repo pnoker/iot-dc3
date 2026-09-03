@@ -19,17 +19,24 @@ package io.github.pnoker.common.manager.repository;
 import io.github.pnoker.common.manager.entity.bo.GroupBindBO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
+/** Reactive persistence port for group bind records. */
 
 public interface ReactiveGroupBindStore {
+    /** Page group bindings matching the tenant-scoped filters. */
     Mono<OffsetPage<GroupBindBO>> list(BindingFilter filter);
 
+    /** Load the group binding scoped to the tenant by id. */
     Mono<GroupBindBO> get(Long tenantId, Long id);
 
+    /** Resolve the group binding by its entity. */
     Mono<GroupBindBO> getByEntity(Long tenantId, byte type, Long entityId);
 
+    /** Insert one group binding and emit the stored row. */
     Mono<GroupBindBO> insert(GroupBindBO value);
 
+    /** Update one group binding and emit the updated row. */
     Mono<GroupBindBO> update(GroupBindBO value);
 
+    /** Delete the group binding, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 }

@@ -25,10 +25,13 @@ import reactor.core.publisher.Mono;
 
 /** Reactive read port for tenant-scoped entity leases. */
 public interface ReactiveEntityStateStore {
+    /** Emit the current state flags for the entity ids. */
     Mono<Map<Long, Byte>> listStateFlags(Long tenantId, EntityTypeEnum type, Collection<Long> entityIds);
 
+    /** Count online entities of the type within the tenant. */
     Mono<Long> countOnline(Long tenantId, EntityTypeEnum type);
 
+    /** Upsert the row and emit the stored state. */
     Mono<EntityStateLease> upsert(
             Long id,
             Long tenantId,
@@ -42,13 +45,17 @@ public interface ReactiveEntityStateStore {
             byte timeoutSourceFlag,
             String stateExt);
 
+    /** Attach the alarm to the entity lease when the version still matches. */
     Mono<Boolean> markAlarm(Long tenantId, EntityTypeEnum type, Long entityId, long leaseVersion, Long alarmId);
 
+    /** Claim expired entity leases for renewal under the lease fence. */
     Mono<EntityStateLease> claimExpired(
             Long tenantId, EntityTypeEnum type, Long entityId, long expectedLeaseVersion, int renewSeconds);
 
+    /** Claim expired entity leases for renewal under the lease fence. */
     Flux<EntityStateLease> claimExpired(EntityTypeEnum type, int limit, int renewSeconds);
 
+    /** Snapshot of one entity lease. */
     record EntityStateLease(
             Long id,
             Long tenantId,

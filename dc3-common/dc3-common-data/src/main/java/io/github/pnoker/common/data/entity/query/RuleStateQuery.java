@@ -31,6 +31,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+/** Query filter for rule state records. */
 @Getter
 @Setter
 @Builder
@@ -61,10 +62,12 @@ public class RuleStateQuery implements Serializable {
         return offset == null ? 0L : offset;
     }
 
+    /** Return the requested page limit. */
     public int getLimit() {
         return limit == null ? PageRequest.DEFAULT_LIMIT : limit;
     }
 
+    /** Return the requested sort. */
     public List<SortSpec> getSort() {
         return sort == null ? List.of() : sort;
     }

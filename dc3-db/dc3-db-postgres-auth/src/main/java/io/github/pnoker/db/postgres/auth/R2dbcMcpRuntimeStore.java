@@ -37,6 +37,7 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/** Reactive persistence port for mcp runtime records. */
 @Repository
 @ConditionalOnClass({DatabaseClient.class, R2dbcDialect.class})
 @RequiredArgsConstructor

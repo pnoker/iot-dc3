@@ -28,8 +28,10 @@ import reactor.core.publisher.Mono;
 /** Reactive driver registration port used by the driver runtime gRPC API. */
 public interface ReactiveDriverRegisterService {
 
+    /** Register the driver runtime and return its metadata snapshot. */
     Mono<Registration> register(GrpcDriverRegisterDTO request);
 
+    /** Driver metadata snapshot returned by registration. */
     record Registration(
             DriverBO driver,
             List<DriverAttributeBO> driverAttributes,

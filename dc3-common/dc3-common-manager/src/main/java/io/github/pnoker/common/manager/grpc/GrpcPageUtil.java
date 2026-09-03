@@ -26,6 +26,7 @@ public final class GrpcPageUtil {
 
     private GrpcPageUtil() {}
 
+    /** Require a page request, defaulting and bounding it. */
     public static io.github.pnoker.db.r2dbc.core.page.PageRequest require(PageRequest page) {
         if (page == null) {
             throw new IllegalArgumentException("page is required");
@@ -33,6 +34,7 @@ public final class GrpcPageUtil {
         return new io.github.pnoker.db.r2dbc.core.page.PageRequest(page.getOffset(), page.getLimit(), sort(page));
     }
 
+    /** Convert the page's sort into whitelisted sort specs. */
     public static List<SortSpec> sort(PageRequest page) {
         if (page == null) {
             throw new IllegalArgumentException("page is required");

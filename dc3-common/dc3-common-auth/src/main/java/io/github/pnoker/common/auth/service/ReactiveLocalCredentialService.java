@@ -23,13 +23,18 @@ import reactor.core.publisher.Mono;
 
 /** Non-blocking local credential queries and authentication primitives. */
 public interface ReactiveLocalCredentialService {
+    /** Resolve the local credential by its id. */
     Mono<LocalCredentialBO> getById(Long tenantId, Long id);
 
+    /** Resolve the local credential by its login name. */
     Mono<LocalCredentialBO> getByLoginName(Long tenantId, String loginName);
 
+    /** Page local credentials matching the tenant-scoped filters. */
     Mono<OffsetPage<LocalCredentialBO>> list(LocalCredentialFilter filter);
 
+    /** Report whether the login name is available in the tenant. */
     Mono<Boolean> isLoginNameAvailable(Long tenantId, String loginName);
 
+    /** Verify the raw password against the credential's hash. */
     Mono<Boolean> verifyPassword(LocalCredentialBO credential, String rawPassword);
 }

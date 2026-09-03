@@ -46,6 +46,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/** Default menu service implementation. */
 @Service
 @RequiredArgsConstructor
 public class ReactiveMenuServiceImpl implements ReactiveMenuService {

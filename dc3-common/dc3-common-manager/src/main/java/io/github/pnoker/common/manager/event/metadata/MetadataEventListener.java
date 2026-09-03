@@ -39,6 +39,7 @@ public class MetadataEventListener {
     private final ReactiveDriverService driverService;
     private final MessageSender messageSender;
 
+    /** React to one committed metadata event. */
     @EventListener
     public void onApplicationEvent(MetadataEvent metadataEvent) {
         if (metadataEvent == null || metadataEvent.getTenantId() == null) {

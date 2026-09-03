@@ -28,13 +28,18 @@ import reactor.core.publisher.Mono;
  * @since 2016.10.1
  */
 public interface NotifyChannelService {
+    /** Add one notify configuration channel. */
     Mono<NotifyChannelBO> add(NotifyChannelBO value);
 
+    /** Delete the notify configuration channel, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id);
 
+    /** Update one notify configuration channel and emit the updated row. */
     Mono<NotifyChannelBO> update(NotifyChannelBO value);
 
+    /** Resolve the notify configuration channel by its id. */
     Mono<NotifyChannelBO> getById(Long tenantId, Long id);
 
+    /** Page notify configuration channels matching the tenant-scoped filters. */
     Mono<OffsetPage<NotifyChannelBO>> list(Long tenantId, NotifyChannelQuery query);
 }

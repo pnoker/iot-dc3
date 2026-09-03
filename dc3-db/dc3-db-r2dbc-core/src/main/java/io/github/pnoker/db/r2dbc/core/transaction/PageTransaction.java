@@ -21,5 +21,6 @@ import reactor.core.publisher.Mono;
 /** Transaction boundary for a consistent count-and-items page snapshot. */
 public interface PageTransaction {
 
+    /** Run the work inside a transaction, emitting its result. */
     <T> Mono<T> transactional(Mono<T> work);
 }

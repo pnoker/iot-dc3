@@ -53,6 +53,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/** REST controller exposing command attribute config endpoints. */
 @Tag(name = "command_attribute_config", description = "Per-device command attribute configuration")
 @RestController
 @RequestMapping(ManagerConstant.COMMAND_ATTRIBUTE_CONFIG_URL_PREFIX)
@@ -64,6 +65,7 @@ public class CommandAttributeConfigController implements BaseController {
     private final ReactiveCommandService commandService;
     private final ReactiveDeviceService deviceService;
 
+    /** Add one command attribute config and return the stored view. */
     @PreAuthorize("@perm.can('command_attribute_config', 'add')")
     @Operation(
             summary = "Add Command Attribute Configuration",
@@ -94,6 +96,7 @@ public class CommandAttributeConfigController implements BaseController {
                 .map(builder::buildVOByBO);
     }
 
+    /** Delete the command attribute config. */
     @PreAuthorize("@perm.can('command_attribute_config', 'delete')")
     @Operation(
             summary = "Delete Command Attribute Configuration",
@@ -132,6 +135,7 @@ public class CommandAttributeConfigController implements BaseController {
                         .then());
     }
 
+    /** Update one command attribute config and emit the updated row. */
     @PreAuthorize("@perm.can('command_attribute_config', 'update')")
     @Operation(
             summary = "Update Command Attribute Configuration",
@@ -161,6 +165,7 @@ public class CommandAttributeConfigController implements BaseController {
                 .map(builder::buildVOByBO);
     }
 
+    /** Resolve the command attribute config by its id. */
     @PreAuthorize("@perm.can('command_attribute_config', 'get')")
     @Operation(
             summary = "Get Command Attribute Configuration",
@@ -184,6 +189,7 @@ public class CommandAttributeConfigController implements BaseController {
                 .flatMap(tenantId -> configService.getById(tenantId, id).map(builder::buildVOByBO));
     }
 
+    /** Resolve the command attribute config by its attribute id and device id and command id. */
     @PreAuthorize("@perm.can('command_attribute_config', 'get')")
     @Operation(
             summary = "Get Command Attribute Configuration by Attribute, Device and Command",
@@ -213,6 +219,7 @@ public class CommandAttributeConfigController implements BaseController {
                         .map(builder::buildVOByBO));
     }
 
+    /** List command attribute configs matched by device id and command id. */
     @PreAuthorize("@perm.can('command_attribute_config', 'list')")
     @Operation(
             summary = "List Command Attribute Configurations by Device and Command",
@@ -239,6 +246,7 @@ public class CommandAttributeConfigController implements BaseController {
                         .collectList());
     }
 
+    /** List command attribute configs matched by device id. */
     @PreAuthorize("@perm.can('command_attribute_config', 'list')")
     @Operation(
             summary = "List Command Attribute Configurations by Device",
@@ -264,6 +272,7 @@ public class CommandAttributeConfigController implements BaseController {
                         .collectList());
     }
 
+    /** Page command attribute configs matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('command_attribute_config', 'list')")
     @Operation(
             summary = "List Command Attribute Configurations",

@@ -18,9 +18,12 @@ package io.github.pnoker.common.auth.security;
 
 /** Invalidates effective-permission snapshots after RBAC mutations. */
 public interface PermissionCacheInvalidator {
+    /** Invalidate the principal's effective-permission snapshot. */
     void invalidate(Long tenantId, Long principalId);
 
+    /** Invalidate every permission snapshot in the tenant. */
     void invalidateTenant(Long tenantId);
 
+    /** Invalidate every permission snapshot. */
     void invalidateAll();
 }

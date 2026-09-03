@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/** Default point attribute config service implementation. */
 @Service
 @RequiredArgsConstructor
 public class ReactivePointAttributeConfigServiceImpl implements ReactivePointAttributeConfigService {

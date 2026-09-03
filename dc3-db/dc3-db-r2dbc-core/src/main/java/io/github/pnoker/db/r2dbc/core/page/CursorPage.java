@@ -18,6 +18,7 @@ package io.github.pnoker.db.r2dbc.core.page;
 
 import java.util.List;
 import java.util.Objects;
+/** Cursor-paged result slice with a signed continuation token. */
 
 public record CursorPage<T>(List<T> items, String nextCursor, boolean hasNext) {
 
@@ -34,6 +35,7 @@ public record CursorPage<T>(List<T> items, String nextCursor, boolean hasNext) {
         }
     }
 
+    /** Create the page with its continuation cursor. */
     public static <T> CursorPage<T> of(List<T> items, String nextCursor) {
         if (nextCursor == null || nextCursor.isBlank()) {
             return new CursorPage<>(items, null, false);

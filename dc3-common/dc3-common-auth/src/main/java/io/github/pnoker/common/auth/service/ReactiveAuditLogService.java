@@ -51,8 +51,10 @@ public interface ReactiveAuditLogService {
             String status,
             String errorCode);
 
+    /** Page audit logs matching the tenant-scoped filters. */
     Mono<CursorPage<IdentityAuditLogVO>> list(IdentityAuditLogFilter filter);
 
+    /** Persist one audit log entry for the action. */
     default Mono<Void> log(
             RequestHeader.PrincipalHeader actor,
             String action,

@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/** gRPC facade exposing tenant operations. */
 @Component
 @RequiredArgsConstructor
 public class TenantGrpcFacade implements TenantFacade {

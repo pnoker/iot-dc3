@@ -24,19 +24,27 @@ import reactor.core.publisher.Mono;
 
 /** Reactive persistence port for tenant-scoped point attributes. */
 public interface ReactivePointAttributeStore {
+    /** Load the point attribute scoped to the tenant by id. */
     Mono<PointAttributeBO> get(Long tenantId, Long id);
 
+    /** Resolve the point attribute by its code and driver. */
     Mono<PointAttributeBO> getByCodeAndDriver(Long tenantId, String attributeCode, Long driverId);
 
+    /** List point attributes matched by driver id. */
     Flux<PointAttributeBO> listByDriverId(Long tenantId, Long driverId);
 
+    /** Insert one point attribute and emit the stored row. */
     Mono<PointAttributeBO> insert(PointAttributeBO value);
 
+    /** Update one point attribute and emit the updated row. */
     Mono<PointAttributeBO> update(PointAttributeBO value, int expectedVersion);
 
+    /** Delete the point attribute, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Delete the records matched by ids. */
     Mono<Boolean> deleteByIds(Long tenantId, Collection<Long> ids, Long operatorId, String operatorName);
 
+    /** Page point attributes matching the tenant-scoped filters. */
     Mono<OffsetPage<PointAttributeBO>> list(PointAttributeFilter filter);
 }

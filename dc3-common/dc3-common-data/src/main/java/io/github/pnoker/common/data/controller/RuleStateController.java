@@ -50,6 +50,7 @@ public class RuleStateController implements BaseController {
     private final RuleStateBuilder ruleStateBuilder;
     private final RuleStateService ruleStateService;
 
+    /** Resolve the rule state by its id. */
     @PreAuthorize("@perm.can('rule_state', 'get')")
     @Operation(
             summary = "Get Rule State by ID",
@@ -71,6 +72,7 @@ public class RuleStateController implements BaseController {
                 .flatMap(tenantId -> ruleStateService.getById(tenantId, id).map(ruleStateBuilder::buildVOByBO));
     }
 
+    /** Page rule states matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('rule_state', 'list')")
     @Operation(
             summary = "List Rule States",
@@ -98,6 +100,7 @@ public class RuleStateController implements BaseController {
                                 page.total())));
     }
 
+    /** Delete the rule state, reporting whether a row was removed. */
     @PreAuthorize("@perm.can('rule_state', 'delete')")
     @Operation(
             summary = "Delete Rule State",

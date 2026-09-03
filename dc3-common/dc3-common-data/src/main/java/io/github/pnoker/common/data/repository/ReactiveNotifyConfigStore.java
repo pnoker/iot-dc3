@@ -26,11 +26,15 @@ import reactor.core.publisher.Mono;
 /** Reactive tenant-scoped reads for notification configuration used by alarm delivery. */
 public interface ReactiveNotifyConfigStore {
 
+    /** Load the notify configuration scoped to the tenant by id. */
     Mono<NotifyBO> getNotify(long tenantId, long id);
 
+    /** Load the message scoped to the tenant by id. */
     Mono<MessageBO> getMessage(long tenantId, long id);
 
+    /** Load the channel scoped to the tenant by id. */
     Mono<NotifyChannelBO> getChannel(long tenantId, long id);
 
+    /** Stream the enabled notify bindings for the tenant. */
     Flux<NotifyChannelBindBO> listEnabledBinds(long tenantId, long notifyId);
 }

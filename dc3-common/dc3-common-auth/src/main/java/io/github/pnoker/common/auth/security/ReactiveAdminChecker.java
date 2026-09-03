@@ -29,6 +29,7 @@ public class ReactiveAdminChecker {
 
     private final ReactiveTenantService tenantService;
 
+    /** Complete only when the principal is a system admin. */
     public Mono<Void> assertSystemAdmin(Long tenantId) {
         return tenantService
                 .getById(tenantId)

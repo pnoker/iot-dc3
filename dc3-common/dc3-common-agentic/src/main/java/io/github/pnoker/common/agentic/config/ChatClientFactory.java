@@ -84,6 +84,7 @@ public class ChatClientFactory {
         this.properties = properties;
     }
 
+    /** Resolve the effective chat model for the request, falling back to the tenant default and the configured fallback model. */
     public Mono<String> resolveModelReactive(String requestedModel, RequestHeader.PrincipalHeader header) {
         String candidate = StringUtils.trimToNull(requestedModel);
         Mono<ModelConfigBO> selected = candidate == null ? Mono.empty() : loadConfig(candidate, header);
@@ -92,6 +93,7 @@ public class ChatClientFactory {
                 .switchIfEmpty(Mono.fromSupplier(() -> fallbackModel(candidate)));
     }
 
+    /** Report whether the resolved model enables tool calling. */
     public Mono<Boolean> supportsToolCallReactive(String model, RequestHeader.PrincipalHeader header) {
         String candidate = StringUtils.trimToNull(model);
         Mono<ModelConfigBO> selected = candidate == null ? Mono.empty() : loadConfig(candidate, header);
@@ -102,6 +104,7 @@ public class ChatClientFactory {
                         && properties.isFallbackToolCallingEnabled());
     }
 
+    /** Return the cached ChatClient for the model, or the fallback client when no config is cached. */
     public ChatClient getOrCreate(String model, Long tenantId) {
         ModelConfigBO config = configCache.get(new ConfigKey(tenantId, model));
         if (config == null) config = defaultConfigCache.get(tenantId);
@@ -115,17 +118,20 @@ public class ChatClientFactory {
         return getOrCreateByProvider(tenantId, config.getProviderId());
     }
 
+    /** Return the cached model provider backing the model, or null when unresolved. */
     public ModelProviderBO resolveProviderForModel(String model, Long tenantId) {
         ModelConfigBO config = configCache.get(new ConfigKey(tenantId, model));
         if (config == null) config = defaultConfigCache.get(tenantId);
         return config == null ? null : providerCache.get(new ProviderKey(tenantId, config.getProviderId()));
     }
 
+    /** Return the provider type backing the model, or null when unresolved. */
     public AgenticModelProviderTypeEnum resolveProviderType(String model, Long tenantId) {
         ModelProviderBO provider = resolveProviderForModel(model, tenantId);
         return provider == null ? null : provider.getProviderType();
     }
 
+    /** Report whether the cached model config enables tool calling. */
     public boolean supportsToolCall(String model, Long tenantId) {
         ModelConfigBO config = configCache.get(new ConfigKey(tenantId, model));
         if (config == null) config = defaultConfigCache.get(tenantId);
@@ -135,6 +141,7 @@ public class ChatClientFactory {
                 && properties.isFallbackToolCallingEnabled();
     }
 
+    /** Drop cached configs, providers and clients owned by the provider. */
     public void evict(Long providerId) {
         providerCache.keySet().removeIf(key -> Objects.equals(key.providerId(), providerId));
         clientCache.entrySet().removeIf(entry -> {
@@ -148,6 +155,7 @@ public class ChatClientFactory {
                 .removeIf(entry -> Objects.equals(entry.getValue().getProviderId(), providerId));
     }
 
+    /** Build a provider-specific chat options builder, or null when nothing is set. */
     public ChatOptions.Builder<?> buildChatOptionsBuilder(
             String model, Long tenantId, Double temperature, Integer maxTokens) {
         if (StringUtils.isBlank(model) && temperature == null && maxTokens == null) return null;

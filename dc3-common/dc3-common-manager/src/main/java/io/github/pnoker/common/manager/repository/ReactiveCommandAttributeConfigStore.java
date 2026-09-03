@@ -20,22 +20,31 @@ import io.github.pnoker.common.manager.entity.bo.CommandAttributeConfigBO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Reactive persistence port for command attribute config records. */
 
 public interface ReactiveCommandAttributeConfigStore {
+    /** Load the command attribute config scoped to the tenant by id. */
     Mono<CommandAttributeConfigBO> get(Long tenantId, Long id);
 
+    /** Resolve the command attribute config by its attribute device command. */
     Mono<CommandAttributeConfigBO> getByAttributeDeviceCommand(
             Long tenantId, Long attributeId, Long deviceId, Long commandId);
 
+    /** List command attribute configs matched by device id. */
     Flux<CommandAttributeConfigBO> listByDeviceId(Long tenantId, Long deviceId);
 
+    /** List command attribute configs matched by device id and command id. */
     Flux<CommandAttributeConfigBO> listByDeviceIdAndCommandId(Long tenantId, Long deviceId, Long commandId);
 
+    /** Insert one command attribute config and emit the stored row. */
     Mono<CommandAttributeConfigBO> insert(CommandAttributeConfigBO value);
 
+    /** Update one command attribute config and emit the updated row. */
     Mono<CommandAttributeConfigBO> update(CommandAttributeConfigBO value, int expectedVersion);
 
+    /** Delete the command attribute config, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Page command attribute configs matching the tenant-scoped filters. */
     Mono<OffsetPage<CommandAttributeConfigBO>> list(CommandAttributeConfigFilter filter);
 }

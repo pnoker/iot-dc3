@@ -85,6 +85,7 @@ public record OperationState(
         }
     }
 
+    /** Create a PENDING operation at zero progress. */
     public static OperationState pending(
             UUID operationId,
             Long tenantId,
@@ -106,10 +107,12 @@ public record OperationState(
                 null);
     }
 
+    /** Return the operation moved to the next status and progress. */
     public OperationState transition(Status nextStatus, int nextProgress, Instant now) {
         return transition(nextStatus, nextProgress, result, error, now);
     }
 
+    /** Return the operation moved to the next status and progress. */
     public OperationState transition(
             Status nextStatus, int nextProgress, String nextResult, String nextError, Instant now) {
         Objects.requireNonNull(nextStatus, "nextStatus must not be null");
@@ -140,6 +143,7 @@ public record OperationState(
                 nextError);
     }
 
+    /** Report whether the status transition is legal. */
     public static boolean isTransitionAllowed(Status current, Status next) {
         Objects.requireNonNull(current, "current status must not be null");
         Objects.requireNonNull(next, "next status must not be null");

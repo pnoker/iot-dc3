@@ -25,6 +25,7 @@ public final class GrpcPageUtil {
 
     private GrpcPageUtil() {}
 
+    /** Require a page request, defaulting and bounding it. */
     public static io.github.pnoker.db.r2dbc.core.page.PageRequest require(PageRequest page) {
         if (page == null) {
             throw new IllegalArgumentException("page is required");

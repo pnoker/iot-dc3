@@ -18,6 +18,7 @@ package io.github.pnoker.db.r2dbc.runtime.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/** Configuration properties bound to the runtime prefix. */
 @ConfigurationProperties(prefix = "dc3.r2dbc")
 public class R2dbcRuntimeProperties {
 
@@ -28,50 +29,62 @@ public class R2dbcRuntimeProperties {
     private String jsonFormat = "canonical-v1";
     private java.time.Duration startupTimeout = java.time.Duration.ofSeconds(10);
 
+    /** Return the schema fingerprint the startup gate requires. */
     public String getSchemaFingerprint() {
         return schemaFingerprint;
     }
 
+    /** Set the schema fingerprint the startup gate requires. */
     public void setSchemaFingerprint(String schemaFingerprint) {
         this.schemaFingerprint = schemaFingerprint;
     }
 
+    /** Return the schema contract identifier. */
     public String getSchemaContract() {
         return schemaContract;
     }
 
+    /** Set the schema contract identifier. */
     public void setSchemaContract(String schemaContract) {
         this.schemaContract = schemaContract;
     }
 
+    /** Return the id format identifier. */
     public String getIdFormat() {
         return idFormat;
     }
 
+    /** Set the id format identifier. */
     public void setIdFormat(String idFormat) {
         this.idFormat = idFormat;
     }
 
+    /** Return the time format identifier. */
     public String getTimeFormat() {
         return timeFormat;
     }
 
+    /** Set the time format identifier. */
     public void setTimeFormat(String timeFormat) {
         this.timeFormat = timeFormat;
     }
 
+    /** Return the JSON format identifier. */
     public String getJsonFormat() {
         return jsonFormat;
     }
 
+    /** Set the JSON format identifier. */
     public void setJsonFormat(String jsonFormat) {
         this.jsonFormat = jsonFormat;
     }
 
+    /** Return the startup gate timeout. */
     public java.time.Duration getStartupTimeout() {
         return startupTimeout;
     }
 
+    /** Set the startup gate timeout. */
     public void setStartupTimeout(java.time.Duration startupTimeout) {
         this.startupTimeout = startupTimeout;
     }

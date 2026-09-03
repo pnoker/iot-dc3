@@ -17,6 +17,7 @@
 package io.github.pnoker.common.manager.entity.operation;
 
 import java.util.List;
+/** One parsed device row from an import workbook. */
 
 public record DeviceImportRow(
         int rowNumber,

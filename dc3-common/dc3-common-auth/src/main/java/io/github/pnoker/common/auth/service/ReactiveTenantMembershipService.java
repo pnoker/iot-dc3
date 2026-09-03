@@ -24,15 +24,21 @@ import reactor.core.publisher.Mono;
 
 /** Reactive tenant-membership security boundary. */
 public interface ReactiveTenantMembershipService {
+    /** Resolve the tenant membership by its id. */
     Mono<TenantMembershipBO> getById(Long tenantId, Long id);
 
+    /** Resolve the tenant membership by its tenant and principal. */
     Mono<TenantMembershipBO> getByTenantAndPrincipal(Long tenantId, Long principalId);
 
+    /** Stream principal ids matching the request. */
     Flux<Long> listPrincipalIds(Long tenantId);
 
+    /** Page tenant memberships matching the tenant-scoped filters. */
     Mono<OffsetPage<TenantMembershipBO>> list(TenantMembershipFilter filter);
 
+    /** Report whether the principal belongs to the tenant. */
     Mono<Boolean> isTenantMember(Long tenantId, Long principalId);
 
+    /** Emit the membership when the principal belongs to the tenant, failing otherwise. */
     Mono<TenantMembershipBO> requireTenantMember(Long tenantId, Long principalId);
 }

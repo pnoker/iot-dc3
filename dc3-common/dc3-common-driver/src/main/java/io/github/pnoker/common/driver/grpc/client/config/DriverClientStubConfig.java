@@ -34,16 +34,19 @@ import org.springframework.grpc.client.GrpcChannelFactory;
 @Configuration
 public class DriverClientStubConfig {
 
+    /** Create the driver SDK's blocking stub for the manager Driver API. */
     @Bean
     public DriverApiGrpc.DriverApiStub driverApiStub(GrpcChannelFactory channels) {
         return DriverApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
+    /** Create the driver SDK's blocking stub for the manager Device API. */
     @Bean
     public DeviceApiGrpc.DeviceApiStub deviceApiStub(GrpcChannelFactory channels) {
         return DeviceApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));
     }
 
+    /** Create the driver SDK's blocking stub for the manager Point API. */
     @Bean
     public PointApiGrpc.PointApiStub pointApiStub(GrpcChannelFactory channels) {
         return PointApiGrpc.newStub(channels.createChannel(ManagerConstant.SERVICE_NAME));

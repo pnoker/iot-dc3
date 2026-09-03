@@ -44,6 +44,7 @@ public class DeviceTool {
     private final PointFacade pointFacade;
     private final PointValueFacade pointValueFacade;
 
+    /** Look up the device by id. */
     public Mono<AgenticToolResult<FacadeDeviceBO>> lookupDeviceByIdReactive(Long deviceId, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
         if (deviceId == null || deviceId <= 0)
@@ -54,6 +55,7 @@ public class DeviceTool {
                 .defaultIfEmpty(AgenticToolResult.notFound("Device not found for ID: " + deviceId));
     }
 
+    /** Look up the devices for the given ids. */
     public Mono<AgenticToolResult<List<FacadeDeviceBO>>> lookupDevicesByIdsReactive(
             List<Long> deviceIds, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
@@ -67,6 +69,7 @@ public class DeviceTool {
                         : AgenticToolResult.ok("Devices loaded", values));
     }
 
+    /** Search devices matching the request. */
     public Mono<AgenticToolResult<OffsetPage<FacadeDeviceBO>>> searchDevicesReactive(
             String deviceName, String deviceCode, Long driverId, long offset, int limit, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
@@ -91,6 +94,7 @@ public class DeviceTool {
                         : AgenticToolResult.ok("Device page loaded", page));
     }
 
+    /** List device tools matched by driver id. */
     public Mono<AgenticToolResult<OffsetPage<FacadeDeviceBO>>> listDevicesByDriverIdReactive(
             Long driverId, long offset, int limit, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
@@ -106,6 +110,7 @@ public class DeviceTool {
                         : AgenticToolResult.ok("Device page loaded for driver " + driverId, page));
     }
 
+    /** List device tools matched by profile id. */
     public Mono<AgenticToolResult<OffsetPage<FacadeDeviceBO>>> listDevicesByProfileIdReactive(
             Long profileId, long offset, int limit, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
@@ -121,6 +126,7 @@ public class DeviceTool {
                         : AgenticToolResult.ok("Device page loaded for profile " + profileId, page));
     }
 
+    /** Load the device latest point values for the request. */
     public Mono<AgenticToolResult<DeviceLatestPointValues>> getDeviceLatestPointValuesReactive(
             Long deviceId, int limit, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);

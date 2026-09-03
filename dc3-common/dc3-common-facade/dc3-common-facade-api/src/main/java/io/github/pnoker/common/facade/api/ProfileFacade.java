@@ -32,11 +32,15 @@ import reactor.core.publisher.Mono;
  */
 public interface ProfileFacade {
 
+    /** Resolve the profile by its id. */
     Mono<FacadeProfileBO> getByIdReactive(Long tenantId, Long id);
 
+    /** List profiles matched by ids. */
     Flux<FacadeProfileBO> listByIdsReactive(Long tenantId, Collection<Long> ids);
 
+    /** List profiles matched by device id. */
     Flux<FacadeProfileBO> listByDeviceIdReactive(Long tenantId, Long deviceId);
 
+    /** Page profiles matching the tenant-scoped filters. */
     Mono<OffsetPage<FacadeProfileBO>> listReactive(FacadeProfileOffsetQuery query);
 }

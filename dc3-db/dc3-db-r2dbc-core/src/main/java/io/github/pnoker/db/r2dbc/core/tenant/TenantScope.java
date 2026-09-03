@@ -15,6 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.github.pnoker.db.r2dbc.core.tenant;
+/** Required tenant scoping for repository ports. */
 
 public record TenantScope(Long tenantId) {
 

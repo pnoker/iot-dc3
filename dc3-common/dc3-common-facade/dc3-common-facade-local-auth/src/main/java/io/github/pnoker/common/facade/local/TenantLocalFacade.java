@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/** In-process facade for tenant operations. */
 @Component
 @RequiredArgsConstructor
 public class TenantLocalFacade implements TenantFacade {

@@ -21,30 +21,43 @@ import io.github.pnoker.common.auth.entity.model.ResourceDO;
 import java.util.List;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Reactive persistence port for resource registry records. */
 
 public interface ReactiveResourceRegistryStore {
 
+    /** Stream apis matching the request. */
     Flux<ApiDO> listApis(String serviceName);
 
+    /** Insert one api and emit the stored row. */
     Mono<ApiDO> insertApi(ApiDO api);
 
+    /** Update one api and emit the updated row. */
     Mono<ApiDO> updateApi(ApiDO api);
 
+    /** Delete the api, reporting whether a row was removed. */
     Mono<Boolean> deleteApi(Long id, Long operatorId, String operatorName);
 
+    /** Stream api resources matching the request. */
     Flux<ResourceDO> listApiResources(String serviceName);
 
+    /** List resource registries matched by entity ids. */
     Flux<ResourceDO> listResourcesByEntityIds(List<Long> entityIds);
 
+    /** Resolve the resource registry by its code. */
     Mono<ResourceDO> getResourceByCode(String resourceCode);
 
+    /** Insert one resource and emit the stored row. */
     Mono<ResourceDO> insertResource(ResourceDO resource);
 
+    /** Update one resource and emit the updated row. */
     Mono<ResourceDO> updateResource(ResourceDO resource);
 
+    /** Delete the resource, reporting whether a row was removed. */
     Mono<Boolean> deleteResource(Long id, Long operatorId, String operatorName);
 
+    /** Count childs matching the request. */
     Mono<Long> countChildren(Long parentId);
 
+    /** Acquire the named advisory lock, emitting the lock token. */
     Mono<Long> acquireLock(String lockName);
 }

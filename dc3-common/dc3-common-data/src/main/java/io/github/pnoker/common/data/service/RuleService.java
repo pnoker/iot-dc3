@@ -24,13 +24,18 @@ import reactor.core.publisher.Mono;
 /** Reactive business service for tenant-scoped alarm rules. */
 public interface RuleService {
 
+    /** Add one rule. */
     Mono<RuleBO> add(RuleBO entityBO);
 
+    /** Delete the rule, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id);
 
+    /** Update one rule and emit the updated row. */
     Mono<RuleBO> update(RuleBO entityBO);
 
+    /** Resolve the rule by its id. */
     Mono<RuleBO> getById(Long tenantId, Long id);
 
+    /** Page rules matching the tenant-scoped filters. */
     Mono<OffsetPage<RuleBO>> list(Long tenantId, RuleQuery entityQuery);
 }

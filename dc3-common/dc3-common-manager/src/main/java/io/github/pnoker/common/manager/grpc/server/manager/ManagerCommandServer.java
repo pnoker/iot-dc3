@@ -36,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/** gRPC server exposing manager command RPCs. */
 @Service
 @RequiredArgsConstructor
 public class ManagerCommandServer extends CommandApiGrpc.CommandApiImplBase {

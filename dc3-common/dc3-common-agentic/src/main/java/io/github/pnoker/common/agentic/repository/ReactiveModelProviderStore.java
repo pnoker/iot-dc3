@@ -24,13 +24,18 @@ import reactor.core.publisher.Mono;
 /** Reactive persistence port for tenant-scoped model providers. */
 public interface ReactiveModelProviderStore {
 
+    /** Stream model providers matching the request. */
     Flux<ModelProviderBO> list(RequestHeader.PrincipalHeader header);
 
+    /** Load the model provider for the request. */
     Mono<ModelProviderBO> get(Long id, RequestHeader.PrincipalHeader header);
 
+    /** Insert one model provider and emit the stored row. */
     Mono<ModelProviderBO> insert(ModelProviderBO provider, RequestHeader.PrincipalHeader header);
 
+    /** Update one model provider and emit the updated row. */
     Mono<ModelProviderBO> update(ModelProviderBO provider, RequestHeader.PrincipalHeader header);
 
+    /** Delete the model provider, reporting whether a row was removed. */
     Mono<Boolean> delete(Long id, RequestHeader.PrincipalHeader header);
 }

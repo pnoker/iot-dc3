@@ -26,19 +26,27 @@ import reactor.core.publisher.Mono;
 /** Reactive device application service. */
 public interface ReactiveDeviceService {
 
+    /** Add one device. */
     Mono<DeviceBO> add(DeviceBO device);
 
+    /** Update one device and emit the updated row. */
     Mono<DeviceBO> update(DeviceBO device);
 
+    /** Delete the device, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Resolve the device by its id. */
     Mono<DeviceBO> getById(Long tenantId, Long id);
 
+    /** Page devices matching the tenant-scoped filters. */
     Mono<OffsetPage<DeviceBO>> list(DeviceFilter filter);
 
+    /** List devices matched by driver id. */
     Flux<DeviceBO> listByDriverId(Long tenantId, Long driverId);
 
+    /** List devices matched by profile id. */
     Flux<DeviceBO> listByProfileId(Long tenantId, Long profileId);
 
+    /** List devices matched by ids. */
     Flux<DeviceBO> listByIds(Long tenantId, List<Long> ids);
 }

@@ -44,6 +44,7 @@ public final class R2dbcPageExecutor {
         this.pageTransaction = Objects.requireNonNull(pageTransaction, "pageTransaction must not be null");
     }
 
+    /** Run the paged query inside the transaction, emitting the page. */
     public <T> Mono<OffsetPage<T>> execute(
             PageRequest pageRequest,
             String countSql,

@@ -25,19 +25,27 @@ import reactor.core.publisher.Mono;
 
 /** Reactive application service for command metadata. */
 public interface ReactiveCommandService {
+    /** Resolve the command by its id. */
     Mono<CommandBO> getById(Long tenantId, Long id);
 
+    /** Add one command. */
     Mono<CommandBO> add(CommandBO value);
 
+    /** Update one command and emit the updated row. */
     Mono<CommandBO> update(CommandBO value);
 
+    /** Delete the command, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** List commands matched by ids. */
     Flux<CommandBO> listByIds(Long tenantId, List<Long> ids);
 
+    /** List commands matched by profile id. */
     Flux<CommandBO> listByProfileId(Long tenantId, Long profileId);
 
+    /** List commands matched by device id. */
     Flux<CommandBO> listByDeviceId(Long tenantId, Long deviceId);
 
+    /** Page commands matching the tenant-scoped filters. */
     Mono<OffsetPage<CommandBO>> list(CommandFilter filter);
 }

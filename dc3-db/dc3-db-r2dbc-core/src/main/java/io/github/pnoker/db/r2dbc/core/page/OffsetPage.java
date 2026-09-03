@@ -18,6 +18,7 @@ package io.github.pnoker.db.r2dbc.core.page;
 
 import java.util.List;
 import java.util.Objects;
+/** Offset-paged result slice with total count. */
 
 public record OffsetPage<T>(List<T> items, long offset, int limit, long total, boolean hasNext) {
 
@@ -41,6 +42,7 @@ public record OffsetPage<T>(List<T> items, long offset, int limit, long total, b
         }
     }
 
+    /** Create the page from the result window. */
     public static <T> OffsetPage<T> of(List<T> items, long offset, int limit, long total) {
         List<T> safeItems = List.copyOf(Objects.requireNonNull(items, "items must not be null"));
         boolean hasNext = offset <= Long.MAX_VALUE - safeItems.size() && offset + safeItems.size() < total;

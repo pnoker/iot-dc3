@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/** In-process facade for local credential operations. */
 @Component
 @RequiredArgsConstructor
 public class LocalCredentialLocalFacade implements LocalCredentialFacade {

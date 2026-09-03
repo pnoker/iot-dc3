@@ -17,6 +17,7 @@
 package io.github.pnoker.db.r2dbc.core.page;
 
 import java.util.Objects;
+/** Whitelisted sort field and direction for repository queries. */
 
 public record SortSpec(String field, Direction direction) {
 

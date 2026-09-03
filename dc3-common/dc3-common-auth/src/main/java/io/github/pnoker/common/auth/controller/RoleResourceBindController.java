@@ -62,6 +62,7 @@ public class RoleResourceBindController implements BaseController {
     private final ResourceBuilder resourceBuilder;
     private final RoleBuilder roleBuilder;
 
+    /** Add one role resource binding and return the stored view. */
     @PreAuthorize("@perm.can('role_resource_bind', 'add')")
     @Operation(
             summary = "Add Role-Resource Binding",
@@ -90,6 +91,7 @@ public class RoleResourceBindController implements BaseController {
         });
     }
 
+    /** Delete the role resource binding. */
     @PreAuthorize("@perm.can('role_resource_bind', 'delete')")
     @Operation(
             summary = "Delete Role-Resource Binding",
@@ -113,6 +115,7 @@ public class RoleResourceBindController implements BaseController {
                 .thenReturn(ResponseEntity.noContent().build());
     }
 
+    /** Page role resource bindings matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @Operation(
             summary = "List Role-Resource Bindings",
@@ -146,6 +149,7 @@ public class RoleResourceBindController implements BaseController {
                                 page.total()))));
     }
 
+    /** List role resource bindings matched by role. */
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @Operation(
             summary = "List Resources by Role",
@@ -171,6 +175,7 @@ public class RoleResourceBindController implements BaseController {
                         .map(ResponseEntity::ok));
     }
 
+    /** List role resource bindings matched by principal. */
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @Operation(
             summary = "List Resources by Principal",
@@ -198,6 +203,7 @@ public class RoleResourceBindController implements BaseController {
                         .map(ResponseEntity::ok));
     }
 
+    /** List role resource bindings matched by resource. */
     @PreAuthorize("@perm.can('role_resource_bind', 'list')")
     @Operation(
             summary = "List Roles by Resource",

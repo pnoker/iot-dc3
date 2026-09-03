@@ -22,6 +22,7 @@ import io.github.pnoker.common.enums.ResourceTypeEnum;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import java.util.List;
 import java.util.Objects;
+/** Tenant-scoped query filter for resource records. */
 
 public record ResourceFilter(
         String resourceName,

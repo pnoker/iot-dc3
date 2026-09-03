@@ -46,6 +46,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/** Reactive persistence port for menu records. */
 @Repository
 @ConditionalOnClass({DatabaseClient.class, TransactionalOperator.class, R2dbcDialect.class})
 @RequiredArgsConstructor

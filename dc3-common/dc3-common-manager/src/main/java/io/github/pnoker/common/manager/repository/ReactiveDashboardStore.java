@@ -26,29 +26,42 @@ import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyProfileRow;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import reactor.core.publisher.Flux;
+/** Reactive persistence port for dashboard records. */
 
 public interface ReactiveDashboardStore {
+    /** Emit driver counts grouped by enable flag. */
     Flux<BucketRow> countDriverByEnable(Long tenantId);
 
+    /** Emit driver counts grouped by type. */
     Flux<BucketRow> countDriverByType(Long tenantId);
 
+    /** Emit driver counts grouped by service. */
     Flux<BucketRow> countDriverByService(Long tenantId);
 
+    /** Emit device counts grouped by enable flag. */
     Flux<BucketRow> countDeviceByEnable(Long tenantId);
 
+    /** Emit the largest device counts grouped by driver. */
     Flux<BucketRow> countDeviceByDriver(Long tenantId, int limit);
 
+    /** Emit the largest device counts grouped by profile. */
     Flux<BucketRow> countDeviceByProfile(Long tenantId, int limit);
 
+    /** Emit daily row growth for the table inside the window. */
     Flux<DailyGrowthRow> dailyGrowth(Long tenantId, String table, LocalDateTime from, LocalDateTime to);
 
+    /** Emit driver rows for the topology view. */
     Flux<TopologyDriverRow> topologyDrivers(Long tenantId);
 
+    /** Emit device rows owned by the drivers for the topology view. */
     Flux<TopologyDeviceRow> topologyDevicesByDrivers(Long tenantId, Collection<Long> driverIds);
 
+    /** Emit profile bindings for the devices. */
     Flux<ProfileBindingRow> topologyProfileBindings(Long tenantId, Collection<Long> deviceIds);
 
+    /** Emit profile rows for the ids. */
     Flux<TopologyProfileRow> topologyProfilesByIds(Long tenantId, Collection<Long> profileIds);
 
+    /** Emit point rows bound to the profiles. */
     Flux<TopologyPointRow> topologyPointsByProfiles(Long tenantId, Collection<Long> profileIds);
 }

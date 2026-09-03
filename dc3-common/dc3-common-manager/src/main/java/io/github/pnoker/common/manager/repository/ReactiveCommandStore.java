@@ -24,22 +24,31 @@ import reactor.core.publisher.Mono;
 
 /** Reactive persistence port for tenant-scoped commands. */
 public interface ReactiveCommandStore {
+    /** Load the command scoped to the tenant by id. */
     Mono<CommandBO> get(Long tenantId, Long id);
 
+    /** Check whether a record exists for the given name or code. */
     Mono<Boolean> existsByNameOrCode(
             Long tenantId, Long profileId, String commandName, String commandCode, Long excludingId);
 
+    /** Insert one command and emit the stored row. */
     Mono<CommandBO> insert(CommandBO value);
 
+    /** Update one command and emit the updated row. */
     Mono<CommandBO> update(CommandBO value, int expectedVersion);
 
+    /** Delete the command, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** List commands matched by ids. */
     Flux<CommandBO> listByIds(Long tenantId, List<Long> ids);
 
+    /** List commands matched by profile id. */
     Flux<CommandBO> listByProfileId(Long tenantId, Long profileId);
 
+    /** List commands matched by device id. */
     Flux<CommandBO> listByDeviceId(Long tenantId, Long deviceId);
 
+    /** Page commands matching the tenant-scoped filters. */
     Mono<OffsetPage<CommandBO>> list(CommandFilter filter);
 }

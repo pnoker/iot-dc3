@@ -26,19 +26,27 @@ import reactor.core.publisher.Mono;
 
 /** Reactive application service for profile metadata. */
 public interface ReactiveProfileService {
+    /** Resolve the profile by its id. */
     Mono<ProfileBO> getById(Long tenantId, Long id);
 
+    /** Add one profile. */
     Mono<ProfileBO> add(ProfileBO value);
 
+    /** Update one profile and emit the updated row. */
     Mono<ProfileBO> update(ProfileBO value);
 
+    /** Delete the profile, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Resolve the profile by its name and type. */
     Mono<ProfileBO> getByNameAndType(Long tenantId, String name, ProfileTypeEnum type);
 
+    /** List profiles matched by ids. */
     Flux<ProfileBO> listByIds(Long tenantId, List<Long> ids);
 
+    /** List profiles matched by device id. */
     Flux<ProfileBO> listByDeviceId(Long tenantId, Long deviceId);
 
+    /** Page profiles matching the tenant-scoped filters. */
     Mono<OffsetPage<ProfileBO>> list(ProfileFilter filter);
 }

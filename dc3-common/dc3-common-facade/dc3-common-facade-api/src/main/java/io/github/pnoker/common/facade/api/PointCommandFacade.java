@@ -48,6 +48,7 @@ public interface PointCommandFacade {
      */
     Mono<String> submitRead(Long tenantId, Long deviceId, Long pointId);
 
+    /** Dispatch a read command for a specific point with an explicit source. */
     default Mono<String> submitRead(Long tenantId, Long deviceId, Long pointId, PointCommandSourceEnum source) {
         return submitRead(tenantId, deviceId, pointId);
     }
@@ -63,6 +64,7 @@ public interface PointCommandFacade {
      */
     Mono<String> submitWrite(Long tenantId, Long deviceId, Long pointId, String value);
 
+    /** Dispatch a write command for a specific point with an explicit source. */
     default Mono<String> submitWrite(
             Long tenantId, Long deviceId, Long pointId, String value, PointCommandSourceEnum source) {
         return submitWrite(tenantId, deviceId, pointId, value);

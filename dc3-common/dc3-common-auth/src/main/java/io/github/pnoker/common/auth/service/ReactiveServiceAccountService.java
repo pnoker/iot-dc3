@@ -23,13 +23,18 @@ import reactor.core.publisher.Mono;
 
 /** Reactive application service for tenant-scoped service-account aggregates. */
 public interface ReactiveServiceAccountService {
+    /** Resolve the service account by its id. */
     Mono<ServiceAccountBO> getById(Long tenantId, Long id);
 
+    /** Page service accounts matching the tenant-scoped filters. */
     Mono<OffsetPage<ServiceAccountBO>> list(ServiceAccountFilter filter);
 
+    /** Add one service account. */
     Mono<ServiceAccountBO> add(ServiceAccountBO account);
 
+    /** Update one service account and emit the updated row. */
     Mono<ServiceAccountBO> update(Long tenantId, ServiceAccountBO account);
 
+    /** Delete the service account. */
     Mono<Void> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 }

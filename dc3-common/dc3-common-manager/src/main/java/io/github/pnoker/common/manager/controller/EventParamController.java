@@ -60,6 +60,7 @@ public class EventParamController implements BaseController {
     private final ReactiveEventParamService eventParamService;
     private final ReactiveEventService eventService;
 
+    /** Add one event param and return the stored view. */
     @PreAuthorize("@perm.can('event_param', 'add')")
     @Operation(
             summary = "Add Event Parameter",
@@ -87,6 +88,7 @@ public class EventParamController implements BaseController {
         });
     }
 
+    /** Delete the event param. */
     @PreAuthorize("@perm.can('event_param', 'delete')")
     @Operation(
             summary = "Delete Event Parameter",
@@ -117,6 +119,7 @@ public class EventParamController implements BaseController {
                 .then());
     }
 
+    /** Update one event param and emit the updated row. */
     @PreAuthorize("@perm.can('event_param', 'update')")
     @Operation(
             summary = "Update Event Parameter",
@@ -142,6 +145,7 @@ public class EventParamController implements BaseController {
         });
     }
 
+    /** Resolve the event param by its id. */
     @PreAuthorize("@perm.can('event_param', 'get')")
     @Operation(
             summary = "Get Event Parameter by ID",
@@ -164,6 +168,7 @@ public class EventParamController implements BaseController {
                 .flatMap(tenantId -> eventParamService.getById(tenantId, id).map(eventParamBuilder::buildVOByBO));
     }
 
+    /** List event params matched by event id. */
     @PreAuthorize("@perm.can('event_param', 'list')")
     @Operation(
             summary = "List Event Parameters by Event ID",
@@ -192,6 +197,7 @@ public class EventParamController implements BaseController {
                         .collectList());
     }
 
+    /** Page event params matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('event_param', 'list')")
     @Operation(
             summary = "List Event Parameters",

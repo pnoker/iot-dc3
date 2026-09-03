@@ -31,13 +31,18 @@ public interface ReactivePointValueIngestOutbox {
      */
     Mono<List<PointValueDO>> enqueue(List<PointValueDO> values, String owner);
 
+    /** Emit receipts that have already reached the durable store. */
     Flux<PointValueDO> findPersisted(List<PointValueDO> values);
 
+    /** Mark one receipt persisted for the owner, returning the rows updated. */
     Mono<Integer> markPersisted(PointValueDO value, String owner);
 
+    /** Claim up to the limit of pending receipts for the replay owner. */
     Flux<PointValueDO> claim(String owner, int limit);
 
+    /** Mark one receipt processed, returning the rows updated. */
     Mono<Integer> markProcessed(PointValueDO value);
 
+    /** Mark one receipt failed for the owner with the error, returning the rows updated. */
     Mono<Integer> markFailed(PointValueDO value, String owner, String error);
 }

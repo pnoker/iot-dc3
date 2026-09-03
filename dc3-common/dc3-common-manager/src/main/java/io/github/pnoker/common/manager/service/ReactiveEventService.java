@@ -22,21 +22,30 @@ import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import java.util.List;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Business service covering event use cases. */
 
 public interface ReactiveEventService {
+    /** Resolve the event by its id. */
     Mono<EventBO> getById(Long tenantId, Long id);
 
+    /** Add one event. */
     Mono<EventBO> add(EventBO value);
 
+    /** Update one event and emit the updated row. */
     Mono<EventBO> update(EventBO value);
 
+    /** Delete the event, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** List events matched by ids. */
     Flux<EventBO> listByIds(Long tenantId, List<Long> ids);
 
+    /** List events matched by profile id. */
     Flux<EventBO> listByProfileId(Long tenantId, Long profileId);
 
+    /** List events matched by device id. */
     Flux<EventBO> listByDeviceId(Long tenantId, Long deviceId);
 
+    /** Page events matching the tenant-scoped filters. */
     Mono<OffsetPage<EventBO>> list(EventFilter filter);
 }

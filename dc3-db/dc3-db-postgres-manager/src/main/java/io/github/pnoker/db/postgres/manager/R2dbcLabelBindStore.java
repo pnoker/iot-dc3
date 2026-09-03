@@ -35,6 +35,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 
+/** Reactive persistence port for label bind records. */
 @Repository
 @RequiredArgsConstructor
 @ConditionalOnClass({DatabaseClient.class, R2dbcDialect.class, TransactionalOperator.class})
@@ -47,6 +48,7 @@ public class R2dbcLabelBindStore implements ReactiveLabelBindStore {
     private final TransactionalOperator tx;
     private final PageTransaction pageTransaction;
 
+    /** Page label bindings matching the tenant-scoped filters. */
     public Mono<OffsetPage<LabelBindBO>> list(BindingFilter f) {
         StringBuilder w = new StringBuilder(" WHERE tenant_id=:tenant AND deleted=0");
         if (f.entityType() != null) w.append(" AND entity_type_flag=:type");
@@ -70,6 +72,7 @@ public class R2dbcLabelBindStore implements ReactiveLabelBindStore {
                 .as(pageTransaction::transactional);
     }
 
+    /** Load the label binding for the request. */
     public Mono<LabelBindBO> get(Long t, Long id) {
         return !ok(t) || !ok(id)
                 ? Mono.empty()
@@ -80,6 +83,7 @@ public class R2dbcLabelBindStore implements ReactiveLabelBindStore {
                         .one();
     }
 
+    /** Resolve the label binding by its entity. */
     public Mono<LabelBindBO> getByEntity(Long t, byte type, Long owner, Long entity) {
         return c.sql(
                         "SELECT " + C + " FROM " + T
@@ -92,6 +96,7 @@ public class R2dbcLabelBindStore implements ReactiveLabelBindStore {
                 .one();
     }
 
+    /** Insert one label binding and emit the stored row. */
     public Mono<LabelBindBO> insert(LabelBindBO v) {
         v.setId(v.getId() == null ? UuidV7.nextLong() : v.getId());
         v.setCreateTime(now());
@@ -104,6 +109,7 @@ public class R2dbcLabelBindStore implements ReactiveLabelBindStore {
                 .flatMap(n -> n == 1 ? get(v.getTenantId(), v.getId()) : Mono.empty()));
     }
 
+    /** Update one label binding and emit the updated row. */
     public Mono<LabelBindBO> update(LabelBindBO v) {
         v.setOperateTime(now());
         String s = "UPDATE " + T
@@ -114,6 +120,7 @@ public class R2dbcLabelBindStore implements ReactiveLabelBindStore {
                 .flatMap(n -> n == 1 ? get(v.getTenantId(), v.getId()) : Mono.empty()));
     }
 
+    /** Delete the label binding, reporting whether a row was removed. */
     public Mono<Boolean> delete(Long t, Long id, Long op, String name) {
         return tx.transactional(c.sql(
                         "UPDATE " + T

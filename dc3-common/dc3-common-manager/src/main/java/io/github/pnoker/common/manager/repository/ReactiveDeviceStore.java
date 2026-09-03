@@ -25,23 +25,33 @@ import reactor.core.publisher.Mono;
 /** Reactive persistence port for tenant-scoped devices. */
 public interface ReactiveDeviceStore {
 
+    /** Page devices matching the tenant-scoped filters. */
     Mono<OffsetPage<DeviceBO>> list(DeviceFilter filter);
 
+    /** Load the device scoped to the tenant by id. */
     Mono<DeviceBO> get(Long tenantId, Long id);
 
+    /** Resolve the device by its name. */
     Mono<DeviceBO> getByName(Long tenantId, String deviceName);
 
+    /** Resolve the device by its code. */
     Mono<DeviceBO> getByCode(Long tenantId, String deviceCode);
 
+    /** List devices matched by driver id. */
     Flux<DeviceBO> listByDriverId(Long tenantId, Long driverId);
 
+    /** List devices matched by profile id. */
     Flux<DeviceBO> listByProfileId(Long tenantId, Long profileId);
 
+    /** List devices matched by ids. */
     Flux<DeviceBO> listByIds(Long tenantId, List<Long> ids);
 
+    /** Insert one device and emit the stored row. */
     Mono<DeviceBO> insert(DeviceBO device);
 
+    /** Update one device and emit the updated row. */
     Mono<DeviceBO> update(DeviceBO device, int expectedVersion);
 
+    /** Delete the device, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 }

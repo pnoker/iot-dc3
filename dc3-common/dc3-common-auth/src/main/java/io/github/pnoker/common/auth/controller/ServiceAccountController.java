@@ -115,6 +115,7 @@ public class ServiceAccountController implements BaseController {
         });
     }
 
+    /** Delete the service account. */
     @PreAuthorize("@perm.can('service_account', 'delete')")
     @Operation(
             summary = "Delete Service Account",
@@ -150,6 +151,7 @@ public class ServiceAccountController implements BaseController {
                         .thenReturn(ResponseEntity.noContent().build()));
     }
 
+    /** Update one service account and emit the updated row. */
     @PreAuthorize("@perm.can('service_account', 'update')")
     @Operation(
             summary = "Update Service Account",
@@ -202,6 +204,7 @@ public class ServiceAccountController implements BaseController {
                                 .thenReturn(ResponseEntity.ok(serviceAccountBuilder.buildVOByBO(saved)))));
     }
 
+    /** Enable the service account identified by id. */
     @PreAuthorize("@perm.can('service_account', 'update')")
     @Operation(
             summary = "Enable Service Account",
@@ -224,6 +227,7 @@ public class ServiceAccountController implements BaseController {
         return toggleEnableFlag(id, EnableFlagEnum.ENABLE);
     }
 
+    /** Disable the service account identified by id. */
     @PreAuthorize("@perm.can('service_account', 'update')")
     @Operation(
             summary = "Disable Service Account",
@@ -268,6 +272,7 @@ public class ServiceAccountController implements BaseController {
                         .thenReturn(ResponseEntity.noContent().build()));
     }
 
+    /** Resolve the service account by its id. */
     @PreAuthorize("@perm.can('service_account', 'get')")
     @Operation(
             summary = "Get Service Account by ID",
@@ -293,6 +298,7 @@ public class ServiceAccountController implements BaseController {
                         .map(account -> ResponseEntity.ok(serviceAccountBuilder.buildVOByBO(account))));
     }
 
+    /** Page service accounts matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('service_account', 'list')")
     @Operation(
             summary = "List Service Accounts",

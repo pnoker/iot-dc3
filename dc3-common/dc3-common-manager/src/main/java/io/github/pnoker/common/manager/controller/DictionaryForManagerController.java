@@ -45,6 +45,7 @@ public class DictionaryForManagerController implements BaseController {
 
     private final DictionaryForManagerService dictionaryService;
 
+    /** Page driver options matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(
             summary = "List Driver Options",
@@ -65,6 +66,7 @@ public class DictionaryForManagerController implements BaseController {
         return getTenantId().flatMap(tenantId -> dictionaryService.listDriverOptions(tenantId, query));
     }
 
+    /** Page profile options matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(
             summary = "List Profile Options",
@@ -85,6 +87,7 @@ public class DictionaryForManagerController implements BaseController {
         return getTenantId().flatMap(tenantId -> dictionaryService.listProfileOptions(tenantId, query));
     }
 
+    /** Page profile point options matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(
             summary = "List Profile Point Options",
@@ -105,6 +108,7 @@ public class DictionaryForManagerController implements BaseController {
         return getTenantId().flatMap(tenantId -> dictionaryService.listProfilePointOptions(tenantId, query));
     }
 
+    /** Page device point options matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(
             summary = "List Device Point Options",
@@ -125,6 +129,7 @@ public class DictionaryForManagerController implements BaseController {
         return getTenantId().flatMap(tenantId -> dictionaryService.listDevicePointOptions(tenantId, query));
     }
 
+    /** Page device options matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(
             summary = "List Device Options",
@@ -145,6 +150,7 @@ public class DictionaryForManagerController implements BaseController {
         return getTenantId().flatMap(tenantId -> dictionaryService.listDeviceOptions(tenantId, query));
     }
 
+    /** Page driver device options matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('dictionary_for_manager', 'list')")
     @Operation(
             summary = "List Driver Device Options",

@@ -30,11 +30,15 @@ import reactor.core.publisher.Mono;
  */
 public interface FilterService {
 
+    /** Load the tenant for the request. */
     Mono<FacadeTenantBO> getTenantReactive(ServerHttpRequest request);
 
+    /** Load the local credential scoped to the tenant by id. */
     Mono<FacadeLocalCredentialBO> getLocalCredentialReactive(ServerHttpRequest request, Long tenantId);
 
+    /** Load the user for the request. */
     Mono<RequestHeader.PrincipalHeader> getUserReactive(FacadeLocalCredentialBO credential, FacadeTenantBO tenant);
 
+    /** Complete when the request's token is valid for the tenant, failing otherwise. */
     Mono<Void> checkValidReactive(ServerHttpRequest request, FacadeTenantBO tenant, FacadeLocalCredentialBO credential);
 }

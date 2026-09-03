@@ -44,6 +44,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 
+/** Reactive persistence port for api records. */
 @Repository
 @ConditionalOnClass({DatabaseClient.class, TransactionalOperator.class, R2dbcDialect.class})
 @RequiredArgsConstructor

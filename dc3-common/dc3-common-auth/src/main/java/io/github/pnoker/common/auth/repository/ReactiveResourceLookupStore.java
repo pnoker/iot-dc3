@@ -22,5 +22,6 @@ import reactor.core.publisher.Flux;
 
 /** Non-blocking read port for globally registered resources. */
 public interface ReactiveResourceLookupStore {
+    /** Stream the enabled resources for the given ids. */
     Flux<ResourceDO> listEnabledByIds(Collection<Long> ids);
 }

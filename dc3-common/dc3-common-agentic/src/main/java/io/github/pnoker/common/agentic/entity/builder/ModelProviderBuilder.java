@@ -32,17 +32,22 @@ import org.mapstruct.MappingTarget;
         uses = {MapStructUtil.class})
 public interface ModelProviderBuilder {
 
+    /** Convert the value object into its business-object form. */
     @Mapping(target = "apiKey", ignore = true)
     ModelProviderBO buildBOByVO(ModelProviderVO entityVO);
 
+    /** Convert the value objects into their business-object forms. */
     List<ModelProviderBO> buildBOListByVOList(List<ModelProviderVO> entityVOList);
 
+    /** Post-process the mapped target after MapStruct copies the fields. */
     @AfterMapping
     default void afterProcess(ModelProviderVO entityRequest, @MappingTarget ModelProviderBO entityBO) {
         if (Objects.nonNull(entityRequest)) entityBO.setProviderType(entityRequest.getProviderType());
     }
 
+    /** Convert the business object into its value-object form. */
     ModelProviderVO buildVOByBO(ModelProviderBO entityBO);
 
+    /** Convert the business objects into their value-object forms. */
     List<ModelProviderVO> buildVOListByBOList(List<ModelProviderBO> entityBOList);
 }

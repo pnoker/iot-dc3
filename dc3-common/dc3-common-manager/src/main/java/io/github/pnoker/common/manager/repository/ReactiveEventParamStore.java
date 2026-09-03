@@ -24,21 +24,30 @@ import reactor.core.publisher.Mono;
 
 /** Reactive persistence port for tenant-scoped event parameters. */
 public interface ReactiveEventParamStore {
+    /** Load the event param scoped to the tenant by id. */
     Mono<EventParamBO> get(Long tenantId, Long id);
 
+    /** List event params matched by event id. */
     Flux<EventParamBO> listByEventId(Long tenantId, Long eventId);
 
+    /** List event params matched by ids. */
     Flux<EventParamBO> listByIds(Long tenantId, Collection<Long> ids);
 
+    /** Check whether a record exists for the given name or code. */
     Mono<Boolean> existsByNameOrCode(Long tenantId, Long eventId, String paramName, String paramCode, Long excludedId);
 
+    /** Insert one event param and emit the stored row. */
     Mono<EventParamBO> insert(EventParamBO value);
 
+    /** Update one event param and emit the updated row. */
     Mono<EventParamBO> update(EventParamBO value, int expectedVersion);
 
+    /** Delete the event param, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Delete the records matched by event id. */
     Mono<Long> deleteByEventId(Long tenantId, Long eventId, Long operatorId, String operatorName);
 
+    /** Page event params matching the tenant-scoped filters. */
     Mono<OffsetPage<EventParamBO>> list(EventParamFilter filter);
 }

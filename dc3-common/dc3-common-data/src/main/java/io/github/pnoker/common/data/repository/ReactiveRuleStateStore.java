@@ -25,8 +25,10 @@ import reactor.core.publisher.Mono;
 /** Reactive tenant-scoped persistence for rule runtime state. */
 public interface ReactiveRuleStateStore {
 
+    /** Load the rule state scoped to the tenant by id. */
     Mono<RuleStateDO> get(long tenantId, long stateId);
 
+    /** Page rule states matching the tenant-scoped filters. */
     Mono<OffsetPage<RuleStateDO>> list(
             long tenantId,
             Long ruleId,
@@ -37,11 +39,15 @@ public interface ReactiveRuleStateStore {
             Long alarmId,
             PageRequest page);
 
+    /** Delete the rule state, reporting whether a row was removed. */
     Mono<Boolean> delete(long tenantId, long stateId);
 
+    /** Load the rule state by its identifier. */
     Mono<RuleStateDO> find(long tenantId, long ruleId, byte alarmTargetTypeFlag, long entityId, String fingerprint);
 
+    /** Advance the rule state to its next lifecycle state. */
     Mono<RuleStateDO> transition(RuleStateDO state, boolean recovery);
 
+    /** Update one last notify time and emit the updated row. */
     Mono<Boolean> updateLastNotifyTime(long tenantId, long stateId, LocalDateTime lastNotifyTime);
 }

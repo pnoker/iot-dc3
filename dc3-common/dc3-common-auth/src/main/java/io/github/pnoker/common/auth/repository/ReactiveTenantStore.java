@@ -23,17 +23,24 @@ import reactor.core.publisher.Mono;
 /** Persistence port for the global tenant catalog. */
 public interface ReactiveTenantStore {
 
+    /** Resolve the tenant by its id. */
     Mono<TenantDO> getById(Long id);
 
+    /** Resolve the enabled tenant by its code. */
     Mono<TenantDO> getEnabledByCode(String code);
 
+    /** Resolve the tenant by its name and code. */
     Mono<TenantDO> getByNameAndCode(String tenantName, String tenantCode);
 
+    /** Page tenants matching the tenant-scoped filters. */
     Mono<OffsetPage<TenantDO>> list(TenantFilter filter);
 
+    /** Insert one tenant and emit the stored row. */
     Mono<TenantDO> insert(TenantDO tenant);
 
+    /** Update one tenant and emit the updated row. */
     Mono<TenantDO> update(TenantDO tenant);
 
+    /** Delete the tenant, reporting whether a row was removed. */
     Mono<Boolean> delete(Long id, Long operatorId, String operatorName);
 }

@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/** In-process facade for user operations. */
 @Component
 @RequiredArgsConstructor
 public class UserLocalFacade implements UserFacade {

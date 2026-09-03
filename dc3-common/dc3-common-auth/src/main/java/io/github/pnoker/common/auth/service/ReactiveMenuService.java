@@ -22,17 +22,24 @@ import io.github.pnoker.common.auth.repository.MenuFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Business service covering menu use cases. */
 
 public interface ReactiveMenuService {
+    /** Resolve the menu by its id. */
     Mono<MenuBO> getById(Long id);
 
+    /** Page menus matching the tenant-scoped filters. */
     Mono<OffsetPage<MenuBO>> list(MenuFilter filter);
 
+    /** Emit the menu tree for the tenant. */
     Flux<MenuTreeBO> listTree(MenuFilter filter);
 
+    /** Add one menu. */
     Mono<MenuBO> add(MenuBO menu);
 
+    /** Update one menu and emit the updated row. */
     Mono<MenuBO> update(MenuBO menu);
 
+    /** Delete the menu. */
     Mono<Void> delete(Long id, Long operatorId, String operatorName);
 }

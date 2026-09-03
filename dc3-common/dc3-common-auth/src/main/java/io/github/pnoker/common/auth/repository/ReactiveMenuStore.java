@@ -21,23 +21,33 @@ import io.github.pnoker.common.auth.entity.model.MenuDO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Reactive persistence port for menu records. */
 
 public interface ReactiveMenuStore {
+    /** Resolve the menu by its id. */
     Mono<MenuDO> getById(Long id);
 
+    /** Page menus matching the tenant-scoped filters. */
     Mono<OffsetPage<MenuDO>> list(MenuFilter filter);
 
+    /** Emit the menu tree for the tenant. */
     Flux<MenuDO> listTree(MenuFilter filter);
 
+    /** Insert one menu and emit the stored row. */
     Mono<MenuDO> insert(MenuBO menu);
 
+    /** Update one menu and emit the updated row. */
     Mono<MenuDO> update(MenuBO menu);
 
+    /** Delete the menu, reporting whether a row was removed. */
     Mono<Boolean> delete(Long id, Long operatorId, String operatorName);
 
+    /** Check whether a duplicate row already exists. */
     Mono<Boolean> existsDuplicate(MenuBO menu);
 
+    /** Report whether the menu has children. */
     Mono<Boolean> hasChildren(Long id);
 
+    /** Report whether the candidate descends from the root. */
     Mono<Boolean> isDescendant(Long rootId, Long candidateId);
 }

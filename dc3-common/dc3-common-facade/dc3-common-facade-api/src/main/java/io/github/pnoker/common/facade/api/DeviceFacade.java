@@ -44,15 +44,21 @@ import reactor.core.publisher.Mono;
  * @since 2016.10.1
  */
 public interface DeviceFacade {
+    /** Resolve the device by its id. */
     Mono<FacadeDeviceBO> getByIdReactive(Long tenantId, Long id);
 
+    /** List devices matched by ids. */
     Flux<FacadeDeviceBO> listByIdsReactive(Long tenantId, Collection<Long> ids);
 
+    /** Page devices matching the tenant-scoped filters. */
     Mono<OffsetPage<FacadeDeviceBO>> listReactive(FacadeDeviceOffsetQuery query);
 
+    /** List devices matched by profile id. */
     Flux<FacadeDeviceBO> listByProfileIdReactive(Long tenantId, Long profileId);
 
+    /** List devices matched by driver id. */
     Flux<FacadeDeviceBO> listByDriverIdReactive(Long tenantId, Long driverId);
 
+    /** Load the active owner scoped to the tenant by id. */
     Mono<FacadeDeviceOwnerBO> getActiveOwnerReactive(Long tenantId, Long deviceId);
 }

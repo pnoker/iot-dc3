@@ -28,27 +28,39 @@ import reactor.core.publisher.Mono;
 
 /** Reactive application service for point metadata. */
 public interface ReactivePointService {
+    /** Resolve the point by its id. */
     Mono<PointBO> getById(Long tenantId, Long id);
 
+    /** Add one point. */
     Mono<PointBO> add(PointBO value);
 
+    /** Update one point and emit the updated row. */
     Mono<PointBO> update(PointBO value);
 
+    /** Delete the point, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Page points matching the tenant-scoped filters. */
     Mono<OffsetPage<PointBO>> list(PointFilter filter);
 
+    /** List points matched by ids. */
     Flux<PointBO> listByIds(Long tenantId, List<Long> ids);
 
+    /** List points matched by profile id. */
     Flux<PointBO> listByProfileId(Long tenantId, Long profileId);
 
+    /** List points matched by device id. */
     Flux<PointBO> listByDeviceId(Long tenantId, Long deviceId);
 
+    /** List units matching the request. */
     Mono<Map<String, String>> listUnits(Long tenantId, List<Long> ids);
 
+    /** Resolve the point by its point id. */
     Mono<DeviceByPointBO> getDeviceStatisticsByPointId(Long tenantId, Long pointId);
 
+    /** Resolve the point by its device id. */
     Mono<Long> getCountByDeviceId(Long tenantId, Long deviceId);
 
+    /** Resolve the point by its device id. */
     Mono<PointConfigByDeviceBO> getPointConfigByDeviceId(Long tenantId, Long deviceId);
 }

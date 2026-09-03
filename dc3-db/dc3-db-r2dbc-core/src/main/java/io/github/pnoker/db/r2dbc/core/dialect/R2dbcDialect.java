@@ -21,8 +21,10 @@ import java.time.Instant;
 /** Database-specific SQL fragments that cannot be expressed portably. */
 public interface R2dbcDialect {
 
+    /** Return the dialect name used in configuration. */
     String name();
 
+    /** Return the fully-qualified schema fingerprint table. */
     String schemaFingerprintTable();
 
     /** Fully-qualified runtime operation table used by the durable async job port. */
@@ -30,12 +32,15 @@ public interface R2dbcDialect {
         return schemaFingerprintTable().replace("dc3_schema_fingerprint", "dc3_operation");
     }
 
+    /** Convert an instant to the dialect bind value. */
     default Object bindInstant(Instant instant) {
         return instant;
     }
 
+    /** Quote one SQL identifier for the dialect. */
     String quoteIdentifier(String identifier);
 
+    /** Return the named JSON bind parameter for the dialect. */
     String jsonParameter(String namedParameter);
 
     /** SQL expression used when writing a JSON value parameter. */

@@ -26,23 +26,33 @@ import reactor.core.publisher.Mono;
 
 /** Reactive command attribute application service. */
 public interface ReactiveCommandAttributeService {
+    /** Add one command attribute. */
     Mono<CommandAttributeBO> add(CommandAttributeBO value);
 
+    /** Update one command attribute and emit the updated row. */
     Mono<CommandAttributeBO> update(CommandAttributeBO value);
 
+    /** Delete the command attribute, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Resolve the command attribute by its id. */
     Mono<CommandAttributeBO> getById(Long tenantId, Long id);
 
+    /** Resolve the command attribute by its name and driver id. */
     Mono<CommandAttributeBO> getByNameAndDriverId(Long tenantId, String name, Long driverId);
 
+    /** List command attributes matched by driver id. */
     Flux<CommandAttributeBO> listByDriverId(Long tenantId, Long driverId);
 
+    /** Page command attributes matching the tenant-scoped filters. */
     Mono<OffsetPage<CommandAttributeBO>> list(CommandAttributeFilter filter);
 
+    /** Delete the records matched by ids. */
     Mono<Boolean> deleteByIds(Long tenantId, Collection<Long> ids, Long operatorId, String operatorName);
 
+    /** Save the batch, inserting or updating as needed. */
     Mono<List<CommandAttributeBO>> saveBatch(List<CommandAttributeBO> values);
 
+    /** Update one batch and emit the updated row. */
     Mono<List<CommandAttributeBO>> updateBatch(List<CommandAttributeBO> values);
 }

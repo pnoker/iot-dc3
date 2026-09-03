@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+/** gRPC facade exposing user operations. */
 @Component
 @RequiredArgsConstructor
 public class UserGrpcFacade implements UserFacade {

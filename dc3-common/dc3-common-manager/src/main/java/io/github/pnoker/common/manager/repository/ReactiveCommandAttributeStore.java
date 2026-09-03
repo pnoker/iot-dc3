@@ -24,19 +24,27 @@ import reactor.core.publisher.Mono;
 
 /** Reactive persistence port for tenant-scoped command attributes. */
 public interface ReactiveCommandAttributeStore {
+    /** Load the command attribute scoped to the tenant by id. */
     Mono<CommandAttributeBO> get(Long tenantId, Long id);
 
+    /** Resolve the command attribute by its code and driver. */
     Mono<CommandAttributeBO> getByCodeAndDriver(Long tenantId, String attributeCode, Long driverId);
 
+    /** List command attributes matched by driver id. */
     Flux<CommandAttributeBO> listByDriverId(Long tenantId, Long driverId);
 
+    /** Insert one command attribute and emit the stored row. */
     Mono<CommandAttributeBO> insert(CommandAttributeBO value);
 
+    /** Update one command attribute and emit the updated row. */
     Mono<CommandAttributeBO> update(CommandAttributeBO value, int expectedVersion);
 
+    /** Delete the command attribute, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Delete the records matched by ids. */
     Mono<Boolean> deleteByIds(Long tenantId, Collection<Long> ids, Long operatorId, String operatorName);
 
+    /** Page command attributes matching the tenant-scoped filters. */
     Mono<OffsetPage<CommandAttributeBO>> list(CommandAttributeFilter filter);
 }

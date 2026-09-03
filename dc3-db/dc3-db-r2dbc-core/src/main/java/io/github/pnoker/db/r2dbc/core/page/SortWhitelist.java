@@ -38,6 +38,7 @@ public final class SortWhitelist {
         }
     }
 
+    /** Filter the requested sorts to whitelisted fields. */
     public List<SortSpec> validate(List<SortSpec> requested) {
         if (requested == null || requested.isEmpty()) {
             return List.of(defaultSort);

@@ -25,11 +25,15 @@ import reactor.core.publisher.Mono;
 /** Reactive metadata and ownership lookups required for command dispatch. */
 public interface ReactivePointCommandContext {
 
+    /** Load the device for command dispatch. */
     Mono<FacadeDeviceBO> device(Long tenantId, Long deviceId);
 
+    /** Load the point for command dispatch. */
     Mono<FacadePointBO> point(Long tenantId, Long pointId);
 
+    /** Resolve the driver owning the device. */
     Mono<FacadeDriverBO> driverByDevice(Long tenantId, Long deviceId);
 
+    /** Resolve the active driver instance owning the device. */
     Mono<FacadeDeviceOwnerBO> activeOwner(Long tenantId, Long deviceId);
 }

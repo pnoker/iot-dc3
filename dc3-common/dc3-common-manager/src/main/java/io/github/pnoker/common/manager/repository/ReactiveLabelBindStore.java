@@ -19,17 +19,24 @@ package io.github.pnoker.common.manager.repository;
 import io.github.pnoker.common.manager.entity.bo.LabelBindBO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
+/** Reactive persistence port for label bind records. */
 
 public interface ReactiveLabelBindStore {
+    /** Page label bindings matching the tenant-scoped filters. */
     Mono<OffsetPage<LabelBindBO>> list(BindingFilter filter);
 
+    /** Load the label binding scoped to the tenant by id. */
     Mono<LabelBindBO> get(Long tenantId, Long id);
 
+    /** Resolve the label binding by its entity. */
     Mono<LabelBindBO> getByEntity(Long tenantId, byte type, Long labelId, Long entityId);
 
+    /** Insert one label binding and emit the stored row. */
     Mono<LabelBindBO> insert(LabelBindBO value);
 
+    /** Update one label binding and emit the updated row. */
     Mono<LabelBindBO> update(LabelBindBO value);
 
+    /** Delete the label binding, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 }

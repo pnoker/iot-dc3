@@ -44,6 +44,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/** Reactive persistence port for rule records. */
 @Repository
 @ConditionalOnClass({DatabaseClient.class, R2dbcDialect.class, TransactionalOperator.class, PageTransaction.class})
 @RequiredArgsConstructor

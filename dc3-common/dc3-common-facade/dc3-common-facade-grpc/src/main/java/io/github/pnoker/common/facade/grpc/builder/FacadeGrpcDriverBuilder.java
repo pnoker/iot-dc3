@@ -46,6 +46,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FacadeGrpcDriverBuilder {
 
+    /** Convert the offset query to its gRPC form. */
     public GrpcOffsetDriverQuery toGrpcOffsetQuery(FacadeDriverOffsetQuery query) {
         PageRequest.Builder page =
                 PageRequest.newBuilder().setOffset(query.offset()).setLimit(query.limit());

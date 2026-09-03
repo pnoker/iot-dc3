@@ -38,6 +38,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+/** REST controller exposing notify endpoints. */
 @Tag(name = "notify", description = "Alarm notification policies")
 @RestController
 @RequestMapping(DataConstant.NOTIFY_URL_PREFIX)
@@ -46,6 +47,7 @@ public class NotifyController implements BaseController {
     private final NotifyBuilder builder;
     private final NotifyService service;
 
+    /** Add one notify configuration and return the stored view. */
     @Operation(
             summary = "Add notify",
             description = "Create a tenant-scoped notification policy.",
@@ -65,6 +67,7 @@ public class NotifyController implements BaseController {
         });
     }
 
+    /** Delete the notify configuration. */
     @Operation(
             summary = "Delete notify",
             description = "Delete a tenant-scoped notification policy.",
@@ -76,6 +79,7 @@ public class NotifyController implements BaseController {
         return getTenantId().flatMap(tenant -> service.delete(tenant, id).then());
     }
 
+    /** Update one notify configuration and emit the updated row. */
     @Operation(
             summary = "Update notify",
             description = "Update a tenant-scoped notification policy.",
@@ -95,6 +99,7 @@ public class NotifyController implements BaseController {
         });
     }
 
+    /** Resolve the notify configuration by its id. */
     @Operation(
             summary = "Get notify",
             description = "Return one tenant-scoped notification policy.",
@@ -107,6 +112,7 @@ public class NotifyController implements BaseController {
         return getTenantId().flatMap(tenant -> service.getById(tenant, id).map(builder::buildVOByBO));
     }
 
+    /** Page notify configurations matching the tenant-scoped filters. */
     @Operation(
             summary = "List notify",
             description = "List tenant-scoped notification policies.",

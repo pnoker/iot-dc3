@@ -24,17 +24,24 @@ import reactor.core.publisher.Mono;
 /** Reactive persistence port for tenant-scoped model configurations. */
 public interface ReactiveModelConfigStore {
 
+    /** Stream model configs matching the request. */
     Flux<ModelConfigBO> list(RequestHeader.PrincipalHeader header, boolean enabledOnly);
 
+    /** Load the model config for the request. */
     Mono<ModelConfigBO> get(Long id, RequestHeader.PrincipalHeader header);
 
+    /** Resolve the model config by its model. */
     Mono<ModelConfigBO> findByModel(String model, RequestHeader.PrincipalHeader header);
 
+    /** Load the default for the request. */
     Mono<ModelConfigBO> findDefault(RequestHeader.PrincipalHeader header);
 
+    /** Insert one model config and emit the stored row. */
     Mono<ModelConfigBO> insert(ModelConfigBO config, RequestHeader.PrincipalHeader header);
 
+    /** Update one model config and emit the updated row. */
     Mono<ModelConfigBO> update(ModelConfigBO config, RequestHeader.PrincipalHeader header);
 
+    /** Delete the model config, reporting whether a row was removed. */
     Mono<Boolean> delete(Long id, RequestHeader.PrincipalHeader header);
 }

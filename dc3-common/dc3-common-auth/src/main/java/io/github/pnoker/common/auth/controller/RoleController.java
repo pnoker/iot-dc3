@@ -100,6 +100,7 @@ public class RoleController implements BaseController {
         });
     }
 
+    /** Delete the role. */
     @PreAuthorize("@perm.can('role', 'delete')")
     @Operation(
             summary = "Delete Role",
@@ -123,6 +124,7 @@ public class RoleController implements BaseController {
                 .thenReturn(ResponseEntity.noContent().build());
     }
 
+    /** Update one role and emit the updated row. */
     @PreAuthorize("@perm.can('role', 'update')")
     @Operation(
             summary = "Update Role",
@@ -149,6 +151,7 @@ public class RoleController implements BaseController {
         });
     }
 
+    /** Resolve the role by its id. */
     @PreAuthorize("@perm.can('role', 'get')")
     @Operation(
             summary = "Get Role by ID",
@@ -172,6 +175,7 @@ public class RoleController implements BaseController {
                         .map(role -> ResponseEntity.ok(roleBuilder.buildVOByBO(role))));
     }
 
+    /** Page roles matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('role', 'list')")
     @Operation(
             summary = "List Roles",
@@ -205,6 +209,7 @@ public class RoleController implements BaseController {
                                 page.total()))));
     }
 
+    /** Emit the role tree for the tenant. */
     @PreAuthorize("@perm.can('role', 'list')")
     @Operation(
             summary = "List Role Tree",

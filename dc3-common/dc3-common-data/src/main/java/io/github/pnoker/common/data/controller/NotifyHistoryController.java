@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/** REST controller exposing notify history endpoints. */
 @Tag(name = "notify_history", description = "Notification delivery history")
 @RestController
 @RequestMapping(DataConstant.NOTIFY_HISTORY_URL_PREFIX)
@@ -49,6 +50,7 @@ public class NotifyHistoryController implements BaseController {
     private final NotifyHistoryBuilder notifyHistoryBuilder;
     private final NotifyHistoryService notifyHistoryService;
 
+    /** Resolve the notify configuration history by its id. */
     @PreAuthorize("@perm.can('notify_history', 'get')")
     @Operation(
             summary = "Get Notification History by ID",
@@ -72,6 +74,7 @@ public class NotifyHistoryController implements BaseController {
                 .flatMap(tenantId -> notifyHistoryService.getById(tenantId, id).map(notifyHistoryBuilder::buildVOByBO));
     }
 
+    /** Page notify configuration histories matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('notify_history', 'list')")
     @Operation(
             summary = "List Notification History",
@@ -100,6 +103,7 @@ public class NotifyHistoryController implements BaseController {
                                 page.total())));
     }
 
+    /** Delete the notify configuration history, reporting whether a row was removed. */
     @PreAuthorize("@perm.can('notify_history', 'delete')")
     @Operation(
             summary = "Delete Notification History",

@@ -91,6 +91,7 @@ public class AgenticMessageRecorder {
                 prepared, content, reasoningContent, AgenticMessageStatusEnum.COMPLETED, userHeader);
     }
 
+    /** Persist the assistant reply and run bookkeeping for the exchange. */
     public Mono<Void> persistAssistantMessage(
             AgenticPreparedChatBO prepared,
             String content,

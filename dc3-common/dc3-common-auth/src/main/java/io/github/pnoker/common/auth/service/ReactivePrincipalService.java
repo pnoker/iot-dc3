@@ -27,14 +27,19 @@ import reactor.core.publisher.Mono;
 /** Reactive application service for the global principal catalog. */
 public interface ReactivePrincipalService {
 
+    /** Resolve the principal by its id. */
     Mono<PrincipalBO> getById(Long tenantId, Long id);
 
+    /** Page principals matching the tenant-scoped filters. */
     Mono<OffsetPage<PrincipalBO>> list(Long tenantId, PrincipalFilter filter);
 
+    /** List principals matched by ids. */
     Flux<PrincipalBO> listByIds(Long tenantId, Collection<Long> ids);
 
+    /** Set the principal's enable flag, emitting the updated principal. */
     Mono<PrincipalBO> setEnableFlag(
             Long tenantId, Long id, EnableFlagEnum target, Long operatorId, String operatorName);
 
+    /** Stamp the principal's last-login time, reporting whether it exists. */
     Mono<Boolean> touchLastLogin(Long id);
 }

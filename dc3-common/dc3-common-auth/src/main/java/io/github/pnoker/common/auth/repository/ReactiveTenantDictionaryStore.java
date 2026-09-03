@@ -21,5 +21,6 @@ import reactor.core.publisher.Flux;
 
 /** Tenant projection used by the auth dictionary endpoint. */
 public interface ReactiveTenantDictionaryStore {
+    /** Stream the enabled dictionary entries for the tenant. */
     Flux<TenantDO> listEnabled();
 }

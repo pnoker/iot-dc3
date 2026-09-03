@@ -58,6 +58,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/** Default data analytics service implementation. */
 @Slf4j
 @Service
 @RequiredArgsConstructor

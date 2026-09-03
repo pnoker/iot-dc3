@@ -25,27 +25,39 @@ import reactor.core.publisher.Mono;
 
 /** Non-blocking persistence boundary for driver membership and fenced assignments. */
 public interface ReactiveDriverLeaseStore {
+    /** Acquire the driver-level membership lock, failing when held. */
     Mono<Void> acquireDriverLock(Long tenantId, Long driverId);
 
+    /** Renew this node's instance lease for the driver. */
     Mono<Void> renewInstance(Long tenantId, Long driverId, String node, String client, String host, Instant leaseUntil);
 
+    /** List nodes holding a live instance lease for the driver. */
     Flux<String> listActiveNodes(Long tenantId, Long driverId);
 
+    /** Page driver device ids after the cursor position. */
     Flux<Long> listDriverDeviceIds(Long tenantId, Long driverId, long afterDeviceId, int limit);
 
+    /** Load the driver lease state row. */
     Mono<DriverLeaseStateDO> getLeaseState(Long tenantId, Long driverId);
 
+    /** Load the driver device revision counter. */
     Mono<Long> getDeviceRevision(Long tenantId, Long driverId);
 
+    /** Advance the assignment version when the membership hash still matches, returning the new version. */
     Mono<Long> advanceAssignmentVersion(Long tenantId, Long driverId, String membershipHash, long deviceRevision);
 
+    /** Drop instance leases expired before the given instant. */
     Mono<Void> deleteExpiredInstances(Long tenantId, Long driverId, Instant expiredBefore);
 
+    /** Reconcile device leases to the supplied assignments. */
     Mono<Void> reconcileDeviceLeases(List<DeviceLeaseDO> leases);
 
+    /** Drop device leases whose device no longer exists. */
     Mono<Void> deleteOrphanedLeases(Long tenantId, Long driverId);
 
+    /** Page device leases owned by the node after the cursor position. */
     Flux<DeviceLeaseDO> listOwnedLeases(Long tenantId, Long driverId, String node, long afterDeviceId, int limit);
 
+    /** Load the active device lease, or null when none. */
     Mono<DeviceLeaseDO> getActiveLease(Long tenantId, Long deviceId);
 }

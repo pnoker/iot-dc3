@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Set;
 
+/** Paged query for event attribute config records. */
 @Schema(description = "Event attribute config list request using zero-based offset pagination")
 public record EventAttributeConfigOffsetRequest(
         @Schema(description = "Zero-based result offset") Long offset,

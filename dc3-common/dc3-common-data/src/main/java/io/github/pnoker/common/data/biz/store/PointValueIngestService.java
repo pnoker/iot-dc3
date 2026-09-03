@@ -23,10 +23,13 @@ import reactor.core.publisher.Mono;
 /** Reactive write orchestration for telemetry ingest. */
 public interface PointValueIngestService {
 
+    /** Save the value, inserting or updating as needed. */
     Mono<Boolean> saveValue(PointValueBO valueBO);
 
+    /** Save the values, inserting or updating as needed. */
     Mono<List<PointValueBO>> saveValues(List<PointValueBO> valueBOList);
 
+    /** Mark one receipt processed, returning the rows updated. */
     Mono<Void> markProcessed(List<PointValueBO> valueBOList);
 
     /** Replay leased/pending receipts after a process crash. */

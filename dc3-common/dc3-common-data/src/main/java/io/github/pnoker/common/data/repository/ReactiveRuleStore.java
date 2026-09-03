@@ -27,10 +27,13 @@ import reactor.core.publisher.Mono;
 /** Reactive tenant-scoped persistence port for alarm rules. */
 public interface ReactiveRuleStore {
 
+    /** Stream enabled candidates matching the request. */
     Flux<RuleBO> listEnabledCandidates(long tenantId, AlarmTargetTypeEnum targetType, long entityId);
 
+    /** Load the rule scoped to the tenant by id. */
     Mono<RuleDO> get(long tenantId, long id);
 
+    /** Page rules matching the tenant-scoped filters. */
     Mono<OffsetPage<RuleDO>> list(
             long tenantId,
             String ruleName,
@@ -40,13 +43,18 @@ public interface ReactiveRuleStore {
             io.github.pnoker.common.enums.EnableFlagEnum enableFlag,
             PageRequest pageRequest);
 
+    /** Insert one rule and emit the stored row. */
     Mono<RuleDO> insert(RuleDO rule);
 
+    /** Update one rule and emit the updated row. */
     Mono<RuleDO> update(RuleDO rule);
 
+    /** Soft-delete the rule, reporting whether it was updated. */
     Mono<Boolean> softDelete(long tenantId, long id);
 
+    /** Report whether the rule has children. */
     Mono<Boolean> hasChildren(long tenantId, long id);
 
+    /** Check whether the active code exists under the tenant. */
     Mono<Boolean> existsActiveCode(long tenantId, String ruleCode, Long excludedId);
 }

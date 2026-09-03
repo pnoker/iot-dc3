@@ -54,6 +54,7 @@ public class RuleController implements BaseController {
     private final RuleBuilder ruleBuilder;
     private final RuleService ruleService;
 
+    /** Add one rule and return the stored view. */
     @PreAuthorize("@perm.can('rule', 'add')")
     @Operation(
             summary = "Add Rule",
@@ -84,6 +85,7 @@ public class RuleController implements BaseController {
                 });
     }
 
+    /** Delete the rule. */
     @PreAuthorize("@perm.can('rule', 'delete')")
     @Operation(
             summary = "Delete Rule",
@@ -103,6 +105,7 @@ public class RuleController implements BaseController {
                 .flatMap(tenantId -> ruleService.delete(tenantId, id).then());
     }
 
+    /** Update one rule and emit the updated row. */
     @PreAuthorize("@perm.can('rule', 'update')")
     @Operation(
             summary = "Update Rule",
@@ -130,6 +133,7 @@ public class RuleController implements BaseController {
                 });
     }
 
+    /** Resolve the rule by its id. */
     @PreAuthorize("@perm.can('rule', 'get')")
     @Operation(
             summary = "Get Rule by ID",
@@ -149,6 +153,7 @@ public class RuleController implements BaseController {
                 .flatMap(tenantId -> ruleService.getById(tenantId, id).map(ruleBuilder::buildVOByBO));
     }
 
+    /** Page rules matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('rule', 'list')")
     @Operation(
             summary = "List Rules",

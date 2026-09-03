@@ -35,6 +35,7 @@ public record CursorRequest(String cursor, int limit, List<SortSpec> sort) {
         this(cursor, limit, List.of());
     }
 
+    /** Create a request for the first page. */
     public static CursorRequest firstPage() {
         return new CursorRequest(null, PageRequest.DEFAULT_LIMIT);
     }

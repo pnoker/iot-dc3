@@ -21,16 +21,22 @@ import java.time.Instant;
 import java.util.UUID;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Reactive persistence port for device import job records. */
 
 public interface ReactiveDeviceImportJobStore {
 
+    /** Insert one device import job and emit the stored row. */
     Mono<Void> insert(DeviceImportJob job);
 
+    /** Claim the import job for the worker until the given instant. */
     Mono<DeviceImportJob> claim(UUID operationId, String workerId, Instant now, Instant claimedUntil);
 
+    /** Renew the worker's claim on the import job. */
     Mono<Boolean> renew(UUID operationId, String workerId, Instant claimedUntil);
 
+    /** List operation ids whose import jobs can be recovered. */
     Flux<UUID> listRecoverable(Instant now);
 
+    /** Delete the device import job. */
     Mono<Void> delete(UUID operationId, Long tenantId);
 }

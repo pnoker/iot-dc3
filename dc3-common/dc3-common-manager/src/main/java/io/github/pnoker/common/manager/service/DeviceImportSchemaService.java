@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/** Business service covering device import schema use cases. */
 @Service
 @RequiredArgsConstructor
 public class DeviceImportSchemaService {
@@ -34,6 +35,7 @@ public class DeviceImportSchemaService {
     private final ReactivePointService pointService;
     private final DeviceImportWorkbookCodec workbookCodec;
 
+    /** Load the device import manifest for the driver/profile pair. */
     public Mono<DeviceImportManifest> load(Long tenantId, Long driverId, Long profileId) {
         if (tenantId == null || driverId == null || profileId == null) {
             return Mono.error(new RequestException("Tenant ID, driver ID and profile ID are required"));

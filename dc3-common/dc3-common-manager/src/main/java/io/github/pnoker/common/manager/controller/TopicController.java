@@ -43,6 +43,7 @@ import reactor.core.publisher.Mono;
 public class TopicController implements BaseController {
     private final ReactiveTopicService topicService;
 
+    /** Page topics matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('topic', 'list')")
     @Operation(
             summary = "List Topics",

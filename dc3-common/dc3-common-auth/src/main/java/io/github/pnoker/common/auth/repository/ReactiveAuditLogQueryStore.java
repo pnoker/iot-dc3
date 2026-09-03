@@ -23,5 +23,6 @@ import reactor.core.publisher.Mono;
 /** Non-blocking cursor read port for identity audit events. */
 public interface ReactiveAuditLogQueryStore {
 
+    /** Page audit log queries matching the tenant-scoped filters. */
     Mono<CursorPage<IdentityAuditLogDO>> list(IdentityAuditLogFilter filter);
 }

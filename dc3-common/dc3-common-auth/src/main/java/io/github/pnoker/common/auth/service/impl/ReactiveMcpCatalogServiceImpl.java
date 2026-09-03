@@ -28,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/** Default mcp catalog service implementation. */
 @Service
 @RequiredArgsConstructor
 public class ReactiveMcpCatalogServiceImpl implements ReactiveMcpCatalogService {

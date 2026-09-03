@@ -29,12 +29,16 @@ import org.mapstruct.Mapping;
         uses = {MapStructUtil.class})
 public interface GroupBindBuilder {
 
+    /** Convert the value object into its business-object form. */
     @Mapping(target = "tenantId", ignore = true)
     GroupBindBO buildBOByVO(GroupBindVO entityVO);
 
+    /** Convert the value objects into their business-object forms. */
     List<GroupBindBO> buildBOListByVOList(List<GroupBindVO> entityVOList);
 
+    /** Convert the business object into its value-object form. */
     GroupBindVO buildVOByBO(GroupBindBO entityBO);
 
+    /** Convert the business objects into their value-object forms. */
     List<GroupBindVO> buildVOListByBOList(List<GroupBindBO> entityBOList);
 }

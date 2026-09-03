@@ -25,17 +25,24 @@ import reactor.core.publisher.Mono;
 
 /** Reactive application service for event parameters. */
 public interface ReactiveEventParamService {
+    /** Add one event param. */
     Mono<EventParamBO> add(EventParamBO value);
 
+    /** Update one event param and emit the updated row. */
     Mono<EventParamBO> update(EventParamBO value);
 
+    /** Delete the event param, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Resolve the event param by its id. */
     Mono<EventParamBO> getById(Long tenantId, Long id);
 
+    /** List event params matched by event id. */
     Flux<EventParamBO> listByEventId(Long tenantId, Long eventId);
 
+    /** List event params matched by ids. */
     Flux<EventParamBO> listByIds(Long tenantId, Collection<Long> ids);
 
+    /** Page event params matching the tenant-scoped filters. */
     Mono<OffsetPage<EventParamBO>> list(EventParamFilter filter);
 }

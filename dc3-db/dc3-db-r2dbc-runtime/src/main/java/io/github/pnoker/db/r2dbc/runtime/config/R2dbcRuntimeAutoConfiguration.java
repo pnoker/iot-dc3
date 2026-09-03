@@ -39,6 +39,7 @@ import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.transaction.ReactiveTransactionManager;
 import org.springframework.transaction.reactive.TransactionalOperator;
 
+/** Spring configuration registering the R2DBC runtime beans. */
 @AutoConfiguration(
         after = {R2dbcAutoConfiguration.class, R2dbcTransactionManagerAutoConfiguration.class},
         afterName = {"io.github.pnoker.db.r2dbc.postgres.PostgresR2dbcDialectConfiguration"})

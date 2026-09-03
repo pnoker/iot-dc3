@@ -20,19 +20,27 @@ import io.github.pnoker.common.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+/** Reactive persistence port for driver attribute config records. */
 
 public interface ReactiveDriverAttributeConfigStore {
+    /** Load the driver attribute config scoped to the tenant by id. */
     Mono<DriverAttributeConfigBO> get(Long tenantId, Long id);
 
+    /** Resolve the driver attribute config by its attribute and device. */
     Mono<DriverAttributeConfigBO> getByAttributeAndDevice(Long tenantId, Long attributeId, Long deviceId);
 
+    /** List driver attribute configs matched by device id. */
     Flux<DriverAttributeConfigBO> listByDeviceId(Long tenantId, Long deviceId);
 
+    /** Insert one driver attribute config and emit the stored row. */
     Mono<DriverAttributeConfigBO> insert(DriverAttributeConfigBO value);
 
+    /** Update one driver attribute config and emit the updated row. */
     Mono<DriverAttributeConfigBO> update(DriverAttributeConfigBO value, int expectedVersion);
 
+    /** Delete the driver attribute config, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, int expectedVersion, Long operatorId, String operatorName);
 
+    /** Page driver attribute configs matching the tenant-scoped filters. */
     Mono<OffsetPage<DriverAttributeConfigBO>> list(DriverAttributeConfigFilter filter);
 }

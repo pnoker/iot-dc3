@@ -31,9 +31,12 @@ import reactor.core.publisher.Mono;
  */
 public interface EventFacade {
 
+    /** Resolve the event by its id. */
     Mono<FacadeEventBO> getById(Long tenantId, Long id);
 
+    /** List events matched by ids. */
     Flux<FacadeEventBO> listByIds(Long tenantId, Collection<Long> ids);
 
+    /** Page events matching the tenant-scoped filters. */
     Mono<OffsetPage<FacadeEventBO>> list(FacadeEventOffsetQuery query);
 }

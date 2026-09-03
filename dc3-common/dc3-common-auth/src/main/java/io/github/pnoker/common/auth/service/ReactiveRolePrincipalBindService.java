@@ -26,13 +26,18 @@ import reactor.core.publisher.Mono;
 
 /** Reactive application service for role-principal assignments. */
 public interface ReactiveRolePrincipalBindService {
+    /** Add one role principal binding. */
     Mono<RolePrincipalBindBO> add(RolePrincipalBindBO binding);
 
+    /** Delete the role principal binding. */
     Mono<Void> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 
+    /** Page role principal bindings matching the tenant-scoped filters. */
     Mono<OffsetPage<RolePrincipalBindBO>> list(RolePrincipalBindFilter filter);
 
+    /** List role principal bindings matched by principal. */
     Flux<RoleBO> listRolesByPrincipal(Long tenantId, Long principalId);
 
+    /** List role principal bindings matched by role. */
     Flux<UserBO> listUsersByRole(Long tenantId, Long roleId);
 }

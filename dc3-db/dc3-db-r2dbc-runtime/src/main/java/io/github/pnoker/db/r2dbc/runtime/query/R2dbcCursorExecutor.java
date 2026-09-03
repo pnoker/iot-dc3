@@ -42,6 +42,7 @@ public final class R2dbcCursorExecutor {
                 Objects.requireNonNull(transactionalOperator, "transactionalOperator must not be null");
     }
 
+    /** Run the cursor query inside the transaction, emitting the page. */
     public <T> Mono<CursorPage<T>> execute(
             CursorRequest request,
             String itemsSql,

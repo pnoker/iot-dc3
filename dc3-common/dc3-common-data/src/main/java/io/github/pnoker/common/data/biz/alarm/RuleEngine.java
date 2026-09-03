@@ -20,5 +20,6 @@ import reactor.core.publisher.Flux;
 
 /** Reactive deterministic rule engine. */
 public interface RuleEngine {
+    /** Evaluate the fact against enabled rules, emitting the matches. */
     Flux<RuleMatch> evaluate(RuleFact fact);
 }

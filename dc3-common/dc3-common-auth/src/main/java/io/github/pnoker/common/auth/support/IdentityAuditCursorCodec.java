@@ -52,6 +52,7 @@ public final class IdentityAuditCursorCodec {
                 Map.of(KEY_ID, new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), ALGORITHM)), clock);
     }
 
+    /** Encode a signed cursor for the tenant and query fingerprint. */
     public String encode(long tenantId, String queryFingerprint, Instant time, long id) {
         validateTenant(tenantId);
         if (time == null || id <= 0) throw invalid();
@@ -60,6 +61,7 @@ public final class IdentityAuditCursorCodec {
                 new CursorState(KEY_ID, tenantUuid(tenantId), digest(queryFingerprint), position(time, id), expiry));
     }
 
+    /** Decode and verify a cursor token for the tenant and query fingerprint. */
     public Position decode(String token, long tenantId, String queryFingerprint) {
         validateTenant(tenantId);
         try {

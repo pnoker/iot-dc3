@@ -40,9 +40,12 @@ import reactor.core.publisher.Mono;
  */
 public interface PointValueFacade {
 
+    /** Load the latest point value for the series. */
     Mono<FacadePointValueBO> lastValue(Long tenantId, Long deviceId, Long pointId);
 
+    /** Load the cursor-paged history for the series. */
     Mono<CursorPage<FacadePointValueBO>> history(Long tenantId, Long deviceId, Long pointId, String cursor, int limit);
 
+    /** Load point value volumes per point since the epoch instant. */
     Mono<List<FacadePointVolumeBO>> pointVolumes(Long tenantId, long fromEpochMillis);
 }

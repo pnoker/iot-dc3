@@ -61,6 +61,7 @@ public record DictionaryOption(
         children = children == null ? List.of() : List.copyOf(children);
     }
 
+    /** Create a leaf dictionary option. */
     public static DictionaryOption leaf(String label, String value) {
         return new DictionaryOption(null, label, value, false, false, List.of());
     }

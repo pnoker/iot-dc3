@@ -59,6 +59,7 @@ import org.springframework.context.annotation.Import;
  * @author pnoker
  * @since 2016.10.1
  */
+/** Auto-configuration wiring the gRPC facade stubs. */
 @AutoConfiguration
 @Import({
     GrpcStubConfig.class,

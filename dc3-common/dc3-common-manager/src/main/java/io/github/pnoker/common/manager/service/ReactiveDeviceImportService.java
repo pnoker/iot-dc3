@@ -21,12 +21,16 @@ import io.github.pnoker.common.manager.entity.operation.OperationView;
 import io.github.pnoker.db.r2dbc.core.operation.OperationAccepted;
 import java.util.UUID;
 import reactor.core.publisher.Mono;
+/** Business service covering device import use cases. */
 
 public interface ReactiveDeviceImportService {
 
+    /** Submit the device import workbook as a tracked async operation. */
     Mono<OperationAccepted> submit(DeviceBO context, String fileName, byte[] content, String idempotencyKey);
 
+    /** Generate the import workbook template for the driver/profile pair. */
     Mono<byte[]> generateTemplate(Long tenantId, Long driverId, Long profileId);
 
+    /** Load the device import operation view by id. */
     Mono<OperationView> getOperation(Long tenantId, UUID operationId);
 }

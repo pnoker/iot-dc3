@@ -23,13 +23,18 @@ import reactor.core.publisher.Mono;
 
 /** Reactive application service for labels. */
 public interface ReactiveLabelService {
+    /** Add one label. */
     Mono<LabelBO> add(LabelBO label);
 
+    /** Update one label and emit the updated row. */
     Mono<LabelBO> update(LabelBO label);
 
+    /** Delete the label, reporting whether a row was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 
+    /** Resolve the label by its id. */
     Mono<LabelBO> getById(Long tenantId, Long id);
 
+    /** Page labels matching the tenant-scoped filters. */
     Mono<OffsetPage<LabelBO>> list(LabelFilter filter);
 }

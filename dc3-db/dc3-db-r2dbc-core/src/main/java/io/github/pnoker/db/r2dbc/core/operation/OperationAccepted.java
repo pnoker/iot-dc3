@@ -18,6 +18,7 @@ package io.github.pnoker.db.r2dbc.core.operation;
 
 import java.util.Objects;
 import java.util.UUID;
+/** Receipt for an accepted asynchronous operation, linking its status resource. */
 
 public record OperationAccepted(UUID operationId, String statusUri) {
     public OperationAccepted {

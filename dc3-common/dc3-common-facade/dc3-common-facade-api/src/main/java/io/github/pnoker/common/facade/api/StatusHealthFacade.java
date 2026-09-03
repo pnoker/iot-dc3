@@ -29,13 +29,18 @@ import reactor.core.publisher.Mono;
  * @since 2026.5.14
  */
 public interface StatusHealthFacade {
+    /** List status healths matched by ids. */
     Mono<Map<Long, String>> listDeviceStatusesByIdsReactive(Long tenantId, Collection<Long> deviceIds);
 
+    /** List status healths matched by profile id. */
     Mono<Map<Long, String>> listDeviceStatusesByProfileIdReactive(Long tenantId, Long profileId);
 
+    /** List status healths matched by ids. */
     Mono<Map<Long, String>> listDriverStatusesByIdsReactive(Long tenantId, Collection<Long> driverIds);
 
+    /** Load the driver device status summary scoped to the tenant by id. */
     Mono<FacadeDriverDeviceStatusSummaryBO> getDriverDeviceStatusSummaryReactive(Long tenantId, Long driverId);
 
+    /** Load the system health snapshot for the tenant. */
     Mono<FacadeSystemHealthBO> systemHealthReactive(Long tenantId);
 }

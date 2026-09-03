@@ -39,6 +39,7 @@ import org.springframework.context.annotation.FilterType;
  * @author pnoker
  * @since 2016.10.1
  */
+/** Auto-configuration wiring the manager local facades. */
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.facade.manager.mode", havingValue = "local")
 @ComponentScan(

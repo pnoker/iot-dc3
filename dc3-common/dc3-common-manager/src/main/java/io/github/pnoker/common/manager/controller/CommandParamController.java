@@ -60,6 +60,7 @@ public class CommandParamController implements BaseController {
     private final ReactiveCommandParamService commandParamService;
     private final ReactiveCommandService commandService;
 
+    /** Add one command param and return the stored view. */
     @PreAuthorize("@perm.can('command_param', 'add')")
     @Operation(
             summary = "Add Command Parameter",
@@ -87,6 +88,7 @@ public class CommandParamController implements BaseController {
         });
     }
 
+    /** Delete the command param. */
     @PreAuthorize("@perm.can('command_param', 'delete')")
     @Operation(
             summary = "Delete Command Parameter",
@@ -117,6 +119,7 @@ public class CommandParamController implements BaseController {
                 .then());
     }
 
+    /** Update one command param and emit the updated row. */
     @PreAuthorize("@perm.can('command_param', 'update')")
     @Operation(
             summary = "Update Command Parameter",
@@ -142,6 +145,7 @@ public class CommandParamController implements BaseController {
         });
     }
 
+    /** Resolve the command param by its id. */
     @PreAuthorize("@perm.can('command_param', 'get')")
     @Operation(
             summary = "Get Command Parameter by ID",
@@ -164,6 +168,7 @@ public class CommandParamController implements BaseController {
                 .flatMap(tenantId -> commandParamService.getById(tenantId, id).map(commandParamBuilder::buildVOByBO));
     }
 
+    /** List command params matched by command id. */
     @PreAuthorize("@perm.can('command_param', 'list')")
     @Operation(
             summary = "List Command Parameters by Command ID",
@@ -192,6 +197,7 @@ public class CommandParamController implements BaseController {
                         .collectList());
     }
 
+    /** Page command params matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('command_param', 'list')")
     @Operation(
             summary = "List Command Parameters",

@@ -19,6 +19,7 @@ package io.github.pnoker.common.auth.repository;
 import io.github.pnoker.common.enums.ApiTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+/** Tenant-scoped query filter for api records. */
 
 public record ApiFilter(
         String serviceName,

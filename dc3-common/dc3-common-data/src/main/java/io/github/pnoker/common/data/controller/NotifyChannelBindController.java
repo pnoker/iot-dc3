@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+/** REST controller exposing notify channel bind endpoints. */
 @Tag(name = "notify_channel_bind", description = "Notification policy channel bindings")
 @RestController
 @RequestMapping(DataConstant.NOTIFY_CHANNEL_BIND_URL_PREFIX)
@@ -52,6 +53,7 @@ public class NotifyChannelBindController implements BaseController {
     private final NotifyChannelBindBuilder builder;
     private final NotifyChannelBindService service;
 
+    /** Add one notify configuration channel bind and return the stored view. */
     @Operation(
             summary = "Add binding",
             description = "Create a tenant-scoped policy channel binding.",
@@ -71,6 +73,7 @@ public class NotifyChannelBindController implements BaseController {
         });
     }
 
+    /** Delete the notify configuration channel bind. */
     @Operation(
             summary = "Delete binding",
             description = "Delete a tenant-scoped policy channel binding.",
@@ -82,6 +85,7 @@ public class NotifyChannelBindController implements BaseController {
         return getTenantId().flatMap(tenant -> service.delete(tenant, id).then());
     }
 
+    /** Update one notify configuration channel bind and emit the updated row. */
     @Operation(
             summary = "Update binding",
             description = "Update a tenant-scoped policy channel binding.",
@@ -101,6 +105,7 @@ public class NotifyChannelBindController implements BaseController {
         });
     }
 
+    /** Resolve the notify configuration channel bind by its id. */
     @Operation(
             summary = "Get binding",
             description = "Return one tenant-scoped policy channel binding.",
@@ -113,6 +118,7 @@ public class NotifyChannelBindController implements BaseController {
         return getTenantId().flatMap(tenant -> service.getById(tenant, id).map(builder::buildVOByBO));
     }
 
+    /** Page notify configuration channel binds matching the tenant-scoped filters. */
     @Operation(
             summary = "List bindings",
             description = "List tenant-scoped policy channel bindings.",

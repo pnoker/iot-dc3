@@ -35,6 +35,7 @@ import reactor.core.publisher.Mono;
 public class DriverTool {
     private final DriverFacade driverFacade;
 
+    /** Look up the driver by id. */
     public Mono<AgenticToolResult<FacadeDriverBO>> lookupDriverByIdReactive(Long driverId, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
         if (driverId == null || driverId <= 0)
@@ -45,6 +46,7 @@ public class DriverTool {
                 .defaultIfEmpty(AgenticToolResult.notFound("Driver not found for ID: " + driverId));
     }
 
+    /** Look up the drivers for the given ids. */
     public Mono<AgenticToolResult<List<FacadeDriverBO>>> lookupDriversByIdsReactive(
             List<Long> driverIds, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);
@@ -58,6 +60,7 @@ public class DriverTool {
                         : AgenticToolResult.ok("Drivers loaded", values));
     }
 
+    /** Search drivers matching the request. */
     public Mono<AgenticToolResult<OffsetPage<FacadeDriverBO>>> searchDriversReactive(
             String driverName, long offset, int limit, ToolContext context) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(context);

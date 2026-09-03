@@ -68,6 +68,7 @@ public class MenuController implements BaseController {
     private final ReactiveAdminChecker adminChecker;
     private final ReactiveRoleResourceBindService roleResourceBindService;
 
+    /** Add one menu and return the stored view. */
     @PreAuthorize("@perm.can('menu', 'add')")
     @Operation(
             summary = "Add Menu",
@@ -97,6 +98,7 @@ public class MenuController implements BaseController {
                         .map(saved -> ResponseEntity.status(201).body(menuBuilder.buildVOByBO(saved))));
     }
 
+    /** Delete the menu. */
     @PreAuthorize("@perm.can('menu', 'delete')")
     @Operation(
             summary = "Delete Menu",
@@ -120,6 +122,7 @@ public class MenuController implements BaseController {
                 .thenReturn(ResponseEntity.noContent().build());
     }
 
+    /** Update one menu and emit the updated row. */
     @PreAuthorize("@perm.can('menu', 'update')")
     @Operation(
             summary = "Update Menu",
@@ -147,6 +150,7 @@ public class MenuController implements BaseController {
                         .map(saved -> ResponseEntity.ok(menuBuilder.buildVOByBO(saved))));
     }
 
+    /** Resolve the menu by its id. */
     @PreAuthorize("@perm.can('menu', 'get')")
     @Operation(
             summary = "Get Menu by ID",
@@ -166,6 +170,7 @@ public class MenuController implements BaseController {
         return menuService.getById(id).map(menu -> ResponseEntity.ok(menuBuilder.buildVOByBO(menu)));
     }
 
+    /** Page menus matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('menu', 'list')")
     @Operation(
             summary = "List Menus",
@@ -191,6 +196,7 @@ public class MenuController implements BaseController {
                         page.total())));
     }
 
+    /** Emit the menu tree for the tenant. */
     @PreAuthorize("@perm.can('menu', 'list')")
     @Operation(
             summary = "List Menu Tree",

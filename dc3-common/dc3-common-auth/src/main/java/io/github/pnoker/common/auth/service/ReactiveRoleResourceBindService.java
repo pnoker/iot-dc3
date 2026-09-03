@@ -26,15 +26,21 @@ import reactor.core.publisher.Mono;
 
 /** Reactive application service for role-resource assignments. */
 public interface ReactiveRoleResourceBindService {
+    /** Add one role resource binding. */
     Mono<RoleResourceBindBO> add(RoleResourceBindBO binding, Long tenantId);
 
+    /** Delete the role resource binding. */
     Mono<Void> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 
+    /** Page role resource bindings matching the tenant-scoped filters. */
     Mono<OffsetPage<RoleResourceBindBO>> list(RoleResourceBindFilter filter);
 
+    /** List role resource bindings matched by role. */
     Flux<ResourceBO> listResourcesByRole(Long tenantId, Long roleId);
 
+    /** List role resource bindings matched by principal. */
     Flux<ResourceBO> listResourcesByPrincipal(Long tenantId, Long principalId);
 
+    /** List role resource bindings matched by resource. */
     Flux<RoleBO> listRolesByResource(Long tenantId, Long resourceId);
 }

@@ -39,6 +39,7 @@ import reactor.core.publisher.Mono;
 public class ProfileTool {
     private final Optional<ProfileFacade> profileFacade;
 
+    /** Look up the profile by id. */
     public Mono<AgenticToolResult<FacadeProfileBO>> lookupProfileByIdReactive(Long profileId, ToolContext context) {
         return Mono.defer(() -> {
             Long tenantId = AgenticToolContextUtil.requireTenantId(context);
@@ -53,6 +54,7 @@ public class ProfileTool {
         });
     }
 
+    /** Look up the profiles for the given ids. */
     public Mono<AgenticToolResult<List<FacadeProfileBO>>> lookupProfilesByIdsReactive(
             List<Long> profileIds, ToolContext context) {
         return Mono.defer(() -> {
@@ -70,6 +72,7 @@ public class ProfileTool {
         });
     }
 
+    /** Search profiles matching the request. */
     public Mono<AgenticToolResult<OffsetPage<FacadeProfileBO>>> searchProfilesReactive(
             String profileName, String profileCode, String profileType, long offset, int limit, ToolContext context) {
         return Mono.defer(() -> {
@@ -100,6 +103,7 @@ public class ProfileTool {
         });
     }
 
+    /** List profile tools matched by device id. */
     public Mono<AgenticToolResult<OffsetPage<FacadeProfileBO>>> listProfilesByDeviceIdReactive(
             Long deviceId, long offset, int limit, ToolContext context) {
         return Mono.defer(() -> {

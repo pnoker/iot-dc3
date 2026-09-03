@@ -21,15 +21,20 @@ import reactor.core.publisher.Mono;
 
 /** Atomic non-blocking local credential lifecycle and login state commands. */
 public interface ReactiveLocalCredentialCommandService {
+    /** Add one local credential under the tenant. */
     Mono<LocalCredentialBO> add(Long tenantId, LocalCredentialBO credential, Long operatorId, String operatorName);
 
+    /** Update one local credential under the tenant. */
     Mono<LocalCredentialBO> update(Long tenantId, LocalCredentialBO credential, Long operatorId, String operatorName);
 
+    /** Delete one local credential, reporting whether it was removed. */
     Mono<Boolean> delete(Long tenantId, Long id, Long operatorId, String operatorName);
 
+    /** Reset the credential password to the supplied raw value. */
     Mono<LocalCredentialBO> resetPassword(
             Long tenantId, Long id, String rawPassword, Long operatorId, String operatorName);
 
+    /** Rotate the local credential password after verifying the current one. */
     Mono<LocalCredentialBO> changePassword(
             Long tenantId,
             String loginName,
@@ -38,7 +43,9 @@ public interface ReactiveLocalCredentialCommandService {
             Long operatorId,
             String operatorName);
 
+    /** Record one successful login for the credential. */
     Mono<Void> recordSuccessfulLogin(Long tenantId, Long id);
 
+    /** Record one failed login for the credential. */
     Mono<Void> recordFailedLogin(Long tenantId, Long id);
 }

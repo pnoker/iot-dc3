@@ -24,11 +24,15 @@ import reactor.core.publisher.Mono;
 /** Reactive persistence port for the relational latest-value projection. */
 public interface ReactivePointValueLatestStore {
 
+    /** Load the latest point value for the series. */
     Mono<PointValueDO> latest(Long tenantId, Long deviceId, Long pointId);
 
+    /** Stream the latest point values for the tenant. */
     Flux<PointValueDO> listLatest(Long tenantId, Long deviceId, List<Long> pointIds);
 
+    /** Stream the latest point values as a continuous feed. */
     Flux<PointValueDO> listLatestStream(Long tenantId, int limit);
 
+    /** Save the batch, inserting or updating as needed. */
     Mono<Integer> upsertBatch(List<PointValueDO> values);
 }

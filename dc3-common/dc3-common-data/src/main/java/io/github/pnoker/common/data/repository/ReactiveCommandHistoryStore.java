@@ -27,15 +27,20 @@ import reactor.core.publisher.Mono;
 /** Reactive, tenant-scoped persistence port for custom command history. */
 public interface ReactiveCommandHistoryStore {
 
+    /** Load the command history record by its record id. */
     Mono<CommandHistoryDO> find(Long tenantId, String recordId);
 
+    /** Insert one command history entry and emit the stored row. */
     Mono<CommandHistoryDO> insert(CommandHistoryDO history);
 
+    /** Mark the command sent at the given instant, reporting whether it was still pending. */
     Mono<Boolean> markSent(Long tenantId, String recordId, Instant sentAt);
 
+    /** Mark the command publish-failed with the error, reporting whether it was updated. */
     Mono<Boolean> markPublishFailed(
             Long tenantId, String recordId, String errorCode, String errorMessage, Instant finishedAt);
 
+    /** Close the command with the final status, response and error, reporting whether it was updated. */
     Mono<Boolean> complete(
             Long tenantId,
             String recordId,
@@ -46,8 +51,10 @@ public interface ReactiveCommandHistoryStore {
             String errorMessage,
             Instant finishedAt);
 
+    /** Mark the command dead with the error, reporting whether it was updated. */
     Mono<Boolean> markDead(Long tenantId, String recordId, String errorCode, String errorMessage, Instant finishedAt);
 
+    /** Page command history entries matching the tenant-scoped filters. */
     Mono<OffsetPage<CommandHistoryDO>> list(
             Long tenantId,
             Long deviceId,

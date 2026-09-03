@@ -21,5 +21,6 @@ import reactor.core.publisher.Mono;
 
 /** Reactive tenant guard for polymorphic manager entity bindings. */
 public interface ReactiveEntityTenantService {
+    /** Require the entity's tenant id, failing when unset. */
     Mono<Void> requireEntityTenant(Long tenantId, EntityTypeEnum entityType, Long entityId);
 }

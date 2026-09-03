@@ -31,6 +31,7 @@ import org.springframework.core.env.Environment;
 @EnableConfigurationProperties(HmacAuthProperties.class)
 public class PointValueCursorConfig {
 
+    /** Create the point-value cursor codec from the signing secret. */
     @Bean
     @ConditionalOnMissingBean
     public PointValueCursorCodec pointValueCursorCodec(HmacAuthProperties properties, Environment environment) {

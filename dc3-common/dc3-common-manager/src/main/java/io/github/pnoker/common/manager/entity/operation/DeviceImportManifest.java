@@ -17,6 +17,7 @@
 package io.github.pnoker.common.manager.entity.operation;
 
 import java.util.List;
+/** Attribute schema embedded in an import workbook. */
 
 public record DeviceImportManifest(
         int schemaVersion,

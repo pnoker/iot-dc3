@@ -35,6 +35,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 
+/** Reactive persistence port for group bind records. */
 @Repository
 @RequiredArgsConstructor
 @ConditionalOnClass({DatabaseClient.class, R2dbcDialect.class, TransactionalOperator.class})
@@ -47,6 +48,7 @@ public class R2dbcGroupBindStore implements ReactiveGroupBindStore {
     private final TransactionalOperator tx;
     private final PageTransaction pageTransaction;
 
+    /** Page group bindings matching the tenant-scoped filters. */
     public Mono<OffsetPage<GroupBindBO>> list(BindingFilter f) {
         StringBuilder w = new StringBuilder(" WHERE tenant_id=:tenant AND deleted=0");
         if (f.entityType() != null) w.append(" AND entity_type_flag=:type");
@@ -70,6 +72,7 @@ public class R2dbcGroupBindStore implements ReactiveGroupBindStore {
                 .as(pageTransaction::transactional);
     }
 
+    /** Load the group binding for the request. */
     public Mono<GroupBindBO> get(Long t, Long id) {
         return !ok(t) || !ok(id)
                 ? Mono.empty()
@@ -80,6 +83,7 @@ public class R2dbcGroupBindStore implements ReactiveGroupBindStore {
                         .one();
     }
 
+    /** Resolve the group binding by its entity. */
     public Mono<GroupBindBO> getByEntity(Long t, byte type, Long entity) {
         return c.sql(
                         "SELECT " + C + " FROM " + T
@@ -91,6 +95,7 @@ public class R2dbcGroupBindStore implements ReactiveGroupBindStore {
                 .one();
     }
 
+    /** Insert one group binding and emit the stored row. */
     public Mono<GroupBindBO> insert(GroupBindBO v) {
         v.setId(v.getId() == null ? UuidV7.nextLong() : v.getId());
         v.setCreateTime(now());
@@ -103,6 +108,7 @@ public class R2dbcGroupBindStore implements ReactiveGroupBindStore {
                 .flatMap(n -> n == 1 ? get(v.getTenantId(), v.getId()) : Mono.empty()));
     }
 
+    /** Update one group binding and emit the updated row. */
     public Mono<GroupBindBO> update(GroupBindBO v) {
         v.setOperateTime(now());
         String s = "UPDATE " + T
@@ -113,6 +119,7 @@ public class R2dbcGroupBindStore implements ReactiveGroupBindStore {
                 .flatMap(n -> n == 1 ? get(v.getTenantId(), v.getId()) : Mono.empty()));
     }
 
+    /** Delete the group binding, reporting whether a row was removed. */
     public Mono<Boolean> delete(Long t, Long id, Long op, String name) {
         return tx.transactional(c.sql(
                         "UPDATE " + T

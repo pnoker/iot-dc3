@@ -20,5 +20,6 @@ import reactor.core.publisher.Flux;
 
 /** Reactive tenant-scoped permission projection used by authorization checks. */
 public interface ReactivePermissionStore {
+    /** Stream resource codes matching the request. */
     Flux<String> listResourceCodes(Long tenantId, Long principalId);
 }

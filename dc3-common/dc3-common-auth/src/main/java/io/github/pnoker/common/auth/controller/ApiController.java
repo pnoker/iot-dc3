@@ -62,6 +62,7 @@ public class ApiController implements BaseController {
     private final ReactiveApiService apiService;
     private final ReactiveAdminChecker adminChecker;
 
+    /** Add one api and return the stored view. */
     @PreAuthorize("@perm.can('api', 'add')")
     @Operation(
             summary = "Add API Endpoint",
@@ -92,6 +93,7 @@ public class ApiController implements BaseController {
                         .map(saved -> ResponseEntity.status(201).body(apiBuilder.buildVOByBO(saved))));
     }
 
+    /** Delete the api. */
     @PreAuthorize("@perm.can('api', 'delete')")
     @Operation(
             summary = "Delete API Endpoint",
@@ -116,6 +118,7 @@ public class ApiController implements BaseController {
                 .thenReturn(ResponseEntity.noContent().build());
     }
 
+    /** Update one api and emit the updated row. */
     @PreAuthorize("@perm.can('api', 'update')")
     @Operation(
             summary = "Update API Endpoint",
@@ -144,6 +147,7 @@ public class ApiController implements BaseController {
                         .map(saved -> ResponseEntity.ok(apiBuilder.buildVOByBO(saved))));
     }
 
+    /** Resolve the api by its id. */
     @PreAuthorize("@perm.can('api', 'get')")
     @Operation(
             summary = "Get API Endpoint by ID",
@@ -163,6 +167,7 @@ public class ApiController implements BaseController {
         return apiService.getById(id).map(api -> ResponseEntity.ok(apiBuilder.buildVOByBO(api)));
     }
 
+    /** Page apis matching the tenant-scoped filters. */
     @PreAuthorize("@perm.can('api', 'list')")
     @Operation(
             summary = "List API Endpoints",

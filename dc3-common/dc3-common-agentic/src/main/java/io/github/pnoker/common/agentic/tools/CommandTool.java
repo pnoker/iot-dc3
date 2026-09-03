@@ -41,6 +41,7 @@ public class CommandTool {
 
     private final CommandFacade commandFacade;
 
+    /** Look up the command by id. */
     public Mono<AgenticToolResult<FacadeCommandBO>> lookupCommandByIdReactive(Long commandId, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         return commandFacade
@@ -49,6 +50,7 @@ public class CommandTool {
                 .defaultIfEmpty(AgenticToolResult.notFound("Command not found for ID: " + commandId));
     }
 
+    /** Look up the commands for the given ids. */
     public Mono<AgenticToolResult<List<FacadeCommandBO>>> lookupCommandsByIdsReactive(
             List<Long> commandIds, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
@@ -62,6 +64,7 @@ public class CommandTool {
                         : AgenticToolResult.ok("Commands loaded", values));
     }
 
+    /** Search commands matching the request. */
     public Mono<AgenticToolResult<OffsetPage<FacadeCommandBO>>> searchCommandsReactive(
             String commandName, Long profileId, long offset, int limit, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
@@ -83,6 +86,7 @@ public class CommandTool {
                         : AgenticToolResult.ok("Command page loaded", value));
     }
 
+    /** List command tools matched by device id. */
     public Mono<AgenticToolResult<OffsetPage<FacadeCommandBO>>> listCommandsByDeviceIdReactive(
             Long deviceId, long offset, int limit, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
@@ -93,6 +97,7 @@ public class CommandTool {
                         : AgenticToolResult.ok("Command page loaded for device " + deviceId, value));
     }
 
+    /** List command tools matched by profile id. */
     public Mono<AgenticToolResult<OffsetPage<FacadeCommandBO>>> listCommandsByProfileIdReactive(
             Long profileId, long offset, int limit, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);

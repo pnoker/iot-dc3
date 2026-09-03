@@ -47,6 +47,7 @@ public final class SchemaFingerprintVerifier {
         this.dialect = Objects.requireNonNull(dialect, "dialect must not be null");
     }
 
+    /** Verify the stored schema fingerprint against the required contract. */
     public Mono<Void> verify() {
         String expected = properties.getSchemaFingerprint();
         if (expected == null || !expected.matches("[0-9a-fA-F]{64}")) {

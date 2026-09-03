@@ -31,9 +31,12 @@ import reactor.core.publisher.Mono;
  * @since 2016.10.1
  */
 public interface PointFacade {
+    /** Resolve the point by its id. */
     Mono<FacadePointBO> getByIdReactive(Long tenantId, Long id);
 
+    /** List points matched by ids. */
     Flux<FacadePointBO> listByIdsReactive(Long tenantId, Collection<Long> ids);
 
+    /** Page points matching the tenant-scoped filters. */
     Mono<OffsetPage<FacadePointBO>> listReactive(FacadePointOffsetQuery query);
 }

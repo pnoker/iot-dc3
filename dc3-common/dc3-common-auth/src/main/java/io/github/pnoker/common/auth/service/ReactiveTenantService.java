@@ -24,15 +24,21 @@ import reactor.core.publisher.Mono;
 /** Reactive application service for the global tenant catalog. */
 public interface ReactiveTenantService {
 
+    /** Resolve the tenant by its id. */
     Mono<TenantBO> getById(Long id);
 
+    /** Resolve the tenant by its code. */
     Mono<TenantBO> getByCode(String code);
 
+    /** Page tenants matching the tenant-scoped filters. */
     Mono<OffsetPage<TenantBO>> list(TenantFilter filter);
 
+    /** Add one tenant. */
     Mono<TenantBO> add(TenantBO tenant);
 
+    /** Update one tenant and emit the updated row. */
     Mono<TenantBO> update(TenantBO tenant);
 
+    /** Delete the tenant, reporting whether a row was removed. */
     Mono<Boolean> delete(Long id, Long operatorId, String operatorName);
 }

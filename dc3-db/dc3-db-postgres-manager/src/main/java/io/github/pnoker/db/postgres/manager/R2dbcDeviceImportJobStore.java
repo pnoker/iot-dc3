@@ -34,6 +34,7 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/** Reactive persistence port for device import job records. */
 @Repository
 @ConditionalOnClass({DatabaseClient.class, TransactionalOperator.class})
 @RequiredArgsConstructor

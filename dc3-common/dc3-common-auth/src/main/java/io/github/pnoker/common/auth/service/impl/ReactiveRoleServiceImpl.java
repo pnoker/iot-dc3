@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+/** Default role service implementation. */
 @Service
 @RequiredArgsConstructor
 public class ReactiveRoleServiceImpl implements ReactiveRoleService {

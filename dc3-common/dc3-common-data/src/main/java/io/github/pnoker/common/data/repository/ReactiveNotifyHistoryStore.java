@@ -26,8 +26,10 @@ import reactor.core.publisher.Mono;
 /** Reactive tenant-scoped persistence for notification delivery history. */
 public interface ReactiveNotifyHistoryStore {
 
+    /** Load the notify configuration history scoped to the tenant by id. */
     Mono<NotifyHistoryDO> get(long tenantId, long historyId);
 
+    /** Page notify configuration histories matching the tenant-scoped filters. */
     Mono<OffsetPage<NotifyHistoryDO>> list(
             long tenantId,
             Long ruleId,
@@ -40,12 +42,16 @@ public interface ReactiveNotifyHistoryStore {
             NotifyHistoryStatusEnum statusFlag,
             PageRequest page);
 
+    /** Delete the notify configuration history, reporting whether a row was removed. */
     Mono<Boolean> delete(long tenantId, long historyId);
 
+    /** Insert one notify configuration history and emit the stored row. */
     Mono<NotifyHistoryDO> insert(NotifyHistoryDO history);
 
+    /** Insert the history row idempotently, emitting the stored row. */
     Mono<NotifyHistoryInsertResult> insertIdempotent(NotifyHistoryDO history);
 
+    /** Update one delivery and emit the updated row. */
     Mono<Boolean> updateDelivery(
             long tenantId,
             long historyId,

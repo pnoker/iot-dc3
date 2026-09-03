@@ -19,6 +19,7 @@ package io.github.pnoker.common.manager.entity.operation;
 import io.github.pnoker.db.r2dbc.core.operation.OperationState;
 import java.time.Instant;
 import java.util.UUID;
+/** Web-facing projection of an async operation. */
 
 public record OperationView(
         UUID operationId,

@@ -35,6 +35,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/** Default message service implementation. */
 @Service
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
