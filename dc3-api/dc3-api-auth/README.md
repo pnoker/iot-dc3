@@ -5,15 +5,15 @@
 
 ## Services
 
-| Service               | RPCs                                                                   | Purpose                                  |
-|-----------------------|------------------------------------------------------------------------|------------------------------------------|
-| `TenantApi`           | `GetByCode`                                                            | resolve tenant metadata                  |
-| `UserApi`             | `GetById`, `GetByPrincipalId`                                          | resolve user identity                    |
-| `TokenApi`            | `CheckValid`                                                           | validate login/token material            |
-| `LocalCredentialApi`  | `GetByLoginName`                                                       | resolve local credentials                |
-| `PermissionApi`       | `ListPermissionCodes`                                                  | resolve effective permission codes       |
-| `ResourceRegistryApi` | `Sync`                                                                 | synchronize annotated API/menu resources |
-| `McpRuntimeApi`       | `Introspect`, `ListTools`, `ResolveTool`, `AuthorizeToolCall`, `Audit` | authorize and audit MCP tools            |
+| Service                 | RPCs                                                                               | Purpose                                    |
+|-------------------------|------------------------------------------------------------------------------------|--------------------------------------------|
+| `TenantApi`             | `GetByCode`                                                                        | resolve tenant metadata                    |
+| `UserApi`               | `GetById`, `GetByPrincipalId`                                                      | resolve user identity                      |
+| `TokenApi`              | `CheckValid`                                                                       | validate login/token material              |
+| `LocalCredentialApi`    | `GetByLoginName`                                                                   | resolve local credentials                  |
+| `PermissionApi`         | `ListPermissionCodes`                                                              | resolve effective permission codes         |
+| `ResourceRegistryApi`   | `Sync`                                                                             | synchronize annotated API/menu resources   |
+| `McpRuntimeApi`         | `Introspect`, `ListTools`, `ResolveTool`, `AuthorizeToolCall`, `CallTool`, `Audit` | authorize and audit MCP tools              |
 
 Every RPC returns its typed payload directly. Failures use standard gRPC status codes and metadata; callers never
 inspect an application-level response envelope.

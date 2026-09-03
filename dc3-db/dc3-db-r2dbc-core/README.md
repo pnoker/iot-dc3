@@ -1,5 +1,7 @@
 # DC3 DB R2DBC Core
 
+Maven module: `dc3-db-r2dbc-core`.
+
 Framework-neutral contracts for the relational persistence layer: offset/cursor
 pagination primitives, sort whitelists, signed cursor codec, tenant scope,
 operation state machine, dialect interface and shared problem-details shape.
