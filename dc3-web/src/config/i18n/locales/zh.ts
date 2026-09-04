@@ -222,6 +222,7 @@ export default {
     title: 'IoT DC3 工业 AI 物联网平台',
     heroTitle: '让智能安全地作用于物理世界',
     heroDescription: '连接设备、治理每条指令，在 AI 智能体与物理世界之间建立可信执行闭环。',
+    tagline: '连接物理世界与 AI · 面向 Physical AI 的开源工业物联网 Runtime',
     capabilities: '平台能力',
     capabilityConnect: '多协议连接',
     capabilityGovern: '策略与审计',

@@ -17,7 +17,7 @@
 
 <template>
   <main class="login-container">
-    <Particles/>
+    <LoginAtmosphere/>
     <div class="login-orb login-orb-primary" aria-hidden="true"/>
     <div class="login-orb login-orb-accent" aria-hidden="true"/>
 
@@ -102,6 +102,15 @@
       </div>
     </section>
 
+    <footer class="login-footer">
+      <span class="login-footer-main">
+        <a class="login-footer-brand" href="https://dc3.site" rel="noopener" target="_blank">IoT DC3</a>
+        <span aria-hidden="true">&nbsp;·&nbsp;</span>
+        <span class="login-footer-tagline">{{ t('login.tagline') }}</span>
+      </span>
+      <span class="login-footer-legal">{{ copyright }}</span>
+    </footer>
+
     <el-dialog v-model="changePasswordVisible" :title="t('login.changePasswordTitle')" width="420px">
       <el-alert :closable="false" :title="changePasswordHint" class="mb-4" show-icon type="warning"/>
       <el-form ref="changePasswordRef" :model="changePasswordData" :rules="changePasswordRule" label-width="0">
@@ -143,7 +152,7 @@ import {failMessage, successMessage} from '@/utils/notificationUtil';
 
 import AppPreferences from '@/components/layout/AppPreferences.vue';
 import BrandLockup from '@/components/brand/BrandLockup.vue';
-import Particles from '@/components/particles/Particles.vue';
+import LoginAtmosphere from '@/components/login-atmosphere/LoginAtmosphere.vue';
 
 interface LoginFormModel {
   tenant: string;
@@ -161,6 +170,9 @@ const {t} = useI18n();
 const authStore = useAuthStore();
 const formDataRef = ref<FormInstance>();
 const loading = ref(false);
+// The range end tracks the current year at render time (2016–2026 today,
+// 2016–2027 next year), matching the family sites' footer contract.
+const copyright = computed(() => `AGPL-3.0 · © 2016–${new Date().getFullYear()}`);
 
 const tenant = typeof authStore.getTenant === 'string' ? authStore.getTenant : 'default';
 const name = typeof authStore.getName === 'string' ? authStore.getName : 'dc3';

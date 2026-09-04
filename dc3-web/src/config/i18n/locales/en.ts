@@ -224,6 +224,7 @@ export default {
     title: 'IoT DC3 Industrial AI IoT Platform',
     heroTitle: 'Turn intelligence into trusted physical action.',
     heroDescription: 'Connect devices, govern every command, and close the loop between AI agents and the physical world.',
+    tagline: 'Connecting the physical world with AI · Open-source industrial IoT runtime for Physical AI',
     capabilities: 'Platform capabilities',
     capabilityConnect: 'Multi-protocol connection',
     capabilityGovern: 'Policy and audit',

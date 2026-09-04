@@ -33,12 +33,9 @@
   padding: clamp(24px, 5vh, 56px) clamp(24px, 6vw, 88px);
   overflow: hidden;
   background:
-    linear-gradient(var(--dc3-login-grid-color) 1px, transparent 1px),
-    linear-gradient(90deg, var(--dc3-login-grid-color) 1px, transparent 1px),
     radial-gradient(circle at 16% 14%, var(--dc3-ambient-primary), transparent 34%),
     radial-gradient(circle at 86% 10%, var(--dc3-ambient-secondary), transparent 30%),
     var(--dc3-bg-canvas);
-  background-size: 48px 48px, 48px 48px, auto, auto, auto;
   color: var(--dc3-text-primary);
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   transition: background var(--dc3-duration-slow) var(--dc3-ease-standard);
@@ -69,6 +66,32 @@
   top: -160px;
   right: -100px;
   background: var(--dc3-ambient-secondary);
+}
+
+// Sits in the container's bottom padding strip on desktop and tablet; drops
+// into normal flow under the card on phones (see the xs block at EOF).
+.login-footer {
+  position: absolute;
+  z-index: 3;
+  inset-inline: 0;
+  bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dc3-space-2) var(--dc3-space-4);
+  align-items: baseline;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--dc3-text-muted);
+
+  .login-footer-brand {
+    font-weight: 600;
+    color: var(--dc3-text-regular);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--dc3-text-brand);
+    }
+  }
 }
 
 .login-shell {
@@ -347,8 +370,8 @@
   }
 
   .login-story {
-    min-height: 176px;
-    padding: var(--dc3-space-3) var(--dc3-space-3) var(--dc3-space-4);
+    // clear the floating preferences capsule pinned to the shell's top-right
+    padding: calc(var(--dc3-space-6) + 40px) var(--dc3-space-3) var(--dc3-space-4);
     border-right: none;
     border-bottom: 1px solid var(--dc3-border-base);
   }
@@ -376,6 +399,8 @@
 
   .login-card-brand {
     display: inline-flex;
+    // roomier than the hero pill so the lockup breathes on small screens
+    padding: 7px 24px 7px 10px;
     margin-bottom: var(--dc3-space-5);
   }
 
@@ -385,5 +410,14 @@
 
   .login-subtitle {
     margin-bottom: var(--dc3-space-5);
+  }
+}
+
+// Phone: the footer flows under the full-width card instead of overlaying it.
+@media (max-width: $breakpoint-xs-max) {
+  .login-footer {
+    position: static;
+    // keep clear of the card's rounded bottom edge
+    padding: var(--dc3-space-4) var(--dc3-space-3) var(--dc3-space-3);
   }
 }
