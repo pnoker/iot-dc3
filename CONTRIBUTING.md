@@ -82,6 +82,9 @@ Allowed types are `feat`, `fix`, `perf`, `refactor`, `docs`, `build`, `ci`, `tes
 `revert`. Use English, keep the subject specific, and avoid vague descriptions such as `update`, `fix`, `misc`, `wip`,
 or `.` because release notes are generated from commit history.
 
+A commit that only updates the generated changelog must use exactly `docs(release): update generated changelog`, and it
+must be kept separate from behaviour, configuration, or tooling changes so the generator can skip it.
+
 The repository provides a Husky `pre-commit` hook under `.husky/`. After frontend dependencies are installed, it runs
 lint-staged and applies ESLint to staged JavaScript, TypeScript, and Vue files.
 
@@ -105,7 +108,8 @@ Before tagging a release, generate the categorized changelog from git:
 make changelog
 ```
 
-By default this reads the current version from `pom.xml`, compares `HEAD` with the latest reachable `v*`
+`dc3/doc/CHANGE.md` is generated from Git history: do not hand-edit the current release block unless fixing generator
+output. By default the command reads the current version from `pom.xml`, compares `HEAD` with the latest reachable `v*`
 (semver) tag, and updates `dc3/doc/CHANGE.md`. You can override the range or version when needed:
 
 ```bash
