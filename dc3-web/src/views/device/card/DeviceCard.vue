@@ -24,6 +24,7 @@
           :icon="icon"
           :name="data.deviceName"
           :status-title="$t('common.enableFlag')"
+          :copy-label="$t('device.card.copyDeviceId')"
           @copy-id="copy(data.id, $t('device.card.copyDeviceId'))"
         >
           <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">{{ $t('status.online') }}</el-tag>
@@ -67,6 +68,7 @@
           :disable-title="$t('common.confirmDisable', {name: $t('common.entityDevice')})"
           :enable-title="$t('common.confirmEnable', {name: $t('common.entityDevice')})"
           :enabled="enabled"
+          :busy="busy"
           @delete="emitDelete"
           @detail="detail"
           @disable="emitToggle('disable')"
@@ -84,7 +86,6 @@ import {Edit, Promotion, Sunset} from '@element-plus/icons-vue';
 import router from '@/config/router';
 import {copy} from '@/utils/commonUtil';
 import {timestamp} from '@/utils/dateUtil';
-import {successMessage} from '@/utils/notificationUtil';
 import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
 import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
@@ -96,17 +97,18 @@ const props = defineProps({
   data: {type: Object as PropType<DeviceRecord>, required: true},
   driver: {type: Object as PropType<Record<string, any>>, default: () => ({})},
   icon: {type: String, default: 'images/common/device.png'},
+  busy: {type: Boolean, default: false},
 });
 
 const emit = defineEmits(['disable', 'enable', 'delete']);
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const emitToggle = (name: 'disable' | 'enable') => {
-  emit(name, props.data, () => successMessage());
+  emit(name, props.data);
 };
 
 const emitDelete = () => {
-  emit('delete', props.data, () => successMessage());
+  emit('delete', props.data);
 };
 
 const edit = () => {

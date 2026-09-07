@@ -57,7 +57,7 @@ describe('thing model profile/device flow', () => {
 
     // changeProfile() must fan out to all three siblings — losing any one
     // leaves stale matrix data after the user picks a different profile.
-    expect(source).toMatch(/const changeProfile = \(\) => \{\s*pointInfo\(\);\s*commandInfo\(\);\s*eventInfo\(\);/);
+    expect(source).toMatch(/const changeProfile = \(\) => \{[\s\S]*pointInfo\(context\),[\s\S]*commandInfo\(context\),[\s\S]*eventInfo\(context\),/);
   });
 
   it('keeps thing model entity codes server-generated rather than user-input form fields', () => {

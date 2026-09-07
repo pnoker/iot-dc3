@@ -323,8 +323,15 @@ async function testActualDelete(page, watch, testCase) {
   await page.getByText(name).first().waitFor({state: 'visible', timeout: 10000});
 
   const deleteMark = markWatch(watch);
-  await page.getByRole('button', {name: 'Delete'}).first().click();
-  const confirmButton = page.getByRole('button', {name: /^(Yes|Confirm|确定|确认)$/}).last();
+  await page.getByRole('button', {name: 'Delete', exact: true}).first().click();
+  // Element Plus teleports the popover outside the table and may briefly
+  // render the wrapper before its inner `.el-popconfirm` gets the visible
+  // state. Target the final visible action button instead of depending on a
+  // particular teleport wrapper/class hierarchy.
+  const confirmButton = page.locator(
+    '.el-popover.el-popper:visible .el-popconfirm__action button.el-button--primary'
+  ).last();
+  await confirmButton.waitFor({state: 'visible', timeout: 5000});
   await confirmButton.click();
   await waitPage(page);
   await assertClean(`${testCase.name} confirmed delete`, watch, deleteMark);

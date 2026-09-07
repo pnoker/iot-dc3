@@ -274,11 +274,11 @@ export const createResourceConfig = (t: Translator, handlers: ResourceHandlers):
     {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true},
   ],
   columns: [
-    {prop: 'resourceName', label: t('settings.resource.resourceName'), minWidth: 220},
-    {prop: 'resourceCode', label: t('settings.resource.resourceCode'), kind: 'code', minWidth: 180},
-    {prop: 'serviceName', label: t('settings.resource.serviceName'), minWidth: 160},
-    {prop: 'resourceTypeFlag', label: t('settings.resource.resourceType'), minWidth: 120},
-    {prop: 'resourceScopeFlag', label: t('settings.resource.resourceScope'), minWidth: 100},
+    {prop: 'resourceName', label: t('settings.resource.resourceName'), minWidth: 220, mobile: 'primary'},
+    {prop: 'resourceCode', label: t('settings.resource.resourceCode'), kind: 'code', minWidth: 180, mobile: 'detail'},
+    {prop: 'serviceName', label: t('settings.resource.serviceName'), minWidth: 160, mobile: 'detail'},
+    {prop: 'resourceTypeFlag', label: t('settings.resource.resourceType'), minWidth: 120, mobile: 'detail'},
+    {prop: 'resourceScopeFlag', label: t('settings.resource.resourceScope'), minWidth: 100, mobile: 'detail'},
     {
       prop: 'entityId',
       label: t('settings.resource.entity'),
@@ -287,10 +287,11 @@ export const createResourceConfig = (t: Translator, handlers: ResourceHandlers):
       formatter: (row, ctx) => formatEntityId(row, ctx),
       linkable: (row) => isEntityLinkable(row),
       onClick: handlers.onEntityClick,
+      mobile: 'detail',
     },
-    {prop: 'remark', label: t('common.remark'), minWidth: 140},
-    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90},
-    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165},
+    {prop: 'remark', label: t('common.remark'), minWidth: 140, mobile: 'hidden'},
+    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90, mobile: 'detail'},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165, mobile: 'hidden'},
   ],
   relations: [
     {

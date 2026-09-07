@@ -35,9 +35,9 @@ dc3-web 是面向 IoT 运维人员的 Vue 3 管理控制台。其体验面向三
 **A2. 呈现按设备类重建，而不是缩放。**布局经流式原语（`minmax`、`auto-fit`、可换行 flex）跟随容器几何；粗糙的设备类切换
 才是断点的唯一职责。*违反特征：*一次性 `@media` 补丁越堆越多。
 
-**A3. 输入能力决定交互模式。**悬停、右键与行内编辑是鼠标语言；44x44 目标、底部抽屉与滑动是拇指语言。指针能力
+**A3. 输入能力决定交互模式。**悬停、右键与行内编辑是鼠标语言；底部抽屉与滑动是拇指语言。指针能力
 （fine/coarse、悬停）是运行期属性，不是媒体查询的猜测——带键盘的平板仍然配得上鼠标交互。*违反特征：*只有悬停才能触发的
-操作，或低于 44px 的触控目标。
+操作。注：v7 起按产品决策，控制目标不再放大到 44px——三端统一 32px 密度，触控目标尺寸让位于跨端视觉一致性。
 
 **A4. 反馈时延就是被感知的产品。**100ms 同步反馈、<1s 骨架屏，再往上是乐观更新。*违反特征：*在网络应答之前毫无反应的
 按钮。
@@ -101,7 +101,7 @@ JavaScript（`useBreakpoint`）与 CSS 必须都读取这一契约——任何�
 - 360px 到 2560px 之间无页面级横向滚动（表格容器豁免）；
   `document.documentElement.scrollWidth <= window.innerWidth`。
 - Lighthouse 移动端：perf >= 90、CLS <= 0.1、LCP <= 2.5s。
-- 100% 的触控目标 >= 44x44；768px 以下对话框全屏。
+- 控制尺寸三端一致（32px 默认密度，图标/字号跨端恒定）；768px 以下对话框全屏。
 - SCSS 中零硬编码颜色/间距字面量（token lint 闸门）。
 - Playwright 运行桌面、平板与移动视口项目；axe 扫描干净；关键页面执行视觉回归。
 
@@ -133,3 +133,23 @@ md-max、1 列映射到 xs-max。tests/guardrails/breakpoint-contract.test.ts �
 设备、驱动、profile、label、point_value、alarm/point、事件/命令历史）现已在每个终端设闸，闸门测试合计 48 个。仍待解决：
 L4 模板推广到其余约 100 个视图（移动端摘要卡片列表受阻于 L1 摘要 schema 决策）、CI 中的 Lighthouse 预算 + axe-core、
 token lint。
+
+2026-09：v7 —— 三端统一控制尺寸（产品决策）。(1) 删除基于宽度/指针的 44px 触控放大（global.scss、NavMenu、
+SlaBadge、AppPreferences、AgenticAssistant）：同一控件在三端保持同一密度——输入框/按钮/分页 32px、导航项 36px，
+图标字形与字号跨端恒定。(2) ToolCard 分页统一 default 尺寸，pager-count 修正为合法奇数（移动端 5 / 其余 7），消除
+Element Plus 校验告警与移动端回退 7 页按钮的形态分裂。(3) 触屏可用性权衡：控制目标回归 ~32px，低于 44px 拇指标准，
+以换取三端视觉一致；仅保留无 hover 时的交互可见性逻辑（StatCard 刷新入口常显、AgenticAssistant 消息工具栏常显），
+不改变尺寸。对应单测覆盖 tool-card / layout / use-breakpoint。
+
+2026-09：v6 —— 全面交互稳定性与三端列表体验收口。(1) 列表页统一 loading、空结果、错误与 retry 状态；详情抽屉/弹窗增加
+错误壳、骨架与关联数据独立重试，避免失败时出现空白或误导性内容。(2) 所有新增/编辑/删除/启停/导入及远程选项请求增加
+请求序列、表单 session 与卸载失效保护；保存期间锁定重复提交，关闭脏表单会明确确认，迟到响应不会污染新页面或新草稿。(3)
+Agentic、MCP、凭证和告警模块补齐流式/上传/动作竞态、pending/附件状态、重试与移动焦点陷阱；敏感字段不回显。(4) 移动端
+列表切换为摘要卡片，长 ID、代码和消息可换行，桌面/平板保留可比较的表格或网格；统一设计 token、触控目标和弹窗宽度。
+(5) 对 mock 构建执行三端 Chromium 响应式 E2E（tests/e2e/specs/responsive.spec.ts）；新增组件边界闸门，覆盖祖先
+`overflow:hidden` 时仍必须可达的工具栏、分页、时间范围、Dashboard 工具和 MCP 元数据。(6) 验证命令：`pnpm check`、
+`pnpm lint:check`、`pnpm build`、`pnpm test:ci` 与 `pnpm run test:e2e`（chromium、desktop、tablet、mobile 四个项目，
+mock 构建），并对全部路由执行三视口溢出/弹窗边界扫描。(7) `useMediaQuery` 在浏览器 setup 阶段
+同步解析当前断点，消除桌面/平板首帧误显示移动布局的闪烁，并由单测覆盖。Lighthouse 性能预算、axe-core 全量扫描、全路由人工视觉
+走查和完整真实后端业务 E2E 尚未执行；已完成登录、首页、设备、设置、弹窗及三端壳层的定向人工抽查，不能将其结果等同于完整发布验收。(8)
+首页统计卡区分加载骨架、请求失败和已知数值；位号值按新鲜度着色、固定字号并支持键盘复制，避免默认值误导和装饰动画干扰。

@@ -86,7 +86,7 @@ export function registerCrud(spec: CrudSpec): void {
     if (i >= 0) rows()[i] = {...rows()[i], ...ctx.body, operateTime: stamp()};
     return responseOf(ctx.config, ok(String(ctx.body?.id ?? '')));
   });
-  on('post', `${baseUrl}/delete`, (ctx) => {
+  on(['post', 'delete'], `${baseUrl}/delete`, (ctx) => {
     const id = ctx.params.id;
     const i = rows().findIndex((r) => String(r.id) === String(id));
     if (i >= 0) rows().splice(i, 1);

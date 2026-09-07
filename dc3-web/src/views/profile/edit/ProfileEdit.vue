@@ -17,12 +17,26 @@
 
 <template>
   <div>
-    <base-card>
-      <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
+    <base-card v-loading="reactiveData.loading">
+      <el-alert
+        v-if="reactiveData.status === 'error'"
+        :closable="false"
+        :title="$t('common.loadFailed')"
+        class="profile-edit__error"
+        show-icon
+        type="error"
+      >
+        <el-button :loading="reactiveData.loading" link type="danger" @click="profile()">
+          {{ $t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-empty v-else-if="!reactiveData.loading && !reactiveData.profileFormData.id" :description="$t('common.empty')" />
+      <el-tabs v-else v-model="reactiveData.active" class="profile-edit__tabs" @tab-click="changeActive">
         <el-tab-pane :label="$t('profile.edit.profileConfig')" name="profileConfig">
           <info-card
             :form-model="reactiveData.profileFormData"
             :rules="formRule"
+            :saving="reactiveData.saving"
             @reset="profileReset"
             @save="profileSave"
           >
@@ -70,4 +84,29 @@
 
 <style lang="scss" scoped>
 @use '@/styles/edit-card.scss';
+
+.profile-edit__error {
+  margin-bottom: var(--dc3-space-3);
+}
+
+.profile-edit__tabs {
+  min-width: 0;
+
+  :deep(.el-tabs__nav-wrap) {
+    overflow-x: auto;
+  }
+
+  :deep(.el-tabs__nav) {
+    min-width: max-content;
+  }
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  .profile-edit__tabs {
+    :deep(.el-tabs__item) {
+      min-height: var(--dc3-touch-target);
+      padding: 0 var(--dc3-space-3);
+    }
+  }
+}
 </style>

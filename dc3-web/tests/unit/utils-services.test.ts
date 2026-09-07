@@ -79,16 +79,62 @@ describe('utils (services)', () => {
   describe('asyncLoaderUtil', () => {
     it('tracks async loader success, swallowed errors, and rethrown errors', async () => {
       const {useAsyncLoader} = await import('@/utils/asyncLoaderUtil');
-      const {loading, run} = useAsyncLoader();
+      const {error, loading, run, status} = useAsyncLoader();
 
       await expect(run(async () => 'ok')).resolves.toBe('ok');
       expect(loading.value).toBe(false);
+      expect(status.value).toBe('success');
+      expect(error.value).toBeNull();
 
       await expect(run(async () => Promise.reject(new Error('swallowed')))).resolves.toBeUndefined();
       expect(loading.value).toBe(false);
+      expect(status.value).toBe('error');
+      expect(error.value).toBeInstanceOf(Error);
 
       await expect(run(async () => Promise.reject(new Error('rethrown')), {rethrow: true})).rejects.toThrow('rethrown');
       expect(loading.value).toBe(false);
+      expect(status.value).toBe('error');
+    });
+
+    it('commits only the latest request result and ignores stale failures', async () => {
+      const {useAsyncLoader} = await import('@/utils/asyncLoaderUtil');
+      const {error, loading, run, status} = useAsyncLoader();
+      const commits: string[] = [];
+      let resolveFirst!: (value: string) => void;
+      let resolveSecond!: (value: string) => void;
+      const firstPromise = new Promise<string>((resolve) => {
+        resolveFirst = resolve;
+      });
+      const secondPromise = new Promise<string>((resolve) => {
+        resolveSecond = resolve;
+      });
+
+      const firstRun = run(() => firstPromise, {apply: (value) => commits.push(value)});
+      const secondRun = run(() => secondPromise, {apply: (value) => commits.push(value)});
+      resolveSecond('latest');
+
+      await expect(secondRun).resolves.toBe('latest');
+      expect(commits).toEqual(['latest']);
+      expect(status.value).toBe('success');
+
+      resolveFirst('stale');
+      await expect(firstRun).resolves.toBeUndefined();
+      expect(commits).toEqual(['latest']);
+      expect(loading.value).toBe(false);
+      expect(error.value).toBeNull();
+
+      let rejectStale!: (reason: Error) => void;
+      const staleFailure = new Promise<string>((_resolve, reject) => {
+        rejectStale = reject;
+      });
+      const staleRun = run(() => staleFailure, {apply: (value) => commits.push(value)});
+      await run(async () => 'current', {apply: (value) => commits.push(value)});
+      rejectStale(new Error('stale failure'));
+
+      await expect(staleRun).resolves.toBeUndefined();
+      expect(commits).toEqual(['latest', 'current']);
+      expect(status.value).toBe('success');
+      expect(error.value).toBeNull();
     });
   });
 

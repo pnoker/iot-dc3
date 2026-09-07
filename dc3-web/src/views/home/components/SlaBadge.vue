@@ -29,14 +29,14 @@
     <el-icon class="sla-badge__icon">
       <Warning/>
     </el-icon>
-    <div v-if="backlog.over24h > 0" class="sla-badge__chip sla-badge__chip--sla" @click="jumpTo('sla')">
+    <button v-if="backlog.over24h > 0" class="sla-badge__chip sla-badge__chip--sla" type="button" @click="jumpTo('sla')">
       <span class="sla-badge__value">{{ backlog.over24h }}</span>
       <span class="sla-badge__label">{{ $t('home.sla.unackOver24h') }}</span>
-    </div>
-    <div v-if="silentCount > 0" class="sla-badge__chip sla-badge__chip--avail" @click="jumpTo('availability')">
+    </button>
+    <button v-if="silentCount > 0" class="sla-badge__chip sla-badge__chip--avail" type="button" @click="jumpTo('availability')">
       <span class="sla-badge__value">{{ silentCount }}</span>
       <span class="sla-badge__label">{{ $t('home.sla.silentDevices') }}</span>
-    </div>
+    </button>
   </div>
 </template>
 
@@ -59,14 +59,24 @@ const visible = computed(() => backlog.over24h > 0 || silentCount.value > 0);
 const warn = computed(() => backlog.over24h > 0);
 
 const load = () =>
-  run(async () => {
-    const [a, s]: [AgingBacklog, SilentSource[]] = await Promise.all([
-      alertAging(),
-      silentSources(7, 15, 200),
-    ]);
-    Object.assign(backlog, a ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
-    silentCount.value = (s ?? []).length;
-  });
+  run(
+    async () => {
+      const [agingBacklog, silentSourceRows]: [AgingBacklog, SilentSource[]] = await Promise.all([
+        alertAging(),
+        silentSources(7, 15, 200),
+      ]);
+      return {agingBacklog, silentCount: (silentSourceRows ?? []).length};
+    },
+    {
+      apply: (result) => {
+        Object.assign(
+          backlog,
+          result.agingBacklog ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0}
+        );
+        silentCount.value = result.silentCount;
+      },
+    }
+  );
 
 const jumpTo = (tab: 'sla' | 'availability') => {
   router.push({name: 'settingsAlarmOverview', query: {tab}}).catch(() => {
@@ -82,17 +92,17 @@ defineExpose({refresh: load});
   display: flex;
   align-items: center;
   gap: var(--dc3-space-2);
-  padding: var(--dc3-space-2) var(--dc3-space-4);
+  padding: var(--dc3-space-1) var(--dc3-space-4);
   border-radius: var(--dc3-radius-md);
-  background: #fdf6ec;
-  border: 1px solid #faecd8;
-  color: #e6a23c;
+  background: var(--el-color-warning-light-9);
+  border: 1px solid var(--el-color-warning-light-7);
+  color: var(--el-color-warning);
   font-size: 13px;
 
   &--warn {
-    background: #fef0f0;
-    border-color: #fde2e2;
-    color: #f56c6c;
+    background: var(--el-color-danger-light-9);
+    border-color: var(--el-color-danger-light-7);
+    color: var(--el-color-danger);
   }
 
   .sla-badge__icon {
@@ -100,26 +110,55 @@ defineExpose({refresh: load});
   }
 
   .sla-badge__chip {
+    position: relative;
+    isolation: isolate;
+    appearance: none;
     display: inline-flex;
-    align-items: baseline;
+    align-items: center;
     gap: var(--dc3-space-1);
-    padding: 2px var(--dc3-space-2);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.5);
+    min-height: var(--dc3-space-8);
+    padding: 0 var(--dc3-space-2);
+    border: 0;
+    border-radius: var(--dc3-radius-full);
+    background: transparent;
+    font: inherit;
+    line-height: 1.2;
+    white-space: nowrap;
     cursor: pointer;
-    transition: background-color 0.12s ease;
 
-    &:hover {
-      background: #ffffff;
+    &::before {
+      position: absolute;
+      z-index: 0;
+      inset: 2px 0;
+      border-radius: inherit;
+      background: var(--dc3-bg-elevated);
+      content: '';
+      pointer-events: none;
+      transition: background-color var(--dc3-duration-fast) var(--dc3-ease-standard);
+    }
+
+    > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    &:hover::before,
+    &:focus-visible::before {
+      background: var(--dc3-bg-elevated-strong);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: var(--dc3-focus-ring);
     }
   }
 
   .sla-badge__chip--sla {
-    color: #f56c6c;
+    color: var(--el-color-danger);
   }
 
   .sla-badge__chip--avail {
-    color: #e6a23c;
+    color: var(--el-color-warning);
   }
 
   .sla-badge__value {

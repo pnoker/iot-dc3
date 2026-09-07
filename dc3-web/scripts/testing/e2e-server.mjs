@@ -33,10 +33,19 @@ const env = {
   ...process.env,
 };
 
-const defaultBaseUrl = `http://localhost:${env.APP_CLI_PORT || '8080'}`;
+const defaultBaseUrl = 'http://127.0.0.1:4174';
 const baseUrl = new URL(env.E2E_BASE_URL || defaultBaseUrl);
 const host = env.E2E_HOST || '0.0.0.0';
-const port = Number(env.E2E_PORT || baseUrl.port || env.APP_CLI_PORT || 8080);
+const portValue = env.E2E_PORT || baseUrl.port;
+const port = Number(portValue);
+// Fail fast on a missing/invalid port: Number('') === 0 and listen(0) would
+// silently bind a random port that Playwright's webServer poll never finds.
+if (!portValue || !Number.isInteger(port) || port <= 0) {
+  console.error(
+    `Invalid E2E server port "${portValue}". Set E2E_PORT or use an E2E_BASE_URL with an explicit port.`
+  );
+  process.exit(1);
+}
 const apiPrefix = normalizeApiPrefix(env.APP_API_PREFIX || '/api');
 const apiTarget = new URL(
   env.E2E_API_TARGET || `${env.APP_API_PATH || 'http://localhost'}:${env.APP_API_PORT || '8000'}`
@@ -172,6 +181,9 @@ function serveStatic(req, res, pathname) {
   res.writeHead(200, {
     'content-length': size,
     'content-type': contentType(file),
+    'content-security-policy': "frame-ancestors 'none'",
+    'x-content-type-options': 'nosniff',
+    'referrer-policy': 'no-referrer',
   });
 
   if (req.method === 'HEAD') {

@@ -16,7 +16,9 @@
  */
 
 // Reactive matchMedia binding (L2, A2). SSR/mock-safe: without window the
-// query reports the default until the component mounts.
+// query reports the default until the component mounts. In a browser, resolve
+// the current value during setup so responsive branches do not flash the
+// fallback layout for the first render.
 
 import {onBeforeUnmount, onMounted, ref, type Ref} from 'vue';
 
@@ -27,9 +29,12 @@ import {onBeforeUnmount, onMounted, ref, type Ref} from 'vue';
  * @param initial Initial value before mount (SSR / no-window environments)
  */
 export const useMediaQuery = (query: string, initial = false): Ref<boolean> => {
-  const matches = ref(initial);
-
   let mql: MediaQueryList | undefined;
+  if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+    mql = window.matchMedia(query);
+  }
+
+  const matches = ref(mql?.matches ?? initial);
 
   const sync = () => {
     if (mql) matches.value = mql.matches;
@@ -40,7 +45,7 @@ export const useMediaQuery = (query: string, initial = false): Ref<boolean> => {
       // Test/build environments without matchMedia keep the initial value.
       return;
     }
-    mql = window.matchMedia(query);
+    mql ??= window.matchMedia(query);
     sync();
     mql.addEventListener('change', sync);
   });

@@ -18,10 +18,26 @@
 <template>
   <div>
     <blank-card>
-      <el-tabs v-model="reactiveData.active">
+      <el-alert
+        v-if="reactiveData.status === 'error'"
+        :closable="false"
+        :title="$t('common.loadFailed')"
+        class="entity-page-error"
+        show-icon
+        type="error"
+      >
+        <el-button :loading="reactiveData.loading" link type="danger" @click="load">
+          {{ $t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-empty
+        v-if="reactiveData.status === 'error' && !reactiveData.data.id"
+        :description="$t('common.loadFailed')"
+      />
+      <el-tabs v-else v-model="reactiveData.active" v-loading="reactiveData.loading">
         <el-tab-pane :label="$t('settings.label.detailTitle')" name="detail">
           <detail-card>
-            <el-descriptions :column="2" border>
+            <el-descriptions :column="isMobile ? 1 : 2" border>
               <el-descriptions-item :label="$t('settings.label.labelName')">
                 {{ reactiveData.data.labelName || '-' }}
               </el-descriptions-item>
@@ -43,7 +59,7 @@
               <el-descriptions-item :label="$t('common.enable')">
                 <enable-tag :value="reactiveData.data.enableFlag"/>
               </el-descriptions-item>
-              <el-descriptions-item :label="$t('common.remark')" :span="2">
+              <el-descriptions-item :label="$t('common.remark')" :span="isMobile ? 1 : 2">
                 {{ reactiveData.data.remark || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.creatorName')">
@@ -67,7 +83,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, reactive} from 'vue';
+import {onBeforeUnmount, onMounted, reactive, watch} from 'vue';
 import {useRoute} from 'vue-router';
 
 import {getLabelById} from '@/api/label';
@@ -75,28 +91,62 @@ import BlankCard from '@/components/card/blank/BlankCard.vue';
 import DetailCard from '@/components/card/detail/DetailCard.vue';
 import EnableTag from '@/components/tag/EnableTag.vue';
 import {timestampLabel} from '@/utils/dateUtil';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 
 const route = useRoute();
+const {isMobile} = useBreakpoint();
 
 const reactiveData = reactive({
   id: route.query.id as string,
   active: (route.query.active as string) || 'detail',
+  loading: true,
+  status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
   data: {} as Record<string, any>,
 });
+let requestId = 0;
 
 const load = () => {
-  if (!reactiveData.id) return;
-  getLabelById(reactiveData.id)
+  const currentRequestId = ++requestId;
+  const labelId = String(reactiveData.id || '');
+  if (!labelId) {
+    reactiveData.status = 'error';
+    reactiveData.loading = false;
+    return;
+  }
+  reactiveData.loading = true;
+  reactiveData.status = 'loading';
+  reactiveData.data = {};
+  getLabelById(labelId)
     .then((res: any) => {
+      if (currentRequestId !== requestId || labelId !== String(reactiveData.id || '')) return;
       reactiveData.data = res || {};
+      reactiveData.status = reactiveData.data.id ? 'success' : 'error';
     })
     .catch(() => {
-      // handled globally
+      if (currentRequestId === requestId) reactiveData.status = 'error';
+    })
+    .finally(() => {
+      if (currentRequestId === requestId) reactiveData.loading = false;
     });
 };
 
+watch(
+  () => route.query.id,
+  (id) => {
+    const nextId = String(id || '');
+    if (nextId !== String(reactiveData.id || '')) {
+      reactiveData.id = nextId;
+      load();
+    }
+  },
+);
+
 onMounted(() => {
   load();
+});
+
+onBeforeUnmount(() => {
+  requestId += 1;
 });
 </script>
 

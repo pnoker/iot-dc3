@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {defineComponent, reactive} from 'vue';
+import {defineComponent, onBeforeUnmount, reactive, watch} from 'vue';
 
 import {useRoute} from 'vue-router';
 import router from '@/config/router';
@@ -30,6 +30,7 @@ import deviceCard from '@/views/device/card/DeviceCard.vue';
 import pointCard from '@/views/point/card/PointCard.vue';
 
 import {timestamp} from '@/utils/dateUtil';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 
 export default defineComponent({
   components: {
@@ -40,61 +41,103 @@ export default defineComponent({
   },
   setup() {
     const route = useRoute();
+    const {isMobile} = useBreakpoint();
 
     const reactiveData = reactive({
-      id: route.query.id as string,
+      id: String(route.query.id ?? ''),
       active: (route.query.active as string) || 'detail',
+      loading: true,
+      status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
+      relationLoading: true,
+      relationStatus: 'idle' as 'idle' | 'loading' | 'success' | 'error',
       driverTable: {} as Record<string, any>,
       statusTable: {} as Record<string, any>,
       data: {} as any,
       listDeviceData: [] as any[],
     });
+    let pointRequestId = 0;
+    let relationRequestId = 0;
 
     const point = () => {
-      getPointById(reactiveData.id)
+      const currentRequestId = ++pointRequestId;
+      const pointId = String(reactiveData.id || '');
+      reactiveData.loading = true;
+      reactiveData.status = 'loading';
+      reactiveData.data = {};
+      if (!pointId) {
+        reactiveData.loading = false;
+        reactiveData.status = 'error';
+        return Promise.resolve();
+      }
+      return getPointById(pointId)
         .then((res) => {
-          reactiveData.data = res;
+          if (currentRequestId !== pointRequestId || pointId !== String(reactiveData.id || '')) return;
+          reactiveData.data = res || {};
+          reactiveData.status = reactiveData.data.id ? 'success' : 'error';
         })
         .catch(() => {
-          // nothing to do
+          if (currentRequestId === pointRequestId) reactiveData.status = 'error';
+        })
+        .finally(() => {
+          if (currentRequestId === pointRequestId) reactiveData.loading = false;
         });
     };
 
     const device = () => {
-      getDeviceStatisticsByPointId(reactiveData.id)
+      const currentRequestId = ++relationRequestId;
+      const pointId = String(reactiveData.id || '');
+      reactiveData.relationLoading = true;
+      reactiveData.relationStatus = 'loading';
+      reactiveData.listDeviceData = [];
+      reactiveData.driverTable = {};
+      reactiveData.statusTable = {};
+      if (!pointId) {
+        reactiveData.relationLoading = false;
+        reactiveData.relationStatus = 'error';
+        return Promise.resolve();
+      }
+      return getDeviceStatisticsByPointId(pointId)
         .then((res) => {
+          if (currentRequestId !== relationRequestId || pointId !== String(reactiveData.id || '')) return;
           reactiveData.listDeviceData = res?.devices || [];
 
           // driver
           const driverIds = Array.from(new Set(reactiveData.listDeviceData.map((device) => device.driverId))).filter(
             Boolean
           );
-          if (driverIds.length > 0) {
-            listDriverByIds(driverIds)
-              .then((res) => {
-                reactiveData.driverTable = res;
-              })
-              .catch(() => {
-                // nothing to do
-              });
-
-            Promise.all(driverIds.map((driverId) => listDeviceStatusByDriverId(driverId)))
-              .then((resList) => {
-                reactiveData.statusTable = resList.reduce<Record<string, any>>((pre, cur) => {
-                  return {...pre, ...(cur || {})};
-                }, {});
-              })
-              .catch(() => {
-                // nothing to do
-              });
-          } else {
-            reactiveData.driverTable = {};
-            reactiveData.statusTable = {};
+          if (driverIds.length === 0) return;
+          return Promise.allSettled([
+            listDriverByIds(driverIds),
+            Promise.all(driverIds.map((driverId) => listDeviceStatusByDriverId(driverId))),
+          ]).then(([drivers, statuses]) => {
+            if (currentRequestId !== relationRequestId) return;
+            let partialFailure = false;
+            if (drivers.status === 'fulfilled') reactiveData.driverTable = drivers.value || {};
+            else partialFailure = true;
+            if (statuses.status === 'fulfilled') {
+              reactiveData.statusTable = statuses.value.reduce<Record<string, any>>((pre, cur) => ({
+                ...pre,
+                ...(cur || {}),
+              }), {});
+            } else partialFailure = true;
+            reactiveData.relationStatus = partialFailure ? 'error' : 'success';
+          });
+        })
+        .then(() => {
+          if (currentRequestId === relationRequestId && reactiveData.relationStatus === 'loading') {
+            reactiveData.relationStatus = 'success';
           }
         })
         .catch(() => {
-          // nothing to do
+          if (currentRequestId === relationRequestId) reactiveData.relationStatus = 'error';
+        })
+        .finally(() => {
+          if (currentRequestId === relationRequestId) reactiveData.relationLoading = false;
         });
+    };
+
+    const reload = () => {
+      load();
     };
 
     const deviceName = () => {
@@ -108,16 +151,43 @@ export default defineComponent({
       });
     };
 
-    point();
-    device();
+    const load = () => {
+      void point();
+      void device();
+    };
+
+    watch(
+      () => [route.query.id, route.query.active],
+      ([id, active]) => {
+        const nextId = String(id ?? '');
+        if (nextId !== String(reactiveData.id || '')) {
+          reactiveData.id = nextId;
+          reactiveData.data = {};
+          reactiveData.listDeviceData = [];
+          reactiveData.driverTable = {};
+          reactiveData.statusTable = {};
+          load();
+        }
+        reactiveData.active = String(active || 'detail');
+      },
+    );
+
+    onBeforeUnmount(() => {
+      pointRequestId += 1;
+      relationRequestId += 1;
+    });
+
+    load();
 
     return {
       reactiveData,
       point,
       device,
+      reload,
       deviceName,
       changeActive,
       timestamp,
+      isMobile,
     };
   },
 });

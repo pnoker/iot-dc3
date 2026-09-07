@@ -25,6 +25,11 @@ import {waitForAppSettled} from '../fixtures/app';
  * happy-path's evil twin — they were the biggest gap in the e2e suite
  * before this spec.
  *
+ * `pnpm test:e2e` (and CI) serves the dev-mode build (`vite build --mode
+ * dev`) through scripts/testing/e2e-server.mjs — there is no in-process
+ * mock in this mode, so login requests are real network traffic that
+ * specs can stub with `page.route`.
+ *
  * The selectors target stable structural surfaces (`.login-form`,
  * `.login-submit`, prop-bound `el-form-item`) rather than i18n strings,
  * so the same spec works against zh and en builds.
@@ -79,28 +84,36 @@ test.describe('login form validation', () => {
   });
 
   test('keeps the user on /login when the backend rejects the credentials', async ({page}) => {
-    // Stub the auth API at the network layer so this test stays
-    // deterministic regardless of backend health. We intercept *before*
-    // navigating to /login below so the route handlers are armed by the
-    // time the user clicks Login.
+    // The dev build talks HTTP, so stub the auth API at the network layer to
+    // keep this deterministic regardless of backend health. The stub bodies
+    // mirror the production wire contract (see src/mock/response.ts): a raw
+    // payload on success and RFC 9457 problem details on failure.
     await page.route('**/api/v3/auth/token/salt', (route) =>
       route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ok: true, code: 200, data: 'forced-salt'}),
+        body: JSON.stringify('forced-salt'),
       })
     );
     await page.route('**/api/v3/auth/token/generate', (route) =>
       route.fulfill({
         status: 401,
-        contentType: 'application/json',
-        body: JSON.stringify({ok: false, code: 401, message: 'Invalid credentials', data: null}),
+        contentType: 'application/problem+json',
+        body: JSON.stringify({
+          type: 'about:blank',
+          title: 'Invalid credentials',
+          status: 401,
+          code: 'R4010',
+          detail: 'Invalid credentials',
+        }),
       })
     );
 
     await page.goto('/#/login', {waitUntil: 'domcontentloaded'});
     await waitForAppSettled(page);
 
+    // A well-formed password, so the rejection below can only come from the
+    // backend response — not from client-side validation.
     await passwordInput(page).fill('dc3dc3dc3');
 
     // Arm the response waiter before clicking. The route is fulfilled
@@ -117,7 +130,11 @@ test.describe('login form validation', () => {
     // back to /login; from /login itself, it stays put.
     await expect(page).toHaveURL(/\/login/);
 
-    // No auth headers should have been persisted on a failed login.
-    expect(await page.evaluate(() => localStorage.getItem('X-Auth-Token'))).toBeNull();
+    // The rejection must surface to the user: the auth store reports the
+    // failed login with an error notification (src/utils/notificationUtil.ts).
+    await expect(page.locator('.el-notification .el-notification--error').first()).toBeVisible();
+
+    // A failed login must not leave a frontend-visible authenticated session.
+    expect(await page.evaluate(() => sessionStorage.getItem('dc3-authenticated'))).toBeNull();
   });
 });

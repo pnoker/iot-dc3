@@ -19,16 +19,55 @@
   <el-dialog
     v-model="reactiveData.formVisible"
     :append-to-body="true"
+    :before-close="requestClose"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    :show-close="false"
+    :close-on-press-escape="!reactiveData.formLoading"
+    :show-close="!reactiveData.formLoading"
     :title="$t('device.import.title')"
     class="things-dialog"
+    destroy-on-close
     draggable
+    @closed="onClosed"
   >
+    <el-alert
+      v-if="reactiveData.saveError"
+      :closable="false"
+      :title="$t('common.saveFailed')"
+      class="things-dialog-form-alert"
+      show-icon
+      type="error"
+    />
+    <el-alert
+      v-if="reactiveData.driverError || reactiveData.profileError"
+      :closable="false"
+      :title="$t('common.loadFailed')"
+      class="things-dialog-form-alert"
+      show-icon
+      type="error"
+    >
+      <el-button
+        v-if="reactiveData.driverError"
+        :loading="reactiveData.driverLoading"
+        link
+        type="danger"
+        @click="driverDictionary()"
+      >
+        {{ $t('device.import.driver') }} {{ $t('common.retry') }}
+      </el-button>
+      <el-button
+        v-if="reactiveData.profileError"
+        :loading="reactiveData.profileLoading"
+        link
+        type="danger"
+        @click="profileDictionary()"
+      >
+        {{ $t('device.add.profile') }} {{ $t('common.retry') }}
+      </el-button>
+    </el-alert>
     <el-form
       ref="formDataRef"
       v-loading="reactiveData.formLoading"
+      :aria-busy="reactiveData.formLoading"
       :model="reactiveData.formData"
       :rules="formRule"
       label-position="top"
@@ -40,6 +79,7 @@
       <el-form-item :label="$t('device.import.driver')" prop="driverId">
         <el-select
           v-model="reactiveData.formData.driverId"
+          :disabled="reactiveData.formLoading"
           :loading="reactiveData.driverLoading"
           :placeholder="$t('device.import.driverPlaceholder')"
           :remote-method="driverDictionary"
@@ -60,6 +100,7 @@
       <el-form-item :label="$t('device.add.profile')" prop="profileId">
         <el-select
           v-model="reactiveData.formData.profileId"
+          :disabled="reactiveData.formLoading"
           :loading="reactiveData.profileLoading"
           :placeholder="$t('device.add.profilePlaceholder')"
           :remote-method="profileDictionary"
@@ -81,11 +122,11 @@
         <el-upload
           ref="formUploadRef"
           :auto-upload="false"
-          :http-request="uploadRequest"
           :limit="1"
           :on-change="handleChange"
           :on-exceed="handleExceed"
           :on-remove="handleRemove"
+          :disabled="reactiveData.formLoading"
           accept=".xlsx"
           class="things-dialog-upload"
           drag
@@ -104,14 +145,18 @@
         show-icon
       />
     </el-form>
-    <div class="things-dialog-footer">
-      <slot name="footer">
-        <el-button :disabled="reactiveData.formLoading" @click="cancel">{{ $t('common.cancel') }}</el-button>
-        <el-button :disabled="reactiveData.formLoading" plain @click="reset">{{ $t('common.reset') }}</el-button>
-        <el-button :disabled="reactiveData.formLoading" plain type="warning" @click="importTemplate">{{ $t('device.import.template') }}</el-button>
-        <el-button :disabled="reactiveData.formLoading" type="primary" @click="importThing">{{ $t('common.confirm') }}</el-button>
-      </slot>
-    </div>
+    <template #footer>
+      <div class="things-dialog-footer">
+        <slot name="footer">
+          <el-button :disabled="reactiveData.formLoading" @click="cancel">{{ $t('common.cancel') }}</el-button>
+          <el-button :disabled="reactiveData.formLoading" plain @click="reset">{{ $t('common.reset') }}</el-button>
+          <el-button :disabled="reactiveData.formLoading" plain type="warning" @click="importTemplate">{{ $t('device.import.template') }}</el-button>
+          <el-button :loading="reactiveData.formLoading" type="primary" @click="importThing">
+            {{ $t('common.confirm') }}
+          </el-button>
+        </slot>
+      </div>
+    </template>
   </el-dialog>
 </template>
 
@@ -123,11 +168,11 @@ import type {
   UploadInstance,
   UploadProps,
   UploadRawFile,
-  UploadRequestOptions,
 } from 'element-plus';
 import {genFileId} from 'element-plus';
-import {reactive, ref, unref} from 'vue';
+import {computed, onBeforeUnmount, reactive, ref, unref} from 'vue';
 import {useI18n} from 'vue-i18n';
+import {ElMessageBox} from 'element-plus';
 
 import type {Dictionary} from '@/config/types';
 
@@ -165,11 +210,29 @@ const reactiveData = reactive({
   } as DeviceImportFormData,
   formVisible: false,
   formLoading: false,
+  saveError: false,
   importStatus: null as OperationUiStatus | null,
   driverDictionary: [] as Dictionary[],
   driverLoading: false,
+  driverError: false,
   profileDictionary: [] as Dictionary[],
   profileLoading: false,
+  profileError: false,
+});
+let formSession = 0;
+let driverRequest = 0;
+let profileRequest = 0;
+let importSession = 0;
+
+const initialForm = ref<DeviceImportFormData>({driverId: '', profileId: ''});
+const fileSignature = (file?: UploadRawFile) => (file ? `${file.name}:${file.size}:${file.lastModified}` : '');
+const isDirty = computed(() => {
+  if (!reactiveData.formVisible) return false;
+  return (
+    reactiveData.formData.driverId !== initialForm.value.driverId ||
+    reactiveData.formData.profileId !== initialForm.value.profileId ||
+    fileSignature(reactiveData.formData.file) !== fileSignature(initialForm.value.file)
+  );
 });
 
 const formRule = reactive<FormRules>({
@@ -197,18 +260,23 @@ const formRule = reactive<FormRules>({
 });
 
 const driverDictionary = async (query = '') => {
+  if (reactiveData.formLoading) return;
+  const requestId = ++driverRequest;
   reactiveData.driverLoading = true;
+  reactiveData.driverError = false;
   try {
     const res = await listDriverDictionary<DictionaryResponse>({
       offset: 0,
       limit: 50,
       label: query,
     });
-    reactiveData.driverDictionary = res.items ?? [];
+    if (requestId === driverRequest && reactiveData.formVisible) {
+      reactiveData.driverDictionary = res.items ?? [];
+    }
   } catch {
-    // nothing to do
+    if (requestId === driverRequest && reactiveData.formVisible) reactiveData.driverError = true;
   } finally {
-    reactiveData.driverLoading = false;
+    if (requestId === driverRequest) reactiveData.driverLoading = false;
   }
 };
 
@@ -219,18 +287,23 @@ const driverDictionaryVisible = (visible: boolean) => {
 };
 
 const profileDictionary = async (query = '') => {
+  if (reactiveData.formLoading) return;
+  const requestId = ++profileRequest;
   reactiveData.profileLoading = true;
+  reactiveData.profileError = false;
   try {
     const res = await listProfileDictionary<DictionaryResponse>({
       offset: 0,
       limit: 50,
       label: query,
     });
-    reactiveData.profileDictionary = res.items ?? [];
+    if (requestId === profileRequest && reactiveData.formVisible) {
+      reactiveData.profileDictionary = res.items ?? [];
+    }
   } catch {
-    // nothing to do
+    if (requestId === profileRequest && reactiveData.formVisible) reactiveData.profileError = true;
   } finally {
-    reactiveData.profileLoading = false;
+    if (requestId === profileRequest) reactiveData.profileLoading = false;
   }
 };
 
@@ -241,73 +314,150 @@ const profileDictionaryVisible = (visible: boolean) => {
 };
 
 const show = () => {
+  formSession += 1;
+  importSession += 1;
+  driverRequest += 1;
+  profileRequest += 1;
+  reactiveData.formData = {driverId: '', profileId: ''};
+  initialForm.value = {driverId: '', profileId: ''};
+  reactiveData.driverDictionary = [];
+  reactiveData.profileDictionary = [];
+  reactiveData.driverError = false;
+  reactiveData.profileError = false;
+  reactiveData.saveError = false;
   reactiveData.formVisible = true;
   reactiveData.formLoading = false;
   reactiveData.importStatus = null;
+  idempotencyKey.value = '';
+  void driverDictionary();
+  void profileDictionary();
 };
 
 const cancel = () => {
-  reactiveData.formVisible = false;
-  reactiveData.formLoading = false;
+  void requestClose();
 };
 
 const reset = () => {
   const form = unref(formDataRef);
-  form?.resetFields();
+  reactiveData.formData = {...initialForm.value};
+  form?.clearValidate();
   formUploadRef.value?.clearFiles();
-  reactiveData.formData.file = undefined;
+  reactiveData.formData.file = initialForm.value.file;
   reactiveData.importStatus = null;
+  reactiveData.saveError = false;
   idempotencyKey.value = '';
 };
 
+const onClosed = () => {
+  formSession += 1;
+  importSession += 1;
+  driverRequest += 1;
+  profileRequest += 1;
+  reactiveData.driverLoading = false;
+  reactiveData.profileLoading = false;
+  formDataRef.value?.clearValidate();
+};
+
+onBeforeUnmount(() => {
+  formSession += 1;
+  importSession += 1;
+  driverRequest += 1;
+  profileRequest += 1;
+});
+
+const requestClose = async (done?: () => void) => {
+  if (reactiveData.formLoading) return;
+  const session = formSession;
+  if (!isDirty.value) {
+    if (done) done();
+    else reactiveData.formVisible = false;
+    return;
+  }
+  try {
+    await ElMessageBox.confirm(t('common.discardConfirm'), t('common.confirm'), {
+      type: 'warning',
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+    });
+    if (session !== formSession || !reactiveData.formVisible) return;
+    if (done) done();
+    else reactiveData.formVisible = false;
+  } catch {
+    // Keep the draft open when the user cancels the confirmation.
+  }
+};
+
 const importTemplate = async () => {
+  if (reactiveData.formLoading) return;
   const form = unref(formDataRef);
   if (!form) {
     return;
   }
 
+  const formSessionId = formSession;
   try {
     await form.validateField(['driverId', 'profileId']);
+    if (formSessionId !== formSession || !reactiveData.formVisible) return;
     reactiveData.formLoading = true;
+    reactiveData.saveError = false;
+    const session = formSessionId;
     emit('import-template', {...reactiveData.formData}, (successful) => {
+      if (session !== formSession) return;
       reactiveData.formLoading = false;
       if (successful) successMessage(t('device.import.templateSuccess'));
+      else reactiveData.saveError = true;
     });
   } catch {
     // validation errors are displayed by Element Plus
   }
 };
 
-const uploadRequest = (param: UploadRequestOptions): Promise<unknown> => {
-  emit('import', reactiveData.formData, param.file as File, idempotencyKey.value, (status) => {
-    reactiveData.importStatus = status;
-    if (status === 'SUCCEEDED') {
-      reactiveData.formLoading = false;
-      cancel();
-      reset();
-      successMessage(t('device.import.importSuccess'));
-    } else if (status === 'FAILED' || status === 'CANCELLED' || status === 'EXPIRED') {
-      reactiveData.formLoading = false;
-      idempotencyKey.value = '';
-    } else if (status === 'REQUEST_ERROR') {
-      reactiveData.formLoading = false;
-    }
+const reportImportStatus = (status: OperationUiStatus) => {
+  reactiveData.importStatus = status;
+  if (status === 'SUCCEEDED') {
+    reactiveData.formLoading = false;
+    initialForm.value = {...reactiveData.formData};
+    importSession += 1;
+    reactiveData.formVisible = false;
+    successMessage(t('device.import.importSuccess'));
+  } else if (status === 'FAILED' || status === 'CANCELLED' || status === 'EXPIRED') {
+    reactiveData.formLoading = false;
+    idempotencyKey.value = '';
+  } else if (status === 'REQUEST_ERROR') {
+    reactiveData.formLoading = false;
+    reactiveData.saveError = true;
+  }
+};
+
+const startImport = (file: File) => {
+  const session = ++importSession;
+  emit('import', reactiveData.formData, file, idempotencyKey.value, (status) => {
+    if (session !== importSession) return;
+    reportImportStatus(status);
   });
-  return Promise.resolve();
 };
 
 const importThing = async () => {
+  if (reactiveData.formLoading) return;
   const form = unref(formDataRef);
   if (!form) {
     return;
   }
 
+  const formSessionId = formSession;
   try {
     await form.validate();
+    if (formSessionId !== formSession || !reactiveData.formVisible) return;
+    const file = reactiveData.formData.file;
+    if (!file) {
+      await form.validateField('file');
+      return;
+    }
     reactiveData.formLoading = true;
+    reactiveData.saveError = false;
     reactiveData.importStatus = 'PENDING';
     if (!idempotencyKey.value) idempotencyKey.value = crypto.randomUUID();
-    formUploadRef.value?.submit();
+    startImport(file);
   } catch {
     // validation errors are displayed by Element Plus
   }

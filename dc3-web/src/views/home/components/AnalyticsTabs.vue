@@ -17,23 +17,26 @@
 
 <template>
   <dashboard-card
-    :empty="!loading && empty"
+    :empty="status === 'success' && !hasData"
     :empty-image-size="80"
-    :empty-text="$t('home.liveFeed.empty')"
+    :empty-text="$t('home.tabs.empty')"
+    :error="status === 'error'"
+    :error-text="$t('common.loadFailed')"
     :loading="loading"
+    :retry-text="$t('common.retry')"
     body-mode="chart"
     class="analytics-tabs"
     variant="tabs"
     @refresh="load"
   >
     <template #title>
-      <el-tabs v-model="activeTab" class="analytics-tabs__bar" @tab-change="onTabChange">
+      <el-tabs v-model="activeTab" class="analytics-tabs__bar">
         <el-tab-pane v-for="t in tabs" :key="t.key" :label="t.label" :name="t.key"/>
       </el-tabs>
     </template>
 
     <template #tools>
-      <range-segmented v-if="isTopTab" v-model="rangeKey" size="small" @update:model-value="load"/>
+      <range-segmented v-if="isTopTab" v-model="rangeKey" size="small"/>
     </template>
 
     <!-- Caption line — spells out the ranking rule and (for top-N tabs) the
@@ -59,6 +62,7 @@ import {listProfileByIds} from '@/api/profile';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 type TabKey = 'deviceStatus' | 'protocol' | 'profile' | 'topDevice' | 'topPoint' | 'topDriver';
 type Group = 'structural' | 'top';
@@ -85,13 +89,16 @@ const tabs = computed<{ key: TabKey; label: string }[]>(() => {
 
 const activeTab = ref<TabKey>(props.group === 'top' ? 'topDriver' : 'protocol');
 const rangeKey = ref<RangeKey>('24h');
-const loading = ref(false);
+const {loading, run, status} = useAsyncLoader();
 const chartRef = ref<HTMLElement>();
-const empty = ref(false);
+const chartData = ref<{key: string; count: number}[]>([]);
+const hasData = computed(() => chartData.value.length > 0);
 
 const isTopTab = computed(
   () => activeTab.value === 'topDevice' || activeTab.value === 'topPoint' || activeTab.value === 'topDriver'
 );
+
+const isTopTabKey = (tab: TabKey) => tab === 'topDevice' || tab === 'topPoint' || tab === 'topDriver';
 
 // Caption text for the current tab — structural tabs get a fixed phrase,
 // top-N tabs interpolate the active range so "{range} internal write volume"
@@ -119,16 +126,14 @@ const caption = computed(() => {
 
 let chart: Chart | undefined;
 
-const onTabChange = () => load();
-
 const disposeChart = () => {
   chart?.destroy();
   chart = undefined;
 };
 
-const ensureChart = () => {
+const createChart = () => {
   if (!chartRef.value) return;
-  if (chart) return;
+  disposeChart();
   chart = new Chart({container: chartRef.value, autoFit: true});
 };
 
@@ -140,9 +145,11 @@ const nameCache: Record<NameKind, Record<string, string>> = {
   driver: {},
   profile: {},
 };
+let namesGeneration = 0;
 
 const resolveNames = async (kind: NameKind, ids: string[]) => {
   const cache = nameCache[kind];
+  const generation = namesGeneration;
   const missing = ids.filter((id) => id && !cache[id]);
   if (missing.length === 0) return;
   try {
@@ -154,7 +161,7 @@ const resolveNames = async (kind: NameKind, ids: string[]) => {
     const data = res || {};
     for (const id of missing) {
       const item = data[id];
-      if (item) {
+      if (item && generation === namesGeneration) {
         cache[id] = item.deviceName || item.pointName || item.driverName || item.profileName || id;
       }
     }
@@ -165,7 +172,7 @@ const resolveNames = async (kind: NameKind, ids: string[]) => {
 
 // ---- renderers ----------------------------------------------------------
 const renderPie = (data: { key: string; count: number }[]) => {
-  ensureChart();
+  createChart();
   if (!chart) return;
   chart.clear();
   chart
@@ -182,7 +189,7 @@ const renderPie = (data: { key: string; count: number }[]) => {
 };
 
 const renderBar = (data: { key: string; count: number }[]) => {
-  ensureChart();
+  createChart();
   if (!chart) return;
   chart.clear();
   chart
@@ -198,7 +205,7 @@ const renderBar = (data: { key: string; count: number }[]) => {
 };
 
 const renderHorizontalBar = (data: { key: string; count: number }[]) => {
-  ensureChart();
+  createChart();
   if (!chart) return;
   chart.clear();
   chart
@@ -215,94 +222,101 @@ const renderHorizontalBar = (data: { key: string; count: number }[]) => {
 };
 
 // ---- loaders ------------------------------------------------------------
-const loadDriverOrDevice = async () => {
-  // deviceStatus / protocol / profile share the same two sources.
-  const [drv, dev]: any = await Promise.all([driverStats(), deviceStats(10)]);
-  const driverPayload = drv?.data || {byEnable: [], byType: [], byService: []};
-  const devicePayload = dev?.data || {byEnable: [], byProfile: [], byDriver: []};
-
-  if (activeTab.value === 'deviceStatus') {
-    const raw = (devicePayload.byEnable || []) as { key: string; count: number }[];
-    const buckets = raw.map((bucket) => ({
-      ...bucket,
-      key: bucket.key === 'ENABLED' ? t('common.enable') : bucket.key === 'DISABLED' ? t('common.disable') : bucket.key,
-    }));
-    empty.value = buckets.length === 0;
-    await nextTick();
-    if (!empty.value) renderPie(buckets);
-    return;
-  }
-  if (activeTab.value === 'protocol') {
-    // byService keys look like "dc3-driver-modbus-tcp" / "dc3-driver-mqtt";
-    // strip the prefix so the chart axis reads "modbus-tcp / mqtt / opc-ua"
-    // without the noise.
-    const raw = (driverPayload.byService || []) as { key: string; count: number }[];
-    const buckets = raw.map((b) => ({
-      key: (b.key || '-').replace(/^dc3-driver-/, ''),
-      count: b.count,
-    }));
-    empty.value = buckets.length === 0;
-    await nextTick();
-    if (!empty.value) renderBar(buckets);
-    return;
-  }
-  if (activeTab.value === 'profile') {
-    const raw = (devicePayload.byProfile || []) as { key: string; count: number }[];
-    const ids = raw.map((b) => b.key).filter(Boolean);
-    await resolveNames('profile', ids);
-    const buckets = raw.map((b) => ({key: nameCache.profile[b.key] || b.key, count: b.count}));
-    empty.value = buckets.length === 0;
-    await nextTick();
-    if (!empty.value) renderHorizontalBar(buckets);
-  }
+type Bucket = {key: string; count: number};
+type StructuralPayload = {
+  driver?: {byService?: Array<{key: string; count: number}>};
+  device?: {
+    byEnable?: Array<{key: string; count: number}>;
+    byProfile?: Array<{key: string; count: number}>;
+  };
 };
 
-const loadTop = async () => {
-  const dimMap: Record<Exclude<TabKey, 'deviceStatus' | 'protocol' | 'profile'>, 'device' | 'point' | 'driver'> = {
+const loadStructural = async (tab: Extract<TabKey, 'deviceStatus' | 'protocol' | 'profile'>): Promise<Bucket[]> => {
+  // Fetch both summaries once for parity with the existing endpoint contract,
+  // but derive the result from the tab captured at request start. This keeps a
+  // late response from being interpreted using a newer tab selection.
+  const [driverResult, deviceResult] = (await Promise.all([driverStats(), deviceStats(10)])) as [StructuralPayload, any];
+  const driverPayload = driverResult?.driver ?? (driverResult as any)?.data ?? driverResult ?? {};
+  const devicePayload = deviceResult?.device ?? (deviceResult as any)?.data ?? deviceResult ?? {};
+
+  if (tab === 'deviceStatus') {
+    return (devicePayload.byEnable ?? []).map((bucket: {key: string; count: number}) => ({
+      key: bucket.key === 'ENABLED' ? t('common.enable') : bucket.key === 'DISABLED' ? t('common.disable') : bucket.key,
+      count: Number(bucket.count) || 0,
+    }));
+  }
+  if (tab === 'protocol') {
+    return (driverPayload.byService ?? []).map((bucket: {key: string; count: number}) => ({
+      key: (bucket.key || '-').replace(/^dc3-driver-/, ''),
+      count: Number(bucket.count) || 0,
+    }));
+  }
+
+  const raw = (devicePayload.byProfile ?? []) as Array<{key: string; count: number}>;
+  await resolveNames('profile', raw.map((bucket) => bucket.key).filter(Boolean));
+  return raw.map((bucket) => ({
+    key: nameCache.profile[bucket.key] || bucket.key,
+    count: Number(bucket.count) || 0,
+  }));
+};
+
+const loadTop = async (
+  tab: Extract<TabKey, 'topDevice' | 'topPoint' | 'topDriver'>,
+  range: RangeKey
+): Promise<Bucket[]> => {
+  const dimMap: Record<typeof tab, 'device' | 'point' | 'driver'> = {
     topDevice: 'device',
     topPoint: 'point',
     topDriver: 'driver',
   };
-  const dim = dimMap[activeTab.value as keyof typeof dimMap];
-  const res: any = await statsTop({dimension: dim, rangeKey: rangeKey.value, limit: 10});
-  const rows: { entityId: number; count: number }[] = res || [];
-  const ids = rows.map((r) => String(r.entityId));
-  await resolveNames(dim, ids);
-  const buckets = rows.map((r) => ({
-    key: nameCache[dim][String(r.entityId)] || String(r.entityId),
-    count: r.count,
+  const dim = dimMap[tab];
+  const result = await statsTop({dimension: dim, rangeKey: range, limit: 10});
+  const rows = (Array.isArray(result) ? result : []) as Array<{entityId: string | number; count: number}>;
+  await resolveNames(dim, rows.map((row) => String(row.entityId)));
+  return rows.map((row) => ({
+    key: nameCache[dim][String(row.entityId)] || String(row.entityId),
+    count: Number(row.count) || 0,
   }));
-  empty.value = buckets.length === 0;
-  await nextTick();
-  if (!empty.value) renderHorizontalBar(buckets);
+};
+
+const renderForTab = (tab: TabKey, buckets: Bucket[]) => {
+  if (tab === 'deviceStatus') renderPie(buckets);
+  else if (tab === 'protocol') renderBar(buckets);
+  else renderHorizontalBar(buckets);
 };
 
 const load = async () => {
-  loading.value = true;
-  try {
-    if (isTopTab.value) {
-      await loadTop();
-    } else {
-      await loadDriverOrDevice();
-    }
-  } catch {
-    // handled globally
-    empty.value = true;
-  } finally {
-    loading.value = false;
-  }
+  const tab = activeTab.value;
+  const range = rangeKey.value;
+  await run(
+    () =>
+      isTopTabKey(tab)
+        ? loadTop(tab as Extract<TabKey, 'topDevice' | 'topPoint' | 'topDriver'>, range)
+        : loadStructural(tab as Extract<TabKey, 'deviceStatus' | 'protocol' | 'profile'>),
+    {apply: (buckets) => (chartData.value = buckets)}
+  );
+  if (status.value !== 'success') return;
+  await nextTick();
+  if (status.value !== 'success') return;
+  if (chartData.value.length > 0) renderForTab(tab, chartData.value);
+  else disposeChart();
 };
 
-onMounted(() => {
+// Tab/range changes only need a reload; cached entity names stay valid
+// and are invalidated solely when the locale (the display language) flips.
+watch([activeTab, rangeKey], () => {
   load();
 });
 
 watch(locale, () => {
+  namesGeneration += 1;
   for (const names of Object.values(nameCache)) {
     for (const id of Object.keys(names)) delete names[id];
   }
   load();
 });
+
+onMounted(load);
 
 onUnmounted(() => disposeChart());
 </script>

@@ -36,6 +36,28 @@ describe('menu store', () => {
   });
 
   describe('fetchTree', () => {
+    it('shares an in-flight request across concurrent callers', async () => {
+      let resolveRequest!: (value: typeof sampleMenuTree) => void;
+      menuMocks.listMenuTree.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveRequest = resolve;
+        })
+      );
+      const store = useMenuStore();
+
+      const first = store.fetchTree();
+      const second = store.fetchTree();
+
+      expect(menuMocks.listMenuTree).toHaveBeenCalledTimes(1);
+      expect(store.loading).toBe(true);
+      resolveRequest(sampleMenuTree);
+      await Promise.all([first, second]);
+
+      expect(store.tree).toEqual(sampleMenuTree);
+      expect(store.loaded).toBe(true);
+      expect(store.loading).toBe(false);
+    });
+
     it('loads the tree once and skips subsequent calls without force', async () => {
       const store = useMenuStore();
 
@@ -65,6 +87,25 @@ describe('menu store', () => {
       await store.fetchTree();
 
       // Network failures must not throw — UI falls back to a static Home.
+      expect(store.tree).toEqual([]);
+      expect(store.loaded).toBe(false);
+      expect(store.loading).toBe(false);
+    });
+
+    it('ignores a response that finishes after reset', async () => {
+      let resolveRequest!: (value: typeof sampleMenuTree) => void;
+      menuMocks.listMenuTree.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveRequest = resolve;
+        })
+      );
+      const store = useMenuStore();
+
+      const pending = store.fetchTree();
+      store.reset();
+      resolveRequest(sampleMenuTree);
+      await pending;
+
       expect(store.tree).toEqual([]);
       expect(store.loaded).toBe(false);
       expect(store.loading).toBe(false);

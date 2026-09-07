@@ -15,9 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import JSONBigInt from 'json-bigint';
-
-const JSONBigIntStr = JSONBigInt({storeAsString: true});
 const E2E_CREDENTIALS = {
   tenant: process.env.E2E_TENANT || 'default',
   name: process.env.E2E_USERNAME || 'dc3',
@@ -184,7 +181,16 @@ export async function apiPost(page, url, body = {}, params = {}) {
       const decodeStorage = (key) => {
         const raw = localStorage.getItem(key);
         if (!raw) return undefined;
-        return JSON.parse(atob(raw)).content;
+        try {
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === 'object' && 'content' in parsed ? parsed.content : parsed;
+        } catch {
+          try {
+            return JSON.parse(atob(raw)).content;
+          } catch {
+            return raw;
+          }
+        }
       };
       const target = new URL(requestUrl, window.location.origin);
       Object.entries(requestParams).forEach(([key, value]) => {
@@ -197,12 +203,12 @@ export async function apiPost(page, url, body = {}, params = {}) {
         'Content-Type': 'application/json',
         'X-Auth-Tenant': decodeStorage('X-Auth-Tenant'),
         'X-Auth-Login': decodeStorage('X-Auth-Login'),
-        'X-Auth-Token': JSON.stringify(decodeStorage('X-Auth-Token')),
       };
       const res = await fetch(targetUrl, {
         method: 'POST',
         headers,
         body: JSON.stringify(requestBody),
+        credentials: 'include',
       });
       const text = await res.text();
       return {status: res.status, text};
@@ -212,7 +218,7 @@ export async function apiPost(page, url, body = {}, params = {}) {
 
   let data;
   try {
-    data = JSONBigIntStr.parse(response.text);
+    data = JSON.parse(response.text);
   } catch {
     data = response.text;
   }
@@ -226,7 +232,16 @@ export async function apiGet(page, url, params = {}) {
       const decodeStorage = (key) => {
         const raw = localStorage.getItem(key);
         if (!raw) return undefined;
-        return JSON.parse(atob(raw)).content;
+        try {
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === 'object' && 'content' in parsed ? parsed.content : parsed;
+        } catch {
+          try {
+            return JSON.parse(atob(raw)).content;
+          } catch {
+            return raw;
+          }
+        }
       };
       const target = new URL(requestUrl, window.location.origin);
       Object.entries(requestParams).forEach(([key, value]) => {
@@ -240,8 +255,8 @@ export async function apiGet(page, url, params = {}) {
           Accept: 'application/json',
           'X-Auth-Tenant': decodeStorage('X-Auth-Tenant'),
           'X-Auth-Login': decodeStorage('X-Auth-Login'),
-          'X-Auth-Token': JSON.stringify(decodeStorage('X-Auth-Token')),
         },
+        credentials: 'include',
       });
       return {status: res.status, text: await res.text()};
     },
@@ -249,7 +264,7 @@ export async function apiGet(page, url, params = {}) {
   );
   let data;
   try {
-    data = JSONBigIntStr.parse(response.text);
+    data = JSON.parse(response.text);
   } catch {
     data = response.text;
   }
@@ -262,7 +277,16 @@ export async function apiDelete(page, url, params = {}) {
       const decodeStorage = (key) => {
         const raw = localStorage.getItem(key);
         if (!raw) return undefined;
-        return JSON.parse(atob(raw)).content;
+        try {
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === 'object' && 'content' in parsed ? parsed.content : parsed;
+        } catch {
+          try {
+            return JSON.parse(atob(raw)).content;
+          } catch {
+            return raw;
+          }
+        }
       };
       const target = new URL(requestUrl, window.location.origin);
       Object.entries(requestParams).forEach(([key, value]) => {
@@ -276,8 +300,8 @@ export async function apiDelete(page, url, params = {}) {
           Accept: 'application/json',
           'X-Auth-Tenant': decodeStorage('X-Auth-Tenant'),
           'X-Auth-Login': decodeStorage('X-Auth-Login'),
-          'X-Auth-Token': JSON.stringify(decodeStorage('X-Auth-Token')),
         },
+        credentials: 'include',
       });
       return {status: res.status, text: await res.text()};
     },
@@ -285,7 +309,7 @@ export async function apiDelete(page, url, params = {}) {
   );
   let data;
   try {
-    data = JSONBigIntStr.parse(response.text);
+    data = JSON.parse(response.text);
   } catch {
     data = response.text;
   }

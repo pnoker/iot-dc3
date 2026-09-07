@@ -16,67 +16,85 @@
   -->
 
 <template>
-  <div>
+  <div class="settings-detail">
     <blank-card>
-      <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
+      <el-alert
+        v-if="state.detailStatus === 'error'"
+        :closable="false"
+        :title="$t('common.loadFailed')"
+        class="settings-detail__alert"
+        show-icon
+        type="error"
+      >
+        <el-button :loading="state.detailLoading" link type="danger" @click="loadDetail(true)">
+          {{ $t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-empty
+        v-if="state.detailStatus === 'error' && !state.data.id"
+        :description="$t('common.loadFailed')"
+      />
+      <el-skeleton v-else-if="!state.data.id" :rows="6" animated />
+      <el-tabs
+        v-else
+        v-model="state.active"
+        @tab-click="changeActive"
+      >
         <el-tab-pane :label="$t('settings.user.detailTitle')" name="detail">
-          <detail-card>
-            <el-descriptions :column="2" border>
+          <detail-card v-loading="state.detailLoading" :aria-busy="state.detailLoading">
+            <el-descriptions :column="isMobile ? 1 : 2" border>
               <el-descriptions-item :label="$t('settings.user.nickName')">
-                {{ reactiveData.data.nickName || '-' }}
+                {{ state.data.nickName || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('settings.user.userName')">
-                {{ reactiveData.data.userName || '-' }}
+                {{ state.data.userName || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('settings.user.phone')">
-                {{ reactiveData.data.phone || '-' }}
+                {{ state.data.phone || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('settings.user.email')">
-                {{ reactiveData.data.email || '-' }}
+                {{ state.data.email || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.enable')">
-                <enable-tag :value="reactiveData.data.enableFlag"/>
+                <enable-tag :value="state.data.enableFlag"/>
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.remark')">
-                {{ reactiveData.data.remark || '-' }}
+                {{ state.data.remark || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.createTime')">
-                {{ timestampLabel(reactiveData.data.createTime) }}
+                {{ timestampLabel(state.data.createTime) }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.operationTime')">
-                {{ timestampLabel(reactiveData.data.operateTime) }}
+                {{ timestampLabel(state.data.operateTime) }}
               </el-descriptions-item>
             </el-descriptions>
           </detail-card>
         </el-tab-pane>
 
         <el-tab-pane :label="$t('settings.user.rolesOfUser')" name="role">
-          <el-table v-loading="reactiveData.rolesLoading" :data="reactiveData.roles" stripe>
-            <el-table-column :label="$t('settings.role.roleName')" min-width="180" prop="roleName"/>
-            <el-table-column :label="$t('settings.role.roleCode')" min-width="180" prop="roleCode"/>
-            <el-table-column :label="$t('common.enable')" width="90">
-              <template #default="{row}">
-                <enable-tag :value="row.enableFlag"/>
-              </template>
-            </el-table-column>
-            <el-table-column :label="$t('common.remark')" min-width="220" prop="remark" show-overflow-tooltip/>
-            <template #empty>
-              <el-empty :description="$t('settings.user.empty')" :image-size="60"/>
-            </template>
-          </el-table>
+          <responsive-record-list
+            :columns="roleColumns"
+            :empty-text="$t('settings.user.empty')"
+            :loading="state.rolesLoading"
+            :rows="state.roles"
+            :status="state.rolesStatus"
+            embedded
+            row-key="id"
+            @retry="() => loadRoles(true)"
+          />
         </el-tab-pane>
 
         <el-tab-pane :label="$t('settings.user.resourcesOfUser')" name="resource">
-          <el-table v-loading="reactiveData.resourcesLoading" :data="reactiveData.resources" stripe>
-            <el-table-column :label="$t('settings.resource.resourceName')" min-width="200" prop="resourceName"/>
-            <el-table-column :label="$t('settings.resource.resourceCode')" min-width="180" prop="resourceCode"/>
-            <el-table-column :label="$t('settings.resource.resourceType')" min-width="120" prop="resourceTypeFlag"/>
-            <el-table-column :label="$t('settings.resource.resourceScope')" min-width="120" prop="resourceScopeFlag"/>
-            <el-table-column :label="$t('common.remark')" min-width="180" prop="remark" show-overflow-tooltip/>
-            <template #empty>
-              <el-empty :description="$t('settings.user.empty')" :image-size="60"/>
-            </template>
-          </el-table>
+          <responsive-record-list
+            :columns="resourceColumns"
+            :empty-text="$t('settings.user.empty')"
+            :loading="state.resourcesLoading"
+            :rows="state.resources"
+            :status="state.resourcesStatus"
+            embedded
+            row-key="id"
+            @retry="() => loadResources(true)"
+          />
         </el-tab-pane>
       </el-tabs>
     </blank-card>
@@ -84,90 +102,228 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, reactive} from 'vue';
+import {computed, onBeforeUnmount, onMounted, reactive, watch} from 'vue';
 import type {TabsPaneContext} from 'element-plus';
+import {useI18n} from 'vue-i18n';
 import {useRoute, useRouter} from 'vue-router';
 
 import {listResourceByPrincipalId} from '@/api/roleResourceBind';
 import {listRoleByPrincipalId} from '@/api/rolePrincipalBind';
 import {getUserById} from '@/api/user';
+import BlankCard from '@/components/card/blank/BlankCard.vue';
+import DetailCard from '@/components/card/detail/DetailCard.vue';
+import ResponsiveRecordList from '@/components/list/ResponsiveRecordList.vue';
+import EnableTag from '@/components/tag/EnableTag.vue';
+import {useBreakpoint} from '@/composables/useBreakpoint';
+import type {ResponsiveListColumn} from '@/config/types';
 import {timestampLabel} from '@/utils/dateUtil';
 
-import blankCard from '@/components/card/blank/BlankCard.vue';
-import detailCard from '@/components/card/detail/DetailCard.vue';
-import EnableTag from '@/components/tag/EnableTag.vue';
+interface DetailRow extends Record<string, any> {
+  id: string;
+  roleName?: string;
+  roleCode?: string;
+  resourceName?: string;
+  resourceCode?: string;
+  resourceTypeFlag?: string;
+  resourceScopeFlag?: string;
+  remark?: string;
+  enableFlag?: unknown;
+}
 
 const route = useRoute();
 const router = useRouter();
+const {t} = useI18n();
+const {isMobile} = useBreakpoint();
 
-const reactiveData = reactive({
-  id: route.query.id as string,
-  active: (route.query.active as string) || 'detail',
+const state = reactive({
+  id: String(route.query.id || ''),
+  active: String(route.query.active || 'detail'),
   data: {} as Record<string, any>,
-  roles: [] as any[],
-  rolesLoaded: false,
+  detailLoading: false,
+  detailStatus: 'idle' as 'idle' | 'loading' | 'success' | 'error',
+  roles: [] as DetailRow[],
   rolesLoading: false,
-  resources: [] as any[],
-  resourcesLoaded: false,
+  rolesStatus: 'idle' as 'idle' | 'loading' | 'success' | 'error',
+  resources: [] as DetailRow[],
   resourcesLoading: false,
+  resourcesStatus: 'idle' as 'idle' | 'loading' | 'success' | 'error',
 });
+let detailRequest = 0;
+let rolesRequest = 0;
+let resourcesRequest = 0;
+let detailPromise: Promise<void> | null = null;
 
-const principalId = () => String(reactiveData.data.principalId || '');
+const roleColumns = computed<ResponsiveListColumn<DetailRow>[]>(() => [
+  {key: 'roleName', label: t('settings.role.roleName'), minWidth: 180, mobile: 'primary'},
+  {key: 'roleCode', label: t('settings.role.roleCode'), minWidth: 180, kind: 'code', mobile: 'detail'},
+  {key: 'enableFlag', label: t('common.enable'), width: 90, kind: 'enable', mobile: 'detail'},
+  {key: 'remark', label: t('common.remark'), minWidth: 220, mobile: 'detail'},
+]);
+const resourceColumns = computed<ResponsiveListColumn<DetailRow>[]>(() => [
+  {key: 'resourceName', label: t('settings.resource.resourceName'), minWidth: 200, mobile: 'primary'},
+  {key: 'resourceCode', label: t('settings.resource.resourceCode'), minWidth: 180, kind: 'code', mobile: 'detail'},
+  {key: 'resourceTypeFlag', label: t('settings.resource.resourceType'), minWidth: 120, mobile: 'detail'},
+  {key: 'resourceScopeFlag', label: t('settings.resource.resourceScope'), minWidth: 120, mobile: 'detail'},
+  {key: 'remark', label: t('common.remark'), minWidth: 180, mobile: 'detail'},
+]);
 
-const load = async () => {
-  if (!reactiveData.id) return;
-  await getUserById(reactiveData.id)
-    .then((res: any) => {
-      reactiveData.data = res || {};
-    })
-    .catch(() => {
-      // handled globally
-    });
+const principalId = () => String(state.data.principalId || '');
+
+const loadDetail = (force = false): Promise<void> => {
+  if (!state.id) {
+    state.data = {};
+    state.detailStatus = 'error';
+    state.detailLoading = false;
+    return Promise.resolve();
+  }
+  if (state.detailStatus === 'success' && !force) return Promise.resolve();
+  if (detailPromise && !force) return detailPromise;
+  const requestId = ++detailRequest;
+  state.detailLoading = true;
+  state.detailStatus = 'loading';
+  const request = (async () => {
+    try {
+      const result = await getUserById(state.id);
+      if (requestId !== detailRequest) return;
+      state.data = (result as any) || {};
+      state.detailStatus = state.data.id ? 'success' : 'error';
+    } catch {
+      if (requestId === detailRequest) state.detailStatus = 'error';
+    } finally {
+      if (requestId === detailRequest) state.detailLoading = false;
+    }
+  })();
+  const trackedRequest = request.finally(() => {
+    if (detailPromise === trackedRequest) detailPromise = null;
+  });
+  detailPromise = trackedRequest;
+  return trackedRequest;
 };
 
-const loadRoles = () => {
-  if (!principalId() || reactiveData.rolesLoaded) return;
-  reactiveData.rolesLoading = true;
-  listRoleByPrincipalId(principalId())
-    .then((res: any) => {
-      reactiveData.roles = (res as any[]) || [];
-      reactiveData.rolesLoaded = true;
-    })
-    .catch(() => {
-      // handled globally
-    })
-    .finally(() => {
-      reactiveData.rolesLoading = false;
-    });
+const loadRoles = async (force = false) => {
+  if (!state.id || state.detailStatus !== 'success') return;
+  const targetId = state.id;
+  if (!principalId()) await loadDetail();
+  if (targetId !== state.id) return;
+  const id = principalId();
+  if (!id) {
+    // A detail record without a principalId is an inconsistent state;
+    // show the error (retry) pane instead of a misleading empty list.
+    state.rolesStatus = 'error';
+    return;
+  }
+  if (state.rolesStatus === 'success' && !force) return;
+  const requestId = ++rolesRequest;
+  state.rolesLoading = true;
+  state.rolesStatus = 'loading';
+  try {
+    const result = await listRoleByPrincipalId(id);
+    if (requestId !== rolesRequest) return;
+    state.roles = ((result as any[]) || []).map((row) => ({...row, id: String(row.id)}));
+    state.rolesStatus = 'success';
+  } catch {
+    if (requestId === rolesRequest) state.rolesStatus = 'error';
+  } finally {
+    if (requestId === rolesRequest) state.rolesLoading = false;
+  }
 };
 
-const loadResources = () => {
-  if (!principalId() || reactiveData.resourcesLoaded) return;
-  reactiveData.resourcesLoading = true;
-  listResourceByPrincipalId(principalId())
-    .then((res: any) => {
-      reactiveData.resources = (res as any[]) || [];
-      reactiveData.resourcesLoaded = true;
-    })
-    .catch(() => {
-      // handled globally
-    })
-    .finally(() => {
-      reactiveData.resourcesLoading = false;
-    });
+const loadResources = async (force = false) => {
+  if (!state.id || state.detailStatus !== 'success') return;
+  const targetId = state.id;
+  if (!principalId()) await loadDetail();
+  if (targetId !== state.id) return;
+  const id = principalId();
+  if (!id) {
+    state.resourcesStatus = 'error';
+    return;
+  }
+  if (state.resourcesStatus === 'success' && !force) return;
+  const requestId = ++resourcesRequest;
+  state.resourcesLoading = true;
+  state.resourcesStatus = 'loading';
+  try {
+    const result = await listResourceByPrincipalId(id);
+    if (requestId !== resourcesRequest) return;
+    state.resources = ((result as any[]) || []).map((row) => ({...row, id: String(row.id)}));
+    state.resourcesStatus = 'success';
+  } catch {
+    if (requestId === resourcesRequest) state.resourcesStatus = 'error';
+  } finally {
+    if (requestId === resourcesRequest) state.resourcesLoading = false;
+  }
 };
 
 const changeActive = (tab: TabsPaneContext) => {
-  const name = String(tab.props.name || '');
-  router.push({query: {...route.query, active: name}}).catch(() => {
-  });
-  if (name === 'role') loadRoles();
-  if (name === 'resource') loadResources();
+  const name = String(tab.props.name || 'detail');
+  state.active = name;
+  void router.push({query: {...route.query, active: name}}).catch(() => undefined);
+  if (name === 'role') void loadRoles();
+  if (name === 'resource') void loadResources();
 };
 
-onMounted(async () => {
-  await load();
-  if (reactiveData.active === 'role') loadRoles();
-  if (reactiveData.active === 'resource') loadResources();
+const resetForId = (id: string) => {
+  state.id = id;
+  detailPromise = null;
+  detailRequest += 1;
+  rolesRequest += 1;
+  resourcesRequest += 1;
+  state.data = {};
+  state.detailLoading = false;
+  state.detailStatus = 'idle';
+  state.roles = [];
+  state.rolesLoading = false;
+  state.rolesStatus = 'idle';
+  state.resources = [];
+  state.resourcesLoading = false;
+  state.resourcesStatus = 'idle';
+};
+
+const loadActive = async () => {
+  await loadDetail();
+  if (state.active === 'role') await loadRoles();
+  if (state.active === 'resource') await loadResources();
+};
+
+watch(
+  () => String(route.query.id || ''),
+  (id) => {
+    if (id === state.id) return;
+    resetForId(id);
+    void loadActive();
+  }
+);
+watch(
+  () => String(route.query.active || 'detail'),
+  (active) => {
+    if (!['detail', 'role', 'resource'].includes(active)) return;
+    if (active === state.active) return;
+    state.active = active;
+    if (active === 'role') void loadRoles();
+    if (active === 'resource') void loadResources();
+  }
+);
+
+onMounted(() => void loadActive());
+
+onBeforeUnmount(() => {
+  detailRequest += 1;
+  rolesRequest += 1;
+  resourcesRequest += 1;
+  detailPromise = null;
 });
 </script>
+
+<style lang="scss" scoped>
+.settings-detail {
+  min-width: 0;
+}
+
+.settings-detail__alert {
+  margin-bottom: var(--dc3-space-3);
+}
+
+:deep(.responsive-record-list__embedded) {
+  box-shadow: none;
+}
+</style>

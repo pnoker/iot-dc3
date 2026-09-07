@@ -58,6 +58,7 @@
               <el-form-item prop="tenant">
                 <el-input
                   v-model="reactiveData.formData.tenant"
+                  :disabled="loading"
                   :placeholder="t('login.tenantPlaceholder')"
                   :prefix-icon="Box"
                   auto-complete="off"
@@ -67,6 +68,7 @@
               <el-form-item prop="name">
                 <el-input
                   v-model="reactiveData.formData.name"
+                  :disabled="loading"
                   :placeholder="t('login.usernamePlaceholder')"
                   :prefix-icon="User"
                   auto-complete="off"
@@ -76,6 +78,7 @@
               <el-form-item prop="password">
                 <el-input
                   v-model="reactiveData.formData.password"
+                  :disabled="loading"
                   :placeholder="t('login.passwordPlaceholder')"
                   :prefix-icon="Lock"
                   :type="reactiveData.passwordType"
@@ -85,6 +88,7 @@
                   <template #append>
                     <el-button
                       :aria-label="t('login.togglePassword')"
+                      :disabled="loading"
                       :icon="reactiveData.isHide"
                       @click="showPassword"
                     />
@@ -111,12 +115,30 @@
       <span class="login-footer-legal">{{ copyright }}</span>
     </footer>
 
-    <el-dialog v-model="changePasswordVisible" :title="t('login.changePasswordTitle')" width="420px">
+    <el-dialog
+      v-model="changePasswordVisible"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      :title="t('login.changePasswordTitle')"
+      class="things-dialog"
+      destroy-on-close
+      width="420px"
+      @closed="resetChangePassword"
+    >
       <el-alert :closable="false" :title="changePasswordHint" class="mb-4" show-icon type="warning"/>
-      <el-form ref="changePasswordRef" :model="changePasswordData" :rules="changePasswordRule" label-width="0">
+      <el-form
+        ref="changePasswordRef"
+        v-loading="changePasswordLoading"
+        :aria-busy="changePasswordLoading"
+        :model="changePasswordData"
+        :rules="changePasswordRule"
+        label-width="0"
+      >
         <el-form-item prop="newPassword">
           <el-input
             v-model="changePasswordData.newPassword"
+            :disabled="changePasswordLoading"
             :placeholder="t('login.newPasswordPlaceholder')"
             show-password
             type="password"
@@ -125,6 +147,7 @@
         <el-form-item prop="confirmPassword">
           <el-input
             v-model="changePasswordData.confirmPassword"
+            :disabled="changePasswordLoading"
             :placeholder="t('login.confirmPasswordPlaceholder')"
             show-password
             type="password"
@@ -132,7 +155,10 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button :loading="changePasswordLoading" type="primary" @click="handleChangePassword">
+        <el-button :disabled="changePasswordLoading" @click="changePasswordVisible = false">
+          {{ t('login.changePasswordBack') }}
+        </el-button>
+        <el-button :disabled="changePasswordLoading" :loading="changePasswordLoading" type="primary" @click="handleChangePassword">
           {{ t('login.changePasswordSubmit') }}
         </el-button>
       </template>
@@ -148,7 +174,7 @@ import {useI18n} from 'vue-i18n';
 
 import {useAuthStore} from '@/store';
 import {PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
-import {failMessage, successMessage} from '@/utils/notificationUtil';
+import {successMessage} from '@/utils/notificationUtil';
 
 import AppPreferences from '@/components/layout/AppPreferences.vue';
 import BrandLockup from '@/components/brand/BrandLockup.vue';
@@ -204,6 +230,7 @@ const showPassword = () => {
 };
 
 const handleLogin = async () => {
+  if (loading.value) return;
   const form = unref(formDataRef);
   if (!form) {
     return;
@@ -264,7 +291,15 @@ const openChangePassword = (code: string) => {
   changePasswordVisible.value = true;
 };
 
+const resetChangePassword = () => {
+  changePasswordLoading.value = false;
+  changePasswordData.newPassword = '';
+  changePasswordData.confirmPassword = '';
+  changePasswordRef.value?.clearValidate();
+};
+
 const handleChangePassword = async () => {
+  if (changePasswordLoading.value) return;
   const form = unref(changePasswordRef);
   if (!form) {
     return;
@@ -287,7 +322,8 @@ const handleChangePassword = async () => {
     reactiveData.formData.password = changePasswordData.newPassword;
     await handleLogin();
   } catch {
-    failMessage(t('login.changePasswordFailed'));
+    // Failure details are already reported by the axios response
+    // interceptor; a second toast here would duplicate it.
   } finally {
     changePasswordLoading.value = false;
   }

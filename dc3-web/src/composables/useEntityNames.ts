@@ -61,13 +61,14 @@ const inflight: Record<EntityKind, Set<string>> = {
   point: new Set(),
 };
 
-// Track the pending promise per kind so concurrent callers can await
-// the same fetch instead of returning immediately with uncached IDs.
-const pending: Record<EntityKind, Promise<void> | null> = {
-  device: null,
-  driver: null,
-  profile: null,
-  point: null,
+// Track all pending batches per kind. More than one batch can be in flight
+// when callers request disjoint IDs at the same time; a single promise slot
+// would be cleared by the first batch and let later callers miss the second.
+const pending: Record<EntityKind, Set<Promise<void>>> = {
+  device: new Set(),
+  driver: new Set(),
+  profile: new Set(),
+  point: new Set(),
 };
 
 const fetchers: Record<EntityKind, (ids: string[]) => Promise<BatchResponse>> = {
@@ -106,8 +107,8 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string>): Promise<vo
   // If some IDs are already being fetched by another caller, await the
   // pending promise first — it may resolve the IDs we need. Then re-check
   // which IDs are still missing so we only fetch the remainder.
-  if (hasInflight && pending[kind]) {
-    await pending[kind];
+  if (hasInflight && pending[kind].size > 0) {
+    await Promise.all([...pending[kind]]);
     // Re-evaluate: the pending fetch may have resolved some of our IDs
     const stillMissing: string[] = [];
     for (const raw of rawIds) {
@@ -142,9 +143,12 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string>): Promise<vo
     }
   })();
 
-  pending[kind] = promise;
-  await promise;
-  pending[kind] = null;
+  pending[kind].add(promise);
+  try {
+    await promise;
+  } finally {
+    pending[kind].delete(promise);
+  }
 }
 
 export type AlertSourceKind = 'point' | 'device' | 'driver';

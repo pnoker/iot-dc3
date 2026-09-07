@@ -47,9 +47,91 @@ describe('mock adapter', () => {
 
   it('returns the full menu tree from list_tree', async () => {
     const res = await call({url: 'api/v3/auth/menu/list_tree', method: 'post', data: {}});
-        expect(Array.isArray(res)).toBe(true);
+    expect(Array.isArray(res)).toBe(true);
     expect(res.some((n: any) => n.menuCode === 'driver')).toBe(true);
     expect(res.some((n: any) => n.menuCode === 'settings')).toBe(true);
+  });
+
+  it('keeps menu tree filtering consistent after deleting a menu', async () => {
+    const menuCode = `mock-menu-${Date.now()}`;
+    const created = await call({
+      url: 'api/v3/auth/menu/add',
+      method: 'post',
+      data: {
+        parentMenuId: 0,
+        menuName: menuCode,
+        menuCode,
+        menuTypeFlag: 'COMMON',
+        menuLevel: 'C1',
+        menuIndex: 999,
+        enableFlag: 'ENABLE',
+      },
+    });
+    const createdId = String(created);
+
+    const beforeDelete = await call({
+      url: 'api/v3/auth/menu/list_tree',
+      method: 'post',
+      data: {menuName: menuCode},
+    });
+    expect(beforeDelete.flatMap((row: any) => [row, ...(row.children || [])]).some((row: any) => row.menuCode === menuCode)).toBe(true);
+
+    await call({url: 'api/v3/auth/menu/delete', method: 'delete', params: {id: createdId}});
+    const afterDelete = await call({
+      url: 'api/v3/auth/menu/list_tree',
+      method: 'post',
+      data: {menuName: menuCode},
+    });
+    expect(afterDelete).toEqual([]);
+  });
+
+  it('rejects reparenting a menu under its own descendant', async () => {
+    const stamp = Date.now();
+    const parentCode = `mock-parent-${stamp}`;
+    const childCode = `mock-child-${stamp}`;
+    const parentId = String(
+      await call({
+        url: 'api/v3/auth/menu/add',
+        method: 'post',
+        data: {
+          parentMenuId: 0,
+          menuName: parentCode,
+          menuCode: parentCode,
+          menuTypeFlag: 'COMMON',
+          menuLevel: 'C1',
+          menuIndex: 999,
+          enableFlag: 'ENABLE',
+        },
+      }),
+    );
+    const childId = String(
+      await call({
+        url: 'api/v3/auth/menu/add',
+        method: 'post',
+        data: {
+          parentMenuId: parentId,
+          menuName: childCode,
+          menuCode: childCode,
+          menuTypeFlag: 'COMMON',
+          menuLevel: 'C2',
+          menuIndex: 1,
+          enableFlag: 'ENABLE',
+        },
+      }),
+    );
+
+    // Moving the parent under its own child would orphan both from the root
+    // and buildTree would silently drop the whole branch from navigation.
+    await expect(
+      call({url: 'api/v3/auth/menu/update', method: 'post', data: {id: parentId, parentMenuId: childId}}),
+    ).rejects.toMatchObject({code: 'R4042', status: 400});
+
+    const tree = await call({url: 'api/v3/auth/menu/list_tree', method: 'post', data: {}});
+    const flat = tree.flatMap((row: any) => [row, ...(row.children || [])]);
+    expect(flat.some((row: any) => row.menuCode === parentCode)).toBe(true);
+    expect(flat.some((row: any) => row.menuCode === childCode)).toBe(true);
+
+    await call({url: 'api/v3/auth/menu/delete', method: 'delete', params: {id: parentId}});
   });
 
   it('paginates core lists into a PageResult', async () => {
@@ -99,13 +181,13 @@ describe('mock adapter', () => {
 
   it('returns the seeded role list with real data', async () => {
     const res = await call({url: 'api/v3/auth/role/list', method: 'post', data: {offset: 0, limit: 12}});
-        expect(res.items.length).toBeGreaterThanOrEqual(3);
+    expect(res.items.length).toBeGreaterThanOrEqual(3);
     expect(res.items.some((r: any) => r.roleCode === 'ROLE_ADMIN')).toBe(true);
   });
 
   it('returns the nested role tree from list_tree', async () => {
     const res = await call({url: 'api/v3/auth/role/list_tree', method: 'post', data: {}});
-        expect(Array.isArray(res)).toBe(true);
+    expect(Array.isArray(res)).toBe(true);
     expect(res.length).toBeGreaterThan(0);
     expect(res.some((r: any) => r.roleCode === 'ROLE_ADMIN')).toBe(true);
   });
@@ -289,5 +371,68 @@ describe('mock adapter', () => {
     expect(stream[0].deviceName).toMatch(/[\u3400-\u9fff]/u);
     expect(alerts[0].message).toBe('设备离线超过 5 分钟');
     expect(topology.nodes.some((node: any) => /[\u3400-\u9fff]/u.test(node.name))).toBe(true);
+  });
+
+  it('parses Request-object bodies through the fetch mock like axios does', async () => {
+    // `fetch(new Request(url, {body}))` leaves init.body undefined — the mock
+    // must read the body off the request object or the handler sees `{}`.
+    const menuCode = `fetch-menu-${Date.now()}`;
+    const res = await window.fetch(
+      new Request('/api/v3/auth/menu/add', {
+        method: 'POST',
+        headers: {'content-type': 'application/json'},
+        body: JSON.stringify({
+          parentMenuId: 0,
+          menuName: menuCode,
+          menuCode,
+          menuTypeFlag: 'COMMON',
+          menuLevel: 'C1',
+          menuIndex: 999,
+          enableFlag: 'ENABLE',
+        }),
+      }),
+    );
+    expect(res.status).toBe(200);
+    const id = String(await res.json());
+    expect(id).not.toBe('');
+
+    const tree = await call({url: 'api/v3/auth/menu/list_tree', method: 'post', data: {menuName: menuCode}});
+    expect(tree.length).toBeGreaterThan(0);
+
+    await window.fetch(`/api/v3/auth/menu/delete?id=${id}`, {method: 'DELETE'});
+  });
+
+  it('collects repeated fetch query keys as arrays instead of keeping only the last value', async () => {
+    // command/get_by_id (generic CRUD) has no first-row fallback, so the
+    // distinction is observable: array params stringify to '9001,9002' and
+    // match nothing, while the old last-value collapse resolved to command 9002.
+    const res = await window.fetch('/api/v3/manager/command/get_by_id?id=9001&id=9002');
+    const body = await res.json();
+    expect(body).toEqual({});
+  });
+
+  it('keeps the four attribute catalogs separate per backend table', async () => {
+    const code = `pt-attr-${Date.now()}`;
+    const added = await call({
+      url: 'api/v3/manager/point_attribute/add',
+      method: 'post',
+      data: {attributeName: code, attributeCode: code, attributeTypeFlag: 'STRING', enableFlag: 'ENABLE'},
+    });
+
+    const lists = await Promise.all(
+      (['driver', 'point', 'command', 'event'] as const).map((scope) =>
+        call({url: `api/v3/manager/${scope}_attribute/list_by_driver_id`, method: 'get', params: {driver_id: '1001'}}),
+      ),
+    );
+    expect(lists[1].some((row: any) => row.attributeCode === code)).toBe(true);
+    expect(lists[0].some((row: any) => row.attributeCode === code)).toBe(false);
+    expect(lists[2].some((row: any) => row.attributeCode === code)).toBe(false);
+    expect(lists[3].some((row: any) => row.attributeCode === code)).toBe(false);
+    // Every catalog still seeds demo candidates.
+    for (const list of lists) {
+      expect(list.length).toBeGreaterThan(0);
+    }
+
+    await call({url: 'api/v3/manager/point_attribute/delete', method: 'delete', params: {id: added.id, version: 0}});
   });
 });

@@ -44,7 +44,15 @@ const configScope = (
 export function registerBusinessHandlers(): void {
   const registerVersionedCrud = (
     baseUrl: string,
-    collection: 'commands' | 'commandParams' | 'events' | 'eventParams',
+    collection:
+      | 'commands'
+      | 'commandParams'
+      | 'events'
+      | 'eventParams'
+      | 'driverAttributes'
+      | 'pointAttributes'
+      | 'commandAttributes'
+      | 'eventAttributes',
     search: string[] = [],
     exact: string[] = ['enableFlag'],
   ) => {
@@ -120,11 +128,15 @@ export function registerBusinessHandlers(): void {
     ),
   );
 
-  // ── A5. attribute metadata (shared across every driver) ──
-  on('get', 'api/v3/manager/driver_attribute/list_by_driver_id', (ctx) => responseOf(ctx.config, ok(db.attributes)));
-  on('get', 'api/v3/manager/point_attribute/list_by_driver_id', (ctx) => responseOf(ctx.config, ok(db.attributes)));
-  on('get', 'api/v3/manager/command_attribute/list_by_driver_id', (ctx) => responseOf(ctx.config, ok(db.attributes)));
-  on('get', 'api/v3/manager/event_attribute/list_by_driver_id', (ctx) => responseOf(ctx.config, ok(db.attributes)));
+  // ── A5. attribute metadata (one collection per backend table) ──
+  registerVersionedCrud('api/v3/manager/driver_attribute', 'driverAttributes', ['attributeName', 'attributeCode']);
+  registerVersionedCrud('api/v3/manager/point_attribute', 'pointAttributes', ['attributeName', 'attributeCode']);
+  registerVersionedCrud('api/v3/manager/command_attribute', 'commandAttributes', ['attributeName', 'attributeCode']);
+  registerVersionedCrud('api/v3/manager/event_attribute', 'eventAttributes', ['attributeName', 'attributeCode']);
+  on('get', 'api/v3/manager/driver_attribute/list_by_driver_id', (ctx) => responseOf(ctx.config, ok(db.driverAttributes)));
+  on('get', 'api/v3/manager/point_attribute/list_by_driver_id', (ctx) => responseOf(ctx.config, ok(db.pointAttributes)));
+  on('get', 'api/v3/manager/command_attribute/list_by_driver_id', (ctx) => responseOf(ctx.config, ok(db.commandAttributes)));
+  on('get', 'api/v3/manager/event_attribute/list_by_driver_id', (ctx) => responseOf(ctx.config, ok(db.eventAttributes)));
 
   // ── A6. attribute_config (driver/point/command/event scopes) ──
   on('get', 'api/v3/manager/driver_attribute_config/list_by_device_id', (ctx) =>

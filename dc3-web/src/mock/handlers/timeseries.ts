@@ -100,13 +100,28 @@ const allRows = (deviceId?: string, pointId?: string): Record<string, unknown>[]
 const cursorScope = (deviceId?: unknown, pointId?: unknown): string =>
   `${deviceId == null ? '' : String(deviceId)}|${pointId == null ? '' : String(pointId)}`;
 
+const toBase64Url = (value: string): string => {
+  const bytes = new TextEncoder().encode(value);
+  let binary = '';
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+  return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
+};
+
+const fromBase64Url = (value: string): string => {
+  const base64 = value.replaceAll('-', '+').replaceAll('_', '/');
+  const bytes = Uint8Array.from(atob(base64), (character) => character.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+};
+
 const encodeCursor = (scope: string, offset: number): string =>
-  Buffer.from(JSON.stringify({v: 1, scope, offset}), 'utf8').toString('base64url');
+  toBase64Url(JSON.stringify({v: 1, scope, offset}));
 
 const decodeCursor = (token: unknown, scope: string): number => {
   if (typeof token !== 'string' || token.length === 0) return 0;
   try {
-    const decoded = JSON.parse(Buffer.from(token, 'base64url').toString('utf8')) as {
+    const decoded = JSON.parse(fromBase64Url(token)) as {
       v?: number;
       scope?: string;
       offset?: number;

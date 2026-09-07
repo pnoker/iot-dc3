@@ -18,10 +18,32 @@
 <template>
   <div>
     <base-card>
-      <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
+      <el-alert
+        v-if="reactiveData.status === 'error'"
+        :closable="false"
+        :title="$t('common.loadFailed')"
+        class="detail-page-alert"
+        show-icon
+        type="error"
+      >
+        <el-button :loading="reactiveData.loading" link type="danger" @click="reload">
+          {{ $t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-empty
+        v-if="reactiveData.status === 'error' && !reactiveData.data.id"
+        :description="$t('common.loadFailed')"
+      />
+      <el-skeleton v-else-if="!reactiveData.data.id" :rows="6" animated />
+      <el-tabs
+        v-else
+        v-model="reactiveData.active"
+        v-loading="reactiveData.loading"
+        @tab-click="changeActive"
+      >
         <el-tab-pane :label="$t('point.detail.pointInfo')" name="detail">
           <detail-card>
-            <el-descriptions :column="2" border>
+            <el-descriptions :column="isMobile ? 1 : 2" border>
               <el-descriptions-item :label="$t('point.detail.pointName')"
               >{{ reactiveData.data.pointName }}
               </el-descriptions-item>
@@ -39,7 +61,27 @@
           </detail-card>
         </el-tab-pane>
         <el-tab-pane :label="$t('point.detail.relatedDevices')" name="device">
-          <el-row>
+          <el-alert
+            v-if="reactiveData.relationStatus === 'error'"
+            :closable="false"
+            :title="$t('common.loadFailed')"
+            class="detail-page-alert"
+            show-icon
+            type="error"
+          >
+            <el-button :loading="reactiveData.relationLoading" link type="danger" @click="device">
+              {{ $t('common.retry') }}
+            </el-button>
+          </el-alert>
+          <el-empty
+            v-if="reactiveData.relationStatus === 'error' && reactiveData.listDeviceData.length === 0"
+            :description="$t('common.loadFailed')"
+          />
+          <el-empty
+            v-else-if="reactiveData.relationStatus === 'success' && reactiveData.listDeviceData.length === 0"
+            :description="$t('common.empty')"
+          />
+          <el-row v-else v-loading="reactiveData.relationLoading" :aria-busy="reactiveData.relationLoading">
             <el-col
               v-for="data in reactiveData.listDeviceData"
               :key="data.id"
@@ -64,3 +106,16 @@
 </template>
 
 <script lang="ts" src="./index.ts"/>
+
+<style lang="scss" scoped>
+.detail-page-alert {
+  margin-bottom: var(--dc3-space-3);
+
+  :deep(.el-alert__content) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--dc3-space-2);
+  }
+}
+</style>

@@ -61,7 +61,7 @@ const cud = (url: string, key: 'agenticModelConfigs' | 'agenticProviders') => {
     if (i >= 0) coll[i] = {...coll[i], ...ctx.body, operateTime: stamp()};
     return responseOf(ctx.config, ok(String(ctx.body?.id ?? '')));
   });
-  on('post', `${url}/delete`, (ctx) => {
+  on(['post', 'delete'], `${url}/delete`, (ctx) => {
     const coll = ctx.db[key];
     const i = coll.findIndex((r) => String(r.id) === String(ctx.params.id));
     if (i >= 0) coll.splice(i, 1);
@@ -98,7 +98,7 @@ export function registerAgenticHandlers(): void {
     const rows = ctx.db.agenticSessions.map(localizeAgenticRow);
     return responseOf(ctx.config, ok(paginate(rows, ctx.body)));
   });
-  on('post', 'api/v3/agentic/session/delete', (ctx) => {
+  on(['post', 'delete'], 'api/v3/agentic/session/delete', (ctx) => {
     const id = ctx.params.conversation_id;
     const coll = ctx.db.agenticSessions;
     const i = coll.findIndex((r) => String(r.conversationId) === String(id));
@@ -182,10 +182,11 @@ export function registerAgenticHandlers(): void {
       ctx.config,
       ok({
         issuer: 'https://demo.dc3.site',
-        authorizationEndpoint: '/oauth/authorize',
-        tokenEndpoint: '/oauth/token',
-        registrationEndpoint: '/oauth/register',
-        scopesSupported: ['mcp:tools:list', 'mcp:tools:call'],
+        authorization_endpoint: 'https://demo.dc3.site/oauth/authorize',
+        token_endpoint: 'https://demo.dc3.site/oauth/token',
+        jwks_uri: 'https://demo.dc3.site/oauth/jwks',
+        registration_endpoint: 'https://demo.dc3.site/oauth/register',
+        scopes_supported: ['mcp:tools:list', 'mcp:tools:call'],
       }),
     ),
   );
@@ -234,7 +235,7 @@ export function registerAgenticHandlers(): void {
   });
   on('post', 'api/v3/auth/mcp/connection/tools/replace', (ctx) => responseOf(ctx.config, ok(true)));
   on('get', 'api/v3/auth/mcp/connection/tools/list', (ctx) =>
-    responseOf(ctx.config, ok(ctx.db.mcpTools)),
+    responseOf(ctx.config, ok(ctx.db.mcpTools.slice(0, 3).map((tool) => String(tool.toolId)))),
   );
 
   // ── MCP: tool catalog & audit ──

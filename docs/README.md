@@ -13,6 +13,7 @@
 | 开发工具 | [development.md](./development.md) Make 开发、启动与质量命令 | 有效 |
 | 设计/架构 | [design/relational-r2dbc.md](./design/relational-r2dbc.md) R2DBC 关系访问层 | 已落地，待全量实库/拓扑验收 |
 | 质量/测试 | [r2dbc-migration-test-handoff.md](./r2dbc-migration-test-handoff.md) R2DBC 全平台测试交接 | 待执行，发布硬门禁 |
+| 质量/测试 | [dc3-web-low-defects-handoff.md](./dc3-web-low-defects-handoff.md) dc3-web 遗留缺陷修复交接 | LOW 项已修复；「需人工确认」5 项待裁决 |
 | 设计/架构 | [design/tsdb-abstraction.md](./design/tsdb-abstraction.md) 时序存储 Port | 已落地 |
 | 设计/架构 | [design/mq-abstraction.md](./design/mq-abstraction.md) 消息中间件 Port | 已落地 |
 | 设计/架构 | [design/storage-abstraction.md](./design/storage-abstraction.md) 存储抽象总纲 | 部分被取代(§3/§4) |

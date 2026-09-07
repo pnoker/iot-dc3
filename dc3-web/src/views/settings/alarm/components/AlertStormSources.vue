@@ -17,10 +17,13 @@
 
 <template>
   <dashboard-card
-    :empty="!loading && rows.length === 0"
+    :empty="status === 'success' && rows.length === 0"
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.stormEmpty')"
+    :error="status === 'error'"
+    :error-text="t('common.loadFailed')"
     :loading="loading"
+    :retry-text="t('common.retry')"
     :subtitle="t('settings.event.overview.stormSubtitle', {hours: window.hours, min: window.minCount})"
     :title="t('settings.event.overview.stormTitle')"
     body-mode="scroll"
@@ -33,15 +36,17 @@
     </template>
 
     <ul class="alert-storm__list">
-      <li v-for="row in rows" :key="`${row.source}:${row.sourceId}`" class="alert-storm__item" @click="onDrillIn(row)">
-        <el-tag :type="sourceTagType(row.source)" size="small">
-          {{ sourceLabel(row.source) }}
-        </el-tag>
-        <span class="alert-storm__name">{{ nameFor(row) }}</span>
-        <span class="alert-storm__count">
-          <el-icon><Warning/></el-icon>
-          {{ row.count }}
-        </span>
+      <li v-for="row in rows" :key="`${row.source}:${row.sourceId}`">
+        <button class="alert-storm__item" type="button" @click="onDrillIn(row)">
+          <el-tag :type="sourceTagType(row.source)" size="small">
+            {{ sourceLabel(row.source) }}
+          </el-tag>
+          <span class="alert-storm__name">{{ nameFor(row) }}</span>
+          <span class="alert-storm__count">
+            <el-icon><Warning/></el-icon>
+            {{ row.count }}
+          </span>
+        </button>
       </li>
     </ul>
   </dashboard-card>
@@ -58,6 +63,7 @@ import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {jumpToSourceEvents} from '@/utils/jumpUtil';
 import type {AlertSource, AlertStormRow} from '@/config/types/dashboard';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 const props = defineProps({
   limit: {type: Number, default: 10},
@@ -87,21 +93,20 @@ const windowOptions = [
 const windowKey = ref<WindowKey>('24h');
 const window = computed(() => WINDOW_SPECS[windowKey.value]);
 
-const loading = ref(false);
+const {loading, run, status} = useAsyncLoader();
 const rows = ref<AlertStormRow[]>([]);
 
 const load = async () => {
-  loading.value = true;
-  try {
-    const {hours, minCount} = window.value;
-    const res: AlertStormRow[] = await alertStormSources(hours, minCount, props.limit);
-    rows.value = res ?? [];
-    await resolveBySource(rows.value);
-  } catch {
-    // handled globally
-  } finally {
-    loading.value = false;
-  }
+  const {hours, minCount} = window.value;
+  await run(
+    async () => {
+      const result = await alertStormSources(hours, minCount, props.limit);
+      const nextRows = Array.isArray(result) ? result : [];
+      await resolveBySource(nextRows);
+      return nextRows;
+    },
+    {apply: (result) => (rows.value = result)}
+  );
 };
 
 watch(windowKey, load);
@@ -131,16 +136,30 @@ defineExpose({refresh: load});
   }
 
   .alert-storm__item {
+    appearance: none;
     display: flex;
     align-items: center;
+    width: 100%;
+    min-height: var(--dc3-touch-target);
     gap: var(--dc3-space-2);
     padding: var(--dc3-space-2) var(--dc3-space-4);
+    border: 0;
     border-bottom: 1px solid var(--el-border-color-lighter);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
     cursor: pointer;
-    transition: background-color 0.12s ease;
+    transition: background-color var(--dc3-duration-fast) var(--dc3-ease-standard);
 
-    &:hover {
-      background: #fafafa;
+    &:hover,
+    &:focus-visible {
+      background: var(--dc3-bg-interactive);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset var(--dc3-focus-ring);
     }
 
     &:last-child {
@@ -155,14 +174,14 @@ defineExpose({refresh: load});
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 13px;
-    color: #303133;
+    color: var(--dc3-text-primary);
   }
 
   .alert-storm__count {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    color: #f56c6c;
+    gap: var(--dc3-space-1);
+    color: var(--el-color-danger);
     font-weight: 600;
     font-size: 13px;
   }

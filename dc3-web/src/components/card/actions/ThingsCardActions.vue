@@ -16,49 +16,52 @@
   -->
 
 <template>
-  <div class="things-card__footer">
+  <div :aria-busy="busy" class="things-card__footer">
     <div class="things-card-footer-operation">
       <el-popconfirm
         :icon="SwitchButton"
+        :disabled="busy || !enabled"
         :title="disableTitle"
         icon-color="#e6a23c"
         placement="top"
         @confirm="$emit('disable')"
       >
         <template #reference>
-          <el-button :disabled="!enabled" link type="primary">
+          <el-button :disabled="busy || !enabled" :loading="busy && enabled" link type="primary">
             {{ t('common.disable') }}
           </el-button>
         </template>
       </el-popconfirm>
       <el-popconfirm
         :icon="CircleCheck"
+        :disabled="busy || enabled"
         :title="enableTitle"
         icon-color="#67c23a"
         placement="top"
         @confirm="$emit('enable')"
       >
         <template #reference>
-          <el-button :disabled="enabled" link type="primary">
+          <el-button :disabled="busy || enabled" :loading="busy && !enabled" link type="primary">
             {{ t('common.enable') }}
           </el-button>
         </template>
       </el-popconfirm>
       <el-popconfirm
         :icon="CircleClose"
+        :disabled="busy"
         :title="deleteTitle"
         icon-color="#f56c6c"
         placement="top"
         @confirm="$emit('delete')"
       >
         <template #reference>
-          <el-button link type="primary">{{ t('common.delete') }}</el-button>
+          <el-button :disabled="busy" :loading="busy" link type="primary">{{ t('common.delete') }}</el-button>
         </template>
       </el-popconfirm>
-      <el-button link type="primary" @click="$emit('edit')">
+      <el-button :disabled="busy" link type="primary" @click="$emit('edit')">
         {{ t('common.edit') }}
       </el-button>
-      <el-button :disabled="detailDisabled" link type="primary" @click="$emit('detail')">
+      <el-button :disabled="busy || detailDisabled" link type="primary" @click="$emit('detail')">
         {{ t('common.detail') }}
       </el-button>
     </div>
@@ -75,6 +78,7 @@ defineProps({
   enableTitle: {type: String, required: true},
   deleteTitle: {type: String, required: true},
   detailDisabled: {type: Boolean, default: false},
+  busy: {type: Boolean, default: false},
 });
 
 defineEmits(['disable', 'enable', 'delete', 'edit', 'detail']);
@@ -84,15 +88,39 @@ const {t} = useI18n();
 
 <style lang="scss" scoped>
 .things-card__footer {
-  height: 35px;
+  min-height: var(--dc3-touch-target);
   margin-top: 2px;
+  padding-inline-end: var(--dc3-floating-action-safe-space);
+  box-sizing: border-box;
   display: flex;
   justify-content: flex-end;
   border-top: 1px solid var(--el-border-color);
 }
 
 .things-card-footer-operation {
-  height: 35px;
+  min-height: var(--dc3-touch-target);
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--dc3-space-1);
+
+  :deep(.el-button) {
+    min-height: var(--dc3-touch-target);
+    margin: 0;
+  }
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  .things-card__footer {
+    justify-content: stretch;
+  }
+
+  .things-card-footer-operation {
+    width: 100%;
+
+    :deep(.el-button) {
+      flex: 1 1 auto;
+    }
+  }
 }
 </style>

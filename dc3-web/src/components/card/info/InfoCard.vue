@@ -20,6 +20,8 @@
     <el-card shadow="never">
       <el-form
         ref="formRef"
+        :aria-busy="saving"
+        :disabled="saving"
         :inline="true"
         :model="formModel"
         :rules="rules"
@@ -35,10 +37,10 @@
           <slot name="actions"/>
           <span v-if="!hideDefaultActions" aria-hidden="true" class="info-card-footer-divider"/>
           <template v-if="!hideDefaultActions">
-            <el-button :icon="Check" plain type="primary" @click="onSave">
+            <el-button :disabled="saving" :icon="Check" :loading="saving" plain type="primary" @click="onSave">
               {{ t('common.save') }}
             </el-button>
-            <el-button :icon="RefreshLeft" plain @click="onReset">
+            <el-button :disabled="saving" :icon="RefreshLeft" plain @click="onReset">
               {{ t('common.reset') }}
             </el-button>
           </template>
@@ -68,6 +70,10 @@ defineProps({
     default: () => ({}),
   },
   hideDefaultActions: {
+    type: Boolean,
+    default: false,
+  },
+  saving: {
     type: Boolean,
     default: false,
   },

@@ -142,6 +142,40 @@ describe('useEntityNames', () => {
     expect(hook.deviceName('d-1')).toBe('Boiler');
   });
 
+  it('waits for the matching batch when disjoint requests overlap', async () => {
+    let resolveFirst!: (value: unknown) => void;
+    let resolveSecond!: (value: unknown) => void;
+    apiMocks.listDeviceByIds.mockImplementation((ids: string[]) => {
+      if (ids[0] === 'd-1') {
+        return new Promise((resolve) => {
+          resolveFirst = resolve;
+        });
+      }
+      return new Promise((resolve) => {
+        resolveSecond = resolve;
+      });
+    });
+
+    const hook = await loadHook();
+    const first = hook.resolveDevices(['d-1']);
+    const second = hook.resolveDevices(['d-2']);
+    let thirdSettled = false;
+    const third = hook.resolveDevices(['d-2']).then(() => {
+      thirdSettled = true;
+    });
+
+    await Promise.resolve();
+    expect(apiMocks.listDeviceByIds).toHaveBeenCalledTimes(2);
+    expect(thirdSettled).toBe(false);
+
+    resolveFirst({'d-1': {deviceName: 'Boiler'}});
+    resolveSecond({'d-2': {deviceName: 'Compressor'}});
+    await Promise.all([first, second, third]);
+
+    expect(thirdSettled).toBe(true);
+    expect(hook.deviceName('d-2')).toBe('Compressor');
+  });
+
   it('resolveBySource splits device/driver ids into a single batched fetch each', async () => {
     const hook = await loadHook();
 

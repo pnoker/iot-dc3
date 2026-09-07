@@ -27,7 +27,7 @@ WORKDIR /build
 
 COPY dc3-web/ ./
 
-RUN corepack enable && corepack prepare pnpm@11.24.0 --activate
+RUN corepack enable && corepack prepare pnpm@12.3.4 --activate
 RUN apk add --no-cache git
 RUN pnpm install --frozen-lockfile --ignore-scripts
 RUN pnpm build

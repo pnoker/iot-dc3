@@ -20,7 +20,7 @@ import {expect, test} from '@playwright/test';
 import {expectHealthy, login, logout, markHealth, waitForAppSettled, watchPageHealth} from '../fixtures/app';
 
 test.describe('logout', () => {
-  test('clearing the auth token forces a redirect to /login on next protected nav', async ({page}) => {
+  test('clearing the auth session forces a redirect to /login on next protected nav', async ({page}) => {
     const health = watchPageHealth(page);
 
     await login(page);
@@ -28,18 +28,18 @@ test.describe('logout', () => {
     await waitForAppSettled(page);
     await expect(page, 'authenticated /home should not redirect').not.toHaveURL(/\/login/);
 
-    const tokenBeforeLogout = await page.evaluate(() => localStorage.getItem('X-Auth-Token'));
-    expect(tokenBeforeLogout, 'auth token should exist before logout').not.toBeNull();
+    const authenticatedBeforeLogout = await page.evaluate(() => sessionStorage.getItem('dc3-authenticated'));
+    expect(authenticatedBeforeLogout, 'auth session marker should exist before logout').not.toBeNull();
 
     const logoutMark = markHealth(health);
     await logout(page);
 
-    // Auth headers must be gone — guard relies on tenant + login + token
-    // all being present, so wiping any one is enough, but we wipe all
-    // three for parity with the production logout action.
-    expect(await page.evaluate(() => localStorage.getItem('X-Auth-Token'))).toBeNull();
+    // Tenant/login are local identity hints; the session marker is the
+    // frontend-visible authentication state. The access token itself is an
+    // httpOnly cookie and must never be readable from JavaScript storage.
     expect(await page.evaluate(() => localStorage.getItem('X-Auth-Tenant'))).toBeNull();
     expect(await page.evaluate(() => localStorage.getItem('X-Auth-Login'))).toBeNull();
+    expect(await page.evaluate(() => sessionStorage.getItem('dc3-authenticated'))).toBeNull();
 
     // Subsequent protected nav must redirect — proves the guard reads
     // storage on every navigation, not only on app boot.

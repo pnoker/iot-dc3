@@ -22,11 +22,29 @@
         <div class="mcp-overview__header">
           <span class="mcp-overview__title">{{ t('settings.mcp.title') }}</span>
           <el-tooltip :content="t('common.refresh')" effect="dark" placement="top">
-            <el-button :icon="Refresh" :loading="loading" circle @click="loadMetadata"/>
+            <el-button
+              :aria-label="t('common.refresh')"
+              :icon="Refresh"
+              :loading="loading"
+              circle
+              @click="loadMetadata"
+            />
           </el-tooltip>
         </div>
       </template>
-      <el-descriptions :column="2" border>
+      <el-alert
+        v-if="loadError"
+        :closable="false"
+        :title="t('common.loadFailed')"
+        class="mcp-overview__error"
+        show-icon
+        type="error"
+      >
+        <el-button :loading="loading" link type="danger" @click="loadMetadata">
+          {{ t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-descriptions v-loading="loading" :aria-busy="loading" :column="isMobile ? 1 : 2" border>
         <el-descriptions-item :label="t('settings.mcp.serverUrl')">
           <div class="mcp-overview__copy-line">
             <span>{{ mcpServerUrl }}</span>
@@ -66,17 +84,22 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
+import {computed, onBeforeUnmount, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {DocumentCopy, Refresh} from '@element-plus/icons-vue';
 
 import {getMcpMetadata} from '@/api/mcp';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 import {MCP_SERVER_PATH} from '@/config/constant/api';
+import type {McpMetadata} from '@/config/types';
 import {copy} from '@/utils/commonUtil';
 
 const {t} = useI18n();
+const {isMobile} = useBreakpoint();
 const loading = ref(false);
-const metadata = ref<Record<string, any>>({});
+const loadError = ref(false);
+const metadata = ref<McpMetadata>({});
+let latestLoadId = 0;
 
 const mcpServerUrl = computed(() => `${window.location.origin}${MCP_SERVER_PATH}`);
 
@@ -92,30 +115,39 @@ const agentSnippets = computed(() => {
 });
 
 const loadMetadata = async () => {
+  const loadId = ++latestLoadId;
   loading.value = true;
+  loadError.value = false;
   try {
     const res = await getMcpMetadata();
+    if (loadId !== latestLoadId) return;
     metadata.value = res || {};
+  } catch {
+    if (loadId === latestLoadId) loadError.value = true;
   } finally {
-    loading.value = false;
+    if (loadId === latestLoadId) loading.value = false;
   }
 };
 
-loadMetadata();
+onBeforeUnmount(() => {
+  latestLoadId += 1;
+});
+
+void loadMetadata();
 </script>
 
 <style lang="scss" scoped>
 .mcp-overview {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--dc3-space-3);
 }
 
 .mcp-overview__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--dc3-space-3);
 }
 
 .mcp-overview__title {
@@ -123,21 +155,63 @@ loadMetadata();
   font-weight: 600;
 }
 
+.mcp-overview__error {
+  margin-bottom: var(--dc3-space-3);
+
+  :deep(.el-alert__content) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--dc3-space-2);
+  }
+}
+
 .mcp-overview__copy-line {
   display: flex;
   align-items: center;
   gap: var(--dc3-space-2);
   min-width: 0;
+  max-width: 100%;
+  padding-inline-end: var(--dc3-floating-action-safe-space);
+  box-sizing: border-box;
+  flex-wrap: wrap;
 }
 
 .mcp-overview__copy-line span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 180px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.mcp-overview__copy-line :deep(.el-button) {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+:deep(.el-descriptions),
+:deep(.el-descriptions__body),
+:deep(.el-descriptions__table) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+:deep(.el-descriptions__table) {
+  table-layout: fixed;
+}
+
+:deep(.el-descriptions__label),
+:deep(.el-descriptions__content) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .mcp-overview__snippet {
-  margin-top: 12px;
+  margin-top: var(--dc3-space-3);
 
   &:first-child {
     margin-top: 0;
@@ -148,7 +222,9 @@ loadMetadata();
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 4px;
+  padding-inline-end: var(--dc3-floating-action-safe-space);
+  box-sizing: border-box;
+  margin-bottom: var(--dc3-space-1);
 }
 
 .mcp-overview__snippet-name {
@@ -161,7 +237,7 @@ loadMetadata();
   max-height: 180px;
   overflow: auto;
   background: var(--el-fill-color-light);
-  border-radius: 4px;
+  border-radius: var(--dc3-radius-sm);
   font-size: 12px;
   line-height: 1.5;
 }

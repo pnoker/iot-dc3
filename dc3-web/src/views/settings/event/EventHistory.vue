@@ -51,52 +51,53 @@
       <span class="auto-refresh-bar__time">{{ $t('common.lastRefreshTime') }}: {{ lastRefreshText }}</span>
     </div>
 
-    <blank-card>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <!-- @vue-generic {EventHistoryRecord} -->
-        <el-table-column :label="$t('eventHistory.device')" min-width="160" show-overflow-tooltip>
-          <template #default="{row}">{{ deviceNameFor(row) }}</template>
-        </el-table-column>
-        <el-table-column :label="$t('eventHistory.eventCode')" min-width="140" prop="eventCode"/>
-        <el-table-column :label="$t('eventHistory.type')" width="110">
-          <template #default="{row}">{{ eventTypeLabel(row.eventTypeFlag) }}</template>
-        </el-table-column>
-        <el-table-column :label="$t('eventHistory.level')" width="100">
-          <template #default="{row}">
-            <el-tag :type="eventLevelTag(row.eventLevelFlag)" size="small">
-              {{ eventLevelLabel(row.eventLevelFlag) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('eventHistory.ack')" prop="acknowledgeFlag" width="90"/>
-        <el-table-column :label="$t('eventHistory.message')" min-width="200" prop="message" show-overflow-tooltip/>
-        <el-table-column
-          :formatter="timestampColumn"
-          :label="$t('eventHistory.occurTime')"
-          prop="occurTime"
-          width="165"
-        />
-        <el-table-column :formatter="timestampColumn" :label="$t('common.createTime')" prop="createTime" width="165"/>
-        <!-- @vue-generic {EventHistoryRecord} -->
-        <el-table-column :label="$t('common.operation')" fixed="right" width="100">
-          <template #default="{row}">
-            <el-button link type="primary" @click="openDetail(row)">{{ $t('common.detail') }}</el-button>
-          </template>
-        </el-table-column>
-        <template #empty>
-          <el-empty :description="$t('common.description')"/>
-        </template>
-      </el-table>
-    </blank-card>
+    <responsive-record-list
+      :columns="columns"
+      :loading="reactiveData.loading"
+      :rows="reactiveData.listData"
+      :status="reactiveData.status"
+      operation-width="100"
+      row-key="recordId"
+      @retry="refresh"
+    >
+      <template #actions="{row}">
+        <el-button link type="primary" @click="openDetail(row as EventHistoryRecord)">
+          {{ $t('common.detail') }}
+        </el-button>
+      </template>
+    </responsive-record-list>
 
     <el-dialog
       v-model="detailVisible"
       :append-to-body="true"
+      :close-on-click-modal="false"
+      :close-on-press-escape="true"
       :title="$t('eventHistory.detailTitle')"
+      class="things-dialog"
+      destroy-on-close
       draggable
       width="700px"
+      @closed="closeDetail"
     >
-      <el-descriptions v-if="detailRow" :column="2" border>
+      <el-alert
+        v-if="detailError"
+        :closable="false"
+        :title="$t('common.detailLoadFailed')"
+        class="history-detail__error"
+        show-icon
+        type="warning"
+      >
+        <el-button :loading="detailLoading" link type="warning" @click="retryDetail">
+          {{ $t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-descriptions
+        v-if="detailRow"
+        v-loading="detailLoading"
+        :aria-busy="detailLoading"
+        :column="isMobile ? 1 : 2"
+        border
+      >
         <el-descriptions-item :label="$t('eventHistory.recordId')" :span="2">
           {{ detailRow.recordId }}
         </el-descriptions-item>
@@ -143,17 +144,22 @@
 
 <script lang="ts" setup>
 import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
 import {listDeviceByIds} from '@/api/device';
 import {getEventHistoryByRecordId, listEventHistory} from '@/api/event';
+import ResponsiveRecordList from '@/components/list/ResponsiveRecordList.vue';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 import {usePagedList} from '@/composables/usePagedList';
-import {timestampColumn, timestampLabel} from '@/utils/dateUtil';
+import {timestampLabel} from '@/utils/dateUtil';
 import {prettyJson} from '@/utils/jsonUtil';
 import {eventLevelLabel, eventLevelTag, eventTypeLabel} from '@/utils/thingModelFormatUtil';
-import type {EventHistoryRecord} from '@/config/types';
+import type {EventHistoryRecord, ResponsiveListColumn} from '@/config/types';
 import {AUTO_REFRESH_INTERVAL} from '@/config/constant/ui';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
-import BlankCard from '@/components/card/blank/BlankCard.vue';
 import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
+
+const {isMobile} = useBreakpoint();
+const {t} = useI18n();
 
 const {
   state: reactiveData,
@@ -169,12 +175,15 @@ const {
 const formData = reactive<Record<string, string>>({});
 const detailVisible = ref(false);
 const detailRow = ref<EventHistoryRecord | null>(null);
+const detailLoading = ref(false);
+const detailError = ref(false);
 const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
-const lastRefreshTime = ref<number>(Date.now());
+let detailRequestId = 0;
+let deviceLookupRequestId = 0;
 
 const lastRefreshText = computed(() => {
-  const d = new Date(lastRefreshTime.value);
-  return d.toLocaleTimeString();
+  if (!reactiveData.lastUpdated) return '-';
+  return new Date(reactiveData.lastUpdated).toLocaleTimeString();
 });
 
 const formatJson = (value: unknown) => prettyJson(value);
@@ -183,12 +192,14 @@ const formatJson = (value: unknown) => prettyJson(value);
 // listDeviceByIds source EventTable uses. Filled as rows arrive.
 const deviceNameMap = reactive<Record<string, string>>({});
 const resolveDeviceNames = async (rows: EventHistoryRecord[]) => {
+  const requestId = ++deviceLookupRequestId;
   const ids = Array.from(
     new Set(rows.map((r) => String(r.deviceId ?? '')).filter((id) => id && id !== '0' && !deviceNameMap[id]))
   );
   if (!ids.length) return;
   try {
     const res: any = await listDeviceByIds(ids);
+    if (requestId !== deviceLookupRequestId) return;
     const data = res || {};
     ids.forEach((id) => {
       if (data[id]) deviceNameMap[id] = data[id].deviceName || id;
@@ -206,6 +217,35 @@ watch(
 );
 const deviceNameFor = (row: EventHistoryRecord) => deviceNameMap[String(row.deviceId)] || String(row.deviceId ?? '-');
 
+const columns = computed<ResponsiveListColumn<EventHistoryRecord>[]>(() => [
+  {
+    key: 'device',
+    label: t('eventHistory.device'),
+    minWidth: 160,
+    mobile: 'primary',
+    formatter: deviceNameFor,
+  },
+  {key: 'eventCode', label: t('eventHistory.eventCode'), minWidth: 140},
+  {
+    key: 'eventTypeFlag',
+    label: t('eventHistory.type'),
+    width: 110,
+    formatter: (row) => eventTypeLabel(row.eventTypeFlag),
+  },
+  {
+    key: 'eventLevelFlag',
+    label: t('eventHistory.level'),
+    width: 100,
+    kind: 'tag',
+    formatter: (row) => eventLevelLabel(row.eventLevelFlag),
+    tagType: (row) => eventLevelTag(row.eventLevelFlag),
+  },
+  {key: 'acknowledgeFlag', label: t('eventHistory.ack'), width: 90},
+  {key: 'message', label: t('eventHistory.message'), minWidth: 200},
+  {key: 'occurTime', label: t('eventHistory.occurTime'), width: 165, kind: 'time'},
+  {key: 'createTime', label: t('common.createTime'), width: 165, kind: 'time', mobile: 'hidden'},
+]);
+
 const onSearch = (data: Record<string, string>) => {
   search(cleanSearchParams(data));
 };
@@ -215,23 +255,39 @@ const onReset = () => {
   reset();
 };
 
-const doRefresh = async () => {
-  await load();
-  lastRefreshTime.value = Date.now();
-};
+const doRefresh = () => load();
 
 const refresh = () => doRefresh();
 
+const loadDetail = async (row: EventHistoryRecord) => {
+  const requestId = ++detailRequestId;
+  detailLoading.value = true;
+  detailError.value = false;
+  try {
+    const response = await getEventHistoryByRecordId(row.recordId);
+    if (requestId === detailRequestId && detailVisible.value) detailRow.value = response || row;
+  } catch {
+    if (requestId === detailRequestId && detailVisible.value) detailError.value = true;
+  } finally {
+    if (requestId === detailRequestId) detailLoading.value = false;
+  }
+};
+
 const openDetail = (row: EventHistoryRecord) => {
-  getEventHistoryByRecordId(row.recordId)
-    .then((res) => {
-      detailRow.value = res || row;
-      detailVisible.value = true;
-    })
-    .catch(() => {
-      detailRow.value = row;
-      detailVisible.value = true;
-    });
+  detailRow.value = row;
+  detailVisible.value = true;
+  void loadDetail(row);
+};
+
+const retryDetail = () => {
+  if (detailRow.value) void loadDetail(detailRow.value);
+};
+
+const closeDetail = () => {
+  detailRequestId += 1;
+  detailLoading.value = false;
+  detailError.value = false;
+  detailRow.value = null;
 };
 
 onMounted(() => {
@@ -243,33 +299,44 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  detailRequestId += 1;
+  deviceLookupRequestId += 1;
   if (autoRefreshTimer.value) {
     clearInterval(autoRefreshTimer.value);
     autoRefreshTimer.value = null;
   }
 });
 
-doRefresh();
+void doRefresh();
 </script>
 
 <style lang="scss" scoped>
 .auto-refresh-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 4px 12px;
-  margin-bottom: 4px;
-  font-size: 12px;
+  flex-wrap: wrap;
+  gap: var(--dc3-space-3);
+  padding: var(--dc3-space-1) var(--dc3-space-3);
+  margin-bottom: var(--dc3-space-1);
+  font-size: var(--el-font-size-extra-small);
   color: var(--el-text-color-secondary);
   background: var(--el-fill-color-light);
-  border-radius: 4px;
+  border-radius: var(--dc3-radius-sm);
 
   &__label {
-    font-weight: 500;
+    font-weight: var(--el-font-weight-primary);
   }
 
   &__time {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: var(--el-text-color-placeholder);
   }
+}
+
+.history-detail__error {
+  margin-bottom: var(--dc3-space-3);
 }
 </style>

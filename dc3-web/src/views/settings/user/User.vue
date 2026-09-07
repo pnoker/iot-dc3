@@ -39,16 +39,16 @@ const assignRef = ref<InstanceType<typeof UserAssignRoles>>();
 
 const openAssignRoles = (row: Record<string, any>) => assignRef.value?.show(row);
 
-const onAssignRoles = async (principalId: string, addIds: string[], removeBindIds: string[], done: () => void) => {
+const onAssignRoles = async (principalId: string, addIds: string[], removeBindIds: string[], done: (successful?: boolean) => void) => {
   try {
     await Promise.all([
       ...addIds.map((roleId) => addRolePrincipalBind({principalId, principalType: 'USER', roleId})),
       ...removeBindIds.map((id) => deleteRolePrincipalBind(id)),
     ]);
     successMessage(t('settings.user.assignSaved'));
-    done();
+    done(true);
   } catch {
-    // handled globally
+    done(false);
   }
 };
 

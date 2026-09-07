@@ -18,10 +18,32 @@
 <template>
   <div>
     <base-card>
-      <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
+      <el-alert
+        v-if="reactiveData.status === 'error'"
+        :closable="false"
+        :title="$t('common.loadFailed')"
+        class="detail-page-alert"
+        show-icon
+        type="error"
+      >
+        <el-button :loading="reactiveData.loading" link type="danger" @click="driver">
+          {{ $t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-empty
+        v-if="reactiveData.status === 'error' && !reactiveData.data.id"
+        :description="$t('common.loadFailed')"
+      />
+      <el-skeleton v-else-if="!reactiveData.data.id" :rows="6" animated />
+      <el-tabs
+        v-else
+        v-model="reactiveData.active"
+        v-loading="reactiveData.loading"
+        @tab-click="changeActive"
+      >
         <el-tab-pane :label="$t('driver.detail.driverInfo')" name="detail">
           <detail-card>
-            <el-descriptions :column="2" border>
+            <el-descriptions :column="isMobile ? 1 : 2" border>
               <el-descriptions-item :label="$t('driver.detail.driverName')"
               >{{ reactiveData.data.driverName }}
               </el-descriptions-item>
@@ -54,6 +76,17 @@
 <script lang="ts" src="./index.ts"/>
 
 <style lang="scss" scoped>
+.detail-page-alert {
+  margin-bottom: var(--dc3-space-3);
+
+  :deep(.el-alert__content) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--dc3-space-2);
+  }
+}
+
 .detail-content {
   margin-left: 0 !important;
   margin-right: 0 !important;

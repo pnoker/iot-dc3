@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@use '@/styles/tokens.scss' as *;
+
 // Vertically centre things-dialog + cap its height so tall forms scroll
 // inside the dialog rather than bleed past the viewport bottom.
 .el-overlay-dialog:has(.things-dialog) {
@@ -106,14 +108,71 @@
   }
 
   .param-editor {
-    margin-top: 12px;
+    margin-top: var(--dc3-space-3);
   }
 
   .param-editor__toolbar {
     align-items: center;
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: var(--dc3-space-2);
+  }
+
+  .param-editor__rows {
+    display: grid;
+    gap: var(--dc3-space-3);
+    min-width: 0;
+  }
+
+  .param-editor__row {
+    min-width: 0;
+    padding: var(--dc3-space-3);
+    border: 1px solid var(--dc3-border-base);
+    border-radius: var(--dc3-radius-md);
+    background: var(--dc3-bg-elevated);
+  }
+
+  .param-editor__row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--dc3-space-3);
+    min-height: var(--dc3-touch-target);
+    margin-bottom: var(--dc3-space-3);
+  }
+
+  .param-editor__row-title {
+    min-width: 0;
+    color: var(--dc3-text-primary);
+  }
+
+  .param-editor__fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--dc3-space-3);
+    min-width: 0;
+  }
+
+  .param-editor__field {
+    display: grid;
+    gap: var(--dc3-space-1);
+    min-width: 0;
+  }
+
+  .param-editor__field--toggle {
+    align-content: start;
+    justify-items: start;
+  }
+
+  .param-editor__label {
+    color: var(--dc3-text-regular);
+    font-size: var(--el-font-size-small);
+    line-height: var(--el-line-height-primary);
+  }
+
+  .param-editor__row .el-input,
+  .param-editor__row .el-select {
+    width: 100%;
   }
 
   .things-dialog-footer {
@@ -144,6 +203,54 @@
 
     .el-textarea__inner {
       height: 100px;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  .things-dialog {
+    &.el-dialog {
+      width: calc(100% - 16px);
+      max-width: calc(100% - 16px);
+      max-height: calc(100dvh - 16px);
+    }
+
+    .el-dialog__body {
+      padding: var(--dc3-space-4) var(--dc3-space-3) var(--dc3-space-3);
+    }
+
+    .things-form-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .things-dialog-form-item {
+      .el-form-item__label {
+        width: auto;
+        height: auto;
+        text-align: left;
+      }
+
+      .el-form-item__label::after {
+        display: none;
+      }
+    }
+
+    .param-editor__fields {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .param-editor__row {
+      padding: var(--dc3-space-3);
+    }
+
+    .things-dialog-footer {
+      flex-wrap: wrap;
+      gap: var(--dc3-space-2);
+
+      .el-button {
+        flex: 1 1 100%;
+        margin: 0;
+      }
     }
   }
 }

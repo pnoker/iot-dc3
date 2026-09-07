@@ -24,6 +24,7 @@
           :icon="icon"
           :name="data.commandName"
           :status-title="$t('common.enableFlag')"
+          :copy-label="$t('command.card.commandId')"
           @copy-id="copy(data.id, 'Command ID')"
         >
           <el-tag v-if="!embedded" :type="enabled ? 'success' : 'info'">
@@ -85,6 +86,7 @@
           :disable-title="$t('common.confirmDisable', {name: $t('common.entityCommand')})"
           :enable-title="$t('common.confirmEnable', {name: $t('common.entityCommand')})"
           :enabled="enabled"
+          :busy="busy"
           @delete="emitDelete"
           @detail="$emit('detail-thing', data)"
           @disable="emitToggle('disable-thing')"
@@ -102,7 +104,6 @@ import {computed} from 'vue';
 import {Edit, List, Location, Sunset} from '@element-plus/icons-vue';
 import {copy} from '@/utils/commonUtil';
 import {timestamp} from '@/utils/dateUtil';
-import {successMessage} from '@/utils/notificationUtil';
 import {callTypeLabel, commandTimeoutLabel, commandTypeLabel, isEnabledFlag} from '@/utils/thingModelFormatUtil';
 import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
@@ -112,6 +113,7 @@ const props = defineProps({
   embedded: {type: Boolean, default: false},
   data: {type: Object as PropType<CommandRecord>, default: () => ({})},
   icon: {type: String, default: 'images/common/command.png'},
+  busy: {type: Boolean, default: false},
 });
 
 const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing', 'edit-thing', 'detail-thing']);
@@ -119,11 +121,11 @@ const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing', 'edit
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const emitToggle = (name: 'disable-thing' | 'enable-thing') => {
-  emit(name, props.data, () => successMessage());
+  emit(name, props.data);
 };
 
 const emitDelete = () => {
-  emit('delete-thing', props.data, () => successMessage());
+  emit('delete-thing', props.data);
 };
 </script>
 

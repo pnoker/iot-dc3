@@ -72,6 +72,12 @@ export type {CommandRecord, CommandForm, CommandParamRecord, CommandParamForm, C
 export type {EventRecord, EventForm, EventParamRecord, EventParamForm, EventHistoryRecord} from './event';
 
 export type {EntityPagination} from './entityList';
+export type {
+  ResponsiveListCellKind,
+  ResponsiveListColumn,
+  ResponsiveListMobileRole,
+  ResponsiveListTagType,
+} from './responsiveList';
 
 export type {
   UserForm,
@@ -99,6 +105,7 @@ export type {
   OAuthClientRecord,
   McpConnectionForm,
   McpConnectionRecord,
+  McpMetadata,
   McpToolRecord,
   McpAuditRecord,
   IdentityAuditRecord,

@@ -655,11 +655,24 @@ const attributeSeeds = [
     enableFlag: 'ENABLE',
   },
 ];
-export const attributes: Attribute[] = attributeSeeds.map((record) => ({
+const attributes: Attribute[] = attributeSeeds.map((record) => ({
   ...record,
   version: 0,
   attributeTypeFlag: record.attributeTypeFlag as Attribute['attributeTypeFlag'],
 }));
+
+// The backend models the four `*_attribute` endpoints as separate tables.
+// Split the shared Modbus seed by scope: connection settings belong to the
+// driver, point-level flags to the point; command/event attribute configs
+// reference the register address, so each gets its own row copy (ids repeat
+// across tables exactly as they would in separate backend tables).
+const attributesByCode = (codes: string[]): Attribute[] =>
+  attributes.filter((attribute) => codes.includes(attribute.attributeCode));
+
+export const driverAttributes = attributesByCode(['host', 'port', 'unitId']);
+export const pointAttributes = attributesByCode(['address', 'enabled', 'factor']);
+export const commandAttributes = attributesByCode(['address']);
+export const eventAttributes = attributesByCode(['address']);
 
 // ─── Attribute Config ────────────────────────────────────────────────
 // Ids start at 30001. Unifies the four `*_attribute_config` tables:

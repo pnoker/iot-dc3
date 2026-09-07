@@ -119,6 +119,11 @@
 
   // Touch ergonomics (A3)
   --dc3-touch-target: 44px;
+  --dc3-floating-action-safe-space: calc(var(--dc3-touch-target) + var(--dc3-space-3));
+  --dc3-z-floating-action: 1000;
+  --dc3-list-label-width: 78px;
+  --dc3-skeleton-line-height: 12px;
+  --dc3-skeleton-title-height: 16px;
 
   color-scheme: light;
 }
@@ -179,12 +184,23 @@ html.dark {
 // it per device class. things-dialog keeps its own max-height contract;
 // this rule only re-shapes width/height on mobile.
 @media (max-width: $breakpoint-xs-max) {
+  // Mobile browsers can expose a wider layout viewport while body scroll is
+  // locked for a modal. Anchor the teleported overlay to the dynamic visual
+  // viewport so dialogs stay centred and fully tappable above the browser UI.
+  .el-overlay.el-modal-dialog,
+  .el-overlay-dialog {
+    width: 100dvw;
+    max-width: 100dvw;
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+
   .el-overlay-dialog .el-dialog:not(.is-fullscreen) {
     --el-dialog-width: 100%;
-    width: calc(100vw - 16px) !important;
+    width: calc(100dvw - 16px) !important;
     margin-top: 8px !important;
     margin-bottom: 8px !important;
-    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
     display: flex;
     flex-direction: column;
 

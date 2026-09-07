@@ -16,10 +16,14 @@
  */
 
 import type {AgenticVisualizationSpec} from '@/config/types';
+import type {InternalAxiosRequestConfig} from 'axios';
 import {currentMockLocale} from './locale';
 import type {MockDb} from './db';
+import {resolve} from './dispatch';
+import type {MockCtx} from './types';
 
 const CHAT_URL = '/api/v3/agentic/chat/completions';
+const API_PREFIX = '/api/';
 
 const encoder = new TextEncoder();
 const sse = (obj: unknown): Uint8Array => encoder.encode(`data: ${JSON.stringify(obj)}\n\n`);
@@ -370,5 +374,80 @@ export function installAgenticFetchMock(db: MockDb): void {
       return Promise.resolve(mockResponse(prompt, stream));
     }
     return original(input as RequestInfo, init);
+  }) as typeof window.fetch;
+}
+
+const readRequestBody = async (input: RequestInfo | URL, init?: RequestInit): Promise<unknown> => {
+  // `fetch(new Request(url, {body}))` carries the body on the request object,
+  // not in init — read it from there so browser-level fixtures see the same
+  // parsed body the axios adapter would.
+  const raw = init?.body ?? (input instanceof Request ? await input.clone().text() : undefined);
+  if (typeof raw !== 'string') return raw ?? {};
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return {};
+  }
+};
+
+/** Mirror the axios adapter: repeated query keys arrive as arrays, not the last value only. */
+const collectParams = (searchParams: URLSearchParams): Record<string, unknown> => {
+  const params: Record<string, unknown> = {};
+  for (const [key, value] of searchParams.entries()) {
+    const existing = params[key];
+    if (existing === undefined) {
+      params[key] = value;
+    } else if (Array.isArray(existing)) {
+      existing.push(value);
+    } else {
+      params[key] = [existing, value];
+    }
+  }
+  return params;
+};
+
+/**
+ * Route native fetch calls used by browser-level fixtures through the same
+ * mock handlers as Axios. The production build never imports this module.
+ */
+export function installApiFetchMock(db: MockDb): void {
+  const previous = window.fetch.bind(window);
+  window.fetch = (async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+    const requestUrl = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    const url = new URL(requestUrl, window.location.origin);
+    if (!url.pathname.startsWith(API_PREFIX) || url.pathname === CHAT_URL) {
+      return previous(input, init);
+    }
+
+    const method = String(init?.method || (input instanceof Request ? input.method : 'GET')).toLowerCase();
+    const body = await readRequestBody(input, init);
+    const params = collectParams(url.searchParams);
+    const ctx: MockCtx = {
+      config: {
+        url: url.pathname.replace(/^\/+/, ''),
+        method,
+        data: init?.body,
+        params,
+      } as InternalAxiosRequestConfig,
+      url: url.pathname.replace(/^\/+/, ''),
+      method,
+      params,
+      body,
+      db,
+    };
+
+    try {
+      const response = await resolve(ctx)(ctx);
+      const headers = {'content-type': String(response.headers?.['content-type'] || 'application/json')};
+      return new Response(response.status === 204 ? null : JSON.stringify(response.data), {
+        status: response.status,
+        headers,
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ok: false, code: 500, message: String(error)}), {
+        status: 500,
+        headers: {'content-type': 'application/json'},
+      });
+    }
   }) as typeof window.fetch;
 }

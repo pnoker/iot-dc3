@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {computed, defineComponent, reactive, ref} from 'vue';
+import {computed, defineComponent, onBeforeUnmount, reactive, ref, watch} from 'vue';
 
 import {useRoute} from 'vue-router';
 import router from '@/config/router';
@@ -34,6 +34,7 @@ import deviceCard from '@/views/device/card/DeviceCard.vue';
 import pointCard from '@/views/point/card/PointCard.vue';
 
 import {timestamp} from '@/utils/dateUtil';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 
 export default defineComponent({
   name: 'DriverDetail',
@@ -51,23 +52,46 @@ export default defineComponent({
   },
   setup() {
     const route = useRoute();
+    const {isMobile} = useBreakpoint();
 
     const deviceViewRef: any = ref<InstanceType<typeof device>>();
 
     const reactiveData = reactive({
-      id: route.query.id as string,
+      id: String(route.query.id ?? ''),
       active: (route.query.active as string) || 'detail',
+      loading: true,
+      status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
       data: {} as any,
     });
+    let requestId = 0;
 
     const deviceLength = computed(() => {
       return deviceViewRef.value?.reactiveData?.page?.total || 0;
     });
 
     const driver = () => {
-      getDriverById(reactiveData.id).then((res) => {
-        reactiveData.data = res;
-      });
+      const currentRequestId = ++requestId;
+      const driverId = String(reactiveData.id || '');
+      reactiveData.loading = true;
+      reactiveData.status = 'loading';
+      reactiveData.data = {};
+      if (!driverId) {
+        reactiveData.loading = false;
+        reactiveData.status = 'error';
+        return Promise.resolve();
+      }
+      return getDriverById(driverId)
+        .then((res) => {
+          if (currentRequestId !== requestId || driverId !== String(reactiveData.id || '')) return;
+          reactiveData.data = res || {};
+          reactiveData.status = reactiveData.data.id ? 'success' : 'error';
+        })
+        .catch(() => {
+          if (currentRequestId === requestId) reactiveData.status = 'error';
+        })
+        .finally(() => {
+          if (currentRequestId === requestId) reactiveData.loading = false;
+        });
     };
 
     const changeActive = (tab: any) => {
@@ -89,8 +113,25 @@ export default defineComponent({
         default:
           break;
       }
-      router.push({query: {...query, active: tab.props.name}});
+      router.push({query: {...query, active: tab.props.name}}).catch(() => undefined);
     };
+
+    watch(
+      () => [route.query.id, route.query.active],
+      ([id, active]) => {
+        const nextId = String(id ?? '');
+        if (nextId !== String(reactiveData.id || '')) {
+          reactiveData.id = nextId;
+          reactiveData.data = {};
+          driver();
+        }
+        reactiveData.active = String(active || 'detail');
+      },
+    );
+
+    onBeforeUnmount(() => {
+      requestId += 1;
+    });
 
     driver();
 
@@ -98,8 +139,10 @@ export default defineComponent({
       deviceViewRef,
       reactiveData,
       deviceLength,
+      driver,
       changeActive,
       timestamp,
+      isMobile,
     };
   },
 });

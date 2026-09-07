@@ -18,9 +18,12 @@
 <template>
   <dashboard-card
     :badge="rows.length || null"
-    :empty="!loading && rows.length === 0"
+    :empty="status === 'success' && rows.length === 0"
     :empty-text="$t('home.alertList.empty')"
+    :error="status === 'error'"
+    :error-text="$t('common.loadFailed')"
     :loading="loading"
+    :retry-text="$t('common.retry')"
     :title="$t('home.alertList.title')"
     body-mode="scroll"
     class="alert-list"
@@ -67,6 +70,7 @@ import {alertLatest, alertStats} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
 import type {AlertSource} from '@/config/types/dashboard';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 interface AlertRow {
   id: string;
@@ -85,25 +89,27 @@ const props = defineProps({
 
 const {t, locale} = useI18n();
 
-const loading = ref(false);
+const {loading, run, status} = useAsyncLoader();
 const rows = ref<AlertRow[]>([]);
 const stats = reactive({total: 0, unconfirmed: 0});
 const {resolveBySource, nameBySource} = useEntityNames();
 
 const refresh = async () => {
-  loading.value = true;
-  try {
-    const [s, l]: any = await Promise.all([alertStats(), alertLatest(props.size)]);
-    stats.total = (s?.driverAlerts ?? 0) + (s?.deviceAlerts ?? 0);
-    stats.unconfirmed = (s?.driverUnconfirmed ?? 0) + (s?.deviceUnconfirmed ?? 0);
-    const data: AlertRow[] = Array.isArray(l) ? l : l?.items ?? [];
-    rows.value = data;
-    await resolveBySource(data);
-  } catch {
-    // handled globally
-  } finally {
-    loading.value = false;
-  }
+  await run(
+    async () => {
+      const [summary, latest]: any = await Promise.all([alertStats(), alertLatest(props.size)]);
+      const data: AlertRow[] = Array.isArray(latest) ? latest : latest?.items ?? [];
+      await resolveBySource(data);
+      return {summary, data};
+    },
+    {
+      apply: ({summary, data}) => {
+        stats.total = (summary?.driverAlerts ?? 0) + (summary?.deviceAlerts ?? 0);
+        stats.unconfirmed = (summary?.driverUnconfirmed ?? 0) + (summary?.deviceUnconfirmed ?? 0);
+        rows.value = data;
+      },
+    }
+  );
 };
 
 // Group the flat row list by YYYY-MM-DD so the timeline has day headings.

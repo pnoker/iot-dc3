@@ -19,13 +19,16 @@
   <dashboard-card
     v-model:interval="intervalMs"
     :auto-refresh="intervalOptions"
-    :empty="!loading && rows.length === 0"
+    :empty="status === 'success' && rows.length === 0"
     :empty-text="$t('home.liveFeed.empty')"
+    :error="status === 'error'"
+    :error-text="$t('common.loadFailed')"
     :loading="loading"
+    :retry-text="$t('common.retry')"
     :title="$t('home.liveFeed.title')"
     body-mode="scroll"
     class="live-feed"
-    loading-target="none"
+    loading-target="button"
     @refresh="refresh"
   >
     <el-timeline>
@@ -68,6 +71,7 @@ import {useI18n} from 'vue-i18n';
 
 import {streamLatest} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 interface Row {
   deviceId: string;
@@ -91,7 +95,7 @@ const props = defineProps({
 
 const {t, locale} = useI18n();
 
-const loading = ref(false);
+const {loading, run, status} = useAsyncLoader();
 const rows = ref<Row[]>([]);
 const lastRefreshed = ref<string>('');
 const intervalMs = ref(0);
@@ -104,17 +108,15 @@ const intervalOptions = computed(() => [
 ]);
 
 const refresh = async () => {
-  loading.value = true;
-  try {
-    const res: any = await streamLatest(props.size);
-    const data: Row[] = res ?? [];
-    rows.value = data;
-    lastRefreshed.value = new Date().toISOString();
-  } catch {
-    // handled globally
-  } finally {
-    loading.value = false;
-  }
+  // Auto-refresh must never stack requests; a manual refresh can still be
+  // initiated after the current request settles via the shared card button.
+  if (loading.value) return;
+  await run(() => streamLatest(props.size), {
+    apply: (res) => {
+      rows.value = Array.isArray(res) ? res : [];
+      lastRefreshed.value = new Date().toISOString();
+    },
+  });
 };
 
 // Show the name when the server resolved it, otherwise fall back to the
@@ -179,6 +181,9 @@ watch(locale, refresh);
   }
 
   .live-feed__line {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     font-size: 13px;
     white-space: nowrap;
     overflow: hidden;
@@ -194,21 +199,34 @@ watch(locale, refresh);
   // device=blue "management", point=green "data") so the same entity
   // reads the same colour everywhere on the page.
   .live-feed__driver {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: #9059f6;
     font-weight: 500;
   }
 
   .live-feed__device {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: #409eff;
     font-weight: 600;
   }
 
   .live-feed__point {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: #67c23a;
     font-weight: 500;
   }
 
   .live-feed__sep {
+    flex: 0 0 auto;
     color: #dcdfe6;
   }
 
@@ -220,6 +238,7 @@ watch(locale, refresh);
   }
 
   .live-feed__tag {
+    flex: 0 0 auto;
     font-size: 10px;
     font-weight: 600;
     padding: 1px 5px;
@@ -250,6 +269,10 @@ watch(locale, refresh);
   }
 
   .live-feed__value {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-family: 'Menlo', monospace;
     color: #303133;
     font-weight: 500;

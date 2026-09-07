@@ -23,11 +23,12 @@ import type {
   McpClientRegistrationForm,
   McpConnectionForm,
   McpConnectionRecord,
+  McpMetadata,
   McpToolRecord,
   OAuthClientRecord,
 } from '@/config/types/auth';
 
-export const getMcpMetadata = () => httpGet<Record<string, unknown>>(`${API_MCP_BASE}/metadata`);
+export const getMcpMetadata = () => httpGet<McpMetadata>(`${API_MCP_BASE}/metadata`);
 
 export const registerMcpClient = (body: McpClientRegistrationForm) =>
   httpPost<Record<string, unknown>>(`${API_MCP_BASE}/client/register`, body);

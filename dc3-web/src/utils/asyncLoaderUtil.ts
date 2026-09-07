@@ -16,7 +16,7 @@
  */
 
 import type {Ref} from 'vue';
-import {ref} from 'vue';
+import {getCurrentInstance, onUnmounted, ref} from 'vue';
 
 /**
  * The `loading.value = true; try { ... } catch { /* handled globally *\/ }
@@ -25,10 +25,10 @@ import {ref} from 'vue';
  *
  * <pre>
  *   const { loading, run } = useAsyncLoader();
- *   const load = () => run(async () => {
- *     const res = await someApi();
- *     rows.value = res;
- *   });
+ *   const load = () => run(
+ *     () => someApi(),
+ *     { apply: (rows) => { data.value = rows; } }
+ *   );
  * </pre>
  *
  * Errors are swallowed by default — the axios response interceptor already
@@ -37,21 +37,54 @@ import {ref} from 'vue';
  */
 export const useAsyncLoader = (): {
   loading: Ref<boolean>;
-  run: <T>(task: () => Promise<T>, options?: { rethrow?: boolean }) => Promise<T | undefined>;
+  error: Ref<unknown | null>;
+  status: Ref<'idle' | 'loading' | 'success' | 'error'>;
+  run: <T>(
+    task: () => Promise<T>,
+    options?: { apply?: (result: T) => void; rethrow?: boolean }
+  ) => Promise<T | undefined>;
+  /** Invalidates an in-flight task so it cannot commit after its owner closes. */
+  invalidate: () => void;
 } => {
   const loading = ref(false);
+  const error = ref<unknown | null>(null);
+  const status = ref<'idle' | 'loading' | 'success' | 'error'>('idle');
+  let latestRunId = 0;
 
-  const run = async <T>(task: () => Promise<T>, options?: { rethrow?: boolean }): Promise<T | undefined> => {
+  const invalidate = () => {
+    latestRunId += 1;
+    loading.value = false;
+  };
+
+  // A composable is also used directly by utility tests and non-component
+  // callers, so only register the lifecycle hook when a Vue instance exists.
+  if (getCurrentInstance()) onUnmounted(invalidate);
+
+  const run = async <T>(
+    task: () => Promise<T>,
+    options?: { apply?: (result: T) => void; rethrow?: boolean }
+  ): Promise<T | undefined> => {
+    const runId = ++latestRunId;
     loading.value = true;
+    error.value = null;
+    status.value = 'loading';
     try {
-      return await task();
-    } catch (err) {
-      if (options?.rethrow) throw err;
+      const result = await task();
+      if (runId !== latestRunId) return undefined;
+      options?.apply?.(result);
+      status.value = 'success';
+      return result;
+    } catch (runError) {
+      if (runId === latestRunId) {
+        error.value = runError;
+        status.value = 'error';
+      }
+      if (options?.rethrow) throw runError;
       return undefined;
     } finally {
-      loading.value = false;
+      if (runId === latestRunId) loading.value = false;
     }
   };
 
-  return {loading, run};
+  return {loading, error, status, run, invalidate};
 };

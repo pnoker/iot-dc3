@@ -61,6 +61,14 @@ export function authNameRules(t: Translator, entityName: string): FormItemRule[]
   ];
 }
 
+/** Length and character validation for an optional auth name. */
+export function optionalAuthNameRules(t: Translator): FormItemRule[] {
+  return [
+    {min: NAME_MIN_LENGTH, max: NAME_MAX_LENGTH, message: t('common.authNameLength'), trigger: 'blur'},
+    {pattern: AUTH_NAME_PATTERN, message: t('common.authNameFormat'), trigger: 'blur'},
+  ];
+}
+
 /** Validation rules for remark fields (max length only). */
 export function remarkRules(t: Translator): FormItemRule[] {
   return [{max: REMARK_MAX_LENGTH, message: t('common.remarkLength'), trigger: 'blur'}];

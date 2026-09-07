@@ -14,9 +14,23 @@ The frontend test suite is intentionally layered so failures point at the right 
 - `pnpm run test:ci`: run Vitest with coverage thresholds.
 - `pnpm run test:coverage`: run Vitest with coverage.
 - `pnpm run test:e2e`: run Playwright Test specs.
+- `pnpm run test:e2e:responsive`: run the three-terminal gate against the self-contained mock build.
 - `pnpm run test:e2e:headed`: run Playwright Test specs in a visible browser.
 - `pnpm run test:e2e:sweep`: run the deep browser sweep.
 - `pnpm run test:e2e:sweep:headed`: run the deep browser sweep in a visible browser.
+
+## Verification
+
+Run the checks yourself instead of trusting recorded results, which go stale as the suite changes.
+
+- `pnpm check`, `pnpm lint:check`, `pnpm build`, and `pnpm test:ci` cover types, lint, the build, and coverage-gated
+  Vitest (thresholds stay enforced by `vitest.config.ts`).
+- `pnpm run test:e2e:responsive` runs the three-terminal gate against the self-contained mock build, so it needs no
+  backend.
+- `pnpm run test:e2e` runs the full Playwright suite; it needs a reachable gateway unless you set `E2E_SERVER_MODE=mock`.
+
+The automated suites do not replace release gating: full real-backend business E2E, Lighthouse budgets, full `axe-core`
+scans, and a full-route manual visual review must still run against a disposable backend dataset before release.
 
 ## Layers
 
@@ -124,10 +138,13 @@ The mandatory policy lives in `tests/frontend-testing-guardrails.md`. In short:
 
 ## E2E Environment
 
-Playwright defaults to `http://localhost:8080`, runs with one worker, and starts
-`pnpm run serve:e2e` unless `E2E_START_SERVER=0` is set. The E2E server builds the app, serves `dist/`, and proxies
-`/api` to `http://localhost:8000` by default. Use `E2E_BASE_URL` to point at an already running environment,
-`E2E_API_TARGET` to point the local E2E proxy at a different gateway, or
+Playwright defaults to `http://127.0.0.1:4174`, runs with one worker, and starts
+`pnpm run serve:e2e` unless `E2E_START_SERVER=0` is set. The full E2E suite uses the development build and proxies
+`/api` to `http://localhost:8000` by default. The test server listens on the dedicated
+`http://127.0.0.1:4174` endpoint so it cannot silently reuse an unrelated service on the development UI port.
+`pnpm run test:e2e:responsive` switches the local server to the
+self-contained mock build, so three-terminal checks do not require a backend. Use `E2E_BASE_URL` with
+`E2E_START_SERVER=0` to test an already running environment, `E2E_API_TARGET` to select another gateway, or
 `E2E_WORKERS=N` to opt into parallelism against an isolated backend dataset.
 
 Use the headed scripts when you want to watch the browser operate:

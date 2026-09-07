@@ -52,6 +52,9 @@ interface MenuState {
   loading: boolean;
 }
 
+let inFlightFetch: Promise<void> | null = null;
+let fetchGeneration = 0;
+
 /** Recursively find the first node matching the predicate, depth-first. */
 const walk = (nodes: MenuNode[], predicate: (node: MenuNode) => boolean): MenuNode | undefined => {
   for (const node of nodes) {
@@ -97,25 +100,39 @@ export const useMenuStore = defineStore('menu', {
   actions: {
     async fetchTree(force = false) {
       if (this.loaded && !force) return;
-      if (this.loading) return;
+      if (inFlightFetch) return inFlightFetch;
+
+      const generation = fetchGeneration;
       this.loading = true;
-      try {
-        const res: any = await listMenuTree({});
-        this.tree = Array.isArray(res) ? res : [];
-        this.loaded = true;
-      } catch {
-        this.tree = [];
-        // Keep failed loads retryable. The router will still deny non-public
-        // routes against the empty tree for this navigation, but the next
-        // navigation can recover if the backend/network comes back.
-        this.loaded = false;
-      } finally {
-        this.loading = false;
-      }
+
+      let request = Promise.resolve();
+      request = (async () => {
+        try {
+          const res: any = await listMenuTree({});
+          if (generation !== fetchGeneration) return;
+          this.tree = Array.isArray(res) ? res : [];
+          this.loaded = true;
+        } catch {
+          if (generation !== fetchGeneration) return;
+          this.tree = [];
+          // Keep failed loads retryable. The router will still deny non-public
+          // routes against the empty tree for this navigation, but the next
+          // navigation can recover if the backend/network comes back.
+          this.loaded = false;
+        } finally {
+          if (inFlightFetch === request) inFlightFetch = null;
+          if (generation === fetchGeneration) this.loading = false;
+        }
+      })();
+      inFlightFetch = request;
+      return request;
     },
     reset() {
+      fetchGeneration += 1;
+      inFlightFetch = null;
       this.tree = [];
       this.loaded = false;
+      this.loading = false;
     },
   },
 });

@@ -19,6 +19,7 @@ import {mount} from '@vue/test-utils';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+import i18n from '@/config/i18n';
 
 import {createElButtonStub, layoutStubs} from '../setup/stubs/element-plus';
 
@@ -46,6 +47,7 @@ function mountDashboard(props: Record<string, unknown> = {}, slots: Record<strin
     props,
     slots,
     global: {
+      plugins: [i18n],
       // v-loading is a runtime Element Plus directive — stub it as a no-op
       // so vitest.setup's strict warning handler doesn't promote the
       // "Failed to resolve directive" warning into a thrown error.
@@ -81,6 +83,29 @@ describe('DashboardCard', () => {
 
     await wrapper.find('button[data-icon="Refresh"]').trigger('click');
     expect(wrapper.emitted('refresh')).toHaveLength(1);
+  });
+
+  it('shows a recoverable error instead of an empty state', async () => {
+    const wrapper = mountDashboard({
+      title: 'X',
+      empty: true,
+      error: true,
+      errorText: 'Network unavailable',
+      retryText: 'Try again',
+    });
+
+    expect(wrapper.find('.dashboard-card__error').exists()).toBe(true);
+    expect(wrapper.find('.dashboard-card__empty').exists()).toBe(false);
+    expect(wrapper.get('.el-alert-stub').attributes('title')).toBe('Network unavailable');
+    await wrapper.get('.dashboard-card__error button').trigger('click');
+    expect(wrapper.emitted('refresh')).toHaveLength(1);
+  });
+
+  it('falls back to localized error and retry texts when the props are omitted', () => {
+    const wrapper = mountDashboard({title: 'X', error: true});
+
+    expect(wrapper.get('.el-alert-stub').attributes('title')).toBe(i18n.global.t('common.loadFailed'));
+    expect(wrapper.get('.dashboard-card__error button').text()).toBe(i18n.global.t('common.retry'));
   });
 
   it('emits update:interval and starts polling refresh on segmented change', async () => {

@@ -17,10 +17,13 @@
 
 <template>
   <dashboard-card
-    :empty="!loading && rows.length === 0"
+    :empty="status === 'success' && rows.length === 0"
     :empty-image-size="60"
-    :empty-text="t('settings.event.empty')"
+    :empty-text="t('settings.event.overview.typeDistributionEmpty')"
+    :error="status === 'error'"
+    :error-text="t('common.loadFailed')"
     :loading="loading"
+    :retry-text="t('common.retry')"
     :title="t('settings.event.overview.typeDistributionTitle')"
     body-mode="chart"
     @refresh="load"
@@ -37,10 +40,11 @@ import {Chart} from '@antv/g2';
 import {alertTypeDistribution} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {AlertTypeRow} from '@/config/types/dashboard';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 const {t, locale} = useI18n();
 
-const loading = ref(false);
+const {loading, run, status} = useAsyncLoader();
 const rows = ref<AlertTypeRow[]>([]);
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
@@ -72,22 +76,30 @@ const render = (data: AlertTypeRow[]) => {
 };
 
 const load = async () => {
-  loading.value = true;
-  try {
-    const res: AlertTypeRow[] = await alertTypeDistribution(30);
-    rows.value = res ?? [];
-    await nextTick();
-    if (rows.value.length > 0) render(rows.value);
-  } catch {
-    // handled globally
-  } finally {
-    loading.value = false;
+  await run(() => alertTypeDistribution(30), {
+    apply: (res) => {
+      rows.value = (Array.isArray(res) ? res : []).map((row) => ({
+        type: String(row.type || '-'),
+        count: Number(row.count) || 0,
+      }));
+    },
+  });
+  if (status.value !== 'success') return;
+  await nextTick();
+  if (status.value !== 'success') return;
+  if (rows.value.length > 0) render(rows.value);
+  else {
+    chart?.destroy();
+    chart = undefined;
   }
 };
 
 onMounted(load);
 watch(locale, load);
-onUnmounted(() => chart?.destroy());
+onUnmounted(() => {
+  chart?.destroy();
+  chart = undefined;
+});
 defineExpose({refresh: load});
 </script>
 

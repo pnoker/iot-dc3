@@ -59,7 +59,7 @@
             :page-size="+page.size"
             :page-sizes="pageSizes"
             :pager-count="isMobile ? 5 : 7"
-            :size="isMobile ? 'small' : 'default'"
+            size="default"
             :total="+page.total"
             background
             @size-change="onSizeChange"
@@ -144,12 +144,15 @@ const emit = defineEmits<{
 }>();
 
 const {t} = useI18n();
-const {isMobile} = useBreakpoint();
+const {isMobile, isTablet} = useBreakpoint();
 const formRef = ref<FormInstance>();
 
 // Pagination degrades to a compact pager on thumb terminals: totals and
 // page-size pickers are desktop affordances (A3).
-const paginationLayout = computed(() => (isMobile.value ? 'prev, pager, next' : 'total, prev, pager, next, sizes'));
+// Tablet toolbars do not have enough horizontal room for the desktop total,
+// seven-page pager, and page-size select. Keep the same compact interaction
+// used on phones so every navigation control remains visible and tappable.
+const paginationLayout = computed(() => (isMobile.value || isTablet.value ? 'prev, pager, next' : 'total, prev, pager, next, sizes'));
 
 const search = async () => {
   const form = unref(formRef);
@@ -212,6 +215,30 @@ defineExpose({search, reset});
         // Stretch every input surface to the cell width — shared with
         // InfoCard via src/styles/shared-form-widths.scss.
         @include form-item-full-width;
+
+        // Segmented filters keep every option reachable on narrow terminals.
+        // Element Plus sizes the group from its labels, so a long enum can
+        // otherwise be clipped by the card's overflow boundary. The control
+        // becomes its own thumb-scroll surface while the form cell remains
+        // fluid.
+      }
+
+      :deep(.el-form-item .el-segmented) {
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      :deep(.el-form-item .el-segmented__group) {
+        width: max-content;
+        min-width: 100%;
+      }
+
+      :deep(.el-form-item .el-segmented__item) {
+        flex: 0 0 auto;
+        min-width: max-content;
       }
     }
 
@@ -235,15 +262,27 @@ defineExpose({search, reset});
     .tool-card-footer-button {
       display: flex;
       align-items: center;
+      flex: 1 1 280px;
+      min-width: 0;
+      max-width: 100%;
+      flex-wrap: wrap;
       gap: 8px;
     }
 
     .tool-card-footer-page {
       display: flex;
       align-items: center;
+      flex: 1 1 280px;
+      min-width: 0;
+      max-width: 100%;
       flex-wrap: wrap;
       justify-content: flex-end;
       gap: 8px;
+
+      :deep(.el-pagination) {
+        min-width: 0;
+        max-width: 100%;
+      }
     }
 
     // Vertical divider, reused both between actions / search-reset in the
@@ -265,6 +304,30 @@ defineExpose({search, reset});
     // and "slot supplied but all its buttons are v-if'd out".
     .tool-card-footer-button > .tool-card-footer-divider:first-child {
       display: none;
+    }
+
+    @media (max-width: $breakpoint-xs-max) {
+      align-items: stretch;
+
+      .tool-card-footer-button,
+      .tool-card-footer-page {
+        width: 100%;
+        flex: 0 1 100%;
+        justify-content: center;
+      }
+
+      .tool-card-footer-button {
+        flex-wrap: wrap;
+      }
+
+      .tool-card-footer-page {
+        :deep(.el-pagination) {
+          flex: 1 1 100%;
+          width: 100%;
+          overflow-x: auto;
+          justify-content: center;
+        }
+      }
     }
   }
 

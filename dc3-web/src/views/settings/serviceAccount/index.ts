@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {defineComponent, reactive, ref, watch} from 'vue';
+import {computed, defineComponent, onBeforeUnmount, reactive, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 
 import {
@@ -30,20 +30,19 @@ import {listPrincipalByIds} from '@/api/principal';
 import {getUserByName} from '@/api/user';
 import {useAuthStore} from '@/store/modules/auth';
 import {usePagedList} from '@/composables/usePagedList';
-import {timestampColumn} from '@/utils/dateUtil';
 import {successMessage} from '@/utils/notificationUtil';
 import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
 
-import type {ServiceAccountForm, ServiceAccountRecord} from '@/config/types/auth';
+import type {ResponsiveListColumn, ServiceAccountForm, ServiceAccountRecord} from '@/config/types';
 
 import serviceAccountTool from './tool/ServiceAccountTool.vue';
 import serviceAccountEditForm from './edit/ServiceAccountEditForm.vue';
-import BlankCard from '@/components/card/blank/BlankCard.vue';
+import ResponsiveRecordList from '@/components/list/ResponsiveRecordList.vue';
 
 export default defineComponent({
   name: 'SettingsServiceAccount',
   components: {
-    BlankCard,
+    ResponsiveRecordList,
     serviceAccountTool,
     serviceAccountEditForm,
   },
@@ -55,6 +54,8 @@ export default defineComponent({
 
     // A service account requires an owner that is a tenant member; default to the current user.
     const ownerPrincipalId = ref('');
+    let disposed = false;
+    let ownerLookupRequestId = 0;
 
     const {
       state: reactiveData,
@@ -74,12 +75,14 @@ export default defineComponent({
     // shared listPrincipalByIds endpoint (same source as the family relations).
     const ownerNameMap = reactive<Record<string, string>>({});
     const resolveOwnerNames = async (rows: ServiceAccountRecord[]) => {
+      const requestId = ++ownerLookupRequestId;
       const ids = Array.from(
         new Set(rows.map((r) => String(r.ownerPrincipalId ?? '')).filter((id) => id && id !== '0' && !ownerNameMap[id]))
       );
       if (!ids.length) return;
       try {
         const res: any = await listPrincipalByIds(ids);
+        if (disposed || requestId !== ownerLookupRequestId) return;
         (res || []).forEach((p: any) => {
           ownerNameMap[String(p.id)] = p.displayName || p.principalName || String(p.id);
         });
@@ -96,10 +99,35 @@ export default defineComponent({
     );
     const ownerNameFor = (row: ServiceAccountRecord) =>
       ownerNameMap[String(row.ownerPrincipalId)] || String(row.ownerPrincipalId ?? '-');
+    const columns = computed<ResponsiveListColumn<ServiceAccountRecord>[]>(() => [
+      {
+        key: 'serviceAccountName',
+        label: t('settings.serviceAccount.serviceAccountName'),
+        minWidth: 160,
+        mobile: 'primary',
+      },
+      {key: 'purpose', label: t('settings.serviceAccount.purpose'), minWidth: 180},
+      {
+        key: 'ownerPrincipalId',
+        label: t('settings.serviceAccount.ownerPrincipalId'),
+        minWidth: 140,
+        formatter: ownerNameFor,
+      },
+      {key: 'expireTime', label: t('settings.serviceAccount.expireTime'), width: 165, kind: 'time'},
+      {key: 'lastUsedTime', label: t('settings.serviceAccount.lastUsedTime'), width: 165, kind: 'time'},
+      {key: 'enableFlag', label: t('common.enable'), width: 90, kind: 'custom'},
+      {key: 'createTime', label: t('common.createTime'), width: 165, kind: 'time', mobile: 'hidden'},
+    ]);
+    const togglingIds = ref(new Set<string>());
+    const isToggling = (row: ServiceAccountRecord) => togglingIds.value.has(String(row.id));
+    const deletingIds = ref(new Set<string>());
+    const isDeleting = (row: ServiceAccountRecord) => deletingIds.value.has(String(row.id));
+    const isRowBusy = (row: ServiceAccountRecord) => isToggling(row) || isDeleting(row);
 
     // Resolve the current user's principalId to use as the default owner of a new service account.
     getUserByName(String(authStore.getName || ''))
       .then((res) => {
+        if (disposed) return;
         ownerPrincipalId.value = String(res?.principalId || '');
       })
       .catch(() => {
@@ -109,59 +137,81 @@ export default defineComponent({
     const openAdd = () => editRef.value?.show(ownerPrincipalId.value);
     const openEdit = (row: ServiceAccountRecord) => editRef.value?.showEdit(row);
 
-    const onAdd = (form: ServiceAccountForm, done: () => void) => {
+    const onAdd = (form: ServiceAccountForm, done: (successful?: boolean) => void) => {
       addServiceAccount(form)
         .then(() => {
+          if (disposed) return;
           successMessage();
-          load();
-          done();
+          void load();
+          done(true);
         })
         .catch(() => {
-          // handled globally
+          if (!disposed) done(false);
         });
     };
 
-    const onUpdate = (form: ServiceAccountForm, done: () => void) => {
+    const onUpdate = (form: ServiceAccountForm, done: (successful?: boolean) => void) => {
       updateServiceAccount(form)
         .then(() => {
+          if (disposed) return;
           successMessage();
-          load();
-          done();
+          void load();
+          done(true);
         })
         .catch(() => {
-          // handled globally
+          if (!disposed) done(false);
         });
     };
 
-    const remove = (id: string) => {
-      deleteServiceAccount(id)
-        .then(() => {
-          successMessage();
-          load();
-        })
-        .catch(() => {
-          // handled globally
-        });
+    const remove = async (id: string) => {
+      const key = String(id);
+      if (deletingIds.value.has(key)) return;
+      deletingIds.value.add(key);
+      try {
+        await deleteServiceAccount(id);
+        if (disposed) return;
+        successMessage();
+        await load();
+      } catch {
+        // handled globally
+      } finally {
+        deletingIds.value.delete(key);
+      }
     };
 
     const toggleEnable = (row: ServiceAccountRecord) => {
+      const id = String(row.id);
+      if (togglingIds.value.has(id) || deletingIds.value.has(id)) return;
+      togglingIds.value.add(id);
       const disable = isEnabledFlag(row.enableFlag);
       (disable ? disableServiceAccount : enableServiceAccount)(row.id)
         .then(() => {
+          if (disposed) return;
           successMessage();
-          load();
+          void load();
         })
         .catch(() => {
           // handled globally
+        })
+        .finally(() => {
+          togglingIds.value.delete(id);
         });
     };
 
-    load();
+    onBeforeUnmount(() => {
+      disposed = true;
+      ownerLookupRequestId += 1;
+      togglingIds.value.clear();
+      deletingIds.value.clear();
+    });
+
+    void load();
 
     return {
       t,
       editRef,
       reactiveData,
+      columns,
       search,
       reset,
       refresh,
@@ -172,9 +222,11 @@ export default defineComponent({
       onUpdate,
       remove,
       toggleEnable,
+      isToggling,
+      isDeleting,
+      isRowBusy,
       sizeChange,
       currentChange,
-      timestampColumn,
       isEnabledFlag,
       ownerNameFor,
     };

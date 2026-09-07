@@ -79,7 +79,8 @@ function rebuildLogoParticles() {
   const particles: LogoParticle[] = [];
   const spacing = 15;
 
-  // 用同一张规则点阵填充 Logo 的 54 个圆形区域，形成干净、连续的粒子剪影。
+  // Fill the 54 circular logo regions with one regular grid for a clean,
+  // continuous particle silhouette.
   for (let y = -520; y <= 520; y += spacing) {
     for (let x = -560; x <= 540; x += spacing) {
       const insideLogo = LOGO_POINTS.some((point) => {
@@ -323,7 +324,7 @@ function draw(now: number) {
   context.fillStyle = glow;
   context.fillRect(signalX - 32, signalY - 32, 64, 64);
 
-  // 最后绘制，避免环境连线和流光穿过 Logo，保持粒子剪影干净完整。
+  // Draw last so ambient lines and the signal glow never cross the logo.
   drawParticleLogo(time);
 
   if (!reducedMotion && inViewport && !document.hidden) animationFrame = requestAnimationFrame(draw);

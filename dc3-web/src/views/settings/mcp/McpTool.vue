@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
+import {onBeforeUnmount, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
 
 import {refreshMcpToolCatalog} from '@/api/mcp';
@@ -32,17 +32,23 @@ import {createMcpToolConfig} from './mcpToolConfig';
 const {t} = useI18n();
 const listRef = ref<InstanceType<typeof EntityListPage>>();
 const refreshing = ref(false);
+let disposed = false;
 
 const onRefresh = async () => {
   refreshing.value = true;
   try {
     const res = await refreshMcpToolCatalog();
+    if (disposed) return;
     successMessage(t('settings.mcp.refreshed', {count: res || 0}));
     listRef.value?.reload();
   } finally {
-    refreshing.value = false;
+    if (!disposed) refreshing.value = false;
   }
 };
 
 const config = createMcpToolConfig(t, {onRefresh, refreshing: () => refreshing.value});
+
+onBeforeUnmount(() => {
+  disposed = true;
+});
 </script>

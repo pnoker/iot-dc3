@@ -18,7 +18,7 @@
 <template>
   <div class="matrix-toolbar">
     <el-card shadow="never">
-      <el-form :inline="true" :model="formModel" class="matrix-toolbar__body">
+      <el-form :aria-busy="saving" :disabled="saving" :inline="true" :model="formModel" class="matrix-toolbar__body">
         <div class="matrix-toolbar-body-form">
           <slot :form-data="formModel" name="filters"/>
         </div>
@@ -28,7 +28,7 @@
           <slot name="actions"/>
           <span aria-hidden="true" class="matrix-toolbar-footer-divider"/>
           <el-button
-            :disabled="dirtyCount < 1"
+            :disabled="saving || dirtyCount < 1"
             :icon="Check"
             :loading="saving"
             plain
@@ -37,9 +37,9 @@
           >
             {{ t('device.edit.saveAll') }}
           </el-button>
-          <el-popconfirm :title="$t('common.discardConfirm')" @confirm="$emit('discard')">
+            <el-popconfirm :disabled="saving || dirtyCount < 1" :title="$t('common.discardConfirm')" @confirm="$emit('discard')">
             <template #reference>
-              <el-button :disabled="dirtyCount < 1" :icon="RefreshLeft" plain>
+              <el-button :disabled="saving || dirtyCount < 1" :icon="RefreshLeft" plain>
                 {{ t('device.edit.discardChanges') }}
               </el-button>
             </template>

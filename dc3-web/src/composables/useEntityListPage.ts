@@ -15,8 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ElMessageBox} from 'element-plus';
 import type {FormInstance, FormItemRule, FormRules} from 'element-plus';
-import {computed, reactive, ref} from 'vue';
+import {computed, getCurrentInstance, onUnmounted, reactive, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRouter} from 'vue-router';
 
@@ -48,6 +49,9 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
     formRef.value = (instance || undefined) as FormInstance | undefined;
   };
   const formModel = reactive<Record<string, any>>({});
+  const initialFormModel = ref('');
+  let formSessionId = 0;
+  let latestSaveId = 0;
 
   const defaultSearchForm = (): Record<string, any> => {
     const form: Record<string, any> = {};
@@ -64,6 +68,10 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
   const state = reactive({
     loading: false,
     saving: false,
+    saveError: null as unknown | null,
+    error: null as unknown | null,
+    status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
+    lastUpdated: null as number | null,
     rows: [] as Record<string, any>[],
     page: {
       total: 0,
@@ -75,6 +83,8 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
   });
   let latestLoadId = 0;
   const cursorStack: Array<string | undefined> = [undefined];
+  const removingIds = reactive(new Set<string>());
+  let disposed = false;
 
   const dialogTitle = computed(() => {
     const entity = config.value.title || config.value.name;
@@ -156,29 +166,33 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
     return out;
   };
 
-  const loadRelations = async (rows: Record<string, any>[]): Promise<void> => {
-    if (!config.value.relations || config.value.relations.length === 0) return;
-    await Promise.all(
-      config.value.relations.map((r) =>
-        r.load(rows).then((result) => {
-          relations[r.key] = result;
-        })
-      )
+  const loadRelations = async (
+    rows: Record<string, any>[]
+  ): Promise<Array<{key: string; value: Record<string, string>}>> => {
+    if (!config.value.relations || config.value.relations.length === 0) return [];
+    return Promise.all(
+      config.value.relations.map(async (relation) => ({
+        key: relation.key,
+        value: await relation.load(rows),
+      }))
     );
   };
 
   const load = () => {
+    if (disposed) return Promise.resolve();
     const loadId = ++latestLoadId;
     state.loading = true;
-    config.value
+    state.status = 'loading';
+    state.error = null;
+    return config.value
       .list(query())
-      .then((data: PageResult<Record<string, any>> | CursorPageResult<Record<string, any>> | Record<string, any>[]) => {
+      .then(async (data: PageResult<Record<string, any>> | CursorPageResult<Record<string, any>> | Record<string, any>[]) => {
         if (loadId !== latestLoadId) return;
         if (config.value.mode === 'tree') {
           state.rows = (data as unknown as Record<string, any>[]) || [];
         } else {
           const page = data as PageResult<Record<string, any>>;
-          state.rows = page.items;
+          state.rows = page.items || [];
           if (config.value.pagination === 'cursor') {
             const cursorPage = data as CursorPageResult<Record<string, any>>;
             state.page.hasNext = cursorPage.hasNext;
@@ -188,14 +202,26 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
             state.page.hasNext = page.hasNext;
           }
         }
-        // Relations resolve after rows arrive so loaders can act on them.
-        return loadRelations(config.value.mode === 'tree' ? flattenRows(state.rows) : state.rows);
+        const relationValues = await loadRelations(
+          config.value.mode === 'tree' ? flattenRows(state.rows) : state.rows
+        );
+        if (loadId !== latestLoadId) return;
+        relationValues.forEach(({key, value}) => {
+          relations[key] = value;
+        });
+        state.status = 'success';
+        state.lastUpdated = Date.now();
       })
-      .catch(() => {
-        // handled globally
+      .catch((error: unknown) => {
+        if (loadId !== latestLoadId) return;
+        state.error = error;
+        state.status = 'error';
       })
       .finally(() => {
-        if (loadId === latestLoadId) state.loading = false;
+        if (loadId === latestLoadId) {
+          state.loading = false;
+          if (state.status === 'loading') state.status = 'success';
+        }
       });
   };
 
@@ -260,30 +286,77 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
       });
   };
 
+  const captureInitialForm = () => {
+    initialFormModel.value = JSON.stringify(formModel);
+    state.saveError = null;
+  };
+
+  const formDirty = computed(() => formVisible.value && JSON.stringify(formModel) !== initialFormModel.value);
+
+  const beginFormSession = () => {
+    formSessionId += 1;
+    latestSaveId += 1;
+    state.saving = false;
+    state.saveError = null;
+  };
+
   const openAdd = () => {
+    beginFormSession();
     editing.value = false;
     assignForm(config.value.defaultForm());
+    captureInitialForm();
     formVisible.value = true;
   };
 
   const resetForm = () => {
-    if (!editing.value) {
-      assignForm(config.value.defaultForm());
-    }
+    assignForm(JSON.parse(initialFormModel.value || '{}') as Record<string, unknown>);
+    state.saveError = null;
     formRef.value?.clearValidate();
   };
 
   const openEdit = (row: Record<string, any>) => {
+    beginFormSession();
     editing.value = true;
     const value = config.value.defaultForm();
     value.id = row.id;
-    if (row.version) value.version = row.version;
+    if (row.version !== undefined && row.version !== null) value.version = row.version;
     config.value.fields.forEach((field) => {
       value[field.prop] = row[field.prop] ?? value[field.prop];
     });
     Object.assign(value, config.value.fromRow?.(row) || {});
     assignForm(value);
+    captureInitialForm();
     formVisible.value = true;
+  };
+
+  const finishCloseForm = (done?: () => void) => {
+    formSessionId += 1;
+    state.saveError = null;
+    if (done) {
+      done();
+      return;
+    }
+    formVisible.value = false;
+  };
+
+  const requestCloseForm = async (done?: () => void) => {
+    if (state.saving) return;
+    const sessionId = formSessionId;
+    if (!formDirty.value) {
+      finishCloseForm(done);
+      return;
+    }
+    try {
+      await ElMessageBox.confirm(t('common.discardConfirm'), {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning',
+      });
+      if (disposed || sessionId !== formSessionId || !formVisible.value) return;
+      finishCloseForm(done);
+    } catch {
+      // Keep the draft open when the user cancels the confirmation.
+    }
   };
 
   const openDetail = (row: Record<string, any>) => {
@@ -297,7 +370,7 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
     if (config.value.toPayload) return config.value.toPayload(formModel);
     const result: Record<string, unknown> = {};
     if (formModel.id) result.id = formModel.id;
-    if (formModel.version) result.version = formModel.version;
+    if (formModel.version !== undefined && formModel.version !== null) result.version = formModel.version;
     config.value.fields.forEach((field) => {
       const value = formModel[field.prop];
       if (field.kind === 'json') {
@@ -311,50 +384,71 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
     return result;
   };
 
-  const submit = () => {
+  const submit = async () => {
+    if (state.saving) return;
     const addRequest = config.value.add;
     const updateRequest = config.value.update;
     if (!addRequest || !updateRequest) {
       logger.warn('Entity list action not configured', {add: Boolean(addRequest), update: Boolean(updateRequest)});
       return;
     }
-    formRef.value?.validate((valid) => {
-      if (!valid) return;
-      let data: Record<string, unknown>;
-      try {
-        data = payload();
-      } catch {
-        formRef.value?.validate().catch(() => undefined);
-        return;
+    const sessionId = formSessionId;
+    state.saving = true;
+    state.saveError = null;
+    const valid = await formRef.value?.validate().catch(() => false);
+    if (disposed || sessionId !== formSessionId || !formVisible.value) {
+      if (sessionId === formSessionId) state.saving = false;
+      return;
+    }
+    if (!valid) {
+      state.saving = false;
+      return;
+    }
+    let data: Record<string, unknown>;
+    try {
+      data = payload();
+    } catch {
+      await formRef.value?.validate().catch(() => undefined);
+      if (sessionId === formSessionId) state.saving = false;
+      return;
+    }
+    const saveId = ++latestSaveId;
+    try {
+      await (editing.value ? updateRequest(data) : addRequest(data));
+      if (saveId !== latestSaveId || sessionId !== formSessionId) return;
+      successMessage();
+      captureInitialForm();
+      state.saving = false;
+      finishCloseForm();
+      await load();
+    } catch (error) {
+      if (saveId === latestSaveId && sessionId === formSessionId) {
+        state.saveError = error;
       }
-      state.saving = true;
-      const request = editing.value ? updateRequest(data) : addRequest(data);
-      request
-        .then(() => {
-          successMessage();
-          formVisible.value = false;
-          load();
-        })
-        .catch(() => {
-          // handled globally
-        })
-        .finally(() => {
-          state.saving = false;
-        });
-    });
+    } finally {
+      if (saveId === latestSaveId && sessionId === formSessionId) {
+        state.saving = false;
+      }
+    }
   };
 
-  const remove = (id: string) => {
+  const isRemoving = (id: string) => removingIds.has(String(id));
+
+  const remove = async (id: string) => {
     const removeRequest = config.value.remove;
-    if (!removeRequest) return;
-    removeRequest(id)
-      .then(() => {
-        successMessage();
-        load();
-      })
-      .catch(() => {
-        // handled globally
-      });
+    const key = String(id);
+    if (!removeRequest || removingIds.has(key)) return;
+    removingIds.add(key);
+    try {
+      await removeRequest(id);
+      if (disposed) return;
+      successMessage();
+      await load();
+    } catch {
+      // handled globally
+    } finally {
+      removingIds.delete(key);
+    }
   };
 
   const optionLabel = (options: EntityOption[] | undefined, value: unknown) => {
@@ -381,6 +475,16 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
 
   const canDelete = (row: Record<string, any>) => (config.value.rowDeletable ? config.value.rowDeletable(row) : true);
 
+  if (getCurrentInstance()) {
+    onUnmounted(() => {
+      disposed = true;
+      latestLoadId += 1;
+      latestSaveId += 1;
+      formSessionId += 1;
+      removingIds.clear();
+    });
+  }
+
   load();
 
   return {
@@ -389,6 +493,7 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
     state,
     searchForm,
     formVisible,
+    formDirty,
     editing,
     setFormRef,
     formModel,
@@ -405,6 +510,7 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
     cursorPrevious,
     openAdd,
     openEdit,
+    requestCloseForm,
     openDetail,
     resetForm,
     submit,
@@ -414,5 +520,6 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
     optionLabel,
     canEdit,
     canDelete,
+    isRemoving,
   };
 };

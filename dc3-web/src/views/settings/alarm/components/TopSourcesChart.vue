@@ -17,7 +17,12 @@
 
 <template>
   <dashboard-card
+    :empty="status === 'success' && rows.length === 0"
+    :empty-text="$t('settings.event.overview.topSourcesEmpty')"
+    :error="status === 'error'"
+    :error-text="$t('common.loadFailed')"
     :loading="loading"
+    :retry-text="$t('common.retry')"
     :title="$t('settings.event.overview.topSourcesTitle')"
     body-mode="chart"
     @refresh="load"
@@ -34,11 +39,13 @@ import {Chart} from '@antv/g2';
 import {alertTopSources} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 const props = defineProps<{ days?: number; limit?: number }>();
 const {locale} = useI18n();
 
-const loading = ref(false);
+const {loading, run, status} = useAsyncLoader();
+const rows = ref<{name: string; count: number}[]>([]);
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
 const {resolveBySource, nameBySource} = useEntityNames();
@@ -66,30 +73,34 @@ const render = (data: { name: string; count: number }[]) => {
 };
 
 const load = async () => {
-  loading.value = true;
-  try {
-    const res: any = await alertTopSources(props.days ?? 30, props.limit ?? 10);
-    const rows: any[] = res ?? [];
-
-    await resolveBySource(rows);
-
-    const chartData = rows.map((r: any) => ({
-      name: nameBySource(r.source, r.sourceId),
-      count: r.count ?? 0,
-    }));
-    await nextTick();
-    render(chartData);
-  } catch {
-    // handled globally
-  } finally {
-    loading.value = false;
+  const days = props.days ?? 30;
+  const limit = props.limit ?? 10;
+  await run(
+    async () => {
+      const result: any = await alertTopSources(days, limit);
+      const sourceRows: any[] = Array.isArray(result) ? result : [];
+      await resolveBySource(sourceRows);
+      return sourceRows.map((row) => ({name: nameBySource(row.source, row.sourceId), count: Number(row.count) || 0}));
+    },
+    {apply: (result) => (rows.value = result)}
+  );
+  if (status.value !== 'success') return;
+  await nextTick();
+  if (status.value !== 'success') return;
+  if (rows.value.length > 0) render(rows.value);
+  else {
+    chart?.destroy();
+    chart = undefined;
   }
 };
 
 onMounted(load);
 watch(() => props.days, load);
 watch(locale, load);
-onUnmounted(() => chart?.destroy());
+onUnmounted(() => {
+  chart?.destroy();
+  chart = undefined;
+});
 
 defineExpose({refresh: load});
 </script>

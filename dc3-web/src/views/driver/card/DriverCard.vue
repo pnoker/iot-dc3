@@ -16,7 +16,7 @@
   -->
 
 <template>
-  <div class="things-card" @click="$emit('select-change', data)">
+  <div class="things-card">
     <el-card shadow="hover">
       <div class="things-card-content">
         <things-card-header
@@ -24,6 +24,7 @@
           :icon="icon"
           :name="data.driverName"
           :status-title="$t('common.name')"
+          :copy-label="$t('driver.card.copyDriverId')"
           @copy-id="copy(data.id, $t('driver.card.copyDriverId'))"
         >
           <el-tag :type="statusTagType" effect="plain">{{ $t(statusLabelKey) }}</el-tag>
@@ -63,17 +64,22 @@
             </p>
           </div>
         </div>
-        <div v-if="!footer" class="things-card__footer">
+        <div v-if="!footer" :aria-busy="busy" class="things-card__footer">
           <div class="things-card-footer-operation">
             <el-popconfirm
+              :disabled="busy"
               :title="$t('common.confirmDelete', {name: $t('common.entityDriver')})"
               @confirm="emitDelete"
             >
               <template #reference>
-                <el-button link type="primary" @click.stop>{{ $t('common.delete') }}</el-button>
+                <el-button :disabled="busy" :loading="busy" link type="primary" @click.stop>
+                  {{ $t('common.delete') }}
+                </el-button>
               </template>
             </el-popconfirm>
-            <el-button link type="primary" @click.stop="detail">{{ $t('common.detail') }}</el-button>
+            <el-button :disabled="busy" link type="primary" @click.stop="detail">
+              {{ $t('common.detail') }}
+            </el-button>
           </div>
         </div>
       </div>
@@ -89,7 +95,6 @@ import router from '@/config/router';
 import {copy} from '@/utils/commonUtil';
 import {timestamp} from '@/utils/dateUtil';
 import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
-import {successMessage} from '@/utils/notificationUtil';
 import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 import type {DriverRecord} from '@/config/types/manager';
 
@@ -98,9 +103,10 @@ const props = defineProps({
   statusTable: {type: Object as PropType<Record<string, string>>, default: () => ({})},
   data: {type: Object as PropType<DriverRecord>, required: true},
   footer: {type: Boolean, default: false},
+  busy: {type: Boolean, default: false},
 });
 
-const emit = defineEmits(['select-change', 'delete']);
+const emit = defineEmits(['delete']);
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const status = computed(() => {
@@ -123,7 +129,7 @@ const statusLabelKey = computed(() => {
 });
 
 const emitDelete = () => {
-  emit('delete', props.data, () => successMessage());
+  emit('delete', props.data);
 };
 
 const detail = () => {
@@ -143,9 +149,11 @@ const detail = () => {
 .things-card__footer {
   height: 35px;
   margin-top: 2px;
+  padding-inline-end: var(--dc3-floating-action-safe-space);
+  box-sizing: border-box;
   display: flex;
   justify-content: flex-end;
-  border-top: 1px solid #dcdfe6;
+  border-top: 1px solid var(--el-border-color);
 
   .things-card-footer-operation {
     height: 35px;

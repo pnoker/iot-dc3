@@ -50,74 +50,89 @@
       </template>
     </tool-card>
 
-    <blank-card>
-      <el-table v-loading="state.loading" :data="state.rows" class="alarm-notify__table" stripe>
-        <!-- @vue-generic {import('@/config/types').AlarmEntity} -->
-        <el-table-column
-          v-for="column in activeConfig.columns"
-          :key="column.prop"
-          :fixed="column.fixed"
-          :label="column.label"
-          :min-width="column.minWidth"
-          :prop="column.prop"
-          :show-overflow-tooltip="column.overflow !== false"
-          :width="column.width"
+    <responsive-record-list
+      :columns="columns"
+      :empty-text="t('settings.alarm.empty')"
+      :error-text="t('common.loadFailed')"
+      :loading="state.loading"
+      :operation-width="activeConfig.editable ? 180 : 100"
+      :rows="state.rows"
+      :status="state.status"
+      openable
+      @open="openDetail"
+      @retry="load"
+    >
+      <template #actions="{row}">
+        <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
+        <el-button
+          v-if="activeConfig.editable"
+          :disabled="isDeleting(row)"
+          link
+          type="primary"
+          @click="openEdit(row)"
         >
-          <template #default="{row}">
-            <el-tag v-if="column.kind === 'tag'" :type="tagType(row[column.prop], column.prop)">
-              {{ formatCell(row, column) }}
-            </el-tag>
-            <code v-else-if="column.kind === 'code'" class="alarm-notify__inline-code">
-              {{ formatCell(row, column) }}
-            </code>
-            <span v-else>{{ formatCell(row, column) }}</span>
+          {{ t('common.edit') }}
+        </el-button>
+        <el-popconfirm
+          v-if="activeConfig.editable"
+          :cancel-button-text="t('common.cancel')"
+          :confirm-button-text="t('common.confirm')"
+          :title="t('common.confirmDelete', {name: t('common.entityConfig')})"
+          @confirm="remove(row)"
+        >
+          <template #reference>
+            <el-button :loading="isDeleting(row)" link type="danger">{{ t('common.delete') }}</el-button>
           </template>
-        </el-table-column>
-        <!-- @vue-generic {import('@/config/types').AlarmEntity} -->
-        <el-table-column :label="t('common.operation')" :width="activeConfig.editable ? 180 : 100" fixed="right">
-          <template #default="{row}">
-            <el-button link type="primary" @click="openDetail(row)">{{ t('common.detail') }}</el-button>
-            <el-button v-if="activeConfig.editable" link type="primary" @click="openEdit(row)">
-              {{ t('common.edit') }}
-            </el-button>
-            <el-popconfirm
-              v-if="activeConfig.editable"
-              :cancel-button-text="t('common.cancel')"
-              :confirm-button-text="t('common.confirm')"
-              :title="t('common.confirmDelete', {name: t('common.entityConfig')})"
-              @confirm="remove(row.id)"
-            >
-              <template #reference>
-                <el-button link type="danger">{{ t('common.delete') }}</el-button>
-              </template>
-            </el-popconfirm>
-          </template>
-        </el-table-column>
-        <template #empty>
-          <el-empty :description="t('settings.alarm.empty')"/>
-        </template>
-      </el-table>
-    </blank-card>
+        </el-popconfirm>
+      </template>
+    </responsive-record-list>
 
     <el-dialog
       v-model="formVisible"
       :append-to-body="true"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      :show-close="false"
+      :before-close="requestCloseForm"
+      :close-on-click-modal="!state.saving"
+      :close-on-press-escape="!state.saving"
+      :show-close="!state.saving"
       :title="dialogTitle"
       class="things-dialog things-dialog--wide"
       destroy-on-close
       draggable
       width="880px"
     >
+      <el-alert
+        v-if="remoteErrorFields.length"
+        :closable="false"
+        :title="t('common.optionLoadFailed')"
+        class="alarm-notify__alert"
+        show-icon
+        type="error"
+      >
+        <el-button :loading="remoteRetrying" link type="danger" @click="retryRemoteOptions">
+          {{ t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-alert
+        v-if="state.saveError"
+        :closable="false"
+        :title="t('common.saveFailed')"
+        class="alarm-notify__alert"
+        show-icon
+        type="error"
+      />
       <el-form :ref="setFormRef" :model="formModel" :rules="formRules" class="alarm-notify__form" label-position="top">
         <el-row :gutter="8">
-          <el-col v-for="field in activeConfig.fields" :key="field.prop" :span="field.span || 12">
+          <el-col
+            v-for="field in activeConfig.fields"
+            :key="field.prop"
+            :sm="field.span || 12"
+            :xs="24"
+          >
             <el-form-item :label="field.label" :prop="field.prop">
               <el-select
                 v-if="field.kind === 'select'"
                 v-model="formModel[field.prop]"
+                :disabled="state.saving"
                 :placeholder="field.placeholder"
                 clearable
                 filterable
@@ -127,6 +142,8 @@
               <el-select
                 v-else-if="field.kind === 'remoteSelect'"
                 v-model="formModel[field.prop]"
+                :disabled="state.saving"
+                :loading="remoteState[field.prop]?.loading"
                 :placeholder="field.placeholder"
                 clearable
                 filterable
@@ -142,29 +159,41 @@
               <el-input-number
                 v-else-if="field.kind === 'number'"
                 v-model="formModel[field.prop]"
+                :disabled="state.saving"
                 :min="0"
                 :precision="field.precision || 0"
                 controls-position="right"
                 style="width: 100%"
               />
-              <enable-flag-segmented v-else-if="field.kind === 'enableFlag'" v-model="formModel[field.prop]"/>
+              <enable-flag-segmented
+                v-else-if="field.kind === 'enableFlag'"
+                v-model="formModel[field.prop]"
+                :disabled="state.saving"
+              />
               <el-input
                 v-else-if="field.kind === 'json' || field.kind === 'textarea'"
                 v-model="formModel[field.prop]"
                 :autosize="{minRows: field.rows || 4, maxRows: 18}"
+                :disabled="state.saving"
                 :placeholder="field.placeholder"
                 resize="vertical"
                 type="textarea"
               />
-              <el-input v-else v-model="formModel[field.prop]" :placeholder="field.placeholder" clearable/>
+              <el-input
+                v-else
+                v-model="formModel[field.prop]"
+                :disabled="state.saving"
+                :placeholder="field.placeholder"
+                clearable
+              />
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <template #footer>
         <div class="things-dialog-footer">
-          <el-button @click="formVisible = false">{{ t('common.cancel') }}</el-button>
-          <el-button plain @click="resetForm">{{ t('common.reset') }}</el-button>
+          <el-button :disabled="state.saving" @click="requestCloseForm()">{{ t('common.cancel') }}</el-button>
+          <el-button :disabled="state.saving" plain @click="resetForm">{{ t('common.reset') }}</el-button>
           <el-button :loading="state.saving" type="primary" @click="submit">{{ t('common.confirm') }}</el-button>
         </div>
       </template>
@@ -173,17 +202,22 @@
 </template>
 
 <script lang="ts" setup>
-import {reactive, watch} from 'vue';
+import {computed, onBeforeUnmount, reactive, watch, type PropType} from 'vue';
 import {Plus} from '@element-plus/icons-vue';
 
-import BlankCard from '@/components/card/blank/BlankCard.vue';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
+import ResponsiveRecordList from '@/components/list/ResponsiveRecordList.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 
-import type {AlarmFieldConfig, AlarmOption} from './alarmEntityConfig';
-import {type AlarmEntityPageProps, useAlarmEntityPage} from './useAlarmEntityPage';
+import type {AlarmFieldConfig, AlarmOption, AlarmTabKey} from './alarmEntityConfig';
+import {useAlarmEntityPage} from './useAlarmEntityPage';
 
-const props = defineProps<AlarmEntityPageProps>();
+const props = defineProps({
+  entity: {
+    type: String as PropType<AlarmTabKey>,
+    required: true,
+  },
+});
 
 const {
   t,
@@ -193,6 +227,7 @@ const {
   searchForm,
   state,
   activeConfig,
+  columns,
   dialogTitle,
   formRules,
   load,
@@ -204,31 +239,88 @@ const {
   openAdd,
   resetForm,
   openEdit,
+  requestCloseForm,
   openDetail,
   submit,
   remove,
-  tagType,
-  formatCell,
+  isDeleting,
 } = useAlarmEntityPage(props);
 
-// remoteSelect option cache keyed by field.prop. Loaded when the dialog opens
-// (so edit-mode values render as names) and on each dropdown expand (so entityId
-// reflects the currently selected alarmTargetTypeFlag).
 const remoteOptions = reactive<Record<string, AlarmOption[]>>({});
+const remoteState = reactive<Record<string, {loading: boolean; error: boolean}>>({});
+const remoteRequestIds: Record<string, number> = {};
+let remoteSessionId = 0;
+
+const stateFor = (prop: string) => {
+  if (!remoteState[prop]) remoteState[prop] = {loading: false, error: false};
+  return remoteState[prop];
+};
+
 const loadRemote = async (field: AlarmFieldConfig) => {
   if (!field.loadOptions) return;
-  remoteOptions[field.prop] = await field.loadOptions(formModel);
+  const requestId = (remoteRequestIds[field.prop] || 0) + 1;
+  const sessionId = remoteSessionId;
+  const optionState = stateFor(field.prop);
+  remoteRequestIds[field.prop] = requestId;
+  optionState.loading = true;
+  try {
+    const options = await field.loadOptions({...formModel});
+    if (requestId !== remoteRequestIds[field.prop] || sessionId !== remoteSessionId || !formVisible.value) return;
+    remoteOptions[field.prop] = options;
+    optionState.error = false;
+  } catch {
+    if (requestId === remoteRequestIds[field.prop] && sessionId === remoteSessionId && formVisible.value) {
+      optionState.error = true;
+    }
+  } finally {
+    if (requestId === remoteRequestIds[field.prop] && sessionId === remoteSessionId) optionState.loading = false;
+  }
 };
+
+const remoteErrorFields = computed(() =>
+  activeConfig.value.fields.filter((field) => field.kind === 'remoteSelect' && remoteState[field.prop]?.error)
+);
+const remoteRetrying = computed(() => remoteErrorFields.value.some((field) => remoteState[field.prop]?.loading));
+const retryRemoteOptions = () => {
+  remoteErrorFields.value.forEach((field) => void loadRemote(field));
+};
+
 watch(formVisible, (visible) => {
+  remoteSessionId += 1;
+  Object.values(remoteState).forEach((optionState) => {
+    optionState.loading = false;
+    optionState.error = false;
+  });
   if (!visible) return;
-  activeConfig.value.fields
-    .filter((field) => field.kind === 'remoteSelect')
-    .forEach((field) => {
-      if (formModel[field.prop] != null && formModel[field.prop] !== '') {
-        formModel[field.prop] = String(formModel[field.prop]);
-      }
-      loadRemote(field);
-    });
+  Object.keys(remoteOptions).forEach((key) => delete remoteOptions[key]);
+  activeConfig.value.fields.filter((field) => field.kind === 'remoteSelect').forEach((field) => {
+    if (formModel[field.prop] != null && formModel[field.prop] !== '') {
+      formModel[field.prop] = String(formModel[field.prop]);
+    }
+    void loadRemote(field);
+  });
+});
+
+watch(
+  () => formModel.alarmTargetTypeFlag,
+  (value, previousValue) => {
+    if (!formVisible.value || value === previousValue) return;
+    formModel.entityId = '';
+    const entityField = activeConfig.value.fields.find((field) => field.prop === 'entityId');
+    if (entityField) void loadRemote(entityField);
+  },
+  // `post` batches programmatic form resets: assignForm deletes every key and
+  // re-assigns them in one tick, so a same-value reset never fires this
+  // watcher (and never clears entityId mid-assign). Only a real net change —
+  // the user switching the target type — lands here.
+  {flush: 'post'}
+);
+
+onBeforeUnmount(() => {
+  remoteSessionId += 1;
+  Object.keys(remoteRequestIds).forEach((key) => {
+    remoteRequestIds[key] = (remoteRequestIds[key] || 0) + 1;
+  });
 });
 </script>
 
@@ -236,9 +328,8 @@ watch(formVisible, (visible) => {
 .alarm-notify {
   min-width: 0;
 
-  &__table {
-    margin-top: 1px;
-    border-radius: 4px;
+  &__alert {
+    margin-bottom: var(--dc3-space-3);
   }
 
   &__form {
@@ -247,14 +338,6 @@ watch(formVisible, (visible) => {
     :deep(.el-input-number) {
       width: 100%;
     }
-  }
-
-  &__inline-code {
-    padding: 2px 5px;
-    border-radius: 4px;
-    color: var(--el-text-color-regular);
-    background: var(--el-fill-color-light);
-    font-size: 12px;
   }
 }
 </style>

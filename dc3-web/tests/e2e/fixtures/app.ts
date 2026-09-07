@@ -140,6 +140,7 @@ export async function logout(page: Page) {
     localStorage.removeItem('X-Auth-Tenant');
     localStorage.removeItem('X-Auth-Login');
     localStorage.removeItem('X-Auth-Token');
+    sessionStorage.removeItem('dc3-authenticated');
   });
 }
 
@@ -154,7 +155,16 @@ export async function apiPost<T = unknown>(
       const decodeStorage = (key: string) => {
         const raw = localStorage.getItem(key);
         if (!raw) return undefined;
-        return JSON.parse(atob(raw)).content;
+        try {
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === 'object' && 'content' in parsed ? parsed.content : parsed;
+        } catch {
+          try {
+            return JSON.parse(atob(raw)).content;
+          } catch {
+            return raw;
+          }
+        }
       };
       const target = new URL(requestUrl, window.location.origin);
       Object.entries(requestParams).forEach(([key, value]) => {
@@ -170,15 +180,14 @@ export async function apiPost<T = unknown>(
       };
       const tenant = decodeStorage('X-Auth-Tenant');
       const login = decodeStorage('X-Auth-Login');
-      const token = decodeStorage('X-Auth-Token');
       if (tenant) headers['X-Auth-Tenant'] = tenant;
       if (login) headers['X-Auth-Login'] = login;
-      if (token) headers['X-Auth-Token'] = JSON.stringify(token);
 
       const response = await fetch(targetUrl, {
         method: 'POST',
         headers,
         body: JSON.stringify(requestBody),
+        credentials: 'include',
       });
       const text = await response.text();
       return {status: response.status, text};
@@ -206,7 +215,16 @@ export async function apiGet<T = unknown>(
       const decodeStorage = (key: string) => {
         const raw = localStorage.getItem(key);
         if (!raw) return undefined;
-        return JSON.parse(atob(raw)).content;
+        try {
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === 'object' && 'content' in parsed ? parsed.content : parsed;
+        } catch {
+          try {
+            return JSON.parse(atob(raw)).content;
+          } catch {
+            return raw;
+          }
+        }
       };
       const target = new URL(requestUrl, window.location.origin);
       Object.entries(requestParams).forEach(([key, value]) => {
@@ -221,14 +239,13 @@ export async function apiGet<T = unknown>(
       };
       const tenant = decodeStorage('X-Auth-Tenant');
       const login = decodeStorage('X-Auth-Login');
-      const token = decodeStorage('X-Auth-Token');
       if (tenant) headers['X-Auth-Tenant'] = tenant;
       if (login) headers['X-Auth-Login'] = login;
-      if (token) headers['X-Auth-Token'] = JSON.stringify(token);
 
       const response = await fetch(targetUrl, {
         method: 'GET',
         headers,
+        credentials: 'include',
       });
       const text = await response.text();
       return {status: response.status, text};
@@ -256,7 +273,16 @@ export async function apiDelete<T = unknown>(
       const decodeStorage = (key: string) => {
         const raw = localStorage.getItem(key);
         if (!raw) return undefined;
-        return JSON.parse(atob(raw)).content;
+        try {
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === 'object' && 'content' in parsed ? parsed.content : parsed;
+        } catch {
+          try {
+            return JSON.parse(atob(raw)).content;
+          } catch {
+            return raw;
+          }
+        }
       };
       const target = new URL(requestUrl, window.location.origin);
       Object.entries(requestParams).forEach(([key, value]) => {
@@ -267,11 +293,9 @@ export async function apiDelete<T = unknown>(
       const headers: Record<string, string> = {Accept: 'application/json'};
       const tenant = decodeStorage('X-Auth-Tenant');
       const login = decodeStorage('X-Auth-Login');
-      const token = decodeStorage('X-Auth-Token');
       if (tenant) headers['X-Auth-Tenant'] = tenant;
       if (login) headers['X-Auth-Login'] = login;
-      if (token) headers['X-Auth-Token'] = JSON.stringify(token);
-      const result = await fetch(targetUrl, {method: 'DELETE', headers});
+      const result = await fetch(targetUrl, {method: 'DELETE', headers, credentials: 'include'});
       return {status: result.status, text: await result.text()};
     },
     {requestUrl: url, requestParams: params}

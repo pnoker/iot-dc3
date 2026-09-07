@@ -18,10 +18,26 @@
 <template>
   <div>
     <blank-card>
-      <el-tabs v-model="reactiveData.active">
+      <el-alert
+        v-if="reactiveData.status === 'error'"
+        :closable="false"
+        :title="$t('common.loadFailed')"
+        class="entity-page-error"
+        show-icon
+        type="error"
+      >
+        <el-button :loading="reactiveData.loading" link type="danger" @click="load">
+          {{ $t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-empty
+        v-if="reactiveData.status === 'error' && !reactiveData.data.id"
+        :description="$t('common.loadFailed')"
+      />
+      <el-tabs v-else v-model="reactiveData.active" v-loading="reactiveData.loading">
         <el-tab-pane :label="$t('settings.menu.detailTitle')" name="detail">
           <detail-card>
-            <el-descriptions :column="2" border>
+            <el-descriptions :column="isMobile ? 1 : 2" border>
               <el-descriptions-item :label="$t('settings.menu.menuName')">
                 {{ reactiveData.data.menuName }}
               </el-descriptions-item>
@@ -49,7 +65,7 @@
               <el-descriptions-item :label="$t('common.enable')">
                 <enable-tag :value="reactiveData.data.enableFlag"/>
               </el-descriptions-item>
-              <el-descriptions-item :label="$t('common.remark')" :span="2">
+              <el-descriptions-item :label="$t('common.remark')" :span="isMobile ? 1 : 2">
                 {{ reactiveData.data.remark || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.createTime')">
@@ -67,7 +83,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, reactive} from 'vue';
+import {computed, onBeforeUnmount, onMounted, reactive, watch} from 'vue';
 import {useRoute} from 'vue-router';
 
 import {getMenuById} from '@/api/menu';
@@ -77,15 +93,20 @@ import {timestampLabel} from '@/utils/dateUtil';
 import blankCard from '@/components/card/blank/BlankCard.vue';
 import detailCard from '@/components/card/detail/DetailCard.vue';
 import EnableTag from '@/components/tag/EnableTag.vue';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 
 const route = useRoute();
 const menuStore = useMenuStore();
+const {isMobile} = useBreakpoint();
 
 const reactiveData = reactive({
   id: route.query.id as string,
   active: (route.query.active as string) || 'detail',
+  loading: true,
+  status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
   data: {} as Record<string, any>,
 });
+let requestId = 0;
 
 // parentMenuId on the wire is a raw id. Resolve it against the cached menu
 // tree so the descriptions row shows something useful ("Home" vs "1234").
@@ -97,15 +118,40 @@ const parentMenuName = computed(() => {
 });
 
 const load = () => {
-  if (!reactiveData.id) return;
-  getMenuById(reactiveData.id)
+  const currentRequestId = ++requestId;
+  const menuId = String(reactiveData.id || '');
+  if (!menuId) {
+    reactiveData.status = 'error';
+    reactiveData.loading = false;
+    return;
+  }
+  reactiveData.loading = true;
+  reactiveData.status = 'loading';
+  reactiveData.data = {};
+  getMenuById(menuId)
     .then((res: any) => {
+      if (currentRequestId !== requestId || menuId !== String(reactiveData.id || '')) return;
       reactiveData.data = res || {};
+      reactiveData.status = reactiveData.data.id ? 'success' : 'error';
     })
     .catch(() => {
-      // handled globally
+      if (currentRequestId === requestId) reactiveData.status = 'error';
+    })
+    .finally(() => {
+      if (currentRequestId === requestId) reactiveData.loading = false;
     });
 };
+
+watch(
+  () => route.query.id,
+  (id) => {
+    const nextId = String(id || '');
+    if (nextId !== String(reactiveData.id || '')) {
+      reactiveData.id = nextId;
+      load();
+    }
+  },
+);
 
 onMounted(() => {
   // Ensure the menu tree is primed before parentMenuName runs — Layout
@@ -113,5 +159,9 @@ onMounted(() => {
   // going through Layout first would leave us with a blank parent.
   menuStore.fetchTree();
   load();
+});
+
+onBeforeUnmount(() => {
+  requestId += 1;
 });
 </script>

@@ -17,8 +17,9 @@
 
 import {defineConfig, devices} from '@playwright/test';
 
-const baseURL = process.env.E2E_BASE_URL || 'http://localhost:8080';
+const baseURL = process.env.E2E_BASE_URL || 'http://127.0.0.1:4174';
 const startServer = process.env.E2E_START_SERVER !== '0';
+const serverCommand = process.env.E2E_SERVER_MODE === 'mock' ? 'pnpm run serve:e2e:mock' : 'pnpm run serve:e2e';
 const workers = Number(process.env.E2E_WORKERS || 1);
 
 export default defineConfig({
@@ -47,9 +48,9 @@ export default defineConfig({
   },
   webServer: startServer
     ? {
-      command: 'pnpm run serve:e2e',
+      command: serverCommand,
       url: baseURL,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: false,
       timeout: 120_000,
     }
     : undefined,

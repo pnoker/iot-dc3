@@ -18,10 +18,35 @@
 <template>
   <el-dialog
     v-model="reactiveData.visible"
+    :before-close="requestClose"
     :close-on-click-modal="false"
+    :close-on-press-escape="!reactiveData.submitting"
+    :show-close="!reactiveData.submitting"
     :title="t('settings.role.assignResourcesTitle')"
+    class="things-dialog assign-dialog"
+    destroy-on-close
     width="640px"
   >
+    <el-alert
+      v-if="reactiveData.loadStatus === 'error'"
+      :closable="false"
+      :title="t('common.loadFailed')"
+      class="assign-alert"
+      show-icon
+      type="error"
+    >
+      <el-button :loading="reactiveData.loading" link type="danger" @click="load(true)">
+        {{ t('common.retry') }}
+      </el-button>
+    </el-alert>
+    <el-alert
+      v-if="reactiveData.saveError"
+      :closable="false"
+      :title="t('common.saveFailed')"
+      class="assign-alert"
+      show-icon
+      type="error"
+    />
     <div v-loading="reactiveData.loading" class="assign-body">
       <div class="assign-target">
         <span class="assign-label">{{ t('settings.role.roleName') }}:</span>
@@ -36,12 +61,13 @@
       <div class="assign-pane">
         <div class="assign-pane__header">
           <span class="assign-pane__title">{{ t('settings.role.resourcesAll') }}</span>
-          <el-input
-            v-model="reactiveData.filter"
-            :placeholder="t('settings.role.resourcesSearchPlaceholder')"
-            clearable
-            size="small"
-          >
+        <el-input
+          v-model="reactiveData.filter"
+          :disabled="reactiveData.loading || reactiveData.submitting"
+          :placeholder="t('settings.role.resourcesSearchPlaceholder')"
+          clearable
+          size="small"
+        >
             <template #prefix>
               <el-icon>
                 <Search/>
@@ -50,7 +76,7 @@
           </el-input>
         </div>
 
-        <el-tabs v-model="activeType" class="assign-pane__tabs">
+        <el-tabs v-model="activeType" :before-leave="canSwitchType" class="assign-pane__tabs">
           <el-tab-pane
             v-for="type in availableTypes"
             :key="type"
@@ -66,10 +92,10 @@
               :ref="(el) => registerTree(type, el)"
               :data="treesByType[type] || []"
               :filter-node-method="filterNode"
-              :props="{label: 'resourceName', children: 'children'}"
-              node-key="id"
-              show-checkbox
-              @check-change="onCheckChange"
+              :props="treeProps"
+            node-key="id"
+            show-checkbox
+            @check-change="onCheckChange"
             />
             <el-empty
               v-show="activeType === type && (treesByType[type] || []).length === 0"
@@ -82,8 +108,13 @@
     </div>
 
     <template #footer>
-      <el-button @click="reactiveData.visible = false">{{ t('common.cancel') }}</el-button>
-      <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
+      <el-button :disabled="reactiveData.submitting" @click="requestClose()">{{ t('common.cancel') }}</el-button>
+      <el-button
+        :disabled="reactiveData.submitting || reactiveData.loading || reactiveData.loadStatus !== 'success'"
+        :loading="reactiveData.submitting"
+        type="primary"
+        @click="submit"
+      >
         {{ t('common.save') }}
       </el-button>
     </template>
@@ -91,8 +122,9 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, reactive, ref, watch} from 'vue';
+import {computed, nextTick, onBeforeUnmount, reactive, ref, watch} from 'vue';
 import type {ElTree} from 'element-plus';
+import {ElMessageBox} from 'element-plus';
 import {Search} from '@element-plus/icons-vue';
 import {useI18n} from 'vue-i18n';
 
@@ -116,7 +148,7 @@ const TYPE_ORDER = ['MENU', 'API', 'DATA', 'DEVICE', 'POINT', 'PROFILE', 'DRIVER
 
 const {t} = useI18n();
 const emit = defineEmits<{
-  (e: 'save', roleId: string, addIds: string[], removeBindIds: string[], done: () => void): void;
+  (e: 'save', roleId: string, addIds: string[], removeBindIds: string[], done: (successful?: boolean) => void): void;
 }>();
 
 // One el-tree per resource type — each keeps its own checked state so
@@ -132,6 +164,8 @@ const reactiveData = reactive({
   visible: false,
   loading: false,
   submitting: false,
+  loadStatus: 'idle' as 'idle' | 'loading' | 'success' | 'error',
+  saveError: false,
   role: {} as any,
   // trees grouped by resourceTypeFlag; each type's nodes keep their
   // within-type parent/child links (cross-type links are dropped since the
@@ -147,6 +181,14 @@ const reactiveData = reactive({
   selectedIds: [] as string[],
   filter: '',
 });
+
+const treeProps = {
+  label: 'resourceName',
+  children: 'children',
+  disabled: () => reactiveData.loading || reactiveData.submitting,
+};
+let loadSequence = 0;
+let saveSequence = 0;
 
 const treesByType = computed(() => reactiveData.treesByType);
 
@@ -185,11 +227,19 @@ const selectedCountByType = computed(() => {
   return map;
 });
 
+const isDirty = computed(() => {
+  const original = new Set(reactiveData.originalResourceIds);
+  const current = new Set(reactiveData.selectedIds);
+  return original.size !== current.size || [...original].some((id) => !current.has(id));
+});
+
 const filterNode = (value: string, data: any) => {
   if (!value) return true;
   const k = value.toLowerCase();
   return (data.resourceName || '').toLowerCase().includes(k) || (data.resourceCode || '').toLowerCase().includes(k);
 };
+
+const canSwitchType = () => !reactiveData.loading && !reactiveData.submitting;
 
 // Only filter the currently visible tree. Re-apply on tab switch so the
 // search box "follows" the user as they flip between types.
@@ -206,6 +256,7 @@ watch(activeType, (type) => {
 // Pull all trees' checked state and merge — keeps selectedIds correct even
 // when the user flips tabs between picks in different types.
 const onCheckChange = () => {
+  if (reactiveData.submitting || reactiveData.loading || reactiveData.loadStatus !== 'success' || !reactiveData.visible) return;
   const all: string[] = [];
   for (const type of availableTypes.value) {
     const tree = treeRefs[type];
@@ -276,8 +327,12 @@ const applyCheckedToTrees = () => {
   }
 };
 
-const load = async () => {
+const load = async (force = false) => {
+  if (!reactiveData.role.id || (reactiveData.loadStatus === 'success' && !force)) return;
+  const sequence = ++loadSequence;
   reactiveData.loading = true;
+  reactiveData.loadStatus = 'loading';
+  reactiveData.saveError = false;
   try {
     const [treeRes, ownRes, bindsRes] = await Promise.all([
       listResourceTree({}) as Promise<any>,
@@ -285,6 +340,7 @@ const load = async () => {
       listRoleResourceBind({offset: 0, limit: 200, roleId: reactiveData.role.id}) as Promise<any>,
     ]);
 
+    if (sequence !== loadSequence) return;
     const treeData = (treeRes as any[]) || [];
     const {flatMap, trees} = groupByType(treeData);
     reactiveData.nodeMap = flatMap;
@@ -307,15 +363,20 @@ const load = async () => {
 
     // el-tree mounts after v-if/v-show paints; defer seeding so every
     // tree ref is registered before we push checked keys into them.
-    nextTick(applyCheckedToTrees);
+    void nextTick(() => {
+      if (sequence === loadSequence && reactiveData.visible) applyCheckedToTrees();
+    });
+    reactiveData.loadStatus = 'success';
   } catch {
-    // handled globally
+    if (sequence === loadSequence) reactiveData.loadStatus = 'error';
   } finally {
-    reactiveData.loading = false;
+    if (sequence === loadSequence) reactiveData.loading = false;
   }
 };
 
 const show = (role: any) => {
+  loadSequence += 1;
+  saveSequence += 1;
   reactiveData.role = role;
   reactiveData.treesByType = {};
   reactiveData.nodeMap = new Map();
@@ -324,11 +385,37 @@ const show = (role: any) => {
   reactiveData.selectedIds = [];
   reactiveData.filter = '';
   activeType.value = '';
+  reactiveData.loadStatus = 'idle';
+  reactiveData.saveError = false;
+  reactiveData.submitting = false;
   reactiveData.visible = true;
-  load();
+  void load();
+};
+
+const requestClose = async (done?: () => void) => {
+  if (reactiveData.submitting) return;
+  const sequence = loadSequence;
+  if (!isDirty.value) {
+    if (done) done();
+    else reactiveData.visible = false;
+    return;
+  }
+  try {
+    await ElMessageBox.confirm(t('common.discardConfirm'), t('common.confirm'), {
+      type: 'warning',
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+    });
+    if (sequence !== loadSequence || !reactiveData.visible) return;
+    if (done) done();
+    else reactiveData.visible = false;
+  } catch {
+    return;
+  }
 };
 
 const submit = () => {
+  if (reactiveData.submitting || reactiveData.loading || reactiveData.loadStatus !== 'success') return;
   const originalSet = new Set(reactiveData.originalResourceIds);
   const currentSet = new Set(reactiveData.selectedIds);
 
@@ -350,20 +437,50 @@ const submit = () => {
   }
 
   reactiveData.submitting = true;
-  emit('save', String(reactiveData.role.id), addIds, removeBindIds, () => {
+  reactiveData.saveError = false;
+  const session = ++saveSequence;
+  emit('save', String(reactiveData.role.id), addIds, removeBindIds, (successful = true) => {
+    if (session !== saveSequence || !reactiveData.visible) return;
     reactiveData.submitting = false;
-    reactiveData.visible = false;
+    if (successful) {
+      reactiveData.originalResourceIds = [...reactiveData.selectedIds];
+      reactiveData.visible = false;
+    } else {
+      reactiveData.saveError = true;
+    }
   });
 };
 
 defineExpose({show});
+
+watch(
+  () => reactiveData.visible,
+  (visible) => {
+    if (visible) return;
+    loadSequence += 1;
+    saveSequence += 1;
+    reactiveData.loading = false;
+    reactiveData.selectedIds = [];
+    for (const type of Object.keys(treeRefs)) treeRefs[type] = null;
+  }
+);
+
+onBeforeUnmount(() => {
+  loadSequence += 1;
+  saveSequence += 1;
+});
 </script>
 
 <style lang="scss" scoped>
 .assign-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--dc3-space-3);
+  min-width: 0;
+}
+
+.assign-alert {
+  margin-bottom: var(--dc3-space-3);
 }
 
 .assign-target {
@@ -437,11 +554,63 @@ defineExpose({show});
 }
 
 .assign-pane__tree {
-  height: 440px;
+  height: min(440px, 52vh);
   overflow: auto;
   border: 1px solid var(--el-border-color-extra-light);
   border-radius: 4px;
   padding: 4px 6px;
   margin-top: 4px;
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  .assign-target {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .assign-summary {
+    margin-left: 0;
+  }
+
+  .assign-pane__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .assign-pane__header .el-input {
+    max-width: none;
+  }
+
+  .assign-pane__tabs {
+    overflow-x: auto;
+  }
+
+  .assign-pane__tree {
+    height: 48vh;
+    min-height: 240px;
+  }
+}
+
+@media (max-width: $breakpoint-sm-max) {
+  .assign-pane__tabs {
+    :deep(.el-tabs__nav-wrap) {
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    :deep(.el-tabs__nav-wrap::-webkit-scrollbar) {
+      display: none;
+    }
+
+    :deep(.el-tabs__nav) {
+      min-width: max-content;
+    }
+
+    :deep(.el-tabs__item) {
+      min-height: var(--dc3-touch-target);
+      line-height: var(--dc3-touch-target);
+    }
+  }
 }
 </style>

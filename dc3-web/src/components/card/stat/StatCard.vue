@@ -16,7 +16,18 @@
   -->
 
 <template>
-  <el-card :class="`stat-card--${tone}`" class="stat-card" shadow="hover" @click="emit('click')">
+  <el-card
+    :aria-label="title"
+    :aria-busy="loading"
+    :class="`stat-card--${tone}`"
+    class="stat-card"
+    role="button"
+    shadow="hover"
+    tabindex="0"
+    @click="emit('click')"
+    @keydown.enter="activateOnSelf"
+    @keydown.space.prevent="activateOnSelf"
+  >
     <div class="stat-card__row">
       <div class="stat-card__icon">
         <el-icon :size="28">
@@ -26,16 +37,18 @@
       <div class="stat-card__body">
         <div class="stat-card__title">{{ title }}</div>
         <div class="stat-card__value">
-          <span class="stat-card__value-text">{{ formattedValue }}</span>
-          <span v-if="trend" :class="['stat-card__trend', `stat-card__trend--${trend.direction}`]">
+          <span v-if="loading" aria-hidden="true" class="stat-card__value-skeleton" />
+          <span v-else class="stat-card__value-text">{{ error ? '—' : formattedValue }}</span>
+          <span v-if="!loading && !error && trend" :class="['stat-card__trend', `stat-card__trend--${trend.direction}`]">
             <el-icon><component :is="trendIcon"/></el-icon>
             {{ trend.label }}
           </span>
         </div>
-        <div v-if="subtitle" class="stat-card__subtitle">{{ subtitle }}</div>
+        <div v-if="!loading && !error && subtitle" class="stat-card__subtitle">{{ subtitle }}</div>
       </div>
       <el-button
         v-if="onRefresh"
+        :aria-label="refreshLabel"
         :icon="Refresh"
         :loading="refreshing"
         circle
@@ -63,6 +76,7 @@ import {computed, ref} from 'vue';
 import {CaretBottom, CaretTop, Minus, Refresh} from '@element-plus/icons-vue';
 
 import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
+import i18n from '@/config/i18n';
 
 interface Trend {
   direction: 'up' | 'down' | 'flat';
@@ -77,6 +91,8 @@ const props = defineProps({
   tone: {type: String as PropType<'blue' | 'green' | 'orange' | 'purple' | 'red'>, default: 'blue'},
   trend: {type: Object as PropType<Trend | null>, default: null},
   sparkline: {type: Array as PropType<number[]>, default: () => []},
+  loading: {type: Boolean, default: false},
+  error: {type: Boolean, default: false},
   /**
    * Optional refresh handler. When provided, a small text button appears
    * in the top-right of the card; clicking it invokes the handler without
@@ -87,6 +103,15 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{ (e: 'click'): void }>();
+const refreshLabel = computed(() => `${props.title} - ${i18n.global.t('common.refresh')}`);
+
+// keydown bubbles up from the nested refresh button; only activate the
+// card when the event originates from the card element itself (the click
+// path is already isolated by the button's @click.stop).
+const activateOnSelf = (event: KeyboardEvent) => {
+  if (event.target !== event.currentTarget) return;
+  emit('click');
+};
 
 const refreshing = ref(false);
 const doRefresh = async () => {
@@ -229,6 +254,13 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
     opacity: 1;
   }
 
+  @media (max-width: $breakpoint-xs-max), (pointer: coarse) {
+    .stat-card__refresh {
+      right: var(--dc3-floating-action-safe-space);
+      opacity: 1;
+    }
+  }
+
   .stat-card__icon {
     width: 44px;
     height: 44px;
@@ -267,6 +299,21 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
     letter-spacing: -0.025em;
   }
 
+  .stat-card__value-skeleton {
+    display: inline-block;
+    width: 78px;
+    height: 30px;
+    border-radius: var(--dc3-radius-sm);
+    background: linear-gradient(
+      90deg,
+      var(--el-fill-color-light) 25%,
+      var(--el-fill-color-lighter) 37%,
+      var(--el-fill-color-light) 63%
+    );
+    background-size: 400% 100%;
+    animation: stat-card-skeleton 1.4s ease infinite;
+  }
+
   .stat-card__trend {
     font-size: 12px;
     display: inline-flex;
@@ -296,6 +343,21 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
     height: 40px;
     margin-top: auto;
     padding-top: 8px;
+  }
+
+  @keyframes stat-card-skeleton {
+    0% {
+      background-position: 100% 0;
+    }
+    100% {
+      background-position: -100% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stat-card__value-skeleton {
+      animation: none;
+    }
   }
 }
 </style>

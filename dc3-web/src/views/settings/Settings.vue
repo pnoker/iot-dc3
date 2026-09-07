@@ -29,6 +29,7 @@
       <el-card class="settings-aside-card" shadow="never">
         <div class="settings-aside-toolbar">
           <el-button
+            v-if="!isTablet"
             :aria-label="asideCollapseLabel"
             :icon="appStore.settingsCollapsed ? Expand : Fold"
             circle
@@ -37,7 +38,7 @@
           />
         </div>
         <el-scrollbar>
-          <settings-sidebar-menu :collapsed="appStore.settingsCollapsed" />
+          <settings-sidebar-menu :collapsed="sidebarCollapsed" />
         </el-scrollbar>
       </el-card>
     </el-aside>
@@ -79,16 +80,17 @@ import { useAppStore } from "@/store";
 import SettingsSidebarMenu from "@/views/settings/components/SettingsSidebarMenu.vue";
 
 const { t } = useI18n();
-const { isMobile } = useBreakpoint();
+const { isMobile, isTablet } = useBreakpoint();
 const appStore = useAppStore();
 
 const asideDrawerVisible = ref(false);
 
-// Desktop aside width follows the L2 layout tokens; collapsed rail is
-// icon-only (64px) on tablet.
-const asideWidth = computed(() =>
-  appStore.settingsCollapsed ? "64px" : "220px",
-);
+// Tablet is an icon rail by contract; only desktop honours the persisted
+// collapse preference. This keeps the content canvas usable at 768–1199px
+// without making the preference unexpectedly alter the tablet information
+// hierarchy.
+const sidebarCollapsed = computed(() => isTablet.value || appStore.settingsCollapsed);
+const asideWidth = computed(() => (sidebarCollapsed.value ? "64px" : "220px"));
 
 const asideCollapseLabel = computed(() =>
   t(

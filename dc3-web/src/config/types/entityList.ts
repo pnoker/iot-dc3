@@ -28,6 +28,7 @@ export type Translator = (key: string, params?: Record<string, unknown>) => stri
 
 export type EntityMode = 'page' | 'tree';
 export type EntityPagination = 'offset' | 'cursor';
+export type EntityMobileRole = 'primary' | 'detail' | 'hidden';
 export type EntityFieldKind =
   'input' | 'number' | 'select' | 'enableFlag' | 'textarea' | 'json' | 'color' | 'treeSelect';
 export type EntityColumnKind = 'text' | 'tag' | 'code' | 'time' | 'enable' | 'color' | 'icon' | 'link';
@@ -81,6 +82,8 @@ export interface EntityColumnConfig {
   formatter?: (row: Record<string, any>, ctx: EntityColumnContext) => string;
   onClick?: (row: Record<string, any>) => void; // link
   linkable?: (row: Record<string, any>) => boolean; // Link columns are clickable by default.
+  /** Controls which columns remain visible and their prominence on narrow screens. */
+  mobile?: EntityMobileRole;
 }
 
 export interface EntitySearchFieldConfig {
@@ -99,7 +102,11 @@ export interface EntityRowAction {
   type?: 'primary' | 'success' | 'warning' | 'danger' | 'info';
   /** When set, the action renders inside el-popconfirm; onClick runs only after confirmation. */
   popconfirmTitle?: string;
-  onClick: (row: Record<string, any>) => void;
+  /** Optional externally managed loading state for long-running row actions. */
+  loading?: (row: Record<string, any>) => boolean;
+  /** Optional predicate for disabling an action for a specific row. */
+  disabled?: (row: Record<string, any>) => boolean;
+  onClick: (row: Record<string, any>) => void | Promise<void>;
 }
 
 /** Toolbar action for operations outside generic CRUD, such as refresh, registration, or connection creation. */

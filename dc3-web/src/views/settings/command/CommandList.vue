@@ -33,32 +33,64 @@
       @current-change="currentChange"
     />
 
+    <el-alert
+      v-if="reactiveData.status === 'error'"
+      :closable="false"
+      :title="$t('common.loadFailed')"
+      class="command-list__error"
+      show-icon
+      type="error"
+    >
+      <el-button :loading="reactiveData.loading" link type="danger" @click="refresh">
+        {{ $t('common.retry') }}
+      </el-button>
+    </el-alert>
+
     <blank-card>
       <el-row>
-        <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-          <skeleton-card :footer="canManage" :loading="reactiveData.loading"></skeleton-card>
-        </el-col>
-        <el-col v-if="hasData">
-          <el-empty :description="$t('command.empty')"/>
-        </el-col>
-        <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-          <command-card
-            :data="data"
-            :embedded="embedded !== '' && embedded !== 'edit'"
-            icon="images/common/command.png"
-            @delete-thing="remove"
-            @detail-thing="openDetail"
-            @disable-thing="disableThing"
-            @edit-thing="openEdit"
-            @enable-thing="enableThing"
-          ></command-card>
-        </el-col>
+        <template v-if="reactiveData.loading">
+          <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+            <skeleton-card :footer="canManage" :loading="true"></skeleton-card>
+          </el-col>
+        </template>
+        <template v-else-if="hasData">
+          <el-col>
+            <el-empty :description="$t('command.empty')"/>
+          </el-col>
+        </template>
+        <template v-else-if="reactiveData.status === 'error' && reactiveData.listData.length === 0">
+          <el-col>
+            <el-empty :description="$t('common.loadFailed')"/>
+          </el-col>
+        </template>
+        <template v-else>
+          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+            <command-card
+              :data="data"
+              :embedded="embedded !== '' && embedded !== 'edit'"
+              :busy="isActionBusy(data)"
+              icon="images/common/command.png"
+              @delete-thing="remove"
+              @detail-thing="openDetail"
+              @disable-thing="disableThing"
+              @edit-thing="openEdit"
+              @enable-thing="enableThing"
+            ></command-card>
+          </el-col>
+        </template>
       </el-row>
     </blank-card>
 
     <command-edit-form ref="editRef" @add-thing="onAdd" @update-thing="onUpdate"/>
 
-    <el-drawer v-model="reactiveData.detailVisible" :title="$t('command.detail.title')" size="520px">
+    <el-drawer
+      v-model="reactiveData.detailVisible"
+      :close-on-click-modal="false"
+      :close-on-press-escape="true"
+      :size="isMobile ? '100%' : '520px'"
+      :title="$t('command.detail.title')"
+      destroy-on-close
+    >
       <el-descriptions v-if="reactiveData.detailRecord" :column="1" border>
         <el-descriptions-item :label="$t('common.name')"
         >{{ reactiveData.detailRecord.commandName || '-' }}
@@ -100,7 +132,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue';
+import {computed, onBeforeUnmount, reactive, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {
   addCommand,
@@ -112,6 +144,7 @@ import {
   updateCommandParam,
 } from '@/api/command';
 import {usePagedList} from '@/composables/usePagedList';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 import {timestampLabel} from '@/utils/dateUtil';
 import {failMessage, successMessage} from '@/utils/notificationUtil';
 import {commandTimeoutLabel} from '@/utils/thingModelFormatUtil';
@@ -134,6 +167,8 @@ const props = withDefaults(
   {embedded: '', pre: false, next: false, profileId: ''}
 );
 
+const {isMobile} = useBreakpoint();
+
 const emit = defineEmits<{
   (e: 'pre-handle'): void;
   (e: 'next-handle'): void;
@@ -142,7 +177,7 @@ const emit = defineEmits<{
 const editRef = ref<InstanceType<typeof CommandEditForm>>();
 const {t} = useI18n();
 const canManage = computed(() => props.embedded === '' || props.embedded === 'edit');
-const hasData = computed(() => !reactiveData.loading && reactiveData.listData.length < 1);
+const hasData = computed(() => reactiveData.status === 'success' && !reactiveData.loading && reactiveData.listData.length < 1);
 
 const withFixedQuery = (params: Record<string, unknown> = {}) => {
   const q = {...params};
@@ -169,6 +204,8 @@ const reactiveData = state as typeof state & {
 };
 reactiveData.detailVisible = false;
 reactiveData.detailRecord = null;
+const actionBusy = reactive(new Set<string>());
+let disposed = false;
 
 const withFixedProfile = (form: CommandForm) => {
   const profileId = !isNull(props.profileId) ? props.profileId : form.profileId;
@@ -223,13 +260,14 @@ const onAdd = (form: CommandForm, params: CommandParamRecord[], done: DoneCallba
         return Promise.reject(new Error(t('command.errors.idNotReturned')));
       }
       return syncCommandParams(commandId, params).then(() => {
+        if (disposed) return;
         successMessage();
-        load();
+        void load();
         done();
       });
     })
     .catch(() => {
-      done(false);
+      if (!disposed) done(false);
     });
 };
 
@@ -247,40 +285,43 @@ const onUpdate = (
         return Promise.reject(new Error(t('command.errors.idMissing')));
       }
       return syncCommandParams(commandId, params, originalParams).then(() => {
+        if (disposed) return;
         successMessage();
-        load();
+        void load();
         done();
       });
     })
     .catch(() => {
-      done(false);
+      if (!disposed) done(false);
     });
 };
 
-const disableThing = (command: CommandRecord, done: () => void) => {
-  updateCommand({...command, enableFlag: 'DISABLE'}).then(() => {
-    load();
-    done();
-  });
+const isActionBusy = (command: CommandRecord) => actionBusy.has(String(command.id));
+
+const runAction = async (command: CommandRecord, action: () => Promise<unknown>) => {
+  const id = String(command.id);
+  if (actionBusy.has(id)) return;
+  actionBusy.add(id);
+  try {
+    await action();
+    if (disposed) return;
+    successMessage();
+    await load();
+  } catch {
+    // handled globally
+  } finally {
+    actionBusy.delete(id);
+  }
 };
 
-const enableThing = (command: CommandRecord, done: () => void) => {
-  updateCommand({...command, enableFlag: 'ENABLE'}).then(() => {
-    load();
-    done();
-  });
-};
+const disableThing = (command: CommandRecord) =>
+  runAction(command, () => updateCommand({...command, enableFlag: 'DISABLE'}));
 
-const remove = (command: CommandRecord, done?: () => void) => {
-  deleteCommand(command.id, command.version).then(() => {
-    load();
-    if (done) {
-      done();
-    } else {
-      successMessage();
-    }
-  });
-};
+const enableThing = (command: CommandRecord) =>
+  runAction(command, () => updateCommand({...command, enableFlag: 'ENABLE'}));
+
+const remove = (command: CommandRecord) =>
+  runAction(command, () => deleteCommand(command.id, command.version));
 
 const preHandle = () => {
   emit('pre-handle');
@@ -297,6 +338,11 @@ watch(
   }
 );
 
+onBeforeUnmount(() => {
+  disposed = true;
+  actionBusy.clear();
+});
+
 defineExpose({
   reactiveData,
   refresh,
@@ -304,3 +350,9 @@ defineExpose({
 
 load();
 </script>
+
+<style lang="scss" scoped>
+.command-list__error {
+  margin-bottom: var(--dc3-space-3);
+}
+</style>

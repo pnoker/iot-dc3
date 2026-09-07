@@ -185,7 +185,7 @@ test.describe('profile edit tabs', () => {
         .getByRole('button', {name: /^(Add|新增)$/})
         .last()
         .click();
-      const paramInputs = dialog.locator('table tbody tr').last().locator('input:not([readonly])');
+      const paramInputs = dialog.locator('.param-editor__row').last().locator('input:not([readonly]):not([disabled])');
       await expect(paramInputs.nth(0)).toBeVisible({timeout: 10_000});
       await paramInputs.nth(0).fill(`${commandName}_param`);
       await paramInputs.nth(1).fill(`${commandName}_code`);

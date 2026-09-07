@@ -17,6 +17,7 @@
 
 <template>
   <div class="container">
+    <a class="skip-link" href="#main-content">{{ t('layout.skipToContent') }}</a>
     <header class="header">
       <div class="header_brand_glass">
         <!-- Thumb terminals get a hamburger instead of the horizontal menu
@@ -31,51 +32,53 @@
         />
         <brand-lockup :compact="isMobile" />
       </div>
-      <div class="header_actions_glass">
-        <div v-if="!isMobile" class="header_menu_wrap">
-          <nav-menu :compact="isTablet" mode="horizontal" />
-        </div>
-        <span v-if="!isMobile" class="header_actions_divider" aria-hidden="true" />
-        <div class="header_utilities">
-          <app-preferences compact />
-          <el-tooltip v-if="settingsEntryName" :content="t('layout.settings')" placement="bottom">
-            <el-button
-              :aria-label="t('layout.settings')"
-              :icon="Setting"
-              circle
-              class="header_settings_button"
-              text
-              @click="handleCommand('settings')"
-            />
-          </el-tooltip>
-        </div>
-        <span class="header_actions_divider" aria-hidden="true" />
-        <div class="header_user">
-          <el-dropdown
-            popper-class="user-dropdown-popper"
-            trigger="click"
-            :popper-options="{
-              modifiers: [{ name: 'preventOverflow', options: { padding: 8 } }],
-            }"
-            @command="handleCommand"
-          >
-            <button :aria-label="t('layout.account')" class="user_trigger" type="button">
-              <img :src="assetUrl('images/common/avatar.png')" alt="" class="user_avatar" />
-            </button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <li class="user_dropdown_identity" role="none">
-                  <span class="user_dropdown_name">{{ currentLogin }}</span>
-                </li>
-                <el-dropdown-item :icon="QuestionFilled" command="help">{{
-                  t("layout.about")
-                }}</el-dropdown-item>
-                <el-dropdown-item :icon="SwitchButton" command="logout" divided>{{
-                  t("layout.logout")
-                }}</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+      <div class="header_actions_row">
+        <div class="header_actions_glass">
+          <div v-if="!isMobile" class="header_menu_wrap">
+            <nav-menu :compact="isTablet" mode="horizontal" />
+          </div>
+          <span v-if="!isMobile" class="header_actions_divider" aria-hidden="true" />
+          <div class="header_utilities">
+            <app-preferences compact />
+            <el-tooltip v-if="settingsEntryName" :content="t('layout.settings')" placement="bottom">
+              <el-button
+                :aria-label="t('layout.settings')"
+                :icon="Setting"
+                circle
+                class="header_settings_button"
+                text
+                @click="handleCommand('settings')"
+              />
+            </el-tooltip>
+          </div>
+          <span class="header_actions_divider" aria-hidden="true" />
+          <div class="header_user">
+            <el-dropdown
+              popper-class="user-dropdown-popper"
+              trigger="click"
+              :popper-options="{
+                modifiers: [{ name: 'preventOverflow', options: { padding: 8 } }],
+              }"
+              @command="handleCommand"
+            >
+              <button :aria-label="t('layout.account')" class="user_trigger" type="button">
+                <img :src="assetUrl('images/common/avatar.png')" alt="" class="user_avatar" />
+              </button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <li class="user_dropdown_identity" role="none">
+                    <span class="user_dropdown_name">{{ currentLogin }}</span>
+                  </li>
+                  <el-dropdown-item :icon="QuestionFilled" command="help">{{
+                    t("layout.about")
+                  }}</el-dropdown-item>
+                  <el-dropdown-item :icon="SwitchButton" command="logout" divided>{{
+                    t("layout.logout")
+                  }}</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </div>
       </div>
     </header>
@@ -91,7 +94,7 @@
       <nav-menu mode="vertical" />
     </el-drawer>
     <div class="body">
-      <div class="body-main">
+      <div id="main-content" class="body-main" tabindex="-1">
         <div v-if="breadcrumbItems.length > 1" class="breadcrumb">
           <el-breadcrumb separator="/">
             <el-breadcrumb-item
@@ -450,6 +453,26 @@ const handleCommand = async (command: string) => {
 <style lang="scss" scoped>
 @use '@/styles/glass-capsule.scss' as *;
 
+.skip-link {
+  position: fixed;
+  z-index: 1000;
+  top: var(--dc3-space-2);
+  left: var(--dc3-space-2);
+  padding: var(--dc3-space-2) var(--dc3-space-3);
+  border-radius: var(--dc3-radius-md);
+  background: var(--el-color-primary);
+  color: var(--el-color-white);
+  box-shadow: var(--dc3-shadow-md);
+  transform: translateY(-200%);
+  transition: transform var(--dc3-duration-fast) var(--dc3-ease-standard);
+
+  &:focus {
+    transform: translateY(0);
+    outline: none;
+    box-shadow: var(--dc3-focus-ring), var(--dc3-shadow-md);
+  }
+}
+
 .container {
   color: var(--dc3-text-primary);
   -moz-osx-font-smoothing: grayscale;
@@ -475,6 +498,12 @@ const handleCommand = async (command: string) => {
     -webkit-backdrop-filter: blur(16px) saturate(1.2);
 
     .header_brand_glass,
+    .header_actions_row {
+      flex: 0 1 auto;
+      min-width: 0;
+      max-width: calc(100% - 228px);
+    }
+
     .header_actions_glass {
       @include glass-capsule(
         $extra-bg: color-mix(in srgb, var(--dc3-bg-elevated) 82%, transparent)
@@ -497,9 +526,7 @@ const handleCommand = async (command: string) => {
     }
 
     .header_actions_glass {
-      flex: 0 1 auto;
       min-width: 0;
-      max-width: calc(100% - 228px);
       padding: 3px 5px 3px 7px;
     }
 
@@ -589,7 +616,7 @@ const handleCommand = async (command: string) => {
     // Tablet keeps navigation visible as accessible icon buttons. Language,
     // settings, and account remain first-class actions in the same capsule.
     @media (max-width: $breakpoint-sm-max) {
-      .header_actions_glass {
+      .header_actions_row {
         max-width: calc(100% - 218px);
       }
     }
@@ -597,23 +624,42 @@ const handleCommand = async (command: string) => {
     // Phone keeps exactly two capsules: menu + brand on the left, user on
     // the right. The drawer remains the navigation surface.
     @media (max-width: $breakpoint-xs-max) {
-      gap: var(--dc3-space-2);
-      padding-right: var(--dc3-space-2);
-      padding-left: var(--dc3-space-2);
+      flex-wrap: wrap;
+      align-content: flex-start;
+      height: 120px;
+      gap: 4px 8px;
+      padding: 8px var(--dc3-space-2);
 
       .header_brand_glass {
         min-width: 0;
-        padding-right: var(--dc3-space-3);
+        height: 44px;
+        padding: 0 var(--dc3-space-3) 0 4px;
       }
 
       .header_menu_toggle {
         display: inline-flex;
       }
 
+      .header_actions_row {
+        order: 2;
+        flex: 0 0 100%;
+        width: 100%;
+        max-width: none;
+        display: flex;
+        justify-content: center;
+      }
+
       .header_actions_glass {
         flex: 0 0 auto;
+        height: 48px;
+        box-sizing: border-box;
         max-width: none;
-        padding: 3px 5px;
+        padding: 2px 5px;
+      }
+
+      .header_brand_glass {
+        order: 1;
+        margin-right: auto;
       }
 
       .header_settings_button {
@@ -621,6 +667,10 @@ const handleCommand = async (command: string) => {
         height: 30px;
       }
     }
+  }
+
+  @media (max-width: $breakpoint-xs-max) {
+    --dc3-header-height: 120px;
   }
 
   // Mobile navigation drawer content.

@@ -33,46 +33,74 @@
   >
     <template #filters>
       <el-form-item v-if="embedded === ''" :label="$t('pointValue.tool.device')" prop="deviceId">
-        <el-select
-          v-model="formData.deviceId"
-          :loading="deviceLoading"
-          :placeholder="$t('pointValue.tool.devicePlaceholder')"
-          :remote-method="deviceDictionary"
-          class="edit-form-special"
-          clearable
-          filterable
-          remote
-          reserve-keyword
-          @visible-change="deviceDictionaryVisible"
-        >
-          <el-option
-            v-for="dictionary in deviceDictionaries"
-            :key="dictionary.value"
-            :label="dictionary.label"
-            :value="dictionary.value"
-          />
-        </el-select>
+        <div class="tool-dictionary-field">
+          <el-select
+            v-model="formData.deviceId"
+            :loading="deviceLoading"
+            :placeholder="$t('pointValue.tool.devicePlaceholder')"
+            :remote-method="deviceDictionary"
+            class="edit-form-special"
+            clearable
+            filterable
+            remote
+            reserve-keyword
+            @visible-change="deviceDictionaryVisible"
+          >
+            <el-option
+              v-for="dictionary in deviceDictionaries"
+              :key="dictionary.value"
+              :label="dictionary.label"
+              :value="dictionary.value"
+            />
+          </el-select>
+          <el-alert
+            v-if="deviceError"
+            :closable="false"
+            :title="$t('common.optionLoadFailed')"
+            class="tool-dictionary-error"
+            show-icon
+            type="error"
+          >
+            <el-button :loading="deviceLoading" link type="danger" @click="deviceDictionary('')">
+              {{ $t('common.retry') }}
+            </el-button>
+          </el-alert>
+        </div>
       </el-form-item>
       <el-form-item v-if="embedded === ''" :label="$t('pointValue.tool.point')" prop="pointId">
-        <el-select
-          v-model="formData.pointId"
-          :loading="pointLoading"
-          :placeholder="$t('pointValue.tool.pointPlaceholder')"
-          :remote-method="pointDictionary"
-          class="edit-form-special"
-          clearable
-          filterable
-          remote
-          reserve-keyword
-          @visible-change="pointDictionaryVisible"
-        >
-          <el-option
-            v-for="dictionary in pointDictionaries"
-            :key="dictionary.value"
-            :label="dictionary.label"
-            :value="dictionary.value"
-          />
-        </el-select>
+        <div class="tool-dictionary-field">
+          <el-select
+            v-model="formData.pointId"
+            :loading="pointLoading"
+            :placeholder="$t('pointValue.tool.pointPlaceholder')"
+            :remote-method="pointDictionary"
+            class="edit-form-special"
+            clearable
+            filterable
+            remote
+            reserve-keyword
+            @visible-change="pointDictionaryVisible"
+          >
+            <el-option
+              v-for="dictionary in pointDictionaries"
+              :key="dictionary.value"
+              :label="dictionary.label"
+              :value="dictionary.value"
+            />
+          </el-select>
+          <el-alert
+            v-if="pointError"
+            :closable="false"
+            :title="$t('common.optionLoadFailed')"
+            class="tool-dictionary-error"
+            show-icon
+            type="error"
+          >
+            <el-button :loading="pointLoading" link type="danger" @click="pointDictionary('')">
+              {{ $t('common.retry') }}
+            </el-button>
+          </el-alert>
+        </div>
       </el-form-item>
       <el-form-item v-if="embedded === 'device'" :label="$t('pointValue.tool.pointName')" prop="pointName">
         <el-input
@@ -86,7 +114,7 @@
         <enable-flag-segmented v-model="formData.enableFlag" include-all/>
       </el-form-item>
       <el-form-item :label="$t('settings.event.timeRange')" prop="rangeKey">
-        <range-segmented v-model="formData.rangeKey" include-all/>
+        <range-segmented v-model="formData.rangeKey" include-all select/>
       </el-form-item>
     </template>
     <template #actions>
@@ -98,7 +126,7 @@
 </template>
 
 <script lang="ts" setup>
-import {reactive, ref} from 'vue';
+import {onBeforeUnmount, reactive, ref, watch} from 'vue';
 import {Plus} from '@element-plus/icons-vue';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
@@ -126,50 +154,73 @@ const emit = defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-
 const formData = reactive<Record<string, any>>({enableFlag: '', rangeKey: ''});
 const deviceDictionaries = ref<Dictionary[]>([]);
 const deviceLoading = ref(false);
+const deviceError = ref(false);
 const pointDictionaries = ref<Dictionary[]>([]);
 const pointLoading = ref(false);
+const pointError = ref(false);
+let deviceRequestId = 0;
+let pointRequestId = 0;
 
 const onSearch = (data: Record<string, any>) => {
   emit('search', cleanSearchParams(data));
 };
 
 const onReset = () => {
+  deviceRequestId += 1;
+  pointRequestId += 1;
+  deviceLoading.value = false;
+  pointLoading.value = false;
+  deviceError.value = false;
+  pointError.value = false;
+  deviceDictionaries.value = [];
+  pointDictionaries.value = [];
   resetSearchForm(formData, {enableFlag: '', rangeKey: ''});
   emit('reset');
 };
 
 const deviceDictionary = (query?: string) => {
+  const requestId = ++deviceRequestId;
   deviceLoading.value = true;
+  deviceError.value = false;
   listDeviceDictionary({
     offset: 0, limit: 50,
     label: query || '',
   })
     .then((res) => {
+      if (requestId !== deviceRequestId) return;
       deviceDictionaries.value = res.items;
     })
     .catch(() => {
-      // nothing to do
+      if (requestId !== deviceRequestId) return;
+      deviceDictionaries.value = [];
+      deviceError.value = true;
     })
     .finally(() => {
-      deviceLoading.value = false;
+      if (requestId === deviceRequestId) deviceLoading.value = false;
     });
 };
 
 const pointDictionary = (query?: string) => {
+  const requestId = ++pointRequestId;
+  const parentId = formData.deviceId || undefined;
   pointLoading.value = true;
+  pointError.value = false;
   listPointDictionary({
     offset: 0, limit: 50,
     label: query || '',
-    parentId: formData.deviceId,
+    parentId,
   })
     .then((res) => {
+      if (requestId !== pointRequestId || (formData.deviceId || undefined) !== parentId) return;
       pointDictionaries.value = res.items;
     })
     .catch(() => {
-      // nothing to do
+      if (requestId !== pointRequestId || (formData.deviceId || undefined) !== parentId) return;
+      pointDictionaries.value = [];
+      pointError.value = true;
     })
     .finally(() => {
-      pointLoading.value = false;
+      if (requestId === pointRequestId) pointLoading.value = false;
     });
 };
 
@@ -180,4 +231,40 @@ const deviceDictionaryVisible = (visible: boolean) => {
 const pointDictionaryVisible = (visible: boolean) => {
   if (visible) pointDictionary('');
 };
+
+watch(
+  () => formData.deviceId,
+  () => {
+    formData.pointId = '';
+    pointRequestId += 1;
+    pointDictionaries.value = [];
+    pointLoading.value = false;
+    pointError.value = false;
+  },
+);
+
+onBeforeUnmount(() => {
+  deviceRequestId += 1;
+  pointRequestId += 1;
+});
 </script>
+
+<style lang="scss" scoped>
+.tool-dictionary-field {
+  display: grid;
+  gap: var(--dc3-space-2);
+  width: 100%;
+  min-width: 0;
+}
+
+.tool-dictionary-error {
+  margin: 0;
+
+  :deep(.el-alert__content) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--dc3-space-2);
+  }
+}
+</style>

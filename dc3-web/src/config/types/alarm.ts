@@ -119,4 +119,10 @@ export interface NotifyHistoryRecord extends AlarmBase {
 }
 
 export type AlarmEntity =
-  RuleRecord | NotifyRecord | MessageRecord | NotifyChannelBindRecord | RuleStateRecord | NotifyHistoryRecord;
+  | RuleRecord
+  | NotifyRecord
+  | MessageRecord
+  | NotifyChannelRecord
+  | NotifyChannelBindRecord
+  | RuleStateRecord
+  | NotifyHistoryRecord;

@@ -123,5 +123,7 @@ describe('Layout', () => {
 
     // Router-view is mounted into the body shell.
     expect(wrapper.find('.router-view-stub').exists()).toBe(true);
+    expect(wrapper.get('.skip-link').attributes('href')).toBe('#main-content');
+    expect(wrapper.get('#main-content').attributes('tabindex')).toBe('-1');
   });
 });

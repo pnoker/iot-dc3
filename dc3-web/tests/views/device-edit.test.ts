@@ -120,4 +120,42 @@ describe('DeviceEdit view', () => {
     expect(commandMocks.listCommandByProfileId).toHaveBeenCalled();
     expect(eventMocks.listEventByProfileId).toHaveBeenCalled();
   });
+
+  // Pagination sits behind `v-if="filtered*.length > pageSize"`, so once the
+  // reloaded dataset fits on one page Element Plus is gone and can no longer
+  // clamp the stale page number. The paginated computeds must do it themselves.
+  it('keeps the point matrix populated when a reload shrinks below the current page', async () => {
+    const thirtyPoints = Array.from({length: 30}, (_, index) => ({
+      id: `pt-${index + 1}`,
+      pointName: `Point ${index + 1}`,
+    }));
+    const DeviceEdit = (await import('@/views/device/edit/DeviceEdit.vue')).default;
+    pointMocks.listPointByProfileId.mockResolvedValueOnce(thirtyPoints);
+    const wrapper = await mountListPage({
+      component: DeviceEdit,
+      routePath: '/test',
+      routeQuery: {id: 'dev-1', active: 'pointConfig'},
+      stubs: {
+        EnableFlagSegmented: {template: '<div />'},
+      },
+    });
+    await flushPromises();
+
+    const page = wrapper.vm as {
+      reactiveData: {pointPageCurrent: number};
+      paginatedPointInfoData: {id: string}[];
+      changeProfile: () => void;
+    };
+
+    page.reactiveData.pointPageCurrent = 3;
+    expect(page.paginatedPointInfoData).toHaveLength(10);
+
+    pointMocks.listPointByProfileId.mockResolvedValueOnce(thirtyPoints.slice(0, 8));
+    page.changeProfile();
+    await flushPromises();
+
+    // Page 3 is now out of range: the slice must fall back to the last page
+    // (all 8 rows) instead of rendering an empty table with no pager to recover.
+    expect(page.paginatedPointInfoData).toHaveLength(8);
+  });
 });

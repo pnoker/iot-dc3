@@ -17,10 +17,13 @@
 
 <template>
   <dashboard-card
-    :empty="!loading && data.total === 0"
+    :empty="status === 'success' && data.total === 0"
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.agingEmpty')"
+    :error="status === 'error'"
+    :error-text="t('common.loadFailed')"
     :loading="loading"
+    :retry-text="t('common.retry')"
     :subtitle="t('settings.event.overview.agingSubtitle', {n: data.total})"
     :title="t('settings.event.overview.agingTitle')"
     body-mode="chart"
@@ -42,7 +45,7 @@ import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 const {t, locale} = useI18n();
-const {loading, run} = useAsyncLoader();
+const {loading, run, status} = useAsyncLoader();
 
 const data = reactive<AgingBacklog>({under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
 const chartRef = ref<HTMLElement>();
@@ -77,11 +80,17 @@ const render = () => {
 };
 
 const load = () =>
-  run(async () => {
-    const res: AgingBacklog = await alertAging();
-    Object.assign(data, res ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
-    await nextTick();
-    if (data.total > 0) render();
+  run(() => alertAging() as Promise<AgingBacklog>, {
+    apply: (result) => {
+      Object.assign(data, result ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
+      void nextTick().then(() => {
+        if (data.total > 0) render();
+        else {
+          chart?.destroy();
+          chart = undefined;
+        }
+      });
+    },
   });
 
 onMounted(load);

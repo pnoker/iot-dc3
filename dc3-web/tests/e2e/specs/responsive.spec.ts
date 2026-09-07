@@ -39,6 +39,42 @@ const expectNoHorizontalOverflow = async (page: Page, label: string) => {
   ).toBeLessThanOrEqual(0);
 };
 
+/** Visible component boxes must stay inside the viewport, even when an
+ * ancestor intentionally owns scrolling. Page-level scrollWidth alone cannot
+ * catch a flex child that is clipped by an overflow-hidden card. */
+const expectVisibleBoxesWithinViewport = async (
+  page: Page,
+  selector: string,
+  label: string,
+) => {
+  const violations = await page.evaluate((target) => {
+    const viewport = document.documentElement.clientWidth;
+    return [...document.querySelectorAll<HTMLElement>(target)]
+      .filter((element) => {
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return (
+          style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
+      })
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          className: String(element.className).slice(0, 120),
+          left: rect.left,
+          right: rect.right,
+          viewport,
+        };
+      })
+      .filter(({ left, right, viewport }) => left < -1 || right > viewport + 1);
+  }, selector);
+
+  expect(violations, label + ": visible box clipped by viewport").toEqual([]);
+};
+
 const isMobileViewport = (page: Page) =>
   (page.viewportSize()?.width ?? 1440) < 768;
 
@@ -58,6 +94,97 @@ test.describe("three-terminal gate", () => {
     await page.goto("/#/settings/user", { waitUntil: "domcontentloaded" });
     await waitForAppSettled(page);
     await expectNoHorizontalOverflow(page, "settings");
+  });
+
+  test("home SLA chips keep compact visuals and the shared control density", async ({
+    page,
+  }) => {
+    await login(page);
+    await page.goto("/#/home", { waitUntil: "domcontentloaded" });
+    await waitForAppSettled(page);
+
+    const badge = page.locator(".sla-badge");
+    await expect(badge).toBeVisible();
+    const badgeHeight = await badge.evaluate(
+      (element) => element.getBoundingClientRect().height,
+    );
+    const metrics = await badge.locator(".sla-badge__chip").evaluateAll(
+      (chips) =>
+        chips.map((chip) => {
+          const element = chip as HTMLElement;
+          const visual = getComputedStyle(element, "::before");
+          const rect = element.getBoundingClientRect();
+          return {
+            height: rect.height,
+            visualHeight: Number.parseFloat(visual.height),
+            background: getComputedStyle(element).backgroundColor,
+          };
+        }),
+    );
+    // A3 (v7 note): controls share the 32px density on every terminal, so the
+    // chips are never enlarged for coarse pointers. The strip bound is that
+    // 32px chip plus the badge padding and border.
+    expect(metrics.length).toBeGreaterThan(0);
+    expect(badgeHeight).toBeLessThanOrEqual(44);
+    for (const metric of metrics) {
+      expect(metric.visualHeight).toBeGreaterThanOrEqual(26);
+      expect(metric.visualHeight).toBeLessThan(metric.height);
+      expect(metric.visualHeight).toBeLessThanOrEqual(30);
+      expect(metric.background).toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+      expect(metric.height).toBeGreaterThanOrEqual(32);
+      expect(metric.height).toBeLessThanOrEqual(36);
+    }
+  });
+
+  test("action alerts keep the message and retry action compact", async ({
+    page,
+  }) => {
+    await login(page);
+    await page.evaluate(() => {
+      const fixture = document.createElement("div");
+      fixture.id = "responsive-action-alert";
+      fixture.className = "el-alert el-alert--error is-light";
+      fixture.setAttribute("role", "alert");
+      fixture.innerHTML = `
+        <i class="el-icon el-alert__icon is-big" aria-hidden="true">
+          <svg viewBox="0 0 1024 1024"><path d="M0 0h1024v1024H0z" /></svg>
+        </i>
+        <div class="el-alert__content">
+          <span class="el-alert__title with-description">Unable to load data.</span>
+          <p class="el-alert__description">
+            <button class="el-button el-button--danger el-button--default is-link" type="button">
+              <span>Retry</span>
+            </button>
+          </p>
+        </div>
+      `;
+      document.querySelector(".home")?.prepend(fixture);
+    });
+
+    const alert = page.locator("#responsive-action-alert");
+    await expect(alert).toBeVisible();
+    const metrics = await alert.evaluate((element) => {
+      const content = element.querySelector<HTMLElement>(".el-alert__content")!;
+      const title = element.querySelector<HTMLElement>(".el-alert__title")!;
+      const action = element.querySelector<HTMLElement>(".el-button")!;
+      const titleRect = title.getBoundingClientRect();
+      const actionRect = action.getBoundingClientRect();
+      return {
+        height: element.getBoundingClientRect().height,
+        contentDirection: getComputedStyle(content).flexDirection,
+        titleCenter: titleRect.top + titleRect.height / 2,
+        actionCenter: actionRect.top + actionRect.height / 2,
+      };
+    });
+
+    expect(metrics.contentDirection).toBe("row");
+    expect(Math.abs(metrics.titleCenter - metrics.actionCenter)).toBeLessThanOrEqual(1);
+    expect(metrics.height).toBeLessThanOrEqual(40);
+    // Retry is a text-link action, so it keeps the shared density instead of a
+    // coarse-pointer enlargement (A3 v7 note): it only has to stay usable.
+    const retry = alert.locator(".el-button");
+    await expect(retry).toBeVisible();
+    await expect(retry).toBeEnabled();
   });
 
   // L4 template sweep: one representative route per page template family
@@ -128,6 +255,15 @@ test.describe("three-terminal gate", () => {
       await page.goto("/#/settings/user", { waitUntil: "domcontentloaded" });
       await waitForAppSettled(page);
       await expect(page.locator(".settings-aside")).toBeVisible();
+      if (isTabletViewport(page)) {
+        // Tablet uses the compact rail contract rather than spending a third
+        // of the viewport on labels that are available in the drawer/menu.
+        await expect(page.locator(".settings-aside")).toHaveAttribute(
+          "style",
+          /width:\s*64px/,
+        );
+        await expect(page.locator(".settings-sidebar-menu.el-menu--collapse")).toBeVisible();
+      }
     }
   });
 
@@ -196,5 +332,55 @@ test.describe("three-terminal gate", () => {
       dialogWidth?.width,
       "dialog wider than viewport",
     ).toBeLessThanOrEqual(viewportWidth);
+  });
+
+  test("mobile toolbars keep every action reachable", async ({ page }) => {
+    if (!isMobileViewport(page)) {
+      return;
+    }
+
+    await login(page);
+
+    await page.goto("/#/device", { waitUntil: "domcontentloaded" });
+    await waitForAppSettled(page);
+    await expectVisibleBoxesWithinViewport(
+      page,
+      ".tool-card__footer, .tool-card-footer-button, .tool-card-footer-page",
+      "device toolbar",
+    );
+
+    await page.goto("/#/point_value", { waitUntil: "domcontentloaded" });
+    await waitForAppSettled(page);
+    await expectVisibleBoxesWithinViewport(
+      page,
+      ".range-segmented",
+      "point-value range selector",
+    );
+
+    await page.goto("/#/home", { waitUntil: "domcontentloaded" });
+    await waitForAppSettled(page);
+    await expectVisibleBoxesWithinViewport(
+      page,
+      ".dashboard-card__tools",
+      "dashboard card tools",
+    );
+
+    await page.goto("/#/settings/alarm/overview", {
+      waitUntil: "domcontentloaded",
+    });
+    await waitForAppSettled(page);
+    await expectVisibleBoxesWithinViewport(
+      page,
+      ".event-overview__quick, .event-overview__quick-actions, .event-overview__quick-actions button",
+      "alarm overview quick actions",
+    );
+
+    await page.goto("/#/settings/mcp", { waitUntil: "domcontentloaded" });
+    await waitForAppSettled(page);
+    await expectVisibleBoxesWithinViewport(
+      page,
+      ".mcp-overview__copy-line, .el-descriptions__table",
+      "MCP metadata",
+    );
   });
 });

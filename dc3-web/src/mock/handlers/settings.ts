@@ -16,6 +16,7 @@
  */
 
 import {on} from '../dispatch';
+import {matches} from '../query';
 import {ok, responseOf} from '../response';
 import {registerCrud} from '../crud';
 import {db} from '../db';
@@ -44,6 +45,47 @@ const buildTree = (
       .map(nest),
   });
   return rows.filter((r) => String(r[parentIdField]) === '0').map(nest);
+};
+
+/**
+ * Apply resource-list filters before rebuilding the tree. The API accepts
+ * arrays for type/scope filters; matching ancestors are retained so a result
+ * remains navigable instead of rendering orphaned children.
+ */
+const filterResources = (rows: Record<string, unknown>[], body: Record<string, unknown> = {}) => {
+  const values = (key: string): string[] => {
+    const value = body[key];
+    if (Array.isArray(value)) return value.map((item) => String(item)).filter(Boolean);
+    if (value === undefined || value === null || value === '' || value === 'ALL') return [];
+    return [String(value)];
+  };
+  const typeFilter = values('resourceTypeFlags');
+  const scopeFilter = values('resourceScopeFlags');
+  const enableFlag = body.enableFlag;
+  const matchesRow = (row: Record<string, unknown>) =>
+    matches(row.resourceName, body.resourceName) &&
+    matches(row.resourceCode, body.resourceCode) &&
+    (typeFilter.length === 0 || typeFilter.includes(String(row.resourceTypeFlag))) &&
+    (scopeFilter.length === 0 || scopeFilter.includes(String(row.resourceScopeFlag))) &&
+    (enableFlag === undefined || enableFlag === null || enableFlag === '' || enableFlag === 'ALL' || String(row.enableFlag) === String(enableFlag));
+
+  const matched = rows.filter(matchesRow);
+  if (matched.length === rows.length) return rows;
+
+  const byId = new Map(rows.map((row) => [String(row.id), row]));
+  const included = new Set<string>();
+  for (const row of matched) {
+    let current: Record<string, unknown> | undefined = row;
+    const seen = new Set<string>();
+    while (current && !seen.has(String(current.id))) {
+      const id = String(current.id);
+      seen.add(id);
+      included.add(id);
+      const parentId: string = String(current.parentResourceId ?? '0');
+      current = parentId === '0' ? undefined : byId.get(parentId);
+    }
+  }
+  return rows.filter((row) => included.has(String(row.id)));
 };
 
 export function registerSettingsHandlers(): void {
@@ -223,6 +265,6 @@ export function registerSettingsHandlers(): void {
     exact: ['resourceTypeFlag', 'resourceScopeFlag', 'enableFlag'],
   });
   on('post', 'api/v3/auth/resource/list_tree', (ctx) =>
-    responseOf(ctx.config, ok(buildTree(db.resources, 'id', 'parentResourceId'))),
+    responseOf(ctx.config, ok(buildTree(filterResources(db.resources, ctx.body), 'id', 'parentResourceId'))),
   );
 }

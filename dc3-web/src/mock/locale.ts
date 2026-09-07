@@ -133,6 +133,11 @@ const localizePoint = (row: MockRow, locale: 'en' | 'zh'): MockRow => {
 
 const localizeDevice = (row: MockRow, locale: 'en' | 'zh'): MockRow => {
   if (locale === 'zh') return {...row};
+  // Seed rows represent the demo catalogue and may be translated. Runtime
+  // rows, however, are user data: replacing their names with a profile label
+  // makes newly created entities impossible to find by the name the user
+  // entered. Keep those names verbatim in every locale.
+  if (!sourceRows.device.has(String(row.id))) return {...row};
   const profile = sourceRows.profile.get(String(row.profileId ?? ''));
   const profileName = profile && profileNames[String(profile.profileCode ?? '')];
   if (!profileName) return {...row};

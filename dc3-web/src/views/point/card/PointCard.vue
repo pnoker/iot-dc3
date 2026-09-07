@@ -24,6 +24,7 @@
           :icon="icon"
           :name="data.pointName"
           :status-title="$t('common.name')"
+          :copy-label="$t('point.card.copyPointId')"
           @copy-id="copy(data.id, $t('point.card.copyPointId'))"
         />
         <div class="things-card__body">
@@ -105,6 +106,7 @@
           :disable-title="$t('common.confirmDisable', {name: $t('common.entityPoint')})"
           :enable-title="$t('common.confirmEnable', {name: $t('common.entityPoint')})"
           :enabled="enabled"
+          :busy="busy"
           @delete="emitDelete"
           @detail="emit('detail', data)"
           @disable="emitToggle('disable')"
@@ -121,7 +123,6 @@ import {computed, type PropType} from 'vue';
 import {Edit, List, Location, Sunset} from '@element-plus/icons-vue';
 import {copy} from '@/utils/commonUtil';
 import {timestamp} from '@/utils/dateUtil';
-import {successMessage} from '@/utils/notificationUtil';
 import {pointTypeKey, rwFlagKey} from '@/utils/pointFormatUtil';
 import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
 import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
@@ -133,17 +134,18 @@ const props = defineProps({
   data: {type: Object as PropType<PointRecord>, required: true},
   profile: {type: Object as PropType<Record<string, any>>, default: () => ({})},
   icon: {type: String, default: 'images/common/point.png'},
+  busy: {type: Boolean, default: false},
 });
 
 const emit = defineEmits(['disable', 'enable', 'delete', 'edit', 'detail']);
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const emitToggle = (name: 'disable' | 'enable') => {
-  emit(name, props.data, () => successMessage());
+  emit(name, props.data);
 };
 
 const emitDelete = () => {
-  emit('delete', props.data, () => successMessage());
+  emit('delete', props.data);
 };
 </script>
 

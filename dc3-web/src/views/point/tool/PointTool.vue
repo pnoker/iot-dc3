@@ -40,25 +40,39 @@
         :label="$t('point.tool.profile')"
         prop="profileId"
       >
-        <el-select
-          v-model="formData.profileId"
-          :loading="profileLoading"
-          :placeholder="$t('point.tool.profilePlaceholder')"
-          :remote-method="profileDictionary"
-          class="edit-form-special"
-          clearable
-          filterable
-          remote
-          reserve-keyword
-          @visible-change="profileDictionaryVisible"
-        >
-          <el-option
-            v-for="dictionary in profileDictionaries"
-            :key="dictionary.value"
-            :label="dictionary.label"
-            :value="dictionary.value"
-          />
-        </el-select>
+        <div class="tool-dictionary-field">
+          <el-select
+            v-model="formData.profileId"
+            :loading="profileLoading"
+            :placeholder="$t('point.tool.profilePlaceholder')"
+            :remote-method="profileDictionary"
+            class="edit-form-special"
+            clearable
+            filterable
+            remote
+            reserve-keyword
+            @visible-change="profileDictionaryVisible"
+          >
+            <el-option
+              v-for="dictionary in profileDictionaries"
+              :key="dictionary.value"
+              :label="dictionary.label"
+              :value="dictionary.value"
+            />
+          </el-select>
+          <el-alert
+            v-if="profileError"
+            :closable="false"
+            :title="$t('common.optionLoadFailed')"
+            class="tool-dictionary-error"
+            show-icon
+            type="error"
+          >
+            <el-button :loading="profileLoading" link type="danger" @click="profileDictionary('')">
+              {{ $t('common.retry') }}
+            </el-button>
+          </el-alert>
+        </div>
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
         <enable-flag-segmented v-model="formData.enableFlag" include-all/>
@@ -83,7 +97,7 @@
 </template>
 
 <script lang="ts" setup>
-import {reactive, ref} from 'vue';
+import {onBeforeUnmount, reactive, ref} from 'vue';
 import {Back, Check, Plus, RefreshLeft, Search} from '@element-plus/icons-vue';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
@@ -91,7 +105,7 @@ import type {Dictionary} from '@/config/types';
 import {listProfileDictionary} from '@/api/dictionary';
 import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
 
-defineProps({
+const props = defineProps({
   embedded: {
     type: String,
     default: '',
@@ -129,27 +143,38 @@ const onSearch = (data: Record<string, any>) => {
 };
 
 const onReset = () => {
+  profileRequestId += 1;
+  profileLoading.value = false;
+  profileError.value = false;
+  profileDictionaries.value = [];
   resetSearchForm(formData, {enableFlag: ''});
   emit('reset');
 };
 
 const profileDictionaries = ref<Dictionary[]>([]);
 const profileLoading = ref(false);
+const profileError = ref(false);
+let profileRequestId = 0;
 
 const profileDictionary = (query?: string) => {
+  const requestId = ++profileRequestId;
   profileLoading.value = true;
+  profileError.value = false;
   listProfileDictionary({
     offset: 0, limit: 50,
     label: query || '',
   })
     .then((res) => {
+      if (requestId !== profileRequestId) return;
       profileDictionaries.value = res.items;
     })
     .catch(() => {
-      // nothing to do
+      if (requestId !== profileRequestId) return;
+      profileDictionaries.value = [];
+      profileError.value = true;
     })
     .finally(() => {
-      profileLoading.value = false;
+      if (requestId === profileRequestId) profileLoading.value = false;
     });
 };
 
@@ -157,5 +182,29 @@ const profileDictionaryVisible = (visible: boolean) => {
   if (visible) profileDictionary('');
 };
 
-profileDictionary();
+if (props.embedded !== 'profile' && props.embedded !== 'edit') profileDictionary();
+
+onBeforeUnmount(() => {
+  profileRequestId += 1;
+});
 </script>
+
+<style lang="scss" scoped>
+.tool-dictionary-field {
+  display: grid;
+  gap: var(--dc3-space-2);
+  width: 100%;
+  min-width: 0;
+}
+
+.tool-dictionary-error {
+  margin: 0;
+
+  :deep(.el-alert__content) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--dc3-space-2);
+  }
+}
+</style>

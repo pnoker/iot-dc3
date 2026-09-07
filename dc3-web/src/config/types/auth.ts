@@ -305,6 +305,21 @@ export interface McpConnectionRecord extends McpConnectionForm {
   lastUsedTime?: string;
 }
 
+export interface McpMetadata {
+  issuer?: string;
+  authorization_endpoint?: string;
+  token_endpoint?: string;
+  jwks_uri?: string;
+  revocation_endpoint?: string;
+  registration_endpoint?: string;
+  response_types_supported?: string[];
+  grant_types_supported?: string[];
+  scopes_supported?: string[];
+  token_endpoint_auth_methods_supported?: string[];
+
+  [key: string]: unknown;
+}
+
 export interface McpToolRecord {
   id: string;
   toolId: string;

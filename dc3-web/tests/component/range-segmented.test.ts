@@ -39,6 +39,27 @@ const ElSegmentedStub = {
   `,
 };
 
+const ElSelectStub = {
+  name: 'ElSelect',
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  template: `
+    <select
+      class="select-stub"
+      :value="modelValue"
+      @change="$emit('update:modelValue', $event.target.value)"
+    >
+      <slot />
+    </select>
+  `,
+};
+
+const ElOptionStub = {
+  name: 'ElOption',
+  props: ['label', 'value'],
+  template: '<option :value="value">{{ label }}</option>',
+};
+
 function mountRange(props: Record<string, unknown> = {}) {
   return mount(RangeSegmented, {
     props: {
@@ -47,7 +68,11 @@ function mountRange(props: Record<string, unknown> = {}) {
     },
     global: {
       plugins: [i18n],
-      stubs: {ElSegmented: ElSegmentedStub},
+      stubs: {
+        ElOption: ElOptionStub,
+        ElSegmented: ElSegmentedStub,
+        ElSelect: ElSelectStub,
+      },
     },
   });
 }
@@ -74,5 +99,17 @@ describe('RangeSegmented', () => {
     await buttons[3].trigger('click');
 
     expect(wrapper.emitted('update:modelValue')).toEqual([[''], ['7d']]);
+  });
+
+  it('renders a full option select for dense toolbars', async () => {
+    const wrapper = mountRange({includeAll: true, select: true});
+    const select = wrapper.get('.select-stub');
+
+    expect(select.findAll('option')).toHaveLength(5);
+    expect(select.find('option').text()).toBe('All');
+
+    await select.setValue('7d');
+
+    expect(wrapper.emitted('update:modelValue')).toEqual([['7d']]);
   });
 });

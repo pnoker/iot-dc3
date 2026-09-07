@@ -17,8 +17,10 @@
 
 <template>
   <dashboard-card
-    :empty="!loading && !hasData"
+    :empty="status === 'success' && !hasData"
     :empty-text="$t('home.topology.empty')"
+    :error="status === 'error'"
+    :error-text="$t('common.loadFailed')"
     :height="480"
     :loading="loading"
     :title="$t('home.topology.title')"
@@ -70,42 +72,34 @@
        scoped flex sizing and overlays cleanly. -->
   <el-dialog
     v-model="othersDialog.visible"
+    :close-on-click-modal="false"
     :title="othersDialog.title"
     append-to-body
+    class="things-dialog things-dialog--wide"
+    destroy-on-close
     width="560px"
   >
-    <el-table :data="othersDialog.children" height="420" size="small">
-      <!-- @vue-generic {TopologyHiddenChild} -->
-      <el-table-column
-        :label="$t('home.topology.colType')"
-        prop="type"
-        width="110"
-      >
-        <template #default="{ row }">
-          <el-tag :type="tagTypeFor(row.type)" size="small">{{
-            layerLabel(row.type)
-          }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="$t('home.topology.colName')"
-        prop="name"
-        show-overflow-tooltip
-      />
-      <!-- @vue-generic {TopologyHiddenChild} -->
-      <el-table-column :label="$t('common.operation')" width="110">
-        <template #default="{ row }">
-          <el-button link size="small" type="primary" @click="onChildJump(row)">
-            {{ $t("common.detail") }}
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <responsive-record-list
+      :columns="hiddenChildColumns"
+      :empty-text="$t('home.topology.empty')"
+      :rows="othersDialog.children"
+      embedded
+      row-key="id"
+    >
+      <template #cell-type="{row}">
+        <el-tag :type="tagTypeFor(row.type)" size="small">{{ layerLabel(row.type) }}</el-tag>
+      </template>
+      <template #actions="{row}">
+        <el-button link type="primary" @click="onChildJump(row)">
+          {{ $t("common.detail") }}
+        </el-button>
+      </template>
+    </responsive-record-list>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, shallowRef, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRouter } from "vue-router";
 import { Chart } from "@antv/g2";
@@ -122,13 +116,14 @@ import type {
 } from "@/config/types/dashboard";
 import DashboardCard from "@/components/card/dashboard/DashboardCard.vue";
 import RangeSegmented from "@/components/segmented/RangeSegmented.vue";
+import ResponsiveRecordList from "@/components/list/ResponsiveRecordList.vue";
+import { useAsyncLoader } from "@/utils/asyncLoaderUtil";
 
 const { t, locale } = useI18n();
 const router = useRouter();
 
-const loading = ref(false);
 const chartRef = ref<HTMLElement>();
-const data = ref<TopologyResponse | null>(null);
+const data = shallowRef<TopologyResponse | null>(null);
 const lastRefreshed = ref<string>("");
 
 // Cardinality = "who is wired to what" (structural count).
@@ -152,6 +147,23 @@ const othersDialog = reactive<{
   children: [],
 });
 let chart: Chart | undefined;
+const { loading, status, run } = useAsyncLoader();
+
+const hiddenChildColumns = computed(() => [
+  {
+    key: "name",
+    label: t("home.topology.colName"),
+    minWidth: 200,
+    mobile: "primary" as const,
+  },
+  {
+    key: "type",
+    label: t("home.topology.colType"),
+    width: 110,
+    kind: "custom" as const,
+    mobile: "detail" as const,
+  },
+]);
 
 const hasData = computed(() => (data.value?.nodes.length ?? 0) > 0);
 const stats = computed<TopologyStats>(
@@ -356,37 +368,53 @@ const render = (payload: TopologyResponse) => {
   chart.render();
 };
 
-// ---- loader ------------------------------------------------------------
-
-const load = async () => {
-  loading.value = true;
+const destroyChart = () => {
+  if (!chart) return;
   try {
-    // Only send rangeKey when it's actually meaningful (volume mode).
-    // Cardinality doesn't look at it, and omitting keeps the server
-    // cache key tight (one entry per tenant instead of one per range).
-    const params =
-      mode.value === "volume"
-        ? { mode: mode.value, rangeKey: rangeKey.value }
-        : { mode: mode.value };
-    const res: TopologyResponse = await topology(params);
-    const payload = res ?? {
-      nodes: [],
-      links: [],
-      stats: { driverCount: 0, deviceCount: 0, profileCount: 0, pointCount: 0 },
-    };
-    data.value = payload;
-    lastRefreshed.value = new Date().toISOString();
-    if (payload.nodes.length > 0) {
-      // Wait a tick so the card body has its final box before G2 measures.
-      await new Promise((r) => setTimeout(r, 0));
-      render(payload);
-    }
-  } catch {
-    // handled globally
+    chart.destroy();
   } finally {
-    loading.value = false;
+    chart = undefined;
   }
 };
+
+// ---- loader ------------------------------------------------------------
+
+const emptyPayload = (): TopologyResponse => ({
+  nodes: [],
+  links: [],
+  stats: { driverCount: 0, deviceCount: 0, profileCount: 0, pointCount: 0 },
+});
+
+const load = async () => {
+  // Only send rangeKey when it's actually meaningful (volume mode).
+  // Cardinality doesn't look at it, and omitting keeps the server cache key
+  // tight (one entry per tenant instead of one per range).
+  const params =
+    mode.value === "volume"
+      ? { mode: mode.value, rangeKey: rangeKey.value }
+      : { mode: mode.value };
+  const payload = await run(() => topology(params), {
+    apply: (result) => {
+      const next = result ?? emptyPayload();
+      data.value = next;
+      lastRefreshed.value = new Date().toISOString();
+      if (next.nodes.length === 0) destroyChart();
+    },
+  });
+  if (!payload || payload.nodes.length === 0) return;
+  // Wait a tick so the card body has its final box before G2 measures. The
+  // identity check prevents a slower render callback from painting stale data
+  // after a newer mode/range request has already completed.
+  await nextTick();
+  if (data.value === payload && status.value === "success") render(payload);
+};
+
+watch(status, (value) => {
+  if (value === "error") {
+    data.value = null;
+    destroyChart();
+  }
+});
 
 // Flipping mode or rangeKey triggers a reload. rangeKey only matters
 // when mode=volume, but we watch it regardless — switching modes first
@@ -441,7 +469,7 @@ const onChildJump = (child: TopologyHiddenChild) => {
 };
 
 onMounted(load);
-onUnmounted(() => chart?.destroy());
+onUnmounted(destroyChart);
 </script>
 
 <style lang="scss" scoped>

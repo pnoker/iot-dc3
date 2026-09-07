@@ -30,6 +30,7 @@ import {
   downQuery,
 } from "@/config/constant/breakpoints";
 import { useBreakpoint } from "@/composables/useBreakpoint";
+import { useMediaQuery } from "@/composables/useMediaQuery";
 import { usePointerCapability } from "@/composables/usePointerCapability";
 import { useAppStore } from "@/store/modules/app";
 import { getStorage } from "@/utils/storageUtil";
@@ -106,6 +107,26 @@ describe("breakpoints contract", () => {
 });
 
 describe("useBreakpoint", () => {
+  it("resolves the media query before the first render", () => {
+    installMatchMedia(() => true);
+    let renderedValue: boolean | undefined;
+    let state!: ReturnType<typeof useMediaQuery>;
+    const Component = defineComponent({
+      setup() {
+        state = useMediaQuery("(min-width: 768px)");
+        return () => {
+          renderedValue = state.value;
+          return h("div");
+        };
+      },
+    });
+    const wrapper = mount(Component);
+
+    expect(renderedValue).toBe(true);
+    expect(state.value).toBe(true);
+    wrapper.unmount();
+  });
+
   it.each([
     [375, "xs", "mobile"],
     [767, "xs", "mobile"],

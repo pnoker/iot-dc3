@@ -46,6 +46,22 @@ function mountStat(props: Record<string, unknown> = {}) {
 }
 
 describe('StatCard', () => {
+  it('does not present the default zero as a loaded value', () => {
+    const wrapper = mountStat({loading: true, value: 0});
+
+    expect(wrapper.get('.stat-card').attributes('aria-busy')).toBe('true');
+    expect(wrapper.find('.stat-card__value-skeleton').exists()).toBe(true);
+    expect(wrapper.find('.stat-card__value-text').exists()).toBe(false);
+    expect(wrapper.find('.stat-card__subtitle').exists()).toBe(false);
+  });
+
+  it('uses an unavailable marker after a metric request fails', () => {
+    const wrapper = mountStat({error: true, value: 0, subtitle: '0 alarms'});
+
+    expect(wrapper.get('.stat-card__value-text').text()).toBe('—');
+    expect(wrapper.find('.stat-card__subtitle').exists()).toBe(false);
+  });
+
   it('formats large numeric values with k / M shorthand and falls back to non-numeric strings', () => {
     expect(mountStat({value: 42}).find('.stat-card__value-text').text()).toBe('42');
     expect(mountStat({value: 1500}).find('.stat-card__value-text').text()).toBe('1.5k');

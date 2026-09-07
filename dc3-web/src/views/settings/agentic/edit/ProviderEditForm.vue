@@ -19,18 +19,29 @@
   <el-dialog
     v-model="visible"
     :append-to-body="true"
+    :before-close="requestClose"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    :show-close="false"
+    :close-on-press-escape="!submitting"
+    :show-close="!submitting"
     :title="isEdit ? $t('settings.agentic.editProvider') : $t('settings.agentic.addProvider')"
     class="things-dialog"
+    destroy-on-close
     draggable
     @closed="onClosed"
   >
-    <el-form ref="formRef" :model="form" :rules="rules" label-position="top">
+    <el-alert
+      v-if="saveError"
+      :closable="false"
+      :title="$t('common.saveFailed')"
+      class="things-dialog-form-alert"
+      show-icon
+      type="error"
+    />
+    <el-form ref="formRef" v-loading="submitting" :aria-busy="submitting" :model="form" :rules="rules" label-position="top">
       <el-form-item :label="$t('settings.agentic.providerName')" prop="name">
         <el-input
           v-model="form.name"
+          :disabled="submitting"
           :placeholder="$t('settings.agentic.providerNamePlaceholder')"
           clearable
           maxlength="128"
@@ -39,6 +50,7 @@
       <el-form-item :label="$t('settings.agentic.providerType')" prop="providerType">
         <el-select
           v-model="form.providerType"
+          :disabled="submitting"
           :placeholder="$t('settings.agentic.providerTypePlaceholder')"
           style="width: 100%"
         >
@@ -48,6 +60,7 @@
       <el-form-item :label="$t('settings.agentic.baseUrl')" prop="baseUrl">
         <el-input
           v-model="form.baseUrl"
+          :disabled="submitting"
           :placeholder="$t('settings.agentic.baseUrlPlaceholder')"
           clearable
           maxlength="256"
@@ -56,6 +69,7 @@
       <el-form-item :label="$t('settings.agentic.apiKey')" prop="apiKey">
         <el-input
           v-model="form.apiKey"
+          :disabled="submitting"
           :placeholder="$t('settings.agentic.apiKeyPlaceholder')"
           clearable
           maxlength="256"
@@ -66,6 +80,7 @@
       <el-form-item :label="$t('settings.agentic.default')">
         <el-switch
           v-model="form.defaultFlag"
+          :disabled="submitting"
           :active-text="$t('common.yes')"
           :inactive-text="$t('common.no')"
           active-value="DEFAULT"
@@ -73,30 +88,34 @@
         />
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')">
-        <enable-flag-segmented v-model="form.enableFlag"/>
+        <enable-flag-segmented v-model="form.enableFlag" :disabled="submitting"/>
       </el-form-item>
       <el-form-item :label="$t('common.remark')" prop="remark">
-        <el-input v-model="form.remark" :rows="3" maxlength="300" show-word-limit type="textarea"/>
+        <el-input v-model="form.remark" :disabled="submitting" :rows="3" maxlength="300" show-word-limit type="textarea"/>
       </el-form-item>
     </el-form>
-    <div class="things-dialog-footer">
-      <el-button @click="visible = false">{{ $t('common.cancel') }}</el-button>
-      <el-button plain @click="onReset">{{ $t('common.reset') }}</el-button>
-      <el-button :loading="submitting" type="primary" @click="onSubmit">
-        {{ $t('common.confirm') }}
-      </el-button>
-    </div>
+    <template #footer>
+      <div class="things-dialog-footer">
+        <el-button :disabled="submitting" @click="requestClose()">{{ $t('common.cancel') }}</el-button>
+        <el-button :disabled="submitting" plain @click="onReset">{{ $t('common.reset') }}</el-button>
+        <el-button :loading="submitting" type="primary" @click="onSubmit">
+          {{ $t('common.confirm') }}
+        </el-button>
+      </div>
+    </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import {computed, reactive, ref} from 'vue';
+import {computed, onBeforeUnmount, reactive, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
 import type {FormInstance, FormRules} from 'element-plus';
+import {ElMessageBox} from 'element-plus';
 
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import type {AgenticProvider} from '@/config/types';
 import {remarkRules} from '@/utils/formRuleUtil';
+import {enableFlagValue} from '@/utils/thingModelFormatUtil';
 
 import {AGENTIC_PROVIDER_TYPES} from '../providerTypes';
 
@@ -109,6 +128,7 @@ const emit = defineEmits<{
 const visible = ref(false);
 const isEdit = ref(false);
 const submitting = ref(false);
+const saveError = ref(false);
 const formRef = ref<FormInstance>();
 const {t} = useI18n();
 
@@ -123,6 +143,10 @@ const initialForm = (): AgenticProvider & { apiKey?: string } => ({
 });
 
 const form = reactive(initialForm());
+const initialFormValue = ref({...form});
+let formSession = 0;
+
+const isDirty = computed(() => visible.value && JSON.stringify(form) !== JSON.stringify(initialFormValue.value));
 
 const rules = computed<FormRules>(() => ({
   name: [{required: true, whitespace: true, message: t('settings.agentic.nameRequired'), trigger: 'blur'}],
@@ -131,45 +155,102 @@ const rules = computed<FormRules>(() => ({
 }));
 
 const show = () => {
+  formSession += 1;
   isEdit.value = false;
   Object.assign(form, initialForm());
+  initialFormValue.value = {...form};
+  saveError.value = false;
+  submitting.value = false;
   visible.value = true;
 };
 
 const showEdit = (row: AgenticProvider & { apiKey?: string }) => {
+  formSession += 1;
   isEdit.value = true;
-  Object.assign(form, initialForm(), row);
+  Object.assign(form, initialForm(), {
+    ...row,
+    defaultFlag:
+      String(row.defaultFlag ?? '').trim().toUpperCase() === 'DEFAULT'
+        ? 'DEFAULT'
+        : 'NOT_DEFAULT',
+    enableFlag: enableFlagValue(row.enableFlag),
+  });
+  initialFormValue.value = {...form};
+  saveError.value = false;
+  submitting.value = false;
   visible.value = true;
 };
 
 const onClosed = () => {
+  formSession += 1;
+  submitting.value = false;
   formRef.value?.resetFields();
 };
 
+onBeforeUnmount(() => {
+  formSession += 1;
+});
+
 const onReset = () => {
-  if (isEdit.value) {
-    formRef.value?.clearValidate();
-  } else {
-    Object.assign(form, initialForm());
-    formRef.value?.resetFields();
+  Object.assign(form, initialFormValue.value);
+  saveError.value = false;
+  formRef.value?.clearValidate();
+};
+
+const requestClose = async (done?: () => void) => {
+  if (submitting.value) return;
+  const session = formSession;
+  if (!isDirty.value) {
+    if (done) done();
+    else visible.value = false;
+    return;
+  }
+  try {
+    await ElMessageBox.confirm(t('common.discardConfirm'), t('common.confirm'), {
+      type: 'warning',
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+    });
+    if (session !== formSession || !visible.value) return;
+    if (done) done();
+    else visible.value = false;
+  } catch {
+    // Keep the draft open when the user cancels the confirmation.
   }
 };
 
 const onSubmit = async () => {
   if (submitting.value) return;
-  submitting.value = true;
+  const session = formSession;
+  if (!visible.value) return;
   try {
     await formRef.value?.validate();
+    if (session !== formSession || !visible.value) return;
   } catch {
-    submitting.value = false;
+    if (session === formSession) submitting.value = false;
     return;
   }
-  emit('save', {...form}, (close = true) => {
-    submitting.value = false;
-    if (close) {
-      visible.value = false;
+  submitting.value = true;
+  saveError.value = false;
+  try {
+    const payload = {...form};
+    if (isEdit.value && !payload.apiKey?.trim()) {
+      delete payload.apiKey;
     }
-  });
+    emit('save', payload, (close = true) => {
+      if (session !== formSession) return;
+      submitting.value = false;
+      if (close) {
+        initialFormValue.value = {...form};
+        visible.value = false;
+      } else {
+        saveError.value = true;
+      }
+    });
+  } catch {
+    submitting.value = false;
+    saveError.value = true;
+  }
 };
 
 defineExpose({show, showEdit});

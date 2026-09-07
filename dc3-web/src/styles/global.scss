@@ -18,6 +18,7 @@
 @use '@/styles/things-dialog.scss';
 @use '@/styles/things-card.scss';
 @use '@/styles/theme.scss';
+@use '@/styles/tokens.scss' as *;
 
 // Imported once by main.ts. These rules cannot live in element-variables.scss because
 // Vite injects additionalData into every scoped style block and appends scope hashes,
@@ -118,6 +119,56 @@ body {
   border-radius: var(--dc3-radius-lg);
 }
 
+.entity-page-error {
+  margin-bottom: var(--dc3-space-3);
+}
+
+// Element Plus treats any default-slot content as a long-form description:
+// it enlarges the icon/title and stacks the slot below the message. Our
+// load-error alerts use that slot only for a Retry link, so the default
+// presentation wastes vertical space and separates the action from its
+// message. Detect that exact structure and restore a compact action-row
+// contract; the link action keeps the shared control density on every
+// terminal (A3 v7 note).
+.el-alert:has(> .el-alert__content > .el-alert__description > .el-button.is-link:only-child) {
+  box-sizing: border-box;
+  min-height: var(--dc3-space-10);
+  padding-block: 2px;
+  border-radius: var(--dc3-radius-md);
+
+  > .el-alert__icon.is-big {
+    width: var(--dc3-space-5);
+    font-size: var(--dc3-space-5);
+    line-height: var(--dc3-space-5);
+  }
+
+  > .el-alert__content {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    flex-flow: row nowrap;
+    gap: var(--dc3-space-2);
+    min-width: 0;
+    padding: 0;
+  }
+
+  > .el-alert__content > .el-alert__title.with-description {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 14px;
+    line-height: var(--dc3-space-5);
+    overflow-wrap: anywhere;
+  }
+
+  > .el-alert__content > .el-alert__description {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    margin: 0;
+    line-height: 1;
+  }
+}
+
 .json-preview {
   max-height: 220px;
   margin: 0;
@@ -154,6 +205,43 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
+
+    .el-button {
+      min-width: 64px;
+      margin: 0;
+    }
+  }
+}
+
+// Element Plus keeps tab headers on one unbreakable row. On touch terminals
+// that row must own its horizontal scroll rather than being clipped by the
+// fixed workspace viewport; this preserves every tab without creating page-
+// level overflow and gives the active tab a predictable swipe target.
+@media (max-width: $breakpoint-sm-max) {
+  .body-main,
+  .settings-main {
+    .el-tabs {
+      min-width: 0;
+    }
+
+    .el-tabs__nav-wrap {
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .el-tabs__nav-wrap::-webkit-scrollbar {
+      display: none;
+    }
+
+    .el-tabs__nav {
+      min-width: max-content;
+    }
+
+    .el-tabs__item {
+      padding-inline: var(--dc3-space-3);
+    }
   }
 }
 

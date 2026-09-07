@@ -30,13 +30,16 @@ import {
 import {
   apis,
   attributeConfigs,
-  attributes,
+  commandAttributes,
   commandParams,
   commands,
+  driverAttributes,
+  eventAttributes,
   eventParams,
   events,
   groups,
   labels,
+  pointAttributes,
   resources,
 } from "./seed/manager";
 import {
@@ -90,7 +93,10 @@ export interface MockDb {
   commandParams: Record<string, unknown>[];
   events: Record<string, unknown>[];
   eventParams: Record<string, unknown>[];
-  attributes: Record<string, unknown>[];
+  driverAttributes: Record<string, unknown>[];
+  pointAttributes: Record<string, unknown>[];
+  commandAttributes: Record<string, unknown>[];
+  eventAttributes: Record<string, unknown>[];
   attributeConfigs: Record<string, unknown>[];
   alarmRules: Record<string, unknown>[];
   alarmNotifies: Record<string, unknown>[];
@@ -135,7 +141,10 @@ export const db: MockDb = {
   commandParams: copy(commandParams),
   events: copy(events),
   eventParams: copy(eventParams),
-  attributes: copy(attributes),
+  driverAttributes: copy(driverAttributes),
+  pointAttributes: copy(pointAttributes),
+  commandAttributes: copy(commandAttributes),
+  eventAttributes: copy(eventAttributes),
   attributeConfigs: copy(attributeConfigs),
   alarmRules: copy(alarmRules),
   alarmNotifies: copy(alarmNotifies),

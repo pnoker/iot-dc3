@@ -22,7 +22,7 @@ import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 
 function mountHeader(props: Record<string, unknown>, slots: Record<string, string> = {}) {
   return mount(ThingsCardHeader, {
-    props: {icon: '/icons/driver.svg', ...props},
+    props: {icon: '/icons/driver.svg', copyLabel: 'Copy ID', ...props},
     slots,
   });
 }

@@ -17,7 +17,12 @@
 
 <template>
   <dashboard-card
+    :empty="status === 'success' && !hasData"
+    :empty-text="t('settings.event.overview.activityEmpty')"
+    :error="status === 'error'"
+    :error-text="t('common.loadFailed')"
     :loading="loading"
+    :retry-text="t('common.retry')"
     :title="t('settings.event.overview.activityTitle')"
     body-mode="chart"
     @refresh="load"
@@ -33,10 +38,13 @@ import {Chart} from '@antv/g2';
 
 import {alertActivity} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 const {t, locale} = useI18n();
 
-const loading = ref(false);
+const {loading, run, status} = useAsyncLoader();
+const rows = ref<{dow: number; hour: number; count: number}[]>([]);
+const hasData = computed(() => rows.value.length > 0);
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
 
@@ -81,22 +89,31 @@ const render = (rows: { dow: number; hour: number; count: number }[]) => {
 };
 
 const load = async () => {
-  loading.value = true;
-  try {
-    const res: { dow: number; hour: number; count: number }[] = await alertActivity(7);
-    const rows = res ?? [];
-    await nextTick();
-    render(rows);
-  } catch {
-    // handled globally
-  } finally {
-    loading.value = false;
+  await run(() => alertActivity(7), {
+    apply: (res) => {
+      rows.value = (Array.isArray(res) ? res : []).map((row) => ({
+        dow: Number(row.dow),
+        hour: Number(row.hour),
+        count: Number(row.count) || 0,
+      }));
+    },
+  });
+  if (status.value !== 'success') return;
+  await nextTick();
+  if (status.value !== 'success') return;
+  if (hasData.value) render(rows.value);
+  else {
+    chart?.destroy();
+    chart = undefined;
   }
 };
 
 onMounted(load);
 watch(locale, load);
-onUnmounted(() => chart?.destroy());
+onUnmounted(() => {
+  chart?.destroy();
+  chart = undefined;
+});
 defineExpose({refresh: load});
 </script>
 

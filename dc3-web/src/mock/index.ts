@@ -29,7 +29,7 @@ import {registerBusinessHandlers} from './handlers/business';
 import {registerSettingsHandlers} from './handlers/settings';
 import {registerTimeseriesHandlers} from './handlers/timeseries';
 import {fallbackHandler} from './handlers/fallback';
-import {installAgenticFetchMock} from './fetch';
+import {installAgenticFetchMock, installApiFetchMock} from './fetch';
 import {db} from './db';
 
 let installed = false;
@@ -59,6 +59,7 @@ export function setupMock(): void {
   registerAgenticHandlers();
 
   request.defaults.adapter = createMockAdapter();
+  installApiFetchMock(db);
   installAgenticFetchMock(db);
 
   // No pre-seeded auth: the demo lands on /login so visitors experience the

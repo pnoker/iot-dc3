@@ -16,9 +16,19 @@
   -->
 
 <template>
-  <dashboard-card :loading="loading" :title="$t('home.activity.title')" body-mode="chart" @refresh="load">
+  <dashboard-card
+    :empty="status === 'success' && !hasData"
+    :empty-text="$t('home.activity.empty')"
+    :error="status === 'error'"
+    :error-text="$t('common.loadFailed')"
+    :loading="loading"
+    :retry-text="$t('common.retry')"
+    :title="$t('home.activity.title')"
+    body-mode="chart"
+    @refresh="load"
+  >
     <template #tools>
-      <range-segmented v-model="rangeKey" size="small" @update:model-value="load"/>
+      <range-segmented v-model="rangeKey" size="small"/>
     </template>
     <div ref="chartRef" class="activity-heatmap__canvas"></div>
   </dashboard-card>
@@ -33,14 +43,17 @@ import {statsActivity} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 const {t} = useI18n();
 // A weekday/hour heatmap is most informative over a full week. The previous
 // 24h default correctly populated only two day rows, which looked incomplete.
 const rangeKey = ref<RangeKey>('7d');
-const loading = ref(false);
+const {error, loading, run, status} = useAsyncLoader();
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
+const rows = ref<{dow: number; hour: number; count: number}[]>([]);
+const hasData = computed(() => rows.value.length > 0);
 
 // Sunday-first to match Postgres EXTRACT(DOW) (0..6 = Sun..Sat).
 const dayLabels = computed(() => [
@@ -88,22 +101,38 @@ const render = (rows: { dow: number; hour: number; count: number }[]) => {
 };
 
 const load = async () => {
-  loading.value = true;
-  try {
-    const res: any = await statsActivity({rangeKey: rangeKey.value});
-    const rows = (res ?? []) as { dow: number; hour: number; count: number }[];
-    await nextTick();
-    render(rows);
-  } catch {
-    // handled globally
-  } finally {
-    loading.value = false;
+  await run(() => statsActivity({rangeKey: rangeKey.value}), {
+    apply: (res) => {
+      const payload = Array.isArray(res) ? res : [];
+      rows.value = payload.map((row) => ({
+        dow: Number(row.dow),
+        hour: Number(row.hour),
+        count: Number(row.count) || 0,
+      }));
+    },
+  });
+  if (status.value !== 'success') return;
+  await nextTick();
+  if (status.value !== 'success') return;
+  if (hasData.value) render(rows.value);
+  else {
+    chart?.destroy();
+    chart = undefined;
   }
 };
 
 onMounted(load);
 watch(rangeKey, load);
-onUnmounted(() => chart?.destroy());
+watch(error, (value) => {
+  if (value) {
+    chart?.destroy();
+    chart = undefined;
+  }
+});
+onUnmounted(() => {
+  chart?.destroy();
+  chart = undefined;
+});
 </script>
 
 <style lang="scss" scoped>

@@ -18,10 +18,13 @@
 <template>
   <dashboard-card
     :badge="rows.length || null"
-    :empty="!loading && rows.length === 0"
+    :empty="status === 'success' && rows.length === 0"
     :empty-image-size="60"
     :empty-text="$t('settings.event.overview.noUnconfirmed')"
+    :error="status === 'error'"
+    :error-text="$t('common.loadFailed')"
     :loading="loading"
+    :retry-text="$t('common.retry')"
     :title="$t('settings.event.overview.unconfirmedTitle')"
     body-mode="scroll"
     class="recent-unconfirmed"
@@ -58,24 +61,23 @@ import {alertPage} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
 import type {AlertEventRow, AlertSource} from '@/config/types/dashboard';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 const {t, locale} = useI18n();
-const loading = ref(false);
+const {loading, run, status} = useAsyncLoader();
 const rows = ref<AlertEventRow[]>([]);
 const {resolveBySource, nameBySource} = useEntityNames();
 
 const load = async () => {
-  loading.value = true;
-  try {
-    const res: any = await alertPage({confirmFlag: 0, offset: 0, limit: 5});
-    const data: AlertEventRow[] = res?.items ?? [];
-    rows.value = data;
-    await resolveBySource(data);
-  } catch {
-    // handled globally
-  } finally {
-    loading.value = false;
-  }
+  await run(
+    async () => {
+      const result: any = await alertPage({confirmFlag: 0, offset: 0, limit: 5});
+      const data: AlertEventRow[] = Array.isArray(result) ? result : result?.items ?? [];
+      await resolveBySource(data);
+      return data;
+    },
+    {apply: (data) => (rows.value = data)}
+  );
 };
 
 const nameFor = (r: AlertEventRow) => nameBySource(r.source, r.sourceId);

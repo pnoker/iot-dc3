@@ -168,6 +168,79 @@ describe('useEntityListPage', () => {
     expect(called['count']).toBe(42);
   });
 
+  it('restores the initial edit values when resetting the form', () => {
+    const config = makeEntityListConfig();
+    const {formModel, openEdit, resetForm} = useEntityListPage(config);
+
+    openEdit({...ENTITY_LIST_ROWS[0], name: 'Original'});
+    formModel['name'] = 'Changed';
+    resetForm();
+
+    expect(formModel['name']).toBe('Original');
+  });
+
+  it('keeps the dialog draft open and exposes an error after save fails', async () => {
+    const config = makeEntityListConfig();
+    config.add = vi.fn().mockRejectedValue(new Error('save failed'));
+    const {formModel, formVisible, openAdd, setFormRef, state, submit} = useEntityListPage(config);
+    setFormRef({
+      validate: () => Promise.resolve(true),
+      clearValidate: () => undefined,
+    });
+
+    openAdd();
+    formModel['name'] = 'Draft';
+    await submit();
+
+    expect(formVisible.value).toBe(true);
+    expect(formModel['name']).toBe('Draft');
+    expect(state.saveError).toBeInstanceOf(Error);
+    expect(state.saving).toBe(false);
+  });
+
+  it('ignores repeated submit attempts while a save is pending', async () => {
+    let resolveSave!: () => void;
+    const config = makeEntityListConfig();
+    config.add = vi.fn(() => new Promise<void>((resolve) => (resolveSave = resolve)));
+    const {openAdd, setFormRef, submit} = useEntityListPage(config);
+    setFormRef({
+      validate: () => Promise.resolve(true),
+      clearValidate: () => undefined,
+    });
+
+    openAdd();
+    const first = submit();
+    await vi.waitFor(() => expect(config.add).toHaveBeenCalledOnce());
+    const second = submit();
+    resolveSave();
+    await Promise.all([first, second]);
+
+    expect(config.add).toHaveBeenCalledOnce();
+  });
+
+  it('does not let an old save response close a newer form session', async () => {
+    let resolveSave!: () => void;
+    const config = makeEntityListConfig();
+    config.add = vi.fn(() => new Promise<void>((resolve) => (resolveSave = resolve)));
+    const {formModel, formVisible, openAdd, setFormRef, submit} = useEntityListPage(config);
+    setFormRef({
+      validate: () => Promise.resolve(true),
+      clearValidate: () => undefined,
+    });
+
+    openAdd();
+    formModel['name'] = 'First draft';
+    const pending = submit();
+    await vi.waitFor(() => expect(config.add).toHaveBeenCalledOnce());
+    openAdd();
+    formModel['name'] = 'Second draft';
+    resolveSave();
+    await pending;
+
+    expect(formVisible.value).toBe(true);
+    expect(formModel['name']).toBe('Second draft');
+  });
+
   it('resets state.page.current to 1 on search', async () => {
     const config = makeEntityListConfig();
     const {state, currentChange, search} = useEntityListPage(config);

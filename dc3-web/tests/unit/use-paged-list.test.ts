@@ -46,6 +46,17 @@ describe('usePagedList', () => {
     expect(state.listData).toHaveLength(5);
   });
 
+  it('clamps the page cursor when setAllData shrinks the source', () => {
+    const {state, setAllData, currentChange} = usePagedList<Row>();
+    setAllData(sampleRows);
+    currentChange(3); // 25 rows / size 12 → page 3 holds the 1-row tail
+
+    setAllData(sampleRows.slice(0, 10));
+
+    expect(state.page.current).toBe(1);
+    expect(state.listData).toHaveLength(10);
+  });
+
   it('applies the optional filter on every refresh', () => {
     const {state, setAllData, search} = usePagedList<Row, { keyword?: string }>({
       filter: (rows, query) => (query.keyword ? rows.filter((r) => r.name.includes(query.keyword!)) : rows),
@@ -146,6 +157,31 @@ describe('usePagedList', () => {
       })
     ).rejects.toThrow('boom');
     expect(state.loading).toBe(false);
+    expect(state.status).toBe('error');
+    expect(state.error).toBeInstanceOf(Error);
+
+    await withLoading(async () => undefined);
+    expect(state.status).toBe('success');
+    expect(state.error).toBeNull();
+    expect(state.lastUpdated).not.toBeNull();
+  });
+
+  it('keeps the newest withLoading operation authoritative', async () => {
+    let resolveFirst!: () => void;
+    let resolveSecond!: () => void;
+    const first = new Promise<void>((resolve) => (resolveFirst = resolve));
+    const second = new Promise<void>((resolve) => (resolveSecond = resolve));
+    const {state, withLoading} = usePagedList<Row>();
+
+    const firstRun = withLoading(() => first);
+    const secondRun = withLoading(() => second);
+    resolveFirst();
+    await firstRun;
+    expect(state.loading).toBe(true);
+    resolveSecond();
+    await secondRun;
+    expect(state.loading).toBe(false);
+    expect(state.status).toBe('success');
   });
 
   it('loads server-paginated rows when a request handler is provided', async () => {
@@ -192,6 +228,38 @@ describe('usePagedList', () => {
     const second = load();
     resolveFirst({items: [sampleRows[0]], offset: 0, limit: 12, total: 1, hasNext: false});
     resolveSecond({items: [sampleRows[1]], offset: 0, limit: 12, total: 1, hasNext: false});
+    await Promise.all([first, second]);
+
+    expect(state.listData).toEqual([sampleRows[1]]);
+    expect(state.loading).toBe(false);
+  });
+
+  it('loads client data with visible error state and retry support', async () => {
+    const request = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValueOnce(sampleRows.slice(0, 2));
+    const {state, loadClientData, setAllData} = usePagedList<Row>();
+
+    await loadClientData(request, setAllData);
+    expect(state.status).toBe('error');
+    expect(state.error).toBeInstanceOf(Error);
+    expect(state.loading).toBe(false);
+
+    await loadClientData(request, setAllData);
+    expect(state.status).toBe('success');
+    expect(state.listData).toEqual(sampleRows.slice(0, 2));
+    expect(state.lastUpdated).not.toBeNull();
+  });
+
+  it('keeps the newest client response when requests resolve out of order', async () => {
+    let resolveFirst!: (value: Row[]) => void;
+    let resolveSecond!: (value: Row[]) => void;
+    const firstRequest = () => new Promise<Row[]>((resolve) => (resolveFirst = resolve));
+    const secondRequest = () => new Promise<Row[]>((resolve) => (resolveSecond = resolve));
+    const {state, loadClientData, setAllData} = usePagedList<Row>();
+
+    const first = loadClientData(firstRequest, setAllData);
+    const second = loadClientData(secondRequest, setAllData);
+    resolveSecond([sampleRows[1]]);
+    resolveFirst([sampleRows[0]]);
     await Promise.all([first, second]);
 
     expect(state.listData).toEqual([sampleRows[1]]);
