@@ -28,7 +28,12 @@
     <module name="TreeWalker">
         <!-- Naming conventions -->
         <module name="TypeName"/>
-        <module name="MethodName"/>
+        <!-- CRUD verb convention (AGENTS.md): find*/query*/fetch* are not used;
+             select* stays reserved for MyBatis mapper calls in *ManagerImpl, so it is
+             not forbidden here and is policed by review instead. -->
+        <module name="MethodName">
+            <property name="format" value="^(?!find|query|fetch)[a-z][a-zA-Z0-9]*$"/>
+        </module>
         <module name="ParameterName"/>
         <module name="LocalVariableName"/>
         <module name="MemberName"/>
@@ -45,6 +50,15 @@
             <property name="accessModifiers" value="public"/>
             <property name="allowMissingParamTags" value="true"/>
             <property name="allowMissingReturnTag" value="true"/>
+            <property name="allowedAnnotations" value="Override"/>
+        </module>
+        <!-- Dead imports and missing public API documentation. -->
+        <module name="UnusedImports"/>
+        <module name="MissingJavadocType">
+            <property name="scope" value="public"/>
+        </module>
+        <module name="MissingJavadocMethod">
+            <property name="scope" value="public"/>
             <property name="allowedAnnotations" value="Override"/>
         </module>
         <module name="NonEmptyAtclauseDescription"/>

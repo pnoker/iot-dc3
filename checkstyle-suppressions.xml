@@ -19,4 +19,6 @@
         "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 <suppressions>
     <suppress files="org[\\/]openscada[\\/]opc[\\/].*" checks=".*"/>
+    <!-- protobuf/gRPC stubs are generated into target/generated-sources -->
+    <suppress files=".*[\\/]generated-sources[\\/].*" checks=".*"/>
 </suppressions>

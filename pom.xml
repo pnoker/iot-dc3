@@ -984,6 +984,9 @@ ${dc3.copyright.body}
                     <artifactId>spotless-maven-plugin</artifactId>
                     <version>${spotless.version}</version>
                     <configuration>
+                        <!-- Only check files that changed relative to the baseline, so
+                             legacy formatting debt does not block unrelated work. -->
+                        <ratchetFrom>origin/main</ratchetFrom>
                         <java>
                             <palantirJavaFormat>
                                 <version>${palantir.java.format.version}</version>
