@@ -37,8 +37,8 @@ public record FacadeCommandOffsetQuery(
         long offset,
         int limit,
         List<SortSpec> sort) {
+    /** Facade command offset query compact constructor: normalizes the query record. */
     public FacadeCommandOffsetQuery {
-        if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");
         if (limit < 1 || limit > PageRequest.MAX_LIMIT) throw new IllegalArgumentException("invalid page bounds");
         sort = sort == null ? List.of() : List.copyOf(sort);

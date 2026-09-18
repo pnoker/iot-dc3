@@ -39,6 +39,7 @@ public record FacadeProfileOffsetQuery(
         long offset,
         int limit,
         List<SortSpec> sort) {
+    /** Facade profile offset query compact constructor: normalizes the query record. */
     public FacadeProfileOffsetQuery {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId is required");
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");
@@ -50,6 +51,7 @@ public record FacadeProfileOffsetQuery(
         }
     }
 
+    /** facade profile offset query. */
     public FacadeProfileOffsetQuery(Long tenantId, long offset, int limit) {
         this(tenantId, null, null, null, null, null, null, null, null, null, offset, limit, List.of());
     }

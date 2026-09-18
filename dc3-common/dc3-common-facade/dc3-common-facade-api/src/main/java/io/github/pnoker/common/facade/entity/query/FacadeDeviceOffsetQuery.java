@@ -41,10 +41,8 @@ public record FacadeDeviceOffsetQuery(
         int limit,
 
         @Schema(description = "Sort expressions") List<SortSpec> sort) {
+    /** Facade device offset query compact constructor: normalizes the query record. */
     public FacadeDeviceOffsetQuery {
-        if (tenantId == null || tenantId <= 0) {
-            throw new IllegalArgumentException("tenantId must be positive");
-        }
         if (offset < 0 || limit < 1 || limit > PageRequest.MAX_LIMIT) {
             throw new IllegalArgumentException("invalid page bounds");
         }

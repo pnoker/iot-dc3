@@ -46,6 +46,7 @@ public record FacadePointOffsetQuery(
 
         @Schema(description = "Sort expressions") List<SortSpec> sort) {
 
+    /** Facade point offset query compact constructor: normalizes the query record. */
     public FacadePointOffsetQuery {
         if (tenantId == null || tenantId <= 0) {
             throw new IllegalArgumentException("tenantId is required");
@@ -59,6 +60,7 @@ public record FacadePointOffsetQuery(
         sort = sort == null ? List.of() : List.copyOf(sort);
     }
 
+    /** facade point offset query. */
     public FacadePointOffsetQuery(Long tenantId, long offset, int limit) {
         this(tenantId, null, null, null, null, null, null, null, null, null, null, offset, limit, List.of());
     }

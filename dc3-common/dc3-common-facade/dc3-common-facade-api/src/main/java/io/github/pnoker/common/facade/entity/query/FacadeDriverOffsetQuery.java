@@ -43,8 +43,8 @@ public record FacadeDriverOffsetQuery(
         int limit,
 
         @Schema(description = "Sort expressions") List<SortSpec> sort) {
+    /** Facade driver offset query compact constructor: normalizes the query record. */
     public FacadeDriverOffsetQuery {
-        if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
         if (offset < 0 || limit < 1 || limit > PageRequest.MAX_LIMIT)
             throw new IllegalArgumentException("invalid page bounds");
         sort = sort == null ? List.of() : List.copyOf(sort);
