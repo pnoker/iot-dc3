@@ -54,16 +54,21 @@ spring:
               filters:
                 - PrefixPath=/auth
                 - Authentic
-            # Token route for authentication (no authentication required).
-            # IMPORTANT: This route MUST stay defined BEFORE auth_route. The gateway
-            # matches routes in definition order (first match wins), so the public
-            # /api/v3/auth/token/** path is carved out of the /api/v3/auth/** wildcard
-            # below purely by ordering — do not move this route after auth_route or the
-            # login endpoint will silently require authentication.
+            # Token route for the pre-authentication endpoints (no authentication
+            # required): salt, generate (login) and change_password (self-service
+            # with the current password). IMPORTANT: This route MUST stay defined
+            # BEFORE auth_route. The gateway matches routes in definition order
+            # (first match wins), so these public paths are carved out of the
+            # /api/v3/auth/** wildcard below purely by ordering — do not move this
+            # route after auth_route or the login endpoint will silently require
+            # authentication. /token/check and /token/cancel are deliberately NOT
+            # listed: they carry @PreAuthorize and need the Authentic filter to
+            # inject the caller identity, so they fall through to auth_route —
+            # routing them publicly here would leave them permanently unauthenticated.
             - id: auth_route_token
               uri: ${GATEWAY_ROUTE_AUTH_TOKEN_URI:http://${CENTER_AUTH_HOST:dc3-center-auth}:8300/}
               predicates:
-                - Path=/api/v3/auth/token/**
+                - Path=/api/v3/auth/token/salt,/api/v3/auth/token/generate,/api/v3/auth/token/change_password
               filters:
                 - StripPrefix=2
             # Auth route for the full authenticated auth-center surface: identity, tenant,
