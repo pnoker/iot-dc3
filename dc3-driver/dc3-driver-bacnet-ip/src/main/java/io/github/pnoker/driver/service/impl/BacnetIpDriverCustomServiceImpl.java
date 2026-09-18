@@ -76,8 +76,9 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private Map<Long, LocalDevice> connectMap;
+    private Map<Long, LocalDevice> connectMap = new ConcurrentHashMap<>(16);
 
+    /** bacnet ip driver custom service impl. */
     public BacnetIpDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;

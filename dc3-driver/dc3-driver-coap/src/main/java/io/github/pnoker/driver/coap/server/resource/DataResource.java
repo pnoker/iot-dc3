@@ -36,6 +36,7 @@ public class DataResource extends CoapResource {
 
     private final CoapReceiveService coapReceiveService;
 
+    /** data resource. */
     public DataResource(String name, CoapReceiveService coapReceiveService) {
         super(name);
         this.coapReceiveService = coapReceiveService;

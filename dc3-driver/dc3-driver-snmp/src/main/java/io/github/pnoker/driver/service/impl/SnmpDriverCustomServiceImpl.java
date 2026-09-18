@@ -77,6 +77,7 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
 
     private Map<Long, Snmp> clientMap;
 
+    /** snmp driver custom service impl. */
     public SnmpDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;

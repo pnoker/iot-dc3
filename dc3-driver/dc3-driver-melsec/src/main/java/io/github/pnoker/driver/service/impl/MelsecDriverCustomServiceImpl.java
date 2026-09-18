@@ -62,7 +62,7 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private Map<Long, MyMcPLC> connectMap;
+    private Map<Long, MyMcPLC> connectMap = new ConcurrentHashMap<>(16);
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {

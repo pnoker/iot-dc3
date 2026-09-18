@@ -108,7 +108,7 @@ class DeviceMetadataTest {
         when(deviceClient.getById(10L)).thenReturn(Mono.just(device));
         StepVerifier.create(deviceMetadata.refreshCache(10L)).expectNext(device).verifyComplete();
 
-        deviceMetadata.removeCache(10L);
+        deviceMetadata.evictCache(10L);
         deviceMetadata.getCache(10L);
 
         // After invalidate the next getCache must re-issue gRPC.

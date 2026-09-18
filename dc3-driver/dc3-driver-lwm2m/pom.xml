@@ -30,6 +30,12 @@
 
     <description>The LwM2M driver for the IoT DC3 platform.</description>
 
+    <!-- Leshan 2.0.0-M14 is compiled against the californium 3.x API (e.g.
+         observe.NotificationListener, removed in 4.x); override the parent pin. -->
+    <properties>
+        <californium.version>3.9.1</californium.version>
+    </properties>
+
     <dependencies>
 
         <!-- LwM2M Protocol Related -->

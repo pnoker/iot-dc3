@@ -117,7 +117,7 @@ public class BufferServiceImpl implements BufferService {
     @Override
     public void republishBatch() {
         DriverProperties.BufferProperties config = driverProperties.getBuffer();
-        List<BufferedPointValue> records = requireBuffer().selectPending(config.getBatchSize(), epochSecond());
+        List<BufferedPointValue> records = requireBuffer().listPending(config.getBatchSize(), epochSecond());
         if (records.isEmpty()) {
             return;
         }

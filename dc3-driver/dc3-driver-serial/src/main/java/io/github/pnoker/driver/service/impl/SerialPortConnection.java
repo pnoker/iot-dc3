@@ -47,6 +47,7 @@ public class SerialPortConnection {
     private InputStream inputStream;
     private OutputStream outputStream;
 
+    /** serial port connection. */
     public SerialPortConnection(String portName, int baudRate, int dataBits, int stopBits, int parity, int timeout) {
         this.portName = portName;
         this.baudRate = baudRate;

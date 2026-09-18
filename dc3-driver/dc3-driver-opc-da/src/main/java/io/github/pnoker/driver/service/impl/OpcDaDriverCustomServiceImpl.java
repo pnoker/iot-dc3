@@ -86,7 +86,7 @@ public class OpcDaDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Cache of device ID to OPC DA server connections.
      */
-    private Map<Long, Server> connectMap;
+    private Map<Long, Server> connectMap = new ConcurrentHashMap<>(16);
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {

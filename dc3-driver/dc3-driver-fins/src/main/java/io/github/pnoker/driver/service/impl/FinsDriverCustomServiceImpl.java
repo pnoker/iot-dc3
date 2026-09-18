@@ -89,6 +89,8 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
 
     private Map<Long, Socket> clientMap;
 
+    /** Create the driver custom service. */
+    /** fins driver custom service impl. */
     public FinsDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;

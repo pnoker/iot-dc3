@@ -230,9 +230,10 @@ public class DriverProperties {
     public static class DeviceHealthProperties {
 
         /**
-         * Whether the SDK should periodically evaluate and report device health.
+         * Whether the SDK should periodically evaluate and report device health. The key
+         * is {@code enable} to match the spelling used by every driver's application.yml.
          */
-        private Boolean enabled = true;
+        private Boolean enable = true;
 
         /**
          * Quartz cron expression used by the device health job. Drivers can tune
@@ -284,9 +285,12 @@ public class DriverProperties {
         public static class ScheduleConfig {
 
             /**
-             * Whether the job is enabled.
+             * Whether the job is enabled. The key is deliberately {@code enable} to match
+             * the {@code dc3.driver.schedule.*.enable} spelling used by every driver's
+             * application.yml — a previous {@code enabled} spelling silently ignored all
+             * of them, leaving read/custom jobs unscheduled in every driver.
              */
-            private Boolean enabled = false;
+            private Boolean enable = false;
 
             /**
              * Quartz cron expression used by the job. Defaults to every 15 minutes on

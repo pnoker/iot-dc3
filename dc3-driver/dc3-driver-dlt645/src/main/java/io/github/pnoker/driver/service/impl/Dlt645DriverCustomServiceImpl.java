@@ -68,7 +68,7 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private Map<Long, Dlt645SerialPortConnection> connectMap;
+    private Map<Long, Dlt645SerialPortConnection> connectMap = new ConcurrentHashMap<>(16);
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {

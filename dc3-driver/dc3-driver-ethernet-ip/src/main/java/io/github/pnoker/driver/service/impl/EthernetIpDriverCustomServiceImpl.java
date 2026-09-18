@@ -75,8 +75,10 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private Map<Long, Socket> connectMap;
+    private Map<Long, Socket> connectMap = new ConcurrentHashMap<>(16);
 
+    /** Create the driver custom service. */
+    /** ethernet ip driver custom service impl. */
     public EthernetIpDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;

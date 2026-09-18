@@ -30,6 +30,7 @@ public class MbusRecord {
     private final int vif;
     private final byte[] valueBytes;
 
+    /** mbus record. */
     public MbusRecord(int dif, int vif, byte[] valueBytes) {
         this.dif = dif;
         this.vif = vif;

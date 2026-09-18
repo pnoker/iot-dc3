@@ -70,6 +70,7 @@ public class DlmsDriverCustomServiceImpl implements DriverCustomService {
 
     private Map<Long, GXDLMSClient> clientMap;
 
+    /** dlms driver custom service impl. */
     public DlmsDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;

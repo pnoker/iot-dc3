@@ -157,7 +157,7 @@ public abstract class AbstractMetadataCache<V> {
     /**
      * Removes the cache entry for {@code id}.
      */
-    public void removeCache(long id) {
+    public void evictCache(long id) {
         cache.synchronous().invalidate(id);
     }
 

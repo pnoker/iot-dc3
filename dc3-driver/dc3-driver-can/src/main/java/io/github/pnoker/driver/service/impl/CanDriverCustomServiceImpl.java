@@ -81,6 +81,7 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
 
     private Map<Long, Boolean> deviceMap;
 
+    /** can driver custom service impl. */
     public CanDriverCustomServiceImpl(DriverMetadata driverMetadata) {
         this.driverMetadata = driverMetadata;
     }

@@ -136,7 +136,10 @@ public class DriverClient {
             }
             DriverBO driver = driverMetadata.getDriver();
             if (Objects.isNull(driver) || Objects.isNull(driver.getTenantId())) {
-                return Mono.error(new ServiceException("Failed to refresh driver metadata: driver is not registered"));
+                // The driver's own registration event can be consumed before
+                // applyMetadata finishes; the registration response carries the full
+                // snapshot, so this redundant pre-registration event is a no-op.
+                return Mono.empty();
             }
             GrpcDriverQuery query = GrpcDriverQuery.newBuilder()
                     .setTenantId(driver.getTenantId())

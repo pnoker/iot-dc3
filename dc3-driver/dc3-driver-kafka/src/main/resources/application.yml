@@ -71,7 +71,7 @@ spring:
     active:
       - ${NODE_ENV:dev}
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:dc3-kafka:9092}
+    bootstrap-servers: ${DC3_MQ_KAFKA_BOOTSTRAP:kafka:9092}
     consumer:
       group-id: dc3-driver-kafka-group
       auto-offset-reset: latest

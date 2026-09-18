@@ -127,7 +127,7 @@ class DriverScheduleServiceImplTest {
     void initialSkipsHealthJobWhenDisabled() throws Exception {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
         properties.setSchedule(s);
-        properties.getHealth().getDevice().setEnabled(false);
+        properties.getHealth().getDevice().setEnable(false);
         service.initialize();
         verify(quartzService, never())
                 .createJobWithCron(
@@ -150,7 +150,7 @@ class DriverScheduleServiceImplTest {
     @Test
     void initialRegistersReadJobWhenEnabled() throws Exception {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
-        s.getRead().setEnabled(true);
+        s.getRead().setEnable(true);
         s.getRead().setCron("0 */1 * * * ?");
         properties.setSchedule(s);
         service.initialize();
@@ -165,7 +165,7 @@ class DriverScheduleServiceImplTest {
     @Test
     void initialRejectsInvalidReadCron() {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
-        s.getRead().setEnabled(true);
+        s.getRead().setEnable(true);
         s.getRead().setCron("definitely-not-a-cron");
         properties.setSchedule(s);
         assertThatThrownBy(() -> service.initialize())
@@ -176,7 +176,7 @@ class DriverScheduleServiceImplTest {
     @Test
     void initialRegistersCustomJobWhenEnabled() throws Exception {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
-        s.getCustom().setEnabled(true);
+        s.getCustom().setEnable(true);
         s.getCustom().setCron("0 0/5 * * * ?");
         properties.setSchedule(s);
         service.initialize();
@@ -191,7 +191,7 @@ class DriverScheduleServiceImplTest {
     @Test
     void initialRejectsInvalidCustomCron() {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
-        s.getCustom().setEnabled(true);
+        s.getCustom().setEnable(true);
         s.getCustom().setCron("garbage");
         properties.setSchedule(s);
         assertThatThrownBy(() -> service.initialize())

@@ -131,8 +131,8 @@ public class MetadataReceiver {
         } else if (MetadataOperateTypeEnum.DELETE.equals(event.getOperateType())) {
             operation = Mono.fromRunnable(() -> {
                 log.debug("Device metadata deleted, deviceId={}", event.getId());
-                driverMetadata.removeDeviceId(event.getId());
-                deviceMetadata.removeCache(event.getId());
+                driverMetadata.deleteDeviceId(event.getId());
+                deviceMetadata.evictCache(event.getId());
             });
         } else {
             operation = Mono.empty();
@@ -149,7 +149,7 @@ public class MetadataReceiver {
         } else if (MetadataOperateTypeEnum.DELETE.equals(event.getOperateType())) {
             operation = Mono.fromRunnable(() -> {
                 log.debug("Point metadata deleted, pointId={}", event.getId());
-                pointMetadata.removeCache(event.getId());
+                pointMetadata.evictCache(event.getId());
             });
         } else {
             operation = Mono.empty();

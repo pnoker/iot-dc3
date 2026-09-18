@@ -64,7 +64,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private Map<Long, MyS7PLC> connectMap;
+    private Map<Long, MyS7PLC> connectMap = new ConcurrentHashMap<>(16);
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {

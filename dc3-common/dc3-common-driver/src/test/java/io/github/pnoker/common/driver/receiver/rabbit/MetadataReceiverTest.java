@@ -119,7 +119,7 @@ class MetadataReceiverTest {
 
         StepVerifier.create(receiver.metadataReceive(received(event), ack)).verifyComplete();
 
-        verify(deviceMetadata).removeCache(99L);
+        verify(deviceMetadata).evictCache(99L);
         assertThat(driverMetadata.getDeviceIds()).isEmpty();
         verify(metadataEventPublisher).publishEvent(any(MetadataEvent.class));
     }

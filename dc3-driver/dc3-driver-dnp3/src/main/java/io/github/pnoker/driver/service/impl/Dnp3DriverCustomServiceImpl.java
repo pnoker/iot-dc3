@@ -80,7 +80,7 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private Map<Long, Dnp3Connection> connectionMap;
+    private Map<Long, Dnp3Connection> connectionMap = new ConcurrentHashMap<>(16);
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {

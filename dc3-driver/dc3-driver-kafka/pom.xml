@@ -34,10 +34,15 @@
 
     <dependencies>
 
-        <!-- Kafka Access -->
+        <!-- Kafka Access: the starter (not bare spring-kafka) so Boot 4 wires
+             KafkaTemplate/listener containers through spring-boot-kafka autoconfiguration. -->
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-kafka</artifactId>
         </dependency>
 
     </dependencies>

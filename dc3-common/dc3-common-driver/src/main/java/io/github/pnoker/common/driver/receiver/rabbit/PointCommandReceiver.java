@@ -66,6 +66,7 @@ public class PointCommandReceiver {
     private final DriverProperties driverProperties;
     private final Scheduler commandScheduler;
 
+    /** point command receiver. */
     public PointCommandReceiver(
             DriverReadService driverReadService,
             DriverWriteService driverWriteService,

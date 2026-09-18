@@ -40,6 +40,7 @@ public class SerialFrameParser {
     private final int dataLength;
     private final ChecksumType checksumType;
 
+    /** serial frame parser. */
     public SerialFrameParser(
             String frameHeaderHex, String frameFooterHex, int dataOffset, int dataLength, String checksumTypeName) {
         this.frameHeader = isBlank(frameHeaderHex) ? null : hexToBytes(frameHeaderHex);

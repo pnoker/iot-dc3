@@ -194,7 +194,7 @@ public final class DriverMetadata {
      * @param id device id to remove
      * @return {@code true} if the set contained the id
      */
-    public boolean removeDeviceId(Long id) {
+    public boolean deleteDeviceId(Long id) {
         deviceFencingTokens.remove(id);
         return deviceIds.remove(id);
     }

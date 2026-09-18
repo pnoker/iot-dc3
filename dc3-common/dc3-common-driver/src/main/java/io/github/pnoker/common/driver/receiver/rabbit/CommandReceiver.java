@@ -72,6 +72,7 @@ public class CommandReceiver {
     private final DriverProperties driverProperties;
     private final Scheduler commandScheduler;
 
+    /** command receiver. */
     public CommandReceiver(
             DriverCustomService driverCustomService,
             DriverSenderService driverSenderService,

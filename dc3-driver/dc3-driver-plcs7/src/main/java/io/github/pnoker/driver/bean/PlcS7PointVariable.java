@@ -31,6 +31,7 @@ public class PlcS7PointVariable {
 
     private final String type;
 
+    /** plc s7 point variable. */
     public PlcS7PointVariable(int dbNum, int byteOffset, int bitOffset, String type) {
         this.type = type;
         boolean isBitAccess = ("boolean".equals(type) || "bool".equals(type)) && bitOffset > 0;

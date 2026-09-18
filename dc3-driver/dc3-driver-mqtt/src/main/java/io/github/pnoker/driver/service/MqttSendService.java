@@ -16,10 +16,6 @@
  */
 package io.github.pnoker.driver.service;
 
-import org.springframework.integration.annotation.MessagingGateway;
-import org.springframework.integration.mqtt.support.MqttHeaders;
-import org.springframework.messaging.handler.annotation.Header;
-
 /**
  * Service for sending messages to MQTT topics. This interface provides methods for
  * publishing messages to MQTT brokers with support for custom topics and Quality of
@@ -28,7 +24,6 @@ import org.springframework.messaging.handler.annotation.Header;
  * @author pnoker
  * @since 2016.10.1
  */
-@MessagingGateway(defaultRequestChannel = "mqttOutboundChannel")
 public interface MqttSendService {
 
     /**
@@ -44,7 +39,7 @@ public interface MqttSendService {
      * @param qos  Custom QoS
      * @param data string
      */
-    void sendToMqtt(@Header(MqttHeaders.QOS) Integer qos, String data);
+    void sendToMqtt(Integer qos, String data);
 
     /**
      * Send data using a custom topic and the default QoS
@@ -52,7 +47,7 @@ public interface MqttSendService {
      * @param topic Custom topic
      * @param data  string
      */
-    void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, String data);
+    void sendToMqtt(String topic, String data);
 
     /**
      * Send data using a custom topic and a custom QoS
@@ -61,5 +56,5 @@ public interface MqttSendService {
      * @param qos   Custom QoS
      * @param data  string
      */
-    void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, @Header(MqttHeaders.QOS) Integer qos, String data);
+    void sendToMqtt(String topic, Integer qos, String data);
 }

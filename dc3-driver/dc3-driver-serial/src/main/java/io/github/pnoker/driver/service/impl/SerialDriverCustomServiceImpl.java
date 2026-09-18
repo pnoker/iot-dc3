@@ -65,7 +65,8 @@ public class SerialDriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private Map<Long, SerialPortConnection> connectMap;
+    // Eagerly initialized: metadata events may arrive before initial() runs.
+    private Map<Long, SerialPortConnection> connectMap = new ConcurrentHashMap<>(16);
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {

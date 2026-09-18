@@ -84,6 +84,7 @@ public class PointValueBuffer {
     private final String dbPath;
     private HikariDataSource dataSource;
 
+    /** point value buffer. */
     public PointValueBuffer(String dbPath) {
         this.dbPath = dbPath;
     }
@@ -207,7 +208,7 @@ public class PointValueBuffer {
      * Return up to {@code batchSize} records due for republish (next_attempt_at &lt;= now),
      * oldest-first.
      */
-    public List<BufferedPointValue> selectPending(int batchSize, long nowEpochSec) {
+    public List<BufferedPointValue> listPending(int batchSize, long nowEpochSec) {
         List<BufferedPointValue> records = new ArrayList<>(batchSize);
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement ps = conn.prepareStatement(SELECT_PENDING_SQL)) {
@@ -229,7 +230,7 @@ public class PointValueBuffer {
                 }
             }
         } catch (SQLException e) {
-            log.error("Buffer selectPending failed", e);
+            log.error("Buffer listPending failed", e);
         }
         return records;
     }

@@ -44,6 +44,7 @@ public class MbusSerialPortConnection {
     private InputStream inputStream;
     private OutputStream outputStream;
 
+    /** mbus serial port connection. */
     public MbusSerialPortConnection(
             String portName, int baudRate, int dataBits, int stopBits, int parity, int timeout) {
         this.portName = portName;

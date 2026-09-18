@@ -19,7 +19,6 @@
 # that is: if the following properties are configured in application-[dev|test|pre|pro].yml,
 # the property values configured in application.yml will be the main ones.
 spring:
-  main:
   grpc:
     client:
       channel:

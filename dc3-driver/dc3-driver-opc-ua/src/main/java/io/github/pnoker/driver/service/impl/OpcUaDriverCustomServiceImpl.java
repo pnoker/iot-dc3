@@ -103,7 +103,7 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private Map<Long, OpcUaClient> connectMap;
+    private Map<Long, OpcUaClient> connectMap = new ConcurrentHashMap<>(16);
     /**
      * Failure tracking for connection backoff to prevent repeated TCP+TLS handshake
      * attempts to unreachable devices on every schedule cycle.

@@ -32,6 +32,8 @@ import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 import org.eclipse.leshan.server.LeshanServer;
 import org.eclipse.leshan.server.LeshanServerBuilder;
+import org.eclipse.leshan.server.californium.endpoint.CaliforniumServerEndpointsProvider;
+import org.eclipse.leshan.server.californium.endpoint.coap.CoapServerProtocolProvider;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.RegistrationListener;
 import org.eclipse.leshan.server.registration.RegistrationUpdate;
@@ -68,6 +70,12 @@ public class Lwm2mServerManager implements DisposableBean {
     public void start() {
         try {
             LeshanServerBuilder builder = new LeshanServerBuilder();
+            // Leshan requires at least one endpoint provider; expose a plain CoAP
+            // endpoint bound to the configured host/port (NOSEC mode).
+            builder.setEndpointsProviders(new CaliforniumServerEndpointsProvider.Builder(
+                            new CoapServerProtocolProvider())
+                    .addEndpoint("coap://" + lwm2mProperties.getServerHost() + ":" + lwm2mProperties.getServerPort())
+                    .build());
             server = builder.build();
 
             // Register device lifecycle listeners

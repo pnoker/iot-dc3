@@ -73,6 +73,7 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
     private BluetoothManager bluetoothManager;
     private Map<Long, DeviceGovernor> deviceGovernorMap;
 
+    /** ble driver custom service impl. */
     public BleDriverCustomServiceImpl(
             DriverMetadata driverMetadata, DriverSenderService driverSenderService, BleManagerFactory managerFactory) {
         this.driverMetadata = driverMetadata;

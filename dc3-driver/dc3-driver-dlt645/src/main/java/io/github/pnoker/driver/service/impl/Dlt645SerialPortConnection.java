@@ -44,6 +44,7 @@ public class Dlt645SerialPortConnection {
     private InputStream inputStream;
     private OutputStream outputStream;
 
+    /** dlt645 serial port connection. */
     public Dlt645SerialPortConnection(
             String portName, int baudRate, int dataBits, int stopBits, int parity, int timeout) {
         this.portName = portName;

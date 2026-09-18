@@ -30,6 +30,7 @@ import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.quartz.QuartzService;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.CronExpression;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Service;
  * @since 2016.10.1
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DriverScheduleServiceImpl implements DriverScheduleService {
 
@@ -87,7 +89,7 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             // Create and schedule the device health job if enabled
             DriverProperties.DeviceHealthProperties deviceHealth =
                     driverProperties.getHealth().getDevice();
-            if (Objects.nonNull(deviceHealth) && Boolean.TRUE.equals(deviceHealth.getEnabled())) {
+            if (Objects.nonNull(deviceHealth) && Boolean.TRUE.equals(deviceHealth.getEnable())) {
                 if (!CronExpression.isValidExpression(deviceHealth.getCron())) {
                     throw new CronException("Device health schedule cron expression is invalid");
                 }
@@ -99,7 +101,7 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             }
 
             // Create and schedule the read job if enabled
-            if (Boolean.TRUE.equals(property.getRead().getEnabled())) {
+            if (Boolean.TRUE.equals(property.getRead().getEnable())) {
                 // Validate read job cron expression
                 if (!CronExpression.isValidExpression(property.getRead().getCron())) {
                     throw new CronException("Read schedule cron expression is invalid");
@@ -112,7 +114,7 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             }
 
             // Create and schedule the custom job if enabled
-            if (Boolean.TRUE.equals(property.getCustom().getEnabled())) {
+            if (Boolean.TRUE.equals(property.getCustom().getEnable())) {
                 // Validate custom job cron expression
                 if (!CronExpression.isValidExpression(property.getCustom().getCron())) {
                     throw new CronException("Custom schedule cron expression is invalid");

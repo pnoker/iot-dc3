@@ -91,7 +91,7 @@ public class ModbusRtuDriverCustomServiceImpl implements DriverCustomService {
     /**
      * Cache of device ID to ModbusMaster connections.
      */
-    private Map<Long, ModbusMaster> connectMap;
+    private Map<Long, ModbusMaster> connectMap = new ConcurrentHashMap<>(16);
     /**
      * Failure tracking for connection backoff to prevent repeated connection
      * attempts to unreachable devices on every schedule cycle.

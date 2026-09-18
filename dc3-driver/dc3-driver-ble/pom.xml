@@ -36,10 +36,24 @@
         <dependency>
             <groupId>org.sputnikdev</groupId>
             <artifactId>bluetooth-manager</artifactId>
+            <exclusions>
+                <!-- bluetooth-manager pins guava 18.0, which predates the overloads
+                     grpc-api needs; grpc supplies its own modern guava transitively. -->
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.sputnikdev</groupId>
             <artifactId>bluetooth-manager-tinyb</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>

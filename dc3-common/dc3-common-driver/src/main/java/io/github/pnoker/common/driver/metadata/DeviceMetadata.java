@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
  * configuration views for the driver runtime.
  *
  * <p>Cache freshness is event-driven: RabbitMQ metadata events call
- * {@link #refreshCache(long)} or {@link #removeCache(long)}. There is no TTL — the
+ * {@link #refreshCache(long)} or {@link #evictCache(long)}. There is no TTL — the
  * {@code maximumSize} bound only caps memory.
  *
  * <p>When the upstream loader returns {@code null} (the device has been removed at
@@ -83,7 +83,7 @@ public final class DeviceMetadata extends AbstractMetadataCache<DeviceBO> {
         if (value == null) {
             // Manager has dropped this device; drop the orphan id so the Quartz read
             // scan stops attempting to read a record that no longer exists.
-            if (driverMetadata.removeDeviceId(id)) {
+            if (driverMetadata.deleteDeviceId(id)) {
                 log.info("Drop orphan device id={} after upstream returned null", id);
             }
         }

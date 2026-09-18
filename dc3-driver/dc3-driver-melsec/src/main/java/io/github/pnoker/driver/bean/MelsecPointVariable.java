@@ -33,10 +33,12 @@ public class MelsecPointVariable {
 
     private final int length;
 
+    /** melsec point variable. */
     public MelsecPointVariable(String address, String type) {
         this(address, type, 0);
     }
 
+    /** melsec point variable. */
     public MelsecPointVariable(String address, String type, int length) {
         this.address = address;
         this.type = type;

@@ -64,6 +64,7 @@ public class CoapProperties {
     @NotNull(message = "DTLS config can't be null")
     private Dtls dtls = new Dtls();
 
+    /** Create a new endpoint configuration. */
     @NoArgsConstructor
     /** CoAP role of the endpoint: client (collect from devices), server (accept device pushes), or both. */
     public enum ModeEnum {
@@ -72,6 +73,7 @@ public class CoapProperties {
         BOTH,
     }
 
+    /** Create a new observe configuration. */
     @Getter
     @Setter
     /** DTLS credentials: PSK identity/secret or a trust-store path for certificate mode. */

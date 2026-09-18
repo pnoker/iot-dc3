@@ -65,7 +65,7 @@ public class MbusDriverCustomServiceImpl implements DriverCustomService {
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private Map<Long, MbusSerialPortConnection> connectMap;
+    private Map<Long, MbusSerialPortConnection> connectMap = new ConcurrentHashMap<>(16);
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
