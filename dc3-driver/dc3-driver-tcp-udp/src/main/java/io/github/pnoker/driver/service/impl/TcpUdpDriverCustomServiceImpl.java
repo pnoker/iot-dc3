@@ -27,6 +27,7 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.driver.support.CodecUtil;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
@@ -44,7 +45,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -272,7 +272,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
     private String sendTcp(Long deviceId, Map<String, AttributeBO> driverConfig, String sendCommand)
             throws IOException {
         Socket socket = getTcpConnector(deviceId, driverConfig);
-        byte[] sendBytes = hexToBytes(sendCommand);
+        byte[] sendBytes = CodecUtil.hexToBytes(sendCommand);
         try {
             OutputStream out = socket.getOutputStream();
             out.write(sendBytes);
@@ -286,7 +286,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
                 System.arraycopy(buffer, 0, response, 0, len);
                 // Successful communication clears failure tracking
                 failureMap.remove(deviceId);
-                return bytesToHex(response);
+                return CodecUtil.bytesToHex(response);
             }
         } catch (IOException e) {
             failureMap.compute(deviceId, (k, v) -> v == null ? new ConsecutiveFailure() : v.increment());
@@ -360,7 +360,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
 
         try (DatagramSocket socket = new DatagramSocket()) {
             socket.setSoTimeout(readTimeout);
-            byte[] sendBytes = hexToBytes(sendCommand);
+            byte[] sendBytes = CodecUtil.hexToBytes(sendCommand);
             DatagramPacket sendPacket =
                     new DatagramPacket(sendBytes, sendBytes.length, java.net.InetAddress.getByName(host), port);
             socket.send(sendPacket);
@@ -372,7 +372,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
             int len = receivePacket.getLength();
             byte[] response = new byte[len];
             System.arraycopy(buffer, 0, response, 0, len);
-            return bytesToHex(response);
+            return CodecUtil.bytesToHex(response);
         }
     }
 
@@ -384,7 +384,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         int length = getConfigIntValue(pointConfig, "dataLength", 0);
         String dataFormat = getConfigValue(pointConfig, "dataFormat", "HEX");
         try {
-            byte[] rawBytes = hexToBytes(rawHex);
+            byte[] rawBytes = CodecUtil.hexToBytes(rawHex);
             if (length > 0 && offset >= 0 && (offset + length) <= rawBytes.length) {
                 byte[] dataBytes = new byte[length];
                 System.arraycopy(rawBytes, offset, dataBytes, 0, length);
@@ -403,26 +403,26 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         String byteOrder = getConfigValue(pointConfig, "byteOrder", "BIG");
         ByteOrder order = "LITTLE".equalsIgnoreCase(byteOrder) ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
         return switch (dataFormat.toUpperCase()) {
-            case "HEX" -> bytesToHex(dataBytes);
+            case "HEX" -> CodecUtil.bytesToHex(dataBytes);
             case "ASCII" -> new String(dataBytes, StandardCharsets.US_ASCII).trim();
             case "INT16" ->
                 dataBytes.length >= 2
                         ? String.valueOf(ByteBuffer.wrap(dataBytes).order(order).getShort())
-                        : bytesToHex(dataBytes);
+                        : CodecUtil.bytesToHex(dataBytes);
             case "UINT16" ->
                 dataBytes.length >= 2
                         ? String.valueOf(
                                 (int) ByteBuffer.wrap(dataBytes).order(order).getShort() & 0xFFFF)
-                        : bytesToHex(dataBytes);
+                        : CodecUtil.bytesToHex(dataBytes);
             case "INT32" ->
                 dataBytes.length >= 4
                         ? String.valueOf(ByteBuffer.wrap(dataBytes).order(order).getInt())
-                        : bytesToHex(dataBytes);
+                        : CodecUtil.bytesToHex(dataBytes);
             case "FLOAT" ->
                 dataBytes.length >= 4
                         ? String.valueOf(ByteBuffer.wrap(dataBytes).order(order).getFloat())
-                        : bytesToHex(dataBytes);
-            default -> bytesToHex(dataBytes);
+                        : CodecUtil.bytesToHex(dataBytes);
+            default -> CodecUtil.bytesToHex(dataBytes);
         };
     }
 
@@ -439,21 +439,6 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         } catch (IOException e) {
             log.warn("TCP socket close failed, protocol={}", driverCode, e);
         }
-    }
-
-    private byte[] hexToBytes(String hex) {
-        if (StringUtils.isBlank(hex)) {
-            return new byte[0];
-        }
-        hex = hex.replaceAll("\\s+", "");
-        return HexFormat.of().parseHex(hex);
-    }
-
-    private String bytesToHex(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) {
-            return "";
-        }
-        return HexFormat.of().withUpperCase().formatHex(bytes);
     }
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {

@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.driver.support.CodecUtil;
 import io.github.pnoker.common.exception.ConnectorException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -94,7 +95,7 @@ public final class MbusFrame {
         frame[4] = CONTROL_SND_UD2;
         frame[5] = (byte) address;
         frame[6] = CI_REQ_UD2;
-        frame[7] = checksum(frame, 4, 7);
+        frame[7] = CodecUtil.sumChecksum(frame, 4, 7);
         frame[8] = END;
         return frame;
     }
@@ -110,7 +111,7 @@ public final class MbusFrame {
         frame[0] = SHORT_START;
         frame[1] = 0x40;
         frame[2] = (byte) address;
-        frame[3] = checksum(frame, 1, 3);
+        frame[3] = CodecUtil.sumChecksum(frame, 1, 3);
         frame[4] = END;
         return frame;
     }
@@ -133,7 +134,7 @@ public final class MbusFrame {
         frame[5] = (byte) address;
         frame[6] = CI_SND_UD;
         System.arraycopy(payload, 0, frame, 7, payload.length);
-        frame[7 + payload.length] = checksum(frame, 4, 7 + payload.length);
+        frame[7 + payload.length] = CodecUtil.sumChecksum(frame, 4, 7 + payload.length);
         frame[8 + payload.length] = END;
         return frame;
     }
@@ -188,15 +189,7 @@ public final class MbusFrame {
         if (frame.length < csIndex + 2) {
             return false;
         }
-        return (checksum(frame, 4, csIndex) & 0xFF) == (frame[csIndex] & 0xFF);
-    }
-
-    private static byte checksum(byte[] bytes, int from, int to) {
-        int sum = 0;
-        for (int i = from; i < to; i++) {
-            sum += bytes[i] & 0xFF;
-        }
-        return (byte) (sum & 0xFF);
+        return (CodecUtil.sumChecksum(frame, 4, csIndex) & 0xFF) == (frame[csIndex] & 0xFF);
     }
 
     /**

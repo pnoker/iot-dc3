@@ -20,6 +20,7 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.utils.DecodeUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HexFormat;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -120,15 +121,38 @@ public class CodecUtil {
      * @return hexadecimal string
      */
     public static String bytesToHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (byte aByte : bytes) {
-            String hex = Integer.toHexString(aByte & 0xFF);
-            if (hex.length() < 2) {
-                sb.append(0);
-            }
-            sb.append(hex);
+        return HexFormat.of().withUpperCase().formatHex(bytes);
+    }
+
+    /**
+     * Parses a hexadecimal string into bytes, tolerating embedded whitespace and
+     * returning an empty array for blank input. Both letter cases are accepted.
+     *
+     * @param hex hexadecimal string, possibly separated by spaces
+     * @return decoded bytes
+     */
+    public static byte[] hexToBytes(String hex) {
+        if (hex == null || hex.isBlank()) {
+            return new byte[0];
         }
-        return sb.toString();
+        return HexFormat.of().parseHex(hex.replaceAll("\\s+", ""));
+    }
+
+    /**
+     * Sum checksum over {@code bytes[from..to)} truncated to one byte - the
+     * frame checksum shared by the MBus and DL/T645 wire formats.
+     *
+     * @param bytes frame bytes
+     * @param from start index, inclusive
+     * @param to end index, exclusive
+     * @return low byte of the arithmetic sum
+     */
+    public static byte sumChecksum(byte[] bytes, int from, int to) {
+        int sum = 0;
+        for (int i = from; i < to; i++) {
+            sum += bytes[i] & 0xFF;
+        }
+        return (byte) (sum & 0xFF);
     }
 
     /**
@@ -240,12 +264,12 @@ public class CodecUtil {
      * @return additive checksum
      */
     public static byte sumBytes(byte[]... bytes) {
-        byte xor = 0x00;
+        byte sum = 0x00;
         for (byte[] value : bytes) {
             for (byte b : value) {
-                xor += b;
+                sum += b;
             }
         }
-        return xor;
+        return sum;
     }
 }

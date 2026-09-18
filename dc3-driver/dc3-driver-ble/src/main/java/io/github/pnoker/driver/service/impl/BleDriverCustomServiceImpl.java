@@ -27,6 +27,7 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.driver.support.CodecUtil;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
@@ -97,14 +98,6 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
         ByteBuffer bb = ByteBuffer.wrap(data);
         if ("LITTLE".equalsIgnoreCase(byteOrder)) bb.order(ByteOrder.LITTLE_ENDIAN);
         return bb.getFloat();
-    }
-
-    private static String bytesToHex(byte[] data) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : data) {
-            sb.append(String.format("%02X", b));
-        }
-        return sb.toString();
     }
 
     private static void checkRequired(
@@ -257,7 +250,7 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
 
     private String parseBytes(byte[] data, String format, String byteOrder) {
         return switch (format.toUpperCase()) {
-            case "HEX" -> bytesToHex(data);
+            case "HEX" -> CodecUtil.bytesToHex(data);
             case "INT16" -> String.valueOf(readInt16(data, byteOrder));
             case "UINT16" -> String.valueOf(readUint16(data, byteOrder));
             case "FLOAT" -> String.valueOf(readFloat(data, byteOrder));

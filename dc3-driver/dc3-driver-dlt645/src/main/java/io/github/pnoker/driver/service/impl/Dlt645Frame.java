@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.driver.support.CodecUtil;
 import io.github.pnoker.common.exception.ConnectorException;
 
 /**
@@ -137,7 +138,7 @@ public final class Dlt645Frame {
         for (byte b : data) {
             frame[pos++] = b;
         }
-        frame[pos++] = checksum(frame, pos);
+        frame[pos++] = CodecUtil.sumChecksum(frame, 0, pos);
         frame[pos] = END;
         return frame;
     }
@@ -188,14 +189,6 @@ public final class Dlt645Frame {
      */
     public static boolean verifyChecksum(byte[] frame) {
         int length = frame.length;
-        return (checksum(frame, length - 2) & 0xFF) == (frame[length - 2] & 0xFF);
-    }
-
-    private static byte checksum(byte[] bytes, int length) {
-        int sum = 0;
-        for (int i = 0; i < length; i++) {
-            sum += bytes[i] & 0xFF;
-        }
-        return (byte) (sum & 0xFF);
+        return (CodecUtil.sumChecksum(frame, 0, length - 2) & 0xFF) == (frame[length - 2] & 0xFF);
     }
 }

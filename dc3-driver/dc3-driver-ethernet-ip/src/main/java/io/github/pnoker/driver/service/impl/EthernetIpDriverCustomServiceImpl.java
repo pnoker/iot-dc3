@@ -26,6 +26,7 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.driver.support.CodecUtil;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
@@ -91,12 +92,6 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
             if (read < 0) throw new IOException("Connection closed");
             offset += read;
         }
-    }
-
-    private static String bytesToHex(byte[] data) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : data) sb.append(String.format("%02X", b));
-        return sb.toString();
     }
 
     private static void checkRequired(
@@ -337,7 +332,7 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
             case "DINT" -> String.valueOf(buf.getInt());
             case "REAL" -> String.valueOf(buf.getFloat());
             case "STRING" -> new String(data, StandardCharsets.US_ASCII).trim();
-            default -> bytesToHex(data);
+            default -> CodecUtil.bytesToHex(data);
         };
     }
 

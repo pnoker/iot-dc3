@@ -28,6 +28,7 @@ import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.driver.support.CodecUtil;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
@@ -81,17 +82,6 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
     private String serverPwd;
 
     private Object sl651Server;
-
-    private static String bytesToHex(byte[] bytes) {
-        if (bytes == null) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(String.format("%02X", b & 0xFF));
-        }
-        return sb.toString();
-    }
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
@@ -288,8 +278,8 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
     }
 
     private void handleSl651Message(Object response, Object bodyResponses) {
-        String stationAddr = bytesToHex(invokeBytes(response, "getRemoteStationAddress"));
-        String funcCode = bytesToHex(invokeBytes(response, "getFunctionCode"));
+        String stationAddr = CodecUtil.bytesToHex(invokeBytes(response, "getRemoteStationAddress"));
+        String funcCode = CodecUtil.bytesToHex(invokeBytes(response, "getFunctionCode"));
         List<String> elements = extractBodyElements(bodyResponses);
         log.debug(
                 "Driver SL651 message received, protocol={}, stationAddr={}, funcCode={}, bodyCount={}",

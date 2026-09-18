@@ -53,7 +53,7 @@ class CodecUtilTest {
     @Test
     void bytesToHexEmitsTwoCharsPerByte() {
         byte[] bytes = {0x00, 0x0F, (byte) 0xA1, (byte) 0xFF};
-        assertThat(CodecUtil.bytesToHex(bytes)).isEqualTo("000fa1ff");
+        assertThat(CodecUtil.bytesToHex(bytes)).isEqualTo("000FA1FF");
     }
 
     @Test
@@ -123,5 +123,18 @@ class CodecUtilTest {
         assertThatThrownBy(constructor::newInstance)
                 .isInstanceOf(InvocationTargetException.class)
                 .hasCauseInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void hexToBytesParsesMixedCaseAndWhitespace() {
+        assertThat(CodecUtil.hexToBytes("0F a1")).containsExactly((byte) 0x0F, (byte) 0xA1);
+        assertThat(CodecUtil.hexToBytes(null)).isEmpty();
+    }
+
+    @Test
+    void sumChecksumMatchesFrameConvention() {
+        byte[] frame = {0x68, 0x01, 0x02, 0x03};
+        // 0x01 + 0x02 + 0x03 = 0x06
+        assertThat(CodecUtil.sumChecksum(frame, 1, 4)).isEqualTo((byte) 0x06);
     }
 }

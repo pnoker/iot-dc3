@@ -26,6 +26,7 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.driver.support.CodecUtil;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
@@ -236,11 +237,7 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
         if (Objects.isNull(hex) || hex.length() != expectedLength * 2 || !hex.matches("[0-9a-fA-F]+")) {
             throw new ConnectorException("Invalid hexadecimal value: {}", hex);
         }
-        byte[] result = new byte[expectedLength];
-        for (int i = 0; i < expectedLength; i++) {
-            result[i] = (byte) Integer.parseInt(hex.substring(i * 2, i * 2 + 2), 16);
-        }
-        return result;
+        return CodecUtil.hexToBytes(hex);
     }
 
     private String formatReadValue(byte[] data, String dataFormat) {

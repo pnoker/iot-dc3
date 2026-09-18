@@ -26,6 +26,7 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.driver.support.CodecUtil;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
@@ -455,7 +456,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                 String.valueOf(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getFloat());
             case "STRING" -> new String(data).trim();
             case "BCD" -> bytesToBcdString(data);
-            default -> bytesToHex(data);
+            default -> CodecUtil.bytesToHex(data);
         };
     }
 
@@ -527,7 +528,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                 break;
             }
             default: {
-                data = hexToBytes(value);
+                data = CodecUtil.hexToBytes(value);
                 break;
             }
         }
@@ -558,24 +559,6 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
         } catch (IOException e) {
             log.warn("FINS socket close failed", e);
         }
-    }
-
-    private String bytesToHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder(bytes.length * 2);
-        for (byte b : bytes) {
-            sb.append(String.format("%02X", b));
-        }
-        return sb.toString();
-    }
-
-    private byte[] hexToBytes(String hex) {
-        String s = hex.replaceAll("\\s+", "");
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
-        }
-        return data;
     }
 
     private String bytesToBcdString(byte[] bytes) {
