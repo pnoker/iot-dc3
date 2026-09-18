@@ -36,6 +36,7 @@ public record RolePrincipalBindOffsetRequest(
 
         @Schema(description = "Principal classification filter")
         PrincipalTypeEnum principalType) {
+    /** Role principal bind offset request compact constructor: normalizes the query record. */
     public RolePrincipalBindOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -45,6 +46,7 @@ public record RolePrincipalBindOffsetRequest(
             throw new IllegalArgumentException("limit must be between 1 and " + PageRequest.MAX_LIMIT);
     }
 
+    /** role principal bind offset request. */
     public RolePrincipalBindOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null);
     }

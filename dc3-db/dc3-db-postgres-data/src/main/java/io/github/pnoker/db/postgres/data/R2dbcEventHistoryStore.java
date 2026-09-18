@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.data;
 
-import io.github.pnoker.common.data.repository.ReactiveEventHistoryStore;
-
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
+import io.github.pnoker.common.data.repository.ReactiveEventHistoryStore;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
@@ -102,7 +101,7 @@ public class R2dbcEventHistoryStore implements ReactiveEventHistoryStore {
     }
 
     @Override
-    public Mono<EventHistoryDO> findByRecordId(Long tenantId, String recordId) {
+    public Mono<EventHistoryDO> getByRecordId(Long tenantId, String recordId) {
         if (tenantId == null || tenantId <= 0 || recordId == null || recordId.isBlank()) return Mono.empty();
         return databaseClient
                 .sql("SELECT " + COLUMNS + " FROM " + TABLE

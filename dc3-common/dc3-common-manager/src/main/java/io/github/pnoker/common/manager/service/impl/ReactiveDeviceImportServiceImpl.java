@@ -117,7 +117,7 @@ public class ReactiveDeviceImportServiceImpl implements ReactiveDeviceImportServ
             return Mono.error(new RequestException("Tenant ID and operation ID are required"));
         }
         return operationRepository
-                .findById(new TenantScope(tenantId), operationId)
+                .getById(new TenantScope(tenantId), operationId)
                 .switchIfEmpty(
                         Mono.error(new io.github.pnoker.common.exception.NotFoundException("Operation does not exist")))
                 .map(state -> new OperationView(

@@ -41,6 +41,7 @@ public record DriverFilter(
     private static final Set<String> SORT_FIELDS = Set.of(
             "id", "driverName", "driverCode", "serviceName", "serviceHost", "createTime", "operateTime", "version");
 
+    /** Driver filter compact constructor: normalizes the filter record. */
     public DriverFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");

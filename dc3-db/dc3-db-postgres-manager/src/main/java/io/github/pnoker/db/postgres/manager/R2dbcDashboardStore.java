@@ -16,8 +16,6 @@
  */
 package io.github.pnoker.db.postgres.manager;
 
-import io.github.pnoker.common.manager.repository.ReactiveDashboardStore;
-
 import io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.DailyGrowthRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.ProfileBindingRow;
@@ -25,6 +23,7 @@ import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDeviceRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDriverRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyPointRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyProfileRow;
+import io.github.pnoker.common.manager.repository.ReactiveDashboardStore;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;

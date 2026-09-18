@@ -53,7 +53,7 @@ class DeviceStatusServiceImplTest {
         when(stateStore.listStateFlags(100L, EntityTypeEnum.DEVICE, List.of(10L)))
                 .thenReturn(Mono.just(Map.of(10L, (byte) EntityStatusEnum.ONLINE.getIndex())));
 
-        StepVerifier.create(service.list(query(100L)))
+        StepVerifier.create(service.list(request(100L)))
                 .assertNext(result -> assertThat(result).containsEntry("10", EntityStatusEnum.ONLINE.getCode()))
                 .verifyComplete();
         verify(deviceFacade).listReactive(any(FacadeDeviceOffsetQuery.class));
@@ -67,12 +67,12 @@ class DeviceStatusServiceImplTest {
                         Mono.just(io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(List.of(device(10L)), 0, 50, 1)));
         when(stateStore.listStateFlags(any(), any(), any())).thenReturn(Mono.just(Map.of()));
 
-        StepVerifier.create(service.list(query(100L)))
+        StepVerifier.create(service.list(request(100L)))
                 .assertNext(result -> assertThat(result).containsEntry("10", EntityStatusEnum.OFFLINE.getCode()))
                 .verifyComplete();
     }
 
-    private FacadeDeviceOffsetQuery query(Long tenantId) {
+    private FacadeDeviceOffsetQuery request(Long tenantId) {
         return new FacadeDeviceOffsetQuery(tenantId, null, null, null, null, null, null, null, null, 0, 50, List.of());
     }
 

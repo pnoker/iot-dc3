@@ -48,6 +48,7 @@ public record GroupListRequest(
 
         @Schema(description = "Optional enabled-state filter", example = "ENABLE")
         EnableFlagEnum enableFlag) {
+    /** Group list request compact constructor: normalizes the query record. */
     public GroupListRequest {
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");
         if (limit < 1 || limit > PageRequest.MAX_LIMIT) {
@@ -56,6 +57,7 @@ public record GroupListRequest(
         sort = sort == null ? List.of() : List.copyOf(sort);
     }
 
+    /** group list request. */
     public GroupListRequest() {
         this(0, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null, null);
     }

@@ -22,8 +22,8 @@ import io.github.pnoker.common.enums.ResourceTypeEnum;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import java.util.List;
 import java.util.Objects;
-/** Tenant-scoped query filter for resource records. */
 
+/** Tenant-scoped query filter for resource records. */
 public record ResourceFilter(
         String resourceName,
         String resourceCode,
@@ -32,6 +32,7 @@ public record ResourceFilter(
         Long parentResourceId,
         EnableFlagEnum enableFlag,
         PageRequest page) {
+    /** Resource filter compact constructor: normalizes the filter record. */
     public ResourceFilter {
         page = page == null ? PageRequest.firstPage() : page;
         resourceName = normalize(resourceName);

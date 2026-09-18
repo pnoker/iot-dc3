@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.agentic;
 
-import io.github.pnoker.common.agentic.repository.ReactiveAttachmentStore;
-
 import io.github.pnoker.common.agentic.entity.bo.AttachmentBO;
+import io.github.pnoker.common.agentic.repository.ReactiveAttachmentStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -76,7 +75,7 @@ public class R2dbcAttachmentStore implements ReactiveAttachmentStore {
                         .fetch()
                         .rowsUpdated()
                         .flatMap(rows -> rows == 1
-                                ? findByPath(attachment.getFilePath(), attachment.getTenantId(), attachment.getUserId())
+                                ? getByPath(attachment.getFilePath(), attachment.getTenantId(), attachment.getUserId())
                                 : Mono.error(
                                         new IllegalStateException("attachment insert affected " + rows + " rows"))))
                 .switchIfEmpty(Mono.error(new IllegalStateException("attachment insert returned no row")));
@@ -98,7 +97,7 @@ public class R2dbcAttachmentStore implements ReactiveAttachmentStore {
     }
 
     @Override
-    public Flux<AttachmentBO> findByIds(Collection<Long> ids, RequestHeader.PrincipalHeader header) {
+    public Flux<AttachmentBO> getByIds(Collection<Long> ids, RequestHeader.PrincipalHeader header) {
         if (header == null) return Flux.error(new IllegalArgumentException("header must not be null"));
         if (ids == null || ids.isEmpty()) return Flux.empty();
         String markers = java.util.stream.IntStream.range(0, ids.size())
@@ -115,7 +114,7 @@ public class R2dbcAttachmentStore implements ReactiveAttachmentStore {
         return statement.map(this::map).all();
     }
 
-    private Mono<AttachmentBO> findByPath(String path, Long tenantId, Long userId) {
+    private Mono<AttachmentBO> getByPath(String path, Long tenantId, Long userId) {
         return databaseClient
                 .sql("SELECT " + COLUMNS + " FROM " + TABLE
                         + " WHERE file_path = :file_path AND tenant_id = :tenant_id AND user_id = :user_id"

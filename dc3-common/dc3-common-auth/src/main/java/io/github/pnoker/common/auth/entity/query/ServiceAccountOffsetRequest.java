@@ -36,6 +36,7 @@ public record ServiceAccountOffsetRequest(
 
         @Schema(description = "Owner principal identifier") Long ownerPrincipalId,
         @Schema(description = "Enable state filter") EnableFlagEnum enableFlag) {
+    /** Service account offset request compact constructor: normalizes the query record. */
     public ServiceAccountOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -46,6 +47,7 @@ public record ServiceAccountOffsetRequest(
         }
     }
 
+    /** service account offset request. */
     public ServiceAccountOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null);
     }

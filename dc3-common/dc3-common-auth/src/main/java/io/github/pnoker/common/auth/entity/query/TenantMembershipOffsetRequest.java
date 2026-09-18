@@ -39,6 +39,7 @@ public record TenantMembershipOffsetRequest(
 
         @Schema(description = "Membership status filter") MembershipStatusEnum membershipStatus) {
 
+    /** Tenant membership offset request compact constructor: normalizes the query record. */
     public TenantMembershipOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -49,6 +50,7 @@ public record TenantMembershipOffsetRequest(
         }
     }
 
+    /** tenant membership offset request. */
     public TenantMembershipOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null);
     }

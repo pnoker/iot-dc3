@@ -28,7 +28,7 @@ import reactor.core.publisher.Mono;
 public interface ReactiveCommandHistoryStore {
 
     /** Load the command history record by its record id. */
-    Mono<CommandHistoryDO> find(Long tenantId, String recordId);
+    Mono<CommandHistoryDO> get(Long tenantId, String recordId);
 
     /** Insert one command history entry and emit the stored row. */
     Mono<CommandHistoryDO> insert(CommandHistoryDO history);

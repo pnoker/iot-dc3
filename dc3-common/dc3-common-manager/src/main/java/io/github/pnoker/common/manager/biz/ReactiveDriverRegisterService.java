@@ -38,6 +38,7 @@ public interface ReactiveDriverRegisterService {
             List<PointAttributeBO> pointAttributes,
             List<CommandAttributeBO> commandAttributes,
             List<EventAttributeBO> eventAttributes) {
+        /** Registration compact constructor: normalizes the record. */
         public Registration {
             driverAttributes = List.copyOf(driverAttributes);
             pointAttributes = List.copyOf(pointAttributes);

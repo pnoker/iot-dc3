@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.data;
 
-import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
-
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
+import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
@@ -102,7 +101,7 @@ public class R2dbcEntityAlarmStore implements ReactiveEntityAlarmStore {
                                         ? Mono.just(alarm)
                                         : Mono.error(new IllegalStateException(
                                                 "entity alarm insert affected " + rows + " rows")))
-                                : findByDedupe(alarm.getTenantId(), alarm.getDedupeKey())
+                                : getByDedupe(alarm.getTenantId(), alarm.getDedupeKey())
                                         .switchIfEmpty(Mono.error(
                                                 new IllegalStateException("entity alarm dedupe row is missing"))));
     }
@@ -220,7 +219,7 @@ public class R2dbcEntityAlarmStore implements ReactiveEntityAlarmStore {
         return value == null ? spec.bindNull(name, type) : spec.bind(name, value);
     }
 
-    private Mono<EntityAlarmDO> findByDedupe(Long tenantId, String dedupeKey) {
+    private Mono<EntityAlarmDO> getByDedupe(Long tenantId, String dedupeKey) {
         if (!validId(tenantId) || dedupeKey == null || dedupeKey.isBlank()) return Mono.empty();
         return databaseClient
                 .sql("SELECT " + COLUMNS + " FROM " + TABLE

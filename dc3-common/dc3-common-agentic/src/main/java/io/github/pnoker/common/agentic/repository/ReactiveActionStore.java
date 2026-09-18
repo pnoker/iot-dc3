@@ -29,8 +29,8 @@ public interface ReactiveActionStore {
     /** Persist a newly created action. */
     Mono<ActionBO> create(ActionBO action);
 
-    /** Find an action owned by the authenticated tenant and user. */
-    Mono<ActionBO> find(String actionId, RequestHeader.PrincipalHeader header);
+    /** Get an action owned by the authenticated tenant and user. */
+    Mono<ActionBO> get(String actionId, RequestHeader.PrincipalHeader header);
 
     /** List non-expired pending actions for a conversation. */
     Mono<OffsetPage<ActionBO>> listPending(

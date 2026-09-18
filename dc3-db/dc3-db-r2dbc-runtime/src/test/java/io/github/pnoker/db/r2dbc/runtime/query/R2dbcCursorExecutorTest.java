@@ -34,7 +34,7 @@ import reactor.test.StepVerifier;
 class R2dbcCursorExecutorTest {
 
     @Test
-    void fetchesOneExtraRowAndBuildsNextCursorOnlyWhenTruncated() {
+    void loadsOneExtraRowAndBuildsNextCursorOnlyWhenTruncated() {
         DatabaseClient client = mock(DatabaseClient.class);
         DatabaseClient.GenericExecuteSpec statement = mock(DatabaseClient.GenericExecuteSpec.class);
         @SuppressWarnings("unchecked")

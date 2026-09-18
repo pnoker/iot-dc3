@@ -17,7 +17,6 @@
 package io.github.pnoker.common.agentic.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -110,15 +109,13 @@ public class ChatCompletionResponseVO {
         private String role;
 
         @Schema(
-                description =
-                        "Text content of the assistant's reply; null when content_ext carries structured content.",
+                description = "Text content of the assistant's reply; null when contentExt carries structured content.",
                 example = "The temperature sensor reads 23.5 °C.")
         private String content;
 
         @Schema(
                 description =
                         "Structured content extension carrying multi-part or tool-call message payloads; present when plain text content is insufficient.")
-        @JsonProperty("content_ext")
         private AgenticMessageContent contentExt;
     }
 

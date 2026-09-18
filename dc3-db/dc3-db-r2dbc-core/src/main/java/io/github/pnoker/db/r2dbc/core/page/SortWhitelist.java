@@ -27,6 +27,7 @@ public final class SortWhitelist {
     private final Set<String> fields;
     private final SortSpec defaultSort;
 
+    /** Create a whitelist bounding sortable fields with a default fallback. */
     public SortWhitelist(Set<String> fields, SortSpec defaultSort) {
         if (fields == null || fields.isEmpty()) {
             throw new IllegalArgumentException("sort whitelist must not be empty");

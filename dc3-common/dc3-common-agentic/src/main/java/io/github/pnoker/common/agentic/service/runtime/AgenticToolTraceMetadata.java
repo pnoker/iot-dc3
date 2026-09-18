@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public record AgenticToolTraceMetadata(String domain, String title) {
 
+    /** Agentic tool trace metadata compact constructor: normalizes the record. */
     public AgenticToolTraceMetadata {
         domain = StringUtils.defaultIfBlank(domain, AgenticConstant.RunEvent.TYPE_TOOL);
         title = StringUtils.defaultString(title);

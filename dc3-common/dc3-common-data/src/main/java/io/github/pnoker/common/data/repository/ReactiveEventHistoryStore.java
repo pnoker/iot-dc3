@@ -29,7 +29,7 @@ public interface ReactiveEventHistoryStore {
     Mono<EventHistoryDO> insert(EventHistoryDO event);
 
     /** Resolve the event history entry by its record id. */
-    Mono<EventHistoryDO> findByRecordId(Long tenantId, String recordId);
+    Mono<EventHistoryDO> getByRecordId(Long tenantId, String recordId);
 
     /** Page event history entries matching the tenant-scoped filters. */
     Mono<OffsetPage<EventHistoryDO>> list(

@@ -101,6 +101,7 @@ public class MqttProperties {
         X509,
     }
 
+    /** Topic declaration. */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -116,6 +117,7 @@ public class MqttProperties {
         private Integer qos;
     }
 
+    /** Batch declaration. */
     @Getter
     @Setter
     public static class Batch {

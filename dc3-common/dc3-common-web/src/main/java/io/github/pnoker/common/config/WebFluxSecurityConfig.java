@@ -47,6 +47,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
@@ -162,6 +163,10 @@ public class WebFluxSecurityConfig {
 
         validateDocsSecurity(environment, hmacAuthSigner, docsInternalSignatureEnabled);
 
+        // CSRF is safe to disable here: every authenticated request requires the
+        // X-Auth-Tenant (and login) custom headers that browsers only send for
+        // same-origin scripts — a cross-site form/image post cannot carry them,
+        // so the httpOnly token cookie alone never authenticates a state change.
         return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
@@ -190,10 +195,15 @@ public class WebFluxSecurityConfig {
                         // — it goes through the @perm.can('mcp','add')-gated management endpoint.
                         .pathMatchers(HttpMethod.POST, McpConstant.OAUTH2_REGISTER)
                         .access((authentication, context) -> dcrAccess(environment, oauthDcrEnabled))
+                        // Health probes must stay unauthenticated — compose/k8s readiness
+                        // checks have no credentials. Everything else under /actuator
+                        // (prometheus, metrics, info) stays open in dev/test for local
+                        // scraping but requires authentication in pre/pro; production
+                        // Prometheus jobs must then send valid credentials.
+                        .pathMatchers("/actuator/health/**", "/health/**")
+                        .permitAll()
                         .pathMatchers("/actuator/**")
-                        .permitAll()
-                        .pathMatchers("/health/**")
-                        .permitAll()
+                        .access((authentication, context) -> actuatorAccess(authentication, environment))
                         .pathMatchers("/v3/api-docs/**", "/v3/api-docs.yaml")
                         .access((authentication, context) -> docsAccess(
                                 context.getExchange(),
@@ -262,6 +272,16 @@ public class WebFluxSecurityConfig {
         // Open in non-protected environments; in pre/pro closed unless explicitly enabled.
         boolean allow = !isProtectedEnvironment(environment) || dcrEnabled;
         return Mono.just(new AuthorizationDecision(allow));
+    }
+
+    private Mono<AuthorizationResult> actuatorAccess(Mono<Authentication> authentication, Environment environment) {
+        // Open in dev/test for local scraping; in pre/pro any authenticated principal passes.
+        if (!isProtectedEnvironment(environment)) {
+            return Mono.just(new AuthorizationDecision(true));
+        }
+        return authentication
+                .map(auth -> (AuthorizationResult) new AuthorizationDecision(auth.isAuthenticated()))
+                .defaultIfEmpty(new AuthorizationDecision(false));
     }
 
     private void validateDocsSecurity(

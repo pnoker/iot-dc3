@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.auth;
 
-import io.github.pnoker.common.auth.repository.ReactiveTenantDictionaryStore;
-
 import io.github.pnoker.common.auth.entity.model.TenantDO;
+import io.github.pnoker.common.auth.repository.ReactiveTenantDictionaryStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;

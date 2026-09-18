@@ -31,6 +31,7 @@ import java.util.Objects;
 public record AgenticToolResult<T>(
         boolean success, String code, String message, T data, List<AgenticVisualizationSpec> visualizations) {
 
+    /** Agentic tool result compact constructor: normalizes the record. */
     public AgenticToolResult {
         visualizations = List.copyOf(Objects.requireNonNullElse(visualizations, List.of()));
     }

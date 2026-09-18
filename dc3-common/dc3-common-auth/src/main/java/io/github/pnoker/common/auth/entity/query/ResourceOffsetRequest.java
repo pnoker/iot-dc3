@@ -48,6 +48,7 @@ public record ResourceOffsetRequest(
         @Schema(description = "Parent resource identifier") Long parentResourceId,
         @Schema(description = "Enable state filter") EnableFlagEnum enableFlag) {
 
+    /** Resource offset request compact constructor: normalizes the query record. */
     public ResourceOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -60,6 +61,7 @@ public record ResourceOffsetRequest(
         }
     }
 
+    /** resource offset request. */
     public ResourceOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, List.of(), null, List.of(), null, null);
     }

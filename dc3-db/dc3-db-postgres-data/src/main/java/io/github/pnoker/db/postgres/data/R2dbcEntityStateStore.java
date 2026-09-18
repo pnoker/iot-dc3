@@ -17,7 +17,6 @@
 package io.github.pnoker.db.postgres.data;
 
 import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
-
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.utils.UuidV7;
@@ -178,7 +177,7 @@ public class R2dbcEntityStateStore implements ReactiveEntityStateStore {
         return transactionalOperator.transactional(spec.fetch()
                 .rowsUpdated()
                 .flatMap(rows -> rows > 0
-                        ? findLease(tenantId, type, entityId)
+                        ? getLease(tenantId, type, entityId)
                         : Mono.error(new IllegalStateException("entity state upsert affected " + rows + " rows"))));
     }
 
@@ -235,8 +234,8 @@ public class R2dbcEntityStateStore implements ReactiveEntityStateStore {
                 .fetch()
                 .rowsUpdated()
                 .filter(rows -> rows == 1)
-                .flatMap(ignored -> findLease(tenantId, type, entityId))
-                .switchIfEmpty(findLease(tenantId, type, entityId)
+                .flatMap(ignored -> getLease(tenantId, type, entityId))
+                .switchIfEmpty(getLease(tenantId, type, entityId)
                         .filter(state -> state.stateFlag() == EntityStatusEnum.OFFLINE.getIndex()
                                 && state.leaseVersion() == expectedLeaseVersion + 1
                                 && state.lastAlarmId() != null
@@ -304,7 +303,7 @@ public class R2dbcEntityStateStore implements ReactiveEntityStateStore {
                                         .fetch()
                                         .rowsUpdated()
                                         .filter(updated -> updated == 1)
-                                        .flatMapMany(ignored -> findLease(row.tenantId(), type, row.entityId()))
+                                        .flatMapMany(ignored -> getLease(row.tenantId(), type, row.entityId()))
                                         .map(lease -> new EntityStateLease(
                                                 lease.id(),
                                                 lease.tenantId(),
@@ -324,7 +323,7 @@ public class R2dbcEntityStateStore implements ReactiveEntityStateStore {
                 .flatMapMany(Flux::fromIterable);
     }
 
-    private Mono<EntityStateLease> findLease(Long tenantId, EntityTypeEnum type, Long entityId) {
+    private Mono<EntityStateLease> getLease(Long tenantId, EntityTypeEnum type, Long entityId) {
         return databaseClient
                 .sql("SELECT id,tenant_id,entity_type_flag,entity_id,parent_entity_id,entity_state_flag,"
                         + "last_state_flag,lease_version,expire_time,timeout_seconds,last_heartbeat_time,last_alarm_id,"

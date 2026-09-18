@@ -16,11 +16,10 @@
  */
 package io.github.pnoker.db.postgres.auth;
 
-import io.github.pnoker.common.auth.repository.ReactiveRoleStore;
-import io.github.pnoker.common.auth.repository.RoleFilter;
-
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.model.RoleDO;
+import io.github.pnoker.common.auth.repository.ReactiveRoleStore;
+import io.github.pnoker.common.auth.repository.RoleFilter;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.RoleExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;

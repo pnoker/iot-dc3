@@ -26,10 +26,12 @@ package io.github.pnoker.common.mq.sender;
  */
 public class MqPublishException extends RuntimeException {
 
+    /** mq publish exception. */
     public MqPublishException(String message) {
         super(message);
     }
 
+    /** mq publish exception. */
     public MqPublishException(String message, Throwable cause) {
         super(message, cause);
     }

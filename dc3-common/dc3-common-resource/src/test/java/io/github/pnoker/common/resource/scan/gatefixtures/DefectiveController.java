@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/gate/bad")
 public class DefectiveController {
 
+    /**  accessor. */
     @GetMapping("/get")
     public String get(@RequestParam("id") Long id) {
         return "bad";

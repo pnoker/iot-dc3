@@ -17,8 +17,8 @@
 package io.github.pnoker.common.manager.entity.operation;
 
 import java.util.List;
-/** Attribute schema embedded in an import workbook. */
 
+/** Attribute schema embedded in an import workbook. */
 public record DeviceImportManifest(
         int schemaVersion,
         Long driverId,
@@ -28,7 +28,9 @@ public record DeviceImportManifest(
 
     public static final int CURRENT_SCHEMA_VERSION = 1;
 
+    /** attribute column. */
     public record AttributeColumn(Long id, String name) {}
 
+    /** point column. */
     public record PointColumn(Long id, String name, List<AttributeColumn> attributes) {}
 }

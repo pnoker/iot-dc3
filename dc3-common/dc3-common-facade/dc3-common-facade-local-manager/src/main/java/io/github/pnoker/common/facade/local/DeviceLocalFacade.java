@@ -52,6 +52,7 @@ public class DeviceLocalFacade implements DeviceFacade {
 
     private final ReactiveDriverLeaseStore reactiveDriverLeaseStore;
 
+    /** Create the local device facade. */
     @org.springframework.beans.factory.annotation.Autowired
     public DeviceLocalFacade(
             FacadeDeviceBuilder facadeDeviceBuilder,

@@ -57,6 +57,7 @@ public class NotifyConfigCache {
     private final Cache<ChannelKey, Mono<NotifyChannelBO>> channelCache;
     private final Cache<NotifyBindKey, Mono<List<NotifyChannelBindBO>>> bindCache;
 
+    /** notify config cache. */
     public NotifyConfigCache(ReactiveNotifyConfigStore configStore, AlarmCacheProperties alarmCacheProperties) {
         this.configStore = configStore;
         AlarmCacheProperties.CacheTuning tuning = alarmCacheProperties.getNotify();
@@ -123,7 +124,7 @@ public class NotifyConfigCache {
      * Returns enabled bindings for {@code (tenantId, notifyId)}. The result is
      * an unmodifiable list to keep accidental mutation from corrupting the cache.
      */
-    public Mono<List<NotifyChannelBindBO>> findEnabledBinds(NotifyBO notify) {
+    public Mono<List<NotifyChannelBindBO>> getEnabledBinds(NotifyBO notify) {
         if (notify == null || !isValidId(notify.getId()) || !isValidId(notify.getTenantId()))
             return Mono.just(List.of());
         NotifyBindKey key = new NotifyBindKey(notify.getTenantId(), notify.getId());
@@ -189,9 +190,12 @@ public class NotifyConfigCache {
      */
     public record NotifyBindKey(Long tenantId, Long notifyId) {}
 
+    /** notify key. */
     public record NotifyKey(Long id, Long tenantId) {}
 
+    /** message key. */
     public record MessageKey(Long id, Long tenantId) {}
 
+    /** channel key. */
     public record ChannelKey(Long id, Long tenantId) {}
 }

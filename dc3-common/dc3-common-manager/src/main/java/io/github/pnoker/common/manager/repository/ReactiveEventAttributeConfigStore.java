@@ -20,8 +20,8 @@ import io.github.pnoker.common.manager.entity.bo.EventAttributeConfigBO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Reactive persistence port for event attribute config records. */
 
+/** Reactive persistence port for event attribute config records. */
 public interface ReactiveEventAttributeConfigStore {
     /** Load the event attribute config scoped to the tenant by id. */
     Mono<EventAttributeConfigBO> get(Long tenantId, Long id);

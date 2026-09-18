@@ -29,8 +29,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Helpers bridging reactive publishers onto gRPC stream observers. */
 
+/** Helpers bridging reactive publishers onto gRPC stream observers. */
 public final class ReactiveGrpcServerSupport {
 
     private ReactiveGrpcServerSupport() {

@@ -161,11 +161,14 @@ public class DeviceTool {
                 .defaultIfEmpty(AgenticToolResult.notFound("Device not found for ID: " + deviceId));
     }
 
+    /** device latest point values. */
     public record DeviceLatestPointValues(FacadeDeviceBO device, List<PointLatestValue> points) {
+        /** Device latest point values compact constructor: normalizes the record. */
         public DeviceLatestPointValues {
             points = List.copyOf(points == null ? List.of() : points);
         }
     }
 
+    /** point latest value. */
     public record PointLatestValue(FacadePointBO point, FacadePointValueBO value) {}
 }

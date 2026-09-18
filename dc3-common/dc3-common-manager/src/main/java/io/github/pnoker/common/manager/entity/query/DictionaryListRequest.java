@@ -42,6 +42,7 @@ public record DictionaryListRequest(
 
     private static final Set<String> SORT_FIELDS = Set.of("label", "value");
 
+    /** Dictionary list request compact constructor: normalizes the query record. */
     public DictionaryListRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -57,6 +58,7 @@ public record DictionaryListRequest(
         }
     }
 
+    /** dictionary list request. */
     public DictionaryListRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null);
     }

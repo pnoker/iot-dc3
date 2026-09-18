@@ -21,6 +21,7 @@ import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 
 /** Tenant-scoped role filters with offset pagination. */
 public record RoleFilter(Long tenantId, String roleName, String roleCode, EnableFlagEnum enableFlag, PageRequest page) {
+    /** Role filter compact constructor: normalizes the filter record. */
     public RoleFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenant id is required");
         page = page == null ? PageRequest.firstPage() : page;

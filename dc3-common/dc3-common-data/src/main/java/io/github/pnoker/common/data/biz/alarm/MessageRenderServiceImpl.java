@@ -43,7 +43,7 @@ public class MessageRenderServiceImpl implements MessageRenderService {
     @Override
     public MessagePayload render(
             MessageBO message, NotifyChannelTypeEnum channelTypeFlag, Map<String, Object> variables) {
-        MessageExt.Template template = selectTemplate(message, channelTypeFlag);
+        MessageExt.Template template = getTemplate(message, channelTypeFlag);
         if (Objects.isNull(template)) {
             return new MessagePayload(channelTypeFlag, null, Map.of(), List.of());
         }
@@ -62,7 +62,7 @@ public class MessageRenderServiceImpl implements MessageRenderService {
      * @param channelTypeFlag the target channel type
      * @return the matching template, or null
      */
-    private MessageExt.Template selectTemplate(MessageBO message, NotifyChannelTypeEnum channelTypeFlag) {
+    private MessageExt.Template getTemplate(MessageBO message, NotifyChannelTypeEnum channelTypeFlag) {
         if (Objects.isNull(message)
                 || Objects.isNull(channelTypeFlag)
                 || Objects.isNull(message.getMessageExt())

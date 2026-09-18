@@ -48,6 +48,7 @@ public record EventReportDTO(
         return new Builder();
     }
 
+    /** builder. */
     public static class Builder {
         private String recordId;
         private Long tenantId;

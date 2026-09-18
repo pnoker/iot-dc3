@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.data;
 
-import io.github.pnoker.common.data.repository.ReactiveCommandHistoryStore;
-
 import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
+import io.github.pnoker.common.data.repository.ReactiveCommandHistoryStore;
 import io.github.pnoker.common.enums.CommandHistorySourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.utils.UuidV7;
@@ -57,7 +56,7 @@ public class R2dbcCommandHistoryStore implements ReactiveCommandHistoryStore {
     private final R2dbcDialect dialect;
 
     @Override
-    public Mono<CommandHistoryDO> find(Long tenantId, String recordId) {
+    public Mono<CommandHistoryDO> get(Long tenantId, String recordId) {
         if (tenantId == null || recordId == null || recordId.isBlank()) return Mono.empty();
         return databaseClient
                 .sql("SELECT " + COLUMNS + " FROM " + TABLE
@@ -113,7 +112,7 @@ public class R2dbcCommandHistoryStore implements ReactiveCommandHistoryStore {
         return transactionalOperator.transactional(spec.fetch()
                 .rowsUpdated()
                 .flatMap(rows -> rows == 1
-                        ? find(history.getTenantId(), history.getRecordId())
+                        ? get(history.getTenantId(), history.getRecordId())
                         : Mono.error(new IllegalStateException("command history insert affected " + rows + " rows"))));
     }
 

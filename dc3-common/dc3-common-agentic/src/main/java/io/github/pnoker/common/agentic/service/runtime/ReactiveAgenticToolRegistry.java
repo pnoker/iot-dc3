@@ -214,19 +214,23 @@ public class ReactiveAgenticToolRegistry {
     private final DriverTool driverTool;
     private final ObjectMapper objectMapper;
 
+    /** reactive agentic tool registry. */
     public ReactiveAgenticToolRegistry(PointValueTool pointValueTool, ObjectMapper objectMapper) {
         this(pointValueTool, null, null, null, null, null, null, objectMapper);
     }
 
+    /** reactive agentic tool registry. */
     public ReactiveAgenticToolRegistry(PointValueTool pointValueTool, PointTool pointTool, ObjectMapper objectMapper) {
         this(pointValueTool, pointTool, null, null, null, null, null, objectMapper);
     }
 
+    /** reactive agentic tool registry. */
     public ReactiveAgenticToolRegistry(
             PointValueTool pointValueTool, PointTool pointTool, ProfileTool profileTool, ObjectMapper objectMapper) {
         this(pointValueTool, pointTool, profileTool, null, null, null, null, objectMapper);
     }
 
+    /** Create the registry over the platform tool set. */
     @Autowired
     public ReactiveAgenticToolRegistry(
             PointValueTool pointValueTool,

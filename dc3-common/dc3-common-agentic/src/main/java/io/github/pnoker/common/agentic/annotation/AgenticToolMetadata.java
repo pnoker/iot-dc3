@@ -31,7 +31,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AgenticToolMetadata {
 
+    /** Tool domain grouping, e.g. point or device. */
     String domain();
 
+    /** Human-readable tool title. */
     String title();
 }

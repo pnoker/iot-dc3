@@ -17,7 +17,6 @@
 package io.github.pnoker.db.postgres.data;
 
 import io.github.pnoker.common.data.repository.ReactiveTsdbStore;
-
 import io.github.pnoker.common.tsdb.model.TsdbModel.AggregateFunction;
 import io.github.pnoker.common.tsdb.model.TsdbModel.BucketAggregate;
 import io.github.pnoker.common.tsdb.model.TsdbModel.CorrelationResult;
@@ -186,7 +185,7 @@ public class R2dbcTsdbStore implements ReactiveTsdbStore {
                 + ", ROW_NUMBER() OVER (PARTITION BY tenant_id,device_id,point_id ORDER BY create_time DESC,message_id DESC) AS rn FROM "
                 + table() + " WHERE " + predicates
                 + ") ranked WHERE rn <= :limit ORDER BY create_time DESC,message_id DESC";
-        return query(sql, filter, null)
+        return spec(sql, filter, null)
                 .bind("limit", bounded)
                 .map(this::map)
                 .all()
@@ -224,7 +223,7 @@ public class R2dbcTsdbStore implements ReactiveTsdbStore {
         sql.append(
                 " ORDER BY create_time DESC,tenant_id DESC,device_id DESC,point_id DESC,message_id DESC LIMIT :limit");
         DatabaseClient.GenericExecuteSpec spec =
-                query(sql.toString(), filter, window).bind("limit", bounded + 1);
+                spec(sql.toString(), filter, window).bind("limit", bounded + 1);
         if (cursor != null) {
             spec = spec.bind("cursor_time", cursor.deviceTime()).bind("cursor_id", cursor.messageId());
             if (cursor.series() != null) {
@@ -253,10 +252,7 @@ public class R2dbcTsdbStore implements ReactiveTsdbStore {
 
     @Override
     public Mono<Long> count(SeriesFilter filter, TimeWindow window, TsdbDeadline deadline) {
-        return query(
-                        "SELECT COUNT(*) AS value FROM " + table() + " WHERE " + predicates(filter, window),
-                        filter,
-                        window)
+        return spec("SELECT COUNT(*) AS value FROM " + table() + " WHERE " + predicates(filter, window), filter, window)
                 .map((row, metadata) -> number(row.get("value")))
                 .one()
                 .timeout(deadline.maxWait());
@@ -291,7 +287,7 @@ public class R2dbcTsdbStore implements ReactiveTsdbStore {
         String sql = "SELECT tenant_id,device_id,point_id," + expression
                 + " AS value,COUNT(*) AS sample_count FROM " + table() + " WHERE "
                 + predicates(filter, window) + " GROUP BY tenant_id,device_id,point_id";
-        return query(sql, filter, window)
+        return spec(sql, filter, window)
                 .map((row, metadata) -> Map.entry(
                         new SeriesKey(
                                 number(row.get("tenant_id")),
@@ -322,7 +318,7 @@ public class R2dbcTsdbStore implements ReactiveTsdbStore {
                         + predicates(filter, window) + " GROUP BY tenant_id,device_id,point_id,bucket"
                         + " ORDER BY bucket ASC";
         DatabaseClient.GenericExecuteSpec spec =
-                query(sql, filter, window).bind("bucket_width", bucketWidth.toMillis() + " milliseconds");
+                spec(sql, filter, window).bind("bucket_width", bucketWidth.toMillis() + " milliseconds");
         return spec.map((row, metadata) -> Map.entry(
                         new SeriesKey(
                                 number(row.get("tenant_id")),
@@ -552,7 +548,7 @@ public class R2dbcTsdbStore implements ReactiveTsdbStore {
         };
     }
 
-    private DatabaseClient.GenericExecuteSpec query(String sql, SeriesFilter filter, TimeWindow window) {
+    private DatabaseClient.GenericExecuteSpec spec(String sql, SeriesFilter filter, TimeWindow window) {
         DatabaseClient.GenericExecuteSpec spec = databaseClient.sql(sql).bind("tenant_id", filter.tenantId());
         if (window != null)
             spec = spec.bind("from_time", dialect.bindInstant(window.from()))

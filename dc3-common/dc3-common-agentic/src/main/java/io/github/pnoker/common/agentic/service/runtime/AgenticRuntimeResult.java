@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public record AgenticRuntimeResult(String content, String finishReason) {
 
+    /** Agentic runtime result compact constructor: normalizes the record. */
     public AgenticRuntimeResult {
         content = Objects.toString(content, "");
         finishReason = StringUtils.isNotBlank(finishReason)

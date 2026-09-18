@@ -16,11 +16,10 @@
  */
 package io.github.pnoker.db.postgres.data;
 
-import io.github.pnoker.common.data.repository.ReactiveRuleStore;
-
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.builder.RuleBuilder;
 import io.github.pnoker.common.data.entity.model.RuleDO;
+import io.github.pnoker.common.data.repository.ReactiveRuleStore;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;

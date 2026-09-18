@@ -92,7 +92,10 @@ public abstract class AbstractJdbcDriverCustomService implements DriverCustomSer
     /**
      * Cache of device ID to HikariDataSource connection pools.
      */
-    protected Map<Long, HikariDataSource> connectMap;
+    // Initialized eagerly: the driver's own registration publishes a DRIVER UPDATE
+    // event that can be consumed before initial() runs, and the event handler
+    // invalidates pools — a lazily-null map NPEs on that path.
+    protected Map<Long, HikariDataSource> connectMap = new ConcurrentHashMap<>(16);
 
     /**
      * Base constructors take no dependencies: connection management and query execution

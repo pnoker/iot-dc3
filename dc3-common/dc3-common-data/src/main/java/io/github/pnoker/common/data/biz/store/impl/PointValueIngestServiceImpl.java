@@ -96,7 +96,7 @@ public class PointValueIngestServiceImpl implements PointValueIngestService {
             return enqueue(rows, owner).flatMap(enqueuedRows -> {
                 if (enqueuedRows.isEmpty()) {
                     Flux<io.github.pnoker.common.data.entity.model.PointValueDO> persisted =
-                            ingestOutbox.findPersisted(rows);
+                            ingestOutbox.getPersisted(rows);
                     return persisted
                             .map(row -> row.getTenantId() + ":" + row.getMessageId())
                             .collectList()

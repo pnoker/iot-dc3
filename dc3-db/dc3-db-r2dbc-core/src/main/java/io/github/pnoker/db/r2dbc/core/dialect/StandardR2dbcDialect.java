@@ -26,6 +26,7 @@ public record StandardR2dbcDialect(String name, String schemaFingerprintTable) i
 
     private static final Pattern IDENTIFIER = Pattern.compile("[A-Za-z_][A-Za-z0-9_]*");
 
+    /** Portable R2DBC SQL dialect used when no engine-specific one applies. */
     public StandardR2dbcDialect {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("dialect name must not be blank");

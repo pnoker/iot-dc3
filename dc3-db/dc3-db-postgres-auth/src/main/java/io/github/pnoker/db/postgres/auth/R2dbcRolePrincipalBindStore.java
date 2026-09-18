@@ -16,11 +16,10 @@
  */
 package io.github.pnoker.db.postgres.auth;
 
-import io.github.pnoker.common.auth.repository.ReactiveRolePrincipalBindStore;
-import io.github.pnoker.common.auth.repository.RolePrincipalBindFilter;
-
 import io.github.pnoker.common.auth.entity.bo.RolePrincipalBindBO;
 import io.github.pnoker.common.auth.entity.model.RolePrincipalBindDO;
+import io.github.pnoker.common.auth.repository.ReactiveRolePrincipalBindStore;
+import io.github.pnoker.common.auth.repository.RolePrincipalBindFilter;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;

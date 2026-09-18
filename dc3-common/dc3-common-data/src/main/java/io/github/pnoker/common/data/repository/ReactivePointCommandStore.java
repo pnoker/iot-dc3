@@ -29,7 +29,7 @@ import reactor.core.publisher.Mono;
 public interface ReactivePointCommandStore {
 
     /** Load the command history record by its command id. */
-    Mono<PointCommandHistoryDO> find(Long tenantId, String commandId);
+    Mono<PointCommandHistoryDO> get(Long tenantId, String commandId);
 
     /** Insert one point command and emit the stored row. */
     Mono<PointCommandHistoryDO> insert(PointCommandHistoryDO command);

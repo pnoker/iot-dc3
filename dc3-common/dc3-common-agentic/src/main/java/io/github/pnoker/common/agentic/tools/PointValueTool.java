@@ -301,6 +301,7 @@ public class PointValueTool {
         return List.of(line, stat);
     }
 
+    /** point value history. */
     public record PointValueHistory(
             Long deviceId,
             Long pointId,
@@ -309,26 +310,32 @@ public class PointValueTool {
             HistoryChart chart,
             AgenticVisualizationUtil.NumericSummary summary) {
 
+        /** Point value history compact constructor: normalizes the record. */
         public PointValueHistory {
             values = List.copyOf(Objects.requireNonNullElse(values, List.of()));
             summary = Objects.requireNonNullElseGet(summary, () -> AgenticVisualizationUtil.NumericSummary.empty(0));
         }
     }
 
+    /** history chart. */
     public record HistoryChart(String type, String title, String xLabel, String xType, List<ChartSeries> series) {
 
+        /** History chart compact constructor: normalizes the record. */
         public HistoryChart {
             series = List.copyOf(Objects.requireNonNullElse(series, List.of()));
         }
     }
 
+    /** chart series. */
     public record ChartSeries(String name, List<List<Number>> data) {
 
+        /** Chart series compact constructor: normalizes the record. */
         public ChartSeries {
             data = List.copyOf(Objects.requireNonNullElse(data, List.of()));
         }
     }
 
+    /** point command result. */
     public record PointCommandResult(
             Long deviceId, Long pointId, String value, boolean sent, boolean pendingConfirmation, String actionId) {}
 }

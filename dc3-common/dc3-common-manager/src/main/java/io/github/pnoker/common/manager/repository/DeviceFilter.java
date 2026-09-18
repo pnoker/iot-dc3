@@ -39,6 +39,7 @@ public record DeviceFilter(
     private static final Set<String> SORT_FIELDS =
             Set.of("id", "deviceName", "deviceCode", "createTime", "operateTime", "version");
 
+    /** device filter. */
     public DeviceFilter(
             Long tenantId,
             String deviceName,
@@ -52,6 +53,7 @@ public record DeviceFilter(
         this(tenantId, deviceName, deviceCode, driverId, profileId, enableFlag, null, null, null, offset, limit, sort);
     }
 
+    /** Device filter compact constructor: normalizes the filter record. */
     public DeviceFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");

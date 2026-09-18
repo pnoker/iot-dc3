@@ -22,6 +22,7 @@ import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 /** Tenant-scoped filters for role-principal bindings. */
 public record RolePrincipalBindFilter(
         Long tenantId, Long roleId, Long principalId, PrincipalTypeEnum principalType, PageRequest page) {
+    /** Role principal bind filter compact constructor: normalizes the filter record. */
     public RolePrincipalBindFilter {
         if (tenantId == null || tenantId <= 0) {
             throw new IllegalArgumentException("tenant id is required");

@@ -70,7 +70,7 @@ class NotifyWorkerTest {
     @Test
     void marksSuccessAndAcks() {
         stubChannel(true);
-        when(notifyChannelAdapterRegistry.find(NotifyChannelTypeEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
+        when(notifyChannelAdapterRegistry.get(NotifyChannelTypeEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
         when(adapter.send(any(), any())).thenReturn(Mono.just(NotifySendResult.success("target", 200, "OK", Map.of())));
         when(notifyHistoryStore.updateDelivery(anyLong(), anyLong(), anyByte(), any(), any(), any(), anyInt()))
                 .thenReturn(Mono.just(true));
@@ -85,7 +85,7 @@ class NotifyWorkerTest {
     @Test
     void retriesFailureBeforeMaxAttempts() {
         stubChannel(true);
-        when(notifyChannelAdapterRegistry.find(NotifyChannelTypeEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
+        when(notifyChannelAdapterRegistry.get(NotifyChannelTypeEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
         when(adapter.send(any(), any())).thenReturn(Mono.just(NotifySendResult.failed("target", "503")));
         when(notifyHistoryStore.updateDelivery(anyLong(), anyLong(), anyByte(), any(), any(), any(), anyInt()))
                 .thenReturn(Mono.just(true));
@@ -110,7 +110,7 @@ class NotifyWorkerTest {
     @Test
     void rejectsWhenHistoryUpdateAffectsNoRows() {
         stubChannel(true);
-        when(notifyChannelAdapterRegistry.find(NotifyChannelTypeEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
+        when(notifyChannelAdapterRegistry.get(NotifyChannelTypeEnum.WEBHOOK)).thenReturn(Optional.of(adapter));
         when(adapter.send(any(), any())).thenReturn(Mono.just(NotifySendResult.success("target", 200, "OK", Map.of())));
         when(notifyHistoryStore.updateDelivery(anyLong(), anyLong(), anyByte(), any(), any(), any(), anyInt()))
                 .thenReturn(Mono.just(false));

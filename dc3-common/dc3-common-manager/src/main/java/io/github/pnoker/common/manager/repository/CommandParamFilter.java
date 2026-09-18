@@ -40,6 +40,7 @@ public record CommandParamFilter(
     private static final Set<String> SORT_FIELDS =
             Set.of("id", "paramName", "paramCode", "commandId", "createTime", "operateTime", "version");
 
+    /** Command param filter compact constructor: normalizes the filter record. */
     public CommandParamFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");

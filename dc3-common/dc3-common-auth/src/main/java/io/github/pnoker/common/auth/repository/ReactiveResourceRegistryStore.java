@@ -21,8 +21,8 @@ import io.github.pnoker.common.auth.entity.model.ResourceDO;
 import java.util.List;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Reactive persistence port for resource registry records. */
 
+/** Reactive persistence port for resource registry records. */
 public interface ReactiveResourceRegistryStore {
 
     /** Stream apis matching the request. */

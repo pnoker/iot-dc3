@@ -41,6 +41,7 @@ public class WebhookNotifyChannelAdapter implements NotifyChannelAdapter {
 
     protected final NotifyCredentialResolver notifyCredentialResolver;
 
+    /** webhook notify channel adapter. */
     public WebhookNotifyChannelAdapter(
             WebClient.Builder webClientBuilder, NotifyCredentialResolver notifyCredentialResolver) {
         this.webClientBuilder = webClientBuilder;

@@ -74,9 +74,8 @@ public class AnalyticsController implements BaseController {
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
     @PostMapping("/query_latest")
-    public Mono<AnalyticsModel.LatestValuesResponse> queryLatest(
-            @RequestBody AnalyticsModel.QueryLatestRequest request) {
-        return getTenantId().flatMap(tenantId -> dataAnalyticsService.queryLatest(tenantId, request));
+    public Mono<AnalyticsModel.LatestValuesResponse> getLatest(@RequestBody AnalyticsModel.QueryLatestRequest request) {
+        return getTenantId().flatMap(tenantId -> dataAnalyticsService.getLatest(tenantId, request));
     }
 
     /**
@@ -97,8 +96,8 @@ public class AnalyticsController implements BaseController {
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
     @PostMapping("/query_history")
-    public Mono<AnalyticsModel.HistoryResponse> queryHistory(@RequestBody AnalyticsModel.QueryHistoryRequest request) {
-        return getTenantId().flatMap(tenantId -> dataAnalyticsService.queryHistory(tenantId, request));
+    public Mono<AnalyticsModel.HistoryResponse> getHistory(@RequestBody AnalyticsModel.QueryHistoryRequest request) {
+        return getTenantId().flatMap(tenantId -> dataAnalyticsService.getHistory(tenantId, request));
     }
 
     /**

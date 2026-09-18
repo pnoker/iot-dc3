@@ -21,8 +21,8 @@ import io.github.pnoker.common.manager.repository.EventAttributeConfigFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Business service covering event attribute config use cases. */
 
+/** Business service covering event attribute config use cases. */
 public interface ReactiveEventAttributeConfigService {
     /** Add one event attribute config. */
     Mono<EventAttributeConfigBO> add(EventAttributeConfigBO value);

@@ -76,7 +76,7 @@ class RepositoryTestQualityGateTest {
         }
     }
 
-    private static Path findRepositoryRoot() {
+    private static Path getRepositoryRoot() {
         Path current = Path.of(System.getProperty("user.dir")).toAbsolutePath();
         while (current != null && !Files.exists(current.resolve(".git"))) {
             current = current.getParent();
@@ -110,7 +110,7 @@ class RepositoryTestQualityGateTest {
 
     @Test
     void javaTestsMustVerifyObservableBehaviour() throws IOException {
-        Path repository = findRepositoryRoot();
+        Path repository = getRepositoryRoot();
         List<String> violations = new ArrayList<>();
 
         try (Stream<Path> paths = Files.walk(repository)) {
@@ -129,7 +129,7 @@ class RepositoryTestQualityGateTest {
 
     @Test
     void aggregateCoverageMustIncludeEveryDriverAndCrossCuttingRuntimeModule() throws Exception {
-        Path repository = findRepositoryRoot();
+        Path repository = getRepositoryRoot();
         Set<String> driverModules = childTexts(repository.resolve("dc3-driver/pom.xml"), "modules", "module");
         Set<String> coveredModules =
                 childTexts(repository.resolve("dc3-coverage/pom.xml"), "dependencies", "artifactId");

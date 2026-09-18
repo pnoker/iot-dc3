@@ -25,10 +25,12 @@ package io.github.pnoker.common.mq.listener;
  */
 public class MqPoisonException extends RuntimeException {
 
+    /** mq poison exception. */
     public MqPoisonException(String message) {
         super(message);
     }
 
+    /** mq poison exception. */
     public MqPoisonException(String message, Throwable cause) {
         super(message, cause);
     }

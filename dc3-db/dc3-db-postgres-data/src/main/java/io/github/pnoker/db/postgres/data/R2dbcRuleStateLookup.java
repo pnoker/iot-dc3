@@ -17,7 +17,6 @@
 package io.github.pnoker.db.postgres.data;
 
 import io.github.pnoker.common.data.repository.ReactiveRuleStateLookup;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;

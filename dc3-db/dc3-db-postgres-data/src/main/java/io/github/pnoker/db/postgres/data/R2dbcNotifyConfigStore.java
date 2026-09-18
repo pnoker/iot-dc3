@@ -16,8 +16,6 @@
  */
 package io.github.pnoker.db.postgres.data;
 
-import io.github.pnoker.common.data.repository.ReactiveNotifyConfigStore;
-
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
@@ -30,6 +28,7 @@ import io.github.pnoker.common.data.entity.model.MessageDO;
 import io.github.pnoker.common.data.entity.model.NotifyChannelBindDO;
 import io.github.pnoker.common.data.entity.model.NotifyChannelDO;
 import io.github.pnoker.common.data.entity.model.NotifyDO;
+import io.github.pnoker.common.data.repository.ReactiveNotifyConfigStore;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
 import java.time.Instant;

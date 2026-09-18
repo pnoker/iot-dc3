@@ -55,10 +55,10 @@ class ChatClientFactoryTest {
         header.setTenantId(1L);
         header.setPrincipalId(2L);
         header.setPrincipalName("admin");
-        lenient().when(modelConfigStore.findDefault(header)).thenReturn(reactor.core.publisher.Mono.empty());
-        lenient().when(modelConfigStore.findByModel("gpt-4o", header)).thenReturn(reactor.core.publisher.Mono.empty());
+        lenient().when(modelConfigStore.getDefault(header)).thenReturn(reactor.core.publisher.Mono.empty());
+        lenient().when(modelConfigStore.getByModel("gpt-4o", header)).thenReturn(reactor.core.publisher.Mono.empty());
         lenient()
-                .when(modelConfigStore.findByModel("unknown-model", header))
+                .when(modelConfigStore.getByModel("unknown-model", header))
                 .thenReturn(reactor.core.publisher.Mono.empty());
     }
 

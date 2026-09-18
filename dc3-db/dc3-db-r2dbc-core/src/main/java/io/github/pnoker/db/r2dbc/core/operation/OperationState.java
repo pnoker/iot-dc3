@@ -41,6 +41,7 @@ public record OperationState(
 
     public static final int MAX_IDEMPOTENCY_KEY_LENGTH = 191;
 
+    /** State machine snapshot of a long-running operation. */
     public OperationState {
         Objects.requireNonNull(operationId, "operationId must not be null");
         if (tenantId == null || tenantId <= 0) {
@@ -163,6 +164,7 @@ public record OperationState(
         return isTransitionAllowed(status, nextStatus);
     }
 
+    /** Operation lifecycle states exposed to polling clients. */
     public enum Status {
         PENDING,
         RUNNING,

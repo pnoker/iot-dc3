@@ -39,7 +39,7 @@ public interface DataAnalyticsService {
      * @param tenantId tenant scope; results never cross tenants
      * @param request  point selection plus freshness/degradation budget
      */
-    Mono<LatestValuesResponse> queryLatest(Long tenantId, QueryLatestRequest request);
+    Mono<LatestValuesResponse> getLatest(Long tenantId, QueryLatestRequest request);
 
     /**
      * Time-windowed history for the requested points.
@@ -47,7 +47,7 @@ public interface DataAnalyticsService {
      * @param tenantId tenant scope; results never cross tenants
      * @param request  window, sampling, and budget constraints
      */
-    Mono<HistoryResponse> queryHistory(Long tenantId, QueryHistoryRequest request);
+    Mono<HistoryResponse> getHistory(Long tenantId, QueryHistoryRequest request);
 
     /**
      * Aggregate statistics (min/max/avg/count and friends) over a window.

@@ -39,6 +39,7 @@ public final class R2dbcOperationRepository implements OperationRepository {
     private final R2dbcDialect dialect;
     private final String table;
 
+    /** R2DBC-backed operation repository for async operation state. */
     public R2dbcOperationRepository(
             DatabaseClient databaseClient, TransactionalOperator transactionalOperator, R2dbcDialect dialect) {
         this.databaseClient = Objects.requireNonNull(databaseClient, "databaseClient must not be null");
@@ -74,12 +75,12 @@ public final class R2dbcOperationRepository implements OperationRepository {
                             .fetch()
                             .rowsUpdated()
                             .flatMap(rows -> rows == 1
-                                    ? findById(tenant, state.operationId())
+                                    ? getById(tenant, state.operationId())
                                     : Mono.error(
                                             new IllegalStateException("operation insert affected " + rows + " rows"))))
                     .onErrorResume(
                             DataIntegrityViolationException.class,
-                            error -> findByIdempotencyKey(tenant, state.idempotencyKey())
+                            error -> getByIdempotencyKey(tenant, state.idempotencyKey())
                                     .flatMap(existing -> sameRequest(existing, state)
                                             ? Mono.just(existing)
                                             : Mono.error(new IllegalArgumentException(
@@ -89,7 +90,7 @@ public final class R2dbcOperationRepository implements OperationRepository {
     }
 
     @Override
-    public Mono<OperationState> findById(TenantScope tenant, UUID operationId) {
+    public Mono<OperationState> getById(TenantScope tenant, UUID operationId) {
         Objects.requireNonNull(tenant, "tenant must not be null");
         Objects.requireNonNull(operationId, "operationId must not be null");
         return one(
@@ -100,7 +101,7 @@ public final class R2dbcOperationRepository implements OperationRepository {
     }
 
     @Override
-    public Mono<OperationState> findByIdempotencyKey(TenantScope tenant, String idempotencyKey) {
+    public Mono<OperationState> getByIdempotencyKey(TenantScope tenant, String idempotencyKey) {
         return Mono.defer(() -> {
             Objects.requireNonNull(tenant, "tenant must not be null");
             validateKey(idempotencyKey);
@@ -149,7 +150,7 @@ public final class R2dbcOperationRepository implements OperationRepository {
             return transactionalOperator.transactional(update.fetch()
                     .rowsUpdated()
                     .flatMap(rows -> rows == 1
-                            ? findById(tenant, operationId)
+                            ? getById(tenant, operationId)
                             : Mono.error(new OptimisticLockingFailureException(
                                     "operation status changed or operation does not exist"))));
         });

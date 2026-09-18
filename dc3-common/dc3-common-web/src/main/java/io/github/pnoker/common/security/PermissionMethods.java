@@ -56,6 +56,7 @@ public class PermissionMethods {
 
     private final String serviceName;
 
+    /** permission methods. */
     public PermissionMethods(@Value("${spring.application.name:unknown}") String serviceName) {
         this.serviceName = serviceName;
     }

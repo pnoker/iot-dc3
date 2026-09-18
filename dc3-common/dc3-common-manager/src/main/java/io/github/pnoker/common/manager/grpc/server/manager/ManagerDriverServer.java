@@ -47,6 +47,7 @@ public class ManagerDriverServer extends DriverApiGrpc.DriverApiImplBase {
 
     private final ReactiveDriverService reactiveDriverService;
 
+    /** Create the manager-side driver gRPC server. */
     @Autowired
     public ManagerDriverServer(GrpcDriverBuilder builder, ReactiveDriverService service) {
         this.grpcDriverBuilder = builder;

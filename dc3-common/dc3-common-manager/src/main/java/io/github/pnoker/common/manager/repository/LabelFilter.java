@@ -34,6 +34,7 @@ public record LabelFilter(
         List<SortSpec> sort) {
     private static final Set<String> SORT_FIELDS = Set.of("id", "labelName", "labelCode", "createTime", "operateTime");
 
+    /** Label filter compact constructor: normalizes the filter record. */
     public LabelFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");

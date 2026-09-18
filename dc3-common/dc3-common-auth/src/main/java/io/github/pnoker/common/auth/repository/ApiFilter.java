@@ -19,8 +19,8 @@ package io.github.pnoker.common.auth.repository;
 import io.github.pnoker.common.enums.ApiTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
-/** Tenant-scoped query filter for api records. */
 
+/** Tenant-scoped query filter for api records. */
 public record ApiFilter(
         String serviceName,
         ApiTypeEnum apiTypeFlag,
@@ -29,6 +29,7 @@ public record ApiFilter(
         String apiGroup,
         EnableFlagEnum enableFlag,
         PageRequest page) {
+    /** Api filter compact constructor: normalizes the filter record. */
     public ApiFilter {
         page = page == null ? PageRequest.firstPage() : page;
         serviceName = normalize(serviceName);

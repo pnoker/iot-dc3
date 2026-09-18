@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.data;
 
-import io.github.pnoker.common.data.repository.ReactivePointCommandStore;
-
 import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
+import io.github.pnoker.common.data.repository.ReactivePointCommandStore;
 import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
@@ -55,7 +54,7 @@ public class R2dbcPointCommandStore implements ReactivePointCommandStore {
     private final PageTransaction pageTransaction;
 
     @Override
-    public Mono<PointCommandHistoryDO> find(Long tenantId, String commandId) {
+    public Mono<PointCommandHistoryDO> get(Long tenantId, String commandId) {
         if (tenantId == null || commandId == null || commandId.isBlank()) return Mono.empty();
         return databaseClient
                 .sql("SELECT " + COLUMNS + " FROM " + TABLE
@@ -107,7 +106,7 @@ public class R2dbcPointCommandStore implements ReactivePointCommandStore {
         return spec.fetch()
                 .rowsUpdated()
                 .flatMap(rows -> rows == 1
-                        ? find(command.getTenantId(), command.getCommandId())
+                        ? get(command.getTenantId(), command.getCommandId())
                         : Mono.error(new IllegalStateException("point command insert affected " + rows + " rows")));
     }
 

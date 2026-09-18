@@ -45,6 +45,7 @@ public final class PointValueCursorCodec {
     private final SignedCursorCodec delegate;
     private final Clock clock;
 
+    /** point value cursor codec. */
     public PointValueCursorCodec(String secret, Clock clock) {
         if (secret == null || secret.isBlank()) {
             throw new IllegalArgumentException("point-value cursor signing secret is required");

@@ -498,7 +498,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         if (currentLifecycle !== lifecycleToken) return false;
         const responseMessage = response.choices?.[0]?.message;
         appendAssistantDelta(conversationId, assistantMessage.id, responseMessage?.content || '');
-        for (const chart of responseMessage?.contentExt?.charts || responseMessage?.content_ext?.charts || []) {
+        for (const chart of responseMessage?.contentExt?.charts || []) {
           appendAssistantVisualization(conversationId, assistantMessage.id, chart);
         }
         const finishReason = response.choices?.[0]?.finishReason ?? response.choices?.[0]?.finish_reason;

@@ -123,7 +123,7 @@ class DeviceImportWorkerTest {
         DeviceBO saved = new DeviceBO();
         saved.setId(101L);
         when(jobStore.claim(eq(OPERATION_ID), any(), any(), any())).thenReturn(Mono.just(job));
-        when(operationRepository.findById(any(), eq(OPERATION_ID))).thenReturn(Mono.just(pending), Mono.just(running));
+        when(operationRepository.getById(any(), eq(OPERATION_ID))).thenReturn(Mono.just(pending), Mono.just(running));
         when(operationRepository.transition(any(), eq(OPERATION_ID), eq(OperationState.Status.PENDING), any()))
                 .thenReturn(Mono.just(running));
         when(operationRepository.transition(any(), eq(OPERATION_ID), eq(OperationState.Status.RUNNING), any()))
@@ -155,7 +155,7 @@ class DeviceImportWorkerTest {
         OperationState pending = pending();
         OperationState running = pending.transition(OperationState.Status.RUNNING, 5, NOW.plusSeconds(1));
         when(jobStore.claim(eq(OPERATION_ID), any(), any(), any())).thenReturn(Mono.just(job));
-        when(operationRepository.findById(any(), eq(OPERATION_ID))).thenReturn(Mono.just(pending), Mono.just(running));
+        when(operationRepository.getById(any(), eq(OPERATION_ID))).thenReturn(Mono.just(pending), Mono.just(running));
         when(operationRepository.transition(any(), eq(OPERATION_ID), eq(OperationState.Status.PENDING), any()))
                 .thenReturn(Mono.just(running));
         when(operationRepository.transition(any(), eq(OPERATION_ID), eq(OperationState.Status.RUNNING), any()))
@@ -182,7 +182,7 @@ class DeviceImportWorkerTest {
                 .transition(OperationState.Status.RUNNING, 5, NOW.plusSeconds(1))
                 .transition(OperationState.Status.SUCCEEDED, 100, "{}", null, NOW.plusSeconds(2));
         when(jobStore.claim(eq(OPERATION_ID), any(), any(), any())).thenReturn(Mono.just(job));
-        when(operationRepository.findById(any(), eq(OPERATION_ID))).thenReturn(Mono.just(succeeded));
+        when(operationRepository.getById(any(), eq(OPERATION_ID))).thenReturn(Mono.just(succeeded));
         when(jobStore.delete(OPERATION_ID, 7L)).thenReturn(Mono.empty());
 
         StepVerifier.create(worker.processSafely(OPERATION_ID)).verifyComplete();
@@ -206,7 +206,7 @@ class DeviceImportWorkerTest {
         DeviceBO saved = new DeviceBO();
         saved.setId(101L);
         when(jobStore.claim(eq(OPERATION_ID), any(), any(), any())).thenReturn(Mono.just(job));
-        when(operationRepository.findById(any(), eq(OPERATION_ID))).thenReturn(Mono.just(pending), Mono.just(running));
+        when(operationRepository.getById(any(), eq(OPERATION_ID))).thenReturn(Mono.just(pending), Mono.just(running));
         when(operationRepository.transition(any(), eq(OPERATION_ID), eq(OperationState.Status.PENDING), any()))
                 .thenReturn(Mono.just(running));
         when(operationRepository.transition(any(), eq(OPERATION_ID), eq(OperationState.Status.RUNNING), any()))

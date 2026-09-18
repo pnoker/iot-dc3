@@ -122,7 +122,7 @@ public class DeviceImportWorker {
     private Mono<Void> process(DeviceImportJob job) {
         TenantScope scope = new TenantScope(job.tenantId());
         return operationRepository
-                .findById(scope, job.operationId())
+                .getById(scope, job.operationId())
                 .flatMap(state -> {
                     if (state.status() == OperationState.Status.PENDING) {
                         OperationState running = state.transition(OperationState.Status.RUNNING, 5, Instant.now());
@@ -145,7 +145,7 @@ public class DeviceImportWorker {
                 .concatMap(row -> insertRow(job, parsed.manifest(), row))
                 .collectList()
                 .flatMap(devices -> operationRepository
-                        .findById(scope, job.operationId())
+                        .getById(scope, job.operationId())
                         .switchIfEmpty(Mono.error(new IllegalStateException("Device import operation does not exist")))
                         .flatMap(current -> {
                             if (current.status() != OperationState.Status.RUNNING) {
@@ -248,7 +248,7 @@ public class DeviceImportWorker {
     private Mono<Void> fail(DeviceImportJob job, Throwable error) {
         UUID operationId = job.operationId();
         return operationRepository
-                .findById(new TenantScope(job.tenantId()), operationId)
+                .getById(new TenantScope(job.tenantId()), operationId)
                 .flatMap(current -> {
                     if (current.status() != OperationState.Status.PENDING
                             && current.status() != OperationState.Status.RUNNING) return Mono.empty();

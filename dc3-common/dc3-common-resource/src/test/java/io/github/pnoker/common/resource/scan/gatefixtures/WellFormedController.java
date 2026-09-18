@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/gate/ok")
 public class WellFormedController {
 
+    /** Create the gate-fixture controller. */
     @Operation(
             summary = "Get Thing",
             description = "Fetch one thing by id; read-only, safe to call freely under the tenant.",

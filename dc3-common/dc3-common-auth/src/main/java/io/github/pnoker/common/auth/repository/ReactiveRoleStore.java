@@ -21,8 +21,8 @@ import io.github.pnoker.common.auth.entity.model.RoleDO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Reactive persistence port for role records. */
 
+/** Reactive persistence port for role records. */
 public interface ReactiveRoleStore {
     /** Resolve the role by its id. */
     Mono<RoleDO> getById(Long tenantId, Long id);

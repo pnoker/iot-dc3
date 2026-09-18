@@ -20,8 +20,8 @@ import io.github.pnoker.common.auth.entity.bo.ApiBO;
 import io.github.pnoker.common.auth.entity.model.ApiDO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
-/** Reactive persistence port for api records. */
 
+/** Reactive persistence port for api records. */
 public interface ReactiveApiStore {
     /** Resolve the api by its id. */
     Mono<ApiDO> getById(Long id);

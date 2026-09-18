@@ -45,6 +45,7 @@ public record EventOffsetRequest(
         Integer version,
 
         @Schema(description = "Device identifier filter") Long deviceId) {
+    /** Event offset request compact constructor: normalizes the query record. */
     public EventOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -57,6 +58,7 @@ public record EventOffsetRequest(
             throw new IllegalArgumentException("unsupported sort field");
     }
 
+    /** event offset request. */
     public EventOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null, null, null, null, null);
     }

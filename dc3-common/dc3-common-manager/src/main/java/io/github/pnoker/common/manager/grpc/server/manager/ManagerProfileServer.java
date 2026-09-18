@@ -46,6 +46,7 @@ public class ManagerProfileServer extends ProfileApiGrpc.ProfileApiImplBase {
 
     private final ReactiveProfileService reactiveProfileService;
 
+    /** Create the manager-side profile gRPC server. */
     @Autowired
     public ManagerProfileServer(GrpcProfileBuilder builder, ReactiveProfileService service) {
         this.grpcProfileBuilder = builder;

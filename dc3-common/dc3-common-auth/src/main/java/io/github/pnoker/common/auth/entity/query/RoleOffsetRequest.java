@@ -34,6 +34,7 @@ public record RoleOffsetRequest(
         @Schema(description = "Partial role name filter") String roleName,
         @Schema(description = "Exact role code filter") String roleCode,
         @Schema(description = "Role enable state filter") EnableFlagEnum enableFlag) {
+    /** Role offset request compact constructor: normalizes the query record. */
     public RoleOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -43,6 +44,7 @@ public record RoleOffsetRequest(
             throw new IllegalArgumentException("limit must be between 1 and " + PageRequest.MAX_LIMIT);
     }
 
+    /** role offset request. */
     public RoleOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null);
     }

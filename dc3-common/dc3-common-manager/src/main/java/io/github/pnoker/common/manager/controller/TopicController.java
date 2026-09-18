@@ -66,6 +66,7 @@ public class TopicController implements BaseController {
         });
     }
 
+    /** topic request. */
     public record TopicRequest(
             @Schema(description = "Topic filter") String topic,
             @Schema(description = "Device name filter") String deviceName,

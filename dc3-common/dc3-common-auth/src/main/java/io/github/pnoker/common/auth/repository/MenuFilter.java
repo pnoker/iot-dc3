@@ -28,6 +28,7 @@ public record MenuFilter(
         String menuCode,
         EnableFlagEnum enableFlag,
         PageRequest page) {
+    /** Menu filter compact constructor: normalizes the filter record. */
     public MenuFilter {
         page = page == null ? PageRequest.firstPage() : page;
         menuName = normalize(menuName);

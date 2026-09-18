@@ -110,7 +110,7 @@ class CommonModuleBoundaryTest {
         return null;
     }
 
-    private static Path findRepositoryRoot() {
+    private static Path getRepositoryRoot() {
         Path current = Path.of(System.getProperty("user.dir")).toAbsolutePath();
         while (current != null && !Files.exists(current.resolve(".git"))) {
             current = current.getParent();
@@ -127,7 +127,7 @@ class CommonModuleBoundaryTest {
 
     @Test
     void sharedTopLevelEnumsAndConstantClassesStayInCommonConstant() throws IOException {
-        Path repository = findRepositoryRoot();
+        Path repository = getRepositoryRoot();
         List<String> violations = new ArrayList<>();
 
         try (Stream<Path> paths = Files.walk(repository)) {
@@ -142,7 +142,7 @@ class CommonModuleBoundaryTest {
 
     @Test
     void foundationModulesKeepTheirDependencyFloor() throws Exception {
-        Path common = findRepositoryRoot().resolve("dc3-common");
+        Path common = getRepositoryRoot().resolve("dc3-common");
 
         assertInternalDependencies(common.resolve("dc3-common-constant/pom.xml"), Set.of());
         assertInternalDependencies(

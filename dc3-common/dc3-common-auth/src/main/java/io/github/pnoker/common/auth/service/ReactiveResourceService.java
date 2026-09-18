@@ -20,8 +20,8 @@ import io.github.pnoker.common.auth.entity.bo.*;
 import io.github.pnoker.common.auth.repository.ResourceFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.*;
-/** Business service covering resource use cases. */
 
+/** Business service covering resource use cases. */
 public interface ReactiveResourceService {
     /** Resolve the resource by its id. */
     Mono<ResourceBO> getById(Long id);

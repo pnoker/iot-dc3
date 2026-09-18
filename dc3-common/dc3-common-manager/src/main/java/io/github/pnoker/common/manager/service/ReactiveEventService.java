@@ -22,8 +22,8 @@ import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import java.util.List;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Business service covering event use cases. */
 
+/** Business service covering event use cases. */
 public interface ReactiveEventService {
     /** Resolve the event by its id. */
     Mono<EventBO> getById(Long tenantId, Long id);

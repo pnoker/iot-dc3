@@ -43,6 +43,7 @@ public record PrincipalFilter(
             "createTime",
             "operateTime");
 
+    /** Principal filter compact constructor: normalizes the filter record. */
     public PrincipalFilter {
         page = page == null ? PageRequest.firstPage() : page;
         if (page.sort().stream().anyMatch(spec -> spec == null || !SORT_FIELDS.contains(spec.field()))) {
@@ -52,6 +53,7 @@ public record PrincipalFilter(
         displayName = normalize(displayName);
     }
 
+    /** principal filter. */
     public PrincipalFilter(
             PrincipalTypeEnum principalType,
             String principalName,

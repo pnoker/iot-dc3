@@ -224,8 +224,10 @@ export interface AgenticChatCompletionResponse {
     message?: {
       role?: AgenticMessageRole;
       content?: string;
+      // DC3's own extension field — camelCase per the body-field law; only
+      // OpenAI protocol fields on this envelope (finish_reason, usage.*)
+      // keep their snake_case wire names.
       contentExt?: AgenticMessageContent;
-      content_ext?: AgenticMessageContent;
     };
     finishReason?: string;
     finish_reason?: string;

@@ -56,6 +56,7 @@ public class MessageHeader implements Serializable {
 
     private Long timestamp;
 
+    /** message header. */
     public MessageHeader(MessageHeaders messageHeaders) {
         if (Objects.nonNull(messageHeaders)) {
             this.id = messageHeaders.getId();

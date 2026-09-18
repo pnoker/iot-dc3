@@ -31,10 +31,10 @@ public interface ReactiveModelConfigStore {
     Mono<ModelConfigBO> get(Long id, RequestHeader.PrincipalHeader header);
 
     /** Resolve the model config by its model. */
-    Mono<ModelConfigBO> findByModel(String model, RequestHeader.PrincipalHeader header);
+    Mono<ModelConfigBO> getByModel(String model, RequestHeader.PrincipalHeader header);
 
     /** Load the default for the request. */
-    Mono<ModelConfigBO> findDefault(RequestHeader.PrincipalHeader header);
+    Mono<ModelConfigBO> getDefault(RequestHeader.PrincipalHeader header);
 
     /** Insert one model config and emit the stored row. */
     Mono<ModelConfigBO> insert(ModelConfigBO config, RequestHeader.PrincipalHeader header);

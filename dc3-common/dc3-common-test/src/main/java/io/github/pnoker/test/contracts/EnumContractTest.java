@@ -71,8 +71,8 @@ public abstract class EnumContractTest<E extends Enum<E>> {
     final List<DynamicTest> indexContractIsHonoured() {
         List<DynamicTest> tests = new ArrayList<>();
         E[] constants = enumClass().getEnumConstants();
-        Method index = findIndexAccessor();
-        Method factory = findFactoryMethod(index.getReturnType());
+        Method index = getIndexAccessor();
+        Method factory = getFactoryMethod(index.getReturnType());
 
         List<Object> indices = new ArrayList<>();
         for (E constant : constants) {
@@ -104,7 +104,7 @@ public abstract class EnumContractTest<E extends Enum<E>> {
         return tests;
     }
 
-    private Method findIndexAccessor() {
+    private Method getIndexAccessor() {
         try {
             return enumClass().getMethod(indexAccessor());
         } catch (NoSuchMethodException e) {
@@ -113,7 +113,7 @@ public abstract class EnumContractTest<E extends Enum<E>> {
         }
     }
 
-    private Method findFactoryMethod(Class<?> indexType) {
+    private Method getFactoryMethod(Class<?> indexType) {
         try {
             return enumClass().getMethod(factoryMethod(), indexType);
         } catch (NoSuchMethodException e) {

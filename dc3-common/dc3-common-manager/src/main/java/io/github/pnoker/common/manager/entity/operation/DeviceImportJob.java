@@ -18,8 +18,8 @@ package io.github.pnoker.common.manager.entity.operation;
 
 import java.time.Instant;
 import java.util.UUID;
-/** Durable device import job state claimed by workers. */
 
+/** Durable device import job state claimed by workers. */
 public record DeviceImportJob(
         UUID operationId,
         Long tenantId,

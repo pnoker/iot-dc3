@@ -16,11 +16,10 @@
  */
 package io.github.pnoker.db.postgres.auth;
 
-import io.github.pnoker.common.auth.repository.MenuFilter;
-import io.github.pnoker.common.auth.repository.ReactiveMenuStore;
-
 import io.github.pnoker.common.auth.entity.bo.MenuBO;
 import io.github.pnoker.common.auth.entity.model.MenuDO;
+import io.github.pnoker.common.auth.repository.MenuFilter;
+import io.github.pnoker.common.auth.repository.ReactiveMenuStore;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.MenuLevelEnum;

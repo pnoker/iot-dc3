@@ -37,6 +37,7 @@ public class ReactiveAuditLogServiceImpl implements ReactiveAuditLogService {
     private final ReactiveAuditLogQueryStore queryStore;
     private final IdentityAuditLogBuilder builder;
 
+    /** reactive audit log service impl. */
     public ReactiveAuditLogServiceImpl(
             ReactiveAuditLogStore store, ReactiveAuditLogQueryStore queryStore, IdentityAuditLogBuilder builder) {
         this.store = store;

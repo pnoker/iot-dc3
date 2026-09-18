@@ -16,10 +16,9 @@
  */
 package io.github.pnoker.db.postgres.auth;
 
+import io.github.pnoker.common.auth.entity.model.UserDO;
 import io.github.pnoker.common.auth.repository.ReactiveUserStore;
 import io.github.pnoker.common.auth.repository.UserFilter;
-
-import io.github.pnoker.common.auth.entity.model.UserDO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
@@ -54,10 +53,9 @@ public class R2dbcUserStore implements ReactiveUserStore {
     @Override
     public Mono<UserDO> getById(Long tenantId, Long id) {
         if (!valid(tenantId, id)) return Mono.empty();
-        return query(
-                        COLUMNS + " FROM " + TABLE + " u WHERE u.id=:id AND u.deleted=0"
-                                + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
-                                + " AND m.principal_id=u.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
+        return sql(COLUMNS + " FROM " + TABLE + " u WHERE u.id=:id AND u.deleted=0"
+                        + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
+                        + " AND m.principal_id=u.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
                 .bind("tenant_id", tenantId)
                 .bind("id", id)
                 .map(this::map)
@@ -67,10 +65,9 @@ public class R2dbcUserStore implements ReactiveUserStore {
     @Override
     public Mono<UserDO> getByUserName(Long tenantId, String userName) {
         if (!valid(tenantId) || userName == null || userName.isBlank()) return Mono.empty();
-        return query(
-                        COLUMNS + " FROM " + TABLE + " u WHERE u.user_name=:user_name AND u.deleted=0"
-                                + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
-                                + " AND m.principal_id=u.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
+        return sql(COLUMNS + " FROM " + TABLE + " u WHERE u.user_name=:user_name AND u.deleted=0"
+                        + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
+                        + " AND m.principal_id=u.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
                 .bind("tenant_id", tenantId)
                 .bind("user_name", userName.trim())
                 .map(this::map)
@@ -80,10 +77,9 @@ public class R2dbcUserStore implements ReactiveUserStore {
     @Override
     public Mono<UserDO> getByPrincipalId(Long tenantId, Long principalId) {
         if (!valid(tenantId, principalId)) return Mono.empty();
-        return query(
-                        COLUMNS + " FROM " + TABLE + " u WHERE u.principal_id=:principal_id AND u.deleted=0"
-                                + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
-                                + " AND m.principal_id=u.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
+        return sql(COLUMNS + " FROM " + TABLE + " u WHERE u.principal_id=:principal_id AND u.deleted=0"
+                        + " AND EXISTS (SELECT 1 FROM " + MEMBERSHIP + " m WHERE m.tenant_id=:tenant_id"
+                        + " AND m.principal_id=u.principal_id AND m.membership_status='ACTIVE' AND m.deleted=0) LIMIT 1")
                 .bind("tenant_id", tenantId)
                 .bind("principal_id", principalId)
                 .map(this::map)
@@ -140,7 +136,7 @@ public class R2dbcUserStore implements ReactiveUserStore {
         return query;
     }
 
-    private DatabaseClient.GenericExecuteSpec query(String suffix) {
+    private DatabaseClient.GenericExecuteSpec sql(String suffix) {
         return databaseClient.sql("SELECT " + suffix);
     }
 

@@ -43,6 +43,7 @@ public class FeishuBotNotifyChannelAdapter extends WebhookNotifyChannelAdapter {
 
     private static final String HMAC_SHA256 = "HmacSHA256";
 
+    /** feishu bot notify channel adapter. */
     public FeishuBotNotifyChannelAdapter(
             WebClient.Builder webClientBuilder, NotifyCredentialResolver notifyCredentialResolver) {
         super(webClientBuilder, notifyCredentialResolver);

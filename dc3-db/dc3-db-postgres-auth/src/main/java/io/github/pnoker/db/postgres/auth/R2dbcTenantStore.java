@@ -16,10 +16,9 @@
  */
 package io.github.pnoker.db.postgres.auth;
 
+import io.github.pnoker.common.auth.entity.model.TenantDO;
 import io.github.pnoker.common.auth.repository.ReactiveTenantStore;
 import io.github.pnoker.common.auth.repository.TenantFilter;
-
-import io.github.pnoker.common.auth.entity.model.TenantDO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;

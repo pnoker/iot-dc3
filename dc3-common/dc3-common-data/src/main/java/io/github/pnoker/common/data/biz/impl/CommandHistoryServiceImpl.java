@@ -103,7 +103,7 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
 
     @Override
     public Mono<CommandHistoryVO> getByRecordId(Long tenantId, String recordId) {
-        return historyStore.find(tenantId, recordId).map(historyBuilder::buildVOByDO);
+        return historyStore.get(tenantId, recordId).map(historyBuilder::buildVOByDO);
     }
 
     @Override

@@ -85,46 +85,55 @@ public final class E2eStack {
         started = true;
     }
 
+    /** JDBC url of the stack postgres instance. */
     public static String postgresJdbcUrl() {
         ensureStarted();
         return POSTGRES.getJdbcUrl();
     }
 
+    /** Username of the stack postgres instance. */
     public static String postgresUsername() {
         ensureStarted();
         return POSTGRES.getUsername();
     }
 
+    /** Password of the stack postgres instance. */
     public static String postgresPassword() {
         ensureStarted();
         return POSTGRES.getPassword();
     }
 
+    /** Hostname of the stack rabbitmq instance. */
     public static String rabbitHost() {
         ensureStarted();
         return RABBIT.getHost();
     }
 
+    /** AMQP port of the stack rabbitmq instance. */
     public static int rabbitAmqpPort() {
         ensureStarted();
         return RABBIT.getAmqpPort();
     }
 
+    /** Username of the stack rabbitmq instance. */
     public static String rabbitUsername() {
         ensureStarted();
         return RABBIT.getAdminUsername();
     }
 
+    /** Password of the stack rabbitmq instance. */
     public static String rabbitPassword() {
         ensureStarted();
         return RABBIT.getAdminPassword();
     }
 
+    /** Rabbit container of the e2e stack. */
     public static GenericContainer<?> rabbitContainer() {
         ensureStarted();
         return RABBIT;
     }
 
+    /** Postgres container of the e2e stack. */
     public static PostgreSQLContainer<?> postgresContainer() {
         ensureStarted();
         return POSTGRES;

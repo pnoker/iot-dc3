@@ -22,8 +22,8 @@ import io.github.pnoker.common.auth.repository.MenuFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Business service covering menu use cases. */
 
+/** Business service covering menu use cases. */
 public interface ReactiveMenuService {
     /** Resolve the menu by its id. */
     Mono<MenuBO> getById(Long id);

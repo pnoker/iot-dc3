@@ -32,7 +32,7 @@ public interface ReactivePointValueIngestOutbox {
     Mono<List<PointValueDO>> enqueue(List<PointValueDO> values, String owner);
 
     /** Emit receipts that have already reached the durable store. */
-    Flux<PointValueDO> findPersisted(List<PointValueDO> values);
+    Flux<PointValueDO> getPersisted(List<PointValueDO> values);
 
     /** Mark one receipt persisted for the owner, returning the rows updated. */
     Mono<Integer> markPersisted(PointValueDO value, String owner);

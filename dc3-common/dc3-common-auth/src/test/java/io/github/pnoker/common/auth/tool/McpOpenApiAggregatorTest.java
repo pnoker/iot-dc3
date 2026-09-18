@@ -69,7 +69,7 @@ class McpOpenApiAggregatorTest {
     }
 
     @Test
-    void queryOnlyOperationStillProducesSchema() throws Exception {
+    void getOnlyOperationStillProducesSchema() throws Exception {
         JsonNode operation = mapper.readTree("""
                 {
                   "parameters": [

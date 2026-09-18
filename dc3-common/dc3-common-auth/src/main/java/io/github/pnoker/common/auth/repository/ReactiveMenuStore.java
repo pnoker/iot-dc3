@@ -21,8 +21,8 @@ import io.github.pnoker.common.auth.entity.model.MenuDO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Reactive persistence port for menu records. */
 
+/** Reactive persistence port for menu records. */
 public interface ReactiveMenuStore {
     /** Resolve the menu by its id. */
     Mono<MenuDO> getById(Long id);

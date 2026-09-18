@@ -71,7 +71,7 @@ class RuleEngineImplTest {
     @Test
     void emitsFiringWithoutStateLookup() {
         RuleBO rule = rule(1L);
-        when(ruleRegistry.findCandidates(any())).thenReturn(Mono.just(List.of(rule)));
+        when(ruleRegistry.getCandidates(any())).thenReturn(Mono.just(List.of(rule)));
         when(ruleEvaluator.matches(eq(rule), any())).thenReturn(Mono.just(true));
         List<RuleMatch> matches = engine.evaluate(fact()).collectList().block();
         assertThat(matches)
@@ -84,7 +84,7 @@ class RuleEngineImplTest {
     @Test
     void emitsRecoveryOnlyWhenStateExists() {
         RuleBO rule = rule(1L);
-        when(ruleRegistry.findCandidates(any())).thenReturn(Mono.just(List.of(rule)));
+        when(ruleRegistry.getCandidates(any())).thenReturn(Mono.just(List.of(rule)));
         when(ruleEvaluator.matches(eq(rule), any())).thenReturn(Mono.just(false));
         when(ruleEvaluator.recovers(eq(rule), any())).thenReturn(Mono.just(true));
         when(ruleStateLookup.hasFiringState(anyLong(), anyLong(), anyByte(), anyLong()))
@@ -98,7 +98,7 @@ class RuleEngineImplTest {
     @Test
     void suppressesRecoveryWithoutState() {
         RuleBO rule = rule(1L);
-        when(ruleRegistry.findCandidates(any())).thenReturn(Mono.just(List.of(rule)));
+        when(ruleRegistry.getCandidates(any())).thenReturn(Mono.just(List.of(rule)));
         when(ruleEvaluator.matches(eq(rule), any())).thenReturn(Mono.just(false));
         when(ruleEvaluator.recovers(eq(rule), any())).thenReturn(Mono.just(true));
         when(ruleStateLookup.hasFiringState(anyLong(), anyLong(), anyByte(), anyLong()))
@@ -109,7 +109,7 @@ class RuleEngineImplTest {
     @Test
     void firingTakesPrecedenceOverRecovery() {
         RuleBO rule = rule(1L);
-        when(ruleRegistry.findCandidates(any())).thenReturn(Mono.just(List.of(rule)));
+        when(ruleRegistry.getCandidates(any())).thenReturn(Mono.just(List.of(rule)));
         when(ruleEvaluator.matches(eq(rule), any())).thenReturn(Mono.just(true));
         assertThat(engine.evaluate(fact()).collectList().block())
                 .singleElement()

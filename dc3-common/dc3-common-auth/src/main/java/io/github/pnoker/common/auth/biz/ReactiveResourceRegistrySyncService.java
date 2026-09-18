@@ -19,8 +19,8 @@ package io.github.pnoker.common.auth.biz;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncCommand;
 import io.github.pnoker.common.auth.entity.bo.ResourceRegistrySyncResult;
 import reactor.core.publisher.Mono;
-/** Business service covering resource registry sync use cases. */
 
+/** Business service covering resource registry sync use cases. */
 public interface ReactiveResourceRegistrySyncService {
 
     /** Synchronize annotated resources into the registry, emitting the result. */

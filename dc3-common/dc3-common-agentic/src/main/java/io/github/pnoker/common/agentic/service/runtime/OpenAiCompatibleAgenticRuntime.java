@@ -98,6 +98,7 @@ public class OpenAiCompatibleAgenticRuntime {
 
     private final ObjectMapper objectMapper = JsonUtil.getJsonMapper();
 
+    /** open ai compatible agentic runtime. */
     public OpenAiCompatibleAgenticRuntime(
             ChatClientFactory chatClientFactory,
             AgenticPromptBuilder promptBuilder,

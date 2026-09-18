@@ -94,7 +94,7 @@ class DataAnalyticsServiceImplTest {
                 new TsdbModel.CursorPage<>(List.of(sample(1, 1), sample(2, 2)), null);
         when(tsdbStore.history(eq(TsdbModel.SeriesFilter.of(SERIES)), any(), isNull(), eq(10), any()))
                 .thenReturn(Mono.just(page));
-        AnalyticsModel.HistoryResponse response = service.queryHistory(
+        AnalyticsModel.HistoryResponse response = service.getHistory(
                         TENANT,
                         new AnalyticsModel.QueryHistoryRequest(
                                 List.of(new AnalyticsModel.SeriesSelector(10L, 20L, null, null)), null, "RAW", 10))
@@ -108,7 +108,7 @@ class DataAnalyticsServiceImplTest {
         TsdbModel.BucketAggregate bucket = new TsdbModel.BucketAggregate(Instant.parse("2026-08-20T00:00:00Z"), 4d, 3L);
         when(tsdbStore.bucketedAggregate(eq(TsdbModel.SeriesFilter.of(SERIES)), any(), any(), any(), isNull(), any()))
                 .thenReturn(Mono.just(Map.of(SERIES, List.of(bucket))));
-        AnalyticsModel.HistoryResponse response = service.queryHistory(
+        AnalyticsModel.HistoryResponse response = service.getHistory(
                         TENANT,
                         new AnalyticsModel.QueryHistoryRequest(
                                 List.of(new AnalyticsModel.SeriesSelector(10L, 20L, null, null)), null, "M4", 1))
@@ -144,7 +144,7 @@ class DataAnalyticsServiceImplTest {
                 .thenReturn(Mono.just(io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(List.of(point), 0, 50, 1)));
         when(tsdbStore.history(any(), any(), isNull(), any(Integer.class), any()))
                 .thenReturn(Mono.just(new TsdbModel.CursorPage<>(List.of(), null)));
-        AnalyticsModel.HistoryResponse response = service.queryHistory(
+        AnalyticsModel.HistoryResponse response = service.getHistory(
                         TENANT,
                         new AnalyticsModel.QueryHistoryRequest(
                                 List.of(new AnalyticsModel.SeriesSelector(null, null, "boiler-1", "temp")),

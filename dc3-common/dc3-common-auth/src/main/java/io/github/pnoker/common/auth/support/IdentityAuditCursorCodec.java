@@ -43,6 +43,7 @@ public final class IdentityAuditCursorCodec {
     private final SignedCursorCodec delegate;
     private final Clock clock;
 
+    /** identity audit cursor codec. */
     public IdentityAuditCursorCodec(String secret, Clock clock) {
         if (secret == null || secret.isBlank()) {
             throw new IllegalArgumentException("identity-audit cursor signing secret is required");
@@ -122,5 +123,6 @@ public final class IdentityAuditCursorCodec {
         return new IllegalArgumentException("Invalid identity audit cursor");
     }
 
+    /** position. */
     public record Position(Instant time, long id) {}
 }

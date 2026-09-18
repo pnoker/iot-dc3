@@ -137,6 +137,7 @@ public class KafkaMqAdapter implements BrokerAdapter {
         }
     }
 
+    /** kafka mq adapter. */
     public KafkaMqAdapter(
             KafkaTemplate<String, byte[]> kafkaTemplate,
             Map<String, Object> baseConsumerConfig,

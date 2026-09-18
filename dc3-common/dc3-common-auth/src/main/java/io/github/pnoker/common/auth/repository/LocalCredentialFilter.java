@@ -35,6 +35,7 @@ public record LocalCredentialFilter(
     private static final Set<String> SORT_FIELDS = Set.of(
             "id", "loginName", "credentialType", "enableFlag", "passwordUpdatedTime", "createTime", "operateTime");
 
+    /** Local credential filter compact constructor: normalizes the filter record. */
     public LocalCredentialFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenant id is required");
         page = page == null ? PageRequest.firstPage() : page;
@@ -44,6 +45,7 @@ public record LocalCredentialFilter(
         loginName = normalize(loginName);
     }
 
+    /** local credential filter. */
     public LocalCredentialFilter(
             Long tenantId,
             Long principalId,

@@ -47,10 +47,12 @@ public class AgenticToolTracingCallback implements ToolCallback {
 
     private final AgenticToolTraceMetadata traceMetadata;
 
+    /** agentic tool tracing callback. */
     public AgenticToolTracingCallback(ToolCallback delegate, ObjectMapper objectMapper) {
         this(delegate, objectMapper, null);
     }
 
+    /** agentic tool tracing callback. */
     public AgenticToolTracingCallback(
             ToolCallback delegate, ObjectMapper objectMapper, AgenticToolTraceMetadata traceMetadata) {
         this.delegate = Objects.requireNonNull(delegate, "delegate");

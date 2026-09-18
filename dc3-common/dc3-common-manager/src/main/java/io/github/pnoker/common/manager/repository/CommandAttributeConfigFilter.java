@@ -35,6 +35,7 @@ public record CommandAttributeConfigFilter(
     private static final Set<String> SORT_FIELDS =
             Set.of("id", "attributeId", "deviceId", "commandId", "createTime", "operateTime", "version");
 
+    /** Command attribute config filter compact constructor: normalizes the filter record. */
     public CommandAttributeConfigFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");

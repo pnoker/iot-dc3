@@ -37,7 +37,7 @@ public class RuleEngineImpl implements RuleEngine {
         if (fact == null || fact.getTenantId() == null || fact.getAlarmTargetTypeFlag() == null) {
             return Flux.empty();
         }
-        return ruleRegistry.findCandidates(fact).flatMapMany(Flux::fromIterable).concatMap(rule -> {
+        return ruleRegistry.getCandidates(fact).flatMapMany(Flux::fromIterable).concatMap(rule -> {
             return ruleEvaluator
                     .matches(rule, fact)
                     .flatMapMany(matches -> matches

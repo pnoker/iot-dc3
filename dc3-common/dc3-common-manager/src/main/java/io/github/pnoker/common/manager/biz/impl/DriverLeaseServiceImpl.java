@@ -145,7 +145,7 @@ public class DriverLeaseServiceImpl implements DriverLeaseService {
                 .concatMap(page -> {
                     List<DeviceLeaseDO> assignments = page.deviceIds.stream()
                             .map(deviceId -> new DeviceLeaseDO(
-                                    tenantId, driverId, deviceId, selectOwner(deviceId, activeNodes), null))
+                                    tenantId, driverId, deviceId, chooseOwner(deviceId, activeNodes), null))
                             .toList();
                     return store.reconcileDeviceLeases(assignments);
                 })
@@ -165,7 +165,7 @@ public class DriverLeaseServiceImpl implements DriverLeaseService {
                 });
     }
 
-    private String selectOwner(Long deviceId, List<String> activeNodes) {
+    private String chooseOwner(Long deviceId, List<String> activeNodes) {
         String selected = null;
         byte[] highest = null;
         MessageDigest digest = SHA_256.get();

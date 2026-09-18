@@ -49,6 +49,7 @@ public class ManagerDeviceServer extends DeviceApiGrpc.DeviceApiImplBase {
     private final ReactiveDeviceService reactiveDeviceService;
     private final DriverLeaseService driverLeaseService;
 
+    /** Create the manager-side device gRPC server. */
     @Autowired
     public ManagerDeviceServer(
             GrpcDeviceBuilder grpcDeviceBuilder,

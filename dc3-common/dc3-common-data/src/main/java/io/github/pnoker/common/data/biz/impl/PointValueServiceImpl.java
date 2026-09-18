@@ -390,9 +390,9 @@ public class PointValueServiceImpl implements PointValueService {
 
     private Flux<FacadePointBO> pageThroughPointsReactive(
             Long tenantId, String pointName, io.github.pnoker.common.enums.EnableFlagEnum enableFlag, Long profileId) {
-        return Flux.defer(() -> fetchPointPage(tenantId, pointName, enableFlag, profileId, 0))
+        return Flux.defer(() -> getPointPage(tenantId, pointName, enableFlag, profileId, 0))
                 .expand(state -> state.page().hasNext()
-                        ? fetchPointPage(
+                        ? getPointPage(
                                 tenantId,
                                 pointName,
                                 enableFlag,
@@ -402,7 +402,7 @@ public class PointValueServiceImpl implements PointValueService {
                 .concatMapIterable(state -> state.page().items());
     }
 
-    private Mono<PageState<FacadePointBO>> fetchPointPage(
+    private Mono<PageState<FacadePointBO>> getPointPage(
             Long tenantId,
             String pointName,
             io.github.pnoker.common.enums.EnableFlagEnum enableFlag,
@@ -434,9 +434,9 @@ public class PointValueServiceImpl implements PointValueService {
             Long driverId,
             Long profileId,
             io.github.pnoker.common.enums.EnableFlagEnum enableFlag) {
-        return Flux.defer(() -> fetchDevicePage(tenantId, deviceName, driverId, profileId, enableFlag, 0))
+        return Flux.defer(() -> getDevicePage(tenantId, deviceName, driverId, profileId, enableFlag, 0))
                 .expand(state -> state.page().hasNext()
-                        ? fetchDevicePage(
+                        ? getDevicePage(
                                 tenantId,
                                 deviceName,
                                 driverId,
@@ -447,7 +447,7 @@ public class PointValueServiceImpl implements PointValueService {
                 .concatMapIterable(state -> state.page().items());
     }
 
-    private Mono<PageState<FacadeDeviceBO>> fetchDevicePage(
+    private Mono<PageState<FacadeDeviceBO>> getDevicePage(
             Long tenantId,
             String deviceName,
             Long driverId,

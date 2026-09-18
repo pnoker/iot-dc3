@@ -16,12 +16,11 @@
  */
 package io.github.pnoker.db.postgres.manager;
 
-import io.github.pnoker.common.manager.repository.GroupFilter;
-import io.github.pnoker.common.manager.repository.ReactiveGroupStore;
-
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.GroupBO;
+import io.github.pnoker.common.manager.repository.GroupFilter;
+import io.github.pnoker.common.manager.repository.ReactiveGroupStore;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;

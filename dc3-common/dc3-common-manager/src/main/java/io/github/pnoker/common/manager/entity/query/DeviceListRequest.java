@@ -46,6 +46,7 @@ public record DeviceListRequest(
         @Schema(description = "Group identifier filter") Long groupId,
         @Schema(description = "Label identifier filter") Long labelId) {
 
+    /** Device list request compact constructor: normalizes the query record. */
     public DeviceListRequest {
         if (offset < 0) {
             throw new IllegalArgumentException("offset must be non-negative");
@@ -56,6 +57,7 @@ public record DeviceListRequest(
         sort = sort == null ? List.of() : List.copyOf(sort);
     }
 
+    /** device list request. */
     public DeviceListRequest() {
         this(0, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null, null, null, null, null);
     }

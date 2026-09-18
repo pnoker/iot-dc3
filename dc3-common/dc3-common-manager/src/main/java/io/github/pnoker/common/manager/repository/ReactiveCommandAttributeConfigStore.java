@@ -20,8 +20,8 @@ import io.github.pnoker.common.manager.entity.bo.CommandAttributeConfigBO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Reactive persistence port for command attribute config records. */
 
+/** Reactive persistence port for command attribute config records. */
 public interface ReactiveCommandAttributeConfigStore {
     /** Load the command attribute config scoped to the tenant by id. */
     Mono<CommandAttributeConfigBO> get(Long tenantId, Long id);

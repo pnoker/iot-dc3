@@ -43,7 +43,7 @@ public interface ReactiveRuleStateStore {
     Mono<Boolean> delete(long tenantId, long stateId);
 
     /** Load the rule state by its identifier. */
-    Mono<RuleStateDO> find(long tenantId, long ruleId, byte alarmTargetTypeFlag, long entityId, String fingerprint);
+    Mono<RuleStateDO> get(long tenantId, long ruleId, byte alarmTargetTypeFlag, long entityId, String fingerprint);
 
     /** Advance the rule state to its next lifecycle state. */
     Mono<RuleStateDO> transition(RuleStateDO state, boolean recovery);

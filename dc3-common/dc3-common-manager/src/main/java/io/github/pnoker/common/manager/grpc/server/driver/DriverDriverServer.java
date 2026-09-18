@@ -69,6 +69,7 @@ public class DriverDriverServer extends DriverApiGrpc.DriverApiImplBase {
     private final ReactiveEventAttributeService reactiveEventAttributeService;
     private final DriverLeaseService driverLeaseService;
 
+    /** Create the driver registration gRPC server. */
     @Autowired
     public DriverDriverServer(
             GrpcDriverBuilder grpcDriverBuilder,

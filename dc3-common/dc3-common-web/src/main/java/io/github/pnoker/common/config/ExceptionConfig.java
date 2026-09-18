@@ -53,6 +53,22 @@ public class ExceptionConfig {
         return problem(response, request, exception.getErrorCode(), exception.getMessage());
     }
 
+    /**
+     * Translate method-security denials to RFC 9457 responses. Method-level
+     * {@code @PreAuthorize} rejections surface here (not at the security filter
+     * chain's access-denied handler) because they are thrown from inside the
+     * handler invocation — without this mapping every permission denial would
+     * fall through to the generic handler and masquerade as a 500 server error.
+     */
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Mono<ProblemDetailsResponse> accessDeniedException(
+            org.springframework.security.access.AccessDeniedException exception,
+            ServerHttpRequest request,
+            ServerHttpResponse response) {
+        return problem(response, request, ErrorCode.FORBIDDEN, exception.getMessage());
+    }
+
     /** Translate business failures to RFC 9457 responses with their error code. */
     @ExceptionHandler(BusinessException.class)
     public Mono<ProblemDetailsResponse> businessException(

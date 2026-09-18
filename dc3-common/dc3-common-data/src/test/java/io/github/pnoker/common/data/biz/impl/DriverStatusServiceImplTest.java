@@ -59,7 +59,7 @@ class DriverStatusServiceImplTest {
         when(stateStore.listStateFlags(100L, EntityTypeEnum.DRIVER, List.of(7L)))
                 .thenReturn(Mono.just(Map.of(7L, (byte) EntityStatusEnum.ONLINE.getIndex())));
 
-        StepVerifier.create(service.list(query(100L)))
+        StepVerifier.create(service.list(request(100L)))
                 .assertNext(result -> assertThat(result).containsEntry("7", EntityStatusEnum.ONLINE.getCode()))
                 .verifyComplete();
     }
@@ -87,7 +87,7 @@ class DriverStatusServiceImplTest {
                 .verify();
     }
 
-    private FacadeDriverOffsetQuery query(Long tenantId) {
+    private FacadeDriverOffsetQuery request(Long tenantId) {
         return new FacadeDriverOffsetQuery(
                 tenantId, null, null, null, null, null, null, null, null, null, 0, 50, List.of());
     }

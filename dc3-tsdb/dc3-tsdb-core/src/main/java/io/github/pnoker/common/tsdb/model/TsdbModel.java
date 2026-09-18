@@ -98,6 +98,7 @@ public final class TsdbModel {
      */
     public record SeriesKey(long tenantId, long deviceId, long pointId) {
 
+        /** Composite series identity: tenant, device and point addressed by a single value stream. */
         public SeriesKey {
             if (tenantId <= 0 || deviceId <= 0 || pointId <= 0) {
                 throw new IllegalArgumentException("series identifiers must be positive");
@@ -115,6 +116,7 @@ public final class TsdbModel {
      */
     public record SeriesFilter(long tenantId, List<SeriesKey> series) {
 
+        /** Filter clauses narrowing a series query (time window, id sets, label matchers). */
         public SeriesFilter {
             if (tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
             series = series == null ? List.of() : List.copyOf(series);
@@ -264,6 +266,7 @@ public final class TsdbModel {
      */
     public record Cursor(Instant deviceTime, String messageId, SeriesKey series, Instant windowFrom, Instant windowTo) {
 
+        /** Read cursor carrying the scan position through a paged series query. */
         public Cursor {
             if (deviceTime == null || messageId == null || messageId.isBlank()) {
                 throw new IllegalArgumentException("cursor position is required");
@@ -276,6 +279,7 @@ public final class TsdbModel {
             }
         }
 
+        /** Create a cursor positioned at a device-time offset within a series. */
         public Cursor(Instant deviceTime, String messageId, SeriesKey series) {
             this(deviceTime, messageId, series, null, null);
         }

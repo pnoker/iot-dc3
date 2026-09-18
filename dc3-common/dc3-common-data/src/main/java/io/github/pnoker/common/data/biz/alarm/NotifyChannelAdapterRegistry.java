@@ -35,6 +35,7 @@ public class NotifyChannelAdapterRegistry {
     private final Map<NotifyChannelTypeEnum, NotifyChannelAdapter> adapters =
             new EnumMap<>(NotifyChannelTypeEnum.class);
 
+    /** notify channel adapter registry. */
     public NotifyChannelAdapterRegistry(List<NotifyChannelAdapter> adapters) {
         for (NotifyChannelAdapter adapter : adapters) {
             this.adapters.put(adapter.channelType(), adapter);
@@ -47,7 +48,7 @@ public class NotifyChannelAdapterRegistry {
      * @param channelTypeFlag channel type
      * @return adapter
      */
-    public Optional<NotifyChannelAdapter> find(NotifyChannelTypeEnum channelTypeFlag) {
+    public Optional<NotifyChannelAdapter> get(NotifyChannelTypeEnum channelTypeFlag) {
         return Optional.ofNullable(adapters.get(channelTypeFlag));
     }
 }

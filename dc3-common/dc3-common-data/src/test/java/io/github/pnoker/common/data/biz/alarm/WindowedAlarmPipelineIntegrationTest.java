@@ -128,7 +128,7 @@ class WindowedAlarmPipelineIntegrationTest {
         feed(85);
         feed(88);
         feed(90);
-        when(ruleRegistry.findCandidates(any()))
+        when(ruleRegistry.getCandidates(any()))
                 .thenReturn(Mono.just(List.of(rule("AVG", ">", BigDecimal.valueOf(80), 3))));
 
         List<RuleMatch> matches = engine.evaluate(factOnPoint()).collectList().block();
@@ -143,7 +143,7 @@ class WindowedAlarmPipelineIntegrationTest {
         feed(80);
         feed(82);
         feed(85);
-        when(ruleRegistry.findCandidates(any()))
+        when(ruleRegistry.getCandidates(any()))
                 .thenReturn(Mono.just(List.of(rule("AVG", ">", BigDecimal.valueOf(80), 5))));
 
         List<RuleMatch> matches = engine.evaluate(factOnPoint()).collectList().block();
@@ -160,7 +160,7 @@ class WindowedAlarmPipelineIntegrationTest {
         feed(85);
         feed(88);
         feed(90);
-        when(ruleRegistry.findCandidates(any()))
+        when(ruleRegistry.getCandidates(any()))
                 .thenReturn(Mono.just(List.of(rule("COUNT", ">", BigDecimal.valueOf(4), 1))));
 
         List<RuleMatch> matches = engine.evaluate(factOnPoint()).collectList().block();
@@ -177,7 +177,7 @@ class WindowedAlarmPipelineIntegrationTest {
         feed(0, "online");
         feed(0, "offline");
         RuleBO anyRule = rule("ANY", "==", null, 1, "calValue");
-        when(ruleRegistry.findCandidates(any())).thenReturn(Mono.just(List.of(anyRule)));
+        when(ruleRegistry.getCandidates(any())).thenReturn(Mono.just(List.of(anyRule)));
 
         List<RuleMatch> matches = engine.evaluate(factOnPoint()).collectList().block();
 
@@ -193,7 +193,7 @@ class WindowedAlarmPipelineIntegrationTest {
         feed(0, "online");
         RuleBO allRule = rule("ALL", "==", null, 1, "calValue");
         // All online; the rule is ALL (calValue == offline) → don't fire.
-        when(ruleRegistry.findCandidates(any())).thenReturn(Mono.just(List.of(allRule)));
+        when(ruleRegistry.getCandidates(any())).thenReturn(Mono.just(List.of(allRule)));
 
         List<RuleMatch> matches = engine.evaluate(factOnPoint()).collectList().block();
 
@@ -204,7 +204,7 @@ class WindowedAlarmPipelineIntegrationTest {
     void lastModeUsesFactValueDirectly() {
         // No buffer feed — LAST evaluates the current fact's named field
         // via ConditionEvaluator without reading the window.
-        when(ruleRegistry.findCandidates(any()))
+        when(ruleRegistry.getCandidates(any()))
                 .thenReturn(Mono.just(List.of(rule("LAST", ">", BigDecimal.valueOf(80), 1))));
 
         // factOnPoint() default value is 0 → don't fire

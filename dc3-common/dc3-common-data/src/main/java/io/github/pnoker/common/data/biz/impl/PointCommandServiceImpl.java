@@ -112,7 +112,7 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
 
     @Override
     public Mono<PointCommandHistoryVO> getByCommandId(Long tenantId, String commandId) {
-        return commandStore.find(tenantId, commandId).map(historyBuilder::buildVOByDO);
+        return commandStore.get(tenantId, commandId).map(historyBuilder::buildVOByDO);
     }
 
     @Override
@@ -210,7 +210,7 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
     private Mono<String> reuseIfPresent(
             Long tenantId, String commandId, Long deviceId, Long pointId, PointCommandTypeEnum type, String value) {
         if (commandId == null || commandId.isBlank()) return Mono.empty();
-        return commandStore.find(tenantId, commandId).flatMap(existing -> {
+        return commandStore.get(tenantId, commandId).flatMap(existing -> {
             if (java.util.Objects.equals(existing.getDeviceId(), deviceId)
                     && java.util.Objects.equals(existing.getPointId(), pointId)
                     && existing.getType() == type
@@ -224,7 +224,7 @@ public class PointCommandServiceImpl implements PointCommandService, PointComman
     private Mono<String> existing(
             Long tenantId, String commandId, Scope scope, PointCommandTypeEnum type, String value) {
         if (commandId == null || commandId.isBlank()) return Mono.empty();
-        return commandStore.find(tenantId, commandId).flatMap(existing -> {
+        return commandStore.get(tenantId, commandId).flatMap(existing -> {
             if (java.util.Objects.equals(existing.getDeviceId(), scope.device().getId())
                     && java.util.Objects.equals(
                             existing.getPointId(), scope.point().getId())

@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-/** RFC 7807-style problem payload for transport-neutral error reporting. */
 
+/** RFC 7807-style problem payload for transport-neutral error reporting. */
 public record ProblemDetails(
         URI type,
         String title,
@@ -34,6 +34,7 @@ public record ProblemDetails(
         String traceId,
         Map<String, List<String>> errors) {
 
+    /** RFC 9457 problem-details carrier for database-layer errors. */
     public ProblemDetails {
         type = type == null ? URI.create("about:blank") : type;
         if (title == null || title.isBlank()) {

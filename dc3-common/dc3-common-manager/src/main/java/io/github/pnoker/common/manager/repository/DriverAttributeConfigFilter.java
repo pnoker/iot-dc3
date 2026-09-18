@@ -20,8 +20,8 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import java.util.List;
 import java.util.Set;
-/** Tenant-scoped query filter for driver attribute config records. */
 
+/** Tenant-scoped query filter for driver attribute config records. */
 public record DriverAttributeConfigFilter(
         Long tenantId,
         Long attributeId,
@@ -34,6 +34,7 @@ public record DriverAttributeConfigFilter(
     private static final Set<String> SORT_FIELDS =
             Set.of("id", "attributeId", "deviceId", "createTime", "operateTime", "version");
 
+    /** Driver attribute config filter compact constructor: normalizes the filter record. */
     public DriverAttributeConfigFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");

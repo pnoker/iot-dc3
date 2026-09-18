@@ -82,6 +82,7 @@ public class RabbitMqAdapter implements BrokerAdapter {
     private final List<SimpleMessageListenerContainer> containers = new CopyOnWriteArrayList<>();
     private volatile boolean stopped;
 
+    /** rabbit mq adapter. */
     public RabbitMqAdapter(
             RabbitTemplate rabbitTemplate,
             RabbitAdmin rabbitAdmin,

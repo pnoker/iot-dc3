@@ -32,6 +32,7 @@ public record BindingFilter(
         List<SortSpec> sort) {
     private static final Set<String> SORT = Set.of("id", "entityId", "createTime", "operateTime");
 
+    /** Binding filter compact constructor: normalizes the filter record. */
     public BindingFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");

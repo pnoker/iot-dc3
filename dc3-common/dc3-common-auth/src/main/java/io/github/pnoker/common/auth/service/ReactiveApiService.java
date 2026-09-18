@@ -20,8 +20,8 @@ import io.github.pnoker.common.auth.entity.bo.ApiBO;
 import io.github.pnoker.common.auth.repository.ApiFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
-/** Business service covering api use cases. */
 
+/** Business service covering api use cases. */
 public interface ReactiveApiService {
     /** Resolve the api by its id. */
     Mono<ApiBO> getById(Long id);

@@ -38,6 +38,7 @@ public record MenuOffsetRequest(
         @Schema(description = "Exact menu code") String menuCode,
         @Schema(description = "Enable state filter") EnableFlagEnum enableFlag) {
 
+    /** Menu offset request compact constructor: normalizes the query record. */
     public MenuOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -48,6 +49,7 @@ public record MenuOffsetRequest(
         }
     }
 
+    /** menu offset request. */
     public MenuOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null, null);
     }

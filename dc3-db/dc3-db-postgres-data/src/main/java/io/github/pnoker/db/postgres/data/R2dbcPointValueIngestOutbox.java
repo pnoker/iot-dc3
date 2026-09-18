@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.data;
 
-import io.github.pnoker.common.data.repository.ReactivePointValueIngestOutbox;
-
 import io.github.pnoker.common.data.entity.model.PointValueDO;
+import io.github.pnoker.common.data.repository.ReactivePointValueIngestOutbox;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -63,7 +62,7 @@ public class R2dbcPointValueIngestOutbox implements ReactivePointValueIngestOutb
     }
 
     @Override
-    public Flux<PointValueDO> findPersisted(List<PointValueDO> values) {
+    public Flux<PointValueDO> getPersisted(List<PointValueDO> values) {
         if (values == null || values.isEmpty()) return Flux.empty();
         return Flux.fromIterable(values)
                 .concatMap(value -> databaseClient

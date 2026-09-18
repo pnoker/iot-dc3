@@ -32,5 +32,5 @@ public interface ReactiveAttachmentStore {
     Flux<AttachmentBO> list(String conversationId, RequestHeader.PrincipalHeader header);
 
     /** Load the attachments for the given ids. */
-    Flux<AttachmentBO> findByIds(Collection<Long> ids, RequestHeader.PrincipalHeader header);
+    Flux<AttachmentBO> getByIds(Collection<Long> ids, RequestHeader.PrincipalHeader header);
 }

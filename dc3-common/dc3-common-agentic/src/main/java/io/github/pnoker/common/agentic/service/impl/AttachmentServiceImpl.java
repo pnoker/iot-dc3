@@ -133,7 +133,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     public Mono<String> summarize(List<Long> attachmentIds, RequestHeader.PrincipalHeader header) {
         if (attachmentIds == null || attachmentIds.isEmpty()) return Mono.just("");
         return attachmentStore
-                .findByIds(attachmentIds, header)
+                .getByIds(attachmentIds, header)
                 .map(item -> "- id=" + item.getId() + ", name=" + item.getFileName() + ", contentType="
                         + item.getContentType() + ", size=" + item.getSize() + " bytes")
                 .collectList()

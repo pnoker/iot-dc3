@@ -21,14 +21,17 @@ import io.github.pnoker.common.enums.ErrorCode;
 /** Exception raised when an optimistic concurrency precondition fails. */
 public class ConflictException extends BusinessException {
 
+    /** Create a conflict exception with a message. */
     public ConflictException() {
         this(null);
     }
 
+    /** Create a conflict exception with a message and cause. */
     public ConflictException(Throwable cause) {
         super(cause);
     }
 
+    /** Create a conflict exception with a message and status code. */
     public ConflictException(String template, Object... params) {
         super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }

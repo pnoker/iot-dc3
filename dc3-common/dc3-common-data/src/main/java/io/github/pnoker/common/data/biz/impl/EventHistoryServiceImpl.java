@@ -130,7 +130,7 @@ public class EventHistoryServiceImpl implements EventHistoryService {
 
     @Override
     public Mono<EventHistoryVO> getByRecordId(Long tenantId, String recordId) {
-        return eventHistoryStore.findByRecordId(tenantId, recordId).map(eventHistoryBuilder::buildVOByDO);
+        return eventHistoryStore.getByRecordId(tenantId, recordId).map(eventHistoryBuilder::buildVOByDO);
     }
 
     @Override

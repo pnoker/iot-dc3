@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.data;
 
-import io.github.pnoker.common.data.repository.ReactiveRuleStateStore;
-
 import io.github.pnoker.common.data.entity.model.RuleStateDO;
+import io.github.pnoker.common.data.repository.ReactiveRuleStateStore;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.UuidV7;
@@ -150,7 +149,7 @@ public class R2dbcRuleStateStore implements ReactiveRuleStateStore {
     }
 
     @Override
-    public Mono<RuleStateDO> find(
+    public Mono<RuleStateDO> get(
             long tenantId, long ruleId, byte alarmTargetTypeFlag, long entityId, String fingerprint) {
         if (!valid(tenantId) || !valid(ruleId) || !valid(entityId) || fingerprint == null) {
             return Mono.empty();
@@ -208,7 +207,7 @@ public class R2dbcRuleStateStore implements ReactiveRuleStateStore {
         return transactionalOperator
                 .transactional(updateSpec.fetch().rowsUpdated())
                 .flatMap(rows -> rows == 1
-                        ? find(
+                        ? get(
                                 state.getTenantId(),
                                 state.getRuleId(),
                                 value(state.getAlarmTargetTypeFlag()),
@@ -217,7 +216,7 @@ public class R2dbcRuleStateStore implements ReactiveRuleStateStore {
                         : insert(state, recovery))
                 .onErrorResume(
                         DataIntegrityViolationException.class,
-                        error -> find(
+                        error -> get(
                                         state.getTenantId(),
                                         state.getRuleId(),
                                         value(state.getAlarmTargetTypeFlag()),

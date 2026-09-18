@@ -116,8 +116,8 @@ class NotifyConfigCacheTest {
         bind.setTenantId(7L);
         when(configStore.listEnabledBinds(7L, 1L)).thenReturn(Flux.just(bind));
 
-        assertThat(cache.findEnabledBinds(notify).block()).containsExactly(bind);
-        assertThat(cache.findEnabledBinds(notify).block()).containsExactly(bind);
+        assertThat(cache.getEnabledBinds(notify).block()).containsExactly(bind);
+        assertThat(cache.getEnabledBinds(notify).block()).containsExactly(bind);
         verify(configStore, times(1)).listEnabledBinds(7L, 1L);
     }
 

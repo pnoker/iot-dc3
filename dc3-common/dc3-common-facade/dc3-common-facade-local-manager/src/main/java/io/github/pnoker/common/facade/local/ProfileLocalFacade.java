@@ -44,6 +44,7 @@ public class ProfileLocalFacade implements ProfileFacade {
 
     private final FacadeProfileBuilder facadeProfileBuilder;
 
+    /** Create the local profile facade. */
     @org.springframework.beans.factory.annotation.Autowired
     public ProfileLocalFacade(
             ReactiveProfileService reactiveProfileService, FacadeProfileBuilder facadeProfileBuilder) {

@@ -22,8 +22,8 @@ import io.github.pnoker.common.enums.ResourceTypeEnum;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Reactive persistence port for resource records. */
 
+/** Reactive persistence port for resource records. */
 public interface ReactiveResourceStore {
 
     /** Resolve the resource by its id. */

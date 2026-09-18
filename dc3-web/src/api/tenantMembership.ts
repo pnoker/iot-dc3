@@ -19,6 +19,11 @@ import {createCrudApi} from '@/api/factory';
 import {API_TENANT_MEMBERSHIP_BASE} from '@/config/constant/api';
 import type {TenantMembershipForm, TenantMembershipRecord} from '@/config/types/auth';
 
+/**
+ * The backend TenantMembershipController only exposes list/add/delete — no
+ * update or get_by_id. Only those three members are re-exported; do not export
+ * `crud.update` / `crud.getById` without adding the backend endpoints first.
+ */
 const crud = createCrudApi<TenantMembershipForm, TenantMembershipRecord>({base: API_TENANT_MEMBERSHIP_BASE});
 
 export const addTenantMembership = crud.add;

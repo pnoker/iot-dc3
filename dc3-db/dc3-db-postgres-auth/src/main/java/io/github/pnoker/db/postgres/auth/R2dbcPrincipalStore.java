@@ -16,10 +16,9 @@
  */
 package io.github.pnoker.db.postgres.auth;
 
+import io.github.pnoker.common.auth.entity.model.PrincipalDO;
 import io.github.pnoker.common.auth.repository.PrincipalFilter;
 import io.github.pnoker.common.auth.repository.ReactivePrincipalStore;
-
-import io.github.pnoker.common.auth.entity.model.PrincipalDO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;

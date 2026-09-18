@@ -21,8 +21,8 @@ import java.time.Instant;
 import java.util.UUID;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Reactive persistence port for device import job records. */
 
+/** Reactive persistence port for device import job records. */
 public interface ReactiveDeviceImportJobStore {
 
     /** Insert one device import job and emit the stored row. */

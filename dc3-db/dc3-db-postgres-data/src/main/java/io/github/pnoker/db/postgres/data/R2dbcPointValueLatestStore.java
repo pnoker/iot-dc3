@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.data;
 
-import io.github.pnoker.common.data.repository.ReactivePointValueLatestStore;
-
 import io.github.pnoker.common.data.entity.model.PointValueDO;
+import io.github.pnoker.common.data.repository.ReactivePointValueLatestStore;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;

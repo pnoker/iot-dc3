@@ -18,10 +18,11 @@ package io.github.pnoker.db.r2dbc.core.page;
 
 import java.util.List;
 import java.util.Objects;
-/** Cursor-paged result slice with a signed continuation token. */
 
+/** Cursor-paged result slice with a signed continuation token. */
 public record CursorPage<T>(List<T> items, String nextCursor, boolean hasNext) {
 
+    /** Cursor-paged result slice with the next continuation token. */
     public CursorPage {
         items = List.copyOf(Objects.requireNonNull(items, "items must not be null"));
         if (hasNext && (nextCursor == null || nextCursor.isBlank())) {

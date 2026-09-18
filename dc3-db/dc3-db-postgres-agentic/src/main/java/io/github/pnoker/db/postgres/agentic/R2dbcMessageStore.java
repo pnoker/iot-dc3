@@ -16,10 +16,9 @@
  */
 package io.github.pnoker.db.postgres.agentic;
 
-import io.github.pnoker.common.agentic.repository.ReactiveMessageStore;
-
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
+import io.github.pnoker.common.agentic.repository.ReactiveMessageStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
@@ -136,12 +135,11 @@ public class R2dbcMessageStore implements ReactiveMessageStore {
                 .fetch()
                 .rowsUpdated()
                 .flatMap(rows -> rows == 1
-                        ? findInserted(conversationId, header, Mono.just(index))
+                        ? getInserted(conversationId, header, Mono.just(index))
                         : Mono.error(new IllegalStateException("message insert affected " + rows + " rows")));
     }
 
-    private Mono<MessageBO> findInserted(
-            String conversationId, RequestHeader.PrincipalHeader header, Mono<Long> index) {
+    private Mono<MessageBO> getInserted(String conversationId, RequestHeader.PrincipalHeader header, Mono<Long> index) {
         return index.flatMap(value -> databaseClient
                 .sql("SELECT " + COLUMNS + " FROM " + TABLE
                         + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id AND user_id = :user_id"

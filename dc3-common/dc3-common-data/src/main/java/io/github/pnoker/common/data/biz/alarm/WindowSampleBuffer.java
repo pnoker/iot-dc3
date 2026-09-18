@@ -58,6 +58,7 @@ public class WindowSampleBuffer {
 
     private final Cache<WindowSampleKey, ConcurrentLinkedDeque<WindowSample>> buffers;
 
+    /** window sample buffer. */
     public WindowSampleBuffer(AlarmWindowProperties properties) {
         this.properties = properties;
         this.buffers = Caffeine.newBuilder()

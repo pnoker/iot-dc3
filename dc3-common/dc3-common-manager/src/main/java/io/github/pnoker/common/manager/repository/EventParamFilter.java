@@ -38,6 +38,7 @@ public record EventParamFilter(
     private static final Set<String> SORT_FIELDS =
             Set.of("id", "paramName", "paramCode", "eventId", "createTime", "operateTime", "version");
 
+    /** Event param filter compact constructor: normalizes the filter record. */
     public EventParamFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");

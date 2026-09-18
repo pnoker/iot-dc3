@@ -69,6 +69,7 @@ public class Dc3ListenerProcessor implements SmartInitializingSingleton, Applica
 
     private ApplicationContext applicationContext;
 
+    /** dc3 listener processor. */
     public Dc3ListenerProcessor(BrokerAdapter adapter) {
         this.adapter = adapter;
         MqContextPropagation.initialize();

@@ -20,8 +20,8 @@ import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Reactive persistence port for point attribute config records. */
 
+/** Reactive persistence port for point attribute config records. */
 public interface ReactivePointAttributeConfigStore {
     /** Load the point attribute config scoped to the tenant by id. */
     Mono<PointAttributeConfigBO> get(Long tenantId, Long id);

@@ -65,8 +65,8 @@ class RuleRegistryTest {
                 .thenReturn(reactor.core.publisher.Flux.just(rule(1L)));
 
         // Same fact twice → only one DB lookup; the second call is a cache hit.
-        registry.findCandidates(fact(7L, 11L)).block();
-        registry.findCandidates(fact(7L, 11L)).block();
+        registry.getCandidates(fact(7L, 11L)).block();
+        registry.getCandidates(fact(7L, 11L)).block();
 
         verify(ruleStore, times(1)).listEnabledCandidates(anyLong(), any(), anyLong());
     }
@@ -76,8 +76,8 @@ class RuleRegistryTest {
         when(ruleStore.listEnabledCandidates(anyLong(), any(), anyLong()))
                 .thenReturn(reactor.core.publisher.Flux.just(rule(1L)));
 
-        registry.findCandidates(fact(7L, 11L)).block();
-        registry.findCandidates(fact(7L, 12L)).block();
+        registry.getCandidates(fact(7L, 11L)).block();
+        registry.getCandidates(fact(7L, 12L)).block();
 
         verify(ruleStore, times(2)).listEnabledCandidates(anyLong(), any(), anyLong());
     }
@@ -87,14 +87,14 @@ class RuleRegistryTest {
         when(ruleStore.listEnabledCandidates(anyLong(), any(), anyLong()))
                 .thenReturn(reactor.core.publisher.Flux.just(rule(1L)));
 
-        registry.findCandidates(fact(7L, 11L)).block();
-        registry.findCandidates(fact(8L, 11L)).block();
+        registry.getCandidates(fact(7L, 11L)).block();
+        registry.getCandidates(fact(8L, 11L)).block();
 
         registry.invalidateTenant(7L);
 
         // tenant 7 should re-load on the next lookup; tenant 8 stays cached.
-        registry.findCandidates(fact(7L, 11L)).block();
-        registry.findCandidates(fact(8L, 11L)).block();
+        registry.getCandidates(fact(7L, 11L)).block();
+        registry.getCandidates(fact(8L, 11L)).block();
 
         verify(ruleStore, times(3)).listEnabledCandidates(anyLong(), any(), anyLong());
     }
@@ -104,9 +104,9 @@ class RuleRegistryTest {
         when(ruleStore.listEnabledCandidates(anyLong(), any(), anyLong()))
                 .thenReturn(reactor.core.publisher.Flux.just(rule(1L)));
 
-        registry.findCandidates(fact(7L, 11L)).block();
+        registry.getCandidates(fact(7L, 11L)).block();
         registry.invalidateAll();
-        registry.findCandidates(fact(7L, 11L)).block();
+        registry.getCandidates(fact(7L, 11L)).block();
 
         verify(ruleStore, times(2)).listEnabledCandidates(anyLong(), any(), anyLong());
     }
@@ -116,8 +116,8 @@ class RuleRegistryTest {
         // A fact with null tenantId / entityId should not be cached, and must
         // not trip the underlying lookup either — the engine guards against
         // bad input upstream.
-        assertThat(registry.findCandidates(null).block()).isEmpty();
-        assertThat(registry.findCandidates(
+        assertThat(registry.getCandidates(null).block()).isEmpty();
+        assertThat(registry.getCandidates(
                                 new RuleFact(null, AlarmTargetTypeEnum.POINT, 11L, null, LocalDateTime.now(), Map.of()))
                         .block())
                 .isEmpty();

@@ -101,11 +101,11 @@ class RuleNotificationServiceImplTest {
 
         when(notifyConfigCache.getNotify(10L, 7L)).thenReturn(Mono.just(notify));
         when(notifyConfigCache.getMessage(20L, 7L)).thenReturn(Mono.just(message));
-        when(notifyConfigCache.findEnabledBinds(notify)).thenReturn(Mono.just(List.of(bind)));
+        when(notifyConfigCache.getEnabledBinds(notify)).thenReturn(Mono.just(List.of(bind)));
         when(notifyConfigCache.getChannel(30L, 7L)).thenReturn(Mono.just(channel));
         when(notifyPolicyEngine.decide(any(), any(), any(), any(), any())).thenReturn(NotifyDecision.send());
         when(messageRenderService.render(any(), any(), any())).thenReturn(payload);
-        when(ruleStateStore.find(anyLong(), anyLong(), any(byte.class), anyLong(), any()))
+        when(ruleStateStore.get(anyLong(), anyLong(), any(byte.class), anyLong(), any()))
                 .thenReturn(Mono.empty());
         when(ruleStateBuilder.buildDOByBO(any())).thenReturn(stateDO);
         when(ruleStateStore.transition(any(), any(Boolean.class))).thenReturn(Mono.just(stateDO));
@@ -128,7 +128,7 @@ class RuleNotificationServiceImplTest {
     void recoveryWithoutFiringStateDoesNotWriteAnything() {
         RuleMatch match = RuleMatch.recovery(rule(), fact());
         when(notifyConfigCache.getNotify(10L, 7L)).thenReturn(Mono.just(notifyPolicy()));
-        when(ruleStateStore.find(anyLong(), anyLong(), any(byte.class), anyLong(), any()))
+        when(ruleStateStore.get(anyLong(), anyLong(), any(byte.class), anyLong(), any()))
                 .thenReturn(Mono.empty());
 
         assertThat(service.notify(match).collectList().block()).isEmpty();
@@ -145,9 +145,9 @@ class RuleNotificationServiceImplTest {
         NotifyHistoryDO historyDO = historyDO(3L, NotifyHistoryStatusEnum.SKIPPED);
         when(notifyConfigCache.getNotify(10L, 7L)).thenReturn(Mono.just(notify));
         when(notifyConfigCache.getMessage(20L, 7L)).thenReturn(Mono.empty());
-        when(notifyConfigCache.findEnabledBinds(notify)).thenReturn(Mono.just(List.of(bind())));
+        when(notifyConfigCache.getEnabledBinds(notify)).thenReturn(Mono.just(List.of(bind())));
         when(notifyConfigCache.getChannel(30L, 7L)).thenReturn(Mono.just(channel));
-        when(ruleStateStore.find(anyLong(), anyLong(), any(byte.class), anyLong(), any()))
+        when(ruleStateStore.get(anyLong(), anyLong(), any(byte.class), anyLong(), any()))
                 .thenReturn(Mono.empty());
         RuleStateDO stateDO = stateDO(1L, RuleStatusEnum.FIRING);
         when(ruleStateBuilder.buildDOByBO(any())).thenReturn(stateDO);
@@ -181,11 +181,11 @@ class RuleNotificationServiceImplTest {
 
         when(notifyConfigCache.getNotify(10L, 7L)).thenReturn(Mono.just(notify));
         when(notifyConfigCache.getMessage(20L, 7L)).thenReturn(Mono.just(message));
-        when(notifyConfigCache.findEnabledBinds(notify)).thenReturn(Mono.just(List.of(bind)));
+        when(notifyConfigCache.getEnabledBinds(notify)).thenReturn(Mono.just(List.of(bind)));
         when(notifyConfigCache.getChannel(30L, 7L)).thenReturn(Mono.just(channel));
         when(notifyPolicyEngine.decide(any(), any(), any(), any(), any())).thenReturn(NotifyDecision.send());
         when(messageRenderService.render(any(), any(), any())).thenReturn(payload);
-        when(ruleStateStore.find(anyLong(), anyLong(), any(byte.class), anyLong(), any()))
+        when(ruleStateStore.get(anyLong(), anyLong(), any(byte.class), anyLong(), any()))
                 .thenReturn(Mono.empty());
         when(ruleStateBuilder.buildDOByBO(any())).thenReturn(stateDO);
         when(ruleStateStore.transition(any(), any(Boolean.class))).thenReturn(Mono.just(stateDO));

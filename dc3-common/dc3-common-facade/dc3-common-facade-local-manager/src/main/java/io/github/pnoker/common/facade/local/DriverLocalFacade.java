@@ -44,6 +44,7 @@ public class DriverLocalFacade implements DriverFacade {
 
     private final ReactiveDriverService reactiveDriverService;
 
+    /** Create the local driver facade. */
     @org.springframework.beans.factory.annotation.Autowired
     public DriverLocalFacade(FacadeDriverBuilder facadeDriverBuilder, ReactiveDriverService reactiveDriverService) {
         this.facadeDriverBuilder = facadeDriverBuilder;

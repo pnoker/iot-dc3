@@ -21,6 +21,7 @@ import java.util.List;
 /** Bounded keyset pagination request. A cursor is opaque to callers. */
 public record CursorRequest(String cursor, int limit, List<SortSpec> sort) {
 
+    /** Cursor-based page request with opaque continuation token. */
     public CursorRequest {
         if (cursor != null && cursor.isBlank()) {
             cursor = null;
@@ -31,6 +32,7 @@ public record CursorRequest(String cursor, int limit, List<SortSpec> sort) {
         sort = sort == null ? List.of() : List.copyOf(sort);
     }
 
+    /** Create a cursor request from a raw token and page size. */
     public CursorRequest(String cursor, int limit) {
         this(cursor, limit, List.of());
     }

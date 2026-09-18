@@ -46,6 +46,7 @@ public class ManagerPointServer extends PointApiGrpc.PointApiImplBase {
 
     private final ReactivePointService reactivePointService;
 
+    /** Create the manager-side point gRPC server. */
     @Autowired
     public ManagerPointServer(GrpcPointBuilder grpcPointBuilder, ReactivePointService reactivePointService) {
         this.grpcPointBuilder = grpcPointBuilder;

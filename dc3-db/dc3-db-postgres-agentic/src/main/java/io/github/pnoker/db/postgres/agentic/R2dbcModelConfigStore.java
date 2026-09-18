@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.agentic;
 
-import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
-
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
+import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -80,7 +79,7 @@ public class R2dbcModelConfigStore implements ReactiveModelConfigStore {
     }
 
     @Override
-    public Mono<ModelConfigBO> findByModel(String model, RequestHeader.PrincipalHeader header) {
+    public Mono<ModelConfigBO> getByModel(String model, RequestHeader.PrincipalHeader header) {
         validateHeader(header);
         if (model == null || model.isBlank()) return Mono.empty();
         return databaseClient
@@ -96,7 +95,7 @@ public class R2dbcModelConfigStore implements ReactiveModelConfigStore {
     }
 
     @Override
-    public Mono<ModelConfigBO> findDefault(RequestHeader.PrincipalHeader header) {
+    public Mono<ModelConfigBO> getDefault(RequestHeader.PrincipalHeader header) {
         validateHeader(header);
         return databaseClient
                 .sql("SELECT " + COLUMNS + ", p.name AS provider_name FROM " + TABLE

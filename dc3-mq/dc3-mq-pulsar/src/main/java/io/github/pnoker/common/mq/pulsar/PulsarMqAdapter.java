@@ -114,6 +114,7 @@ public class PulsarMqAdapter implements BrokerAdapter {
     private final List<ExecutorService> deliveryExecutors = new CopyOnWriteArrayList<>();
     private volatile boolean stopped;
 
+    /** pulsar mq adapter. */
     public PulsarMqAdapter(PulsarClient client, BatchConsumerProperties retryProperties) {
         this.client = client;
         this.retryProperties = retryProperties;

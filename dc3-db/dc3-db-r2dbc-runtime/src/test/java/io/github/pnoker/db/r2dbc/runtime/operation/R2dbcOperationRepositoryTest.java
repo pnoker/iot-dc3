@@ -49,7 +49,7 @@ class R2dbcOperationRepositoryTest {
     void rejectsInvalidIdempotencyKeyLazily() {
         R2dbcOperationRepository repository = repository();
 
-        StepVerifier.create(repository.findByIdempotencyKey(new TenantScope(TENANT_ID), " bad"))
+        StepVerifier.create(repository.getByIdempotencyKey(new TenantScope(TENANT_ID), " bad"))
                 .expectErrorMessage("idempotencyKey is invalid")
                 .verify();
     }

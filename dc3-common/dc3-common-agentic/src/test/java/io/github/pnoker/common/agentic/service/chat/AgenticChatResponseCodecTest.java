@@ -124,7 +124,7 @@ class AgenticChatResponseCodecTest {
 
         String json = new ObjectMapper().writeValueAsString(codec.blockingResponse(prepared, "Analysis ready", "stop"));
 
-        assertThat(json).contains("\"content_ext\"");
+        assertThat(json).contains("\"contentExt\"");
         assertThat(json).contains("\"charts\"");
         assertThat(json).contains("\"type\":\"line\"");
     }

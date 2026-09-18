@@ -40,10 +40,12 @@ public class AgenticToolTracingCallbackProvider implements ToolCallbackProvider 
 
     private final ToolCallback[] callbacks;
 
+    /** agentic tool tracing callback provider. */
     public AgenticToolTracingCallbackProvider(ToolCallbackProvider delegate, ObjectMapper objectMapper) {
         this(delegate, objectMapper, new Object[0]);
     }
 
+    /** agentic tool tracing callback provider. */
     public AgenticToolTracingCallbackProvider(
             ToolCallbackProvider delegate, ObjectMapper objectMapper, Object... toolObjects) {
         Map<String, AgenticToolTraceMetadata> metadataByName = resolveMetadata(toolObjects);

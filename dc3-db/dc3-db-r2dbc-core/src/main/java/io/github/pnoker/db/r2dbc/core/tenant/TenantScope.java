@@ -16,9 +16,9 @@
  */
 package io.github.pnoker.db.r2dbc.core.tenant;
 /** Required tenant scoping for repository ports. */
-
 public record TenantScope(Long tenantId) {
 
+    /** Required tenant scoping for repository ports. */
     public TenantScope {
         if (tenantId == null || tenantId <= 0) {
             throw new IllegalArgumentException("tenantId must be positive");

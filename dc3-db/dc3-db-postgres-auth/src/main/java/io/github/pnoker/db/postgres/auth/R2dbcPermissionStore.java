@@ -17,7 +17,6 @@
 package io.github.pnoker.db.postgres.auth;
 
 import io.github.pnoker.common.auth.repository.ReactivePermissionStore;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;

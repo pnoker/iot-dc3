@@ -31,10 +31,10 @@ public interface OperationRepository {
     Mono<OperationState> create(TenantScope tenant, OperationState state);
 
     /** Resolve the operation by its id. */
-    Mono<OperationState> findById(TenantScope tenant, UUID operationId);
+    Mono<OperationState> getById(TenantScope tenant, UUID operationId);
 
     /** Resolve the operation by its idempotency key. */
-    Mono<OperationState> findByIdempotencyKey(TenantScope tenant, String idempotencyKey);
+    Mono<OperationState> getByIdempotencyKey(TenantScope tenant, String idempotencyKey);
 
     /**
      * Apply one validated state transition using optimistic status matching.

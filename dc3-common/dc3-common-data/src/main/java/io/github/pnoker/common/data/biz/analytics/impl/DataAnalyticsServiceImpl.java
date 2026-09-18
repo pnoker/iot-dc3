@@ -151,7 +151,7 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
     }
 
     @Override
-    public Mono<AnalyticsModel.LatestValuesResponse> queryLatest(
+    public Mono<AnalyticsModel.LatestValuesResponse> getLatest(
             Long tenantId, AnalyticsModel.QueryLatestRequest request) {
         return Mono.defer(() -> {
             requireTenant(tenantId);
@@ -203,8 +203,7 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
     }
 
     @Override
-    public Mono<AnalyticsModel.HistoryResponse> queryHistory(
-            Long tenantId, AnalyticsModel.QueryHistoryRequest request) {
+    public Mono<AnalyticsModel.HistoryResponse> getHistory(Long tenantId, AnalyticsModel.QueryHistoryRequest request) {
         return Mono.defer(() -> {
             requireTenant(tenantId);
             TimeWindow window = resolveWindow(request == null ? null : request.window());

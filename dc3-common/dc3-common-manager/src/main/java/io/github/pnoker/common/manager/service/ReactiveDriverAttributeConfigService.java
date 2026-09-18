@@ -21,8 +21,8 @@ import io.github.pnoker.common.manager.repository.DriverAttributeConfigFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Business service covering driver attribute config use cases. */
 
+/** Business service covering driver attribute config use cases. */
 public interface ReactiveDriverAttributeConfigService {
     /** Add one driver attribute config. */
     Mono<DriverAttributeConfigBO> add(DriverAttributeConfigBO value);

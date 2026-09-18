@@ -115,6 +115,7 @@ export function registerSettingsHandlers(): void {
     baseUrl: 'api/v3/auth/role_principal',
     collection: 'rolePrincipalBinds',
     exact: ['roleId', 'principalId', 'principalType'],
+    verbs: ['list', 'add', 'delete'],
   });
   // list_role_by_principal: roles granted to a principal
   on('get', 'api/v3/auth/role_principal/list_role_by_principal', (ctx) => {
@@ -141,6 +142,7 @@ export function registerSettingsHandlers(): void {
     baseUrl: 'api/v3/auth/role_resource',
     collection: 'roleResourceBinds',
     exact: ['roleId', 'resourceId'],
+    verbs: ['list', 'add', 'delete'],
   });
   on('get', 'api/v3/auth/role_resource/list_resource_by_role', (ctx) => {
     const resources = db.roleResourceBinds
@@ -181,6 +183,7 @@ export function registerSettingsHandlers(): void {
     search: ['principalName'],
     exact: ['principalType', 'enableFlag'],
     enable: true,
+    verbs: ['list', 'get_by_id'],
   });
   on('post', 'api/v3/auth/principal/list_by_ids', (ctx) => {
     const ids = Array.isArray(ctx.body) ? ctx.body : [];
@@ -201,6 +204,7 @@ export function registerSettingsHandlers(): void {
     baseUrl: 'api/v3/auth/tenant_membership',
     collection: 'tenantMemberships',
     exact: ['principalId', 'tenantId'],
+    verbs: ['list', 'add', 'delete'],
   });
 
   // ── identity audit ──

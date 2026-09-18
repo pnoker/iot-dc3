@@ -35,6 +35,7 @@ public record TenantOffsetRequest(
         @Schema(description = "Exact tenant code filter") String tenantCode,
         @Schema(description = "Enable state filter") EnableFlagEnum enableFlag) {
 
+    /** Tenant offset request compact constructor: normalizes the query record. */
     public TenantOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -45,6 +46,7 @@ public record TenantOffsetRequest(
         }
     }
 
+    /** tenant offset request. */
     public TenantOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null);
     }

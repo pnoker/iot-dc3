@@ -79,6 +79,7 @@ public class DriverAlarmDTO implements Serializable {
      */
     private LocalDateTime createTime;
 
+    /** driver alarm DTO. */
     public DriverAlarmDTO(Long driverId, String message) {
         this.driverId = driverId;
         this.message = message;

@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.data;
 
-import io.github.pnoker.common.data.repository.ReactiveAlertStore;
-
 import io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow;
+import io.github.pnoker.common.data.repository.ReactiveAlertStore;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;

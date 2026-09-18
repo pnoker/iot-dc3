@@ -57,6 +57,7 @@ public class MetadataEvent extends ApplicationEvent {
         this(source, null, id, metadataType, operateType, Collections.emptySet());
     }
 
+    /** metadata event. */
     public MetadataEvent(
             Object source, Long tenantId, Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType) {
         this(source, tenantId, id, metadataType, operateType, Collections.emptySet());
@@ -80,6 +81,7 @@ public class MetadataEvent extends ApplicationEvent {
         this(source, null, id, metadataType, operateType, targetServices);
     }
 
+    /** metadata event. */
     public MetadataEvent(
             Object source,
             Long tenantId,

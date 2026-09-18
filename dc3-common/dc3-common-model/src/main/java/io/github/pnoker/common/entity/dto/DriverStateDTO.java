@@ -71,12 +71,14 @@ public class DriverStateDTO implements Serializable {
      */
     private LocalDateTime createTime;
 
+    /** driver state DTO. */
     public DriverStateDTO(Long driverId, String status) {
         this.driverId = driverId;
         this.status = status;
         this.createTime = LocalDateTimeUtil.now();
     }
 
+    /** driver state DTO. */
     public DriverStateDTO(Long driverId, EntityStatusEnum status) {
         this(driverId, status == null ? null : status.getCode());
     }

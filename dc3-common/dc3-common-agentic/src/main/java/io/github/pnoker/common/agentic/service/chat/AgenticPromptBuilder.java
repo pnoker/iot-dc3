@@ -45,6 +45,7 @@ public class AgenticPromptBuilder {
 
     private final Advisor toolCallAdvisor;
 
+    /** agentic prompt builder. */
     public AgenticPromptBuilder(
             ChatClientFactory chatClientFactory,
             @Qualifier("agenticToolCallbackProvider") ToolCallbackProvider toolCallbackProvider,

@@ -16,8 +16,6 @@
  */
 package io.github.pnoker.db.postgres.data;
 
-import io.github.pnoker.common.data.repository.ReactiveAlertAnalyticsStore;
-
 import io.github.pnoker.common.data.entity.bo.dashboard.ActivityCellRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.AgingBucketRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.AlertCountersRow;
@@ -32,6 +30,7 @@ import io.github.pnoker.common.data.entity.bo.dashboard.ProtocolHealthRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.RecentChangeRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow;
+import io.github.pnoker.common.data.repository.ReactiveAlertAnalyticsStore;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import java.time.Instant;
 import java.time.LocalDate;

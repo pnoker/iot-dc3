@@ -50,6 +50,7 @@ public record EventParamOffsetRequest(
 
         @Schema(description = "Optimistic-lock version filter.")
         Integer version) {
+    /** Event param offset request compact constructor: normalizes the query record. */
     public EventParamOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -62,6 +63,7 @@ public record EventParamOffsetRequest(
             throw new IllegalArgumentException("unsupported sort field");
     }
 
+    /** event param offset request. */
     public EventParamOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null, null, null);
     }

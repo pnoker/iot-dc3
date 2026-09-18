@@ -73,7 +73,7 @@ public final class TreeUtil {
         List<T> trees = new ArrayList<>(16);
         for (T treeNode : treeNodes) {
             if (root.equals(treeNode.getParentId())) {
-                trees.add(findChildren(treeNode, treeNodes));
+                trees.add(getChildren(treeNode, treeNodes));
             }
         }
         return trees;
@@ -87,13 +87,13 @@ public final class TreeUtil {
      * @param treeNodes List of all tree nodes
      * @return T Tree
      */
-    public static <T extends TreeNode> T findChildren(T treeNode, List<T> treeNodes) {
+    public static <T extends TreeNode> T getChildren(T treeNode, List<T> treeNodes) {
         for (T it : treeNodes) {
             if (treeNode.getId() == it.getParentId()) {
                 if (Objects.isNull(treeNode.getChildren())) {
                     treeNode.setChildren(new ArrayList<>(16));
                 }
-                treeNode.add(findChildren(it, treeNodes));
+                treeNode.add(getChildren(it, treeNodes));
             }
         }
         return treeNode;

@@ -133,7 +133,7 @@ class PointValueIngestServiceImplTest {
         lenient()
                 .when(ingestOutbox.enqueue(anyList(), any()))
                 .thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
-        lenient().when(ingestOutbox.findPersisted(anyList())).thenReturn(reactor.core.publisher.Flux.empty());
+        lenient().when(ingestOutbox.getPersisted(anyList())).thenReturn(reactor.core.publisher.Flux.empty());
         lenient().when(ingestOutbox.markPersisted(any(), any())).thenReturn(Mono.just(1));
         lenient().when(ingestOutbox.markProcessed(any())).thenReturn(Mono.just(1));
         lenient().when(ingestOutbox.markFailed(any(), any(), any())).thenReturn(Mono.just(1));

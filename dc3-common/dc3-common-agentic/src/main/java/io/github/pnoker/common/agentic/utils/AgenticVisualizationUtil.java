@@ -243,14 +243,17 @@ public class AgenticVisualizationUtil {
         }
     }
 
+    /** numeric series. */
     public record NumericSeries(List<Map<String, Object>> dataset, NumericSummary summary) {
 
+        /** Numeric series compact constructor: normalizes the record. */
         public NumericSeries {
             dataset = List.copyOf(Objects.requireNonNullElse(dataset, List.of()));
             summary = Objects.requireNonNullElseGet(summary, () -> NumericSummary.empty(0));
         }
     }
 
+    /** numeric summary. */
     public record NumericSummary(
             int totalCount,
             int numericCount,

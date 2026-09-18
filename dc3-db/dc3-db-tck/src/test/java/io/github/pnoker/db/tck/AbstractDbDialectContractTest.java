@@ -300,7 +300,7 @@ abstract class AbstractDbDialectContractTest {
         assertThat(store.markPersisted(row, owner).block()).isEqualTo(1);
         assertThat(store.markProcessed(row).block()).isEqualTo(1);
         assertThat(store.markProcessed(row).block()).isZero();
-        assertThat(store.findPersisted(List.of(row)).collectList().block()).isEmpty();
+        assertThat(store.getPersisted(List.of(row)).collectList().block()).isEmpty();
     }
 
     @Test

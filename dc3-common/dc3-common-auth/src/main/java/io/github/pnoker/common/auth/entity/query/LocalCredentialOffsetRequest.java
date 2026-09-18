@@ -37,6 +37,7 @@ public record LocalCredentialOffsetRequest(
         @Schema(description = "Credential type filter") CredentialTypeEnum credentialType,
         @Schema(description = "Enable state filter") EnableFlagEnum enableFlag) {
 
+    /** Local credential offset request compact constructor: normalizes the query record. */
     public LocalCredentialOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -47,6 +48,7 @@ public record LocalCredentialOffsetRequest(
         }
     }
 
+    /** local credential offset request. */
     public LocalCredentialOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null);
     }

@@ -27,6 +27,7 @@ public class OAuthProtocolException extends ResponseStatusException {
     private final String error;
     private final String description;
 
+    /** o auth protocol exception. */
     public OAuthProtocolException(int status, String error, String description) {
         super(HttpStatus.valueOf(status), description);
         this.error = error;

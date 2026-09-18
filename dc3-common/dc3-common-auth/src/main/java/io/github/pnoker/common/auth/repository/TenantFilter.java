@@ -28,6 +28,7 @@ public record TenantFilter(String tenantName, String tenantCode, EnableFlagEnum 
     private static final Set<String> SORT_FIELDS =
             Set.of("id", "tenantName", "tenantCode", "createTime", "operateTime");
 
+    /** Tenant filter compact constructor: normalizes the filter record. */
     public TenantFilter {
         page = page == null ? PageRequest.firstPage() : page;
         if (page.sort().stream().anyMatch(spec -> spec == null || !SORT_FIELDS.contains(spec.field()))) {
@@ -37,6 +38,7 @@ public record TenantFilter(String tenantName, String tenantCode, EnableFlagEnum 
         tenantCode = normalize(tenantCode);
     }
 
+    /** tenant filter. */
     public TenantFilter(
             String tenantName,
             String tenantCode,

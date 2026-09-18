@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.manager;
 
-import io.github.pnoker.common.manager.repository.ReactiveDeviceImportJobStore;
-
 import io.github.pnoker.common.manager.entity.operation.DeviceImportJob;
+import io.github.pnoker.common.manager.repository.ReactiveDeviceImportJobStore;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import java.time.Instant;
 import java.time.LocalDateTime;

@@ -22,8 +22,8 @@ import io.github.pnoker.common.auth.repository.RoleFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Business service covering role use cases. */
 
+/** Business service covering role use cases. */
 public interface ReactiveRoleService {
     /** Resolve the role by its id. */
     Mono<RoleBO> getById(Long tenantId, Long id);

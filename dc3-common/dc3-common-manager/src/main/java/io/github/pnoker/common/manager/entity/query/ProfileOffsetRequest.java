@@ -50,6 +50,7 @@ public record ProfileOffsetRequest(
 
         @Schema(description = "Device identifier filter") Long deviceId) {
 
+    /** Profile offset request compact constructor: normalizes the query record. */
     public ProfileOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -62,6 +63,7 @@ public record ProfileOffsetRequest(
             throw new IllegalArgumentException("unsupported sort field");
     }
 
+    /** profile offset request. */
     public ProfileOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null, null, null, null, null, null);
     }

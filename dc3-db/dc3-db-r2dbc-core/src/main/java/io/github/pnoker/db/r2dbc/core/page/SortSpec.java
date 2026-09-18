@@ -17,15 +17,17 @@
 package io.github.pnoker.db.r2dbc.core.page;
 
 import java.util.Objects;
-/** Whitelisted sort field and direction for repository queries. */
 
+/** Whitelisted sort field and direction for repository queries. */
 public record SortSpec(String field, Direction direction) {
 
+    /** Sort direction applied to a whitelisted field. */
     public enum Direction {
         ASC,
         DESC
     }
 
+    /** Single-field sort specification. */
     public SortSpec {
         if (field == null || field.isBlank()) {
             throw new IllegalArgumentException("sort field must not be blank");

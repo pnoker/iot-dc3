@@ -84,6 +84,7 @@ public class DeviceAlarmDTO implements Serializable {
      */
     private LocalDateTime createTime;
 
+    /** device alarm DTO. */
     public DeviceAlarmDTO(Long deviceId, String message) {
         this.deviceId = deviceId;
         this.message = message;

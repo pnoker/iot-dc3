@@ -47,6 +47,7 @@ public record PrincipalOffsetRequest(
         @Schema(description = "Principal enable state filter")
         EnableFlagEnum enableFlag) {
 
+    /** Principal offset request compact constructor: normalizes the query record. */
     public PrincipalOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -57,6 +58,7 @@ public record PrincipalOffsetRequest(
         }
     }
 
+    /** principal offset request. */
     public PrincipalOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null, null);
     }

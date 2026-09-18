@@ -37,6 +37,7 @@ public record EventAttributeFilter(
     private static final Set<String> SORT_FIELDS =
             Set.of("id", "attributeName", "attributeCode", "driverId", "createTime", "operateTime", "version");
 
+    /** Event attribute filter compact constructor: normalizes the filter record. */
     public EventAttributeFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");

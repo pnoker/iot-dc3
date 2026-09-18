@@ -44,7 +44,15 @@ export interface CrudSpec {
   exact?: string[];
   /** Register `/enable` and `/disable` toggles (principal/serviceAccount). */
   enable?: boolean;
+  /**
+   * Subset of the standard CRUD endpoints to register (default: all five).
+   * Must mirror the real controller surface — e.g. rule/state and notify/history
+   * have no add/update, binds and tenant_membership have no update/get_by_id.
+   */
+  verbs?: CrudVerb[];
 }
+
+export type CrudVerb = 'list' | 'get_by_id' | 'add' | 'update' | 'delete';
 
 const compileFilter =
   (search: string[], exact: string[]) =>
@@ -61,37 +69,44 @@ const compileFilter =
  * reflects user actions; `/list` re-reads the (now mutated) collection each call.
  *
  * Registered: POST /list, GET /get_by_id, POST /add, POST /update, POST /delete,
- * (optional) POST /enable, POST /disable.
+ * (optional) POST /enable, POST /disable — pass `verbs` to register only the
+ * subset the real controller exposes.
  *
  * Out of scope (entity-specific shapes): /list_by_ids, /list_tree, join queries,
  * history — register those separately next to this call.
  */
 export function registerCrud(spec: CrudSpec): void {
-  const {baseUrl, collection, search = [], exact = ['enableFlag'], enable = false} = spec;
+  const {baseUrl, collection, search = [], exact = ['enableFlag'], enable = false, verbs} = spec;
+  const active = new Set(verbs ?? ['list', 'get_by_id', 'add', 'update', 'delete']);
   const rows = (): Record<string, unknown>[] => db[collection] as Record<string, unknown>[];
   const filter = compileFilter(search, exact);
   const findById = (id: unknown) => rows().find((r) => String(r.id) === String(id));
 
-  on('post', `${baseUrl}/list`, (ctx) => responseOf(ctx.config, ok(paginate(rows(), ctx.body, filter))));
-  on('get', `${baseUrl}/get_by_id`, (ctx) =>
-    responseOf(ctx.config, ok(findById(ctx.params.id) ?? rows()[0] ?? {})),
-  );
-  on('post', `${baseUrl}/add`, (ctx) => {
-    const row: Record<string, unknown> = {...ctx.body, id: newId(), createTime: stamp(), operateTime: stamp()};
-    rows().push(row);
-    return responseOf(ctx.config, ok(String(row.id)));
-  });
-  on('post', `${baseUrl}/update`, (ctx) => {
-    const i = rows().findIndex((r) => String(r.id) === String(ctx.body?.id));
-    if (i >= 0) rows()[i] = {...rows()[i], ...ctx.body, operateTime: stamp()};
-    return responseOf(ctx.config, ok(String(ctx.body?.id ?? '')));
-  });
-  on(['post', 'delete'], `${baseUrl}/delete`, (ctx) => {
-    const id = ctx.params.id;
-    const i = rows().findIndex((r) => String(r.id) === String(id));
-    if (i >= 0) rows().splice(i, 1);
-    return responseOf(ctx.config, ok(String(id)));
-  });
+  if (active.has('list'))
+    on('post', `${baseUrl}/list`, (ctx) => responseOf(ctx.config, ok(paginate(rows(), ctx.body, filter))));
+  if (active.has('get_by_id'))
+    on('get', `${baseUrl}/get_by_id`, (ctx) =>
+      responseOf(ctx.config, ok(findById(ctx.params.id) ?? rows()[0] ?? {})),
+    );
+  if (active.has('add'))
+    on('post', `${baseUrl}/add`, (ctx) => {
+      const row: Record<string, unknown> = {...ctx.body, id: newId(), createTime: stamp(), operateTime: stamp()};
+      rows().push(row);
+      return responseOf(ctx.config, ok(String(row.id)));
+    });
+  if (active.has('update'))
+    on('post', `${baseUrl}/update`, (ctx) => {
+      const i = rows().findIndex((r) => String(r.id) === String(ctx.body?.id));
+      if (i >= 0) rows()[i] = {...rows()[i], ...ctx.body, operateTime: stamp()};
+      return responseOf(ctx.config, ok(String(ctx.body?.id ?? '')));
+    });
+  if (active.has('delete'))
+    on(['post', 'delete'], `${baseUrl}/delete`, (ctx) => {
+      const id = ctx.params.id;
+      const i = rows().findIndex((r) => String(r.id) === String(id));
+      if (i >= 0) rows().splice(i, 1);
+      return responseOf(ctx.config, ok(String(id)));
+    });
   if (enable) {
     const toggle = (flag: string) => (ctx: MockCtx) => {
       const row = findById(ctx.params.id);

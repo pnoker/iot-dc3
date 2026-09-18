@@ -66,7 +66,7 @@ public class JwksKeySource implements OAuthJwtVerifier.KeySource {
     public JwksKeySource(String jwksUrl, Duration refreshInterval) {
         this.jwksUri = URI.create(jwksUrl);
         this.refreshInterval = refreshInterval;
-        this.cachedKeys = fetch();
+        this.cachedKeys = load();
         this.fetchedAtMillis = System.currentTimeMillis();
     }
 
@@ -79,14 +79,14 @@ public class JwksKeySource implements OAuthJwtVerifier.KeySource {
         // Unknown kid: force one refresh (ignoring the reuse window) so rotation is
         // immediate, then give up.
         fetchedAtMillis = Long.MIN_VALUE;
-        Map<String, RSAPublicKey> refreshed = fetch();
+        Map<String, RSAPublicKey> refreshed = load();
         if (!refreshed.isEmpty()) {
             return refreshed.get(kid);
         }
         return null;
     }
 
-    private Map<String, RSAPublicKey> fetch() {
+    private Map<String, RSAPublicKey> load() {
         if (isFresh()) {
             return cachedKeys;
         }

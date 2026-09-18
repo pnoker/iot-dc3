@@ -88,7 +88,7 @@ class PointCommandServiceImplTest {
         driver.setId(30L);
         driver.setServiceName("driver");
         owner = new FacadeDeviceOwnerBO(30L, "node", 7L);
-        when(store.find(anyLong(), anyString())).thenReturn(Mono.empty());
+        when(store.get(anyLong(), anyString())).thenReturn(Mono.empty());
         when(store.insert(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
         when(store.markSent(anyLong(), anyString(), any())).thenReturn(Mono.just(true));
         when(sender.sendConfirmed(any())).thenReturn(Mono.empty());
@@ -146,7 +146,7 @@ class PointCommandServiceImplTest {
         existing.setDeviceId(10L);
         existing.setPointId(20L);
         existing.setType(io.github.pnoker.common.enums.PointCommandTypeEnum.READ);
-        when(store.find(1L, "cmd-existing")).thenReturn(Mono.just(existing));
+        when(store.get(1L, "cmd-existing")).thenReturn(Mono.just(existing));
 
         StepVerifier.create(service.read(1L, new PointCommandReadBO(10L, 20L, "cmd-existing")))
                 .expectNext("cmd-existing")

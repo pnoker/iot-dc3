@@ -33,6 +33,7 @@ public record TenantMembershipFilter(
     private static final Set<String> SORT_FIELDS =
             Set.of("id", "principalId", "principalType", "membershipStatus", "joinedTime", "createTime", "operateTime");
 
+    /** Tenant membership filter compact constructor: normalizes the filter record. */
     public TenantMembershipFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenant id is required");
         page = page == null ? PageRequest.firstPage() : page;
@@ -41,6 +42,7 @@ public record TenantMembershipFilter(
         }
     }
 
+    /** tenant membership filter. */
     public TenantMembershipFilter(
             Long tenantId,
             Long principalId,

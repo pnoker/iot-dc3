@@ -36,6 +36,7 @@ public class RuleRegistry {
     private final ReactiveRuleStore ruleStore;
     private final Cache<RuleCacheKey, Mono<List<RuleBO>>> cache;
 
+    /** rule registry. */
     public RuleRegistry(ReactiveRuleStore ruleStore, AlarmCacheProperties properties) {
         this.ruleStore = ruleStore;
         AlarmCacheProperties.CacheTuning tuning = properties.getRule();
@@ -46,7 +47,7 @@ public class RuleRegistry {
     }
 
     /** Emit the cached enabled rule candidates matching the fact. */
-    public Mono<List<RuleBO>> findCandidates(RuleFact fact) {
+    public Mono<List<RuleBO>> getCandidates(RuleFact fact) {
         if (fact == null
                 || fact.getTenantId() == null
                 || fact.getTenantId() <= 0
@@ -74,5 +75,6 @@ public class RuleRegistry {
         cache.invalidateAll();
     }
 
+    /** rule cache key. */
     public record RuleCacheKey(Long tenantId, AlarmTargetTypeEnum targetType, Long entityId) {}
 }

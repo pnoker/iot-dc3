@@ -29,6 +29,7 @@ public record IdentityAuditLogFilter(
         String cursor,
         int limit) {
 
+    /** Identity audit log filter compact constructor: normalizes the filter record. */
     public IdentityAuditLogFilter {
         if (tenantId == null || tenantId <= 0) {
             throw new IllegalArgumentException("tenant id is required");

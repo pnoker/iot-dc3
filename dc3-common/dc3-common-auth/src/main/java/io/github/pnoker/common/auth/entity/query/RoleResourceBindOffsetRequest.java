@@ -32,6 +32,7 @@ public record RoleResourceBindOffsetRequest(
 
         @Schema(description = "Role identifier filter") Long roleId,
         @Schema(description = "Resource identifier filter") Long resourceId) {
+    /** Role resource bind offset request compact constructor: normalizes the query record. */
     public RoleResourceBindOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -41,6 +42,7 @@ public record RoleResourceBindOffsetRequest(
             throw new IllegalArgumentException("limit must be between 1 and " + PageRequest.MAX_LIMIT);
     }
 
+    /** role resource bind offset request. */
     public RoleResourceBindOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null);
     }

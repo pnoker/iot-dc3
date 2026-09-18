@@ -103,7 +103,7 @@ class ActionServiceImplTest {
         claimed.setStatus(AgenticActionStatusEnum.CONFIRMED);
         ActionBO executed = pendingAction();
         executed.setStatus(AgenticActionStatusEnum.EXECUTED);
-        when(actionStore.find("action-1", header)).thenReturn(reactor.core.publisher.Mono.just(action));
+        when(actionStore.get("action-1", header)).thenReturn(reactor.core.publisher.Mono.just(action));
         when(actionStore.claimPending(
                         eq("action-1"), eq(header), eq(AgenticActionStatusEnum.CONFIRMED), any(Instant.class)))
                 .thenReturn(reactor.core.publisher.Mono.just(claimed));
@@ -125,7 +125,7 @@ class ActionServiceImplTest {
     @Test
     void confirmRaceReturnsRequestErrorAndDoesNotDispatchCommand() {
         ActionBO action = pendingAction();
-        when(actionStore.find("action-1", header)).thenReturn(reactor.core.publisher.Mono.just(action));
+        when(actionStore.get("action-1", header)).thenReturn(reactor.core.publisher.Mono.just(action));
         when(actionStore.claimPending(
                         eq("action-1"), eq(header), eq(AgenticActionStatusEnum.CONFIRMED), any(Instant.class)))
                 .thenReturn(reactor.core.publisher.Mono.empty());
@@ -143,7 +143,7 @@ class ActionServiceImplTest {
     void rejectExpiredActionDoesNotClaim() {
         ActionBO action = pendingAction();
         action.setExpireTime(LocalDateTime.now(ZoneOffset.UTC).minusSeconds(1));
-        when(actionStore.find("action-1", header)).thenReturn(reactor.core.publisher.Mono.just(action));
+        when(actionStore.get("action-1", header)).thenReturn(reactor.core.publisher.Mono.just(action));
 
         StepVerifier.create(service.reject("action-1", header))
                 .expectErrorSatisfies(error ->
@@ -160,7 +160,7 @@ class ActionServiceImplTest {
         claimed.setStatus(AgenticActionStatusEnum.CONFIRMED);
         ActionBO failed = pendingAction();
         failed.setStatus(AgenticActionStatusEnum.FAILED);
-        when(actionStore.find("action-1", header)).thenReturn(reactor.core.publisher.Mono.just(action));
+        when(actionStore.get("action-1", header)).thenReturn(reactor.core.publisher.Mono.just(action));
         when(actionStore.claimPending(
                         eq("action-1"), eq(header), eq(AgenticActionStatusEnum.CONFIRMED), any(Instant.class)))
                 .thenReturn(reactor.core.publisher.Mono.just(claimed));

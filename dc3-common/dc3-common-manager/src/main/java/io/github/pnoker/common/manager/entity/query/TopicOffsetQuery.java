@@ -20,6 +20,7 @@ import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 
 /** Canonical offset query for topic projections. */
 public record TopicOffsetQuery(Long tenantId, String topic, String deviceName, long offset, int limit) {
+    /** Topic offset query compact constructor: normalizes the query record. */
     public TopicOffsetQuery {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId must be positive");
         if (offset < 0 || limit < 1 || limit > PageRequest.MAX_LIMIT)

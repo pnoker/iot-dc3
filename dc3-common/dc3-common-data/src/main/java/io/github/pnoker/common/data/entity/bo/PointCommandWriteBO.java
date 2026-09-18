@@ -32,12 +32,15 @@ import lombok.ToString;
 @ToString
 public class PointCommandWriteBO {
 
+    /** point command write BO. */
     public PointCommandWriteBO() {}
 
+    /** point command write BO. */
     public PointCommandWriteBO(Long deviceId, Long pointId, String value, String commandId) {
         this(deviceId, pointId, value, commandId, null);
     }
 
+    /** point command write BO. */
     public PointCommandWriteBO(
             Long deviceId, Long pointId, String value, String commandId, PointCommandSourceEnum source) {
         this.deviceId = deviceId;

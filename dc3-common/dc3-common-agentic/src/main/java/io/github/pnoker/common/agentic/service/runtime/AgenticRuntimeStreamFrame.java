@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public record AgenticRuntimeStreamFrame(AgenticStreamDelta delta, String finishReason) {
 
+    /** Agentic runtime stream frame compact constructor: normalizes the record. */
     public AgenticRuntimeStreamFrame {
         delta = Objects.nonNull(delta) ? delta : AgenticStreamDelta.empty();
     }

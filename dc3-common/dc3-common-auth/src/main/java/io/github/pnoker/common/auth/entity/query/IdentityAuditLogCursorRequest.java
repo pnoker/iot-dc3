@@ -32,6 +32,7 @@ public record IdentityAuditLogCursorRequest(
         @Schema(description = "Resource identifier filter") Long resourceId,
         @Schema(description = "Outcome status filter") String status) {
 
+    /** Identity audit log cursor request compact constructor: normalizes the query record. */
     public IdentityAuditLogCursorRequest {
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
         if (limit < 1 || limit > PageRequest.MAX_LIMIT) {
@@ -39,6 +40,7 @@ public record IdentityAuditLogCursorRequest(
         }
     }
 
+    /** identity audit log cursor request. */
     public IdentityAuditLogCursorRequest() {
         this(null, PageRequest.DEFAULT_LIMIT, null, null, null, null, null);
     }

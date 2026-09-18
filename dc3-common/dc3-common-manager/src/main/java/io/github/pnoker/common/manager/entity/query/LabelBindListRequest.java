@@ -41,6 +41,7 @@ public record LabelBindListRequest(
 
         @Schema(description = "Optional bound entity identifier filter", example = "200")
         Long entityId) {
+    /** Label bind list request compact constructor: normalizes the query record. */
     public LabelBindListRequest {
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");
         if (limit < 1 || limit > PageRequest.MAX_LIMIT) {
@@ -49,6 +50,7 @@ public record LabelBindListRequest(
         sort = sort == null ? List.of() : List.copyOf(sort);
     }
 
+    /** label bind list request. */
     public LabelBindListRequest() {
         this(0, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null);
     }

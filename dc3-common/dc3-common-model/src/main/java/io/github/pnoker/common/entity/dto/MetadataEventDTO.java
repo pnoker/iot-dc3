@@ -55,10 +55,12 @@ public class MetadataEventDTO implements Serializable {
      */
     private MetadataOperateTypeEnum operateType;
 
+    /** metadata event DTO. */
     public MetadataEventDTO(Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType) {
         this(null, id, metadataType, operateType);
     }
 
+    /** metadata event DTO. */
     public MetadataEventDTO(
             Long tenantId, Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType) {
         this.tenantId = tenantId;

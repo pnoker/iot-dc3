@@ -128,7 +128,7 @@ public class NotifyWorker {
                     task, NotifySendResult.skipped(channel.getCredentialRef(), "Notify channel is disabled"));
         }
         NotifyChannelTypeEnum type = channel.getChannelTypeFlag();
-        NotifyChannelAdapter adapter = notifyChannelAdapterRegistry.find(type).orElse(null);
+        NotifyChannelAdapter adapter = notifyChannelAdapterRegistry.get(type).orElse(null);
         if (Objects.isNull(adapter)) {
             return persistTerminal(
                     task,

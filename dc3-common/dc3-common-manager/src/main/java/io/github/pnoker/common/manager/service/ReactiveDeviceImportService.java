@@ -21,8 +21,8 @@ import io.github.pnoker.common.manager.entity.operation.OperationView;
 import io.github.pnoker.db.r2dbc.core.operation.OperationAccepted;
 import java.util.UUID;
 import reactor.core.publisher.Mono;
-/** Business service covering device import use cases. */
 
+/** Business service covering device import use cases. */
 public interface ReactiveDeviceImportService {
 
     /** Submit the device import workbook as a tracked async operation. */

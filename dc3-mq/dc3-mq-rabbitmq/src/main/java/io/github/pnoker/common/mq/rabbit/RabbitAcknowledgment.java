@@ -35,6 +35,7 @@ public final class RabbitAcknowledgment implements Acknowledgment {
     private final long deliveryTag;
     private final boolean multiple;
 
+    /** rabbit acknowledgment. */
     public RabbitAcknowledgment(Channel channel, long deliveryTag, boolean multiple) {
         this.channel = channel;
         this.deliveryTag = deliveryTag;

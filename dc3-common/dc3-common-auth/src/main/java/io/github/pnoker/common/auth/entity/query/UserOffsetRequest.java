@@ -37,6 +37,7 @@ public record UserOffsetRequest(
         @Schema(description = "Partial phone filter") String phone,
         @Schema(description = "Partial email filter") String email,
         @Schema(description = "Enable state filter") EnableFlagEnum enableFlag) {
+    /** User offset request compact constructor: normalizes the query record. */
     public UserOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -46,6 +47,7 @@ public record UserOffsetRequest(
             throw new IllegalArgumentException("limit must be between 1 and " + PageRequest.MAX_LIMIT);
     }
 
+    /** user offset request. */
     public UserOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null, null, null);
     }

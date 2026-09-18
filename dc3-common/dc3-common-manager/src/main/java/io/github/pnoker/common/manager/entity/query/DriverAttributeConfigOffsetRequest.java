@@ -40,6 +40,7 @@ public record DriverAttributeConfigOffsetRequest(
 
         @Schema(description = "Optimistic-lock version filter")
         Integer version) {
+    /** Driver attribute config offset request compact constructor: normalizes the query record. */
     public DriverAttributeConfigOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -51,6 +52,7 @@ public record DriverAttributeConfigOffsetRequest(
             throw new IllegalArgumentException("unsupported sort field");
     }
 
+    /** driver attribute config offset request. */
     public DriverAttributeConfigOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null);
     }

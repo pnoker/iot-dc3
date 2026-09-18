@@ -110,6 +110,7 @@ public class MqttMqAdapter implements BrokerAdapter {
     private final List<Subscription> subscriptions = new CopyOnWriteArrayList<>();
     private volatile boolean stopped;
 
+    /** mqtt mq adapter. */
     public MqttMqAdapter(String host, int port, BatchConsumerProperties retryProperties) {
         this.host = host;
         this.port = port;

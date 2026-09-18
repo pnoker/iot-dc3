@@ -26,8 +26,8 @@ import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyProfileRow;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import reactor.core.publisher.Flux;
-/** Reactive persistence port for dashboard records. */
 
+/** Reactive persistence port for dashboard records. */
 public interface ReactiveDashboardStore {
     /** Emit driver counts grouped by enable flag. */
     Flux<BucketRow> countDriverByEnable(Long tenantId);

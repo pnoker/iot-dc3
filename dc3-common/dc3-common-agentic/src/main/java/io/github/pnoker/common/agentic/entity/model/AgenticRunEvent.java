@@ -36,6 +36,7 @@ public record AgenticRunEvent(
         String status,
         String code) {
 
+    /** Agentic run event compact constructor: normalizes the record. */
     public AgenticRunEvent {
         type = StringUtils.defaultIfBlank(type, AgenticConstant.RunEvent.TYPE_EVENT);
         name = StringUtils.defaultString(name);

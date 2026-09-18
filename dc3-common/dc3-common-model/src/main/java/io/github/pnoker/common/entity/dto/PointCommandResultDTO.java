@@ -45,6 +45,7 @@ public record PointCommandResultDTO(
         return new Builder();
     }
 
+    /** builder. */
     public static class Builder {
         private String commandId;
         private Long tenantId;

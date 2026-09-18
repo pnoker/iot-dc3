@@ -29,6 +29,7 @@ public final class SpringR2dbcPageTransaction implements PageTransaction {
 
     private final TransactionalOperator transactionalOperator;
 
+    /** Spring-transaction adapter for paged R2DBC reads. */
     public SpringR2dbcPageTransaction(ReactiveTransactionManager transactionManager) {
         Objects.requireNonNull(transactionManager, "transactionManager must not be null");
         DefaultTransactionDefinition definition = new DefaultTransactionDefinition();

@@ -27,6 +27,7 @@ public record ServiceAccountFilter(
         Long ownerPrincipalId,
         EnableFlagEnum enableFlag,
         PageRequest page) {
+    /** Service account filter compact constructor: normalizes the filter record. */
     public ServiceAccountFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenant id is required");
         page = page == null ? PageRequest.firstPage() : page;

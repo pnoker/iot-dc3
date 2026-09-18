@@ -46,6 +46,7 @@ public record PointOffsetQuery(
         @Schema(description = "Optimistic-lock version") Integer version,
         @Schema(description = "Device identifier") Long deviceId) {
 
+    /** Point offset query compact constructor: normalizes the query record. */
     public PointOffsetQuery {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? 50 : limit;

@@ -31,5 +31,4 @@ import org.springframework.r2dbc.core.DatabaseClient;
 @AutoConfiguration
 @ConditionalOnClass({DatabaseClient.class, R2dbcDialect.class})
 @ComponentScan(basePackages = "io.github.pnoker.db.postgres.manager")
-public class ManagerPostgresStoresConfiguration {
-}
+public class ManagerPostgresStoresConfiguration {}

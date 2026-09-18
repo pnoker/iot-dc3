@@ -16,9 +16,6 @@
  */
 package io.github.pnoker.db.postgres.manager;
 
-import io.github.pnoker.common.manager.repository.ProfileFilter;
-import io.github.pnoker.common.manager.repository.ReactiveProfileStore;
-
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.ProfileExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -26,6 +23,8 @@ import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.ProfileShareTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
+import io.github.pnoker.common.manager.repository.ProfileFilter;
+import io.github.pnoker.common.manager.repository.ReactiveProfileStore;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;

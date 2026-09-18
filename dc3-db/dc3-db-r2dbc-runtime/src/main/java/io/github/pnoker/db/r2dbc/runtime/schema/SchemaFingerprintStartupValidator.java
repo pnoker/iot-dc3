@@ -29,6 +29,7 @@ public final class SchemaFingerprintStartupValidator implements SmartInitializin
     private final SchemaFingerprintVerifier verifier;
     private final Duration timeout;
 
+    /** Startup guard rejecting services whose embedded schema fingerprint is stale. */
     public SchemaFingerprintStartupValidator(SchemaFingerprintVerifier verifier, R2dbcRuntimeProperties properties) {
         this.verifier = verifier;
         Duration configured = properties.getStartupTimeout();

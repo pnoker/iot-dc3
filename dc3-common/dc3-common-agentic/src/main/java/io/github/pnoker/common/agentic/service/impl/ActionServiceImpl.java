@@ -105,7 +105,7 @@ public class ActionServiceImpl implements ActionService {
             return Mono.error(new IllegalArgumentException("header must not be null"));
         }
         return actionStore
-                .find(actionId, header)
+                .get(actionId, header)
                 .switchIfEmpty(Mono.error(new NotFoundException("Agentic action does not exist")))
                 .flatMap(action -> {
                     if (action.getStatus() != AgenticActionStatusEnum.PENDING) {

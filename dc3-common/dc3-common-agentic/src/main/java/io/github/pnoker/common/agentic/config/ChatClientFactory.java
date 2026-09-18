@@ -73,6 +73,7 @@ public class ChatClientFactory {
     @Value("${spring.ai.openai.chat.options.model:gpt-4o}")
     private String fallbackModel;
 
+    /** chat client factory. */
     public ChatClientFactory(
             ReactiveModelProviderStore modelProviderStore,
             ReactiveModelConfigStore modelConfigStore,
@@ -170,13 +171,13 @@ public class ChatClientFactory {
         ConfigKey key = new ConfigKey(header.getTenantId(), model);
         ModelConfigBO cached = configCache.get(key);
         if (cached != null) return Mono.just(cached);
-        return modelConfigStore.findByModel(model, header).doOnNext(this::cacheConfig);
+        return modelConfigStore.getByModel(model, header).doOnNext(this::cacheConfig);
     }
 
     private Mono<ModelConfigBO> loadDefaultConfig(RequestHeader.PrincipalHeader header) {
         ModelConfigBO cached = defaultConfigCache.get(header.getTenantId());
         if (cached != null) return Mono.just(cached);
-        return modelConfigStore.findDefault(header).doOnNext(this::cacheConfig);
+        return modelConfigStore.getDefault(header).doOnNext(this::cacheConfig);
     }
 
     private Mono<ModelProviderBO> warmProvider(ModelConfigBO config, RequestHeader.PrincipalHeader header) {

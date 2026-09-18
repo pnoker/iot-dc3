@@ -18,10 +18,11 @@ package io.github.pnoker.db.r2dbc.core.page;
 
 import java.util.List;
 import java.util.Objects;
-/** Offset-paged result slice with total count. */
 
+/** Offset-paged result slice with total count. */
 public record OffsetPage<T>(List<T> items, long offset, int limit, long total, boolean hasNext) {
 
+    /** Offset-paged result slice with total count. */
     public OffsetPage {
         items = List.copyOf(Objects.requireNonNull(items, "items must not be null"));
         if (offset < 0) {

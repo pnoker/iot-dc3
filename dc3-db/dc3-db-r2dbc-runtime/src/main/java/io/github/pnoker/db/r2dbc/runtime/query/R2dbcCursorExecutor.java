@@ -36,6 +36,7 @@ public final class R2dbcCursorExecutor {
     private final DatabaseClient databaseClient;
     private final TransactionalOperator transactionalOperator;
 
+    /** Executes cursor-paged queries with signed continuation tokens. */
     public R2dbcCursorExecutor(DatabaseClient databaseClient, TransactionalOperator transactionalOperator) {
         this.databaseClient = Objects.requireNonNull(databaseClient, "databaseClient must not be null");
         this.transactionalOperator =

@@ -48,6 +48,7 @@ public record DriverListRequest(
         @Schema(description = "Group identifier filter") Long groupId,
         @Schema(description = "Label identifier filter") Long labelId) {
 
+    /** Driver list request compact constructor: normalizes the query record. */
     public DriverListRequest {
         if (offset < 0) throw new IllegalArgumentException("offset must be non-negative");
         if (limit < 1 || limit > PageRequest.MAX_LIMIT)
@@ -55,6 +56,7 @@ public record DriverListRequest(
         sort = sort == null ? List.of() : List.copyOf(sort);
     }
 
+    /** driver list request. */
     public DriverListRequest() {
         this(0, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null, null, null, null, null, null);
     }

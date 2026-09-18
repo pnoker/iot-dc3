@@ -38,6 +38,7 @@ public class GatewayAuthenticationToken extends AbstractAuthenticationToken {
 
     private final RequestHeader.PrincipalHeader principalHeader;
 
+    /** gateway authentication token. */
     public GatewayAuthenticationToken(
             RequestHeader.PrincipalHeader principalHeader, Collection<? extends GrantedAuthority> authorities) {
         super(authorities);

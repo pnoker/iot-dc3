@@ -42,6 +42,7 @@ public record PointFilter(
     private static final Set<String> SORT_FIELDS =
             Set.of("id", "pointName", "pointCode", "createTime", "operateTime", "version");
 
+    /** Point filter compact constructor: normalizes the filter record. */
     public PointFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId is required");
         if (offset < 0 || limit < 1 || limit > 200) throw new IllegalArgumentException("invalid page bounds");

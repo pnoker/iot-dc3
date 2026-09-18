@@ -36,6 +36,7 @@ public record UserFilter(
     private static final Set<String> SORT_FIELDS =
             Set.of("id", "userName", "nickName", "phone", "email", "createTime", "operateTime");
 
+    /** User filter compact constructor: normalizes the filter record. */
     public UserFilter {
         if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenant id is required");
         page = page == null ? PageRequest.firstPage() : page;
@@ -48,6 +49,7 @@ public record UserFilter(
         email = normalize(email);
     }
 
+    /** user filter. */
     public UserFilter(
             Long tenantId,
             Long principalId,

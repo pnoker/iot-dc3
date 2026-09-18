@@ -71,10 +71,10 @@ class TreeUtilTest {
     }
 
     @Test
-    void findChildrenAttachesChildrenAndReturnsTheRoot() {
+    void getChildrenAttachesChildrenAndReturnsTheRoot() {
         TreeNode root = node(1, 0);
         TreeNode child = node(2, 1);
-        TreeNode result = TreeUtil.findChildren(root, List.of(child));
+        TreeNode result = TreeUtil.getChildren(root, List.of(child));
         assertThat(result).isSameAs(root);
         assertThat(result.getChildren()).extracting(TreeNode::getId).contains(2);
     }

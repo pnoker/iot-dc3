@@ -21,8 +21,8 @@ import io.github.pnoker.common.manager.repository.CommandAttributeConfigFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Business service covering command attribute config use cases. */
 
+/** Business service covering command attribute config use cases. */
 public interface ReactiveCommandAttributeConfigService {
     /** Add one command attribute config. */
     Mono<CommandAttributeConfigBO> add(CommandAttributeConfigBO value);

@@ -16,10 +16,9 @@
  */
 package io.github.pnoker.db.postgres.data;
 
+import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 import io.github.pnoker.common.data.repository.NotifyHistoryInsertResult;
 import io.github.pnoker.common.data.repository.ReactiveNotifyHistoryStore;
-
-import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.UuidV7;
@@ -199,7 +198,7 @@ public class R2dbcNotifyHistoryStore implements ReactiveNotifyHistoryStore {
                                     new IllegalStateException("notify history insert affected " + rows + " rows")));
         }
         return transactionalOperator
-                .transactional(affected.flatMap(ignored -> findByDedupe(history.getTenantId(), history.getDedupeKey())
+                .transactional(affected.flatMap(ignored -> getByDedupe(history.getTenantId(), history.getDedupeKey())
                         .switchIfEmpty(Mono.error(new IllegalStateException("notify history dedupe row disappeared")))
                         .map(existing -> new NotifyHistoryInsertResult(
                                 existing, history.getId().equals(existing.getId())))))
@@ -360,7 +359,7 @@ public class R2dbcNotifyHistoryStore implements ReactiveNotifyHistoryStore {
         return spec.bind("response_ext", serializeJsonOrEmpty(history.getResponseExt()));
     }
 
-    private Mono<NotifyHistoryDO> findByDedupe(long tenantId, String dedupeKey) {
+    private Mono<NotifyHistoryDO> getByDedupe(long tenantId, String dedupeKey) {
         return databaseClient
                 .sql("SELECT " + COLUMNS + " FROM " + TABLE
                         + " WHERE tenant_id=:tenant_id AND dedupe_key=:dedupe_key LIMIT 1")

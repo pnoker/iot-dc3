@@ -89,16 +89,19 @@ public class DeviceStateDTO implements Serializable {
      */
     private LocalDateTime createTime;
 
+    /** device state DTO. */
     public DeviceStateDTO(Long deviceId, String status) {
         this.deviceId = deviceId;
         this.status = status;
         this.createTime = LocalDateTimeUtil.now();
     }
 
+    /** device state DTO. */
     public DeviceStateDTO(Long deviceId, EntityStatusEnum status) {
         this(deviceId, status == null ? null : status.getCode());
     }
 
+    /** device state DTO. */
     public DeviceStateDTO(Long deviceId, String status, int timeout, TimeUnit timeoutUnit) {
         this.deviceId = deviceId;
         this.status = status;
@@ -107,6 +110,7 @@ public class DeviceStateDTO implements Serializable {
         this.createTime = LocalDateTimeUtil.now();
     }
 
+    /** device state DTO. */
     public DeviceStateDTO(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit) {
         this(deviceId, status == null ? null : status.getCode(), timeout, timeoutUnit);
     }

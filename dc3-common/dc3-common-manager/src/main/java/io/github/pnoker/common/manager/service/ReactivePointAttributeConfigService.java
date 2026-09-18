@@ -21,8 +21,8 @@ import io.github.pnoker.common.manager.repository.PointAttributeConfigFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Business service covering point attribute config use cases. */
 
+/** Business service covering point attribute config use cases. */
 public interface ReactivePointAttributeConfigService {
     /** Add one point attribute config. */
     Mono<PointAttributeConfigBO> add(PointAttributeConfigBO value);

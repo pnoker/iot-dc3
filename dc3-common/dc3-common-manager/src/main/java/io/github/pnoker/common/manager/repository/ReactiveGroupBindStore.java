@@ -19,8 +19,8 @@ package io.github.pnoker.common.manager.repository;
 import io.github.pnoker.common.manager.entity.bo.GroupBindBO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
-/** Reactive persistence port for group bind records. */
 
+/** Reactive persistence port for group bind records. */
 public interface ReactiveGroupBindStore {
     /** Page group bindings matching the tenant-scoped filters. */
     Mono<OffsetPage<GroupBindBO>> list(BindingFilter filter);

@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.agentic;
 
-import io.github.pnoker.common.agentic.repository.ReactiveActionStore;
-
 import io.github.pnoker.common.agentic.entity.bo.ActionBO;
+import io.github.pnoker.common.agentic.repository.ReactiveActionStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticActionStatusEnum;
 import io.github.pnoker.common.utils.UuidV7;
@@ -104,12 +103,12 @@ public class R2dbcActionStore implements ReactiveActionStore {
                 .fetch()
                 .rowsUpdated()
                 .flatMap(rows -> rows == 1
-                        ? find(action.getActionId(), principal(action))
+                        ? get(action.getActionId(), principal(action))
                         : Mono.error(new IllegalStateException("action insert affected " + rows + " rows")));
     }
 
     @Override
-    public Mono<ActionBO> find(String actionId, RequestHeader.PrincipalHeader header) {
+    public Mono<ActionBO> get(String actionId, RequestHeader.PrincipalHeader header) {
         if (actionId == null || actionId.isBlank()) {
             return Mono.error(new IllegalArgumentException("actionId must not be blank"));
         }
@@ -192,7 +191,7 @@ public class R2dbcActionStore implements ReactiveActionStore {
                 .bind("now", current)
                 .fetch()
                 .rowsUpdated()
-                .flatMap(rows -> rows == 1 ? find(actionId, header) : Mono.empty());
+                .flatMap(rows -> rows == 1 ? get(actionId, header) : Mono.empty());
     }
 
     @Override
@@ -222,7 +221,7 @@ public class R2dbcActionStore implements ReactiveActionStore {
                 .bind("confirmed_status", AgenticActionStatusEnum.CONFIRMED.getIndex())
                 .fetch()
                 .rowsUpdated()
-                .flatMap(rows -> rows == 1 ? find(actionId, header) : Mono.empty());
+                .flatMap(rows -> rows == 1 ? get(actionId, header) : Mono.empty());
     }
 
     private ActionBO map(io.r2dbc.spi.Row row, io.r2dbc.spi.RowMetadata metadata) {

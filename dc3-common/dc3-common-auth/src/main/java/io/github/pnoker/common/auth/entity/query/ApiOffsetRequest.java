@@ -38,6 +38,7 @@ public record ApiOffsetRequest(
         @Schema(description = "Exact API code") String apiCode,
         @Schema(description = "API group filter") String apiGroup,
         @Schema(description = "Enable state filter") EnableFlagEnum enableFlag) {
+    /** Api offset request compact constructor: normalizes the query record. */
     public ApiOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -46,6 +47,7 @@ public record ApiOffsetRequest(
         if (limit < 1 || limit > PageRequest.MAX_LIMIT) throw new IllegalArgumentException("invalid limit");
     }
 
+    /** API offset request. */
     public ApiOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null, null, null);
     }

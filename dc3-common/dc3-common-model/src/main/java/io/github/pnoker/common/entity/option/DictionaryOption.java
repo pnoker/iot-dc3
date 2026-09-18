@@ -55,6 +55,7 @@ public record DictionaryOption(
         @Schema(description = "Child options; empty for a leaf", requiredMode = Schema.RequiredMode.REQUIRED)
         List<DictionaryOption> children) {
 
+    /** Dictionary option compact constructor: normalizes the record. */
     public DictionaryOption {
         label = Objects.requireNonNull(label, "label must not be null");
         value = Objects.requireNonNull(value, "value must not be null");

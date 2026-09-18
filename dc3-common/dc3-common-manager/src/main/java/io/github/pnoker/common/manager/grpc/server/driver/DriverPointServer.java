@@ -51,6 +51,7 @@ public class DriverPointServer extends PointApiGrpc.PointApiImplBase {
     private final ReactiveDriverService reactiveDriverService;
     private final ReactiveDeviceService reactiveDeviceService;
 
+    /** Create the driver-side point gRPC server. */
     @Autowired
     public DriverPointServer(
             GrpcPointBuilder grpcPointBuilder,

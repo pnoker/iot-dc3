@@ -53,7 +53,7 @@ class LoggingPolicyTest {
 
             Matcher callMatcher = LOG_CALL.matcher(source);
             while (callMatcher.find()) {
-                int end = findInvocationEnd(source, callMatcher.end());
+                int end = getInvocationEnd(source, callMatcher.end());
                 if (end < 0) {
                     violations.add(location(repository, path, source, callMatcher.start())
                             + " logging invocation cannot be parsed");
@@ -88,7 +88,7 @@ class LoggingPolicyTest {
         }
     }
 
-    private static Path findRepositoryRoot() {
+    private static Path getRepositoryRoot() {
         Path current = Path.of(System.getProperty("user.dir")).toAbsolutePath();
         while (current != null && !Files.exists(current.resolve(".git"))) {
             current = current.getParent();
@@ -140,7 +140,7 @@ class LoggingPolicyTest {
         return STRING_LITERAL.matcher(value).replaceAll("").indexOf(operator) >= 0;
     }
 
-    private static int findInvocationEnd(String source, int start) {
+    private static int getInvocationEnd(String source, int start) {
         boolean string = false;
         boolean character = false;
         boolean escaped = false;
@@ -182,7 +182,7 @@ class LoggingPolicyTest {
 
     @Test
     void productionJavaSourcesFollowLoggingPolicy() throws IOException {
-        Path repository = findRepositoryRoot();
+        Path repository = getRepositoryRoot();
         List<String> violations = new ArrayList<>();
 
         try (Stream<Path> paths = Files.walk(repository)) {

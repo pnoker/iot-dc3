@@ -33,8 +33,8 @@ import java.util.Objects;
 import java.util.UUID;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
-/** Encode and verify signed cursor tokens carrying {@link CursorState}. */
 
+/** Encode and verify signed cursor tokens carrying {@link CursorState}. */
 public final class SignedCursorCodec {
 
     static final int MAX_POSITION_BYTES = 4_096;
@@ -51,6 +51,7 @@ public final class SignedCursorCodec {
     private final Map<String, SecretKey> keys;
     private final Clock clock;
 
+    /** Create a codec signing cursor tokens with per-key secrets. */
     public SignedCursorCodec(Map<String, SecretKey> keys, Clock clock) {
         if (keys == null || keys.isEmpty()) {
             throw new IllegalArgumentException("at least one cursor signing key is required");
@@ -112,7 +113,7 @@ public final class SignedCursorCodec {
             CursorState state = deserialize(payload);
             Instant now = clock.instant().truncatedTo(ChronoUnit.MICROS);
             if (!state.tenantId().equals(expectedTenantId)
-                    || !MessageDigest.isEqual(state.queryDigest(), expectedDigest)
+                    || !MessageDigest.isEqual(state.requestDigest(), expectedDigest)
                     || !state.expiresAt().isAfter(now)
                     || state.expiresAt().isAfter(now.plus(MAX_CURSOR_LIFETIME))) {
                 throw invalidCursor();
@@ -139,7 +140,7 @@ public final class SignedCursorCodec {
                         Math.multiplyExact(state.expiresAt().getEpochSecond(), 1_000_000L),
                         state.expiresAt().getNano() / 1_000L);
                 output.writeLong(expiryMicros);
-                output.write(state.queryDigest());
+                output.write(state.requestDigest());
                 byte[] position = state.position();
                 output.writeInt(position.length);
                 output.write(position);

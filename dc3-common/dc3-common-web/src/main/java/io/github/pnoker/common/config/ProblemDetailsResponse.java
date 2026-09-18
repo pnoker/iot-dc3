@@ -32,6 +32,7 @@ public record ProblemDetailsResponse(
         String traceId,
         Map<String, List<String>> errors) {
 
+    /** Problem details response compact constructor: normalizes the record. */
     public ProblemDetailsResponse {
         type = type == null || type.isBlank() ? "about:blank" : type;
         title = title == null || title.isBlank() ? "Request failed" : title;

@@ -95,7 +95,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
                                 .map(Optional::of)
                                 .defaultIfEmpty(Optional.empty())
                                 .flatMapMany(messageValue -> notifyConfigCache
-                                        .findEnabledBinds(notify)
+                                        .getEnabledBinds(notify)
                                         .flatMapMany(Flux::fromIterable)
                                         .concatMap(bind -> notifyConfigCache
                                                 .getChannel(bind.getChannelId(), bind.getTenantId())
@@ -200,7 +200,7 @@ public class RuleNotificationServiceImpl implements RuleNotificationService {
         String fingerprint = fingerprint(match, notify, variables);
         boolean recovery = Strings.CI.equals(match.getMatchType(), AlarmConstant.MATCH_TYPE_RECOVERY);
         return ruleStateStore
-                .find(
+                .get(
                         fact.getTenantId(),
                         rule.getId(),
                         rule.getAlarmTargetTypeFlag().getIndex(),

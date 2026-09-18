@@ -43,6 +43,7 @@ public record CommandAttributeOffsetRequest(
 
         @Schema(description = "Optimistic-lock version filter")
         Integer version) {
+    /** Command attribute offset request compact constructor: normalizes the query record. */
     public CommandAttributeOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -56,6 +57,7 @@ public record CommandAttributeOffsetRequest(
             throw new IllegalArgumentException("unsupported sort field");
     }
 
+    /** command attribute offset request. */
     public CommandAttributeOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null, null, null);
     }

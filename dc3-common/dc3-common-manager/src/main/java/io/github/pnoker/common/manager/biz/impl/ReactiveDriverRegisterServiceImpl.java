@@ -92,7 +92,12 @@ public class ReactiveDriverRegisterServiceImpl implements ReactiveDriverRegister
                 .onErrorResume(NotFoundException.class, ignored -> Mono.empty())
                 .flatMap(existing -> {
                     incoming.setId(existing.getId());
-                    if (incoming.getVersion() == null) incoming.setVersion(existing.getVersion());
+                    // proto3 serializes an unset int version as 0 (not null); treat the
+                    // sentinel as "not provided" so a driver restart re-registers against
+                    // the current row version instead of failing the optimistic lock.
+                    if (incoming.getVersion() == null || incoming.getVersion() <= 0) {
+                        incoming.setVersion(existing.getVersion());
+                    }
                     return driverService.update(incoming);
                 })
                 .switchIfEmpty(driverService.add(incoming))
@@ -255,15 +260,23 @@ public class ReactiveDriverRegisterServiceImpl implements ReactiveDriverRegister
         }
         if (value instanceof DriverAttributeBO target
                 && old instanceof DriverAttributeBO source
-                && target.getVersion() == null) target.setVersion(source.getVersion());
+                && (target.getVersion() == null || target.getVersion() <= 0)) {
+            target.setVersion(source.getVersion());
+        }
         if (value instanceof PointAttributeBO target
                 && old instanceof PointAttributeBO source
-                && target.getVersion() == null) target.setVersion(source.getVersion());
+                && (target.getVersion() == null || target.getVersion() <= 0)) {
+            target.setVersion(source.getVersion());
+        }
         if (value instanceof CommandAttributeBO target
                 && old instanceof CommandAttributeBO source
-                && target.getVersion() == null) target.setVersion(source.getVersion());
+                && (target.getVersion() == null || target.getVersion() <= 0)) {
+            target.setVersion(source.getVersion());
+        }
         if (value instanceof EventAttributeBO target
                 && old instanceof EventAttributeBO source
-                && target.getVersion() == null) target.setVersion(source.getVersion());
+                && (target.getVersion() == null || target.getVersion() <= 0)) {
+            target.setVersion(source.getVersion());
+        }
     }
 }

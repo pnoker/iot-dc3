@@ -40,6 +40,7 @@ public final class SchemaFingerprintVerifier {
     private final R2dbcRuntimeProperties properties;
     private final R2dbcDialect dialect;
 
+    /** Compares expected and actual schema fingerprints for the runtime schema. */
     public SchemaFingerprintVerifier(
             ConnectionFactory connectionFactory, R2dbcRuntimeProperties properties, R2dbcDialect dialect) {
         this.connectionFactory = Objects.requireNonNull(connectionFactory, "connectionFactory must not be null");

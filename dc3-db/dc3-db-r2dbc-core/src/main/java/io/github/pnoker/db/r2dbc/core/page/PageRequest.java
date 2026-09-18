@@ -24,6 +24,7 @@ public record PageRequest(long offset, int limit, List<SortSpec> sort) {
     public static final int DEFAULT_LIMIT = 50;
     public static final int MAX_LIMIT = 200;
 
+    /** Offset/limit page request bounds shared by repository ports. */
     public PageRequest {
         if (offset < 0) {
             throw new IllegalArgumentException("offset must be non-negative");
@@ -37,6 +38,7 @@ public record PageRequest(long offset, int limit, List<SortSpec> sort) {
         sort = sort == null ? List.of() : List.copyOf(sort);
     }
 
+    /** Create a page request at the given offset and limit. */
     public PageRequest(long offset, int limit) {
         this(offset, limit, List.of());
     }

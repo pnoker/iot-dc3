@@ -16,11 +16,10 @@
  */
 package io.github.pnoker.db.postgres.auth;
 
+import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
 import io.github.pnoker.common.auth.repository.ReactiveTenantMembershipCommandStore;
 import io.github.pnoker.common.auth.repository.ReactiveTenantMembershipStore;
 import io.github.pnoker.common.auth.repository.TenantMembershipFilter;
-
-import io.github.pnoker.common.auth.entity.model.TenantMembershipDO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.UuidV7;

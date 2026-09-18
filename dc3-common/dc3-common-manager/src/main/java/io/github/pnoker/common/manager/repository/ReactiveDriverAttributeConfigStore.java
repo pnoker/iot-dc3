@@ -20,8 +20,8 @@ import io.github.pnoker.common.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-/** Reactive persistence port for driver attribute config records. */
 
+/** Reactive persistence port for driver attribute config records. */
 public interface ReactiveDriverAttributeConfigStore {
     /** Load the driver attribute config scoped to the tenant by id. */
     Mono<DriverAttributeConfigBO> get(Long tenantId, Long id);

@@ -20,8 +20,8 @@ import io.github.pnoker.common.manager.entity.bo.LabelBindBO;
 import io.github.pnoker.common.manager.repository.BindingFilter;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
-/** Business service covering label bind use cases. */
 
+/** Business service covering label bind use cases. */
 public interface ReactiveLabelBindService {
     /** Add one label binding. */
     Mono<LabelBindBO> add(LabelBindBO value);

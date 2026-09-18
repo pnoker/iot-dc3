@@ -16,9 +16,8 @@
  */
 package io.github.pnoker.db.postgres.auth;
 
-import io.github.pnoker.common.auth.repository.ReactiveResourceLookupStore;
-
 import io.github.pnoker.common.auth.entity.model.ResourceDO;
+import io.github.pnoker.common.auth.repository.ReactiveResourceLookupStore;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
 import java.time.Instant;

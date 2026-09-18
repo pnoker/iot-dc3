@@ -17,7 +17,6 @@
 package io.github.pnoker.db.postgres.data;
 
 import io.github.pnoker.common.data.repository.ReactivePointCommandContext;
-
 import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;

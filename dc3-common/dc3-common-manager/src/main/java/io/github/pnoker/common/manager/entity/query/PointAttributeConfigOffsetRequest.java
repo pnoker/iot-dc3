@@ -41,6 +41,7 @@ public record PointAttributeConfigOffsetRequest(
 
         @Schema(description = "Optimistic-lock version filter")
         Integer version) {
+    /** Point attribute config offset request compact constructor: normalizes the query record. */
     public PointAttributeConfigOffsetRequest {
         offset = offset == null ? 0L : offset;
         limit = limit == null ? PageRequest.DEFAULT_LIMIT : limit;
@@ -52,6 +53,7 @@ public record PointAttributeConfigOffsetRequest(
             throw new IllegalArgumentException("unsupported sort field");
     }
 
+    /** point attribute config offset request. */
     public PointAttributeConfigOffsetRequest() {
         this(0L, PageRequest.DEFAULT_LIMIT, List.of(), null, null, null, null, null);
     }

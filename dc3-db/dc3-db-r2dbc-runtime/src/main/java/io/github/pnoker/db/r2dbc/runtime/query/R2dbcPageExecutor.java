@@ -39,6 +39,7 @@ public final class R2dbcPageExecutor {
     private final DatabaseClient databaseClient;
     private final PageTransaction pageTransaction;
 
+    /** Executes offset-paged queries with whitelisted sorting. */
     public R2dbcPageExecutor(DatabaseClient databaseClient, PageTransaction pageTransaction) {
         this.databaseClient = Objects.requireNonNull(databaseClient, "databaseClient must not be null");
         this.pageTransaction = Objects.requireNonNull(pageTransaction, "pageTransaction must not be null");
