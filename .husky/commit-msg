@@ -1,0 +1,55 @@
+#!/usr/bin/env sh
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# Conventional-commit lint per the repository guidelines: enforces the
+# <type>(<scope>): <lowercase imperative description> subject line.
+# Auto-generated commits (merges, reverts, fixup) pass through untouched.
+
+commit_msg_file="$1"
+[ -f "$commit_msg_file" ] || exit 1
+
+subject=$(grep -m1 -v '^#' "$commit_msg_file" | grep -v '^$')
+[ -z "$subject" ] && exit 0
+
+# passthrough for git-generated messages
+printf '%s' "$subject" | grep -qE '^(Merge |Revert |fixup!|squash! )' && exit 0
+
+fail() {
+  echo "commit-msg: $1" >&2
+  echo "  subject: $subject" >&2
+  echo "  expected: <type>(<scope>): <lowercase imperative description>" >&2
+  exit 1
+}
+
+type='feat|fix|perf|refactor|docs|build|ci|test|chore|style|security|revert'
+breaking='!'
+
+# <type>(<scope>)!??: <description>, scope optional, '!' marks breaking
+pattern="^(${type})(\\([a-z0-9-]+\\))?${breaking}?: .+$"
+printf '%s' "$subject" | grep -qE "$pattern" || fail "type or format not allowed"
+
+[ "${#subject}" -le 100 ] || fail "subject exceeds 100 chars (${#subject})"
+
+description=$(printf '%s' "$subject" | sed -E "s/^(${type})(\\([a-z0-9-]+\\))?${breaking}?: //")
+[ "${#description}" -ge 10 ] || fail "description shorter than 10 chars"
+
+printf '%s' "$description" | grep -qE '[[:upper:]]' && fail "description must be lowercase"
+
+printf '%s' "$description" | grep -qE '[^ -~]' && fail "description must be ascii/english"
+
+exit 0
