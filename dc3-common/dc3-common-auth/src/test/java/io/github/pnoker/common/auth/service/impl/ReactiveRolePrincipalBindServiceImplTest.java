@@ -16,17 +16,22 @@
  */
 package io.github.pnoker.common.auth.service.impl;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.auth.entity.bo.RolePrincipalBindBO;
 import io.github.pnoker.common.auth.entity.bo.TenantMembershipBO;
 import io.github.pnoker.common.auth.entity.builder.RolePrincipalBindBuilder;
+import io.github.pnoker.common.auth.entity.model.RolePrincipalBindDO;
 import io.github.pnoker.common.auth.repository.ReactiveRolePrincipalBindStore;
+import io.github.pnoker.common.auth.security.AuthPermissionProvider;
 import io.github.pnoker.common.auth.service.ReactiveRoleService;
 import io.github.pnoker.common.auth.service.ReactiveTenantMembershipService;
 import io.github.pnoker.common.auth.service.ReactiveUserService;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
+import io.github.pnoker.common.exception.AccessDeniedException;
 import io.github.pnoker.common.exception.DuplicateException;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -36,6 +41,8 @@ import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class ReactiveRolePrincipalBindServiceImplTest {
+    private static final Long CALLER = 99L;
+
     @Mock
     ReactiveRolePrincipalBindStore store;
 
@@ -51,6 +58,9 @@ class ReactiveRolePrincipalBindServiceImplTest {
     @Mock
     ReactiveUserService userService;
 
+    @Mock
+    AuthPermissionProvider permissionProvider;
+
     @Test
     void addRejectsPrincipalTypeSpoofing() {
         RolePrincipalBindBO binding = binding();
@@ -60,7 +70,7 @@ class ReactiveRolePrincipalBindServiceImplTest {
         when(roleService.getById(7L, 11L)).thenReturn(Mono.just(new io.github.pnoker.common.auth.entity.bo.RoleBO()));
         when(membershipService.requireTenantMember(7L, 13L)).thenReturn(Mono.just(membership));
 
-        StepVerifier.create(service().add(binding))
+        StepVerifier.create(service().add(binding, CALLER))
                 .expectErrorMessage("Principal type does not match tenant membership")
                 .verify();
     }
@@ -72,11 +82,45 @@ class ReactiveRolePrincipalBindServiceImplTest {
         membership.setPrincipalType(PrincipalTypeEnum.USER);
         when(roleService.getById(7L, 11L)).thenReturn(Mono.just(new io.github.pnoker.common.auth.entity.bo.RoleBO()));
         when(membershipService.requireTenantMember(7L, 13L)).thenReturn(Mono.just(membership));
+        when(permissionProvider.listPermissionCodes(7L, CALLER)).thenReturn(Mono.just(Set.of("*")));
         when(store.exists(7L, 11L, 13L, null)).thenReturn(Mono.just(true));
 
-        StepVerifier.create(service().add(binding))
+        StepVerifier.create(service().add(binding, CALLER))
                 .expectError(DuplicateException.class)
                 .verify();
+    }
+
+    @Test
+    void addRejectsRoleTheCallerDoesNotHold() {
+        RolePrincipalBindBO binding = binding();
+        TenantMembershipBO membership = new TenantMembershipBO();
+        membership.setPrincipalType(PrincipalTypeEnum.USER);
+        when(roleService.getById(7L, 11L)).thenReturn(Mono.just(new io.github.pnoker.common.auth.entity.bo.RoleBO()));
+        when(membershipService.requireTenantMember(7L, 13L)).thenReturn(Mono.just(membership));
+        when(permissionProvider.listPermissionCodes(7L, CALLER))
+                .thenReturn(Mono.just(Set.of("dc3-center-auth:role:list")));
+        when(store.exists(7L, 11L, CALLER, null)).thenReturn(Mono.just(false));
+
+        StepVerifier.create(service().add(binding, CALLER))
+                .expectError(AccessDeniedException.class)
+                .verify();
+    }
+
+    @Test
+    void addAllowsGrantWhenCallerHoldsTheRole() {
+        RolePrincipalBindBO binding = binding();
+        TenantMembershipBO membership = new TenantMembershipBO();
+        membership.setPrincipalType(PrincipalTypeEnum.USER);
+        when(roleService.getById(7L, 11L)).thenReturn(Mono.just(new io.github.pnoker.common.auth.entity.bo.RoleBO()));
+        when(membershipService.requireTenantMember(7L, 13L)).thenReturn(Mono.just(membership));
+        when(permissionProvider.listPermissionCodes(7L, CALLER))
+                .thenReturn(Mono.just(Set.of("dc3-center-auth:role:list")));
+        when(store.exists(7L, 11L, CALLER, null)).thenReturn(Mono.just(true));
+        when(store.exists(7L, 11L, 13L, null)).thenReturn(Mono.just(false));
+        when(store.insert(binding)).thenReturn(Mono.just(new RolePrincipalBindDO()));
+        when(builder.buildBOByDO(any(RolePrincipalBindDO.class))).thenReturn(new RolePrincipalBindBO());
+
+        StepVerifier.create(service().add(binding, CALLER)).expectNextCount(1).verifyComplete();
     }
 
     private RolePrincipalBindBO binding() {
@@ -89,6 +133,7 @@ class ReactiveRolePrincipalBindServiceImplTest {
     }
 
     private ReactiveRolePrincipalBindServiceImpl service() {
-        return new ReactiveRolePrincipalBindServiceImpl(store, builder, roleService, membershipService, userService);
+        return new ReactiveRolePrincipalBindServiceImpl(
+                store, builder, roleService, membershipService, userService, permissionProvider);
     }
 }

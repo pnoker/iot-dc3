@@ -16,18 +16,23 @@
  */
 package io.github.pnoker.common.auth.service.impl;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.common.auth.entity.builder.ResourceBuilder;
 import io.github.pnoker.common.auth.entity.builder.RoleResourceBindBuilder;
+import io.github.pnoker.common.auth.entity.model.ResourceDO;
 import io.github.pnoker.common.auth.repository.ReactiveResourceLookupStore;
 import io.github.pnoker.common.auth.repository.ReactiveRoleResourceBindStore;
+import io.github.pnoker.common.auth.security.AuthPermissionProvider;
 import io.github.pnoker.common.auth.service.ReactiveRoleService;
 import io.github.pnoker.common.auth.service.ReactiveTenantMembershipService;
+import io.github.pnoker.common.exception.AccessDeniedException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -38,6 +43,8 @@ import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class ReactiveRoleResourceBindServiceImplTest {
+    private static final Long CALLER = 99L;
+
     @Mock
     ReactiveRoleResourceBindStore store;
 
@@ -56,12 +63,15 @@ class ReactiveRoleResourceBindServiceImplTest {
     @Mock
     ReactiveTenantMembershipService membershipService;
 
+    @Mock
+    AuthPermissionProvider permissionProvider;
+
     @Test
     void addRejectsUnknownResource() {
         RoleResourceBindBO binding = binding();
         when(roleService.getById(7L, 11L)).thenReturn(Mono.just(new io.github.pnoker.common.auth.entity.bo.RoleBO()));
         when(resourceStore.listEnabledByIds(List.of(13L))).thenReturn(Flux.empty());
-        StepVerifier.create(service().add(binding, 7L))
+        StepVerifier.create(service().add(binding, 7L, CALLER))
                 .expectError(NotFoundException.class)
                 .verify();
     }
@@ -70,12 +80,46 @@ class ReactiveRoleResourceBindServiceImplTest {
     void addRejectsDuplicateBinding() {
         RoleResourceBindBO binding = binding();
         when(roleService.getById(7L, 11L)).thenReturn(Mono.just(new io.github.pnoker.common.auth.entity.bo.RoleBO()));
-        when(resourceStore.listEnabledByIds(List.of(13L)))
-                .thenReturn(Flux.just(new io.github.pnoker.common.auth.entity.model.ResourceDO()));
+        when(resourceStore.listEnabledByIds(List.of(13L))).thenReturn(Flux.just(resource("*")));
+        when(permissionProvider.listPermissionCodes(7L, CALLER)).thenReturn(Mono.just(Set.of("*")));
         when(store.exists(7L, 11L, 13L)).thenReturn(Mono.just(true));
-        StepVerifier.create(service().add(binding, 7L))
+        StepVerifier.create(service().add(binding, 7L, CALLER))
                 .expectError(DuplicateException.class)
                 .verify();
+    }
+
+    @Test
+    void addRejectsResourceTheCallerDoesNotHold() {
+        RoleResourceBindBO binding = binding();
+        when(roleService.getById(7L, 11L)).thenReturn(Mono.just(new io.github.pnoker.common.auth.entity.bo.RoleBO()));
+        when(resourceStore.listEnabledByIds(List.of(13L))).thenReturn(Flux.just(resource("dc3-center-auth:user:add")));
+        when(permissionProvider.listPermissionCodes(7L, CALLER))
+                .thenReturn(Mono.just(Set.of("dc3-center-auth:role:list")));
+        StepVerifier.create(service().add(binding, 7L, CALLER))
+                .expectError(AccessDeniedException.class)
+                .verify();
+    }
+
+    @Test
+    void addAllowsGrantWhenCallerHoldsTheResourceCode() {
+        RoleResourceBindBO binding = binding();
+        when(roleService.getById(7L, 11L)).thenReturn(Mono.just(new io.github.pnoker.common.auth.entity.bo.RoleBO()));
+        when(resourceStore.listEnabledByIds(List.of(13L))).thenReturn(Flux.just(resource("dc3-center-auth:role:list")));
+        when(permissionProvider.listPermissionCodes(7L, CALLER))
+                .thenReturn(Mono.just(Set.of("dc3-center-auth:role:list")));
+        when(store.exists(7L, 11L, 13L)).thenReturn(Mono.just(false));
+        when(store.insert(binding))
+                .thenReturn(Mono.just(new io.github.pnoker.common.auth.entity.model.RoleResourceBindDO()));
+        when(bindingBuilder.buildBOByDO(any())).thenReturn(new RoleResourceBindBO());
+        StepVerifier.create(service().add(binding, 7L, CALLER))
+                .expectNextCount(1)
+                .verifyComplete();
+    }
+
+    private ResourceDO resource(String code) {
+        ResourceDO resource = new ResourceDO();
+        resource.setResourceCode(code);
+        return resource;
     }
 
     private RoleResourceBindBO binding() {
@@ -87,6 +131,12 @@ class ReactiveRoleResourceBindServiceImplTest {
 
     private ReactiveRoleResourceBindServiceImpl service() {
         return new ReactiveRoleResourceBindServiceImpl(
-                store, resourceStore, bindingBuilder, resourceBuilder, roleService, membershipService);
+                store,
+                resourceStore,
+                bindingBuilder,
+                resourceBuilder,
+                roleService,
+                membershipService,
+                permissionProvider);
     }
 }

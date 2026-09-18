@@ -26,8 +26,11 @@ import reactor.core.publisher.Mono;
 
 /** Reactive application service for role-resource assignments. */
 public interface ReactiveRoleResourceBindService {
-    /** Add one role resource binding. */
-    Mono<RoleResourceBindBO> add(RoleResourceBindBO binding, Long tenantId);
+    /**
+     * Add one role resource binding. The caller must hold the granted resource
+     * code or the wildcard authority (no-privilege-escalation guard).
+     */
+    Mono<RoleResourceBindBO> add(RoleResourceBindBO binding, Long tenantId, Long callerPrincipalId);
 
     /** Delete the role resource binding. */
     Mono<Void> delete(Long tenantId, Long id, Long operatorId, String operatorName);

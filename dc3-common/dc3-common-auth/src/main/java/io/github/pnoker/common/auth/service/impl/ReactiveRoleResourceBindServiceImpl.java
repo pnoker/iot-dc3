@@ -24,13 +24,16 @@ import io.github.pnoker.common.auth.entity.builder.RoleResourceBindBuilder;
 import io.github.pnoker.common.auth.repository.ReactiveResourceLookupStore;
 import io.github.pnoker.common.auth.repository.ReactiveRoleResourceBindStore;
 import io.github.pnoker.common.auth.repository.RoleResourceBindFilter;
+import io.github.pnoker.common.auth.security.AuthPermissionProvider;
 import io.github.pnoker.common.auth.security.PermissionCacheInvalidator;
 import io.github.pnoker.common.auth.service.ReactiveRoleResourceBindService;
 import io.github.pnoker.common.auth.service.ReactiveRoleService;
 import io.github.pnoker.common.auth.service.ReactiveTenantMembershipService;
+import io.github.pnoker.common.exception.AccessDeniedException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
+import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,6 +50,7 @@ public class ReactiveRoleResourceBindServiceImpl implements ReactiveRoleResource
     private final ResourceBuilder resourceBuilder;
     private final ReactiveRoleService roleService;
     private final ReactiveTenantMembershipService membershipService;
+    private final AuthPermissionProvider permissionProvider;
     private PermissionCacheInvalidator permissionCacheInvalidator;
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
@@ -55,7 +59,7 @@ public class ReactiveRoleResourceBindServiceImpl implements ReactiveRoleResource
     }
 
     @Override
-    public Mono<RoleResourceBindBO> add(RoleResourceBindBO binding, Long tenantId) {
+    public Mono<RoleResourceBindBO> add(RoleResourceBindBO binding, Long tenantId, Long callerPrincipalId) {
         if (binding == null || !valid(tenantId) || !valid(binding.getRoleId()) || !valid(binding.getResourceId())) {
             return Mono.error(new RequestException("Role resource binding identifiers are required"));
         }
@@ -66,12 +70,45 @@ public class ReactiveRoleResourceBindServiceImpl implements ReactiveRoleResource
                         .hasElements()
                         .flatMap(enabled ->
                                 enabled ? Mono.<Void>empty() : Mono.error(new NotFoundException("Resource"))))
+                .then(Mono.defer(() -> ensureGrantable(tenantId, callerPrincipalId, binding.getResourceId())))
                 .then(Mono.defer(() -> store.exists(tenantId, binding.getRoleId(), binding.getResourceId())))
                 .flatMap(duplicate -> Boolean.TRUE.equals(duplicate)
                         ? Mono.error(new DuplicateException("Role resource bind has been duplicated"))
                         : store.insert(binding))
                 .doOnSuccess(saved -> invalidateTenant(tenantId))
                 .map(bindingBuilder::buildBOByDO);
+    }
+
+    /**
+     * No-privilege-escalation guard: a resource may only be granted to a role by a
+     * caller who already holds that resource code or the wildcard authority.
+     * Without this, {@code role_resource_bind:add} alone lets a caller attach the
+     * wildcard resource to a role they hold — self-elevation to tenant superuser.
+     *
+     * @param tenantId tenant scope of the binding
+     * @param callerPrincipalId principal invoking the grant
+     * @param resourceId resource being granted
+     * @return empty when the grant is allowed
+     */
+    private Mono<Void> ensureGrantable(Long tenantId, Long callerPrincipalId, Long resourceId) {
+        if (!valid(callerPrincipalId)) {
+            return Mono.error(new AccessDeniedException("Role resource binding requires an authenticated caller"));
+        }
+        return permissionProvider
+                .listPermissionCodes(tenantId, callerPrincipalId)
+                .flatMap(
+                        codes -> codes.contains(PermissionMethods.WILDCARD)
+                                ? Mono.<Void>empty()
+                                : resourceStore
+                                        .listEnabledByIds(java.util.List.of(resourceId))
+                                        .next()
+                                        .map(resource -> resource.getResourceCode())
+                                        .flatMap(
+                                                code -> codes.contains(code)
+                                                        ? Mono.<Void>empty()
+                                                        : Mono.error(
+                                                                new AccessDeniedException(
+                                                                        "Resources can only be granted by callers who hold them or hold the wildcard permission"))));
     }
 
     @Override

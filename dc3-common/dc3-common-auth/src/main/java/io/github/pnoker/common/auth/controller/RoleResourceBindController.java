@@ -86,7 +86,7 @@ public class RoleResourceBindController implements BaseController {
             binding.setOperatorId(header.getUserId());
             binding.setOperatorName(header.getNickName());
             return bindingService
-                    .add(binding, header.getTenantId())
+                    .add(binding, header.getTenantId(), header.getPrincipalId())
                     .map(saved -> ResponseEntity.status(201).body(bindingBuilder.buildVOByBO(saved)));
         });
     }

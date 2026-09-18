@@ -22,6 +22,7 @@ import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.RolePrincipalBindBuilder;
 import io.github.pnoker.common.auth.repository.ReactiveRolePrincipalBindStore;
 import io.github.pnoker.common.auth.repository.RolePrincipalBindFilter;
+import io.github.pnoker.common.auth.security.AuthPermissionProvider;
 import io.github.pnoker.common.auth.security.PermissionCacheInvalidator;
 import io.github.pnoker.common.auth.service.ReactiveRolePrincipalBindService;
 import io.github.pnoker.common.auth.service.ReactiveRoleService;
@@ -29,9 +30,11 @@ import io.github.pnoker.common.auth.service.ReactiveTenantMembershipService;
 import io.github.pnoker.common.auth.service.ReactiveUserService;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
+import io.github.pnoker.common.exception.AccessDeniedException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
+import io.github.pnoker.common.security.PermissionMethods;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,6 +50,7 @@ public class ReactiveRolePrincipalBindServiceImpl implements ReactiveRolePrincip
     private final ReactiveRoleService roleService;
     private final ReactiveTenantMembershipService membershipService;
     private final ReactiveUserService userService;
+    private final AuthPermissionProvider permissionProvider;
     private PermissionCacheInvalidator permissionCacheInvalidator;
 
     @org.springframework.beans.factory.annotation.Autowired(required = false)
@@ -55,7 +59,7 @@ public class ReactiveRolePrincipalBindServiceImpl implements ReactiveRolePrincip
     }
 
     @Override
-    public Mono<RolePrincipalBindBO> add(RolePrincipalBindBO binding) {
+    public Mono<RolePrincipalBindBO> add(RolePrincipalBindBO binding, Long callerPrincipalId) {
         if (binding == null
                 || !valid(binding.getTenantId())
                 || !valid(binding.getRoleId())
@@ -70,13 +74,44 @@ public class ReactiveRolePrincipalBindServiceImpl implements ReactiveRolePrincip
                     if (member.getPrincipalType() != null && member.getPrincipalType() != binding.getPrincipalType()) {
                         return Mono.error(new RequestException("Principal type does not match tenant membership"));
                     }
-                    return store.exists(binding.getTenantId(), binding.getRoleId(), binding.getPrincipalId(), null);
+                    return ensureGrantable(binding.getTenantId(), callerPrincipalId, binding.getRoleId());
                 })
+                .then(Mono.defer(
+                        () -> store.exists(binding.getTenantId(), binding.getRoleId(), binding.getPrincipalId(), null)))
                 .flatMap(duplicate -> Boolean.TRUE.equals(duplicate)
                         ? Mono.error(new DuplicateException("Role principal bind has been duplicated"))
                         : store.insert(binding))
                 .doOnSuccess(saved -> invalidate(binding.getTenantId(), binding.getPrincipalId()))
                 .map(builder::buildBOByDO);
+    }
+
+    /**
+     * No-privilege-escalation guard: a role may only be granted by a caller who
+     * already holds that role or holds the wildcard authority. Without this,
+     * {@code role_principal_bind:add} alone is equivalent to every role in the
+     * tenant (bind the wildcard administrator role to yourself).
+     *
+     * @param tenantId tenant scope of the binding
+     * @param callerPrincipalId principal invoking the grant
+     * @param roleId role being granted
+     * @return empty when the grant is allowed
+     */
+    private Mono<Void> ensureGrantable(Long tenantId, Long callerPrincipalId, Long roleId) {
+        if (!valid(callerPrincipalId)) {
+            return Mono.error(new AccessDeniedException("Role principal binding requires an authenticated caller"));
+        }
+        return permissionProvider
+                .listPermissionCodes(tenantId, callerPrincipalId)
+                .flatMap(
+                        codes -> codes.contains(PermissionMethods.WILDCARD)
+                                ? Mono.empty()
+                                : store.exists(tenantId, roleId, callerPrincipalId, null)
+                                        .flatMap(
+                                                holds -> Boolean.TRUE.equals(holds)
+                                                        ? Mono.empty()
+                                                        : Mono.error(
+                                                                new AccessDeniedException(
+                                                                        "Roles can only be granted by callers who hold them or hold the wildcard permission"))));
     }
 
     @Override

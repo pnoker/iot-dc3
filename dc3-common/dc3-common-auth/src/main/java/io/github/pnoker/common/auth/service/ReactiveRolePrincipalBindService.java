@@ -26,8 +26,11 @@ import reactor.core.publisher.Mono;
 
 /** Reactive application service for role-principal assignments. */
 public interface ReactiveRolePrincipalBindService {
-    /** Add one role principal binding. */
-    Mono<RolePrincipalBindBO> add(RolePrincipalBindBO binding);
+    /**
+     * Add one role principal binding. The caller must hold the granted role or
+     * the wildcard authority (no-privilege-escalation guard).
+     */
+    Mono<RolePrincipalBindBO> add(RolePrincipalBindBO binding, Long callerPrincipalId);
 
     /** Delete the role principal binding. */
     Mono<Void> delete(Long tenantId, Long id, Long operatorId, String operatorName);
