@@ -206,11 +206,16 @@ export function registerBusinessHandlers(): void {
     collection: 'alarmChannelBinds',
     exact: ['notifyId', 'channelId'],
   });
-  registerCrud({baseUrl: 'api/v3/data/rule/state', collection: 'alarmRuleStates', exact: ['ruleId']});
-  registerCrud({baseUrl: 'api/v3/data/notify/history', collection: 'alarmHistories'});
+  registerCrud({
+    baseUrl: 'api/v3/data/rule/state',
+    collection: 'alarmRuleStates',
+    exact: ['ruleId'],
+    verbs: ['list', 'get_by_id', 'delete'],
+  });
+  registerCrud({baseUrl: 'api/v3/data/notify/history', collection: 'alarmHistories', verbs: ['list', 'get_by_id', 'delete']});
 
   // ── C. command / event history (synthesized from the seed definitions) ──
-  on('post', 'api/v3/manager/command_history/list', (ctx) => {
+  on('post', 'api/v3/data/command_history/list', (ctx) => {
     const deviceId = db.devices[0]?.id ?? '1';
     const rows = db.commands.slice(0, 3).map((c) => ({
       recordId: newId(),

@@ -120,7 +120,7 @@ public class CommandHistoryController implements BaseController {
                                     "Record ID returned by the Call Command endpoint; must resolve to a command-call history entry owned by the current tenant",
                             example = "cmd_20260523_a1b2c3d4")
                     @NotBlank
-                    @RequestParam
+                    @RequestParam(name = "record_id")
                     String recordId) {
         return getTenantId()
                 .flatMap(tenantId -> commandHistoryService

@@ -194,14 +194,14 @@ export function registerTimeseriesHandlers(): void {
     const commandId = `mock-read-${ctx.body?.deviceId ?? 'device'}-${ctx.body?.pointId ?? 'point'}`;
     return responseOf(ctx.config, ok({
       commandId,
-      statusUri: `/api/v3/data/point_command_history/get_by_command_id?commandId=${commandId}`,
+      statusUri: `/api/v3/data/point_command_history/get_by_command_id?command_id=${commandId}`,
     }), 202);
   });
   on('post', 'api/v3/data/point_command/write', (ctx) => {
     const commandId = `mock-write-${ctx.body?.deviceId ?? 'device'}-${ctx.body?.pointId ?? 'point'}`;
     return responseOf(ctx.config, ok({
       commandId,
-      statusUri: `/api/v3/data/point_command_history/get_by_command_id?commandId=${commandId}`,
+      statusUri: `/api/v3/data/point_command_history/get_by_command_id?command_id=${commandId}`,
     }), 202);
   });
 }

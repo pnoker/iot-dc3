@@ -132,7 +132,7 @@ export function registerCommandCommand(program: Command): void {
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.get(
-        `/api/v3/data/command_history/get_by_record_id?recordId=${encodeURIComponent(id)}`,
+        `/api/v3/data/command_history/get_by_record_id?record_id=${encodeURIComponent(id)}`,
       );
       printAndExit(result, format);
     });

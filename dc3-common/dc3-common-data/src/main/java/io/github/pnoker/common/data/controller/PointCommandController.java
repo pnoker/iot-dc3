@@ -118,7 +118,7 @@ public class PointCommandController implements BaseController {
     }
 
     private ResponseEntity<PointCommandAcceptedVO> accepted(String commandId) {
-        String statusUri = DataConstant.POINT_COMMAND_HISTORY_URL_PREFIX + "/get_by_command_id?commandId=" + commandId;
+        String statusUri = DataConstant.POINT_COMMAND_HISTORY_URL_PREFIX + "/get_by_command_id?command_id=" + commandId;
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .header("Location", statusUri)
                 .body(new PointCommandAcceptedVO(commandId, statusUri));

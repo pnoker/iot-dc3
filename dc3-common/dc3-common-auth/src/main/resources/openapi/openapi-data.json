@@ -2677,7 +2677,7 @@
                 "operationId": "getByCommandId",
                 "parameters": [
                     {
-                        "name": "commandId",
+                        "name": "command_id",
                         "in": "query",
                         "description": "Tenant-owned point command identifier",
                         "required": true,
@@ -4982,7 +4982,7 @@
                 "operationId": "getByRecordId_1",
                 "parameters": [
                     {
-                        "name": "recordId",
+                        "name": "record_id",
                         "in": "query",
                         "description": "Record ID returned by the Call Command endpoint; must resolve to a command-call history entry owned by the current tenant",
                         "required": true,

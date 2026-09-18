@@ -66,7 +66,9 @@ public class PointCommandHistoryController implements BaseController {
                             }))
     @GetMapping("/get_by_command_id")
     public Mono<PointCommandHistoryVO> getByCommandId(
-            @Parameter(description = "Tenant-owned point command identifier") @NotBlank @RequestParam
+            @Parameter(description = "Tenant-owned point command identifier")
+                    @NotBlank
+                    @RequestParam(name = "command_id")
                     String commandId) {
         return getTenantId()
                 .flatMap(tenantId -> pointCommandHistoryService
