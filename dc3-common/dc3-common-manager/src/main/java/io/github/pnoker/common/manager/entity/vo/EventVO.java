@@ -104,6 +104,11 @@ public class EventVO extends BaseVO {
     @Schema(description = "Signature used for configuration integrity verification.")
     private String signature;
 
+    @Schema(
+            description = "Identifier of the owning tenant; read-only, resolved server-side from the auth context.",
+            example = "1")
+    private String tenantId;
+
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
 }

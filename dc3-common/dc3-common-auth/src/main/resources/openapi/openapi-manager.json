@@ -11550,6 +11550,11 @@
                         "type": "string",
                         "description": "Signature used for configuration integrity verification."
                     },
+                    "tenantId": {
+                        "type": "string",
+                        "description": "Identifier of the owning tenant; read-only, resolved server-side from the auth context.",
+                        "example": "1"
+                    },
                     "version": {
                         "type": "integer",
                         "format": "int32",
@@ -13451,6 +13456,11 @@
                     "signature": {
                         "type": "string",
                         "description": "Signature used for configuration integrity verification."
+                    },
+                    "tenantId": {
+                        "type": "string",
+                        "description": "Identifier of the owning tenant; read-only, resolved server-side from the auth context.",
+                        "example": "1"
                     },
                     "version": {
                         "type": "integer",
