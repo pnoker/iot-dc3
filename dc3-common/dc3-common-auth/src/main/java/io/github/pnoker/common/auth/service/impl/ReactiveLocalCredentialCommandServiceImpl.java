@@ -214,7 +214,12 @@ public class ReactiveLocalCredentialCommandServiceImpl implements ReactiveLocalC
                                     current.setLockedUntil(null);
                                     return current;
                                 })
-                                : Mono.error(new UnAuthorizedException("The current password does not match"))))
+                                // The endpoint is public (self-service before a token exists),
+                                // so a wrong current password must count toward the same lockout
+                                // the login flow enforces — otherwise it is a free brute-force surface.
+                                : recordFailedLogin(tenantId, current.getId())
+                                        .then(Mono.error(
+                                                new UnAuthorizedException("The current password does not match")))))
                 .flatMap(prepared -> updateRow(tenantId, prepared, operatorId, operatorName)
                         .then(reactiveLocalCredentialService.getById(tenantId, prepared.getId())));
     }
