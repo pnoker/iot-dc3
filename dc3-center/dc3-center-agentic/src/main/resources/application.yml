@@ -19,6 +19,15 @@ server:
   port: ${DC3_AGENTIC_PORT:8600}
 
 spring:
+  autoconfigure:
+    # The gRPC OAuth2 resource-server autoconfiguration references servlet-OAuth2
+    # classes (JwtDecoder / OpaqueTokenIntrospector) that are intentionally absent
+    # here; loading it only produces TypeNotPresent introspection warnings at boot.
+    # NOTE: keep this list in each center, NOT in the shared application-web.yml —
+    # the web profile outranks dc3-gateway's own yml and would replace its
+    # security-autoconfiguration excludes.
+    exclude:
+      - org.springframework.boot.grpc.server.autoconfigure.security.GrpcServerOAuth2ResourceServerAutoConfiguration
   config:
     import: classpath:application-r2dbc.yml
   application:
