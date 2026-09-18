@@ -15,16 +15,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-  { { - if and .Values.services.agentic .Values.services.agentic.pvc.enabled } }
+  {{- if and .Values.services.agentic .Values.services.agentic.pvc.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: dc3-agentic-data
   labels:
-    { { - include "dc3.labels" . | nindent 4 } }
+    {{- include "dc3.labels" . | nindent 4 }}
 spec:
   accessModes: [ "ReadWriteOnce" ]
   resources:
     requests:
-      storage: { { .Values.services.agentic.pvc.size } }
-  { { - end } }
+      storage: {{ .Values.services.agentic.pvc.size }}
+  {{- end }}

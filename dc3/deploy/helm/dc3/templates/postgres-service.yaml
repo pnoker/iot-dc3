@@ -15,13 +15,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-  { { - if .Values.postgres.enabled } }
+  {{- if .Values.postgres.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
   name: dc3-postgres
   labels:
-    { { - include "dc3.labels" . | nindent 4 } }
+    {{- include "dc3.labels" . | nindent 4 }}
 spec:
   type: ClusterIP
   clusterIP: None
@@ -31,4 +31,4 @@ spec:
     - name: postgres
       port: 5432
       targetPort: postgres
-  { { - end } }
+  {{- end }}
