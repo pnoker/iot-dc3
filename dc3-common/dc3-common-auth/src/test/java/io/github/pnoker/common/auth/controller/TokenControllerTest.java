@@ -23,8 +23,12 @@ import io.github.pnoker.common.auth.biz.ReactiveTokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import io.github.pnoker.common.auth.entity.query.TokenQuery;
 import io.github.pnoker.common.constant.common.RequestConstant;
+import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.exception.AccessDeniedException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
+import io.github.pnoker.common.security.GatewayAuthenticationToken;
 import java.util.Date;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +37,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.mock.http.server.reactive.MockServerHttpResponse;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -44,7 +49,7 @@ class TokenControllerTest {
 
     private TokenController controller;
 
-    private static TokenQuery query() {
+    private static TokenQuery request() {
         TokenQuery query = new TokenQuery();
         query.setTenant("tenant-A");
         query.setName("alice");
@@ -60,11 +65,17 @@ class TokenControllerTest {
         controller = new TokenController(tokenService);
     }
 
+    private static GatewayAuthenticationToken principal(Long principalId) {
+        RequestHeader.PrincipalHeader header = new RequestHeader.PrincipalHeader();
+        header.setPrincipalId(principalId);
+        return new GatewayAuthenticationToken(header, Set.of());
+    }
+
     @Test
     void generateSaltReturnsDirectResource() {
         when(tokenService.generateSalt("alice", "tenant-A")).thenReturn(Mono.just("salt-value"));
 
-        StepVerifier.create(controller.generateSalt(query()))
+        StepVerifier.create(controller.generateSalt(request()))
                 .expectNext("salt-value")
                 .verifyComplete();
     }
@@ -74,7 +85,7 @@ class TokenControllerTest {
         when(tokenService.generateSalt("alice", "tenant-A"))
                 .thenReturn(Mono.error(new UnAuthorizedException("invalid")));
 
-        StepVerifier.create(controller.generateSalt(query()))
+        StepVerifier.create(controller.generateSalt(request()))
                 .expectError(UnAuthorizedException.class)
                 .verify();
     }
@@ -84,7 +95,7 @@ class TokenControllerTest {
         when(tokenService.generateToken("alice", "hash", "tenant-A")).thenReturn(Mono.just("jwt-token"));
         ServerHttpResponse httpResponse = new MockServerHttpResponse();
 
-        StepVerifier.create(controller.generateToken(query(), httpResponse))
+        StepVerifier.create(controller.generateToken(request(), httpResponse))
                 .expectNext("jwt-token")
                 .verifyComplete();
 
@@ -102,7 +113,7 @@ class TokenControllerTest {
                 .thenReturn(Mono.error(new UnAuthorizedException("invalid")));
         ServerHttpResponse httpResponse = new MockServerHttpResponse();
 
-        StepVerifier.create(controller.generateToken(query(), httpResponse))
+        StepVerifier.create(controller.generateToken(request(), httpResponse))
                 .expectError(UnAuthorizedException.class)
                 .verify();
 
@@ -115,17 +126,20 @@ class TokenControllerTest {
         when(tokenService.changePassword("alice", "hash", "new-hash", "tenant-A"))
                 .thenReturn(Mono.empty());
 
-        StepVerifier.create(controller.changePassword(query()))
+        StepVerifier.create(controller.changePassword(request()))
                 .expectNext(Boolean.TRUE)
                 .verifyComplete();
     }
 
     @Test
     void cancelTokenCompletesAndClearsCookie() {
-        when(tokenService.tryCancelToken("alice", "tenant-A")).thenReturn(Mono.just(true));
+        when(tokenService.tryCancelToken("alice", "tenant-A", 7L)).thenReturn(Mono.just(true));
         ServerHttpResponse httpResponse = new MockServerHttpResponse();
 
-        StepVerifier.create(controller.cancelToken(query(), httpResponse)).verifyComplete();
+        StepVerifier.create(controller
+                        .cancelToken(request(), httpResponse)
+                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(principal(7L))))
+                .verifyComplete();
 
         ResponseCookie cookie = httpResponse.getCookies().getFirst(RequestConstant.Header.TOKEN_COOKIE);
         assertThat(cookie).isNotNull();
@@ -135,11 +149,26 @@ class TokenControllerTest {
 
     @Test
     void cancelTokenSignalsUnauthorizedWhenServiceRejects() {
-        when(tokenService.tryCancelToken("alice", "tenant-A")).thenReturn(Mono.just(false));
+        when(tokenService.tryCancelToken("alice", "tenant-A", 7L)).thenReturn(Mono.just(false));
         ServerHttpResponse httpResponse = new MockServerHttpResponse();
 
-        StepVerifier.create(controller.cancelToken(query(), httpResponse))
+        StepVerifier.create(controller
+                        .cancelToken(request(), httpResponse)
+                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(principal(7L))))
                 .expectError(UnAuthorizedException.class)
+                .verify();
+    }
+
+    @Test
+    void cancelTokenRejectsCancellingAnotherPrincipalsSession() {
+        when(tokenService.tryCancelToken("alice", "tenant-A", 7L))
+                .thenReturn(Mono.error(new AccessDeniedException("Tokens can only be cancelled by their owner")));
+        ServerHttpResponse httpResponse = new MockServerHttpResponse();
+
+        StepVerifier.create(controller
+                        .cancelToken(request(), httpResponse)
+                        .contextWrite(ReactiveSecurityContextHolder.withAuthentication(principal(7L))))
+                .expectError(AccessDeniedException.class)
                 .verify();
     }
 
@@ -148,7 +177,7 @@ class TokenControllerTest {
         TokenValid valid = new TokenValid(true, new Date(1_700_000_000_000L));
         when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(Mono.just(valid));
 
-        StepVerifier.create(controller.checkValid(query())).expectNext(valid).verifyComplete();
+        StepVerifier.create(controller.checkValid(request())).expectNext(valid).verifyComplete();
     }
 
     @Test
@@ -156,6 +185,8 @@ class TokenControllerTest {
         TokenValid invalid = new TokenValid(false, null);
         when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(Mono.just(invalid));
 
-        StepVerifier.create(controller.checkValid(query())).expectNext(invalid).verifyComplete();
+        StepVerifier.create(controller.checkValid(request()))
+                .expectNext(invalid)
+                .verifyComplete();
     }
 }

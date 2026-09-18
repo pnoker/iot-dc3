@@ -31,7 +31,11 @@ public interface ReactiveTokenService {
     Mono<Void> changePassword(String loginName, String currentPassword, String newPassword, String tenantCode);
 
     /** Best-effort cancel of the login token, reporting whether it was active. */
-    Mono<Boolean> tryCancelToken(String loginName, String tenantCode);
+    /**
+     * Cancel the token of the named login under the given tenant. Self-service
+     * only: the resolved credential must belong to the calling principal.
+     */
+    Mono<Boolean> tryCancelToken(String loginName, String tenantCode, Long callerPrincipalId);
 
     /** Validate the login token against the stored material. */
     Mono<TokenValid> checkValid(String loginName, String token, String tenantCode);

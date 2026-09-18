@@ -210,8 +210,9 @@ public class TokenController implements BaseController {
     @PostMapping("/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> cancelToken(@Validated @RequestBody TokenQuery entityVO, ServerHttpResponse response) {
-        return tokenService
-                .tryCancelToken(entityVO.getName(), entityVO.getTenant())
+        return getPrincipalHeader()
+                .flatMap(header ->
+                        tokenService.tryCancelToken(entityVO.getName(), entityVO.getTenant(), header.getPrincipalId()))
                 .flatMap(cancelled -> cancelled
                         ? Mono.fromRunnable(
                                 () -> response.addCookie(ResponseCookie.from(RequestConstant.Header.TOKEN_COOKIE, "")

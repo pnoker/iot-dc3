@@ -29,6 +29,7 @@ import io.github.pnoker.common.auth.support.ReactiveAuthScheduler;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.enums.RequirePasswordChangeFlagEnum;
+import io.github.pnoker.common.exception.AccessDeniedException;
 import io.github.pnoker.common.exception.PasswordChangeRequiredException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.KeyUtil;
@@ -91,12 +92,18 @@ public class ReactiveTokenServiceImpl implements ReactiveTokenService {
     }
 
     @Override
-    public Mono<Boolean> tryCancelToken(String loginName, String tenantCode) {
+    public Mono<Boolean> tryCancelToken(String loginName, String tenantCode, Long callerPrincipalId) {
         return tenantService
                 .getByCode(tenantCode)
                 .flatMap(tenant -> credentialService
                         .getByLoginName(tenant.getId(), loginName)
                         .map(credential -> {
+                            // Self-service logout: a caller may only cancel their own session.
+                            // Without this check, any principal holding token:delete could log
+                            // out arbitrary users by name (denial of service).
+                            if (callerPrincipalId == null || !callerPrincipalId.equals(credential.getPrincipalId())) {
+                                throw new AccessDeniedException("Tokens can only be cancelled by their owner");
+                            }
                             String principalKey = String.valueOf(credential.getPrincipalId());
                             long logoutEpochMs = System.currentTimeMillis();
                             tokenDenylistCache.markLogout(principalKey, tenantCode, logoutEpochMs);
