@@ -14,44 +14,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcLoginQuery;
-import io.github.pnoker.api.center.auth.GrpcRTokenDTO;
+import io.github.pnoker.api.center.auth.GrpcTokenValidationDTO;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
 import io.github.pnoker.common.facade.api.TokenFacade;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-/**
- * gRPC {@link TokenFacade}.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
-@Slf4j
+/** gRPC facade exposing token operations. */
 @Component
 @RequiredArgsConstructor
 public class TokenGrpcFacade implements TokenFacade {
-
-    private final TokenApiGrpc.TokenApiBlockingStub tokenApiBlockingStub;
-
-    private final GrpcFacadeSupport grpcFacadeSupport;
+    private final TokenApiGrpc.TokenApiStub tokenApiStub;
+    private final GrpcFacadeSupport support;
 
     @Override
-    public boolean checkValid(String tenant, String name, String salt, String token) {
-        GrpcLoginQuery login = GrpcLoginQuery.newBuilder()
+    public Mono<Boolean> checkValid(String tenant, String name, String token) {
+        GrpcLoginQuery request = GrpcLoginQuery.newBuilder()
                 .setTenant(tenant)
                 .setName(name)
-                .setSalt(salt)
                 .setToken(token)
                 .build();
-        GrpcRTokenDTO response = grpcFacadeSupport.call("TokenFacade.checkValid", tokenApiBlockingStub,
-                stub -> stub.checkValid(login));
-        return response.getResult().getOk();
+        TokenApiGrpc.TokenApiStub stub = support.withDeadline(tokenApiStub);
+        return ReactiveGrpcClientSupport.<GrpcLoginQuery, GrpcTokenValidationDTO>unary(
+                        "TokenFacade.checkValid", observer -> stub.checkValid(request, observer))
+                .map(GrpcTokenValidationDTO::getValid);
     }
-
 }

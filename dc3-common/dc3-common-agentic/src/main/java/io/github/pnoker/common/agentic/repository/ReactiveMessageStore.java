@@ -1,0 +1,46 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package io.github.pnoker.common.agentic.repository;
+
+import io.github.pnoker.common.agentic.entity.bo.MessageBO;
+import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
+import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+/** Reactive persistence port for the single source of truth, {@code dc3_message}. */
+public interface ReactiveMessageStore {
+
+    /** Save the message, inserting or updating as needed. */
+    Mono<MessageBO> save(
+            String conversationId,
+            String role,
+            AgenticMessageContent content,
+            String model,
+            AgenticMessageStatusEnum status,
+            RequestHeader.PrincipalHeader header);
+
+    /** Stream messages matching the request. */
+    Flux<MessageBO> list(String conversationId, RequestHeader.PrincipalHeader header);
+
+    /** Stream the conversation history newest-first for the principal. */
+    Flux<MessageBO> loadHistory(String conversationId, RequestHeader.PrincipalHeader header, int limit);
+
+    /** Delete the records matched by conversation id. */
+    Mono<Long> deleteByConversationId(String conversationId, RequestHeader.PrincipalHeader header);
+}

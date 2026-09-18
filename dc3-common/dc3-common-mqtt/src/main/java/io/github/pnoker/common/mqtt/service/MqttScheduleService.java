@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mqtt.service;
 
 /**
@@ -25,7 +24,6 @@ package io.github.pnoker.common.mqtt.service;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface MqttScheduleService {
@@ -34,5 +32,4 @@ public interface MqttScheduleService {
      * Initialize scheduling tasks
      */
     void initial();
-
 }

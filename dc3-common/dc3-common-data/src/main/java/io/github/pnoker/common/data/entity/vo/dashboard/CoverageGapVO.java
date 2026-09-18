@@ -14,20 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Config-vs-reality coverage report — points declared in dc3_point that never produced
@@ -35,7 +33,6 @@ import java.util.List;
  * {@code items} is the (capped) list of offending ids so the UI can drill in.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -76,6 +73,9 @@ public class CoverageGapVO implements Serializable {
         items.add(item);
     }
 
+    /**
+     * One point that has never reported any sample (missing coverage item).
+     */
     @Getter
     @Setter
     @ToString
@@ -87,11 +87,9 @@ public class CoverageGapVO implements Serializable {
         private static final long serialVersionUID = 1L;
 
         @Schema(description = "point ID", example = "2048")
-        private long pointId;
+        private String pointId;
 
         @Schema(description = "profile ID the point belongs to", example = "1024")
-        private long profileId;
-
+        private String profileId;
     }
-
 }

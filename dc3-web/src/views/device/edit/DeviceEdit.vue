@@ -18,12 +18,46 @@
 <template>
   <div>
     <base-card>
-      <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
+      <el-alert
+        v-if="reactiveData.deviceError"
+        :closable="false"
+        :title="$t('device.edit.deviceLoadFailed')"
+        class="device-edit-error"
+        show-icon
+        type="error"
+      >
+        <el-button :loading="reactiveData.deviceLoading" link type="danger" @click="device">
+          {{ $t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-empty
+        v-if="reactiveData.deviceMissing || (reactiveData.deviceError && !reactiveData.deviceFormData.id)"
+        :description="reactiveData.deviceMissing ? $t('common.description') : $t('device.edit.deviceLoadFailed')"
+      />
+      <el-tabs
+        v-else
+        v-model="reactiveData.active"
+        v-loading="reactiveData.deviceLoading"
+        @tab-click="changeActive"
+      >
         <!-- Device Config -->
         <el-tab-pane :label="$t('device.edit.deviceConfig')" name="deviceConfig">
+          <el-alert
+            v-if="reactiveData.deviceSaveError"
+            :closable="false"
+            :title="$t('common.saveFailed')"
+            class="device-edit-error"
+            show-icon
+            type="error"
+          >
+            <el-button :loading="reactiveData.deviceSaving" link type="danger" @click="deviceSave">
+              {{ $t('common.retry') }}
+            </el-button>
+          </el-alert>
           <info-card
             :form-model="reactiveData.deviceFormData"
             :rules="deviceFormRule"
+            :saving="reactiveData.deviceSaving"
             @reset="deviceReset"
             @save="deviceSave"
           >
@@ -38,46 +72,74 @@
                 />
               </el-form-item>
               <el-form-item :label="$t('device.edit.driver')" prop="driverId">
-                <el-select
-                  v-model="reactiveData.deviceFormData.driverId"
-                  :loading="reactiveData.driverLoading"
-                  :placeholder="$t('device.edit.driverPlaceholder')"
-                  :remote-method="driverDictionary"
-                  clearable
-                  filterable
-                  remote
-                  reserve-keyword
-                  @change="changeAttribute"
-                  @visible-change="driverDictionaryVisible"
-                >
-                  <el-option
-                    v-for="dictionary in reactiveData.driverDictionary"
-                    :key="dictionary.value"
-                    :label="dictionary.label"
-                    :value="dictionary.value"
-                  />
-                </el-select>
+                <div class="dictionary-field">
+                  <el-select
+                    v-model="reactiveData.deviceFormData.driverId"
+                    :loading="reactiveData.driverLoading"
+                    :placeholder="$t('device.edit.driverPlaceholder')"
+                    :remote-method="driverDictionary"
+                    clearable
+                    filterable
+                    remote
+                    reserve-keyword
+                    @change="handleDriverChange"
+                    @visible-change="driverDictionaryVisible"
+                  >
+                    <el-option
+                      v-for="dictionary in reactiveData.driverDictionary"
+                      :key="dictionary.value"
+                      :label="dictionary.label"
+                      :value="dictionary.value"
+                    />
+                  </el-select>
+                  <el-alert
+                    v-if="reactiveData.driverDictionaryError"
+                    :closable="false"
+                    :title="$t('common.loadFailed')"
+                    class="dictionary-load-error"
+                    show-icon
+                    type="error"
+                  >
+                    <el-button :loading="reactiveData.driverLoading" link type="danger" @click="driverDictionary('')">
+                      {{ $t('common.retry') }}
+                    </el-button>
+                  </el-alert>
+                </div>
               </el-form-item>
               <el-form-item :label="$t('device.edit.profile')" prop="profileId">
-                <el-select
-                  v-model="reactiveData.deviceFormData.profileId"
-                  :loading="reactiveData.profileLoading"
-                  :placeholder="$t('device.edit.profilePlaceholder')"
-                  :remote-method="profileDictionary"
-                  clearable
-                  filterable
-                  remote
-                  reserve-keyword
-                  @change="changeProfile"
-                  @visible-change="profileDictionaryVisible"
-                >
-                  <el-option
-                    v-for="dictionary in reactiveData.profileDictionary"
-                    :key="dictionary.value"
-                    :label="dictionary.label"
-                    :value="dictionary.value"
-                  />
-                </el-select>
+                <div class="dictionary-field">
+                  <el-select
+                    v-model="reactiveData.deviceFormData.profileId"
+                    :loading="reactiveData.profileLoading"
+                    :placeholder="$t('device.edit.profilePlaceholder')"
+                    :remote-method="profileDictionary"
+                    clearable
+                    filterable
+                    remote
+                    reserve-keyword
+                    @change="handleProfileChange"
+                    @visible-change="profileDictionaryVisible"
+                  >
+                    <el-option
+                      v-for="dictionary in reactiveData.profileDictionary"
+                      :key="dictionary.value"
+                      :label="dictionary.label"
+                      :value="dictionary.value"
+                    />
+                  </el-select>
+                  <el-alert
+                    v-if="reactiveData.profileDictionaryError"
+                    :closable="false"
+                    :title="$t('common.loadFailed')"
+                    class="dictionary-load-error"
+                    show-icon
+                    type="error"
+                  >
+                    <el-button :loading="reactiveData.profileLoading" link type="danger" @click="profileDictionary('')">
+                      {{ $t('common.retry') }}
+                    </el-button>
+                  </el-alert>
+                </div>
               </el-form-item>
               <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
                 <enable-flag-segmented v-model="reactiveData.deviceFormData.enableFlag"/>
@@ -105,15 +167,34 @@
             @discard="driverInfoReset"
             @save="saveDriverMatrix"
           />
-          <el-empty v-if="!hasDriverAttributes" :description="$t('device.edit.driverAttributeEmpty')"/>
-          <el-table
-            v-else
-            v-loading="reactiveData.loading"
-            :data="reactiveData.driverAttributes"
-            class="matrix-table"
-            row-key="id"
-            stripe
+          <el-alert
+            v-if="reactiveData.matrixErrors.driver"
+            :closable="false"
+            :title="$t('device.edit.driverLoadFailed')"
+            class="matrix-load-error"
+            show-icon
+            type="error"
           >
+            <el-button :loading="reactiveData.loading" link type="danger" @click="retryMatrix">
+              {{ $t('common.retry') }}
+            </el-button>
+          </el-alert>
+          <el-empty v-if="!hasDriverAttributes" :description="$t('device.edit.driverAttributeEmpty')"/>
+          <div
+            v-else
+            :aria-label="$t('device.edit.matrixScrollRegion')"
+            class="matrix-table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <p class="matrix-table-scroll__hint">{{ $t('device.edit.matrixScrollHint') }}</p>
+            <el-table
+              v-loading="reactiveData.loading"
+              :data="reactiveData.driverAttributes"
+              class="matrix-table"
+              row-key="id"
+              stripe
+            >
             <el-table-column :label="$t('device.edit.attributeName')" min-width="140" prop="attributeName"/>
             <el-table-column :label="$t('device.edit.attributeType')" width="90">
               <template #default="{row}">
@@ -127,6 +208,7 @@
                   <el-switch
                     v-if="isBooleanAttribute(attribute)"
                     :active-value="true"
+                    :disabled="reactiveData.driverSaving"
                     :inactive-value="false"
                     :model-value="getDriverCellValue(attribute)"
                     size="small"
@@ -134,6 +216,7 @@
                   />
                   <el-input-number
                     v-else-if="isNumberAttribute(attribute)"
+                    :disabled="reactiveData.driverSaving"
                     :model-value="getDriverCellValue(attribute)"
                     :placeholder="attributePlaceholder(attribute)"
                     :precision="attributePrecision(attribute)"
@@ -144,6 +227,7 @@
                   />
                   <el-input
                     v-else
+                    :disabled="reactiveData.driverSaving"
                     :model-value="getDriverCellValue(attribute)"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
@@ -159,7 +243,8 @@
                 </div>
               </template>
             </el-table-column>
-          </el-table>
+            </el-table>
+          </div>
         </el-tab-pane>
 
         <!-- Point Config -->
@@ -189,6 +274,7 @@
                 v-if="filteredPointInfoData.length > reactiveData.pointPageSize"
                 v-model:current-page="reactiveData.pointPageCurrent"
                 v-model:page-size="reactiveData.pointPageSize"
+                :disabled="reactiveData.pointSaving"
                 :page-sizes="[10, 20, 50]"
                 :total="filteredPointInfoData.length"
                 layout="total, sizes, prev, pager, next"
@@ -197,14 +283,35 @@
             </template>
           </matrix-toolbar>
 
-          <el-empty v-if="!hasPointAttributes" :description="$t('device.edit.pointAttributeEmpty')"/>
-          <el-table
-            v-else
-            v-loading="reactiveData.loading"
-            :data="paginatedPointInfoData"
-            :row-class-name="pointMatrixRowClassName"
-            stripe
+          <el-alert
+            v-if="reactiveData.matrixErrors.point"
+            :closable="false"
+            :title="$t('device.edit.pointLoadFailed')"
+            class="matrix-load-error"
+            show-icon
+            type="error"
           >
+            <el-button :loading="reactiveData.loading" link type="danger" @click="retryMatrix">
+              {{ $t('common.retry') }}
+            </el-button>
+          </el-alert>
+
+          <el-empty v-if="!hasPointAttributes" :description="$t('device.edit.pointAttributeEmpty')"/>
+          <div
+            v-else
+            :aria-label="$t('device.edit.matrixScrollRegion')"
+            class="matrix-table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <p class="matrix-table-scroll__hint">{{ $t('device.edit.matrixScrollHint') }}</p>
+            <el-table
+              v-loading="reactiveData.loading"
+              :data="paginatedPointInfoData"
+              :row-class-name="pointMatrixRowClassName"
+              class="matrix-table"
+              stripe
+            >
             <el-table-column :label="$t('device.edit.pointName')" fixed min-width="160" show-overflow-tooltip>
               <template #default="{row}">
                 <el-tooltip :content="row.pointCode || row.id" :disabled="!row.pointCode" placement="top">
@@ -240,6 +347,7 @@
                     v-if="isBooleanAttribute(attribute)"
                     v-model="pointCell(row, attribute).configValue"
                     :active-value="true"
+                    :disabled="reactiveData.pointSaving || pointCell(row, attribute).saving"
                     :inactive-value="false"
                     size="small"
                     @change="markPointCellDirty(row, attribute)"
@@ -247,6 +355,7 @@
                   <el-input
                     v-else-if="isNumberAttribute(attribute)"
                     v-model="pointCell(row, attribute).configValue"
+                    :disabled="reactiveData.pointSaving || pointCell(row, attribute).saving"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
                     inputmode="decimal"
@@ -259,6 +368,7 @@
                   <el-input
                     v-else
                     v-model="pointCell(row, attribute).configValue"
+                    :disabled="reactiveData.pointSaving || pointCell(row, attribute).saving"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
                     maxlength="512"
@@ -276,7 +386,8 @@
                 </div>
               </template>
             </el-table-column>
-          </el-table>
+            </el-table>
+          </div>
         </el-tab-pane>
 
         <!-- Command Config -->
@@ -306,6 +417,7 @@
                 v-if="filteredCommandInfoData.length > reactiveData.commandPageSize"
                 v-model:current-page="reactiveData.commandPageCurrent"
                 v-model:page-size="reactiveData.commandPageSize"
+                :disabled="reactiveData.commandSaving"
                 :page-sizes="[10, 20, 50]"
                 :total="filteredCommandInfoData.length"
                 layout="total, sizes, prev, pager, next"
@@ -314,14 +426,35 @@
             </template>
           </matrix-toolbar>
 
-          <el-empty v-if="!hasCommandAttributes" :description="$t('device.edit.commandAttributeEmpty')"/>
-          <el-table
-            v-else
-            v-loading="reactiveData.loading"
-            :data="paginatedCommandInfoData"
-            :row-class-name="commandMatrixRowClassName"
-            stripe
+          <el-alert
+            v-if="reactiveData.matrixErrors.command"
+            :closable="false"
+            :title="$t('device.edit.commandLoadFailed')"
+            class="matrix-load-error"
+            show-icon
+            type="error"
           >
+            <el-button :loading="reactiveData.loading" link type="danger" @click="retryMatrix">
+              {{ $t('common.retry') }}
+            </el-button>
+          </el-alert>
+
+          <el-empty v-if="!hasCommandAttributes" :description="$t('device.edit.commandAttributeEmpty')"/>
+          <div
+            v-else
+            :aria-label="$t('device.edit.matrixScrollRegion')"
+            class="matrix-table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <p class="matrix-table-scroll__hint">{{ $t('device.edit.matrixScrollHint') }}</p>
+            <el-table
+              v-loading="reactiveData.loading"
+              :data="paginatedCommandInfoData"
+              :row-class-name="commandMatrixRowClassName"
+              class="matrix-table"
+              stripe
+            >
             <el-table-column :label="$t('device.edit.commandName')" fixed min-width="160" show-overflow-tooltip>
               <template #default="{row}">
                 <el-tooltip :content="row.commandCode || row.id" :disabled="!row.commandCode" placement="top">
@@ -357,6 +490,7 @@
                     v-if="isBooleanAttribute(attribute)"
                     v-model="commandCell(row, attribute).configValue"
                     :active-value="true"
+                    :disabled="reactiveData.commandSaving || commandCell(row, attribute).saving"
                     :inactive-value="false"
                     size="small"
                     @change="markCommandCellDirty(row, attribute)"
@@ -364,6 +498,7 @@
                   <el-input
                     v-else-if="isNumberAttribute(attribute)"
                     v-model="commandCell(row, attribute).configValue"
+                    :disabled="reactiveData.commandSaving || commandCell(row, attribute).saving"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
                     inputmode="decimal"
@@ -376,6 +511,7 @@
                   <el-input
                     v-else
                     v-model="commandCell(row, attribute).configValue"
+                    :disabled="reactiveData.commandSaving || commandCell(row, attribute).saving"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
                     maxlength="512"
@@ -393,7 +529,8 @@
                 </div>
               </template>
             </el-table-column>
-          </el-table>
+            </el-table>
+          </div>
         </el-tab-pane>
 
         <!-- Event Config -->
@@ -423,6 +560,7 @@
                 v-if="filteredEventInfoData.length > reactiveData.eventPageSize"
                 v-model:current-page="reactiveData.eventPageCurrent"
                 v-model:page-size="reactiveData.eventPageSize"
+                :disabled="reactiveData.eventSaving"
                 :page-sizes="[10, 20, 50]"
                 :total="filteredEventInfoData.length"
                 layout="total, sizes, prev, pager, next"
@@ -431,14 +569,35 @@
             </template>
           </matrix-toolbar>
 
-          <el-empty v-if="!hasEventAttributes" :description="$t('device.edit.eventAttributeEmpty')"/>
-          <el-table
-            v-else
-            v-loading="reactiveData.loading"
-            :data="paginatedEventInfoData"
-            :row-class-name="eventMatrixRowClassName"
-            stripe
+          <el-alert
+            v-if="reactiveData.matrixErrors.event"
+            :closable="false"
+            :title="$t('device.edit.eventLoadFailed')"
+            class="matrix-load-error"
+            show-icon
+            type="error"
           >
+            <el-button :loading="reactiveData.loading" link type="danger" @click="retryMatrix">
+              {{ $t('common.retry') }}
+            </el-button>
+          </el-alert>
+
+          <el-empty v-if="!hasEventAttributes" :description="$t('device.edit.eventAttributeEmpty')"/>
+          <div
+            v-else
+            :aria-label="$t('device.edit.matrixScrollRegion')"
+            class="matrix-table-scroll"
+            role="region"
+            tabindex="0"
+          >
+            <p class="matrix-table-scroll__hint">{{ $t('device.edit.matrixScrollHint') }}</p>
+            <el-table
+              v-loading="reactiveData.loading"
+              :data="paginatedEventInfoData"
+              :row-class-name="eventMatrixRowClassName"
+              class="matrix-table"
+              stripe
+            >
             <el-table-column :label="$t('device.edit.eventName')" fixed min-width="160" show-overflow-tooltip>
               <template #default="{row}">
                 <el-tooltip :content="row.eventCode || row.id" :disabled="!row.eventCode" placement="top">
@@ -474,6 +633,7 @@
                     v-if="isBooleanAttribute(attribute)"
                     v-model="eventCell(row, attribute).configValue"
                     :active-value="true"
+                    :disabled="reactiveData.eventSaving || eventCell(row, attribute).saving"
                     :inactive-value="false"
                     size="small"
                     @change="markEventCellDirty(row, attribute)"
@@ -481,6 +641,7 @@
                   <el-input
                     v-else-if="isNumberAttribute(attribute)"
                     v-model="eventCell(row, attribute).configValue"
+                    :disabled="reactiveData.eventSaving || eventCell(row, attribute).saving"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
                     inputmode="decimal"
@@ -493,6 +654,7 @@
                   <el-input
                     v-else
                     v-model="eventCell(row, attribute).configValue"
+                    :disabled="reactiveData.eventSaving || eventCell(row, attribute).saving"
                     :placeholder="attributePlaceholder(attribute)"
                     clearable
                     maxlength="512"
@@ -510,7 +672,8 @@
                 </div>
               </template>
             </el-table-column>
-          </el-table>
+            </el-table>
+          </div>
         </el-tab-pane>
       </el-tabs>
     </base-card>
@@ -521,6 +684,40 @@
 
 <style lang="scss" scoped>
 @use '@/styles/edit-card.scss';
+
+.device-edit-error,
+.matrix-load-error {
+  margin-bottom: var(--dc3-space-3);
+
+  :deep(.el-alert__content) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--dc3-space-2);
+  }
+}
+
+.dictionary-field {
+  display: grid;
+  gap: var(--dc3-space-2);
+  width: 100%;
+  min-width: 0;
+}
+
+.dictionary-load-error {
+  margin: 0;
+
+  :deep(.el-alert__content) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--dc3-space-2);
+  }
+}
+
+.matrix-load-error {
+  margin-top: var(--dc3-space-2);
+}
 
 .driver-info-card {
   margin-top: 12px;
@@ -549,6 +746,30 @@
   }
 }
 
+.matrix-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  outline: none;
+
+  &:focus-visible {
+    box-shadow: var(--dc3-focus-ring);
+    border-radius: var(--dc3-radius-sm);
+  }
+}
+
+.matrix-table-scroll__hint {
+  display: none;
+  margin: 0 0 var(--dc3-space-2);
+  color: var(--el-text-color-secondary);
+  font-size: var(--el-font-size-extra-small);
+}
+
 .point-matrix-name {
   font-size: 13px;
   font-weight: 500;
@@ -561,6 +782,16 @@
   justify-content: space-between;
   gap: 8px;
   font-size: 13px;
+}
+
+@media (max-width: $breakpoint-sm-max) {
+  .matrix-table-scroll__hint {
+    display: block;
+  }
+
+  .matrix-table-scroll :deep(.el-table) {
+    min-width: max-content;
+  }
 }
 
 .matrix-cell {

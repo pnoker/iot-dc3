@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
 import io.github.pnoker.common.data.entity.model.NotifyDO;
 import io.github.pnoker.common.data.entity.vo.NotifyVO;
@@ -28,25 +26,24 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 /**
  * MapStruct builder converting between alarm notification BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface NotifyBuilder {
 
     /**
@@ -78,6 +75,12 @@ public interface NotifyBuilder {
     @Mapping(target = "deleted", ignore = true)
     NotifyDO buildDOByBO(NotifyBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(NotifyBO entityBO, @MappingTarget NotifyDO entityDO) {
         // Code
@@ -124,6 +127,12 @@ public interface NotifyBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     NotifyBO buildBOByDO(NotifyDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(NotifyDO entityDO, @MappingTarget NotifyBO entityBO) {
         // Json Ext
@@ -176,18 +185,10 @@ public interface NotifyBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
-    default Page<NotifyBO> buildBOPageByDOPage(Page<NotifyDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
     /**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    default Page<NotifyVO> buildVOPageByBOPage(Page<NotifyBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

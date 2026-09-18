@@ -14,28 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.data.entity.vo.PointValueVO;
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
 
 /**
  * MapStruct builder converting between point value BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface PointValueBuilder {
 
     /**
@@ -44,6 +41,11 @@ public interface PointValueBuilder {
      * @param entityVO EntityVO
      * @return EntityBO
      */
+    @Mapping(target = "messageId", ignore = true)
+    @Mapping(target = "schemaVersion", ignore = true)
+    @Mapping(target = "driverNode", ignore = true)
+    @Mapping(target = "sequence", ignore = true)
+    @Mapping(target = "fencingToken", ignore = true)
     PointValueBO buildBOByVO(PointValueVO entityVO);
 
     /**
@@ -60,6 +62,7 @@ public interface PointValueBuilder {
      * @param entityBO EntityBO
      * @return EntityDO
      */
+    @Mapping(target = "quality", ignore = true)
     PointValueDO buildDOByBO(PointValueBO entityBO);
 
     /**
@@ -109,18 +112,10 @@ public interface PointValueBuilder {
      * @param entityPageDO EntityDO Page
      * @return EntityBO Page
      */
-    default Page<PointValueBO> buildBOPageByDOPage(Page<PointValueDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
     /**
      * BOPage to VOPage
      *
      * @param entityPageBO EntityBO Page
      * @return EntityVO Page
      */
-    default Page<PointValueVO> buildVOPageByBOPage(Page<PointValueBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

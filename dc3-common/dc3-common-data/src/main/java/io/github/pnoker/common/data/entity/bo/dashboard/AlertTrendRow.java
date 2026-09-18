@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.bo.dashboard;
 
 import lombok.Getter;
@@ -25,7 +24,6 @@ import lombok.ToString;
  * One day's split alert count (device vs driver source).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -38,5 +36,4 @@ public class AlertTrendRow {
     private long deviceCount;
 
     private long driverCount;
-
 }

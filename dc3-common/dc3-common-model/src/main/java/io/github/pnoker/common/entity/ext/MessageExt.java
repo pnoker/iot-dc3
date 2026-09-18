@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * JSON extension object for message metadata.
@@ -32,7 +30,6 @@ import java.util.Map;
  * Extended information related to messages.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -47,9 +44,14 @@ public class MessageExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content payload of the message; the concrete shape is selected by the inherited type and version fields")
+    @Schema(
+            description =
+                    "Extended content payload of the message; the concrete shape is selected by the inherited type and version fields")
     private Content content;
 
+    /**
+     * Message template core content (level, body text).
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -60,17 +62,23 @@ public class MessageExt extends BaseExt {
         /**
          * Variables expected by the templates.
          */
-        @Schema(description = "Placeholder variable names that templates reference and that must be supplied at render time")
+        @Schema(
+                description =
+                        "Placeholder variable names that templates reference and that must be supplied at render time")
         private List<String> variables;
 
         /**
          * Channel-specific templates. Destinations and credentials belong to notification channels.
          */
-        @Schema(description = "Channel-specific templates keyed by channel type; note that destinations and credentials are owned by the notification channel, not by the template")
+        @Schema(
+                description =
+                        "Channel-specific templates keyed by channel type; note that destinations and credentials are owned by the notification channel, not by the template")
         private List<Template> templates;
-
     }
 
+    /**
+     * Per-channel rendering overrides keyed by channel type (FEISHU_BOT, WEBHOOK, EMAIL...).
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -81,21 +89,25 @@ public class MessageExt extends BaseExt {
         /**
          * Channel type such as FEISHU_BOT, WEBHOOK, or EMAIL.
          */
-        @Schema(description = "Notification channel type this template targets, e.g. FEISHU_BOT, WEBHOOK, or EMAIL", example = "FEISHU_BOT")
+        @Schema(
+                description = "Notification channel type this template targets, e.g. FEISHU_BOT, WEBHOOK, or EMAIL",
+                example = "FEISHU_BOT")
         private String channelType;
 
         /**
          * Payload type such as CARD, TEXT, JSON, or HTML.
          */
-        @Schema(description = "Rendered payload format produced by this template, e.g. CARD, TEXT, JSON, or HTML", example = "CARD")
+        @Schema(
+                description = "Rendered payload format produced by this template, e.g. CARD, TEXT, JSON, or HTML",
+                example = "CARD")
         private String payloadType;
 
         /**
          * Structured template payload to render.
          */
-        @Schema(description = "Structured template payload to render, whose shape depends on channelType and payloadType")
+        @Schema(
+                description =
+                        "Structured template payload to render, whose shape depends on channelType and payloadType")
         private Map<String, Object> template;
-
     }
-
 }

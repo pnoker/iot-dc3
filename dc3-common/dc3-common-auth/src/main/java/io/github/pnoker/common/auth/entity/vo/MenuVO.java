@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -40,7 +39,6 @@ import lombok.ToString;
  * View object for menu API responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -55,9 +53,14 @@ public class MenuVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "ID of the parent menu node in the hierarchy. Null for root-level menus.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Menu parent id can't be empty", groups = {Add.class, Update.class})
-    private Long parentMenuId;
+    @Schema(
+            description = "ID of the parent menu node in the hierarchy. Null for root-level menus.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Menu parent id can't be empty",
+            groups = {Add.class, Update.class})
+    private String parentMenuId;
 
     /**
      * Type
@@ -68,22 +71,33 @@ public class MenuVO extends BaseVO {
     /**
      * Name
      */
-    @NotBlank(message = "Menu name can't be empty", groups = {Add.class, Auth.class})
-    @Schema(description = "Menu display name shown in the navigation sidebar.", example = "Device Management", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid menu name",
+    @NotBlank(
+            message = "Menu name can't be empty",
+            groups = {Add.class, Auth.class})
+    @Schema(
+            description = "Menu display name shown in the navigation sidebar.",
+            example = "Device Management",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
+            message = "Invalid menu name",
             groups = {Add.class, Update.class})
     private String menuName;
 
     /**
      * Code, URLMD5
      */
-    @Schema(description = "Menu code. Stable business identifier used for permission and routing.", example = "device_mgmt")
+    @Schema(
+            description = "Menu code. Stable business identifier used for permission and routing.",
+            example = "device_mgmt")
     private String menuCode;
 
     /**
      *
      */
-    @Schema(description = "Menu hierarchy level: ROOT, C1 (first level), C2 (second), C3 (third), or C4 (fourth).", example = "C1")
+    @Schema(
+            description = "Menu hierarchy level: ROOT, C1 (first level), C2 (second), C3 (third), or C4 (fourth).",
+            example = "C1")
     private MenuLevelEnum menuLevel;
 
     /**
@@ -95,7 +109,9 @@ public class MenuVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "Menu extension metadata object containing UI-specific settings such as icon, route URL, and additional permissions.")
+    @Schema(
+            description =
+                    "Menu extension metadata object containing UI-specific settings such as icon, route URL, and additional permissions.")
     private MenuExt menuExt;
 
     /**
@@ -103,5 +119,4 @@ public class MenuVO extends BaseVO {
      */
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

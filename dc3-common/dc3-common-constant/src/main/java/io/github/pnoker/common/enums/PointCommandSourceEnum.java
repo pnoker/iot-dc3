@@ -14,21 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Enumeration of point command sources.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter
@@ -59,7 +55,6 @@ public enum PointCommandSourceEnum {
     /**
      * Index
      */
-    @EnumValue
     private final Byte index;
 
     /**
@@ -111,5 +106,4 @@ public enum PointCommandSourceEnum {
             return null;
         }
     }
-
 }

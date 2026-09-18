@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.EventReportBO;
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
@@ -26,13 +24,11 @@ import io.github.pnoker.common.enums.EventHistoryAcknowledgeFlagEnum;
 import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.List;
 
 /**
  * MapStruct builder converting between event history DO and VO.
@@ -43,10 +39,11 @@ import java.util.List;
  * than scattered across services.
  *
  * @author pnoker
- * @version 2026.6.5
  * @since 2026.6.5
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface EventHistoryBuilder {
 
     /**
@@ -57,11 +54,23 @@ public interface EventHistoryBuilder {
      */
     EventReportBO buildBOByVO(EventReportVO entityVO);
 
+    /**
+     * Convert do to vo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     @Mapping(target = "eventTypeFlag", ignore = true)
     @Mapping(target = "eventLevelFlag", ignore = true)
     @Mapping(target = "acknowledgeFlag", ignore = true)
     EventHistoryVO buildVOByDO(EventHistoryDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityVO view object
+     */
     @AfterMapping
     default void afterProcess(EventHistoryDO entityDO, @MappingTarget EventHistoryVO entityVO) {
         entityVO.setEventTypeFlag(EventTypeFlagEnum.ofIndex(entityDO.getEventTypeFlag()));
@@ -69,10 +78,11 @@ public interface EventHistoryBuilder {
         entityVO.setAcknowledgeFlag(EventHistoryAcknowledgeFlagEnum.ofIndex(entityDO.getAcknowledgeFlag()));
     }
 
+    /**
+     * Convert do list to vo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<EventHistoryVO> buildVOListByDOList(List<EventHistoryDO> entityDOList);
-
-    default Page<EventHistoryVO> buildVOPageByDOPage(Page<EventHistoryDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildVOByDO);
-    }
-
 }

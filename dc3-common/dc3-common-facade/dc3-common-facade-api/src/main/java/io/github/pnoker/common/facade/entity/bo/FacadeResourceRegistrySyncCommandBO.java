@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.entity.bo;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,13 +24,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 /**
  * Facade-level command driving a resource-registry sync call.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -41,13 +38,9 @@ import java.util.List;
 @AllArgsConstructor
 public class FacadeResourceRegistrySyncCommandBO {
 
-
     private String serviceName;
-
 
     private boolean deleteMissing;
 
-
     private List<FacadeScannedApiBO> apis;
-
 }

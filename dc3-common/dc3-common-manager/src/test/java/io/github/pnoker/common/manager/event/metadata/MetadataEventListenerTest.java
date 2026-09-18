@@ -14,43 +14,40 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.event.metadata;
 
-import io.github.pnoker.common.constant.driver.RabbitConstant;
-import io.github.pnoker.common.entity.dto.MetadataEventDTO;
-import io.github.pnoker.common.entity.event.MetadataEvent;
-import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
-import io.github.pnoker.common.enums.MetadataTypeEnum;
-import io.github.pnoker.common.manager.entity.bo.DriverBO;
-import io.github.pnoker.common.manager.service.DriverService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
-import java.util.List;
-import java.util.Set;
-
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.entity.event.MetadataEvent;
+import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
+import io.github.pnoker.common.enums.MetadataTypeEnum;
+import io.github.pnoker.common.manager.entity.bo.DriverBO;
+import io.github.pnoker.common.manager.service.ReactiveDriverService;
+import io.github.pnoker.common.mq.sender.MessageSender;
+import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
 @ExtendWith(MockitoExtension.class)
 class MetadataEventListenerTest {
+    @Mock
+    private ReactiveDriverService driverService;
 
     @Mock
-    private DriverService driverService;
-
-    @Mock
-    private RabbitTemplate rabbitTemplate;
+    private MessageSender messageSender;
 
     @InjectMocks
     private MetadataEventListener listener;
@@ -61,86 +58,62 @@ class MetadataEventListenerTest {
     void setUp() {
         driver = new DriverBO();
         driver.setId(7L);
+        driver.setTenantId(1L);
         driver.setServiceName("dc3-driver-modbus-tcp");
     }
 
     @Test
-    void deviceEventNotifiesOwningDriverViaRabbit() {
-        when(driverService.getByDeviceId(10L, null)).thenReturn(driver);
-
-        listener.onApplicationEvent(new MetadataEvent(this, 10L, MetadataTypeEnum.DEVICE,
-                MetadataOperateTypeEnum.UPDATE));
-
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
-                eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-modbus-tcp"),
-                any(MetadataEventDTO.class));
+    void deviceEventNotifiesOwningDriverWithTenant() {
+        when(driverService.getByDeviceId(1L, 10L)).thenReturn(Mono.just(driver));
+        listener.onApplicationEvent(
+                new MetadataEvent(this, 1L, 10L, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE));
+        verify(messageSender)
+                .send(argThat(m -> m.getTopic() == MqTopic.METADATA
+                        && "dc3-driver-modbus-tcp".equals(m.getPartitionKey())
+                        && ((io.github.pnoker.common.entity.dto.MetadataEventDTO) m.getPayload())
+                                .getTenantId()
+                                .equals(1L)));
     }
 
     @Test
     void pointEventFansOutToEveryAffectedDriver() {
         DriverBO secondary = new DriverBO();
+        secondary.setTenantId(1L);
         secondary.setServiceName("dc3-driver-mqtt");
-        when(driverService.listByPointId(20L, null)).thenReturn(List.of(driver, secondary));
-
-        listener.onApplicationEvent(new MetadataEvent(this, 20L, MetadataTypeEnum.POINT,
-                MetadataOperateTypeEnum.ADD));
-
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
-                eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-modbus-tcp"),
-                any(MetadataEventDTO.class));
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
-                eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-mqtt"),
-                any(MetadataEventDTO.class));
-        verify(rabbitTemplate, times(2)).convertAndSend(
-                any(String.class), any(String.class), any(MetadataEventDTO.class));
+        when(driverService.listByPointId(1L, 20L)).thenReturn(Flux.just(driver, secondary));
+        listener.onApplicationEvent(
+                new MetadataEvent(this, 1L, 20L, MetadataTypeEnum.POINT, MetadataOperateTypeEnum.ADD));
+        verify(messageSender, times(2)).send(any());
     }
 
     @Test
-    void pointEventWithEmptyDriverListEmitsNothing() {
-        when(driverService.listByPointId(20L, null)).thenReturn(List.of());
-
-        listener.onApplicationEvent(new MetadataEvent(this, 20L, MetadataTypeEnum.POINT,
-                MetadataOperateTypeEnum.UPDATE));
-
-        verifyNoInteractions(rabbitTemplate);
+    void eventWithoutTenantIsDropped() {
+        listener.onApplicationEvent(
+                new MetadataEvent(this, 10L, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.UPDATE));
+        verifyNoInteractions(driverService, messageSender);
     }
 
     @Test
     void eventWithTargetServicesBypassesOwnerLookup() {
-        listener.onApplicationEvent(new MetadataEvent(this, 10L, MetadataTypeEnum.DEVICE,
-                MetadataOperateTypeEnum.DELETE, Set.of("dc3-driver-old")));
-
-        verify(driverService, never()).getByDeviceId(10L, null);
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
-                eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-old"),
-                any(MetadataEventDTO.class));
+        listener.onApplicationEvent(new MetadataEvent(
+                this, 1L, 10L, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE, Set.of("dc3-driver-old")));
+        verify(driverService, never()).getByDeviceId(any(), any());
+        verify(messageSender).send(argThat(m -> "dc3-driver-old".equals(m.getPartitionKey())));
     }
 
     @Test
     void driverEventNotifiesRegisteredDriverService() {
-        when(driverService.getById(7L)).thenReturn(driver);
-
-        listener.onApplicationEvent(new MetadataEvent(this, 7L, MetadataTypeEnum.DRIVER,
-                MetadataOperateTypeEnum.UPDATE));
-
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitConstant.TOPIC_EXCHANGE_METADATA),
-                eq(RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + "dc3-driver-modbus-tcp"),
-                any(MetadataEventDTO.class));
+        when(driverService.getById(1L, 7L)).thenReturn(Mono.just(driver));
+        listener.onApplicationEvent(
+                new MetadataEvent(this, 1L, 7L, MetadataTypeEnum.DRIVER, MetadataOperateTypeEnum.UPDATE));
+        verify(messageSender).send(any());
     }
 
     @Test
-    void serviceFailureIsSwallowedSilently() {
-        when(driverService.getByDeviceId(10L, null)).thenThrow(new RuntimeException("downstream offline"));
-
-        listener.onApplicationEvent(new MetadataEvent(this, 10L, MetadataTypeEnum.DEVICE,
-                MetadataOperateTypeEnum.DELETE));
-
-        verify(rabbitTemplate, never()).convertAndSend(
-                any(String.class), any(String.class), any(MetadataEventDTO.class));
+    void serviceFailureDoesNotPublish() {
+        when(driverService.getByDeviceId(1L, 10L)).thenReturn(Mono.error(new RuntimeException("downstream offline")));
+        listener.onApplicationEvent(
+                new MetadataEvent(this, 1L, 10L, MetadataTypeEnum.DEVICE, MetadataOperateTypeEnum.DELETE));
+        verify(messageSender, never()).send(any());
     }
 }

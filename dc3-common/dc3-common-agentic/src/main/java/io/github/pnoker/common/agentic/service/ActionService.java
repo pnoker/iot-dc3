@@ -18,40 +18,41 @@ package io.github.pnoker.common.agentic.service;
 
 import io.github.pnoker.common.agentic.entity.bo.ActionBO;
 import io.github.pnoker.common.entity.common.RequestHeader;
-
-import java.util.List;
-
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
 /**
  * Service for managing agentic actions including write-point-value confirmation and rejection.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface ActionService {
 
     /**
-     * Create a pending write-point-value action awaiting user confirmation.
+     * Create and persist a pending write action through the reactive repository.
      *
      * @param conversationId the conversation the action belongs to
-     * @param deviceId       target device
-     * @param pointId        target point
-     * @param value          value to write
-     * @param header         authenticated caller principal and tenant
+     * @param deviceId target device
+     * @param pointId target point
+     * @param value value to write
+     * @param header authenticated caller principal and tenant
      * @return the created action id
      */
-    String createWritePointValueAction(String conversationId, Long deviceId, Long pointId, String value,
-                                       RequestHeader.PrincipalHeader header);
+    Mono<String> createWritePointValueAction(
+            String conversationId, Long deviceId, Long pointId, String value, RequestHeader.PrincipalHeader header);
 
     /**
      * List pending, non-expired actions for a conversation.
      *
+     * @param offset zero-based result offset
+     * @param limit maximum number of rows
      * @param conversationId the conversation to query
-     * @param header         authenticated caller principal and tenant
-     * @return pending actions for the conversation
+     * @param header authenticated caller principal and tenant
+     * @return an offset page of pending actions
      */
-    List<ActionBO> listPending(String conversationId, RequestHeader.PrincipalHeader header);
+    Mono<OffsetPage<ActionBO>> listPending(
+            long offset, int limit, String conversationId, RequestHeader.PrincipalHeader header);
 
     /**
      * Confirm a pending action and execute it. For a write-point-value action this
@@ -61,7 +62,7 @@ public interface ActionService {
      * @param header   authenticated caller principal and tenant
      * @return the updated action
      */
-    ActionBO confirm(String actionId, RequestHeader.PrincipalHeader header);
+    Mono<ActionBO> confirm(String actionId, RequestHeader.PrincipalHeader header);
 
     /**
      * Reject a pending action, transitioning it to REJECTED without executing it.
@@ -70,6 +71,5 @@ public interface ActionService {
      * @param header   authenticated caller principal and tenant
      * @return the updated action
      */
-    ActionBO reject(String actionId, RequestHeader.PrincipalHeader header);
-
+    Mono<ActionBO> reject(String actionId, RequestHeader.PrincipalHeader header);
 }

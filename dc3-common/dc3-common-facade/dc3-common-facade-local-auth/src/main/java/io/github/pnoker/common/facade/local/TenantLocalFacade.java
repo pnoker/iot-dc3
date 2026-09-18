@@ -14,40 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
-import io.github.pnoker.common.auth.entity.bo.TenantBO;
-import io.github.pnoker.common.auth.service.TenantService;
+import io.github.pnoker.common.auth.service.ReactiveTenantService;
 import io.github.pnoker.common.facade.api.TenantFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.facade.local.builder.FacadeTenantBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
-/**
- * In-process {@link TenantFacade}.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
-@Slf4j
+/** In-process facade for tenant operations. */
 @Component
 @RequiredArgsConstructor
 public class TenantLocalFacade implements TenantFacade {
-
-    private final TenantService tenantService;
-
-    private final FacadeTenantBuilder facadeTenantBuilder;
+    private final ReactiveTenantService tenantService;
+    private final FacadeTenantBuilder builder;
 
     @Override
-    public FacadeTenantBO getByCode(String code) {
-        TenantBO bo = tenantService.getByCode(code);
-        return Objects.isNull(bo) ? null : facadeTenantBuilder.toFacadeBO(bo);
+    public Mono<FacadeTenantBO> getByCode(String code) {
+        return tenantService.getByCode(code).map(builder::toFacadeBO);
     }
-
 }

@@ -14,17 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.driver;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
-
 
 /**
  * Constants for driver/device event messaging.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class EventConstant {
@@ -37,7 +34,6 @@ public class EventConstant {
      * Driver event related constants
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Driver {
@@ -54,19 +50,20 @@ public class EventConstant {
          */
         public static final String REGISTER = "driver_register";
 
+        /**
+         * Driver event type code for registration acknowledgments.
+         */
         public static final String REGISTER_BACK = "driver_register_back";
 
         private Driver() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
      * Device event related constants
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Device {
@@ -84,7 +81,5 @@ public class EventConstant {
         private Device() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
-
 }

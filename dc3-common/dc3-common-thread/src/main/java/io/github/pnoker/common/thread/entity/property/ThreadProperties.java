@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.thread.entity.property;
 
 import jakarta.validation.constraints.AssertTrue;
@@ -34,7 +33,6 @@ import org.springframework.validation.annotation.Validated;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -48,28 +46,34 @@ public class ThreadProperties {
      */
     @NotBlank(message = "Thread name prefix can't be empty")
     private String prefix = "dc3-thread-";
-
     /**
      * Number of thread pool core threads
      */
     @Min(value = 1, message = "Core pool size must be greater than 0")
     private int corePoolSize = 4;
-
     /**
      * Maximum number of thread pool threads
      */
     @Min(value = 1, message = "Maximum pool size must be greater than 0")
     private int maximumPoolSize = 32;
-
     /**
      * Idle thread waiting time, unit: seconds
      */
     @Min(value = 1, message = "Keep alive time must be greater than 0")
     private int keepAliveTime = 15;
 
+    /**
+     * Creates the thread properties with defaults.
+     */
+    public ThreadProperties() {}
+
+    /**
+     * Validate that the maximum pool size is not smaller than the core pool size.
+     *
+     * @return {@code true} when the configured pool sizes form a valid range
+     */
     @AssertTrue(message = "Maximum pool size must be greater than or equal to core pool size")
     public boolean isPoolSizeValid() {
         return maximumPoolSize >= corePoolSize;
     }
-
 }

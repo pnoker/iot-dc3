@@ -19,18 +19,36 @@
   <el-dialog
     v-model="reactiveData.visible"
     :append-to-body="true"
+    :before-close="requestClose"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    :show-close="false"
+    :close-on-press-escape="!reactiveData.submitting"
+    :show-close="!reactiveData.submitting"
     :title="isEdit ? $t('point.edit.title') : $t('point.add.title')"
     class="things-dialog"
+    destroy-on-close
     draggable
-    @closed="reset"
+    @closed="onClosed"
   >
-    <el-form ref="formRef" :model="reactiveData.formData" :rules="rules" label-position="top">
+    <el-alert
+      v-if="reactiveData.saveError"
+      :closable="false"
+      :title="$t('common.saveFailed')"
+      class="things-dialog-form-alert"
+      show-icon
+      type="error"
+    />
+    <el-form
+      ref="formRef"
+      v-loading="reactiveData.submitting"
+      :aria-busy="reactiveData.submitting"
+      :model="reactiveData.formData"
+      :rules="rules"
+      label-position="top"
+    >
       <el-form-item :label="$t('point.add.pointName')" prop="pointName">
         <el-input
           v-model="reactiveData.formData.pointName"
+          :disabled="reactiveData.submitting"
           :placeholder="$t('point.add.pointNamePlaceholder')"
           clearable
           maxlength="32"
@@ -40,6 +58,7 @@
       <el-form-item :label="$t('point.add.dataType')" prop="pointTypeFlag">
         <el-select
           v-model="reactiveData.formData.pointTypeFlag"
+          :disabled="reactiveData.submitting"
           :placeholder="$t('point.add.dataTypeRequired')"
           clearable
         >
@@ -54,18 +73,24 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('point.add.rwType')" prop="rwFlag">
-        <el-select v-model="reactiveData.formData.rwFlag" :placeholder="$t('point.add.rwTypeRequired')" clearable>
+        <el-select
+          v-model="reactiveData.formData.rwFlag"
+          :disabled="reactiveData.submitting"
+          :placeholder="$t('point.add.rwTypeRequired')"
+          clearable
+        >
           <el-option :label="$t('status.readOnly')" value="READ_ONLY"/>
           <el-option :label="$t('status.writeOnly')" value="WRITE_ONLY"/>
           <el-option :label="$t('status.readWrite')" value="READ_WRITE"/>
         </el-select>
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
-        <enable-flag-segmented v-model="reactiveData.formData.enableFlag"/>
+        <enable-flag-segmented v-model="reactiveData.formData.enableFlag" :disabled="reactiveData.submitting"/>
       </el-form-item>
       <el-form-item :label="$t('point.add.accuracy')" prop="valueDecimal">
         <el-input-number
           v-model="reactiveData.formData.valueDecimal"
+          :disabled="reactiveData.submitting"
           :max="127"
           :min="0"
           :placeholder="$t('point.add.accuracyPlaceholder')"
@@ -76,6 +101,7 @@
       <el-form-item :label="$t('point.add.unit')" prop="unit">
         <el-input
           v-model="reactiveData.formData.unit"
+          :disabled="reactiveData.submitting"
           :placeholder="$t('point.add.unitPlaceholder')"
           clearable
           maxlength="32"
@@ -84,16 +110,23 @@
       <el-form-item :label="$t('point.add.baseValue')" prop="baseValue">
         <el-input
           v-model="reactiveData.formData.baseValue"
+          :disabled="reactiveData.submitting"
           :placeholder="$t('point.add.baseValuePlaceholder')"
           clearable
         />
       </el-form-item>
       <el-form-item :label="$t('point.add.ratio')" prop="multiple">
-        <el-input v-model="reactiveData.formData.multiple" :placeholder="$t('point.add.ratioPlaceholder')" clearable/>
+        <el-input
+          v-model="reactiveData.formData.multiple"
+          :disabled="reactiveData.submitting"
+          :placeholder="$t('point.add.ratioPlaceholder')"
+          clearable
+        />
       </el-form-item>
       <el-form-item :label="$t('point.add.description')" prop="remark">
         <el-input
           v-model="reactiveData.formData.remark"
+          :disabled="reactiveData.submitting"
           :placeholder="$t('point.add.descriptionPlaceholder')"
           clearable
           maxlength="300"
@@ -102,19 +135,22 @@
         />
       </el-form-item>
     </el-form>
-    <div class="things-dialog-footer">
-      <el-button @click="cancel">{{ $t('common.cancel') }}</el-button>
-      <el-button plain @click="formReset">{{ $t('common.reset') }}</el-button>
-      <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
-        {{ $t('common.confirm') }}
-      </el-button>
-    </div>
+    <template #footer>
+      <div class="things-dialog-footer">
+        <el-button :disabled="reactiveData.submitting" @click="cancel">{{ $t('common.cancel') }}</el-button>
+        <el-button :disabled="reactiveData.submitting" plain @click="formReset">{{ $t('common.reset') }}</el-button>
+        <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
+          {{ $t('common.confirm') }}
+        </el-button>
+      </div>
+    </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import {reactive, ref, unref} from 'vue';
+import {computed, onBeforeUnmount, reactive, ref, unref} from 'vue';
 import type {FormInstance, FormRules} from 'element-plus';
+import {ElMessageBox} from 'element-plus';
 import {useI18n} from 'vue-i18n';
 
 import {byteRules, decimalRules, nameRules, remarkRules, requiredSelectRule} from '@/utils/formRuleUtil';
@@ -147,6 +183,7 @@ const formRef = ref<FormInstance>();
 
 const isEdit = ref(false);
 const originalData = ref<PointRecord | null>(null);
+let formSession = 0;
 
 const emptyForm = (profileId: string): PointFormData => ({
   pointTypeFlag: 'FLOAT',
@@ -159,11 +196,18 @@ const emptyForm = (profileId: string): PointFormData => ({
   profileId,
 });
 
+const initialData = ref<PointFormData>(emptyForm(''));
+
 const reactiveData = reactive({
   visible: false,
   submitting: false,
+  saveError: false,
   formData: emptyForm('') as PointFormData,
 });
+
+const isDirty = computed(
+  () => reactiveData.visible && JSON.stringify(reactiveData.formData) !== JSON.stringify(initialData.value)
+);
 
 const rules = reactive<FormRules>({
   pointName: nameRules(t, t('common.entityPoint')),
@@ -177,13 +221,18 @@ const rules = reactive<FormRules>({
 });
 
 const show = (profileId: string) => {
+  formSession += 1;
   isEdit.value = false;
   originalData.value = null;
   reactiveData.formData = emptyForm(profileId);
+  initialData.value = {...reactiveData.formData};
+  reactiveData.submitting = false;
+  reactiveData.saveError = false;
   reactiveData.visible = true;
 };
 
 const showEdit = (row: PointRecord) => {
+  formSession += 1;
   isEdit.value = true;
   originalData.value = {...row};
   reactiveData.formData = {
@@ -198,59 +247,92 @@ const showEdit = (row: PointRecord) => {
     profileId: row.profileId,
     remark: row.remark,
   } as PointFormData;
+  initialData.value = {...reactiveData.formData};
+  reactiveData.submitting = false;
+  reactiveData.saveError = false;
   reactiveData.visible = true;
 };
 
 const cancel = () => {
-  reactiveData.visible = false;
+  void requestClose();
 };
 
 const reset = () => {
-  const form = unref(formRef);
-  form?.resetFields();
+  formReset();
+};
+
+const onClosed = () => {
+  formSession += 1;
   reactiveData.submitting = false;
+  formRef.value?.clearValidate();
+};
+
+onBeforeUnmount(() => {
+  formSession += 1;
+});
+
+const requestClose = async (done?: () => void) => {
+  if (reactiveData.submitting) return;
+  const session = formSession;
+  if (!isDirty.value) {
+    if (done) done();
+    else reactiveData.visible = false;
+    return;
+  }
+  try {
+    await ElMessageBox.confirm(t('common.discardConfirm'), t('common.confirm'), {
+      type: 'warning',
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+    });
+    if (session !== formSession || !reactiveData.visible) return;
+    if (done) done();
+    else reactiveData.visible = false;
+  } catch {
+    // Keep the draft open when the user cancels the confirmation.
+  }
 };
 
 const formReset = () => {
-  if (isEdit.value && originalData.value) {
-    const row = originalData.value;
-    reactiveData.formData = {
-      pointName: row.pointName,
-      pointTypeFlag: row.pointTypeFlag,
-      rwFlag: row.rwFlag,
-      baseValue: row.baseValue,
-      multiple: row.multiple,
-      valueDecimal: row.valueDecimal,
-      unit: row.unit || '',
-      enableFlag: row.enableFlag,
-      profileId: row.profileId,
-      remark: row.remark,
-    } as PointFormData;
-  }
+  reactiveData.formData = {...initialData.value};
+  reactiveData.saveError = false;
   const form = unref(formRef);
   form?.clearValidate();
 };
 
 const submit = async () => {
+  if (reactiveData.submitting) return;
   const form = unref(formRef);
   if (!form) return;
 
+  const session = formSession;
   try {
     await form.validate();
+    if (session !== formSession || !reactiveData.visible) return;
     const data = {...reactiveData.formData};
     const done: DoneCallback = (close = true) => {
+      if (session !== formSession) return;
+      reactiveData.submitting = false;
       if (close) {
         reactiveData.visible = false;
+        initialData.value = {...reactiveData.formData};
+      } else {
+        reactiveData.saveError = true;
       }
-      reactiveData.submitting = false;
     };
 
     reactiveData.submitting = true;
-    if (isEdit.value) {
-      Object.assign(data, {id: originalData.value?.id});
-      emit('update', data, done);
-    } else {
-      emit('add', data, done);
+    reactiveData.saveError = false;
+    try {
+      if (isEdit.value) {
+        Object.assign(data, {id: originalData.value?.id});
+        emit('update', data, done);
+      } else {
+        emit('add', data, done);
+      }
+    } catch {
+      reactiveData.submitting = false;
+      reactiveData.saveError = true;
     }
   } catch {
     // validation errors are displayed by Element Plus

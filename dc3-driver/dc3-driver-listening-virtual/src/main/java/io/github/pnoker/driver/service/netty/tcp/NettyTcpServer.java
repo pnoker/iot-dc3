@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.netty.tcp;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -29,14 +28,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Netty-based TCP server for handling device connections and data exchange.
@@ -46,7 +44,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -63,20 +60,41 @@ public class NettyTcpServer {
      * </p>
      */
     private static final Map<Long, Channel> DEVICE_CHANNEL_MAP = new ConcurrentHashMap<>(16);
+
     private final NettyTcpServerHandler nettyTcpServerHandler;
 
+    /**
+     * Register device channel.
+     *
+     * @param deviceId device identifier
+     * @param channel  channel
+     */
     public static void registerDeviceChannel(Long deviceId, Channel channel) {
         DEVICE_CHANNEL_MAP.put(deviceId, channel);
     }
 
+    /**
+     * Return device channel.
+     *
+     * @param deviceId device identifier
+     * @return get device channel result
+     */
     public static Channel getDeviceChannel(Long deviceId) {
         return DEVICE_CHANNEL_MAP.get(deviceId);
     }
 
+    /**
+     * Unregister device channel.
+     *
+     * @param channel channel
+     */
     public static void unregisterDeviceChannel(Channel channel) {
         DEVICE_CHANNEL_MAP.entrySet().removeIf(entry -> entry.getValue() == channel);
     }
 
+    /**
+     * Clear device channels.
+     */
     public static void clearDeviceChannels() {
         DEVICE_CHANNEL_MAP.clear();
     }
@@ -91,13 +109,15 @@ public class NettyTcpServer {
         EventLoopGroup group = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
         try {
             ServerBootstrap bootstrap = new ServerBootstrap();
-            bootstrap.group(group)
+            bootstrap
+                    .group(group)
                     .channel(NioServerSocketChannel.class)
                     .localAddress(new InetSocketAddress(port))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) {
-                            socketChannel.pipeline()
+                            socketChannel
+                                    .pipeline()
                                     .addLast(new StringEncoder())
                                     .addLast(new ByteArrayEncoder())
                                     .addLast(new WriteTimeoutHandler(30), nettyTcpServerHandler);
@@ -111,5 +131,4 @@ public class NettyTcpServer {
             log.info("Driver listener stopped, protocol={}, port={}", PROTOCOL, port);
         }
     }
-
 }

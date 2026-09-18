@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mqtt.service.impl;
 
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
@@ -34,7 +33,6 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service
@@ -49,13 +47,16 @@ public class MqttScheduleServiceImpl implements MqttScheduleService {
     public void initial() {
         try {
             Integer interval = mqttProperties.getBatch().getInterval();
-            quartzService.createJobWithInterval("ScheduleGroup", "MqttScheduleJob", interval,
-                    DateBuilder.IntervalUnit.SECOND, MqttScheduleJob.class);
+            quartzService.createJobWithInterval(
+                    "ScheduleGroup",
+                    "MqttScheduleJob",
+                    interval,
+                    DateBuilder.IntervalUnit.SECOND,
+                    MqttScheduleJob.class);
 
             quartzService.startScheduler();
         } catch (SchedulerException e) {
             throw new IllegalStateException("Failed to initialize MQTT batch scheduler", e);
         }
     }
-
 }

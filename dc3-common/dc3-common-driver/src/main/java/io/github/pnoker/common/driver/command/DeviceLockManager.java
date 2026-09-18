@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.command;
-
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * Per-device serialization lock to prevent concurrent command execution on
@@ -34,14 +32,15 @@ import java.util.function.Supplier;
  * lock table permanently.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
 @Component
 public class DeviceLockManager {
 
-    /** Per-device lock registry, keyed by device id; entries are created lazily and evicted when unreferenced. */
+    /**
+     * Per-device lock registry, keyed by device id; entries are created lazily and evicted when unreferenced.
+     */
     private final ConcurrentHashMap<Long, LockRef> locks = new ConcurrentHashMap<>();
 
     /**
@@ -114,10 +113,13 @@ public class DeviceLockManager {
     }
 
     private static class LockRef {
-        /** The actual per-device ReentrantLock serializing commands for this device. */
+        /**
+         * The actual per-device ReentrantLock serializing commands for this device.
+         */
         private final ReentrantLock lock = new ReentrantLock();
-        /** Reference count of in-flight callers; the entry is evicted once this drops to zero. */
+        /**
+         * Reference count of in-flight callers; the entry is evicted once this drops to zero.
+         */
         private int references;
     }
-
 }

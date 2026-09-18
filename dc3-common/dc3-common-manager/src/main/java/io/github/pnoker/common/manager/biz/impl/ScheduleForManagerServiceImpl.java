@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.biz.impl;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
@@ -24,16 +23,17 @@ import io.github.pnoker.common.manager.job.HourlyJobForManager;
 import io.github.pnoker.common.quartz.QuartzService;
 import lombok.RequiredArgsConstructor;
 import org.quartz.SchedulerException;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 /**
  * Scheduled task service implementation for the manager module.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service
+@Profile("quartz")
 @RequiredArgsConstructor
 public class ScheduleForManagerServiceImpl implements ScheduleForManagerService {
 
@@ -43,13 +43,12 @@ public class ScheduleForManagerServiceImpl implements ScheduleForManagerService 
     public void initial() {
         try {
             // Custom schedule
-            quartzService.createJobWithCron(ScheduleConstant.MANAGER_SCHEDULE_GROUP, "hourly-job", "0 0 0/1 * * ?",
-                    HourlyJobForManager.class);
+            quartzService.createJobWithCron(
+                    ScheduleConstant.MANAGER_SCHEDULE_GROUP, "hourly-job", "0 0 0/1 * * ?", HourlyJobForManager.class);
 
             quartzService.startScheduler();
         } catch (SchedulerException e) {
             throw new ServiceException("Failed to initialize manager scheduler", e);
         }
     }
-
 }

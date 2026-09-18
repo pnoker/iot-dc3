@@ -23,14 +23,13 @@ import org.apache.commons.lang3.StringUtils;
  * Trace metadata resolved for one Spring AI tool callback.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 public record AgenticToolTraceMetadata(String domain, String title) {
 
+    /** Agentic tool trace metadata compact constructor: normalizes the record. */
     public AgenticToolTraceMetadata {
         domain = StringUtils.defaultIfBlank(domain, AgenticConstant.RunEvent.TYPE_TOOL);
         title = StringUtils.defaultString(title);
     }
-
 }

@@ -33,47 +33,95 @@ const routes: RouteRecordRaw = {
   children: [
     {
       name: 'home',
-      path: '/home',
+      path: 'home',
       meta: {
-        title: 'Home',
+        title: 'nav.home',
       },
       component: () => import('@/views/home/Home.vue'),
     },
     {
       name: 'driver',
-      path: '/driver',
+      path: 'driver',
       meta: {
         icon: 'Promotion',
-        title: 'Driver',
+        title: 'nav.driver',
       },
       component: () => import('@/views/driver/Driver.vue'),
     },
     {
+      name: 'driverDetail',
+      path: 'driver/detail',
+      meta: {
+        title: 'nav.driverDetail',
+      },
+      component: () => import('@/views/driver/detail/DriverDetail.vue'),
+    },
+    {
       name: 'profile',
-      path: '/profile',
+      path: 'profile',
       meta: {
         icon: 'List',
-        title: 'Profile',
+        title: 'nav.profile',
       },
       component: () => import('@/views/profile/Profile.vue'),
     },
     {
+      name: 'profileDetail',
+      path: 'profile/detail',
+      meta: {
+        title: 'nav.profileDetail',
+      },
+      component: () => import('@/views/profile/detail/ProfileDetail.vue'),
+    },
+    {
+      name: 'profileEdit',
+      path: 'profile/edit',
+      meta: {
+        title: 'nav.profileEdit',
+      },
+      component: () => import('@/views/profile/edit/ProfileEdit.vue'),
+    },
+    {
       name: 'device',
-      path: '/device',
+      path: 'device',
       meta: {
         icon: 'Management',
-        title: 'Device',
+        title: 'nav.device',
       },
       component: () => import('@/views/device/Device.vue'),
     },
     {
+      name: 'deviceDetail',
+      path: 'device/detail',
+      meta: {
+        title: 'nav.deviceDetail',
+      },
+      component: () => import('@/views/device/detail/DeviceDetail.vue'),
+    },
+    {
+      name: 'deviceEdit',
+      path: 'device/edit',
+      meta: {
+        title: 'nav.deviceEdit',
+      },
+      component: () => import('@/views/device/edit/DeviceEdit.vue'),
+    },
+    {
       name: 'pointValue',
-      path: '/point_value',
+      path: 'point_value',
       meta: {
         icon: 'Histogram',
-        title: 'Data',
+        title: 'page.pointValue',
       },
       component: () => import('@/views/point/value/PointValue.vue'),
+    },
+    {
+      name: 'pointDetail',
+      path: 'point/detail',
+      meta: {
+        title: 'nav.pointDetail',
+      },
+      component: () => import('@/views/point/detail/PointDetail.vue'),
     },
   ],
 };

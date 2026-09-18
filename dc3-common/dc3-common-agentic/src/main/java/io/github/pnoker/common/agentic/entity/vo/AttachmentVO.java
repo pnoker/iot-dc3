@@ -26,7 +26,6 @@ import lombok.ToString;
  * View object for agentic attachment API responses.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 @Getter
@@ -38,16 +37,21 @@ public class AttachmentVO extends BaseVO {
     @Schema(description = "Identifier of the conversation session this attachment belongs to.", example = "1024")
     private String conversationId;
 
-    @Schema(description = "Original file name of the uploaded attachment as provided by the client.", example = "report.pdf")
+    @Schema(
+            description = "Original file name of the uploaded attachment as provided by the client.",
+            example = "report.pdf")
     private String fileName;
 
-    @Schema(description = "MIME content type of the attachment file (e.g. application/pdf, image/png).", example = "application/pdf")
+    @Schema(
+            description = "MIME content type of the attachment file (e.g. application/pdf, image/png).",
+            example = "application/pdf")
     private String contentType;
 
     @Schema(description = "File size of the attachment in bytes.", example = "10240")
     private Long size;
 
-    @Schema(description = "Server-side storage path where the attachment file is persisted.", example = "/storage/attachments/2026/report.pdf")
+    @Schema(
+            description = "Server-side storage path where the attachment file is persisted.",
+            example = "/storage/attachments/2026/report.pdf")
     private String filePath;
-
 }

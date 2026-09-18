@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service;
 
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.CommandRuntimeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
-import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
-
 import java.util.Collections;
 import java.util.Map;
 
@@ -33,7 +31,6 @@ import java.util.Map;
  * against the device and return output parameter name-value pairs.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 public interface DriverCommand {
@@ -52,9 +49,8 @@ public interface DriverCommand {
             Map<String, AttributeBO> driverConfig,
             Map<String, AttributeBO> commandConfig,
             DeviceBO device,
-            FacadeCommandBO command,
+            CommandRuntimeBO command,
             Map<String, String> paramValues) {
         return Collections.emptyMap();
     }
-
 }

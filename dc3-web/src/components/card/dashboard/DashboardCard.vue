@@ -66,6 +66,7 @@
           />
           <el-button
             v-if="refreshable"
+            :aria-label="title ? `${title}: ${t('common.refresh')}` : t('common.refresh')"
             :icon="Refresh"
             :loading="spinButton"
             circle
@@ -77,7 +78,14 @@
     </template>
 
     <div v-loading="loadBody" class="dashboard-card__body">
-      <div v-if="empty" class="dashboard-card__empty">
+      <div v-if="error" class="dashboard-card__error" role="alert">
+        <el-alert :closable="false" :title="errorText ?? t('common.loadFailed')" show-icon type="error">
+          <el-button :loading="loading" link type="danger" @click="emit('refresh')">
+            {{ retryText ?? t('common.retry') }}
+          </el-button>
+        </el-alert>
+      </div>
+      <div v-else-if="empty" class="dashboard-card__empty">
         <el-empty :description="emptyText" :image-size="emptyImageSize"/>
       </div>
       <div v-else class="dashboard-card__content">
@@ -93,7 +101,10 @@
 
 <script lang="ts" setup>
 import {computed, onUnmounted, useSlots, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
 import {Refresh} from '@element-plus/icons-vue';
+
+const {t} = useI18n();
 
 export type DashboardCardHeight = number | 'auto';
 export type DashboardCardBodyMode = 'plain' | 'chart' | 'scroll';
@@ -132,6 +143,9 @@ const props = withDefaults(
     empty?: boolean;
     emptyText?: string;
     emptyImageSize?: number;
+    error?: boolean;
+    errorText?: string;
+    retryText?: string;
     refreshable?: boolean;
     /** If provided, an `el-segmented` is rendered left of the refresh button (interval in ms; 0 = off). */
     autoRefresh?: AutoRefreshOption[];
@@ -148,8 +162,9 @@ const props = withDefaults(
     loading: false,
     loadingTarget: 'body',
     empty: false,
-    emptyText: 'No data',
+    emptyText: '',
     emptyImageSize: 80,
+    error: false,
     refreshable: true,
     autoRefresh: undefined,
     interval: 0,
@@ -160,6 +175,7 @@ const emit = defineEmits<{
   (e: 'refresh'): void;
   (e: 'update:interval', value: number): void;
 }>();
+
 
 const slots = useSlots();
 const hasFooter = computed(() => !!slots.footer);
@@ -214,9 +230,11 @@ defineExpose({
 .dashboard-card {
   display: flex;
   flex-direction: column;
+  border-color: var(--dc3-border-base);
 
   :deep(.el-card__header) {
-    padding: 12px 16px;
+    padding: var(--dc3-space-3) var(--dc3-space-4);
+    background: linear-gradient(180deg, var(--dc3-bg-elevated-strong), transparent);
   }
 
   // Body holds both the content region and (if present) the footer. We use
@@ -247,14 +265,28 @@ defineExpose({
   }
 
   .dashboard-card__title-text {
-    font-weight: 600;
-    color: var(--el-text-color-primary);
+    position: relative;
+    padding-left: var(--dc3-space-3);
+    font-weight: 650;
+    color: var(--dc3-text-primary);
+
+    &::before {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 4px;
+      height: 14px;
+      border-radius: var(--dc3-radius-full);
+      background: var(--dc3-brand-gradient);
+      content: '';
+      transform: translateY(-50%);
+    }
   }
 
   .dashboard-card__subtitle {
     font-size: 12px;
     font-weight: normal;
-    color: var(--el-text-color-secondary);
+    color: var(--dc3-text-muted);
   }
 
   // Badge sits inline with the title — override the default floating
@@ -270,7 +302,19 @@ defineExpose({
     display: flex;
     align-items: center;
     gap: 8px;
-    flex-shrink: 0;
+    min-width: 0;
+    max-width: 100%;
+    flex-shrink: 1;
+
+    > * {
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    :deep(.el-segmented) {
+      min-width: 0;
+      max-width: 100%;
+    }
   }
 
   // ---- body ------------------------------------------------------------
@@ -296,6 +340,10 @@ defineExpose({
     padding: 40px 0;
   }
 
+  .dashboard-card__error {
+    padding: var(--dc3-space-4);
+  }
+
   // ---- bodyMode variants ----------------------------------------------
   // plain — Element default body padding, no special overflow treatment.
   &--plain {
@@ -314,6 +362,7 @@ defineExpose({
   // with `width: 100%; height: 100%;` inside.
   &--chart {
     .dashboard-card__content {
+      box-sizing: border-box;
       width: 100%;
       height: 100%;
       padding: 8px 16px 16px;
@@ -343,9 +392,9 @@ defineExpose({
     gap: 8px;
     padding: 8px 16px;
     font-size: 12px;
-    color: var(--el-text-color-secondary);
-    border-top: 1px solid var(--el-border-color-lighter);
-    background: var(--el-fill-color-lighter);
+    color: var(--dc3-text-muted);
+    border-top: 1px solid var(--dc3-border-base);
+    background: var(--dc3-bg-muted);
     flex-shrink: 0;
   }
 
@@ -363,6 +412,29 @@ defineExpose({
 
     :deep(.el-tabs__header) {
       margin-bottom: 0;
+    }
+  }
+
+  @media (max-width: $breakpoint-xs-max) {
+    .dashboard-card__header {
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .dashboard-card__title,
+    .dashboard-card__tools {
+      width: 100%;
+      flex: 1 1 100%;
+    }
+
+    .dashboard-card__tools {
+      justify-content: flex-end;
+      flex-wrap: wrap;
+
+      :deep(.el-segmented) {
+        flex: 1 1 auto;
+        overflow-x: auto;
+      }
     }
   }
 }

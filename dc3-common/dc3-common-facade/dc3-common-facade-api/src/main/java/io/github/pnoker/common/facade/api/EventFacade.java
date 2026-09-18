@@ -14,39 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeEventQuery;
-
+import io.github.pnoker.common.facade.entity.query.FacadeEventOffsetQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import java.util.Collection;
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral event facade. Single-record and bulk lookups are tenant-scoped.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface EventFacade {
 
-    /**
-     * Tenant-scoped single lookup. Returns {@code null} when the event is missing or
-     * belongs to another tenant.
-     */
-    FacadeEventBO getById(Long tenantId, Long id);
+    /** Resolve the event by its id. */
+    Mono<FacadeEventBO> getById(Long tenantId, Long id);
 
-    /**
-     * Tenant-scoped bulk lookup. Missing or cross-tenant events are omitted.
-     */
-    List<FacadeEventBO> listByIds(Long tenantId, Collection<Long> ids);
+    /** List events matched by ids. */
+    Flux<FacadeEventBO> listByIds(Long tenantId, Collection<Long> ids);
 
-    /**
-     * @return a page of events (never {@code null}; empty page when nothing matches).
-     */
-    FacadePage<FacadeEventBO> listByPage(FacadeEventQuery query);
-
+    /** Page events matching the tenant-scoped filters. */
+    Mono<OffsetPage<FacadeEventBO>> list(FacadeEventOffsetQuery query);
 }

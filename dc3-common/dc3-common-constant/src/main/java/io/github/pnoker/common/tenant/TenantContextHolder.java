@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.tenant;
 
 import java.util.function.Supplier;
@@ -45,7 +44,9 @@ public final class TenantContextHolder {
     }
 
     /**
-     * @return the tenant id bound to the current thread, or {@code null} if none.
+     * The tenant id bound to the current thread.
+     *
+     * @return the tenant id bound to the current thread, or {@code null} if none
      */
     public static Long getTenantId() {
         return TENANT_ID.get();
@@ -53,13 +54,17 @@ public final class TenantContextHolder {
 
     /**
      * Bind the tenant id to the current thread.
+     *
+     * @param tenantId tenant id to bind
      */
     public static void setTenantId(Long tenantId) {
         TENANT_ID.set(tenantId);
     }
 
     /**
-     * @return {@code true} while the current thread is inside a {@link #runIgnore} scope.
+     * Whether tenant filtering is currently disabled on this thread.
+     *
+     * @return {@code true} while the current thread is inside a {@link #runIgnore} scope
      */
     public static boolean isIgnored() {
         return Boolean.TRUE.equals(IGNORE.get());
@@ -69,6 +74,8 @@ public final class TenantContextHolder {
      * Run {@code supplier} with tenant filtering disabled, restoring the previous
      * ignore flag afterwards. Safe to nest and exception-safe.
      *
+     * @param supplier work to run without tenant filtering
+     * @param <T>      result type
      * @return the supplier's result
      */
     public static <T> T runIgnore(Supplier<T> supplier) {
@@ -84,6 +91,8 @@ public final class TenantContextHolder {
     /**
      * Void variant of {@link #runIgnore(Supplier)} for actions with no result.
      * Same nesting/exception safety.
+     *
+     * @param action work to run without tenant filtering
      */
     public static void runIgnoreAction(Runnable action) {
         boolean previous = isIgnored();

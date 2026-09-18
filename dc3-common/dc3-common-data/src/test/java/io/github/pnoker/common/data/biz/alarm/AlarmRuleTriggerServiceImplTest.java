@@ -14,24 +14,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
-
-import io.github.pnoker.common.entity.bo.PointValueBO;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.stream.IntStream;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+import io.github.pnoker.common.entity.bo.PointValueBO;
+import java.util.List;
+import java.util.stream.IntStream;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 
 @ExtendWith(MockitoExtension.class)
 class AlarmRuleTriggerServiceImplTest {
@@ -56,7 +56,8 @@ class AlarmRuleTriggerServiceImplTest {
 
     @Test
     void processPointValueDispatchesToPipelineWhenIdsAreValid() {
-        service.processPointValue(point(11L, 7L));
+        when(alarmRulePipelineService.process(any())).thenReturn(Flux.empty());
+        service.processPointValue(point(11L, 7L)).block();
         verify(alarmRulePipelineService).process(any(RuleFact.class));
     }
 
@@ -74,8 +75,8 @@ class AlarmRuleTriggerServiceImplTest {
 
     @Test
     void processPointValuesNoopOnEmptyBatch() {
-        service.processPointValues(List.of());
-        service.processPointValues(null);
+        service.processPointValues(List.of()).block();
+        service.processPointValues(null).block();
         verifyNoInteractions(alarmRulePipelineService);
     }
 
@@ -84,11 +85,11 @@ class AlarmRuleTriggerServiceImplTest {
         // 250 inputs across 5 distinct point ids are grouped internally and
         // dispatched as one processBatch call so the engine can amortize
         // RuleRegistry lookups and batch-write rule_state / notify_history.
-        List<PointValueBO> batch = IntStream.range(0, 250)
-                .mapToObj(i -> point(11L + (i % 5), 7L))
-                .toList();
+        List<PointValueBO> batch =
+                IntStream.range(0, 250).mapToObj(i -> point(11L + (i % 5), 7L)).toList();
 
-        service.processPointValues(batch);
+        when(alarmRulePipelineService.processBatch(anyList())).thenReturn(Flux.empty());
+        service.processPointValues(batch).block();
 
         verify(alarmRulePipelineService).processBatch(anyList());
     }
@@ -99,15 +100,15 @@ class AlarmRuleTriggerServiceImplTest {
         // filtered before the batch call; only 3 facts reach the pipeline.
         List<PointValueBO> batch = List.of(
                 point(11L, 7L),
-                point(0L, 7L),       // invalid pointId
+                point(0L, 7L), // invalid pointId
                 point(12L, 7L),
-                point(13L, 0L),      // invalid tenantId
+                point(13L, 0L), // invalid tenantId
                 point(14L, 7L));
 
-        service.processPointValues(batch);
+        when(alarmRulePipelineService.processBatch(anyList())).thenReturn(Flux.empty());
+        service.processPointValues(batch).block();
 
         verify(alarmRulePipelineService).processBatch(anyList());
         verify(alarmRulePipelineService, never()).processBatch(null);
     }
-
 }

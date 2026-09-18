@@ -83,8 +83,12 @@ management:
 springdoc:
   api-docs:
     path: /v3/api-docs
+    # Explicit true keeps behavior identical but silences SpringDoc's
+    # "enabled by default" boot reminder (it only fires on unset properties).
+    enabled: true
   swagger-ui:
     path: /swagger-ui.html
+    enabled: true
     # Stable, reviewable ordering of operations and tags.
     operations-sorter: alpha
     tags-sorter: alpha

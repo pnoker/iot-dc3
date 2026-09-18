@@ -14,11 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.dto;
 
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,16 +29,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Device state heartbeat payload sent over RabbitMQ.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -92,16 +89,19 @@ public class DeviceStateDTO implements Serializable {
      */
     private LocalDateTime createTime;
 
+    /** device state DTO. */
     public DeviceStateDTO(Long deviceId, String status) {
         this.deviceId = deviceId;
         this.status = status;
         this.createTime = LocalDateTimeUtil.now();
     }
 
+    /** device state DTO. */
     public DeviceStateDTO(Long deviceId, EntityStatusEnum status) {
         this(deviceId, status == null ? null : status.getCode());
     }
 
+    /** device state DTO. */
     public DeviceStateDTO(Long deviceId, String status, int timeout, TimeUnit timeoutUnit) {
         this.deviceId = deviceId;
         this.status = status;
@@ -110,8 +110,8 @@ public class DeviceStateDTO implements Serializable {
         this.createTime = LocalDateTimeUtil.now();
     }
 
+    /** device state DTO. */
     public DeviceStateDTO(Long deviceId, EntityStatusEnum status, int timeout, TimeUnit timeoutUnit) {
         this(deviceId, status == null ? null : status.getCode(), timeout, timeoutUnit);
     }
-
 }

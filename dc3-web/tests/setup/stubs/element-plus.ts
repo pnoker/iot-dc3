@@ -69,7 +69,7 @@ export const createElPaginationStub = () =>
  * Returns the spies alongside the component so tests can assert on them.
  */
 export const createElFormStub = () => {
-  const validate = vi.fn(() => Promise.resolve());
+  const validate = vi.fn(() => Promise.resolve(true));
   const resetFields = vi.fn();
 
   const ElForm = defineComponent({
@@ -110,11 +110,17 @@ export const layoutStubs: Record<string, ComponentOptions> = {
   ElDialog: {template: '<section class="el-dialog-stub"><slot /><slot name="footer" /></section>'},
   ElDrawer: passthrough('section', 'el-drawer-stub'),
   ElEmpty: {template: '<div class="el-empty-stub" />'},
+  ElSkeleton: {template: '<div class="el-skeleton-stub" />'},
   ElPopconfirm: {template: '<span class="el-popconfirm-stub"><slot name="reference" /></span>'},
   ElTable: passthrough('section', 'el-table-stub'),
   ElTableColumn: {template: '<span class="el-table-column-stub" />'},
   ElTag: passthrough('span', 'el-tag-stub'),
-  ElInput: {template: '<input class="el-input-stub" />'},
+  ElInput: {
+    props: ['modelValue', 'disabled', 'readonly'],
+    emits: ['update:modelValue'],
+    template:
+      '<span class="el-input-stub"><input :value="modelValue" :disabled="disabled" :readonly="readonly" @input="$emit(\'update:modelValue\', $event.target.value)" /><span class="el-input-group__append"><slot name="append" /></span></span>',
+  },
   ElInputNumber: {template: '<input class="el-input-number-stub" />'},
   ElOption: {template: '<option class="el-option-stub" />'},
   ElSelect: {template: '<select class="el-select-stub"><slot /></select>'},
@@ -132,14 +138,24 @@ export const layoutStubs: Record<string, ComponentOptions> = {
     template:
       '<section class="el-result-stub" :data-icon="icon" :data-title="title" :data-sub-title="subTitle"><slot /><slot name="extra" /></section>',
   },
-  ElAlert: passthrough('div', 'el-alert-stub'),
+  ElAlert: {
+    props: ['title', 'description'],
+    template:
+      '<div class="el-alert-stub" :title="title" :data-description="description"><strong v-if="title">{{ title }}</strong><span v-if="description">{{ description }}</span><slot /></div>',
+  },
   ElSteps: passthrough('div', 'el-steps-stub'),
   ElStep: passthrough('div', 'el-step-stub'),
   ElBadge: passthrough('span', 'el-badge-stub'),
   ElMenu: passthrough('nav', 'el-menu-stub'),
   ElMenuItem: passthrough('a', 'el-menu-item-stub'),
   ElSubMenu: passthrough('div', 'el-sub-menu-stub'),
-  ElDropdown: passthrough('div', 'el-dropdown-stub'),
+  // ElDropdown keeps its menu content in a named `dropdown` slot (the real
+  // component teleports it to a popper). Render both slots so layouts can
+  // assert trigger and menu content.
+  ElDropdown: {
+    template:
+      '<div class="el-dropdown-stub"><slot /><slot name="dropdown" /></div>',
+  },
   ElDropdownMenu: passthrough('div', 'el-dropdown-menu-stub'),
   ElDropdownItem: passthrough('div', 'el-dropdown-item-stub'),
   ElIcon: passthrough('span', 'el-icon-stub'),

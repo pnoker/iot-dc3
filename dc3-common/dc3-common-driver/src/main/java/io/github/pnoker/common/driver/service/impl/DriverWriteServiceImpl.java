@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
@@ -30,19 +29,17 @@ import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.driver.service.DriverWriteService;
 import io.github.pnoker.common.driver.support.ConnectionBackoff;
 import io.github.pnoker.common.exception.WritePointException;
+import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Default {@link DriverWriteService} implementation that resolves metadata, delegates the
  * actual write operation to the custom driver, and echoes the written value only on success.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -50,19 +47,29 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DriverWriteServiceImpl implements DriverWriteService {
 
-    /** Driver-scoped metadata registry exposing the running driver's configuration. */
+    /**
+     * Driver-scoped metadata registry exposing the running driver's configuration.
+     */
     private final DriverMetadata driverMetadata;
 
-    /** Device-scoped metadata cache providing device, profile and attribute lookups. */
+    /**
+     * Device-scoped metadata cache providing device, profile and attribute lookups.
+     */
     private final DeviceMetadata deviceMetadata;
 
-    /** Point-scoped metadata cache supplying point definitions and type information. */
+    /**
+     * Point-scoped metadata cache supplying point definitions and type information.
+     */
     private final PointMetadata pointMetadata;
 
-    /** Custom protocol hook invoked to perform the device-specific write. */
+    /**
+     * Custom protocol hook invoked to perform the device-specific write.
+     */
     private final DriverCustomService driverCustomService;
 
-    /** Outbound sender used to publish acknowledged writes back to the platform. */
+    /**
+     * Outbound sender used to publish acknowledged writes back to the platform.
+     */
     private final DriverSenderService driverSenderService;
 
     /**
@@ -87,9 +94,11 @@ public class DriverWriteServiceImpl implements DriverWriteService {
             throw new WritePointException("Failed to write point value, device[{}] is null", deviceId);
         }
 
-        if (Objects.isNull(pointId) || Objects.isNull(device.getPointIds()) || !device.getPointIds().contains(pointId)) {
-            throw new WritePointException("Failed to write point value, device[{}] not contained point[{}]",
-                    deviceId, pointId);
+        if (Objects.isNull(pointId)
+                || Objects.isNull(device.getPointIds())
+                || !device.getPointIds().contains(pointId)) {
+            throw new WritePointException(
+                    "Failed to write point value, device[{}] not contained point[{}]", deviceId, pointId);
         }
 
         Map<String, AttributeBO> driverConfig = deviceMetadata.getDriverConfig(deviceId);
@@ -98,19 +107,19 @@ public class DriverWriteServiceImpl implements DriverWriteService {
         }
         Map<String, AttributeBO> pointConfig = deviceMetadata.getPointConfig(deviceId, pointId);
         if (Objects.isNull(pointConfig) || pointConfig.isEmpty()) {
-            throw new WritePointException("Failed to write point value, point config is empty, deviceId={}, pointId={}",
-                    deviceId, pointId);
+            throw new WritePointException(
+                    "Failed to write point value, point config is empty, deviceId={}, pointId={}", deviceId, pointId);
         }
 
         PointBO point = pointMetadata.getCache(pointId);
         if (Objects.isNull(point)) {
-            throw new WritePointException("Failed to write point value, point is null, deviceId={}, pointId={}",
-                    deviceId, pointId);
+            throw new WritePointException(
+                    "Failed to write point value, point is null, deviceId={}, pointId={}", deviceId, pointId);
         }
 
         try {
-            Boolean ok = driverCustomService.write(driverConfig, pointConfig, device, point,
-                    new WritePointValue(value, point.getPointTypeFlag()));
+            Boolean ok = driverCustomService.write(
+                    driverConfig, pointConfig, device, point, new WritePointValue(value, point.getPointTypeFlag()));
 
             // Only echo the value back to the platform when the device acknowledged the write.
             // Failed writes must not produce fake success signals.
@@ -125,5 +134,4 @@ public class DriverWriteServiceImpl implements DriverWriteService {
             throw e;
         }
     }
-
 }

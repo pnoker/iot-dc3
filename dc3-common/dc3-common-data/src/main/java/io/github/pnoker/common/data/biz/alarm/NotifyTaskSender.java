@@ -14,20 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
-import io.github.pnoker.common.constant.driver.RabbitConstant;
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.stereotype.Component;
-
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
 import java.util.Locale;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
  * Publishes {@link NotifyTaskDTO} payloads to the alarm exchange so the
@@ -36,7 +35,6 @@ import java.util.Objects;
  * (e.g. dedicated workers per channel) without re-writing the producer.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.21
  */
 @Slf4j
@@ -44,20 +42,24 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class NotifyTaskSender {
 
-    private final RabbitTemplate rabbitTemplate;
+    private final ReactiveMessageSender messageSender;
 
-    private final TopicExchange alarmExchange;
-
-    public void publish(NotifyTaskDTO task) {
+    /**
+     * Publish.
+     *
+     * @param task task
+     */
+    public Mono<Void> publish(NotifyTaskDTO task) {
         if (Objects.isNull(task) || Objects.isNull(task.getNotifyHistoryId())) {
-            log.warn("Refusing to publish notify task without a history id: {}", task);
-            return;
+            log.warn(
+                    "Notify task publish skipped, reason=missingHistoryId, channelId={}",
+                    Objects.nonNull(task) ? task.getChannelId() : null);
+            return Mono.empty();
         }
         String channelType = Objects.nonNull(task.getChannelTypeFlag())
                 ? task.getChannelTypeFlag().toString()
                 : DataConstant.STATUS_UNKNOWN;
-        String routingKey = (RabbitConstant.ROUTING_NOTIFY_TASK_PREFIX + channelType).toLowerCase(Locale.ROOT);
-        rabbitTemplate.convertAndSend(alarmExchange.getName(), routingKey, task);
+        return messageSender.sendConfirmed(
+                MqMessage.of(MqTopic.NOTIFY_TASK, channelType.toLowerCase(Locale.ROOT), task));
     }
-
 }

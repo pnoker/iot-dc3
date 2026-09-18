@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
@@ -31,25 +29,24 @@ import io.github.pnoker.common.manager.entity.vo.PointVO;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 /**
  * MapStruct builder converting between point BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface PointBuilder {
 
     /**
@@ -82,6 +79,12 @@ public interface PointBuilder {
     @Mapping(target = "deleted", ignore = true)
     PointDO buildDOByBO(PointBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(PointBO entityBO, @MappingTarget PointDO entityDO) {
         // Code
@@ -133,6 +136,12 @@ public interface PointBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     PointBO buildBOByDO(PointDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(PointDO entityDO, @MappingTarget PointBO entityBO) {
         // Json Ext
@@ -184,25 +193,10 @@ public interface PointBuilder {
     List<PointVO> buildVOListByBOList(List<PointBO> entityBOList);
 
     /**
-     * DOPage to BOPage
+     * Convert bo to vo device.
      *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
+     * @param pointConfigByDeviceBO business object
+     * @return converted value
      */
-    default Page<PointBO> buildBOPageByDOPage(Page<PointDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<PointVO> buildVOPageByBOPage(Page<PointBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
     PointConfigByDeviceVO buildVODeviceByBO(PointConfigByDeviceBO pointConfigByDeviceBO);
-
 }

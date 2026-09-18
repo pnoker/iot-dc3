@@ -14,21 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Enumeration of timeout source flags.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter
@@ -56,13 +52,18 @@ public enum TimeoutSourceTypeEnum {
     PROFILE((byte) 3, "profile", "Profile"),
     ;
 
-    @EnumValue
     private final Byte index;
 
     private final String code;
 
     private final String remark;
 
+    /**
+     * Resolve a timeout source from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching source, or {@code null} when the index is unknown
+     */
     public static TimeoutSourceTypeEnum ofIndex(Byte index) {
         Optional<TimeoutSourceTypeEnum> any = Arrays.stream(TimeoutSourceTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -70,6 +71,12 @@ public enum TimeoutSourceTypeEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a timeout source from its stable wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching source, or {@code null} when the code is unknown
+     */
     public static TimeoutSourceTypeEnum ofCode(String code) {
         Optional<TimeoutSourceTypeEnum> any = Arrays.stream(TimeoutSourceTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
@@ -77,6 +84,12 @@ public enum TimeoutSourceTypeEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a timeout source from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching source, or {@code null} when the name is unknown
+     */
     public static TimeoutSourceTypeEnum ofName(String name) {
         try {
             return valueOf(name);
@@ -84,5 +97,4 @@ public enum TimeoutSourceTypeEnum {
             return null;
         }
     }
-
 }

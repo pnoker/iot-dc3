@@ -16,27 +16,40 @@
   -->
 
 <template>
-  <dashboard-card :loading="loading" :title="$t('home.trendTitle')" body-mode="chart" @refresh="load">
+  <dashboard-card
+    :empty="status === 'success' && !hasData"
+    :empty-text="$t('home.trendEmpty')"
+    :error="status === 'error'"
+    :error-text="$t('common.loadFailed')"
+    :loading="loading"
+    :retry-text="$t('common.retry')"
+    :title="$t('home.trendTitle')"
+    body-mode="chart"
+    @refresh="load"
+  >
     <template #tools>
-      <range-segmented v-model="rangeKey" size="small" @update:model-value="load"/>
+      <range-segmented v-model="rangeKey" size="small"/>
     </template>
     <div ref="chartRef" class="trend-chart__canvas"></div>
   </dashboard-card>
 </template>
 
 <script lang="ts" setup>
-import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {Chart} from '@antv/g2';
 
 import {statsTimeseries} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
-import type {RangeKey} from '@/components/segmented/RangeSegmented.vue';
+import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 const rangeKey = ref<RangeKey>('24h');
-const loading = ref(false);
+const {error, loading, run, status} = useAsyncLoader();
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
+const points = ref<{bucket: string; count: number}[]>([]);
+const hasData = computed(() => points.value.length > 0);
 
 const ensureChart = () => {
   if (!chartRef.value) return;
@@ -80,25 +93,42 @@ const granularityFor = (key: RangeKey): 'hour' | 'day' => {
 };
 
 const load = async () => {
-  loading.value = true;
-  try {
-    const res: any = await statsTimeseries({
-      granularity: granularityFor(rangeKey.value),
-      rangeKey: rangeKey.value,
-    });
-    const points = (res?.data ?? []).map((p: any) => ({bucket: p.bucket, count: Number(p.count) || 0}));
-    await nextTick();
-    render(points);
-  } catch {
-    // handled globally
-  } finally {
-    loading.value = false;
+  const requestRange = rangeKey.value;
+  await run(
+    () =>
+      statsTimeseries({
+        granularity: granularityFor(requestRange),
+        rangeKey: requestRange,
+      }),
+    {
+      apply: (res) => {
+        const payload = Array.isArray(res) ? res : [];
+        points.value = payload.map((point) => ({bucket: String(point.bucket), count: Number(point.count) || 0}));
+      },
+    }
+  );
+  if (status.value !== 'success') return;
+  await nextTick();
+  if (status.value !== 'success') return;
+  if (hasData.value) render(points.value);
+  else {
+    chart?.destroy();
+    chart = undefined;
   }
 };
 
 onMounted(load);
 watch(rangeKey, load);
-onUnmounted(() => chart?.destroy());
+watch(error, (value) => {
+  if (value) {
+    chart?.destroy();
+    chart = undefined;
+  }
+});
+onUnmounted(() => {
+  chart?.destroy();
+  chart = undefined;
+});
 </script>
 
 <style lang="scss" scoped>

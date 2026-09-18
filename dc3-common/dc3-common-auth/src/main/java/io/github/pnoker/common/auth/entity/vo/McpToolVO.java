@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -31,7 +30,6 @@ import lombok.ToString;
  * View object for MCP tool catalog API responses.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter
@@ -93,5 +91,4 @@ public class McpToolVO extends BaseVO {
 
     @Schema(description = "JSON envelope carrying the tool input schema.", example = "{\"inputSchema\":{}}")
     private String toolExt;
-
 }

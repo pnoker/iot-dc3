@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.bean;
 
 import io.github.pnoker.common.driver.support.TypedValueConverter;
 import io.github.pnoker.common.enums.PointTypeEnum;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,14 +27,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 /**
  * Typed point value to be written to a device.
  *
  * @author pnoker
- * @version 2026.5.15
  * @since 2026.5.15
  */
 @Getter
@@ -67,5 +64,4 @@ public class WritePointValue implements Serializable {
     public <T> T getValue(Class<T> clazz) {
         return TypedValueConverter.convertPointValue(value, type, clazz);
     }
-
 }

@@ -5,7 +5,7 @@
 > **Trợ lý AI:** Đọc [README.ai.md](./README.ai.md) trước để có tổng quan ngắn gọn về IoT DC3 dành cho AI.
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="./.github/brand/png/banner.vi.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
 </p>
 
 <p align="center">
@@ -28,13 +28,13 @@
 
 <p align="center">
   <strong>
-    IoT DC3 — nền tảng IoT công nghiệp mã nguồn mở, đa giao thức, tích hợp AI, cloud-native.<br>
-    Microservice cloud-native · Kết nối đa giao thức · Vận hành hỗ trợ bởi AI · 28 driver sẵn dùng
+    IoT DC3 — nền tảng IoT công nghiệp đa giao thức, cloud-native, mã nguồn mở.<br>
+    Với AI — từ kết nối thiết bị đến agent công nghiệp
   </strong>
 </p>
 
 <p align="center">
-  <a href="https://docs.dc3.site">https://docs.dc3.site</a>
+  <a href="https://dc3.site">https://dc3.site</a>
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="Dashboard nền tảng" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="Dashboard nền tảng" width="100%">
       <br>
       <strong>Trang chủ / Dashboard</strong><br>
       <em>Tổng quan hệ thống · Thống kê thiết bị online · Biểu đồ xu hướng dữ liệu</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="Trang quản lý thiết bị" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="Trang quản lý thiết bị" width="100%">
       <br>
       <strong>Quản lý thiết bị</strong><br>
       <em>Danh sách thiết bị · Trạng thái online · Tìm kiếm và lọc</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="Trang trò chuyện AI" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="Trang trò chuyện AI" width="100%">
       <br>
       <strong>Trò chuyện AI</strong><br>
       <em>Điều khiển thiết bị bằng ngôn ngữ tự nhiên · Truy vấn dữ liệu · Phân tích thông minh</em>
@@ -79,9 +79,9 @@
 
 ### Toàn cảnh kiến trúc sản phẩm
 
-![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-vi.png)
+![IoT DC3 Architecture Panorama](https://docs.dc3.site/images/architecture-panorama-vi.png)
 
-Kiến trúc microservice 6 tầng: clients → gateway → 4 center services → message bus → 28 protocol drivers → field
+Kiến trúc microservice 6 tầng: clients → gateway → 4 center services → message bus → 36 protocol drivers → field
 devices. PostgreSQL (TimescaleDB + pgvector + AGE) và stack observability tùy chọn (ELK + Prometheus + Grafana).
 
 🧱 **Nguyên tắc thiết kế** — các lời gọi xuyên dịch vụ luôn đi qua interface Facade; mô hình ba tầng DO/BO/VO tách biệt
@@ -95,16 +95,16 @@ mở rộng theo dịch vụ và đội nhóm.
 
 ### 🔌 Kết nối thiết bị đa giao thức
 
-IoT DC3 tích hợp **28 module driver kết nối**, bao phủ tự động hóa công nghiệp, truyền thông IoT, cầu nối dữ liệu,
+IoT DC3 tích hợp **36 module driver kết nối**, bao phủ tự động hóa công nghiệp, truyền thông IoT, cầu nối dữ liệu,
 truyền thông cơ bản, mô phỏng và gỡ lỗi, giúp giảm chi phí kết nối thiết bị và nguồn dữ liệu phổ biến:
 
-| Nhóm                                        | Module driver                                                                                                                                      |
-|---------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🏭 **Giao thức công nghiệp**                | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
-| 📡 **Giao thức IoT**                        | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
-| 🗄️ **Cầu nối dữ liệu**                     | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
-| 🔧 **Truyền thông cơ bản và quản trị mạng** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
-| 🧪 **Mô phỏng và gỡ lỗi**                   | Virtual · Listening Virtual                                                                                                                        |
+| Nhóm                                        | Module driver                                                                                                                                                                                |
+|---------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🏭 **Giao thức công nghiệp**                | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · IEC 61850 · DNP3 · DLMS · DLT645 · KNX · M-Bus · SL651 |
+| 📡 **Giao thức IoT**                        | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee · LoRaWAN                                                                                                                                          |
+| 🗄️ **Cầu nối dữ liệu**                      | MySQL · PostgreSQL · Oracle · SQL Server · Redis                                                                                                                                             |
+| 🔧 **Truyền thông cơ bản và quản trị mạng** | TCP/UDP · Serial · SNMP · CAN · Kafka                                                                                                                                                        |
+| 🧪 **Mô phỏng và gỡ lỗi**                   | Virtual · Listening Virtual                                                                                                                                                                  |
 
 **Driver SDK** hỗ trợ phát triển nhanh driver giao thức tùy chỉnh và đăng ký vào nền tảng runtime.
 
@@ -112,8 +112,8 @@ truyền thông cơ bản, mô phỏng và gỡ lỗi, giúp giảm chi phí k�
 
 Agentic Center được xây dựng trên **Spring AI**, đưa mô hình ngôn ngữ lớn vào quy trình vận hành IoT:
 
-- **Vận hành hỗ trợ bằng ngôn ngữ tự nhiên** - thông qua Tool Calling và trong phạm vi kiểm soát quyền, LLM có thể
-  truy vấn thiết bị, đọc/ghi point và hỗ trợ thực thi lệnh
+- **Vận hành hỗ trợ bằng ngôn ngữ tự nhiên** - thông qua Tool Calling và trong phạm vi kiểm soát quyền, LLM có thể truy
+  vấn thiết bị, đọc/ghi point và hỗ trợ thực thi lệnh
 - **Phân tích cảnh báo thông minh** - AI hỗ trợ phân tích nguyên nhân và đề xuất cách xử lý
 - **Thông tin chuyên sâu từ dữ liệu** - Truy vấn dữ liệu thiết bị bằng ngôn ngữ tự nhiên và sinh biểu đồ trực quan
 - **Hỗ trợ nhiều mô hình** - Tương thích với nhà cung cấp kiểu OpenAI API và các mô hình phổ biến như GPT, Claude,
@@ -172,8 +172,8 @@ Nếu cần registry Alibaba Cloud cho Trung Quốc đại lục, dùng `make up
 IoT DC3 được xây dựng trên Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3,
 TypeScript và Vite.
 
-Xem [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) để biết chi tiết từng thành phần và vị
-trí sử dụng.
+Xem [Technology Stack](https://docs.dc3.site/en/development/technology-stack) để biết chi tiết từng thành phần và vị trí
+sử dụng.
 
 ## 📖 Tài liệu và cộng đồng
 
@@ -181,13 +181,13 @@ trí sử dụng.
 |----------------------|---------------------------------------------------------------------------------|
 | 📚 Tài liệu online   | [docs.dc3.site](https://docs.dc3.site/)                                         |
 | 🚀 Quickstart        | [Quickstart Guide](https://docs.dc3.site/en/quickstart/)                        |
-| 🛠️ Công nghệ        | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack)      |
-| 🏗️ Kiến trúc        | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
+| 🛠️ Công nghệ         | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)       |
+| 🏗️ Kiến trúc         | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
 | 🔧 Phát triển driver | [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring) |
 | 🐛 Khắc phục sự cố   | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)               |
 | 📋 Changelog         | [Release Changelog](https://docs.dc3.site/en/development/changelog)             |
 | 🐛 Phản hồi issue    | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                       |
-| 🇨🇳 Gitee mirror    | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                           |
+| 🇨🇳 Gitee mirror      | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                           |
 
 ## 🌍 Trường hợp ứng dụng
 
@@ -233,7 +233,3 @@ IoT DC3 được phát hành mã nguồn mở theo giấy phép [AGPL 3.0](./LIC
 - ⚠️ **Cung cấp như dịch vụ thương mại cho bên thứ ba mà không open source phần sửa đổi** - Cần giấy phép thương mại
 
 Xem [LICENSE.txt](./LICENSE.txt) để biết chi tiết về giấy phép thương mại.
-
-## ⭐ Lịch sử Star
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)

@@ -33,22 +33,68 @@
       @current-change="currentChange"
     />
 
+    <el-alert
+      v-if="reactiveData.status === 'error'"
+      :closable="false"
+      :title="$t('common.loadFailed')"
+      class="entity-page-error"
+      show-icon
+      type="error"
+    >
+      <el-button :loading="reactiveData.loading" link type="danger" @click="refresh">
+        {{ $t('common.retry') }}
+      </el-button>
+    </el-alert>
+
+    <el-alert
+      v-if="reactiveData.profileLookupError"
+      :closable="false"
+      :title="$t('common.optionLoadFailed')"
+      class="entity-page-error"
+      show-icon
+      type="error"
+    >
+      <el-button :loading="reactiveData.profileLookupLoading" link type="danger" @click="retryProfileLookup">
+        {{ $t('common.retry') }}
+      </el-button>
+    </el-alert>
+
     <blank-card>
       <el-row>
         <template v-if="reactiveData.loading">
-          <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-            <skeleton-card :footer="true" :loading="true"/>
+          <el-col
+            v-for="data in 12"
+            :key="data"
+            :lg="6"
+            :md="12"
+            :sm="12"
+            :xl="6"
+            :xs="24"
+          >
+            <skeleton-card :footer="true" :loading="true" />
           </el-col>
         </template>
         <template v-else>
-          <el-col v-if="reactiveData.listData.length < 1">
-            <el-empty :description="$t('point.empty')"/>
+          <el-col v-if="reactiveData.status === 'success' && reactiveData.listData.length < 1">
+            <el-empty :description="$t('point.empty')" />
           </el-col>
-          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
+          <el-col v-else-if="reactiveData.status === 'error' && reactiveData.listData.length < 1">
+            <el-empty :description="$t('common.loadFailed')" />
+          </el-col>
+          <el-col
+            v-for="data in reactiveData.listData"
+            :key="data.id"
+            :lg="6"
+            :md="12"
+            :sm="12"
+            :xl="6"
+            :xs="24"
+          >
             <point-card
               :data="data"
               :embedded="embedded === 'profile' || embedded === 'device'"
               :profile="reactiveData.profileTable[data.profileId ?? '']"
+              :busy="isActionBusy(data)"
               @delete="onDelete"
               @detail="openDetail"
               @disable="onDisable"
@@ -60,9 +106,16 @@
       </el-row>
     </blank-card>
 
-    <point-edit-form ref="editRef" @add="onAdd" @update="onUpdate"/>
+    <point-edit-form ref="editRef" @add="onAdd" @update="onUpdate" />
 
-    <el-drawer v-model="reactiveData.detailVisible" :title="$t('point.detail.pointInfo')" size="520px">
+    <el-drawer
+      v-model="reactiveData.detailVisible"
+      :close-on-click-modal="false"
+      :close-on-press-escape="true"
+      :title="$t('point.detail.pointInfo')"
+      :size="isMobile ? '100%' : '520px'"
+      destroy-on-close
+    >
       <el-descriptions v-if="reactiveData.detailRecord" :column="1" border>
         <el-descriptions-item :label="$t('point.detail.pointName')">
           {{ reactiveData.detailRecord.pointName }}
@@ -74,7 +127,7 @@
           {{ $t(rwFlagKey(reactiveData.detailRecord.rwFlag)) }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('point.card.unit')">
-          {{ reactiveData.detailRecord.unit || '-' }}
+          {{ reactiveData.detailRecord.unit || "-" }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('point.card.ratio')">
           {{ reactiveData.detailRecord.multiple }}
@@ -87,42 +140,50 @@
         </el-descriptions-item>
         <el-descriptions-item :label="$t('point.card.profile')">
           {{
-          reactiveData.detailRecord.profileId
-          ? reactiveData.profileTable[reactiveData.detailRecord.profileId]?.profileName || '-'
-          : '-'
+            reactiveData.detailRecord.profileId
+              ? reactiveData.profileTable[reactiveData.detailRecord.profileId]
+                  ?.profileName || "-"
+              : "-"
           }}
         </el-descriptions-item>
-        <el-descriptions-item :label="$t('point.detail.relatedDevices')" :span="2">
+        <el-descriptions-item
+          :label="$t('point.detail.relatedDevices')"
+          :span="2"
+        >
           {{ reactiveData.detailRecord.deviceCount || 0 }}
         </el-descriptions-item>
         <el-descriptions-item :label="$t('point.add.description')" :span="2">
-          {{ reactiveData.detailRecord.remark || '-' }}
+          {{ reactiveData.detailRecord.remark || "-" }}
         </el-descriptions-item>
       </el-descriptions>
-      <el-empty v-else :description="$t('common.description')"/>
+      <el-empty v-else :description="$t('common.description')" />
     </el-drawer>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, watch} from 'vue';
+import { computed, onBeforeUnmount, reactive, ref, watch } from "vue";
 
-import {addPoint, deletePoint, listPoint, updatePoint} from '@/api/point';
-import {listProfileByIds} from '@/api/profile';
-import {usePagedList} from '@/composables/usePagedList';
-import {failMessage, successMessage} from '@/utils/notificationUtil';
-import {isNull} from '@/utils/validationUtil';
-import {pointTypeKey, rwFlagKey} from '@/utils/pointFormatUtil';
+import { addPoint, deletePoint, listPoint, updatePoint } from "@/api/point";
+import { listProfileByIds } from "@/api/profile";
+import { useBreakpoint } from "@/composables/useBreakpoint";
+import { usePagedList } from "@/composables/usePagedList";
+import { successMessage } from "@/utils/notificationUtil";
+import { isNull } from "@/utils/validationUtil";
+import { pointTypeKey, rwFlagKey } from "@/utils/pointFormatUtil";
 
-import type {PointRecord} from '@/config/types/manager';
+import type { PointRecord } from "@/config/types/manager";
 
-import BlankCard from '@/components/card/blank/BlankCard.vue';
-import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
-import PointEditForm from './add/PointEditForm.vue';
-import PointCard from './card/PointCard.vue';
-import PointTool from './tool/PointTool.vue';
+import BlankCard from "@/components/card/blank/BlankCard.vue";
+import SkeletonCard from "@/components/card/skeleton/SkeletonCard.vue";
+import PointEditForm from "./add/PointEditForm.vue";
+import PointCard from "./card/PointCard.vue";
+import PointTool from "./tool/PointTool.vue";
 
-type EditFormInstance = { show: (profileId: string) => void; showEdit: (row: PointRecord) => void };
+type EditFormInstance = {
+  show: (profileId: string) => void;
+  showEdit: (row: PointRecord) => void;
+};
 
 const props = withDefaults(
   defineProps<{
@@ -133,17 +194,19 @@ const props = withDefaults(
     deviceId?: string;
   }>(),
   {
-    embedded: '',
+    embedded: "",
     pre: false,
     next: false,
-    profileId: '',
-    deviceId: '',
-  }
+    profileId: "",
+    deviceId: "",
+  },
 );
 
+const { isMobile } = useBreakpoint();
+
 const emit = defineEmits<{
-  (e: 'pre-handle'): void;
-  (e: 'next-handle'): void;
+  (e: "pre-handle"): void;
+  (e: "next-handle"): void;
 }>();
 
 const editRef = ref<EditFormInstance | null>(null);
@@ -157,7 +220,7 @@ const {
   currentChange,
 } = usePagedList<PointRecord>({
   pageSize: 12,
-  sortColumn: 'create_time',
+  sortColumn: "create_time",
   request: (query) => listPoint(query),
 });
 
@@ -165,10 +228,18 @@ const reactiveData = state as typeof state & {
   detailVisible: boolean;
   detailRecord: PointRecord | null;
   profileTable: Record<string, Record<string, any>>;
+  profileLookupLoading: boolean;
+  profileLookupError: unknown | null;
 };
 reactiveData.detailVisible = false;
 reactiveData.detailRecord = null;
 reactiveData.profileTable = {};
+reactiveData.profileLookupLoading = false;
+reactiveData.profileLookupError = null;
+let profileLookupSequence = 0;
+let profileLookupRequestId = 0;
+let disposed = false;
+const actionBusy = reactive(new Set<string>());
 
 const basePointQuery = computed(() => {
   const q: Record<string, unknown> = {};
@@ -178,7 +249,7 @@ const basePointQuery = computed(() => {
 });
 
 const search = (params: Record<string, unknown>) => {
-  _search({...basePointQuery.value, ...params});
+  _search({ ...basePointQuery.value, ...params });
 };
 
 const reset = () => {
@@ -198,100 +269,121 @@ const openDetail = (row: PointRecord) => {
   reactiveData.detailVisible = true;
 };
 
-const onAdd = (form: unknown, done: () => void) => {
+const onAdd = (form: unknown, done: (successful?: boolean) => void) => {
   addPoint(form as Record<string, unknown>)
     .then(() => {
+      if (disposed) return;
       successMessage();
-      load();
+      void load();
+      done(true);
     })
     .catch(() => {
-      failMessage();
-    })
-    .finally(() => {
-      done();
+      if (!disposed) done(false);
     });
 };
 
-const onUpdate = (form: unknown, done: () => void) => {
+const onUpdate = (form: unknown, done: (successful?: boolean) => void) => {
   updatePoint(form as Record<string, unknown>)
     .then(() => {
+      if (disposed) return;
       successMessage();
-      load();
+      void load();
+      done(true);
     })
     .catch(() => {
-      failMessage();
-    })
-    .finally(() => {
-      done();
+      if (!disposed) done(false);
     });
 };
 
-const onDisable = (id: string, profileId: string, done: () => void) => {
-  updatePoint({id, profileId, enableFlag: 'DISABLE'})
-    .then(() => {
-      successMessage();
-      load();
-    })
-    .catch(() => {
-      failMessage();
-    })
-    .finally(() => {
-      done();
-    });
+const isActionBusy = (point: PointRecord) => actionBusy.has(String(point.id));
+
+const runAction = async (point: PointRecord, action: () => Promise<unknown>) => {
+  const id = String(point.id);
+  if (actionBusy.has(id)) return;
+  actionBusy.add(id);
+  try {
+    await action();
+    if (disposed) return;
+    successMessage();
+    await load();
+  } catch {
+    // handled globally
+  } finally {
+    actionBusy.delete(id);
+  }
 };
 
-const onEnable = (id: string, profileId: string, done: () => void) => {
-  updatePoint({id, profileId, enableFlag: 'ENABLE'})
-    .then(() => {
-      successMessage();
-      load();
-    })
-    .catch(() => {
-      failMessage();
-    })
-    .finally(() => {
-      done();
-    });
-};
+const onDisable = (point: PointRecord) =>
+  runAction(point, () => updatePoint({...point, enableFlag: 'DISABLE'}));
 
-const onDelete = (id: string, done: () => void) => {
-  deletePoint(id)
-    .then(() => {
-      successMessage();
-      load();
-    })
-    .catch(() => {
-      failMessage();
-    })
-    .finally(() => {
-      done();
-    });
-};
+const onEnable = (point: PointRecord) =>
+  runAction(point, () => updatePoint({...point, enableFlag: 'ENABLE'}));
+
+const onDelete = (point: PointRecord) =>
+  runAction(point, () => deletePoint(point.id, point.version));
 
 const refresh = () => load();
 
-const preHandle = () => emit('pre-handle');
-const nextHandle = () => emit('next-handle');
+const loadProfileLookup = (points = reactiveData.listData, generation = profileLookupSequence) => {
+  const requestId = ++profileLookupRequestId;
+  const profileIds = Array.from(new Set(points.map((point) => point.profileId)
+    .filter((id): id is string => typeof id === 'string' && id.length > 0)));
+  reactiveData.profileLookupError = null;
+  if (profileIds.length === 0) {
+    reactiveData.profileLookupLoading = false;
+    reactiveData.profileTable = {};
+    return Promise.resolve();
+  }
+  reactiveData.profileLookupLoading = true;
+  return listProfileByIds(profileIds)
+    .then((res) => {
+      if (generation !== profileLookupSequence || requestId !== profileLookupRequestId) return;
+      reactiveData.profileTable = (res || {}) as Record<string, Record<string, any>>;
+    })
+    .catch((error) => {
+      if (generation !== profileLookupSequence || requestId !== profileLookupRequestId) return;
+      reactiveData.profileLookupError = error;
+    })
+    .finally(() => {
+      if (generation === profileLookupSequence && requestId === profileLookupRequestId) {
+        reactiveData.profileLookupLoading = false;
+      }
+    });
+};
+
+const retryProfileLookup = () => {
+  void loadProfileLookup();
+};
+
+const preHandle = () => emit("pre-handle");
+const nextHandle = () => emit("next-handle");
 
 watch(
   () => reactiveData.listData,
   (points) => {
-    const profileIds = Array.from(new Set(points.map((p) => p.profileId).filter((id): id is string => !!id)));
-    if (profileIds.length === 0) {
-      reactiveData.profileTable = {};
-      return;
-    }
-    listProfileByIds(profileIds)
-      .then((res) => {
-        reactiveData.profileTable = (res.data || {}) as Record<string, Record<string, any>>;
-      })
-      .catch(() => {
-        // handled globally
-      });
-  }
+    const sequence = ++profileLookupSequence;
+    reactiveData.profileTable = {};
+    reactiveData.profileLookupError = null;
+    void loadProfileLookup(points, sequence);
+  },
 );
 
-defineExpose({reactiveData, refresh});
+watch(
+  () => [props.profileId, props.deviceId],
+  () => {
+    profileLookupSequence += 1;
+    _search(basePointQuery.value);
+  },
+);
+
+onBeforeUnmount(() => {
+  disposed = true;
+  profileLookupSequence += 1;
+  profileLookupRequestId += 1;
+  actionBusy.clear();
+});
+
+defineExpose({ reactiveData, refresh });
 
 load();
 </script>

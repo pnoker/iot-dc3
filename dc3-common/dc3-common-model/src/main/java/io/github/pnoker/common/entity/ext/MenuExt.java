@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Map;
 
 /**
  * JSON extension object for menu configuration metadata.
@@ -31,10 +29,11 @@ import java.util.Map;
  * Extended information related to menus.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Schema(description = "JSON extension object for menu configuration metadata, holding extended information related to menus")
+@Schema(
+        description =
+                "JSON extension object for menu configuration metadata, holding extended information related to menus")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -49,6 +48,9 @@ public class MenuExt extends BaseExt {
     @Schema(description = "Extended content, distinguished by Type and Version")
     private Content content;
 
+    /**
+     * Menu display metadata: localized titles (authoritative), icon and route URL — drives the settings sidebar rendering.
+     */
     @Schema(description = "Extended content of the menu, carrying localized titles, icon, link and description")
     @Getter
     @Setter
@@ -62,7 +64,9 @@ public class MenuExt extends BaseExt {
          * Authoritative source for the menu display name. When rendering, the UI picks
          * {@code titles[currentLocale]} with fallback to {@code titles["en"]}.
          */
-        @Schema(description = "Localized titles keyed by locale code (e.g. zh, en); authoritative source for the menu display name, falling back to titles[\"en\"]")
+        @Schema(
+                description =
+                        "Localized titles keyed by locale code (e.g. zh, en); authoritative source for the menu display name, falling back to titles[\"en\"]")
         private Map<String, String> titles;
 
         /**
@@ -82,7 +86,5 @@ public class MenuExt extends BaseExt {
          */
         @Schema(description = "Description")
         private String remark;
-
     }
-
 }

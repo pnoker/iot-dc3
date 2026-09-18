@@ -18,10 +18,26 @@
 <template>
   <div>
     <blank-card>
-      <el-tabs v-model="reactiveData.active">
+      <el-alert
+        v-if="reactiveData.status === 'error'"
+        :closable="false"
+        :title="$t('common.loadFailed')"
+        class="entity-page-error"
+        show-icon
+        type="error"
+      >
+        <el-button :loading="reactiveData.loading" link type="danger" @click="load">
+          {{ $t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-empty
+        v-if="reactiveData.status === 'error' && !reactiveData.data.id"
+        :description="$t('common.loadFailed')"
+      />
+      <el-tabs v-else v-model="reactiveData.active" v-loading="reactiveData.loading">
         <el-tab-pane :label="activeConfig.detailTitle" name="detail">
           <detail-card>
-            <el-descriptions :column="2" border>
+            <el-descriptions :column="isMobile ? 1 : 2" border>
               <el-descriptions-item v-for="field in activeConfig.fields" :key="field.prop" :label="field.label">
                 <el-tag v-if="field.kind === 'tag'" :type="tagType(reactiveData.data[field.prop], field.prop)">
                   {{ formatDetail(field) }}
@@ -46,7 +62,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, reactive} from 'vue';
+import {computed, onBeforeUnmount, onMounted, reactive, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRoute} from 'vue-router';
 
@@ -64,6 +80,7 @@ import DetailCard from '@/components/card/detail/DetailCard.vue';
 import type {AlarmEntity as AlarmEntityData} from '@/config/types';
 import {timestampLabel} from '@/utils/dateUtil';
 import {prettyJson} from '@/utils/jsonUtil';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 
 type AlarmEntity = 'rule' | 'notify' | 'message' | 'channel' | 'bind' | 'state' | 'history';
 type FieldKind = 'text' | 'tag' | 'time' | 'code';
@@ -79,7 +96,7 @@ interface DetailConfig {
   detailTitle: string;
   fields: DetailField[];
   extProps: string[];
-  load: (id: string) => Promise<R>;
+  load: (id: string) => Promise<unknown>;
 }
 
 const props = withDefaults(
@@ -93,12 +110,16 @@ const props = withDefaults(
 
 const route = useRoute();
 const {t} = useI18n();
+const {isMobile} = useBreakpoint();
 
 const reactiveData = reactive({
   id: route.query.id as string,
   active: (route.query.active as string) || 'detail',
+  loading: true,
+  status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
   data: {} as AlarmEntityData,
 });
+let requestId = 0;
 
 const commonFields = (): DetailField[] => [
   {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'tag'},
@@ -182,12 +203,12 @@ const configs = computed<DetailConfig[]>(() => [
       {prop: 'alarmTargetTypeFlag', label: t('settings.alarm.targetType'), kind: 'tag'},
       {prop: 'entityId', label: t('settings.alarm.entityId'), kind: 'code'},
       {prop: 'entityStateFlag', label: t('settings.alarm.state'), kind: 'tag'},
-      {prop: 'fingerprint', label: 'Fingerprint', kind: 'code'},
+      {prop: 'fingerprint', label: t('settings.alarm.fingerprint'), kind: 'code'},
       {prop: 'triggerCount', label: t('settings.alarm.triggerCount')},
-      {prop: 'alarmId', label: 'Alarm ID', kind: 'code'},
-      {prop: 'firstTriggerTime', label: 'First Trigger', kind: 'time'},
+      {prop: 'alarmId', label: t('settings.alarm.alarmId'), kind: 'code'},
+      {prop: 'firstTriggerTime', label: t('settings.alarm.firstTriggerTime'), kind: 'time'},
       {prop: 'lastTriggerTime', label: t('settings.alarm.lastTriggerTime'), kind: 'time'},
-      {prop: 'lastRecoverTime', label: 'Last Recovery', kind: 'time'},
+      {prop: 'lastRecoverTime', label: t('settings.alarm.lastRecoverTime'), kind: 'time'},
       {prop: 'lastNotifyTime', label: t('settings.alarm.lastNotifyTime'), kind: 'time'},
       ...commonFields(),
     ],
@@ -202,7 +223,7 @@ const configs = computed<DetailConfig[]>(() => [
       {prop: 'notifyId', label: t('settings.alarm.notifyId'), kind: 'code'},
       {prop: 'messageId', label: t('settings.alarm.messageId'), kind: 'code'},
       {prop: 'channelId', label: t('settings.alarm.channelId'), kind: 'code'},
-      {prop: 'alarmId', label: 'Alarm ID', kind: 'code'},
+      {prop: 'alarmId', label: t('settings.alarm.alarmId'), kind: 'code'},
       {prop: 'channelTypeFlag', label: t('settings.alarm.channelType'), kind: 'tag'},
       {prop: 'target', label: t('settings.alarm.target')},
       {prop: 'statusFlag', label: t('settings.alarm.status'), kind: 'tag'},
@@ -282,19 +303,51 @@ const extLabel = (prop: string) => {
 };
 
 const load = () => {
-  if (!reactiveData.id) return;
+  const currentRequestId = ++requestId;
+  const entityId = String(reactiveData.id || '');
+  const entityKey = activeEntity.value;
+  if (!entityId) {
+    reactiveData.status = 'error';
+    reactiveData.loading = false;
+    return;
+  }
+  reactiveData.loading = true;
+  reactiveData.status = 'loading';
+  reactiveData.data = {} as AlarmEntityData;
   activeConfig.value
-    .load(reactiveData.id)
+    .load(entityId)
     .then((res: any) => {
-      reactiveData.data = res.data || {};
+      if (
+        currentRequestId !== requestId ||
+        entityId !== String(reactiveData.id || '') ||
+        entityKey !== activeEntity.value
+      ) return;
+      reactiveData.data = res || {};
+      reactiveData.status = reactiveData.data.id ? 'success' : 'error';
     })
     .catch(() => {
-      // handled globally
+      if (currentRequestId === requestId) reactiveData.status = 'error';
+    })
+    .finally(() => {
+      if (currentRequestId === requestId) reactiveData.loading = false;
     });
 };
 
+watch(
+  () => [route.query.id, activeEntity.value] as const,
+  ([id]) => {
+    const nextId = String(id || '');
+    reactiveData.id = nextId;
+    load();
+  },
+);
+
 onMounted(() => {
   load();
+});
+
+onBeforeUnmount(() => {
+  requestId += 1;
 });
 </script>
 

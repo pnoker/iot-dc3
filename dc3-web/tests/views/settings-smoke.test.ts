@@ -27,8 +27,8 @@ import {mountListPage} from './_helpers';
 // happy) that also carries the page-result keys (`records`/`total`) list pages
 // read — one stub satisfies both response shapes without per-endpoint mocking.
 vi.mock('@/api/common', () => {
-  const empty = () => Object.assign([] as unknown[], {records: [], total: 0, rows: [], list: [], children: []});
-  const ok = () => Promise.resolve({data: empty()});
+  const empty = () => Object.assign([] as unknown[], {items: [], total: 0, rows: [], list: [], children: []});
+  const ok = () => Promise.resolve(empty());
   return {httpGet: ok, httpPost: ok, crudAdd: ok, crudUpdate: ok, crudDelete: ok, crudGetById: ok, crudList: ok};
 });
 

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.common;
 
 import java.io.Serial;
@@ -38,5 +37,4 @@ public class KeyedResultSet<K, V> extends ArrayList<KeyedResult<K, V>> {
     public KeyedResultSet(final int size) {
         super(size); // me
     }
-
 }

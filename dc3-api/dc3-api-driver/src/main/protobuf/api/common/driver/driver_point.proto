@@ -20,10 +20,8 @@ syntax = "proto3";
 package api.common.driver;
 
 import "api/common/page.proto";
-import "api/common/r.proto";
 import "api/common/entity.proto";
 import "api/common/driver/driver_query.proto";
-import "api/common/driver/driver_query_page.proto";
 
 // Configuration options for code generation
 option java_package = "io.github.pnoker.api.common.driver";
@@ -33,35 +31,21 @@ option java_multiple_files = true;
 
 // Service interface defining RPC calls related to driver points
 service PointApi {
-  // Query points with pagination
-  rpc ListByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
+  // Canonical offset-based query used by reactive driver clients.
+  rpc List (GrpcOffsetPointQuery) returns (GrpcOffsetPagePointDTO);
   // Query point by point ID
-  rpc GetById (GrpcPointQuery) returns (GrpcRPointDTO);
+  rpc GetById (GrpcPointQuery) returns (GrpcPointDTO);
 }
 
-// Response wrapper for paged point query
-message GrpcRPagePointDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
-  // Paged point data
-  GrpcPagePointDTO data = 2;
+message GrpcOffsetPointQuery {
+  PageRequest page = 1;
+  int64 tenant_id = 2;
+  int64 driver_id = 3;
+  optional int64 device_id = 4;
+  optional int64 profile_id = 5;
 }
 
-// Paged point data structure
-message GrpcPagePointDTO {
-  // Pagination information including page number, page size, and total count
-  GrpcPage page = 1;
-
-  // List of points
-  repeated GrpcPointDTO data = 2;
-}
-
-// Response wrapper for single point query
-message GrpcRPointDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
-  // Single point data
-  GrpcPointDTO data = 2;
+message GrpcOffsetPagePointDTO {
+  OffsetPage page = 1;
+  repeated GrpcPointDTO items = 2;
 }

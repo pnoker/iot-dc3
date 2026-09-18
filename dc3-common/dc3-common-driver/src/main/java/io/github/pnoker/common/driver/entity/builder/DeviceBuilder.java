@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.builder;
 
 import io.github.pnoker.api.common.GrpcDeviceDTO;
@@ -35,12 +34,19 @@ import org.mapstruct.MappingTarget;
  * MapStruct mapper for converting device gRPC DTOs into internal business objects.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface DeviceBuilder {
 
+    /**
+     * Convert grpc transfer object to dto.
+     *
+     * @param entityGrpc entity grpc
+     * @return converted value
+     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
@@ -56,18 +62,26 @@ public interface DeviceBuilder {
     @Mapping(target = "driverAttributeConfigIdMap", ignore = true)
     @Mapping(target = "pointAttributeConfigIdMap", ignore = true)
     @Mapping(target = "commandAttributeConfigIdMap", ignore = true)
+    @Mapping(target = "commandRuntimeIdMap", ignore = true)
     @Mapping(target = "eventAttributeConfigIdMap", ignore = true)
+    @Mapping(target = "eventRuntimeIdMap", ignore = true)
     DeviceBO buildDTOByGrpcDTO(GrpcDeviceDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityBO   business object
+     */
     @AfterMapping
     default void afterProcess(GrpcDeviceDTO entityGrpc, @MappingTarget DeviceBO entityBO) {
         GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
 
         CollectionOptional.ofNullable(entityGrpc.getProfileIdsList())
-                .ifPresent(value -> entityBO.setProfileId(value.stream().findFirst().orElse(null)));
+                .ifPresent(value ->
+                        entityBO.setProfileId(value.stream().findFirst().orElse(null)));
         JsonOptional.ofNullable(entityGrpc.getDeviceExt())
                 .ifPresent(value -> entityBO.setDeviceExt(JsonUtil.parseObject(value, DeviceExt.class)));
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityBO::setEnableFlag);
     }
-
 }

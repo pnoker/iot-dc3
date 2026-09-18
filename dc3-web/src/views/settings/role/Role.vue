@@ -39,16 +39,16 @@ const assignRef = ref<InstanceType<typeof RoleAssignResources>>();
 
 const openAssignResources = (row: Record<string, any>) => assignRef.value?.show(row);
 
-const onAssignResources = async (roleId: string, addIds: string[], removeBindIds: string[], done: () => void) => {
+const onAssignResources = async (roleId: string, addIds: string[], removeBindIds: string[], done: (successful?: boolean) => void) => {
   try {
     await Promise.all([
       ...addIds.map((resourceId) => addRoleResourceBind({roleId, resourceId})),
       ...removeBindIds.map((id) => deleteRoleResourceBind(id)),
     ]);
     successMessage(t('settings.role.assignSaved'));
-    done();
+    done(true);
   } catch {
-    // handled globally
+    done(false);
   }
 };
 

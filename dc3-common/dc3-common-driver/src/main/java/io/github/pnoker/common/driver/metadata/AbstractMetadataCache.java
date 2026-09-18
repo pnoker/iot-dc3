@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.metadata;
 
 import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
@@ -23,13 +22,13 @@ import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.exception.ServiceException;
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.concurrent.CompletableFuture;
+import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 /**
  * Shared scaffolding for the driver-side metadata caches ({@link DeviceMetadata},
@@ -38,13 +37,12 @@ import java.util.function.Function;
  * consumer.
  *
  * <p>Cache freshness comes from RabbitMQ events, not TTL. {@code maximumSize} caps
- * memory only. {@link #loadCache(long)} is intentionally synchronous: it lets the
- * MetadataReceiver surface gRPC failures so the message can be nack-requeued instead
- * of silently dropped.
+ * memory only. Event-driven refreshes expose their completion as a {@link Mono}, so
+ * broker settlement waits for the upstream metadata lookup without blocking the
+ * consumer thread.
  *
  * @param <V> cached value type
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -73,28 +71,26 @@ public abstract class AbstractMetadataCache<V> {
      * @param name       short label used in log lines to distinguish this cache
      * @param loader     source-of-truth function invoked on cache miss for a given key
      */
-    protected AbstractMetadataCache(DriverProperties.MetadataProperties.CacheProperties cacheProps,
-                                    String name,
-                                    Function<Long, V> loader) {
+    protected AbstractMetadataCache(
+            DriverProperties.MetadataProperties.CacheProperties cacheProps,
+            String name,
+            Function<Long, Mono<V>> loader) {
         this.name = name;
         this.loadTimeoutSeconds = cacheProps.getLoadTimeoutSeconds();
 
-        RemovalListener<Long, V> removalListener = (key, value, cause) ->
-                log.debug("Evict {} cache, id={}, cause={}", name, key, cause);
+        RemovalListener<Long, V> removalListener =
+                (key, value, cause) -> log.debug("Evict {} cache, id={}, cause={}", name, key, cause);
 
-        Caffeine<Long, V> builder = Caffeine.newBuilder()
-                .maximumSize(cacheProps.getMaxSize())
-                .<Long, V>removalListener(removalListener);
+        Caffeine<Long, V> builder =
+                Caffeine.newBuilder().maximumSize(cacheProps.getMaxSize()).<Long, V>removalListener(removalListener);
         if (cacheProps.isRecordStats()) {
             builder.recordStats();
         }
 
-        this.cache = builder.buildAsync((id, executor) -> CompletableFuture.supplyAsync(() -> {
+        this.cache = builder.buildAsync((id, executor) -> {
             log.debug("Load {} metadata, id={}", name, id);
-            V value = loader.apply(id);
-            postLoad(id, value);
-            return value;
-        }, executor));
+            return loader.apply(id).doOnSuccess(value -> postLoad(id, value)).toFuture();
+        });
     }
 
     /**
@@ -111,7 +107,7 @@ public abstract class AbstractMetadataCache<V> {
 
     /**
      * Returns the cached value for {@code id}, triggering the loader on miss. Bounded
-     * by {@link DriverProperties.MetadataProperties.CacheProperties#getLoadTimeoutSeconds()}.
+     * by {@code DriverProperties.MetadataProperties.CacheProperties#getLoadTimeoutSeconds()}.
      *
      * @param id cache key
      * @return cached value, or {@code null} if loading timed out, was interrupted, or
@@ -134,9 +130,8 @@ public abstract class AbstractMetadataCache<V> {
     }
 
     /**
-     * Refreshes the cache entry for {@code id}, blocking until the load completes or
-     * times out so the caller (typically the RabbitMQ metadata consumer) can decide
-     * whether to ack or nack the triggering event.
+     * Refreshes the cache entry for {@code id} and exposes the upstream completion to
+     * the caller so broker settlement can follow the metadata transaction.
      *
      * <p>Behavior:
      * <ul>
@@ -149,28 +144,20 @@ public abstract class AbstractMetadataCache<V> {
      * </ul>
      *
      * @param id cache key
-     * @return loaded value, or {@code null} if upstream reports the record is gone
-     * @throws ServiceException when the loader fails or the wait is interrupted/times out
+     * @return loaded value, or an empty completion if upstream reports the record is gone
      */
-    public V loadCache(long id) {
-        try {
-            return cache.synchronous().refresh(id).get(loadTimeoutSeconds, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new ServiceException("Interrupted while refreshing {} cache, id={}", name, id, e);
-        } catch (TimeoutException e) {
-            throw new ServiceException("Timed out refreshing {} cache after {}s, id={}",
-                    name, loadTimeoutSeconds, id, e);
-        } catch (ExecutionException e) {
-            Throwable cause = e.getCause() != null ? e.getCause() : e;
-            throw new ServiceException("Failed to refresh {} cache, id={}", name, id, cause);
-        }
+    public Mono<V> refreshCache(long id) {
+        return Mono.defer(() -> Mono.fromFuture(cache.synchronous().refresh(id)))
+                .timeout(Duration.ofSeconds(loadTimeoutSeconds))
+                .onErrorMap(
+                        error -> !(error instanceof ServiceException),
+                        error -> new ServiceException("Failed to refresh {} cache, id={}", name, id, error));
     }
 
     /**
      * Removes the cache entry for {@code id}.
      */
-    public void removeCache(long id) {
+    public void evictCache(long id) {
         cache.synchronous().invalidate(id);
     }
 
@@ -188,5 +175,4 @@ public abstract class AbstractMetadataCache<V> {
     public CacheStats stats() {
         return cache.synchronous().stats();
     }
-
 }

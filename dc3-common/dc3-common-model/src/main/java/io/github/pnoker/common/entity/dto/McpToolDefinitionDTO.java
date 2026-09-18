@@ -14,11 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pnoker.common.constant.service.McpConstant;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,15 +28,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.Map;
-
 /**
  * Public MCP tool definition returned by JSON-RPC tools/list.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -113,7 +110,6 @@ public class McpToolDefinitionDTO implements Serializable {
          * Hint that the tool may interact with entities outside the local environment.
          */
         private boolean openWorldHint;
-
     }
 
     /**
@@ -148,7 +144,5 @@ public class McpToolDefinitionDTO implements Serializable {
          */
         @JsonProperty(McpConstant.Field.RISK_LEVEL_META)
         private String riskLevel;
-
     }
-
 }

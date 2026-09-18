@@ -67,7 +67,7 @@
     </scm>
 
     <properties>
-        <logstash.logback.version>8.1</logstash.logback.version>
+        <logstash.logback.version>9.0</logstash.logback.version>
     </properties>
 
     <dependencies>
@@ -85,6 +85,13 @@
         </dependency>
 
         <!-- Logstash Logback -->
+        <!-- Provided by every service at runtime; needed at compile time for
+             the HV000271 turbo filter (logback.xml lives in this module). -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>

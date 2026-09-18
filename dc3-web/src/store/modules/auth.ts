@@ -36,10 +36,11 @@ interface LoginForm {
   password: string;
 }
 
+/** Pinia store for auth state: tenant/login names plus login, logout, and token refresh flows. */
 export const useAuthStore = defineStore('auth', () => {
   // State
-  const tenant = ref('default');
-  const name = ref('dc3');
+  const tenantRef = ref('default');
+  const nameRef = ref('dc3');
 
   // Getters
   const getTenant = computed(() => {
@@ -51,19 +52,20 @@ export const useAuthStore = defineStore('auth', () => {
   });
 
   // Actions
-  const setToken = (login: Login) => {
-    setStorage(AUTH_HEADERS.TENANT, login.tenant);
-    setStorage(AUTH_HEADERS.LOGIN, login.name);
-    setStorage(AUTH_HEADERS.TOKEN, {salt: login.salt, token: login.token});
+  const setToken = ({tenant, name}: Pick<Login, 'tenant' | 'name'>) => {
+    setStorage(AUTH_HEADERS.TENANT, tenant);
+    setStorage(AUTH_HEADERS.LOGIN, name);
+    // Token is in an httpOnly cookie; store only a frontend-visible login flag.
+    setStorage(AUTH_HEADERS.AUTHENTICATED, true, true);
 
-    tenant.value = login.tenant || 'default';
-    name.value = login.name || 'dc3';
+    tenantRef.value = tenant || 'default';
+    nameRef.value = name || 'dc3';
   };
 
   const removeToken = () => {
     removeStorage(AUTH_HEADERS.TENANT);
     removeStorage(AUTH_HEADERS.LOGIN);
-    removeStorage(AUTH_HEADERS.TOKEN);
+    removeStorage(AUTH_HEADERS.AUTHENTICATED, true);
   };
 
   const login = async (form: LoginForm) => {
@@ -73,7 +75,7 @@ export const useAuthStore = defineStore('auth', () => {
     });
     try {
       const saltRes = await generateSalt({tenant: form.tenant, name: form.name});
-      const salt: string = saltRes.data;
+      const salt: string = saltRes;
       if (!salt) {
         failMessage(i18n.global.t('login.failed'));
         return;
@@ -86,12 +88,10 @@ export const useAuthStore = defineStore('auth', () => {
       };
 
       const tokenRes = await generateToken(loginWithPassword);
-      setToken({
-        tenant: loginWithPassword.tenant,
-        name: loginWithPassword.name,
-        salt: loginWithPassword.salt,
-        token: tokenRes.data,
-      });
+      // Token is set as an httpOnly cookie by the backend; the response body
+      // only signals success, so we don't persist any token value here.
+      void tokenRes;
+      setToken({tenant: loginWithPassword.tenant, name: loginWithPassword.name});
       await router.push({name: 'home'});
     } catch (error) {
       const code = (error as { code?: string })?.code;
@@ -130,8 +130,8 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     // State
-    tenant,
-    name,
+    tenant: tenantRef,
+    name: nameRef,
     // Getters
     getTenant,
     getName,

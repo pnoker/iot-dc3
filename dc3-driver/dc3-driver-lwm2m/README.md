@@ -3,8 +3,8 @@
 ## Overview
 
 `dc3-driver-lwm2m` is the LwM2M (Lightweight M2M) protocol driver of the IoT DC3 platform. It is intended to run an
-embedded Eclipse Leshan LwM2M server, accept device registrations, and read/write LwM2M resources by Object /
-Object Instance / Resource ID.
+embedded Eclipse Leshan LwM2M server, accept device registrations, and read/write LwM2M resources by Object / Object
+Instance / Resource ID.
 
 > ⚠️ **Work in progress.** This driver is currently a skeleton — protocol-level I/O is not yet fully implemented. The
 > class documentation of `Lwm2mDriverCustomServiceImpl` explicitly states it is a "work-in-progress skeleton". Treat it
@@ -14,7 +14,6 @@ Object Instance / Resource ID.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-lwm2m
-- **Version**: 2026.5.22
 - **Driver Name**: LwM2M Driver
 
 ## Driver Attributes (Device-level)
@@ -38,6 +37,9 @@ Object Instance / Resource ID.
 | Resource ID        | LwM2M Resource ID (e.g. 5700=Sensor Value) |
 | Observe            | Enable LwM2M Observe: true, false          |
 
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
+
 ## Prerequisites
 
 LwM2M client devices that register with the embedded Leshan server. The server binds to the configured `Server Host` /
@@ -48,23 +50,25 @@ LwM2M client devices that register with the embedded Leshan server. The server b
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev GROUP=core
 ```
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-lwm2m -am package
 java -jar dc3-driver/dc3-driver-lwm2m/target/dc3-driver-lwm2m.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-lwm2m -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-driver` — Driver SDK for registration, scheduling, and RabbitMQ integration
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

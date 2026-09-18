@@ -23,12 +23,12 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Spring AI backed implementation of the agentic runtime.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Component
@@ -50,20 +50,26 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
             ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
             return promptSpec.stream()
                     .chatResponse()
-                    .map(response -> new AgenticRuntimeStreamFrame(responseMapper.streamDelta(response),
-                            responseMapper.finishReasonOrNull(response)));
+                    .map(response -> new AgenticRuntimeStreamFrame(
+                            responseMapper.streamDelta(response), responseMapper.finishReasonOrNull(response)));
         });
     }
 
     @Override
-    public AgenticRuntimeResult call(AgenticPreparedChatBO prepared) {
+    public Mono<AgenticRuntimeResult> call(AgenticPreparedChatBO prepared) {
         if (openAiCompatibleAgenticRuntime.supports(prepared)) {
             return openAiCompatibleAgenticRuntime.call(prepared);
         }
-        ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
-        ChatResponse chatResponse = promptSpec.call().chatResponse();
-        return new AgenticRuntimeResult(responseMapper.assistantContent(chatResponse),
-                responseMapper.finishReasonOrNull(chatResponse));
+        return Mono.defer(() -> {
+            ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
+            return promptSpec.stream().chatResponse().collectList().map(responses -> {
+                ChatResponse chatResponse = responses.isEmpty() ? null : responses.get(responses.size() - 1);
+                if (chatResponse == null) {
+                    return new AgenticRuntimeResult("", null);
+                }
+                return new AgenticRuntimeResult(
+                        responseMapper.assistantContent(chatResponse), responseMapper.finishReasonOrNull(chatResponse));
+            });
+        });
     }
-
 }

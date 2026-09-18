@@ -68,12 +68,6 @@
 
     <dependencies>
 
-        <!-- Mybatis Plus Extension -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-extension</artifactId>
-        </dependency>
-
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -86,6 +80,12 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-public</artifactId>
+        </dependency>
+
+        <!-- Canonical reactive pagination types shared by query contracts. -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-core</artifactId>
         </dependency>
 
     </dependencies>

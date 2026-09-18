@@ -14,8 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
@@ -35,25 +43,15 @@ import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.UnSupportException;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ModbusRtuDriverCustomServiceImplTest {
@@ -83,19 +81,47 @@ class ModbusRtuDriverCustomServiceImplTest {
 
     private static Map<String, AttributeBO> driverConfig() {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("port", AttributeBO.builder().value("/dev/ttyS0").type(AttributeTypeEnum.STRING).build());
-        m.put("baudRate", AttributeBO.builder().value("9600").type(AttributeTypeEnum.INT).build());
-        m.put("dataBits", AttributeBO.builder().value("8").type(AttributeTypeEnum.INT).build());
-        m.put("stopBits", AttributeBO.builder().value("1").type(AttributeTypeEnum.INT).build());
-        m.put("parity", AttributeBO.builder().value("0").type(AttributeTypeEnum.INT).build());
+        m.put(
+                "port",
+                AttributeBO.builder()
+                        .value("/dev/ttyS0")
+                        .type(AttributeTypeEnum.STRING)
+                        .build());
+        m.put(
+                "baudRate",
+                AttributeBO.builder().value("9600").type(AttributeTypeEnum.INT).build());
+        m.put(
+                "dataBits",
+                AttributeBO.builder().value("8").type(AttributeTypeEnum.INT).build());
+        m.put(
+                "stopBits",
+                AttributeBO.builder().value("1").type(AttributeTypeEnum.INT).build());
+        m.put(
+                "parity",
+                AttributeBO.builder().value("0").type(AttributeTypeEnum.INT).build());
         return m;
     }
 
     private static Map<String, AttributeBO> pointConfig(int slaveId, int functionCode, int offset) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("slaveId", AttributeBO.builder().value(String.valueOf(slaveId)).type(AttributeTypeEnum.INT).build());
-        m.put("functionCode", AttributeBO.builder().value(String.valueOf(functionCode)).type(AttributeTypeEnum.INT).build());
-        m.put("offset", AttributeBO.builder().value(String.valueOf(offset)).type(AttributeTypeEnum.INT).build());
+        m.put(
+                "slaveId",
+                AttributeBO.builder()
+                        .value(String.valueOf(slaveId))
+                        .type(AttributeTypeEnum.INT)
+                        .build());
+        m.put(
+                "functionCode",
+                AttributeBO.builder()
+                        .value(String.valueOf(functionCode))
+                        .type(AttributeTypeEnum.INT)
+                        .build());
+        m.put(
+                "offset",
+                AttributeBO.builder()
+                        .value(String.valueOf(offset))
+                        .type(AttributeTypeEnum.INT)
+                        .build());
         return m;
     }
 
@@ -137,10 +163,12 @@ class ModbusRtuDriverCustomServiceImplTest {
         when(modbusFactory.createRtuMaster(any(JSerialCommWrapper.class))).thenReturn(modbusMaster);
         when(modbusMaster.getValue(any(BaseLocator.class))).thenReturn(true, 42);
 
-        assertThat(service.read(driverConfig(), pointConfig(1, 1, 0), device(10L),
-                point(PointTypeEnum.BOOLEAN)).getValue()).isEqualTo("true");
-        assertThat(service.read(driverConfig(), pointConfig(1, 3, 0), device(10L),
-                point(PointTypeEnum.INT)).getValue()).isEqualTo("42");
+        assertThat(service.read(driverConfig(), pointConfig(1, 1, 0), device(10L), point(PointTypeEnum.BOOLEAN))
+                        .getValue())
+                .isEqualTo("true");
+        assertThat(service.read(driverConfig(), pointConfig(1, 3, 0), device(10L), point(PointTypeEnum.INT))
+                        .getValue())
+                .isEqualTo("42");
 
         verify(modbusFactory, times(1)).createRtuMaster(any(JSerialCommWrapper.class));
     }
@@ -149,8 +177,9 @@ class ModbusRtuDriverCustomServiceImplTest {
     void readUnsupportedFunctionCodeThrows() throws Exception {
         when(modbusFactory.createRtuMaster(any(JSerialCommWrapper.class))).thenReturn(modbusMaster);
 
-        assertThatThrownBy(() -> service.read(driverConfig(), pointConfig(1, 99, 0), device(10L),
-                point(PointTypeEnum.INT))).isInstanceOf(UnSupportException.class);
+        assertThatThrownBy(() ->
+                        service.read(driverConfig(), pointConfig(1, 99, 0), device(10L), point(PointTypeEnum.INT)))
+                .isInstanceOf(UnSupportException.class);
         verify(modbusMaster, never()).getValue(any(BaseLocator.class));
     }
 
@@ -159,8 +188,9 @@ class ModbusRtuDriverCustomServiceImplTest {
         when(modbusFactory.createRtuMaster(any(JSerialCommWrapper.class))).thenReturn(modbusMaster);
         when(modbusMaster.getValue(any(BaseLocator.class))).thenThrow(new ModbusTransportException("serial down"));
 
-        assertThatThrownBy(() -> service.read(driverConfig(), pointConfig(1, 3, 0), device(20L),
-                point(PointTypeEnum.INT))).isInstanceOf(ReadPointException.class)
+        assertThatThrownBy(
+                        () -> service.read(driverConfig(), pointConfig(1, 3, 0), device(20L), point(PointTypeEnum.INT)))
+                .isInstanceOf(ReadPointException.class)
                 .hasMessageContaining("serial down");
         verify(modbusMaster).destroy();
     }
@@ -170,8 +200,9 @@ class ModbusRtuDriverCustomServiceImplTest {
         when(modbusFactory.createRtuMaster(any(JSerialCommWrapper.class))).thenReturn(modbusMaster);
         doThrow(new ModbusInitException("offline")).when(modbusMaster).init();
 
-        assertThatThrownBy(() -> service.read(driverConfig(), pointConfig(1, 1, 0), device(10L),
-                point(PointTypeEnum.INT))).isInstanceOf(ConnectorException.class)
+        assertThatThrownBy(
+                        () -> service.read(driverConfig(), pointConfig(1, 1, 0), device(10L), point(PointTypeEnum.INT)))
+                .isInstanceOf(ConnectorException.class)
                 .hasMessageContaining("offline");
         verify(modbusMaster).destroy();
     }

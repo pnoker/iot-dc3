@@ -16,7 +16,15 @@
   -->
 
 <template>
-  <div class="things-card cursor-pointer" @click="$emit('select', data)">
+  <div
+    :aria-label="String(data.pointName || data.attributeName || '')"
+    class="things-card cursor-pointer"
+    role="button"
+    tabindex="0"
+    @click="$emit('select', data)"
+    @keydown.enter.prevent="$emit('select', data)"
+    @keydown.space.prevent="$emit('select', data)"
+  >
     <el-card :shadow="data.shadow">
       <div class="things-card-content">
         <div :class="['things-card__header', isConfig ? 'header-enable' : 'header-disable']">
@@ -82,10 +90,16 @@ const isSelect = computed(() =>
 </script>
 
 <style lang="scss" scoped>
-// PointInfoCard 内联了一个简化的 header(无状态标签),不使用 ThingsCardHeader,在此补齐样式。
+// PointInfoCard has a simplified header without a status tag, so it supplies its own header styles.
 
 .cursor-pointer {
   cursor: pointer;
+
+  &:focus-visible {
+    border-radius: var(--dc3-radius-xl);
+    outline: none;
+    box-shadow: var(--dc3-focus-ring);
+  }
 }
 
 .things-card__header {
@@ -96,8 +110,8 @@ const isSelect = computed(() =>
   .things-card-header-icon {
     width: 48px;
     height: 48px;
-    margin-right: 12px;
-    border-radius: 4px;
+    margin-right: var(--dc3-space-3);
+    border-radius: var(--dc3-radius-sm);
     overflow: hidden;
 
     img {

@@ -1,0 +1,62 @@
+/*!
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Design tokens (SCSS source). Single source of truth for the L2 layer —
+// see docs/design/frontend-three-terminal-ux.md (A5). element-variables.scss
+// @forwards this module, so every scoped style block gets the tokens without
+// an extra @use.
+//
+// The runtime-themable half (colors, spacing, motion as CSS custom
+// properties) lives in theme.scss; this file carries compile-time tokens:
+// breakpoints, layout metrics, and grid thresholds that media queries and
+// Sass math need.
+
+// ---------------------------------------------------------------------------
+// Breakpoints — the ONLY breakpoint contract. Aligned with Element Plus
+// el-col semantics so JS (useBreakpoint) and el-col responsive props agree.
+// ---------------------------------------------------------------------------
+$breakpoint-xs: 0px; // < 768px mobile
+$breakpoint-sm: 768px; // 768 - 991px tablet
+$breakpoint-md: 992px; // 992 - 1199px tablet / small desktop
+$breakpoint-lg: 1200px; // 1200 - 1919px desktop
+$breakpoint-xl: 1920px; // >= 1920px wide desktop
+
+// max-width variants for (max-width: ...) media queries (767.98 avoids the
+// 768px boundary ambiguity between adjacent ranges).
+$breakpoint-xs-max: 767.98px;
+$breakpoint-sm-max: 991.98px;
+$breakpoint-md-max: 1199.98px;
+$breakpoint-lg-max: 1919.98px;
+
+// ---------------------------------------------------------------------------
+// Layout metrics (single source; components must not redefine these)
+// ---------------------------------------------------------------------------
+$header-height: 60px;
+$settings-aside-width: 220px;
+$settings-aside-collapsed-width: 64px;
+
+// ---------------------------------------------------------------------------
+// Fluid-grid thresholds. ToolCard/InfoCard cells wrap below this width —
+// replace magic 220px literals with this token (A5).
+// ---------------------------------------------------------------------------
+$form-cell-min-width: 220px;
+
+// ---------------------------------------------------------------------------
+// Touch ergonomics (A3): minimum tappable target on coarse-pointer devices.
+// CSS custom property --dc3-touch-target in theme.scss mirrors this.
+// ---------------------------------------------------------------------------
+$touch-target-min: 44px;

@@ -14,85 +14,108 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.buffer.PointValueIngestBuffer;
-import io.github.pnoker.common.entity.bo.PointValueBO;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
-
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-/**
- * Verifies the receiver routes messages to the ingest buffer and applies back-pressure
- * (nack-requeue) when the buffer is full.
- *
- * @author pnoker
- * @version 2026.7.8
- * @since 2026.7.8
- */
+import io.github.pnoker.common.data.biz.PointValueService;
+import io.github.pnoker.common.entity.bo.PointValueBO;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqPoisonException;
+import io.github.pnoker.common.mq.listener.MqReceived;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
 @ExtendWith(MockitoExtension.class)
 class PointValueReceiverTest {
 
     @Mock
-    private PointValueIngestBuffer buffer;
+    private PointValueService pointValueService;
 
     @Mock
-    private Channel channel;
+    private Acknowledgment ack;
 
     private PointValueReceiver receiver;
-    private Message message;
 
     @BeforeEach
     void setUp() {
-        receiver = new PointValueReceiver(buffer);
-        MessageProperties props = new MessageProperties();
-        props.setDeliveryTag(7L);
-        message = new Message(new byte[0], props);
+        receiver = new PointValueReceiver(pointValueService);
     }
 
     @Test
-    void rejectsNullPayload() throws Exception {
-        receiver.pointValueReceive(channel, message, null);
-        verifyNoInteractions(buffer);
-        verify(channel).basicReject(eq(7L), eq(false));
+    void persistsCompleteBatchBeforeAcknowledging() {
+        MqReceived<PointValueBO> first = received(validValue("m-1", 1L));
+        MqReceived<PointValueBO> second = received(validValue("m-2", 2L));
+        when(pointValueService.save(anyList())).thenReturn(Mono.empty());
+
+        StepVerifier.create(receiver.pointValueReceive(List.of(first, second), ack))
+                .verifyComplete();
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<PointValueBO>> captor = ArgumentCaptor.forClass(List.class);
+        verify(pointValueService).save(captor.capture());
+        assertThat(captor.getValue()).extracting(PointValueBO::getMessageId).containsExactly("m-1", "m-2");
     }
 
     @Test
-    void rejectsPayloadWithoutDeviceId() throws Exception {
-        PointValueBO bo = PointValueBO.builder().pointId(20L).build();
-        receiver.pointValueReceive(channel, message, bo);
-        verifyNoInteractions(buffer);
-        verify(channel).basicReject(eq(7L), eq(false));
+    void doesNotAcknowledgeWhenPersistenceFails() {
+        when(pointValueService.save(anyList()))
+                .thenReturn(Mono.error(new IllegalStateException("database unavailable")));
+
+        StepVerifier.create(receiver.pointValueReceive(List.of(received(validValue("m-1", 1L))), ack))
+                .expectErrorMessage("database unavailable")
+                .verify();
     }
 
     @Test
-    void offersAndAcks() throws Exception {
-        PointValueBO bo = PointValueBO.builder().deviceId(10L).pointId(20L).rawValue("v").build();
-        when(buffer.offer(bo)).thenReturn(true);
-        receiver.pointValueReceive(channel, message, bo);
-        verify(buffer).offer(bo);
-        verify(channel).basicAck(eq(7L), eq(false));
+    void rejectsEntireBatchWhenWireContractIsInvalid() {
+        PointValueBO invalid = validValue("m-1", 1L);
+        invalid.setDriverNode(null);
+
+        assertThatThrownBy(() -> receiver.pointValueReceive(List.of(received(invalid)), ack))
+                .isInstanceOf(MqPoisonException.class);
+        verifyNoInteractions(pointValueService);
     }
 
     @Test
-    void nacksAndRequeuesWhenBufferFull() throws Exception {
-        PointValueBO bo = PointValueBO.builder().deviceId(10L).pointId(20L).rawValue("v").build();
-        when(buffer.offer(bo)).thenReturn(false);
-        receiver.pointValueReceive(channel, message, bo);
-        verify(buffer).offer(bo);
-        verify(channel).basicNack(eq(7L), eq(false), eq(true));
-        verify(channel, never()).basicAck(eq(7L), eq(false));
+    void ignoresEmptyBatch() {
+        StepVerifier.create(receiver.pointValueReceive(List.of(), ack)).verifyComplete();
+
+        verifyNoInteractions(pointValueService, ack);
+    }
+
+    private MqReceived<PointValueBO> received(PointValueBO value) {
+        return new MqReceived<>(value, Map.of(), false);
+    }
+
+    private PointValueBO validValue(String messageId, long sequence) {
+        return PointValueBO.builder()
+                .messageId(messageId)
+                .schemaVersion(1)
+                .driverNode("node-a")
+                .sequence(sequence)
+                .fencingToken(77L)
+                .tenantId(100L)
+                .driverId(200L)
+                .deviceId(10L)
+                .pointId(20L)
+                .rawValue("42")
+                .calValue("42")
+                .createTime(LocalDateTime.now())
+                .build();
     }
 }

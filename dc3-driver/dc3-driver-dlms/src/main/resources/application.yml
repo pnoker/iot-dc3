@@ -101,7 +101,6 @@ dc3:
     command-attribute: [ ]
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/dlms/buffer.db
 
 spring:

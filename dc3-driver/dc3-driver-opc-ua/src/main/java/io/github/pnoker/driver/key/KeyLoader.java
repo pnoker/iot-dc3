@@ -14,15 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.key;
 
 import io.github.pnoker.common.utils.HostUtil;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.eclipse.milo.opcua.stack.core.util.SelfSignedCertificateBuilder;
-import org.eclipse.milo.opcua.stack.core.util.SelfSignedCertificateGenerator;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -34,6 +28,10 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.regex.Pattern;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.milo.opcua.stack.core.util.SelfSignedCertificateBuilder;
+import org.eclipse.milo.opcua.stack.core.util.SelfSignedCertificateGenerator;
 
 /**
  * Certificate and key loader for OPC-UA client authentication. This class handles loading
@@ -42,7 +40,6 @@ import java.util.regex.Pattern;
  * for the client.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -51,8 +48,8 @@ public class KeyLoader {
     /**
      * IPv4 address regex pattern, used to validate if a string is a legal IPv4 address.
      */
-    private static final Pattern IP_ADDR_PATTERN = Pattern
-            .compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+    private static final Pattern IP_ADDR_PATTERN =
+            Pattern.compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
     /**
      * PKCS12 keystore password, used to load/generate client certificate keystore.
@@ -66,8 +63,10 @@ public class KeyLoader {
      * keystore.
      */
     private static final String CLIENT_ALIAS = "client-ai";
+
     @Getter
     private X509Certificate clientCertificate;
+
     @Getter
     private KeyPair clientKeyPair;
 
@@ -92,6 +91,7 @@ public class KeyLoader {
      * @throws Exception if certificate generation or loading fails
      */
     public KeyLoader load(Path baseDir) throws Exception {
+        Files.createDirectories(baseDir);
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         Path serverKeyStore = baseDir.resolve("dc3-opc-ua-client.pfx");
 
@@ -120,7 +120,7 @@ public class KeyLoader {
             }
 
             X509Certificate certificate = builder.build();
-            keyStore.setKeyEntry(CLIENT_ALIAS, keyPair.getPrivate(), PASSWORD, new X509Certificate[]{certificate});
+            keyStore.setKeyEntry(CLIENT_ALIAS, keyPair.getPrivate(), PASSWORD, new X509Certificate[] {certificate});
             try (OutputStream out = Files.newOutputStream(serverKeyStore)) {
                 keyStore.store(out, PASSWORD);
             }
@@ -142,5 +142,4 @@ public class KeyLoader {
 
         return this;
     }
-
 }

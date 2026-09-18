@@ -14,15 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
-
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
+import io.github.pnoker.common.facade.entity.query.FacadeDeviceOffsetQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import java.util.Collection;
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral device facade.
@@ -32,46 +32,33 @@ import java.util.List;
  * this interface:
  * <ul>
  * <li>{@code DeviceLocalFacade} — in-process call into {@code DeviceService}, selected
- * when {@code dc3.facade.mode=local} (single deployment).</li>
+ * when {@code dc3.facade.manager.mode=local}.</li>
  * <li>{@code DeviceGrpcFacade} — gRPC call against Manager Center, selected when
- * {@code dc3.facade.mode=grpc} (distributed deployment, default).</li>
+ * {@code dc3.facade.manager.mode=grpc} (default).</li>
  * </ul>
  * <p>
  * Single-record and bulk lookups are tenant-scoped: the tenant id rides on the gRPC query
  * (or the thread-local in local mode) so the manager center enforces tenant isolation.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DeviceFacade {
+    /** Resolve the device by its id. */
+    Mono<FacadeDeviceBO> getByIdReactive(Long tenantId, Long id);
 
-    /**
-     * Tenant-scoped single lookup. Returns {@code null} when the device is missing or
-     * belongs to another tenant.
-     */
-    FacadeDeviceBO getById(Long tenantId, Long id);
+    /** List devices matched by ids. */
+    Flux<FacadeDeviceBO> listByIdsReactive(Long tenantId, Collection<Long> ids);
 
-    /**
-     * Tenant-scoped bulk lookup. Missing or cross-tenant devices are omitted.
-     */
-    List<FacadeDeviceBO> listByIds(Long tenantId, Collection<Long> ids);
+    /** Page devices matching the tenant-scoped filters. */
+    Mono<OffsetPage<FacadeDeviceBO>> listReactive(FacadeDeviceOffsetQuery query);
 
-    /**
-     * Paginated query.
-     *
-     * @return a page of devices (never {@code null}; empty page when nothing matches).
-     */
-    FacadePage<FacadeDeviceBO> listByPage(FacadeDeviceQuery query);
+    /** List devices matched by profile id. */
+    Flux<FacadeDeviceBO> listByProfileIdReactive(Long tenantId, Long profileId);
 
-    /**
-     * Tenant-scoped lookup by profile. Cross-tenant devices are omitted.
-     */
-    List<FacadeDeviceBO> listByProfileId(Long tenantId, Long profileId);
+    /** List devices matched by driver id. */
+    Flux<FacadeDeviceBO> listByDriverIdReactive(Long tenantId, Long driverId);
 
-    /**
-     * Tenant-scoped lookup by driver. Cross-tenant devices are omitted.
-     */
-    List<FacadeDeviceBO> listByDriverId(Long tenantId, Long driverId);
-
+    /** Load the active owner scoped to the tenant by id. */
+    Mono<FacadeDeviceOwnerBO> getActiveOwnerReactive(Long tenantId, Long deviceId);
 }

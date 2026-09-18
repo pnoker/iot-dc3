@@ -14,32 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.biz.PointValueService;
-import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
+import io.github.pnoker.common.facade.entity.bo.FacadePointVolumeBO;
 import io.github.pnoker.common.facade.local.builder.FacadePointValueBuilder;
+import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import reactor.core.publisher.Mono;
 
 /**
  * In-process implementation: routes each call straight into {@link PointValueService}.
  * <p>
- * Selected when {@code dc3.facade.mode=local}. Carries zero serialization cost — the same
+ * Selected when {@code dc3.facade.data.mode=local}. Carries zero serialization cost — the same
  * JVM handles both caller and service.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -52,26 +48,38 @@ public class PointValueLocalFacade implements PointValueFacade {
     private final FacadePointValueBuilder facadePointValueBuilder;
 
     @Override
-    public FacadePointValueBO lastValue(Long tenantId, Long deviceId, Long pointId) {
+    public Mono<FacadePointValueBO> lastValue(Long tenantId, Long deviceId, Long pointId) {
         PointValueQuery query = PointValueQuery.builder()
                 .tenantId(tenantId)
                 .deviceId(deviceId)
                 .pointId(pointId)
                 .build();
-        Page<PointValueBO> page = pointValueService.latest(query);
-        if (Objects.isNull(page) || page.getRecords().isEmpty()) {
-            return null;
-        }
-        return facadePointValueBuilder.toFacadeBO(page.getRecords().getFirst());
+        return pointValueService
+                .latest(query)
+                .flatMap(page -> page.items().stream()
+                        .findFirst()
+                        .map(value -> Mono.just(facadePointValueBuilder.toFacadeBO(value)))
+                        .orElseGet(Mono::empty));
     }
 
     @Override
-    public List<String> history(Long tenantId, Long deviceId, Long pointId, int count) {
-        List<String> result = pointValueService.history(tenantId, deviceId, pointId, count);
-        if (Objects.isNull(result) || result.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return result;
+    public Mono<CursorPage<FacadePointValueBO>> history(
+            Long tenantId, Long deviceId, Long pointId, String cursor, int limit) {
+        return pointValueService
+                .history(tenantId, deviceId, pointId, cursor, limit)
+                .map(result -> CursorPage.of(
+                        result.items().stream()
+                                .map(facadePointValueBuilder::toFacadeBO)
+                                .toList(),
+                        result.nextCursor()));
     }
 
+    @Override
+    public Mono<List<FacadePointVolumeBO>> pointVolumes(Long tenantId, long fromEpochMillis) {
+        return pointValueService
+                .seriesVolumes(tenantId, java.time.Instant.ofEpochMilli(fromEpochMillis))
+                .map(rows -> rows.stream()
+                        .map(row -> new FacadePointVolumeBO(row.deviceId(), row.pointId(), row.count()))
+                        .toList());
+    }
 }

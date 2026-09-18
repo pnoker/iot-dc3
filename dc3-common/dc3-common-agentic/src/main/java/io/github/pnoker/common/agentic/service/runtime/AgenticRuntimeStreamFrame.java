@@ -16,29 +16,37 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * One streamed frame emitted by the model runtime.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 public record AgenticRuntimeStreamFrame(AgenticStreamDelta delta, String finishReason) {
 
+    /** Agentic runtime stream frame compact constructor: normalizes the record. */
     public AgenticRuntimeStreamFrame {
         delta = Objects.nonNull(delta) ? delta : AgenticStreamDelta.empty();
     }
 
+    /**
+     * Determine whether the frame carries visible or reasoning content.
+     *
+     * @return {@code true} when the delta contains content
+     */
     public boolean hasContent() {
         return delta.hasContent();
     }
 
+    /**
+     * Determine whether the frame terminates the stream with a finish reason.
+     *
+     * @return {@code true} when a non-blank finish reason is present
+     */
     public boolean hasFinishReason() {
         return StringUtils.isNotBlank(finishReason);
     }
-
 }

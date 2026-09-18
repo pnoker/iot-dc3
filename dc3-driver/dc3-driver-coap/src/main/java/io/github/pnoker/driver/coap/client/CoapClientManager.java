@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.coap.client;
 
 import io.github.pnoker.driver.coap.entity.CoapResult;
 import io.github.pnoker.driver.coap.entity.property.CoapProperties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapClient;
@@ -28,16 +29,12 @@ import org.eclipse.californium.elements.config.Configuration;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
 /**
  * CoAP Client Manager
  * <p>
  * Manages a pool of CoapClient instances keyed by device URI.
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @Slf4j
@@ -77,12 +74,12 @@ public class CoapClientManager implements DisposableBean {
 
                 org.eclipse.californium.core.CoapResponse response = client.get();
                 if (response == null) {
-                    log.warn("CoAP GET timeout: {}{}", uri, path);
+                    log.warn("CoAP GET timed out, uri={}, path={}", uri, path);
                     return null;
                 }
                 return toResult(response);
             } catch (Exception e) {
-                log.error("CoAP GET failed: {}{}", uri, path, e);
+                log.error("CoAP GET failed, uri={}, path={}", uri, path, e);
                 return null;
             }
         }
@@ -101,14 +98,15 @@ public class CoapClientManager implements DisposableBean {
         synchronized (client) {
             client.setURI(uri + path);
             try {
-                org.eclipse.californium.core.CoapResponse response = client.put(payload, MediaTypeRegistry.APPLICATION_JSON);
+                org.eclipse.californium.core.CoapResponse response =
+                        client.put(payload, MediaTypeRegistry.APPLICATION_JSON);
                 if (response == null) {
-                    log.warn("CoAP PUT timeout: {}{}", uri, path);
+                    log.warn("CoAP PUT timed out, uri={}, path={}", uri, path);
                     return null;
                 }
                 return toResult(response);
             } catch (Exception e) {
-                log.error("CoAP PUT failed: {}{}", uri, path, e);
+                log.error("CoAP PUT failed, uri={}, path={}", uri, path, e);
                 return null;
             }
         }
@@ -137,7 +135,7 @@ public class CoapClientManager implements DisposableBean {
 
     private CoapClient createClient(String uri) {
         CoapClient client = new CoapClient(uri);
-        log.debug("Created CoAP client for: {}", uri);
+        log.debug("CoAP client created, uri={}", uri);
         return client;
     }
 
@@ -149,5 +147,4 @@ public class CoapClientManager implements DisposableBean {
                 .success(response.isSuccess())
                 .build();
     }
-
 }

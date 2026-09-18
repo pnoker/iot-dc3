@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +26,6 @@ import lombok.Setter;
  * JSON extension object for event metadata.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Schema(description = "JSON extension object for event metadata")
@@ -40,9 +38,14 @@ public class EventExt extends BaseExt {
     /**
      * Extended content.
      */
-    @Schema(description = "Structured payload carrying the event's extension content; serialized as JSON inside the extension object")
+    @Schema(
+            description =
+                    "Structured payload carrying the event's extension content; serialized as JSON inside the extension object")
     private Content content;
 
+    /**
+     * Reserved event extension slot, currently a placeholder.
+     */
     @Schema(description = "Extended content payload nested in the event extension object")
     @Getter
     @Setter
@@ -52,7 +55,5 @@ public class EventExt extends BaseExt {
 
         @Schema(description = "Reserved placeholder field for the event extension content", example = "reserved")
         private String keep;
-
     }
-
 }

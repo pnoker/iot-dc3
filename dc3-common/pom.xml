@@ -71,7 +71,7 @@
         <!-- Test execution toggles (consumed by surefire/failsafe) -->
         <skip.unit.tests>false</skip.unit.tests>
         <skip.integration.tests>false</skip.integration.tests>
-        <mockito.version>5.20.0</mockito.version>
+        <mockito.version>5.23.0</mockito.version>
         <mockito.javaagent.argLine>
             -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
         </mockito.javaagent.argLine>
@@ -82,7 +82,6 @@
         <module>dc3-common-api</module>
         <module>dc3-common-auth</module>
         <module>dc3-common-constant</module>
-        <module>dc3-common-dal</module>
         <module>dc3-common-data</module>
         <module>dc3-common-driver</module>
         <module>dc3-common-exception</module>
@@ -92,13 +91,10 @@
         <module>dc3-common-manager</module>
         <module>dc3-common-model</module>
         <module>dc3-common-mqtt</module>
-        <module>dc3-common-postgres</module>
         <module>dc3-common-public</module>
         <module>dc3-common-quartz</module>
-        <module>dc3-common-rabbitmq</module>
-        <module>dc3-common-repository</module>
         <module>dc3-common-sql</module>
-        <module>dc3-common-resource-registrar</module>
+        <module>dc3-common-resource</module>
         <module>dc3-common-test</module>
         <module>dc3-common-thread</module>
         <module>dc3-common-web</module>
@@ -280,11 +276,6 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-dal</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-data</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
@@ -356,7 +347,17 @@
             </dependency>
             <dependency>
                 <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-postgres</artifactId>
+                <artifactId>dc3-db-r2dbc-core</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-db-r2dbc-runtime</artifactId>
+                <version>${dc3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.pnoker</groupId>
+                <artifactId>dc3-db-r2dbc-postgres</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>
@@ -367,16 +368,6 @@
             <dependency>
                 <groupId>io.github.pnoker</groupId>
                 <artifactId>dc3-common-quartz</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-rabbitmq</artifactId>
-                <version>${dc3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.github.pnoker</groupId>
-                <artifactId>dc3-common-repository</artifactId>
                 <version>${dc3.version}</version>
             </dependency>
             <dependency>

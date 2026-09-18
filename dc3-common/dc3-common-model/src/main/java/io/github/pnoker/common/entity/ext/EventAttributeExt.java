@@ -14,23 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * JSON extension object for event attribute configuration.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Schema(description = "JSON extension object for event attribute configuration")
@@ -48,6 +45,9 @@ public class EventAttributeExt extends BaseExt {
     @Schema(description = "Event attribute configuration content")
     private Content content;
 
+    /**
+     * Attribute-value retention strategy hint.
+     */
     @Schema(description = "Event attribute configuration content")
     @Getter
     @Setter
@@ -69,9 +69,11 @@ public class EventAttributeExt extends BaseExt {
 
         @Schema(description = "Scope to which the attribute applies")
         private AppliesTo appliesTo;
-
     }
 
+    /**
+     * Front-end rendering hints for the attribute input.
+     */
     @Schema(description = "UI rendering configuration for the attribute", example = "form")
     @Getter
     @Setter
@@ -99,9 +101,11 @@ public class EventAttributeExt extends BaseExt {
 
         @Schema(description = "Variables expression used by the UI component")
         private String variables;
-
     }
 
+    /**
+     * Value constraints for attribute input validation.
+     */
     @Schema(description = "Validation rules for the attribute value", example = "standard")
     @Getter
     @Setter
@@ -117,9 +121,11 @@ public class EventAttributeExt extends BaseExt {
 
         @Schema(description = "Regular expression the attribute value must match", example = "^[a-zA-Z0-9_]+$")
         private String regex;
-
     }
 
+    /**
+     * Access-control hints for the attribute.
+     */
     @Schema(description = "Security configuration for the attribute", example = "basic")
     @Getter
     @Setter
@@ -129,9 +135,11 @@ public class EventAttributeExt extends BaseExt {
 
         @Schema(description = "Whether the attribute value is treated as a secret", example = "true")
         private Boolean secret;
-
     }
 
+    /**
+     * Applicability scoping of the attribute.
+     */
     @Schema(description = "Scope to which the attribute applies")
     @Getter
     @Setter
@@ -144,7 +152,5 @@ public class EventAttributeExt extends BaseExt {
 
         @Schema(description = "Event source types this attribute applies to")
         private List<String> eventSourceTypes;
-
     }
-
 }

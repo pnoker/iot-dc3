@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
@@ -22,19 +21,17 @@ import io.github.pnoker.common.entity.common.TenantOwned;
 import io.github.pnoker.common.entity.ext.RuleStateExt;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.RuleStatusEnum;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-
 /**
  * Business object for rule runtime state operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -68,7 +65,5 @@ public class RuleStateBO extends BaseBO implements TenantOwned {
 
     private RuleStateExt entityStateExt;
 
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
-
 }

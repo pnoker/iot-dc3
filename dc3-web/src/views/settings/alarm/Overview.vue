@@ -21,10 +21,22 @@
       <span class="auto-refresh-bar__label">{{ $t('common.autoRefresh') }} (30s)</span>
       <span class="auto-refresh-bar__time">{{ $t('common.lastRefreshTime') }}: {{ lastRefreshText }}</span>
     </div>
+    <el-alert
+      v-if="status === 'error'"
+      :closable="false"
+      :title="t('common.loadFailed')"
+      class="event-overview__error"
+      show-icon
+      type="error"
+    >
+      <el-button :loading="loading" link type="danger" @click="load">
+        {{ t('common.retry') }}
+      </el-button>
+    </el-alert>
     <el-tabs v-model="activeTab" class="event-overview__tabs" @tab-change="onTabChange">
       <el-tab-pane :label="t('settings.event.overview.tabSituation')" name="situation">
         <blank-card>
-          <el-descriptions :column="3" border class="event-overview__quick">
+          <el-descriptions :column="isMobile || isTablet ? 1 : 3" border class="event-overview__quick">
             <el-descriptions-item>
               <template #label>
                 <span class="event-overview__quick-label">
@@ -180,9 +192,11 @@ import {useI18n} from 'vue-i18n';
 import {useRoute, useRouter} from 'vue-router';
 import {Bell, CircleCheck, Management, Promotion, Warning, WarningFilled} from '@element-plus/icons-vue';
 
+import {AUTO_REFRESH_INTERVAL} from '@/config/constant/ui';
 import {alertPage, alertStats, alertTrend} from '@/api/dashboard';
 import blankCard from '@/components/card/blank/BlankCard.vue';
 import StatCard from '@/components/card/stat/StatCard.vue';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 import EventTrendChart from './components/EventTrendChart.vue';
 import TopSourcesChart from './components/TopSourcesChart.vue';
 import RecentUnconfirmed from './components/RecentUnconfirmed.vue';
@@ -223,6 +237,7 @@ interface Card {
 const {t} = useI18n();
 const router = useRouter();
 const route = useRoute();
+const {isMobile, isTablet} = useBreakpoint();
 
 // Tab state — synced to URL query so direct links to "?tab=sla" land on
 // the SLA sub-board. Valid names: situation (default) | noise | availability | sla.
@@ -239,9 +254,10 @@ const onTabChange = (name: string | number) => {
 };
 
 const loading = ref(false);
+const status = ref<'idle' | 'loading' | 'success' | 'error'>('idle');
 const autoRefreshTimer = ref<ReturnType<typeof setInterval> | null>(null);
 const lastRefreshTime = ref<number>(Date.now());
-const AUTO_REFRESH_INTERVAL = 30000;
+let loadSequence = 0;
 
 const lastRefreshText = computed(() => {
   const d = new Date(lastRefreshTime.value);
@@ -271,56 +287,53 @@ const state = reactive({
 });
 
 const fetchCount = async (source: 'point' | 'device' | 'driver', confirmFlag: number | null) => {
-  try {
-    const res: { data?: { total?: number } } = await alertPage({source, confirmFlag, current: 1, size: 1});
-    return Number(res?.data?.total ?? 0);
-  } catch {
-    return 0;
-  }
+  const res: any = await alertPage({source, confirmFlag, offset: 0, limit: 1});
+  return Number(res?.total ?? 0);
 };
 
 const load = async () => {
+  if (loading.value) return;
+  const sequence = ++loadSequence;
   loading.value = true;
+  status.value = 'loading';
   try {
     const [dt, du, rt, ru, stats, trend] = await Promise.all([
       fetchCount('device', null),
       fetchCount('device', 0),
       fetchCount('driver', null),
       fetchCount('driver', 0),
-      alertStats().catch(() => null),
-      alertTrend(7).catch(() => null),
+      alertStats(),
+      alertTrend(7),
     ]);
+    if (sequence !== loadSequence) return;
     state.deviceTotal = dt;
     state.deviceUnconfirmed = du;
     state.driverTotal = rt;
     state.driverUnconfirmed = ru;
-    const statsData = (
-      stats as {
-        data?: {
-          sparkline24h?: number[];
-          todayDeviceAlarms?: number;
-          todayDriverAlarms?: number;
-          todayDeviceUnconfirmed?: number;
-          todayDriverUnconfirmed?: number;
-        };
-      } | null
-    )?.data;
+    const statsData = stats as {
+      sparkline24h?: number[];
+      todayDeviceAlarms?: number;
+      todayDriverAlarms?: number;
+      todayDeviceUnconfirmed?: number;
+      todayDriverUnconfirmed?: number;
+    } | null;
     state.sparkline24h = statsData?.sparkline24h ?? [];
     state.todayDevice = Number(statsData?.todayDeviceAlarms ?? 0);
     state.todayDriver = Number(statsData?.todayDriverAlarms ?? 0);
     state.todayDeviceUnconfirmed = Number(statsData?.todayDeviceUnconfirmed ?? 0);
     state.todayDriverUnconfirmed = Number(statsData?.todayDriverUnconfirmed ?? 0);
 
-    const trendRows =
-      ((trend as { data?: Array<{ deviceCount?: number; driverCount?: number }> } | null)?.data as Array<{
-        deviceCount?: number;
-        driverCount?: number;
-      }>) || [];
+    const trendRows = (trend as Array<{ deviceCount?: number; driverCount?: number }> | null) || [];
     state.driverDaily = trendRows.map((r) => Number(r.driverCount || 0));
     state.deviceDaily = trendRows.map((r) => Number(r.deviceCount || 0));
+    status.value = 'success';
+  } catch {
+    if (sequence === loadSequence) status.value = 'error';
   } finally {
-    loading.value = false;
-    lastRefreshTime.value = Date.now();
+    if (sequence === loadSequence) {
+      loading.value = false;
+      lastRefreshTime.value = Date.now();
+    }
   }
 };
 
@@ -460,6 +473,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  loadSequence += 1;
   if (autoRefreshTimer.value) {
     clearInterval(autoRefreshTimer.value);
     autoRefreshTimer.value = null;
@@ -483,6 +497,17 @@ $overview-gap: 8px;
   // Other settings sub-pages (User / Role / Api / ...) are form/table
   // views and keep flush-right — only this overview needs the balance.
   padding-right: 4px;
+
+  &__error {
+    margin: 0;
+
+    :deep(.el-alert__content) {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--dc3-space-2);
+    }
+  }
 
   // Tabs wrap the whole page — each pane renders its own flex-column
   // stack. el-tabs renders flat by default (expects to live inside a
@@ -517,7 +542,7 @@ $overview-gap: 8px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: $overview-gap;
-    @media (max-width: 1024px) {
+    @media (max-width: $breakpoint-sm-max) {
       grid-template-columns: 1fr;
     }
   }
@@ -566,10 +591,10 @@ $overview-gap: 8px;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: $overview-gap;
 
-    @media (max-width: 1280px) {
+    @media (max-width: $breakpoint-md-max) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
-    @media (max-width: 640px) {
+    @media (max-width: $breakpoint-xs-max) {
       grid-template-columns: 1fr;
     }
   }
@@ -579,7 +604,7 @@ $overview-gap: 8px;
     grid-template-columns: 2fr 1fr;
     gap: $overview-gap;
 
-    @media (max-width: 1024px) {
+    @media (max-width: $breakpoint-sm-max) {
       grid-template-columns: 1fr;
     }
   }
@@ -592,7 +617,7 @@ $overview-gap: 8px;
     grid-template-columns: 1fr 1fr;
     gap: $overview-gap;
 
-    @media (max-width: 1024px) {
+    @media (max-width: $breakpoint-sm-max) {
       grid-template-columns: 1fr;
     }
   }

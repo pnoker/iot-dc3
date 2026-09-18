@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
 
 import lombok.AllArgsConstructor;
@@ -29,24 +28,31 @@ import lombok.Getter;
  * distinct remark for log and debug clarity.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
 @AllArgsConstructor
 public enum SuccessCode implements ResponseCode {
 
+    /**
+     * Success.
+     */
     OK(200, "R200", "Success"),
+    /**
+     * Added successfully.
+     */
     ADD(201, "R201", "Added successfully"),
+    /**
+     * Deleted successfully.
+     */
     DELETE(200, "R200", "Deleted successfully"),
+    /**
+     * Updated successfully.
+     */
     UPDATE(200, "R200", "Updated successfully"),
     ;
 
-    @Getter(onMethod_ = {@Override})
     private final int httpStatus;
-    @Getter(onMethod_ = {@Override})
     private final String code;
-    @Getter(onMethod_ = {@Override})
     private final String remark;
-
 }

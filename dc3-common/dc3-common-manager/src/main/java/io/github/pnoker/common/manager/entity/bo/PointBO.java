@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
@@ -23,19 +22,17 @@ import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.enums.RwTypeEnum;
+import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.math.BigDecimal;
-
 /**
  * Business object for point operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -103,7 +100,6 @@ public class PointBO extends BaseBO implements TenantOwned {
     /**
      * Tenant ID
      */
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     /**
@@ -127,5 +123,4 @@ public class PointBO extends BaseBO implements TenantOwned {
         this.valueDecimal = 6;
         this.unit = "";
     }
-
 }

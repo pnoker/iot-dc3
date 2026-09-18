@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.optional;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class JsonOptionalTest {
 
@@ -51,8 +49,7 @@ class JsonOptionalTest {
     @Test
     void ifPresentOrElseFiresFallbackForInvalidJson() {
         AtomicBoolean fallback = new AtomicBoolean(false);
-        JsonOptional.ofNullable("garbage").ifPresentOrElse(value -> {
-        }, () -> fallback.set(true));
+        JsonOptional.ofNullable("garbage").ifPresentOrElse(value -> {}, () -> fallback.set(true));
         assertThat(fallback).isTrue();
     }
 

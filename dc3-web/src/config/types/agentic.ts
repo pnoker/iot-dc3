@@ -36,6 +36,8 @@ export interface AgenticProvider {
   remark?: string;
   createTime?: string;
   operateTime?: string;
+
+  [key: string]: unknown;
 }
 
 export interface AgenticModelConfig {
@@ -63,14 +65,19 @@ export interface AgenticModelConfig {
   remark?: string;
   createTime?: string;
   operateTime?: string;
+
+  [key: string]: unknown;
 }
 
 export interface AgenticSession {
   conversationId: string;
   title?: string;
+  summary?: string;
   sessionExt?: AgenticSessionExt;
   createTime?: string;
   operateTime?: string;
+
+  [key: string]: unknown;
 }
 
 export interface AgenticSessionExt {
@@ -78,9 +85,13 @@ export interface AgenticSessionExt {
   reasoningEnabled?: boolean;
   temperature?: number;
   maxTokens?: number;
+  /** Optional visual category metadata used by rich clients and mock demos. */
+  icon?: 'monitor' | 'warning' | 'trend' | 'connection' | 'odometer' | 'tools' | 'operation' | 'lightning';
+  category?: string;
 }
 
 export type AgenticMessageRole = 'user' | 'assistant' | 'system';
+export type AgenticMessageStatus = 'COMPLETED' | 'FAILED' | 'CANCELLED';
 
 export interface AgenticMessage {
   id: string;
@@ -89,17 +100,19 @@ export interface AgenticMessage {
   contentExt?: AgenticMessageContent;
   model?: string;
   messageIndex?: number;
-  status?: number;
+  status?: AgenticMessageStatus;
   streaming?: boolean;
   reasoning?: string;
   finishReason?: string;
   createTime?: string;
+
+  [key: string]: unknown;
 }
 
 export interface AgenticMessageContent {
   text?: string;
   format?: string;
-  attachments?: number[];
+  attachments?: string[];
   tools?: string[];
   traces?: AgenticTraceEvent[];
   charts?: AgenticVisualizationSpec[];
@@ -107,6 +120,8 @@ export interface AgenticMessageContent {
   tokens?: AgenticMessageTokens;
   reasoning?: boolean;
   reasoningContent?: string;
+  /** The assistant recovered through a fallback path after a tool failure. */
+  recovered?: boolean;
 }
 
 export type AgenticVisualizationType =
@@ -151,13 +166,15 @@ export interface AgenticMessageTokens {
 }
 
 export interface AgenticAttachment {
-  id: number;
+  id: string;
   conversationId: string;
   fileName: string;
   contentType: string;
   size: number;
   filePath?: string;
   createTime?: string;
+
+  [key: string]: unknown;
 }
 
 export interface AgenticAction {
@@ -171,6 +188,8 @@ export interface AgenticAction {
   status: number;
   expireTime?: string;
   remark?: string;
+
+  [key: string]: unknown;
 }
 
 export interface AgenticChatMessage {
@@ -191,7 +210,7 @@ export interface AgenticChatCompletionRequest {
    * Leaving this empty is rejected by the backend with HTTP 400.
    */
   conversationId: string;
-  attachments?: number[];
+  attachments?: string[];
   reasoning?: boolean;
 }
 
@@ -205,8 +224,10 @@ export interface AgenticChatCompletionResponse {
     message?: {
       role?: AgenticMessageRole;
       content?: string;
+      // DC3's own extension field — camelCase per the body-field law; only
+      // OpenAI protocol fields on this envelope (finish_reason, usage.*)
+      // keep their snake_case wire names.
       contentExt?: AgenticMessageContent;
-      content_ext?: AgenticMessageContent;
     };
     finishReason?: string;
     finish_reason?: string;

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,14 +28,15 @@ import lombok.Setter;
  * Extended information related to tenants.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Tenant JSON extension object holding extended tenant metadata, embedded inside tenant VO extension fields")
+@Schema(
+        description =
+                "Tenant JSON extension object holding extended tenant metadata, embedded inside tenant VO extension fields")
 public class TenantExt extends BaseExt {
 
     /**
@@ -44,9 +44,14 @@ public class TenantExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content payload for the tenant; structure is interpreted according to the type and version fields of the extension")
+    @Schema(
+            description =
+                    "Extended content payload for the tenant; structure is interpreted according to the type and version fields of the extension")
     private Content content;
 
+    /**
+     * Reserved tenant extension slot.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -54,9 +59,10 @@ public class TenantExt extends BaseExt {
     @Schema(description = "Extended content payload of the tenant extension object")
     public static class Content {
 
-        @Schema(description = "Placeholder field reserved for future extended tenant content; currently has no business meaning", example = "placeholder")
+        @Schema(
+                description =
+                        "Placeholder field reserved for future extended tenant content; currently has no business meaning",
+                example = "placeholder")
         private String keep;
-
     }
-
 }

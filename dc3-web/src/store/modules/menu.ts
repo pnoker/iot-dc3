@@ -20,8 +20,8 @@ import {defineStore} from 'pinia';
 import {listMenuTree} from '@/api/menu';
 
 export interface MenuNode {
-  id: number | string;
-  parentMenuId: number | string;
+  id: string;
+  parentMenuId: string;
   menuName: string;
   menuCode: string;
   menuTypeFlag?: string;
@@ -52,6 +52,22 @@ interface MenuState {
   loading: boolean;
 }
 
+let inFlightFetch: Promise<void> | null = null;
+let fetchGeneration = 0;
+
+/** Recursively find the first node matching the predicate, depth-first. */
+const walk = (nodes: MenuNode[], predicate: (node: MenuNode) => boolean): MenuNode | undefined => {
+  for (const node of nodes) {
+    if (predicate(node)) return node;
+    if (node.children && node.children.length) {
+      const hit = walk(node.children, predicate);
+      if (hit) return hit;
+    }
+  }
+  return undefined;
+};
+
+/** Pinia store for the backend menu tree with code-based lookup helpers. */
 export const useMenuStore = defineStore('menu', {
   state: (): MenuState => ({
     tree: [],
@@ -66,17 +82,7 @@ export const useMenuStore = defineStore('menu', {
     findByCode:
       (state) =>
         (code: string): MenuNode | undefined => {
-          const walk = (nodes: MenuNode[]): MenuNode | undefined => {
-            for (const n of nodes) {
-              if (n.menuCode === code) return n;
-              if (n.children && n.children.length) {
-                const hit = walk(n.children);
-                if (hit) return hit;
-              }
-            }
-            return undefined;
-          };
-          return walk(state.tree);
+          return walk(state.tree, (node) => node.menuCode === code);
         },
 
     /**
@@ -86,43 +92,47 @@ export const useMenuStore = defineStore('menu', {
      */
     findById:
       (state) =>
-        (id: number | string): MenuNode | undefined => {
+        (id: string): MenuNode | undefined => {
           const key = String(id);
-          const walk = (nodes: MenuNode[]): MenuNode | undefined => {
-            for (const n of nodes) {
-              if (String(n.id) === key) return n;
-              if (n.children && n.children.length) {
-                const hit = walk(n.children);
-                if (hit) return hit;
-              }
-            }
-            return undefined;
-          };
-          return walk(state.tree);
+          return walk(state.tree, (node) => String(node.id) === key);
         },
   },
   actions: {
     async fetchTree(force = false) {
       if (this.loaded && !force) return;
-      if (this.loading) return;
+      if (inFlightFetch) return inFlightFetch;
+
+      const generation = fetchGeneration;
       this.loading = true;
-      try {
-        const res: any = await listMenuTree({});
-        this.tree = Array.isArray(res?.data) ? res.data : [];
-        this.loaded = true;
-      } catch {
-        this.tree = [];
-        // Keep failed loads retryable. The router will still deny non-public
-        // routes against the empty tree for this navigation, but the next
-        // navigation can recover if the backend/network comes back.
-        this.loaded = false;
-      } finally {
-        this.loading = false;
-      }
+
+      let request = Promise.resolve();
+      request = (async () => {
+        try {
+          const res: any = await listMenuTree({});
+          if (generation !== fetchGeneration) return;
+          this.tree = Array.isArray(res) ? res : [];
+          this.loaded = true;
+        } catch {
+          if (generation !== fetchGeneration) return;
+          this.tree = [];
+          // Keep failed loads retryable. The router will still deny non-public
+          // routes against the empty tree for this navigation, but the next
+          // navigation can recover if the backend/network comes back.
+          this.loaded = false;
+        } finally {
+          if (inFlightFetch === request) inFlightFetch = null;
+          if (generation === fetchGeneration) this.loading = false;
+        }
+      })();
+      inFlightFetch = request;
+      return request;
     },
     reset() {
+      fetchGeneration += 1;
+      inFlightFetch = null;
       this.tree = [];
       this.loaded = false;
+      this.loading = false;
     },
   },
 });

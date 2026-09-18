@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.oauth;
 
 import lombok.Getter;
@@ -25,7 +24,6 @@ import lombok.ToString;
  * MCP tool catalog projection.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -73,5 +71,4 @@ public class McpToolRecord {
      * JSON envelope, e.g. {"inputSchema": {...}} — populated by the optional OpenAPI aggregator.
      */
     private String toolExt;
-
 }

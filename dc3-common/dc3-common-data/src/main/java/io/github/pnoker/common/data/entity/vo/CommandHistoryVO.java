@@ -14,28 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.enums.CommandHistorySourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 /**
  * View object for command history API responses.
  *
  * @author pnoker
- * @version 2026.6.5
  * @since 2026.6.5
  */
 @Getter
@@ -51,19 +48,19 @@ public class CommandHistoryVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Primary key")
-    private Long id;
+    private String id;
 
     @Schema(description = "Unique record ID for this command history entry.", example = "123456")
     private String recordId;
 
     @Schema(description = "Tenant ID")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "ID of the device the command was sent to.", example = "1024")
-    private Long deviceId;
+    private String deviceId;
 
     @Schema(description = "ID of the command definition invoked.", example = "4096")
-    private Long commandId;
+    private String commandId;
 
     @Schema(description = "Command code. Stable business identifier for this command.", example = "READ_HOLDING_REG")
     private String commandCode;
@@ -71,7 +68,9 @@ public class CommandHistoryVO implements Serializable {
     @Schema(description = "Command parameter values", example = "{\"temperature\": \"50\"}")
     private String paramValues;
 
-    @Schema(description = "Result values returned from the device after command execution, keyed by parameter code.", example = "{\"status\": \"00\"}")
+    @Schema(
+            description = "Result values returned from the device after command execution, keyed by parameter code.",
+            example = "{\"status\": \"00\"}")
     private String resultValues;
 
     @Schema(description = "Command configuration snapshot", example = "{\"timeout\": 3000}")
@@ -90,7 +89,7 @@ public class CommandHistoryVO implements Serializable {
     private CommandHistorySourceEnum source;
 
     @Schema(description = "ID of the user who issued this command.", example = "1000")
-    private Long sourceUserId;
+    private String sourceUserId;
 
     @Schema(description = "Timestamp when the command was issued.")
     private LocalDateTime occurTime;
@@ -101,7 +100,9 @@ public class CommandHistoryVO implements Serializable {
     @Schema(description = "Timestamp when the command execution completed (success or failure).")
     private LocalDateTime finishTime;
 
-    @Schema(description = "Timestamp when the command expires. If the device does not respond by this time, the command is considered failed.")
+    @Schema(
+            description =
+                    "Timestamp when the command expires. If the device does not respond by this time, the command is considered failed.")
     private LocalDateTime expireTime;
 
     @Schema(description = "Schema version")
@@ -112,5 +113,4 @@ public class CommandHistoryVO implements Serializable {
 
     @Schema(description = "Last operation time")
     private LocalDateTime operateTime;
-
 }

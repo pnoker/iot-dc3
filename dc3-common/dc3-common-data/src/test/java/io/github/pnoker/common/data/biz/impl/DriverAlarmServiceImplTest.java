@@ -14,12 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
+import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,18 +33,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class DriverAlarmServiceImplTest {
 
     @Mock
-    private EntityAlarmManager entityAlarmManager;
+    private ReactiveEntityAlarmStore entityAlarmStore;
 
     @Mock
     private AlarmRuleTriggerService alarmRuleTriggerService;
@@ -48,15 +49,15 @@ class DriverAlarmServiceImplTest {
 
     @Test
     void dropsAlarmWhenDtoIsNull() {
-        service.alarm(null);
-        verifyNoInteractions(entityAlarmManager, alarmRuleTriggerService);
+        service.alarm(null).block();
+        verifyNoInteractions(entityAlarmStore, alarmRuleTriggerService);
     }
 
     @Test
     void dropsAlarmWhenDriverIdMissing() {
         DriverAlarmDTO dto = DriverAlarmDTO.builder().tenantId(7L).message("x").build();
-        service.alarm(dto);
-        verifyNoInteractions(entityAlarmManager, alarmRuleTriggerService);
+        service.alarm(dto).block();
+        verifyNoInteractions(entityAlarmStore, alarmRuleTriggerService);
     }
 
     @Test
@@ -67,10 +68,12 @@ class DriverAlarmServiceImplTest {
                 .message("offline")
                 .build();
 
-        service.alarm(dto);
+        when(entityAlarmStore.insert(any())).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        when(alarmRuleTriggerService.processDriverAlarm(any())).thenReturn(Mono.empty());
+        service.alarm(dto).block();
 
         ArgumentCaptor<EntityAlarmDO> captor = ArgumentCaptor.forClass(EntityAlarmDO.class);
-        verify(entityAlarmManager).save(captor.capture());
+        verify(entityAlarmStore).insert(captor.capture());
         assertThat(captor.getValue().getTenantId()).isEqualTo(7L);
         verify(alarmRuleTriggerService).processDriverAlarm(dto);
     }
@@ -79,15 +82,12 @@ class DriverAlarmServiceImplTest {
     void dropsAlarmWhenTenantIdIsMissing() {
         // The fail-closed tenant-line interceptor forbids reverse-resolving the tenant from
         // the driver, so a tenant-less alarm is dropped rather than persisted as tenant_id=0.
-        DriverAlarmDTO dto = DriverAlarmDTO.builder()
-                .driverId(3L)
-                .message("offline")
-                .build(); // tenantId missing
+        DriverAlarmDTO dto =
+                DriverAlarmDTO.builder().driverId(3L).message("offline").build(); // tenantId missing
 
-        service.alarm(dto);
+        service.alarm(dto).block();
 
-        verify(entityAlarmManager, never()).save(any());
+        verify(entityAlarmStore, never()).insert(any());
         verifyNoInteractions(alarmRuleTriggerService);
     }
-
 }

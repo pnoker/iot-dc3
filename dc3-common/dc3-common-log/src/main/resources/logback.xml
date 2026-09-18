@@ -20,11 +20,12 @@
 <configuration scan="true">
     <!-- Override the parameter configurations in base.xml. -->
     <property name="CONSOLE_LOG_PATTERN"
-              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr([%X{requestId:-},%X{traceId:-},%X{spanId:-}]){faint} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){magenta} [%clr(%4line){magenta}] %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"/>
+              value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr([${APPLICATION_NAME:-unknown}]){green} %clr([%X{requestId:-},%X{traceId:-},%X{spanId:-}]){faint} %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){magenta} [%clr(%4line){magenta}] %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"/>
     <property name="LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START" value="false"/>
     <property name="LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE" value="200MB"/>
     <property name="LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP" value="20GB"/>
     <property name="LOGBACK_ROLLINGPOLICY_MAX_HISTORY" value="30"/>
+    <property name="LOGBACK_ASYNC_QUEUE_SIZE" value="8192"/>
 
     <!-- Include base.xml -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
@@ -54,16 +55,37 @@
                 <logLevel/>
                 <logLevelValue/>
                 <mdc/>
+                <keyValuePairs/>
                 <contextName/>
+                <pattern>
+                    <pattern>{"service":"${APPLICATION_NAME:-unknown}","pid":"${PID:-unknown}"}</pattern>
+                </pattern>
                 <stackTrace/>
             </providers>
         </encoder>
     </appender>
 
+    <!-- Keep console and JSON file I/O off application threads while preserving every event. -->
+    <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>${LOGBACK_ASYNC_QUEUE_SIZE:-8192}</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <neverBlock>false</neverBlock>
+        <includeCallerData>true</includeCallerData>
+        <appender-ref ref="CONSOLE"/>
+    </appender>
+
+    <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>${LOGBACK_ASYNC_QUEUE_SIZE:-8192}</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <neverBlock>false</neverBlock>
+        <includeCallerData>false</includeCallerData>
+        <appender-ref ref="FILE"/>
+    </appender>
+
     <!-- Root level is overridable via DC3_LOG_LEVEL env var (defaults to INFO) -->
     <root level="${DC3_LOG_LEVEL:-INFO}">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
+        <appender-ref ref="ASYNC_CONSOLE"/>
+        <appender-ref ref="ASYNC_FILE"/>
     </root>
 
     <!-- Nop Status Listener -->
@@ -75,14 +97,15 @@
         <resetJUL>true</resetJUL>
     </contextListener>
 
+    <!-- Drops spring-cloud-gateway 4.3.0's HV000271 deprecation notice (its
+         GatewayProperties uses container-level @Valid on List fields). A turbo
+         filter is required because spring boot's logging re-init installs a
+         second LoggerContext that resets logger levels set here. Remove once
+         the upstream migrates to type-argument annotations. -->
+    <turboFilter class="io.github.pnoker.common.log.Hv000271TurboFilter"/>
+
     <!-- User configuration -->
     <logger name="io.github.pnoker.center.manager.receiver.rabbit" level="WARN"/>
-
-    <!-- Customized configuration -->
-    <logger name="org.mybatis.spring.mapper.ClassPathMapperScanner" level="ERROR"/>
-    <logger name="com.baomidou.mybatisplus.extension.spring" level="ERROR"/>
-    <logger name="com.baomidou.mybatisplus.core.metadata.TableInfoHelper" level="ERROR"/>
-    <logger name="com.baomidou.mybatisplus.core.injector.DefaultSqlInjector" level="ERROR"/>
 
     <!-- System configuration -->
     <logger name="org.springframework.boot.autoconfigure.thymeleaf" level="WARN"/>
@@ -99,15 +122,12 @@
     <logger name="org.springframework.integration" level="WARN"/>
     <logger name="org.springframework.scheduling" level="WARN"/>
     <logger name="org.springframework.boot.web" level="WARN"/>
-    <logger name="org.mybatis.spring.mapper" level="WARN"/>
     <logger name="de.codecentric.boot.admin" level="WARN"/>
     <logger name="org.elasticsearch.client" level="WARN"/>
     <logger name="org.springframework.data" level="WARN"/>
     <logger name="org.springframework.amqp" level="WARN"/>
     <logger name="com.zaxxer.hikari.pool" level="WARN"/>
     <logger name="org.springframework.web" level="WARN"/>
-    <logger name="com.baomidou.dynamic" level="WARN"/>
-    <logger name="org.mybatis.spring" level="WARN"/>
     <logger name="net.devh.boot.grpc" level="WARN"/>
     <logger name="org.mongodb.driver" level="WARN"/>
     <logger name="com.zaxxer.hikari" level="WARN"/>

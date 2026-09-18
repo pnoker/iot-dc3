@@ -1,6 +1,13 @@
 name: Web CI
 
 on:
+  workflow_call:
+    inputs:
+      e2e_base_url:
+        description: 'Optional running web environment URL for Playwright e2e'
+        required: false
+        type: string
+        default: ''
   pull_request:
     paths:
       - dc3-web/**
@@ -27,12 +34,16 @@ concurrency:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: dc3-web
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+
+      - name: Validate repository documentation
+        run: python3 ../dc3/bin/check_documentation.py
 
       - name: Set pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86
@@ -67,12 +78,13 @@ jobs:
   e2e:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.e2e_base_url != '' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: dc3-web
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - name: Set pnpm
         uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86

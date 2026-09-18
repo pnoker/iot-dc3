@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.common;
-
-import org.jinterop.dcom.common.JIException;
-import org.jinterop.dcom.core.JIStruct;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
+import org.jinterop.dcom.common.JIException;
+import org.jinterop.dcom.core.JIStruct;
 
 /**
  *
@@ -35,8 +33,7 @@ public class FILETIME {
 
     private int low = 0;
 
-    public FILETIME() {
-    }
+    public FILETIME() {}
 
     public FILETIME(final FILETIME arg0) {
         this.high = arg0.high;
@@ -48,6 +45,9 @@ public class FILETIME {
         this.low = low;
     }
 
+    /**
+     * The COM wire shape: a two-int JIStruct (low, high), member order fixed by the OPC spec.
+     */
     public static JIStruct getStruct() throws JIException {
         final JIStruct struct = new JIStruct();
 
@@ -57,6 +57,9 @@ public class FILETIME {
         return struct;
     }
 
+    /**
+     * Decode a wire FILETIME (low first) into the typed wrapper.
+     */
     public static FILETIME fromStruct(final JIStruct struct) {
         final FILETIME ft = new FILETIME();
 
@@ -112,6 +115,9 @@ public class FILETIME {
         return true;
     }
 
+    /**
+     * The FILETIME epoch (1601-01-01) reinterpreted as a Calendar.
+     */
     public Calendar asCalendar() {
         final Calendar c = Calendar.getInstance();
 
@@ -156,5 +162,4 @@ public class FILETIME {
     public String toString() {
         return String.format("%s/%s", this.high, this.low);
     }
-
 }

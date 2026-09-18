@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.exception;
 
 import io.github.pnoker.common.enums.ErrorCode;
@@ -23,26 +22,39 @@ import io.github.pnoker.common.enums.ErrorCode;
  * Exception for duplicate resource creation attempts.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class DuplicateException extends BusinessException {
 
+    /**
+     * Exception with a failure detail and cause.
+     *
+     */
     public DuplicateException() {
         this(null);
     }
 
+    /**
+     * Exception with a plain failure cause.
+     *
+     * @param cause underlying failure
+     */
     public DuplicateException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Exception with a failure detail and cause.
+     *
+     * @param template failure detail or underlying failure
+     * @param params   failure detail or underlying failure
+     */
     public DuplicateException(String template, Object... params) {
         super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }
 
     @Override
     public ErrorCode getErrorCode() {
-        return ErrorCode.VALIDATION;
+        return ErrorCode.ALREADY_EXISTS;
     }
-
 }

@@ -28,13 +28,31 @@
     <artifactId>dc3-center-data</artifactId>
     <packaging>jar</packaging>
 
-    <description>IoT DC3 Platform Data Center - Integrates common messaging middleware including AMQP, WebSocket, and
-        MQTT for collecting device group information through message
-        subscription mechanisms.
+    <description>IoT DC3 Platform Data Center - Collects device point values from drivers over RabbitMQ (AMQP),
+        stores them through the pluggable time-series port, and exposes
+        data query and command APIs.
     </description>
 
     <dependencies>
 
+        <!-- Present only so Spring's annotation introspection of the (excluded)
+             gRPC OAuth2 resource-server autoconfiguration resolves cleanly instead
+             of logging TypeNotPresent warnings at boot; no beans are created. -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-runtime</artifactId>
+        </dependency><dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-postgres-data</artifactId>
+        </dependency>
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -46,7 +64,7 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-resource-registrar</artifactId>
+            <artifactId>dc3-common-resource</artifactId>
         </dependency>
 
     </dependencies>

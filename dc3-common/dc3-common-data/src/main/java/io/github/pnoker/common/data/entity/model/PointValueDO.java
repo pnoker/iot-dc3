@@ -14,57 +14,72 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.model;
-
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Persistence object for the dc3_point_value table.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
 @Setter
 @ToString
-@TableName("dc3_point_value")
 public class PointValueDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
+     * Immutable event identity used for idempotent inserts.
+     */
+    private String messageId;
+
+    /**
+     * Wire schema version.
+     */
+    private Integer schemaVersion;
+
+    /**
+     * Unique runtime node that produced this reading.
+     */
+    private String driverNode;
+
+    /**
+     * Monotonically increasing sequence within {@link #driverNode}.
+     */
+    private Long sequence;
+
+    /**
+     * Manager-issued device ownership fencing token.
+     */
+    private Long fencingToken;
+
+    /**
      * Device ID
      */
-    @TableField("device_id")
     private Long deviceId;
 
     /**
      * Point ID
      */
-    @TableField("point_id")
     private Long pointId;
 
     /**
      * Raw value
      */
-    @TableField("raw_value")
     private String rawValue;
 
     /**
      *
      */
-    @TableField("cal_value")
     private String calValue;
 
     /**
@@ -72,31 +87,30 @@ public class PointValueDO implements Serializable {
      * queries (AVG/MIN/MAX/SUM/timeseries). NULL for non-numeric payloads
      * (booleans, JSON, free-form text).
      */
-    @TableField("num_value")
     private Double numValue;
+
+    /**
+     * OPC-UA style quality code. Zero represents a good sample.
+     */
+    private Integer quality;
 
     /**
      * Driver ID
      */
-    @TableField("driver_id")
     private Long driverId;
 
     /**
      * Tenant ID
      */
-    @TableField("tenant_id")
     private Long tenantId;
 
     /**
      * Create Time
      */
-    @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
      * Operate Time
      */
-    @TableField("operate_time")
     private LocalDateTime operateTime;
-
 }

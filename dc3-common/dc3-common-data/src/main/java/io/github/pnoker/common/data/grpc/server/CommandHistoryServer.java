@@ -16,46 +16,33 @@
  */
 package io.github.pnoker.common.data.grpc.server;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.api.center.data.CommandHistoryApiGrpc;
+import io.github.pnoker.api.center.data.GrpcCommandAccepted;
 import io.github.pnoker.api.center.data.GrpcCommandCallVO;
 import io.github.pnoker.api.center.data.GrpcCommandHistoryDTO;
+import io.github.pnoker.api.center.data.GrpcCommandHistoryOffsetPage;
 import io.github.pnoker.api.center.data.GrpcCommandHistoryQuery;
-import io.github.pnoker.api.center.data.GrpcPageCommandHistoryDTO;
-import io.github.pnoker.api.center.data.GrpcRCommandHistoryDTO;
-import io.github.pnoker.api.center.data.GrpcRPageCommandHistoryDTO;
-import io.github.pnoker.api.center.data.GrpcRString;
 import io.github.pnoker.api.center.data.GrpcStringQuery;
-import io.github.pnoker.api.common.GrpcPage;
-import io.github.pnoker.api.common.GrpcRFactory;
+import io.github.pnoker.api.common.OffsetPage;
 import io.github.pnoker.common.data.biz.CommandHistoryService;
 import io.github.pnoker.common.data.entity.bo.CommandCallBO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
-import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.data.grpc.GrpcPageUtil;
+import io.github.pnoker.common.enums.CommandHistorySourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
-import io.github.pnoker.common.tenant.TenantContextHolder;
-import io.github.pnoker.common.utils.GrpcBuilderUtil;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.grpc.stub.StreamObserver;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import tools.jackson.core.type.TypeReference;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Map;
-import java.util.Objects;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import tools.jackson.core.type.TypeReference;
 
-/**
- * gRPC server implementation for the CommandHistory service.
- *
- * @author pnoker
- * @version 2026.5.23
- * @since 2026.5.23
- */
-@Slf4j
+/** Non-blocking gRPC server for custom command history. */
 @Service
 @RequiredArgsConstructor
 public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryApiImplBase {
@@ -63,131 +50,124 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
     private final CommandHistoryService commandHistoryService;
 
     @Override
-    public void callCommand(GrpcCommandCallVO request, StreamObserver<GrpcRString> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            CommandCallBO entityBO = new CommandCallBO();
-            entityBO.setDeviceId(request.getDeviceId());
-            entityBO.setCommandId(request.getCommandId());
-            entityBO.setParamValues(request.getParamValuesMap());
-            String recordId = commandHistoryService.call(request.getTenantId(), entityBO);
-
-            responseObserver.onNext(GrpcRString.newBuilder()
-                    .setResult(GrpcRFactory.ok())
-                    .setData(recordId)
-                    .build());
-            responseObserver.onCompleted();
-        } catch (Exception e) {
-            log.error("CommandHistoryServer.callCommand failed", e);
-            responseObserver.onNext(GrpcRString.newBuilder()
-                    .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
-                    .build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public void callCommand(GrpcCommandCallVO request, StreamObserver<GrpcCommandAccepted> observer) {
+        CommandCallBO command = new CommandCallBO();
+        command.setDeviceId(request.getDeviceId());
+        command.setCommandId(request.getCommandId() == 0 ? null : request.getCommandId());
+        command.setCommandCode(request.getCommandCode().isBlank() ? null : request.getCommandCode());
+        command.setParamValues(request.getParamValuesMap());
+        command.setSource(CommandHistorySourceEnum.GRPC);
+        ReactiveGrpcServerSupport.subscribe(
+                commandHistoryService
+                        .call(request.getTenantId(), command)
+                        .map(recordId -> GrpcCommandAccepted.newBuilder()
+                                .setRecordId(recordId)
+                                .build()),
+                observer);
     }
 
     @Override
-    public void getByRecordId(GrpcStringQuery request, StreamObserver<GrpcRCommandHistoryDTO> responseObserver) {
-        try {
-            // record_id is globally unique but dc3_command_history is not tenant-whitelisted;
-            // the GrpcStringQuery carries no tenant_id, so bypass tenant filtering here.
-            CommandHistoryVO record = TenantContextHolder.runIgnore(() -> commandHistoryService.getByRecordId(request.getValue()));
-            GrpcRCommandHistoryDTO.Builder response = GrpcRCommandHistoryDTO.newBuilder();
-
-            if (Objects.nonNull(record)) {
-                response.setResult(GrpcRFactory.ok());
-                response.setData(toGrpcDTO(record));
-            } else {
-                response.setResult(GrpcRFactory.notFound());
-            }
-            responseObserver.onNext(response.build());
-            responseObserver.onCompleted();
-        } catch (Exception e) {
-            log.error("CommandHistoryServer.getByRecordId failed", e);
-            responseObserver.onNext(GrpcRCommandHistoryDTO.newBuilder()
-                    .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
-                    .build());
-            responseObserver.onCompleted();
+    public void getByRecordId(GrpcStringQuery request, StreamObserver<GrpcCommandHistoryDTO> observer) {
+        if (request.getTenantId() <= 0) {
+            observer.onError(io.grpc.Status.INVALID_ARGUMENT
+                    .withDescription("tenant_id is required")
+                    .asRuntimeException());
+            return;
         }
+        ReactiveGrpcServerSupport.subscribe(
+                commandHistoryService
+                        .getByRecordId(request.getTenantId(), request.getValue())
+                        .switchIfEmpty(Mono.error(new NotFoundException("Command history does not exist")))
+                        .map(this::toGrpcDTO),
+                observer);
     }
 
     @Override
-    public void listByPage(GrpcCommandHistoryQuery request, StreamObserver<GrpcRPageCommandHistoryDTO> responseObserver) {
-        TenantContextHolder.setTenantId(request.getTenantId());
-        try {
-            CommandHistoryQueryVO queryVO = new CommandHistoryQueryVO();
-            queryVO.setDeviceId(request.getDeviceId() != 0 ? request.getDeviceId() : null);
-            queryVO.setCommandId(request.getCommandId() != 0 ? request.getCommandId() : null);
-            queryVO.setStatus(request.getStatus() != 0
-                    ? PointCommandStatusEnum.ofIndex((byte) request.getStatus()) : null);
-            queryVO.setPage(GrpcBuilderUtil.buildPagesByGrpcPage(request.getPage()));
-
-            Page<CommandHistoryVO> page = commandHistoryService.list(request.getTenantId(), queryVO);
-
-            GrpcPageCommandHistoryDTO.Builder pageDataBuilder = GrpcPageCommandHistoryDTO.newBuilder()
-                    .setPage(GrpcPage.newBuilder()
-                            .setCurrent(page.getCurrent())
-                            .setSize(page.getSize())
-                            .setTotal(page.getTotal())
-                            .setPages(page.getPages())
-                            .build());
-            page.getRecords().forEach(record -> pageDataBuilder.addData(toGrpcDTO(record)));
-
-            responseObserver.onNext(GrpcRPageCommandHistoryDTO.newBuilder()
-                    .setResult(GrpcRFactory.ok())
-                    .setData(pageDataBuilder.build())
-                    .build());
-            responseObserver.onCompleted();
-        } catch (Exception e) {
-            log.error("CommandHistoryServer.listByPage failed", e);
-            responseObserver.onNext(GrpcRPageCommandHistoryDTO.newBuilder()
-                    .setResult(GrpcRFactory.fail(ErrorCode.FAILURE, e.getMessage()))
-                    .build());
-            responseObserver.onCompleted();
-        } finally {
-            TenantContextHolder.clear();
+    public void list(GrpcCommandHistoryQuery request, StreamObserver<GrpcCommandHistoryOffsetPage> observer) {
+        if (request.getTenantId() <= 0 || !request.hasPage()) {
+            observer.onError(io.grpc.Status.INVALID_ARGUMENT
+                    .withDescription("tenant_id, offset or limit is invalid")
+                    .asRuntimeException());
+            return;
         }
+        io.github.pnoker.db.r2dbc.core.page.PageRequest requestPage;
+        try {
+            requestPage = GrpcPageUtil.require(request.getPage());
+        } catch (IllegalArgumentException error) {
+            observer.onError(io.grpc.Status.INVALID_ARGUMENT
+                    .withDescription(error.getMessage())
+                    .asRuntimeException());
+            return;
+        }
+        CommandHistoryQueryVO query = new CommandHistoryQueryVO();
+        query.setDeviceId(request.hasDeviceId() ? String.valueOf(request.getDeviceId()) : null);
+        query.setCommandId(request.hasCommandId() ? String.valueOf(request.getCommandId()) : null);
+        query.setCommandCode(request.getCommandCode().isBlank() ? null : request.getCommandCode());
+        query.setStatus(request.hasStatus() ? PointCommandStatusEnum.ofIndex((byte) request.getStatus()) : null);
+        query.setOffset(requestPage.offset());
+        query.setLimit(requestPage.limit());
+        query.setSort(requestPage.sort());
+        ReactiveGrpcServerSupport.subscribe(
+                commandHistoryService.list(request.getTenantId(), query).map(page -> {
+                    GrpcCommandHistoryOffsetPage.Builder payload = GrpcCommandHistoryOffsetPage.newBuilder()
+                            .setPage(OffsetPage.newBuilder()
+                                    .setOffset(page.offset())
+                                    .setLimit(page.limit())
+                                    .setTotal(page.total())
+                                    .setHasNext(page.hasNext())
+                                    .build());
+                    page.items().forEach(item -> payload.addItems(toGrpcDTO(item)));
+                    return payload.build();
+                }),
+                observer);
     }
 
     private GrpcCommandHistoryDTO toGrpcDTO(CommandHistoryVO record) {
         return GrpcCommandHistoryDTO.newBuilder()
-                .setId(Objects.nonNull(record.getId()) ? record.getId() : 0)
-                .setRecordId(Objects.nonNull(record.getRecordId()) ? record.getRecordId() : "")
-                .setTenantId(Objects.nonNull(record.getTenantId()) ? record.getTenantId() : 0)
-                .setDeviceId(Objects.nonNull(record.getDeviceId()) ? record.getDeviceId() : 0)
-                .setCommandId(Objects.nonNull(record.getCommandId()) ? record.getCommandId() : 0)
-                .setCommandCode(Objects.nonNull(record.getCommandCode()) ? record.getCommandCode() : "")
+                .setId(number(record.getId()))
+                .setRecordId(value(record.getRecordId()))
+                .setTenantId(number(record.getTenantId()))
+                .setDeviceId(number(record.getDeviceId()))
+                .setCommandId(number(record.getCommandId()))
+                .setCommandCode(value(record.getCommandCode()))
                 .putAllParamValues(toStringMap(record.getParamValues()))
                 .putAllResultValues(toStringMap(record.getResultValues()))
-                .setConfigSnapshot(Objects.nonNull(record.getConfigSnapshot()) ? record.getConfigSnapshot() : "")
-                .setStatus(Objects.nonNull(record.getStatus()) ? record.getStatus().getIndex() : 0)
-                .setErrorCode(Objects.nonNull(record.getErrorCode()) ? record.getErrorCode() : "")
-                .setErrorMessage(Objects.nonNull(record.getErrorMessage()) ? record.getErrorMessage() : "")
-                .setSource(Objects.nonNull(record.getSource()) ? record.getSource().getIndex() : 0)
-                .setSourceUserId(Objects.nonNull(record.getSourceUserId()) ? record.getSourceUserId() : 0)
-                .setOccurTime(toEpochSecond(record.getOccurTime()))
-                .setSendTime(toEpochSecond(record.getSendTime()))
-                .setFinishTime(toEpochSecond(record.getFinishTime()))
-                .setSchemaVersion(Objects.nonNull(record.getSchemaVersion()) ? record.getSchemaVersion() : 0)
-                .setCreateTime(toEpochSecond(record.getCreateTime()))
-                .setOperateTime(toEpochSecond(record.getOperateTime()))
-                .setExpireTime(toEpochSecond(record.getExpireTime()))
+                .setConfigSnapshot(value(record.getConfigSnapshot()))
+                .setStatus(record.getStatus() == null ? 0 : record.getStatus().getIndex())
+                .setErrorCode(value(record.getErrorCode()))
+                .setErrorMessage(value(record.getErrorMessage()))
+                .setSource(record.getSource() == null ? 0 : record.getSource().getIndex())
+                .setSourceUserId(number(record.getSourceUserId()))
+                .setOccurTime(epoch(record.getOccurTime()))
+                .setSendTime(epoch(record.getSendTime()))
+                .setFinishTime(epoch(record.getFinishTime()))
+                .setSchemaVersion(record.getSchemaVersion() == null ? 0 : record.getSchemaVersion())
+                .setCreateTime(epoch(record.getCreateTime()))
+                .setOperateTime(epoch(record.getOperateTime()))
+                .setExpireTime(epoch(record.getExpireTime()))
                 .build();
     }
 
-    private long toEpochSecond(LocalDateTime value) {
-        return Objects.nonNull(value) ? value.toEpochSecond(ZoneOffset.UTC) : 0;
+    private long number(String value) {
+        if (value == null || value.isBlank()) return 0L;
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ignored) {
+            return 0L;
+        }
+    }
+
+    private String value(String value) {
+        return value == null ? "" : value;
+    }
+
+    private long epoch(LocalDateTime value) {
+        return value == null ? 0L : value.toEpochSecond(ZoneOffset.UTC);
     }
 
     private Map<String, String> toStringMap(String json) {
-        if (Objects.isNull(json) || json.isBlank()) {
-            return Map.of();
-        }
-        Map<String, String> values = JsonUtil.parseObject(json, new TypeReference<Map<String, String>>() {
-        });
-        return Objects.nonNull(values) ? values : Map.of();
+        if (json == null || json.isBlank()) return Map.of();
+        Map<String, String> values = JsonUtil.parseObject(json, new TypeReference<Map<String, String>>() {});
+        return values == null ? Map.of() : values;
     }
-
 }

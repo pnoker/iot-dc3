@@ -80,7 +80,6 @@ dc3:
         default-value: '${value}'
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/iec104/buffer.db
 
 spring:

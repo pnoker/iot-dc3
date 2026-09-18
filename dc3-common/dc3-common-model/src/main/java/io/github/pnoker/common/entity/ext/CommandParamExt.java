@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +26,6 @@ import lombok.Setter;
  * JSON extension object for command param metadata.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Schema(description = "JSON extension object for command param metadata")
@@ -43,6 +41,9 @@ public class CommandParamExt extends BaseExt {
     @Schema(description = "Extended content of the command param")
     private Content content;
 
+    /**
+     * Extra command-param data not covered by typed fields.
+     */
     @Schema(description = "Extended content payload for the command param")
     @Getter
     @Setter
@@ -50,9 +51,9 @@ public class CommandParamExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Free-form string carrying extra command param data not covered by the typed fields", example = "extra metadata")
+        @Schema(
+                description = "Free-form string carrying extra command param data not covered by the typed fields",
+                example = "extra metadata")
         private String keep;
-
     }
-
 }

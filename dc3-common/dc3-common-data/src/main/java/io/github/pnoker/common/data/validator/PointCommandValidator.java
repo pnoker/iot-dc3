@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.validator;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Component;
  * {@code constraints} field is populated in the point schema.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j

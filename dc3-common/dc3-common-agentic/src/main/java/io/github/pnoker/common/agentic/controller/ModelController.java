@@ -23,7 +23,6 @@ import io.github.pnoker.common.agentic.entity.vo.ModelVO;
 import io.github.pnoker.common.agentic.service.ModelConfigService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,27 +31,31 @@ import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 /**
  * REST controller exposing agentic model configuration endpoints.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Tag(name = "model", description = "AI model registry: manage model metadata including name, version, capabilities, context limits, and provider associations")
+@Tag(
+        name = "model",
+        description =
+                "AI model registry: manage model metadata including name, version, capabilities, context limits, and provider associations")
 @RestController
 @RequestMapping(AgenticConstant.MODEL_URL_PREFIX)
 @RequiredArgsConstructor
@@ -68,17 +71,22 @@ public class ModelController implements BaseController {
      * @return a list of ModelVO options with model ids and display names
      */
     @PreAuthorize("@perm.can('model', 'list')")
-    @Operation(summary = "List AI Models", description = "List the AI model options available to the current tenant for selection in a chat session." +
-            " Returns model ids with display names; use to pick a model before chatting.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List AI Models",
+            description = "List the AI model options available to the current tenant for selection in a chat session."
+                    + " Returns model ids with display names; use to pick a model before chatting.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @GetMapping("/list")
-    public Mono<R<List<ModelVO>>> list() {
-        return async(() -> R.ok(modelConfigService.listOptions()));
+    public Mono<List<ModelVO>> list() {
+        return getPrincipalHeader().flatMap(modelConfigService::listOptions);
     }
 
     /**
@@ -87,17 +95,24 @@ public class ModelController implements BaseController {
      * @return a list of full ModelConfigVO records binding provider, model id and parameters
      */
     @PreAuthorize("@perm.can('model', 'list')")
-    @Operation(summary = "List AI Model Configurations", description = "List the stored AI model configurations for the current tenant, each binding a provider, model id and parameters." +
-            " Returns full configuration records for management, unlike the lightweight model options used for chat selection.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "LOW"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "List AI Model Configurations",
+            description =
+                    "List the stored AI model configurations for the current tenant, each binding a provider, model id and parameters."
+                            + " Returns full configuration records for management, unlike the lightweight model options used for chat selection.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @GetMapping("/config/list")
-    public Mono<R<List<ModelConfigVO>>> listConfigs() {
-        return async(() -> R.ok(modelConfigBuilder.buildVOListByBOList(modelConfigService.listConfigs())));
+    public Mono<List<ModelConfigVO>> listConfigs() {
+        return getPrincipalHeader()
+                .flatMap(header -> modelConfigService.listConfigs(header).map(modelConfigBuilder::buildVOListByBOList));
     }
 
     /**
@@ -107,20 +122,26 @@ public class ModelController implements BaseController {
      * @return the saved ModelConfigVO, selectable as a model in future sessions
      */
     @PreAuthorize("@perm.can('model', 'add')")
-    @Operation(summary = "Add AI Model Configuration", description = "Create an AI model configuration for the current tenant binding a provider, model id and parameters." +
-            " Returns the saved configuration; the assistant can then use it as a selectable model in a session.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "false"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Add AI Model Configuration",
+            description =
+                    "Create an AI model configuration for the current tenant binding a provider, model id and parameters."
+                            + " Returns the saved configuration; the assistant can then use it as a selectable model in a session.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "false"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/config/add")
-    public Mono<R<ModelConfigVO>> add(@Validated(Add.class) @RequestBody ModelConfigVO request) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
+    public Mono<ModelConfigVO> add(@Validated(Add.class) @RequestBody ModelConfigVO request) {
+        return getPrincipalHeader().flatMap(header -> {
             ModelConfigBO entityBO = modelConfigBuilder.buildBOByVO(request);
-            return R.ok(modelConfigBuilder.buildVOByBO(modelConfigService.add(entityBO, header)));
-        }));
+            return modelConfigService.add(entityBO, header).map(modelConfigBuilder::buildVOByBO);
+        });
     }
 
     /**
@@ -130,20 +151,26 @@ public class ModelController implements BaseController {
      * @return the updated ModelConfigVO; changes apply to future sessions that select this model
      */
     @PreAuthorize("@perm.can('model', 'update')")
-    @Operation(summary = "Update AI Model Configuration", description = "Update an existing AI model configuration's provider, model id or parameters for the current tenant." +
-            " Returns the updated configuration; changes apply to future sessions that select this model.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
-                    @ExtensionProperty(name = "destructive", value = "false"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
+    @Operation(
+            summary = "Update AI Model Configuration",
+            description =
+                    "Update an existing AI model configuration's provider, model id or parameters for the current tenant."
+                            + " Returns the updated configuration; changes apply to future sessions that select this model.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
     @PostMapping("/config/update")
-    public Mono<R<ModelConfigVO>> update(@Validated(Update.class) @RequestBody ModelConfigVO request) {
-        return getPrincipalHeader().flatMap(header -> async(() -> {
+    public Mono<ModelConfigVO> update(@Validated(Update.class) @RequestBody ModelConfigVO request) {
+        return getPrincipalHeader().flatMap(header -> {
             ModelConfigBO entityBO = modelConfigBuilder.buildBOByVO(request);
-            return R.ok(modelConfigBuilder.buildVOByBO(modelConfigService.update(entityBO, header)));
-        }));
+            return modelConfigService.update(entityBO, header).map(modelConfigBuilder::buildVOByBO);
+        });
     }
 
     /**
@@ -153,20 +180,28 @@ public class ModelController implements BaseController {
      * @return delete-success status (true on success)
      */
     @PreAuthorize("@perm.can('model', 'delete')")
-    @Operation(summary = "Delete AI Model Configuration", description = "Permanently delete the AI model configuration identified by id within the current tenant." +
-            " Returns true on success; the model is no longer selectable in new sessions.",
-            extensions = @Extension(name = "x-dc3-ai", properties = {
-                    @ExtensionProperty(name = "riskLevel", value = "HIGH"),
-                    @ExtensionProperty(name = "destructive", value = "true"),
-                    @ExtensionProperty(name = "idempotent", value = "true"),
-                    @ExtensionProperty(name = "openWorld", value = "false")
-            }))
-    @PostMapping("/config/delete")
-    public Mono<R<Boolean>> delete(@Parameter(description = "Primary key of the entity to delete. Must belong to the current tenant.", example = "1024") @NotNull @RequestParam(value = "id") Long id) {
-        return async(() -> {
-            modelConfigService.delete(id);
-            return R.ok(true);
-        });
+    @Operation(
+            summary = "Delete AI Model Configuration",
+            description = "Permanently delete the AI model configuration identified by id within the current tenant."
+                    + " Returns true on success; the model is no longer selectable in new sessions.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                                @ExtensionProperty(name = "destructive", value = "true"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @DeleteMapping("/config/delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> delete(
+            @Parameter(
+                            description = "Primary key of the entity to delete. Must belong to the current tenant.",
+                            example = "1024")
+                    @NotNull
+                    @RequestParam(value = "id")
+                    Long id) {
+        return getPrincipalHeader().flatMap(header -> modelConfigService.delete(id, header));
     }
-
 }

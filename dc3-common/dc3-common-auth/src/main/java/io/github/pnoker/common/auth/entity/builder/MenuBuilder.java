@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.MenuBO;
 import io.github.pnoker.common.auth.entity.bo.MenuTreeBO;
 import io.github.pnoker.common.auth.entity.model.MenuDO;
@@ -31,25 +29,24 @@ import io.github.pnoker.common.enums.MenuTypeFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 /**
  * MapStruct builder converting between menu BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface MenuBuilder {
 
     /**
@@ -81,6 +78,12 @@ public interface MenuBuilder {
     @Mapping(target = "deleted", ignore = true)
     MenuDO buildDOByBO(MenuBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(MenuBO entityBO, @MappingTarget MenuDO entityDO) {
         // Code
@@ -132,6 +135,12 @@ public interface MenuBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     MenuBO buildBOByDO(MenuDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(MenuDO entityDO, @MappingTarget MenuBO entityBO) {
         // Json Ext
@@ -183,29 +192,21 @@ public interface MenuBuilder {
     List<MenuVO> buildVOListByBOList(List<MenuBO> entityBOList);
 
     /**
-     * DOPage to BOPage
+     * Convert bo list to tree view object list.
      *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
+     * @param entityBOList entity business object list
+     * @return converted value
      */
-    default Page<MenuBO> buildBOPageByDOPage(Page<MenuDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<MenuVO> buildVOPageByBOPage(Page<MenuBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
     default List<MenuTreeVO> buildTreeVOListByBOList(List<MenuTreeBO> entityBOList) {
         return entityBOList.stream().map(this::buildTreeVOByBO).toList();
     }
 
+    /**
+     * Convert bo to tree view object.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     default MenuTreeVO buildTreeVOByBO(MenuTreeBO entityBO) {
         MenuVO flat = buildVOByBO(entityBO);
         MenuTreeVO out = new MenuTreeVO();
@@ -230,5 +231,4 @@ public interface MenuBuilder {
         }
         return out;
     }
-
 }

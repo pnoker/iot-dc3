@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.builder;
 
 import io.github.pnoker.api.common.GrpcBase;
@@ -28,24 +27,30 @@ import io.github.pnoker.common.optional.JsonOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.Optional;
 
 /**
  * MapStruct mapper for converting point attribute definitions between gRPC DTOs and
  * internal DTOs.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcPointAttributeBuilder {
 
+    /**
+     * Convert grpc transfer object to dto.
+     *
+     * @param entityGrpc entity grpc
+     * @return converted value
+     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
@@ -59,6 +64,12 @@ public interface GrpcPointAttributeBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     PointAttributeDTO buildDTOByGrpcDTO(GrpcPointAttributeDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityDTO  transfer object
+     */
     @AfterMapping
     default void afterProcess(GrpcPointAttributeDTO entityGrpc, @MappingTarget PointAttributeDTO entityDTO) {
         GrpcBuilderUtil.buildBaseDTOByGrpcBase(entityGrpc.getBase(), entityDTO);
@@ -70,6 +81,12 @@ public interface GrpcPointAttributeBuilder {
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityDTO::setEnableFlag);
     }
 
+    /**
+     * Convert dto to grpc transfer object.
+     *
+     * @param entityDTO transfer object
+     * @return converted value
+     */
     @Mapping(target = "attributeExt", ignore = true)
     @Mapping(target = "attributeTypeFlag", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
@@ -88,6 +105,12 @@ public interface GrpcPointAttributeBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcPointAttributeDTO buildGrpcDTOByDTO(PointAttributeDTO entityDTO);
 
+    /**
+     * After process.
+     *
+     * @param entityDTO  transfer object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(PointAttributeDTO entityDTO, @MappingTarget GrpcPointAttributeDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByDTO(entityDTO);
@@ -96,11 +119,12 @@ public interface GrpcPointAttributeBuilder {
         Optional.ofNullable(entityDTO.getAttributeExt())
                 .ifPresent(value -> entityGrpc.setAttributeExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityDTO.getAttributeTypeFlag())
-                .ifPresentOrElse(value -> entityGrpc.setAttributeTypeFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setAttributeTypeFlag(value.getIndex()),
                         () -> entityGrpc.setAttributeTypeFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(entityDTO.getEnableFlag())
-                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setEnableFlag(value.getIndex()),
                         () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
     }
-
 }

@@ -1,0 +1,24 @@
+# Spring Boot owns the single R2DBC ConnectionFactory/pool. Centers must configure
+# spring.r2dbc.url and spring.r2dbc.pool.*; this module never wraps another pool.
+dc3:
+  db:
+    # PostgreSQL is the single supported relational engine.
+    type: postgres
+  r2dbc:
+    # A center must provide exactly one spring.r2dbc.url.
+    schema-fingerprint: ${DC3_SCHEMA_FINGERPRINT:}
+    schema-contract: ${DC3_SCHEMA_CONTRACT:r2dbc-flag-day-v1}
+    startup-timeout: ${DC3_SCHEMA_STARTUP_TIMEOUT:10s}
+
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
+      - org.springframework.boot.jdbc.autoconfigure.health.DataSourceHealthContributorAutoConfiguration
+  r2dbc:
+    pool:
+      enabled: true
+      initial-size: ${DC3_R2DBC_POOL_INITIAL_SIZE:4}
+      max-size: ${DC3_R2DBC_POOL_MAX_SIZE:32}
+      max-acquire-time: ${DC3_R2DBC_POOL_MAX_ACQUIRE:5s}
+      max-create-connection-time: ${DC3_R2DBC_POOL_MAX_CREATE:5s}

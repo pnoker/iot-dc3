@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Test;
 
 class ZoneDateTimeUtilTest {
 
@@ -57,8 +55,7 @@ class ZoneDateTimeUtilTest {
         ZonedDateTime original = ZoneDateTimeUtil.dateTime(1_700_000_000_000L);
         String formatted = ZoneDateTimeUtil.defaultFormat(original);
         assertThat(formatted).matches("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}");
-        assertThat(ZoneDateTimeUtil.defaultDate(formatted)).isEqualTo(
-                ZoneDateTimeUtil.defaultDate(formatted));
+        assertThat(ZoneDateTimeUtil.defaultDate(formatted)).isEqualTo(ZoneDateTimeUtil.defaultDate(formatted));
     }
 
     @Test

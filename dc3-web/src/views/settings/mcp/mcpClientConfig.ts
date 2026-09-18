@@ -15,11 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {listMcpClient} from '@/api/mcp';
 import {MCP_CLIENT_TYPE_OPTIONS} from '@/config/constant/enums';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
 interface McpClientHandlers {
   onRegister: () => void;
@@ -34,7 +32,7 @@ const includes = (value: unknown, keyword: string) =>
 
 // OAuth clients. Backend `client/list` returns a flat array with no filters, so
 // search is applied client-side here before wrapping into a single-page result.
-export const createMcpClientConfig = (t: ComposerTranslation, handlers: McpClientHandlers): EntityListConfig => ({
+export const createMcpClientConfig = (t: Translator, handlers: McpClientHandlers): EntityListConfig => ({
   name: 'mcp-client',
   title: t('nav.settingsMcpClient'),
   editable: false,
@@ -59,11 +57,13 @@ export const createMcpClientConfig = (t: ComposerTranslation, handlers: McpClien
   defaultForm: () => ({}),
   list: async (query) => {
     const p = query as Record<string, any>;
-    const res: any = await listMcpClient();
-    let records: Record<string, any>[] = Array.isArray(res?.data) ? res.data : [];
-    if (p.clientName) records = records.filter((r) => includes(r.clientName, p.clientName));
-    if (p.clientType) records = records.filter((r) => r.clientType === p.clientType);
-    return {data: {records, total: records.length}} as R;
+    let items: Record<string, any>[] = await listMcpClient();
+    if (p.clientName) items = items.filter((r) => includes(r.clientName, p.clientName));
+    if (p.clientType) items = items.filter((r) => r.clientType === p.clientType);
+    const offset = Number(p.offset || 0);
+    const limit = Number(p.limit || 50);
+    const pageItems = items.slice(offset, offset + limit);
+    return {items: pageItems, offset, limit, total: items.length, hasNext: offset + limit < items.length};
   },
   toolbarActions: [
     {

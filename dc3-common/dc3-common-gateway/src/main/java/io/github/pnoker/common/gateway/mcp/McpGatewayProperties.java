@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.gateway.mcp;
 
 import jakarta.validation.constraints.NotEmpty;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -25,14 +26,10 @@ import org.apache.commons.lang3.Strings;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * Gateway MCP endpoint and backend invocation configuration.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -57,6 +54,12 @@ public class McpGatewayProperties {
     @NotEmpty(message = "MCP backend base urls can't be empty")
     private Map<String, String> backendBaseUrls = new LinkedHashMap<>();
 
+    /**
+     * Backend base url.
+     *
+     * @param serviceName service name
+     * @return backend base url result
+     */
     public String backendBaseUrl(String serviceName) {
         String baseUrl = backendBaseUrls.get(serviceName);
         if (StringUtils.isBlank(baseUrl)) {
@@ -64,5 +67,4 @@ public class McpGatewayProperties {
         }
         return Strings.CS.removeEnd(baseUrl, "/");
     }
-
 }

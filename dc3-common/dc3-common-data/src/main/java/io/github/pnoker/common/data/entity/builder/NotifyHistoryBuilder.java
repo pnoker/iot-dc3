@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
 import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 import io.github.pnoker.common.data.entity.vo.NotifyHistoryVO;
@@ -28,37 +26,61 @@ import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 /**
  * MapStruct builder converting between notification delivery history BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface NotifyHistoryBuilder {
 
+    /**
+     * Convert vo to bo.
+     *
+     * @param entityVO view object
+     * @return converted value
+     */
     @Mapping(target = "tenantId", ignore = true)
+    @Mapping(target = "dedupeKey", ignore = true)
     NotifyHistoryBO buildBOByVO(NotifyHistoryVO entityVO);
 
+    /**
+     * Convert vo list to bo list.
+     *
+     * @param entityVOList entity view object list
+     * @return converted value
+     */
     List<NotifyHistoryBO> buildBOListByVOList(List<NotifyHistoryVO> entityVOList);
 
+    /**
+     * Convert bo to do.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "requestExt", ignore = true)
     @Mapping(target = "responseExt", ignore = true)
     @Mapping(target = "channelTypeFlag", ignore = true)
     @Mapping(target = "statusFlag", ignore = true)
     NotifyHistoryDO buildDOByBO(NotifyHistoryBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(NotifyHistoryBO entityBO, @MappingTarget NotifyHistoryDO entityDO) {
         entityDO.setRequestExt(buildRequestExt(entityBO.getRequestExt()));
@@ -71,14 +93,32 @@ public interface NotifyHistoryBuilder {
         Optional.ofNullable(statusFlag).ifPresent(value -> entityDO.setStatusFlag(value.getIndex()));
     }
 
+    /**
+     * Convert bo list to do list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<NotifyHistoryDO> buildDOListByBOList(List<NotifyHistoryBO> entityBOList);
 
+    /**
+     * Convert do to bo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     @Mapping(target = "requestExt", ignore = true)
     @Mapping(target = "responseExt", ignore = true)
     @Mapping(target = "channelTypeFlag", ignore = true)
     @Mapping(target = "statusFlag", ignore = true)
     NotifyHistoryBO buildBOByDO(NotifyHistoryDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(NotifyHistoryDO entityDO, @MappingTarget NotifyHistoryBO entityBO) {
         JsonExt requestExt = entityDO.getRequestExt();
@@ -108,20 +148,36 @@ public interface NotifyHistoryBuilder {
         entityBO.setStatusFlag(NotifyHistoryStatusEnum.ofIndex(statusFlag));
     }
 
+    /**
+     * Convert do list to bo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<NotifyHistoryBO> buildBOListByDOList(List<NotifyHistoryDO> entityDOList);
 
+    /**
+     * Convert bo to vo.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     NotifyHistoryVO buildVOByBO(NotifyHistoryBO entityBO);
 
+    /**
+     * Convert bo list to vo list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<NotifyHistoryVO> buildVOListByBOList(List<NotifyHistoryBO> entityBOList);
 
-    default Page<NotifyHistoryBO> buildBOPageByDOPage(Page<NotifyHistoryDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    default Page<NotifyHistoryVO> buildVOPageByBOPage(Page<NotifyHistoryBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
+    /**
+     * Build request ext.
+     *
+     * @param entityExt entity ext
+     * @return converted value
+     */
     default JsonExt buildRequestExt(NotifyHistoryRequestExt entityExt) {
         JsonExt ext = new JsonExt();
         if (Objects.nonNull(entityExt)) {
@@ -133,6 +189,12 @@ public interface NotifyHistoryBuilder {
         return ext;
     }
 
+    /**
+     * Build response ext.
+     *
+     * @param entityExt entity ext
+     * @return converted value
+     */
     default JsonExt buildResponseExt(NotifyHistoryResponseExt entityExt) {
         JsonExt ext = new JsonExt();
         if (Objects.nonNull(entityExt)) {
@@ -143,5 +205,4 @@ public interface NotifyHistoryBuilder {
         }
         return ext;
     }
-
 }

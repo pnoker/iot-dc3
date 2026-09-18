@@ -14,19 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.enums.WindowModeEnum;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * Deterministic evaluator for structured alarm rules. Dispatches by window
@@ -39,7 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * evaluator skips it with a one-time warn per rule id.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -52,47 +50,51 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
     private final Set<Long> warnedInvalidRules = ConcurrentHashMap.newKeySet();
 
     private static RuleExt.Window window(RuleBO rule) {
-        if (Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())) {
+        if (Objects.isNull(rule.getRuleExt())
+                || Objects.isNull(rule.getRuleExt().getContent())) {
             return null;
         }
         return rule.getRuleExt().getContent().getWindow();
     }
 
     private static RuleExt.Condition condition(RuleBO rule) {
-        if (Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())) {
+        if (Objects.isNull(rule.getRuleExt())
+                || Objects.isNull(rule.getRuleExt().getContent())) {
             return null;
         }
         return rule.getRuleExt().getContent().getCondition();
     }
 
     @Override
-    public boolean matches(RuleBO rule, RuleFact fact) {
+    public Mono<Boolean> matches(RuleBO rule, RuleFact fact) {
         if (Objects.isNull(rule) || Objects.isNull(fact)) {
-            return false;
+            return Mono.just(false);
         }
         WindowSpec spec = parseSpec(rule);
         if (!spec.valid()) {
-            return false;
+            return Mono.just(false);
         }
         if (spec.mode() != WindowModeEnum.LAST) {
             return windowedRuleEvaluator.matches(rule, fact, spec);
         }
         RuleExt.Condition condition = condition(rule);
         if (Objects.isNull(condition)) {
-            return false;
+            return Mono.just(false);
         }
-        return ConditionEvaluator.evaluate(condition, fact.value(condition.getField()));
+        return Mono.just(ConditionEvaluator.evaluate(condition, fact.value(condition.getField())));
     }
 
     @Override
-    public boolean recovers(RuleBO rule, RuleFact fact) {
-        if (Objects.isNull(rule) || Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())
+    public Mono<Boolean> recovers(RuleBO rule, RuleFact fact) {
+        if (Objects.isNull(rule)
+                || Objects.isNull(rule.getRuleExt())
+                || Objects.isNull(rule.getRuleExt().getContent())
                 || Objects.isNull(fact)) {
-            return false;
+            return Mono.just(false);
         }
         WindowSpec spec = parseSpec(rule);
         if (!spec.valid()) {
-            return false;
+            return Mono.just(false);
         }
         if (spec.mode() != WindowModeEnum.LAST) {
             return windowedRuleEvaluator.recovers(rule, fact, spec);
@@ -100,19 +102,21 @@ public class RuleEvaluatorImpl implements RuleEvaluator {
         RuleExt.Recovery recovery = rule.getRuleExt().getContent().getRecovery();
         RuleExt.Condition condition = rule.getRuleExt().getContent().getCondition();
         if (Objects.isNull(recovery) || !Boolean.TRUE.equals(recovery.getEnabled()) || Objects.isNull(condition)) {
-            return false;
+            return Mono.just(false);
         }
         RuleExt.Condition recoveryCondition = ConditionEvaluator.recoveryConditionOf(condition, recovery);
-        return ConditionEvaluator.evaluate(recoveryCondition, fact.value(condition.getField()));
+        return Mono.just(ConditionEvaluator.evaluate(recoveryCondition, fact.value(condition.getField())));
     }
 
     private WindowSpec parseSpec(RuleBO rule) {
         RuleExt.Window window = window(rule);
         WindowSpec spec = WindowSpecParser.parse(window);
         if (!spec.valid() && Objects.nonNull(rule.getId()) && warnedInvalidRules.add(rule.getId())) {
-            log.warn("Skipping rule[{}] because window spec is invalid: {}", rule.getId(), spec.reason());
+            log.warn(
+                    "Alarm rule evaluation skipped, reason=invalidWindowSpec, ruleId={}, detail={}",
+                    rule.getId(),
+                    spec.reason());
         }
         return spec;
     }
-
 }

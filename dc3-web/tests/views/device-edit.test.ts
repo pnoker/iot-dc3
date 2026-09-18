@@ -28,63 +28,61 @@ import {mountListPage} from './_helpers'; // DeviceEdit is the wizard that the r
 const deviceMocks = vi.hoisted(() => ({
   getDeviceById: vi.fn(() =>
     Promise.resolve({
-      data: {
-        id: 'dev-1',
-        deviceName: 'Pump',
-        driverId: 'drv-1',
-        profileId: 'pf-1',
-        enableFlag: 'ENABLE',
-      },
+      id: 'dev-1',
+      deviceName: 'Pump',
+      driverId: 'drv-1',
+      profileId: 'pf-1',
+      enableFlag: 'ENABLE',
     })
   ),
-  updateDevice: vi.fn(() => Promise.resolve({data: {}})),
+  updateDevice: vi.fn(() => Promise.resolve( {})),
 }));
 
 const driverMocks = vi.hoisted(() => ({
-  getDriverById: vi.fn(() => Promise.resolve({data: {id: 'drv-1', driverName: 'Modbus'}})),
+  getDriverById: vi.fn(() => Promise.resolve( {id: 'drv-1', driverName: 'Modbus'})),
 }));
 
 const profileMocks = vi.hoisted(() => ({
-  getProfileById: vi.fn(() => Promise.resolve({data: {id: 'pf-1', profileName: 'Sensor'}})),
+  getProfileById: vi.fn(() => Promise.resolve( {id: 'pf-1', profileName: 'Sensor'})),
 }));
 
 const dictionaryMocks = vi.hoisted(() => ({
-  getDriverDictionary: vi.fn(() => Promise.resolve({data: {records: []}})),
-  getProfileDictionary: vi.fn(() => Promise.resolve({data: {records: []}})),
+  getDriverDictionary: vi.fn(() => Promise.resolve( {items: []})),
+  getProfileDictionary: vi.fn(() => Promise.resolve( {items: []})),
 }));
 
 const attributeMocks = vi.hoisted(() => ({
-  listCommandAttributeByDriverId: vi.fn(() => Promise.resolve({data: []})),
-  listDriverAttributeByDriverId: vi.fn(() => Promise.resolve({data: []})),
-  listEventAttributeByDriverId: vi.fn(() => Promise.resolve({data: []})),
-  listPointAttributeByDriverId: vi.fn(() => Promise.resolve({data: []})),
+  listCommandAttributeByDriverId: vi.fn(() => Promise.resolve( [])),
+  listDriverAttributeByDriverId: vi.fn(() => Promise.resolve( [])),
+  listEventAttributeByDriverId: vi.fn(() => Promise.resolve( [])),
+  listPointAttributeByDriverId: vi.fn(() => Promise.resolve( [])),
 }));
 
 const infoMocks = vi.hoisted(() => ({
-  addCommandInfo: vi.fn(() => Promise.resolve({data: {}})),
-  addDriverInfo: vi.fn(() => Promise.resolve({data: {}})),
-  addEventInfo: vi.fn(() => Promise.resolve({data: {}})),
-  addPointInfo: vi.fn(() => Promise.resolve({data: {}})),
-  listCommandInfoByDeviceId: vi.fn(() => Promise.resolve({data: []})),
-  listDriverInfoByDeviceId: vi.fn(() => Promise.resolve({data: []})),
-  listEventInfoByDeviceId: vi.fn(() => Promise.resolve({data: []})),
-  listPointInfoByDeviceId: vi.fn(() => Promise.resolve({data: []})),
-  updateCommandInfo: vi.fn(() => Promise.resolve({data: {}})),
-  updateDriverInfo: vi.fn(() => Promise.resolve({data: {}})),
-  updateEventInfo: vi.fn(() => Promise.resolve({data: {}})),
-  updatePointInfo: vi.fn(() => Promise.resolve({data: {}})),
+  addCommandInfo: vi.fn(() => Promise.resolve( {})),
+  addDriverInfo: vi.fn(() => Promise.resolve( {})),
+  addEventInfo: vi.fn(() => Promise.resolve( {})),
+  addPointInfo: vi.fn(() => Promise.resolve( {})),
+  listCommandInfoByDeviceId: vi.fn(() => Promise.resolve( [])),
+  listDriverInfoByDeviceId: vi.fn(() => Promise.resolve( [])),
+  listEventInfoByDeviceId: vi.fn(() => Promise.resolve( [])),
+  listPointInfoByDeviceId: vi.fn(() => Promise.resolve( [])),
+  updateCommandInfo: vi.fn(() => Promise.resolve( {})),
+  updateDriverInfo: vi.fn(() => Promise.resolve( {})),
+  updateEventInfo: vi.fn(() => Promise.resolve( {})),
+  updatePointInfo: vi.fn(() => Promise.resolve( {})),
 }));
 
 const pointMocks = vi.hoisted(() => ({
-  listPointByProfileId: vi.fn(() => Promise.resolve({data: []})),
+  listPointByProfileId: vi.fn(() => Promise.resolve( [])),
 }));
 
 const commandMocks = vi.hoisted(() => ({
-  listCommandByProfileId: vi.fn(() => Promise.resolve({data: []})),
+  listCommandByProfileId: vi.fn(() => Promise.resolve( [])),
 }));
 
 const eventMocks = vi.hoisted(() => ({
-  listEventByProfileId: vi.fn(() => Promise.resolve({data: []})),
+  listEventByProfileId: vi.fn(() => Promise.resolve( [])),
 }));
 
 vi.mock('@/api/device', () => deviceMocks);
@@ -121,5 +119,43 @@ describe('DeviceEdit view', () => {
     expect(pointMocks.listPointByProfileId).toHaveBeenCalled();
     expect(commandMocks.listCommandByProfileId).toHaveBeenCalled();
     expect(eventMocks.listEventByProfileId).toHaveBeenCalled();
+  });
+
+  // Pagination sits behind `v-if="filtered*.length > pageSize"`, so once the
+  // reloaded dataset fits on one page Element Plus is gone and can no longer
+  // clamp the stale page number. The paginated computeds must do it themselves.
+  it('keeps the point matrix populated when a reload shrinks below the current page', async () => {
+    const thirtyPoints = Array.from({length: 30}, (_, index) => ({
+      id: `pt-${index + 1}`,
+      pointName: `Point ${index + 1}`,
+    }));
+    const DeviceEdit = (await import('@/views/device/edit/DeviceEdit.vue')).default;
+    pointMocks.listPointByProfileId.mockResolvedValueOnce(thirtyPoints);
+    const wrapper = await mountListPage({
+      component: DeviceEdit,
+      routePath: '/test',
+      routeQuery: {id: 'dev-1', active: 'pointConfig'},
+      stubs: {
+        EnableFlagSegmented: {template: '<div />'},
+      },
+    });
+    await flushPromises();
+
+    const page = wrapper.vm as {
+      reactiveData: {pointPageCurrent: number};
+      paginatedPointInfoData: {id: string}[];
+      changeProfile: () => void;
+    };
+
+    page.reactiveData.pointPageCurrent = 3;
+    expect(page.paginatedPointInfoData).toHaveLength(10);
+
+    pointMocks.listPointByProfileId.mockResolvedValueOnce(thirtyPoints.slice(0, 8));
+    page.changeProfile();
+    await flushPromises();
+
+    // Page 3 is now out of range: the slice must fall back to the last page
+    // (all 8 rows) instead of rendering an empty table with no pager to recover.
+    expect(page.paginatedPointInfoData).toHaveLength(8);
   });
 });

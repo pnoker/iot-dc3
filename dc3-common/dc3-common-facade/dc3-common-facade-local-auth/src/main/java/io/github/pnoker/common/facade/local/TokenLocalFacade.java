@@ -14,37 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
-import io.github.pnoker.common.auth.biz.TokenService;
-import io.github.pnoker.common.auth.entity.bean.TokenValid;
+import io.github.pnoker.common.auth.biz.ReactiveTokenService;
 import io.github.pnoker.common.facade.api.TokenFacade;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
-/**
- * In-process {@link TokenFacade}. Collapses the three-way outcome of
- * {@code TokenService.checkValid} (null / invalid / valid) into a boolean.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
-@Slf4j
+/** In-process facade for token operations. */
 @Component
 @RequiredArgsConstructor
 public class TokenLocalFacade implements TokenFacade {
-
-    private final TokenService tokenService;
+    private final ReactiveTokenService tokenService;
 
     @Override
-    public boolean checkValid(String tenant, String name, String salt, String token) {
-        TokenValid entity = tokenService.checkValid(name, salt, token, tenant);
-        return Objects.nonNull(entity) && entity.isValid();
+    public Mono<Boolean> checkValid(String tenant, String name, String token) {
+        return tokenService.checkValid(name, token, tenant).map(value -> value != null && value.isValid());
     }
-
 }

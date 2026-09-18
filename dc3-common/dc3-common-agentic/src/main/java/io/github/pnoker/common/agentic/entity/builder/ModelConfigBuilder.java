@@ -16,85 +16,27 @@
  */
 package io.github.pnoker.common.agentic.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
-import io.github.pnoker.common.agentic.entity.model.ModelConfigDO;
 import io.github.pnoker.common.agentic.entity.vo.ModelConfigVO;
-import io.github.pnoker.common.enums.DefaultFlagEnum;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-
 import java.util.List;
-import java.util.Optional;
+import org.mapstruct.Mapper;
 
-/**
- * MapStruct builder converting between model configuration BO, VO, and DO.
- *
- * @author pnoker
- * @version 2026.5.11
- * @since 2026.5.11
- */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+/** MapStruct builder converting between model configuration business and API objects. */
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface ModelConfigBuilder {
 
+    /** Convert the value object into its business-object form. */
     ModelConfigBO buildBOByVO(ModelConfigVO entityVO);
 
+    /** Convert the value objects into their business-object forms. */
     List<ModelConfigBO> buildBOListByVOList(List<ModelConfigVO> entityVOList);
 
-    @Mapping(target = "tenantId", ignore = true)
-    @Mapping(target = "creatorId", ignore = true)
-    @Mapping(target = "creatorName", ignore = true)
-    @Mapping(target = "createTime", ignore = true)
-    @Mapping(target = "operatorId", ignore = true)
-    @Mapping(target = "operatorName", ignore = true)
-    @Mapping(target = "operateTime", ignore = true)
-    @Mapping(target = "defaultFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    ModelConfigDO buildDOByBO(ModelConfigBO entityBO);
-
-    @AfterMapping
-    default void afterProcess(ModelConfigBO entityBO, @MappingTarget ModelConfigDO entityDO) {
-        DefaultFlagEnum defaultFlag = entityBO.getDefaultFlag();
-        Optional.ofNullable(defaultFlag).ifPresent(value -> entityDO.setDefaultFlag(value.getIndex()));
-
-        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
-    }
-
-    List<ModelConfigDO> buildDOListByBOList(List<ModelConfigBO> entityBOList);
-
-    @Mapping(target = "providerName", ignore = true)
-    @Mapping(target = "defaultFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    ModelConfigBO buildBOByDO(ModelConfigDO entityDO);
-
-    @AfterMapping
-    default void afterProcess(ModelConfigDO entityDO, @MappingTarget ModelConfigBO entityBO) {
-        Byte defaultFlag = entityDO.getDefaultFlag();
-        entityBO.setDefaultFlag(DefaultFlagEnum.ofIndex(defaultFlag));
-
-        Byte enableFlag = entityDO.getEnableFlag();
-        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
-    }
-
-    List<ModelConfigBO> buildBOListByDOList(List<ModelConfigDO> entityDOList);
-
+    /** Convert the business object into its value-object form. */
     ModelConfigVO buildVOByBO(ModelConfigBO entityBO);
 
+    /** Convert the business objects into their value-object forms. */
     List<ModelConfigVO> buildVOListByBOList(List<ModelConfigBO> entityBOList);
-
-    default Page<ModelConfigBO> buildBOPageByDOPage(Page<ModelConfigDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    default Page<ModelConfigVO> buildVOPageByBOPage(Page<ModelConfigBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

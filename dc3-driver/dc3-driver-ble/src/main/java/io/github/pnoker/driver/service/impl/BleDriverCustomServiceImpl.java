@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
@@ -28,21 +27,13 @@ import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.driver.support.CodecUtil;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.sputnikdev.bluetooth.URL;
-import org.sputnikdev.bluetooth.manager.BluetoothManager;
-import org.sputnikdev.bluetooth.manager.CharacteristicGovernor;
-import org.sputnikdev.bluetooth.manager.DeviceGovernor;
-import org.sputnikdev.bluetooth.manager.impl.BluetoothManagerBuilder;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -51,6 +42,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.sputnikdev.bluetooth.URL;
+import org.sputnikdev.bluetooth.manager.BluetoothManager;
+import org.sputnikdev.bluetooth.manager.CharacteristicGovernor;
+import org.sputnikdev.bluetooth.manager.DeviceGovernor;
 
 /**
  * Bluetooth LE driver service implementation.
@@ -60,7 +58,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -69,15 +66,20 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+    private final BleManagerFactory managerFactory;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
     private BluetoothManager bluetoothManager;
     private Map<Long, DeviceGovernor> deviceGovernorMap;
 
-    public BleDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
+    /** ble driver custom service impl. */
+    public BleDriverCustomServiceImpl(
+            DriverMetadata driverMetadata, DriverSenderService driverSenderService, BleManagerFactory managerFactory) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
+        this.managerFactory = managerFactory;
     }
 
     private static int readInt16(byte[] data, String byteOrder) {
@@ -98,33 +100,22 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
         return bb.getFloat();
     }
 
-    private static String bytesToHex(byte[] data) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : data) {
-            sb.append(String.format("%02X", b));
-        }
-        return sb.toString();
-    }
-
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
     @Override
     public void initial() {
         deviceGovernorMap = new ConcurrentHashMap<>(16);
-        bluetoothManager = new BluetoothManagerBuilder()
-                .withTinyBTransport(true)
-                .withIgnoreTransportInitErrors(true)
-                .withStarted(true)
-                .withDiscovering(false)
-                .build();
+        bluetoothManager = managerFactory.create();
         log.info("BLE driver initialized, protocol={}", driverCode);
     }
 
@@ -161,35 +152,49 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 DeviceGovernor removed = deviceGovernorMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     removed.setConnectionControl(false);
-                    log.info("Driver device control released, protocol={}, deviceId={}, operateType={}",
-                            driverCode, metadataEvent.getId(), operateType);
+                    log.info(
+                            "Driver device control released, protocol={}, deviceId={}, operateType={}",
+                            driverCode,
+                            metadataEvent.getId(),
+                            operateType);
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         try {
             String serviceUuid = getRequiredConfig(pointConfig, "serviceUuid");
             String characteristicUuid = getRequiredConfig(pointConfig, "characteristicUuid");
             String readFormat = getConfigValue(pointConfig, "readFormat", "UTF8");
             String byteOrder = getConfigValue(pointConfig, "byteOrder", "BIG");
 
-            CharacteristicGovernor gov = getCharacteristicGovernor(device.getId(), driverConfig,
-                    serviceUuid, characteristicUuid);
+            CharacteristicGovernor gov =
+                    getCharacteristicGovernor(device.getId(), driverConfig, serviceUuid, characteristicUuid);
 
             byte[] data = gov.read();
             if (Objects.isNull(data) || data.length == 0) {
@@ -206,14 +211,18 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         try {
             String serviceUuid = getRequiredConfig(pointConfig, "serviceUuid");
             String characteristicUuid = getRequiredConfig(pointConfig, "characteristicUuid");
 
-            CharacteristicGovernor gov = getCharacteristicGovernor(device.getId(), driverConfig,
-                    serviceUuid, characteristicUuid);
+            CharacteristicGovernor gov =
+                    getCharacteristicGovernor(device.getId(), driverConfig, serviceUuid, characteristicUuid);
 
             byte[] data = writePointValue.getValue(String.class).getBytes(StandardCharsets.UTF_8);
             return gov.write(data);
@@ -222,8 +231,8 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
-    private CharacteristicGovernor getCharacteristicGovernor(Long deviceId, Map<String, AttributeBO> driverConfig,
-                                                             String serviceUuid, String characteristicUuid) {
+    private CharacteristicGovernor getCharacteristicGovernor(
+            Long deviceId, Map<String, AttributeBO> driverConfig, String serviceUuid, String characteristicUuid) {
         String deviceAddress = getRequiredConfig(driverConfig, "deviceAddress");
         String adapterName = getConfigValue(driverConfig, "adapterName", "hci0");
 
@@ -241,7 +250,7 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
 
     private String parseBytes(byte[] data, String format, String byteOrder) {
         return switch (format.toUpperCase()) {
-            case "HEX" -> bytesToHex(data);
+            case "HEX" -> CodecUtil.bytesToHex(data);
             case "INT16" -> String.valueOf(readInt16(data, byteOrder));
             case "UINT16" -> String.valueOf(readUint16(data, byteOrder));
             case "FLOAT" -> String.valueOf(readFloat(data, byteOrder));
@@ -251,7 +260,9 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
 
     private String getRequiredConfig(Map<String, AttributeBO> config, String code) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             throw new ConnectorException("Required attribute '{}' is missing", code);
         }
         return attr.getValue(String.class);
@@ -259,7 +270,9 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -269,20 +282,21 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
     public ValidationReport validate(Map<String, AttributeBO> driverConfig) {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
         checkRequired(driverConfig, "adapterName", issues);
+        checkRequired(driverConfig, "deviceAddress", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
     public ValidationReport validatePoint(Map<String, AttributeBO> pointConfig, PointBO point) {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
-        checkRequired(pointConfig, "deviceAddress", issues);
         checkRequired(pointConfig, "serviceUuid", issues);
         checkRequired(pointConfig, "characteristicUuid", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

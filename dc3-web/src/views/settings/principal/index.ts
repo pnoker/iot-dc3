@@ -15,32 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {defineComponent, reactive} from 'vue';
+import {computed, defineComponent, onBeforeUnmount, reactive, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
 
 import {disablePrincipal, enablePrincipal, listPrincipal} from '@/api/principal';
 import {usePagedList} from '@/composables/usePagedList';
-import {timestampColumn} from '@/utils/dateUtil';
 import {successMessage} from '@/utils/notificationUtil';
 import {cleanSearchParams} from '@/utils/searchParamUtil';
 import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
 
-import type {PrincipalRecord} from '@/config/types';
+import {PRINCIPAL_TYPE_OPTIONS} from '@/config/constant/enums';
+import type {PrincipalRecord, ResponsiveListColumn} from '@/config/types';
 
-import BlankCard from '@/components/card/blank/BlankCard.vue';
+import ResponsiveRecordList from '@/components/list/ResponsiveRecordList.vue';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-
-const PRINCIPAL_TYPE_OPTIONS = [
-  {label: 'USER', value: 'USER'},
-  {label: 'SERVICE_ACCOUNT', value: 'SERVICE_ACCOUNT'},
-  {label: 'SYSTEM', value: 'SYSTEM'},
-];
 
 export default defineComponent({
   name: 'SettingsPrincipal',
   components: {
-    BlankCard,
+    ResponsiveRecordList,
     ToolCard,
     EnableFlagSegmented,
   },
@@ -59,22 +53,53 @@ export default defineComponent({
     });
 
     const refresh = () => load();
+    let disposed = false;
 
     // Read-mostly roster: principals are created through user / service-account management, so
     // this page only lists and toggles enable. No add dialog.
     const filterForm = reactive<Record<string, any>>({principalType: '', principalName: '', enableFlag: ''});
+    const togglingIds = ref(new Set<string>());
+
+    const columns = computed<ResponsiveListColumn<PrincipalRecord>[]>(() => [
+      {
+        key: 'principalName',
+        label: t('settings.principal.principalName'),
+        minWidth: 200,
+        mobile: 'primary',
+      },
+      {key: 'displayName', label: t('settings.principal.displayName'), minWidth: 160},
+      {key: 'principalType', label: t('settings.principal.principalType'), minWidth: 150, kind: 'tag'},
+      {key: 'sourceType', label: t('settings.principal.sourceType'), minWidth: 130},
+      {key: 'enableFlag', label: t('common.enable'), width: 90, kind: 'custom'},
+      {key: 'lastLoginTime', label: t('settings.principal.lastLoginTime'), width: 165, kind: 'time'},
+      {key: 'createTime', label: t('common.createTime'), width: 165, kind: 'time', mobile: 'hidden'},
+    ]);
+
+    const isToggling = (row: PrincipalRecord) => togglingIds.value.has(String(row.id));
 
     const toggleEnable = (row: PrincipalRecord) => {
+      const id = String(row.id);
+      if (togglingIds.value.has(id)) return;
+      togglingIds.value.add(id);
       const disable = isEnabledFlag(row.enableFlag);
       (disable ? disablePrincipal : enablePrincipal)(row.id)
         .then(() => {
+          if (disposed) return;
           successMessage();
-          load();
+          void load();
         })
         .catch(() => {
           // handled globally
+        })
+        .finally(() => {
+          togglingIds.value.delete(id);
         });
     };
+
+    onBeforeUnmount(() => {
+      disposed = true;
+      togglingIds.value.clear();
+    });
 
     const onSearch = (data: Record<string, any>) => search(cleanSearchParams(data));
     const onReset = () => {
@@ -84,7 +109,7 @@ export default defineComponent({
       reset();
     };
 
-    load();
+    void load();
 
     return {
       t,
@@ -94,11 +119,12 @@ export default defineComponent({
       sizeChange,
       currentChange,
       filterForm,
+      columns,
       principalTypeOptions: PRINCIPAL_TYPE_OPTIONS,
       toggleEnable,
+      isToggling,
       onSearch,
       onReset,
-      timestampColumn,
       isEnabledFlag,
     };
   },

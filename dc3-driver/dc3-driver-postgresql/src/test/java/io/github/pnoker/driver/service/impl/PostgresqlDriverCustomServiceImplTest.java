@@ -14,27 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
-
-import io.github.pnoker.common.driver.entity.bean.ValidationReport;
-import io.github.pnoker.common.driver.entity.bo.PointBO;
-import io.github.pnoker.common.driver.service.DriverSenderService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.pnoker.common.driver.entity.bean.ValidationReport;
+import io.github.pnoker.common.driver.entity.bo.PointBO;
+import java.util.HashMap;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 @ExtendWith(MockitoExtension.class)
 class PostgresqlDriverCustomServiceImplTest {
-
-    @Mock
-    private DriverSenderService driverSenderService;
 
     private PostgresqlDriverCustomServiceImpl service;
 
@@ -46,7 +39,7 @@ class PostgresqlDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new PostgresqlDriverCustomServiceImpl(driverSenderService);
+        service = new PostgresqlDriverCustomServiceImpl();
     }
 
     @Test
@@ -64,5 +57,4 @@ class PostgresqlDriverCustomServiceImplTest {
         assertThat(report.isPassed()).isFalse();
         assertThat(report.getIssues()).isNotEmpty();
     }
-
 }

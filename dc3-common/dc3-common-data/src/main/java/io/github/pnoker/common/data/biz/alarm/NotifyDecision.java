@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import lombok.AllArgsConstructor;
@@ -27,7 +26,6 @@ import lombok.ToString;
  * Notification policy decision.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -41,12 +39,22 @@ public class NotifyDecision {
 
     private String reason;
 
+    /**
+     * Send.
+     *
+     * @return send result
+     */
     public static NotifyDecision send() {
         return new NotifyDecision(true, "OK");
     }
 
+    /**
+     * Skip.
+     *
+     * @param reason reason
+     * @return skip result
+     */
     public static NotifyDecision skip(String reason) {
         return new NotifyDecision(false, reason);
     }
-
 }

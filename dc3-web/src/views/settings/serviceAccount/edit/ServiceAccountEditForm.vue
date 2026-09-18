@@ -19,20 +19,38 @@
   <el-dialog
     v-model="reactiveData.visible"
     :append-to-body="true"
+    :before-close="requestClose"
     :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    :show-close="false"
+    :close-on-press-escape="!reactiveData.submitting"
+    :show-close="!reactiveData.submitting"
     :title="
       reactiveData.mode === 'add' ? t('settings.serviceAccount.addTitle') : t('settings.serviceAccount.editTitle')
     "
     class="things-dialog"
+    destroy-on-close
     draggable
-    @closed="reset"
+    @closed="onClosed"
   >
-    <el-form ref="formRef" :model="reactiveData.form" :rules="rules" label-position="top">
+    <el-alert
+      v-if="reactiveData.saveError"
+      :closable="false"
+      :title="t('common.saveFailed')"
+      class="things-dialog-form-alert"
+      show-icon
+      type="error"
+    />
+    <el-form
+      ref="formRef"
+      v-loading="reactiveData.submitting"
+      :aria-busy="reactiveData.submitting"
+      :model="reactiveData.form"
+      :rules="rules"
+      label-position="top"
+    >
       <el-form-item :label="t('settings.serviceAccount.serviceAccountName')" prop="serviceAccountName">
         <el-input
           v-model="reactiveData.form.serviceAccountName"
+          :disabled="reactiveData.submitting"
           :placeholder="t('settings.serviceAccount.serviceAccountNamePlaceholder')"
           clearable
           maxlength="32"
@@ -45,6 +63,7 @@
       <el-form-item :label="t('settings.serviceAccount.purpose')">
         <el-input
           v-model="reactiveData.form.purpose"
+          :disabled="reactiveData.submitting"
           :placeholder="t('settings.serviceAccount.purposePlaceholder')"
           maxlength="255"
           show-word-limit
@@ -54,22 +73,25 @@
       <el-form-item :label="t('settings.serviceAccount.expireTime')">
         <el-date-picker
           v-model="reactiveData.form.expireTime"
+          :disabled="reactiveData.submitting"
           style="width: 100%"
           type="datetime"
           value-format="YYYY-MM-DDTHH:mm:ss"
         />
       </el-form-item>
       <el-form-item :label="t('common.enableFlag')" prop="enableFlag">
-        <enable-flag-segmented v-model="reactiveData.form.enableFlag"/>
+        <enable-flag-segmented v-model="reactiveData.form.enableFlag" :disabled="reactiveData.submitting"/>
       </el-form-item>
     </el-form>
-    <div class="things-dialog-footer">
-      <el-button @click="reactiveData.visible = false">{{ t('common.cancel') }}</el-button>
-      <el-button plain @click="reset">{{ t('common.reset') }}</el-button>
-      <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
-        {{ t('common.confirm') }}
-      </el-button>
-    </div>
+    <template #footer>
+      <div class="things-dialog-footer">
+        <el-button :disabled="reactiveData.submitting" @click="requestClose()">{{ t('common.cancel') }}</el-button>
+        <el-button :disabled="reactiveData.submitting" plain @click="reset">{{ t('common.reset') }}</el-button>
+        <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
+          {{ t('common.confirm') }}
+        </el-button>
+      </div>
+    </template>
   </el-dialog>
 </template>
 

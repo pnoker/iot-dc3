@@ -14,44 +14,50 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Password hashing algorithm.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
 @AllArgsConstructor
 public enum PasswordAlgorithmEnum {
 
+    /**
+     * Argon2id.
+     */
     ARGON2ID("ARGON2ID", "argon2id", "Argon2id"),
 
+    /**
+     * BCrypt.
+     */
     BCRYPT("BCRYPT", "bcrypt", "BCrypt"),
     ;
 
-    @EnumValue
     private final String value;
 
     private final String code;
 
     private final String remark;
 
+    /**
+     * Resolve a password algorithm from its encoded-hash identifier.
+     *
+     * @param value algorithm identifier
+     * @return matching algorithm, or {@code null} when the value is unknown
+     */
     public static PasswordAlgorithmEnum ofValue(String value) {
         Optional<PasswordAlgorithmEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))
                 .findFirst();
         return any.orElse(null);
     }
-
 }

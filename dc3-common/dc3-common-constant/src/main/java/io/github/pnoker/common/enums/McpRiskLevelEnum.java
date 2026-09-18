@@ -14,22 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * MCP tool risk level (governs confirmation and visibility policy).
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -55,7 +51,6 @@ public enum McpRiskLevelEnum {
     /**
      * Database / wire value.
      */
-    @EnumValue
     @JsonValue
     private final String value;
 
@@ -69,11 +64,16 @@ public enum McpRiskLevelEnum {
      */
     private final String remark;
 
+    /**
+     * Resolve an MCP risk level from its persisted wire value.
+     *
+     * @param value persisted risk-level value
+     * @return matching level, or {@code null} when the value is unknown
+     */
     public static McpRiskLevelEnum ofValue(String value) {
         Optional<McpRiskLevelEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))
                 .findFirst();
         return any.orElse(null);
     }
-
 }

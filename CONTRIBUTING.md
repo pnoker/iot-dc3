@@ -31,14 +31,25 @@ For source-run Java processes, load runtime variables from:
 source dc3/env/dev.env.sh
 ```
 
+The root Makefile is the project-level command entry point. The Web application
+and TypeScript CLI retain independent pnpm packages and lockfiles. See
+[`docs/development.md`](docs/development.md) for the full command table:
+
+```bash
+make install-node   # install dc3-web and dc3-cli dependencies
+make dev-auth       # one backend service
+make dev            # auth, gateway, data, manager, agentic
+make check          # Java, Web, CLI, and Python quality gates
+```
+
 For Compose interpolation, copy the root template first:
 
 ```bash
 cp .env.example .env
 ```
 
-See `dc3/doc/ENVIRONMENT.md` for the difference between `.env.example`, `.env`, `dc3/env/dev.env`, and
-`dc3/env/dev.env.sh`, including JetBrains IDEA usage.
+See the [environment guide](https://docs.dc3.site/en/quickstart/environment) for the difference between `.env.example`,
+`.env`, `dc3/env/dev.env`, and `dc3/env/dev.env.sh`, including JetBrains IDEA usage.
 
 ## Branches and Pull Requests
 
@@ -46,8 +57,9 @@ IoT DC3 follows a simplified Git Flow:
 
 - `develop` — integration branch. Cut `feature/<scope>` branches from `develop` and open pull requests back against
   `develop`. Full CI (lint / test / build / e2e) runs here.
-- `main` — production trunk. Verified work is promoted from `develop` to `main` via pull request. Each merge to `main`
-  is a release (a tag is cut and artifacts are published).
+- `main` — production trunk. Verified work is promoted from `develop` to `main` via pull request. A release is published
+  only after the version and generated changelog are committed and the matching `v<project.version>` tag is explicitly
+  created.
 - `hotfix/<scope>` — cut from `main` for production fixes; open the PR back against `main` (then tag), and back-merge to
   `develop`.
 - `release` — archived (read-only). It is kept for history only; do not open pull requests against it.
@@ -70,8 +82,11 @@ Allowed types are `feat`, `fix`, `perf`, `refactor`, `docs`, `build`, `ci`, `tes
 `revert`. Use English, keep the subject specific, and avoid vague descriptions such as `update`, `fix`, `misc`, `wip`,
 or `.` because release notes are generated from commit history.
 
-Husky Git hooks are pre-installed in the repository (`.husky/`). The `pre-commit` hook automatically runs lint-staged
-(eslint + prettier) on staged files before each commit. No manual setup is needed.
+A commit that only updates the generated changelog must use exactly `docs(release): update generated changelog`, and it
+must be kept separate from behaviour, configuration, or tooling changes so the generator can skip it.
+
+The repository provides a Husky `pre-commit` hook under `.husky/`. After frontend dependencies are installed, it runs
+lint-staged and applies ESLint to staged JavaScript, TypeScript, and Vue files.
 
 ## Build and Verification
 
@@ -93,26 +108,46 @@ Before tagging a release, generate the categorized changelog from git:
 make changelog
 ```
 
-By default this reads the current version from `pom.xml`, compares `HEAD` with the latest reachable `v*`
+`dc3/doc/CHANGE.md` is generated from Git history: do not hand-edit the current release block unless fixing generator
+output. By default the command reads the current version from `pom.xml`, compares `HEAD` with the latest reachable `v*`
 (semver) tag, and updates `dc3/doc/CHANGE.md`. You can override the range or version when needed:
 
 ```bash
-make changelog FROM=v2025.9.3 TO=HEAD VERSION=2026.5.22
+make changelog FROM=<previous-v-tag> TO=HEAD VERSION=<project-version>
 ```
 
-To cut a release, switch to `main` and create the next semver tag (this also opens a GitHub Release):
+The root `pom.xml` version is the release identity. Update and commit that version and the generated changelog first,
+then switch to a clean, up-to-date `main` and create the matching tag:
 
 ```bash
-make tag            # patch: v2025.9.3 -> v2025.9.4
-make tag minor      # minor: v2025.9.4 -> v2025.10.0
-make tag major      # major: v2025.10.0 -> v2026.0.0
+make tag            # pom.xml <version> -> annotated tag v<version>
 ```
 
-`bash dc3/bin/tag.sh --dry-run` previews the next tag without pushing. Tagging only runs on `main`.
+`bash dc3/bin/tag.sh --dry-run` previews the exact tag without pushing. The script refuses dirty, non-`main`,
+out-of-date, duplicate, or malformed-version releases. It only pushes the annotated tag; the `Docker Images` workflow
+then reruns backend and web verification, checks that the tag matches `pom.xml`, publishes images, and creates the
+GitHub Release. Configure the `release` environment with required reviewers, protected `v*` tags, and the registry
+credentials. A manual workflow run performs a non-publishing build unless it targets an existing matching `v*` tag.
 
 Generated changelog-only release commits are skipped by default so rerunning the command after committing
-`CHANGE.md` remains stable. Set `INCLUDE_CHANGELOG_COMMITS=true` only when those commits should appear in
-release notes.
+`CHANGE.md` remains stable. Set `INCLUDE_CHANGELOG_COMMITS=true` only when those commits should appear in release notes.
+
+### Backfilling Missing Releases
+
+Every version recorded in `CHANGE.md` should end up with a GitHub Release. When a release window is skipped (a version
+is committed to `CHANGE.md` but never tagged), close the gap without re-tagging history:
+
+```bash
+make release-backfill          # dry-run: list CHANGE.md versions that have no release
+make release-backfill-apply    # create them (gh CLI, authenticated)
+```
+
+The tool maps each date-formatted version to the last commit dated on or before that version day, assembles the release
+body from `TITLE.md` + the version's changelog block + the `RELEASE-FOOTER.md` quick start (deep usage and deployment
+content lives on docs.dc3.site), and creates the tag through the GitHub API — which does **not** trigger the
+`Docker Images` workflow and never moves the `latest` pointer. When `TITLE.md` or `RELEASE-FOOTER.md` evolves,
+`make release-backfill-refresh` re-renders the bodies of already-backfilled releases. Run the dry-run periodically to
+catch drift between `CHANGE.md` and the release list.
 
 ## Coding Guidelines
 
@@ -125,9 +160,9 @@ release notes.
 
 ## Documentation and Translation
 
-When changing root README content, keep `README.md`, `README.zh.md`, `README.ja.md`, and `README.vi.md` structurally
-aligned. If a translated update is not possible in the same pull request, call it out clearly in the pull request
-description.
+When changing root README content, keep `README.md`, `README.zh.md`, `README.es.md`, `README.ja.md`, `README.ko.md`,
+`README.ru.md`, and `README.vi.md` structurally aligned. If a translated update is not possible in the same pull
+request, call it out clearly in the pull request description.
 
 ## License
 

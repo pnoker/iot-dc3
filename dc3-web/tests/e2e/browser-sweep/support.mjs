@@ -15,9 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import JSONBigInt from 'json-bigint';
-
-const JSONBigIntStr = JSONBigInt({storeAsString: true});
 const E2E_CREDENTIALS = {
   tenant: process.env.E2E_TENANT || 'default',
   name: process.env.E2E_USERNAME || 'dc3',
@@ -184,7 +181,16 @@ export async function apiPost(page, url, body = {}, params = {}) {
       const decodeStorage = (key) => {
         const raw = localStorage.getItem(key);
         if (!raw) return undefined;
-        return JSON.parse(atob(raw)).content;
+        try {
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === 'object' && 'content' in parsed ? parsed.content : parsed;
+        } catch {
+          try {
+            return JSON.parse(atob(raw)).content;
+          } catch {
+            return raw;
+          }
+        }
       };
       const target = new URL(requestUrl, window.location.origin);
       Object.entries(requestParams).forEach(([key, value]) => {
@@ -197,12 +203,12 @@ export async function apiPost(page, url, body = {}, params = {}) {
         'Content-Type': 'application/json',
         'X-Auth-Tenant': decodeStorage('X-Auth-Tenant'),
         'X-Auth-Login': decodeStorage('X-Auth-Login'),
-        'X-Auth-Token': JSON.stringify(decodeStorage('X-Auth-Token')),
       };
       const res = await fetch(targetUrl, {
         method: 'POST',
         headers,
         body: JSON.stringify(requestBody),
+        credentials: 'include',
       });
       const text = await res.text();
       return {status: res.status, text};
@@ -212,7 +218,7 @@ export async function apiPost(page, url, body = {}, params = {}) {
 
   let data;
   try {
-    data = JSONBigIntStr.parse(response.text);
+    data = JSON.parse(response.text);
   } catch {
     data = response.text;
   }
@@ -220,12 +226,111 @@ export async function apiPost(page, url, body = {}, params = {}) {
   return {status: response.status, data, text: response.text};
 }
 
+export async function apiGet(page, url, params = {}) {
+  const response = await page.evaluate(
+    async ({requestUrl, requestParams}) => {
+      const decodeStorage = (key) => {
+        const raw = localStorage.getItem(key);
+        if (!raw) return undefined;
+        try {
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === 'object' && 'content' in parsed ? parsed.content : parsed;
+        } catch {
+          try {
+            return JSON.parse(atob(raw)).content;
+          } catch {
+            return raw;
+          }
+        }
+      };
+      const target = new URL(requestUrl, window.location.origin);
+      Object.entries(requestParams).forEach(([key, value]) => {
+        if (value !== undefined) target.searchParams.set(key, String(value));
+      });
+      const targetUrl =
+        target.origin === window.location.origin ? `${target.pathname}${target.search}` : target.toString();
+      const res = await fetch(targetUrl, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+          'X-Auth-Tenant': decodeStorage('X-Auth-Tenant'),
+          'X-Auth-Login': decodeStorage('X-Auth-Login'),
+        },
+        credentials: 'include',
+      });
+      return {status: res.status, text: await res.text()};
+    },
+    {requestUrl: url, requestParams: params}
+  );
+  let data;
+  try {
+    data = JSON.parse(response.text);
+  } catch {
+    data = response.text;
+  }
+  return {status: response.status, data, text: response.text};
+}
+
+export async function apiDelete(page, url, params = {}) {
+  const response = await page.evaluate(
+    async ({requestUrl, requestParams}) => {
+      const decodeStorage = (key) => {
+        const raw = localStorage.getItem(key);
+        if (!raw) return undefined;
+        try {
+          const parsed = JSON.parse(raw);
+          return parsed && typeof parsed === 'object' && 'content' in parsed ? parsed.content : parsed;
+        } catch {
+          try {
+            return JSON.parse(atob(raw)).content;
+          } catch {
+            return raw;
+          }
+        }
+      };
+      const target = new URL(requestUrl, window.location.origin);
+      Object.entries(requestParams).forEach(([key, value]) => {
+        if (value !== undefined) target.searchParams.set(key, String(value));
+      });
+      const targetUrl =
+        target.origin === window.location.origin ? `${target.pathname}${target.search}` : target.toString();
+      const res = await fetch(targetUrl, {
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json',
+          'X-Auth-Tenant': decodeStorage('X-Auth-Tenant'),
+          'X-Auth-Login': decodeStorage('X-Auth-Login'),
+        },
+        credentials: 'include',
+      });
+      return {status: res.status, text: await res.text()};
+    },
+    {requestUrl: url, requestParams: params}
+  );
+  let data;
+  try {
+    data = JSON.parse(response.text);
+  } catch {
+    data = response.text;
+  }
+  return {status: response.status, data, text: response.text};
+}
+
+export async function deleteVersionedEntity(page, baseUrl, id) {
+  const current = await apiGet(page, `${baseUrl}/get_by_id`, {id});
+  const version = Number(current.data?.version);
+  if (!Number.isInteger(version) || version < 0) {
+    throw new Error(`Cannot delete ${baseUrl}/${id}: current version is missing`);
+  }
+  return apiDelete(page, `${baseUrl}/delete`, {id, version});
+}
+
 export async function listCount(page, url, nameField, name) {
-  const res = await apiPost(page, url, {page: {size: 10, current: 1}, [nameField]: name});
-  if (!res.data?.ok) {
+  const res = await apiPost(page, url, {offset: 0, limit: 10, [nameField]: name});
+  if (res.status >= 300) {
     throw new Error(`Failed to list ${url}: ${JSON.stringify(res.data)}`);
   }
-  return res.data.data?.records?.length || 0;
+  return res.data?.items?.length || 0;
 }
 
 export function idOf(record) {
@@ -235,15 +340,13 @@ export function idOf(record) {
 }
 
 export async function firstRecord(page, url) {
-  const res = await apiPost(page, url, {page: {size: 1, current: 1}});
-  if (!res.data?.ok) return undefined;
-  return res.data.data?.records?.[0];
+  const res = await apiPost(page, url, {offset: 0, limit: 1});
+  return res.status < 300 ? res.data?.items?.[0] : undefined;
 }
 
 export async function listByName(page, url, nameField, name) {
-  const res = await apiPost(page, url, {page: {size: 1, current: 1}, [nameField]: name});
-  if (!res.data?.ok) return undefined;
-  return res.data.data?.records?.[0];
+  const res = await apiPost(page, url, {offset: 0, limit: 1, [nameField]: name});
+  return res.status < 300 ? res.data?.items?.[0] : undefined;
 }
 
 export function uniqueName(prefix) {
@@ -256,18 +359,22 @@ export async function createEntity(page, cleanupStack, seed) {
   if (idOf(existing)) return idOf(existing);
 
   const add = await apiPost(page, seed.addUrl, seed.body);
-  if (!add.data?.ok) {
+  if (add.status >= 300) {
     throw new Error(`Failed to seed ${seed.addUrl}: ${JSON.stringify(add.data)}`);
   }
-  const created = add.data.data || (await listByName(page, seed.listUrl, seed.nameField, name));
+  const created = add.data || (await listByName(page, seed.listUrl, seed.nameField, name));
   const id = idOf(created);
   if (!id) {
     throw new Error(`Seeded ${seed.addUrl} but could not resolve id`);
   }
 
   cleanupStack.push(async () => {
-    await apiPost(page, seed.deleteUrl, {}, {id}).catch(() => {
-    });
+    const baseUrl = seed.deleteUrl.replace(/\/delete$/, '');
+    if (seed.versioned) {
+      await deleteVersionedEntity(page, baseUrl, id).catch(() => {});
+    } else {
+      await apiDelete(page, seed.deleteUrl, {id}).catch(() => {});
+    }
   });
   return id;
 }

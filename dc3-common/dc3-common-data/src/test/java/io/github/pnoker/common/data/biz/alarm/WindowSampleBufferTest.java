@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.data.entity.property.AlarmWindowProperties;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class WindowSampleBufferTest {
 
@@ -97,7 +95,8 @@ class WindowSampleBufferTest {
 
         assertThat(buffer.size(KEY_A)).isEqualTo(1);
         assertThat(buffer.snapshot(KEY_A, null, null))
-                .extracting(WindowSample::numValue).containsExactly(3.0);
+                .extracting(WindowSample::numValue)
+                .containsExactly(3.0);
     }
 
     @Test
@@ -109,9 +108,11 @@ class WindowSampleBufferTest {
         assertThat(buffer.size(KEY_A)).isEqualTo(1);
         assertThat(buffer.size(KEY_B)).isEqualTo(1);
         assertThat(buffer.snapshot(KEY_A, null, null))
-                .extracting(WindowSample::numValue).containsExactly(80.0);
+                .extracting(WindowSample::numValue)
+                .containsExactly(80.0);
         assertThat(buffer.snapshot(KEY_B, null, null))
-                .extracting(WindowSample::numValue).containsExactly(99.9);
+                .extracting(WindowSample::numValue)
+                .containsExactly(99.9);
     }
 
     @Test
@@ -127,5 +128,4 @@ class WindowSampleBufferTest {
         buffer.append(KEY_A, null);
         assertThat(buffer.size(KEY_A)).isZero();
     }
-
 }

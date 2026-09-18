@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.coap.handler;
 
 import io.github.pnoker.driver.coap.entity.CoapMessage;
@@ -23,7 +22,6 @@ import io.github.pnoker.driver.coap.entity.CoapMessage;
  * CoAP Observe Handler Interface
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 public interface CoapObserveHandler {
@@ -42,5 +40,4 @@ public interface CoapObserveHandler {
      * @param error the error that occurred
      */
     void onError(String uri, Exception error);
-
 }

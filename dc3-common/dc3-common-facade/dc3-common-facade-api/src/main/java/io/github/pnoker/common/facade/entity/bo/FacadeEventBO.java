@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
@@ -32,7 +31,6 @@ import lombok.ToString;
  * Facade-level event BO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -42,34 +40,23 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class FacadeEventBO extends BaseBO {
 
-
     private String eventName;
-
 
     private String eventCode;
 
-
     private EventTypeFlagEnum eventTypeFlag;
-
 
     private EventLevelEnum eventLevelFlag;
 
-
     private EventExt eventExt;
-
 
     private Long profileId;
 
-
     private EnableFlagEnum enableFlag;
-
 
     private Long tenantId;
 
-
     private String signature;
 
-
     private Integer version;
-
 }

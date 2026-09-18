@@ -14,26 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.OAuthClientTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-
 /**
  * View object for registered OAuth client API responses. The client secret hash is never exposed.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter
@@ -55,13 +52,13 @@ public class OAuthClientVO extends BaseVO {
     private OAuthClientTypeEnum clientType;
 
     @Schema(description = "Principal that owns the client.", example = "1024")
-    private Long ownerPrincipalId;
+    private String ownerPrincipalId;
 
     @Schema(description = "Service account principal bound to the client, for client_credentials.", example = "2048")
-    private Long serviceAccountPrincipalId;
+    private String serviceAccountPrincipalId;
 
     @Schema(description = "Tenant the client belongs to.", example = "1")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "Timestamp when the client secret expires.", example = "2027-06-19 12:00:00")
     private LocalDateTime clientSecretExpiresAt;
@@ -86,5 +83,4 @@ public class OAuthClientVO extends BaseVO {
 
     @Schema(description = "Enable flag: 0 enabled, 1 disabled.", example = "0")
     private Byte enableFlag;
-
 }

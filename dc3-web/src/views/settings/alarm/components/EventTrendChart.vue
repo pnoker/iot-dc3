@@ -17,7 +17,12 @@
 
 <template>
   <dashboard-card
+    :empty="status === 'success' && rows.length === 0"
+    :empty-text="$t('settings.event.overview.trendEmpty')"
+    :error="status === 'error'"
+    :error-text="$t('common.loadFailed')"
     :loading="loading"
+    :retry-text="$t('common.retry')"
     :title="$t('settings.event.overview.trendTitle')"
     body-mode="chart"
     @refresh="load"
@@ -28,14 +33,18 @@
 
 <script lang="ts" setup>
 import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
 import {alertTrend} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 const props = defineProps<{ days?: number }>();
+const {t, locale} = useI18n();
 
-const loading = ref(false);
+const {loading, run, status} = useAsyncLoader();
+const rows = ref<{date: string; source: string; count: number}[]>([]);
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
 
@@ -59,28 +68,47 @@ const render = (data: { date: string; source: string; count: number }[]) => {
 };
 
 const load = async () => {
-  loading.value = true;
-  try {
-    const res: any = await alertTrend(props.days ?? 30);
-    const rows: any[] = res?.data ?? [];
-    const flat: { date: string; source: string; count: number }[] = [];
-    for (const r of rows) {
-      flat.push({date: r.date, source: 'Device', count: r.deviceCount ?? 0});
-      flat.push({date: r.date, source: 'Driver', count: r.driverCount ?? 0});
-      flat.push({date: r.date, source: 'Point', count: r.pointCount ?? 0});
-    }
-    await nextTick();
-    render(flat);
-  } catch {
-    // handled globally
-  } finally {
-    loading.value = false;
+  const days = props.days ?? 30;
+  await run(() => alertTrend(days), {
+    apply: (res) => {
+      const flat: {date: string; source: string; count: number}[] = [];
+      type TrendPayload = {
+        date: string;
+        source?: string;
+        count?: number;
+        deviceCount?: number;
+        driverCount?: number;
+        pointCount?: number;
+      };
+      for (const row of (Array.isArray(res) ? res : []) as TrendPayload[]) {
+        if (row.source) {
+          flat.push({date: row.date, source: row.source, count: Number(row.count) || 0});
+          continue;
+        }
+        flat.push({date: row.date, source: t('settings.event.sourceDevice'), count: Number(row.deviceCount) || 0});
+        flat.push({date: row.date, source: t('settings.event.sourceDriver'), count: Number(row.driverCount) || 0});
+        flat.push({date: row.date, source: t('settings.event.sourcePoint'), count: Number(row.pointCount) || 0});
+      }
+      rows.value = flat;
+    },
+  });
+  if (status.value !== 'success') return;
+  await nextTick();
+  if (status.value !== 'success') return;
+  if (rows.value.length > 0) render(rows.value);
+  else {
+    chart?.destroy();
+    chart = undefined;
   }
 };
 
 onMounted(load);
 watch(() => props.days, load);
-onUnmounted(() => chart?.destroy());
+watch(locale, load);
+onUnmounted(() => {
+  chart?.destroy();
+  chart = undefined;
+});
 
 defineExpose({refresh: load});
 </script>

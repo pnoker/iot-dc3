@@ -14,25 +14,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 /**
  * Query view object for paging the MCP tool catalog.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter
@@ -47,13 +46,22 @@ public class McpToolCatalogQueryVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    @Schema(description = "Zero-based result offset.", example = "0", minimum = "0")
+    private Long offset;
+
+    @Schema(
+            description = "Maximum number of results; bounded to 1..200.",
+            example = "50",
+            minimum = "1",
+            maximum = "200")
+    private Integer limit;
+
+    @Schema(description = "Stable sort fields; only server-approved fields are accepted.")
+    private List<SortSpec> sort;
+
     @Schema(description = "Fuzzy keyword over tool id, name and title.", example = "device")
     private String keyword;
 
     @Schema(description = "Filter by tool risk level: LOW, MEDIUM or HIGH.", example = "LOW")
     private String riskLevel;
-
-    @Schema(description = "Maximum number of records to return.", example = "200")
-    private Integer limit;
-
 }

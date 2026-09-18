@@ -24,6 +24,7 @@
           :icon="icon"
           :name="data.profileName"
           :status-title="$t('common.name')"
+          :copy-label="$t('profile.card.profileId')"
           @copy-id="copy(data.id, $t('profile.card.profileId'))"
         />
         <div class="things-card__body">
@@ -33,13 +34,13 @@
                 <el-icon>
                   <Edit/>
                 </el-icon>
-                {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime) }}
+                {{ $t('common.operationTime') }}: {{ timestamp(data.operateTime || '') }}
               </li>
               <li class="nowrap-item">
                 <el-icon>
                   <Sunset/>
                 </el-icon>
-                {{ $t('common.createTime') }}: {{ timestamp(data.createTime) }}
+                {{ $t('common.createTime') }}: {{ timestamp(data.createTime || '') }}
               </li>
             </ul>
           </div>
@@ -51,10 +52,11 @@
         </div>
         <things-card-actions
           v-if="!embedded"
-          :delete-title="$t('profile.card.confirmDelete')"
-          :disable-title="$t('profile.card.confirmDisable')"
-          :enable-title="$t('profile.card.confirmEnable')"
+          :delete-title="$t('common.confirmDelete', {name: $t('common.entityProfile')})"
+          :disable-title="$t('common.confirmDisable', {name: $t('common.entityProfile')})"
+          :enable-title="$t('common.confirmEnable', {name: $t('common.entityProfile')})"
           :enabled="enabled"
+          :busy="busy"
           @delete="emitAction('delete-thing')"
           @detail="detail"
           @disable="emitAction('disable-thing')"
@@ -72,22 +74,23 @@ import {Edit, Sunset} from '@element-plus/icons-vue';
 import router from '@/config/router';
 import {copy} from '@/utils/commonUtil';
 import {timestamp} from '@/utils/dateUtil';
-import {successMessage} from '@/utils/notificationUtil';
 import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
 import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
+import type {ProfileRecord} from '@/config/types/manager';
 
 const props = defineProps({
   embedded: {type: Boolean, default: false},
-  data: {type: Object as PropType<Record<string, any>>, default: () => ({})},
+  data: {type: Object as PropType<ProfileRecord>, required: true},
   icon: {type: String, default: 'images/common/profile.png'},
+  busy: {type: Boolean, default: false},
 });
 
 const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing']);
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const emitAction = (name: 'disable-thing' | 'enable-thing' | 'delete-thing') => {
-  emit(name, props.data.id, () => successMessage());
+  emit(name, props.data);
 };
 
 const edit = () => {

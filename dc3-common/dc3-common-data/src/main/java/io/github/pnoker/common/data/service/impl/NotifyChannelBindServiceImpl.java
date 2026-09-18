@@ -14,188 +14,147 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.constant.common.QueryWrapperConstant;
-import io.github.pnoker.common.data.dal.NotifyChannelBindManager;
-import io.github.pnoker.common.data.dal.NotifyChannelManager;
-import io.github.pnoker.common.data.dal.NotifyManager;
+import io.github.pnoker.common.data.biz.alarm.NotifyConfigCache;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
 import io.github.pnoker.common.data.entity.builder.NotifyChannelBindBuilder;
 import io.github.pnoker.common.data.entity.model.NotifyChannelBindDO;
-import io.github.pnoker.common.data.entity.model.NotifyChannelDO;
-import io.github.pnoker.common.data.entity.model.NotifyDO;
 import io.github.pnoker.common.data.entity.query.NotifyChannelBindQuery;
+import io.github.pnoker.common.data.repository.ReactiveNotifyAdminStore;
 import io.github.pnoker.common.data.service.NotifyChannelBindService;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.exception.AddException;
 import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
-import io.github.pnoker.common.utils.FieldUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
-/**
- * Notification channel binding service implementation.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
-@Slf4j
+/** Default notify channel bind service implementation. */
 @Service
 @RequiredArgsConstructor
 public class NotifyChannelBindServiceImpl implements NotifyChannelBindService {
-
-    private final NotifyChannelBindBuilder notifyChannelBindBuilder;
-
-    private final NotifyChannelBindManager notifyChannelBindManager;
-
-    private final NotifyManager notifyManager;
-
-    private final NotifyChannelManager notifyChannelManager;
-
-    private final io.github.pnoker.common.data.biz.alarm.NotifyConfigCache notifyConfigCache;
+    private final NotifyChannelBindBuilder builder;
+    private final ReactiveNotifyAdminStore store;
+    private final NotifyConfigCache cache;
 
     @Override
-    public void add(NotifyChannelBindBO entityBO) {
-        requireReferences(entityBO);
-        checkDuplicate(entityBO, false, true);
-
-        NotifyChannelBindDO entityDO = notifyChannelBindBuilder.buildDOByBO(entityBO);
-        if (!notifyChannelBindManager.save(entityDO)) {
-            throw new AddException("Failed to create notify channel binding");
-        }
-        notifyConfigCache.invalidateBinds(entityBO.getTenantId(), entityBO.getNotifyId());
-    }
-
-    @Override
-    public void delete(Long id) {
-        NotifyChannelBindDO existing = getDOById(id, true);
-
-        if (!notifyChannelBindManager.removeById(id)) {
-            throw new DeleteException("Failed to remove notify channel binding");
-        }
-        notifyConfigCache.invalidateBinds(existing.getTenantId(), existing.getNotifyId());
+    public Mono<NotifyChannelBindBO> add(NotifyChannelBindBO value) {
+        return Mono.defer(() -> {
+            validate(value);
+            return refs(value)
+                    .then(store.existsBind(
+                            value(value.getTenantId()), value(value.getNotifyId()), value(value.getChannelId()), null))
+                    .flatMap(exists -> {
+                        if (exists)
+                            return Mono.error(new DuplicateException("Notify channel binding has been duplicated"));
+                        NotifyChannelBindDO data = builder.buildDOByBO(value);
+                        return store.insertBind(data)
+                                .map(builder::buildBOByDO)
+                                .switchIfEmpty(Mono.error(new AddException("Failed to create notify channel binding")));
+                    })
+                    .doOnSuccess(result -> {
+                        if (result != null) cache.invalidateBinds(result.getTenantId(), result.getNotifyId());
+                    })
+                    .onErrorMap(
+                            DataIntegrityViolationException.class,
+                            error -> new DuplicateException("Notify channel binding has been duplicated"));
+        });
     }
 
     @Override
-    public void update(NotifyChannelBindBO entityBO) {
-        NotifyChannelBindDO existing = getDOById(entityBO.getId(), true);
-
-        requireReferences(entityBO);
-        checkDuplicate(entityBO, true, true);
-
-        NotifyChannelBindDO entityDO = notifyChannelBindBuilder.buildDOByBO(entityBO);
-        entityDO.setOperateTime(null);
-        if (!notifyChannelBindManager.updateById(entityDO)) {
-            throw new UpdateException("Failed to update notify channel binding");
-        }
-        // Invalidate both old and new (tenant, notify) tuples; the parent notify
-        // could in principle change.
-        notifyConfigCache.invalidateBinds(existing.getTenantId(), existing.getNotifyId());
-        notifyConfigCache.invalidateBinds(entityBO.getTenantId(), entityBO.getNotifyId());
+    public Mono<Boolean> delete(Long tenantId, Long id) {
+        return store.getBind(value(tenantId), value(id))
+                .switchIfEmpty(Mono.error(new NotFoundException("Notify channel binding does not exist")))
+                .flatMap(existing -> store.deleteBind(value(tenantId), value(id))
+                        .flatMap(ok -> ok
+                                ? Mono.just(true)
+                                : Mono.error(new DeleteException("Failed to remove notify channel binding")))
+                        .doOnSuccess(ok -> cache.invalidateBinds(existing.getTenantId(), existing.getNotifyId())));
     }
 
     @Override
-    public NotifyChannelBindBO getById(Long id) {
-        NotifyChannelBindDO entityDO = getDOById(id, true);
-        return notifyChannelBindBuilder.buildBOByDO(entityDO);
+    public Mono<NotifyChannelBindBO> update(NotifyChannelBindBO value) {
+        return Mono.defer(() -> {
+            validate(value);
+            return store.getBind(value(value.getTenantId()), value(value.getId()))
+                    .switchIfEmpty(Mono.error(new NotFoundException("Notify channel binding does not exist")))
+                    .flatMap(existing -> refs(value)
+                            .then(store.existsBind(
+                                    value(value.getTenantId()),
+                                    value(value.getNotifyId()),
+                                    value(value.getChannelId()),
+                                    value.getId()))
+                            .flatMap(exists -> {
+                                if (exists)
+                                    return Mono.error(
+                                            new DuplicateException("Notify channel binding has been duplicated"));
+                                NotifyChannelBindDO data = builder.buildDOByBO(value);
+                                return store.updateBind(data)
+                                        .map(builder::buildBOByDO)
+                                        .switchIfEmpty(Mono.error(
+                                                new UpdateException("Failed to update notify channel binding")))
+                                        .doOnSuccess(updated -> {
+                                            cache.invalidateBinds(existing.getTenantId(), existing.getNotifyId());
+                                            if (updated != null)
+                                                cache.invalidateBinds(updated.getTenantId(), updated.getNotifyId());
+                                        });
+                            }));
+        });
     }
 
     @Override
-    public Page<NotifyChannelBindBO> list(NotifyChannelBindQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-        Page<NotifyChannelBindDO> entityPageDO = notifyChannelBindManager.page(
-                PageUtil.page(entityQuery.getPage()), fuzzyQuery(entityQuery));
-        return notifyChannelBindBuilder.buildBOPageByDOPage(entityPageDO);
+    public Mono<NotifyChannelBindBO> getById(Long tenantId, Long id) {
+        return store.getBind(value(tenantId), value(id))
+                .switchIfEmpty(Mono.error(new NotFoundException("Notify channel binding does not exist")))
+                .map(builder::buildBOByDO);
     }
 
-    /**
-     * Build fuzzy query wrapper for notify-channel binding search.
-     *
-     * @param entityQuery {@link NotifyChannelBindQuery} query parameters
-     * @return {@link LambdaQueryWrapper} for {@link NotifyChannelBindDO}
-     */
-    private LambdaQueryWrapper<NotifyChannelBindDO> fuzzyQuery(NotifyChannelBindQuery entityQuery) {
-        LambdaQueryWrapper<NotifyChannelBindDO> wrapper = Wrappers.<NotifyChannelBindDO>query().lambda();
-        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getNotifyId()), NotifyChannelBindDO::getNotifyId,
-                entityQuery.getNotifyId());
-        wrapper.eq(FieldUtil.isValidIdField(entityQuery.getChannelId()), NotifyChannelBindDO::getChannelId,
-                entityQuery.getChannelId());
-        wrapper.eq(Objects.nonNull(entityQuery.getEnableFlag()), NotifyChannelBindDO::getEnableFlag,
-                Objects.isNull(entityQuery.getEnableFlag()) ? null : entityQuery.getEnableFlag().getIndex());
-        return wrapper;
+    @Override
+    public Mono<OffsetPage<NotifyChannelBindBO>> list(Long tenantId, NotifyChannelBindQuery query) {
+        return Mono.defer(() -> {
+            requireTenant(tenantId);
+            NotifyChannelBindQuery request = query == null ? new NotifyChannelBindQuery() : query;
+            PageRequest page = new PageRequest(request.getOffset(), request.getLimit(), request.getSort());
+            return store.listBind(
+                            tenantId, request.getNotifyId(), request.getChannelId(), request.getEnableFlag(), page)
+                    .map(result -> OffsetPage.of(
+                            result.items().stream().map(builder::buildBOByDO).toList(),
+                            result.offset(),
+                            result.limit(),
+                            result.total()));
+        });
     }
 
-    /**
-     * Check whether a notify-channel binding is duplicated by notify and channel.
-     *
-     * @param entityBO       {@link NotifyChannelBindBO} to be validated
-     * @param isUpdate       whether the operation is an update (true) or create (false)
-     * @param throwException whether to throw {@link DuplicateException} when duplicated
-     * @return {@code true} if duplicated, otherwise {@code false}
-     */
-    private boolean checkDuplicate(NotifyChannelBindBO entityBO, boolean isUpdate, boolean throwException) {
-        LambdaQueryWrapper<NotifyChannelBindDO> wrapper = Wrappers.<NotifyChannelBindDO>query().lambda();
-        wrapper.eq(NotifyChannelBindDO::getNotifyId, entityBO.getNotifyId());
-        wrapper.eq(NotifyChannelBindDO::getChannelId, entityBO.getChannelId());
-        wrapper.last(QueryWrapperConstant.LIMIT_ONE);
-        NotifyChannelBindDO one = notifyChannelBindManager.getOne(wrapper);
-        if (Objects.isNull(one)) {
-            return false;
-        }
-        boolean duplicate = !isUpdate || !one.getId().equals(entityBO.getId());
-        if (throwException && duplicate) {
-            throw new DuplicateException("Notify channel binding has been duplicated");
-        }
-        return duplicate;
+    private Mono<Void> refs(NotifyChannelBindBO value) {
+        return store.existsNotify(value(value.getTenantId()), value(value.getNotifyId()))
+                .flatMap(notify -> notify
+                        ? store.existsChannel(value(value.getTenantId()), value(value.getChannelId()))
+                        : Mono.just(false))
+                .flatMap(ok -> ok
+                        ? Mono.empty()
+                        : Mono.error(new NotFoundException("Notify policy or channel does not exist")));
     }
 
-    /**
-     * Validate that the bound notify policy and channel exist and belong to the same
-     * tenant.
-     *
-     * @param entityBO the binding to validate
-     */
-    private void requireReferences(NotifyChannelBindBO entityBO) {
-        NotifyDO notify = notifyManager.getById(entityBO.getNotifyId());
-        if (Objects.isNull(notify) || !Objects.equals(notify.getTenantId(), entityBO.getTenantId())) {
-            throw new NotFoundException("Notify policy does not exist");
-        }
-
-        NotifyChannelDO channel = notifyChannelManager.getById(entityBO.getChannelId());
-        if (Objects.isNull(channel) || !Objects.equals(channel.getTenantId(), entityBO.getTenantId())) {
-            throw new NotFoundException("Notify channel does not exist");
-        }
+    private void validate(NotifyChannelBindBO value) {
+        if (value == null
+                || value.getTenantId() == null
+                || value.getTenantId() <= 0
+                || value.getNotifyId() == null
+                || value.getChannelId() == null)
+            throw new IllegalArgumentException("tenantId, notifyId and channelId are required");
     }
 
-    /**
-     * Get notify-channel binding data object by primary key ID.
-     *
-     * @param id             primary key ID
-     * @param throwException whether to throw {@link NotFoundException} when not found
-     * @return {@link NotifyChannelBindDO} if found, otherwise {@code null} when
-     * {@code throwException} is false
-     */
-    private NotifyChannelBindDO getDOById(Long id, boolean throwException) {
-        NotifyChannelBindDO entityDO = notifyChannelBindManager.getById(id);
-        if (throwException && Objects.isNull(entityDO)) {
-            throw new NotFoundException("Notify channel binding does not exist");
-        }
-        return entityDO;
+    private long value(Long value) {
+        return value == null ? 0 : value;
     }
 
+    private void requireTenant(Long tenantId) {
+        if (tenantId == null || tenantId <= 0) throw new IllegalArgumentException("tenantId is required");
+    }
 }

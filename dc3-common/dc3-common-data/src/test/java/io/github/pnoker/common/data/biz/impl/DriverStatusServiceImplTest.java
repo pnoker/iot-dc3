@@ -14,161 +14,87 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
 
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import io.github.pnoker.common.data.dal.EntityStateManager;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.entity.query.DriverQuery;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
+import io.github.pnoker.common.facade.entity.query.FacadeDriverOffsetQuery;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class DriverStatusServiceImplTest {
+    @Mock
+    DriverFacade driverFacade;
 
     @Mock
-    private DriverFacade driverFacade;
+    DeviceFacade deviceFacade;
 
     @Mock
-    private DeviceFacade deviceFacade;
+    ReactiveEntityStateStore stateStore;
 
-    @Mock
-    private EntityStateManager entityStateManager;
+    @Test
+    void listUsesReactiveDriverFacade() {
+        DriverStatusServiceImpl service = new DriverStatusServiceImpl(driverFacade, deviceFacade, stateStore);
+        FacadeDriverBO driver = new FacadeDriverBO();
+        driver.setId(7L);
+        when(driverFacade.listReactive(any(FacadeDriverOffsetQuery.class)))
+                .thenReturn(Mono.just(io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(List.of(driver), 0, 50, 1)));
+        when(stateStore.listStateFlags(100L, EntityTypeEnum.DRIVER, List.of(7L)))
+                .thenReturn(Mono.just(Map.of(7L, (byte) EntityStatusEnum.ONLINE.getIndex())));
 
-    @Mock
-    private LambdaQueryChainWrapper<EntityStateDO> queryWrapper;
+        StepVerifier.create(service.list(request(100L)))
+                .assertNext(result -> assertThat(result).containsEntry("7", EntityStatusEnum.ONLINE.getCode()))
+                .verifyComplete();
+    }
 
-    @InjectMocks
-    private DriverStatusServiceImpl service;
+    @Test
+    void countOnlineDevicesIsTenantScoped() {
+        DriverStatusServiceImpl service = new DriverStatusServiceImpl(driverFacade, deviceFacade, stateStore);
+        when(driverFacade.getByIdReactive(100L, 7L)).thenReturn(Mono.just(new FacadeDriverBO()));
+        when(deviceFacade.listByDriverIdReactive(100L, 7L)).thenReturn(Flux.just(device(10L), device(11L)));
+        when(stateStore.listStateFlags(100L, EntityTypeEnum.DEVICE, List.of(10L, 11L)))
+                .thenReturn(Mono.just(Map.of(10L, (byte) EntityStatusEnum.ONLINE.getIndex(), 11L, (byte)
+                        EntityStatusEnum.OFFLINE.getIndex())));
 
-    private FacadeDriverBO driver(Long id) {
-        FacadeDriverBO bo = new FacadeDriverBO();
-        bo.setId(id);
-        return bo;
+        StepVerifier.create(service.countOnlineDevices(100L, 7L)).expectNext(1L).verifyComplete();
+    }
+
+    @Test
+    void missingDriverIsNotFound() {
+        DriverStatusServiceImpl service = new DriverStatusServiceImpl(driverFacade, deviceFacade, stateStore);
+        when(driverFacade.getByIdReactive(100L, 7L)).thenReturn(Mono.empty());
+
+        StepVerifier.create(service.countOnlineDevices(100L, 7L))
+                .expectErrorSatisfies(error ->
+                        assertThat(error).isInstanceOf(io.github.pnoker.common.exception.NotFoundException.class))
+                .verify();
+    }
+
+    private FacadeDriverOffsetQuery request(Long tenantId) {
+        return new FacadeDriverOffsetQuery(
+                tenantId, null, null, null, null, null, null, null, null, null, 0, 50, List.of());
     }
 
     private FacadeDeviceBO device(Long id) {
-        FacadeDeviceBO bo = new FacadeDeviceBO();
-        bo.setId(id);
-        return bo;
-    }
-
-    private EntityStateDO onlineState(Long entityId, int typeFlag) {
-        EntityStateDO state = new EntityStateDO();
-        state.setEntityTypeFlag((byte) typeFlag);
-        state.setEntityId(entityId);
-        state.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
-        state.setExpireTime(LocalDateTime.now().plusSeconds(60));
-        return state;
-    }
-
-    private EntityStateDO expiredState(Long entityId, int typeFlag) {
-        EntityStateDO state = new EntityStateDO();
-        state.setEntityTypeFlag((byte) typeFlag);
-        state.setEntityId(entityId);
-        state.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
-        state.setExpireTime(LocalDateTime.now().minusSeconds(10));
-        return state;
-    }
-
-    @Test
-    void getStatusByPageReturnsEmptyMapForEmptyPage() {
-        FacadePage<FacadeDriverBO> page = new FacadePage<>();
-        page.setRecords(List.of());
-        when(driverFacade.listByPage(any())).thenReturn(page);
-        assertThat(service.getStatusByPage(new DriverQuery())).isEmpty();
-    }
-
-    @Test
-    void getStatusByPageDefaultsToOfflineWhenDbRowMissing() {
-        FacadePage<FacadeDriverBO> page = new FacadePage<>();
-        page.setRecords(List.of(driver(1L)));
-        when(driverFacade.listByPage(any())).thenReturn(page);
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(null);
-        assertThat(service.getStatusByPage(new DriverQuery()))
-                .containsEntry(1L, EntityStatusEnum.OFFLINE.getCode());
-    }
-
-    @Test
-    void getStatusByPageReturnsOnlineFromDb() {
-        FacadePage<FacadeDriverBO> page = new FacadePage<>();
-        page.setRecords(List.of(driver(1L)));
-        when(driverFacade.listByPage(any())).thenReturn(page);
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(onlineState(1L, EntityTypeEnum.DRIVER.getIndex()));
-        assertThat(service.getStatusByPage(new DriverQuery()))
-                .containsEntry(1L, EntityStatusEnum.ONLINE.getCode());
-    }
-
-    @Test
-    void getStatusByPageReturnsOfflineWhenExpired() {
-        FacadePage<FacadeDriverBO> page = new FacadePage<>();
-        page.setRecords(List.of(driver(1L)));
-        when(driverFacade.listByPage(any())).thenReturn(page);
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(expiredState(1L, EntityTypeEnum.DRIVER.getIndex()));
-        assertThat(service.getStatusByPage(new DriverQuery()))
-                .containsEntry(1L, EntityStatusEnum.OFFLINE.getCode());
-    }
-
-    @Test
-    void getDeviceOnlineByDriverIdReturnsZeroWhenDriverMissing() {
-        when(driverFacade.getById(1L, 7L)).thenReturn(null);
-        assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo(0L);
-    }
-
-    @Test
-    void getDeviceOnlineByDriverIdReturnsZeroWhenNoDevices() {
-        when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
-        when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of());
-        assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo(0L);
-    }
-
-    @Test
-    void getDeviceOnlineByDriverIdCountsOnlineDevices() {
-        when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
-        when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of(device(10L), device(11L)));
-        EntityStateDO online10 = onlineState(10L, EntityTypeEnum.DEVICE.getIndex());
-        online10.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
-        EntityStateDO expired11 = expiredState(11L, EntityTypeEnum.DEVICE.getIndex());
-        expired11.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(online10).thenReturn(expired11);
-        assertThat(service.getDeviceOnlineByDriverId(1L, 7L)).isEqualTo(1L);
-    }
-
-    @Test
-    void getDeviceOfflineByDriverIdCountsOfflineAndMissingDevices() {
-        when(driverFacade.getById(1L, 7L)).thenReturn(driver(7L));
-        when(deviceFacade.listByDriverId(1L, 7L)).thenReturn(List.of(device(10L), device(11L), device(12L)));
-        EntityStateDO online10 = onlineState(10L, EntityTypeEnum.DEVICE.getIndex());
-        online10.setStateFlag((byte) EntityStatusEnum.ONLINE.getIndex());
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(online10).thenReturn(null).thenReturn(null);
-        assertThat(service.getDeviceOfflineByDriverId(1L, 7L)).isEqualTo(2L);
+        FacadeDeviceBO value = new FacadeDeviceBO();
+        value.setId(id);
+        return value;
     }
 }

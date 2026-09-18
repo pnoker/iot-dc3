@@ -14,23 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 /**
  * Daily event count for a single day, split by device and driver source.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.3
  */
 @Getter
@@ -51,5 +48,4 @@ public class AlertTrendVO implements Serializable {
 
     @Schema(description = "driver alarm count for the day", example = "5")
     private long driverCount;
-
 }

@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.entity.ext.RuleExt;
 import io.github.pnoker.common.enums.WindowModeEnum;
-import org.junit.jupiter.api.Test;
-
 import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class WindowSpecParserTest {
 
@@ -100,5 +98,4 @@ class WindowSpecParserTest {
         WindowSpec all = WindowSpecParser.parse(new RuleExt.Window("ALL", "", 1));
         assertThat(all.valid()).isFalse();
     }
-
 }

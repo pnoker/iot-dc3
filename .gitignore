@@ -39,6 +39,9 @@ hs_err_pid*.log
 replay_pid*.log
 *.hprof
 core.*
+# Exception: dc3-web mock core handler (the `core.*` rule above is for JVM
+# crash dumps and would otherwise silently skip this source file).
+!dc3-web/src/mock/handlers/core.ts
 
 # ===== Environment & secrets =====
 .env
@@ -116,10 +119,6 @@ node_modules/
 .eslintcache
 .node_repl_history
 
-# ===== VitePress build output =====
-docs/.vitepress/cache/
-docs/.vitepress/dist/
-
 # ===== Vite / Vue =====
 .vite/
 .temp/
@@ -131,6 +130,9 @@ auto-imports.d.ts
 
 # ===== Database =====
 *.db
+*.db-shm
+*.db-wal
+*.db-journal
 *.sqlite
 *.sqlite3
 
@@ -142,6 +144,10 @@ src-tauri/target/
 src-tauri/Cargo.lock
 
 # ===== Project-local data =====
-dc3/data/
+# Services resolve the runtime dirs (dc3/data, dc3/logs) against the process
+# cwd, so a driver started from its module dir writes under dc3-driver/*/.
+# The anchored dc3/data/ pattern missed those; ** matches any depth (logs/
+# already works because an unanchored dir-name pattern matches everywhere).
+**/dc3/data/
 .claude/settings.local.json
 .claude/TODO.md

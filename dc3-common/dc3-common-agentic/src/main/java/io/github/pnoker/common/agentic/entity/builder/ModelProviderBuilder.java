@@ -16,121 +16,38 @@
  */
 package io.github.pnoker.common.agentic.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
-import io.github.pnoker.common.agentic.entity.model.ModelProviderDO;
 import io.github.pnoker.common.agentic.entity.vo.ModelProviderVO;
-import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
-import io.github.pnoker.common.enums.DefaultFlagEnum;
-import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
-import org.apache.commons.lang3.StringUtils;
+import java.util.List;
+import java.util.Objects;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-/**
- * MapStruct builder converting between model provider BO, VO, and DO.
- *
- * @author pnoker
- * @version 2026.5.11
- * @since 2026.5.11
- */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+/** MapStruct builder converting between model provider business and API objects. */
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface ModelProviderBuilder {
 
+    /** Convert the value object into its business-object form. */
     @Mapping(target = "apiKey", ignore = true)
     ModelProviderBO buildBOByVO(ModelProviderVO entityVO);
 
+    /** Convert the value objects into their business-object forms. */
     List<ModelProviderBO> buildBOListByVOList(List<ModelProviderVO> entityVOList);
 
-    @Mapping(target = "providerType", ignore = true)
-    @Mapping(target = "tenantId", ignore = true)
-    @Mapping(target = "creatorId", ignore = true)
-    @Mapping(target = "creatorName", ignore = true)
-    @Mapping(target = "createTime", ignore = true)
-    @Mapping(target = "operatorId", ignore = true)
-    @Mapping(target = "operatorName", ignore = true)
-    @Mapping(target = "operateTime", ignore = true)
+    /** Post-process the mapped target after MapStruct copies the fields. */
     @AfterMapping
     default void afterProcess(ModelProviderVO entityRequest, @MappingTarget ModelProviderBO entityBO) {
-        if (Objects.isNull(entityRequest)) {
-            return;
-        }
-        entityBO.setProviderType(entityRequest.getProviderType());
+        if (Objects.nonNull(entityRequest)) entityBO.setProviderType(entityRequest.getProviderType());
     }
 
-    @Mapping(target = "providerType", ignore = true)
-    @Mapping(target = "defaultFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    ModelProviderDO buildDOByBO(ModelProviderBO entityBO);
-
-    @AfterMapping
-    default void afterProcess(ModelProviderBO entityBO, @MappingTarget ModelProviderDO entityDO) {
-        AgenticModelProviderTypeEnum providerType = entityBO.getProviderType();
-        Optional.ofNullable(providerType).ifPresent(value -> entityDO.setProviderType(value.getIndex()));
-
-        DefaultFlagEnum defaultFlag = entityBO.getDefaultFlag();
-        Optional.ofNullable(defaultFlag).ifPresent(value -> entityDO.setDefaultFlag(value.getIndex()));
-
-        EnableFlagEnum enableFlag = entityBO.getEnableFlag();
-        Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
-    }
-
-    List<ModelProviderDO> buildDOListByBOList(List<ModelProviderBO> entityBOList);
-
-    @Mapping(target = "providerType", ignore = true)
-    @Mapping(target = "defaultFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    ModelProviderBO buildBOByDO(ModelProviderDO entityDO);
-
-    @AfterMapping
-    default void afterProcess(ModelProviderDO entityDO, @MappingTarget ModelProviderBO entityBO) {
-        Byte providerType = entityDO.getProviderType();
-        entityBO.setProviderType(AgenticModelProviderTypeEnum.ofIndex(providerType));
-
-        Byte defaultFlag = entityDO.getDefaultFlag();
-        entityBO.setDefaultFlag(DefaultFlagEnum.ofIndex(defaultFlag));
-
-        Byte enableFlag = entityDO.getEnableFlag();
-        entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
-    }
-
-    List<ModelProviderBO> buildBOListByDOList(List<ModelProviderDO> entityDOList);
-
+    /** Convert the business object into its value-object form. */
     ModelProviderVO buildVOByBO(ModelProviderBO entityBO);
 
+    /** Convert the business objects into their value-object forms. */
     List<ModelProviderVO> buildVOListByBOList(List<ModelProviderBO> entityBOList);
-
-    default Page<ModelProviderBO> buildBOPageByDOPage(Page<ModelProviderDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    default Page<ModelProviderVO> buildVOPageByBOPage(Page<ModelProviderBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
-    default AgenticModelProviderTypeEnum providerType(String value) {
-        if (StringUtils.isBlank(value)) {
-            return null;
-        }
-        String normalized = value.trim();
-        AgenticModelProviderTypeEnum providerType = AgenticModelProviderTypeEnum.ofCode(normalized);
-        if (Objects.nonNull(providerType)) {
-            return providerType;
-        }
-        try {
-            return AgenticModelProviderTypeEnum.ofIndex(Byte.valueOf(normalized));
-        } catch (NumberFormatException ignored) {
-            return AgenticModelProviderTypeEnum.ofName(normalized.toUpperCase().replace('-', '_'));
-        }
-    }
-
 }

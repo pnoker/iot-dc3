@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.config;
 
 import jakarta.validation.constraints.Min;
@@ -27,7 +26,6 @@ import org.springframework.validation.annotation.Validated;
  * gRPC facade transport settings.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 @Getter
@@ -38,5 +36,4 @@ public class GrpcFacadeProperties {
 
     @Min(value = 0, message = "gRPC facade deadline must be greater than or equal to 0")
     private long deadlineMs = 3000;
-
 }

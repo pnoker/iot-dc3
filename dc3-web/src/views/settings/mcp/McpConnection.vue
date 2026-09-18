@@ -25,9 +25,8 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
+import {onBeforeUnmount, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
-import {ElMessageBox} from 'element-plus';
 
 import {revokeMcpConnection} from '@/api/mcp';
 import EntityListPage from '@/components/entity/EntityListPage.vue';
@@ -44,20 +43,13 @@ const listRef = ref<InstanceType<typeof EntityListPage>>();
 const addRef = ref<InstanceType<typeof AddConnectionDialog>>();
 const infoRef = ref<InstanceType<typeof ConnectionInfoDialog>>();
 const toolsRef = ref<InstanceType<typeof ManageToolsDrawer>>();
+let disposed = false;
 
 const reload = () => listRef.value?.reload();
 
 const onRevoke = async (row: Record<string, any>) => {
-  try {
-    await ElMessageBox.confirm(t('settings.mcp.revoke'), t('settings.mcp.connectionInfo'), {
-      type: 'warning',
-      confirmButtonText: t('common.confirm'),
-      cancelButtonText: t('common.cancel'),
-    });
-  } catch {
-    return; // cancelled
-  }
   await revokeMcpConnection((row as McpConnectionRecord).id);
+  if (disposed) return;
   successMessage(t('settings.mcp.saved'));
   reload();
 };
@@ -67,5 +59,9 @@ const config = createMcpConnectionConfig(t, {
   onConnectionInfo: (row) => infoRef.value?.open(row as McpConnectionRecord),
   onManageTools: (row) => toolsRef.value?.open(row as McpConnectionRecord),
   onRevoke,
+});
+
+onBeforeUnmount(() => {
+  disposed = true;
 });
 </script>

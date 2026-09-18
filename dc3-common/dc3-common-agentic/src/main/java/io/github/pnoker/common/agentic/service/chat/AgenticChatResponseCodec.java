@@ -27,6 +27,12 @@ import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import io.github.pnoker.common.utils.UuidV7;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,18 +41,10 @@ import org.springframework.stereotype.Component;
 import tools.jackson.databind.DatabindException;
 import tools.jackson.databind.ObjectMapper;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.UUID;
-
 /**
  * Encodes agentic chat responses and server-sent events.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
@@ -65,10 +63,11 @@ public class AgenticChatResponseCodec {
      * @param finishReason the finish reason
      * @return the chat completion response
      */
-    public ChatCompletionResponseVO blockingResponse(AgenticPreparedChatBO prepared, String content,
-                                                     String finishReason) {
+    public ChatCompletionResponseVO blockingResponse(
+            AgenticPreparedChatBO prepared, String content, String finishReason) {
         int completionTokens = AgenticTokenEstimatorUtil.estimate(content);
-        int promptTokens = Objects.nonNull(prepared.inputTokens()) ? prepared.inputTokens().getInput() : 0;
+        int promptTokens =
+                Objects.nonNull(prepared.inputTokens()) ? prepared.inputTokens().getInput() : 0;
         return ChatCompletionResponseVO.builder()
                 .id(newChatId())
                 .object(AgenticConstant.Chat.COMPLETION_OBJECT)
@@ -76,20 +75,37 @@ public class AgenticChatResponseCodec {
                 .model(prepared.model())
                 .choices(List.of(ChatCompletionResponseVO.Choice.builder()
                         .index(0)
-                        .message(new ChatCompletionResponseVO.Message(AgenticConstant.Chat.ROLE_ASSISTANT, content,
-                                buildResponseContentExt(prepared)))
+                        .message(new ChatCompletionResponseVO.Message(
+                                AgenticConstant.Chat.ROLE_ASSISTANT, content, buildResponseContentExt(prepared)))
                         .finishReason(normalizeFinishReason(finishReason))
                         .build()))
-                .usage(new ChatCompletionResponseVO.Usage(promptTokens, completionTokens,
-                        promptTokens + completionTokens))
+                .usage(new ChatCompletionResponseVO.Usage(
+                        promptTokens, completionTokens, promptTokens + completionTokens))
                 .build();
     }
 
+    /**
+     * New chat identifier.
+     *
+     * @return new chat identifier result
+     */
     public String newChatId() {
         return AgenticConstant.Chat.ID_PREFIX
-                + UUID.randomUUID().toString().replace(SymbolConstant.HYPHEN, StringUtils.EMPTY).substring(0, 24);
+                + UuidV7.next()
+                        .toString()
+                        .replace(SymbolConstant.HYPHEN, StringUtils.EMPTY)
+                        .substring(0, 24);
     }
 
+    /**
+     * Format final chunk.
+     *
+     * @param id           id
+     * @param created      created
+     * @param model        model
+     * @param finishReason finish reason
+     * @return format final chunk result
+     */
     public String formatFinalChunk(String id, long created, String model, String finishReason) {
         ChatCompletionChunkVO chunk = ChatCompletionChunkVO.builder()
                 .id(id)
@@ -105,6 +121,12 @@ public class AgenticChatResponseCodec {
         return toJson(chunk);
     }
 
+    /**
+     * Initial events.
+     *
+     * @param prepared prepared
+     * @return initial events result
+     */
     public List<ServerSentEvent<String>> initialEvents(AgenticPreparedChatBO prepared) {
         List<ServerSentEvent<String>> events = new ArrayList<>();
         if (prepared.reasoning()) {
@@ -125,13 +147,12 @@ public class AgenticChatResponseCodec {
      * @param streamDelta the delta for this step, may be null or content-less
      * @return the SSE events to emit for this step
      */
-    public List<ServerSentEvent<String>> streamEvents(AgenticPreparedChatBO prepared, String chatId, long created,
-                                                      AgenticStreamDelta streamDelta) {
+    public List<ServerSentEvent<String>> streamEvents(
+            AgenticPreparedChatBO prepared, String chatId, long created, AgenticStreamDelta streamDelta) {
         List<ServerSentEvent<String>> events = new ArrayList<>();
         for (AgenticRunEvent event : prepared.runTrace().drainPendingEvents()) {
-            events.add(ServerSentEvent.<String>builder()
-                    .data(formatEvent(event))
-                    .build());
+            events.add(
+                    ServerSentEvent.<String>builder().data(formatEvent(event)).build());
         }
         for (AgenticVisualizationSpec visualization : prepared.runTrace().drainPendingVisualizations()) {
             events.add(ServerSentEvent.<String>builder()
@@ -146,10 +167,22 @@ public class AgenticChatResponseCodec {
         return events;
     }
 
+    /**
+     * Format event.
+     *
+     * @param runEvent run event
+     * @return format event result
+     */
     public String formatEvent(AgenticRunEvent runEvent) {
         return toJson(AgenticRunEventVO.of(runEvent));
     }
 
+    /**
+     * Format visualization.
+     *
+     * @param visualization visualization
+     * @return format visualization result
+     */
     public String formatVisualization(AgenticVisualizationSpec visualization) {
         return toJson(AgenticVisualizationVO.of(visualization, Instant.now().getEpochSecond()));
     }
@@ -172,8 +205,8 @@ public class AgenticChatResponseCodec {
                 .model(model)
                 .choices(List.of(ChatCompletionChunkVO.ChunkChoice.builder()
                         .index(0)
-                        .delta(new ChatCompletionChunkVO.Delta(null, StringUtils.trimToNull(streamDelta.content()),
-                                streamDelta.reasoningContent()))
+                        .delta(new ChatCompletionChunkVO.Delta(
+                                null, StringUtils.trimToNull(streamDelta.content()), streamDelta.reasoningContent()))
                         .finishReason(null)
                         .build()))
                 .build();
@@ -191,9 +224,11 @@ public class AgenticChatResponseCodec {
         try {
             return objectMapper.writeValueAsString(obj);
         } catch (DatabindException e) {
-            log.error("Agentic response serialization failed, responseType={}", obj.getClass().getSimpleName(), e);
+            log.error(
+                    "Agentic response serialization failed, responseType={}",
+                    obj.getClass().getSimpleName(),
+                    e);
             return "{}";
         }
     }
-
 }

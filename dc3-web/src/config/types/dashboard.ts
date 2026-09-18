@@ -16,14 +16,9 @@
  */
 
 /**
- * Dashboard / event-overview payload shapes. Keeping these here (not in
- * api/dashboard.ts alongside the fetch functions) follows the project-wide
- * convention described in CLAUDE.md: "config/entity/" is the interface-only
- * module, always imported with `import type` under verbatimModuleSyntax.
- *
- * <p>Shared primitives (AlertSource, RangeKey) live here too so every
- * card / API wrapper points at the same union instead of re-declaring
- * `'device' | 'driver'` inline.</p>
+ * Dashboard / event-overview payload shapes. Kept here (not inside the API
+ * wrappers) so every card and `api/dashboard/*` module points at one source
+ * of truth, always imported with `import type` under verbatimModuleSyntax.
  */
 
 /** Three canonical alarm sources — point-level, device-level, driver-level. */
@@ -51,21 +46,27 @@ export interface TimeRangeParams {
 /** Config-change subjects used by the Change Impact card. */
 export type ChangeKind = 'driver' | 'device' | 'profile';
 
+export interface SystemHealth {
+  center: Record<string, 'up' | 'down'>;
+  infra: Record<string, 'up' | 'down'>;
+  drivers: {total: number; online: number};
+  devices: {total: number; online: number};
+}
+
 // ---- Alert list / pagination -----------------------------------------
 
 export interface AlertPageQuery {
   source?: AlertSource | null;
-  eventTypeFlag?: number | null;
+  alarmTypeFlag?: number | null;
   confirmFlag?: number | null;
-  rangeHours?: number | null;
   /**
-   * Preferred time-range selector. Backend TimeRangeUtil turns this into a
-   * concrete `from` timestamp (TODAY maps to local-midnight; 24h/7d/30d are
-   * rolling windows). When both rangeKey and rangeHours are set, rangeKey wins.
+   * Preset time-range selector. Backend TimeRangeUtil turns this into a
+   * concrete `from` timestamp (TODAY maps to local-midnight; 24h/7d/30d are rolling windows).
    */
   rangeKey?: string | null;
-  current?: number;
-  size?: number;
+  offset?: number;
+  limit?: number;
+  sort?: Array<{field: string; direction: 'ASC' | 'DESC'}>;
 }
 
 // ---- Topology Sankey -------------------------------------------------
@@ -112,24 +113,24 @@ export interface TopologyResponse {
 
 export interface FlappingSource {
   source: AlertSource;
-  sourceId: number | string;
+  sourceId: string;
   eventTypeFlag: number;
   count: number;
 }
 
 export interface CorrelationPair {
   aSource: AlertSource;
-  aSourceId: number | string;
+  aSourceId: string;
   aEventType: number;
   bSource: AlertSource;
-  bSourceId: number | string;
+  bSourceId: string;
   bEventType: number;
   coCount: number;
 }
 
 export interface PeerDeviation {
-  profileId: number | string;
-  deviceId: number | string;
+  profileId: string;
+  deviceId: string;
   alarmCount: number;
   peerMedian: number;
   ratio: number;
@@ -159,20 +160,20 @@ export interface ProtocolHealth {
 
 export interface ChangeImpact {
   kind: ChangeKind;
-  entityId: number | string;
+  entityId: string;
   operateTime: string;
 }
 
 export interface SilentSource {
-  deviceId: number | string;
-  pointId: number | string;
+  deviceId: string;
+  pointId: string;
   lastSeen: string;
   silentSeconds: number;
 }
 
 export interface CoverageGapItem {
-  pointId: number | string;
-  profileId: number | string;
+  pointId: string;
+  profileId: string;
 }
 
 export interface CoverageGap {
@@ -190,6 +191,8 @@ export interface StatsTodaySummary {
 }
 
 export interface StatsTimeBucket {
+  /** Start of the bucket, matching backend TimeseriesPointVO.bucket. */
+  bucket: string;
   count: number;
 }
 
@@ -212,4 +215,77 @@ export interface DailyGrowthSummary {
   deviceDailyCounts: number[];
   pointDailyCounts: number[];
   profileDailyCounts: number[];
+}
+
+// ---- Alert overview cards (previously declared inline in components) ----
+
+export interface AlertEventRow {
+  id: string;
+  source: AlertSource;
+  sourceId: string;
+  pointId?: string;
+  alarmTypeFlag: number;
+  confirmFlag: string;
+  createTime: string;
+  message?: string;
+}
+
+export interface AlertStormRow {
+  source: AlertSource;
+  sourceId: string;
+  count: number;
+}
+
+export interface AlertTypeRow {
+  type: string;
+  count: number;
+}
+
+export interface AlertActivityRow {
+  /** 0..6 = Sun..Sat, matching Postgres EXTRACT(DOW). */
+  dow: number;
+  hour: number;
+  count: number;
+}
+
+export interface AlertTrendRow {
+  date: string;
+  source: string;
+  count: number;
+}
+
+export interface AlertTopSourceRow {
+  name: string;
+  count: number;
+}
+
+/** Bucket shape shared by statsTop / latency / enable-breakdown endpoints. */
+export interface StatsCountBucket {
+  entityId?: number;
+  key?: string;
+  bin?: number;
+  count: number;
+}
+
+export interface StreamRow {
+  deviceId: string;
+  pointId: string;
+  driverId?: string;
+  // driverName / deviceName / pointName are populated server-side via metadata
+  // facades, so the feed renders the full tuple without extra lookups.
+  driverName?: string;
+  deviceName?: string;
+  pointName?: string;
+}
+
+export interface DriverStats {
+  byEnable: { key: string; count: number }[];
+  byType: { key: string; count: number }[];
+  byService: { key: string; count: number }[];
+}
+
+export interface DeviceStats {
+  byEnable: { key: string; count: number }[];
+  byProfile: { key: string; count: number }[];
+  byDriver: { key: string; count: number }[];
 }

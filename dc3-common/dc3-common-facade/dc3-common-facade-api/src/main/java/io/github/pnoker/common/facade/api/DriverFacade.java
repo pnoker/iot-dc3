@@ -14,15 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
-
+import io.github.pnoker.common.facade.entity.query.FacadeDriverOffsetQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import java.util.Collection;
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral driver facade.
@@ -33,31 +32,16 @@ import java.util.List;
  * it on the thread. Callers must supply the tenant id explicitly.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DriverFacade {
 
-    /**
-     * Tenant-scoped single lookup. Returns {@code null} when the driver is missing or
-     * belongs to another tenant.
-     */
-    FacadeDriverBO getById(Long tenantId, Long id);
+    /** Resolve the driver by its id. */
+    Mono<FacadeDriverBO> getByIdReactive(Long tenantId, Long id);
 
-    /**
-     * Tenant-scoped bulk lookup. Missing or cross-tenant drivers are omitted.
-     */
-    List<FacadeDriverBO> listByIds(Long tenantId, Collection<Long> ids);
+    /** List drivers matched by ids. */
+    Flux<FacadeDriverBO> listByIdsReactive(Long tenantId, Collection<Long> ids);
 
-    /**
-     * @return a page of drivers (never {@code null}; empty page when nothing matches).
-     */
-    FacadePage<FacadeDriverBO> listByPage(FacadeDriverQuery query);
-
-    /**
-     * Tenant-scoped owner lookup. Returns {@code null} when the owning driver is missing
-     * or belongs to another tenant.
-     */
-    FacadeDriverBO getByDeviceId(Long tenantId, Long deviceId);
-
+    /** Page drivers matching the tenant-scoped filters. */
+    Mono<OffsetPage<FacadeDriverBO>> listReactive(FacadeDriverOffsetQuery query);
 }

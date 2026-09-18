@@ -20,7 +20,6 @@ syntax = "proto3";
 package api.common.auth;
 
 import "api/common/base.proto";
-import "api/common/r.proto";
 
 // Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.auth";
@@ -31,25 +30,18 @@ option java_multiple_files = true;
 // Service interface defining user-related RPC calls
 service UserApi {
   // Query user information by user ID
-  rpc GetById (GrpcIdQuery) returns (GrpcRUserDTO);
+  rpc GetById (GrpcIdQuery) returns (GrpcUserDTO);
 
   // Query user information by principal ID
-  rpc GetByPrincipalId (GrpcIdQuery) returns (GrpcRUserDTO);
+  rpc GetByPrincipalId (GrpcIdQuery) returns (GrpcUserDTO);
 }
 
 // Request message for querying by user ID
 message GrpcIdQuery {
   // User ID, unique identifier of a user
   int64 id = 1;
-}
-
-// Response wrapper for user information
-message GrpcRUserDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
-  // Returned user data
-  GrpcUserDTO data = 2;
+  // Tenant scope for tenant-isolated reactive lookups
+  int64 tenant_id = 2;
 }
 
 // User data transfer object containing basic user information

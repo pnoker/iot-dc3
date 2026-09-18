@@ -29,7 +29,7 @@ describe('BlankCard', () => {
       global: {stubs: {...layoutStubs}},
     });
 
-    expect(wrapper.find('.blank-card').exists()).toBe(true);
-    expect(wrapper.find('.blank-card__container .payload').exists()).toBe(true);
+    expect(wrapper.find('.card-shell').exists()).toBe(true);
+    expect(wrapper.find('.card-shell__container .payload').exists()).toBe(true);
   });
 });

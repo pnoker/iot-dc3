@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.common;
 
 import java.time.ZoneId;
@@ -23,7 +22,6 @@ import java.time.ZoneId;
  * Time related constants.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class TimeConstant {
@@ -43,14 +41,22 @@ public class TimeConstant {
      */
     public static final String DAY_DATE_FORMAT1 = "yyyy.MM.dd";
 
+    /**
+     * day date format2 constant.
+     */
     public static final String DAY_DATE_FORMAT2 = "yyyy-MM-dd";
 
+    /**
+     * default date format constant.
+     */
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+    /**
+     * complete date format constant.
+     */
     public static final String COMPLETE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
     private TimeConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
-
 }

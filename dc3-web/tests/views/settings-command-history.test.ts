@@ -21,8 +21,8 @@ import {describe, expect, it, vi} from 'vitest';
 import {mountListPage} from './_helpers';
 
 const commandMocks = vi.hoisted(() => ({
-  getCommandHistoryByRecordId: vi.fn(() => Promise.resolve({data: {}})),
-  listCommandHistory: vi.fn(() => Promise.resolve({data: {records: [], total: 0}})),
+  getCommandHistoryByRecordId: vi.fn(() => Promise.resolve( {})),
+  listCommandHistory: vi.fn(() => Promise.resolve( {items: [], total: 0})),
 }));
 
 vi.mock('@/api/command', () => commandMocks);

@@ -14,22 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * OAuth registered client type.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -50,7 +46,6 @@ public enum OAuthClientTypeEnum {
     /**
      * Database / wire value.
      */
-    @EnumValue
     @JsonValue
     private final String value;
 
@@ -64,11 +59,16 @@ public enum OAuthClientTypeEnum {
      */
     private final String remark;
 
+    /**
+     * Resolve an OAuth client type from its persisted wire value.
+     *
+     * @param value persisted client-type value
+     * @return matching type, or {@code null} when the value is unknown
+     */
     public static OAuthClientTypeEnum ofValue(String value) {
         Optional<OAuthClientTypeEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))
                 .findFirst();
         return any.orElse(null);
     }
-
 }

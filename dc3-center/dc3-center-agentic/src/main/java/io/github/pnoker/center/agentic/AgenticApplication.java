@@ -26,14 +26,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * of other center services.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @SpringBootApplication
 public class AgenticApplication {
 
+    /**
+     * Start the agentic application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(AgenticApplication.class, args);
     }
-
 }

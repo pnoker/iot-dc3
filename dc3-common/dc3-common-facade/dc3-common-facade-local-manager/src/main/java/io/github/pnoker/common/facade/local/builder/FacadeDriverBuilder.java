@@ -14,31 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
-import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
-import io.github.pnoker.common.manager.entity.query.DriverQuery;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 /**
  * FacadeDriver ↔ manager DriverBO/Query mapper. Field sets are aligned.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface FacadeDriverBuilder {
 
-    @Mapping(target = "groupId", ignore = true)
-    @Mapping(target = "labelId", ignore = true)
-    DriverQuery toManagerQuery(FacadeDriverQuery facadeQuery);
-
+    /**
+     * To facade business object.
+     *
+     * @param managerBO business object
+     * @return to facade business object result
+     */
     FacadeDriverBO toFacadeBO(DriverBO managerBO);
-
 }

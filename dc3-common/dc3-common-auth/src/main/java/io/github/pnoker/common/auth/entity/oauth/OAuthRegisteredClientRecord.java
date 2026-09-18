@@ -14,20 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.oauth;
 
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
 
 /**
  * Minimal OAuth registered client projection used by the OAuth endpoints.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -67,5 +64,4 @@ public class OAuthRegisteredClientRecord {
     private Byte requireConsent;
 
     private Byte enableFlag;
-
 }

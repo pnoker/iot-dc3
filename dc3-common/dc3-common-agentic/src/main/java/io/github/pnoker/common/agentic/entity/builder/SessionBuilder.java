@@ -16,50 +16,21 @@
  */
 package io.github.pnoker.common.agentic.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
-import io.github.pnoker.common.agentic.entity.model.SessionDO;
 import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import java.util.List;
+import org.mapstruct.Mapper;
 
-/**
- * MapStruct builder converting between session BO, VO, and DO representations.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+/** Maps reactive session projections to API resources. */
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface SessionBuilder {
 
-    SessionBO buildBOByVO(SessionVO entityVO);
-
-    List<SessionBO> buildBOListByVOList(List<SessionVO> entityVOList);
-
+    /** Convert the business object into its value-object form. */
     SessionVO buildVOByBO(SessionBO entityBO);
 
+    /** Convert the business objects into their value-object forms. */
     List<SessionVO> buildVOListByBOList(List<SessionBO> entityBOList);
-
-    SessionBO buildBOByDO(SessionDO entityDO);
-
-    List<SessionBO> buildBOListByDOList(List<SessionDO> entityDOList);
-
-    @Mapping(target = "deleted", ignore = true)
-    SessionDO buildDOByBO(SessionBO entityBO);
-
-    List<SessionDO> buildDOListByBOList(List<SessionBO> entityBOList);
-
-    default Page<SessionVO> buildVOPageByBOPage(Page<SessionBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
-    default Page<SessionBO> buildBOPageByDOPage(Page<SessionDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
 }

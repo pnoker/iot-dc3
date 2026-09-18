@@ -14,81 +14,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.grpc.builder;
 
-import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
 import io.github.pnoker.api.common.GrpcBase;
 import io.github.pnoker.api.common.GrpcPointDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.PointTypeEnum;
-import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
-import io.github.pnoker.common.manager.entity.query.PointQuery;
-import io.github.pnoker.common.optional.EnableOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.Optional;
-
 /**
  * MapStruct builder for point gRPC message conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcPointBuilder {
-
-    /**
-     * Grpc Query to Query
-     *
-     * @param entityQuery GrpcPagePointQuery
-     * @return PointQuery
-     */
-    @Mapping(target = "page", ignore = true)
-    @Mapping(target = "pointTypeFlag", ignore = true)
-    @Mapping(target = "rwFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "labelId", ignore = true)
-    PointQuery buildQueryByGrpcQuery(GrpcPagePointQuery entityQuery);
-
-    @AfterMapping
-    default void afterProcess(GrpcPagePointQuery entityGrpc, @MappingTarget PointQuery.PointQueryBuilder entityQuery) {
-        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
-        entityQuery.page(pages);
-
-        Optional.ofNullable(PointTypeEnum.ofIndex((byte) entityGrpc.getPointTypeFlag()))
-                .ifPresent(entityQuery::pointTypeFlag);
-        Optional.ofNullable(RwTypeEnum.ofIndex((byte) entityGrpc.getRwFlag())).ifPresent(entityQuery::rwFlag);
-        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
-    }
-
-    @Mapping(target = "page", ignore = true)
-    @Mapping(target = "pointName", ignore = true)
-    @Mapping(target = "pointCode", ignore = true)
-    @Mapping(target = "version", ignore = true)
-    @Mapping(target = "profileId", ignore = true)
-    @Mapping(target = "pointTypeFlag", ignore = true)
-    @Mapping(target = "rwFlag", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    @Mapping(target = "groupId", ignore = true)
-    @Mapping(target = "labelId", ignore = true)
-    PointQuery buildQueryByGrpcQuery(io.github.pnoker.api.common.driver.GrpcPagePointQuery entityQuery);
-
-    @AfterMapping
-    default void afterProcess(io.github.pnoker.api.common.driver.GrpcPagePointQuery entityGrpc,
-                              @MappingTarget PointQuery.PointQueryBuilder entityQuery) {
-        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
-        entityQuery.page(pages);
-    }
 
     /**
      * BO to Grpc DTO
@@ -115,6 +65,12 @@ public interface GrpcPointBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcPointDTO buildGrpcDTOByBO(PointBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO   business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(PointBO entityBO, @MappingTarget GrpcPointDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
@@ -123,14 +79,16 @@ public interface GrpcPointBuilder {
         Optional.ofNullable(entityBO.getPointExt())
                 .ifPresent(value -> entityGrpc.setPointExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityBO.getPointTypeFlag())
-                .ifPresentOrElse(value -> entityGrpc.setPointTypeFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setPointTypeFlag(value.getIndex()),
                         () -> entityGrpc.setPointTypeFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(entityBO.getRwFlag())
-                .ifPresentOrElse(value -> entityGrpc.setRwFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setRwFlag(value.getIndex()),
                         () -> entityGrpc.setRwFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(entityBO.getEnableFlag())
-                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setEnableFlag(value.getIndex()),
                         () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
     }
-
 }

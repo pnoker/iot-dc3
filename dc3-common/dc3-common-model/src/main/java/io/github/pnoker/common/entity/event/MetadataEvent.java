@@ -14,31 +14,30 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.event;
 
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
-import lombok.Getter;
-import org.springframework.context.ApplicationEvent;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.Getter;
+import org.springframework.context.ApplicationEvent;
 
 /**
- * Metadata event.
+ * Metadata-change event published to drivers so they refresh their cached configuration.
  *
  * @author zhangzi
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
 public class MetadataEvent extends ApplicationEvent {
 
     private final Long id;
+
+    private final Long tenantId;
 
     private final MetadataTypeEnum metadataType;
 
@@ -55,7 +54,13 @@ public class MetadataEvent extends ApplicationEvent {
      * @param operateType  Metadata operation type
      */
     public MetadataEvent(Object source, Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType) {
-        this(source, id, metadataType, operateType, Collections.emptySet());
+        this(source, null, id, metadataType, operateType, Collections.emptySet());
+    }
+
+    /** metadata event. */
+    public MetadataEvent(
+            Object source, Long tenantId, Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType) {
+        this(source, tenantId, id, metadataType, operateType, Collections.emptySet());
     }
 
     /**
@@ -67,17 +72,33 @@ public class MetadataEvent extends ApplicationEvent {
      * @param operateType    Metadata operation type
      * @param targetServices Driver services that must receive this event
      */
-    public MetadataEvent(Object source, Long id, MetadataTypeEnum metadataType, MetadataOperateTypeEnum operateType,
-                         Collection<String> targetServices) {
+    public MetadataEvent(
+            Object source,
+            Long id,
+            MetadataTypeEnum metadataType,
+            MetadataOperateTypeEnum operateType,
+            Collection<String> targetServices) {
+        this(source, null, id, metadataType, operateType, targetServices);
+    }
+
+    /** metadata event. */
+    public MetadataEvent(
+            Object source,
+            Long tenantId,
+            Long id,
+            MetadataTypeEnum metadataType,
+            MetadataOperateTypeEnum operateType,
+            Collection<String> targetServices) {
         super(source);
+        this.tenantId = tenantId;
         this.id = id;
         this.metadataType = metadataType;
         this.operateType = operateType;
-        this.targetServices = Objects.isNull(targetServices) ? Collections.emptySet()
+        this.targetServices = Objects.isNull(targetServices)
+                ? Collections.emptySet()
                 : targetServices.stream()
-                .filter(Objects::nonNull)
-                .filter(service -> !service.isBlank())
-                .collect(Collectors.toUnmodifiableSet());
+                        .filter(Objects::nonNull)
+                        .filter(service -> !service.isBlank())
+                        .collect(Collectors.toUnmodifiableSet());
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.grpc.builder;
 
 import io.github.pnoker.api.center.auth.GrpcUserDTO;
@@ -23,21 +22,21 @@ import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.Optional;
-
 /**
  * MapStruct builder for user gRPC message conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcUserBuilder {
 
     /**
@@ -65,6 +64,12 @@ public interface GrpcUserBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcUserDTO buildGrpcDTOByBO(UserBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO   business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(UserBO entityBO, @MappingTarget GrpcUserDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
@@ -74,8 +79,6 @@ public interface GrpcUserBuilder {
                 .ifPresent(value -> entityGrpc.setSocialExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityBO.getIdentityExt())
                 .ifPresent(value -> entityGrpc.setIdentityExt(JsonUtil.toJsonString(value)));
-        Optional.ofNullable(entityBO.getPrincipalId())
-                .ifPresent(entityGrpc::setPrincipalId);
+        Optional.ofNullable(entityBO.getPrincipalId()).ifPresent(entityGrpc::setPrincipalId);
     }
-
 }

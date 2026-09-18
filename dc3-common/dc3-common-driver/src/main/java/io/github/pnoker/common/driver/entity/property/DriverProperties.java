@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.property;
 
 import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
@@ -23,10 +22,13 @@ import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.enums.DriverTypeEnum;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,14 +36,10 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Spring configuration properties for a driver instance.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -67,7 +65,9 @@ public class DriverProperties {
      * Driver display name.
      */
     @NotBlank(message = "Driver name can't be empty")
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5\\s_#@/.|\\-]{1,63}$", message = "Invalid driver name format")
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5\\s_#@/.|\\-]{1,63}$",
+            message = "Invalid driver name format")
     private String name;
 
     /**
@@ -86,25 +86,36 @@ public class DriverProperties {
      * Schedule configuration for periodic driver tasks.
      */
     @Valid
+    @NotNull(message = "Driver schedule configuration can't be empty")
     private ScheduleProperties schedule = new ScheduleProperties();
 
     /**
      * Health configuration for driver-side runtime checks.
      */
     @Valid
+    @NotNull(message = "Driver health configuration can't be empty")
     private HealthProperties health = new HealthProperties();
 
     /**
      * Local buffer configuration for point-value resume on broker outage.
      */
     @Valid
+    @NotNull(message = "Driver buffer configuration can't be empty")
     private BufferProperties buffer = new BufferProperties();
 
     /**
      * Metadata cache tuning for the driver runtime.
      */
     @Valid
+    @NotNull(message = "Driver metadata configuration can't be empty")
     private MetadataProperties metadata = new MetadataProperties();
+
+    /**
+     * Distributed runtime lease and heartbeat configuration.
+     */
+    @Valid
+    @NotNull(message = "Driver lease configuration can't be empty")
+    private LeaseProperties lease = new LeaseProperties();
 
     /**
      * Driver-level attribute definitions declared in configuration.
@@ -129,16 +140,19 @@ public class DriverProperties {
     /**
      * Generated or configured driver node identifier.
      */
+    @NotBlank(message = "Driver node can't be empty")
     private String node;
 
     /**
      * Driver service name, typically composed from tenant and application name.
      */
+    @NotBlank(message = "Driver service can't be empty")
     private String service;
 
     /**
      * Host address exposed by the driver process.
      */
+    @NotBlank(message = "Driver host can't be empty")
     private String host;
 
     /**
@@ -149,6 +163,7 @@ public class DriverProperties {
     /**
      * Driver client identifier used for queue and registration routing.
      */
+    @NotBlank(message = "Driver client can't be empty")
     private String client;
 
     /**
@@ -190,9 +205,7 @@ public class DriverProperties {
              * default — flip on when diagnosing cache behavior in production.
              */
             private boolean recordStats = false;
-
         }
-
     }
 
     /**
@@ -207,7 +220,6 @@ public class DriverProperties {
          */
         @Valid
         private DeviceHealthProperties device = new DeviceHealthProperties();
-
     }
 
     /**
@@ -218,9 +230,10 @@ public class DriverProperties {
     public static class DeviceHealthProperties {
 
         /**
-         * Whether the SDK should periodically evaluate and report device health.
+         * Whether the SDK should periodically evaluate and report device health. The key
+         * is {@code enable} to match the spelling used by every driver's application.yml.
          */
-        private Boolean enabled = true;
+        private Boolean enable = true;
 
         /**
          * Quartz cron expression used by the device health job. Drivers can tune
@@ -241,7 +254,6 @@ public class DriverProperties {
          */
         @NotNull
         private TimeUnit timeoutUnit = TimeUnit.SECONDS;
-
     }
 
     /**
@@ -273,9 +285,12 @@ public class DriverProperties {
         public static class ScheduleConfig {
 
             /**
-             * Whether the job is enabled.
+             * Whether the job is enabled. The key is deliberately {@code enable} to match
+             * the {@code dc3.driver.schedule.*.enable} spelling used by every driver's
+             * application.yml — a previous {@code enabled} spelling silently ignored all
+             * of them, leaving read/custom jobs unscheduled in every driver.
              */
-            private Boolean enabled = false;
+            private Boolean enable = false;
 
             /**
              * Quartz cron expression used by the job. Defaults to every 15 minutes on
@@ -284,9 +299,7 @@ public class DriverProperties {
              * SDK's intent.
              */
             private String cron = "0 */15 * * * ?";
-
         }
-
     }
 
     /**
@@ -299,24 +312,11 @@ public class DriverProperties {
     public static class BufferProperties {
 
         /**
-         * Whether to persist failed/NACKed point values locally for later republish.
-         * On by default so drivers resume broker outages out of the box.
-         */
-        private Boolean enabled = true;
-
-        /**
          * SQLite database path, relative to the driver working directory. Mirrors the
          * {@code dc3/logs} layout so each driver writes its own buffer file.
          */
         @NotBlank(message = "Buffer db path can't be empty")
         private String dbPath = "dc3/data/driver/buffer.db";
-
-        /**
-         * Upper bound on the buffer database size in megabytes. When exceeded the oldest
-         * records are evicted to keep the newest readings (capacity over completeness).
-         */
-        @Min(1)
-        private long maxSizeMb = 256;
 
         /**
          * Number of buffered point values republished per Quartz tick.
@@ -331,12 +331,6 @@ public class DriverProperties {
         private String republishCron = "0/10 * * * * ?";
 
         /**
-         * Maximum republish attempts before a buffered record is dropped as poison.
-         */
-        @Min(1)
-        private int maxRetry = 50;
-
-        /**
          * Initial backoff before the first republish retry, in seconds.
          */
         @Min(1)
@@ -347,7 +341,27 @@ public class DriverProperties {
          */
         @Min(1)
         private long maxBackoffSeconds = 600;
-
     }
 
+    /**
+     * Runtime membership lease. A node stops processing devices as soon as this lease
+     * expires locally, even if Manager Center is unavailable.
+     */
+    @Getter
+    @Setter
+    public static class LeaseProperties {
+
+        @Min(10)
+        @Max(120)
+        private int seconds = 30;
+
+        @NotBlank(message = "Lease renewal cron can't be empty")
+        private String renewCron = "0/10 * * * * ?";
+
+        /**
+         * Delete per-instance command queues after a departed node remains unused.
+         */
+        @Min(60000)
+        private int queueExpiresMillis = 300000;
+    }
 }

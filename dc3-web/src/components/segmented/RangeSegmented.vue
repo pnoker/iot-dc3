@@ -16,20 +16,38 @@
   -->
 
 <template>
-  <el-segmented :model-value="modelValue" :options="options" :size="size" @update:model-value="onChange"/>
+  <div :class="['range-segmented', {'range-segmented--select': select}]">
+    <el-select
+      v-if="select"
+      :model-value="modelValue"
+      class="range-segmented__select"
+      @update:model-value="onChange"
+    >
+      <el-option v-for="option in options" :key="option.value || 'all'" :label="option.label" :value="option.value" />
+    </el-select>
+    <el-segmented
+      v-else
+      :model-value="modelValue"
+      :options="options"
+      :size="size"
+      class="range-segmented__control"
+      @update:model-value="onChange"
+    />
+  </div>
 </template>
 
 <script lang="ts" setup>
 import type {PropType} from 'vue';
 import {computed} from 'vue';
 import {useI18n} from 'vue-i18n';
+import type {RangeKey} from '@/config/types/dashboard';
 
 /**
  * Presets the frontend sends as {@code rangeKey} — kept in sync with
  * backend {@link TimeRangeKeyEnum}. The empty-string sentinel is the
  * "no filter" choice, rendered only when {@code includeAll} is true.
  */
-export type RangeKey = '' | 'today' | '24h' | '7d' | '30d';
+export type {RangeKey};
 
 const props = defineProps({
   modelValue: {
@@ -48,6 +66,11 @@ const props = defineProps({
   size: {
     type: String as PropType<'' | 'default' | 'small' | 'large'>,
     default: 'default',
+  },
+  /** Use a native select when the range is part of a dense filter toolbar. */
+  select: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -72,3 +95,51 @@ const onChange = (value: string | number | boolean) => {
   emit('update:modelValue', value as RangeKey);
 };
 </script>
+
+<style lang="scss" scoped>
+.range-segmented {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.range-segmented--select {
+  width: 100%;
+  flex: 1 1 140px;
+}
+
+.range-segmented__select {
+  width: 100%;
+  min-width: 120px;
+}
+
+.range-segmented__control {
+  display: flex;
+  width: max-content;
+  min-width: 100%;
+  white-space: nowrap;
+
+  :deep(.el-segmented__group) {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  :deep(.el-segmented__item) {
+    flex: 0 0 auto;
+    min-width: max-content;
+  }
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  .range-segmented {
+    scrollbar-width: none;
+  }
+
+  .range-segmented::-webkit-scrollbar {
+    display: none;
+  }
+}
+</style>

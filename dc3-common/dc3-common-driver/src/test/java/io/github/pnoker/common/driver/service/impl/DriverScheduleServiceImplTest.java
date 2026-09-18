@@ -14,14 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
+import io.github.pnoker.common.driver.job.BufferRepublishScheduleJob;
 import io.github.pnoker.common.driver.job.DeviceHealthScheduleJob;
 import io.github.pnoker.common.driver.job.DriverCustomScheduleJob;
 import io.github.pnoker.common.driver.job.DriverHealthScheduleJob;
+import io.github.pnoker.common.driver.job.DriverLeaseRenewScheduleJob;
 import io.github.pnoker.common.driver.job.DriverReadScheduleJob;
 import io.github.pnoker.common.exception.CronException;
 import io.github.pnoker.common.quartz.QuartzService;
@@ -31,15 +40,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.quartz.SchedulerException;
-
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 class DriverScheduleServiceImplTest {
@@ -57,9 +57,11 @@ class DriverScheduleServiceImplTest {
     }
 
     @Test
-    void initialNoOpsWhenScheduleConfigMissing() {
+    void initialFailsClosedWhenScheduleConfigMissing() {
         properties.setSchedule(null);
-        assertThatNoException().isThrownBy(() -> service.initialize());
+        assertThatThrownBy(() -> service.initialize())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("schedule configuration is required");
         verifyNoInteractions(quartzService);
     }
 
@@ -68,12 +70,43 @@ class DriverScheduleServiceImplTest {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
         properties.setSchedule(s);
         service.initialize();
-        verify(quartzService).createJobWithCron(
-                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.DRIVER_HEALTH_SCHEDULE_JOB),
-                eq(ScheduleConstant.DRIVER_HEALTH_SCHEDULE_CRON),
-                eq(DriverHealthScheduleJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.DRIVER_HEALTH_SCHEDULE_JOB),
+                        eq(ScheduleConstant.DRIVER_HEALTH_SCHEDULE_CRON),
+                        eq(DriverHealthScheduleJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.DRIVER_LEASE_RENEW_SCHEDULE_JOB),
+                        eq(properties.getLease().getRenewCron()),
+                        eq(DriverLeaseRenewScheduleJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.BUFFER_REPUBLISH_SCHEDULE_JOB),
+                        eq(properties.getBuffer().getRepublishCron()),
+                        eq(BufferRepublishScheduleJob.class));
         verify(quartzService).startScheduler();
+    }
+
+    @Test
+    void initialRejectsMissingOutboxConfig() {
+        properties.setBuffer(null);
+
+        assertThatThrownBy(() -> service.initialize())
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("outbox configuration is required");
+    }
+
+    @Test
+    void initialRejectsInvalidOutboxCron() {
+        properties.getBuffer().setRepublishCron("not-a-cron");
+
+        assertThatThrownBy(() -> service.initialize())
+                .isInstanceOf(CronException.class)
+                .hasMessageContaining("Buffer republish schedule");
     }
 
     @Test
@@ -82,24 +115,26 @@ class DriverScheduleServiceImplTest {
         properties.setSchedule(s);
         properties.getHealth().getDevice().setCron("0/20 * * * * ?");
         service.initialize();
-        verify(quartzService).createJobWithCron(
-                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB),
-                eq("0/20 * * * * ?"),
-                eq(DeviceHealthScheduleJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB),
+                        eq("0/20 * * * * ?"),
+                        eq(DeviceHealthScheduleJob.class));
     }
 
     @Test
     void initialSkipsHealthJobWhenDisabled() throws Exception {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
         properties.setSchedule(s);
-        properties.getHealth().getDevice().setEnabled(false);
+        properties.getHealth().getDevice().setEnable(false);
         service.initialize();
-        verify(quartzService, never()).createJobWithCron(
-                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB),
-                any(),
-                eq(DeviceHealthScheduleJob.class));
+        verify(quartzService, never())
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB),
+                        any(),
+                        eq(DeviceHealthScheduleJob.class));
     }
 
     @Test
@@ -115,21 +150,22 @@ class DriverScheduleServiceImplTest {
     @Test
     void initialRegistersReadJobWhenEnabled() throws Exception {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
-        s.getRead().setEnabled(true);
+        s.getRead().setEnable(true);
         s.getRead().setCron("0 */1 * * * ?");
         properties.setSchedule(s);
         service.initialize();
-        verify(quartzService).createJobWithCron(
-                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.DRIVER_READ_SCHEDULE_JOB),
-                eq("0 */1 * * * ?"),
-                eq(DriverReadScheduleJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.DRIVER_READ_SCHEDULE_JOB),
+                        eq("0 */1 * * * ?"),
+                        eq(DriverReadScheduleJob.class));
     }
 
     @Test
     void initialRejectsInvalidReadCron() {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
-        s.getRead().setEnabled(true);
+        s.getRead().setEnable(true);
         s.getRead().setCron("definitely-not-a-cron");
         properties.setSchedule(s);
         assertThatThrownBy(() -> service.initialize())
@@ -140,21 +176,22 @@ class DriverScheduleServiceImplTest {
     @Test
     void initialRegistersCustomJobWhenEnabled() throws Exception {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
-        s.getCustom().setEnabled(true);
+        s.getCustom().setEnable(true);
         s.getCustom().setCron("0 0/5 * * * ?");
         properties.setSchedule(s);
         service.initialize();
-        verify(quartzService).createJobWithCron(
-                eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
-                eq(ScheduleConstant.DRIVER_CUSTOM_SCHEDULE_JOB),
-                eq("0 0/5 * * * ?"),
-                eq(DriverCustomScheduleJob.class));
+        verify(quartzService)
+                .createJobWithCron(
+                        eq(ScheduleConstant.DRIVER_SCHEDULE_GROUP),
+                        eq(ScheduleConstant.DRIVER_CUSTOM_SCHEDULE_JOB),
+                        eq("0 0/5 * * * ?"),
+                        eq(DriverCustomScheduleJob.class));
     }
 
     @Test
     void initialRejectsInvalidCustomCron() {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
-        s.getCustom().setEnabled(true);
+        s.getCustom().setEnable(true);
         s.getCustom().setCron("garbage");
         properties.setSchedule(s);
         assertThatThrownBy(() -> service.initialize())
@@ -166,7 +203,8 @@ class DriverScheduleServiceImplTest {
     void initialWrapsSchedulerExceptionInServiceException() throws Exception {
         DriverProperties.ScheduleProperties s = new DriverProperties.ScheduleProperties();
         properties.setSchedule(s);
-        doThrow(new SchedulerException("scheduler down")).when(quartzService)
+        doThrow(new SchedulerException("scheduler down"))
+                .when(quartzService)
                 .createJobWithCron(any(), any(), any(), any());
         assertThatThrownBy(() -> service.initialize())
                 .isInstanceOf(io.github.pnoker.common.exception.ServiceException.class)

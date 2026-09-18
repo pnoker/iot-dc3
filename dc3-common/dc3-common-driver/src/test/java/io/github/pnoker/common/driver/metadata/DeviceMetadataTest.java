@@ -14,27 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.metadata;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.grpc.client.DeviceClient;
 import io.github.pnoker.common.exception.ServiceException;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class DeviceMetadataTest {
@@ -51,50 +49,43 @@ class DeviceMetadataTest {
         driverProperties = new DriverProperties();
         driverProperties.getMetadata().getCache().setRecordStats(true);
         driverMetadata = new DriverMetadata();
-        driverMetadata.setDeviceIds(new HashSet<>(Set.of(10L, 11L)));
+        driverMetadata.setDeviceLeases(Map.of(10L, 1L, 11L, 2L), System.currentTimeMillis() + 60_000, 1L);
         deviceMetadata = new DeviceMetadata(driverProperties, driverMetadata, deviceClient);
     }
 
     @Test
-    void loadCachePopulatesCacheOnSuccess() {
+    void refreshCachePopulatesCacheOnSuccess() {
         DeviceBO device = new DeviceBO();
         device.setId(10L);
-        when(deviceClient.getById(10L)).thenReturn(device);
+        when(deviceClient.getById(10L)).thenReturn(Mono.just(device));
 
-        DeviceBO returned = deviceMetadata.loadCache(10L);
+        StepVerifier.create(deviceMetadata.refreshCache(10L)).expectNext(device).verifyComplete();
 
-        assertThat(returned).isSameAs(device);
-        // Subsequent getCache should not re-issue gRPC because the cache has been
-        // populated by the refresh.
         DeviceBO cached = deviceMetadata.getCache(10L);
         assertThat(cached).isSameAs(device);
         verify(deviceClient, times(1)).getById(10L);
     }
 
     @Test
-    void loadCacheReturningNullDropsOrphanDeviceId() {
-        when(deviceClient.getById(10L)).thenReturn(null);
+    void refreshCacheEmptyResultDropsOrphanDeviceId() {
+        when(deviceClient.getById(10L)).thenReturn(Mono.empty());
 
-        DeviceBO returned = deviceMetadata.loadCache(10L);
+        StepVerifier.create(deviceMetadata.refreshCache(10L)).verifyComplete();
 
-        assertThat(returned).isNull();
-        // Manager has dropped this device → the orphan id must be removed so the
-        // Quartz scan stops re-fetching it.
         assertThat(driverMetadata.getDeviceIds()).doesNotContain(10L);
-        // Other deviceIds remain untouched.
         assertThat(driverMetadata.getDeviceIds()).contains(11L);
     }
 
     @Test
-    void loadCacheThrowsServiceExceptionWhenLoaderFails() {
-        when(deviceClient.getById(10L)).thenThrow(new RuntimeException("manager unreachable"));
+    void refreshCachePropagatesLoaderFailure() {
+        when(deviceClient.getById(10L)).thenReturn(Mono.error(new RuntimeException("manager unreachable")));
 
-        assertThatThrownBy(() -> deviceMetadata.loadCache(10L))
-                .isInstanceOf(ServiceException.class)
-                .hasMessageContaining("device cache")
-                .hasRootCauseMessage("manager unreachable");
-        // gRPC failure must not silently strip the deviceId — only a confirmed null
-        // upstream does that. The id is preserved so the next event can retry.
+        StepVerifier.create(deviceMetadata.refreshCache(10L))
+                .expectErrorMatches(error -> error instanceof ServiceException
+                        && error.getMessage().contains("device cache")
+                        && error.getCause().getMessage().equals("manager unreachable"))
+                .verify();
+
         assertThat(driverMetadata.getDeviceIds()).contains(10L);
     }
 
@@ -102,7 +93,7 @@ class DeviceMetadataTest {
     void getCacheTriggersLoaderOnMissAndReturnsValue() {
         DeviceBO device = new DeviceBO();
         device.setId(10L);
-        when(deviceClient.getById(10L)).thenReturn(device);
+        when(deviceClient.getById(10L)).thenReturn(Mono.just(device));
 
         DeviceBO returned = deviceMetadata.getCache(10L);
 
@@ -114,10 +105,10 @@ class DeviceMetadataTest {
     void removeCacheInvalidatesEntry() {
         DeviceBO device = new DeviceBO();
         device.setId(10L);
-        when(deviceClient.getById(10L)).thenReturn(device);
-        deviceMetadata.loadCache(10L);
+        when(deviceClient.getById(10L)).thenReturn(Mono.just(device));
+        StepVerifier.create(deviceMetadata.refreshCache(10L)).expectNext(device).verifyComplete();
 
-        deviceMetadata.removeCache(10L);
+        deviceMetadata.evictCache(10L);
         deviceMetadata.getCache(10L);
 
         // After invalidate the next getCache must re-issue gRPC.
@@ -130,10 +121,14 @@ class DeviceMetadataTest {
         device10.setId(10L);
         DeviceBO device11 = new DeviceBO();
         device11.setId(11L);
-        when(deviceClient.getById(10L)).thenReturn(device10);
-        when(deviceClient.getById(11L)).thenReturn(device11);
-        deviceMetadata.loadCache(10L);
-        deviceMetadata.loadCache(11L);
+        when(deviceClient.getById(10L)).thenReturn(Mono.just(device10));
+        when(deviceClient.getById(11L)).thenReturn(Mono.just(device11));
+        StepVerifier.create(deviceMetadata.refreshCache(10L))
+                .expectNext(device10)
+                .verifyComplete();
+        StepVerifier.create(deviceMetadata.refreshCache(11L))
+                .expectNext(device11)
+                .verifyComplete();
 
         deviceMetadata.clearCache();
         deviceMetadata.getCache(10L);
@@ -142,5 +137,4 @@ class DeviceMetadataTest {
         verify(deviceClient, times(2)).getById(10L);
         verify(deviceClient, times(2)).getById(11L);
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.service;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
@@ -23,21 +22,38 @@ import io.github.pnoker.common.constant.common.BaseConstant;
  * Alarm service constants.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class AlarmConstant {
 
+    /**
+     * Match type marking a firing (threshold-crossing) alarm evaluation.
+     */
     public static final String MATCH_TYPE_FIRING = "FIRING";
 
+    /**
+     * Match type marking a recovery (back-to-normal) alarm evaluation.
+     */
     public static final String MATCH_TYPE_RECOVERY = "RECOVERY";
 
+    /**
+     * JSON extension column holding the rule-event payload.
+     */
     public static final String EXT_RULE_EVENT = "ALARM_RULE_EVENT";
 
+    /**
+     * JSON extension column holding the rule-state snapshot.
+     */
     public static final String EXT_RULE_STATE = "ALARM_RULE_STATE";
 
+    /**
+     * JSON extension column holding the notify-history request payload.
+     */
     public static final String EXT_NOTIFY_HISTORY_REQUEST = "ALARM_NOTIFY_HISTORY_REQUEST";
 
+    /**
+     * JSON extension column holding the notify-history response payload.
+     */
     public static final String EXT_NOTIFY_HISTORY_RESPONSE = "ALARM_NOTIFY_HISTORY_RESPONSE";
 
     /**
@@ -51,5 +67,4 @@ public class AlarmConstant {
     private AlarmConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
-
 }

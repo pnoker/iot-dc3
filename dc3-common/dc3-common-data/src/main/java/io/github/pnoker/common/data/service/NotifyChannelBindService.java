@@ -14,20 +14,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.service;
 
-import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
 import io.github.pnoker.common.data.entity.query.NotifyChannelBindQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
 /**
  * Notification channel binding service.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface NotifyChannelBindService extends BaseService<NotifyChannelBindBO, NotifyChannelBindQuery> {
+public interface NotifyChannelBindService {
+    /** Add one notify configuration channel bind. */
+    Mono<NotifyChannelBindBO> add(NotifyChannelBindBO value);
 
+    /** Delete the notify configuration channel bind, reporting whether a row was removed. */
+    Mono<Boolean> delete(Long tenantId, Long id);
+
+    /** Update one notify configuration channel bind and emit the updated row. */
+    Mono<NotifyChannelBindBO> update(NotifyChannelBindBO value);
+
+    /** Resolve the notify configuration channel bind by its id. */
+    Mono<NotifyChannelBindBO> getById(Long tenantId, Long id);
+
+    /** Page notify configuration channel binds matching the tenant-scoped filters. */
+    Mono<OffsetPage<NotifyChannelBindBO>> list(Long tenantId, NotifyChannelBindQuery query);
 }

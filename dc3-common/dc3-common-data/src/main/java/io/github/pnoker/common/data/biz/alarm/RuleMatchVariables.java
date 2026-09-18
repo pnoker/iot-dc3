@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.entity.ext.RuleExt;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -29,13 +27,11 @@ import java.util.Objects;
  * Template variables exposed by a rule match.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 final class RuleMatchVariables {
 
-    private RuleMatchVariables() {
-    }
+    private RuleMatchVariables() {}
 
     static Map<String, Object> of(RuleMatch match) {
         RuleBO rule = match.getRule();
@@ -62,7 +58,8 @@ final class RuleMatchVariables {
     }
 
     private static void enrichRuleConditionVariables(RuleBO rule, Map<String, Object> variables) {
-        if (Objects.isNull(rule.getRuleExt()) || Objects.isNull(rule.getRuleExt().getContent())
+        if (Objects.isNull(rule.getRuleExt())
+                || Objects.isNull(rule.getRuleExt().getContent())
                 || Objects.isNull(rule.getRuleExt().getContent().getCondition())) {
             return;
         }
@@ -90,8 +87,7 @@ final class RuleMatchVariables {
             String severity,
             String eventType,
             List<String> labels,
-            Map<String, Object> values) {
-    }
+            Map<String, Object> values) {}
 
     private static final class Variable {
 
@@ -105,9 +101,6 @@ final class RuleMatchVariables {
         private static final String HIGH = "high";
         private static final String UNIT = "unit";
 
-        private Variable() {
-        }
-
+        private Variable() {}
     }
-
 }

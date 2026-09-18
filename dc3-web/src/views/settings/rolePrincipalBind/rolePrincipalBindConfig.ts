@@ -15,21 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {listRole} from '@/api/role';
 import {addRolePrincipalBind, deleteRolePrincipalBind, listRolePrincipalBind} from '@/api/rolePrincipalBind';
-import type {EntityListConfig} from '@/config/types/entityList';
+import {PRINCIPAL_TYPE_OPTIONS} from '@/config/constant/enums';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
 import {principalIdField, principalNameRelation, roleNameRelation} from '../relations';
 
-const PRINCIPAL_TYPE_OPTIONS = [
-  {label: 'USER', value: 'USER'},
-  {label: 'SERVICE_ACCOUNT', value: 'SERVICE_ACCOUNT'},
-  {label: 'SYSTEM', value: 'SYSTEM'},
-];
-
-export const createRolePrincipalBindConfig = (t: ComposerTranslation): EntityListConfig => ({
+export const createRolePrincipalBindConfig = (t: Translator): EntityListConfig => ({
   name: 'role-principal-bind',
   title: t('nav.settingsRolePrincipalBind'),
   editable: true,
@@ -60,8 +53,8 @@ export const createRolePrincipalBindConfig = (t: ComposerTranslation): EntityLis
       kind: 'treeSelect',
       tree: {
         load: async () => {
-          const res: any = await listRole({page: {current: 1, size: 1000}});
-          return res?.data?.records || [];
+          const res: any = await listRole({offset: 0, limit: 200});
+          return res?.items || [];
         },
         props: {label: 'roleName', value: 'id'},
       },
@@ -81,6 +74,6 @@ export const createRolePrincipalBindConfig = (t: ComposerTranslation): EntityLis
   list: listRolePrincipalBind,
   add: addRolePrincipalBind,
   remove: deleteRolePrincipalBind,
-  confirmDeleteText: t('settings.rolePrincipalBind.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityBinding')}),
   emptyText: t('settings.rolePrincipalBind.empty'),
 });

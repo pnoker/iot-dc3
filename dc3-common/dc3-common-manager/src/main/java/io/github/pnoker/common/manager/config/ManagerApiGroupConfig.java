@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.config;
 
 import org.springdoc.core.models.GroupedOpenApi;
@@ -30,12 +29,16 @@ import org.springframework.context.annotation.Configuration;
  * it appears as one of several selectable groups.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @Configuration
 public class ManagerApiGroupConfig {
 
+    /**
+     * Create and configure the application-managed manager api group.
+     *
+     * @return manager api group result
+     */
     @Bean
     public GroupedOpenApi managerApiGroup() {
         return GroupedOpenApi.builder()

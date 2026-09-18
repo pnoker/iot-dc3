@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
@@ -29,7 +28,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * Spring profile activation configuration for the agentic service.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Slf4j
@@ -40,5 +38,4 @@ public class ActiveAgenticProfileConfig implements EnvironmentPostProcessor {
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         environment.addActiveProfile(EnvironmentConstant.AGENTIC_PROFILE);
     }
-
 }

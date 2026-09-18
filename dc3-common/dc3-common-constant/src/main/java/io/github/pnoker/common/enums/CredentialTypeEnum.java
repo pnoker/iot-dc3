@@ -14,42 +14,45 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Local credential type.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
 @AllArgsConstructor
 public enum CredentialTypeEnum {
 
+    /**
+     * Password-based local credential.
+     */
     PASSWORD("PASSWORD", "password", "Password credential"),
     ;
 
-    @EnumValue
     private final String value;
 
     private final String code;
 
     private final String remark;
 
+    /**
+     * Resolve a credential type from its persisted value.
+     *
+     * @param value persisted credential value
+     * @return matching type, or {@code null} when the value is unknown
+     */
     public static CredentialTypeEnum ofValue(String value) {
         Optional<CredentialTypeEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))
                 .findFirst();
         return any.orElse(null);
     }
-
 }

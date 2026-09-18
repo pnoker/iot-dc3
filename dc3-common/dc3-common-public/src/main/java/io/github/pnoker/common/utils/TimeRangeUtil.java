@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.enums.TimeRangeKeyEnum;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -28,7 +26,6 @@ import java.util.Objects;
  * concrete {@link LocalDateTime} lower bounds for {@code create_time >= ?} queries.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.3
  */
 public final class TimeRangeUtil {
@@ -38,8 +35,14 @@ public final class TimeRangeUtil {
      */
     public static final int HOURS_24H = 24;
 
+    /**
+     * Hour span used by the seven-day rolling preset.
+     */
     public static final int HOURS_7D = 24 * 7;
 
+    /**
+     * Hour span used by the thirty-day rolling preset.
+     */
     public static final int HOURS_30D = 24 * 30;
 
     private TimeRangeUtil() {
@@ -72,6 +75,10 @@ public final class TimeRangeUtil {
 
     /**
      * Convenience overload that accepts the raw wire-format code.
+     *
+     * @param rangeKeyCode stable range-key code; unknown values fall back to {@code rangeHours}
+     * @param rangeHours   legacy positive-hour fallback
+     * @return lower-bound timestamp, or {@code null} when no bound applies
      */
     public static LocalDateTime resolveFrom(String rangeKeyCode, Integer rangeHours) {
         return resolveFrom(TimeRangeKeyEnum.ofCode(rangeKeyCode), rangeHours);
@@ -84,6 +91,8 @@ public final class TimeRangeUtil {
      * since local midnight rounded up to the next whole hour (minimum 1), which lines up
      * with sparkline bucketing.
      *
+     * @param rangeKey   parsed range key; {@code null} falls back to {@code rangeHours}
+     * @param rangeHours legacy positive-hour fallback
      * @return effective hour span, or {@code null} when no bound applies
      */
     public static Integer resolveHours(TimeRangeKeyEnum rangeKey, Integer rangeHours) {
@@ -91,7 +100,8 @@ public final class TimeRangeUtil {
             return switch (rangeKey) {
                 case TODAY -> {
                     LocalDateTime midnight = LocalDate.now().atStartOfDay();
-                    long minutes = java.time.Duration.between(midnight, LocalDateTime.now()).toMinutes();
+                    long minutes = java.time.Duration.between(midnight, LocalDateTime.now())
+                            .toMinutes();
                     // round up to the next whole hour so bucketed queries cover the full
                     // day so far
                     int hours = (int) Math.max(1, (minutes + 59) / 60);
@@ -110,6 +120,10 @@ public final class TimeRangeUtil {
 
     /**
      * Convenience overload that accepts the raw wire-format code.
+     *
+     * @param rangeKeyCode stable range-key code; unknown values fall back to {@code rangeHours}
+     * @param rangeHours   legacy positive-hour fallback
+     * @return effective hour span, or {@code null} when no bound applies
      */
     public static Integer resolveHours(String rangeKeyCode, Integer rangeHours) {
         return resolveHours(TimeRangeKeyEnum.ofCode(rangeKeyCode), rangeHours);
@@ -120,6 +134,8 @@ public final class TimeRangeUtil {
      * {@code /alert/trend?days=30}). {@code TODAY} and {@code H24} both map to 1 day; the
      * legacy {@code days} integer passes through.
      *
+     * @param rangeKey parsed range key; {@code null} falls back to {@code days}
+     * @param days     legacy positive-day fallback
      * @return effective day count, or {@code null} when no bound applies
      */
     public static Integer resolveDays(TimeRangeKeyEnum rangeKey, Integer days) {
@@ -138,9 +154,12 @@ public final class TimeRangeUtil {
 
     /**
      * Convenience overload that accepts the raw wire-format code.
+     *
+     * @param rangeKeyCode stable range-key code; unknown values fall back to {@code days}
+     * @param days         legacy positive-day fallback
+     * @return effective day count, or {@code null} when no bound applies
      */
     public static Integer resolveDays(String rangeKeyCode, Integer days) {
         return resolveDays(TimeRangeKeyEnum.ofCode(rangeKeyCode), days);
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.builder;
 
 import io.github.pnoker.api.common.GrpcPointAttributeConfigDTO;
@@ -31,12 +30,19 @@ import org.mapstruct.MappingTarget;
  * MapStruct mapper for converting point attribute configuration DTOs from gRPC responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcPointAttributeConfigBuilder {
 
+    /**
+     * Convert grpc transfer object to dto.
+     *
+     * @param entityGrpc entity grpc
+     * @return converted value
+     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
@@ -48,12 +54,17 @@ public interface GrpcPointAttributeConfigBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     PointAttributeConfigDTO buildDTOByGrpcDTO(GrpcPointAttributeConfigDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityDTO  transfer object
+     */
     @AfterMapping
-    default void afterProcess(GrpcPointAttributeConfigDTO entityGrpc,
-                              @MappingTarget PointAttributeConfigDTO entityDTO) {
+    default void afterProcess(
+            GrpcPointAttributeConfigDTO entityGrpc, @MappingTarget PointAttributeConfigDTO entityDTO) {
         GrpcBuilderUtil.buildBaseDTOByGrpcBase(entityGrpc.getBase(), entityDTO);
 
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityDTO::setEnableFlag);
     }
-
 }

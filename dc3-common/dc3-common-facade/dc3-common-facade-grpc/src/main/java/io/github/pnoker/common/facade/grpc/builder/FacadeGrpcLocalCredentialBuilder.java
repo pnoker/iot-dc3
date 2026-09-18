@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.builder;
 
 import io.github.pnoker.api.center.auth.GrpcLocalCredentialDTO;
@@ -23,21 +22,25 @@ import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
 import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
-import org.springframework.stereotype.Component;
-
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 /**
  * {@code GrpcLocalCredentialDTO} to {@link FacadeLocalCredentialBO}.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Component
 public class FacadeGrpcLocalCredentialBuilder {
 
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadeLocalCredentialBO toFacadeBO(GrpcLocalCredentialDTO dto) {
         if (Objects.isNull(dto)) {
             return null;
@@ -50,5 +53,4 @@ public class FacadeGrpcLocalCredentialBuilder {
         Optional.ofNullable(EnableFlagEnum.ofIndex((byte) dto.getEnableFlag())).ifPresent(bo::setEnableFlag);
         return bo;
     }
-
 }

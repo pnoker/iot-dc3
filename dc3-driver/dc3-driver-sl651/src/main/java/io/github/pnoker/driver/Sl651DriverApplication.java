@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver;
 
 import org.springframework.boot.SpringApplication;
@@ -34,7 +33,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @SpringBootApplication
@@ -48,5 +46,4 @@ public class Sl651DriverApplication {
     public static void main(String[] args) {
         SpringApplication.run(Sl651DriverApplication.class, args);
     }
-
 }

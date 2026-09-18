@@ -14,70 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
-import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
-import io.github.pnoker.common.entity.dto.McpToolAuthorizeRequestDTO;
-import io.github.pnoker.common.entity.dto.McpToolAuthorizeResponseDTO;
+import io.github.pnoker.common.entity.dto.McpCallToolRequestDTO;
+import io.github.pnoker.common.entity.dto.McpCallToolResponseDTO;
 import io.github.pnoker.common.entity.dto.McpToolListResponseDTO;
-import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
+import reactor.core.publisher.Mono;
 
-/**
- * Protocol-neutral MCP runtime facade used by gateway-to-auth internal calls.
- *
- * @author pnoker
- * @version 2026.6.12
- * @since 2026.6.12
- */
+/** Reactive MCP runtime facade used by the gateway. */
 public interface McpRuntimeFacade {
+    /** List tools matching the request. */
+    Mono<McpToolListResponseDTO> listTools(String token);
 
-    /**
-     * Introspect an MCP OAuth bearer token.
-     *
-     * @param token bearer token
-     * @return introspection result
-     */
-    McpIntrospectResponseDTO introspect(String token);
+    /** Authorize and execute one MCP tool call. */
+    Mono<McpCallToolResponseDTO> callTool(McpCallToolRequestDTO request);
 
-    /**
-     * List tools visible to the current MCP connection.
-     *
-     * @param tenantId        tenant ID
-     * @param principalId     principal ID
-     * @param mcpConnectionId MCP connection ID
-     * @param scope           granted OAuth scopes
-     * @return visible MCP tools
-     */
-    McpToolListResponseDTO listTools(Long tenantId, Long principalId, Long mcpConnectionId, String scope);
-
-    /**
-     * Resolve one visible MCP tool to backend invocation metadata.
-     *
-     * @param tenantId        tenant ID
-     * @param principalId     principal ID
-     * @param mcpConnectionId MCP connection ID
-     * @param scope           granted OAuth scopes
-     * @param toolName        MCP tool name
-     * @return backend invocation metadata
-     */
-    McpToolResolveResponseDTO resolveTool(Long tenantId, Long principalId, Long mcpConnectionId, String scope,
-                                          String toolName);
-
-    /**
-     * Authorize one tool call, enforcing high-risk confirmation and idempotency.
-     *
-     * @param request authorization request
-     * @return authorization decision
-     */
-    McpToolAuthorizeResponseDTO authorizeToolCall(McpToolAuthorizeRequestDTO request);
-
-    /**
-     * Store one MCP call audit record.
-     *
-     * @param command audit command
-     */
-    void audit(McpAuditCommandDTO command);
-
+    /** Persist one MCP tool-call audit record. */
+    Mono<Void> audit(McpAuditCommandDTO command);
 }

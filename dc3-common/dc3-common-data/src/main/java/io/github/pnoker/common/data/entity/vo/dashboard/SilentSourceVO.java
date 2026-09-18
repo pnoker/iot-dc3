@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * A (device, point) pair that was active within the baseline window but has gone silent
@@ -33,7 +31,6 @@ import java.time.LocalDateTime;
  * don't self-report "I'm offline".
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -47,10 +44,10 @@ public class SilentSourceVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "device ID")
-    private long deviceId;
+    private String deviceId;
 
     @Schema(description = "point ID")
-    private long pointId;
+    private String pointId;
 
     @Schema(description = "time the last sample was seen")
     private LocalDateTime lastSeen;
@@ -60,5 +57,4 @@ public class SilentSourceVO implements Serializable {
      */
     @Schema(description = "seconds since the last sample, rounded", example = "3600")
     private long silentSeconds;
-
 }

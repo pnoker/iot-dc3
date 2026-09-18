@@ -1,0 +1,191 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# =============================================================================
+# IoT DC3 on Kubernetes - kustomize root
+#
+# Apply (creates namespace dc3, Secrets, StatefulSets, Deployments, HPA, PDB,
+# Ingress). Dependency images (dc3-postgres/dc3-rabbitmq) must exist in the
+# registry first - see scripts/push-images.sh and README.md.
+#
+#   kubectl apply -k dc3/deploy/k8s
+#
+# Common overrides:
+#   kubectl kustomize dc3/deploy/k8s | kubectl apply -f -
+#   kustomize edit set image pnoker/dc3-gateway=my.registry/dc3-gateway:2026.6
+# =============================================================================
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - postgres/statefulset.yaml
+  - postgres/service.yaml
+  - rabbitmq/statefulset.yaml
+  - rabbitmq/service.yaml
+  - auth/deployment.yaml
+  - auth/service.yaml
+  - manager/deployment.yaml
+  - manager/service.yaml
+  - data/deployment.yaml
+  - data/service.yaml
+  - agentic/deployment.yaml
+  - agentic/service.yaml
+  - agentic/pvc.yaml
+  - gateway/deployment.yaml
+  - gateway/service.yaml
+  - web/deployment.yaml
+  - web/service.yaml
+  - drivers/driver-listening-virtual.yaml
+  - drivers/driver-modbus-tcp.yaml
+  - drivers/driver-modbus-rtu.yaml
+  - drivers/driver-mqtt.yaml
+  - drivers/driver-opc-da.yaml
+  - drivers/driver-opc-ua.yaml
+  - drivers/driver-plcs7.yaml
+  - drivers/driver-virtual.yaml
+  - drivers/driver-bacnet-ip.yaml
+  - drivers/driver-fins.yaml
+  - drivers/driver-melsec.yaml
+  - drivers/driver-ethernet-ip.yaml
+  - drivers/driver-iec104.yaml
+  - drivers/driver-sl651.yaml
+  - drivers/driver-snmp.yaml
+  - drivers/driver-dlms.yaml
+  - drivers/driver-coap.yaml
+  - drivers/driver-lwm2m.yaml
+  - drivers/driver-http.yaml
+  - drivers/driver-serial.yaml
+  - drivers/driver-tcp-udp.yaml
+  - drivers/driver-mysql.yaml
+  - drivers/driver-postgresql.yaml
+  - drivers/driver-oracle.yaml
+  - drivers/driver-sqlserver.yaml
+  - drivers/driver-ble.yaml
+  - drivers/driver-can.yaml
+  - drivers/driver-dlt645.yaml
+  - drivers/driver-dnp3.yaml
+  - drivers/driver-iec61850.yaml
+  - drivers/driver-kafka.yaml
+  - drivers/driver-knx.yaml
+  - drivers/driver-lorawan.yaml
+  - drivers/driver-mbus.yaml
+  - drivers/driver-redis.yaml
+  - drivers/driver-zigbee.yaml
+  - drivers/service-listening-virtual.yaml
+  - ingress.yaml
+  - hpa.yaml
+  - pdb.yaml
+
+secretGenerator:
+  - name: dc3-secrets
+    envs:
+      - secret.env
+    options:
+      disableNameSuffixHash: true
+
+# Single place to bump/switch the image tag or registry for every component.
+images:
+  # dc3-web is published only as `latest` and full release versions (e.g.
+  # 2026.6.0) - it has NO series tag. Pin a full release version here for
+  # reproducible production rollouts.
+  - name: pnoker/dc3-web
+    newTag: latest
+  - name: pnoker/dc3-gateway
+    newTag: 2026.6
+  - name: pnoker/dc3-center-auth
+    newTag: 2026.6
+  - name: pnoker/dc3-center-manager
+    newTag: 2026.6
+  - name: pnoker/dc3-center-data
+    newTag: 2026.6
+  - name: pnoker/dc3-center-agentic
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-listening-virtual
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-modbus-tcp
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-modbus-rtu
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-mqtt
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-opc-da
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-opc-ua
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-plcs7
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-virtual
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-bacnet-ip
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-fins
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-melsec
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-ethernet-ip
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-iec104
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-sl651
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-snmp
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-dlms
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-coap
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-lwm2m
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-http
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-serial
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-tcp-udp
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-mysql
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-postgresql
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-oracle
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-sqlserver
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-ble
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-can
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-dlt645
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-dnp3
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-iec61850
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-kafka
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-knx
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-lorawan
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-mbus
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-redis
+    newTag: 2026.6
+  - name: pnoker/dc3-driver-zigbee
+    newTag: 2026.6

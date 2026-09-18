@@ -22,17 +22,15 @@ import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
-import org.springframework.ai.chat.model.ToolContext;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
+import org.springframework.ai.chat.model.ToolContext;
 
 /**
  * Accessors for the explicit Spring AI tool context passed into platform tools.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2026.5.9
  */
 public class AgenticToolContextUtil {
@@ -41,6 +39,12 @@ public class AgenticToolContextUtil {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
+    /**
+     * Require principal header.
+     *
+     * @param toolContext tool context
+     * @return require principal header result
+     */
     public static RequestHeader.PrincipalHeader requirePrincipalHeader(ToolContext toolContext) {
         Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.USER_HEADER);
         if (value instanceof RequestHeader.PrincipalHeader userHeader) {
@@ -55,12 +59,19 @@ public class AgenticToolContextUtil {
     }
 
     private static void validatePrincipalHeader(RequestHeader.PrincipalHeader userHeader) {
-        if (Objects.isNull(userHeader) || Objects.isNull(userHeader.getTenantId())
+        if (Objects.isNull(userHeader)
+                || Objects.isNull(userHeader.getTenantId())
                 || Objects.isNull(userHeader.getPrincipalId())) {
             throw new UnAuthorizedException("Unable to get agentic principal header");
         }
     }
 
+    /**
+     * Require tenant identifier.
+     *
+     * @param toolContext tool context
+     * @return require tenant identifier result
+     */
     public static Long requireTenantId(ToolContext toolContext) {
         Long tenantId = getLongContextValue(toolContext, AgenticConstant.ToolContextKey.TENANT_ID);
         if (Objects.nonNull(tenantId)) {
@@ -69,6 +80,12 @@ public class AgenticToolContextUtil {
         return requirePrincipalHeader(toolContext).getTenantId();
     }
 
+    /**
+     * Require user identifier.
+     *
+     * @param toolContext tool context
+     * @return require user identifier result
+     */
     public static Long requireUserId(ToolContext toolContext) {
         Long userId = getLongContextValue(toolContext, AgenticConstant.ToolContextKey.USER_ID);
         if (Objects.nonNull(userId)) {
@@ -77,6 +94,12 @@ public class AgenticToolContextUtil {
         return requirePrincipalHeader(toolContext).getUserId();
     }
 
+    /**
+     * Require conversation identifier.
+     *
+     * @param toolContext tool context
+     * @return require conversation identifier result
+     */
     public static String requireConversationId(ToolContext toolContext) {
         Object value = getContextValue(toolContext, AgenticConstant.ToolContextKey.CONVERSATION_ID);
         if (value instanceof String stringValue && !stringValue.isBlank()) {
@@ -85,20 +108,50 @@ public class AgenticToolContextUtil {
         throw new UnAuthorizedException("Unable to get agentic conversation ID");
     }
 
-    public static void recordToolInvocation(ToolContext toolContext, String toolName, String domain,
-                                            String description) {
+    /**
+     * Record tool invocation.
+     *
+     * @param toolContext tool context
+     * @param toolName    tool name
+     * @param domain      domain
+     * @param description description
+     */
+    public static void recordToolInvocation(
+            ToolContext toolContext, String toolName, String domain, String description) {
         recordRunEvent(toolContext, AgenticRunEvent.toolStart(toolName, domain, description));
     }
 
-    public static void recordToolResult(ToolContext toolContext, String toolName, boolean success, String code,
-                                        String message) {
+    /**
+     * Record tool result.
+     *
+     * @param toolContext tool context
+     * @param toolName    tool name
+     * @param success     success
+     * @param code        code
+     * @param message     message
+     */
+    public static void recordToolResult(
+            ToolContext toolContext, String toolName, boolean success, String code, String message) {
         recordRunEvent(toolContext, AgenticRunEvent.toolResult(toolName, success, code, message));
     }
 
+    /**
+     * Record tool error.
+     *
+     * @param toolContext tool context
+     * @param toolName    tool name
+     * @param message     message
+     */
     public static void recordToolError(ToolContext toolContext, String toolName, String message) {
         recordRunEvent(toolContext, AgenticRunEvent.toolError(toolName, message));
     }
 
+    /**
+     * Record visualizations.
+     *
+     * @param toolContext    tool context
+     * @param visualizations visualizations
+     */
     @SuppressWarnings("unchecked")
     public static void recordVisualizations(ToolContext toolContext, List<AgenticVisualizationSpec> visualizations) {
         if (Objects.isNull(visualizations) || visualizations.isEmpty()) {
@@ -111,6 +164,12 @@ public class AgenticToolContextUtil {
         }
     }
 
+    /**
+     * Record run event.
+     *
+     * @param toolContext tool context
+     * @param event       event
+     */
     @SuppressWarnings("unchecked")
     public static void recordRunEvent(ToolContext toolContext, AgenticRunEvent event) {
         if (Objects.isNull(event)) {
@@ -139,5 +198,4 @@ public class AgenticToolContextUtil {
         }
         return toolContext.getContext().get(key);
     }
-
 }

@@ -14,29 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
-import io.github.pnoker.common.constant.driver.RabbitConstant;
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.data.biz.PointCommandHistoryService;
 import io.github.pnoker.common.data.biz.PointCommandService;
-import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
 import io.github.pnoker.common.data.entity.bo.PointCommandReadBO;
 import io.github.pnoker.common.data.entity.bo.PointCommandWriteBO;
 import io.github.pnoker.common.data.entity.builder.PointCommandHistoryBuilder;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
 import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryVO;
-import io.github.pnoker.common.data.mapper.EntityStateMapper;
+import io.github.pnoker.common.data.repository.ReactivePointCommandContext;
+import io.github.pnoker.common.data.repository.ReactivePointCommandStore;
 import io.github.pnoker.common.data.validator.PointCommandValidator;
 import io.github.pnoker.common.entity.dto.PointCommandDTO;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
@@ -44,257 +38,294 @@ import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
-import io.github.pnoker.common.facade.api.DeviceFacade;
-import io.github.pnoker.common.facade.api.DriverFacade;
-import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
+import io.github.pnoker.common.mq.MqHeaders;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
+import io.github.pnoker.common.utils.UuidV7;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
-import java.util.UUID;
-
-/**
- * Business service implementation for point command operations.
- * <p>
- * Validates command scope, checks driver online status, persists the command,
- * publishes to the driver via RabbitMQ, and returns a {@code commandId} that
- * callers can use to poll for the terminal result.
- *
- * @author pnoker
- * @version 2026.5.22
- * @since 2016.10.1
- */
+/** Reactive point command application service. */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PointCommandServiceImpl implements PointCommandService, PointCommandHistoryService {
 
-    private final DeviceFacade deviceFacade;
-
-    private final DriverFacade driverFacade;
-
-    private final PointFacade pointFacade;
-
-    private final RabbitTemplate rabbitTemplate;
-
-    private final PointCommandHistoryManager pointCommandHistoryManager;
-
-    private final PointCommandHistoryBuilder pointCommandHistoryBuilder;
-
-    private final EntityStateMapper entityStateMapper;
-
-    private final PointCommandValidator pointCommandValidator;
+    private final ReactivePointCommandContext commandContext;
+    private final ReactivePointCommandStore commandStore;
+    private final ReactiveMessageSender messageSender;
+    private final PointCommandHistoryBuilder historyBuilder;
+    private final PointCommandValidator commandValidator;
 
     @Override
-    public String read(Long tenantId, PointCommandReadBO entityBO) {
-        validateCommandScope(tenantId, entityBO.getDeviceId(), entityBO.getPointId());
-
-        // Idempotency: if caller supplied a commandId that already exists, return it
-        String existing = checkExistingCommand(entityBO.getCommandId());
-        if (Objects.nonNull(existing)) {
-            return existing;
-        }
-
-        FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityBO.getDeviceId());
-        if (Objects.isNull(driver)) {
-            throw new ServiceException("No driver registered for this device");
-        }
-        checkDriverOnline(tenantId, driver.getId());
-
-        String commandId = resolveCommandId(entityBO.getCommandId());
-        LocalDateTime nowLocal = LocalDateTime.now();
-
-        PointCommandHistoryDO commandDO = new PointCommandHistoryDO();
-        commandDO.setCommandId(commandId);
-        commandDO.setTenantId(tenantId);
-        commandDO.setType(PointCommandTypeEnum.READ);
-        commandDO.setDeviceId(entityBO.getDeviceId());
-        commandDO.setPointId(entityBO.getPointId());
-        commandDO.setStatus(PointCommandStatusEnum.PENDING);
-        commandDO.setSource(PointCommandSourceEnum.HTTP);
-        commandDO.setOccurTime(nowLocal);
-        commandDO.setExpireTime(nowLocal.plusSeconds(10));
-        commandDO.setSchemaVersion((short) 1);
-        pointCommandHistoryManager.save(commandDO);
-
-        publishCommand(PointCommandDTO.ofRead(commandId, tenantId, entityBO.getDeviceId(),
-                entityBO.getPointId()), driver.getServiceName(), commandId);
-
-        commandDO.setStatus(PointCommandStatusEnum.SENT);
-        commandDO.setSendTime(LocalDateTime.now());
-        pointCommandHistoryManager.updateById(commandDO);
-
-        return commandId;
+    public Mono<String> read(Long tenantId, PointCommandReadBO entityBO) {
+        if (entityBO == null) return Mono.error(new ServiceException("Point command is required"));
+        return reuseIfPresent(
+                        tenantId,
+                        entityBO.getCommandId(),
+                        entityBO.getDeviceId(),
+                        entityBO.getPointId(),
+                        PointCommandTypeEnum.READ,
+                        null)
+                .switchIfEmpty(Mono.defer(() -> scope(tenantId, entityBO.getDeviceId(), entityBO.getPointId(), false)
+                        .flatMap(scope -> submit(
+                                tenantId,
+                                entityBO.getCommandId(),
+                                scope,
+                                PointCommandTypeEnum.READ,
+                                null,
+                                entityBO.getSource()))));
     }
 
     @Override
-    public String write(Long tenantId, PointCommandWriteBO entityBO) {
-        validateWriteScope(tenantId, entityBO.getDeviceId(), entityBO.getPointId());
-
-        // Idempotency: if caller supplied a commandId that already exists, return it
-        String existing = checkExistingCommand(entityBO.getCommandId());
-        if (Objects.nonNull(existing)) {
-            return existing;
-        }
-
-        FacadeDriverBO driver = driverFacade.getByDeviceId(tenantId, entityBO.getDeviceId());
-        if (Objects.isNull(driver)) {
-            throw new ServiceException("No driver registered for this device");
-        }
-        checkDriverOnline(tenantId, driver.getId());
-
-        pointCommandValidator.validateWriteValue(entityBO.getValue());
-
-        String commandId = resolveCommandId(entityBO.getCommandId());
-        LocalDateTime nowLocal = LocalDateTime.now();
-
-        PointCommandHistoryDO commandDO = new PointCommandHistoryDO();
-        commandDO.setCommandId(commandId);
-        commandDO.setTenantId(tenantId);
-        commandDO.setType(PointCommandTypeEnum.WRITE);
-        commandDO.setDeviceId(entityBO.getDeviceId());
-        commandDO.setPointId(entityBO.getPointId());
-        commandDO.setRequestValue(entityBO.getValue());
-        commandDO.setStatus(PointCommandStatusEnum.PENDING);
-        commandDO.setSource(PointCommandSourceEnum.HTTP);
-        commandDO.setOccurTime(nowLocal);
-        commandDO.setExpireTime(nowLocal.plusSeconds(10));
-        commandDO.setSchemaVersion((short) 1);
-        pointCommandHistoryManager.save(commandDO);
-
-        publishCommand(PointCommandDTO.ofWrite(commandId, tenantId, entityBO.getDeviceId(),
-                entityBO.getPointId(), entityBO.getValue()), driver.getServiceName(), commandId);
-
-        commandDO.setStatus(PointCommandStatusEnum.SENT);
-        commandDO.setSendTime(LocalDateTime.now());
-        pointCommandHistoryManager.updateById(commandDO);
-
-        return commandId;
+    public Mono<String> write(Long tenantId, PointCommandWriteBO entityBO) {
+        if (entityBO == null) return Mono.error(new ServiceException("Point command is required"));
+        return Mono.defer(() -> {
+            commandValidator.validateWriteValue(entityBO.getValue());
+            return reuseIfPresent(
+                            tenantId,
+                            entityBO.getCommandId(),
+                            entityBO.getDeviceId(),
+                            entityBO.getPointId(),
+                            PointCommandTypeEnum.WRITE,
+                            entityBO.getValue())
+                    .switchIfEmpty(Mono.defer(() -> scope(tenantId, entityBO.getDeviceId(), entityBO.getPointId(), true)
+                            .flatMap(scope -> submit(
+                                    tenantId,
+                                    entityBO.getCommandId(),
+                                    scope,
+                                    PointCommandTypeEnum.WRITE,
+                                    entityBO.getValue(),
+                                    entityBO.getSource()))));
+        });
     }
 
     @Override
-    public PointCommandHistoryVO getByCommandId(Long tenantId, String commandId) {
-        PointCommandHistoryDO entityDO = pointCommandHistoryManager.lambdaQuery()
-                .eq(Objects.nonNull(tenantId), PointCommandHistoryDO::getTenantId, tenantId)
-                .eq(PointCommandHistoryDO::getCommandId, commandId)
-                .one();
-        return pointCommandHistoryBuilder.buildVOByDO(entityDO);
+    public Mono<PointCommandHistoryVO> getByCommandId(Long tenantId, String commandId) {
+        return commandStore.get(tenantId, commandId).map(historyBuilder::buildVOByDO);
     }
 
     @Override
-    public Page<PointCommandHistoryVO> list(Long tenantId, PointCommandHistoryQueryVO queryVO) {
-        LambdaQueryWrapper<PointCommandHistoryDO> wrapper = new LambdaQueryWrapper<PointCommandHistoryDO>()
-                .eq(PointCommandHistoryDO::getTenantId, tenantId)
-                .eq(Objects.nonNull(queryVO.getDeviceId()), PointCommandHistoryDO::getDeviceId, queryVO.getDeviceId())
-                .eq(Objects.nonNull(queryVO.getPointId()), PointCommandHistoryDO::getPointId, queryVO.getPointId())
-                .eq(Objects.nonNull(queryVO.getStatus()), PointCommandHistoryDO::getStatus, queryVO.getStatus())
-                .eq(Objects.nonNull(queryVO.getType()), PointCommandHistoryDO::getType, queryVO.getType())
-                .orderByDesc(PointCommandHistoryDO::getOccurTime);
-        Page<PointCommandHistoryDO> page = pointCommandHistoryManager.page(queryVO.toPage(), wrapper);
-        return pointCommandHistoryBuilder.buildVOPageByDOPage(page);
+    public Mono<OffsetPage<PointCommandHistoryVO>> list(Long tenantId, PointCommandHistoryQueryVO queryVO) {
+        PointCommandHistoryQueryVO query = queryVO == null ? new PointCommandHistoryQueryVO() : queryVO;
+        long offset = query.getOffset() == null ? 0L : query.getOffset();
+        int limit = query.getLimit() == null ? 50 : query.getLimit();
+        return commandStore
+                .list(
+                        tenantId,
+                        parseId(query.getDeviceId(), "deviceId"),
+                        parseId(query.getPointId(), "pointId"),
+                        query.getStatus(),
+                        query.getType(),
+                        offset,
+                        limit,
+                        query.getSort())
+                .map(page -> OffsetPage.of(
+                        page.items().stream().map(historyBuilder::buildVOByDO).toList(),
+                        page.offset(),
+                        page.limit(),
+                        page.total()));
     }
 
-    /**
-     * Verify the driver serving the command is online, throwing {@link ServiceException}
-     * when no online state exists for the driver.
-     *
-     * @param tenantId tenant scope
-     * @param driverId the driver to check
-     */
-    private void checkDriverOnline(Long tenantId, Long driverId) {
-        EntityStateDO driverState = entityStateMapper.selectOne(
-                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<EntityStateDO>()
-                        .eq(EntityStateDO::getTenantId, tenantId)
-                        .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
-                        .eq(EntityStateDO::getEntityId, driverId));
-        if (Objects.isNull(driverState) || !EntityStatusEnum.ONLINE.getIndex().equals(driverState.getStateFlag())) {
-            throw new ServiceException("Driver is offline");
-        }
+    private Mono<String> submit(
+            Long tenantId,
+            String requestedId,
+            Scope scope,
+            PointCommandTypeEnum type,
+            String value,
+            PointCommandSourceEnum source) {
+        return existing(tenantId, requestedId, scope, type, value).switchIfEmpty(Mono.defer(() -> {
+            String commandId =
+                    requestedId == null || requestedId.isBlank() ? UuidV7.next().toString() : requestedId;
+            Instant now = Instant.now();
+            PointCommandHistoryDO command = new PointCommandHistoryDO();
+            command.setCommandId(commandId);
+            command.setTenantId(tenantId);
+            command.setType(type);
+            command.setDeviceId(scope.device().getId());
+            command.setPointId(scope.point().getId());
+            command.setRequestValue(value);
+            command.setStatus(PointCommandStatusEnum.PENDING);
+            command.setSource(source == null ? PointCommandSourceEnum.HTTP : source);
+            command.setOccurTime(local(now));
+            command.setExpireTime(local(now.plusSeconds(10)));
+            command.setSchemaVersion((short) 1);
+            return commandStore
+                    .insert(command)
+                    .map(saved -> new PersistedCommand(saved, true))
+                    .onErrorResume(error -> {
+                        if (requestedId == null || requestedId.isBlank()) {
+                            return Mono.error(error);
+                        }
+                        return existing(tenantId, requestedId, scope, type, value)
+                                .map(id -> new PersistedCommand(commandWithId(id), false))
+                                .switchIfEmpty(Mono.error(error));
+                    })
+                    .flatMap(persisted -> {
+                        if (!persisted.fresh()) {
+                            return Mono.just(persisted.command().getCommandId());
+                        }
+                        return publishAndMarkSent(scope, type, value, commandId, tenantId);
+                    });
+        }));
     }
 
-    /**
-     * Validate the device and point exist within the tenant, are enabled, and share a
-     * profile.
-     *
-     * @param tenantId tenant scope
-     * @param deviceId the device to validate
-     * @param pointId  the point to validate
-     */
-    private void validateCommandScope(Long tenantId, Long deviceId, Long pointId) {
-        FacadeDeviceBO device = deviceFacade.getById(tenantId, deviceId);
-        if (Objects.isNull(device)) {
-            throw new NotFoundException("Device does not exist");
-        }
-        if (EnableFlagEnum.DISABLE.equals(device.getEnableFlag())) {
-            throw new ServiceException("Device is disabled");
-        }
+    private Mono<String> publishAndMarkSent(
+            Scope scope, PointCommandTypeEnum type, String value, String commandId, Long tenantId) {
+        return publish(scope, type, value, commandId, tenantId)
+                .then(commandStore.markSent(tenantId, commandId, Instant.now()))
+                .flatMap(marked -> marked
+                        ? Mono.just(commandId)
+                        : Mono.error(new ServiceException("Point command disappeared before dispatch")))
+                .onErrorResume(publishError -> commandStore
+                        .markPublishFailed(
+                                tenantId, commandId, "BROKER_PUBLISH_FAILED", publishError.getMessage(), Instant.now())
+                        .onErrorResume(markError -> {
+                            log.error(
+                                    "Failed to persist point command publish failure, commandId={}",
+                                    commandId,
+                                    markError);
+                            return Mono.just(false);
+                        })
+                        .then(Mono.error(new ServiceException(
+                                "Failed to route point command to active driver owner", publishError))));
+    }
 
-        FacadePointBO point = pointFacade.getById(tenantId, pointId);
-        if (Objects.isNull(point)) {
-            throw new NotFoundException("Point does not exist");
+    private PointCommandHistoryDO commandWithId(String commandId) {
+        PointCommandHistoryDO command = new PointCommandHistoryDO();
+        command.setCommandId(commandId);
+        return command;
+    }
+
+    private Mono<String> reuseIfPresent(
+            Long tenantId, String commandId, Long deviceId, Long pointId, PointCommandTypeEnum type, String value) {
+        if (commandId == null || commandId.isBlank()) return Mono.empty();
+        return commandStore.get(tenantId, commandId).flatMap(existing -> {
+            if (java.util.Objects.equals(existing.getDeviceId(), deviceId)
+                    && java.util.Objects.equals(existing.getPointId(), pointId)
+                    && existing.getType() == type
+                    && java.util.Objects.equals(existing.getRequestValue(), value)) {
+                return Mono.just(existing.getCommandId());
+            }
+            return Mono.error(new ServiceException("Idempotency key is already used for another command"));
+        });
+    }
+
+    private Mono<String> existing(
+            Long tenantId, String commandId, Scope scope, PointCommandTypeEnum type, String value) {
+        if (commandId == null || commandId.isBlank()) return Mono.empty();
+        return commandStore.get(tenantId, commandId).flatMap(existing -> {
+            if (java.util.Objects.equals(existing.getDeviceId(), scope.device().getId())
+                    && java.util.Objects.equals(
+                            existing.getPointId(), scope.point().getId())
+                    && existing.getType() == type
+                    && java.util.Objects.equals(existing.getRequestValue(), value)) {
+                return Mono.just(existing.getCommandId());
+            }
+            return Mono.error(new ServiceException("Idempotency key is already used for another command"));
+        });
+    }
+
+    private Mono<Scope> scope(Long tenantId, Long deviceId, Long pointId, boolean write) {
+        if (tenantId == null || deviceId == null || pointId == null) {
+            return Mono.error(new ServiceException("Tenant, device and point are required"));
         }
+        return commandContext
+                .device(tenantId, deviceId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Device does not exist")))
+                .flatMap(device -> {
+                    if (EnableFlagEnum.DISABLE.equals(device.getEnableFlag())) {
+                        return Mono.error(new ServiceException("Device is disabled"));
+                    }
+                    return commandContext
+                            .point(tenantId, pointId)
+                            .switchIfEmpty(Mono.error(new NotFoundException("Point does not exist")))
+                            .flatMap(point -> validatePoint(device, point, write)
+                                    .then(commandContext
+                                            .driverByDevice(tenantId, deviceId)
+                                            .switchIfEmpty(Mono.error(
+                                                    new ServiceException("No driver registered for this device"))))
+                                    .flatMap(driver -> commandContext
+                                            .activeOwner(tenantId, deviceId)
+                                            .filter(owner -> owner.driverId() != null
+                                                    && owner.driverId().equals(driver.getId())
+                                                    && owner.ownerNode() != null
+                                                    && !owner.ownerNode().isBlank()
+                                                    && owner.fencingToken() != null
+                                                    && owner.fencingToken() > 0)
+                                            .switchIfEmpty(Mono.error(
+                                                    new ServiceException("Device has no active driver owner")))
+                                            .map(owner -> new Scope(device, point, driver, owner))));
+                });
+    }
+
+    private Mono<Void> validatePoint(FacadeDeviceBO device, FacadePointBO point, boolean write) {
         if (EnableFlagEnum.DISABLE.equals(point.getEnableFlag())) {
-            throw new ServiceException("Point is disabled");
+            return Mono.error(new ServiceException("Point is disabled"));
         }
-        if (Objects.isNull(device.getProfileId()) || !Objects.equals(device.getProfileId(), point.getProfileId())) {
-            throw new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH);
+        if (device.getProfileId() == null || !device.getProfileId().equals(point.getProfileId())) {
+            return Mono.error(new UnAuthorizedException(ExceptionConstant.NO_AVAILABLE_AUTH));
+        }
+        if (write
+                && !RwTypeEnum.WRITE_ONLY.equals(point.getRwFlag())
+                && !RwTypeEnum.READ_WRITE.equals(point.getRwFlag())) {
+            return Mono.error(new ServiceException("Point is not writable"));
+        }
+        return Mono.empty();
+    }
+
+    private Mono<Void> publish(Scope scope, PointCommandTypeEnum type, String value, String commandId, Long tenantId) {
+        PointCommandDTO dto = type == PointCommandTypeEnum.READ
+                ? PointCommandDTO.ofRead(
+                        commandId,
+                        tenantId,
+                        scope.owner().ownerNode(),
+                        scope.owner().fencingToken(),
+                        scope.device().getId(),
+                        scope.point().getId())
+                : PointCommandDTO.ofWrite(
+                        commandId,
+                        tenantId,
+                        scope.owner().ownerNode(),
+                        scope.owner().fencingToken(),
+                        scope.device().getId(),
+                        scope.point().getId(),
+                        value);
+        return messageSender.sendConfirmed(MqMessage.builder()
+                .topic(MqTopic.POINT_COMMAND)
+                .partitionKey(
+                        scope.driver().getServiceName() + "." + scope.owner().ownerNode())
+                .payload(dto)
+                .header(MqHeaders.CORRELATION_ID, commandId)
+                .header(MqHeaders.TENANT_ID, String.valueOf(tenantId))
+                .build());
+    }
+
+    private Long parseId(String value, String field) {
+        if (value == null || value.isBlank()) return null;
+        try {
+            return Long.valueOf(value);
+        } catch (NumberFormatException exception) {
+            throw new ServiceException(field + " must be a number", exception);
         }
     }
 
-    /**
-     * Validate the command scope and additionally require the point be writable
-     * (write-only or read-write).
-     *
-     * @param tenantId tenant scope
-     * @param deviceId the device to validate
-     * @param pointId  the point to validate for write access
-     */
-    private void validateWriteScope(Long tenantId, Long deviceId, Long pointId) {
-        validateCommandScope(tenantId, deviceId, pointId);
-        FacadePointBO point = pointFacade.getById(tenantId, pointId);
-        if (!RwTypeEnum.WRITE_ONLY.equals(point.getRwFlag()) && !RwTypeEnum.READ_WRITE.equals(point.getRwFlag())) {
-            throw new ServiceException("Point is not writable");
-        }
+    private LocalDateTime local(Instant value) {
+        return LocalDateTime.ofInstant(value, ZoneOffset.UTC);
     }
 
-    /**
-     * Check whether a caller-supplied commandId already exists.
-     *
-     * @param commandId the caller-supplied command id, may be null or blank
-     * @return the existing commandId, or null if not provided or not found
-     */
-    private String checkExistingCommand(String commandId) {
-        if (Objects.isNull(commandId) || commandId.isBlank()) {
-            return null;
-        }
-        PointCommandHistoryVO existing = getByCommandId(commandId);
-        return Objects.nonNull(existing) ? existing.getCommandId() : null;
-    }
+    private record Scope(
+            FacadeDeviceBO device, FacadePointBO point, FacadeDriverBO driver, FacadeDeviceOwnerBO owner) {}
 
-    /**
-     * Resolve the commandId to use: caller-supplied, or generate a new UUID.
-     */
-    private String resolveCommandId(String callerCommandId) {
-        if (Objects.nonNull(callerCommandId) && !callerCommandId.isBlank()) {
-            return callerCommandId;
-        }
-        return UUID.randomUUID().toString();
-    }
-
-    /**
-     * Publish a point command DTO to the driver via RabbitMQ.
-     */
-    private void publishCommand(PointCommandDTO dto, String serviceName, String commandId) {
-        CorrelationData correlationData = new CorrelationData(commandId);
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_POINT_COMMAND,
-                RabbitConstant.ROUTING_POINT_COMMAND_PREFIX + serviceName, dto, correlationData);
-    }
-
+    private record PersistedCommand(PointCommandHistoryDO command, boolean fresh) {}
 }

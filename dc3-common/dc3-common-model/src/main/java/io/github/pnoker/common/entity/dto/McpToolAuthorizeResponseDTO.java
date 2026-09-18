@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,16 +26,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 /**
  * Auth-to-gateway authorization decision for one MCP tool call. {@code decision} is one of
  * AUTHORIZED, CONFIRM_REQUIRED, or REJECTED; {@code confirmId} carries the issued ticket when
  * a high-risk confirmation is required.
  *
  * @author pnoker
- * @version 2026.6.17
  * @since 2026.6.17
  */
 @Getter
@@ -56,5 +53,4 @@ public class McpToolAuthorizeResponseDTO implements Serializable {
     private String message;
 
     private String riskLevel;
-
 }

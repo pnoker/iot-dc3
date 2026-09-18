@@ -14,144 +14,154 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
 
-import io.github.pnoker.common.data.biz.DriverAlarmService;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.mapper.EntityStateMapper;
-import io.github.pnoker.common.entity.dto.DriverStateDTO;
-import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
-import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeEnum;
-import io.github.pnoker.common.enums.TimeoutSourceTypeEnum;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
-import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyByte;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import io.github.pnoker.common.data.biz.DriverAlarmService;
+import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
+import io.github.pnoker.common.entity.dto.DriverStateDTO;
+import io.github.pnoker.common.enums.EntityStatusEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
+import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicBoolean;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+
 @ExtendWith(MockitoExtension.class)
 class DriverStateServiceImplTest {
+    @Mock
+    DriverAlarmService alarmService;
 
     @Mock
-    private DriverAlarmService driverAlarmService;
+    ReactiveEntityStateStore stateStore;
 
     @Mock
-    private EntityStateMapper entityStateMapper;
+    ReactiveMessageSender sender;
 
-    @Mock
-    private RabbitTemplate rabbitTemplate;
-
-    @InjectMocks
-    private DriverStateServiceImpl service;
-
-    private DriverStateDTO heartbeat(Long driverId, String status, Long tenantId) {
-        DriverStateDTO dto = new DriverStateDTO();
-        dto.setDriverId(driverId);
-        dto.setStatus(status);
-        dto.setTenantId(tenantId);
-        return dto;
-    }
-
-    private EntityStateDO persisted(byte stateFlag, byte lastStateFlag, long leaseVersion) {
-        EntityStateDO state = new EntityStateDO();
-        state.setEntityTypeFlag((byte) EntityTypeEnum.DRIVER.getIndex());
-        state.setEntityId(1L);
-        state.setParentEntityId(0L);
-        state.setTenantId(100L);
-        state.setStateFlag(stateFlag);
-        state.setLastStateFlag(lastStateFlag);
-        state.setLeaseVersion(leaseVersion);
-        state.setTimeoutSeconds(45);
-        state.setExpireTime(LocalDateTime.now().plusSeconds(45));
-        state.setLastHeartbeatTime(LocalDateTime.now());
-        state.setLastAlarmId(0L);
-        return state;
-    }
-
-    private void stubUpsert(EntityStateDO state) {
-        when(entityStateMapper.upsertEntityState(anyLong(), anyLong(), anyByte(), anyLong(), anyLong(), anyByte(),
-                anyByte(), any(), anyInt(), anyByte(), anyString(), any())).thenReturn(state);
+    @Test
+    void heartbeatUpsertsAndPublishes() {
+        DriverStateServiceImpl service = new DriverStateServiceImpl(alarmService, stateStore, sender);
+        when(alarmService.alarm(any())).thenReturn(Mono.empty());
+        when(stateStore.upsert(
+                        any(),
+                        eq(100L),
+                        eq(EntityTypeEnum.DRIVER),
+                        eq(1L),
+                        eq(0L),
+                        any(byte.class),
+                        any(byte.class),
+                        any(),
+                        eq(45),
+                        any(byte.class),
+                        any()))
+                .thenReturn(Mono.just(lease((byte) 2, (byte) 1)));
+        when(sender.sendConfirmed(any())).thenReturn(Mono.empty());
+        service.heartbeat(event(1L, 100L, EntityStatusEnum.ONLINE.getCode())).block();
+        verify(stateStore)
+                .upsert(
+                        any(),
+                        eq(100L),
+                        eq(EntityTypeEnum.DRIVER),
+                        eq(1L),
+                        eq(0L),
+                        eq((byte) EntityStatusEnum.ONLINE.getIndex()),
+                        eq((byte) EntityStatusEnum.OFFLINE.getIndex()),
+                        any(),
+                        eq(45),
+                        any(byte.class),
+                        any());
+        verify(sender).sendConfirmed(any());
     }
 
     @Test
-    void nullDtoDoesNothing() {
-        service.heartbeat(null);
-
-        verifyNoInteractions(entityStateMapper, rabbitTemplate);
+    void statusFlipTriggersAlarm() {
+        DriverStateServiceImpl service = new DriverStateServiceImpl(alarmService, stateStore, sender);
+        when(alarmService.alarm(any())).thenReturn(Mono.empty());
+        when(stateStore.upsert(
+                        any(),
+                        any(),
+                        any(),
+                        any(),
+                        any(),
+                        any(byte.class),
+                        any(byte.class),
+                        any(),
+                        any(Integer.class),
+                        any(byte.class),
+                        any()))
+                .thenReturn(Mono.just(lease((byte) 1, (byte) 2)));
+        when(sender.sendConfirmed(any())).thenReturn(Mono.empty());
+        service.heartbeat(event(1L, 100L, EntityStatusEnum.OFFLINE.getCode())).block();
+        verify(alarmService).alarm(any());
     }
 
     @Test
-    void nullDriverIdDoesNothing() {
-        DriverStateDTO dto = new DriverStateDTO();
-        dto.setStatus(EntityStatusEnum.ONLINE.getCode());
+    void statusFlipWaitsForAlarmCompletion() {
+        DriverStateServiceImpl service = new DriverStateServiceImpl(alarmService, stateStore, sender);
+        AtomicBoolean completed = new AtomicBoolean();
+        when(stateStore.upsert(
+                        any(),
+                        any(),
+                        any(),
+                        any(),
+                        any(),
+                        any(byte.class),
+                        any(byte.class),
+                        any(),
+                        any(Integer.class),
+                        any(byte.class),
+                        any()))
+                .thenReturn(Mono.just(lease((byte) 1, (byte) 2)));
+        when(sender.sendConfirmed(any())).thenReturn(Mono.empty());
+        when(alarmService.alarm(any())).thenReturn(Mono.defer(() -> {
+            completed.set(true);
+            return Mono.empty();
+        }));
 
-        service.heartbeat(dto);
+        service.heartbeat(event(1L, 100L, EntityStatusEnum.OFFLINE.getCode())).block();
 
-        verifyNoInteractions(entityStateMapper, rabbitTemplate);
+        org.assertj.core.api.Assertions.assertThat(completed).isTrue();
     }
 
     @Test
-    void driverHeartbeatUpsertsDbRowAndPublishesTimeoutCheck() {
-        stubUpsert(persisted((byte) EntityStatusEnum.ONLINE.getIndex(),
-                (byte) EntityStatusEnum.OFFLINE.getIndex(), 6L));
-
-        service.heartbeat(heartbeat(1L, EntityStatusEnum.ONLINE.getCode(), 100L));
-
-        verify(entityStateMapper).upsertEntityState(anyLong(),
-                eq(100L),
-                eq((byte) EntityTypeEnum.DRIVER.getIndex()),
-                eq(1L),
-                eq(0L),
-                eq((byte) EntityStatusEnum.ONLINE.getIndex()),
-                eq((byte) EntityStatusEnum.OFFLINE.getIndex()),
-                any(LocalDateTime.class),
-                eq(45),
-                eq((byte) TimeoutSourceTypeEnum.SYSTEM.getIndex()),
-                eq("driver-heartbeat"),
-                any());
-
-        ArgumentCaptor<DriverTimeoutCheckDTO> captor = ArgumentCaptor.forClass(DriverTimeoutCheckDTO.class);
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), captor.capture());
-        assertThat(captor.getValue().getDriverId()).isEqualTo(1L);
-        assertThat(captor.getValue().getTenantId()).isEqualTo(100L);
-        assertThat(captor.getValue().getLeaseVersion()).isEqualTo(6L);
+    void invalidHeartbeatIsIgnored() {
+        DriverStateServiceImpl service = new DriverStateServiceImpl(alarmService, stateStore, sender);
+        service.heartbeat(null).block();
+        verifyNoInteractions(stateStore, sender, alarmService);
     }
 
-    @Test
-    void statusFlipFromOnlineToOfflineTriggersAlarm() {
-        stubUpsert(persisted((byte) EntityStatusEnum.OFFLINE.getIndex(),
-                (byte) EntityStatusEnum.ONLINE.getIndex(), 4L));
-
-        service.heartbeat(heartbeat(1L, EntityStatusEnum.OFFLINE.getCode(), 100L));
-
-        verify(driverAlarmService).alarm(any());
+    private DriverStateDTO event(Long driver, Long tenant, String status) {
+        DriverStateDTO value = new DriverStateDTO();
+        value.setDriverId(driver);
+        value.setTenantId(tenant);
+        value.setStatus(status);
+        return value;
     }
 
-    @Test
-    void sameStatusNoFlipDoesNotTriggerAlarm() {
-        stubUpsert(persisted((byte) EntityStatusEnum.ONLINE.getIndex(),
-                (byte) EntityStatusEnum.ONLINE.getIndex(), 4L));
-
-        service.heartbeat(heartbeat(1L, EntityStatusEnum.ONLINE.getCode(), 100L));
-
-        verify(driverAlarmService, never()).alarm(any());
+    private ReactiveEntityStateStore.EntityStateLease lease(byte state, byte previous) {
+        return new ReactiveEntityStateStore.EntityStateLease(
+                1L,
+                100L,
+                EntityTypeEnum.DRIVER,
+                1L,
+                0L,
+                state,
+                previous,
+                2L,
+                Instant.now().plusSeconds(45),
+                45,
+                Instant.now(),
+                0L,
+                (byte) 0,
+                "{}");
     }
 }

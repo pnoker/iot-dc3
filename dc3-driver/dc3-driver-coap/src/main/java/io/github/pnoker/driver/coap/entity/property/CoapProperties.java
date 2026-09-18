@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.coap.entity.property;
 
 import jakarta.validation.Valid;
@@ -30,7 +29,6 @@ import org.springframework.validation.annotation.Validated;
  * CoAP Properties Configuration Class
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @Getter
@@ -66,15 +64,19 @@ public class CoapProperties {
     @NotNull(message = "DTLS config can't be null")
     private Dtls dtls = new Dtls();
 
+    /** Create a new endpoint configuration. */
     @NoArgsConstructor
+    /** CoAP role of the endpoint: client (collect from devices), server (accept device pushes), or both. */
     public enum ModeEnum {
-
-        CLIENT, SERVER, BOTH,
-
+        CLIENT,
+        SERVER,
+        BOTH,
     }
 
+    /** Create a new observe configuration. */
     @Getter
     @Setter
+    /** DTLS credentials: PSK identity/secret or a trust-store path for certificate mode. */
     public static class Dtls {
 
         private String pskIdentity;
@@ -86,7 +88,5 @@ public class CoapProperties {
         private String identityCertificatePath;
 
         private String identityPrivateKeyPath;
-
     }
-
 }

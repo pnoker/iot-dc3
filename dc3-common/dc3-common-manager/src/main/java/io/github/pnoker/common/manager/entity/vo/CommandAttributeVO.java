@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -38,7 +37,6 @@ import lombok.ToString;
  * View object for command attribute API responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -53,25 +51,42 @@ public class CommandAttributeVO extends BaseVO {
     /**
      * Name
      */
-    @NotBlank(message = "Attribute name can't be empty", groups = {Add.class})
-    @Schema(description = "Command attribute name. Unique name within a driver for identifying a configurable command property.", example = "Function Code", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid attribute name format",
+    @NotBlank(
+            message = "Attribute name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description =
+                    "Command attribute name. Unique name within a driver for identifying a configurable command property.",
+            example = "Function Code",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid attribute name format",
             groups = {Add.class, Update.class})
     private String attributeName;
 
     /**
      * Code
      */
-    @NotBlank(message = "Attribute code can't be empty", groups = {Add.class})
-    @Schema(description = "Command attribute code. Stable business identifier; must not change once deployed.", example = "FUNC_CODE", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$", message = "Invalid attribute code format",
+    @NotBlank(
+            message = "Attribute code can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Command attribute code. Stable business identifier; must not change once deployed.",
+            example = "FUNC_CODE",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9][A-Za-z0-9-_#@/.|]{1,31}$",
+            message = "Invalid attribute code format",
             groups = {Add.class, Update.class})
     private String attributeCode;
 
     /**
      * Type
      */
-    @Schema(description = "Command attribute data type: STRING, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, or BOOLEAN.", example = "BYTE")
+    @Schema(
+            description = "Command attribute data type: STRING, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, or BOOLEAN.",
+            example = "BYTE")
     private AttributeTypeEnum attributeTypeFlag;
 
     /**
@@ -83,9 +98,14 @@ public class CommandAttributeVO extends BaseVO {
     /**
      * Driver ID
      */
-    @Schema(description = "ID of the protocol driver this attribute belongs to.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Driver ID can't be empty", groups = {Add.class, Update.class})
-    private Long driverId;
+    @Schema(
+            description = "ID of the protocol driver this attribute belongs to.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Driver ID can't be empty",
+            groups = {Add.class, Update.class})
+    private String driverId;
 
     /**
      *
@@ -110,5 +130,4 @@ public class CommandAttributeVO extends BaseVO {
      */
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
-
 }

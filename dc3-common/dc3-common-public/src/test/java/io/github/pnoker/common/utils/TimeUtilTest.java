@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 import java.util.Date;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.Test;
 
 class TimeUtilTest {
 
@@ -46,8 +44,7 @@ class TimeUtilTest {
         Date now = new Date();
         Date plusOneHour = TimeUtil.expireTime(1, Calendar.HOUR);
         assertThat(plusOneHour.getTime()).isGreaterThan(now.getTime());
-        assertThat(plusOneHour.getTime() - now.getTime())
-                .isBetween(60L * 60_000L - 5_000L, 60L * 60_000L + 5_000L);
+        assertThat(plusOneHour.getTime() - now.getTime()).isBetween(60L * 60_000L - 5_000L, 60L * 60_000L + 5_000L);
     }
 
     @Test

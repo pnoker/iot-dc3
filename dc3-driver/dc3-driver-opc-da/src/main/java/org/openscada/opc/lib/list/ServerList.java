@@ -14,9 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.list;
 
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.JIClsid;
 import org.jinterop.dcom.core.JIComServer;
@@ -25,11 +28,6 @@ import org.openscada.opc.dcom.list.ClassDetails;
 import org.openscada.opc.dcom.list.Constants;
 import org.openscada.opc.dcom.list.impl.OPCServerList;
 import rpc.core.UUID;
-
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * A wrapper around the {@link OPCServerList} class which makes the handling somewhat
@@ -143,7 +141,8 @@ public class ServerList {
         }
 
         // get them as UUIDs
-        Collection<UUID> resultU = this._serverList.enumClassesOfCategories(u1, u2).asCollection();
+        Collection<UUID> resultU =
+                this._serverList.enumClassesOfCategories(u1, u2).asCollection();
 
         // and convert to easier usable strings
         Collection<String> result = new ArrayList<String>(resultU.size());
@@ -175,5 +174,4 @@ public class ServerList {
 
         return result;
     }
-
 }

@@ -28,13 +28,13 @@
           class="things-card__header"
         >
           <div class="things-card-header-icon">
-            <img :alt="data.pointName" :src="icon"/>
+            <img :alt="data?.pointName || point?.pointName || ''" :src="icon"/>
           </div>
           <div
             class="things-card-header-name nowrap-name"
-            @click="copy(data.pointId, $t('pointValue.card.pointValueId'))"
+            @click="copy(data?.pointId, $t('pointValue.card.pointValueId'))"
           >
-            {{ point.pointName }}
+            {{ point?.pointName || data?.pointName || '-' }}
           </div>
           <div :title="$t('pointValue.card.rwType')" class="things-card-header-status">
             <el-tag v-if="!hasLatestValue" effect="plain" type="info">{{ $t('pointValue.card.noLatestValue') }}</el-tag>
@@ -48,11 +48,20 @@
             <div class="things-card-body-content-column">
               <div class="things-card-body-content-value">
                 <span
-                  :class="{'value-missing': !hasLatestValue}"
+                  :class="{
+                    'value-fresh': delayOk,
+                    'value-missing': !hasLatestValue,
+                    'value-stale': delaySlow,
+                  }"
+                  :aria-label="$t('pointValue.card.processedValue')"
                   :title="$t('pointValue.card.processedValue')"
                   class="nowrap-item value"
+                  role="button"
+                  tabindex="0"
                   @click="copyValue(data)"
-                >{{ data.calValue }} {{ hasLatestValue ? unit : '' }}</span
+                  @keydown.enter="copyValue(data)"
+                  @keydown.space.prevent="copyValue(data)"
+                >{{ data?.calValue ?? '--' }} {{ hasLatestValue ? unit : '' }}</span
                 >
               </div>
               <ul>
@@ -60,13 +69,13 @@
                   <el-icon>
                     <Sunrise/>
                   </el-icon>
-                  {{ $t('pointValue.card.rawValue') }}: {{ data.rawValue }}
+                  {{ $t('pointValue.card.rawValue') }}: {{ data?.rawValue ?? '--' }}
                 </li>
                 <li v-if="embedded == ''" class="nowrap-item value-point">
                   <el-icon>
                     <Management/>
                   </el-icon>
-                  {{ $t('pointValue.card.device') }}: {{ device.deviceName }}
+                  {{ $t('pointValue.card.device') }}: {{ device?.deviceName || '-' }}
                 </li>
                 <li class="nowrap-item">
                   <el-icon>
@@ -78,20 +87,39 @@
                   <el-icon>
                     <Edit/>
                   </el-icon>
-                  {{ $t('pointValue.card.collectTime') }}: {{ displayTime(data.createTime) }}
+                  {{ $t('pointValue.card.collectTime') }}: {{ displayTime(data?.createTime) }}
                 </li>
                 <li class="nowrap-item">
                   <el-icon>
                     <Sunset/>
                   </el-icon>
-                  {{ $t('pointValue.card.saveTime') }}: {{ displayTime(data.createTime) }}
+                  {{ $t('pointValue.card.saveTime') }}: {{ displayTime(data?.operateTime) }}
                 </li>
               </ul>
             </div>
           </div>
           <div v-if="embedded != ''" class="things-card-body-content-time">
+            <div
+              v-if="historyLoading"
+              aria-live="polite"
+              class="point-value-history-loading"
+            >
+              {{ $t('common.loading') }}
+            </div>
+            <el-alert
+              v-else-if="historyError"
+              :closable="false"
+              :title="$t('pointValue.card.historyLoadFailed')"
+              class="point-value-history-error"
+              show-icon
+              type="error"
+            >
+              <el-button :loading="historyLoading" link type="danger" @click="history">
+                {{ $t('common.retry') }}
+              </el-button>
+            </el-alert>
             <mini-area-chart
-              v-if="hasLatestValue"
+              v-else-if="hasLatestValue && historyData.length > 0"
               :data="historyData"
               :height="80"
               :tooltip-unit="unit"
@@ -117,7 +145,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, ref, watch} from 'vue';
+import {computed, onBeforeUnmount, onMounted, ref, watch} from 'vue';
 import {Edit, Management, Sunrise, Sunset, Timer} from '@element-plus/icons-vue';
 import {useI18n} from 'vue-i18n';
 
@@ -167,11 +195,11 @@ defineEmits(['write-thing', 'detail-thing']);
 
 const copyValue = (data: any) => {
   const content = {
-    deviceId: data.deviceId,
-    pointId: data.pointId,
-    calValue: data.calValue,
-    rawValue: data.rawValue,
-    hasLatestValue: data.hasLatestValue,
+    deviceId: data?.deviceId,
+    pointId: data?.pointId,
+    calValue: data?.calValue,
+    rawValue: data?.rawValue,
+    hasLatestValue: data?.hasLatestValue,
   };
   copy(JSON.stringify(content, null, 2), t('pointValue.card.pointValueId'));
 };
@@ -200,28 +228,48 @@ const displayTime = (value: string | null | undefined) => {
 };
 
 // Numeric series fed into MiniAreaChart. BOOL points are coerced to 0/1,
-// STRING points render as an empty chart (and the embedded timeline area
-// collapses to the fallback spacer).
+// STRING points render the explicit no-history fallback instead of feeding
+// non-numeric values into the chart.
 const historyData = ref<number[]>([]);
+const historyLoading = ref(false);
+const historyError = ref(false);
+let historyRequestId = 0;
 
 const history = () => {
-  if (!hasLatestValue.value) {
+  const requestId = ++historyRequestId;
+  const deviceId = String(props.data?.deviceId ?? '');
+  const pointId = String(props.data?.pointId ?? '');
+  if (!hasLatestValue.value || !deviceId || !pointId) {
     historyData.value = [];
+    historyLoading.value = false;
+    historyError.value = false;
     return;
   }
-  listPointValueHistory(props.data.deviceId, props.data.pointId, 100)
+  historyLoading.value = true;
+  historyError.value = false;
+  listPointValueHistory(deviceId, pointId, undefined, 100)
     .then((res) => {
-      const pointValueType = (props.point.pointTypeFlag || '').toLowerCase();
+      if (requestId !== historyRequestId) return;
+      const pointValueType = String(props.point?.pointTypeFlag || '').toLowerCase();
+      const values = (res?.items || []).map((item) => String(item.value ?? ''));
       if (pointValueType === 'string') {
         historyData.value = [];
       } else if (pointValueType === 'boolean') {
-        historyData.value = res.data.reverse().map((value: string) => (value === 'true' ? 1 : 0));
+        historyData.value = values.reverse().map((value) => (value === 'true' ? 1 : 0));
       } else {
-        historyData.value = res.data.reverse().map((value: string) => +value);
+        historyData.value = values
+          .reverse()
+          .map((value) => Number(value))
+          .filter((value) => Number.isFinite(value));
       }
     })
     .catch(() => {
-      // handled globally
+      if (requestId !== historyRequestId) return;
+      historyData.value = [];
+      historyError.value = true;
+    })
+    .finally(() => {
+      if (requestId === historyRequestId) historyLoading.value = false;
     });
 };
 
@@ -240,11 +288,15 @@ onMounted(() => {
     history();
   }
 });
+
+onBeforeUnmount(() => {
+  historyRequestId += 1;
+});
 </script>
 
 <style lang="scss" scoped>
-// PointValueCard 内联了 header / footer / 实时数值展示区,不使用 ThingsCardHeader / ThingsCardActions,
-// 因此在此补齐对应样式。`header-enable` / `header-disable` 语义不同:基于 data.interval 表示延时是否正常。
+// PointValueCard owns its header, footer, and live-value area. Its header-enable and
+// header-disable states indicate whether data.interval is within the expected delay.
 
 .things-card__header {
   width: 100%;
@@ -285,11 +337,31 @@ onMounted(() => {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 6px;
+    gap: var(--dc3-space-2);
 
     :deep(.el-tag) {
       vertical-align: middle;
     }
+  }
+}
+
+.point-value-history-loading,
+.point-value-empty-chart {
+  display: grid;
+  min-height: 80px;
+  place-items: center;
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+}
+
+.point-value-history-error {
+  min-height: 80px;
+
+  :deep(.el-alert__content) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--dc3-space-2);
   }
 }
 
@@ -320,14 +392,22 @@ onMounted(() => {
 
     .value {
       font-weight: bold;
-      font-size: xx-large;
-      animation: hue 1s ease-in;
+      font-size: 28px;
+      font-variant-numeric: tabular-nums;
+      color: var(--value-tone, var(--el-text-color-primary));
       cursor: pointer;
     }
 
+    .value-fresh {
+      --value-tone: var(--el-color-success);
+    }
+
+    .value-stale {
+      --value-tone: var(--el-color-warning);
+    }
+
     .value-missing {
-      color: var(--el-text-color-secondary);
-      animation: none;
+      --value-tone: var(--el-text-color-secondary);
     }
 
     .value-point {
@@ -351,6 +431,8 @@ onMounted(() => {
 .things-card__footer {
   height: 35px;
   margin-top: 2px;
+  padding-inline-end: var(--dc3-floating-action-safe-space);
+  box-sizing: border-box;
   display: flex;
   justify-content: flex-end;
   border-top: 1px solid var(--el-border-color);
@@ -361,15 +443,4 @@ onMounted(() => {
   }
 }
 
-@keyframes hue {
-  0% {
-    color: var(--el-color-primary);
-  }
-  50% {
-    color: var(--el-color-primary-light-9);
-  }
-  100% {
-    color: var(--el-color-primary);
-  }
-}
 </style>

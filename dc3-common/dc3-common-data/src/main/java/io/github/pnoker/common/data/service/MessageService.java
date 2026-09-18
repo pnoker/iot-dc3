@@ -14,20 +14,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.service;
 
-import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.data.entity.query.MessageQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
 /**
  * Business service for alarm message template operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface MessageService extends BaseService<MessageBO, MessageQuery> {
+public interface MessageService {
+    /** Add one message. */
+    Mono<MessageBO> add(MessageBO value);
 
+    /** Delete the message, reporting whether a row was removed. */
+    Mono<Boolean> delete(Long tenantId, Long id);
+
+    /** Update one message and emit the updated row. */
+    Mono<MessageBO> update(MessageBO value);
+
+    /** Resolve the message by its id. */
+    Mono<MessageBO> getById(Long tenantId, Long id);
+
+    /** Page messages matching the tenant-scoped filters. */
+    Mono<OffsetPage<MessageBO>> list(Long tenantId, MessageQuery query);
 }

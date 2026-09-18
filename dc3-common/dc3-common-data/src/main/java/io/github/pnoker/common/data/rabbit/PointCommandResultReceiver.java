@@ -14,31 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.dal.PointCommandHistoryManager;
-import io.github.pnoker.common.data.entity.model.PointCommandHistoryDO;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.data.repository.ReactivePointCommandStore;
 import io.github.pnoker.common.entity.dto.PointCommandResultDTO;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Objects;
+import reactor.core.publisher.Mono;
 
 /**
  * RabbitMQ receiver for point command result receipts sent by drivers.
  * Updates the matching {@code dc3_point_command_history} row with the terminal status.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -46,53 +40,42 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PointCommandResultReceiver {
 
-    private final PointCommandHistoryManager pointCommandHistoryManager;
+    private final ReactivePointCommandStore pointCommandStore;
 
     /**
      * Consume a point command execution result and update the matching point command
      * history record by command id with its status, error, and response value.
      *
-     * @param channel   the RabbitMQ channel for manual ack
      * @param message   the raw message carrying the delivery tag
-     * @param resultDTO the deserialized point command result
+     * @param ack       acknowledgment handle for the message
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{pointCommandResultQueue.name}")
-    public void onResult(Channel channel, Message message, PointCommandResultDTO resultDTO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
-        try {
-            if (Objects.isNull(resultDTO) || Objects.isNull(resultDTO.commandId())) {
-                RabbitAckUtil.reject(channel, deliveryTag);
-                return;
-            }
-
-            log.info("Receive point command result: commandId={}, status={}", resultDTO.commandId(), resultDTO.status());
-
-            PointCommandHistoryDO commandDO = pointCommandHistoryManager.lambdaQuery()
-                    .eq(PointCommandHistoryDO::getCommandId, resultDTO.commandId())
-                    .one();
-
-            if (Objects.nonNull(commandDO)) {
-                commandDO.setStatus(resultDTO.status());
-                commandDO.setErrorCode(resultDTO.errorCode());
-                commandDO.setErrorMessage(resultDTO.errorMessage());
-                commandDO.setResponseValue(resultDTO.responseValue());
-                if (Objects.nonNull(resultDTO.finishedAt())) {
-                    commandDO.setFinishTime(LocalDateTime.ofInstant(resultDTO.finishedAt(), ZoneId.systemDefault()));
-                } else {
-                    commandDO.setFinishTime(LocalDateTime.now());
-                }
-                pointCommandHistoryManager.updateById(commandDO);
-                log.info("Updated command status: commandId={}, status={}", resultDTO.commandId(), resultDTO.status());
-            } else {
-                log.warn("Command not found for result: commandId={}", resultDTO.commandId());
-            }
-
-            RabbitAckUtil.ack(channel, deliveryTag);
-        } catch (Exception e) {
-            log.error("Point command result processing failed, deliveryTag={}", deliveryTag, e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+    @Dc3Listener(topic = MqTopic.POINT_COMMAND_RESULT)
+    public Mono<Void> onResult(MqReceived<PointCommandResultDTO> message, Acknowledgment ack) {
+        PointCommandResultDTO resultDTO = message.payload();
+        if (Objects.isNull(resultDTO)
+                || Objects.isNull(resultDTO.commandId())
+                || resultDTO.commandId().isBlank()
+                || resultDTO.tenantId() == null
+                || resultDTO.status() == null) {
+            ack.reject(false);
+            return Mono.empty();
         }
+        return pointCommandStore
+                .complete(
+                        resultDTO.tenantId(),
+                        resultDTO.commandId(),
+                        resultDTO.status(),
+                        resultDTO.responseValue(),
+                        resultDTO.errorCode(),
+                        resultDTO.errorMessage(),
+                        resultDTO.finishedAt())
+                .doOnNext(updated -> {
+                    if (!updated) {
+                        ack.reject(false);
+                    }
+                })
+                .doOnError(error ->
+                        log.error("Point command result processing failed, commandId={}", resultDTO.commandId(), error))
+                .then();
     }
-
 }

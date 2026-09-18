@@ -14,20 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.exception;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class ExceptionMessageFormatterTest {
 
     private String invokeFormat(String template, Object... params) throws Exception {
-        Method method = ExceptionMessageFormatter.class.getDeclaredMethod(
-                "format", String.class, Object[].class);
+        Method method = ExceptionMessageFormatter.class.getDeclaredMethod("format", String.class, Object[].class);
         method.setAccessible(true);
         return (String) method.invoke(null, template, params);
     }
@@ -35,7 +32,7 @@ class ExceptionMessageFormatterTest {
     private Throwable invokeCause(Object... params) throws Exception {
         Method method = ExceptionMessageFormatter.class.getDeclaredMethod("cause", Object[].class);
         method.setAccessible(true);
-        return (Throwable) method.invoke(null, new Object[]{params});
+        return (Throwable) method.invoke(null, new Object[] {params});
     }
 
     @Test
@@ -45,20 +42,17 @@ class ExceptionMessageFormatterTest {
 
     @Test
     void substitutesPlaceholdersInOrder() throws Exception {
-        assertThat(invokeFormat("user {} action {}", "alice", "login"))
-                .isEqualTo("user alice action login");
+        assertThat(invokeFormat("user {} action {}", "alice", "login")).isEqualTo("user alice action login");
     }
 
     @Test
     void leavesExtraPlaceholdersWhenParamsRunOut() throws Exception {
-        assertThat(invokeFormat("a={} b={} c={}", "1", "2"))
-                .isEqualTo("a=1 b=2 c={}");
+        assertThat(invokeFormat("a={} b={} c={}", "1", "2")).isEqualTo("a=1 b=2 c={}");
     }
 
     @Test
     void ignoresExtraParamsBeyondPlaceholders() throws Exception {
-        assertThat(invokeFormat("only one {}", "first", "second", "third"))
-                .isEqualTo("only one first");
+        assertThat(invokeFormat("only one {}", "first", "second", "third")).isEqualTo("only one first");
     }
 
     @Test
@@ -74,20 +68,18 @@ class ExceptionMessageFormatterTest {
 
     @Test
     void formatsNullParamAsLiteralNull() throws Exception {
-        assertThat(invokeFormat("value={}", new Object[]{null})).isEqualTo("value=null");
+        assertThat(invokeFormat("value={}", new Object[] {null})).isEqualTo("value=null");
     }
 
     @Test
     void preservesSurroundingText() throws Exception {
-        assertThat(invokeFormat("[before:{}:after]", "x"))
-                .isEqualTo("[before:x:after]");
+        assertThat(invokeFormat("[before:{}:after]", "x")).isEqualTo("[before:x:after]");
     }
 
     @Test
     void trailingThrowableIsCauseNotFormatParam() throws Exception {
         IllegalStateException cause = new IllegalStateException("root");
-        assertThat(invokeFormat("operation {} failed", "sync", cause))
-                .isEqualTo("operation sync failed");
+        assertThat(invokeFormat("operation {} failed", "sync", cause)).isEqualTo("operation sync failed");
         assertThat(invokeCause("sync", cause)).isSameAs(cause);
     }
 }

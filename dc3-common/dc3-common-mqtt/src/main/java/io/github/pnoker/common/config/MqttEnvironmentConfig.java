@@ -14,28 +14,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import io.github.pnoker.common.utils.EnvironmentUtil;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertySource;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * MQTT Environment Configuration
+ * Environment post processor for MQTT configuration.
  * <p>
  * Environment post processor for MQTT configuration in IoT DC3 platform. Sets up MQTT
  * environment variables and property sources based on node configuration and service
@@ -43,7 +39,6 @@ import java.util.Map;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -52,8 +47,6 @@ public class MqttEnvironmentConfig implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        addLegacyMqttAliases(environment);
-
         String node = environment.getProperty(EnvironmentConstant.DRIVER_NODE, String.class);
         if (StringUtils.isEmpty(node)) {
             node = EnvironmentUtil.getNodeId();
@@ -75,24 +68,4 @@ public class MqttEnvironmentConfig implements EnvironmentPostProcessor {
         MutablePropertySources propertySources = environment.getPropertySources();
         propertySources.addFirst(new MapPropertySource("mqtt", source));
     }
-
-    private void addLegacyMqttAliases(ConfigurableEnvironment environment) {
-        Map<String, Object> aliases = new HashMap<>();
-        for (PropertySource<?> propertySource : environment.getPropertySources()) {
-            if (propertySource instanceof EnumerablePropertySource<?> enumerablePropertySource) {
-                for (String propertyName : enumerablePropertySource.getPropertyNames()) {
-                    if (propertyName.startsWith("driver.mqtt.")) {
-                        String aliasName = "dc3." + propertyName;
-                        if (!environment.containsProperty(aliasName)) {
-                            aliases.put(aliasName, enumerablePropertySource.getProperty(propertyName));
-                        }
-                    }
-                }
-            }
-        }
-        if (!aliases.isEmpty()) {
-            environment.getPropertySources().addLast(new MapPropertySource("legacyMqttAliases", aliases));
-        }
-    }
-
 }

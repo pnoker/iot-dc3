@@ -103,7 +103,6 @@ dc3:
         default-value: UINT16
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/fins/buffer.db
 
 spring:

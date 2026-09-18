@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.bo.dashboard;
 
 import lombok.Getter;
@@ -25,7 +24,6 @@ import lombok.ToString;
  * Generic (key, count) aggregate row; key is Object to fit JDBC int or varchar.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -33,8 +31,7 @@ import lombok.ToString;
 @ToString
 public class BucketRow {
 
-    private Object key;
+    private Object bucketKey;
 
     private long count;
-
 }

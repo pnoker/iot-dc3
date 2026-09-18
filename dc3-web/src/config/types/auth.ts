@@ -43,7 +43,7 @@ export interface UserRecord extends UserForm {
 
 export interface RoleForm {
   id?: string;
-  parentRoleId?: number | string;
+  parentRoleId?: string;
   roleName?: string;
   roleCode?: string;
   enableFlag?: string;
@@ -63,7 +63,7 @@ export interface RoleRecord extends RoleForm {
 
 export interface MenuForm {
   id?: string;
-  parentMenuId?: number | string;
+  parentMenuId?: string;
   menuName?: string;
   menuCode?: string;
   menuTypeFlag?: string;
@@ -93,13 +93,13 @@ export interface MenuRecord extends MenuForm {
 
 export interface ResourceForm {
   id?: string;
-  parentResourceId?: number | string;
+  parentResourceId?: string;
   resourceName?: string;
   resourceCode?: string;
   serviceName?: string;
   resourceTypeFlag?: string;
   resourceScopeFlag?: string;
-  entityId?: string | number;
+  entityId?: string;
   resourceExt?: Record<string, unknown>;
   enableFlag?: string;
   remark?: string;
@@ -227,6 +227,12 @@ export interface RoleResourceBindForm {
   [key: string]: unknown;
 }
 
+export interface RoleResourceBindRecord extends RoleResourceBindForm {
+  id: string;
+  createTime?: string;
+  operateTime?: string;
+}
+
 // ─── Service Account ────────────────────────────────────────────────
 
 export interface ServiceAccountForm {
@@ -256,7 +262,7 @@ export interface McpClientRegistrationForm {
   client_type?: 'PUBLIC' | 'CONFIDENTIAL' | string;
   grant_types?: string[];
   redirect_uris?: string[];
-  scope?: string[];
+  scope?: string;
   tenant_id?: string;
   service_account_principal_id?: string;
 
@@ -297,6 +303,21 @@ export interface McpConnectionRecord extends McpConnectionForm {
   enableFlag?: string | number;
   revokeTime?: string;
   lastUsedTime?: string;
+}
+
+export interface McpMetadata {
+  issuer?: string;
+  authorization_endpoint?: string;
+  token_endpoint?: string;
+  jwks_uri?: string;
+  revocation_endpoint?: string;
+  registration_endpoint?: string;
+  response_types_supported?: string[];
+  grant_types_supported?: string[];
+  scopes_supported?: string[];
+  token_endpoint_auth_methods_supported?: string[];
+
+  [key: string]: unknown;
 }
 
 export interface McpToolRecord {

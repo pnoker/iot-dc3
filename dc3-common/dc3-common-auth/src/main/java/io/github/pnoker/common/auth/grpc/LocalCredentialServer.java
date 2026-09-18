@@ -14,29 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.grpc;
 
+import com.google.common.util.concurrent.MoreExecutors;
+import io.github.pnoker.api.center.auth.GrpcLocalCredentialDTO;
 import io.github.pnoker.api.center.auth.GrpcLoginNameQuery;
-import io.github.pnoker.api.center.auth.GrpcRLocalCredentialDTO;
 import io.github.pnoker.api.center.auth.LocalCredentialApiGrpc;
-import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.auth.entity.bo.LocalCredentialBO;
 import io.github.pnoker.common.auth.grpc.builder.GrpcLocalCredentialBuilder;
-import io.github.pnoker.common.auth.service.LocalCredentialService;
-import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.auth.service.ReactiveLocalCredentialService;
+import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
+import reactor.core.Disposable;
+import reactor.core.publisher.Mono;
 
 /**
  * gRPC server handling local credential facade requests.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Slf4j
@@ -46,27 +46,48 @@ public class LocalCredentialServer extends LocalCredentialApiGrpc.LocalCredentia
 
     private final GrpcLocalCredentialBuilder grpcLocalCredentialBuilder;
 
-    private final LocalCredentialService localCredentialService;
+    private final ReactiveLocalCredentialService reactiveLocalCredentialService;
 
     @Override
-    public void getByLoginName(GrpcLoginNameQuery request, StreamObserver<GrpcRLocalCredentialDTO> responseObserver) {
-        GrpcRLocalCredentialDTO.Builder builder = GrpcRLocalCredentialDTO.newBuilder();
-
-        try {
-            LocalCredentialBO entityBO = localCredentialService.getByLoginName(request.getLoginName(), false);
-            if (Objects.isNull(entityBO)) {
-                builder.setResult(GrpcRFactory.notFound());
-            } else {
-                builder.setResult(GrpcRFactory.ok());
-                builder.setData(grpcLocalCredentialBuilder.buildGrpcDTOByBO(entityBO));
-            }
-        } catch (Exception e) {
-            log.warn("getByLoginName failed", e);
-            builder.setResult(GrpcRFactory.fail(ErrorCode.FAILURE));
-        }
-
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
+    public void getByLoginName(GrpcLoginNameQuery request, StreamObserver<GrpcLocalCredentialDTO> responseObserver) {
+        subscribe(
+                reactiveLocalCredentialService.getByLoginName(request.getTenantId(), request.getLoginName()),
+                responseObserver);
     }
 
+    private void subscribe(Mono<LocalCredentialBO> publisher, StreamObserver<GrpcLocalCredentialDTO> responseObserver) {
+        Context context = Context.current();
+        AtomicBoolean terminated = new AtomicBoolean();
+        AtomicReference<Disposable> subscription = new AtomicReference<>();
+        Disposable disposable = publisher
+                .switchIfEmpty(Mono.error(io.grpc.Status.NOT_FOUND
+                        .withDescription("Local credential not found")
+                        .asRuntimeException()))
+                .map(grpcLocalCredentialBuilder::buildGrpcDTOByBO)
+                .subscribe(
+                        value -> {
+                            if (context.isCancelled() || !terminated.compareAndSet(false, true)) return;
+                            responseObserver.onNext(value);
+                            responseObserver.onCompleted();
+                        },
+                        error -> {
+                            if (context.isCancelled() || !terminated.compareAndSet(false, true)) return;
+                            log.warn("getByLoginName failed", error);
+                            responseObserver.onError(
+                                    error instanceof io.grpc.StatusRuntimeException
+                                            ? error
+                                            : io.grpc.Status.INTERNAL
+                                                    .withDescription("getByLoginName failed")
+                                                    .withCause(error)
+                                                    .asRuntimeException());
+                        });
+        subscription.set(disposable);
+        context.addListener(
+                ignored -> {
+                    Disposable current = subscription.get();
+                    if (current != null) current.dispose();
+                },
+                MoreExecutors.directExecutor());
+        if (context.isCancelled()) disposable.dispose();
+    }
 }

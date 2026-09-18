@@ -14,99 +14,92 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
 import io.github.pnoker.common.facade.local.builder.FacadeDriverBuilder;
-import io.github.pnoker.common.manager.entity.bo.DriverBO;
-import io.github.pnoker.common.manager.entity.query.DriverQuery;
-import io.github.pnoker.common.manager.service.DriverService;
-import io.github.pnoker.common.tenant.TenantContextHolder;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
+import io.github.pnoker.common.manager.repository.DriverFilter;
+import io.github.pnoker.common.manager.service.ReactiveDriverService;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * In-process DriverFacade implementation.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class DriverLocalFacade implements DriverFacade {
-
-    private final DriverService driverService;
 
     private final FacadeDriverBuilder facadeDriverBuilder;
 
-    @Override
-    public FacadeDriverBO getById(Long tenantId, Long id) {
-        TenantContextHolder.setTenantId(tenantId);
-        try {
-            DriverBO managerBO = driverService.getById(id);
-            return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
-        } finally {
-            TenantContextHolder.clear();
-        }
+    private final ReactiveDriverService reactiveDriverService;
+
+    /** Create the local driver facade. */
+    @org.springframework.beans.factory.annotation.Autowired
+    public DriverLocalFacade(FacadeDriverBuilder facadeDriverBuilder, ReactiveDriverService reactiveDriverService) {
+        this.facadeDriverBuilder = facadeDriverBuilder;
+        this.reactiveDriverService = reactiveDriverService;
     }
 
     @Override
-    public List<FacadeDriverBO> listByIds(Long tenantId, Collection<Long> ids) {
-        TenantContextHolder.setTenantId(tenantId);
-        try {
-            if (Objects.isNull(ids) || ids.isEmpty()) {
-                return Collections.emptyList();
-            }
-            List<DriverBO> list = driverService.listByIds(new HashSet<>(ids));
-            if (Objects.isNull(list) || list.isEmpty()) {
-                return Collections.emptyList();
-            }
-            return list.stream().map(facadeDriverBuilder::toFacadeBO).toList();
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Mono<FacadeDriverBO> getByIdReactive(Long tenantId, Long id) {
+        if (reactiveDriverService == null)
+            return Mono.error(new IllegalStateException("ReactiveDriverService is not configured"));
+        return reactiveDriverService.getById(tenantId, id).map(facadeDriverBuilder::toFacadeBO);
     }
 
     @Override
-    public FacadePage<FacadeDriverBO> listByPage(FacadeDriverQuery query) {
-        TenantContextHolder.setTenantId(query.getTenantId());
-        try {
-            DriverQuery managerQuery = facadeDriverBuilder.toManagerQuery(query);
-            Page<DriverBO> page = driverService.list(managerQuery);
-            if (Objects.isNull(page)) {
-                return FacadePage.empty();
-            }
-
-            List<FacadeDriverBO> records = page.getRecords().stream().map(facadeDriverBuilder::toFacadeBO).toList();
-            return new FacadePage<>(page.getCurrent(), page.getSize(), page.getTotal(), page.getPages(), records);
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Flux<FacadeDriverBO> listByIdsReactive(Long tenantId, Collection<Long> ids) {
+        if (reactiveDriverService == null)
+            return Flux.error(new IllegalStateException("ReactiveDriverService is not configured"));
+        return reactiveDriverService
+                .listByIds(
+                        tenantId,
+                        ids == null
+                                ? List.of()
+                                : ids.stream()
+                                        .filter(Objects::nonNull)
+                                        .distinct()
+                                        .toList())
+                .map(facadeDriverBuilder::toFacadeBO);
     }
 
     @Override
-    public FacadeDriverBO getByDeviceId(Long tenantId, Long deviceId) {
-        TenantContextHolder.setTenantId(tenantId);
-        try {
-            DriverBO managerBO = driverService.getByDeviceId(deviceId, null);
-            return Objects.isNull(managerBO) ? null : facadeDriverBuilder.toFacadeBO(managerBO);
-        } finally {
-            TenantContextHolder.clear();
-        }
+    public Mono<OffsetPage<FacadeDriverBO>> listReactive(
+            io.github.pnoker.common.facade.entity.query.FacadeDriverOffsetQuery query) {
+        if (reactiveDriverService == null)
+            return Mono.error(new IllegalStateException("ReactiveDriverService is not configured"));
+        return reactiveDriverService
+                .list(new DriverFilter(
+                        query.tenantId(),
+                        query.driverName(),
+                        query.driverCode(),
+                        query.serviceName(),
+                        query.serviceHost(),
+                        query.driverTypeFlag(),
+                        query.enableFlag(),
+                        query.version(),
+                        query.groupId(),
+                        query.labelId(),
+                        query.offset(),
+                        query.limit(),
+                        query.sort()))
+                .map(page -> OffsetPage.of(
+                        page.items().stream()
+                                .map(facadeDriverBuilder::toFacadeBO)
+                                .toList(),
+                        page.offset(),
+                        page.limit(),
+                        page.total()));
     }
-
 }

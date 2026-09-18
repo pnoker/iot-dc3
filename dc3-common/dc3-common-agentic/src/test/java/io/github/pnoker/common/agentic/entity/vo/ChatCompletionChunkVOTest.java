@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.agentic.entity.vo;
 
-import org.junit.jupiter.api.Test;
-import tools.jackson.databind.ObjectMapper;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+import tools.jackson.databind.ObjectMapper;
 
 class ChatCompletionChunkVOTest {
 
@@ -46,5 +44,4 @@ class ChatCompletionChunkVOTest {
         assertThat(json).contains("\"content\":\"answer\"");
         assertThat(json).contains("\"reasoning_content\":\"thought\"");
     }
-
 }

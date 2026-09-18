@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da.impl;
 
+import java.net.UnknownHostException;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.IJIComObject;
 import org.jinterop.dcom.core.JICallBuilder;
@@ -30,8 +30,6 @@ import org.openscada.opc.dcom.common.impl.BaseCOMObject;
 import org.openscada.opc.dcom.da.Constants;
 import org.openscada.opc.dcom.da.IOPCDataCallback;
 import org.openscada.opc.dcom.da.OPCGroupState;
-
-import java.net.UnknownHostException;
 
 /**
  * Implementation of <code>IOPCGroupStateMgt</code>
@@ -53,8 +51,8 @@ public class OPCGroupStateMgt extends BaseCOMObject {
 
         callObject.addOutParamAsType(Integer.class, JIFlags.FLAG_NULL);
         callObject.addOutParamAsType(Boolean.class, JIFlags.FLAG_NULL);
-        callObject.addOutParamAsObject(new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)),
-                JIFlags.FLAG_NULL);
+        callObject.addOutParamAsObject(
+                new JIPointer(new JIString(JIFlags.FLAG_REPRESENTATION_STRING_LPWSTR)), JIFlags.FLAG_NULL);
         callObject.addOutParamAsType(Integer.class, JIFlags.FLAG_NULL);
         callObject.addOutParamAsType(Float.class, JIFlags.FLAG_NULL);
         callObject.addOutParamAsType(Integer.class, JIFlags.FLAG_NULL);
@@ -89,15 +87,21 @@ public class OPCGroupStateMgt extends BaseCOMObject {
      * @return the granted update rate
      * @throws JIException JIException
      */
-    public int setState(final Integer requestedUpdateRate, final Boolean active, final Integer timeBias,
-                        final Float percentDeadband, final Integer localeID, final Integer clientHandle) throws JIException {
+    public int setState(
+            final Integer requestedUpdateRate,
+            final Boolean active,
+            final Integer timeBias,
+            final Float percentDeadband,
+            final Integer localeID,
+            final Integer clientHandle)
+            throws JIException {
         final JICallBuilder callObject = new JICallBuilder(true);
         callObject.setOpnum(1);
 
         callObject.addInParamAsPointer(new JIPointer(requestedUpdateRate), JIFlags.FLAG_NULL);
         if (active != null) {
-            callObject.addInParamAsPointer(new JIPointer(Integer.valueOf(active.booleanValue() ? 1 : 0)),
-                    JIFlags.FLAG_NULL);
+            callObject.addInParamAsPointer(
+                    new JIPointer(Integer.valueOf(active.booleanValue() ? 1 : 0)), JIFlags.FLAG_NULL);
         } else {
             callObject.addInParamAsPointer(new JIPointer(null), JIFlags.FLAG_NULL);
         }
@@ -171,7 +175,9 @@ public class OPCGroupStateMgt extends BaseCOMObject {
         // If happens in some cases that the callback is triggered before
         // the method attachEventHandler returns.
         synchronized (callbackObject) {
-            final String id = JIFrameworkHelper.attachEventHandler(getCOMObject(), Constants.IOPCDataCallback_IID,
+            final String id = JIFrameworkHelper.attachEventHandler(
+                    getCOMObject(),
+                    Constants.IOPCDataCallback_IID,
                     JIObjectFactory.buildObject(getCOMObject().getAssociatedSession(), callbackObject.getCoClass()));
 
             callbackObject.setInfo(getCOMObject(), id);
@@ -194,5 +200,4 @@ public class OPCGroupStateMgt extends BaseCOMObject {
             return null;
         }
     }
-
 }

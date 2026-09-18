@@ -18,12 +18,12 @@ package io.github.pnoker.common.agentic.service.runtime;
 
 import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Executes the model/tool runtime for one prepared agentic chat turn.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 public interface AgenticRuntime {
@@ -43,6 +43,5 @@ public interface AgenticRuntime {
      * @param prepared the prepared chat request
      * @return the final result and finish reason
      */
-    AgenticRuntimeResult call(AgenticPreparedChatBO prepared);
-
+    Mono<AgenticRuntimeResult> call(AgenticPreparedChatBO prepared);
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -32,7 +31,6 @@ import lombok.ToString;
  * View object for notification channel binding API responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -44,16 +42,21 @@ import lombok.ToString;
 @Schema(description = "Notify Channel Bind view object")
 public class NotifyChannelBindVO extends BaseVO {
 
-    @Schema(description = "ID of the notification rule to bind.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Long notifyId;
+    @Schema(
+            description = "ID of the notification rule to bind.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    private String notifyId;
 
-    @Schema(description = "ID of the notification channel to bind.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
-    private Long channelId;
+    @Schema(
+            description = "ID of the notification channel to bind.",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    private String channelId;
 
     @Schema(description = "Bind extension information, serialized as JSON for custom routing metadata.")
     private NotifyChannelBindExt bindExt;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

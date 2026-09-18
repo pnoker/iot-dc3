@@ -14,31 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
-import io.github.pnoker.common.manager.entity.query.PointQuery;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 /**
  * FacadePoint ↔ manager PointBO/Query mapper.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface FacadePointBuilder {
 
-    @Mapping(target = "groupId", ignore = true)
-    @Mapping(target = "labelId", ignore = true)
-    PointQuery toManagerQuery(FacadePointQuery facadeQuery);
-
+    /**
+     * To facade business object.
+     *
+     * @param managerBO business object
+     * @return to facade business object result
+     */
     FacadePointBO toFacadeBO(PointBO managerBO);
-
 }

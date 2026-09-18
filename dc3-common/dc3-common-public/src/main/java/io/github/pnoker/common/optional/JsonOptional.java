@@ -14,19 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.optional;
 
 import io.github.pnoker.common.utils.JsonUtil;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.function.Consumer;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Optional wrapper that checks for non-empty valid JSON strings.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public final class JsonOptional {
@@ -37,16 +34,33 @@ public final class JsonOptional {
         this.value = value;
     }
 
+    /**
+     * Create a wrapper that treats empty or syntactically invalid JSON as absent.
+     *
+     * @param value JSON text to wrap
+     * @return wrapper for the supplied text
+     */
     public static JsonOptional ofNullable(String value) {
         return new JsonOptional(value);
     }
 
+    /**
+     * Invoke the action when the wrapped text is non-empty valid JSON.
+     *
+     * @param action action that consumes the valid JSON text
+     */
     public void ifPresent(Consumer<String> action) {
         if (StringUtils.isNotEmpty(value) && JsonUtil.isJson(value)) {
             action.accept(value);
         }
     }
 
+    /**
+     * Invoke exactly one branch according to whether the wrapped text is valid JSON.
+     *
+     * @param action      action that consumes valid JSON text
+     * @param emptyAction action to run for empty or invalid JSON
+     */
     public void ifPresentOrElse(Consumer<String> action, Runnable emptyAction) {
         if (StringUtils.isNotEmpty(value) && JsonUtil.isJson(value)) {
             action.accept(value);
@@ -54,5 +68,4 @@ public final class JsonOptional {
             emptyAction.run();
         }
     }
-
 }

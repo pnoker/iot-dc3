@@ -16,15 +16,14 @@
  */
 package io.github.pnoker.common.driver.entity.bean;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
 import io.github.pnoker.common.enums.PointTypeEnum;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link PointValue} verifying that the ReadPointValue constructor
@@ -115,11 +114,8 @@ class PointValueTest {
 
     @Test
     void nullNumValueIsSerializedAsNull() {
-        PointValue pv = PointValue.builder()
-                .deviceId(1L)
-                .pointId(10L)
-                .calValue("text")
-                .build();
+        PointValue pv =
+                PointValue.builder().deviceId(1L).pointId(10L).calValue("text").build();
 
         assertThat(pv.getNumValue()).isNull();
     }

@@ -15,12 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {ElMessageBox} from 'element-plus';
 import type {FormInstance, FormItemRule, FormRules} from 'element-plus';
-import {computed, reactive, ref, watch} from 'vue';
+import {computed, getCurrentInstance, onUnmounted, reactive, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRouter} from 'vue-router';
 
-import type {AlarmEntity, Order, PageQuery} from '@/config/types';
+import type {
+  AlarmEntity,
+  Order,
+  PageQuery,
+  ResponsiveListCellKind,
+  ResponsiveListColumn,
+  ResponsiveListTagType,
+} from '@/config/types';
 import {timestampLabel} from '@/utils/dateUtil';
 import {prettyJson} from '@/utils/jsonUtil';
 import {successMessage} from '@/utils/notificationUtil';
@@ -50,6 +58,9 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     formRef.value = (instance || undefined) as FormInstance | undefined;
   };
   const formModel = reactive<Record<string, any>>({});
+  const initialFormModel = ref('');
+  let formSessionId = 0;
+  let latestSaveId = 0;
   const searchForm = reactive<Record<string, any>>({
     keyword: '',
     filterValue: '',
@@ -58,6 +69,10 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
   const state = reactive({
     loading: false,
     saving: false,
+    saveError: null as unknown | null,
+    error: null as unknown | null,
+    status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
+    lastUpdated: null as number | null,
     rows: [] as AlarmEntity[],
     page: {
       total: 0,
@@ -66,6 +81,9 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
       orders: [{column: 'create_time', asc: false}] as Order[],
     },
   });
+  let latestLoadId = 0;
+  const deletingIds = ref(new Set<string>());
+  let disposed = false;
 
   const defaultConfig = configs[0] as AlarmEntityConfig;
   const activeConfig = computed<AlarmEntityConfig>(
@@ -82,7 +100,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
         fieldRules.push({
           required: true,
           message: t('settings.alarm.required'),
-          trigger: field.kind === 'select' ? 'change' : 'blur',
+          trigger: field.kind === 'select' || field.kind === 'remoteSelect' ? 'change' : 'blur',
         });
       }
       if (field.kind === 'json') {
@@ -109,15 +127,12 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     return rules;
   });
 
-  const query = (): PageQuery => {
-    const config = activeConfig.value;
+  const query = (config = activeConfig.value): PageQuery => {
     const params = cleanSearchParams(searchForm);
     const result: PageQuery = {
-      page: {
-        current: state.page.current,
-        size: state.page.size,
-        orders: state.page.orders,
-      },
+      offset: (state.page.current - 1) * state.page.size,
+      limit: state.page.size,
+      sort: state.page.orders.map((order) => ({field: order.column, direction: order.asc ? 'ASC' : 'DESC'})),
     };
     if (config.searchProp && params.keyword) {
       result[config.searchProp] = String(params.keyword).trim();
@@ -128,21 +143,30 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     return result;
   };
 
-  const load = () => {
+  const load = async () => {
+    if (disposed) return;
+    const loadId = ++latestLoadId;
+    const config = activeConfig.value;
     state.loading = true;
-    activeConfig.value
-      .list(query())
-      .then((res: R) => {
-        const page = res.data || {};
-        state.rows = page.records || [];
-        state.page.total = Number(page.total || 0);
-      })
-      .catch(() => {
-        // handled globally
-      })
-      .finally(() => {
+    state.status = 'loading';
+    state.error = null;
+    try {
+      const page = await config.list(query(config));
+      if (loadId !== latestLoadId || config.key !== activeConfig.value.key) return;
+      state.rows = page.items || [];
+      state.page.total = page.total || 0;
+      state.status = 'success';
+      state.lastUpdated = Date.now();
+    } catch (error) {
+      if (loadId !== latestLoadId || config.key !== activeConfig.value.key) return;
+      state.error = error;
+      state.status = 'error';
+    } finally {
+      if (loadId === latestLoadId) {
         state.loading = false;
-      });
+        if (state.status === 'loading') state.status = 'success';
+      }
+    }
   };
 
   const search = (params: Record<string, any>) => {
@@ -185,29 +209,78 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
       });
   };
 
+  const captureInitialForm = () => {
+    initialFormModel.value = JSON.stringify(formModel);
+    state.saveError = null;
+  };
+
+  const formDirty = computed(() => formVisible.value && JSON.stringify(formModel) !== initialFormModel.value);
+
+  const beginFormSession = () => {
+    formSessionId += 1;
+    latestSaveId += 1;
+    state.saving = false;
+    state.saveError = null;
+  };
+
   const openAdd = () => {
+    beginFormSession();
     editing.value = false;
     assignForm(activeConfig.value.defaultForm());
+    captureInitialForm();
     formVisible.value = true;
   };
 
   const resetForm = () => {
-    if (!editing.value) {
-      assignForm(activeConfig.value.defaultForm());
-    }
+    assignForm(JSON.parse(initialFormModel.value || '{}') as Record<string, unknown>);
+    state.saveError = null;
     formRef.value?.clearValidate();
   };
 
   const openEdit = (row: AlarmEntity) => {
+    beginFormSession();
     editing.value = true;
     const value = activeConfig.value.defaultForm();
     value.id = row.id;
-    if (row.version) value.version = row.version;
+    if (row.version !== undefined && row.version !== null) value.version = row.version;
     activeConfig.value.fields.forEach((field) => {
       value[field.prop] = row[field.prop] ?? value[field.prop];
     });
     assignForm(value);
+    captureInitialForm();
     formVisible.value = true;
+  };
+
+  const finishCloseForm = (done?: () => void) => {
+    formSessionId += 1;
+    latestSaveId += 1;
+    state.saving = false;
+    state.saveError = null;
+    if (done) {
+      done();
+      return;
+    }
+    formVisible.value = false;
+  };
+
+  const requestCloseForm = async (done?: () => void) => {
+    if (state.saving) return;
+    const sessionId = formSessionId;
+    if (!formDirty.value) {
+      finishCloseForm(done);
+      return;
+    }
+    try {
+      await ElMessageBox.confirm(t('common.discardConfirm'), {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning',
+      });
+      if (disposed || sessionId !== formSessionId || !formVisible.value) return;
+      finishCloseForm(done);
+    } catch {
+      // Keep the draft open when the user cancels the confirmation.
+    }
   };
 
   const openDetail = (row: AlarmEntity) => {
@@ -219,7 +292,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
   const payload = () => {
     const result: Record<string, unknown> = {};
     if (formModel.id) result.id = formModel.id;
-    if (formModel.version) result.version = formModel.version;
+    if (formModel.version !== undefined && formModel.version !== null) result.version = formModel.version;
     activeConfig.value.fields.forEach((field) => {
       const value = formModel[field.prop];
       if (field.kind === 'json') {
@@ -233,48 +306,75 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     return result;
   };
 
-  const submit = () => {
+  const submit = async () => {
+    if (state.saving) return;
     const addRequest = activeConfig.value.add;
     const updateRequest = activeConfig.value.update;
     if (!addRequest || !updateRequest) return;
-    formRef.value?.validate((valid) => {
-      if (!valid) return;
-      let data: Record<string, unknown>;
-      try {
-        data = payload();
-      } catch {
-        formRef.value?.validate().catch(() => undefined);
-        return;
-      }
-      state.saving = true;
-      const request = editing.value ? updateRequest(data) : addRequest(data);
-      request
-        .then(() => {
-          successMessage();
-          formVisible.value = false;
-          load();
-        })
-        .catch(() => {
-          // handled globally
-        })
-        .finally(() => {
-          state.saving = false;
-        });
-    });
+    const sessionId = formSessionId;
+    state.saving = true;
+    state.saveError = null;
+    const valid = await formRef.value?.validate().catch(() => false);
+    if (disposed || sessionId !== formSessionId || !formVisible.value) {
+      if (sessionId === formSessionId) state.saving = false;
+      return;
+    }
+    if (!valid) {
+      state.saving = false;
+      return;
+    }
+    let data: Record<string, unknown>;
+    try {
+      data = payload();
+    } catch {
+      await formRef.value?.validate().catch(() => undefined);
+      if (sessionId === formSessionId) state.saving = false;
+      return;
+    }
+    const saveId = ++latestSaveId;
+    try {
+      await (editing.value ? updateRequest(data) : addRequest(data));
+      if (saveId !== latestSaveId || sessionId !== formSessionId) return;
+      successMessage();
+      captureInitialForm();
+      state.saving = false;
+      finishCloseForm();
+      await load();
+    } catch (error) {
+      if (saveId === latestSaveId && sessionId === formSessionId) state.saveError = error;
+    } finally {
+      if (saveId === latestSaveId && sessionId === formSessionId) state.saving = false;
+    }
   };
 
-  const remove = (id: string) => {
+  const remove = async (row: AlarmEntity) => {
     const removeRequest = activeConfig.value.remove;
-    if (!removeRequest) return;
-    removeRequest(id)
-      .then(() => {
-        successMessage();
-        load();
-      })
-      .catch(() => {
-        // handled globally
-      });
+    const id = String(row.id || '');
+    if (!removeRequest || !id || deletingIds.value.has(id)) return;
+    deletingIds.value.add(id);
+    try {
+      await removeRequest(id);
+      if (disposed) return;
+      successMessage();
+      await load();
+    } catch {
+      // handled globally
+    } finally {
+      deletingIds.value.delete(id);
+    }
   };
+
+  const isDeleting = (row: AlarmEntity) => deletingIds.value.has(String(row.id));
+
+  if (getCurrentInstance()) {
+    onUnmounted(() => {
+      disposed = true;
+      latestLoadId += 1;
+      latestSaveId += 1;
+      formSessionId += 1;
+      deletingIds.value.clear();
+    });
+  }
 
   const enumLabel = (value: unknown) => {
     const text = String(value || '');
@@ -305,7 +405,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     return map[text] || text || '-';
   };
 
-  const tagType = (value: unknown, prop: string) => {
+  const tagType = (value: unknown, prop: string): ResponsiveListTagType => {
     const text = String(value || '');
     if (text === 'ENABLE' || text === 'SUCCESS' || text === 'NORMAL' || text === 'AUTO') return 'success';
     if (text === 'DISABLE' || text === 'FAILED' || text === 'FIRING') return 'danger';
@@ -322,17 +422,34 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     return String(value);
   };
 
+  const columns = computed<ResponsiveListColumn<AlarmEntity>[]>(() =>
+    activeConfig.value.columns.map((column) => ({
+      key: column.prop,
+      prop: column.prop,
+      label: column.label,
+      kind: (column.kind === 'json' ? 'text' : column.kind || 'text') as ResponsiveListCellKind,
+      width: column.width,
+      minWidth: column.minWidth,
+      fixed: column.fixed,
+      overflow: column.overflow,
+      mobile: column.mobile,
+      formatter: (row) => formatCell(row, column),
+      tagType: (row) => tagType(row[column.prop], column.prop),
+    }))
+  );
+
   watch(
     () => props.entity,
     () => {
+      beginFormSession();
       resetSearchForm(searchForm, {keyword: '', filterValue: ''});
       state.page.current = 1;
       formVisible.value = false;
-      load();
+      void load();
     }
   );
 
-  load();
+  void load();
 
   return {
     t,
@@ -342,8 +459,10 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     searchForm,
     state,
     activeConfig,
+    columns,
     dialogTitle,
     formRules,
+    formDirty,
     load,
     search,
     reset,
@@ -353,9 +472,11 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
     openAdd,
     resetForm,
     openEdit,
+    requestCloseForm,
     openDetail,
     submit,
     remove,
+    isDeleting,
     tagType,
     formatCell,
   };

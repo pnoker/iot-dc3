@@ -18,7 +18,6 @@ package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
-
 import java.util.List;
 import java.util.Map;
 
@@ -26,15 +25,20 @@ import java.util.Map;
  * Immutable request state shared by the chat orchestration pipeline.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
-public record AgenticPreparedChatBO(String userMessage, String scopedConversationId,
-                                    String requestSystemContext, String model,
-                                    Map<String, Object> toolContext, Double temperature,
-                                    Integer maxTokens,
-                                    AgenticRunTrace runTrace,
-                                    boolean toolCallingEnabled, boolean reasoning,
-                                    List<Long> attachments, List<AgenticMessageContent.Context> contexts,
-                                    AgenticMessageContent.Tokens inputTokens, List<MessageBO> memoryHistory) {
-}
+public record AgenticPreparedChatBO(
+        String userMessage,
+        String conversationId,
+        String requestSystemContext,
+        String model,
+        Map<String, Object> toolContext,
+        Double temperature,
+        Integer maxTokens,
+        AgenticRunTrace runTrace,
+        boolean toolCallingEnabled,
+        boolean reasoning,
+        List<Long> attachments,
+        List<AgenticMessageContent.Context> contexts,
+        AgenticMessageContent.Tokens inputTokens,
+        List<MessageBO> memoryHistory) {}

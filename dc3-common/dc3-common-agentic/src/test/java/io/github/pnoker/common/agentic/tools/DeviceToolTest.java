@@ -16,39 +16,34 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
-import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.api.PointValueFacade;
-import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
-import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.ai.chat.model.ToolContext;
-
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.ai.chat.model.ToolContext;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class DeviceToolTest {
-
     @Mock
     private DeviceFacade deviceFacade;
 
@@ -58,114 +53,86 @@ class DeviceToolTest {
     @Mock
     private PointValueFacade pointValueFacade;
 
-    @Mock
-    private StatusHealthFacade statusHealthFacade;
-
     private DeviceTool tool;
 
     @BeforeEach
     void setUp() {
-        tool = new DeviceTool(deviceFacade, pointFacade, pointValueFacade, Optional.of(statusHealthFacade));
+        tool = new DeviceTool(deviceFacade, pointFacade, pointValueFacade);
     }
 
     @Test
-    void searchDevicesUsesTenantScopedQueryAndReturnsStructuredPage() {
+    void reactiveSearchUsesOffsetQueryAndTenantScope() {
         FacadeDeviceBO device = device(201L, "Edge Gateway A1", 101L);
-        FacadePage<FacadeDeviceBO> page = new FacadePage<>(1L, 20L, 1L, 1L, List.of(device));
-        when(deviceFacade.listByPage(org.mockito.ArgumentMatchers.any(FacadeDeviceQuery.class))).thenReturn(page);
-
-        AgenticToolResult<FacadePage<FacadeDeviceBO>> result = tool.searchDevices(
-                "Edge Gateway", "edge-gateway-a1", 101L, 1, 20, toolContext());
-
-        assertThat(result.success()).isTrue();
-        assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
-        assertThat(result.data().getRecords()).extracting(FacadeDeviceBO::getDeviceName)
-                .containsExactly("Edge Gateway A1");
-
-        ArgumentCaptor<FacadeDeviceQuery> captor = forClass(FacadeDeviceQuery.class);
-        org.mockito.Mockito.verify(deviceFacade).listByPage(captor.capture());
-        assertThat(captor.getValue().getTenantId()).isEqualTo(11L);
-        assertThat(captor.getValue().getDeviceName()).isEqualTo("Edge Gateway");
-        assertThat(captor.getValue().getDeviceCode()).isEqualTo("edge-gateway-a1");
-        assertThat(captor.getValue().getDriverId()).isEqualTo(101L);
-        assertThat(captor.getValue().getPage().getSize()).isEqualTo(20L);
+        when(deviceFacade.listReactive(org.mockito.ArgumentMatchers.any()))
+                .thenReturn(Mono.just(OffsetPage.of(List.of(device), 20, 10, 21)));
+        StepVerifier.create(tool.searchDevicesReactive("Edge", null, 101L, 20, 10, toolContext()))
+                .assertNext(result -> {
+                    assertThat(result.success()).isTrue();
+                    assertThat(result.data().offset()).isEqualTo(20);
+                    assertThat(result.data().items()).containsExactly(device);
+                })
+                .verifyComplete();
+        org.mockito.Mockito.verify(deviceFacade)
+                .listReactive(org.mockito.ArgumentMatchers.argThat(
+                        query -> query.tenantId().equals(11L)));
     }
 
     @Test
-    void getDeviceLatestPointValuesCombinesDevicePointMetadataAndLatestValues() {
-        FacadeDeviceBO device = device(201L, "Edge Gateway A1", 101L);
-        FacadePointBO temperature = point(301L, "Ambient Temperature");
-        FacadePointValueBO latestValue = FacadePointValueBO.builder()
+    void reactiveLookupRejectsInvalidIdWithoutFacadeCall() {
+        StepVerifier.create(tool.lookupDeviceByIdReactive(0L, toolContext()))
+                .assertNext(
+                        result -> assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_INVALID_ARGUMENT))
+                .verifyComplete();
+        org.mockito.Mockito.verifyNoInteractions(deviceFacade);
+    }
+
+    @Test
+    void reactiveBatchLookupNormalizesIds() {
+        when(deviceFacade.listByIdsReactive(11L, List.of(1L, 2L)))
+                .thenReturn(Flux.just(device(1L, "A", 9L), device(2L, "B", 9L)));
+        StepVerifier.create(tool.lookupDevicesByIdsReactive(Arrays.asList(null, 1L, 1L, -1L, 2L), toolContext()))
+                .assertNext(result -> assertThat(result.data()).hasSize(2))
+                .verifyComplete();
+    }
+
+    @Test
+    void latestSnapshotCombinesPointAndValueStreams() {
+        FacadeDeviceBO device = device(201L, "Gateway", 101L);
+        FacadePointBO point = new FacadePointBO();
+        point.setId(301L);
+        point.setPointName("Temperature");
+        FacadePointValueBO value = FacadePointValueBO.builder()
                 .deviceId(201L)
                 .pointId(301L)
                 .value("23.7")
-                .rawValue("23.68")
-                .numValue(23.7D)
-                .createTime(1_780_000_000L)
                 .build();
-        when(deviceFacade.getById(11L, 201L)).thenReturn(device);
-        when(pointFacade.listByPage(org.mockito.ArgumentMatchers.any(FacadePointQuery.class)))
-                .thenReturn(new FacadePage<>(1L, 5L, 1L, 1L, List.of(temperature)));
-        when(pointValueFacade.lastValue(11L, 201L, 301L)).thenReturn(latestValue);
-
-        AgenticToolResult<DeviceTool.DeviceLatestPointValues> result = tool.getDeviceLatestPointValues(
-                201L, 5, toolContext());
-
-        assertThat(result.success()).isTrue();
-        assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
-        assertThat(result.data().device().getDeviceName()).isEqualTo("Edge Gateway A1");
-        assertThat(result.data().points()).hasSize(1);
-        assertThat(result.data().points().get(0).point().getPointName()).isEqualTo("Ambient Temperature");
-        assertThat(result.data().points().get(0).value().getValue()).isEqualTo("23.7");
-
-        ArgumentCaptor<FacadePointQuery> captor = forClass(FacadePointQuery.class);
-        org.mockito.Mockito.verify(pointFacade).listByPage(captor.capture());
-        assertThat(captor.getValue().getTenantId()).isEqualTo(11L);
-        assertThat(captor.getValue().getDeviceId()).isEqualTo(201L);
-        assertThat(captor.getValue().getPage().getSize()).isEqualTo(5L);
-    }
-
-    @Test
-    void getDeviceStatusesReturnsUnavailableWhenStatusFacadeIsAbsent() {
-        DeviceTool unavailableTool = new DeviceTool(deviceFacade, pointFacade, pointValueFacade, Optional.empty());
-
-        AgenticToolResult<Map<Long, String>> result = unavailableTool.getDeviceStatusesByIds(
-                List.of(201L), toolContext());
-
-        assertThat(result.success()).isFalse();
-        assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_UNAVAILABLE);
-        assertThat(result.data()).isNull();
+        when(deviceFacade.getByIdReactive(11L, 201L)).thenReturn(Mono.just(device));
+        when(pointFacade.listReactive(org.mockito.ArgumentMatchers.any()))
+                .thenReturn(Mono.just(OffsetPage.of(List.of(point), 0, 5, 1)));
+        when(pointValueFacade.lastValue(11L, 201L, 301L)).thenReturn(Mono.just(value));
+        StepVerifier.create(tool.getDeviceLatestPointValuesReactive(201L, 5, toolContext()))
+                .assertNext(result -> assertThat(result.data().points())
+                        .singleElement()
+                        .extracting(DeviceTool.PointLatestValue::value)
+                        .isEqualTo(value))
+                .verifyComplete();
     }
 
     private FacadeDeviceBO device(Long id, String name, Long driverId) {
         FacadeDeviceBO device = new FacadeDeviceBO();
         device.setId(id);
         device.setDeviceName(name);
-        device.setDeviceCode(name.toLowerCase().replace(' ', '-'));
         device.setDriverId(driverId);
         device.setEnableFlag(EnableFlagEnum.ENABLE);
         device.setTenantId(11L);
-        device.setProfileId(401L);
         return device;
-    }
-
-    private FacadePointBO point(Long id, String name) {
-        FacadePointBO point = new FacadePointBO();
-        point.setId(id);
-        point.setPointName(name);
-        point.setPointCode(name.toLowerCase().replace(' ', '-'));
-        point.setProfileId(401L);
-        point.setTenantId(11L);
-        point.setUnit("C");
-        return point;
     }
 
     private ToolContext toolContext() {
         Map<String, Object> values = new HashMap<>();
         values.put(AgenticConstant.ToolContextKey.TENANT_ID, 11L);
         values.put(AgenticConstant.ToolContextKey.USER_ID, 22L);
-        values.put(AgenticConstant.ToolContextKey.CONVERSATION_ID, "11:22:conv-1");
+        values.put(AgenticConstant.ToolContextKey.CONVERSATION_ID, "conv-1");
         return new ToolContext(values);
     }
-
 }

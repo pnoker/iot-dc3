@@ -14,66 +14,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcCodeQuery;
-import io.github.pnoker.api.center.auth.GrpcRTenantDTO;
+import io.github.pnoker.api.center.auth.GrpcTenantDTO;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
-import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ErrorCode;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.TenantFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcTenantBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-/**
- * gRPC {@link TenantFacade}.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
-@Slf4j
+/** gRPC facade exposing tenant operations. */
 @Component
 @RequiredArgsConstructor
 public class TenantGrpcFacade implements TenantFacade {
-
-    private final TenantApiGrpc.TenantApiBlockingStub tenantApiBlockingStub;
-
-    private final FacadeGrpcTenantBuilder facadeGrpcTenantBuilder;
-
-    private final GrpcFacadeSupport grpcFacadeSupport;
+    private final TenantApiGrpc.TenantApiStub tenantApiStub;
+    private final FacadeGrpcTenantBuilder builder;
+    private final GrpcFacadeSupport support;
 
     @Override
-    public FacadeTenantBO getByCode(String code) {
+    public Mono<FacadeTenantBO> getByCode(String code) {
         GrpcCodeQuery request = GrpcCodeQuery.newBuilder().setCode(code).build();
-        GrpcRTenantDTO response = grpcFacadeSupport.call("TenantFacade.getByCode", tenantApiBlockingStub,
-                stub -> stub.getByCode(request));
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "getByCode");
-            return null;
-        }
-        return facadeGrpcTenantBuilder.toFacadeBO(response.getData());
+        TenantApiGrpc.TenantApiStub stub = support.withDeadline(tenantApiStub);
+        return ReactiveGrpcClientSupport.<GrpcCodeQuery, GrpcTenantDTO>unary(
+                        "TenantFacade.getByCode", observer -> stub.getByCode(request, observer))
+                .map(builder::toFacadeBO);
     }
-
-    /**
-     * Guard a gRPC result: NOT_FOUND is treated as a normal empty outcome, any other
-     * error code throws a service exception.
-     *
-     * @param result the gRPC result envelope
-     * @param op     the operation name, for error messages
-     */
-    private void guardOrThrow(GrpcR result, String op) {
-        String code = result.getCode();
-        if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
-            log.debug("TenantGrpcFacade.{} => no resource", op);
-            return;
-        }
-        throw new ServiceException("TenantFacade." + op + " failed: [" + code + "] " + result.getMessage());
-    }
-
 }

@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.List;
 
 /**
  * JSON extension object for notification configuration.
@@ -31,7 +29,6 @@ import java.util.List;
  * Extended information related to notifications.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -46,9 +43,14 @@ public class NotifyExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended notification content, distinguished by the type and version fields of the base extension")
+    @Schema(
+            description =
+                    "Extended notification content, distinguished by the type and version fields of the base extension")
     private Content content;
 
+    /**
+     * Notify-rule core content.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -91,9 +93,11 @@ public class NotifyExt extends BaseExt {
          */
         @Schema(description = "Escalation policies applied to unresolved alarms")
         private List<Escalation> escalation;
-
     }
 
+    /**
+     * Duplicate suppression: enabled + grouping key (e.g. ruleId).
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -104,11 +108,15 @@ public class NotifyExt extends BaseExt {
         @Schema(description = "Whether deduplication is enabled", example = "true")
         private Boolean enabled;
 
-        @Schema(description = "Deduplication key used to group notifications that should be suppressed as duplicates", example = "ruleId")
+        @Schema(
+                description = "Deduplication key used to group notifications that should be suppressed as duplicates",
+                example = "ruleId")
         private String key;
-
     }
 
+    /**
+     * Per-key send rate limiting.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -121,9 +129,11 @@ public class NotifyExt extends BaseExt {
 
         @Schema(description = "Maximum number of notifications allowed within the interval window", example = "10")
         private Integer maxCount;
-
     }
 
+    /**
+     * Quiet-window suppression of notifications.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -136,9 +146,11 @@ public class NotifyExt extends BaseExt {
 
         @Schema(description = "List of silence windows during which notifications are suppressed")
         private List<Window> windows;
-
     }
 
+    /**
+     * Active sending window (timezone + HH:mm start/end) outside which sends are held.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -157,9 +169,11 @@ public class NotifyExt extends BaseExt {
 
         @Schema(description = "Days of week the window applies to")
         private List<String> daysOfWeek;
-
     }
 
+    /**
+     * Repeat-reminder policy while a condition stays true.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -175,9 +189,11 @@ public class NotifyExt extends BaseExt {
 
         @Schema(description = "Maximum number of repeated reminders to send", example = "5")
         private Integer maxTimes;
-
     }
 
+    /**
+     * Recovery-notification policy when a condition clears.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -193,9 +209,11 @@ public class NotifyExt extends BaseExt {
 
         @Schema(description = "Whether to automatically confirm the alarm when it recovers", example = "false")
         private Boolean autoConfirmOnRecovery;
-
     }
 
+    /**
+     * Escalation policy when a condition stays unacknowledged.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -208,7 +226,5 @@ public class NotifyExt extends BaseExt {
 
         @Schema(description = "Message template code used for the escalation notification", example = "ESCALATION_MSG")
         private String messageCode;
-
     }
-
 }

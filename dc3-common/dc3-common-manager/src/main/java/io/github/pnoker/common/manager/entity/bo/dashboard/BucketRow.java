@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.bo.dashboard;
 
 import lombok.Getter;
@@ -35,7 +34,6 @@ import lombok.ToString;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -48,8 +46,7 @@ public class BucketRow {
      * of different JDBC types (SMALLINT enable_flag, VARCHAR service_name, BIGINT
      * driver_id). Service-side formatters narrow it per call-site.
      */
-    private Object key;
+    private Object bucketKey;
 
     private long count;
-
 }

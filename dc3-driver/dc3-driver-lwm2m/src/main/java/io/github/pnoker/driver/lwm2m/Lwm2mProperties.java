@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.lwm2m;
 
 import jakarta.validation.constraints.Min;
@@ -28,7 +27,6 @@ import org.springframework.validation.annotation.Validated;
  * LwM2M Properties Configuration Class
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter
@@ -54,5 +52,4 @@ public class Lwm2mProperties {
     private String pskIdentity;
 
     private String pskKey;
-
 }

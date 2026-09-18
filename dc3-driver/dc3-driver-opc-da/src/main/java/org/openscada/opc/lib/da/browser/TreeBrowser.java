@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da.browser;
-
-import org.jinterop.dcom.common.JIException;
-import org.jinterop.dcom.core.JIVariant;
-import org.openscada.opc.dcom.da.OPCBROWSEDIRECTION;
-import org.openscada.opc.dcom.da.OPCBROWSETYPE;
-import org.openscada.opc.dcom.da.impl.OPCBrowseServerAddressSpace;
 
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.LinkedList;
+import org.jinterop.dcom.common.JIException;
+import org.jinterop.dcom.core.JIVariant;
+import org.openscada.opc.dcom.da.OPCBROWSEDIRECTION;
+import org.openscada.opc.dcom.da.OPCBROWSETYPE;
+import org.openscada.opc.dcom.da.impl.OPCBrowseServerAddressSpace;
 
 /**
  * Browse through the hierarchical server namespace.
@@ -69,8 +67,11 @@ public class TreeBrowser extends BaseBrowser {
      *                       for all)
      * @param variantType    The variant type (use <code>JIVariant.VT_EMPTY</code> for all)
      */
-    public TreeBrowser(final OPCBrowseServerAddressSpace browser, final String filterCriteria,
-                       final EnumSet<Access> accessMask, final int variantType) {
+    public TreeBrowser(
+            final OPCBrowseServerAddressSpace browser,
+            final String filterCriteria,
+            final EnumSet<Access> accessMask,
+            final int variantType) {
         super(browser);
         this._filterCriteria = filterCriteria;
         this._accessMask = accessMask;
@@ -207,8 +208,8 @@ public class TreeBrowser extends BaseBrowser {
             throws IllegalArgumentException, UnknownHostException, JIException {
         branch.setBranches(new LinkedList<Branch>());
 
-        for (String item : browse(OPCBROWSETYPE.OPC_BRANCH, this._filterCriteria, this._accessMask,
-                this._variantType)) {
+        for (String item :
+                browse(OPCBROWSETYPE.OPC_BRANCH, this._filterCriteria, this._accessMask, this._variantType)) {
             Branch subBranch = new Branch(branch, item);
             // descend only if we should
             if (descend) {
@@ -232,5 +233,4 @@ public class TreeBrowser extends BaseBrowser {
             browseBranches(branch, leaves, descend);
         }
     }
-
 }

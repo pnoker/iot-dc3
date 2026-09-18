@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
@@ -30,7 +29,6 @@ import lombok.ToString;
  * does not expose it.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -42,22 +40,15 @@ public class FacadeUserBO extends BaseBO {
 
     private Long principalId;
 
-
     private String nickName;
-
 
     private String userName;
 
-
     private String phone;
-
 
     private String email;
 
-
     private String socialExt;
 
-
     private String identityExt;
-
 }

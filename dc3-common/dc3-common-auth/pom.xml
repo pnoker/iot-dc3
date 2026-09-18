@@ -38,7 +38,16 @@
 
     <dependencies>
 
-        <!-- Local cache for token denylist (replaces Redis) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-r2dbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-core</artifactId>
+        </dependency>
+
+        <!-- Process-local cache for the token denylist -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
@@ -46,8 +55,12 @@
 
         <!-- gRPC Related -->
         <dependency>
-            <groupId>org.springframework.grpc</groupId>
-            <artifactId>spring-grpc-spring-boot-starter</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-grpc-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-grpc-client</artifactId>
         </dependency>
 
         <!-- DC3 API Related -->
@@ -63,19 +76,11 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-dal</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-log</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-model</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-postgres</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -107,7 +112,7 @@
         <!-- x-dc3-ai annotation gate (SP2 ratchet): scans this module's controllers in a unit test -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-resource-registrar</artifactId>
+            <artifactId>dc3-common-resource</artifactId>
             <scope>test</scope>
         </dependency>
 

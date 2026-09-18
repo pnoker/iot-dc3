@@ -14,18 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.service.impl;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.pnoker.common.constant.common.SymbolConstant;
+import io.github.pnoker.common.constant.common.TimeConstant;
 import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.common.facade.api.PointValueFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadePointVolumeBO;
 import io.github.pnoker.common.manager.constant.TopologyLimits;
 import io.github.pnoker.common.manager.entity.bo.dashboard.BucketRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.DailyGrowthRow;
-import io.github.pnoker.common.manager.entity.bo.dashboard.PointVolumeRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.ProfileBindingRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDeviceRow;
 import io.github.pnoker.common.manager.entity.bo.dashboard.TopologyDriverRow;
@@ -40,12 +41,8 @@ import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyLinkVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyNodeVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyStatsVO;
 import io.github.pnoker.common.manager.entity.vo.dashboard.TopologyVO;
-import io.github.pnoker.common.manager.mapper.DashboardMapper;
+import io.github.pnoker.common.manager.repository.ReactiveDashboardStore;
 import io.github.pnoker.common.manager.service.DashboardService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -60,16 +57,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * Dashboard service implementation providing home-page aggregates and topology.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Slf4j
-@Service
+@Service("managerDashboardService")
 @RequiredArgsConstructor
 public class DashboardServiceImpl implements DashboardService {
 
@@ -81,7 +81,9 @@ public class DashboardServiceImpl implements DashboardService {
             .maximumSize(TopologyLimits.CACHE_MAX_SIZE)
             .build();
 
-    private final DashboardMapper dashboardMapper;
+    private final ReactiveDashboardStore dashboardStore;
+
+    private final PointValueFacade pointValueFacade;
 
     /**
      * Convert bucket rows to bucket VOs, formatting each key with the given formatter.
@@ -94,7 +96,7 @@ public class DashboardServiceImpl implements DashboardService {
         List<BucketVO> out = new ArrayList<>(rows.size());
         for (BucketRow row : rows) {
             BucketVO vo = new BucketVO();
-            vo.setKey(fmt.format(row.getKey()));
+            vo.setKey(fmt.format(row.getBucketKey()));
             vo.setCount(row.getCount());
             out.add(vo);
         }
@@ -108,8 +110,7 @@ public class DashboardServiceImpl implements DashboardService {
      * @return the enable-flag name or unknown bucket
      */
     private static String enableKey(Object raw) {
-        if (Objects.isNull(raw))
-            return TopologyLimits.UNKNOWN_BUCKET;
+        if (Objects.isNull(raw)) return TopologyLimits.UNKNOWN_BUCKET;
         Byte b = raw instanceof Number n ? n.byteValue() : parseByteSafe(raw.toString());
         EnableFlagEnum e = EnableFlagEnum.ofIndex(b);
         return Objects.isNull(e) ? TopologyLimits.UNKNOWN_BUCKET : e.name();
@@ -126,8 +127,7 @@ public class DashboardServiceImpl implements DashboardService {
      * @return the driver-type name or unknown bucket
      */
     private static String driverTypeKey(Object raw) {
-        if (Objects.isNull(raw))
-            return TopologyLimits.UNKNOWN_BUCKET;
+        if (Objects.isNull(raw)) return TopologyLimits.UNKNOWN_BUCKET;
         Byte b = raw instanceof Number n ? n.byteValue() : parseByteSafe(raw.toString());
         DriverTypeEnum e = DriverTypeEnum.ofIndex(b);
         return Objects.isNull(e) ? TopologyLimits.UNKNOWN_BUCKET : e.name();
@@ -142,16 +142,14 @@ public class DashboardServiceImpl implements DashboardService {
         LocalDate anchor = today.minusDays(length - 1L);
         for (DailyGrowthRow row : rows) {
             LocalDate day = row.getDay();
-            if (Objects.isNull(day))
-                continue;
+            if (Objects.isNull(day)) continue;
             int idx = (int) (day.toEpochDay() - anchor.toEpochDay());
             if (idx >= 0 && idx < length) {
                 series[idx] = row.getCount();
             }
         }
         List<Long> out = new ArrayList<>(length);
-        for (long v : series)
-            out.add(v);
+        for (long v : series) out.add(v);
         return out;
     }
 
@@ -169,8 +167,7 @@ public class DashboardServiceImpl implements DashboardService {
             long wa = weights.getOrDefault(idOf.applyAsLong(a), 0L);
             long wb = weights.getOrDefault(idOf.applyAsLong(b), 0L);
             int cmp = Long.compare(wb, wa);
-            if (cmp != 0)
-                return cmp;
+            if (cmp != 0) return cmp;
             return Long.compare(idOf.applyAsLong(a), idOf.applyAsLong(b));
         };
     }
@@ -183,11 +180,12 @@ public class DashboardServiceImpl implements DashboardService {
      * @return the normalised range key
      */
     private static String normaliseRange(String rangeKey) {
-        if (Objects.isNull(rangeKey) || rangeKey.isBlank())
-            return TopologyLimits.RANGE_DEFAULT;
+        if (Objects.isNull(rangeKey) || rangeKey.isBlank()) return TopologyLimits.RANGE_DEFAULT;
         return switch (rangeKey) {
-            case TopologyLimits.RANGE_TODAY, TopologyLimits.RANGE_24H, TopologyLimits.RANGE_7D,
-                 TopologyLimits.RANGE_30D -> rangeKey;
+            case TopologyLimits.RANGE_TODAY,
+                    TopologyLimits.RANGE_24H,
+                    TopologyLimits.RANGE_7D,
+                    TopologyLimits.RANGE_30D -> rangeKey;
             default -> TopologyLimits.RANGE_DEFAULT;
         };
     }
@@ -227,8 +225,8 @@ public class DashboardServiceImpl implements DashboardService {
         return Objects.isNull(v) ? 0L : v;
     }
 
-    private static TopologyNodeVO node(String id, String name, int layer, String type,
-                                       List<TopologyHiddenChildVO> hiddenChildren) {
+    private static TopologyNodeVO node(
+            String id, String name, int layer, String type, List<TopologyHiddenChildVO> hiddenChildren) {
         TopologyNodeVO n = new TopologyNodeVO();
         n.setId(id);
         n.setName(name);
@@ -246,16 +244,30 @@ public class DashboardServiceImpl implements DashboardService {
         return l;
     }
 
+    private static Byte parseByteSafe(String s) {
+        try {
+            return Byte.parseByte(s);
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
     @Override
-    public DriverStatsVO driverStats(Long tenantId) {
+    public Mono<DriverStatsVO> driverStats(Long tenantId) {
+        return Mono.zip(
+                        dashboardStore.countDriverByEnable(tenantId).collectList(),
+                        dashboardStore.countDriverByType(tenantId).collectList(),
+                        dashboardStore.countDriverByService(tenantId).collectList())
+                .map(rows -> driverStats(rows.getT1(), rows.getT2(), rows.getT3()));
+    }
+
+    private DriverStatsVO driverStats(
+            List<BucketRow> enableRows, List<BucketRow> typeRows, List<BucketRow> serviceRows) {
         DriverStatsVO out = new DriverStatsVO();
 
-        List<BucketVO> byEnable = buckets(dashboardMapper.countDriverByEnable(tenantId),
-                DashboardServiceImpl::enableKey);
-        List<BucketVO> byType = buckets(dashboardMapper.countDriverByType(tenantId),
-                DashboardServiceImpl::driverTypeKey);
-        List<BucketVO> byService = buckets(dashboardMapper.countDriverByService(tenantId),
-                v -> Objects.isNull(v) ? SymbolConstant.HYPHEN : v.toString());
+        List<BucketVO> byEnable = buckets(enableRows, DashboardServiceImpl::enableKey);
+        List<BucketVO> byType = buckets(typeRows, DashboardServiceImpl::driverTypeKey);
+        List<BucketVO> byService = buckets(serviceRows, v -> Objects.isNull(v) ? SymbolConstant.HYPHEN : v.toString());
 
         out.setByEnable(byEnable);
         out.setByType(byType);
@@ -265,16 +277,26 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public DeviceStatsVO deviceStats(Long tenantId, int topN) {
+    public Mono<DeviceStatsVO> deviceStats(Long tenantId, int topN) {
         int clampedTopN = Math.clamp(topN, 1, 50);
+        return Mono.zip(
+                        dashboardStore.countDeviceByEnable(tenantId).collectList(),
+                        dashboardStore
+                                .countDeviceByDriver(tenantId, clampedTopN)
+                                .collectList(),
+                        dashboardStore
+                                .countDeviceByProfile(tenantId, clampedTopN)
+                                .collectList())
+                .map(rows -> deviceStats(rows.getT1(), rows.getT2(), rows.getT3()));
+    }
+
+    private DeviceStatsVO deviceStats(
+            List<BucketRow> enableRows, List<BucketRow> driverRows, List<BucketRow> profileRows) {
         DeviceStatsVO out = new DeviceStatsVO();
 
-        List<BucketVO> byEnable = buckets(dashboardMapper.countDeviceByEnable(tenantId),
-                DashboardServiceImpl::enableKey);
-        List<BucketVO> byDriver = buckets(dashboardMapper.countDeviceByDriver(tenantId, clampedTopN),
-                v -> Objects.isNull(v) ? SymbolConstant.HYPHEN : v.toString());
-        List<BucketVO> byProfile = buckets(dashboardMapper.countDeviceByProfile(tenantId, clampedTopN),
-                v -> Objects.isNull(v) ? SymbolConstant.HYPHEN : v.toString());
+        List<BucketVO> byEnable = buckets(enableRows, DashboardServiceImpl::enableKey);
+        List<BucketVO> byDriver = buckets(driverRows, v -> Objects.isNull(v) ? SymbolConstant.HYPHEN : v.toString());
+        List<BucketVO> byProfile = buckets(profileRows, v -> Objects.isNull(v) ? SymbolConstant.HYPHEN : v.toString());
 
         out.setByEnable(byEnable);
         out.setByDriver(byDriver);
@@ -284,33 +306,100 @@ public class DashboardServiceImpl implements DashboardService {
     }
 
     @Override
-    public GrowthVO dailyGrowth(Long tenantId, int days) {
+    public Mono<GrowthVO> dailyGrowth(Long tenantId, int days) {
         int clamped = Math.clamp(days, 1, 90);
         LocalDate today = LocalDate.now();
         LocalDateTime from = today.minusDays(clamped - 1L).atStartOfDay();
         LocalDateTime to = today.plusDays(1).atStartOfDay();
 
-        GrowthVO out = new GrowthVO();
-        out.setDriverDailyCounts(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_driver", from, to), today, clamped));
-        out.setDeviceDailyCounts(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_device", from, to), today, clamped));
-        out.setPointDailyCounts(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_point", from, to), today, clamped));
-        out.setProfileDailyCounts(fillSeries(dashboardMapper.dailyGrowth(tenantId, "dc3_profile", from, to), today, clamped));
-        return out;
+        return Mono.zip(
+                        dashboardStore
+                                .dailyGrowth(tenantId, "dc3_driver", from, to)
+                                .collectList(),
+                        dashboardStore
+                                .dailyGrowth(tenantId, "dc3_device", from, to)
+                                .collectList(),
+                        dashboardStore
+                                .dailyGrowth(tenantId, "dc3_point", from, to)
+                                .collectList(),
+                        dashboardStore
+                                .dailyGrowth(tenantId, "dc3_profile", from, to)
+                                .collectList())
+                .map(rows -> {
+                    GrowthVO out = new GrowthVO();
+                    out.setDriverDailyCounts(fillSeries(rows.getT1(), today, clamped));
+                    out.setDeviceDailyCounts(fillSeries(rows.getT2(), today, clamped));
+                    out.setPointDailyCounts(fillSeries(rows.getT3(), today, clamped));
+                    out.setProfileDailyCounts(fillSeries(rows.getT4(), today, clamped));
+                    return out;
+                });
     }
 
     @Override
-    public TopologyVO topology(Long tenantId, String mode, String rangeKey) {
-        String normMode = TopologyLimits.MODE_VOLUME.equalsIgnoreCase(mode) ? TopologyLimits.MODE_VOLUME
+    public Mono<TopologyVO> topology(Long tenantId, String mode, String rangeKey) {
+        String normMode = TopologyLimits.MODE_VOLUME.equalsIgnoreCase(mode)
+                ? TopologyLimits.MODE_VOLUME
                 : TopologyLimits.MODE_CARDINALITY;
         String normRange = normaliseRange(rangeKey);
         String cacheKey = tenantId + SymbolConstant.COLON + normMode + SymbolConstant.COLON + normRange;
         TopologyVO hit = topologyCache.getIfPresent(cacheKey);
-        if (Objects.nonNull(hit))
-            return hit;
+        if (Objects.nonNull(hit)) return Mono.just(hit);
+        return loadTopology(tenantId, normMode, normRange).doOnNext(out -> topologyCache.put(cacheKey, out));
+    }
 
-        TopologyVO out = computeTopology(tenantId, normMode, normRange);
-        topologyCache.put(cacheKey, out);
-        return out;
+    private Mono<TopologyVO> loadTopology(Long tenantId, String mode, String rangeKey) {
+        Mono<List<TopologyDriverRow>> drivers =
+                dashboardStore.topologyDrivers(tenantId).collectList();
+        return drivers.flatMap(driverRows -> {
+            List<Long> driverIds =
+                    driverRows.stream().map(TopologyDriverRow::getId).toList();
+            return dashboardStore
+                    .topologyDevicesByDrivers(tenantId, driverIds)
+                    .collectList()
+                    .flatMap(deviceRows -> {
+                        List<Long> deviceIds = deviceRows.stream()
+                                .map(TopologyDeviceRow::getId)
+                                .toList();
+                        return dashboardStore
+                                .topologyProfileBindings(tenantId, deviceIds)
+                                .collectList()
+                                .flatMap(bindings -> {
+                                    List<Long> profileIds = bindings.stream()
+                                            .map(ProfileBindingRow::getProfileId)
+                                            .filter(Objects::nonNull)
+                                            .distinct()
+                                            .toList();
+                                    return Mono.zip(
+                                                    dashboardStore
+                                                            .topologyProfilesByIds(tenantId, profileIds)
+                                                            .collectList(),
+                                                    dashboardStore
+                                                            .topologyPointsByProfiles(tenantId, profileIds)
+                                                            .collectList())
+                                            .flatMap(meta -> {
+                                                Mono<List<FacadePointVolumeBO>> volumes =
+                                                        TopologyLimits.MODE_VOLUME.equals(mode)
+                                                                ? pointValueFacade.pointVolumes(
+                                                                        tenantId,
+                                                                        fromOfRange(rangeKey)
+                                                                                .atZone(TimeConstant.DEFAULT_ZONEID)
+                                                                                .toInstant()
+                                                                                .toEpochMilli())
+                                                                : Mono.just(List.of());
+                                                return volumes.map(volumeRows -> computeTopology(
+                                                        tenantId,
+                                                        mode,
+                                                        rangeKey,
+                                                        driverRows,
+                                                        deviceRows,
+                                                        bindings,
+                                                        meta.getT1(),
+                                                        meta.getT2(),
+                                                        volumeRows));
+                                            });
+                                });
+                    });
+        });
     }
 
     /**
@@ -323,7 +412,16 @@ public class DashboardServiceImpl implements DashboardService {
      * @param rangeKey time window for volume mode
      * @return the assembled topology
      */
-    private TopologyVO computeTopology(Long tenantId, String mode, String rangeKey) {
+    private TopologyVO computeTopology(
+            Long tenantId,
+            String mode,
+            String rangeKey,
+            List<TopologyDriverRow> driverRows,
+            List<TopologyDeviceRow> deviceRows,
+            List<ProfileBindingRow> bindingRows,
+            List<TopologyProfileRow> profileRows,
+            List<TopologyPointRow> pointRows,
+            List<FacadePointVolumeBO> volumeRows) {
         TopologyVO out = new TopologyVO();
         boolean volumeMode = TopologyLimits.MODE_VOLUME.equals(mode);
 
@@ -332,7 +430,6 @@ public class DashboardServiceImpl implements DashboardService {
         // volume mode's Top-N sort needs per-entity weights anyway so a
         // single-pass rollup is simpler than iterated filtered queries.
 
-        List<TopologyDriverRow> driverRows = dashboardMapper.topologyDrivers(tenantId);
         long driverTotal = driverRows.size();
         if (driverRows.isEmpty()) {
             out.setStats(emptyStats(rangeKey, volumeMode));
@@ -348,7 +445,6 @@ public class DashboardServiceImpl implements DashboardService {
         // just the ones with the most devices listed.
         List<Long> allDriverIds = new ArrayList<>(driverNameById.keySet());
 
-        List<TopologyDeviceRow> deviceRows = dashboardMapper.topologyDevicesByDrivers(tenantId, allDriverIds);
         long deviceTotal = deviceRows.size();
         Map<Long, Long> deviceToDriver = new HashMap<>(deviceRows.size() * 2);
         Map<Long, String> deviceNameById = new LinkedHashMap<>();
@@ -359,8 +455,6 @@ public class DashboardServiceImpl implements DashboardService {
         }
         List<Long> allDeviceIds = new ArrayList<>(deviceNameById.keySet());
 
-        List<ProfileBindingRow> bindingRows = allDeviceIds.isEmpty() ? Collections.emptyList()
-                : dashboardMapper.topologyProfileBindings(tenantId, allDeviceIds);
         // device → set<profile> and profile → set<device>
         Map<Long, Set<Long>> profilesByDevice = new HashMap<>();
         Map<Long, Set<Long>> devicesByProfile = new LinkedHashMap<>();
@@ -372,33 +466,30 @@ public class DashboardServiceImpl implements DashboardService {
         }
 
         Set<Long> allProfileIdSet = devicesByProfile.keySet();
-        List<TopologyProfileRow> profileRows = allProfileIdSet.isEmpty() ? Collections.emptyList()
-                : dashboardMapper.topologyProfilesByIds(tenantId, allProfileIdSet);
         Map<Long, String> profileNameById = new LinkedHashMap<>();
         for (TopologyProfileRow r : profileRows) {
             profileNameById.put(r.getId(), r.getProfileName());
         }
 
-        List<TopologyPointRow> pointRows = allProfileIdSet.isEmpty() ? Collections.emptyList()
-                : dashboardMapper.topologyPointsByProfiles(tenantId, allProfileIdSet);
         long pointTotal = pointRows.size();
         // profile → ordered list of points
         Map<Long, List<TopologyPointRow>> pointsByProfile = new LinkedHashMap<>();
         for (TopologyPointRow r : pointRows) {
-            pointsByProfile.computeIfAbsent(r.getProfileId(), k -> new ArrayList<>()).add(r);
+            pointsByProfile
+                    .computeIfAbsent(r.getProfileId(), k -> new ArrayList<>())
+                    .add(r);
         }
 
         // ---- Fetch volumes if needed -------------------------------------
         // Map<(deviceId, pointId), count>. Empty in cardinality mode.
         Map<Long, Map<Long, Long>> volumeByDevicePoint = new HashMap<>();
         if (volumeMode) {
-            LocalDateTime from = fromOfRange(rangeKey);
-            List<PointVolumeRow> volumeRows = dashboardMapper.topologyPointVolumes(tenantId, from);
-            for (PointVolumeRow r : volumeRows) {
-                Long did = r.getDeviceId();
-                Long pid = r.getPointId();
-                long cnt = r.getCnt();
-                volumeByDevicePoint.computeIfAbsent(did, k -> new HashMap<>()).put(pid, cnt);
+            // Volumes come from the data center facade (TSDB port, S13-⑤ series
+            // counts) — the manager no longer reads dc3_history cross-schema.
+            for (var row : volumeRows) {
+                volumeByDevicePoint
+                        .computeIfAbsent(row.deviceId(), k -> new HashMap<>())
+                        .put(row.pointId(), row.count());
             }
         }
 
@@ -425,8 +516,7 @@ public class DashboardServiceImpl implements DashboardService {
                     long sum = 0;
                     for (Long did : devs) {
                         Map<Long, Long> vs = volumeByDevicePoint.get(did);
-                        if (Objects.nonNull(vs))
-                            sum += vs.getOrDefault(pid, 0L);
+                        if (Objects.nonNull(vs)) sum += vs.getOrDefault(pid, 0L);
                     }
                     pointWeight.put(pid, sum);
                 }
@@ -434,12 +524,10 @@ public class DashboardServiceImpl implements DashboardService {
             for (Map.Entry<Long, Map<Long, Long>> e : volumeByDevicePoint.entrySet()) {
                 Long did = e.getKey();
                 long sum = 0;
-                for (long v : e.getValue().values())
-                    sum += v;
+                for (long v : e.getValue().values()) sum += v;
                 deviceWeight.put(did, sum);
                 Long drvId = deviceToDriver.get(did);
-                if (Objects.nonNull(drvId))
-                    driverWeight.merge(drvId, sum, Long::sum);
+                if (Objects.nonNull(drvId)) driverWeight.merge(drvId, sum, Long::sum);
             }
         } else {
             // Cardinality fallbacks mirror the original Top-N behaviour:
@@ -466,33 +554,33 @@ public class DashboardServiceImpl implements DashboardService {
         // here BEFORE Top-N sort so the crop reflects real activity.
         // Cardinality mode keeps everything so operators can still see
         // "unconfigured" entities on the structural view.
-        List<TopologyDriverRow> activeDrivers = volumeMode ? driverRows.stream()
-                .filter(r -> nullZero(driverWeight.get(r.getId())) > 0)
-                .collect(java.util.stream.Collectors.toList()) : new ArrayList<>(driverRows);
+        List<TopologyDriverRow> activeDrivers = volumeMode
+                ? driverRows.stream()
+                        .filter(r -> nullZero(driverWeight.get(r.getId())) > 0)
+                        .collect(java.util.stream.Collectors.toList())
+                : new ArrayList<>(driverRows);
 
         // ---- Crop Top-N drivers ----------------------------------------
         activeDrivers.sort(cmpByMap(driverWeight, v -> v.getId()));
         List<TopologyDriverRow> topDrivers = activeDrivers.size() > TopologyLimits.TOP_DRIVERS
-                ? activeDrivers.subList(0, TopologyLimits.TOP_DRIVERS) : activeDrivers;
+                ? activeDrivers.subList(0, TopologyLimits.TOP_DRIVERS)
+                : activeDrivers;
         Set<Long> topDriverIds = new LinkedHashSet<>();
-        for (TopologyDriverRow r : topDrivers)
-            topDriverIds.add(r.getId());
+        for (TopologyDriverRow r : topDrivers) topDriverIds.add(r.getId());
 
         // ---- Crop Top-N devices (must belong to a kept driver) ----------
         List<TopologyDeviceRow> filteredDevices = new ArrayList<>();
         for (TopologyDeviceRow r : deviceRows) {
-            if (!topDriverIds.contains(r.getDriverId()))
-                continue;
-            if (volumeMode && nullZero(deviceWeight.get(r.getId())) == 0)
-                continue;
+            if (!topDriverIds.contains(r.getDriverId())) continue;
+            if (volumeMode && nullZero(deviceWeight.get(r.getId())) == 0) continue;
             filteredDevices.add(r);
         }
         filteredDevices.sort(cmpByMap(deviceWeight, v -> v.getId()));
         List<TopologyDeviceRow> topDevices = filteredDevices.size() > TopologyLimits.TOP_DEVICES
-                ? filteredDevices.subList(0, TopologyLimits.TOP_DEVICES) : filteredDevices;
+                ? filteredDevices.subList(0, TopologyLimits.TOP_DEVICES)
+                : filteredDevices;
         Set<Long> topDeviceIdSet = new LinkedHashSet<>();
-        for (TopologyDeviceRow r : topDevices)
-            topDeviceIdSet.add(r.getId());
+        for (TopologyDeviceRow r : topDevices) topDeviceIdSet.add(r.getId());
 
         // Per-driver "others:device:{driverId}" buckets for cropped
         // devices. In volume mode only devices that had activity but got
@@ -501,8 +589,7 @@ public class DashboardServiceImpl implements DashboardService {
         Map<Long, List<TopologyHiddenChildVO>> otherDevicesByDriver = new LinkedHashMap<>();
         for (TopologyDeviceRow r : filteredDevices) {
             long deviceId = r.getId();
-            if (topDeviceIdSet.contains(deviceId))
-                continue;
+            if (topDeviceIdSet.contains(deviceId)) continue;
             long drvId = r.getDriverId();
             TopologyHiddenChildVO hidden = new TopologyHiddenChildVO();
             hidden.setId("device:" + deviceId);
@@ -518,8 +605,7 @@ public class DashboardServiceImpl implements DashboardService {
         Set<Long> keptProfileIds = new LinkedHashSet<>();
         for (Long did : topDeviceIdSet) {
             Set<Long> pids = profilesByDevice.get(did);
-            if (Objects.nonNull(pids))
-                keptProfileIds.addAll(pids);
+            if (Objects.nonNull(pids)) keptProfileIds.addAll(pids);
         }
         if (volumeMode) {
             Set<Long> active = new LinkedHashSet<>();
@@ -527,11 +613,9 @@ public class DashboardServiceImpl implements DashboardService {
                 long sum = 0;
                 for (TopologyPointRow p : pointsByProfile.getOrDefault(pid, Collections.emptyList())) {
                     sum += nullZero(pointWeight.get(p.getId()));
-                    if (sum > 0)
-                        break;
+                    if (sum > 0) break;
                 }
-                if (sum > 0)
-                    active.add(pid);
+                if (sum > 0) active.add(pid);
             }
             keptProfileIds = active;
         }
@@ -598,10 +682,8 @@ public class DashboardServiceImpl implements DashboardService {
         for (ProfileBindingRow r : bindingRows) {
             Long deviceId = r.getDeviceId();
             Long profileId = r.getProfileId();
-            if (!topDeviceIdSet.contains(deviceId))
-                continue;
-            if (!keptProfileIds.contains(profileId))
-                continue;
+            if (!topDeviceIdSet.contains(deviceId)) continue;
+            if (!keptProfileIds.contains(profileId)) continue;
             long w = 1L;
             if (volumeMode) {
                 long sum = 0;
@@ -612,8 +694,7 @@ public class DashboardServiceImpl implements DashboardService {
                         sum += devVols.getOrDefault(p.getId(), 0L);
                     }
                 }
-                if (sum == 0)
-                    continue;
+                if (sum == 0) continue;
                 w = sum;
             }
             links.add(link("device:" + deviceId, "profile:" + profileId, w));
@@ -625,13 +706,14 @@ public class DashboardServiceImpl implements DashboardService {
         // but silent"; cardinality keeps everything for the structural
         // view.
         for (Long profileId : keptProfileIds) {
-            List<TopologyPointRow> allPoints = new ArrayList<>(
-                    pointsByProfile.getOrDefault(profileId, Collections.emptyList()));
+            List<TopologyPointRow> allPoints =
+                    new ArrayList<>(pointsByProfile.getOrDefault(profileId, Collections.emptyList()));
             if (volumeMode) {
                 allPoints.removeIf(p -> nullZero(pointWeight.get(p.getId())) == 0);
                 allPoints.sort(cmpByMap(pointWeight, v -> v.getId()));
             } else {
-                allPoints.sort(Comparator.comparingLong((TopologyPointRow r) -> r.getId()).reversed());
+                allPoints.sort(Comparator.comparingLong((TopologyPointRow r) -> r.getId())
+                        .reversed());
             }
 
             int keep = Math.min(TopologyLimits.TOP_POINTS_PER_PROFILE, allPoints.size());
@@ -655,8 +737,7 @@ public class DashboardServiceImpl implements DashboardService {
                     hidden.setName(r.getPointName());
                     hidden.setType("point");
                     children.add(hidden);
-                    if (volumeMode)
-                        sumW += nullZero(pointWeight.get(id));
+                    if (volumeMode) sumW += nullZero(pointWeight.get(id));
                 }
                 long w = volumeMode ? Math.max(1L, sumW) : children.size();
                 String otherId = "others:point:" + profileId;
@@ -682,16 +763,12 @@ public class DashboardServiceImpl implements DashboardService {
     @FunctionalInterface
     private interface KeyFormatter {
 
+        /**
+         * Format.
+         *
+         * @param raw raw
+         * @return format result
+         */
         String format(Object raw);
-
     }
-
-
-    private static Byte parseByteSafe(String s) {
-            try {
-                return Byte.parseByte(s);
-            } catch (NumberFormatException e) {
-                return 0;
-            }
-        }
 }

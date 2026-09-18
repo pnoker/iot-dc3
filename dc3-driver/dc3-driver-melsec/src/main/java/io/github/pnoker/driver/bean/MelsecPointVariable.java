@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.bean;
 
 import lombok.Getter;
@@ -23,7 +22,6 @@ import lombok.Getter;
  * Melsec point variable holding a device address string and type code.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Getter
@@ -35,14 +33,15 @@ public class MelsecPointVariable {
 
     private final int length;
 
+    /** melsec point variable. */
     public MelsecPointVariable(String address, String type) {
         this(address, type, 0);
     }
 
+    /** melsec point variable. */
     public MelsecPointVariable(String address, String type, int length) {
         this.address = address;
         this.type = type;
         this.length = length;
     }
-
 }

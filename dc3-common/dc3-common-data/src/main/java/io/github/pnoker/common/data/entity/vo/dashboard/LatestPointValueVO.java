@@ -14,28 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.github.pnoker.common.constant.common.TimeConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 /**
  * One row in the dashboard live-data feed — the most recent N point-value entries across
  * every typed hypertable.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Getter
@@ -50,19 +47,21 @@ public class LatestPointValueVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "device ID", example = "1024")
-    private Long deviceId;
+    private String deviceId;
 
     @Schema(description = "point ID", example = "2048")
-    private Long pointId;
+    private String pointId;
 
     @Schema(description = "driver ID", example = "512")
-    private Long driverId;
+    private String driverId;
 
     /**
      * Display name for the device, resolved via {@code DeviceFacade}. May be {@code null}
      * when the device has been deleted but historical point values still reference it.
      */
-    @Schema(description = "display name for the device, may be null if the device was deleted", example = "Temperature Sensor A1")
+    @Schema(
+            description = "display name for the device, may be null if the device was deleted",
+            example = "Temperature Sensor A1")
     private String deviceName;
 
     /**
@@ -93,5 +92,4 @@ public class LatestPointValueVO implements Serializable {
     @Schema(description = "sample creation time")
     @JsonFormat(pattern = TimeConstant.COMPLETE_DATE_FORMAT, timezone = TimeConstant.DEFAULT_TIMEZONE)
     private LocalDateTime createTime;
-
 }

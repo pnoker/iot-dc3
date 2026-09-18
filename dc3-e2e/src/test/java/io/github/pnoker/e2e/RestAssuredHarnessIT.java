@@ -14,8 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.e2e;
+
+import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -24,18 +28,12 @@ import io.restassured.RestAssured;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.http.ContentType;
 import io.restassured.parsing.Parser;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-
-import static io.restassured.RestAssured.given;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 /**
  * Pins the rest-assured wiring shape that the platform-driven E2E flows will use:
@@ -58,15 +56,15 @@ class RestAssuredHarnessIT extends BaseE2eIT {
     @Test
     void restAssuredCanCallAStubHttpServerAndDecodeJson() throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-        server.createContext("/v3/probe", new JsonHandler(200,
-                "{\"ok\":true,\"data\":{\"name\":\"dc3-center-auth\"},\"message\":\"alive\"}"));
-        server.createContext("/v3/error", new JsonHandler(401,
-                "{\"ok\":false,\"data\":null,\"message\":\"Unauthorized\"}"));
+        server.createContext(
+                "/v3/probe",
+                new JsonHandler(200, "{\"ok\":true,\"data\":{\"name\":\"dc3-center-auth\"},\"message\":\"alive\"}"));
+        server.createContext(
+                "/v3/error", new JsonHandler(401, "{\"ok\":false,\"data\":null,\"message\":\"Unauthorized\"}"));
         server.start();
         try {
             int port = server.getAddress().getPort();
-            given()
-                    .baseUri("http://127.0.0.1")
+            given().baseUri("http://127.0.0.1")
                     .port(port)
                     .accept(ContentType.JSON)
                     .contentType(ContentType.JSON)
@@ -78,8 +76,7 @@ class RestAssuredHarnessIT extends BaseE2eIT {
                     .body("data.name", equalTo("dc3-center-auth"))
                     .body("message", equalTo("alive"));
 
-            given()
-                    .baseUri("http://127.0.0.1")
+            given().baseUri("http://127.0.0.1")
                     .port(port)
                     .contentType(ContentType.JSON)
                     .when()
@@ -111,8 +108,7 @@ class RestAssuredHarnessIT extends BaseE2eIT {
         server.start();
         try {
             int port = server.getAddress().getPort();
-            given()
-                    .baseUri("http://127.0.0.1")
+            given().baseUri("http://127.0.0.1")
                     .port(port)
                     .header("X-DC3-Token", "alice-token")
                     .contentType(ContentType.JSON)
@@ -143,8 +139,7 @@ class RestAssuredHarnessIT extends BaseE2eIT {
             int port = server.getAddress().getPort();
             RestAssuredConfig config = RestAssured.config()
                     .encoderConfig(RestAssured.config().getEncoderConfig().defaultContentCharset("UTF-8"));
-            given()
-                    .config(config)
+            given().config(config)
                     .baseUri("http://127.0.0.1")
                     .port(port)
                     .contentType(ContentType.JSON)
@@ -167,8 +162,7 @@ class RestAssuredHarnessIT extends BaseE2eIT {
         server.start();
         try {
             int port = server.getAddress().getPort();
-            String body = given()
-                    .baseUri("http://127.0.0.1")
+            String body = given().baseUri("http://127.0.0.1")
                     .port(port)
                     .contentType(ContentType.JSON)
                     .when()

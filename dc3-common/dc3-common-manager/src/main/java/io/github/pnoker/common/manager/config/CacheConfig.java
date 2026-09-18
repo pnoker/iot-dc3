@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.config;
 
 import org.springframework.cache.annotation.EnableCaching;
@@ -24,10 +23,8 @@ import org.springframework.context.annotation.Configuration;
  * Enables Spring Cache abstraction backed by Caffeine (auto-configured by Boot).
  *
  * @author pnoker
- * @version 2026.5.26
  * @since 2026.5.26
  */
 @Configuration
 @EnableCaching
-public class CacheConfig {
-}
+public class CacheConfig {}

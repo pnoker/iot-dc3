@@ -14,29 +14,30 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.grpc;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import io.github.pnoker.api.center.auth.GrpcIdQuery;
-import io.github.pnoker.api.center.auth.GrpcRUserDTO;
+import io.github.pnoker.api.center.auth.GrpcUserDTO;
 import io.github.pnoker.api.center.auth.UserApiGrpc;
-import io.github.pnoker.api.common.GrpcRFactory;
 import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.grpc.builder.GrpcUserBuilder;
-import io.github.pnoker.common.auth.service.UserService;
-import io.github.pnoker.common.enums.ErrorCode;
+import io.github.pnoker.common.auth.service.ReactiveUserService;
+import io.github.pnoker.common.exception.NotFoundException;
+import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
+import reactor.core.Disposable;
+import reactor.core.publisher.Mono;
 
 /**
  * gRPC server handling user facade requests.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -46,42 +47,56 @@ public class UserServer extends UserApiGrpc.UserApiImplBase {
 
     private final GrpcUserBuilder grpcUserBuilder;
 
-    private final UserService userService;
+    private final ReactiveUserService reactiveUserService;
 
     @Override
-    public void getById(GrpcIdQuery request, StreamObserver<GrpcRUserDTO> responseObserver) {
-        writeUserResponse(() -> userService.getById(request.getId()), "getById", responseObserver);
+    public void getById(GrpcIdQuery request, StreamObserver<GrpcUserDTO> responseObserver) {
+        subscribe(reactiveUserService.getById(request.getTenantId(), request.getId()), "getById", responseObserver);
     }
 
     @Override
-    public void getByPrincipalId(GrpcIdQuery request, StreamObserver<GrpcRUserDTO> responseObserver) {
-        writeUserResponse(() -> userService.getByPrincipalId(request.getId(), false), "getByPrincipalId",
+    public void getByPrincipalId(GrpcIdQuery request, StreamObserver<GrpcUserDTO> responseObserver) {
+        subscribe(
+                reactiveUserService.getByPrincipalId(request.getTenantId(), request.getId()),
+                "getByPrincipalId",
                 responseObserver);
     }
 
-    private void writeUserResponse(UserLookup lookup, String operation, StreamObserver<GrpcRUserDTO> responseObserver) {
-        GrpcRUserDTO.Builder builder = GrpcRUserDTO.newBuilder();
-
-        try {
-            UserBO entityBO = lookup.get();
-            if (Objects.isNull(entityBO)) {
-                builder.setResult(GrpcRFactory.notFound());
-            } else {
-                builder.setResult(GrpcRFactory.ok());
-                builder.setData(grpcUserBuilder.buildGrpcDTOByBO(entityBO));
-            }
-        } catch (Exception e) {
-            log.warn("{} failed", operation, e);
-            builder.setResult(GrpcRFactory.fail(ErrorCode.FAILURE));
-        }
-
-        responseObserver.onNext(builder.build());
-        responseObserver.onCompleted();
+    private void subscribe(Mono<UserBO> publisher, String operation, StreamObserver<GrpcUserDTO> responseObserver) {
+        Context context = Context.current();
+        AtomicBoolean terminated = new AtomicBoolean();
+        AtomicReference<Disposable> subscription = new AtomicReference<>();
+        Disposable disposable = publisher
+                .onErrorResume(
+                        NotFoundException.class,
+                        error -> Mono.error(io.grpc.Status.NOT_FOUND
+                                .withDescription("User not found")
+                                .asRuntimeException()))
+                .map(grpcUserBuilder::buildGrpcDTOByBO)
+                .subscribe(
+                        value -> {
+                            if (context.isCancelled() || !terminated.compareAndSet(false, true)) return;
+                            responseObserver.onNext(value);
+                            responseObserver.onCompleted();
+                        },
+                        error -> {
+                            if (context.isCancelled() || !terminated.compareAndSet(false, true)) return;
+                            log.warn("{} failed", operation, error);
+                            responseObserver.onError(
+                                    error instanceof io.grpc.StatusRuntimeException
+                                            ? error
+                                            : io.grpc.Status.INTERNAL
+                                                    .withDescription(operation + " failed")
+                                                    .withCause(error)
+                                                    .asRuntimeException());
+                        });
+        subscription.set(disposable);
+        context.addListener(
+                ignored -> {
+                    Disposable current = subscription.get();
+                    if (current != null) current.dispose();
+                },
+                MoreExecutors.directExecutor());
+        if (context.isCancelled()) disposable.dispose();
     }
-
-    @FunctionalInterface
-    private interface UserLookup {
-        UserBO get();
-    }
-
 }

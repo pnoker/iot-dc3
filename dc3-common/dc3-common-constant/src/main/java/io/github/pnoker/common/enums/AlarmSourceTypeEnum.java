@@ -14,21 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Enumeration of alarm source flags.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -68,13 +64,18 @@ public enum AlarmSourceTypeEnum {
     SYSTEM((byte) 4, "system", "System"),
     ;
 
-    @EnumValue
     private final Byte index;
 
     private final String code;
 
     private final String remark;
 
+    /**
+     * Resolve an alarm source from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching source, or {@code null} when the index is unknown
+     */
     public static AlarmSourceTypeEnum ofIndex(Byte index) {
         Optional<AlarmSourceTypeEnum> any = Arrays.stream(AlarmSourceTypeEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -82,6 +83,12 @@ public enum AlarmSourceTypeEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve an alarm source from its stable wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching source, or {@code null} when the code is unknown
+     */
     public static AlarmSourceTypeEnum ofCode(String code) {
         Optional<AlarmSourceTypeEnum> any = Arrays.stream(AlarmSourceTypeEnum.values())
                 .filter(type -> type.getCode().equals(code))
@@ -89,6 +96,12 @@ public enum AlarmSourceTypeEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve an alarm source from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching source, or {@code null} when the name is unknown
+     */
     public static AlarmSourceTypeEnum ofName(String name) {
         try {
             return valueOf(name);
@@ -96,5 +109,4 @@ public enum AlarmSourceTypeEnum {
             return null;
         }
     }
-
 }

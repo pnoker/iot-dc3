@@ -18,18 +18,54 @@
 <template>
   <div>
     <base-card>
-      <el-tabs v-model="reactiveData.active" @tab-click="changeActive">
+      <el-alert
+        v-if="reactiveData.status === 'error'"
+        :closable="false"
+        :title="$t('common.loadFailed')"
+        class="detail-page-alert"
+        show-icon
+        type="error"
+      >
+        <el-button :loading="reactiveData.loading" link type="danger" @click="device">
+          {{ $t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-empty
+        v-if="reactiveData.status === 'error' && !reactiveData.data.id"
+        :description="$t('common.loadFailed')"
+      />
+      <el-skeleton v-else-if="reactiveData.status === 'loading' && !reactiveData.data.id" :rows="6" animated />
+      <el-tabs
+        v-else-if="reactiveData.status !== 'error' && reactiveData.data.id"
+        v-model="reactiveData.active"
+        v-loading="reactiveData.loading"
+        @tab-click="changeActive"
+      >
         <el-tab-pane :label="$t('device.detail.deviceInfo')" name="detail">
           <detail-card>
-            <el-descriptions :column="2" border>
+            <el-descriptions :column="isMobile ? 1 : 2" border>
               <el-descriptions-item :label="$t('device.detail.deviceName')"
               >{{ reactiveData.data.deviceName }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('device.detail.driverName')"
-              >{{ reactiveData.driver.driverName }}
+              >
+                <span v-if="reactiveData.driverLoadError" class="detail-inline-error">
+                  {{ $t('common.loadFailed') }}
+                  <el-button :loading="reactiveData.driverLoading" link size="small" type="danger" @click="retryDriver">
+                    {{ $t('common.retry') }}
+                  </el-button>
+                </span>
+                <span v-else>{{ reactiveData.driver.driverName || '-' }}</span>
               </el-descriptions-item>
               <el-descriptions-item :label="$t('device.detail.profileName')"
-              >{{ reactiveData.profile.profileName || '-' }}
+              >
+                <span v-if="reactiveData.profileLoadError" class="detail-inline-error">
+                  {{ $t('common.loadFailed') }}
+                  <el-button :loading="reactiveData.profileLoading" link size="small" type="danger" @click="retryProfile">
+                    {{ $t('common.retry') }}
+                  </el-button>
+                </span>
+                <span v-else>{{ reactiveData.profile.profileName || '-' }}</span>
               </el-descriptions-item>
               <el-descriptions-item :label="$t('device.detail.profileCode')"
               >{{ reactiveData.profile.profileCode || '-' }}
@@ -38,10 +74,10 @@
               <el-descriptions-item :label="$t('device.detail.commandCount')">{{ commandLength }}</el-descriptions-item>
               <el-descriptions-item :label="$t('device.detail.eventCount')">{{ eventLength }}</el-descriptions-item>
               <el-descriptions-item :label="$t('common.operationTime')"
-              >{{ timestamp(reactiveData.data.createTime) }}
+              >{{ timestamp(reactiveData.data.operateTime || '') }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.createTime')"
-              >{{ timestamp(reactiveData.data.createTime) }}
+              >{{ timestamp(reactiveData.data.createTime || '') }}
               </el-descriptions-item>
             </el-descriptions>
           </detail-card>
@@ -71,7 +107,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, reactive, ref, watch} from 'vue';
+import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
 
 import {useRoute} from 'vue-router';
 import router from '@/config/router';
@@ -87,33 +123,42 @@ import pointValue from '@/views/point/value/PointValue.vue';
 import CommandList from '@/views/settings/command/CommandList.vue';
 import EventList from '@/views/settings/event/definition/EventList.vue';
 import {timestamp} from '@/utils/dateUtil';
+import type {DeviceRecord, DriverRecord, PointRecord, ProfileRecord} from '@/config/types/manager';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 
 const route = useRoute();
-const pointViewRef: any = ref<InstanceType<typeof point>>();
+const {isMobile} = useBreakpoint();
+const pointViewRef = ref<InstanceType<typeof point>>();
 const commandViewRef = ref<InstanceType<typeof CommandList>>();
 const eventViewRef = ref<InstanceType<typeof EventList>>();
-const pointValueViewRef: any = ref<InstanceType<typeof pointValue>>();
+const pointValueViewRef = ref<InstanceType<typeof pointValue>>();
 
-// 定义响应式数据
 const reactiveData = reactive({
-  id: route.query.id as string,
+  id: String(route.query.id ?? ''),
   active: (route.query.active as string) || 'detail',
-  profileLoading: true,
-  pointLoading: true,
-  pointValueLoading: true,
-  data: {} as any,
-  driver: {} as any,
-  profile: {} as any,
+  loading: true,
+  status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
+  data: {} as Partial<DeviceRecord>,
+  driver: {} as Partial<DriverRecord>,
+  profile: {} as Partial<ProfileRecord>,
+  driverLoading: false,
+  profileLoading: false,
+  driverLoadError: false,
+  profileLoadError: false,
   profileTable: {} as Record<string, any>,
   pointTable: {} as Record<string, any>,
   deviceTable: {} as Record<string, any>,
   unitTable: {} as Record<string, any>,
-  listProfileData: [] as any[],
-  listPointData: [] as any[],
-  listPointValueData: [] as any[],
+  listProfileData: [] as ProfileRecord[],
+  listPointData: [] as PointRecord[],
+  listPointValueData: [] as Record<string, unknown>[],
   listPointValueHistoryData: {} as Record<string, any>,
   pointValueDetailData: {} as Record<string, any>,
 });
+
+let requestId = 0;
+let driverRequestId = 0;
+let profileRequestId = 0;
 
 const profileId = computed(() => String(reactiveData.data.profileId || ''));
 
@@ -129,36 +174,111 @@ const eventLength = computed(() => {
   return eventViewRef.value?.reactiveData?.page?.total || 0;
 });
 
-const device = () => {
-  getDeviceById(reactiveData.id)
+const loadDriver = (deviceRequestId: number, deviceId: string, driverId: string) => {
+  if (!driverId) return;
+  const relationRequestId = ++driverRequestId;
+  reactiveData.driverLoading = true;
+  reactiveData.driverLoadError = false;
+  void getDriverById(driverId)
     .then((res) => {
-      reactiveData.data = res.data;
-      reactiveData.deviceTable[reactiveData.data.id] = reactiveData.data.deviceName;
-      reactiveData.profile = {};
-
-      getDriverById(reactiveData.data.driverId)
-        .then((res) => {
-          reactiveData.driver = res.data;
-        })
-        .catch(() => {
-          // nothing to do
-        });
-
-      if (reactiveData.data.profileId) {
-        getProfileById(String(reactiveData.data.profileId))
-          .then((res) => {
-            reactiveData.profile = res.data || {};
-          })
-          .catch(() => {
-            // nothing to do
-          });
-      }
+      if (
+        deviceRequestId !== requestId ||
+        relationRequestId !== driverRequestId ||
+        deviceId !== String(reactiveData.id || '')
+      ) return;
+      reactiveData.driver = res || {};
     })
     .catch(() => {
-      // nothing to do
+      if (
+        deviceRequestId === requestId &&
+        relationRequestId === driverRequestId &&
+        deviceId === String(reactiveData.id || '')
+      ) {
+        reactiveData.driverLoadError = true;
+      }
     })
     .finally(() => {
-      reactiveData.profileLoading = false;
+      if (deviceRequestId === requestId && relationRequestId === driverRequestId) reactiveData.driverLoading = false;
+    });
+};
+
+const loadProfile = (deviceRequestId: number, deviceId: string, profileIdValue: string) => {
+  if (!profileIdValue) return;
+  const relationRequestId = ++profileRequestId;
+  reactiveData.profileLoading = true;
+  reactiveData.profileLoadError = false;
+  void getProfileById(profileIdValue)
+    .then((res) => {
+      if (
+        deviceRequestId !== requestId ||
+        relationRequestId !== profileRequestId ||
+        deviceId !== String(reactiveData.id || '')
+      ) return;
+      reactiveData.profile = res || {};
+    })
+    .catch(() => {
+      if (
+        deviceRequestId === requestId &&
+        relationRequestId === profileRequestId &&
+        deviceId === String(reactiveData.id || '')
+      ) {
+        reactiveData.profileLoadError = true;
+      }
+    })
+    .finally(() => {
+      if (deviceRequestId === requestId && relationRequestId === profileRequestId) reactiveData.profileLoading = false;
+    });
+};
+
+const retryDriver = () => {
+  const driverId = String(reactiveData.data.driverId || '');
+  if (driverId && reactiveData.data.id) loadDriver(requestId, String(reactiveData.data.id), driverId);
+};
+
+const retryProfile = () => {
+  const profileIdValue = String(reactiveData.data.profileId || '');
+  if (profileIdValue && reactiveData.data.id) loadProfile(requestId, String(reactiveData.data.id), profileIdValue);
+};
+
+const device = () => {
+  const currentRequestId = ++requestId;
+  const deviceId = String(reactiveData.id || '');
+  reactiveData.loading = true;
+  reactiveData.status = 'loading';
+  reactiveData.data = {};
+  reactiveData.driver = {};
+  reactiveData.profile = {};
+  driverRequestId += 1;
+  profileRequestId += 1;
+  reactiveData.driverLoading = false;
+  reactiveData.profileLoading = false;
+  reactiveData.driverLoadError = false;
+  reactiveData.profileLoadError = false;
+  if (!deviceId) {
+    reactiveData.loading = false;
+    reactiveData.status = 'error';
+    return Promise.resolve();
+  }
+  return getDeviceById(deviceId)
+    .then((res) => {
+      if (currentRequestId !== requestId || deviceId !== String(reactiveData.id || '')) return;
+      reactiveData.data = res || {};
+      if (!res?.id) {
+        reactiveData.status = 'error';
+        return;
+      }
+      reactiveData.deviceTable = {[res.id]: res.deviceName};
+      reactiveData.status = 'success';
+
+      const driverId = String(reactiveData.data.driverId || '');
+      loadDriver(currentRequestId, deviceId, driverId);
+      loadProfile(currentRequestId, deviceId, String(reactiveData.data.profileId || ''));
+    })
+    .catch(() => {
+      if (currentRequestId === requestId) reactiveData.status = 'error';
+    })
+    .finally(() => {
+      if (currentRequestId === requestId) reactiveData.loading = false;
     });
 };
 
@@ -190,9 +310,23 @@ const changeActive = (tab: any) => {
 watch(
   () => [route.query.id, route.query.active],
   ([id, active]) => {
-    const nextId = id as string;
-    if (nextId && nextId !== reactiveData.id) {
+    const nextId = String(id ?? '');
+    if (nextId !== reactiveData.id) {
       reactiveData.id = nextId;
+      reactiveData.data = {};
+      reactiveData.driver = {};
+      reactiveData.profile = {};
+      reactiveData.driverLoadError = false;
+      reactiveData.profileLoadError = false;
+      reactiveData.profileTable = {};
+      reactiveData.pointTable = {};
+      reactiveData.deviceTable = {};
+      reactiveData.unitTable = {};
+      reactiveData.listProfileData = [];
+      reactiveData.listPointData = [];
+      reactiveData.listPointValueData = [];
+      reactiveData.listPointValueHistoryData = {};
+      reactiveData.pointValueDetailData = {};
       device();
     }
     reactiveData.active = (active as string) || 'detail';
@@ -202,4 +336,27 @@ watch(
 onMounted(() => {
   device();
 });
+
+onBeforeUnmount(() => {
+  requestId += 1;
+  driverRequestId += 1;
+  profileRequestId += 1;
+});
 </script>
+
+<style lang="scss" scoped>
+.detail-page-alert {
+  margin-bottom: var(--dc3-space-3);
+
+  :deep(.el-alert__content) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--dc3-space-2);
+  }
+}
+
+.detail-inline-error {
+  color: var(--el-color-danger);
+}
+</style>

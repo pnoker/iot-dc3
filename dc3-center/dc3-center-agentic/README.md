@@ -2,16 +2,15 @@
 
 ## Overview
 
-`dc3-center-agentic` is the AI / agentic center of the IoT DC3 platform. It exposes an LLM-backed
-conversational and tool-calling service (built on Spring AI) that lets users query and operate platform
-resources — drivers, devices, points, point values, profiles, commands, and events — through natural
-language. The service is a thin Spring Boot shell; the agentic logic lives in `dc3-common-agentic`.
+`dc3-center-agentic` is the AI / agentic center of the IoT DC3 platform. It exposes an LLM-backed conversational and
+tool-calling service (built on Spring AI) that lets users query and operate platform resources — drivers, devices,
+points, point values, profiles, commands, and events — through natural language. The service is a thin Spring Boot
+shell; the agentic logic lives in `dc3-common-agentic`.
 
 ## Module Information
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-center-agentic
-- **Version**: 2026.5.22
 - **Package**: `io.github.pnoker.center.agentic`
 
 ## Service Ports
@@ -35,7 +34,7 @@ The WebFlux base path is `/agentic`; through the gateway the service is reached 
 ## Configuration
 
 - `DC3_AGENTIC_PORT` — HTTP port (default `8600`)
-- `DC3_FACADE_MODE` — facade transport (default `grpc`)
+- `DC3_FACADE_GRPC_DEADLINE_MS` — cross-service gRPC deadline in milliseconds (default `3000`)
 - Model/provider settings are bound via `AgenticProperties`, with an OpenAI-compatible fallback configured through the
   `AGENTIC_FALLBACK_OPENAI_*` environment variables (see `dc3/.env.example` / repo-root `.env.example`).
 
@@ -44,25 +43,30 @@ The WebFlux base path is `/agentic`; through the gateway the service is reached 
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev SERVICES="auth manager data"
 ```
+
+The agentic service has gRPC facade channels for Auth, Manager, and Data centers. Start all three before exercising
+platform tools; the gateway is optional when calling the agentic service directly.
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-agentic -am package
 java -jar dc3-center/dc3-center-agentic/target/dc3-center-agentic.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-center/dc3-center-agentic -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-agentic` — agentic SDK: Spring AI chat client, platform tools, conversation memory, model management
 - `dc3-common-facade-grpc` — gRPC facade for cross-service access
-- `dc3-common-resource-registrar` — registers this service's API / menu resources
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
+- `dc3-common-resource` — registers this service's API / menu resources

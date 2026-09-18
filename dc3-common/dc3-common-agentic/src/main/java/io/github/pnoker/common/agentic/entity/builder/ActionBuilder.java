@@ -16,70 +16,45 @@
  */
 package io.github.pnoker.common.agentic.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.ActionBO;
-import io.github.pnoker.common.agentic.entity.model.ActionDO;
 import io.github.pnoker.common.agentic.entity.vo.ActionVO;
-import io.github.pnoker.common.enums.AgenticActionStatusEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
-import org.mapstruct.AfterMapping;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
- * MapStruct builder converting between action BO, VO, and DO.
+ * MapStruct builder converting between action BO and VO.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface ActionBuilder {
 
+    /** Convert the value object into its business-object form. */
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "userId", ignore = true)
     ActionBO buildBOByVO(ActionVO entityVO);
 
+    /**
+     * Convert vo list to bo list.
+     *
+     * @param entityVOList entity view object list
+     * @return converted value
+     */
     List<ActionBO> buildBOListByVOList(List<ActionVO> entityVOList);
 
-    @Mapping(target = "status", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    ActionDO buildDOByBO(ActionBO entityBO);
-
-    @AfterMapping
-    default void afterProcess(ActionBO entityBO, @MappingTarget ActionDO entityDO) {
-        AgenticActionStatusEnum status = entityBO.getStatus();
-        Optional.ofNullable(status).ifPresent(value -> entityDO.setStatus(value.getIndex()));
-    }
-
-    List<ActionDO> buildDOListByBOList(List<ActionBO> entityBOList);
-
-    @Mapping(target = "status", ignore = true)
-    ActionBO buildBOByDO(ActionDO entityDO);
-
-    @AfterMapping
-    default void afterProcess(ActionDO entityDO, @MappingTarget ActionBO entityBO) {
-        Byte status = entityDO.getStatus();
-        entityBO.setStatus(AgenticActionStatusEnum.ofIndex(status));
-    }
-
-    List<ActionBO> buildBOListByDOList(List<ActionDO> entityDOList);
-
+    /** Convert the business object into its value-object form. */
     ActionVO buildVOByBO(ActionBO entityBO);
 
+    /**
+     * Convert bo list to vo list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<ActionVO> buildVOListByBOList(List<ActionBO> entityBOList);
-
-    default Page<ActionBO> buildBOPageByDOPage(Page<ActionDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    default Page<ActionVO> buildVOPageByBOPage(Page<ActionBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

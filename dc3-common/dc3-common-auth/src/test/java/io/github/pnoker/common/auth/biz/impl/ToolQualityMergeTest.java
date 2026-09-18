@@ -14,14 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.biz.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.tool.ToolQuality;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class ToolQualityMergeTest {
 
@@ -37,10 +36,18 @@ class ToolQualityMergeTest {
     @Test
     void appliesDeclaredQualityAndDerivesReadOnlyForGet() {
         McpToolRecord r = record("GET");
-        OAuthMcpRuntimeServiceImpl.applyQuality(r, ToolQuality.builder()
-                .summary("List Devices").description("List devices.")
-                .riskLevel("LOW").destructive(false).idempotent(true).openWorld(false).hidden(false)
-                .inputSchema("{\"type\":\"object\"}").build());
+        ReactiveOAuthMcpRuntimeServiceImpl.applyQuality(
+                r,
+                ToolQuality.builder()
+                        .summary("List Devices")
+                        .description("List devices.")
+                        .riskLevel("LOW")
+                        .destructive(false)
+                        .idempotent(true)
+                        .openWorld(false)
+                        .hidden(false)
+                        .inputSchema("{\"type\":\"object\"}")
+                        .build());
 
         assertThat(r.getRiskLevel()).isEqualTo("LOW");
         assertThat(r.getReadOnlyHint()).isEqualTo((byte) 1); // GET derived
@@ -56,10 +63,10 @@ class ToolQualityMergeTest {
     @Test
     void appliesConservativeDefaultsWhenQualityIsNull() {
         McpToolRecord r = record("POST");
-        OAuthMcpRuntimeServiceImpl.applyQuality(r, null);
+        ReactiveOAuthMcpRuntimeServiceImpl.applyQuality(r, null);
 
         assertThat(r.getRiskLevel()).isEqualTo("HIGH");
-        assertThat(r.getReadOnlyHint()).isEqualTo((byte) 0);   // POST
+        assertThat(r.getReadOnlyHint()).isEqualTo((byte) 0); // POST
         assertThat(r.getDestructiveHint()).isEqualTo((byte) 1);
         assertThat(r.getIdempotentHint()).isEqualTo((byte) 0);
         assertThat(r.getOpenWorldHint()).isEqualTo((byte) 1);
@@ -69,8 +76,8 @@ class ToolQualityMergeTest {
     @Test
     void hiddenDisablesTheCatalogRow() {
         McpToolRecord r = record("GET");
-        OAuthMcpRuntimeServiceImpl.applyQuality(r, ToolQuality.builder()
-                .riskLevel("LOW").hidden(true).build());
+        ReactiveOAuthMcpRuntimeServiceImpl.applyQuality(
+                r, ToolQuality.builder().riskLevel("LOW").hidden(true).build());
 
         assertThat(r.getEnableFlag()).isEqualTo((byte) 1); // hidden -> disabled
     }
@@ -78,23 +85,40 @@ class ToolQualityMergeTest {
     @Test
     void toolChangedDetectsHintOnlyEdit() {
         McpToolRecord existing = record("GET");
-        OAuthMcpRuntimeServiceImpl.applyQuality(existing, ToolQuality.builder()
-                .riskLevel("LOW").destructive(false).idempotent(true).openWorld(false).hidden(false).build());
+        ReactiveOAuthMcpRuntimeServiceImpl.applyQuality(
+                existing,
+                ToolQuality.builder()
+                        .riskLevel("LOW")
+                        .destructive(false)
+                        .idempotent(true)
+                        .openWorld(false)
+                        .hidden(false)
+                        .build());
         McpToolRecord candidate = record("GET");
-        OAuthMcpRuntimeServiceImpl.applyQuality(candidate, ToolQuality.builder()
-                .riskLevel("LOW").destructive(true).idempotent(true).openWorld(false).hidden(false).build());
+        ReactiveOAuthMcpRuntimeServiceImpl.applyQuality(
+                candidate,
+                ToolQuality.builder()
+                        .riskLevel("LOW")
+                        .destructive(true)
+                        .idempotent(true)
+                        .openWorld(false)
+                        .hidden(false)
+                        .build());
         // schemaHash/riskLevel/enableFlag/toolExt unchanged; only destructiveHint differs.
-        assertThat(OAuthMcpRuntimeServiceImpl.toolChanged(existing, candidate)).isTrue();
+        assertThat(ReactiveOAuthMcpRuntimeServiceImpl.toolChanged(existing, candidate))
+                .isTrue();
     }
 
     @Test
     void toolChangedIsFalseForIdenticalRecords() {
         McpToolRecord a = record("GET");
-        OAuthMcpRuntimeServiceImpl.applyQuality(a, ToolQuality.builder().riskLevel("LOW").build());
+        ReactiveOAuthMcpRuntimeServiceImpl.applyQuality(
+                a, ToolQuality.builder().riskLevel("LOW").build());
         a.setSchemaHash("h");
         McpToolRecord b = record("GET");
-        OAuthMcpRuntimeServiceImpl.applyQuality(b, ToolQuality.builder().riskLevel("LOW").build());
+        ReactiveOAuthMcpRuntimeServiceImpl.applyQuality(
+                b, ToolQuality.builder().riskLevel("LOW").build());
         b.setSchemaHash("h");
-        assertThat(OAuthMcpRuntimeServiceImpl.toolChanged(a, b)).isFalse();
+        assertThat(ReactiveOAuthMcpRuntimeServiceImpl.toolChanged(a, b)).isFalse();
     }
 }

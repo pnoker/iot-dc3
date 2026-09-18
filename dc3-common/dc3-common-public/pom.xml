@@ -78,16 +78,6 @@
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
 
-        <!-- Data Access Related -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-extension</artifactId>
-        </dependency>
-
         <!-- Serialization Related -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -149,7 +139,7 @@
             <artifactId>dc3-common-exception</artifactId>
         </dependency>
 
-        <!-- OpenAPI annotations (for @Schema on the shared R<T> response wrapper) -->
+        <!-- OpenAPI annotations for shared request and response models -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-common</artifactId>

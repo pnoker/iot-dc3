@@ -15,14 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {addLabel, deleteLabel, listLabel, updateLabel} from '@/api/label';
 import {ENTITY_TYPE_OPTIONS} from '@/config/constant/enums';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 import {nameRules, remarkRules} from '@/utils/formRuleUtil';
 
-export const createLabelConfig = (t: ComposerTranslation): EntityListConfig => ({
+export const createLabelConfig = (t: Translator): EntityListConfig => ({
   name: 'label',
   title: t('nav.settingsLabel'),
   editable: true,
@@ -83,6 +81,6 @@ export const createLabelConfig = (t: ComposerTranslation): EntityListConfig => (
   update: updateLabel,
   remove: deleteLabel,
   detail: {routeName: 'settingsLabelDetail'},
-  confirmDeleteText: t('settings.label.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityLabel')}),
   emptyText: t('settings.label.empty'),
 });

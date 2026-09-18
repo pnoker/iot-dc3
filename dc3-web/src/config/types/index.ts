@@ -15,7 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-export type {Login, Attribute, Dictionary, Order, PageQuery, PageResult} from './common';
+export type {
+  Login,
+  Attribute,
+  Dictionary,
+  Order,
+  SortSpec,
+  PageQuery,
+  CursorPageQuery,
+  PageResult,
+  CursorPageResult,
+} from './common';
 
 export type {
   AgenticModel,
@@ -24,6 +34,7 @@ export type {
   AgenticSession,
   AgenticSessionExt,
   AgenticMessage,
+  AgenticMessageContent,
   AgenticMessageContext,
   AgenticMessageTokens,
   AgenticMessageRole,
@@ -60,6 +71,14 @@ export type {
 export type {CommandRecord, CommandForm, CommandParamRecord, CommandParamForm, CommandHistoryRecord} from './command';
 export type {EventRecord, EventForm, EventParamRecord, EventParamForm, EventHistoryRecord} from './event';
 
+export type {EntityPagination} from './entityList';
+export type {
+  ResponsiveListCellKind,
+  ResponsiveListColumn,
+  ResponsiveListMobileRole,
+  ResponsiveListTagType,
+} from './responsiveList';
+
 export type {
   UserForm,
   UserRecord,
@@ -86,6 +105,7 @@ export type {
   OAuthClientRecord,
   McpConnectionForm,
   McpConnectionRecord,
+  McpMetadata,
   McpToolRecord,
   McpAuditRecord,
   IdentityAuditRecord,

@@ -15,8 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {listApi} from '@/api/api';
 import {listDeviceByIds} from '@/api/device';
 import {listDriverByIds} from '@/api/driver';
@@ -26,7 +24,7 @@ import {addResource, deleteResource, listResourceTree, updateResource} from '@/a
 import {RESOURCE_SCOPE_OPTIONS, RESOURCE_TYPE_OPTIONS} from '@/config/constant/enums';
 import {useMenuStore} from '@/store';
 import type {ApiRecord, DeviceRecord, DriverRecord, PointRecord, ProfileRecord} from '@/config/types';
-import type {EntityColumnContext, EntityListConfig} from '@/config/types/entityList';
+import type {EntityColumnContext, EntityListConfig, Translator} from '@/config/types/entityList';
 import {authNameRules, positiveIntegerRules, remarkRules, requiredSelectRule} from '@/utils/formRuleUtil';
 import {logger} from '@/utils/log';
 
@@ -107,8 +105,8 @@ const resolveEntityNames = async (records: Record<string, any>[]): Promise<Recor
     }
   }
 
-  const fill = (ids: string[], res: R<Record<string, EntityRecord>>, nameKey: keyof EntityRecord) => {
-    const data = res.data || {};
+  const fill = (ids: string[], res: Record<string, EntityRecord>, nameKey: keyof EntityRecord) => {
+    const data = res || {};
     ids.forEach((id) => {
       const item = data[id];
       const name = item?.[nameKey];
@@ -121,41 +119,41 @@ const resolveEntityNames = async (records: Record<string, any>[]): Promise<Recor
     promises.push(
       listDriverByIds(driverIds)
         .then((r) => fill(driverIds, r, 'driverName'))
-        .catch((e) => logger.debug('bulk name lookup failed', e))
+        .catch((e) => logger.debug('Bulk driver name lookup failed', e))
     );
   if (deviceIds.length)
     promises.push(
       listDeviceByIds(deviceIds)
         .then((r) => fill(deviceIds, r, 'deviceName'))
-        .catch((e) => logger.debug('bulk name lookup failed', e))
+        .catch((e) => logger.debug('Bulk device name lookup failed', e))
     );
   if (pointIds.length)
     promises.push(
       listPointByIds(pointIds)
         .then((r) => fill(pointIds, r, 'pointName'))
-        .catch((e) => logger.debug('bulk name lookup failed', e))
+        .catch((e) => logger.debug('Bulk point name lookup failed', e))
     );
   if (profileIds.length)
     promises.push(
       listProfileByIds(profileIds)
         .then((r) => fill(profileIds, r, 'profileName'))
-        .catch((e) => logger.debug('bulk name lookup failed', e))
+        .catch((e) => logger.debug('Bulk profile name lookup failed', e))
     );
   // APIs have no bulk-lookup endpoint; pull the whole list (capped at 1000,
   // already 10x the realistic API count on a single tenant) and resolve from
   // that map.
   if (apiIds.length)
     promises.push(
-      listApi({page: {size: 1000, current: 1}})
+      listApi({offset: 0, limit: 1000})
         .then((r) => {
-          const apiRecords = r.data?.records || [];
+          const apiRecords = r.items;
           const byId = new Map(apiRecords.map((a) => [String(a.id), a.apiName]));
           apiIds.forEach((id) => {
             const name = byId.get(id);
             if (name) map[id] = name;
           });
         })
-        .catch((e) => logger.debug('bulk name lookup failed', e))
+        .catch((e) => logger.debug('Bulk API name lookup failed', e))
     );
   // Menus are already cached in the pinia store for the top-nav; reuse the
   // cached tree instead of hitting the network again.
@@ -190,7 +188,7 @@ const flattenTree = (nodes: any[]): any[] => {
 // one disabled group node per resource type with that type's resources nested
 // underneath. Cross-type parent/child links in the source tree are dropped: a
 // node parented to a different type becomes a root inside its own type group.
-const buildParentTreeOptions = (t: ComposerTranslation, treeData: any[]) => {
+const buildParentTreeOptions = (t: Translator, treeData: any[]) => {
   const flat = flattenTree(treeData || []);
   const buckets: Record<string, any[]> = {};
   for (const n of flat) {
@@ -237,7 +235,7 @@ interface ResourceHandlers {
   onEntityClick: (row: Record<string, any>) => void;
 }
 
-export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceHandlers): EntityListConfig => ({
+export const createResourceConfig = (t: Translator, handlers: ResourceHandlers): EntityListConfig => ({
   name: 'resource',
   title: t('nav.settingsResource'),
   mode: 'tree',
@@ -276,11 +274,11 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
     {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true},
   ],
   columns: [
-    {prop: 'resourceName', label: t('settings.resource.resourceName'), minWidth: 220},
-    {prop: 'resourceCode', label: t('settings.resource.resourceCode'), kind: 'code', minWidth: 180},
-    {prop: 'serviceName', label: t('settings.resource.serviceName'), minWidth: 160},
-    {prop: 'resourceTypeFlag', label: t('settings.resource.resourceType'), minWidth: 120},
-    {prop: 'resourceScopeFlag', label: t('settings.resource.resourceScope'), minWidth: 100},
+    {prop: 'resourceName', label: t('settings.resource.resourceName'), minWidth: 220, mobile: 'primary'},
+    {prop: 'resourceCode', label: t('settings.resource.resourceCode'), kind: 'code', minWidth: 180, mobile: 'detail'},
+    {prop: 'serviceName', label: t('settings.resource.serviceName'), minWidth: 160, mobile: 'detail'},
+    {prop: 'resourceTypeFlag', label: t('settings.resource.resourceType'), minWidth: 120, mobile: 'detail'},
+    {prop: 'resourceScopeFlag', label: t('settings.resource.resourceScope'), minWidth: 100, mobile: 'detail'},
     {
       prop: 'entityId',
       label: t('settings.resource.entity'),
@@ -289,10 +287,11 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
       formatter: (row, ctx) => formatEntityId(row, ctx),
       linkable: (row) => isEntityLinkable(row),
       onClick: handlers.onEntityClick,
+      mobile: 'detail',
     },
-    {prop: 'remark', label: t('common.remark'), minWidth: 140},
-    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90},
-    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165},
+    {prop: 'remark', label: t('common.remark'), minWidth: 140, mobile: 'hidden'},
+    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90, mobile: 'detail'},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165, mobile: 'hidden'},
   ],
   relations: [
     {
@@ -313,7 +312,7 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
       required: true,
       placeholder: t('settings.resource.parentResourceIdPlaceholder'),
       tree: {
-        load: () => listResourceTree({}).then((res) => res.data || []),
+        load: () => listResourceTree({}).then((res) => res || []),
         transform: (rows) => buildParentTreeOptions(t, rows),
         props: {label: 'resourceName', children: 'children', disabled: 'disabled'},
         nodeKey: 'id',
@@ -340,15 +339,7 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
       kind: 'select',
       required: true,
       placeholder: t('settings.resource.resourceTypePlaceholder'),
-      options: [
-        {label: 'DRIVER', value: 'DRIVER'},
-        {label: 'PROFILE', value: 'PROFILE'},
-        {label: 'POINT', value: 'POINT'},
-        {label: 'DEVICE', value: 'DEVICE'},
-        {label: 'DATA', value: 'DATA'},
-        {label: 'MENU', value: 'MENU'},
-        {label: 'API', value: 'API'},
-      ],
+      options: RESOURCE_TYPE_OPTIONS,
       rules: requiredSelectRule(t('settings.resource.resourceTypePlaceholder')),
     },
     {
@@ -385,6 +376,6 @@ export const createResourceConfig = (t: ComposerTranslation, handlers: ResourceH
   update: updateResource as EntityListConfig['update'],
   remove: deleteResource,
   detail: {routeName: 'settingsResourceDetail'},
-  confirmDeleteText: t('settings.resource.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityResource')}),
   emptyText: t('settings.resource.empty'),
 });

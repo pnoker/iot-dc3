@@ -14,32 +14,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
+import java.net.InetSocketAddress;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpCookie;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-
-import java.net.InetSocketAddress;
-import java.util.Objects;
 
 /**
  * Utility class for handling HTTP request operations. Provides methods to extract
  * information from ServerHttpRequest objects such as IP addresses, headers and cookies.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
 public class RequestUtil {
 
     private static final String[] PROXY_IP_HEADERS = {
-            "X-Original-Forwarded-For", "X-Forwarded-For", "X-Real-IP",
-            "Proxy-Client-IP", "WL-Proxy-Client-IP", "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"
+        "X-Original-Forwarded-For",
+        "X-Forwarded-For",
+        "X-Real-IP",
+        "Proxy-Client-IP",
+        "WL-Proxy-Client-IP",
+        "HTTP_CLIENT_IP",
+        "HTTP_X_FORWARDED_FOR"
     };
     private static final String UNKNOWN_IP = "unknown";
     private static final String COMMA = ",";
@@ -117,5 +119,4 @@ public class RequestUtil {
         HttpCookie cookie = request.getCookies().getFirst(key);
         return Objects.isNull(cookie) ? StringUtils.EMPTY : cookie.getValue();
     }
-
 }

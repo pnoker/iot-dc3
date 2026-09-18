@@ -14,46 +14,55 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Principal source classification.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
 @AllArgsConstructor
 public enum PrincipalSourceTypeEnum {
 
+    /**
+     * Local identity.
+     */
     LOCAL("LOCAL", "local", "Local identity"),
 
+    /**
+     * External identity provider.
+     */
     EXTERNAL("EXTERNAL", "external", "External identity provider"),
 
+    /**
+     * System identity.
+     */
     SYSTEM("SYSTEM", "system", "System identity"),
     ;
 
-    @EnumValue
     private final String value;
 
     private final String code;
 
     private final String remark;
 
+    /**
+     * Resolve a principal source from its persisted wire value.
+     *
+     * @param value persisted source value
+     * @return matching source, or {@code null} when the value is unknown
+     */
     public static PrincipalSourceTypeEnum ofValue(String value) {
         Optional<PrincipalSourceTypeEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))
                 .findFirst();
         return any.orElse(null);
     }
-
 }

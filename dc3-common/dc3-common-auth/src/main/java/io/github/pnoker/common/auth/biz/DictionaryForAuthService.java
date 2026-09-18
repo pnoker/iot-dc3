@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.biz;
 
-import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
-
+import io.github.pnoker.common.entity.option.DictionaryOption;
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * Dictionary lookup service for the auth module.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DictionaryForAuthService {
@@ -35,6 +33,5 @@ public interface DictionaryForAuthService {
      *
      * @return Dictionary Array
      */
-    List<DictionaryBO> tenantDictionary();
-
+    Mono<List<DictionaryOption>> listTenantOptions();
 }

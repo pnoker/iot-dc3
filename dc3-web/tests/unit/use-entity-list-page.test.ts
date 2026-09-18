@@ -129,12 +129,12 @@ describe('useEntityListPage', () => {
     await Promise.resolve();
 
     const lastCall = (config.list as ReturnType<typeof vi.fn>).mock.lastCall?.[0] as Record<string, unknown>;
-    expect(lastCall).toHaveProperty('page');
-    expect((lastCall.page as Record<string, unknown>).current).toBe(1);
+    expect(lastCall).toMatchObject({offset: 0, limit: 12});
+    expect(lastCall.sort).toBeInstanceOf(Array);
   });
 
   it('parses json field to object and coerces number field in payload when submitting', async () => {
-    const addFn = vi.fn().mockResolvedValue({ok: true, code: 'ok', message: 'ok', data: null});
+    const addFn = vi.fn().mockResolvedValue(null);
     const config = makeEntityListConfig();
     // Add a number field alongside the existing json 'extra' field
     config.fields = [...config.fields, {prop: 'count', label: 'Count', kind: 'number'}];
@@ -168,6 +168,79 @@ describe('useEntityListPage', () => {
     expect(called['count']).toBe(42);
   });
 
+  it('restores the initial edit values when resetting the form', () => {
+    const config = makeEntityListConfig();
+    const {formModel, openEdit, resetForm} = useEntityListPage(config);
+
+    openEdit({...ENTITY_LIST_ROWS[0], name: 'Original'});
+    formModel['name'] = 'Changed';
+    resetForm();
+
+    expect(formModel['name']).toBe('Original');
+  });
+
+  it('keeps the dialog draft open and exposes an error after save fails', async () => {
+    const config = makeEntityListConfig();
+    config.add = vi.fn().mockRejectedValue(new Error('save failed'));
+    const {formModel, formVisible, openAdd, setFormRef, state, submit} = useEntityListPage(config);
+    setFormRef({
+      validate: () => Promise.resolve(true),
+      clearValidate: () => undefined,
+    });
+
+    openAdd();
+    formModel['name'] = 'Draft';
+    await submit();
+
+    expect(formVisible.value).toBe(true);
+    expect(formModel['name']).toBe('Draft');
+    expect(state.saveError).toBeInstanceOf(Error);
+    expect(state.saving).toBe(false);
+  });
+
+  it('ignores repeated submit attempts while a save is pending', async () => {
+    let resolveSave!: () => void;
+    const config = makeEntityListConfig();
+    config.add = vi.fn(() => new Promise<void>((resolve) => (resolveSave = resolve)));
+    const {openAdd, setFormRef, submit} = useEntityListPage(config);
+    setFormRef({
+      validate: () => Promise.resolve(true),
+      clearValidate: () => undefined,
+    });
+
+    openAdd();
+    const first = submit();
+    await vi.waitFor(() => expect(config.add).toHaveBeenCalledOnce());
+    const second = submit();
+    resolveSave();
+    await Promise.all([first, second]);
+
+    expect(config.add).toHaveBeenCalledOnce();
+  });
+
+  it('does not let an old save response close a newer form session', async () => {
+    let resolveSave!: () => void;
+    const config = makeEntityListConfig();
+    config.add = vi.fn(() => new Promise<void>((resolve) => (resolveSave = resolve)));
+    const {formModel, formVisible, openAdd, setFormRef, submit} = useEntityListPage(config);
+    setFormRef({
+      validate: () => Promise.resolve(true),
+      clearValidate: () => undefined,
+    });
+
+    openAdd();
+    formModel['name'] = 'First draft';
+    const pending = submit();
+    await vi.waitFor(() => expect(config.add).toHaveBeenCalledOnce());
+    openAdd();
+    formModel['name'] = 'Second draft';
+    resolveSave();
+    await pending;
+
+    expect(formVisible.value).toBe(true);
+    expect(formModel['name']).toBe('Second draft');
+  });
+
   it('resets state.page.current to 1 on search', async () => {
     const config = makeEntityListConfig();
     const {state, currentChange, search} = useEntityListPage(config);
@@ -198,5 +271,29 @@ describe('useEntityListPage', () => {
 
     expect((config.list as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(callsBefore);
     expect(state.page.orders[0].asc).toBe(true);
+  });
+
+  it('keeps the newest response when list requests resolve out of order', async () => {
+    let resolveFirst!: (value: unknown) => void;
+    let resolveSecond!: (value: unknown) => void;
+    const config = makeEntityListConfig();
+    (config.list as ReturnType<typeof vi.fn>)
+      .mockReset()
+      .mockResolvedValueOnce({items: [], offset: 0, limit: 12, total: 0, hasNext: false})
+      .mockReturnValueOnce(new Promise((resolve) => (resolveFirst = resolve)))
+      .mockReturnValueOnce(new Promise((resolve) => (resolveSecond = resolve)));
+    const {state, load} = useEntityListPage(config);
+
+    const first = load();
+    const second = load();
+    resolveFirst({items: [ENTITY_LIST_ROWS[0]], offset: 0, limit: 12, total: 1, hasNext: false});
+    resolveSecond({items: [ENTITY_LIST_ROWS[1]], offset: 0, limit: 12, total: 1, hasNext: false});
+    await Promise.all([first, second]);
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(state.rows).toEqual([ENTITY_LIST_ROWS[1]]);
+    expect(state.loading).toBe(false);
   });
 });

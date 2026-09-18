@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.grpc.builder;
 
 import io.github.pnoker.api.common.GrpcBase;
@@ -28,21 +27,21 @@ import io.github.pnoker.common.optional.JsonOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.Optional;
-
 /**
  * MapStruct builder for point attribute gRPC message conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcPointAttributeBuilder {
 
     /**
@@ -64,6 +63,12 @@ public interface GrpcPointAttributeBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     PointAttributeBO buildBOByGrpcDTO(GrpcPointAttributeDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityBO   business object
+     */
     @AfterMapping
     default void afterProcess(GrpcPointAttributeDTO entityGrpc, @MappingTarget PointAttributeBO entityBO) {
         GrpcBuilderUtil.buildBaseBOByGrpcBase(entityGrpc.getBase(), entityBO);
@@ -99,6 +104,12 @@ public interface GrpcPointAttributeBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcPointAttributeDTO buildGrpcDTOByBO(PointAttributeBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO   business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(PointAttributeBO entityBO, @MappingTarget GrpcPointAttributeDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
@@ -107,11 +118,12 @@ public interface GrpcPointAttributeBuilder {
         Optional.ofNullable(entityBO.getAttributeExt())
                 .ifPresent(value -> entityGrpc.setAttributeExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityBO.getAttributeTypeFlag())
-                .ifPresentOrElse(value -> entityGrpc.setAttributeTypeFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setAttributeTypeFlag(value.getIndex()),
                         () -> entityGrpc.setAttributeTypeFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(entityBO.getEnableFlag())
-                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setEnableFlag(value.getIndex()),
                         () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
     }
-
 }

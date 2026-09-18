@@ -16,25 +16,26 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ToolContext;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class SystemAndContextToolTest {
@@ -44,7 +45,8 @@ class SystemAndContextToolTest {
 
     @Test
     void tenantToolReturnsOnlyBackendTenantContext() {
-        AgenticToolResult<TenantTool.CurrentTenantContext> result = new TenantTool().getCurrentTenantInfo(toolContext());
+        AgenticToolResult<TenantTool.CurrentTenantContext> result =
+                new TenantTool().getCurrentTenantInfo(toolContext());
 
         assertThat(result.success()).isTrue();
         assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
@@ -79,24 +81,27 @@ class SystemAndContextToolTest {
                 Map.of("postgres", "UP"),
                 new FacadeSystemHealthBO.FleetSummary(4, 3),
                 new FacadeSystemHealthBO.FleetSummary(120, 117));
-        when(statusHealthFacade.systemHealth(11L)).thenReturn(health);
+        when(statusHealthFacade.systemHealthReactive(11L)).thenReturn(Mono.just(health));
 
-        AgenticToolResult<FacadeSystemHealthBO> result = new SystemTool(Optional.of(statusHealthFacade))
-                .getSystemHealth(toolContext());
-
-        assertThat(result.success()).isTrue();
-        assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
-        assertThat(result.data().getDrivers().getTotal()).isEqualTo(4);
-        assertThat(result.data().getDevices().getOnline()).isEqualTo(117);
+        StepVerifier.create(new SystemTool(Optional.of(statusHealthFacade)).getSystemHealth(toolContext()))
+                .assertNext(result -> {
+                    assertThat(result.success()).isTrue();
+                    assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
+                    assertThat(result.data().getDrivers().getTotal()).isEqualTo(4);
+                    assertThat(result.data().getDevices().getOnline()).isEqualTo(117);
+                })
+                .verifyComplete();
     }
 
     @Test
     void systemHealthDoesNotFabricateWhenFacadeIsUnavailable() {
-        AgenticToolResult<FacadeSystemHealthBO> result = new SystemTool(Optional.empty()).getSystemHealth(toolContext());
-
-        assertThat(result.success()).isFalse();
-        assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_UNAVAILABLE);
-        assertThat(result.data()).isNull();
+        StepVerifier.create(new SystemTool(Optional.empty()).getSystemHealth(toolContext()))
+                .assertNext(result -> {
+                    assertThat(result.success()).isFalse();
+                    assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_UNAVAILABLE);
+                    assertThat(result.data()).isNull();
+                })
+                .verifyComplete();
     }
 
     private ToolContext toolContext() {
@@ -110,8 +115,7 @@ class SystemAndContextToolTest {
         values.put(AgenticConstant.ToolContextKey.TENANT_ID, 11L);
         values.put(AgenticConstant.ToolContextKey.USER_ID, 22L);
         values.put(AgenticConstant.ToolContextKey.USER_HEADER, header);
-        values.put(AgenticConstant.ToolContextKey.CONVERSATION_ID, "11:22:conv-1");
+        values.put(AgenticConstant.ToolContextKey.CONVERSATION_ID, "conv-1");
         return new ToolContext(values);
     }
-
 }

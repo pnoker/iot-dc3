@@ -29,7 +29,6 @@ import org.springframework.validation.annotation.Validated;
  * Prefix: {@code dc3.agentic}
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -92,5 +91,4 @@ public class AgenticProperties {
      * are stored under tenant/user/conversation subfolders.
      */
     private String attachmentStoragePath = "dc3/data/upload/agentic/attachment";
-
 }

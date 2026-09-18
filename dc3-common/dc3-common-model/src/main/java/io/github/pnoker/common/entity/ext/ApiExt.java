@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,7 +28,6 @@ import lombok.Setter;
  * Extended information related to API interfaces.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Schema(description = "JSON extension object for API interface configuration")
@@ -44,9 +42,14 @@ public class ApiExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Extended content of the API interface; discriminated by Type and Version of the parent extension")
+    @Schema(
+            description =
+                    "Extended content of the API interface; discriminated by Type and Version of the parent extension")
     private Content content;
 
+    /**
+     * Human-facing API metadata (title, doc URL, remark) rendered in the tool catalog and OpenAPI quality merge.
+     */
     @Schema(description = "Extended content of the API interface")
     @Getter
     @Setter
@@ -63,15 +66,17 @@ public class ApiExt extends BaseExt {
         /**
          * URL link.
          */
-        @Schema(description = "URL link of the API interface; must be a valid HTTP(S) endpoint", example = "https://example.com/api/device/temperature")
+        @Schema(
+                description = "URL link of the API interface; must be a valid HTTP(S) endpoint",
+                example = "https://example.com/api/device/temperature")
         private String url;
 
         /**
          * Description.
          */
-        @Schema(description = "Free-form description remark of the API interface", example = "Returns the latest temperature reading for a device")
+        @Schema(
+                description = "Free-form description remark of the API interface",
+                example = "Returns the latest temperature reading for a device")
         private String remark;
-
     }
-
 }

@@ -16,119 +16,82 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
-import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.facade.api.DriverFacade;
-import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.ai.chat.model.ToolContext;
-
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.ai.chat.model.ToolContext;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class DriverToolTest {
-
     @Mock
     private DriverFacade driverFacade;
 
-    @Mock
-    private StatusHealthFacade statusHealthFacade;
-
-    private RequestHeader.PrincipalHeader header;
-
-    @BeforeEach
-    void setUp() {
-        header = new RequestHeader.PrincipalHeader();
-        header.setTenantId(11L);
-        header.setPrincipalId(22L);
+    @Test
+    void reactiveSearchUsesCanonicalOffset() {
+        FacadeDriverBO driver = driver(101L, "Virtual");
+        when(driverFacade.listReactive(org.mockito.ArgumentMatchers.any()))
+                .thenReturn(Mono.just(OffsetPage.of(List.of(driver), 10, 5, 11)));
+        DriverTool tool = new DriverTool(driverFacade);
+        StepVerifier.create(tool.searchDriversReactive("Virtual", 10, 5, context()))
+                .assertNext(result -> assertThat(result.data().items()).containsExactly(driver))
+                .verifyComplete();
+        org.mockito.Mockito.verify(driverFacade)
+                .listReactive(org.mockito.ArgumentMatchers.argThat(
+                        query -> query.tenantId().equals(11L) && query.offset() == 10));
     }
 
     @Test
-    void searchDriversUsesTenantScopedQueryAndReturnsStructuredPage() {
-        DriverTool tool = new DriverTool(driverFacade, Optional.of(statusHealthFacade));
-        FacadeDriverBO driver = driver(101L, "Virtual - Edge Acceptance Lab");
-        FacadePage<FacadeDriverBO> page = new FacadePage<>(1L, 10L, 1L, 1L, List.of(driver));
-        when(driverFacade.listByPage(org.mockito.ArgumentMatchers.any(FacadeDriverQuery.class))).thenReturn(page);
-
-        AgenticToolResult<FacadePage<FacadeDriverBO>> result = tool.searchDrivers(
-                "Virtual - Edge Acceptance Lab", 1, 10, toolContext());
-
-        assertThat(result.success()).isTrue();
-        assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_OK);
-        assertThat(result.message()).isEqualTo("Driver page loaded");
-        assertThat(result.data().getRecords()).extracting(FacadeDriverBO::getDriverName)
-                .containsExactly("Virtual - Edge Acceptance Lab");
-
-        ArgumentCaptor<FacadeDriverQuery> captor = forClass(FacadeDriverQuery.class);
-        verify(driverFacade).listByPage(captor.capture());
-        assertThat(captor.getValue().getTenantId()).isEqualTo(11L);
-        assertThat(captor.getValue().getDriverName()).isEqualTo("Virtual - Edge Acceptance Lab");
-        assertThat(captor.getValue().getPage().getCurrent()).isEqualTo(1L);
-        assertThat(captor.getValue().getPage().getSize()).isEqualTo(10L);
+    void reactiveLookupNormalizesBatchIds() {
+        when(driverFacade.listByIdsReactive(11L, List.of(101L, 102L)))
+                .thenReturn(Flux.just(driver(101L, "A"), driver(102L, "B")));
+        DriverTool tool = new DriverTool(driverFacade);
+        StepVerifier.create(tool.lookupDriversByIdsReactive(Arrays.asList(null, 101L, -1L, 101L, 102L), context()))
+                .assertNext(result -> assertThat(result.data()).hasSize(2))
+                .verifyComplete();
     }
 
     @Test
-    void getDriverStatusesReturnsUnavailableWhenStatusFacadeIsAbsent() {
-        DriverTool tool = new DriverTool(driverFacade, Optional.empty());
-
-        AgenticToolResult<Map<Long, String>> result = tool.getDriverStatusesByIds(List.of(101L), toolContext());
-
-        assertThat(result.success()).isFalse();
-        assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_UNAVAILABLE);
-        assertThat(result.data()).isNull();
+    void reactiveLookupRejectsInvalidId() {
+        DriverTool tool = new DriverTool(driverFacade);
+        StepVerifier.create(tool.lookupDriverByIdReactive(0L, context()))
+                .assertNext(
+                        result -> assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_INVALID_ARGUMENT))
+                .verifyComplete();
+        org.mockito.Mockito.verifyNoInteractions(driverFacade);
     }
 
-    @Test
-    void lookupDriverByIdReturnsNotFoundWithoutFabricatingData() {
-        DriverTool tool = new DriverTool(driverFacade, Optional.of(statusHealthFacade));
-        when(driverFacade.getById(11L, 404L)).thenReturn(null);
-
-        AgenticToolResult<FacadeDriverBO> result = tool.lookupDriverById(404L, toolContext());
-
-        assertThat(result.success()).isFalse();
-        assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_NOT_FOUND);
-        assertThat(result.data()).isNull();
-    }
-
-    private FacadeDriverBO driver(Long id, String name) {
+    private static FacadeDriverBO driver(Long id, String name) {
         FacadeDriverBO driver = new FacadeDriverBO();
         driver.setId(id);
         driver.setDriverName(name);
-        driver.setDriverCode("virtual-edge-acceptance-lab");
-        driver.setServiceName("dc3-driver-virtual");
-        driver.setServiceHost("dc3-driver-virtual.iot.svc");
+        driver.setDriverCode(name.toLowerCase());
         driver.setDriverTypeFlag(DriverTypeEnum.DRIVER_CLIENT);
         driver.setEnableFlag(EnableFlagEnum.ENABLE);
         driver.setTenantId(11L);
         return driver;
     }
 
-    private ToolContext toolContext() {
+    private static ToolContext context() {
         Map<String, Object> values = new HashMap<>();
-        values.put(AgenticConstant.ToolContextKey.TENANT_ID, header.getTenantId());
-        values.put(AgenticConstant.ToolContextKey.USER_ID, header.getUserId());
-        values.put(AgenticConstant.ToolContextKey.USER_HEADER, header);
-        values.put(AgenticConstant.ToolContextKey.CONVERSATION_ID, "11:22:conv-1");
+        values.put(AgenticConstant.ToolContextKey.TENANT_ID, 11L);
+        values.put(AgenticConstant.ToolContextKey.USER_ID, 22L);
         return new ToolContext(values);
     }
-
 }

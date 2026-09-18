@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import java.lang.reflect.RecordComponent;
@@ -25,13 +24,11 @@ import java.util.Map;
  * Ordered runtime value map helper used at the rule-engine boundary.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 final class RuleValueMap {
 
-    private RuleValueMap() {
-    }
+    private RuleValueMap() {}
 
     static Map<String, Object> from(Record snapshot) {
         Map<String, Object> values = new LinkedHashMap<>();
@@ -49,5 +46,4 @@ final class RuleValueMap {
             throw new IllegalStateException("Failed to read rule snapshot field: " + component.getName(), e);
         }
     }
-
 }

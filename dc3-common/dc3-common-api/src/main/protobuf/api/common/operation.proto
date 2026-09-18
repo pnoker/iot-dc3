@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package api.common;
+
+option java_package = "io.github.pnoker.api.common";
+option java_outer_classname = "OperationProto";
+option java_multiple_files = true;
+
+message OperationAccepted {
+  string operation_id = 1;
+  string status_uri = 2;
+}
+
+enum OperationStatus {
+  OPERATION_STATUS_UNSPECIFIED = 0;
+  OPERATION_STATUS_PENDING = 1;
+  OPERATION_STATUS_RUNNING = 2;
+  OPERATION_STATUS_SUCCEEDED = 3;
+  OPERATION_STATUS_FAILED = 4;
+  OPERATION_STATUS_CANCELLED = 5;
+  OPERATION_STATUS_EXPIRED = 6;
+}

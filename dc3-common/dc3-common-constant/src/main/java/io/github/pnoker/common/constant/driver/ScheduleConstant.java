@@ -14,17 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.driver;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
-
 
 /**
  * Constants for scheduled job intervals and cron expressions.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class ScheduleConstant {
@@ -60,6 +57,11 @@ public class ScheduleConstant {
     public static final String BUFFER_REPUBLISH_SCHEDULE_JOB = "buffer-republish-schedule-job";
 
     /**
+     * Driver runtime lease renewal job.
+     */
+    public static final String DRIVER_LEASE_RENEW_SCHEDULE_JOB = "driver-lease-renew-schedule-job";
+
+    /**
      * Driver health schedule cron
      */
     public static final String DRIVER_HEALTH_SCHEDULE_CRON = "0/15 * * * * ?";
@@ -77,5 +79,4 @@ public class ScheduleConstant {
     private ScheduleConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
-
 }

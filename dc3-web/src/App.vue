@@ -16,7 +16,7 @@
   -->
 
 <template>
-  <el-config-provider :locale="elementLocale">
+  <el-config-provider :locale="elementLocale" :size="appStore.componentSize">
     <div id="app">
       <router-view/>
     </div>
@@ -29,7 +29,10 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import en from 'element-plus/es/locale/lang/en';
 import {useI18n} from 'vue-i18n';
 
+import {useAppStore} from '@/store';
+
 const {locale} = useI18n();
+const appStore = useAppStore();
 
 const elementLocale = computed(() => {
   return locale.value === 'zh' ? zhCn : en;
@@ -40,9 +43,8 @@ const elementLocale = computed(() => {
 #app {
   width: 100%;
   height: 100%;
-  // Don't clip horizontally — body has min-width: 1280px in global.scss,
-  // so when the viewport narrows we want a page-level scroll bar that
-  // carries the header + body together instead of hiding the right edge.
+  // No min-width here: the shell adapts to any viewport
+  // (docs/design/frontend-three-terminal-ux.md, A2).
 }
 
 #nprogress .bar {

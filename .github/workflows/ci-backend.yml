@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
       - name: Set up JDK 21
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
@@ -37,7 +37,34 @@ jobs:
       - name: Audit controller permissions
         run: python3 dc3/bin/audit_controller_permissions.py
 
+      - name: Validate PostgreSQL initialization schema
+        run: python3 dc3/bin/check_postgres_init.py
+
+      - name: Validate R2DBC migration gate
+        run: python3 dc3/bin/check_r2dbc_migration.py
+
+      - name: Validate schema fingerprint distribution
+        run: python3 dc3/bin/schema_fingerprint.py --check
+
+      - name: Validate repository documentation
+        run: python3 dc3/bin/check_documentation.py
+
+      - name: Validate Java formatting and copyright headers
+        run: mvn -B -DskipTests initialize spotless:check --no-transfer-progress
+
+      - name: Validate Java naming and Javadoc structure
+        run: mvn -B -DskipTests checkstyle:check --no-transfer-progress
+
       - name: Compile
         run: |
           set -euo pipefail
           mvn -U -e -B -DskipTests compile --no-transfer-progress
+
+      - name: Validate Javadoc
+        run: |
+          set -euo pipefail
+          mvn -B -DskipTests -Dspotless.check.skip=true -Dcheckstyle.skip=true \
+            -pl dc3-common/dc3-common-public -am install --no-transfer-progress
+          mvn -B -DskipTests -Ddoclint=all -Dmaven.javadoc.failOnWarnings=true \
+            -pl dc3-common/dc3-common-constant,dc3-common/dc3-common-public \
+            javadoc:javadoc --no-transfer-progress

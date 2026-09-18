@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.e2e;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Tag("e2e")
 class E2eEnvironmentGuardIT {
@@ -31,5 +30,4 @@ class E2eEnvironmentGuardIT {
                 .as("Set DC3_E2E=true when running -Pe2e so the gated E2E classes execute")
                 .matches("(?i)true|1|yes|on");
     }
-
 }

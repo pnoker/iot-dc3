@@ -91,7 +91,6 @@ dc3:
         remark: HTTP method for command
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/http/buffer.db
 
 spring:

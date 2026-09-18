@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
 
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +71,6 @@ public class ServerStateOperation implements Runnable {
                 this._lock.notify();
             }
         }
-
     }
 
     /**
@@ -106,5 +104,4 @@ public class ServerStateOperation implements Runnable {
 
         return this._serverStatus;
     }
-
 }

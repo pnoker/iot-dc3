@@ -3,21 +3,20 @@
 ## Overview
 
 `dc3-gateway` is the API Gateway of the IoT DC3 platform, built on Spring Cloud Gateway (WebFlux). It serves as the
-single ingress point for all external HTTP traffic, providing
-rate limiting, authentication verification, service routing, and reverse proxying.
+single ingress point for all external HTTP traffic, providing rate limiting, authentication verification, service
+routing, and reverse proxying.
 
 ## Module Information
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-gateway
-- **Version**: 2026.5.22
 - **Package**: `io.github.pnoker.gateway`
 
 ## Service Ports
 
-| Protocol | Port   |
-|----------|--------|
-| HTTP     | `8000` |
+| Protocol | Port   | Override           |
+|----------|--------|--------------------|
+| HTTP     | `8000` | `DC3_GATEWAY_PORT` |
 
 ## Key Responsibilities
 
@@ -31,8 +30,8 @@ rate limiting, authentication verification, service routing, and reverse proxyin
 
 ## Routing Rules
 
-Routes are matched in definition order (first match wins); the public token and OAuth
-metadata routes are deliberately defined before the `/api/v3/auth/**` wildcard.
+Routes are matched in definition order (first match wins); the public token and OAuth metadata routes are deliberately
+defined before the `/api/v3/auth/**` wildcard.
 
 | Path Pattern                                                                                                     | Backend Service      | Auth Required |
 |------------------------------------------------------------------------------------------------------------------|----------------------|---------------|
@@ -44,8 +43,8 @@ metadata routes are deliberately defined before the `/api/v3/auth/**` wildcard.
 | `/api/v3/data/**`                                                                                                | `dc3-center-data`    | Yes           |
 | `/api/v3/agentic/**`                                                                                             | `dc3-center-agentic` | Yes           |
 
-The `/oauth2/**` and `/.well-known/**` routes expose the Auth Center's OAuth2
-authorization-server and MCP discovery endpoints for MCP clients.
+The `/oauth2/**` and `/.well-known/**` routes expose the Auth Center's OAuth2 authorization-server and MCP discovery
+endpoints for MCP clients.
 
 ## Dependencies
 
@@ -73,19 +72,27 @@ Route definitions and the auth gRPC channel are shared in `dc3-common-gateway`'s
 ### 1. Start Infrastructure
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
+make up-db
 ```
 
 ### 2. Build
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-gateway -am package
 ```
 
-### 3. Run (start first before any center service)
+### 3. Run after the required center services are available
 
 ```bash
 java -jar dc3-gateway/target/dc3-gateway.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-gateway -am test
 ```
 
 ## Related Modules
@@ -93,10 +100,3 @@ java -jar dc3-gateway/target/dc3-gateway.jar
 - `dc3-common-gateway` — `Authentic` filter implementation and gateway utilities
 - `dc3-api-auth` — gRPC API contracts for token validation
 - `dc3-center-auth` — Token validation backend
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)
-

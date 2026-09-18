@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.builder;
 
 import io.github.pnoker.api.common.GrpcDriverAttributeConfigDTO;
@@ -32,12 +31,19 @@ import org.mapstruct.MappingTarget;
  * responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcDriverAttributeConfigBuilder {
 
+    /**
+     * Convert grpc transfer object to dto.
+     *
+     * @param entityGrpc entity grpc
+     * @return converted value
+     */
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "remark", ignore = true)
     @Mapping(target = "creatorId", ignore = true)
@@ -49,12 +55,17 @@ public interface GrpcDriverAttributeConfigBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     DriverAttributeConfigDTO buildDTOByGrpcDTO(GrpcDriverAttributeConfigDTO entityGrpc);
 
+    /**
+     * After process.
+     *
+     * @param entityGrpc entity grpc
+     * @param entityDTO  transfer object
+     */
     @AfterMapping
-    default void afterProcess(GrpcDriverAttributeConfigDTO entityGrpc,
-                              @MappingTarget DriverAttributeConfigDTO entityDTO) {
+    default void afterProcess(
+            GrpcDriverAttributeConfigDTO entityGrpc, @MappingTarget DriverAttributeConfigDTO entityDTO) {
         GrpcBuilderUtil.buildBaseDTOByGrpcBase(entityGrpc.getBase(), entityDTO);
 
         EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityDTO::setEnableFlag);
     }
-
 }

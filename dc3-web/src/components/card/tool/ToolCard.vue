@@ -53,22 +53,30 @@
         </div>
         <div class="tool-card-footer-page">
           <el-pagination
-            v-if="!hidePagination"
+            v-if="!hidePagination && !cursorMode"
             :current-page="+page.current"
+            :layout="paginationLayout"
             :page-size="+page.size"
             :page-sizes="pageSizes"
+            :pager-count="isMobile ? 5 : 7"
+            size="default"
             :total="+page.total"
             background
-            layout="total, prev, pager, next, sizes"
             @size-change="onSizeChange"
             @current-change="onCurrentChange"
           />
+          <template v-else-if="cursorMode">
+            <el-button :disabled="!cursorPrevious" @click="emit('cursor-previous')">{{ t('common.previous') }}</el-button>
+            <el-button :disabled="!cursorNext" type="primary" @click="emit('cursor-next')">{{ t('common.next') }}</el-button>
+          </template>
           <span aria-hidden="true" class="tool-card-footer-divider"/>
+          <!-- Icon-only buttons need explicit accessible names (A7): the
+               surrounding tooltip text is not part of the button's name. -->
           <el-tooltip :content="t('common.refresh')" effect="dark" placement="top">
-            <el-button :icon="Refresh" circle @click="onRefresh"/>
+            <el-button :aria-label="t('common.refresh')" :icon="Refresh" circle @click="onRefresh"/>
           </el-tooltip>
           <el-tooltip v-if="!hideSort" :content="t('common.sort')" effect="dark" placement="top">
-            <el-button :icon="Sort" circle @click="onSort"/>
+            <el-button :aria-label="t('common.sort')" :icon="Sort" circle @click="onSort"/>
           </el-tooltip>
         </div>
       </div>
@@ -78,7 +86,9 @@
 
 <script lang="ts" setup>
 import type {PropType} from 'vue';
-import {ref, unref} from 'vue';
+import {computed, ref, unref} from 'vue';
+
+import {useBreakpoint} from '@/composables/useBreakpoint';
 import {useI18n} from 'vue-i18n';
 import type {FormInstance, FormRules} from 'element-plus';
 import {Refresh, RefreshRight, Search, Sort} from '@element-plus/icons-vue';
@@ -108,6 +118,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  cursorMode: {
+    type: Boolean,
+    default: false,
+  },
+  cursorPrevious: {
+    type: Boolean,
+    default: false,
+  },
+  cursorNext: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits<{
@@ -117,10 +139,20 @@ const emit = defineEmits<{
   (e: 'sort'): void;
   (e: 'size-change', size: number): void;
   (e: 'current-change', current: number): void;
+  (e: 'cursor-previous'): void;
+  (e: 'cursor-next'): void;
 }>();
 
 const {t} = useI18n();
+const {isMobile, isTablet} = useBreakpoint();
 const formRef = ref<FormInstance>();
+
+// Pagination degrades to a compact pager on thumb terminals: totals and
+// page-size pickers are desktop affordances (A3).
+// Tablet toolbars do not have enough horizontal room for the desktop total,
+// seven-page pager, and page-size select. Keep the same compact interaction
+// used on phones so every navigation control remains visible and tappable.
+const paginationLayout = computed(() => (isMobile.value || isTablet.value ? 'prev, pager, next' : 'total, prev, pager, next, sizes'));
 
 const search = async () => {
   const form = unref(formRef);
@@ -152,6 +184,8 @@ defineExpose({search, reset});
 </script>
 
 <style lang="scss" scoped>
+@use "@/styles/shared-form-widths.scss" as *;
+
 .tool-card {
   margin: 0 0 4px;
 
@@ -178,30 +212,33 @@ defineExpose({search, reset});
           flex-wrap: nowrap;
         }
 
-        // Force every common input surface to honour the cell width so
-        // rows line up. The extra .edit-form-* overrides are here because
-        // element-variables.scss pins those helper classes to fixed px
-        // widths (used for standalone forms); in the toolbar grid we need
-        // them to stretch.
-        .el-input,
-        .el-input.edit-form-small,
-        .el-input.edit-form-medium,
-        .el-input.edit-form-default,
-        .el-input.edit-form-special,
-        .el-input.edit-form-large,
-        .el-select,
-        .el-select.edit-form-small,
-        .el-select.edit-form-medium,
-        .el-select.edit-form-default,
-        .el-select.edit-form-special,
-        .el-select.edit-form-large,
-        .el-tree-select,
-        .el-date-editor,
-        .el-input-number,
-        .el-cascader,
-        .el-segmented {
-          width: 100%;
-        }
+        // Stretch every input surface to the cell width — shared with
+        // InfoCard via src/styles/shared-form-widths.scss.
+        @include form-item-full-width;
+
+        // Segmented filters keep every option reachable on narrow terminals.
+        // Element Plus sizes the group from its labels, so a long enum can
+        // otherwise be clipped by the card's overflow boundary. The control
+        // becomes its own thumb-scroll surface while the form cell remains
+        // fluid.
+      }
+
+      :deep(.el-form-item .el-segmented) {
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      :deep(.el-form-item .el-segmented__group) {
+        width: max-content;
+        min-width: 100%;
+      }
+
+      :deep(.el-form-item .el-segmented__item) {
+        flex: 0 0 auto;
+        min-width: max-content;
       }
     }
 
@@ -220,27 +257,32 @@ defineExpose({search, reset});
   }
 
   .tool-card__footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px 12px;
-    margin-top: 16px;
-    padding-top: 12px;
-    border-top: 1px solid var(--el-border-color-lighter);
+    @include card-footer;
 
     .tool-card-footer-button {
       display: flex;
       align-items: center;
+      flex: 1 1 280px;
+      min-width: 0;
+      max-width: 100%;
+      flex-wrap: wrap;
       gap: 8px;
     }
 
     .tool-card-footer-page {
       display: flex;
       align-items: center;
+      flex: 1 1 280px;
+      min-width: 0;
+      max-width: 100%;
       flex-wrap: wrap;
       justify-content: flex-end;
       gap: 8px;
+
+      :deep(.el-pagination) {
+        min-width: 0;
+        max-width: 100%;
+      }
     }
 
     // Vertical divider, reused both between actions / search-reset in the
@@ -263,10 +305,34 @@ defineExpose({search, reset});
     .tool-card-footer-button > .tool-card-footer-divider:first-child {
       display: none;
     }
+
+    @media (max-width: $breakpoint-xs-max) {
+      align-items: stretch;
+
+      .tool-card-footer-button,
+      .tool-card-footer-page {
+        width: 100%;
+        flex: 0 1 100%;
+        justify-content: center;
+      }
+
+      .tool-card-footer-button {
+        flex-wrap: wrap;
+      }
+
+      .tool-card-footer-page {
+        :deep(.el-pagination) {
+          flex: 1 1 100%;
+          width: 100%;
+          overflow-x: auto;
+          justify-content: center;
+        }
+      }
+    }
   }
 
   :deep(.el-card) {
-    border: 0;
+    border-color: var(--dc3-border-base);
   }
 }
 </style>

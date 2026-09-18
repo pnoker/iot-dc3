@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.config;
 
 import org.springdoc.core.models.GroupedOpenApi;
@@ -31,12 +30,16 @@ import org.springframework.context.annotation.Configuration;
  * several selectable groups alongside manager, data, and agentic.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @Configuration
 public class AuthApiGroupConfig {
 
+    /**
+     * Create and configure the application-managed auth api group.
+     *
+     * @return auth api group result
+     */
     @Bean
     public GroupedOpenApi authApiGroup() {
         return GroupedOpenApi.builder()

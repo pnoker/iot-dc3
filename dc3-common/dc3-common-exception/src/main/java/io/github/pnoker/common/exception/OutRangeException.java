@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.exception;
 
 import io.github.pnoker.common.enums.ErrorCode;
@@ -23,19 +22,33 @@ import io.github.pnoker.common.enums.ErrorCode;
  * Exception for values outside the valid range.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class OutRangeException extends BusinessException {
 
+    /**
+     * Exception with a failure detail and cause.
+     *
+     */
     public OutRangeException() {
         this(null);
     }
 
+    /**
+     * Exception with a plain failure cause.
+     *
+     * @param cause underlying failure
+     */
     public OutRangeException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Exception with a failure detail and cause.
+     *
+     * @param template failure detail or underlying failure
+     * @param params   failure detail or underlying failure
+     */
     public OutRangeException(String template, Object... params) {
         super(ExceptionMessageFormatter.format(template, params), ExceptionMessageFormatter.cause(params));
     }
@@ -44,5 +57,4 @@ public class OutRangeException extends BusinessException {
     public ErrorCode getErrorCode() {
         return ErrorCode.OUT_OF_RANGE;
     }
-
 }

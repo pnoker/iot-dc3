@@ -14,23 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * <p>
@@ -39,13 +31,11 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
 @Setter
 @ToString
-@TableName(value = "dc3_menu", autoResultMap = true)
 public class MenuDO implements Serializable {
 
     @Serial
@@ -54,104 +44,85 @@ public class MenuDO implements Serializable {
     /**
      * Primary key ID
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
      * ID
      */
-    @TableField("parent_menu_id")
     private Long parentMenuId;
 
     /**
      * Type
      */
-    @TableField("menu_type_flag")
     private Byte menuTypeFlag;
 
     /**
      * Name
      */
-    @TableField("menu_name")
     private String menuName;
 
     /**
      * Code
      */
-    @TableField("menu_code")
     private String menuCode;
 
     /**
      *
      */
-    @TableField("menu_level")
     private Byte menuLevel;
 
     /**
      *
      */
-    @TableField("menu_index")
     private Byte menuIndex;
 
     /**
      *
      */
-    @TableField(value = "menu_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt menuExt;
 
     /**
      * Enable flag, 0:Enable, 1:Disable
      */
-    @TableField("enable_flag")
     private Byte enableFlag;
 
     /**
      * Description
      */
-    @TableField("remark")
     private String remark;
 
     /**
      * Creator ID
      */
-    @TableField("creator_id")
     private Long creatorId;
 
     /**
      * Creator Name
      */
-    @TableField("creator_name")
     private String creatorName;
 
     /**
      * Create Time
      */
-    @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
      * Operator ID
      */
-    @TableField("operator_id")
     private Long operatorId;
 
     /**
      * Operator Name
      */
-    @TableField("operator_name")
     private String operatorName;
 
     /**
      * Operate Time
      */
-    @TableField("operate_time")
     private LocalDateTime operateTime;
 
     /**
      * Logical delete flag, 0:not deleted, 1:deleted
      */
-    @TableLogic
-    @TableField("deleted")
     private Byte deleted;
-
 }

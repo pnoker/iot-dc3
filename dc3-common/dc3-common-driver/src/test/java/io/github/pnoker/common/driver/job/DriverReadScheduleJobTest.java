@@ -14,30 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.job;
+
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverReadService;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DriverReadScheduleJobTest {
@@ -66,7 +65,7 @@ class DriverReadScheduleJobTest {
 
     @Test
     void enabledPointsAreSubmittedToExecutor() {
-        driverMetadata.setDeviceIds(Set.of(10L));
+        driverMetadata.setDeviceLeases(Map.of(10L, 1L), System.currentTimeMillis() + 60_000, 1L);
         when(deviceMetadata.getCache(10L)).thenReturn(readableDevice(10L, Set.of(20L, 21L)));
 
         job.executeInternal(null);
@@ -77,7 +76,7 @@ class DriverReadScheduleJobTest {
 
     @Test
     void disabledDeviceIsSkipped() {
-        driverMetadata.setDeviceIds(Set.of(10L));
+        driverMetadata.setDeviceLeases(Map.of(10L, 1L), System.currentTimeMillis() + 60_000, 1L);
         DeviceBO device = readableDevice(10L, Set.of(20L));
         device.setEnableFlag(EnableFlagEnum.DISABLE);
         when(deviceMetadata.getCache(10L)).thenReturn(device);

@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Objects;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * Converts between the facade-api shapes and {@code dc3-common-data} internals.
@@ -34,12 +32,19 @@ import java.util.Objects;
  * epoch seconds.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface FacadePointValueBuilder {
 
+    /**
+     * To facade business object.
+     *
+     * @param bo bo
+     * @return to facade business object result
+     */
     @Mapping(source = "calValue", target = "value")
     @Mapping(source = "createTime", target = "createTime")
     FacadePointValueBO toFacadeBO(PointValueBO bo);
@@ -53,5 +58,4 @@ public interface FacadePointValueBuilder {
         }
         return value.toEpochSecond(ZoneOffset.UTC);
     }
-
 }

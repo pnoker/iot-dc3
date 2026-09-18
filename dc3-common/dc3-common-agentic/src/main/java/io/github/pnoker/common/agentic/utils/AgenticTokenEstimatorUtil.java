@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
  * this estimator is intentionally approximate.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 public class AgenticTokenEstimatorUtil {
@@ -35,6 +34,12 @@ public class AgenticTokenEstimatorUtil {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
+    /**
+     * Estimate.
+     *
+     * @param text text
+     * @return estimate result
+     */
     public static int estimate(String text) {
         if (StringUtils.isBlank(text)) {
             return 0;
@@ -50,5 +55,4 @@ public class AgenticTokenEstimatorUtil {
         }
         return Math.max(1, (int) Math.ceil(ascii / 4.0 + nonAscii / 1.8));
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da;
 
 /**
@@ -24,8 +23,9 @@ package org.openscada.opc.dcom.da;
  * @since 2016.10.1
  */
 public enum OPCNAMESPACETYPE {
-
-    OPC_NS_HIERARCHIAL(1), OPC_NS_FLAT(2), OPC_NS_UNKNOWN(0);
+    OPC_NS_HIERARCHIAL(1),
+    OPC_NS_FLAT(2),
+    OPC_NS_UNKNOWN(0);
 
     private int _id;
 
@@ -47,5 +47,4 @@ public enum OPCNAMESPACETYPE {
     public int id() {
         return this._id;
     }
-
 }

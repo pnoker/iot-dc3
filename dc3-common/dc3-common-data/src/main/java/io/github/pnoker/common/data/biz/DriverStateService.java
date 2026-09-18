@@ -14,17 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
+import reactor.core.publisher.Mono;
 
 /**
  * Handles driver heartbeat/state events: refreshes the online-status cache and
  * derives alarm rows on status flips.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DriverStateService {
@@ -36,6 +35,5 @@ public interface DriverStateService {
      *
      * @param entityDTO DriverStateDTO
      */
-    void heartbeat(DriverStateDTO entityDTO);
-
+    Mono<Void> heartbeat(DriverStateDTO entityDTO);
 }

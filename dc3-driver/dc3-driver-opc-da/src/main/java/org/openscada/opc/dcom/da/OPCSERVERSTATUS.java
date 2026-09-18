@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da;
 
 import org.jinterop.dcom.common.JIException;
@@ -72,6 +71,9 @@ public class OPCSERVERSTATUS {
         return struct;
     }
 
+    /**
+     * Decode the COM wire struct into the typed OPCSERVERSTATUS wrapper.
+     */
     public static OPCSERVERSTATUS fromStruct(final JIStruct struct) {
         OPCSERVERSTATUS status = new OPCSERVERSTATUS();
 
@@ -178,5 +180,4 @@ public class OPCSERVERSTATUS {
     public void setServerState(final OPCSERVERSTATE dwServerState) {
         this._serverState = dwServerState;
     }
-
 }

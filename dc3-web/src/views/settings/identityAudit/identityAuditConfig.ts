@@ -15,10 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {listIdentityAudit} from '@/api/identityAudit';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
 import {principalNameRelation} from '../relations';
 
@@ -34,11 +32,11 @@ const STATUS_OPTIONS = [
   {label: 'FAILURE', value: 'FAILURE'},
 ];
 
-// Read-only audit log: family list page with no add/edit/delete. The backend
-// returns the latest N rows (no real paging), so `list` wraps the array into a
-// single-page result the EntityListPage contract expects.
-export const createIdentityAuditConfig = (t: ComposerTranslation): EntityListConfig => ({
+// Read-only audit log: cursor pagination is required because audit history is unbounded.
+export const createIdentityAuditConfig = (t: Translator): EntityListConfig => ({
   name: 'identity-audit',
+  pagination: 'cursor',
+  pageSize: 20,
   editable: false,
   searchFields: [
     {prop: 'principalId', label: t('settings.identityAudit.principalId'), kind: 'input'},
@@ -66,15 +64,15 @@ export const createIdentityAuditConfig = (t: ComposerTranslation): EntityListCon
   relations: [principalNameRelation()],
   list: async (query) => {
     const p = query as Record<string, any>;
-    const res: any = await listIdentityAudit({
+    const items = await listIdentityAudit({
       principalId: p.principalId,
       action: p.action,
       resourceType: p.resourceType,
       status: p.status,
-      limit: 200,
+      limit: p.limit,
+      cursor: p.cursor,
     });
-    const records = Array.isArray(res?.data) ? res.data : [];
-    return {data: {records, total: records.length}} as R;
+    return items;
   },
   emptyText: t('settings.identityAudit.empty'),
 });

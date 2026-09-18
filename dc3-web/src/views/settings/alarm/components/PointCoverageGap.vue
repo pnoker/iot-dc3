@@ -17,10 +17,13 @@
 
 <template>
   <dashboard-card
-    :empty="!loading && report.totalPoints === 0"
+    :empty="status === 'success' && report.totalPoints === 0"
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.coverageEmpty')"
     :loading="loading"
+    :error="status === 'error'"
+    :error-text="t('common.loadFailed')"
+    :retry-text="t('common.retry')"
     :subtitle="subtitleText"
     :title="t('settings.event.overview.coverageTitle')"
     body-mode="scroll"
@@ -46,35 +49,57 @@
       </div>
     </div>
 
-    <el-table v-if="report.items.length" :data="report.items" size="small" @row-click="onRowClick">
-      <el-table-column :label="t('settings.event.overview.colPoint')" min-width="130">
-        <template #default="{row}">{{ pointName(row.pointId) }}</template>
-      </el-table-column>
-      <el-table-column :label="t('settings.event.overview.colProfile')" min-width="130">
-        <template #default="{row}">{{ profileName(row.profileId) }}</template>
-      </el-table-column>
-    </el-table>
+    <responsive-record-list
+      v-if="report.items.length"
+      :columns="columns"
+      :loading="loading"
+      :rows="report.items"
+      :status="status"
+      embedded
+      openable
+      :row-key="rowKey"
+      @open="onRowClick"
+      @retry="load"
+    />
   </dashboard-card>
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, reactive} from 'vue';
+import {computed, onMounted, reactive, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRouter} from 'vue-router';
 
 import {coverageGap} from '@/api/dashboard';
 import type {CoverageGap, CoverageGapItem} from '@/config/types/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+import ResponsiveRecordList from '@/components/list/ResponsiveRecordList.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {jumpToEntity} from '@/utils/jumpUtil';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const router = useRouter();
-const {loading, run} = useAsyncLoader();
+const {loading, run, status} = useAsyncLoader();
 const {resolvePoints, resolveProfiles, pointName, profileName} = useEntityNames();
 
 const report = reactive<CoverageGap>({totalPoints: 0, missingPoints: 0, items: []});
+const columns = computed(() => [
+  {
+    key: 'pointId',
+    label: t('settings.event.overview.colPoint'),
+    minWidth: 130,
+    mobile: 'primary' as const,
+    formatter: (row: CoverageGapItem) => pointName(row.pointId),
+  },
+  {
+    key: 'profileId',
+    label: t('settings.event.overview.colProfile'),
+    minWidth: 130,
+    mobile: 'detail' as const,
+    formatter: (row: CoverageGapItem) => profileName(row.profileId),
+  },
+]);
+const rowKey = (row: CoverageGapItem) => `${row.profileId}:${row.pointId}`;
 
 const coveragePercent = computed(() => {
   if (report.totalPoints === 0) return 0;
@@ -83,9 +108,9 @@ const coveragePercent = computed(() => {
 
 const coverageColor = computed(() => {
   const p = coveragePercent.value;
-  if (p >= 90) return '#67c23a';
-  if (p >= 70) return '#e6a23c';
-  return '#f56c6c';
+  if (p >= 90) return 'var(--el-color-success)';
+  if (p >= 70) return 'var(--el-color-warning)';
+  return 'var(--el-color-danger)';
 });
 
 const subtitleText = computed(() =>
@@ -96,16 +121,21 @@ const subtitleText = computed(() =>
 );
 
 const load = () =>
-  run(async () => {
-    const res: { data?: CoverageGap } = await coverageGap(100);
-    Object.assign(report, res?.data ?? {totalPoints: 0, missingPoints: 0, items: []});
-    await Promise.all([
-      resolvePoints(report.items.map((r) => r.pointId)),
-      resolveProfiles(report.items.map((r) => r.profileId)),
-    ]);
-  });
+  run(
+    async () => {
+      const result: CoverageGap = await coverageGap(100);
+      const nextReport = result ?? {totalPoints: 0, missingPoints: 0, items: []};
+      await Promise.all([
+        resolvePoints(nextReport.items.map((row) => row.pointId)),
+        resolveProfiles(nextReport.items.map((row) => row.profileId)),
+      ]);
+      return nextReport;
+    },
+    {apply: (nextReport) => Object.assign(report, nextReport)}
+  );
 
 onMounted(load);
+watch(locale, load);
 
 const onRowClick = (row: CoverageGapItem) => jumpToEntity(router, 'point', row.pointId);
 
@@ -119,39 +149,47 @@ defineExpose({refresh: load});
   .coverage-gap__summary {
     display: flex;
     align-items: center;
-    gap: 24px;
-    padding: 16px;
+    gap: var(--dc3-space-6);
+    padding: var(--dc3-space-4);
     border-bottom: 1px solid var(--el-border-color-lighter);
   }
 
   .coverage-gap__nums {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: var(--dc3-space-1);
   }
 
   .coverage-gap__num {
     display: flex;
     align-items: baseline;
-    gap: 10px;
+    gap: var(--dc3-space-2);
     font-size: 13px;
 
     &--gap .coverage-gap__value {
-      color: #f56c6c;
+      color: var(--el-color-danger);
     }
   }
 
   .coverage-gap__label {
-    color: #909399;
+    color: var(--dc3-text-muted);
     min-width: 48px;
   }
 
   .coverage-gap__value {
-    color: #303133;
+    color: var(--dc3-text-primary);
     font-weight: 600;
     font-size: 15px;
   }
 
   @include clickable-rows;
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  .coverage-gap .coverage-gap__summary {
+    align-items: flex-start;
+    gap: var(--dc3-space-3);
+    padding: var(--dc3-space-3);
+  }
 }
 </style>

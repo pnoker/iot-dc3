@@ -14,25 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.bo;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 /**
  * Tree-shaped variant of {@link ResourceBO} — adds a nested children collection so the
  * Resource tree can be serialized into a single payload for the frontend's tree table.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter
@@ -54,6 +51,7 @@ public class ResourceTreeBO extends ResourceBO {
         node.setParentResourceId(source.getParentResourceId());
         node.setResourceName(source.getResourceName());
         node.setResourceCode(source.getResourceCode());
+        node.setServiceName(source.getServiceName());
         node.setResourceTypeFlag(source.getResourceTypeFlag());
         node.setResourceScopeFlag(source.getResourceScopeFlag());
         node.setEntityId(source.getEntityId());
@@ -69,11 +67,15 @@ public class ResourceTreeBO extends ResourceBO {
         return node;
     }
 
+    /**
+     * Create child.
+     *
+     * @param child child
+     */
     public void addChild(ResourceTreeBO child) {
         if (Objects.isNull(children)) {
             children = new ArrayList<>();
         }
         children.add(child);
     }
-
 }

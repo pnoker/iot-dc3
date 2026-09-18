@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,21 +21,19 @@ import io.github.pnoker.common.enums.EventHistoryAcknowledgeFlagEnum;
 import io.github.pnoker.common.enums.EventLevelEnum;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 /**
  * View object for event history API responses.
  *
  * @author pnoker
- * @version 2026.6.5
  * @since 2026.6.5
  */
 @Getter
@@ -52,19 +49,19 @@ public class EventHistoryVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Primary key")
-    private Long id;
+    private String id;
 
     @Schema(description = "Unique record ID for this event history entry.", example = "123456")
     private String recordId;
 
     @Schema(description = "Tenant ID")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "ID of the device that triggered this event.", example = "1024")
-    private Long deviceId;
+    private String deviceId;
 
     @Schema(description = "ID of the event definition.", example = "4096")
-    private Long eventId;
+    private String eventId;
 
     @Schema(description = "Event code. Stable business identifier for this event.", example = "HIGH_TEMP_ALARM")
     private String eventCode;
@@ -97,7 +94,7 @@ public class EventHistoryVO implements Serializable {
     private LocalDateTime acknowledgeTime;
 
     @Schema(description = "ID of the user who acknowledged this event. Null if not yet acknowledged.", example = "1000")
-    private Long acknowledgeUserId;
+    private String acknowledgeUserId;
 
     @Schema(description = "Schema version")
     private Short schemaVersion;
@@ -107,5 +104,4 @@ public class EventHistoryVO implements Serializable {
 
     @Schema(description = "Last operation time")
     private LocalDateTime operateTime;
-
 }

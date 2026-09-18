@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.event.metadata;
 
 import io.github.pnoker.common.driver.service.DriverCustomService;
@@ -31,7 +30,6 @@ import org.springframework.stereotype.Component;
  * custom driver service.
  *
  * @author zhangzi
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -39,7 +37,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MetadataEventListener implements ApplicationListener<MetadataEvent> {
 
-    /** Custom driver service that receives the forwarded metadata change events. */
+    /**
+     * Custom driver service that receives the forwarded metadata change events.
+     */
     private final DriverCustomService driverCustomService;
 
     /**
@@ -50,7 +50,10 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
      */
     @Override
     public void onApplicationEvent(MetadataEvent metadataEvent) {
-        log.debug("Metadata event listener received: id={}, type={}", metadataEvent.getId(), metadataEvent.getMetadataType());
+        log.debug(
+                "Metadata event listener received: id={}, type={}",
+                metadataEvent.getId(),
+                metadataEvent.getMetadataType());
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             MetadataEventDTO entityEvent = new MetadataEventDTO();
@@ -78,5 +81,4 @@ public class MetadataEventListener implements ApplicationListener<MetadataEvent>
             driverCustomService.event(entityEvent);
         }
     }
-
 }

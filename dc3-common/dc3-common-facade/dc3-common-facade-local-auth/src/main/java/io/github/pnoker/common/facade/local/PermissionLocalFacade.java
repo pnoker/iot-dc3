@@ -14,25 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
-import io.github.pnoker.common.auth.entity.bo.ResourceBO;
-import io.github.pnoker.common.auth.service.RoleResourceBindService;
+import io.github.pnoker.common.auth.repository.ReactivePermissionStore;
 import io.github.pnoker.common.facade.api.PermissionFacade;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Mono;
 
 /**
  * In-process {@link PermissionFacade}.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -40,19 +36,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PermissionLocalFacade implements PermissionFacade {
 
-    private final RoleResourceBindService roleResourceBindService;
+    private final ReactivePermissionStore permissionStore;
 
     @Override
-    public Set<String> listPermissionCodes(Long tenantId, Long principalId) {
+    public Mono<Set<String>> listPermissionCodes(Long tenantId, Long principalId) {
         if (tenantId == null || principalId == null) {
-            return Set.of();
+            return Mono.just(Set.of());
         }
-        return roleResourceBindService.listResourceByPrincipalId(principalId, tenantId)
-                .stream()
-                .map(ResourceBO::getResourceCode)
-                .filter(Objects::nonNull)
-                .filter(code -> !code.isBlank())
-                .collect(Collectors.toSet());
+        return permissionStore.listResourceCodes(tenantId, principalId).collect(Collectors.toUnmodifiableSet());
     }
-
 }

@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * A (source, eventType) pair that fired repeatedly in the window — i.e. is "flapping".
@@ -32,7 +30,6 @@ import java.io.Serializable;
  * event-type so operators can tell whether the same condition keeps re-tripping.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -49,12 +46,11 @@ public class FlappingSourceVO implements Serializable {
     private String source;
 
     @Schema(description = "source entity ID", example = "1024")
-    private long sourceId;
+    private String sourceId;
 
     @Schema(description = "Alarm type enum", example = "1")
     private int alarmTypeFlag;
 
     @Schema(description = "number of times this source/type fired in the window", example = "8")
     private long count;
-
 }

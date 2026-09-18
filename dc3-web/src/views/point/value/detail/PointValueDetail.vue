@@ -20,11 +20,13 @@
     v-model="detailVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="true"
+    :size="isMobile ? '100%' : isTablet ? '520px' : '40%'"
     :title="$t('pointValue.detail.title')"
+    class="point-value-detail"
+    destroy-on-close
     direction="rtl"
-    size="40%"
   >
-    <pre class="json-preview">{{ formatJson(detailData) }}</pre>
+    <pre aria-live="polite" class="json-preview">{{ formatJson(detailData) }}</pre>
   </el-drawer>
 </template>
 
@@ -32,6 +34,7 @@
 import type {PropType} from 'vue';
 import {ref} from 'vue';
 import {prettyJson} from '@/utils/jsonUtil';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 
 defineProps({
   detailData: {
@@ -41,6 +44,7 @@ defineProps({
 });
 
 const detailVisible = ref(false);
+const {isMobile, isTablet} = useBreakpoint();
 const formatJson = (value: unknown) => prettyJson(value);
 const show = () => {
   detailVisible.value = true;

@@ -14,30 +14,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc;
 
-import io.github.pnoker.api.center.auth.GrpcRSyncResult;
 import io.github.pnoker.api.center.auth.GrpcScannedApiDTO;
 import io.github.pnoker.api.center.auth.GrpcSyncRequest;
+import io.github.pnoker.api.center.auth.GrpcSyncResultDTO;
 import io.github.pnoker.api.center.auth.ResourceRegistryApiGrpc;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.ResourceRegistryFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResultBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeScannedApiBO;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.Objects;
+import reactor.core.publisher.Mono;
 
 /**
  * gRPC {@link ResourceRegistryFacade}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -45,41 +42,38 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class ResourceRegistryGrpcFacade implements ResourceRegistryFacade {
 
-    private final ResourceRegistryApiGrpc.ResourceRegistryApiBlockingStub resourceRegistryApiBlockingStub;
-
-    private final GrpcFacadeSupport grpcFacadeSupport;
+    private final ResourceRegistryApiGrpc.ResourceRegistryApiStub resourceRegistryApiStub;
 
     @Override
-    public FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command) {
-        GrpcSyncRequest.Builder request = GrpcSyncRequest.newBuilder()
-                .setServiceName(Objects.requireNonNullElse(command.getServiceName(), ""))
-                .setDeleteMissing(command.isDeleteMissing());
-        List<FacadeScannedApiBO> apis = command.getApis();
-        if (Objects.nonNull(apis)) {
-            for (FacadeScannedApiBO api : apis) {
-                request.addApis(GrpcScannedApiDTO.newBuilder()
-                        .setMethod(Objects.requireNonNullElse(api.getMethod(), ""))
-                        .setPath(Objects.requireNonNullElse(api.getPath(), ""))
-                        .setApiName(Objects.requireNonNullElse(api.getApiName(), ""))
-                        .setTitle(Objects.requireNonNullElse(api.getTitle(), ""))
-                        .setRemark(Objects.requireNonNullElse(api.getRemark(), ""))
-                        .setApiGroup(Objects.requireNonNullElse(api.getApiGroup(), ""))
-                        .build());
+    public Mono<FacadeResourceRegistrySyncResultBO> sync(FacadeResourceRegistrySyncCommandBO command) {
+        return Mono.defer(() -> {
+            if (command == null) return Mono.error(new IllegalArgumentException("registry sync command is required"));
+            GrpcSyncRequest.Builder request = GrpcSyncRequest.newBuilder()
+                    .setServiceName(Objects.requireNonNullElse(command.getServiceName(), ""))
+                    .setDeleteMissing(command.isDeleteMissing());
+            List<FacadeScannedApiBO> apis = command.getApis();
+            if (Objects.nonNull(apis)) {
+                for (FacadeScannedApiBO api : apis) {
+                    request.addApis(GrpcScannedApiDTO.newBuilder()
+                            .setMethod(Objects.requireNonNullElse(api.getMethod(), ""))
+                            .setPath(Objects.requireNonNullElse(api.getPath(), ""))
+                            .setApiName(Objects.requireNonNullElse(api.getApiName(), ""))
+                            .setTitle(Objects.requireNonNullElse(api.getTitle(), ""))
+                            .setRemark(Objects.requireNonNullElse(api.getRemark(), ""))
+                            .setApiGroup(Objects.requireNonNullElse(api.getApiGroup(), ""))
+                            .build());
+                }
             }
-        }
-        GrpcSyncRequest syncRequest = request.build();
-        GrpcRSyncResult response = grpcFacadeSupport.call("ResourceRegistryFacade.sync", resourceRegistryApiBlockingStub,
-                stub -> stub.sync(syncRequest));
-        if (!response.getResult().getOk()) {
-            throw new ServiceException("ResourceRegistryFacade.sync failed: [" + response.getResult().getCode() + "] "
-                    + response.getResult().getMessage());
-        }
-        return FacadeResourceRegistrySyncResultBO.builder()
-                .inserted(response.getData().getInserted())
-                .updated(response.getData().getUpdated())
-                .deleted(response.getData().getDeleted())
-                .unchanged(response.getData().getUnchanged())
-                .build();
+            GrpcSyncRequest syncRequest = request.build();
+            return ReactiveGrpcClientSupport.<GrpcSyncRequest, GrpcSyncResultDTO>unary(
+                            "ResourceRegistryFacade.sync",
+                            observer -> resourceRegistryApiStub.sync(syncRequest, observer))
+                    .map(response -> FacadeResourceRegistrySyncResultBO.builder()
+                            .inserted(response.getInserted())
+                            .updated(response.getUpdated())
+                            .deleted(response.getDeleted())
+                            .unchanged(response.getUnchanged())
+                            .build());
+        });
     }
-
 }

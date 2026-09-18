@@ -56,9 +56,20 @@ const onChange = (value: string | number | boolean) => {
 <style lang="scss" scoped>
 .search-segmented {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 
   :deep(.el-segmented__item) {
     flex: 1 1 0;
+    min-width: max-content;
+  }
+
+  :deep(.el-segmented__group) {
+    width: max-content;
+    min-width: 100%;
   }
 }
 </style>

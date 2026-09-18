@@ -24,12 +24,12 @@
          el-descriptions' built-in title prop so we don't need a
          separate card-header slot. -->
     <blank-card>
-      <el-descriptions :column="2" border>
+      <el-descriptions :column="isMobile ? 1 : 2" border>
         <el-descriptions-item :label="t('settings.about.name')">IoT DC3</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.version')">v{{ version }}</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.license')">AGPL-3.0</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.docs')">
-          <external-link href="https://iotdc3.com">iotdc3.com</external-link>
+          <external-link href="https://docs.dc3.site">docs.dc3.site</external-link>
         </el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.repo')">
           <external-link href="https://github.com/pnoker/iot-dc3">github.com/pnoker/iot-dc3</external-link>
@@ -92,9 +92,11 @@
 import {useI18n} from 'vue-i18n';
 
 import blankCard from '@/components/card/blank/BlankCard.vue';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 import pkg from '../../../../package.json';
 
 const {t} = useI18n();
+const {isMobile} = useBreakpoint();
 const version = pkg.version;
 
 const objectiveKeys = [

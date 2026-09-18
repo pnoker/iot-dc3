@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.bo.dashboard;
 
 import lombok.Getter;
@@ -24,7 +23,6 @@ import lombok.Setter;
  * One (device, profile) link from dc3_device — 1:1 edge in the topology.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -34,5 +32,4 @@ public class ProfileBindingRow {
     private Long profileId;
 
     private Long deviceId;
-
 }

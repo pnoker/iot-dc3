@@ -14,22 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * MCP tool-call audit outcome.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -65,7 +61,6 @@ public enum McpAuditStatusEnum {
     /**
      * Database / wire value.
      */
-    @EnumValue
     @JsonValue
     private final String value;
 
@@ -79,11 +74,16 @@ public enum McpAuditStatusEnum {
      */
     private final String remark;
 
+    /**
+     * Resolve an MCP audit status from its persisted wire value.
+     *
+     * @param value persisted status value
+     * @return matching status, or {@code null} when the value is unknown
+     */
     public static McpAuditStatusEnum ofValue(String value) {
         Optional<McpAuditStatusEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))
                 .findFirst();
         return any.orElse(null);
     }
-
 }

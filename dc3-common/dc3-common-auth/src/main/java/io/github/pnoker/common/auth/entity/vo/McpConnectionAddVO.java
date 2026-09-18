@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,19 +21,17 @@ import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.valid.Add;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-
 /**
  * Request view object for creating an MCP connection.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter
@@ -46,26 +43,32 @@ import java.time.LocalDateTime;
 @Schema(description = "MCP connection create request")
 public class McpConnectionAddVO extends BaseVO {
 
-    @Schema(description = "Connection display name; defaults to the client name when blank.", example = "Claude Desktop - default")
+    @Schema(
+            description = "Connection display name; defaults to the client name when blank.",
+            example = "Claude Desktop - default")
     private String connectionName;
 
-    @NotBlank(message = "Client id can't be empty", groups = {Add.class})
-    @Schema(description = "Bound OAuth client identifier.", requiredMode = Schema.RequiredMode.REQUIRED, example = "mcp-abcd1234")
+    @NotBlank(
+            message = "Client id can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Bound OAuth client identifier.",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            example = "mcp-abcd1234")
     private String clientId;
 
     @Schema(description = "Principal that owns the connection; defaults to the caller.", example = "1024")
-    private Long principalId;
+    private String principalId;
 
     @Schema(description = "Principal type: USER or SERVICE_ACCOUNT.", example = "USER")
     private String principalType;
 
     @Schema(description = "Tenant the connection belongs to; defaults to the caller tenant.", example = "1")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "Authorization grant type; defaults to authorization_code.", example = "authorization_code")
     private String grantType;
 
     @Schema(description = "Timestamp when the connection expires.", example = "2027-06-19 12:00:00")
     private LocalDateTime expireTime;
-
 }

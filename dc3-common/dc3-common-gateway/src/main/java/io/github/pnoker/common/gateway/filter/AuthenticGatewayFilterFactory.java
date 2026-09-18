@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.gateway.filter;
 
 import lombok.RequiredArgsConstructor;
@@ -25,31 +24,27 @@ import org.springframework.stereotype.Component;
 
 /**
  * Factory for creating authentic gateway filter instances.
+ * <p>
+ * Declares {@code AbstractGatewayFilterFactory<Object>} rather than a dedicated config
+ * type. The filter has no tunable options, and Spring Cloud Gateway binds a plain
+ * {@code Object} config for an argument-less {@code filters: - Authentic} route entry.
+ * A concrete config type would make javac synthesize a bridge {@code apply(Object)}
+ * that casts to that type and throw {@link ClassCastException} at runtime when the
+ * framework passes the {@code Object} instance; {@code Object} keeps {@code apply}
+ * cast-free.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<AuthenticGatewayFilterFactory.Config> {
+public class AuthenticGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 
     private final AuthenticGatewayFilter authenticGatewayFilter;
 
     @Override
-    public GatewayFilter apply(Config config) {
+    public GatewayFilter apply(Object config) {
         return authenticGatewayFilter;
     }
-
-    /**
-     * Empty configuration marker for the authentic gateway filter.
-     * <p>
-     * The filter has no tunable options; this class exists to give the factory a
-     * dedicated, named config type instead of the overly generic {@code Object},
-     * which produces a confusing method signature.
-     */
-    public static class Config {
-    }
-
 }

@@ -14,39 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz;
 
-import io.github.pnoker.common.data.entity.query.DeviceQuery;
-
+import io.github.pnoker.common.facade.entity.query.FacadeDeviceOffsetQuery;
 import java.util.Map;
+import reactor.core.publisher.Mono;
 
-/**
- * Business service for device status operations.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
+/** Reactive business service for tenant-scoped device status. */
 public interface DeviceStatusService {
 
-    /**
-     * Paged query of device status, used in conjunction with paged query of devices
-     *
-     * @param deviceQuery DeviceQuery, including pagination parameters
-     * @return Map Long:String, where Long is the device ID and String is the device
-     * status
-     */
-    Map<Long, String> getStatusByPage(DeviceQuery deviceQuery);
+    /** List device status matching the request. */
+    Mono<Map<String, String>> list(FacadeDeviceOffsetQuery query);
 
-    /**
-     * Query device status by profile ID
-     *
-     * @param tenantId  Tenant ID
-     * @param profileId Profile ID
-     * @return Map Long:String, where Long is the device ID and String is the device
-     * status
-     */
-    Map<Long, String> listByProfileId(Long tenantId, Long profileId);
-
+    /** List device status matched by profile id. */
+    Mono<Map<String, String>> listByProfileId(Long tenantId, Long profileId);
 }

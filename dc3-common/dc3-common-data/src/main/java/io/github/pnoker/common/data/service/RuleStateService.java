@@ -14,20 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.service;
 
-import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.data.entity.bo.RuleStateBO;
 import io.github.pnoker.common.data.entity.query.RuleStateQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
-/**
- * Rule runtime state service.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
-public interface RuleStateService extends BaseService<RuleStateBO, RuleStateQuery> {
+/** Reactive rule runtime state service. */
+public interface RuleStateService {
 
+    /** Resolve the rule state by its id. */
+    Mono<RuleStateBO> getById(Long tenantId, Long id);
+
+    /** Page rule states matching the tenant-scoped filters. */
+    Mono<OffsetPage<RuleStateBO>> list(Long tenantId, RuleStateQuery query);
+
+    /** Delete the rule state, reporting whether a row was removed. */
+    Mono<Boolean> delete(Long tenantId, Long id);
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +38,7 @@ public class Item {
 
     Item(final Group group, final int serverHandle, final int clientHandle, final String id) {
         super();
-        log.debug(String.format("Adding new item '%s' (0x%08X) for group %s", id, serverHandle, group.toString()));
+        log.debug("OPC DA item created, itemId={}, serverHandle={}, group={}", id, serverHandle, group);
         this._group = group;
         this._serverHandle = serverHandle;
         this._clientHandle = clientHandle;
@@ -71,7 +70,8 @@ public class Item {
     }
 
     public Integer write(final JIVariant value) throws JIException {
-        return this._group.write(new WriteRequest[]{new WriteRequest(this, value)}).get(this);
+        return this._group
+                .write(new WriteRequest[] {new WriteRequest(this, value)})
+                .get(this);
     }
-
 }

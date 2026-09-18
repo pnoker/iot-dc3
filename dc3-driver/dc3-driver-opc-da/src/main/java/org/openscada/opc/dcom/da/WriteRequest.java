@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da;
 
 import org.jinterop.dcom.core.JIVariant;
@@ -32,8 +31,7 @@ public class WriteRequest {
 
     private JIVariant value = JIVariant.EMPTY();
 
-    public WriteRequest() {
-    }
+    public WriteRequest() {}
 
     public WriteRequest(final WriteRequest request) {
         this.serverHandle = request.serverHandle;
@@ -66,5 +64,4 @@ public class WriteRequest {
     public void setValue(final JIVariant value) {
         this.value = value;
     }
-
 }

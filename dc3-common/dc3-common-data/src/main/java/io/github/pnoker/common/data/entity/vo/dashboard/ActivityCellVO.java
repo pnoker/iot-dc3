@@ -14,24 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * One cell of the day-of-week × hour-of-day activity heatmap. {@code dow} is
  * 0=Sunday..6=Saturday; {@code hour} is 0..23.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Getter
@@ -50,7 +47,8 @@ public class ActivityCellVO implements Serializable {
     @Schema(description = "Hour of day for this heatmap cell; range 0 to 23.", example = "14")
     private int hour;
 
-    @Schema(description = "Number of samples aggregated into this day-of-week / hour-of-day cell; non-negative.", example = "128")
+    @Schema(
+            description = "Number of samples aggregated into this day-of-week / hour-of-day cell; non-negative.",
+            example = "128")
     private long count;
-
 }

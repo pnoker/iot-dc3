@@ -14,29 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.builder;
 
-import io.github.pnoker.api.center.manager.GrpcPagePointQuery;
-import io.github.pnoker.api.common.GrpcPage;
+import io.github.pnoker.api.center.manager.GrpcOffsetPointQuery;
 import io.github.pnoker.api.common.GrpcPointDTO;
+import io.github.pnoker.api.common.PageRequest;
+import io.github.pnoker.api.common.SortDirection;
+import io.github.pnoker.api.common.SortSpec;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.ext.PointExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.enums.RwTypeEnum;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
+import io.github.pnoker.common.facade.entity.query.FacadePointOffsetQuery;
 import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 /**
  * Hand-rolled conversion between facade shapes and protobuf point types.
@@ -49,39 +48,49 @@ import java.util.Optional;
  * {@code rwFlag} / {@code profileId}, matching {@code GrpcPointBuilder}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Component
 public class FacadeGrpcPointBuilder {
 
-    public GrpcPagePointQuery toGrpcPageQuery(FacadePointQuery query) {
-        GrpcPagePointQuery.Builder builder = GrpcPagePointQuery.newBuilder();
-
-        Pages pages = Objects.isNull(query.getPage()) ? new Pages() : query.getPage();
-        GrpcPage.Builder page = GrpcPage.newBuilder().setCurrent(pages.getCurrent()).setSize(pages.getSize());
-        builder.setPage(page);
-
-        LongOptional.ofNullable(query.getTenantId()).ifPresent(builder::setTenantId);
-        StringOptional.ofNullable(query.getPointName()).ifPresent(builder::setPointName);
-        StringOptional.ofNullable(query.getPointCode()).ifPresent(builder::setPointCode);
-        LongOptional.ofNullable(query.getDeviceId()).ifPresent(builder::setDeviceId);
-
-        Optional.ofNullable(query.getPointTypeFlag())
-                .ifPresentOrElse(value -> builder.setPointTypeFlag(value.getIndex()),
-                        () -> builder.setPointTypeFlag(DefaultConstant.NULL_INT));
-        Optional.ofNullable(query.getRwFlag())
-                .ifPresentOrElse(value -> builder.setRwFlag(value.getIndex()),
-                        () -> builder.setRwFlag(DefaultConstant.NULL_INT));
-        Optional.ofNullable(query.getProfileId())
-                .ifPresentOrElse(builder::setProfileId, () -> builder.setProfileId(DefaultConstant.NULL_INT));
-        Optional.ofNullable(query.getEnableFlag())
-                .ifPresentOrElse(value -> builder.setEnableFlag(value.getIndex()),
-                        () -> builder.setEnableFlag(DefaultConstant.NULL_INT));
-
+    /** Convert the canonical offset query to its protobuf representation. */
+    public GrpcOffsetPointQuery toGrpcOffsetQuery(FacadePointOffsetQuery query) {
+        GrpcOffsetPointQuery.Builder builder = GrpcOffsetPointQuery.newBuilder()
+                .setPage(PageRequest.newBuilder()
+                        .setOffset(query.offset())
+                        .setLimit(query.limit())
+                        .addAllSort(query.sort().stream().map(this::toGrpcSort).toList())
+                        .build())
+                .setTenantId(query.tenantId());
+        StringOptional.ofNullable(query.pointName()).ifPresent(builder::setPointName);
+        StringOptional.ofNullable(query.pointCode()).ifPresent(builder::setPointCode);
+        LongOptional.ofNullable(query.profileId()).ifPresent(builder::setProfileId);
+        LongOptional.ofNullable(query.groupId()).ifPresent(builder::setGroupId);
+        LongOptional.ofNullable(query.labelId()).ifPresent(builder::setLabelId);
+        LongOptional.ofNullable(query.deviceId()).ifPresent(builder::setDeviceId);
+        Optional.ofNullable(query.pointTypeFlag()).ifPresent(value -> builder.setPointTypeFlag(value.getIndex()));
+        Optional.ofNullable(query.rwFlag()).ifPresent(value -> builder.setRwFlag(value.getIndex()));
+        Optional.ofNullable(query.enableFlag()).ifPresent(value -> builder.setEnableFlag(value.getIndex()));
+        Optional.ofNullable(query.version()).ifPresent(builder::setVersion);
         return builder.build();
     }
 
+    private SortSpec toGrpcSort(io.github.pnoker.db.r2dbc.core.page.SortSpec sort) {
+        return SortSpec.newBuilder()
+                .setField(sort.field())
+                .setDirection(
+                        sort.direction() == io.github.pnoker.db.r2dbc.core.page.SortSpec.Direction.ASC
+                                ? SortDirection.SORT_DIRECTION_ASC
+                                : SortDirection.SORT_DIRECTION_DESC)
+                .build();
+    }
+
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadePointBO toFacadeBO(GrpcPointDTO dto) {
         if (Objects.isNull(dto)) {
             return null;
@@ -122,5 +131,4 @@ public class FacadeGrpcPointBuilder {
 
         return bo;
     }
-
 }

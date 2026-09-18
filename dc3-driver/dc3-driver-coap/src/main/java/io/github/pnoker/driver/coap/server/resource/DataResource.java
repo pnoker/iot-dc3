@@ -14,15 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.coap.server.resource;
 
 import io.github.pnoker.driver.coap.entity.CoapMessage;
 import io.github.pnoker.driver.coap.service.CoapReceiveService;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.californium.core.CoapExchange;
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
-import org.eclipse.californium.core.CoapExchange;
 
 /**
  * CoAP Data Resource
@@ -30,7 +29,6 @@ import org.eclipse.californium.core.CoapExchange;
  * Handles POST requests from devices pushing telemetry data.
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @Slf4j
@@ -38,6 +36,7 @@ public class DataResource extends CoapResource {
 
     private final CoapReceiveService coapReceiveService;
 
+    /** data resource. */
     public DataResource(String name, CoapReceiveService coapReceiveService) {
         super(name);
         this.coapReceiveService = coapReceiveService;
@@ -53,7 +52,10 @@ public class DataResource extends CoapResource {
             }
 
             CoapMessage message = CoapMessage.builder()
-                    .sourceAddress(exchange.getSourceContext().getPeerAddress().getAddress().getHostAddress())
+                    .sourceAddress(exchange.getSourceContext()
+                            .getPeerAddress()
+                            .getAddress()
+                            .getHostAddress())
                     .sourcePort(exchange.getSourceContext().getPeerAddress().getPort())
                     .uriPath(exchange.getRequestOptions().getUriPathString())
                     .payload(payload)
@@ -61,13 +63,20 @@ public class DataResource extends CoapResource {
                     .method("POST")
                     .build();
 
-            log.debug("CoAP POST received from {}:{}, uri: {}, payload: {}",
-                    message.getSourceAddress(), message.getSourcePort(), message.getUriPath(), payload);
+            log.debug(
+                    "CoAP POST received, source={}:{}, path={}, payloadLength={}",
+                    message.getSourceAddress(),
+                    message.getSourcePort(),
+                    message.getUriPath(),
+                    payload.length());
 
             coapReceiveService.receiveValue(message);
             exchange.respond(CoAP.ResponseCode.CHANGED);
         } catch (Exception e) {
-            log.error("Failed to handle CoAP POST", e);
+            log.error(
+                    "CoAP POST handling failed, path={}",
+                    exchange.getRequestOptions().getUriPathString(),
+                    e);
             exchange.respond(CoAP.ResponseCode.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
@@ -76,5 +85,4 @@ public class DataResource extends CoapResource {
     public void handleGET(CoapExchange exchange) {
         exchange.respond(CoAP.ResponseCode.CONTENT, "CoAP Data Resource is active");
     }
-
 }

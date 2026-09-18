@@ -14,12 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
 
-import org.jinterop.dcom.core.JIVariant;
-
 import java.util.Calendar;
+import org.jinterop.dcom.core.JIVariant;
 
 /**
  *
@@ -51,8 +49,9 @@ public class ItemState {
 
     @Override
     public String toString() {
-        return String.format("Value: %s, Timestamp: %tc, Quality: %s, ErrorCode: %08x", this._value, this._timestamp,
-                this._quality, this._errorCode);
+        return String.format(
+                "Value: %s, Timestamp: %tc, Quality: %s, ErrorCode: %08x",
+                this._value, this._timestamp, this._quality, this._errorCode);
     }
 
     public Short getQuality() {
@@ -136,5 +135,4 @@ public class ItemState {
         }
         return true;
     }
-
 }

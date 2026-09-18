@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -38,7 +37,6 @@ import lombok.ToString;
  * View object for device API responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -53,10 +51,16 @@ public class DeviceVO extends BaseVO {
     /**
      * Device Name
      */
-    @NotBlank(message = "Device name can't be empty", groups = {Add.class})
-    @Schema(description = "Device name. Unique within a tenant.", example = "Temperature Sensor 01",
+    @NotBlank(
+            message = "Device name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Device name. Unique within a tenant.",
+            example = "Temperature Sensor 01",
             requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid device name format",
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid device name format",
             groups = {Add.class, Update.class})
     private String deviceName;
 
@@ -69,10 +73,14 @@ public class DeviceVO extends BaseVO {
     /**
      * Driver ID
      */
-    @Schema(description = "ID of the driver this device connects through.", example = "1024",
+    @Schema(
+            description = "ID of the driver this device connects through.",
+            example = "1024",
             requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Driver ID can't be empty", groups = {Add.class, Update.class, Upload.class})
-    private Long driverId;
+    @NotNull(
+            message = "Driver ID can't be empty",
+            groups = {Add.class, Update.class, Upload.class})
+    private String driverId;
 
     /**
      *
@@ -101,9 +109,12 @@ public class DeviceVO extends BaseVO {
     /**
      * Profile ID
      */
-    @Schema(description = "ID of the profile (device template) this device is derived from.", example = "2048",
+    @Schema(
+            description = "ID of the profile (device template) this device is derived from.",
+            example = "2048",
             requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Upload.class})
-    private Long profileId;
-
+    @NotNull(
+            message = "Profile ID can't be empty",
+            groups = {Add.class, Upload.class})
+    private String profileId;
 }

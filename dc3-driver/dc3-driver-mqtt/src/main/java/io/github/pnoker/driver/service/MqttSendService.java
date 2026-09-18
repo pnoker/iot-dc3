@@ -14,12 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service;
-
-import org.springframework.integration.annotation.MessagingGateway;
-import org.springframework.integration.mqtt.support.MqttHeaders;
-import org.springframework.messaging.handler.annotation.Header;
 
 /**
  * Service for sending messages to MQTT topics. This interface provides methods for
@@ -27,10 +22,8 @@ import org.springframework.messaging.handler.annotation.Header;
  * Service (QoS) levels. It is implemented as a Spring Integration messaging gateway.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@MessagingGateway(defaultRequestChannel = "mqttOutboundChannel")
 public interface MqttSendService {
 
     /**
@@ -46,7 +39,7 @@ public interface MqttSendService {
      * @param qos  Custom QoS
      * @param data string
      */
-    void sendToMqtt(@Header(MqttHeaders.QOS) Integer qos, String data);
+    void sendToMqtt(Integer qos, String data);
 
     /**
      * Send data using a custom topic and the default QoS
@@ -54,7 +47,7 @@ public interface MqttSendService {
      * @param topic Custom topic
      * @param data  string
      */
-    void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, String data);
+    void sendToMqtt(String topic, String data);
 
     /**
      * Send data using a custom topic and a custom QoS
@@ -63,6 +56,5 @@ public interface MqttSendService {
      * @param qos   Custom QoS
      * @param data  string
      */
-    void sendToMqtt(@Header(MqttHeaders.TOPIC) String topic, @Header(MqttHeaders.QOS) Integer qos, String data);
-
+    void sendToMqtt(String topic, Integer qos, String data);
 }

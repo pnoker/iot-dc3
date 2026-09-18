@@ -17,65 +17,91 @@
 
 <template>
   <dashboard-card
-    :empty="!loading && rows.length === 0"
+    :empty="status === 'success' && rows.length === 0"
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.protocolEmpty')"
     :loading="loading"
+    :error="status === 'error'"
+    :error-text="t('common.loadFailed')"
+    :retry-text="t('common.retry')"
     :title="t('settings.event.overview.protocolTitle')"
     body-mode="scroll"
     class="protocol-health"
     loading-target="button"
     @refresh="load"
   >
-    <el-table :data="rows" size="small">
-      <el-table-column :label="t('settings.event.overview.colProtocol')" min-width="140">
-        <template #default="{row}">
-          <span class="protocol-health__name">{{ stripPrefix(row.serviceName) }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="t('settings.event.overview.colDrivers')" align="right" prop="driverCount" width="100"/>
-      <!-- @vue-generic {ProtocolHealth} -->
-      <el-table-column :label="t('settings.event.overview.colEnabled')" align="right" width="120">
-        <template #default="{row}">
-          <span :class="enabledClass(row)" class="protocol-health__enabled">
-            {{ row.enabledCount }} / {{ row.driverCount }}
-          </span>
-        </template>
-      </el-table-column>
-      <el-table-column :label="t('settings.event.overview.colDevices')" align="right" prop="deviceCount" width="100"/>
-      <!-- @vue-generic {ProtocolHealth} -->
-      <el-table-column :label="t('settings.event.overview.colHealthRatio')" min-width="130">
-        <template #default="{row}">
-          <el-progress
-            :color="healthColor(row)"
-            :percentage="healthPercent(row)"
-            :show-text="false"
-            :stroke-width="8"
-          />
-        </template>
-      </el-table-column>
-    </el-table>
+    <responsive-record-list
+      :columns="columns"
+      :loading="loading"
+      :rows="rows"
+      :status="status"
+      embedded
+      row-key="serviceName"
+      @retry="load"
+    >
+      <template #cell-serviceName="{row}">
+        <span class="protocol-health__name">{{ stripPrefix(row.serviceName) }}</span>
+      </template>
+      <template #cell-enabled="{row}">
+        <span :class="enabledClass(row)" class="protocol-health__enabled">
+          {{ row.enabledCount }} / {{ row.driverCount }}
+        </span>
+      </template>
+      <template #cell-health="{row}">
+        <el-progress
+          :color="healthColor(row)"
+          :percentage="healthPercent(row)"
+          :show-text="false"
+          :stroke-width="8"
+        />
+      </template>
+    </responsive-record-list>
   </dashboard-card>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue';
+import {computed, onMounted, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
 
 import {protocolHealth} from '@/api/dashboard';
 import type {ProtocolHealth} from '@/config/types/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+import ResponsiveRecordList from '@/components/list/ResponsiveRecordList.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 const {t} = useI18n();
-const {loading, run} = useAsyncLoader();
+const {loading, run, status} = useAsyncLoader();
 
 const rows = ref<ProtocolHealth[]>([]);
+const columns = computed(() => [
+  {
+    key: 'serviceName',
+    label: t('settings.event.overview.colProtocol'),
+    minWidth: 140,
+    kind: 'custom' as const,
+    mobile: 'primary' as const,
+  },
+  {key: 'driverCount', label: t('settings.event.overview.colDrivers'), width: 100, mobile: 'detail' as const},
+  {
+    key: 'enabled',
+    label: t('settings.event.overview.colEnabled'),
+    width: 120,
+    kind: 'custom' as const,
+    mobile: 'detail' as const,
+  },
+  {key: 'deviceCount', label: t('settings.event.overview.colDevices'), width: 100, mobile: 'detail' as const},
+  {
+    key: 'health',
+    label: t('settings.event.overview.colHealthRatio'),
+    minWidth: 130,
+    kind: 'custom' as const,
+    mobile: 'detail' as const,
+  },
+]);
 
 const load = () =>
-  run(async () => {
-    const res: { data?: ProtocolHealth[] } = await protocolHealth();
-    rows.value = res?.data ?? [];
+  run(() => protocolHealth() as Promise<ProtocolHealth[]>, {
+    apply: (result) => (rows.value = result ?? []),
   });
 
 // Backend keeps the raw `dc3-driver-*` service name; strip the prefix
@@ -88,9 +114,9 @@ const healthPercent = (r: ProtocolHealth) =>
 
 const healthColor = (r: ProtocolHealth) => {
   const p = healthPercent(r);
-  if (p === 100) return '#67c23a';
-  if (p >= 50) return '#e6a23c';
-  return '#f56c6c';
+  if (p === 100) return 'var(--el-color-success)';
+  if (p >= 50) return 'var(--el-color-warning)';
+  return 'var(--el-color-danger)';
 };
 
 const enabledClass = (r: ProtocolHealth) => {
@@ -111,7 +137,7 @@ defineExpose({refresh: load});
 .protocol-health {
   .protocol-health__name {
     font-family: 'Menlo', monospace;
-    color: #303133;
+    color: var(--dc3-text-primary);
     font-size: 13px;
   }
 
@@ -119,15 +145,15 @@ defineExpose({refresh: load});
     font-weight: 600;
 
     &--ok {
-      color: #67c23a;
+      color: var(--el-color-success);
     }
 
     &--warn {
-      color: #e6a23c;
+      color: var(--el-color-warning);
     }
 
     &--bad {
-      color: #f56c6c;
+      color: var(--el-color-danger);
     }
   }
 }

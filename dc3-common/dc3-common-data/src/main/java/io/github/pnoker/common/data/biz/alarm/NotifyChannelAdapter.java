@@ -14,17 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
+import reactor.core.publisher.Mono;
 
 /**
  * Notification channel adapter.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface NotifyChannelAdapter {
@@ -41,8 +40,7 @@ public interface NotifyChannelAdapter {
      *
      * @param channel channel
      * @param payload rendered payload
-     * @return send result
+     * @return asynchronous send result
      */
-    NotifySendResult send(NotifyChannelBO channel, MessagePayload payload);
-
+    Mono<NotifySendResult> send(NotifyChannelBO channel, MessagePayload payload);
 }

@@ -14,8 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.bo.RegisterBO;
@@ -29,11 +32,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.verify;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class DriverRegisterServiceImplTest {
@@ -60,11 +59,12 @@ class DriverRegisterServiceImplTest {
         properties.setRemark("integration");
         properties.setType(DriverTypeEnum.DRIVER_CLIENT);
         service = new DriverRegisterServiceImpl(properties, driverClient);
+        org.mockito.Mockito.when(driverClient.driverRegister(any())).thenReturn(Mono.empty());
     }
 
     @Test
     void initialBuildsRegistrationPayloadFromProperties() {
-        service.initial();
+        service.initial().block();
 
         ArgumentCaptor<RegisterBO> captor = ArgumentCaptor.forClass(RegisterBO.class);
         verify(driverClient).driverRegister(captor.capture());
@@ -81,9 +81,9 @@ class DriverRegisterServiceImplTest {
 
     @Test
     void initialWrapsClientFailureInServiceException() {
-        doThrow(new RuntimeException("manager unavailable")).when(driverClient)
-                .driverRegister(any());
-        assertThatThrownBy(() -> service.initial())
+        org.mockito.Mockito.when(driverClient.driverRegister(any()))
+                .thenReturn(Mono.error(new RuntimeException("manager unavailable")));
+        assertThatThrownBy(() -> service.initial().block())
                 .isInstanceOf(ServiceException.class)
                 .hasMessageContaining("Driver initialization failed");
     }

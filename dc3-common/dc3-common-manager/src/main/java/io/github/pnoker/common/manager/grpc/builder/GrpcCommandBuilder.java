@@ -14,57 +14,38 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.grpc.builder;
 
-import io.github.pnoker.api.center.manager.GrpcPageCommandQuery;
 import io.github.pnoker.api.common.GrpcBase;
 import io.github.pnoker.api.common.GrpcCommandDTO;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.enums.CallTypeEnum;
-import io.github.pnoker.common.enums.CommandTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.CommandBO;
-import io.github.pnoker.common.manager.entity.query.CommandQuery;
-import io.github.pnoker.common.optional.EnableOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.Optional;
-
 /**
  * MapStruct builder for command gRPC message conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface GrpcCommandBuilder {
 
-    @Mapping(target = "page", ignore = true)
-    @Mapping(target = "commandType", ignore = true)
-    @Mapping(target = "callType", ignore = true)
-    @Mapping(target = "enableFlag", ignore = true)
-    CommandQuery buildQueryByGrpcQuery(GrpcPageCommandQuery entityQuery);
-
-    @AfterMapping
-    default void afterProcess(GrpcPageCommandQuery entityGrpc, @MappingTarget CommandQuery.CommandQueryBuilder entityQuery) {
-        Pages pages = GrpcBuilderUtil.buildPagesByGrpcPage(entityGrpc.getPage());
-        entityQuery.page(pages);
-
-        Optional.ofNullable(CommandTypeEnum.ofIndex((byte) entityGrpc.getCommandTypeFlag()))
-                .ifPresent(entityQuery::commandType);
-        Optional.ofNullable(CallTypeEnum.ofIndex((byte) entityGrpc.getCallTypeFlag()))
-                .ifPresent(entityQuery::callType);
-        EnableOptional.ofNullable(entityGrpc.getEnableFlag()).ifPresent(entityQuery::enableFlag);
-    }
-
+    /**
+     * Convert bo to grpc transfer object.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "commandExt", ignore = true)
     @Mapping(target = "commandTypeFlag", ignore = true)
     @Mapping(target = "callTypeFlag", ignore = true)
@@ -83,6 +64,12 @@ public interface GrpcCommandBuilder {
     @Mapping(target = "allFields", ignore = true)
     GrpcCommandDTO buildGrpcDTOByBO(CommandBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO   business object
+     * @param entityGrpc entity grpc
+     */
     @AfterMapping
     default void afterProcess(CommandBO entityBO, @MappingTarget GrpcCommandDTO.Builder entityGrpc) {
         GrpcBase grpcBase = GrpcBuilderUtil.buildGrpcBaseByBO(entityBO);
@@ -91,14 +78,16 @@ public interface GrpcCommandBuilder {
         Optional.ofNullable(entityBO.getCommandExt())
                 .ifPresent(value -> entityGrpc.setCommandExt(JsonUtil.toJsonString(value)));
         Optional.ofNullable(entityBO.getCommandTypeFlag())
-                .ifPresentOrElse(value -> entityGrpc.setCommandTypeFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setCommandTypeFlag(value.getIndex()),
                         () -> entityGrpc.setCommandTypeFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(entityBO.getCallTypeFlag())
-                .ifPresentOrElse(value -> entityGrpc.setCallTypeFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setCallTypeFlag(value.getIndex()),
                         () -> entityGrpc.setCallTypeFlag(DefaultConstant.NULL_INT));
         Optional.ofNullable(entityBO.getEnableFlag())
-                .ifPresentOrElse(value -> entityGrpc.setEnableFlag(value.getIndex()),
+                .ifPresentOrElse(
+                        value -> entityGrpc.setEnableFlag(value.getIndex()),
                         () -> entityGrpc.setEnableFlag(DefaultConstant.DEFAULT_INT));
     }
-
 }

@@ -14,26 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Tree-shaped variant of {@link MenuVO} — used by GET /menu/tree so the frontend can
  * render directly into el-table / sidebar trees without re-assembling flat rows.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter
@@ -45,8 +42,9 @@ import java.util.List;
 @Schema(description = "Menu Tree view object")
 public class MenuTreeVO extends MenuVO {
 
-    @Schema(description = "Ordered list of direct child menu nodes nested under this menu entry; empty when the node is a leaf.")
+    @Schema(
+            description =
+                    "Ordered list of direct child menu nodes nested under this menu entry; empty when the node is a leaf.")
     @ToString.Exclude
     private List<MenuTreeVO> children = new ArrayList<>();
-
 }

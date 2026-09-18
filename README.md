@@ -5,7 +5,7 @@
 > **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="./.github/brand/png/banner.en.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
 </p>
 
 <p align="center">
@@ -28,13 +28,13 @@
 
 <p align="center">
   <strong>
-    IoT DC3 — the multi-protocol, AI-powered, cloud-native open-source industrial IoT platform.<br>
-    Cloud-native microservices · Multi-protocol connectivity · AI-assisted operations · 28 ready-to-use drivers
+    IoT DC3 — the multi-protocol, cloud-native, open-source industrial IoT platform.<br>
+    AI-powered — from device connectivity to industrial agents
   </strong>
 </p>
 
 <p align="center">
-  <a href="https://docs.dc3.site">https://docs.dc3.site</a>
+  <a href="https://dc3.site">https://dc3.site</a>
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="Platform dashboard" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="Platform dashboard" width="100%">
       <br>
       <strong>Home / Dashboard</strong><br>
       <em>System overview · Online device metrics · Data trend charts</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="Device management page" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="Device management page" width="100%">
       <br>
       <strong>Device Management</strong><br>
       <em>Device list · Online status · Search and filtering</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="AI chat page" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI chat page" width="100%">
       <br>
       <strong>AI Chat</strong><br>
       <em>Natural-language device queries · Data analysis · Intelligent assistance</em>
@@ -79,11 +79,11 @@
 
 ### Architecture at a Glance
 
-![IoT DC3 Architecture Panorama](docs/public/images/architecture-panorama-en.png)
+![IoT DC3 Architecture Panorama](https://docs.dc3.site/images/architecture-panorama-en.png)
 
-Six-layer microservice architecture at a glance: clients → gateway → four center services → message bus → 28 protocol
-drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence and optional observability stack
-(ELK + Prometheus + Grafana) laid out in one view.
+Six-layer microservice architecture at a glance: clients → gateway → four center services → message bus → 36 protocol
+drivers → field devices. PostgreSQL (TimescaleDB + pgvector + AGE) persistence and optional observability stack (ELK +
+Prometheus + Grafana) laid out in one view.
 
 🧱 **Design principles** — cross-service calls always go through Facade interfaces; the DO/BO/VO three-tier model keeps
 persistence, business, and API shapes strictly separated; and tenant isolation runs end to end across database, cache,
@@ -96,16 +96,16 @@ and API paths. Clear boundaries that scale across services and teams.
 
 ### 🔌 Multi-Protocol Device Connectivity
 
-IoT DC3 includes **28 access driver modules** for industrial automation, IoT communication, data bridging, basic
+IoT DC3 includes **36 access driver modules** for industrial automation, IoT communication, data bridging, basic
 communication, and simulation/debugging scenarios, reducing the cost of connecting common devices and data sources:
 
-| Category                           | Driver Modules                                                                                                                                     |
-|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🏭 **Industrial protocols**        | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
-| 📡 **IoT protocols**               | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
-| 🗄️ **Data bridging**              | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
-| 🔧 **Basic communication and NMS** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
-| 🧪 **Simulation and debugging**    | Virtual · Listening Virtual                                                                                                                        |
+| Category                                      | Driver Modules                                                                                                                                                                               |
+|-----------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🏭 **Industrial protocols**                   | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · IEC 61850 · DNP3 · DLMS · DLT645 · KNX · M-Bus · SL651 |
+| 📡 **IoT protocols**                          | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee · LoRaWAN                                                                                                                                          |
+| 🗄️ **Data bridging**                          | MySQL · PostgreSQL · Oracle · SQL Server · Redis                                                                                                                                             |
+| 🔧 **Basic communication, messaging and NMS** | TCP/UDP · Serial · SNMP · CAN · Kafka                                                                                                                                                        |
+| 🧪 **Simulation and debugging**               | Virtual · Listening Virtual                                                                                                                                                                  |
 
 The **Driver SDK** supports fast development of custom protocol drivers and registration into the runtime platform.
 
@@ -133,7 +133,9 @@ Distributed microservice architecture based on **Spring Boot 4 + Spring Cloud 20
 
 ### 📊 Real-Time Data Engine
 
-- **Data collection** - Drivers collect device telemetry and send it asynchronously through RabbitMQ
+- **Data collection** - Drivers collect device telemetry and send it asynchronously through the internal message
+  broker — pluggable per deployment: RabbitMQ (default), Kafka, Pulsar or any MQTT 5 broker
+  ([broker guide](docs/mq-brokers.md))
 - **Time-series storage** - Efficient queries for real-time and historical data
 - **Rule engine** - Flexible alarm rules with multi-level alarms and notifications
 - **Event traceability** - Full command and event history
@@ -150,8 +152,8 @@ Distributed microservice architecture based on **Spring Boot 4 + Spring Cloud 20
 - **Driver SDK** - A complete driver development toolkit. See
   the [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring)
 - **Separated frontend and backend** - Vue 3 + TypeScript frontend, RESTful and gRPC APIs
-- **Containerized deployment** - One-command startup with Podman / Docker Compose, with a path toward Kubernetes and
-  other container platforms
+- **Containerized deployment** - One-command startup with Podman / Docker Compose, plus compose scaling, Docker Swarm,
+  Kubernetes and Helm deployment configs. See the [Deployment Guide](dc3/doc/DEPLOYMENT.md).
 - **Complete documentation** - Online docs, quickstart guide, and troubleshooting guide
 
 ## ⚡ Quick Start
@@ -171,11 +173,12 @@ Use `make up-db-cn` if you prefer the Alibaba Cloud registry in Mainland China.
 
 ## 🛠️ Technology Stack
 
-IoT DC3 is built on Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3,
+IoT DC3 is built on Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, a pluggable message broker
+(RabbitMQ, Kafka, Pulsar or MQTT 5 — [selection guide](docs/mq-brokers.md)), gRPC, Vue 3,
 TypeScript, and Vite.
 
-See [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) for component details and
-where each technology is used.
+See [Technology Stack](https://docs.dc3.site/en/development/technology-stack) for component details and where each
+technology is used.
 
 ## 📖 Documentation and Community
 
@@ -183,13 +186,13 @@ where each technology is used.
 |-----------------------|---------------------------------------------------------------------------------|
 | 📚 Online docs        | [docs.dc3.site](https://docs.dc3.site/)                                         |
 | 🚀 Quickstart         | [Quickstart Guide](https://docs.dc3.site/en/quickstart/)                        |
-| 🛠️ Technology stack  | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack)      |
-| 🏗️ Architecture      | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
+| 🛠️ Technology stack   | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)       |
+| 🏗️ Architecture       | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
 | 🔧 Driver development | [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring) |
 | 🐛 Troubleshooting    | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)               |
 | 📋 Changelog          | [Release Changelog](https://docs.dc3.site/en/development/changelog)             |
 | 🐛 Issue feedback     | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                       |
-| 🇨🇳 Gitee mirror     | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                           |
+| 🇨🇳 Gitee mirror       | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                           |
 
 ## 🌍 Use Cases
 
@@ -236,7 +239,3 @@ IoT DC3 is open source under the [AGPL 3.0](./LICENSE-AGPL.txt) license.
   commercial license
 
 For commercial licensing details, see [LICENSE.txt](./LICENSE.txt).
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)

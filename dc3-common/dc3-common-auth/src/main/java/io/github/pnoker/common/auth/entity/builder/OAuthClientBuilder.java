@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.bo.OAuthClientRegistrationBO;
@@ -24,23 +23,23 @@ import io.github.pnoker.common.auth.entity.vo.OAuthClientVO;
 import io.github.pnoker.common.enums.OAuthClientTypeEnum;
 import io.github.pnoker.common.enums.OAuthGrantTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-
 /**
  * MapStruct builder converting an OAuth registered client projection to its view object.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface OAuthClientBuilder {
 
     /**
@@ -50,8 +49,21 @@ public interface OAuthClientBuilder {
      * @return EntityVO
      */
     @Mapping(target = "clientType", ignore = true)
+    @Mapping(target = "remark", ignore = true)
+    @Mapping(target = "creatorId", ignore = true)
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
     OAuthClientVO buildVOByRecord(OAuthRegisteredClientRecord entityRecord);
 
+    /**
+     * After process.
+     *
+     * @param entityRecord entity record
+     * @param entityVO     view object
+     */
     @AfterMapping
     default void afterProcess(OAuthRegisteredClientRecord entityRecord, @MappingTarget OAuthClientVO entityVO) {
         entityVO.setClientType(OAuthClientTypeEnum.ofValue(entityRecord.getClientType()));
@@ -73,11 +85,25 @@ public interface OAuthClientBuilder {
      */
     @Mapping(target = "clientType", ignore = true)
     @Mapping(target = "grantTypes", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "remark", ignore = true)
+    @Mapping(target = "creatorId", ignore = true)
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
     OAuthClientRegistrationBO buildBOByRequestVO(OAuthClientRegistrationRequestVO entityVO);
 
+    /**
+     * After process.
+     *
+     * @param entityVO view object
+     * @param entityBO business object
+     */
     @AfterMapping
-    default void afterProcess(OAuthClientRegistrationRequestVO entityVO,
-                              @MappingTarget OAuthClientRegistrationBO entityBO) {
+    default void afterProcess(
+            OAuthClientRegistrationRequestVO entityVO, @MappingTarget OAuthClientRegistrationBO entityBO) {
         entityBO.setClientType(
                 OAuthClientTypeEnum.ofValue(StringUtils.upperCase(StringUtils.trimToNull(entityVO.getClientType()))));
         if (Objects.nonNull(entityVO.getGrantTypes())) {
@@ -101,5 +127,4 @@ public interface OAuthClientBuilder {
         String raw = StringUtils.upperCase(StringUtils.trimToNull(entityVO.getClientType()));
         return Objects.nonNull(raw) && Objects.isNull(OAuthClientTypeEnum.ofValue(raw));
     }
-
 }

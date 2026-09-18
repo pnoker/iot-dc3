@@ -14,13 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
-import io.github.pnoker.common.facade.entity.query.FacadeProfileQuery;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
-import io.github.pnoker.common.manager.entity.query.ProfileQuery;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
 
@@ -28,14 +25,18 @@ import org.mapstruct.Mapper;
  * FacadeProfile ↔ manager ProfileBO/Query mapper.
  *
  * @author pnoker
- * @version 2026.5.14
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface FacadeProfileBuilder {
 
-    ProfileQuery toManagerQuery(FacadeProfileQuery facadeQuery);
-
+    /**
+     * To facade business object.
+     *
+     * @param managerBO business object
+     * @return to facade business object result
+     */
     FacadeProfileBO toFacadeBO(ProfileBO managerBO);
-
 }

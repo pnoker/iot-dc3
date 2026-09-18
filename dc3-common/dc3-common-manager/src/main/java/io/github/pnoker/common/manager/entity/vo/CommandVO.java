@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -39,7 +38,6 @@ import lombok.ToString;
  * View object for command API responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -51,37 +49,63 @@ import lombok.ToString;
 @Schema(description = "Command view object")
 public class CommandVO extends BaseVO {
 
-    @NotBlank(message = "Command name can't be empty", groups = {Add.class})
-    @Schema(description = "Command name. Unique name within a tenant.", example = "Read Holding Register", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Pattern(regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$", message = "Invalid command name format",
+    @NotBlank(
+            message = "Command name can't be empty",
+            groups = {Add.class})
+    @Schema(
+            description = "Command name. Unique name within a tenant.",
+            example = "Read Holding Register",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @Pattern(
+            regexp = "^[A-Za-z0-9\\u4e00-\\u9fa5][A-Za-z0-9\\u4e00-\\u9fa5-_#@/.|]{1,31}$",
+            message = "Invalid command name format",
             groups = {Add.class, Update.class})
     private String commandName;
 
-    @Schema(description = "Command code. Stable business identifier; must not change once deployed.", example = "READ_HOLDING_REG")
+    @Schema(
+            description = "Command code. Stable business identifier; must not change once deployed.",
+            example = "READ_HOLDING_REG")
     private String commandCode;
 
-    @Schema(description = "Command type: READ (fetch data) or WRITE (send data).", example = "READ", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotNull(message = "Command type can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Command type: READ (fetch data) or WRITE (send data).",
+            example = "READ",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Command type can't be empty",
+            groups = {Add.class, Update.class})
     private CommandTypeEnum commandTypeFlag;
 
-    @Schema(description = "Command invocation mode: SYNC (wait for response) or ASYNC (fire and forget).", example = "SYNC", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotNull(message = "Call type can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description = "Command invocation mode: SYNC (wait for response) or ASYNC (fire and forget).",
+            example = "SYNC",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Call type can't be empty",
+            groups = {Add.class, Update.class})
     private CallTypeEnum callTypeFlag;
 
-    @Schema(description = "Command execution timeout in milliseconds. The command is cancelled if no response is received within this period.", example = "3000", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotNull(message = "Command timeout can't be empty", groups = {Add.class, Update.class})
+    @Schema(
+            description =
+                    "Command execution timeout in milliseconds. The command is cancelled if no response is received within this period.",
+            example = "3000",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Command timeout can't be empty",
+            groups = {Add.class, Update.class})
     private Integer timeout;
 
     @Schema(description = "Command extension information, serialized as JSON for custom parameters and metadata.")
     private CommandExt commandExt;
 
-    @Schema(description = "ID of the profile (device template) this command is defined in.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
-
-    @NotNull(message = "Profile ID can't be empty", groups = {Add.class, Update.class})
-    private Long profileId;
+    @Schema(
+            description = "ID of the profile (device template) this command is defined in.",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Profile ID can't be empty",
+            groups = {Add.class, Update.class})
+    private String profileId;
 
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
@@ -89,7 +113,11 @@ public class CommandVO extends BaseVO {
     @Schema(description = "Signature used for configuration integrity verification.")
     private String signature;
 
+    @Schema(
+            description = "Identifier of the owning tenant; read-only, resolved server-side from the auth context.",
+            example = "1")
+    private String tenantId;
+
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
-
 }

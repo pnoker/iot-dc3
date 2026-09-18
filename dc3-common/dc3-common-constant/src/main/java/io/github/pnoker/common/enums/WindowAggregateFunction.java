@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.Locale;
+import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * SQL aggregate functions valid for repository window aggregation queries.
@@ -31,7 +29,6 @@ import java.util.Locale;
  * {@code num_value}; COUNT counts every row in the window.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Getter
@@ -65,6 +62,9 @@ public enum WindowAggregateFunction {
     /**
      * Resolves a free-form string ({@code "AVG"}, {@code "avg"}, whitespace ok)
      * to the corresponding function, returning {@code null} when unrecognized.
+     *
+     * @param function free-form function name
+     * @return the matching function, or {@code null} when unrecognized
      */
     public static WindowAggregateFunction ofCode(String function) {
         if (StringUtils.isBlank(function)) {
@@ -76,5 +76,4 @@ public enum WindowAggregateFunction {
                 .findFirst()
                 .orElse(null);
     }
-
 }

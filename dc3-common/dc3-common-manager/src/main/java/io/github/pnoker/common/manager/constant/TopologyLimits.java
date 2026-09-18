@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.constant;
 
 /**
@@ -24,7 +23,6 @@ package io.github.pnoker.common.manager.constant;
  * place to look, and so controller + tests can share the same symbols.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.4
  */
 public final class TopologyLimits {
@@ -77,5 +75,4 @@ public final class TopologyLimits {
     private TopologyLimits() {
         // utility class — never instantiated
     }
-
 }

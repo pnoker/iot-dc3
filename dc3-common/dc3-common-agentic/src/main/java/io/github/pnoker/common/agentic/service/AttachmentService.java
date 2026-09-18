@@ -18,17 +18,15 @@ package io.github.pnoker.common.agentic.service;
 
 import io.github.pnoker.common.agentic.entity.bo.AttachmentBO;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import org.springframework.http.codec.multipart.FilePart;
-import reactor.core.publisher.Mono;
-
 import java.util.List;
-
+import org.springframework.http.codec.multipart.FilePart;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Service for uploading and summarizing conversation attachments.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface AttachmentService {
@@ -51,7 +49,7 @@ public interface AttachmentService {
      * @param header         authenticated caller principal and tenant
      * @return the conversation's attachments
      */
-    List<AttachmentBO> list(String conversationId, RequestHeader.PrincipalHeader header);
+    Flux<AttachmentBO> list(String conversationId, RequestHeader.PrincipalHeader header);
 
     /**
      * Summarize the given attachments into a metadata text suitable for inclusion in a
@@ -61,6 +59,5 @@ public interface AttachmentService {
      * @param header        authenticated caller principal and tenant
      * @return the summary text
      */
-    String summarize(List<Long> attachmentIds, RequestHeader.PrincipalHeader header);
-
+    Mono<String> summarize(List<Long> attachmentIds, RequestHeader.PrincipalHeader header);
 }

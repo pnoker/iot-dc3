@@ -19,11 +19,9 @@ syntax = "proto3";
 
 package api.common.manager;
 
-import "api/common/page.proto";
-import "api/common/r.proto";
 import "api/common/entity.proto";
 import "api/common/manager/manager_query.proto";
-import "api/common/manager/manager_query_page.proto";
+import "api/common/page.proto";
 
 // Configuration options for code generation
 option java_package = "io.github.pnoker.api.center.manager";
@@ -33,46 +31,36 @@ option java_multiple_files = true;
 
 // Service interface defining RPC calls related to point management
 service PointApi {
-  // Paginated query for point information
-  rpc ListByPage (GrpcPagePointQuery) returns (GrpcRPagePointDTO);
+  // Canonical offset-based reactive query. Page-number RPCs are retired for new clients.
+  rpc List (GrpcOffsetPointQuery) returns (GrpcOffsetPagePointDTO);
   // Query single point information by point ID
-  rpc GetById (GrpcPointQuery) returns (GrpcRPointDTO);
+  rpc GetById (GrpcPointQuery) returns (GrpcPointDTO);
   // Batch query point information by point IDs
-  rpc ListByIds (GrpcPointIdsQuery) returns (GrpcRPointListDTO);
+  rpc ListByIds (GrpcPointIdsQuery) returns (GrpcPointListDTO);
 }
 
-// Response wrapper for paginated point query
-message GrpcRPagePointDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
-  // Returned paginated point data
-  GrpcPagePointDTO data = 2;
+message GrpcOffsetPointQuery {
+  PageRequest page = 1;
+  int64 tenant_id = 2;
+  string point_name = 3;
+  string point_code = 4;
+  optional int32 point_type_flag = 5;
+  optional int32 rw_flag = 6;
+  optional int64 profile_id = 7;
+  optional int64 group_id = 8;
+  optional int64 label_id = 9;
+  optional int32 enable_flag = 10;
+  optional int32 version = 11;
+  optional int64 device_id = 12;
 }
 
-// Point pagination data structure
-message GrpcPagePointDTO {
-  // Pagination information including page number, page size, and total count
-  GrpcPage page = 1;
-
-  // List of point data
-  repeated GrpcPointDTO data = 2;
+message GrpcOffsetPagePointDTO {
+  OffsetPage page = 1;
+  repeated GrpcPointDTO items = 2;
 }
+
 
 // Response wrapper for point list query
-message GrpcRPointListDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
-  // Returned point list data
-  repeated GrpcPointDTO data = 2;
-}
-
-// Response wrapper for single point query
-message GrpcRPointDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
-  // Returned single point data
-  GrpcPointDTO data = 2;
+message GrpcPointListDTO {
+  repeated GrpcPointDTO items = 1;
 }

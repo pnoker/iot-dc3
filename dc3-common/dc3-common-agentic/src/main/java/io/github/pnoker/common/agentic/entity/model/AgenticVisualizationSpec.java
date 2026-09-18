@@ -18,21 +18,19 @@ package io.github.pnoker.common.agentic.entity.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Safe, structured visualization contract emitted by platform tools and
  * rendered by the frontend through a fixed chart whitelist.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter
@@ -63,6 +61,9 @@ public class AgenticVisualizationSpec implements Serializable {
 
     private List<Annotation> annotations;
 
+    /**
+     * Visual-channel bindings: which field maps to x/y/color/size.
+     */
     @Getter
     @Setter
     @ToString
@@ -83,15 +84,24 @@ public class AgenticVisualizationSpec implements Serializable {
 
         private String shape;
 
+        /**
+         * Xy.
+         *
+         * @param x x
+         * @param y y
+         * @return xy result
+         */
         public static Encode xy(String x, String y) {
             Encode encode = new Encode();
             encode.setX(x);
             encode.setY(y);
             return encode;
         }
-
     }
 
+    /**
+     * One chart annotation (type, value, label).
+     */
     @Getter
     @Setter
     @ToString
@@ -107,7 +117,5 @@ public class AgenticVisualizationSpec implements Serializable {
         private Object value;
 
         private String label;
-
     }
-
 }

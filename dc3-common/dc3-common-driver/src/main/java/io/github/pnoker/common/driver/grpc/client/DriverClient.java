@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.grpc.client;
 
 import io.github.pnoker.api.common.GrpcCommandAttributeDTO;
@@ -24,8 +23,10 @@ import io.github.pnoker.api.common.GrpcDriverQuery;
 import io.github.pnoker.api.common.GrpcEventAttributeDTO;
 import io.github.pnoker.api.common.GrpcPointAttributeDTO;
 import io.github.pnoker.api.common.driver.DriverApiGrpc;
+import io.github.pnoker.api.common.driver.GrpcDriverLeaseDTO;
+import io.github.pnoker.api.common.driver.GrpcDriverLeaseRequest;
 import io.github.pnoker.api.common.driver.GrpcDriverRegisterDTO;
-import io.github.pnoker.api.common.driver.GrpcRDriverRegisterDTO;
+import io.github.pnoker.api.common.driver.GrpcDriverRegistrationDTO;
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
 import io.github.pnoker.common.driver.entity.bo.RegisterBO;
 import io.github.pnoker.common.driver.entity.builder.DriverBuilder;
@@ -37,38 +38,38 @@ import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.exception.RegisterException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.optional.CollectionOptional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 /**
  * gRPC client responsible for driver registration and for loading the metadata returned
  * by the manager center after registration succeeds.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class DriverClient {
 
-    private final DriverApiGrpc.DriverApiBlockingStub driverApiBlockingStub;
+    private final DriverApiGrpc.DriverApiStub driverApiStub;
 
     private final DriverMetadata driverMetadata;
+
+    private final DriverProperties driverProperties;
 
     private final DriverBuilder driverBuilder;
 
@@ -86,44 +87,40 @@ public class DriverClient {
      *
      * @param entityBO driver registration payload
      */
-    public void driverRegister(RegisterBO entityBO) {
-        // Build driver registration information
-        GrpcDriverRegisterDTO.Builder builder = GrpcDriverRegisterDTO.newBuilder();
-        GrpcDriverDTO grpcDriverDTO = driverBuilder.buildGrpcDTOByDTO(entityBO.getDriver());
-        builder.setTenant(entityBO.getTenant()).setClient(entityBO.getClient()).setDriver(grpcDriverDTO);
+    public Mono<Void> driverRegister(RegisterBO entityBO) {
+        return Mono.defer(() -> {
+            GrpcDriverRegisterDTO.Builder builder = GrpcDriverRegisterDTO.newBuilder();
+            GrpcDriverDTO grpcDriverDTO = driverBuilder.buildGrpcDTOByDTO(entityBO.getDriver());
+            builder.setTenant(entityBO.getTenant())
+                    .setClient(entityBO.getClient())
+                    .setNode(entityBO.getNode())
+                    .setLeaseSeconds(entityBO.getLeaseSeconds())
+                    .setDriver(grpcDriverDTO);
 
-        CollectionOptional.ofNullable(entityBO.getDriverAttributes()).ifPresent(value -> {
-            List<GrpcDriverAttributeDTO> grpcDriverAttributeDTOList = value.stream()
-                    .map(grpcDriverAttributeBuilder::buildGrpcDTOByDTO)
-                    .toList();
-            builder.addAllDriverAttributes(grpcDriverAttributeDTOList);
-        });
-        CollectionOptional.ofNullable(entityBO.getPointAttributes()).ifPresent(value -> {
-            List<GrpcPointAttributeDTO> grpcPointAttributeDTOList = value.stream()
-                    .map(grpcPointAttributeBuilder::buildGrpcDTOByDTO)
-                    .toList();
-            builder.addAllPointAttributes(grpcPointAttributeDTOList);
-        });
-        CollectionOptional.ofNullable(entityBO.getCommandAttributes()).ifPresent(value -> {
-            List<GrpcCommandAttributeDTO> grpcCommandAttributeDTOList = value.stream()
-                    .map(grpcCommandAttributeBuilder::buildGrpcDTOByDTO)
-                    .toList();
-            builder.addAllCommandAttributes(grpcCommandAttributeDTOList);
-        });
-        CollectionOptional.ofNullable(entityBO.getEventAttributes()).ifPresent(value -> {
-            List<GrpcEventAttributeDTO> grpcEventAttributeDTOList = value.stream()
-                    .map(grpcEventAttributeBuilder::buildGrpcDTOByDTO)
-                    .toList();
-            builder.addAllEventAttributes(grpcEventAttributeDTOList);
-        });
+            CollectionOptional.ofNullable(entityBO.getDriverAttributes())
+                    .ifPresent(value -> builder.addAllDriverAttributes(value.stream()
+                            .map(grpcDriverAttributeBuilder::buildGrpcDTOByDTO)
+                            .toList()));
+            CollectionOptional.ofNullable(entityBO.getPointAttributes())
+                    .ifPresent(value -> builder.addAllPointAttributes(value.stream()
+                            .map(grpcPointAttributeBuilder::buildGrpcDTOByDTO)
+                            .toList()));
+            CollectionOptional.ofNullable(entityBO.getCommandAttributes())
+                    .ifPresent(value -> builder.addAllCommandAttributes(value.stream()
+                            .map(grpcCommandAttributeBuilder::buildGrpcDTOByDTO)
+                            .toList()));
+            CollectionOptional.ofNullable(entityBO.getEventAttributes())
+                    .ifPresent(value -> builder.addAllEventAttributes(value.stream()
+                            .map(grpcEventAttributeBuilder::buildGrpcDTOByDTO)
+                            .toList()));
 
-        // Initiate driver registration
-        GrpcRDriverRegisterDTO rDriverRegisterDTO = driverApiBlockingStub.driverRegister(builder.build());
-        if (!rDriverRegisterDTO.getResult().getOk()) {
-            throw new RegisterException(rDriverRegisterDTO.getResult().getMessage());
-        }
-
-        applyMetadata(rDriverRegisterDTO);
+            return ReactiveGrpcClientSupport.<GrpcDriverRegisterDTO, GrpcDriverRegistrationDTO>unary(
+                            "register driver", observer -> driverApiStub.driverRegister(builder.build(), observer))
+                    .flatMap(response -> {
+                        applyMetadata(response);
+                        return renewLease();
+                    });
+        });
     }
 
     /**
@@ -132,69 +129,151 @@ public class DriverClient {
      *
      * @param driverId registered driver id
      */
-    public void refreshMetadata(Long driverId) {
-        if (Objects.isNull(driverId) || driverId <= 0) {
-            throw new ServiceException("Failed to refresh driver metadata: invalid driver id");
-        }
-
-        GrpcDriverQuery query = GrpcDriverQuery.newBuilder()
-                .setTenantId(driverMetadata.getDriver().getTenantId())
-                .setDriverId(driverId).build();
-        GrpcRDriverRegisterDTO rDriverRegisterDTO = driverApiBlockingStub.getById(query);
-        if (!rDriverRegisterDTO.getResult().getOk()) {
-            throw new ServiceException(rDriverRegisterDTO.getResult().getMessage());
-        }
-
-        applyMetadata(rDriverRegisterDTO);
+    public Mono<Void> refreshMetadata(Long driverId) {
+        return Mono.defer(() -> {
+            if (Objects.isNull(driverId) || driverId <= 0) {
+                return Mono.error(new ServiceException("Failed to refresh driver metadata: invalid driver id"));
+            }
+            DriverBO driver = driverMetadata.getDriver();
+            if (Objects.isNull(driver) || Objects.isNull(driver.getTenantId())) {
+                // The driver's own registration event can be consumed before
+                // applyMetadata finishes; the registration response carries the full
+                // snapshot, so this redundant pre-registration event is a no-op.
+                return Mono.empty();
+            }
+            GrpcDriverQuery query = GrpcDriverQuery.newBuilder()
+                    .setTenantId(driver.getTenantId())
+                    .setDriverId(driverId)
+                    .build();
+            return ReactiveGrpcClientSupport.<GrpcDriverQuery, GrpcDriverRegistrationDTO>unary(
+                            "refresh driver metadata", observer -> driverApiStub.getById(query, observer))
+                    .doOnNext(this::applyMetadata)
+                    .then();
+        });
     }
 
-    private void applyMetadata(GrpcRDriverRegisterDTO rDriverRegisterDTO) {
+    /**
+     * Renew runtime membership and replace the locally owned device set.
+     */
+    public Mono<Void> renewLease() {
+        return Mono.defer(() -> {
+            DriverBO driver = driverMetadata.getDriver();
+            if (Objects.isNull(driver)) {
+                return Mono.error(new ServiceException("Failed to renew driver lease: driver is not registered"));
+            }
+            GrpcDriverLeaseRequest request = GrpcDriverLeaseRequest.newBuilder()
+                    .setTenantId(driver.getTenantId())
+                    .setDriverId(driver.getId())
+                    .setNode(driverProperties.getNode())
+                    .setClient(driverProperties.getClient())
+                    .setHost(driverProperties.getHost())
+                    .setLeaseSeconds(driverProperties.getLease().getSeconds())
+                    .setAssignmentVersion(driverMetadata.getAssignmentVersion())
+                    .build();
+            return ReactiveGrpcClientSupport.<GrpcDriverLeaseRequest, GrpcDriverLeaseDTO>stream(
+                            "renew driver lease", observer -> driverApiStub.renewLease(request, observer))
+                    .collect(LeaseSnapshot::new, LeaseSnapshot::accept)
+                    .flatMap(snapshot -> snapshot.install(driverMetadata));
+        });
+    }
+
+    private static final class LeaseSnapshot {
+
+        private final Map<Long, Long> owned = new HashMap<>();
+        private Long assignmentVersion;
+        private Long leaseUntilEpochMillis;
+        private Boolean assignmentsChanged;
+        private boolean snapshotComplete;
+        private int batches;
+
+        private void accept(GrpcDriverLeaseDTO response) {
+            if (snapshotComplete) {
+                throw new ServiceException("Driver lease stream continued after snapshot completion");
+            }
+            if (assignmentVersion == null) {
+                assignmentVersion = response.getAssignmentVersion();
+                leaseUntilEpochMillis = response.getLeaseUntilEpochMillis();
+                assignmentsChanged = response.getAssignmentsChanged();
+            } else if (!Objects.equals(assignmentVersion, response.getAssignmentVersion())
+                    || !Objects.equals(leaseUntilEpochMillis, response.getLeaseUntilEpochMillis())
+                    || !Objects.equals(assignmentsChanged, response.getAssignmentsChanged())) {
+                throw new ServiceException("Driver lease stream metadata changed between batches");
+            }
+            response.getDeviceLeasesList().forEach(lease -> {
+                Long previous = owned.put(lease.getDeviceId(), lease.getFencingToken());
+                if (previous != null) {
+                    throw new ServiceException("Driver lease stream contains duplicate device {}", lease.getDeviceId());
+                }
+            });
+            snapshotComplete = response.getSnapshotComplete();
+            batches++;
+        }
+
+        private Mono<Void> install(DriverMetadata metadata) {
+            if (batches == 0
+                    || !snapshotComplete
+                    || assignmentVersion == null
+                    || leaseUntilEpochMillis == null
+                    || assignmentsChanged == null) {
+                return Mono.error(new ServiceException("Driver lease stream ended before snapshot completion"));
+            }
+            if (assignmentsChanged) {
+                metadata.setDeviceLeases(owned, leaseUntilEpochMillis, assignmentVersion);
+            } else {
+                if (!owned.isEmpty()) {
+                    return Mono.error(
+                            new ServiceException("Unchanged driver lease stream contains device assignments"));
+                }
+                metadata.renewLeaseDeadline(leaseUntilEpochMillis);
+            }
+            return Mono.empty();
+        }
+    }
+
+    private void applyMetadata(GrpcDriverRegistrationDTO rDriverRegisterDTO) {
         DriverBO driverBO = driverBuilder.buildDTOByGrpcDTO(rDriverRegisterDTO.getDriver());
         driverMetadata.setDriver(driverBO);
 
-        driverMetadata.setDeviceIds(new HashSet<>(rDriverRegisterDTO.getDeviceIdsList()));
-
         List<GrpcDriverAttributeDTO> driverAttributesList = rDriverRegisterDTO.getDriverAttributesList();
         Map<Long, DriverAttributeDTO> driverAttributeIdMap = driverAttributesList.stream()
-                .collect(Collectors.toMap(entity -> entity.getBase().getId(),
-                        grpcDriverAttributeBuilder::buildDTOByGrpcDTO));
+                .collect(Collectors.toMap(
+                        entity -> entity.getBase().getId(), grpcDriverAttributeBuilder::buildDTOByGrpcDTO));
         Map<String, DriverAttributeDTO> driverAttributeNameMap = driverAttributesList.stream()
-                .collect(Collectors.toMap(GrpcDriverAttributeDTO::getAttributeCode,
-                        grpcDriverAttributeBuilder::buildDTOByGrpcDTO));
+                .collect(Collectors.toMap(
+                        GrpcDriverAttributeDTO::getAttributeCode, grpcDriverAttributeBuilder::buildDTOByGrpcDTO));
         driverMetadata.setDriverAttributeIdMap(driverAttributeIdMap);
         driverMetadata.setDriverAttributeNameMap(driverAttributeNameMap);
 
         List<GrpcPointAttributeDTO> pointAttributesList = rDriverRegisterDTO.getPointAttributesList();
         Map<Long, PointAttributeDTO> pointAttributeIdMap = pointAttributesList.stream()
-                .collect(
-                        Collectors.toMap(entity -> entity.getBase().getId(), grpcPointAttributeBuilder::buildDTOByGrpcDTO));
+                .collect(Collectors.toMap(
+                        entity -> entity.getBase().getId(), grpcPointAttributeBuilder::buildDTOByGrpcDTO));
         Map<String, PointAttributeDTO> pointAttributeNameMap = pointAttributesList.stream()
-                .collect(Collectors.toMap(GrpcPointAttributeDTO::getAttributeCode,
-                        grpcPointAttributeBuilder::buildDTOByGrpcDTO));
+                .collect(Collectors.toMap(
+                        GrpcPointAttributeDTO::getAttributeCode, grpcPointAttributeBuilder::buildDTOByGrpcDTO));
         driverMetadata.setPointAttributeIdMap(pointAttributeIdMap);
         driverMetadata.setPointAttributeNameMap(pointAttributeNameMap);
 
         List<GrpcCommandAttributeDTO> commandAttributesList = rDriverRegisterDTO.getCommandAttributesList();
         Map<Long, CommandAttributeDTO> commandAttributeIdMap = commandAttributesList.stream()
-                .collect(Collectors.toMap(entity -> entity.getBase().getId(),
-                        grpcCommandAttributeBuilder::buildDTOByGrpcDTO));
+                .collect(Collectors.toMap(
+                        entity -> entity.getBase().getId(), grpcCommandAttributeBuilder::buildDTOByGrpcDTO));
         Map<String, CommandAttributeDTO> commandAttributeNameMap = commandAttributesList.stream()
-                .collect(Collectors.toMap(GrpcCommandAttributeDTO::getAttributeCode,
-                        grpcCommandAttributeBuilder::buildDTOByGrpcDTO));
+                .collect(Collectors.toMap(
+                        GrpcCommandAttributeDTO::getAttributeCode, grpcCommandAttributeBuilder::buildDTOByGrpcDTO));
         driverMetadata.setCommandAttributeIdMap(commandAttributeIdMap);
         driverMetadata.setCommandAttributeNameMap(commandAttributeNameMap);
 
         List<GrpcEventAttributeDTO> eventAttributesList = rDriverRegisterDTO.getEventAttributesList();
         Map<Long, EventAttributeDTO> eventAttributeIdMap = eventAttributesList.stream()
-                .collect(Collectors.toMap(entity -> entity.getBase().getId(),
-                        grpcEventAttributeBuilder::buildDTOByGrpcDTO));
+                .collect(Collectors.toMap(
+                        entity -> entity.getBase().getId(), grpcEventAttributeBuilder::buildDTOByGrpcDTO));
         Map<String, EventAttributeDTO> eventAttributeNameMap = eventAttributesList.stream()
-                .collect(Collectors.toMap(GrpcEventAttributeDTO::getAttributeCode,
-                        grpcEventAttributeBuilder::buildDTOByGrpcDTO));
+                .collect(Collectors.toMap(
+                        GrpcEventAttributeDTO::getAttributeCode, grpcEventAttributeBuilder::buildDTOByGrpcDTO));
         driverMetadata.setEventAttributeIdMap(eventAttributeIdMap);
         driverMetadata.setEventAttributeNameMap(eventAttributeNameMap);
 
         driverMetadata.setDriverStatus(EntityStatusEnum.ONLINE);
     }
-
 }

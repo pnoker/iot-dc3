@@ -14,11 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.exception.ConnectorException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.Security;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -34,25 +51,6 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.PKCSException;
 
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManagerFactory;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.Security;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-
 /**
  * X.509 certificate loading and SSL socket factory creation.
  * <p>
@@ -62,7 +60,6 @@ import java.security.cert.X509Certificate;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -81,8 +78,8 @@ public class X509Util {
      * @param password  Private key password
      * @return Configured SSL socket factory
      */
-    public static SSLSocketFactory getSSLSocketFactory(final String caCrtFile, final String crtFile,
-                                                       final String keyFile, final String password) {
+    public static SSLSocketFactory getSSLSocketFactory(
+            final String caCrtFile, final String crtFile, final String keyFile, final String password) {
         try {
             Security.addProvider(new BouncyCastleProvider());
 
@@ -92,8 +89,8 @@ public class X509Util {
             KeyStore caKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             caKeyStore.load(null, null);
             caKeyStore.setCertificateEntry("cacertfile", caCert);
-            TrustManagerFactory trustManagerFactory = TrustManagerFactory
-                    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            TrustManagerFactory trustManagerFactory =
+                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             trustManagerFactory.init(caKeyStore);
 
             // load client certificate
@@ -104,10 +101,9 @@ public class X509Util {
             KeyStore certKeyStore = KeyStore.getInstance(KeyStore.getDefaultType());
             certKeyStore.load(null, null);
             certKeyStore.setCertificateEntry("certfile", cert);
-            certKeyStore.setKeyEntry("keyfile", key, password.toCharArray(),
-                    new Certificate[]{cert});
-            KeyManagerFactory keyManagerFactory = KeyManagerFactory
-                    .getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            certKeyStore.setKeyEntry("keyfile", key, password.toCharArray(), new Certificate[] {cert});
+            KeyManagerFactory keyManagerFactory =
+                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
             keyManagerFactory.init(certKeyStore, password.toCharArray());
 
             // finally, create SSL socket factory
@@ -136,20 +132,23 @@ public class X509Util {
     private static PrivateKey loadPrivateKey(String keyFile, String password) throws IOException {
         char[] passwordChars = password == null ? new char[0] : password.toCharArray();
         try (Reader reader = new InputStreamReader(open(keyFile));
-             PEMParser pemParser = new PEMParser(reader)) {
+                PEMParser pemParser = new PEMParser(reader)) {
             Object pemObject = pemParser.readObject();
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME);
             return switch (pemObject) {
                 // Encrypted traditional (PKCS#1) key, e.g. "Proc-Type: 4,ENCRYPTED"
                 case PEMEncryptedKeyPair encryptedKeyPair -> {
                     PEMDecryptorProvider decryptor = new JcePEMDecryptorProviderBuilder().build(passwordChars);
-                    yield converter.getKeyPair(encryptedKeyPair.decryptKeyPair(decryptor)).getPrivate();
+                    yield converter
+                            .getKeyPair(encryptedKeyPair.decryptKeyPair(decryptor))
+                            .getPrivate();
                 }
                 // Encrypted PKCS#8 key ("ENCRYPTED PRIVATE KEY")
                 case PKCS8EncryptedPrivateKeyInfo encryptedInfo -> {
                     try {
                         InputDecryptorProvider decryptor = new JceOpenSSLPKCS8DecryptorProviderBuilder()
-                                .setProvider(BouncyCastleProvider.PROVIDER_NAME).build(passwordChars);
+                                .setProvider(BouncyCastleProvider.PROVIDER_NAME)
+                                .build(passwordChars);
                         yield converter.getPrivateKey(encryptedInfo.decryptPrivateKeyInfo(decryptor));
                     } catch (OperatorCreationException | PKCSException e) {
                         throw new IOException("Failed to decrypt PKCS#8 private key", e);
@@ -161,7 +160,8 @@ public class X509Util {
                 case PrivateKeyInfo privateKeyInfo -> converter.getPrivateKey(privateKeyInfo);
                 case null -> throw new IOException("No PEM private key found in: " + keyFile);
                 default ->
-                        throw new IOException("Unsupported private key PEM content: " + pemObject.getClass().getName());
+                    throw new IOException("Unsupported private key PEM content: "
+                            + pemObject.getClass().getName());
             };
         }
     }
@@ -176,5 +176,4 @@ public class X509Util {
         }
         return new ByteArrayInputStream(Files.readAllBytes(Paths.get(path)));
     }
-
 }

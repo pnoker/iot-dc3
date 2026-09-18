@@ -14,68 +14,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.biz;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
-import io.github.pnoker.common.manager.entity.query.DictionaryQuery;
+import io.github.pnoker.common.entity.option.DictionaryOption;
+import io.github.pnoker.common.manager.entity.query.DictionaryListRequest;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
-/**
- * Dictionary lookup service for the manager module.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
+/** Read-only option query service for manager entities. */
 public interface DictionaryForManagerService {
 
-    /**
-     * Get driver dictionary list with pagination
-     *
-     * @param entityQuery {@link DictionaryQuery}
-     * @return DictionaryBO Page
-     */
-    Page<DictionaryBO> driverDictionary(DictionaryQuery entityQuery);
+    /** Page driver options matching the tenant-scoped filters. */
+    Mono<OffsetPage<DictionaryOption>> listDriverOptions(Long tenantId, DictionaryListRequest request);
 
-    /**
-     * Get profile dictionary list with pagination
-     *
-     * @param entityQuery {@link DictionaryQuery}
-     * @return DictionaryBO Page
-     */
-    Page<DictionaryBO> profileDictionary(DictionaryQuery entityQuery);
+    /** Page profile options matching the tenant-scoped filters. */
+    Mono<OffsetPage<DictionaryOption>> listProfileOptions(Long tenantId, DictionaryListRequest request);
 
-    /**
-     * Get point dictionary under profile with pagination
-     *
-     * @param entityQuery {@link DictionaryQuery}
-     * @return DictionaryBO Page
-     */
-    Page<DictionaryBO> pointDictionaryForProfile(DictionaryQuery entityQuery);
+    /** Page profile point options matching the tenant-scoped filters. */
+    Mono<OffsetPage<DictionaryOption>> listProfilePointOptions(Long tenantId, DictionaryListRequest request);
 
-    /**
-     * Get point dictionary under device with pagination
-     *
-     * @param entityQuery {@link DictionaryQuery}
-     * @return DictionaryBO Page
-     */
-    Page<DictionaryBO> pointDictionaryForDevice(DictionaryQuery entityQuery);
+    /** Page device point options matching the tenant-scoped filters. */
+    Mono<OffsetPage<DictionaryOption>> listDevicePointOptions(Long tenantId, DictionaryListRequest request);
 
-    /**
-     * Get device dictionary list with pagination
-     *
-     * @param entityQuery {@link DictionaryQuery}
-     * @return DictionaryBO Page
-     */
-    Page<DictionaryBO> deviceDictionary(DictionaryQuery entityQuery);
+    /** Page device options matching the tenant-scoped filters. */
+    Mono<OffsetPage<DictionaryOption>> listDeviceOptions(Long tenantId, DictionaryListRequest request);
 
-    /**
-     * Get device dictionary under driver with pagination
-     *
-     * @param entityQuery {@link DictionaryQuery}
-     * @return DictionaryBO Page
-     */
-    Page<DictionaryBO> deviceDictionaryForDriver(DictionaryQuery entityQuery);
-
+    /** Page driver device options matching the tenant-scoped filters. */
+    Mono<OffsetPage<DictionaryOption>> listDriverDeviceOptions(Long tenantId, DictionaryListRequest request);
 }

@@ -14,24 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
-
-import io.github.pnoker.common.data.entity.bo.RuleBO;
-import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import io.github.pnoker.common.data.entity.bo.RuleBO;
+import io.github.pnoker.common.entity.ext.RuleExt;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Mono;
 
 class RuleEvaluatorImplTest {
 
@@ -43,7 +42,7 @@ class RuleEvaluatorImplTest {
         RuleBO rule = rule(">", BigDecimal.valueOf(80), null);
         RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(86.5)));
 
-        assertThat(evaluator.matches(rule, fact)).isTrue();
+        assertThat(evaluator.matches(rule, fact).block()).isTrue();
     }
 
     @Test
@@ -51,7 +50,7 @@ class RuleEvaluatorImplTest {
         RuleBO rule = rule("<", null, null);
         RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(70)));
 
-        assertThat(evaluator.matches(rule, fact)).isFalse();
+        assertThat(evaluator.matches(rule, fact).block()).isFalse();
     }
 
     @Test
@@ -60,7 +59,7 @@ class RuleEvaluatorImplTest {
         rule.getRuleExt().getContent().getCondition().setField("status");
         RuleFact fact = fact(Map.of("status", "offline"));
 
-        assertThat(evaluator.matches(rule, fact)).isTrue();
+        assertThat(evaluator.matches(rule, fact).block()).isTrue();
     }
 
     @Test
@@ -69,7 +68,7 @@ class RuleEvaluatorImplTest {
         rule.getRuleExt().getContent().setRecovery(new RuleExt.Recovery(true, "<=", BigDecimal.valueOf(75), "PT2M"));
         RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(72)));
 
-        assertThat(evaluator.recovers(rule, fact)).isTrue();
+        assertThat(evaluator.recovers(rule, fact).block()).isTrue();
     }
 
     @Test
@@ -78,7 +77,7 @@ class RuleEvaluatorImplTest {
         rule.getRuleExt().getContent().setWindow(new RuleExt.Window(null, null, null));
         RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(86)));
 
-        assertThat(evaluator.matches(rule, fact)).isTrue();
+        assertThat(evaluator.matches(rule, fact).block()).isTrue();
     }
 
     @Test
@@ -87,7 +86,7 @@ class RuleEvaluatorImplTest {
         rule.getRuleExt().getContent().setWindow(new RuleExt.Window("LAST", "PT3M", 1));
         RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(86)));
 
-        assertThat(evaluator.matches(rule, fact)).isTrue();
+        assertThat(evaluator.matches(rule, fact).block()).isTrue();
     }
 
     @Test
@@ -95,9 +94,9 @@ class RuleEvaluatorImplTest {
         RuleBO rule = rule(">", BigDecimal.valueOf(80), null);
         rule.getRuleExt().getContent().setWindow(new RuleExt.Window("AVG", "PT3M", 3));
         RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(86)));
-        when(windowedRuleEvaluator.matches(any(), any(), any())).thenReturn(true);
+        when(windowedRuleEvaluator.matches(any(), any(), any())).thenReturn(Mono.just(true));
 
-        assertThat(evaluator.matches(rule, fact)).isTrue();
+        assertThat(evaluator.matches(rule, fact).block()).isTrue();
         verify(windowedRuleEvaluator).matches(any(), any(), any());
     }
 
@@ -107,9 +106,9 @@ class RuleEvaluatorImplTest {
         rule.getRuleExt().getContent().setRecovery(new RuleExt.Recovery(true, "<=", BigDecimal.valueOf(75), "PT2M"));
         rule.getRuleExt().getContent().setWindow(new RuleExt.Window("COUNT", "PT3M", 3));
         RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(72)));
-        when(windowedRuleEvaluator.recovers(any(), any(), any())).thenReturn(true);
+        when(windowedRuleEvaluator.recovers(any(), any(), any())).thenReturn(Mono.just(true));
 
-        assertThat(evaluator.recovers(rule, fact)).isTrue();
+        assertThat(evaluator.recovers(rule, fact).block()).isTrue();
         verify(windowedRuleEvaluator).recovers(any(), any(), any());
     }
 
@@ -121,7 +120,7 @@ class RuleEvaluatorImplTest {
         rule.getRuleExt().getContent().setWindow(new RuleExt.Window("AVG", "5 minutes", 3));
         RuleFact fact = fact(Map.of("numValue", BigDecimal.valueOf(86)));
 
-        assertThat(evaluator.matches(rule, fact)).isFalse();
+        assertThat(evaluator.matches(rule, fact).block()).isFalse();
     }
 
     private RuleBO rule(String operator, BigDecimal threshold, String expected) {
@@ -144,13 +143,6 @@ class RuleEvaluatorImplTest {
     }
 
     private RuleFact fact(Map<String, Object> values) {
-        return new RuleFact(
-                1L,
-                AlarmTargetTypeEnum.POINT,
-                1001L,
-                2001L,
-                LocalDateTime.now(),
-                values);
+        return new RuleFact(1L, AlarmTargetTypeEnum.POINT, 1001L, 2001L, LocalDateTime.now(), values);
     }
-
 }

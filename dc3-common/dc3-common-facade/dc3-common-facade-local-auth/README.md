@@ -3,14 +3,13 @@
 ## Overview
 
 `dc3-common-facade-local-auth` provides the **in-process implementation** of the auth-domain facade contracts from
-`dc3-common-facade-api`. Instead of issuing gRPC calls, each facade delegates directly to the auth service beans on
-the local classpath — used inside the `dc3-center-single` monolith where auth, manager, and data run in one process.
+`dc3-common-facade-api`. Instead of issuing gRPC calls, each facade delegates directly to the auth service beans on the
+local classpath — used inside the `dc3-center-single` monolith where auth, manager, and data run in one process.
 
 ## Module Information
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-facade-local-auth
-- **Version**: 2026.5.22
 
 ## Implementations
 
@@ -20,7 +19,7 @@ classes convert between auth domain objects and facade BOs. Beans are registered
 
 ## Activation
 
-Active when the in-process facade mode is selected (`dc3.facade.mode=local`) and `dc3-common-auth` is on the classpath.
+Active when the auth-domain in-process mode is selected (`dc3.facade.auth.mode=local`) and `dc3-common-auth` is on the classpath.
 
 ## Dependencies
 
@@ -30,16 +29,18 @@ Active when the in-process facade mode is selected (`dc3.facade.mode=local`) and
 ## Build Instructions
 
 ```bash
-mvn -s ../../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-facade/dc3-common-facade-local-auth -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-facade/dc3-common-facade-local-auth -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-facade-grpc` — gRPC alternative for distributed deployments
 - `dc3-common-facade-local-data` / `-manager` — sibling in-process facades
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

@@ -16,7 +16,9 @@
   -->
 
 <template>
-  <el-segmented :model-value="modelValue" :options="options" :size="size" @update:model-value="onChange"/>
+  <div class="matrix-status-segmented">
+    <el-segmented :model-value="modelValue" :options="options" :size="size" @update:model-value="onChange"/>
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -53,3 +55,39 @@ const onChange = (value: string | number | boolean) => {
   emit('update:modelValue', value as MatrixStatus);
 };
 </script>
+
+<style lang="scss" scoped>
+.matrix-status-segmented {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+
+  :deep(.el-segmented) {
+    display: flex;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  :deep(.el-segmented__group) {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  :deep(.el-segmented__item) {
+    flex: 0 0 auto;
+    min-width: max-content;
+  }
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  .matrix-status-segmented {
+    scrollbar-width: none;
+  }
+
+  .matrix-status-segmented::-webkit-scrollbar {
+    display: none;
+  }
+}
+</style>

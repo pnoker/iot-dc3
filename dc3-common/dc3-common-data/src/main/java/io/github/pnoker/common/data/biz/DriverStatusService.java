@@ -14,47 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz;
 
-import io.github.pnoker.common.data.entity.query.DriverQuery;
-
+import io.github.pnoker.common.facade.entity.query.FacadeDriverOffsetQuery;
 import java.util.Map;
+import reactor.core.publisher.Mono;
 
-/**
- * Business service for driver status operations.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
+/** Reactive business service for tenant-scoped driver status. */
 public interface DriverStatusService {
 
-    /**
-     * Paged query of driver status, used in conjunction with paged query of drivers
-     *
-     * @param driverQuery DriverQuery, including pagination parameters
-     * @return Map Long:String, where Long is the driver ID and String is the driver
-     * status
-     */
-    Map<Long, String> getStatusByPage(DriverQuery driverQuery);
+    /** List driver status matching the request. */
+    Mono<Map<String, String>> list(FacadeDriverOffsetQuery query);
 
-    /**
-     * Count of currently online devices under the driver.
-     *
-     * @param tenantId Tenant ID
-     * @param driverId Driver ID
-     * @return Number of online devices
-     */
-    Long getDeviceOnlineByDriverId(Long tenantId, Long driverId);
+    /** Count online devices matching the request. */
+    Mono<Long> countOnlineDevices(Long tenantId, Long driverId);
 
-    /**
-     * Count of currently offline devices under the driver.
-     *
-     * @param tenantId Tenant ID
-     * @param driverId Driver ID
-     * @return Number of offline devices
-     */
-    Long getDeviceOfflineByDriverId(Long tenantId, Long driverId);
-
+    /** Count offline devices matching the request. */
+    Mono<Long> countOfflineDevices(Long tenantId, Long driverId);
 }

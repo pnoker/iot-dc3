@@ -14,21 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.EventReportDTO;
-
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * Converts runtime data into rule facts and feeds the alarm rule pipeline.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface AlarmRuleTriggerService {
@@ -38,7 +36,7 @@ public interface AlarmRuleTriggerService {
      *
      * @param pointValue point value
      */
-    void processPointValue(PointValueBO pointValue);
+    Mono<Void> processPointValue(PointValueBO pointValue);
 
     /**
      * Process a batch of point value samples. Implementations should group
@@ -47,27 +45,26 @@ public interface AlarmRuleTriggerService {
      *
      * @param pointValues point values
      */
-    void processPointValues(List<PointValueBO> pointValues);
+    Mono<Void> processPointValues(List<PointValueBO> pointValues);
 
     /**
      * Process a device alarm event.
      *
      * @param alarm device alarm payload
      */
-    void processDeviceAlarm(DeviceAlarmDTO alarm);
+    Mono<Void> processDeviceAlarm(DeviceAlarmDTO alarm);
 
     /**
      * Process a driver alarm event.
      *
      * @param alarm driver alarm payload
      */
-    void processDriverAlarm(DriverAlarmDTO alarm);
+    Mono<Void> processDriverAlarm(DriverAlarmDTO alarm);
 
     /**
      * Process an event report.
      *
      * @param entityDTO event report payload
      */
-    void processEventReport(EventReportDTO entityDTO);
-
+    Mono<Void> processEventReport(EventReportDTO entityDTO);
 }

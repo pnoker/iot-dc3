@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.netty.udp;
 
 import io.github.pnoker.driver.service.netty.NettyServerHandler;
@@ -47,7 +46,6 @@ import org.springframework.stereotype.Component;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -81,8 +79,11 @@ public class NettyUdpServerHandler extends SimpleChannelInboundHandler<DatagramP
     @Override
     @SneakyThrows
     public void exceptionCaught(ChannelHandlerContext context, Throwable throwable) {
-        log.warn("Driver channel error, protocol={}, remoteAddress={}", PROTOCOL, context.channel().remoteAddress(), throwable);
+        log.warn(
+                "Driver channel error, protocol={}, remoteAddress={}",
+                PROTOCOL,
+                context.channel().remoteAddress(),
+                throwable);
         context.disconnect();
     }
-
 }

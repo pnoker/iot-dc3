@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,21 +21,19 @@ import io.github.pnoker.common.enums.PointCommandSourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 /**
  * View object for point command history API responses.
  *
  * @author pnoker
- * @version 2026.6.5
  * @since 2026.6.5
  */
 @Getter
@@ -52,22 +49,22 @@ public class PointCommandHistoryVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Primary key", example = "1")
-    private Long id;
+    private String id;
 
     @Schema(description = "ID of the command definition invoked.", example = "4096")
     private String commandId;
 
     @Schema(description = "Tenant ID", example = "100001")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "Point command type", example = "READ")
     private PointCommandTypeEnum type;
 
     @Schema(description = "ID of the device the point command was sent to.", example = "1024")
-    private Long deviceId;
+    private String deviceId;
 
     @Schema(description = "ID of the target data point.", example = "2048")
-    private Long pointId;
+    private String pointId;
 
     @Schema(description = "Command value sent to the data point.", example = "42")
     private String requestValue;
@@ -81,14 +78,16 @@ public class PointCommandHistoryVO implements Serializable {
     @Schema(description = "Error code if the point command execution failed. Null on success.", example = "ERR_TIMEOUT")
     private String errorCode;
 
-    @Schema(description = "Human-readable error message if the point command execution failed. Null on success.", example = "Connection timeout after 3000ms")
+    @Schema(
+            description = "Human-readable error message if the point command execution failed. Null on success.",
+            example = "Connection timeout after 3000ms")
     private String errorMessage;
 
     @Schema(description = "Source identifier", example = "HTTP")
     private PointCommandSourceEnum source;
 
     @Schema(description = "ID of the user who issued this point command.", example = "1000")
-    private Long sourceUserId;
+    private String sourceUserId;
 
     @Schema(description = "Timestamp when the point command was issued.")
     private LocalDateTime occurTime;
@@ -110,5 +109,4 @@ public class PointCommandHistoryVO implements Serializable {
 
     @Schema(description = "Last operation time")
     private LocalDateTime operateTime;
-
 }

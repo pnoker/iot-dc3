@@ -94,6 +94,18 @@ describe('AI coding guardrails', () => {
     );
   });
 
+  it('installs runtime adapters and stores before initial router navigation', () => {
+    const entrypoint = readProjectFile('src/main.ts');
+    const mockInstall = entrypoint.indexOf("await import('@/mock')");
+    const piniaInstall = entrypoint.indexOf('app.use(pinia)');
+    const routerInstall = entrypoint.indexOf('app.use(router)');
+
+    expect(mockInstall).toBeGreaterThan(-1);
+    expect(piniaInstall).toBeGreaterThan(mockInstall);
+    expect(routerInstall).toBeGreaterThan(piniaInstall);
+    expect(entrypoint.indexOf('await router.isReady()')).toBeGreaterThan(routerInstall);
+  });
+
   it('forbids direct wrapper.vm.<method>() calls in component/view tests', () => {
     // Driving a component through wrapper.vm internals couples the test to
     // API that churns whenever <script setup> details change. Tests should
@@ -114,7 +126,7 @@ describe('AI coding guardrails', () => {
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\.test\.ts$/.test(path))
       .filter((path) => !path.includes('setup/stubs'))
-      .filter((path) => !path.includes('tests/guardrails/'))
+      .filter((path) => !relativeProjectPath(path).startsWith('tests/guardrails/'))
       .filter((path) => inlineStub.test(readFileSync(path, 'utf8')))
       .map(relativeProjectPath);
 
@@ -144,7 +156,7 @@ describe('AI coding guardrails', () => {
     const badAssertion = /\bas\s+unknown\s+as\b|\bas\s+never\b/;
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\.test\.ts$/.test(path))
-      .filter((path) => !path.includes('tests/guardrails/'))
+      .filter((path) => !relativeProjectPath(path).startsWith('tests/guardrails/'))
       .filter((path) => badAssertion.test(readFileSync(path, 'utf8')))
       .map(relativeProjectPath);
 
@@ -164,7 +176,7 @@ describe('AI coding guardrails', () => {
     const callPattern = /(?<![.\w])(?:it|test)\(\s*(['"`])([^'"`\n]+)\1/g;
     const offenders: string[] = [];
     for (const path of walk(join(root, 'tests')).filter((p) => /\.test\.ts$/.test(p))) {
-      if (path.includes('tests/guardrails/')) continue;
+      if (relativeProjectPath(path).startsWith('tests/guardrails/')) continue;
       const source = readFileSync(path, 'utf8');
       let match: RegExpExecArray | null;
       while ((match = callPattern.exec(source)) !== null) {
@@ -196,7 +208,7 @@ describe('AI coding guardrails', () => {
     ];
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\.test\.ts$/.test(path))
-      .filter((path) => !path.includes('tests/guardrails/'))
+      .filter((path) => !relativeProjectPath(path).startsWith('tests/guardrails/'))
       .filter((path) => {
         const src = readFileSync(path, 'utf8');
         return tautologies.some((re) => re.test(src));
@@ -213,7 +225,7 @@ describe('AI coding guardrails', () => {
     const weakAssertion = /\.(?:toBeTruthy|toBeFalsy)\s*\(/;
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\.(?:test|spec)\.ts$/.test(path))
-      .filter((path) => !path.includes('tests/guardrails/'))
+      .filter((path) => !relativeProjectPath(path).startsWith('tests/guardrails/'))
       .filter((path) => weakAssertion.test(readFileSync(path, 'utf8')))
       .map(relativeProjectPath);
 
@@ -224,8 +236,35 @@ describe('AI coding guardrails', () => {
     const debugCalls = /\bconsole\.(?:log|debug|info)\s*\(/;
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\.test\.ts$/.test(path))
-      .filter((path) => !path.includes('tests/guardrails/'))
+      .filter((path) => !relativeProjectPath(path).startsWith('tests/guardrails/'))
       .filter((path) => debugCalls.test(readFileSync(path, 'utf8')))
+      .map(relativeProjectPath);
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('routes application console output through the unified logger', () => {
+    const consoleCall = /\bconsole\.(?:log|debug|info|warn|error)\s*\(/;
+    const offenders = walk(join(root, 'src'))
+      .filter((path) => /\.(?:ts|tsx|vue|js)$/.test(path))
+      .filter((path) => relativeProjectPath(path) !== 'src/utils/log.ts')
+      .filter((path) => consoleCall.test(readFileSync(path, 'utf8')))
+      .map(relativeProjectPath);
+
+    expect(offenders).toEqual([]);
+  });
+
+  it('requires stable English event names for application logs', () => {
+    const loggerCall = /\blogger\.(?:debug|info|warn|error)\s*\(\s*(?!['"`])/;
+    const loggerEvent = /\blogger\.(?:debug|info|warn|error)\s*\(\s*(['"`])([^'"`]*?)\1/g;
+    const hanCharacter = /\p{Script=Han}/u;
+    const offenders = walk(join(root, 'src'))
+      .filter((path) => /\.(?:ts|tsx|vue|js)$/.test(path))
+      .filter((path) => {
+        const source = readFileSync(path, 'utf8');
+        if (loggerCall.test(source)) return true;
+        return [...source.matchAll(loggerEvent)].some((match) => hanCharacter.test(match[2]));
+      })
       .map(relativeProjectPath);
 
     expect(offenders).toEqual([]);
@@ -239,7 +278,7 @@ describe('AI coding guardrails', () => {
     const setTimeoutWait = /\bsetTimeout\s*\(/;
     const offenders = walk(join(root, 'tests'))
       .filter((path) => /\/(?:unit|component|views|api)\/[^/]+\.test\.ts$/.test(path))
-      .filter((path) => !path.includes('tests/guardrails/'))
+      .filter((path) => !relativeProjectPath(path).startsWith('tests/guardrails/'))
       .filter((path) => setTimeoutWait.test(readFileSync(path, 'utf8')))
       .map(relativeProjectPath);
 
@@ -270,7 +309,7 @@ describe('AI coding guardrails', () => {
   });
 
   it('documents the mandatory AI testing policy', () => {
-    const policy = readProjectFile('../docs/zh/frontend/frontend-testing-guardrails.md');
+    const policy = readProjectFile('tests/frontend-testing-guardrails.md');
 
     for (const section of [
       'Required Test Mapping',

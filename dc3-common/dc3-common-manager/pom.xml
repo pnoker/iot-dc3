@@ -44,10 +44,18 @@
             <artifactId>spring-boot-starter-cache</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-r2dbc</artifactId>
+        </dependency>
         <!-- gRPC Related -->
         <dependency>
-            <groupId>org.springframework.grpc</groupId>
-            <artifactId>spring-grpc-spring-boot-starter</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-grpc-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-grpc-client</artifactId>
         </dependency>
 
         <!-- Utility Libraries -->
@@ -85,10 +93,6 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-dal</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-facade-api</artifactId>
         </dependency>
         <dependency>
@@ -101,7 +105,15 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-postgres</artifactId>
+            <artifactId>dc3-db-r2dbc-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-postgres</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -109,7 +121,11 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-rabbitmq</artifactId>
+            <artifactId>dc3-mq-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-mq-rabbitmq</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -118,6 +134,12 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-web</artifactId>
+        </dependency>
+
+        <!-- OpenAPI annotations -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-common</artifactId>
         </dependency>
 
         <!-- Reactive + gRPC test utilities -->
@@ -139,7 +161,7 @@
         <!-- x-dc3-ai annotation gate (SP2 ratchet): scans this module's controllers in a unit test -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-resource-registrar</artifactId>
+            <artifactId>dc3-common-resource</artifactId>
             <scope>test</scope>
         </dependency>
 

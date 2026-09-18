@@ -14,23 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Map;
-
 /**
  * Channel sending result.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -54,19 +51,40 @@ public class NotifySendResult {
 
     private String errorMessage;
 
-    public static NotifySendResult success(String target, Integer statusCode, String statusMessage,
-                                           Map<String, Object> responsePayload) {
-        return new NotifySendResult(NotifyHistoryStatusEnum.SUCCESS, target, statusCode, statusMessage, null,
-                responsePayload, null);
+    /**
+     * Success.
+     *
+     * @param target          target
+     * @param statusCode      status code
+     * @param statusMessage   status message
+     * @param responsePayload response payload
+     * @return success result
+     */
+    public static NotifySendResult success(
+            String target, Integer statusCode, String statusMessage, Map<String, Object> responsePayload) {
+        return new NotifySendResult(
+                NotifyHistoryStatusEnum.SUCCESS, target, statusCode, statusMessage, null, responsePayload, null);
     }
 
+    /**
+     * Failed.
+     *
+     * @param target       target
+     * @param errorMessage error message
+     * @return failed result
+     */
     public static NotifySendResult failed(String target, String errorMessage) {
-        return new NotifySendResult(NotifyHistoryStatusEnum.FAILED, target, null, null, null, Map.of(),
-                errorMessage);
+        return new NotifySendResult(NotifyHistoryStatusEnum.FAILED, target, null, null, null, Map.of(), errorMessage);
     }
 
+    /**
+     * Skipped.
+     *
+     * @param target target
+     * @param reason reason
+     * @return skipped result
+     */
     public static NotifySendResult skipped(String target, String reason) {
         return new NotifySendResult(NotifyHistoryStatusEnum.SKIPPED, target, null, null, null, Map.of(), reason);
     }
-
 }

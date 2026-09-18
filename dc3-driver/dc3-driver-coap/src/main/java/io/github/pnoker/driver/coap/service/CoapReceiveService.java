@@ -14,18 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.coap.service;
 
 import io.github.pnoker.driver.coap.entity.CoapMessage;
-
 import java.util.List;
 
 /**
  * CoAP Receive Service Interface
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 public interface CoapReceiveService {
@@ -43,5 +40,4 @@ public interface CoapReceiveService {
      * @param coapMessageList CoapMessage list
      */
     void receiveValues(List<CoapMessage> coapMessageList);
-
 }

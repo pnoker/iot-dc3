@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
@@ -36,7 +35,6 @@ import org.springframework.context.annotation.ComponentScan;
  * starts.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -64,5 +62,4 @@ public class MqttInitRunner implements ApplicationRunner {
         }
         mqttScheduleService.initial();
     }
-
 }

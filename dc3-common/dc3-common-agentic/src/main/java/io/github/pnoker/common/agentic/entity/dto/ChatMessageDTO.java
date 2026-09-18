@@ -27,7 +27,6 @@ import lombok.Setter;
  * A single message in the OpenAI-compatible chat completion request.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -48,7 +47,8 @@ public class ChatMessageDTO {
     /**
      * Message content text.
      */
-    @Schema(description = "Text content of the message for this conversation turn.", example = "What is the current temperature of sensor 1024?")
+    @Schema(
+            description = "Text content of the message for this conversation turn.",
+            example = "What is the current temperature of sensor 1024?")
     private String content;
-
 }

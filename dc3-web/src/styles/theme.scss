@@ -1,0 +1,212 @@
+/*!
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// Runtime theme tokens as CSS custom properties (L2). Imported once by
+// global.scss, so these land on :root exactly once — never inside a scoped
+// style block. The app store (src/store/modules/app.ts) toggles the .dark
+// class on <html>; Element Plus dark variables come from
+// element-plus/theme-chalk/dark/css-vars.css imported in
+// src/config/plugins/element/element.ts.
+//
+// Rule (A5): new colors/spacing/motion go HERE, not into component SCSS.
+// Components read --dc3-* at runtime and the SCSS constants in tokens.scss
+// at compile time.
+
+// Standalone module loaded via @use from global.scss: additionalData
+// injection does not reach it, so import the breakpoint contract explicitly.
+@use '@/styles/tokens.scss' as *;
+
+:root {
+  // Brand override for Element Plus (moved from global.scss to keep every
+  // color mutation in one file).
+  --el-color-primary: #1296db;
+  --el-color-primary-light-3: #59b6e6;
+  --el-color-primary-light-5: #89cbed;
+  --el-color-primary-light-7: #b8e0f4;
+  --el-color-primary-light-8: #d0eaf8;
+  --el-color-primary-light-9: #e7f5fb;
+  --el-color-primary-dark-2: #0e78af;
+
+  // Canvas -> surface -> emphasis. Pages should communicate hierarchy with
+  // these layers instead of accumulating borders around every region.
+  --dc3-bg-body: #f2f7fa;
+  --dc3-bg-canvas:
+    radial-gradient(circle at 10% 0%, rgba(18, 150, 219, 0.11), transparent 30%),
+    radial-gradient(circle at 92% 10%, rgba(81, 86, 199, 0.08), transparent 26%),
+    linear-gradient(180deg, #f5fafc 0%, #eef4f7 100%);
+  --dc3-bg-elevated: rgba(255, 255, 255, 0.88);
+  --dc3-bg-elevated-strong: #ffffff;
+  --dc3-bg-muted: rgba(237, 246, 250, 0.76);
+  --dc3-bg-interactive: rgba(18, 150, 219, 0.07);
+  --dc3-bg-interactive-active: rgba(18, 150, 219, 0.13);
+  --dc3-ambient-primary: rgba(18, 150, 219, 0.17);
+  --dc3-ambient-secondary: rgba(85, 88, 201, 0.2);
+  --dc3-highlight-sheen: rgba(255, 255, 255, 0.62);
+  --dc3-text-primary: #2c3e50;
+  --dc3-text-regular: #606266;
+  --dc3-text-muted: #78909f;
+  --dc3-text-brand: #087fbd;
+  --dc3-border-base: rgba(100, 148, 174, 0.2);
+  --dc3-border-strong: rgba(62, 143, 184, 0.3);
+  --dc3-brand-gradient: linear-gradient(118deg, #087fbd 0%, #15a3d8 48%, #5558c9 100%);
+  --dc3-brand-gradient-soft: linear-gradient(118deg, rgba(18, 150, 219, 0.14), rgba(85, 88, 201, 0.1));
+  --dc3-color-purple: #7457d8;
+  --dc3-color-purple-soft: rgba(116, 87, 216, 0.11);
+  --dc3-focus-ring: 0 0 0 3px rgba(18, 150, 219, 0.18);
+  --dc3-shadow-sm: 0 4px 14px rgba(25, 78, 105, 0.06);
+  --dc3-shadow-md: 0 12px 34px rgba(25, 78, 105, 0.09);
+  --dc3-shadow-hover: 0 16px 40px rgba(22, 87, 120, 0.13);
+  --dc3-shadow-active: 0 5px 14px rgba(18, 121, 178, 0.1);
+
+  // Login-specific surfaces remain tokens because the public page must obey
+  // the same persisted theme contract as the authenticated workspace.
+  --dc3-login-grid-color: rgba(18, 150, 219, 0.045);
+  --dc3-login-shell-bg: rgba(255, 255, 255, 0.38);
+  --dc3-login-story-bg:
+    radial-gradient(circle at 16% 4%, rgba(255, 255, 255, 0.88), transparent 32%),
+    linear-gradient(145deg, rgba(225, 249, 255, 0.72), rgba(236, 241, 255, 0.6));
+  --dc3-login-card-bg: rgba(255, 255, 255, 0.66);
+  --dc3-login-chip-bg: rgba(255, 255, 255, 0.56);
+  --dc3-login-input-bg: rgba(248, 251, 253, 0.88);
+  --dc3-login-input-focus-bg: #ffffff;
+  --dc3-login-title-gradient: linear-gradient(112deg, #102b3c 5%, #07549a 38%, #149ed7 62%, #5154c4 96%);
+  --dc3-login-shell-shadow: 0 32px 80px rgba(18, 73, 123, 0.14);
+
+  // Spacing scale (4px grid)
+  --dc3-space-1: 4px;
+  --dc3-space-2: 8px;
+  --dc3-space-3: 12px;
+  --dc3-space-4: 16px;
+  --dc3-space-5: 20px;
+  --dc3-space-6: 24px;
+  --dc3-space-8: 32px;
+  --dc3-space-10: 40px;
+
+  // Radii
+  --dc3-radius-sm: 4px;
+  --dc3-radius-md: 8px;
+  --dc3-radius-lg: 12px;
+  --dc3-radius-xl: 16px;
+  --dc3-radius-2xl: 20px;
+  --dc3-radius-full: 999px;
+
+  // Motion (A4/A7: durations collapse to 0ms under prefers-reduced-motion)
+  --dc3-duration-fast: 120ms;
+  --dc3-duration-base: 200ms;
+  --dc3-duration-slow: 280ms;
+  --dc3-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --dc3-ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+
+  // Layout metrics mirror tokens.scss (read at runtime when a component
+  // needs a metric in JS or calc()).
+  --dc3-header-height: 60px;
+  --dc3-aside-width: 220px;
+  --dc3-aside-collapsed-width: 64px;
+
+  // Touch ergonomics (A3)
+  --dc3-touch-target: 44px;
+  --dc3-floating-action-safe-space: calc(var(--dc3-touch-target) + var(--dc3-space-3));
+  --dc3-z-floating-action: 1000;
+  --dc3-list-label-width: 78px;
+  --dc3-skeleton-line-height: 12px;
+  --dc3-skeleton-title-height: 16px;
+
+  color-scheme: light;
+}
+
+html.dark {
+  // Element Plus handles its own dark vars; dc3 custom tokens follow.
+  --dc3-bg-body: #10171c;
+  --dc3-bg-canvas:
+    radial-gradient(circle at 10% 0%, rgba(18, 150, 219, 0.12), transparent 30%),
+    radial-gradient(circle at 92% 10%, rgba(91, 95, 214, 0.1), transparent 26%),
+    linear-gradient(180deg, #121b21 0%, #0e151a 100%);
+  --dc3-bg-elevated: rgba(27, 38, 45, 0.9);
+  --dc3-bg-elevated-strong: #1b262d;
+  --dc3-bg-muted: rgba(43, 59, 68, 0.72);
+  --dc3-bg-interactive: rgba(60, 178, 229, 0.1);
+  --dc3-bg-interactive-active: rgba(60, 178, 229, 0.17);
+  --dc3-ambient-primary: rgba(18, 150, 219, 0.18);
+  --dc3-ambient-secondary: rgba(91, 95, 214, 0.2);
+  --dc3-highlight-sheen: rgba(255, 255, 255, 0.1);
+  --dc3-text-primary: #e5eaf3;
+  --dc3-text-regular: #a3a6ad;
+  --dc3-text-muted: #8295a1;
+  --dc3-text-brand: #55bde9;
+  --dc3-border-base: rgba(139, 184, 207, 0.16);
+  --dc3-border-strong: rgba(72, 178, 226, 0.28);
+  --dc3-brand-gradient-soft: linear-gradient(118deg, rgba(18, 150, 219, 0.2), rgba(85, 88, 201, 0.16));
+  --dc3-shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.16);
+  --dc3-shadow-md: 0 14px 36px rgba(0, 0, 0, 0.22);
+  --dc3-shadow-hover: 0 18px 44px rgba(0, 0, 0, 0.3);
+  --dc3-shadow-active: 0 6px 18px rgba(0, 0, 0, 0.2);
+  --dc3-color-purple-soft: rgba(135, 111, 224, 0.16);
+  --dc3-login-grid-color: rgba(76, 188, 232, 0.055);
+  --dc3-login-shell-bg: rgba(14, 23, 29, 0.66);
+  --dc3-login-story-bg:
+    radial-gradient(circle at 16% 4%, rgba(57, 135, 169, 0.18), transparent 34%),
+    linear-gradient(145deg, rgba(21, 43, 53, 0.92), rgba(27, 31, 57, 0.86));
+  --dc3-login-card-bg: rgba(18, 27, 34, 0.82);
+  --dc3-login-chip-bg: rgba(44, 62, 72, 0.58);
+  --dc3-login-input-bg: rgba(31, 45, 54, 0.86);
+  --dc3-login-input-focus-bg: #263943;
+  --dc3-login-title-gradient: linear-gradient(112deg, #f1fbff 4%, #73cff1 42%, #43b8e8 65%, #aaa8ff 96%);
+  --dc3-login-shell-shadow: 0 34px 90px rgba(0, 0, 0, 0.38);
+
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dc3-duration-fast: 0ms;
+    --dc3-duration-base: 0ms;
+    --dc3-duration-slow: 0ms;
+  }
+}
+
+// A3 acceptance: dialogs go (near) full-screen below the xs tier so a
+// 640px-wide dialog never overflows a 390px viewport. Element Plus writes
+// the width prop as an inline style, so !important is required to override
+// it per device class. things-dialog keeps its own max-height contract;
+// this rule only re-shapes width/height on mobile.
+@media (max-width: $breakpoint-xs-max) {
+  // Mobile browsers can expose a wider layout viewport while body scroll is
+  // locked for a modal. Anchor the teleported overlay to the dynamic visual
+  // viewport so dialogs stay centred and fully tappable above the browser UI.
+  .el-overlay.el-modal-dialog,
+  .el-overlay-dialog {
+    width: 100dvw;
+    max-width: 100dvw;
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  .el-overlay-dialog .el-dialog:not(.is-fullscreen) {
+    --el-dialog-width: 100%;
+    width: calc(100dvw - 16px) !important;
+    margin-top: 8px !important;
+    margin-bottom: 8px !important;
+    max-height: calc(100dvh - 32px);
+    display: flex;
+    flex-direction: column;
+
+    .el-dialog__body {
+      flex: 1 1 auto;
+      overflow-y: auto;
+    }
+  }
+}

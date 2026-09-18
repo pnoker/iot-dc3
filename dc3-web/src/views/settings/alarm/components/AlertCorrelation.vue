@@ -17,11 +17,14 @@
 
 <template>
   <dashboard-card
-    :empty="!loading && pairs.length === 0"
+    :empty="status === 'success' && pairs.length === 0"
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.correlationEmpty')"
+    :error="status === 'error'"
+    :error-text="t('common.loadFailed')"
     :height="520"
     :loading="loading"
+    :retry-text="t('common.retry')"
     :subtitle="t('settings.event.overview.correlationSubtitle', {hours, windowSec})"
     :title="t('settings.event.overview.correlationTitle')"
     body-mode="chart"
@@ -48,8 +51,8 @@ import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {DASHBOARD_PALETTE} from '@/config/constant/palette';
 
-const {t} = useI18n();
-const {loading, run} = useAsyncLoader();
+const {t, locale} = useI18n();
+const {loading, run, status} = useAsyncLoader();
 const {resolveBySource, nameBySource} = useEntityNames();
 
 // Window tool — longer windows reveal relationships that take minutes
@@ -69,24 +72,38 @@ const graphRef = ref<HTMLElement>();
 let graph: Graph | undefined;
 
 const load = () =>
-  run(async () => {
-    const res: { data?: CorrelationPair[] } = await alertCorrelation(hours.value, windowSec, 15);
-    pairs.value = res?.data ?? [];
-    // Feed both endpoints per pair into the shared name cache.
-    const flat = pairs.value.flatMap((p) => [
-      {source: p.aSource, sourceId: p.aSourceId},
-      {source: p.bSource, sourceId: p.bSourceId},
-    ]);
-    await resolveBySource(flat);
-    await nextTick();
-    if (pairs.value.length > 0) renderGraph();
-  });
+  run(
+    async () => {
+      const result: CorrelationPair[] = await alertCorrelation(hours.value, windowSec, 15);
+      const nextPairs = result ?? [];
+      await resolveBySource(
+        nextPairs.flatMap((pair) => [
+          {source: pair.aSource, sourceId: pair.aSourceId},
+          {source: pair.bSource, sourceId: pair.bSourceId},
+        ])
+      );
+      return nextPairs;
+    },
+    {
+      apply: (nextPairs) => {
+        pairs.value = nextPairs;
+        void nextTick().then(() => {
+          if (pairs.value.length > 0) renderGraph();
+          else {
+            graph?.destroy();
+            graph = undefined;
+          }
+        });
+      },
+    }
+  );
 
 watch(hoursKey, load);
+watch(locale, load);
 onMounted(load);
 onUnmounted(() => graph?.destroy());
 
-const nodeId = (source: string, id: number | string) => `${source}:${id}`;
+const nodeId = (source: string, id: string) => `${source}:${id}`;
 
 const renderGraph = () => {
   const container = graphRef.value;
@@ -94,7 +111,7 @@ const renderGraph = () => {
   graph?.destroy();
 
   // Convert pairs → unique nodes + weighted edges.
-  const nodeMap = new Map<string, { id: string; data: { source: string; sid: number | string; name: string } }>();
+  const nodeMap = new Map<string, { id: string; data: { source: string; sid: string; name: string } }>();
   const edges: Array<{ source: string; target: string; data: { weight: number } }> = [];
   for (const p of pairs.value) {
     const aId = nodeId(p.aSource, p.aSourceId);

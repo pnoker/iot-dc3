@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da.impl;
 
 import org.jinterop.dcom.common.JIException;
@@ -63,8 +62,8 @@ public class OPCItemMgt extends BaseCOMObject {
         callObject.addInParamAsInt(items.length, JIFlags.FLAG_NULL);
         callObject.addInParamAsArray(itemArray, JIFlags.FLAG_NULL);
         callObject.addInParamAsInt(0, JIFlags.FLAG_NULL); // don't update blobs
-        callObject.addOutParamAsObject(new JIPointer(new JIArray(OPCITEMRESULT.getStruct(), null, 1, true)),
-                JIFlags.FLAG_NULL);
+        callObject.addOutParamAsObject(
+                new JIPointer(new JIArray(OPCITEMRESULT.getStruct(), null, 1, true)), JIFlags.FLAG_NULL);
         callObject.addOutParamAsObject(new JIPointer(new JIArray(Integer.class, null, 1, true)), JIFlags.FLAG_NULL);
 
         final Object result[] = Helper.callRespectSFALSE(getCOMObject(), callObject);
@@ -72,12 +71,12 @@ public class OPCItemMgt extends BaseCOMObject {
         final JIStruct[] results = (JIStruct[]) ((JIArray) ((JIPointer) result[0]).getReferent()).getArrayInstance();
         final Integer[] errorCodes = (Integer[]) ((JIArray) ((JIPointer) result[1]).getReferent()).getArrayInstance();
 
-        final KeyedResultSet<OPCITEMDEF, OPCITEMRESULT> resultList = new KeyedResultSet<OPCITEMDEF, OPCITEMRESULT>(
-                items.length);
+        final KeyedResultSet<OPCITEMDEF, OPCITEMRESULT> resultList =
+                new KeyedResultSet<OPCITEMDEF, OPCITEMRESULT>(items.length);
         for (int i = 0; i < items.length; i++) {
             final OPCITEMRESULT itemResult = OPCITEMRESULT.fromStruct(results[i]);
-            final KeyedResult<OPCITEMDEF, OPCITEMRESULT> resultEntry = new KeyedResult<OPCITEMDEF, OPCITEMRESULT>(
-                    items[i], itemResult, errorCodes[i]);
+            final KeyedResult<OPCITEMDEF, OPCITEMRESULT> resultEntry =
+                    new KeyedResult<OPCITEMDEF, OPCITEMRESULT>(items[i], itemResult, errorCodes[i]);
             resultList.add(resultEntry);
         }
 
@@ -107,8 +106,8 @@ public class OPCItemMgt extends BaseCOMObject {
          * callObject.addOutParamAsObject ( new JIPointer ( new JIArray ( Integer.class,
          * null, 1, true ) ), JIFlags.FLAG_NULL );
          */
-        callObject.addOutParamAsObject(new JIPointer(new JIArray(OPCITEMRESULT.getStruct(), null, 1, true)),
-                JIFlags.FLAG_NULL);
+        callObject.addOutParamAsObject(
+                new JIPointer(new JIArray(OPCITEMRESULT.getStruct(), null, 1, true)), JIFlags.FLAG_NULL);
         callObject.addOutParamAsObject(new JIPointer(new JIArray(Integer.class, null, 1, true)), JIFlags.FLAG_NULL);
 
         final Object result[] = Helper.callRespectSFALSE(getCOMObject(), callObject);
@@ -116,12 +115,12 @@ public class OPCItemMgt extends BaseCOMObject {
         final JIStruct[] results = (JIStruct[]) ((JIArray) ((JIPointer) result[0]).getReferent()).getArrayInstance();
         final Integer[] errorCodes = (Integer[]) ((JIArray) ((JIPointer) result[1]).getReferent()).getArrayInstance();
 
-        final KeyedResultSet<OPCITEMDEF, OPCITEMRESULT> resultList = new KeyedResultSet<OPCITEMDEF, OPCITEMRESULT>(
-                items.length);
+        final KeyedResultSet<OPCITEMDEF, OPCITEMRESULT> resultList =
+                new KeyedResultSet<OPCITEMDEF, OPCITEMRESULT>(items.length);
         for (int i = 0; i < items.length; i++) {
             final OPCITEMRESULT itemResult = OPCITEMRESULT.fromStruct(results[i]);
-            final KeyedResult<OPCITEMDEF, OPCITEMRESULT> resultEntry = new KeyedResult<OPCITEMDEF, OPCITEMRESULT>(
-                    items[i], itemResult, errorCodes[i]);
+            final KeyedResult<OPCITEMDEF, OPCITEMRESULT> resultEntry =
+                    new KeyedResult<OPCITEMDEF, OPCITEMRESULT>(items[i], itemResult, errorCodes[i]);
             resultList.add(resultEntry);
         }
 
@@ -199,5 +198,4 @@ public class OPCItemMgt extends BaseCOMObject {
         }
         return results;
     }
-
 }

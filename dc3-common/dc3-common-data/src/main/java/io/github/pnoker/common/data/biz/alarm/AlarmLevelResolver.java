@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
@@ -33,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
  * routing reads severity from the resolved alarm level, not from the message.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.21
  */
 public final class AlarmLevelResolver {
@@ -51,12 +49,13 @@ public final class AlarmLevelResolver {
         if (StringUtils.isBlank(severity)) {
             return fallback;
         }
-        AlarmMessageLevelEnum byName = AlarmMessageLevelEnum.ofName(severity.trim().toUpperCase());
+        AlarmMessageLevelEnum byName =
+                AlarmMessageLevelEnum.ofName(severity.trim().toUpperCase());
         if (byName != null) {
             return byName;
         }
-        AlarmMessageLevelEnum byCode = AlarmMessageLevelEnum.ofCode(severity.trim().toLowerCase());
+        AlarmMessageLevelEnum byCode =
+                AlarmMessageLevelEnum.ofCode(severity.trim().toLowerCase());
         return byCode != null ? byCode : fallback;
     }
-
 }

@@ -31,11 +31,33 @@ vi.mock('@/api/menu', () => menuMocks);
 describe('menu store', () => {
   beforeEach(() => {
     setActivePinia(createPinia());
-    vi.clearAllMocks();
-    menuMocks.listMenuTree.mockResolvedValue({data: sampleMenuTree});
+    vi.resetAllMocks();
+    menuMocks.listMenuTree.mockResolvedValue(sampleMenuTree);
   });
 
   describe('fetchTree', () => {
+    it('shares an in-flight request across concurrent callers', async () => {
+      let resolveRequest!: (value: typeof sampleMenuTree) => void;
+      menuMocks.listMenuTree.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveRequest = resolve;
+        })
+      );
+      const store = useMenuStore();
+
+      const first = store.fetchTree();
+      const second = store.fetchTree();
+
+      expect(menuMocks.listMenuTree).toHaveBeenCalledTimes(1);
+      expect(store.loading).toBe(true);
+      resolveRequest(sampleMenuTree);
+      await Promise.all([first, second]);
+
+      expect(store.tree).toEqual(sampleMenuTree);
+      expect(store.loaded).toBe(true);
+      expect(store.loading).toBe(false);
+    });
+
     it('loads the tree once and skips subsequent calls without force', async () => {
       const store = useMenuStore();
 
@@ -70,8 +92,27 @@ describe('menu store', () => {
       expect(store.loading).toBe(false);
     });
 
+    it('ignores a response that finishes after reset', async () => {
+      let resolveRequest!: (value: typeof sampleMenuTree) => void;
+      menuMocks.listMenuTree.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveRequest = resolve;
+        })
+      );
+      const store = useMenuStore();
+
+      const pending = store.fetchTree();
+      store.reset();
+      resolveRequest(sampleMenuTree);
+      await pending;
+
+      expect(store.tree).toEqual([]);
+      expect(store.loaded).toBe(false);
+      expect(store.loading).toBe(false);
+    });
+
     it('coerces non-array payloads to an empty tree', async () => {
-      menuMocks.listMenuTree.mockResolvedValueOnce({data: {not: 'an array'}});
+      menuMocks.listMenuTree.mockResolvedValueOnce({not: 'an array'});
       const store = useMenuStore();
 
       await store.fetchTree();
@@ -119,3 +160,5 @@ describe('menu store', () => {
     });
   });
 });
+    menuMocks.listMenuTree.mockResolvedValue(sampleMenuTree);
+      menuMocks.listMenuTree.mockResolvedValueOnce({not: 'an array'});

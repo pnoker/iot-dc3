@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.biz;
 
 /**
  * Scheduled task service for the manager module.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface ScheduleForManagerService {
@@ -30,5 +28,4 @@ public interface ScheduleForManagerService {
      * Initialize the scheduling task for manager
      */
     void initial();
-
 }

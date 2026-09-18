@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.job;
 
 import io.github.pnoker.common.driver.buffer.BufferService;
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Component;
  * logged (not rethrown) so one bad batch does not abort the scheduler.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.6.2
  */
 @Slf4j

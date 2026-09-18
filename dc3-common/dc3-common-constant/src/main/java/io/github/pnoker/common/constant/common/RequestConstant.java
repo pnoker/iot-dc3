@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.common;
 
 /**
  * HTTP request related constants.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class RequestConstant {
@@ -44,7 +42,6 @@ public class RequestConstant {
      * Custom request header related constants.
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Header {
@@ -65,6 +62,13 @@ public class RequestConstant {
         public static final String X_AUTH_TOKEN = "X-Auth-Token";
 
         /**
+         * Name of the httpOnly cookie that carries the auth token server-side.
+         * The frontend never reads it (httpOnly); the browser attaches it
+         * automatically on every same-site request via withCredentials.
+         */
+        public static final String TOKEN_COOKIE = "dc3-token";
+
+        /**
          * Custom principal request header. Used to pass authenticated caller information
          * to backend services.
          */
@@ -78,12 +82,24 @@ public class RequestConstant {
          */
         public static final String X_AUTH_SIGN = "X-Auth-Sign";
 
+        /**
+         * x internal caller constant.
+         */
         public static final String X_INTERNAL_CALLER = "X-Internal-Caller";
 
+        /**
+         * x internal timestamp constant.
+         */
         public static final String X_INTERNAL_TIMESTAMP = "X-Internal-Timestamp";
 
+        /**
+         * x internal nonce constant.
+         */
         public static final String X_INTERNAL_NONCE = "X-Internal-Nonce";
 
+        /**
+         * x internal sign constant.
+         */
         public static final String X_INTERNAL_SIGN = "X-Internal-Sign";
 
         /**
@@ -119,14 +135,12 @@ public class RequestConstant {
         private Header() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
      * Custom request message related constants.
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Message {
@@ -139,14 +153,12 @@ public class RequestConstant {
         private Message() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
 
     /**
      * Custom request key related constants.
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Key {
@@ -159,7 +171,5 @@ public class RequestConstant {
         private Key() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
-
 }

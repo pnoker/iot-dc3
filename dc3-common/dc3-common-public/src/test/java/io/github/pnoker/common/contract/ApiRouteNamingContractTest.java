@@ -14,12 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.contract;
 
-import io.github.pnoker.common.constant.common.SymbolConstant;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.pnoker.common.constant.common.SymbolConstant;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,8 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 /**
  * Guards the public HTTP contract:
@@ -36,9 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class ApiRouteNamingContractTest {
 
-    private static final Pattern MAPPING = Pattern.compile(
-            "@(?:Get|Post|Put|Delete|Patch|Request)Mapping\\s*\\((.*?)\\)",
-            Pattern.DOTALL);
+    private static final Pattern MAPPING =
+            Pattern.compile("@(?:Get|Post|Put|Delete|Patch|Request)Mapping\\s*\\((.*?)\\)", Pattern.DOTALL);
     private static final Pattern METHOD_MAPPING = Pattern.compile(
             "@(Get|Post|Put|Delete|Patch|Request)Mapping(?:\\s*\\((.*?)\\))?\\s*(?:(?:\\r?\\n)\\s*@[^\r\n]+)*\\s*public\\s+[^=;{]+?\\s+([A-Za-z0-9_]+)\\s*\\(",
             Pattern.DOTALL);
@@ -49,8 +46,7 @@ class ApiRouteNamingContractTest {
     private static List<Path> javaSources() throws IOException {
         Path commonRoot = Path.of("..").toAbsolutePath().normalize();
         try (var stream = Files.walk(commonRoot)) {
-            return stream
-                    .filter(Files::isRegularFile)
+            return stream.filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".java"))
                     .filter(path -> path.toString().contains("/src/main/java/"))
                     .filter(path -> path.toString().contains("/controller/"))
@@ -81,8 +77,8 @@ class ApiRouteNamingContractTest {
         }
     }
 
-    private static void assertMethodRoute(Path source, String annotation, String annotationArgs, String method,
-                                          List<String> violations) {
+    private static void assertMethodRoute(
+            Path source, String annotation, String annotationArgs, String method, List<String> violations) {
         if ("Request".equals(annotation)) {
             return;
         }
@@ -129,13 +125,15 @@ class ApiRouteNamingContractTest {
                 violations.add("%s imports or uses PathVariable".formatted(source));
             }
             if (text.contains("AttachmentUploadRequest")) {
-                violations.add("%s uses JSON/Base64 attachment upload request instead of multipart file upload".formatted(source));
+                violations.add("%s uses JSON/Base64 attachment upload request instead of multipart file upload"
+                        .formatted(source));
             }
             if (text.contains("MultipartFile")) {
                 violations.add("%s uses MultipartFile; reactive controllers should use FilePart".formatted(source));
             }
             if (text.contains("FileUtil.getTempPath() +")) {
-                violations.add("%s concatenates upload temp paths instead of using module-scoped FileUtil helpers".formatted(source));
+                violations.add("%s concatenates upload temp paths instead of using module-scoped FileUtil helpers"
+                        .formatted(source));
             }
 
             Matcher mappings = MAPPING.matcher(text);
@@ -153,12 +151,11 @@ class ApiRouteNamingContractTest {
 
             Matcher methodMappings = METHOD_MAPPING.matcher(text);
             while (methodMappings.find()) {
-                assertMethodRoute(source, methodMappings.group(1), methodMappings.group(2), methodMappings.group(3),
-                        violations);
+                assertMethodRoute(
+                        source, methodMappings.group(1), methodMappings.group(2), methodMappings.group(3), violations);
             }
         }
 
         assertThat(violations).isEmpty();
     }
-
 }

@@ -14,27 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.builder;
 
-import io.github.pnoker.api.center.manager.GrpcPageDriverQuery;
+import io.github.pnoker.api.center.manager.GrpcOffsetDriverQuery;
 import io.github.pnoker.api.common.GrpcDriverDTO;
-import io.github.pnoker.api.common.GrpcPage;
+import io.github.pnoker.api.common.PageRequest;
+import io.github.pnoker.api.common.SortDirection;
 import io.github.pnoker.common.constant.common.DefaultConstant;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.entity.ext.DriverExt;
 import io.github.pnoker.common.enums.DriverTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
-import io.github.pnoker.common.facade.entity.query.FacadeDriverQuery;
+import io.github.pnoker.common.facade.entity.query.FacadeDriverOffsetQuery;
 import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import org.springframework.stereotype.Component;
-
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 /**
  * Hand-rolled conversion between facade shapes and protobuf driver types.
@@ -43,34 +41,44 @@ import java.util.Optional;
  * (unlike Device, which piggy-backs on {@code DEFAULT_INT = 0}).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Component
 public class FacadeGrpcDriverBuilder {
 
-    public GrpcPageDriverQuery toGrpcPageQuery(FacadeDriverQuery query) {
-        GrpcPageDriverQuery.Builder builder = GrpcPageDriverQuery.newBuilder();
-
-        Pages pages = Objects.isNull(query.getPage()) ? new Pages() : query.getPage();
-        GrpcPage.Builder page = GrpcPage.newBuilder().setCurrent(pages.getCurrent()).setSize(pages.getSize());
-        builder.setPage(page);
-
-        LongOptional.ofNullable(query.getTenantId()).ifPresent(builder::setTenantId);
-        StringOptional.ofNullable(query.getDriverName()).ifPresent(builder::setDriverName);
-        StringOptional.ofNullable(query.getDriverCode()).ifPresent(builder::setDriverCode);
-        StringOptional.ofNullable(query.getServiceName()).ifPresent(builder::setServiceName);
-        StringOptional.ofNullable(query.getServiceHost()).ifPresent(builder::setServiceHost);
-        Optional.ofNullable(query.getDriverTypeFlag())
-                .ifPresentOrElse(value -> builder.setDriverTypeFlag(value.getIndex()),
-                        () -> builder.setDriverTypeFlag(DefaultConstant.NULL_INT));
-        Optional.ofNullable(query.getEnableFlag())
-                .ifPresentOrElse(value -> builder.setEnableFlag(value.getIndex()),
-                        () -> builder.setEnableFlag(DefaultConstant.NULL_INT));
-
+    /** Convert the offset query to its gRPC form. */
+    public GrpcOffsetDriverQuery toGrpcOffsetQuery(FacadeDriverOffsetQuery query) {
+        PageRequest.Builder page =
+                PageRequest.newBuilder().setOffset(query.offset()).setLimit(query.limit());
+        if (query.sort() != null)
+            query.sort()
+                    .forEach(spec -> page.addSort(io.github.pnoker.api.common.SortSpec.newBuilder()
+                            .setField(spec.field())
+                            .setDirection(
+                                    spec.direction() == io.github.pnoker.db.r2dbc.core.page.SortSpec.Direction.DESC
+                                            ? SortDirection.SORT_DIRECTION_DESC
+                                            : SortDirection.SORT_DIRECTION_ASC)
+                            .build()));
+        GrpcOffsetDriverQuery.Builder builder =
+                GrpcOffsetDriverQuery.newBuilder().setPage(page).setTenantId(query.tenantId());
+        Optional.ofNullable(query.driverName()).ifPresent(builder::setDriverName);
+        Optional.ofNullable(query.driverCode()).ifPresent(builder::setDriverCode);
+        Optional.ofNullable(query.serviceName()).ifPresent(builder::setServiceName);
+        Optional.ofNullable(query.serviceHost()).ifPresent(builder::setServiceHost);
+        Optional.ofNullable(query.driverTypeFlag()).ifPresent(value -> builder.setDriverTypeFlag(value.getIndex()));
+        Optional.ofNullable(query.enableFlag()).ifPresent(value -> builder.setEnableFlag(value.getIndex()));
+        Optional.ofNullable(query.version()).ifPresent(builder::setVersion);
+        Optional.ofNullable(query.groupId()).ifPresent(builder::setGroupId);
+        Optional.ofNullable(query.labelId()).ifPresent(builder::setLabelId);
         return builder.build();
     }
 
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadeDriverBO toFacadeBO(GrpcDriverDTO dto) {
         if (Objects.isNull(dto)) {
             return null;
@@ -102,5 +110,4 @@ public class FacadeGrpcDriverBuilder {
 
         return bo;
     }
-
 }

@@ -20,10 +20,8 @@ syntax = "proto3";
 package api.common.manager;
 
 import "api/common/page.proto";
-import "api/common/r.proto";
 import "api/common/entity.proto";
 import "api/common/manager/manager_query.proto";
-import "api/common/manager/manager_query_page.proto";
 
 option java_package = "io.github.pnoker.api.center.manager";
 option java_outer_classname = "ManagerProfileProto";
@@ -32,48 +30,38 @@ option java_multiple_files = true;
 
 // Service interface defining RPC calls related to profile/template management
 service ProfileApi {
-  // Paginated query for profile/template information
-  rpc ListByPage (GrpcPageProfileQuery) returns (GrpcRPageProfileDTO);
+  // Canonical offset-based query. Page-number RPCs are retired for new clients.
+  rpc List (GrpcOffsetProfileQuery) returns (GrpcOffsetPageProfileDTO);
   // Query single profile/template information by Profile ID
-  rpc GetByProfileId (GrpcProfileQuery) returns (GrpcRProfileDTO);
+  rpc GetByProfileId (GrpcProfileQuery) returns (GrpcProfileDTO);
   // Batch query profile/template information by Profile IDs
-  rpc ListByProfileIds (GrpcProfileIdsQuery) returns (GrpcRProfileListDTO);
+  rpc ListByProfileIds (GrpcProfileIdsQuery) returns (GrpcProfileListDTO);
   // Query profiles/templates bound to a Device ID
-  rpc ListByDeviceId (GrpcDeviceQuery) returns (GrpcRProfileListDTO);
+  rpc ListByDeviceId (GrpcDeviceQuery) returns (GrpcProfileListDTO);
 }
 
-// Response wrapper for paginated profile query
-message GrpcRPageProfileDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
-  // Returned paginated profile data
-  GrpcPageProfileDTO data = 2;
+// Canonical offset-based profile query.
+message GrpcOffsetProfileQuery {
+  PageRequest page = 1;
+  int64 tenant_id = 2;
+  string profile_name = 3;
+  string profile_code = 4;
+  optional int32 profile_share_flag = 5;
+  optional int32 profile_type_flag = 6;
+  optional int32 enable_flag = 7;
+  optional int32 version = 8;
+  optional int64 group_id = 9;
+  optional int64 label_id = 10;
+  optional int64 device_id = 11;
 }
 
-// Profile page data structure
-message GrpcPageProfileDTO {
-  // Pagination information including page number, page size, and total count
-  GrpcPage page = 1;
-
-  // List of profile data
-  repeated GrpcProfileDTO data = 2;
+message GrpcOffsetPageProfileDTO {
+  OffsetPage page = 1;
+  repeated GrpcProfileDTO items = 2;
 }
+
 
 // Response wrapper for profile list query
-message GrpcRProfileListDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
-  // Returned profile list data
-  repeated GrpcProfileDTO data = 2;
-}
-
-// Response wrapper for single profile query
-message GrpcRProfileDTO {
-  // Common result wrapper containing status code, message, etc.
-  GrpcR result = 1;
-
-  // Returned single profile data
-  GrpcProfileDTO data = 2;
+message GrpcProfileListDTO {
+  repeated GrpcProfileDTO items = 1;
 }

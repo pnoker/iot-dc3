@@ -24,8 +24,7 @@ The following table lists the iot-dc3 versions that are currently supported with
 > notes.
 
 If you find a potential security vulnerability while using **iot-dc3**, **do not disclose it publicly in issues or
-discussion areas**, but report it through the following private
-channels:
+discussion areas**, but report it through the following private channels:
 
 1. **GitHub Security Advisory (preferred)**:  
    Use [private vulnerability reporting](https://github.com/pnoker/iot-dc3/security/advisories/new) on GitHub — this is

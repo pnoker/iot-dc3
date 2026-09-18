@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * Rollup for one driver service_name — how many driver rows are enabled, how many devices
@@ -33,7 +31,6 @@ import java.io.Serializable;
  * in later.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -60,5 +57,4 @@ public class ProtocolHealthVO implements Serializable {
 
     @Schema(description = "device count served by this service", example = "120")
     private long deviceCount;
-
 }

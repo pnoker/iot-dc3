@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -33,7 +32,6 @@ import lombok.ToString;
  * View object for alarm rule API responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -48,38 +46,49 @@ public class RuleVO extends BaseVO {
     /**
      * Alarm target type flag
      */
-    @Schema(description = "Alarm target type: POINT, DEVICE, DRIVER, or EVENT. Specifies which entity type this rule monitors.", example = "DEVICE")
+    @Schema(
+            description =
+                    "Alarm target type: POINT, DEVICE, DRIVER, or EVENT. Specifies which entity type this rule monitors.",
+            example = "DEVICE")
     private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
     /**
      * Rule name
      */
-    @Schema(description = "Rule name. Unique name within a tenant for identifying a data processing pipeline rule.", example = "High Temp > 80 Alert", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(
+            description = "Rule name. Unique name within a tenant for identifying a data processing pipeline rule.",
+            example = "High Temp > 80 Alert",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     private String ruleName;
 
     /**
      * Rule code
      */
-    @Schema(description = "Rule code. Stable business identifier; must not change once deployed.", example = "HIGH_TEMP_ALERT")
+    @Schema(
+            description = "Rule code. Stable business identifier; must not change once deployed.",
+            example = "HIGH_TEMP_ALERT")
     private String ruleCode;
 
     /**
      * Entity ID
      */
-    @Schema(description = "ID of the entity (point, device, driver, or event) that this rule monitors, as selected by alarmTargetTypeFlag.", example = "2048")
-    private Long entityId;
+    @Schema(
+            description =
+                    "ID of the entity (point, device, driver, or event) that this rule monitors, as selected by alarmTargetTypeFlag.",
+            example = "2048")
+    private String entityId;
 
     /**
      * Alarm notification template ID
      */
     @Schema(description = "ID of the notification rule to invoke when this rule triggers.", example = "1024")
-    private Long notifyId;
+    private String notifyId;
 
     /**
      * Alarm message template ID
      */
     @Schema(description = "ID of the message template to use for the alert payload of this rule.", example = "2048")
-    private Long messageId;
+    private String messageId;
 
     /**
      * Alarm rule
@@ -92,5 +101,4 @@ public class RuleVO extends BaseVO {
      */
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

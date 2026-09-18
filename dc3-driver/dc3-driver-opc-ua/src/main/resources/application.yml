@@ -65,7 +65,6 @@ dc3:
         remark: OPC UA node tag name
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/opc-ua/buffer.db
 
 spring:

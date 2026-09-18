@@ -14,68 +14,68 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.entity.dto.NotifyTaskDTO;
+import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class NotifyTaskSenderTest {
 
     @Mock
-    private RabbitTemplate rabbitTemplate;
-
-    @Mock
-    private TopicExchange alarmExchange;
+    private ReactiveMessageSender messageSender;
 
     @InjectMocks
     private NotifyTaskSender sender;
 
     @Test
     void publishesWithChannelTypedRoutingKey() {
-        when(alarmExchange.getName()).thenReturn("dc3.e.alarm");
         NotifyTaskDTO task = NotifyTaskDTO.builder()
                 .notifyHistoryId(1L)
                 .channelId(2L)
                 .channelTypeFlag((byte) 0)
                 .build();
 
-        sender.publish(task);
+        when(messageSender.sendConfirmed(any())).thenReturn(Mono.empty());
+        sender.publish(task).block();
 
-        verify(rabbitTemplate).convertAndSend(eq("dc3.e.alarm"), eq("dc3.r.notify.task.0"), eq(task));
+        verify(messageSender)
+                .sendConfirmed(argThat(m -> m.getTopic() == MqTopic.NOTIFY_TASK
+                        && "0".equals(m.getPartitionKey())
+                        && m.getPayload() == task));
     }
 
     @Test
     void usesUnknownRoutingKeyWhenChannelTypeIsMissing() {
-        when(alarmExchange.getName()).thenReturn("dc3.e.alarm");
-        NotifyTaskDTO task = NotifyTaskDTO.builder()
-                .notifyHistoryId(1L)
-                .channelId(2L)
-                .build(); // channelTypeFlag missing
+        NotifyTaskDTO task =
+                NotifyTaskDTO.builder().notifyHistoryId(1L).channelId(2L).build(); // channelTypeFlag missing
 
-        sender.publish(task);
+        when(messageSender.sendConfirmed(any())).thenReturn(Mono.empty());
+        sender.publish(task).block();
 
-        verify(rabbitTemplate).convertAndSend(eq("dc3.e.alarm"), eq("dc3.r.notify.task.unknown"), eq(task));
+        verify(messageSender)
+                .sendConfirmed(argThat(m -> m.getTopic() == MqTopic.NOTIFY_TASK
+                        && "unknown".equals(m.getPartitionKey())
+                        && m.getPayload() == task));
     }
 
     @Test
     void refusesToPublishWhenHistoryIdIsMissing() {
         NotifyTaskDTO task = NotifyTaskDTO.builder().channelId(2L).build();
-        sender.publish(task);
-        verify(rabbitTemplate, never()).convertAndSend((String) any(), any(), (Object) any());
+        sender.publish(task).block();
+        verify(messageSender, never()).sendConfirmed(any());
     }
-
 }

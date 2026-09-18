@@ -14,25 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
-import io.github.pnoker.common.auth.biz.TokenService;
+import static org.mockito.Mockito.when;
+
+import io.github.pnoker.common.auth.biz.ReactiveTokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class TokenLocalFacadeTest {
 
     @Mock
-    private TokenService tokenService;
+    private ReactiveTokenService tokenService;
 
     private TokenLocalFacade facade;
 
@@ -42,24 +42,24 @@ class TokenLocalFacadeTest {
     }
 
     @Test
-    void checkValidReturnsFalseWhenServiceReturnsNull() {
-        when(tokenService.checkValid("alice", "salt", "token", "tenant-A")).thenReturn(null);
-        assertThat(facade.checkValid("tenant-A", "alice", "salt", "token")).isFalse();
+    void checkValidMapsValidToken() {
+        TokenValid token = new TokenValid();
+        token.setValid(true);
+        when(tokenService.checkValid("alice", "token", "tenant-a")).thenReturn(Mono.just(token));
+
+        StepVerifier.create(facade.checkValid("tenant-a", "alice", "token"))
+                .expectNext(true)
+                .verifyComplete();
     }
 
     @Test
-    void checkValidReturnsFalseWhenTokenInvalid() {
-        TokenValid invalid = new TokenValid();
-        invalid.setValid(false);
-        when(tokenService.checkValid("alice", "salt", "token", "tenant-A")).thenReturn(invalid);
-        assertThat(facade.checkValid("tenant-A", "alice", "salt", "token")).isFalse();
-    }
+    void checkValidMapsInvalidToken() {
+        TokenValid token = new TokenValid();
+        token.setValid(false);
+        when(tokenService.checkValid("alice", "token", "tenant-a")).thenReturn(Mono.just(token));
 
-    @Test
-    void checkValidReturnsTrueWhenTokenValid() {
-        TokenValid valid = new TokenValid();
-        valid.setValid(true);
-        when(tokenService.checkValid("alice", "salt", "token", "tenant-A")).thenReturn(valid);
-        assertThat(facade.checkValid("tenant-A", "alice", "salt", "token")).isTrue();
+        StepVerifier.create(facade.checkValid("tenant-a", "alice", "token"))
+                .expectNext(false)
+                .verifyComplete();
     }
 }

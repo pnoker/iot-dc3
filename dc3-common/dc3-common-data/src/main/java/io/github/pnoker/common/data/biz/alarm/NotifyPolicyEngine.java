@@ -14,20 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
 import io.github.pnoker.common.data.entity.bo.RuleStateBO;
-
 import java.time.LocalDateTime;
 
 /**
  * Applies notification policies to rule matches.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface NotifyPolicyEngine {
@@ -42,7 +39,6 @@ public interface NotifyPolicyEngine {
      * @param now    decision time
      * @return decision
      */
-    NotifyDecision decide(RuleMatch match, NotifyBO notify, NotifyChannelBindBO bind, RuleStateBO state,
-                          LocalDateTime now);
-
+    NotifyDecision decide(
+            RuleMatch match, NotifyBO notify, NotifyChannelBindBO bind, RuleStateBO state, LocalDateTime now);
 }

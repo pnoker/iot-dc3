@@ -14,57 +14,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.gateway.service;
 
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import reactor.core.publisher.Mono;
 
 /**
  * Service interface for gateway filter logic.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface FilterService {
 
-    /**
-     * Resolve the tenant from the request's tenant header, requiring it to be enabled.
-     *
-     * @param request the incoming request
-     * @return the resolved tenant
-     */
-    FacadeTenantBO getTenant(ServerHttpRequest request);
+    /** Load the tenant for the request. */
+    Mono<FacadeTenantBO> getTenantReactive(ServerHttpRequest request);
 
-    /**
-     * Resolve the local credential from the request's login header.
-     *
-     * @param request the incoming request
-     * @return the resolved credential
-     */
-    FacadeLocalCredentialBO getLocalCredential(ServerHttpRequest request);
+    /** Load the local credential scoped to the tenant by id. */
+    Mono<FacadeLocalCredentialBO> getLocalCredentialReactive(ServerHttpRequest request, Long tenantId);
 
-    /**
-     * Assemble the principal header forwarded to downstream services from the resolved
-     * credential and tenant.
-     *
-     * @param credential the local credential
-     * @param tenant     the tenant
-     * @return the principal header for downstream
-     */
-    RequestHeader.PrincipalHeader getUser(FacadeLocalCredentialBO credential, FacadeTenantBO tenant);
+    /** Load the user for the request. */
+    Mono<RequestHeader.PrincipalHeader> getUserReactive(FacadeLocalCredentialBO credential, FacadeTenantBO tenant);
 
-    /**
-     * Validate the request's token (salt + token) against the resolved tenant and
-     * credential.
-     *
-     * @param request    the incoming request
-     * @param tenant     the resolved tenant
-     * @param credential the resolved credential
-     */
-    void checkValid(ServerHttpRequest request, FacadeTenantBO tenant, FacadeLocalCredentialBO credential);
-
+    /** Complete when the request's token is valid for the tenant, failing otherwise. */
+    Mono<Void> checkValidReactive(ServerHttpRequest request, FacadeTenantBO tenant, FacadeLocalCredentialBO credential);
 }

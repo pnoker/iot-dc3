@@ -1,0 +1,60 @@
+name: CLI CI
+
+on:
+  pull_request:
+    paths:
+      - dc3-cli/**
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - dc3-cli/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cli-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: dc3-cli
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+
+      - name: Set pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86
+        with:
+          package_json_file: dc3-cli/package.json
+
+      - name: Set Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: dc3-cli/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint Check
+        run: pnpm exec eslint src test
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Smoke — help output lists command groups
+        run: |
+          node dist/index.js --help | grep -E "auth|device|tools"
+          node dist/index.js auth login --help > /dev/null

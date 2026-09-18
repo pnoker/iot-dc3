@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.lwm2m;
 
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import jakarta.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.leshan.core.observation.Observation;
@@ -30,15 +32,13 @@ import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 import org.eclipse.leshan.server.LeshanServer;
 import org.eclipse.leshan.server.LeshanServerBuilder;
+import org.eclipse.leshan.server.californium.endpoint.CaliforniumServerEndpointsProvider;
+import org.eclipse.leshan.server.californium.endpoint.coap.CoapServerProtocolProvider;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.RegistrationListener;
 import org.eclipse.leshan.server.registration.RegistrationUpdate;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * LwM2M Server Manager.
@@ -49,7 +49,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -71,29 +70,37 @@ public class Lwm2mServerManager implements DisposableBean {
     public void start() {
         try {
             LeshanServerBuilder builder = new LeshanServerBuilder();
+            // Leshan requires at least one endpoint provider; expose a plain CoAP
+            // endpoint bound to the configured host/port (NOSEC mode).
+            builder.setEndpointsProviders(new CaliforniumServerEndpointsProvider.Builder(
+                            new CoapServerProtocolProvider())
+                    .addEndpoint("coap://" + lwm2mProperties.getServerHost() + ":" + lwm2mProperties.getServerPort())
+                    .build());
             server = builder.build();
 
             // Register device lifecycle listeners
             server.getRegistrationService().addListener(new RegistrationListener() {
                 @Override
-                public void registered(Registration registration, Registration previousReg,
-                                       Collection<Observation> observations) {
+                public void registered(
+                        Registration registration, Registration previousReg, Collection<Observation> observations) {
                     String endpoint = registration.getEndpoint();
                     registrations.put(endpoint, registration);
                     log.info("LwM2M device registered: endpoint={}, id={}", endpoint, registration.getId());
                 }
 
                 @Override
-                public void updated(RegistrationUpdate update, Registration updatedReg,
-                                    Registration previousReg) {
+                public void updated(RegistrationUpdate update, Registration updatedReg, Registration previousReg) {
                     String endpoint = updatedReg.getEndpoint();
                     registrations.put(endpoint, updatedReg);
                     log.info("LwM2M device updated: endpoint={}, id={}", endpoint, updatedReg.getId());
                 }
 
                 @Override
-                public void unregistered(Registration registration, Collection<Observation> observations,
-                                         boolean expired, Registration previousReg) {
+                public void unregistered(
+                        Registration registration,
+                        Collection<Observation> observations,
+                        boolean expired,
+                        Registration previousReg) {
                     String endpoint = registration.getEndpoint();
                     registrations.remove(endpoint);
                     log.info("LwM2M device unregistered: endpoint={}, expired={}", endpoint, expired);
@@ -101,7 +108,8 @@ public class Lwm2mServerManager implements DisposableBean {
             });
 
             server.start();
-            log.info("LwM2M server started on coap://{}:{} (secure port: {})",
+            log.info(
+                    "LwM2M server started, host={}, port={}, securePort={}",
                     lwm2mProperties.getServerHost(),
                     lwm2mProperties.getServerPort(),
                     lwm2mProperties.getSecurePort());
@@ -132,18 +140,33 @@ public class Lwm2mServerManager implements DisposableBean {
                 return response.getContent().toString();
             } else {
                 String code = response != null ? response.getCode().toString() : "timeout";
-                log.warn("LwM2M read failed: endpoint={}, path=/{}/{}/{}, code={}",
-                        endpoint, objectId, objectInstanceId, resourceId, code);
+                log.warn(
+                        "LwM2M read failed: endpoint={}, path=/{}/{}/{}, code={}",
+                        endpoint,
+                        objectId,
+                        objectInstanceId,
+                        resourceId,
+                        code);
                 return null;
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.error("LwM2M read interrupted: endpoint={}, path=/{}/{}/{}",
-                    endpoint, objectId, objectInstanceId, resourceId, e);
+            log.error(
+                    "LwM2M read interrupted: endpoint={}, path=/{}/{}/{}",
+                    endpoint,
+                    objectId,
+                    objectInstanceId,
+                    resourceId,
+                    e);
             return null;
         } catch (Exception e) {
-            log.error("LwM2M read error: endpoint={}, path=/{}/{}/{}",
-                    endpoint, objectId, objectInstanceId, resourceId, e);
+            log.error(
+                    "LwM2M read error: endpoint={}, path=/{}/{}/{}",
+                    endpoint,
+                    objectId,
+                    objectInstanceId,
+                    resourceId,
+                    e);
             return null;
         }
     }
@@ -165,26 +188,44 @@ public class Lwm2mServerManager implements DisposableBean {
         }
 
         try {
-            WriteResponse response = server.send(reg,
-                    new WriteRequest(objectId, objectInstanceId, resourceId, value));
+            WriteResponse response = server.send(reg, new WriteRequest(objectId, objectInstanceId, resourceId, value));
             if (response != null && response.isSuccess()) {
-                log.debug("LwM2M write succeeded: endpoint={}, path=/{}/{}/{}",
-                        endpoint, objectId, objectInstanceId, resourceId);
+                log.debug(
+                        "LwM2M write succeeded: endpoint={}, path=/{}/{}/{}",
+                        endpoint,
+                        objectId,
+                        objectInstanceId,
+                        resourceId);
                 return true;
             } else {
                 String code = response != null ? response.getCode().toString() : "timeout";
-                log.warn("LwM2M write failed: endpoint={}, path=/{}/{}/{}, code={}",
-                        endpoint, objectId, objectInstanceId, resourceId, code);
+                log.warn(
+                        "LwM2M write failed: endpoint={}, path=/{}/{}/{}, code={}",
+                        endpoint,
+                        objectId,
+                        objectInstanceId,
+                        resourceId,
+                        code);
                 return false;
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.error("LwM2M write interrupted: endpoint={}, path=/{}/{}/{}",
-                    endpoint, objectId, objectInstanceId, resourceId, e);
+            log.error(
+                    "LwM2M write interrupted: endpoint={}, path=/{}/{}/{}",
+                    endpoint,
+                    objectId,
+                    objectInstanceId,
+                    resourceId,
+                    e);
             return false;
         } catch (Exception e) {
-            log.error("LwM2M write error: endpoint={}, path=/{}/{}/{}",
-                    endpoint, objectId, objectInstanceId, resourceId, e);
+            log.error(
+                    "LwM2M write error: endpoint={}, path=/{}/{}/{}",
+                    endpoint,
+                    objectId,
+                    objectInstanceId,
+                    resourceId,
+                    e);
             return false;
         }
     }
@@ -204,13 +245,22 @@ public class Lwm2mServerManager implements DisposableBean {
         }
 
         try {
-            server.getObservationService().cancelObservations(reg,
-                    "/" + objectId + "/" + objectInstanceId + "/" + resourceId);
-            log.info("LwM2M observation cancelled: endpoint={}, path=/{}/{}/{}",
-                    endpoint, objectId, objectInstanceId, resourceId);
+            server.getObservationService()
+                    .cancelObservations(reg, "/" + objectId + "/" + objectInstanceId + "/" + resourceId);
+            log.info(
+                    "LwM2M observation cancelled: endpoint={}, path=/{}/{}/{}",
+                    endpoint,
+                    objectId,
+                    objectInstanceId,
+                    resourceId);
         } catch (Exception e) {
-            log.error("LwM2M cancel observation error: endpoint={}, path=/{}/{}/{}",
-                    endpoint, objectId, objectInstanceId, resourceId, e);
+            log.error(
+                    "LwM2M cancel observation error: endpoint={}, path=/{}/{}/{}",
+                    endpoint,
+                    objectId,
+                    objectInstanceId,
+                    resourceId,
+                    e);
         }
     }
 
@@ -240,7 +290,9 @@ public class Lwm2mServerManager implements DisposableBean {
     public void destroy() {
         if (server != null) {
             server.destroy();
-            log.info("LwM2M server destroyed on coap://{}:{}", lwm2mProperties.getServerHost(),
+            log.info(
+                    "LwM2M server destroyed on coap://{}:{}",
+                    lwm2mProperties.getServerHost(),
                     lwm2mProperties.getServerPort());
         }
     }

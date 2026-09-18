@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -33,7 +32,6 @@ import lombok.ToString;
  * View object for alarm message template API responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -48,13 +46,17 @@ public class MessageVO extends BaseVO {
     /**
      * Alarm message template title
      */
-    @Schema(description = "Message template name. Unique within the current tenant.", example = "High Temp Alert Message")
+    @Schema(
+            description = "Message template name. Unique within the current tenant.",
+            example = "High Temp Alert Message")
     private String messageName;
 
     /**
      * Alarm message template code
      */
-    @Schema(description = "Message template code. Stable business identifier; must not change once deployed.", example = "HIGH_TEMP_MSG")
+    @Schema(
+            description = "Message template code. Stable business identifier; must not change once deployed.",
+            example = "HIGH_TEMP_MSG")
     private String messageCode;
 
     /**
@@ -66,7 +68,9 @@ public class MessageVO extends BaseVO {
     /**
      * Alarm message template content
      */
-    @Schema(description = "Message template extension information, serialized as JSON for custom formatting and routing.")
+    @Schema(
+            description =
+                    "Message template extension information, serialized as JSON for custom formatting and routing.")
     private MessageExt messageExt;
 
     /**
@@ -74,5 +78,4 @@ public class MessageVO extends BaseVO {
      */
     @Schema(description = "Enable flag: ENABLE (0) or DISABLE (1).", example = "ENABLE")
     private EnableFlagEnum enableFlag;
-
 }

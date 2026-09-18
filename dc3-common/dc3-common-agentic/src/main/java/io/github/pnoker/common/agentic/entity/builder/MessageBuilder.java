@@ -16,84 +16,39 @@
  */
 package io.github.pnoker.common.agentic.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
-import io.github.pnoker.common.agentic.entity.model.MessageDO;
 import io.github.pnoker.common.agentic.entity.vo.MessageVO;
-import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-/**
- * MapStruct builder converting between message BO, VO, and DO.
- *
- * @author pnoker
- * @version 2026.5.11
- * @since 2026.5.11
- */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+/** Maps reactive message projections to API resources. */
+@Mapper(
+        componentModel = "spring",
+        implementationName = "AgenticMessageBuilderImpl",
+        uses = {MapStructUtil.class})
 public interface MessageBuilder {
 
-    @Mapping(target = "content", source = "contentExt")
-    @Mapping(target = "tenantId", ignore = true)
-    @Mapping(target = "userId", ignore = true)
-    MessageBO buildBOByVO(MessageVO entityVO);
-
-    List<MessageBO> buildBOListByVOList(List<MessageVO> entityVOList);
-
-    @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "status", ignore = true)
-    MessageDO buildDOByBO(MessageBO entityBO);
-
-    @AfterMapping
-    default void afterProcess(MessageBO entityBO, @MappingTarget MessageDO entityDO) {
-        AgenticMessageStatusEnum status = entityBO.getStatus();
-        Optional.ofNullable(status).ifPresent(value -> entityDO.setStatus(value.getIndex()));
-    }
-
-    List<MessageDO> buildDOListByBOList(List<MessageBO> entityBOList);
-
-    @Mapping(target = "status", ignore = true)
-    MessageBO buildBOByDO(MessageDO entityDO);
-
-    @AfterMapping
-    default void afterProcess(MessageDO entityDO, @MappingTarget MessageBO entityBO) {
-        Byte status = entityDO.getStatus();
-        entityBO.setStatus(AgenticMessageStatusEnum.ofIndex(status));
-    }
-
-    List<MessageBO> buildBOListByDOList(List<MessageDO> entityDOList);
-
+    /** Convert the business object into its value-object form. */
     @Mapping(target = "content", ignore = true)
     @Mapping(target = "contentExt", source = "content")
     MessageVO buildVOByBO(MessageBO entityBO);
 
+    /** Convert the business objects into their value-object forms. */
+    List<MessageVO> buildVOListByBOList(List<MessageBO> entityBOList);
+
+    /** Post-process the mapped target after MapStruct copies the fields. */
     @AfterMapping
     default void afterProcess(MessageBO entityBO, @MappingTarget MessageVO entityVO) {
-        AgenticMessageContent content = Objects.nonNull(entityBO.getContent()) ? entityBO.getContent()
-                : AgenticMessageContent.ofText("");
+        AgenticMessageContent content =
+                Objects.nonNull(entityBO.getContent()) ? entityBO.getContent() : AgenticMessageContent.ofText("");
         entityVO.setContent(StringUtils.defaultString(content.getText()));
         entityVO.setContentExt(content);
     }
-
-    List<MessageVO> buildVOListByBOList(List<MessageBO> entityBOList);
-
-    default Page<MessageBO> buildBOPageByDOPage(Page<MessageDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    default Page<MessageVO> buildVOPageByBOPage(Page<MessageBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

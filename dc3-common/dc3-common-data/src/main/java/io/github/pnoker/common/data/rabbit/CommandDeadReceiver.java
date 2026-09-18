@@ -14,29 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.dal.CommandHistoryManager;
-import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
-import io.github.pnoker.common.enums.PointCommandStatusEnum;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.data.repository.ReactiveCommandHistoryStore;
+import io.github.pnoker.common.mq.MqHeaders;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
+import reactor.core.publisher.Mono;
 
 /**
  * RabbitMQ receiver for custom command messages rejected into the dead letter exchange.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Slf4j
@@ -44,39 +38,46 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CommandDeadReceiver {
 
-    private final CommandHistoryManager commandHistoryManager;
+    private final ReactiveCommandHistoryStore historyStore;
 
     /**
      * Consume a command dead-letter message and mark the matching command history record
      * as dead, using the message correlation id as the record id.
      *
-     * @param channel the RabbitMQ channel for manual ack
-     * @param message the dead-letter message carrying the correlation id
+     * @param message the dead-letter delivery carrying the correlation id header
+     * @param ack     the acknowledgement handle
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{commandDeadQueue.name}")
-    public void onDeadLetter(Channel channel, Message message) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
-        try {
-            String correlationId = message.getMessageProperties().getCorrelationId();
-            if (Objects.nonNull(correlationId)) {
-                CommandHistoryDO recordDO = commandHistoryManager.lambdaQuery()
-                        .eq(CommandHistoryDO::getRecordId, correlationId)
-                        .one();
-                if (Objects.nonNull(recordDO)) {
-                    recordDO.setStatus(PointCommandStatusEnum.DEAD);
-                    recordDO.setErrorCode("DLX");
-                    recordDO.setErrorMessage("Message rejected to dead letter queue");
-                    recordDO.setFinishTime(LocalDateTime.now());
-                    commandHistoryManager.updateById(recordDO);
-                    log.info("Marked dead command record: recordId={}", correlationId);
-                }
-            }
-            RabbitAckUtil.ack(channel, deliveryTag);
-        } catch (Exception e) {
-            log.error("Command dead letter processing failed", e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+    @Dc3Listener(topic = MqTopic.COMMAND_DEAD)
+    public Mono<Void> onDeadLetter(MqReceived<Object> message, Acknowledgment ack) {
+        String correlationId = message.headers().get(MqHeaders.CORRELATION_ID);
+        Long tenantId = tenantId(message);
+        if (correlationId == null || tenantId == null || tenantId <= 0) {
+            ack.reject(false);
+            return Mono.empty();
         }
+        return historyStore
+                .markDead(
+                        tenantId,
+                        correlationId,
+                        "DLX",
+                        "Message rejected to dead letter queue",
+                        java.time.Instant.now())
+                .doOnNext(updated -> {
+                    if (updated) {
+                        log.info("Marked dead command record: recordId={}", correlationId);
+                    }
+                })
+                .doOnError(
+                        error -> log.error("Command dead letter persistence failed, recordId={}", correlationId, error))
+                .then();
     }
 
+    private Long tenantId(MqReceived<?> message) {
+        try {
+            String value = message.headers().get(MqHeaders.TENANT_ID);
+            return value == null ? null : Long.valueOf(value);
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
 }

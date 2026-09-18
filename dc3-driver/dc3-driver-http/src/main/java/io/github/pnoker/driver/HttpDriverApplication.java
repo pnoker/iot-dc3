@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver;
 
 import org.springframework.boot.SpringApplication;
@@ -24,12 +23,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * HTTP REST client driver application.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @SpringBootApplication
 public class HttpDriverApplication {
 
+    /**
+     * Start the http driver application.
+     *
+     * @param args command-line arguments
+     */
     public static void main(String[] args) {
         SpringApplication.run(HttpDriverApplication.class, args);
     }

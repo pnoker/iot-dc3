@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.test.support;
 
+import java.time.Duration;
+import java.util.concurrent.Callable;
 import lombok.RequiredArgsConstructor;
 import org.awaitility.Awaitility;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
-import java.time.Duration;
-import java.util.concurrent.Callable;
 
 /**
  * Minimal helper around {@link RabbitTemplate} that captures the publish + assert
@@ -35,10 +33,24 @@ public final class RabbitTestHarness {
 
     private final RabbitTemplate rabbitTemplate;
 
+    /**
+     * Send.
+     *
+     * @param exchange   exchange
+     * @param routingKey routing key
+     * @param payload    payload
+     */
     public void send(String exchange, String routingKey, Object payload) {
         rabbitTemplate.convertAndSend(exchange, routingKey, payload);
     }
 
+    /**
+     * Receive.
+     *
+     * @param queue   queue
+     * @param timeout timeout
+     * @return receive result
+     */
     public Message receive(String queue, Duration timeout) {
         rabbitTemplate.setReceiveTimeout(timeout.toMillis());
         return rabbitTemplate.receive(queue);

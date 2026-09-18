@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
 
 /**
@@ -25,7 +24,6 @@ package io.github.pnoker.common.enums;
  * status the web layer aligns to, so the body code and transport status never diverge.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface ResponseCode {
@@ -50,5 +48,4 @@ public interface ResponseCode {
      * @return HTTP status value
      */
     int getHttpStatus();
-
 }

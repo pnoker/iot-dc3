@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class AlarmLevelResolverTest {
 
@@ -40,7 +39,8 @@ class AlarmLevelResolverTest {
 
     @Test
     void normalizesWhitespaceAndMixedCase() {
-        assertThat(AlarmLevelResolver.resolve("  p1  ", AlarmMessageLevelEnum.P2)).isEqualTo(AlarmMessageLevelEnum.P1);
+        assertThat(AlarmLevelResolver.resolve("  p1  ", AlarmMessageLevelEnum.P2))
+                .isEqualTo(AlarmMessageLevelEnum.P1);
         assertThat(AlarmLevelResolver.resolve("Critical", AlarmMessageLevelEnum.P2))
                 .as("unrecognized labels fall back to the supplied default")
                 .isEqualTo(AlarmMessageLevelEnum.P2);
@@ -48,12 +48,8 @@ class AlarmLevelResolverTest {
 
     @Test
     void usesFallbackWhenSeverityIsBlankOrNull() {
-        assertThat(AlarmLevelResolver.resolve(null, AlarmMessageLevelEnum.P2))
-                .isEqualTo(AlarmMessageLevelEnum.P2);
-        assertThat(AlarmLevelResolver.resolve("", AlarmMessageLevelEnum.P3))
-                .isEqualTo(AlarmMessageLevelEnum.P3);
-        assertThat(AlarmLevelResolver.resolve("   ", AlarmMessageLevelEnum.P0))
-                .isEqualTo(AlarmMessageLevelEnum.P0);
+        assertThat(AlarmLevelResolver.resolve(null, AlarmMessageLevelEnum.P2)).isEqualTo(AlarmMessageLevelEnum.P2);
+        assertThat(AlarmLevelResolver.resolve("", AlarmMessageLevelEnum.P3)).isEqualTo(AlarmMessageLevelEnum.P3);
+        assertThat(AlarmLevelResolver.resolve("   ", AlarmMessageLevelEnum.P0)).isEqualTo(AlarmMessageLevelEnum.P0);
     }
-
 }

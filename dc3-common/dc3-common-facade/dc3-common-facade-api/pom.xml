@@ -39,6 +39,11 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+        </dependency>
+
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -47,6 +52,12 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-model</artifactId>
+        </dependency>
+
+        <!-- Canonical reactive paging contract shared by facade ports. -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-core</artifactId>
         </dependency>
 
 

@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBO;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * Email channel placeholder adapter.
@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
  * with its own credential resolver and sender implementation.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service
@@ -40,8 +39,8 @@ public class EmailNotifyChannelAdapter implements NotifyChannelAdapter {
     }
 
     @Override
-    public NotifySendResult send(NotifyChannelBO channel, MessagePayload payload) {
-        return NotifySendResult.skipped(channel.getCredentialRef(), "Email channel sender is not configured");
+    public Mono<NotifySendResult> send(NotifyChannelBO channel, MessagePayload payload) {
+        return Mono.just(
+                NotifySendResult.skipped(channel.getCredentialRef(), "Email channel sender is not configured"));
     }
-
 }

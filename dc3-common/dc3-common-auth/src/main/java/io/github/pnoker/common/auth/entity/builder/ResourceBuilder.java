@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.bo.ResourceTreeBO;
 import io.github.pnoker.common.auth.entity.model.ResourceDO;
@@ -31,25 +29,24 @@ import io.github.pnoker.common.enums.ResourceTypeEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 /**
  * MapStruct builder converting between resource BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface ResourceBuilder {
 
     /**
@@ -81,6 +78,12 @@ public interface ResourceBuilder {
     @Mapping(target = "deleted", ignore = true)
     ResourceDO buildDOByBO(ResourceBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(ResourceBO entityBO, @MappingTarget ResourceDO entityDO) {
         // Code
@@ -132,6 +135,12 @@ public interface ResourceBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     ResourceBO buildBOByDO(ResourceDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(ResourceDO entityDO, @MappingTarget ResourceBO entityBO) {
         // Json Ext
@@ -183,29 +192,21 @@ public interface ResourceBuilder {
     List<ResourceVO> buildVOListByBOList(List<ResourceBO> entityBOList);
 
     /**
-     * DOPage to BOPage
+     * Convert bo list to tree view object list.
      *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
+     * @param entityBOList entity business object list
+     * @return converted value
      */
-    default Page<ResourceBO> buildBOPageByDOPage(Page<ResourceDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<ResourceVO> buildVOPageByBOPage(Page<ResourceBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
     default List<ResourceTreeVO> buildTreeVOListByBOList(List<ResourceTreeBO> entityBOList) {
         return entityBOList.stream().map(this::buildTreeVOByBO).toList();
     }
 
+    /**
+     * Convert bo to tree view object.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     default ResourceTreeVO buildTreeVOByBO(ResourceTreeBO entityBO) {
         ResourceVO flat = buildVOByBO(entityBO);
         ResourceTreeVO out = new ResourceTreeVO();
@@ -231,5 +232,4 @@ public interface ResourceBuilder {
         }
         return out;
     }
-
 }

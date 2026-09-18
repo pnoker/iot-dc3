@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,7 +28,6 @@ import lombok.Setter;
  * Extended information related to user identity.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -47,6 +45,9 @@ public class UserIdentityExt extends BaseExt {
     @Schema(description = "Extended content payload, distinguished by the type and version fields")
     private Content content;
 
+    /**
+     * User identity extension slot (credential/profile metadata per identity).
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -63,7 +64,9 @@ public class UserIdentityExt extends BaseExt {
         /**
          * Gender.
          */
-        @Schema(description = "Gender of the user; free-form text such as 'male', 'female' or 'other'", example = "male")
+        @Schema(
+                description = "Gender of the user; free-form text such as 'male', 'female' or 'other'",
+                example = "male")
         private String gender;
 
         /**
@@ -75,9 +78,9 @@ public class UserIdentityExt extends BaseExt {
         /**
          * Identification number.
          */
-        @Schema(description = "Government-issued identification number of the user (e.g. national ID or passport)", example = "110101199001011234")
+        @Schema(
+                description = "Government-issued identification number of the user (e.g. national ID or passport)",
+                example = "110101199001011234")
         private String idNumber;
-
     }
-
 }

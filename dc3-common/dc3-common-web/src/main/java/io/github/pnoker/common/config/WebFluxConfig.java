@@ -14,24 +14,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.utils.JsonUtil;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * WebFlux auto-configuration for static resources and JSON codecs.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @AutoConfiguration
 public class WebFluxConfig implements WebFluxConfigurer {
+
+    /** Create the shared WebClient builder. */
+    @Bean
+    @ConditionalOnMissingBean
+    public WebClient.Builder webClientBuilder() {
+        return WebClient.builder();
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -40,14 +48,18 @@ public class WebFluxConfig implements WebFluxConfigurer {
         // so the Swagger UI webjar assets must be served explicitly; otherwise /swagger-ui/** 404s.
         registry.addResourceHandler("/swagger-ui/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/swagger-ui/");
-        registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
     @Override
     public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
-        configurer.defaultCodecs().jacksonJsonEncoder(new org.springframework.http.codec.json.JacksonJsonEncoder(JsonUtil.getJsonMapper()));
-        configurer.defaultCodecs().jacksonJsonDecoder(new org.springframework.http.codec.json.JacksonJsonDecoder(JsonUtil.getJsonMapper()));
+        configurer
+                .defaultCodecs()
+                .jacksonJsonEncoder(
+                        new org.springframework.http.codec.json.JacksonJsonEncoder(JsonUtil.getJsonMapper()));
+        configurer
+                .defaultCodecs()
+                .jacksonJsonDecoder(
+                        new org.springframework.http.codec.json.JacksonJsonDecoder(JsonUtil.getJsonMapper()));
     }
-
 }

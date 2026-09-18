@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import lombok.Getter;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.Locale;
+import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Evaluation modes supported by {@code RuleExt.Window.mode}. All modes other
@@ -34,7 +32,6 @@ import java.util.Locale;
  * sample-by-sample.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Getter
@@ -83,6 +80,9 @@ public enum WindowModeEnum {
     /**
      * Resolves a free-form string ({@code "AVG"}, {@code "avg"}, whitespace ok)
      * to the corresponding mode, returning {@code null} when unrecognized.
+     *
+     * @param mode free-form mode name
+     * @return the matching mode, or {@code null} when unrecognized
      */
     public static WindowModeEnum ofCode(String mode) {
         if (StringUtils.isBlank(mode)) {
@@ -99,6 +99,8 @@ public enum WindowModeEnum {
      * Whether the mode aggregates the window into a scalar before applying the
      * rule's operator. AVG/MIN/MAX/SUM/COUNT do; LAST is single-sample;
      * ALL/ANY apply the operator per-sample and fold the booleans.
+     *
+     * @return true when the mode aggregates the window into a scalar
      */
     public boolean reducesToScalar() {
         return this == AVG || this == MIN || this == MAX || this == SUM || this == COUNT;
@@ -108,6 +110,8 @@ public enum WindowModeEnum {
      * Maps this mode to a {@link WindowAggregateFunction} suitable for
      * repository-level SQL aggregation. Modes that do not reduce to a scalar
      * (LAST, ALL, ANY) return {@code null}.
+     *
+     * @return the SQL aggregation for this mode, or {@code null} when it does not reduce to a scalar
      */
     public WindowAggregateFunction toAggregateFunction() {
         return switch (this) {
@@ -123,9 +127,10 @@ public enum WindowModeEnum {
     /**
      * Whether the mode requires a non-null window duration. Only LAST is
      * exempt; everything else needs a defined window to bound its scope.
+     *
+     * @return true when the mode needs a non-null window duration
      */
     public boolean requiresDuration() {
         return this != LAST;
     }
-
 }

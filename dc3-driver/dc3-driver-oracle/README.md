@@ -11,22 +11,20 @@ queries and writes through configured `UPDATE`/`INSERT` queries. JDBC connection
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-driver-oracle
-- **Version**: 2026.5.22
 - **Driver Name**: Oracle Driver
 
 ## Driver Attributes (Device-level)
 
-| Attribute       | Description                               |
-|-----------------|-------------------------------------------|
-| Host            | Oracle host                               |
-| Port            | Oracle port                               |
-| Database        | Oracle database name                      |
-| Username        | Oracle username                           |
-| Password        | Oracle password                           |
-| Query Timeout   | SQL query timeout in seconds              |
-| Connection Type | Oracle connection type [SID, ServiceName] |
-| SID             | Oracle SID                                |
-| Service Name    | Oracle service name                       |
+| Attribute       | Description                                                        |
+|-----------------|--------------------------------------------------------------------|
+| Host            | Oracle host                                                        |
+| Port            | Oracle port                                                        |
+| Username        | Oracle username                                                    |
+| Password        | Oracle password                                                    |
+| Query Timeout   | SQL query timeout in seconds                                       |
+| Connection Type | Oracle connection type [SID, ServiceName]                          |
+| SID             | Oracle SID (used when Connection Type is SID)                      |
+| Service Name    | Oracle service name (required when Connection Type is ServiceName) |
 
 ## Point Attributes
 
@@ -41,6 +39,9 @@ queries and writes through configured `UPDATE`/`INSERT` queries. JDBC connection
 |---------------|----------------------------------|
 | Execute Query | SQL query to execute for command |
 
+The module `application.yml` is authoritative for attribute codes, types, default values, scheduling, health, and local
+buffering. Keep this README aligned when those user-facing settings change.
+
 ## Prerequisites
 
 A reachable Oracle database addressable by the configured host, port, credentials, and connection type (SID or Service
@@ -51,24 +52,26 @@ Name).
 ### 1. Start Infrastructure and Center Services
 
 ```bash
-podman compose -f dc3/docker-compose-db.yml up -d
-java -jar dc3-center/dc3-center-manager/target/dc3-center-manager.jar
+make up-db
+make up-dev GROUP=core
 ```
 
 ### 2. Build and Run
 
 ```bash
-mvn -s .mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-oracle -am package
 java -jar dc3-driver/dc3-driver-oracle/target/dc3-driver-oracle.jar
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-driver/dc3-driver-oracle -am test
 ```
 
 ## Related Modules
 
 - `dc3-common-driver` — Driver SDK for registration, scheduling, and RabbitMQ integration
 - `dc3-common-sql` — Abstract JDBC driver service (connection pooling, read/write query execution)
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

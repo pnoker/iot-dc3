@@ -19,12 +19,12 @@
  * Alarm / notification data-domain types.
  */
 
-export type AlarmTargetTypeFlag = 'POINT' | 'DEVICE' | 'DRIVER' | string;
-export type NotifyChannelTypeFlag = 'FEISHU_BOT' | 'WEBHOOK' | 'EMAIL' | string;
-export type RuleStateFlag = 'NORMAL' | 'FIRING' | 'RECOVERED' | string;
-export type NotifyHistoryStatusFlag = 'PENDING' | 'SUCCESS' | 'FAILED' | 'RETRYING' | 'SKIPPED' | string;
-export type AutoConfirmFlag = 'AUTO' | 'MANUAL' | string;
-export type EnableFlag = 'ENABLE' | 'DISABLE' | string;
+export type AlarmTargetTypeFlag = 'POINT' | 'DEVICE' | 'DRIVER';
+export type NotifyChannelTypeFlag = 'FEISHU_BOT' | 'WEBHOOK' | 'EMAIL';
+export type RuleStateFlag = 'NORMAL' | 'FIRING' | 'RECOVERED';
+export type NotifyHistoryStatusFlag = 'PENDING' | 'SUCCESS' | 'FAILED' | 'RETRYING' | 'SKIPPED';
+export type AutoConfirmFlag = 'AUTO' | 'MANUAL';
+export type EnableFlag = 'ENABLE' | 'DISABLE';
 
 export interface StructuredExt<T = Record<string, unknown>> {
   type?: string;
@@ -119,4 +119,10 @@ export interface NotifyHistoryRecord extends AlarmBase {
 }
 
 export type AlarmEntity =
-  RuleRecord | NotifyRecord | MessageRecord | NotifyChannelBindRecord | RuleStateRecord | NotifyHistoryRecord;
+  | RuleRecord
+  | NotifyRecord
+  | MessageRecord
+  | NotifyChannelRecord
+  | NotifyChannelBindRecord
+  | RuleStateRecord
+  | NotifyHistoryRecord;

@@ -14,18 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.common;
 
 /**
  * Marker contract for tenant-scoped objects.
  *
  * @author pnoker
- * @version 2026.5.10
  * @since 2026.5.10
  */
 public interface TenantOwned {
 
+    /**
+     * Return the tenant that owns this object.
+     *
+     * @return owning tenant identifier
+     */
     Long getTenantId();
-
 }

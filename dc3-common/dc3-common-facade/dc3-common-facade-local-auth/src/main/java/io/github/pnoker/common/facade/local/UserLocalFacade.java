@@ -14,46 +14,37 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
-import io.github.pnoker.common.auth.entity.bo.UserBO;
-import io.github.pnoker.common.auth.service.UserService;
+import io.github.pnoker.common.auth.service.ReactiveUserService;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.facade.api.UserFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
 import io.github.pnoker.common.facade.local.builder.FacadeUserBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
-/**
- * In-process {@link UserFacade}.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
-@Slf4j
+/** In-process facade for user operations. */
 @Component
 @RequiredArgsConstructor
 public class UserLocalFacade implements UserFacade {
-
-    private final UserService userService;
-
-    private final FacadeUserBuilder facadeUserBuilder;
+    private final ReactiveUserService userService;
+    private final FacadeUserBuilder builder;
 
     @Override
-    public FacadeUserBO getById(Long id) {
-        UserBO bo = userService.getById(id);
-        return Objects.isNull(bo) ? null : facadeUserBuilder.toFacadeBO(bo);
+    public Mono<FacadeUserBO> getById(Long tenantId, Long id) {
+        return userService
+                .getById(tenantId, id)
+                .map(builder::toFacadeBO)
+                .onErrorResume(NotFoundException.class, error -> Mono.empty());
     }
 
     @Override
-    public FacadeUserBO getByPrincipalId(Long principalId) {
-        UserBO bo = userService.getByPrincipalId(principalId, false);
-        return Objects.isNull(bo) ? null : facadeUserBuilder.toFacadeBO(bo);
+    public Mono<FacadeUserBO> getByPrincipalId(Long tenantId, Long principalId) {
+        return userService
+                .getByPrincipalId(tenantId, principalId)
+                .map(builder::toFacadeBO)
+                .onErrorResume(NotFoundException.class, error -> Mono.empty());
     }
-
 }

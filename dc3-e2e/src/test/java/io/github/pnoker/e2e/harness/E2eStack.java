@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.e2e.harness;
 
+import java.time.Duration;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -24,8 +24,6 @@ import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 import org.testcontainers.utility.TestcontainersConfiguration;
-
-import java.time.Duration;
 
 /**
  * Singleton container stack used by E2E tests.
@@ -44,12 +42,10 @@ import java.time.Duration;
  */
 public final class E2eStack {
 
-    private static final DockerImageName POSTGRES_IMAGE = DockerImageName
-            .parse("timescale/timescaledb-ha:pg18")
-            .asCompatibleSubstituteFor("postgres");
+    private static final DockerImageName POSTGRES_IMAGE =
+            DockerImageName.parse("timescale/timescaledb-ha:pg18").asCompatibleSubstituteFor("postgres");
 
-    private static final DockerImageName RABBIT_IMAGE = DockerImageName
-            .parse("rabbitmq:3.13-management");
+    private static final DockerImageName RABBIT_IMAGE = DockerImageName.parse("rabbitmq:3.13-management");
 
     private static final Network NETWORK = Network.newNetwork();
 
@@ -73,8 +69,7 @@ public final class E2eStack {
 
     private static volatile boolean started;
 
-    private E2eStack() {
-    }
+    private E2eStack() {}
 
     /**
      * Idempotent boot. The first invocation starts the containers; subsequent calls
@@ -90,46 +85,55 @@ public final class E2eStack {
         started = true;
     }
 
+    /** JDBC url of the stack postgres instance. */
     public static String postgresJdbcUrl() {
         ensureStarted();
         return POSTGRES.getJdbcUrl();
     }
 
+    /** Username of the stack postgres instance. */
     public static String postgresUsername() {
         ensureStarted();
         return POSTGRES.getUsername();
     }
 
+    /** Password of the stack postgres instance. */
     public static String postgresPassword() {
         ensureStarted();
         return POSTGRES.getPassword();
     }
 
+    /** Hostname of the stack rabbitmq instance. */
     public static String rabbitHost() {
         ensureStarted();
         return RABBIT.getHost();
     }
 
+    /** AMQP port of the stack rabbitmq instance. */
     public static int rabbitAmqpPort() {
         ensureStarted();
         return RABBIT.getAmqpPort();
     }
 
+    /** Username of the stack rabbitmq instance. */
     public static String rabbitUsername() {
         ensureStarted();
         return RABBIT.getAdminUsername();
     }
 
+    /** Password of the stack rabbitmq instance. */
     public static String rabbitPassword() {
         ensureStarted();
         return RABBIT.getAdminPassword();
     }
 
+    /** Rabbit container of the e2e stack. */
     public static GenericContainer<?> rabbitContainer() {
         ensureStarted();
         return RABBIT;
     }
 
+    /** Postgres container of the e2e stack. */
     public static PostgreSQLContainer<?> postgresContainer() {
         ensureStarted();
         return POSTGRES;
@@ -137,9 +141,8 @@ public final class E2eStack {
 
     private static void ensureStarted() {
         if (!started) {
-            throw new IllegalStateException(
-                    "E2eStack has not been started. Call E2eStack.start() from a "
-                            + "@BeforeAll hook or extend BaseE2eIT.");
+            throw new IllegalStateException("E2eStack has not been started. Call E2eStack.start() from a "
+                    + "@BeforeAll hook or extend BaseE2eIT.");
         }
     }
 

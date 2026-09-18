@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.coap.entity;
 
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,13 +24,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serializable;
-
 /**
  * CoAP Response Entity Class
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @Getter
@@ -48,5 +45,4 @@ public class CoapResult implements Serializable {
     private String contentType;
 
     private boolean success;
-
 }

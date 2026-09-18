@@ -21,10 +21,10 @@ import {describe, expect, it, vi} from 'vitest';
 import {mountListPage} from './_helpers';
 
 const groupMocks = vi.hoisted(() => ({
-  addGroup: vi.fn(() => Promise.resolve({data: true})),
-  deleteGroup: vi.fn(() => Promise.resolve({data: true})),
-  listGroup: vi.fn(() => Promise.resolve({data: {records: [{id: 'g-1', groupName: 'Default'}], total: 1}})),
-  updateGroup: vi.fn(() => Promise.resolve({data: true})),
+  addGroup: vi.fn(() => Promise.resolve( true)),
+  deleteGroup: vi.fn(() => Promise.resolve( true)),
+  listGroup: vi.fn(() => Promise.resolve( {items: [{id: 'g-1', groupName: 'Default'}], total: 1})),
+  updateGroup: vi.fn(() => Promise.resolve( true)),
 }));
 
 vi.mock('@/api/group', () => groupMocks);

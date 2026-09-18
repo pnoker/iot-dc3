@@ -14,12 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.coap.server;
 
 import io.github.pnoker.driver.coap.entity.property.CoapProperties;
 import io.github.pnoker.driver.coap.server.resource.DataResource;
 import io.github.pnoker.driver.coap.service.CoapReceiveService;
+import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapServer;
@@ -29,9 +30,6 @@ import org.eclipse.californium.elements.config.Configuration;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.net.InetSocketAddress;
-import java.util.concurrent.TimeUnit;
-
 /**
  * CoAP Server Manager
  * <p>
@@ -39,7 +37,6 @@ import java.util.concurrent.TimeUnit;
  * Starts the server on application startup and shuts it down on context close.
  *
  * @author pnoker
- * @version 2026.5.0
  * @since 2026.5.0
  */
 @Slf4j
@@ -55,7 +52,7 @@ public class CoapServerManager implements CommandLineRunner {
     public void run(String... args) {
         CoapProperties.ModeEnum mode = coapProperties.getMode();
         if (mode != CoapProperties.ModeEnum.SERVER && mode != CoapProperties.ModeEnum.BOTH) {
-            log.info("CoAP server mode disabled, current mode: {}", mode);
+            log.info("CoAP server startup skipped, reason=serverModeDisabled, mode={}", mode);
             return;
         }
 
@@ -68,13 +65,17 @@ public class CoapServerManager implements CommandLineRunner {
         // interfaces regardless of serverHost, making the property (and the startup log) misleading.
         coapServer.addEndpoint(new CoapEndpoint.Builder()
                 .setConfiguration(configuration)
-                .setInetSocketAddress(new InetSocketAddress(
-                        coapProperties.getServerHost(), coapProperties.getServerPort()))
+                .setInetSocketAddress(
+                        new InetSocketAddress(coapProperties.getServerHost(), coapProperties.getServerPort()))
                 .build());
         coapServer.add(new DataResource("data", coapReceiveService));
 
         coapServer.start();
-        log.info("CoAP server started on {}:{} (mode: {})", coapProperties.getServerHost(), coapProperties.getServerPort(), mode);
+        log.info(
+                "CoAP server started, host={}, port={}, mode={}",
+                coapProperties.getServerHost(),
+                coapProperties.getServerPort(),
+                mode);
     }
 
     /**

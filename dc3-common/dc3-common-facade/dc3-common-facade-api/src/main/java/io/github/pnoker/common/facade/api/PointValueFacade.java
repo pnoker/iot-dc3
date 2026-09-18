@@ -14,12 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
-
+import io.github.pnoker.common.facade.entity.bo.FacadePointVolumeBO;
+import io.github.pnoker.db.r2dbc.core.page.CursorPage;
 import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral point value facade.
@@ -29,30 +30,22 @@ import java.util.List;
  * back this interface:
  * <ul>
  * <li>{@code PointValueLocalFacade} — in-process call into {@code PointValueService},
- * selected when {@code dc3.facade.mode=local} (single deployment).</li>
+ * selected when {@code dc3.facade.data.mode=local}.</li>
  * <li>{@code PointValueGrpcFacade} — gRPC call against Data Center, selected when
- * {@code dc3.facade.mode=grpc} (distributed deployment, default).</li>
+ * {@code dc3.facade.data.mode=grpc} (default).</li>
  * </ul>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface PointValueFacade {
 
-    /**
-     * Query the latest collected value of a device point.
-     *
-     * @return the point value, or {@code null} when no value exists.
-     */
-    FacadePointValueBO lastValue(Long tenantId, Long deviceId, Long pointId);
+    /** Load the latest point value for the series. */
+    Mono<FacadePointValueBO> lastValue(Long tenantId, Long deviceId, Long pointId);
 
-    /**
-     * Query historical values of a device point.
-     *
-     * @return an immutable list of value strings (never {@code null}; empty when nothing
-     * matches).
-     */
-    List<String> history(Long tenantId, Long deviceId, Long pointId, int count);
+    /** Load the cursor-paged history for the series. */
+    Mono<CursorPage<FacadePointValueBO>> history(Long tenantId, Long deviceId, Long pointId, String cursor, int limit);
 
+    /** Load point value volumes per point since the epoch instant. */
+    Mono<List<FacadePointVolumeBO>> pointVolumes(Long tenantId, long fromEpochMillis);
 }

@@ -14,19 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.api.common.GrpcBase;
-import io.github.pnoker.api.common.GrpcPage;
 import io.github.pnoker.common.constant.common.DefaultConstant;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.base.BaseDTO;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -34,36 +30,12 @@ import java.util.Optional;
  * Utility methods for building gRPC request/response messages.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class GrpcBuilderUtil {
 
     private GrpcBuilderUtil() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
-    }
-
-    /**
-     * Grpc Page to Pages
-     *
-     * @param page GrpcPage
-     * @return Pages
-     */
-    public static Pages buildPagesByGrpcPage(GrpcPage page) {
-        if (Objects.isNull(page)) {
-            GrpcPage.Builder builder = GrpcPage.newBuilder();
-            builder.setCurrent(1);
-            builder.setSize(DefaultConstant.PAGE_SIZE);
-            page = builder.build();
-        }
-
-        Pages pages = new Pages();
-        long current = page.getCurrent() < 1 ? 1 : page.getCurrent();
-        long pageSize = page.getSize() < 1 ? DefaultConstant.PAGE_SIZE : page.getSize();
-        pageSize = pageSize > DefaultConstant.MAX_PAGE_SIZE ? DefaultConstant.MAX_PAGE_SIZE : pageSize;
-        pages.setCurrent(current);
-        pages.setSize(pageSize);
-        return pages;
     }
 
     /**
@@ -171,5 +143,4 @@ public class GrpcBuilderUtil {
         LongOptional.ofNullable(entityGrpc.getOperateTime())
                 .ifPresent(value -> entityDTO.setOperateTime(LocalDateTimeUtil.dateTime(value)));
     }
-
 }

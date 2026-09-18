@@ -14,14 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.RuleStatusEnum;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,16 +31,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-
-/**
- * Query parameters for rule runtime state listing and filtering.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
+/** Query filter for rule state records. */
 @Getter
 @Setter
 @Builder
@@ -46,34 +39,54 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(description = "Rule State query parameters")
+@Schema(description = "Rule State offset query parameters")
 public class RuleStateQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Schema(description = "Zero-based row offset", example = "0")
+    private Long offset;
 
-    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
-    private Pages page;
+    @Schema(description = "Maximum rows to return", example = "50")
+    @Builder.Default
+    private Integer limit = PageRequest.DEFAULT_LIMIT;
 
-    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
-    private Long tenantId;
+    @Schema(description = "Whitelisted sort fields")
+    @Builder.Default
+    private List<SortSpec> sort = List.of();
 
-    @Schema(description = "rule ID", example = "1024")
+    /**
+     * Null-safe paging accessors: the runtime Jackson 3 mapper binds request bodies
+     * through the all-args constructor, leaving absent fields null. Boxed fields keep
+     * "unspecified" distinguishable from explicit (possibly invalid) values.
+     */
+    public long getOffset() {
+        return offset == null ? 0L : offset;
+    }
+
+    /** Return the requested page limit. */
+    public int getLimit() {
+        return limit == null ? PageRequest.DEFAULT_LIMIT : limit;
+    }
+
+    /** Return the requested sort. */
+    public List<SortSpec> getSort() {
+        return sort == null ? List.of() : sort;
+    }
+
+    @Schema(description = "Filter by rule identifier")
     private Long ruleId;
 
-    @Schema(description = "Alarm target type enum", example = "1")
+    @Schema(description = "Filter by alarm target type")
     private AlarmTargetTypeEnum alarmTargetTypeFlag;
 
-    @Schema(description = "Associated entity ID", example = "2048")
+    @Schema(description = "Filter by associated entity identifier")
     private Long entityId;
 
-    @Schema(description = "Alarm fingerprint", example = "rule_HIGH_TEMP_ALERT_device_1024")
+    @Schema(description = "Filter by rule state fingerprint")
     private String fingerprint;
 
-    @Schema(description = "Entity state enum", example = "TRIGGERED")
+    @Schema(description = "Filter by current rule state")
     private RuleStatusEnum entityStateFlag;
 
-    @Schema(description = "alarm ID", example = "512")
+    @Schema(description = "Filter by associated alarm identifier")
     private Long alarmId;
-
 }

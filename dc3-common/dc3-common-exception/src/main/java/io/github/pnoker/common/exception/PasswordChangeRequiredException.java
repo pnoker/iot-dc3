@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.exception;
 
 import io.github.pnoker.common.enums.ErrorCode;
@@ -28,13 +27,17 @@ import io.github.pnoker.common.enums.ErrorCode;
  * flow treats it as a routable outcome rather than a hard failure.
  *
  * @author pnoker
- * @version 2026.6.17
  * @since 2026.6.17
  */
 public class PasswordChangeRequiredException extends BusinessException {
 
     private final ErrorCode errorCode;
 
+    /**
+     * Exception with a failure detail and cause.
+     *
+     * @param errorCode failure detail or underlying failure
+     */
     public PasswordChangeRequiredException(ErrorCode errorCode) {
         super(errorCode.getRemark(), null);
         this.errorCode = errorCode;
@@ -44,5 +47,4 @@ public class PasswordChangeRequiredException extends BusinessException {
     public ErrorCode getErrorCode() {
         return errorCode;
     }
-
 }

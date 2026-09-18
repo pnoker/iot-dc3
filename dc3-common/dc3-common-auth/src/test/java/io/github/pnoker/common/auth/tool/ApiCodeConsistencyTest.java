@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.tool;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 /**
  * The JSON side (aggregator) and the DB side (ResourceRegistrySyncServiceImpl.apiCodeOf) must
@@ -38,6 +36,6 @@ class ApiCodeConsistencyTest {
         // Write-side format: serviceName + ":" + ApiTypeEnum.<METHOD>.name() + ":" + path
         // -> dc3-center-fixturesvc:POST:/device/add . The aggregator must match it verbatim.
         assertThat(quality).containsKey("dc3-center-fixturesvc:POST:/device/add");
-        assertThat(quality.keySet()).allMatch(k -> k.matches("^dc3-center-[^:]+:(GET|POST|PUT|DELETE):/.*"));
+        assertThat(quality.keySet()).allMatch(k -> k.matches("^dc3-center-[^:]+:(GET|POST|PUT|PATCH|DELETE):/.*"));
     }
 }

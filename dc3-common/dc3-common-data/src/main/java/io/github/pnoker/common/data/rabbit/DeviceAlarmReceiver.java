@@ -14,28 +14,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
-import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
+import reactor.core.publisher.Mono;
 
 /**
  * RabbitMQ receiver for device alarm events.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -48,28 +44,26 @@ public class DeviceAlarmReceiver {
     /**
      * Consume a device alarm message and forward it to the alarm service for processing.
      *
-     * @param channel   the RabbitMQ channel for manual ack
      * @param message   the raw message carrying the delivery tag
-     * @param entityDTO the deserialized device alarm
+     * @param ack       acknowledgment handle for the message
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{deviceAlarmQueue.name}")
-    public void deviceAlarmReceive(Channel channel, Message message, DeviceAlarmDTO entityDTO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
-        try {
-            log.debug("Receive device alarm: {}", JsonUtil.toJsonString(entityDTO));
-            if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())) {
-                log.warn("Invalid device alarm, deviceId is null, deviceId={}",
-                        Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId());
-                RabbitAckUtil.reject(channel, deliveryTag);
-                return;
-            }
-            deviceAlarmService.alarm(entityDTO);
-            RabbitAckUtil.ack(channel, deliveryTag);
-        } catch (Exception e) {
-            log.error("Device alarm consume failed, deliveryTag={}", deliveryTag, e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+    @Dc3Listener(topic = MqTopic.ALARM, keyPattern = "device.*")
+    public Mono<Void> deviceAlarmReceive(MqReceived<DeviceAlarmDTO> message, Acknowledgment ack) {
+        DeviceAlarmDTO entityDTO = message.payload();
+        log.debug(
+                "Device alarm received, tenantId={}, driverId={}, deviceId={}",
+                Objects.isNull(entityDTO) ? null : entityDTO.getTenantId(),
+                Objects.isNull(entityDTO) ? null : entityDTO.getDriverId(),
+                Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId());
+        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())) {
+            log.warn(
+                    "Invalid device alarm, deviceId is null, deviceId={}",
+                    Objects.isNull(entityDTO) ? null : entityDTO.getDeviceId());
+            ack.reject(false);
+            return Mono.empty();
         }
+        return deviceAlarmService
+                .alarm(entityDTO)
+                .doOnError(error -> log.error("Device alarm processing failed.", error));
     }
-
 }

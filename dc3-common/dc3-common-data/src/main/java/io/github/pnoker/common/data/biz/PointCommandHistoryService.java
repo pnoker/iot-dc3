@@ -14,18 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryVO;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
 /**
  * Business service for point command history queries.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 public interface PointCommandHistoryService {
@@ -36,9 +35,15 @@ public interface PointCommandHistoryService {
      * @param commandId unique command identifier
      * @return matching command history row, or null
      */
-    PointCommandHistoryVO getByCommandId(Long tenantId, String commandId);
+    Mono<PointCommandHistoryVO> getByCommandId(Long tenantId, String commandId);
 
-    default PointCommandHistoryVO getByCommandId(String commandId) {
+    /**
+     * Return by command identifier.
+     *
+     * @param commandId command identifier
+     * @return get by command identifier result
+     */
+    default Mono<PointCommandHistoryVO> getByCommandId(String commandId) {
         return getByCommandId(null, commandId);
     }
 
@@ -49,6 +54,5 @@ public interface PointCommandHistoryService {
      * @param queryVO  query filters
      * @return paginated command history rows
      */
-    Page<PointCommandHistoryVO> list(Long tenantId, PointCommandHistoryQueryVO queryVO);
-
+    Mono<OffsetPage<PointCommandHistoryVO>> list(Long tenantId, PointCommandHistoryQueryVO queryVO);
 }

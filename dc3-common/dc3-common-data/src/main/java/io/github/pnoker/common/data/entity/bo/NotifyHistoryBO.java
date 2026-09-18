@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
@@ -33,7 +32,6 @@ import lombok.ToString;
  * Business object for notification delivery history operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -53,6 +51,8 @@ public class NotifyHistoryBO extends BaseBO implements TenantOwned {
 
     private Long alarmId;
 
+    private String dedupeKey;
+
     private NotifyChannelTypeEnum channelTypeFlag;
 
     private String target;
@@ -67,7 +67,5 @@ public class NotifyHistoryBO extends BaseBO implements TenantOwned {
 
     private Integer retryCount;
 
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
-
 }

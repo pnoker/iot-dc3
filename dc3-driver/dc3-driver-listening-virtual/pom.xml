@@ -35,7 +35,7 @@
 
     <!--
         Netty is already on the runtime classpath transitively via grpc-netty
-        (spring-grpc-spring-boot-starter → grpc-netty → netty-*). Declaring its own netty
+        (spring-boot-starter-grpc-server → grpc-netty → netty-*). Declaring its own netty
         dependency used to drag in netty-all (heavyweight) and netty-resolver-dns-native-macos
         (macOS-only native artifact that has no place in a production pom).
     -->

@@ -14,89 +14,93 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.event.metadata;
 
-import io.github.pnoker.common.constant.driver.RabbitConstant;
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.entity.event.MetadataEvent;
-import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
-import io.github.pnoker.common.manager.service.DriverService;
-import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.manager.service.ReactiveDriverService;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.MessageSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.Objects;
-
-/**
- * Event listener that processes metadata change events.
- *
- * @author zhangzi
- * @version 2025.9.0
- * @since 2016.10.1
- */
+/** Dispatches tenant-scoped metadata changes to affected driver queues. */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class MetadataEventListener {
 
-    private final DriverService driverService;
+    private final ReactiveDriverService driverService;
+    private final MessageSender messageSender;
 
-    private final RabbitTemplate rabbitTemplate;
-
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
+    /** React to one committed metadata event. */
+    @EventListener
     public void onApplicationEvent(MetadataEvent metadataEvent) {
-        log.debug("Metadata event listener received: id={}, type={}", metadataEvent.getId(), metadataEvent.getMetadataType());
-        try {
-            Long id = metadataEvent.getId();
-            MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
-            MetadataEventDTO entityDTO = new MetadataEventDTO(id, metadataType, metadataEvent.getOperateType());
-            if (CollectionUtils.isNotEmpty(metadataEvent.getTargetServices())) {
-                metadataEvent.getTargetServices().forEach(service -> notifyDriver(service, entityDTO));
-                return;
-            }
-
-            if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-                DriverBO entityBO = driverService.getByDeviceId(id, null);
-                if (Objects.nonNull(entityBO)) {
-                    notifyDriver(entityBO.getServiceName(), entityDTO);
-                }
-            } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-                List<DriverBO> entityBOList = driverService.listByPointId(id, null);
-                if (CollectionUtils.isNotEmpty(entityBOList)) {
-                    entityBOList.forEach(entityBO -> notifyDriver(entityBO.getServiceName(), entityDTO));
-                }
-            } else if (MetadataTypeEnum.DRIVER.equals(metadataType)) {
-                DriverBO entityBO = driverService.getById(id);
-                if (Objects.nonNull(entityBO)) {
-                    notifyDriver(entityBO.getServiceName(), entityDTO);
-                }
-            }
-        } catch (Exception e) {
-            log.error("Metadata event listener failed, event={}", JsonUtil.toJsonString(metadataEvent), e);
-        }
-    }
-
-    /**
-     * @param service
-     * @param entityDTO DriverTransferMetadataDTO
-     */
-    private void notifyDriver(String service, MetadataEventDTO entityDTO) {
-        if (Objects.isNull(service) || service.isBlank()) {
+        if (metadataEvent == null || metadataEvent.getTenantId() == null) {
+            log.warn(
+                    "Dropping metadata event without tenant scope, id={}, type={}",
+                    metadataEvent == null ? null : metadataEvent.getId(),
+                    metadataEvent == null ? null : metadataEvent.getMetadataType());
             return;
         }
-        log.debug("Notify driver[{}]: id={}, type={}", service, entityDTO.getId(), entityDTO.getMetadataType());
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_METADATA,
-                RabbitConstant.ROUTING_DRIVER_METADATA_PREFIX + service, entityDTO);
+        dispatch(metadataEvent)
+                .subscribe(
+                        null,
+                        error -> log.error(
+                                "Metadata event handling failed, id={}, type={}, operation={}",
+                                metadataEvent.getId(),
+                                metadataEvent.getMetadataType(),
+                                metadataEvent.getOperateType(),
+                                error));
     }
 
+    private Mono<Void> dispatch(MetadataEvent metadataEvent) {
+        MetadataEventDTO payload = new MetadataEventDTO(
+                metadataEvent.getTenantId(),
+                metadataEvent.getId(),
+                metadataEvent.getMetadataType(),
+                metadataEvent.getOperateType());
+        Flux<String> services;
+        if (!metadataEvent.getTargetServices().isEmpty()) {
+            services = Flux.fromIterable(metadataEvent.getTargetServices());
+        } else {
+            services = switch (metadataEvent.getMetadataType()) {
+                case DEVICE ->
+                    driverService
+                            .getByDeviceId(metadataEvent.getTenantId(), metadataEvent.getId())
+                            .flux()
+                            .map(DriverBO::getServiceName);
+                case POINT ->
+                    driverService
+                            .listByPointId(metadataEvent.getTenantId(), metadataEvent.getId())
+                            .map(DriverBO::getServiceName);
+                case DRIVER ->
+                    driverService
+                            .getById(metadataEvent.getTenantId(), metadataEvent.getId())
+                            .flux()
+                            .map(DriverBO::getServiceName);
+                default -> Flux.empty();
+            };
+        }
+        return services.filter(service -> service != null && !service.isBlank())
+                .distinct()
+                .flatMap(service -> Mono.fromRunnable(() -> notifyDriver(service, payload)), 16)
+                .then();
+    }
+
+    private void notifyDriver(String service, MetadataEventDTO payload) {
+        log.debug(
+                "Driver metadata notification published, tenantId={}, serviceName={}, id={}, type={}",
+                payload.getTenantId(),
+                service,
+                payload.getId(),
+                payload.getMetadataType());
+        messageSender.send(MqMessage.of(MqTopic.METADATA, service, payload));
+    }
 }

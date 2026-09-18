@@ -21,14 +21,16 @@ import {listDeviceByIds} from '@/api/device';
 import {listDriverByIds} from '@/api/driver';
 import {listPointByIds} from '@/api/point';
 import {listProfileByIds} from '@/api/profile';
+import i18n from '@/config/i18n';
 
 /**
  * Cross-component reactive cache for entity id → display name lookups.
  * Replaces the seven copies of `resolveNames` + local `nameMap` that every
  * dashboard card used to maintain. Two concrete wins:
  *
- *   1. **Cache is process-wide.** Opening FlappingSources after SilentSources
- *      already resolved a device id doesn't re-issue the batch request.
+ *   1. **Cache is process-wide and locale-aware.** Opening FlappingSources
+ *      after SilentSources reuses names resolved in the same UI language,
+ *      while a language switch cannot leak stale labels from the old locale.
  *   2. **Inflight dedup.** Two cards mounting simultaneously won't fire two
  *      identical listDeviceByIds calls for the same missing ids — the second
  *      one sees ids marked inflight and waits for the first to land.
@@ -38,7 +40,7 @@ import {listProfileByIds} from '@/api/profile';
  * id string rather than showing a spinner forever.
  */
 
-type BatchResponse = { data?: Record<string, any> };
+type BatchResponse = Record<string, any>;
 
 type EntityKind = 'device' | 'driver' | 'profile' | 'point';
 
@@ -59,13 +61,14 @@ const inflight: Record<EntityKind, Set<string>> = {
   point: new Set(),
 };
 
-// Track the pending promise per kind so concurrent callers can await
-// the same fetch instead of returning immediately with uncached IDs.
-const pending: Record<EntityKind, Promise<void> | null> = {
-  device: null,
-  driver: null,
-  profile: null,
-  point: null,
+// Track all pending batches per kind. More than one batch can be in flight
+// when callers request disjoint IDs at the same time; a single promise slot
+// would be cleared by the first batch and let later callers miss the second.
+const pending: Record<EntityKind, Set<Promise<void>>> = {
+  device: new Set(),
+  driver: new Set(),
+  profile: new Set(),
+  point: new Set(),
 };
 
 const fetchers: Record<EntityKind, (ids: string[]) => Promise<BatchResponse>> = {
@@ -84,15 +87,17 @@ const nameField: Record<EntityKind, string> = {
   point: 'pointName',
 };
 
-async function fetchMissing(kind: EntityKind, rawIds: Array<string | number>): Promise<void> {
+async function fetchMissing(kind: EntityKind, rawIds: Array<string>): Promise<void> {
   if (!rawIds || rawIds.length === 0) return;
+  const locale = String(i18n.global.locale.value);
+  const cacheKey = (id: string) => `${locale}:${id}`;
   const missing: string[] = [];
   let hasInflight = false;
   for (const raw of rawIds) {
     const id = String(raw);
     if (!id) continue;
-    if (cache[kind][id] !== undefined) continue;
-    if (inflight[kind].has(id)) {
+    if (cache[kind][cacheKey(id)] !== undefined) continue;
+    if (inflight[kind].has(cacheKey(id))) {
       hasInflight = true;
       continue;
     }
@@ -102,14 +107,14 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string | number>): P
   // If some IDs are already being fetched by another caller, await the
   // pending promise first — it may resolve the IDs we need. Then re-check
   // which IDs are still missing so we only fetch the remainder.
-  if (hasInflight && pending[kind]) {
-    await pending[kind];
+  if (hasInflight && pending[kind].size > 0) {
+    await Promise.all([...pending[kind]]);
     // Re-evaluate: the pending fetch may have resolved some of our IDs
     const stillMissing: string[] = [];
     for (const raw of rawIds) {
       const id = String(raw);
-      if (!id || cache[kind][id] !== undefined) continue;
-      if (inflight[kind].has(id)) continue;
+      if (!id || cache[kind][cacheKey(id)] !== undefined) continue;
+      if (inflight[kind].has(cacheKey(id))) continue;
       stillMissing.push(id);
     }
     if (stillMissing.length === 0) return;
@@ -120,65 +125,75 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string | number>): P
   }
 
   if (missing.length === 0) return;
-  missing.forEach((id) => inflight[kind].add(id));
+  missing.forEach((id) => inflight[kind].add(cacheKey(id)));
 
   const promise = (async () => {
     try {
       const res = await fetchers[kind](missing);
-      const data = res?.data ?? {};
+      const data = res;
       for (const id of missing) {
         const row = data[id];
         // Cache whatever the backend returned — even empty → fallback to id.
-        cache[kind][id] = row?.[nameField[kind]] ?? id;
+        cache[kind][cacheKey(id)] = row?.[nameField[kind]] ?? id;
       }
     } catch {
       // errors handled by global axios interceptor
     } finally {
-      missing.forEach((id) => inflight[kind].delete(id));
+      missing.forEach((id) => inflight[kind].delete(cacheKey(id)));
     }
   })();
 
-  pending[kind] = promise;
-  await promise;
-  pending[kind] = null;
+  pending[kind].add(promise);
+  try {
+    await promise;
+  } finally {
+    pending[kind].delete(promise);
+  }
 }
 
 export type AlertSourceKind = 'point' | 'device' | 'driver';
 
+/**
+ * Cross-component reactive cache resolving entity ids to display names
+ * (device / driver / profile / point), locale-aware and inflight-deduped.
+ */
 export const useEntityNames = () => {
-  const resolveDevices = (ids: Array<string | number>) => fetchMissing('device', ids);
-  const resolveDrivers = (ids: Array<string | number>) => fetchMissing('driver', ids);
-  const resolveProfiles = (ids: Array<string | number>) => fetchMissing('profile', ids);
-  const resolvePoints = (ids: Array<string | number>) => fetchMissing('point', ids);
+  const cachedName = (kind: EntityKind, id: string): string =>
+    cache[kind][`${String(i18n.global.locale.value)}:${String(id)}`] ?? String(id);
 
-  const deviceName = (id: string | number | undefined | null): string =>
-    id == null ? '' : (cache.device[String(id)] ?? String(id));
-  const driverName = (id: string | number | undefined | null): string =>
-    id == null ? '' : (cache.driver[String(id)] ?? String(id));
-  const profileName = (id: string | number | undefined | null): string =>
-    id == null ? '' : (cache.profile[String(id)] ?? String(id));
-  const pointName = (id: string | number | undefined | null): string =>
-    id == null ? '' : (cache.point[String(id)] ?? String(id));
+  const resolveDevices = (ids: Array<string>) => fetchMissing('device', ids);
+  const resolveDrivers = (ids: Array<string>) => fetchMissing('driver', ids);
+  const resolveProfiles = (ids: Array<string>) => fetchMissing('profile', ids);
+  const resolvePoints = (ids: Array<string>) => fetchMissing('point', ids);
+
+  const deviceName = (id: string | undefined | null): string =>
+    id == null ? '' : cachedName('device', id);
+  const driverName = (id: string | undefined | null): string =>
+    id == null ? '' : cachedName('driver', id);
+  const profileName = (id: string | undefined | null): string =>
+    id == null ? '' : cachedName('profile', id);
+  const pointName = (id: string | undefined | null): string =>
+    id == null ? '' : cachedName('point', id);
 
   /** Resolve a mixed batch of (source, id) rows in one call. */
   const resolveBySource = async (
     rows: Array<{
       source: AlertSourceKind;
-      sourceId: string | number;
+      sourceId: string;
     }>
   ): Promise<void> => {
-    const ptIds: Array<string | number> = [];
-    const devIds: Array<string | number> = [];
-    const drvIds: Array<string | number> = [];
+    const pointIds: Array<string> = [];
+    const deviceIds: Array<string> = [];
+    const driverIds: Array<string> = [];
     for (const r of rows) {
-      if (r.source === 'point') ptIds.push(r.sourceId);
-      else if (r.source === 'device') devIds.push(r.sourceId);
-      else drvIds.push(r.sourceId);
+      if (r.source === 'point') pointIds.push(r.sourceId);
+      else if (r.source === 'device') deviceIds.push(r.sourceId);
+      else driverIds.push(r.sourceId);
     }
-    await Promise.all([resolvePoints(ptIds), resolveDevices(devIds), resolveDrivers(drvIds)]);
+    await Promise.all([resolvePoints(pointIds), resolveDevices(deviceIds), resolveDrivers(driverIds)]);
   };
 
-  const nameBySource = (source: AlertSourceKind, id: string | number): string => {
+  const nameBySource = (source: AlertSourceKind, id: string): string => {
     if (source === 'point') return pointName(id);
     if (source === 'driver') return driverName(id);
     return deviceName(id);

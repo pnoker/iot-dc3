@@ -14,20 +14,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.service;
 
-import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.data.entity.bo.NotifyBO;
 import io.github.pnoker.common.data.entity.query.NotifyQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
 /**
  * Business service for alarm notification template operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-public interface NotifyService extends BaseService<NotifyBO, NotifyQuery> {
+public interface NotifyService {
 
+    /** Add one notify configuration. */
+    Mono<NotifyBO> add(NotifyBO value);
+
+    /** Delete the notify configuration, reporting whether a row was removed. */
+    Mono<Boolean> delete(Long tenantId, Long id);
+
+    /** Update one notify configuration and emit the updated row. */
+    Mono<NotifyBO> update(NotifyBO value);
+
+    /** Resolve the notify configuration by its id. */
+    Mono<NotifyBO> getById(Long tenantId, Long id);
+
+    /** Page notify configurations matching the tenant-scoped filters. */
+    Mono<OffsetPage<NotifyBO>> list(Long tenantId, NotifyQuery query);
 }

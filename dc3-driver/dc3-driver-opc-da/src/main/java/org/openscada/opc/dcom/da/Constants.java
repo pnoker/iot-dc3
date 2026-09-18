@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da;
 
 /**
@@ -44,5 +43,4 @@ public interface Constants extends org.openscada.opc.dcom.common.Constants {
     public static final String IOPCAsyncIO2_IID = "39C13A71-011E-11D0-9675-0020AFD8ADB3";
 
     public static final String IOPCSyncIO_IID = "39C13A52-011E-11D0-9675-0020AFD8ADB3";
-
 }

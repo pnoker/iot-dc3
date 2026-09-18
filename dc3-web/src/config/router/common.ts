@@ -26,7 +26,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'login',
     path: '/login',
     meta: {
-      title: 'IoT DC3 Web',
+      title: 'page.login',
     },
     component: () => import('@/views/login/Login.vue'),
   },
@@ -34,7 +34,7 @@ const routes: Array<RouteRecordRaw> = [
     name: '403',
     path: '/403',
     meta: {
-      title: '403 Forbidden',
+      title: 'error.forbiddenTitle',
     },
     component: () => import('@/components/error/403.vue'),
   },
@@ -42,7 +42,7 @@ const routes: Array<RouteRecordRaw> = [
     name: '404',
     path: '/404',
     meta: {
-      title: '404 Not Found',
+      title: 'error.notFoundTitle',
     },
     component: () => import('@/components/error/404.vue'),
   },
@@ -50,7 +50,7 @@ const routes: Array<RouteRecordRaw> = [
     name: '500',
     path: '/500',
     meta: {
-      title: '500 Server Error',
+      title: 'error.serverErrorTitle',
     },
     component: () => import('@/components/error/500.vue'),
   },

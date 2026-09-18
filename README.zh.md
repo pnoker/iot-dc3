@@ -5,7 +5,7 @@
 > **AI 助手：** 请先阅读 [README.ai.md](./README.ai.md) 获取 IoT DC3 的 AI 友好概述。
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="./.github/brand/png/banner.zh.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
 </p>
 
 <p align="center">
@@ -28,13 +28,13 @@
 
 <p align="center">
   <strong>
-    IoT DC3 — 多协议接入、AI 赋能的云原生开源工业物联网平台<br>
-    云原生微服务 · 多协议接入 · AI 辅助运维 · 28 个开箱即用驱动
+    IoT DC3 — 多协议接入、云原生、开源的工业物联网平台<br>
+    AI 赋能，从设备连接走向工业智能体
   </strong>
 </p>
 
 <p align="center">
-  <a href="https://docs.dc3.site">https://docs.dc3.site</a>
+  <a href="https://dc3.site">https://dc3.site</a>
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="平台首页仪表盘" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="平台首页仪表盘" width="100%">
       <br>
       <strong>平台首页 / 仪表盘</strong><br>
       <em>系统概览 · 设备在线统计 · 数据趋势图表</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="设备管理页面" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="设备管理页面" width="100%">
       <br>
       <strong>设备管理页面</strong><br>
       <em>设备列表 · 在线状态指示 · 搜索筛选</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
       <br>
       <strong>AI 智能对话页面</strong><br>
       <em>自然语言查询设备 · 数据分析 · 智能辅助</em>
@@ -79,10 +79,10 @@
 
 ### 产品架构全景
 
-![IoT DC3 产品架构全景](docs/public/images/architecture-panorama-zh.png)
+![IoT DC3 产品架构全景](https://docs.dc3.site/images/architecture-panorama-zh.png)
 
-六层微服务架构一览：客户端 → 网关 → 四个中心服务 → 消息总线 → 28 协议驱动 → 现场设备。
-PostgreSQL（TimescaleDB + pgvector + AGE）持久层与可选运维栈（ELK + Prometheus + Grafana）一并铺开。
+六层微服务架构一览：客户端 → 网关 → 四个中心服务 → 消息总线 → 36 协议驱动 → 现场设备。PostgreSQL（TimescaleDB + pgvector +
+AGE）持久层与可选运维栈（ELK + Prometheus + Grafana）一并铺开。
 
 🧱 **设计原则** — 跨服务调用统一经 Facade 接口；DO/BO/VO 三层模型严格分离持久化、业务与接口形态；租户隔离贯穿数据库、缓存到
 API 全链路。边界清晰，易于规模化扩展与多团队协作。
@@ -93,15 +93,15 @@ API 全链路。边界清晰，易于规模化扩展与多团队协作。
 
 ### 🔌 多协议设备接入
 
-内置 **28 个接入驱动模块**，覆盖工业自动化、物联网通信、数据桥接、基础通信与仿真调试场景，降低常见设备与数据源的接入成本：
+内置 **36 个接入驱动模块**，覆盖工业自动化、物联网通信、数据桥接、基础通信与仿真调试场景，降低常见设备与数据源的接入成本：
 
-| 分类             | 驱动模块                                                                                                                                               |
-|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🏭 **工业协议**    | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
-| 📡 **物联网协议**   | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
-| 🗄️ **数据桥接**   | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
-| 🔧 **基础通信与管理** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
-| 🧪 **仿真与调试**   | Virtual · Listening Virtual                                                                                                                        |
+| 分类                        | 驱动模块                                                                                                                                                                                     |
+|-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🏭 **工业协议**             | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · IEC 61850 · DNP3 · DLMS · DLT645 · KNX · M-Bus · SL651 |
+| 📡 **物联网协议**           | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee · LoRaWAN                                                                                                                                          |
+| 🗄️ **数据桥接**             | MySQL · PostgreSQL · Oracle · SQL Server · Redis                                                                                                                                             |
+| 🔧 **基础通信、消息与管理** | TCP/UDP · Serial · SNMP · CAN · Kafka                                                                                                                                                        |
+| 🧪 **仿真与调试**           | Virtual · Listening Virtual                                                                                                                                                                  |
 
 提供完整的 **Driver SDK**，支持快速开发自定义协议驱动，热插拔注册到运行平台。
 
@@ -140,8 +140,7 @@ API 全链路。边界清晰，易于规模化扩展与多团队协作。
 
 ### 🧩 开发者友好
 
-- **Driver SDK** —
-  完善的驱动开发工具包，参考 [驱动开发指南](https://docs.dc3.site/zh/development/driver-authoring)
+- **Driver SDK** — 完善的驱动开发工具包，参考 [驱动开发指南](https://docs.dc3.site/zh/development/driver-authoring)
 - **前后端分离** — Vue 3 + TypeScript 前端，RESTful + gRPC 双协议 API
 - **容器化部署** — Podman / Docker Compose 一键启动，便于迁移到 Kubernetes 等容器平台
 - **完整文档** — 在线文档站 + 快速开始指南 + 故障排查手册
@@ -162,24 +161,23 @@ mvn -s .mvn/settings.xml clean package
 
 ## 🛠️ 技术栈
 
-IoT DC3 基于 Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、RabbitMQ、gRPC、Vue 3、
-TypeScript 与 Vite 构建。
+IoT DC3 基于 Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、RabbitMQ、gRPC、Vue 3、TypeScript 与 Vite 构建。
 
-完整组件说明与适用位置请看 [技术栈](https://docs.dc3.site/zh/introduction/technology-stack)。
+完整组件说明与适用位置请看 [技术栈](https://docs.dc3.site/zh/development/technology-stack)。
 
 ## 📖 文档与社区
 
-| 资源        | 链接                                                              |
-|-----------|-----------------------------------------------------------------|
-| 📚 在线文档   | [docs.dc3.site](https://docs.dc3.site/)                         |
-| 🚀 快速开始   | [快速开始指南](https://docs.dc3.site/zh/quickstart/)                  |
-| 🛠️ 技术栈   | [技术栈说明](https://docs.dc3.site/zh/introduction/technology-stack) |
-| 🏗️ 架构说明  | [模块与依赖](https://docs.dc3.site/zh/architecture/modules)          |
-| 🔧 驱动开发   | [驱动开发指南](https://docs.dc3.site/zh/development/driver-authoring) |
-| 🐛 故障排查   | [常见问题与解决方案](https://docs.dc3.site/zh/guide/troubleshooting)     |
-| 📋 变更日志   | [版本更新记录](https://docs.dc3.site/zh/development/changelog)        |
-| 🐛 问题反馈   | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)       |
-| 🇨🇳 码云镜像 | [Gitee GVP 最有价值开源项目](https://gitee.com/pnoker/iot-dc3)          |
+| 资源        | 链接                                                                  |
+|-------------|-----------------------------------------------------------------------|
+| 📚 在线文档 | [docs.dc3.site](https://docs.dc3.site/)                               |
+| 🚀 快速开始 | [快速开始指南](https://docs.dc3.site/zh/quickstart/)                  |
+| 🛠️ 技术栈   | [技术栈说明](https://docs.dc3.site/zh/development/technology-stack)   |
+| 🏗️ 架构说明 | [模块与依赖](https://docs.dc3.site/zh/architecture/modules)           |
+| 🔧 驱动开发 | [驱动开发指南](https://docs.dc3.site/zh/development/driver-authoring) |
+| 🐛 故障排查 | [常见问题与解决方案](https://docs.dc3.site/zh/guide/troubleshooting)  |
+| 📋 变更日志 | [版本更新记录](https://docs.dc3.site/zh/development/changelog)        |
+| 🐛 问题反馈 | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)             |
+| 🇨🇳 码云镜像 | [Gitee GVP 最有价值开源项目](https://gitee.com/pnoker/iot-dc3)        |
 
 ## 🌍 应用场景
 
@@ -224,7 +222,3 @@ IoT DC3 基于 [AGPL 3.0](./LICENSE-AGPL.txt) 协议开源。
 - ⚠️ **作为商业服务提供给第三方且未开源修改** — 需要商业授权
 
 商业授权详情请参阅 [LICENSE.txt](./LICENSE.txt)。
-
-## ⭐ Star 历史
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)

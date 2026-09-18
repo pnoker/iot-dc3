@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.exception;
 
 import io.github.pnoker.common.enums.ErrorCode;
@@ -31,7 +30,6 @@ import io.github.pnoker.common.enums.ErrorCode;
  * template+params); this base provides the matching {@code super(...)} plumbing.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public abstract class BusinessException extends RuntimeException {
@@ -54,5 +52,4 @@ public abstract class BusinessException extends RuntimeException {
      * @return {@link ErrorCode}
      */
     public abstract ErrorCode getErrorCode();
-
 }

@@ -90,7 +90,6 @@ dc3:
         default-value: '${value}'
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/can/buffer.db
 
 spring:

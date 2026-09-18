@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.property;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Notification credential references.
@@ -32,7 +30,6 @@ import java.util.Map;
  * only the reference; secrets stay outside message templates and notification channel rows.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -46,6 +43,9 @@ public class NotifyCredentialProperties {
      */
     private Map<String, Credential> credentials = new LinkedHashMap<>();
 
+    /**
+     * One channel-type credential bundle (e.g. Feishu bot webhook URL), keyed by type.
+     */
     @Getter
     @Setter
     public static class Credential {
@@ -64,7 +64,5 @@ public class NotifyCredentialProperties {
          * Additional non-secret request headers.
          */
         private Map<String, String> headers = new LinkedHashMap<>();
-
     }
-
 }

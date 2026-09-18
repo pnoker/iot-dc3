@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
 
 import lombok.AllArgsConstructor;
@@ -31,30 +30,63 @@ import lombok.Getter;
  * the login flow can tell the two states apart, even though both map to 403.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
 @AllArgsConstructor
 public enum ErrorCode implements ResponseCode {
 
+    /**
+     * Resource does not exist.
+     */
     NOT_FOUND(404, "R404", "Resource does not exist"),
+    /**
+     * Missing or invalid authentication.
+     */
     UNAUTHORIZED(401, "R401", "Unauthorized"),
+    /**
+     * The presented token is invalid or expired.
+     */
     TOKEN_INVALID(401, "R401", "Token is invalid"),
+    /**
+     * The caller IP is not allowed.
+     */
     IP_INVALID(401, "R401", "Invalid IP"),
+    /**
+     * Authenticated principal lacks access.
+     */
     FORBIDDEN(403, "R403", "Access denied"),
+    /**
+     * A password change is enforced before continuing.
+     */
     PASSWORD_CHANGE_REQUIRED(403, "R4031", "Password change required"),
+    /**
+     * The password has expired.
+     */
     PASSWORD_EXPIRED(403, "R4032", "Password expired"),
+    /**
+     * Request validation failed.
+     */
     VALIDATION(422, "R422", "Validation failed"),
+    /**
+     * A numeric value is out of range.
+     */
     OUT_OF_RANGE(422, "R422", "Number out of range"),
+    /**
+     * A resource with the same business identity already exists.
+     */
+    ALREADY_EXISTS(409, "R4090", "Resource already exists"),
+    /**
+     * The resource changed after the caller read it.
+     */
+    CONFLICT(409, "R4091", "Resource version conflict"),
+    /**
+     * Generic service failure.
+     */
     FAILURE(500, "R500", "Service exception"),
     ;
 
-    @Getter(onMethod_ = {@Override})
     private final int httpStatus;
-    @Getter(onMethod_ = {@Override})
     private final String code;
-    @Getter(onMethod_ = {@Override})
     private final String remark;
-
 }

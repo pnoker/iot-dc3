@@ -20,6 +20,8 @@
     <el-card shadow="never">
       <el-form
         ref="formRef"
+        :aria-busy="saving"
+        :disabled="saving"
         :inline="true"
         :model="formModel"
         :rules="rules"
@@ -35,10 +37,10 @@
           <slot name="actions"/>
           <span v-if="!hideDefaultActions" aria-hidden="true" class="info-card-footer-divider"/>
           <template v-if="!hideDefaultActions">
-            <el-button :icon="Check" plain type="primary" @click="onSave">
+            <el-button :disabled="saving" :icon="Check" :loading="saving" plain type="primary" @click="onSave">
               {{ t('common.save') }}
             </el-button>
-            <el-button :icon="RefreshLeft" plain @click="onReset">
+            <el-button :disabled="saving" :icon="RefreshLeft" plain @click="onReset">
               {{ t('common.reset') }}
             </el-button>
           </template>
@@ -68,6 +70,10 @@ defineProps({
     default: () => ({}),
   },
   hideDefaultActions: {
+    type: Boolean,
+    default: false,
+  },
+  saving: {
     type: Boolean,
     default: false,
   },
@@ -105,6 +111,8 @@ defineExpose({formRef});
 </script>
 
 <style lang="scss" scoped>
+@use "@/styles/shared-form-widths.scss" as *;
+
 .info-card {
   margin: 0 0 4px;
 
@@ -127,25 +135,9 @@ defineExpose({formRef});
           flex-wrap: nowrap;
         }
 
-        .el-input,
-        .el-input.edit-form-small,
-        .el-input.edit-form-medium,
-        .el-input.edit-form-default,
-        .el-input.edit-form-special,
-        .el-input.edit-form-large,
-        .el-select,
-        .el-select.edit-form-small,
-        .el-select.edit-form-medium,
-        .el-select.edit-form-default,
-        .el-select.edit-form-special,
-        .el-select.edit-form-large,
-        .el-tree-select,
-        .el-date-editor,
-        .el-input-number,
-        .el-cascader,
-        .el-segmented {
-          width: 100%;
-        }
+        // Stretch every input surface to the cell width — shared with
+        // ToolCard via src/styles/shared-form-widths.scss.
+        @include form-item-full-width;
       }
 
       :deep(.el-form-item.info-card-item-full) {
@@ -159,14 +151,7 @@ defineExpose({formRef});
   }
 
   .info-card__footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px 12px;
-    margin-top: 16px;
-    padding-top: 12px;
-    border-top: 1px solid var(--el-border-color-lighter);
+    @include card-footer;
 
     // Primary actions cluster on the left — mirrors ToolCard.
     .info-card-footer-actions {
@@ -200,7 +185,7 @@ defineExpose({formRef});
   }
 
   :deep(.el-card) {
-    border: 0;
+    border-color: var(--dc3-border-base);
   }
 }
 </style>

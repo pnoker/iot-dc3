@@ -14,21 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Agentic action execution status.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Getter
@@ -64,7 +60,6 @@ public enum AgenticActionStatusEnum {
     /**
      * Index value stored in database.
      */
-    @EnumValue
     private final Byte index;
 
     /**
@@ -116,5 +111,4 @@ public enum AgenticActionStatusEnum {
             return null;
         }
     }
-
 }

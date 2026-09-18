@@ -14,24 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.constant.service.AlarmConstant;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 /**
  * Result produced when a normalized fact satisfies a rule.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -87,5 +84,4 @@ public class RuleMatch {
         }
         return match;
     }
-
 }

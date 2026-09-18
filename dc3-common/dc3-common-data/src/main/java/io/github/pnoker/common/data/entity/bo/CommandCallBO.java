@@ -14,22 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.bo;
 
+import io.github.pnoker.common.enums.CommandHistorySourceEnum;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Map;
-
 /**
  * Business object for submitting a custom command call.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Getter
@@ -59,4 +57,7 @@ public class CommandCallBO {
      */
     private Map<String, String> paramValues;
 
+    private CommandHistorySourceEnum source;
+
+    private Long sourceUserId;
 }

@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mqtt.entity;
 
+import java.io.Serializable;
+import java.util.Objects;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.MessageHeaders;
-
-import java.io.Serializable;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * MQTT Message Header Class
@@ -36,7 +34,6 @@ import java.util.UUID;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -59,6 +56,7 @@ public class MessageHeader implements Serializable {
 
     private Long timestamp;
 
+    /** message header. */
     public MessageHeader(MessageHeaders messageHeaders) {
         if (Objects.nonNull(messageHeaders)) {
             this.id = messageHeaders.getId();
@@ -88,5 +86,4 @@ public class MessageHeader implements Serializable {
         }
         return null;
     }
-
 }

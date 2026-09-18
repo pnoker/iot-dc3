@@ -14,99 +14,48 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.model;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.pnoker.common.entity.ext.JsonExt;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Persistence object for external identities.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
 @Setter
 @ToString
-@TableName(value = "dc3_external_identity", autoResultMap = true)
 public class ExternalIdentityDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
-
-    @TableField("provider_id")
     private Long providerId;
-
-    @TableField("principal_id")
     private Long principalId;
-
-    @TableField("external_subject")
     private String externalSubject;
-
-    @TableField("external_username")
     private String externalUsername;
-
-    @TableField("external_email")
     private String externalEmail;
-
-    @TableField("email_verified")
     private Byte emailVerified;
-
-    @TableField("first_login_time")
     private LocalDateTime firstLoginTime;
-
-    @TableField("last_login_time")
     private LocalDateTime lastLoginTime;
-
-    @TableField("last_claims_digest")
     private String lastClaimsDigest;
-
-    @TableField(value = "identity_ext", typeHandler = JacksonTypeHandler.class)
     private JsonExt identityExt;
-
-    @TableField("enable_flag")
     private Byte enableFlag;
-
-    @TableField("remark")
     private String remark;
-
-    @TableField("creator_id")
     private Long creatorId;
-
-    @TableField("creator_name")
     private String creatorName;
-
-    @TableField("create_time")
     private LocalDateTime createTime;
-
-    @TableField("operator_id")
     private Long operatorId;
-
-    @TableField("operator_name")
     private String operatorName;
-
-    @TableField("operate_time")
     private LocalDateTime operateTime;
-
-    @TableLogic
-    @TableField("deleted")
     private Byte deleted;
-
 }

@@ -37,6 +37,7 @@ export const timestampColumn = (_row: unknown, _col: unknown, cellValue: unknown
   return timestamp(String(cellValue));
 };
 
+/** Format a timestamp cell value, falling back to the given placeholder. */
 export const timestampLabel = (value: unknown, fallback = '-'): string => {
   if (value == null || value === '') return fallback;
   return timestamp(String(value)) || fallback;
@@ -91,7 +92,8 @@ export const calcDate = (date1: Date, date2: Date): DateDiff => {
   const minutes = Math.floor(leave2 / (60 * 1000));
 
   const leave3 = leave2 % (60 * 1000);
-  const seconds = Math.round(date3 / 1000);
+  // leave3 is the millisecond remainder after minutes — /1000 yields the seconds part.
+  const seconds = Math.floor(leave3 / 1000);
   return {
     leave1,
     leave2,
@@ -102,3 +104,4 @@ export const calcDate = (date1: Date, date2: Date): DateDiff => {
     seconds,
   };
 };
+

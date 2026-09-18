@@ -14,41 +14,51 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Rule runtime state enumeration.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
 @AllArgsConstructor
 public enum RuleStatusEnum {
 
+    /**
+     * Normal.
+     */
     NORMAL((byte) 0, "normal", "Normal"),
 
+    /**
+     * Firing.
+     */
     FIRING((byte) 1, "firing", "Firing"),
 
+    /**
+     * Recovered.
+     */
     RECOVERED((byte) 2, "recovered", "Recovered"),
     ;
 
-    @EnumValue
     private final Byte index;
 
     private final String code;
 
     private final String remark;
 
+    /**
+     * Resolve a rule status from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching status, or {@code null} when the index is unknown
+     */
     public static RuleStatusEnum ofIndex(Byte index) {
         Optional<RuleStatusEnum> any = Arrays.stream(RuleStatusEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -56,6 +66,12 @@ public enum RuleStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a rule status from its stable wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching status, or {@code null} when the code is unknown
+     */
     public static RuleStatusEnum ofCode(String code) {
         Optional<RuleStatusEnum> any = Arrays.stream(RuleStatusEnum.values())
                 .filter(type -> type.getCode().equals(code))
@@ -63,6 +79,12 @@ public enum RuleStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a rule status from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching status, or {@code null} when the name is unknown
+     */
     public static RuleStatusEnum ofName(String name) {
         try {
             return valueOf(name);
@@ -70,5 +92,4 @@ public enum RuleStatusEnum {
             return null;
         }
     }
-
 }

@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da.impl;
 
+import java.net.UnknownHostException;
 import org.jinterop.dcom.common.JIException;
 import org.jinterop.dcom.core.IJIComObject;
 import org.jinterop.dcom.core.JIArray;
@@ -29,8 +29,6 @@ import org.openscada.opc.dcom.common.FILETIME;
 import org.openscada.opc.dcom.common.impl.BaseCOMObject;
 import org.openscada.opc.dcom.da.Constants;
 import org.openscada.opc.dcom.da.IORequest;
-
-import java.net.UnknownHostException;
 
 /**
  *
@@ -65,11 +63,10 @@ public class OPCItemIO extends BaseCOMObject {
 
         callObject.addOutParamAsObject(new JIPointer(new JIArray(JIVariant.class, null, 1, true)), JIFlags.FLAG_NULL);
         callObject.addOutParamAsObject(new JIPointer(new JIArray(Integer.class, null, 1, true)), JIFlags.FLAG_NULL);
-        callObject.addOutParamAsObject(new JIPointer(new JIArray(FILETIME.getStruct(), null, 1, true)),
-                JIFlags.FLAG_NULL);
+        callObject.addOutParamAsObject(
+                new JIPointer(new JIArray(FILETIME.getStruct(), null, 1, true)), JIFlags.FLAG_NULL);
         callObject.addOutParamAsObject(new JIPointer(new JIArray(Integer.class, null, 1, true)), JIFlags.FLAG_NULL);
 
         getCOMObject().call(callObject);
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -35,7 +34,6 @@ import lombok.ToString;
  * View object for point attribute configuration API responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -50,23 +48,36 @@ public class PointAttributeConfigVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "ID of the point attribute whose value is being configured.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Point attribute ID can't be empty", groups = {Add.class, Update.class})
-    private Long attributeId;
+    @Schema(
+            description = "ID of the point attribute whose value is being configured.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Point attribute ID can't be empty",
+            groups = {Add.class, Update.class})
+    private String attributeId;
 
     /**
      *
      */
-    @Schema(description = "The configured value overriding the attribute default for this specific device.", example = "40001", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(
+            description = "The configured value overriding the attribute default for this specific device.",
+            example = "40001",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Point attribute config value can't be empty")
     private String configValue;
 
     /**
      * Device ID
      */
-    @Schema(description = "ID of the device this configuration applies to.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Device ID can't be empty", groups = {Add.class, Update.class})
-    private Long deviceId;
+    @Schema(
+            description = "ID of the device this configuration applies to.",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Device ID can't be empty",
+            groups = {Add.class, Update.class})
+    private String deviceId;
 
     /**
      *
@@ -77,9 +88,14 @@ public class PointAttributeConfigVO extends BaseVO {
     /**
      * Point ID
      */
-    @Schema(description = "ID of the data point this configuration is scoped to; must belong to the current tenant.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Point ID can't be empty", groups = {Add.class, Update.class})
-    private Long pointId;
+    @Schema(
+            description = "ID of the data point this configuration is scoped to; must belong to the current tenant.",
+            example = "4096",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Point ID can't be empty",
+            groups = {Add.class, Update.class})
+    private String pointId;
 
     /**
      * Enable flag
@@ -90,7 +106,9 @@ public class PointAttributeConfigVO extends BaseVO {
     /**
      *
      */
-    @Schema(description = "Signature used for configuration integrity verification.", example = "d41d8cd98f00b204e9800998ecf8427e")
+    @Schema(
+            description = "Signature used for configuration integrity verification.",
+            example = "d41d8cd98f00b204e9800998ecf8427e")
     private String signature;
 
     /**
@@ -98,5 +116,4 @@ public class PointAttributeConfigVO extends BaseVO {
      */
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
-
 }

@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
-
-import org.junit.jupiter.api.Test;
-
-import java.io.ByteArrayOutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.io.ByteArrayOutputStream;
+import org.junit.jupiter.api.Test;
 
 class CmdUtilTest {
 
@@ -52,5 +50,4 @@ class CmdUtilTest {
         assertThat(outputStream).hasToString("");
         verify(process).destroyForcibly();
     }
-
 }

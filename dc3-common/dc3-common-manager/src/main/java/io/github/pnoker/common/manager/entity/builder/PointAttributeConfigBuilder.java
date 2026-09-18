@@ -14,32 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.manager.entity.bo.PointAttributeConfigBO;
 import io.github.pnoker.common.manager.entity.model.PointAttributeConfigDO;
 import io.github.pnoker.common.manager.entity.vo.PointAttributeConfigVO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
- * PointAttributeConfig Builder
+ * MapStruct builder converting between point attribute config BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface PointAttributeConfigBuilder {
 
     /**
@@ -69,6 +66,12 @@ public interface PointAttributeConfigBuilder {
     @Mapping(target = "deleted", ignore = true)
     PointAttributeConfigDO buildDOByBO(PointAttributeConfigBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(PointAttributeConfigBO entityBO, @MappingTarget PointAttributeConfigDO entityDO) {
         // Enable Flag
@@ -93,6 +96,12 @@ public interface PointAttributeConfigBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     PointAttributeConfigBO buildBOByDO(PointAttributeConfigDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(PointAttributeConfigDO entityDO, @MappingTarget PointAttributeConfigBO entityBO) {
         // Enable Flag
@@ -123,25 +132,4 @@ public interface PointAttributeConfigBuilder {
      * @return EntityVO Array
      */
     List<PointAttributeConfigVO> buildVOListByBOList(List<PointAttributeConfigBO> entityBOList);
-
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    default Page<PointAttributeConfigBO> buildBOPageByDOPage(Page<PointAttributeConfigDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<PointAttributeConfigVO> buildVOPageByBOPage(Page<PointAttributeConfigBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

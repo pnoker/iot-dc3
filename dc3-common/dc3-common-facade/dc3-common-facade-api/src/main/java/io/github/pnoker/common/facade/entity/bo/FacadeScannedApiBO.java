@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.entity.bo;
 
 import lombok.AllArgsConstructor;
@@ -28,7 +27,6 @@ import lombok.ToString;
  * Facade-level representation of a single scanned HTTP endpoint.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -39,18 +37,13 @@ import lombok.ToString;
 @AllArgsConstructor
 public class FacadeScannedApiBO {
 
-
     private String method;
-
 
     private String path;
 
-
     private String apiName;
 
-
     private String title;
-
 
     private String remark;
 
@@ -58,5 +51,4 @@ public class FacadeScannedApiBO {
      * API grouping label — usually the owning controller's simple class name.
      */
     private String apiGroup;
-
 }

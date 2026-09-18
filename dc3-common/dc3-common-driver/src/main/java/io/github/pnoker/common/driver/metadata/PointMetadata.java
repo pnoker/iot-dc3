@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.metadata;
 
 import io.github.pnoker.common.driver.entity.bo.PointBO;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Component;
  * {@link AbstractMetadataCache} for the shared semantics.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -48,5 +46,4 @@ public final class PointMetadata extends AbstractMetadataCache<PointBO> {
     public PointMetadata(DriverProperties driverProperties, PointClient pointClient) {
         super(driverProperties.getMetadata().getCache(), "point", pointClient::getById);
     }
-
 }

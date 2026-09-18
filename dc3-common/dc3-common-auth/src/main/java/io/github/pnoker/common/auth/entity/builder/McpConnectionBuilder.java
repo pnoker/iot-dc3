@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.bo.McpConnectionAddBO;
@@ -24,21 +23,21 @@ import io.github.pnoker.common.auth.entity.vo.McpConnectionVO;
 import io.github.pnoker.common.enums.OAuthGrantTypeEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-
 /**
  * MapStruct builder converting between MCP connection projection and view objects.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface McpConnectionBuilder {
 
     /**
@@ -49,8 +48,18 @@ public interface McpConnectionBuilder {
      */
     @Mapping(target = "principalType", ignore = true)
     @Mapping(target = "grantType", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
     McpConnectionVO buildVOByRecord(McpConnectionRecord entityRecord);
 
+    /**
+     * After process.
+     *
+     * @param entityRecord entity record
+     * @param entityVO     view object
+     */
     @AfterMapping
     default void afterProcess(McpConnectionRecord entityRecord, @MappingTarget McpConnectionVO entityVO) {
         entityVO.setPrincipalType(PrincipalTypeEnum.ofValue(entityRecord.getPrincipalType()));
@@ -75,10 +84,15 @@ public interface McpConnectionBuilder {
     @Mapping(target = "grantType", ignore = true)
     McpConnectionAddBO buildBOByAddVO(McpConnectionAddVO entityVO);
 
+    /**
+     * After process.
+     *
+     * @param entityVO view object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(McpConnectionAddVO entityVO, @MappingTarget McpConnectionAddBO entityBO) {
         entityBO.setPrincipalType(PrincipalTypeEnum.ofValue(entityVO.getPrincipalType()));
         entityBO.setGrantType(OAuthGrantTypeEnum.ofValue(entityVO.getGrantType()));
     }
-
 }

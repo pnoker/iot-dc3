@@ -14,21 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.model;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * <p>
@@ -37,13 +30,11 @@ import java.time.LocalDateTime;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
 @Setter
 @ToString
-@TableName("dc3_role_resource_bind")
 public class RoleResourceBindDO implements Serializable {
 
     @Serial
@@ -52,68 +43,55 @@ public class RoleResourceBindDO implements Serializable {
     /**
      * Primary key ID
      */
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
      * ID
      */
-    @TableField("role_id")
     private Long roleId;
 
     /**
      * ID
      */
-    @TableField("resource_id")
     private Long resourceId;
 
     /**
      * Description
      */
-    @TableField("remark")
     private String remark;
 
     /**
      * Creator ID
      */
-    @TableField("creator_id")
     private Long creatorId;
 
     /**
      * Creator Name
      */
-    @TableField("creator_name")
     private String creatorName;
 
     /**
      * Create Time
      */
-    @TableField("create_time")
     private LocalDateTime createTime;
 
     /**
      * Operator ID
      */
-    @TableField("operator_id")
     private Long operatorId;
 
     /**
      * Operator Name
      */
-    @TableField("operator_name")
     private String operatorName;
 
     /**
      * Operate Time
      */
-    @TableField("operate_time")
     private LocalDateTime operateTime;
 
     /**
      * Logical delete flag, 0:not deleted, 1:deleted
      */
-    @TableLogic
-    @TableField("deleted")
     private Byte deleted;
-
 }

@@ -14,15 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Unified entity status enumeration for drivers and devices.
@@ -31,23 +28,33 @@ import java.util.Optional;
  * used on MQ payloads and API responses.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Getter
 @AllArgsConstructor
 public enum EntityStatusEnum {
 
+    /**
+     * Entity is online and healthy.
+     */
     ONLINE((byte) 0, "online", "Online"),
+    /**
+     * Entity is offline.
+     */
     OFFLINE((byte) 1, "offline", "Offline"),
+    /**
+     * Entity is under maintenance.
+     */
     MAINTAIN((byte) 2, "maintain", "Maintain"),
+    /**
+     * Entity reported a fault.
+     */
     FAULT((byte) 3, "fault", "Fault"),
     ;
 
     /**
      * Index value stored in database.
      */
-    @EnumValue
     private final Byte index;
 
     /**
@@ -60,6 +67,12 @@ public enum EntityStatusEnum {
      */
     private final String remark;
 
+    /**
+     * Resolve an entity status from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching status, or {@code null} when the index is unknown
+     */
     public static EntityStatusEnum ofIndex(Byte index) {
         Optional<EntityStatusEnum> any = Arrays.stream(EntityStatusEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -67,6 +80,12 @@ public enum EntityStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve an entity status from its case-insensitive wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching status, or {@code null} when the code is unknown
+     */
     public static EntityStatusEnum ofCode(String code) {
         Optional<EntityStatusEnum> any = Arrays.stream(EntityStatusEnum.values())
                 .filter(type -> type.getCode().equalsIgnoreCase(code))
@@ -74,6 +93,12 @@ public enum EntityStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve an entity status from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching status, or {@code null} when the name is unknown
+     */
     public static EntityStatusEnum ofName(String name) {
         try {
             return valueOf(name);
@@ -81,5 +106,4 @@ public enum EntityStatusEnum {
             return null;
         }
     }
-
 }

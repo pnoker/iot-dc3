@@ -21,10 +21,10 @@ import {describe, expect, it, vi} from 'vitest';
 import {mountListPage} from './_helpers';
 
 const menuMocks = vi.hoisted(() => ({
-  addMenu: vi.fn(() => Promise.resolve({data: true})),
-  deleteMenu: vi.fn(() => Promise.resolve({data: true})),
-  listMenuTree: vi.fn(() => Promise.resolve({data: [{id: 'm-1', menuName: 'Home', children: []}]})),
-  updateMenu: vi.fn(() => Promise.resolve({data: true})),
+  addMenu: vi.fn(() => Promise.resolve( true)),
+  deleteMenu: vi.fn(() => Promise.resolve( true)),
+  listMenuTree: vi.fn(() => Promise.resolve( [{id: 'm-1', menuName: 'Home', children: []}])),
+  updateMenu: vi.fn(() => Promise.resolve( true)),
 }));
 
 vi.mock('@/api/menu', () => menuMocks);

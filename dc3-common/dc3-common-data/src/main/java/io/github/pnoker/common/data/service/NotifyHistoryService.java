@@ -14,20 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.service;
 
-import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
 import io.github.pnoker.common.data.entity.query.NotifyHistoryQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
-/**
- * Notification delivery history service.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
-public interface NotifyHistoryService extends BaseService<NotifyHistoryBO, NotifyHistoryQuery> {
+/** Reactive notification delivery history service. */
+public interface NotifyHistoryService {
+    /** Resolve the notify configuration history by its id. */
+    Mono<NotifyHistoryBO> getById(Long tenantId, Long id);
 
+    /** Page notify configuration histories matching the tenant-scoped filters. */
+    Mono<OffsetPage<NotifyHistoryBO>> list(Long tenantId, NotifyHistoryQuery query);
+
+    /** Delete the notify configuration history, reporting whether a row was removed. */
+    Mono<Boolean> delete(Long tenantId, Long id);
 }

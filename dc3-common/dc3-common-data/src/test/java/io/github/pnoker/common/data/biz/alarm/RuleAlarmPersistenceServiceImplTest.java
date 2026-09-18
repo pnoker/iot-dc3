@@ -14,26 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
-
-import io.github.pnoker.common.constant.service.AlarmConstant;
-import io.github.pnoker.common.data.dal.EntityAlarmManager;
-import io.github.pnoker.common.data.entity.bo.RuleBO;
-import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
-import io.github.pnoker.common.entity.ext.RuleExt;
-import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
-import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,14 +24,33 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.github.pnoker.common.constant.service.AlarmConstant;
+import io.github.pnoker.common.data.entity.bo.RuleBO;
+import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
+import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
+import io.github.pnoker.common.data.repository.ReactiveRuleStateLookup;
+import io.github.pnoker.common.entity.ext.RuleExt;
+import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
+import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+
 @ExtendWith(MockitoExtension.class)
 class RuleAlarmPersistenceServiceImplTest {
 
     @Mock
-    private EntityAlarmManager entityAlarmManager;
+    private ReactiveEntityAlarmStore entityAlarmStore;
 
     @Mock
-    private RuleStateLookup ruleStateLookup;
+    private ReactiveRuleStateLookup ruleStateLookup;
 
     @InjectMocks
     private RuleAlarmPersistenceServiceImpl service;
@@ -72,8 +72,8 @@ class RuleAlarmPersistenceServiceImplTest {
     }
 
     private static RuleMatch firingMatch(String severity) {
-        RuleFact fact = new RuleFact(7L, AlarmTargetTypeEnum.POINT, 11L, null, LocalDateTime.now(),
-                Map.of("driverId", 3L, "deviceId", 5L));
+        RuleFact fact = new RuleFact(
+                7L, AlarmTargetTypeEnum.POINT, 11L, null, LocalDateTime.now(), Map.of("driverId", 3L, "deviceId", 5L));
         return RuleMatch.firing(rule(1L, severity), fact);
     }
 
@@ -85,17 +85,18 @@ class RuleAlarmPersistenceServiceImplTest {
     @Test
     void persistsEntityAlarmWithSeverityFromRuleExt() {
         RuleMatch match = firingMatch("P0");
-        when(ruleStateLookup.getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
-        when(entityAlarmManager.save(any(EntityAlarmDO.class))).thenAnswer(inv -> {
+        when(ruleStateLookup.getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong()))
+                .thenReturn(Mono.empty());
+        when(entityAlarmStore.insert(any(EntityAlarmDO.class))).thenAnswer(inv -> {
             EntityAlarmDO d = inv.getArgument(0);
             d.setId(42L);
-            return true;
+            return Mono.just(d);
         });
 
-        service.ensureAlarm(match);
+        service.ensureAlarm(match).block();
 
         ArgumentCaptor<EntityAlarmDO> captor = ArgumentCaptor.forClass(EntityAlarmDO.class);
-        verify(entityAlarmManager).save(captor.capture());
+        verify(entityAlarmStore).insert(captor.capture());
         EntityAlarmDO persisted = captor.getValue();
         // Severity P0 → alarm_level_flag index 0
         assertThat(persisted.getAlarmLevelFlag()).isEqualTo(AlarmMessageLevelEnum.P0.getIndex());
@@ -108,30 +109,32 @@ class RuleAlarmPersistenceServiceImplTest {
     @Test
     void defaultsToP2WhenSeverityIsBlank() {
         RuleMatch match = firingMatch(null);
-        when(ruleStateLookup.getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
-        when(entityAlarmManager.save(any(EntityAlarmDO.class))).thenAnswer(inv -> {
+        when(ruleStateLookup.getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong()))
+                .thenReturn(Mono.empty());
+        when(entityAlarmStore.insert(any(EntityAlarmDO.class))).thenAnswer(inv -> {
             EntityAlarmDO d = inv.getArgument(0);
             d.setId(99L);
-            return true;
+            return Mono.just(d);
         });
 
-        service.ensureAlarm(match);
+        service.ensureAlarm(match).block();
 
         ArgumentCaptor<EntityAlarmDO> captor = ArgumentCaptor.forClass(EntityAlarmDO.class);
-        verify(entityAlarmManager).save(captor.capture());
+        verify(entityAlarmStore).insert(captor.capture());
         assertThat(captor.getValue().getAlarmLevelFlag()).isEqualTo(AlarmMessageLevelEnum.P2.getIndex());
     }
 
     @Test
     void reusesExistingFiringAlarmIdAndSkipsInsert() {
         RuleMatch match = firingMatch("P1");
-        when(ruleStateLookup.getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(101L);
+        when(ruleStateLookup.getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong()))
+                .thenReturn(Mono.just(101L));
 
-        service.ensureAlarm(match);
+        service.ensureAlarm(match).block();
 
         // No new entity alarm is written when a firing one already exists; the
         // fact's alarmId is just rebound to the existing alarm.
-        verify(entityAlarmManager, never()).save(any());
+        verify(entityAlarmStore, never()).insert(any());
         assertThat(match.getFact().getAlarmId()).isEqualTo(101L);
     }
 
@@ -141,11 +144,12 @@ class RuleAlarmPersistenceServiceImplTest {
         // ensureAlarm should not create a new EntityAlarm row for a RECOVERY match
         // when no firing alarm exists to recover from.
         RuleMatch match = recoveryMatch();
-        when(ruleStateLookup.getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong())).thenReturn(null);
+        when(ruleStateLookup.getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong()))
+                .thenReturn(Mono.empty());
 
-        service.ensureAlarm(match);
+        service.ensureAlarm(match).block();
 
-        verify(entityAlarmManager, never()).save(any());
+        verify(entityAlarmStore, never()).insert(any());
         assertThat(match.getFact().getAlarmId()).isNull();
         assertThat(match.getMatchType()).isEqualTo(AlarmConstant.MATCH_TYPE_RECOVERY);
     }
@@ -155,10 +159,9 @@ class RuleAlarmPersistenceServiceImplTest {
         RuleMatch match = firingMatch("P1");
         match.getFact().setAlarmId(55L);
 
-        service.ensureAlarm(match);
+        service.ensureAlarm(match).block();
 
-        verify(entityAlarmManager, never()).save(any());
+        verify(entityAlarmStore, never()).insert(any());
         verify(ruleStateLookup, never()).getFiringAlarmId(anyLong(), anyLong(), anyByte(), anyLong());
     }
-
 }

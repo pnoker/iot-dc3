@@ -16,24 +16,26 @@
  */
 
 import {flushPromises} from '@vue/test-utils';
-import {describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {mountListPage} from './_helpers';
 
 const commandMocks = vi.hoisted(() => ({
-  addCommand: vi.fn(() => Promise.resolve({data: true})),
-  addCommandParam: vi.fn(() => Promise.resolve({data: true})),
-  deleteCommand: vi.fn(() => Promise.resolve({data: true})),
-  deleteCommandParam: vi.fn(() => Promise.resolve({data: true})),
-  listCommand: vi.fn(() => Promise.resolve({data: {records: [], total: 0}})),
-  updateCommand: vi.fn(() => Promise.resolve({data: true})),
-  updateCommandParam: vi.fn(() => Promise.resolve({data: true})),
+  addCommand: vi.fn(() => Promise.resolve({id: '101'})),
+  addCommandParam: vi.fn(() => Promise.resolve({id: '201'})),
+  deleteCommand: vi.fn(() => Promise.resolve( true)),
+  deleteCommandParam: vi.fn(() => Promise.resolve( true)),
+  listCommand: vi.fn(() => Promise.resolve( {items: [], total: 0})),
+  updateCommand: vi.fn(() => Promise.resolve( true)),
+  updateCommandParam: vi.fn(() => Promise.resolve( true)),
 }));
 
 vi.mock('@/api/command', () => commandMocks);
 vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 
 describe('CommandList view', () => {
+  beforeEach(() => vi.clearAllMocks());
+
   it('lists command definitions on mount', async () => {
     const CommandList = (await import('@/views/settings/command/CommandList.vue')).default;
     await mountListPage({
@@ -46,5 +48,23 @@ describe('CommandList view', () => {
     });
     await flushPromises();
     expect(commandMocks.listCommand).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the created command record id when saving parameters', async () => {
+    const CommandList = (await import('@/views/settings/command/CommandList.vue')).default;
+    const wrapper = await mountListPage({
+      component: CommandList,
+      stubs: {
+        CommandCard: {template: '<div />'},
+        CommandTool: {template: '<div />'},
+        CommandEditForm: {
+          emits: ['add-thing'],
+          template: '<button class="emit-add" @click="$emit(\'add-thing\', {commandName: \'read\', profileId: \'10\'}, [{paramName: \'speed\', paramCode: \'speed\'}], () => undefined)" />',
+        },
+      },
+    });
+    await wrapper.get('.emit-add').trigger('click');
+    await flushPromises();
+    expect(commandMocks.addCommandParam).toHaveBeenCalledWith(expect.objectContaining({commandId: '101'}));
   });
 });

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
 
 /**
@@ -28,5 +27,4 @@ public interface AccessStateListener {
     public abstract void stateChanged(boolean state);
 
     public abstract void errorOccured(Throwable t);
-
 }

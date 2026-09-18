@@ -14,12 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pnoker.common.constant.service.McpConstant;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,15 +29,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.Set;
-
 /**
  * OAuth dynamic client registration response for MCP clients.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -72,5 +69,4 @@ public class OAuthClientRegistrationResponseVO implements Serializable {
 
     @JsonProperty(McpConstant.Field.CLIENT_SECRET)
     private String clientSecret;
-
 }

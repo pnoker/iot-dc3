@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.mqtt.service;
 
 import io.github.pnoker.common.mqtt.entity.MqttMessage;
-
 import java.util.List;
 
 /**
@@ -30,7 +28,6 @@ import java.util.List;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface MqttReceiveService {
@@ -56,5 +53,4 @@ public interface MqttReceiveService {
      * @param mqttMessageList String Array List
      */
     void receiveValues(List<MqttMessage> mqttMessageList);
-
 }

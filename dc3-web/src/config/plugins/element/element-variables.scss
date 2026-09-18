@@ -17,6 +17,11 @@
 
 // Element Plus form component size tokens. Keep this file token-only because
 // Vite injects it into every SCSS block via additionalData.
+//
+// Forward the L2 design tokens so every scoped style block sees them under
+// the same 'as *' namespace without an extra @use (see docs/design/frontend-three-terminal-ux.md).
+@forward '@/styles/tokens.scss';
+
 $form-width-small: 120px;
 $form-width-medium: 150px;
 $form-width-default: 250px;

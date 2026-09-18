@@ -14,38 +14,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.grpc;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.api.center.auth.GrpcLoginQuery;
-import io.github.pnoker.api.center.auth.GrpcRTokenDTO;
+import io.github.pnoker.api.center.auth.GrpcTokenValidationDTO;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
-import io.github.pnoker.common.auth.biz.TokenService;
+import io.github.pnoker.common.auth.biz.ReactiveTokenService;
 import io.github.pnoker.common.auth.entity.bean.TokenValid;
-import io.github.pnoker.common.enums.ErrorCode;
-import io.github.pnoker.common.enums.SuccessCode;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
+import java.util.Date;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Date;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class TokenServerTest {
 
     @Mock
-    private TokenService tokenService;
+    private ReactiveTokenService tokenService;
 
     private Server server;
     private ManagedChannel channel;
@@ -56,7 +54,11 @@ class TokenServerTest {
         TokenServer tokenServer = new TokenServer(tokenService);
 
         String name = "dc3-token-" + UUID.randomUUID();
-        server = InProcessServerBuilder.forName(name).directExecutor().addService(tokenServer).build().start();
+        server = InProcessServerBuilder.forName(name)
+                .directExecutor()
+                .addService(tokenServer)
+                .build()
+                .start();
         channel = InProcessChannelBuilder.forName(name).directExecutor().build();
         stub = TokenApiGrpc.newBlockingStub(channel);
     }
@@ -74,49 +76,42 @@ class TokenServerTest {
     @Test
     void checkValidReportsOkWithExpiryDataForValidToken() {
         TokenValid valid = new TokenValid(true, new Date(1_700_000_000_000L));
-        when(tokenService.checkValid("alice", "salt", "token", "tenant-A")).thenReturn(valid);
+        when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(Mono.just(valid));
 
-        GrpcRTokenDTO response = stub.checkValid(GrpcLoginQuery.newBuilder()
+        GrpcTokenValidationDTO response = stub.checkValid(GrpcLoginQuery.newBuilder()
                 .setTenant("tenant-A")
                 .setName("alice")
-                .setSalt("salt")
                 .setToken("token")
                 .build());
 
-        assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getResult().getCode()).isEqualTo(SuccessCode.OK.getCode());
-        assertThat(response.getData()).matches("\\d{4}-\\d{2}-\\d{2} .*");
+        assertThat(response.getValid()).isTrue();
+        assertThat(response.getExpireTime()).matches("\\d{4}-\\d{2}-\\d{2} .*");
     }
 
     @Test
-    void checkValidReportsTokenInvalidEnvelopeForInvalidToken() {
-        when(tokenService.checkValid("alice", "salt", "token", "tenant-A"))
-                .thenReturn(new TokenValid(false, null));
+    void checkValidReportsInvalidPayloadForInvalidToken() {
+        when(tokenService.checkValid("alice", "token", "tenant-A")).thenReturn(Mono.just(new TokenValid(false, null)));
 
-        GrpcRTokenDTO response = stub.checkValid(GrpcLoginQuery.newBuilder()
+        GrpcTokenValidationDTO response = stub.checkValid(GrpcLoginQuery.newBuilder()
                 .setTenant("tenant-A")
                 .setName("alice")
-                .setSalt("salt")
                 .setToken("token")
                 .build());
 
-        assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.TOKEN_INVALID.getCode());
-        assertThat(response.getData()).isEmpty();
+        assertThat(response.getValid()).isFalse();
+        assertThat(response.getExpireTime()).isEmpty();
     }
 
     @Test
-    void checkValidReportsNoResourceWhenServiceReturnsNull() {
-        when(tokenService.checkValid("alice", "salt", "token", "tenant-A")).thenReturn(null);
+    void checkValidReportsInternalStatusWhenServiceErrors() {
+        when(tokenService.checkValid("alice", "token", "tenant-A"))
+                .thenReturn(Mono.error(new IllegalStateException("not found")));
 
-        GrpcRTokenDTO response = stub.checkValid(GrpcLoginQuery.newBuilder()
-                .setTenant("tenant-A")
-                .setName("alice")
-                .setSalt("salt")
-                .setToken("token")
-                .build());
-
-        assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
+        assertThatThrownBy(() -> stub.checkValid(GrpcLoginQuery.newBuilder()
+                        .setTenant("tenant-A")
+                        .setName("alice")
+                        .setToken("token")
+                        .build()))
+                .hasMessageContaining("INTERNAL");
     }
 }

@@ -29,6 +29,19 @@
       @current-change="currentChange"
     ></profile-tool>
 
+    <el-alert
+      v-if="reactiveData.status === 'error'"
+      :closable="false"
+      :title="$t('common.loadFailed')"
+      class="entity-page-error"
+      show-icon
+      type="error"
+    >
+      <el-button :loading="reactiveData.loading" link type="danger" @click="refresh">
+        {{ $t('common.retry') }}
+      </el-button>
+    </el-alert>
+
     <blank-card>
       <el-row>
         <template v-if="reactiveData.loading">
@@ -37,13 +50,17 @@
           </el-col>
         </template>
         <template v-else>
-          <el-col v-if="reactiveData.listData.length < 1">
+          <el-col v-if="reactiveData.status === 'success' && reactiveData.listData.length < 1">
             <el-empty :description="$t('profile.empty')"/>
+          </el-col>
+          <el-col v-else-if="reactiveData.status === 'error' && reactiveData.listData.length < 1">
+            <el-empty :description="$t('common.loadFailed')"/>
           </el-col>
           <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
             <profile-card
               :data="data"
               :embedded="embedded != ''"
+              :busy="isActionBusy(data)"
               @disable-thing="disableThing"
               @enable-thing="enableThing"
               @delete-thing="deleteThing"
@@ -58,11 +75,11 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
+import {computed, onBeforeUnmount, reactive, ref, watch} from 'vue';
 
 import {addProfile, deleteProfile, listProfile, updateProfile} from '@/api/profile';
 import {usePagedList} from '@/composables/usePagedList';
-import {failMessage, successMessage} from '@/utils/notificationUtil';
+import {successMessage} from '@/utils/notificationUtil';
 import {isNull} from '@/utils/validationUtil';
 
 import type {ProfileRecord} from '@/config/types/manager';
@@ -87,6 +104,8 @@ const props = withDefaults(
 );
 
 const profileAddFormRef = ref<DialogInstance | null>(null);
+const actionBusy = reactive(new Set<string>());
+let disposed = false;
 
 const {
   state: reactiveData,
@@ -97,7 +116,7 @@ const {
   currentChange,
 } = usePagedList<ProfileRecord>({
   pageSize: 12,
-  sortColumn: 'create_time',
+  sortColumn: 'createTime',
   request: (query) => listProfile(query),
 });
 
@@ -119,63 +138,59 @@ const showAdd = () => {
   profileAddFormRef.value?.show();
 };
 
-const addThing = (form: unknown, done: () => void) => {
+const addThing = (form: unknown, done: (successful?: boolean) => void) => {
   addProfile(form as Record<string, unknown>)
     .then(() => {
+      if (disposed) return;
       successMessage();
-      load();
+      void load();
+      done(true);
     })
     .catch(() => {
-      failMessage();
-    })
-    .finally(() => {
-      done();
+      if (!disposed) done(false);
     });
 };
 
-const disableThing = (id: number | string, done: () => void) => {
-  updateProfile({id: String(id), enableFlag: 'DISABLE'})
-    .then(() => {
-      successMessage();
-      load();
-    })
-    .catch(() => {
-      failMessage();
-    })
-    .finally(() => {
-      done();
-    });
+const isActionBusy = (profile: ProfileRecord) => actionBusy.has(String(profile.id));
+
+const runAction = async (profile: ProfileRecord, action: () => Promise<unknown>) => {
+  const id = String(profile.id);
+  if (actionBusy.has(id)) return;
+  actionBusy.add(id);
+  try {
+    await action();
+    if (disposed) return;
+    successMessage();
+    await load();
+  } catch {
+    // handled globally
+  } finally {
+    actionBusy.delete(id);
+  }
 };
 
-const enableThing = (id: number | string, done: () => void) => {
-  updateProfile({id: String(id), enableFlag: 'ENABLE'})
-    .then(() => {
-      successMessage();
-      load();
-    })
-    .catch(() => {
-      failMessage();
-    })
-    .finally(() => {
-      done();
-    });
-};
+const disableThing = (profile: ProfileRecord) =>
+  runAction(profile, () => updateProfile({...profile, enableFlag: 'DISABLE'}));
 
-const deleteThing = (id: number | string, done: () => void) => {
-  deleteProfile(String(id))
-    .then(() => {
-      successMessage();
-      load();
-    })
-    .catch(() => {
-      failMessage();
-    })
-    .finally(() => {
-      done();
-    });
-};
+const enableThing = (profile: ProfileRecord) =>
+  runAction(profile, () => updateProfile({...profile, enableFlag: 'ENABLE'}));
+
+const deleteThing = (profile: ProfileRecord) =>
+  runAction(profile, () => deleteProfile(profile.id, profile.version));
 
 const refresh = () => load();
+
+watch(
+  () => props.deviceId,
+  () => {
+    _search(baseProfileQuery.value);
+  }
+);
+
+onBeforeUnmount(() => {
+  disposed = true;
+  actionBusy.clear();
+});
 
 defineExpose({
   reactiveData,

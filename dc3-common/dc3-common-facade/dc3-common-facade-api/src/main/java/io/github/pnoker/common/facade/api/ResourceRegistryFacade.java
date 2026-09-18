@@ -14,18 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncCommandBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeResourceRegistrySyncResultBO;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral resource registry facade. Mirrors
  * {@code api.center.auth.ResourceRegistryApi}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface ResourceRegistryFacade {
@@ -34,6 +33,5 @@ public interface ResourceRegistryFacade {
      * Submit the caller's full API inventory. The auth-side server reconciles it against
      * the dc3_api and dc3_resource tables and returns counters.
      */
-    FacadeResourceRegistrySyncResultBO sync(FacadeResourceRegistrySyncCommandBO command);
-
+    Mono<FacadeResourceRegistrySyncResultBO> sync(FacadeResourceRegistrySyncCommandBO command);
 }

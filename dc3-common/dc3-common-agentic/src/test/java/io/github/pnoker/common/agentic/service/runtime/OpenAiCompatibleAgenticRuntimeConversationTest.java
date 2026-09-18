@@ -16,9 +16,10 @@
  */
 package io.github.pnoker.common.agentic.service.runtime;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import com.sun.net.httpserver.HttpServer;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
@@ -28,19 +29,7 @@ import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
 import io.github.pnoker.common.agentic.service.chat.AgenticRunTrace;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.ai.tool.definition.DefaultToolDefinition;
-import org.springframework.ai.tool.definition.ToolDefinition;
-
+import io.github.pnoker.common.utils.JsonUtil;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -55,17 +44,29 @@ import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.definition.DefaultToolDefinition;
+import org.springframework.ai.tool.definition.ToolDefinition;
+import reactor.test.StepVerifier;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 class OpenAiCompatibleAgenticRuntimeConversationTest {
 
     private static final String MODEL = "deepseek-reasoner";
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = JsonUtil.getJsonMapper();
 
     @Mock
     private ChatClientFactory chatClientFactory;
@@ -117,13 +118,12 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
     @MethodSource("platformDataScenarios")
     void platformDataQuestionsRunRealToolLoop(ConversationScenario scenario) throws Exception {
         try (FakeOpenAiServer server = FakeOpenAiServer.start()) {
-            server.enqueue(toolCallResponse(scenario.toolName(), scenario.arguments(),
-                    "需要调用平台工具读取真实数据。"));
+            server.enqueue(toolCallResponse(scenario.toolName(), scenario.arguments(), "需要调用平台工具读取真实数据。"));
             server.enqueue(finalResponse(scenario.finalAnswer()));
             RecordingToolCallback callback = new RecordingToolCallback(scenario.toolName(), scenario.toolResult());
             OpenAiCompatibleAgenticRuntime runtime = runtime(server, callback);
 
-            AgenticRuntimeResult result = runtime.call(prepared(scenario.userMessage()));
+            AgenticRuntimeResult result = await(runtime.call(prepared(scenario.userMessage())));
 
             assertThat(result.content()).isEqualTo(scenario.finalAnswer());
             assertThat(result.finishReason()).isEqualTo(AgenticConstant.Chat.FINISH_REASON_STOP);
@@ -134,7 +134,8 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
                     .containsEntry(AgenticConstant.ToolContextKey.USER_ID, 22L);
 
             assertThat(server.requestBodies()).hasSize(2);
-            JsonNode secondRequest = objectMapper.readTree(server.requestBodies().get(1));
+            JsonNode secondRequest =
+                    objectMapper.readTree(server.requestBodies().get(1));
             assertThat(secondRequest.at("/messages").toString())
                     .contains("\"role\":\"assistant\"")
                     .contains("\"reasoning_content\":\"需要调用平台工具读取真实数据。\"")
@@ -147,11 +148,12 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
     void generalChatCanFinishWithoutToolCall() throws Exception {
         try (FakeOpenAiServer server = FakeOpenAiServer.start()) {
             server.enqueue(finalResponse("你好，我是 IoT DC3 平台助手。"));
-            RecordingToolCallback callback = new RecordingToolCallback("searchDevices",
+            RecordingToolCallback callback = new RecordingToolCallback(
+                    "searchDevices",
                     "{\"success\":true,\"code\":\"OK\",\"message\":\"Device page loaded\",\"data\":{}}");
             OpenAiCompatibleAgenticRuntime runtime = runtime(server, callback);
 
-            AgenticRuntimeResult result = runtime.call(prepared("你好"));
+            AgenticRuntimeResult result = await(runtime.call(prepared("你好")));
 
             assertThat(result.content()).isEqualTo("你好，我是 IoT DC3 平台助手。");
             assertThat(callback.calls()).hasValue(0);
@@ -165,46 +167,68 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
         provider.setProviderType(AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE);
         provider.setBaseUrl(server.baseUrl());
         provider.setApiKey("test-api-key");
-        when(chatClientFactory.resolveProviderForModel(MODEL)).thenReturn(provider);
+        when(chatClientFactory.resolveProviderForModel(MODEL, 11L)).thenReturn(provider);
         when(promptBuilder.buildSystemPrompt(any(AgenticPreparedChatBO.class)))
                 .thenReturn("You are the IoT DC3 platform assistant.");
-        return new OpenAiCompatibleAgenticRuntime(chatClientFactory, promptBuilder,
-                ToolCallbackProvider.from(callback));
+        return new OpenAiCompatibleAgenticRuntime(
+                chatClientFactory,
+                promptBuilder,
+                ToolCallbackProvider.from(callback),
+                new ReactiveAgenticToolRegistry(null, null));
+    }
+
+    private AgenticRuntimeResult await(reactor.core.publisher.Mono<AgenticRuntimeResult> result) {
+        java.util.concurrent.atomic.AtomicReference<AgenticRuntimeResult> value =
+                new java.util.concurrent.atomic.AtomicReference<>();
+        StepVerifier.create(result).assertNext(value::set).verifyComplete();
+        return value.get();
     }
 
     private AgenticPreparedChatBO prepared(String userMessage) {
-        return new AgenticPreparedChatBO(userMessage, "11:22:conv-1", null, MODEL,
+        return new AgenticPreparedChatBO(
+                userMessage,
+                "conv-1",
+                null,
+                MODEL,
                 Map.of(
                         AgenticConstant.ToolContextKey.TENANT_ID, 11L,
                         AgenticConstant.ToolContextKey.USER_ID, 22L,
-                        AgenticConstant.ToolContextKey.CONVERSATION_ID, "11:22:conv-1"),
-                null, null, new AgenticRunTrace(), true, true, List.of(), List.of(),
-                AgenticMessageContent.Tokens.of(10, 0, 10, 0, 0, 0), List.of());
+                        AgenticConstant.ToolContextKey.CONVERSATION_ID, "conv-1"),
+                null,
+                null,
+                new AgenticRunTrace(),
+                true,
+                true,
+                List.of(),
+                List.of(),
+                AgenticMessageContent.Tokens.of(10, 0, 10, 0, 0, 0),
+                List.of());
     }
 
     private String toolCallResponse(String toolName, Map<String, Object> arguments, String reasoning)
-            throws JsonProcessingException {
+            throws JacksonException {
         Map<String, Object> message = new LinkedHashMap<>();
         message.put("role", AgenticConstant.Chat.ROLE_ASSISTANT);
         message.put("content", null);
         message.put("reasoning_content", reasoning);
-        message.put("tool_calls", List.of(Map.of(
-                "id", "call_1",
-                "type", "function",
-                "function", Map.of(
-                        "name", toolName,
-                        "arguments", objectMapper.writeValueAsString(arguments)))));
+        message.put(
+                "tool_calls",
+                List.of(Map.of(
+                        "id", "call_1",
+                        "type", "function",
+                        "function",
+                                Map.of("name", toolName, "arguments", objectMapper.writeValueAsString(arguments)))));
         return completion(message, "tool_calls");
     }
 
-    private String finalResponse(String content) throws JsonProcessingException {
+    private String finalResponse(String content) throws JacksonException {
         Map<String, Object> message = new LinkedHashMap<>();
         message.put("role", AgenticConstant.Chat.ROLE_ASSISTANT);
         message.put("content", content);
         return completion(message, AgenticConstant.Chat.FINISH_REASON_STOP);
     }
 
-    private String completion(Map<String, Object> message, String finishReason) throws JsonProcessingException {
+    private String completion(Map<String, Object> message, String finishReason) throws JacksonException {
         Map<String, Object> choice = new LinkedHashMap<>();
         choice.put("index", 0);
         choice.put("message", message);
@@ -219,9 +243,15 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
         return objectMapper.writeValueAsString(response);
     }
 
-    private record ConversationScenario(String name, String userMessage, String toolName,
-                                        Map<String, Object> arguments, String expectedArgumentFragment,
-                                        String toolResult, String toolResultCode, String finalAnswer) {
+    private record ConversationScenario(
+            String name,
+            String userMessage,
+            String toolName,
+            Map<String, Object> arguments,
+            String expectedArgumentFragment,
+            String toolResult,
+            String toolResultCode,
+            String finalAnswer) {
         @Override
         public String toString() {
             return name;
@@ -282,7 +312,6 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
         ToolContext lastToolContext() {
             return lastToolContext.get();
         }
-
     }
 
     private static class FakeOpenAiServer implements AutoCloseable {
@@ -301,8 +330,8 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
             HttpServer httpServer = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
             FakeOpenAiServer fakeServer = new FakeOpenAiServer(httpServer);
             httpServer.createContext("/v1/chat/completions", exchange -> {
-                fakeServer.requestBodies.add(new String(exchange.getRequestBody().readAllBytes(),
-                        StandardCharsets.UTF_8));
+                fakeServer.requestBodies.add(
+                        new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
                 String response = fakeServer.responses.poll();
                 if (Objects.isNull(response)) {
                     response = "{\"error\":{\"message\":\"No fake OpenAI response queued\"}}";
@@ -339,7 +368,5 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
         public void close() {
             server.stop(0);
         }
-
     }
-
 }

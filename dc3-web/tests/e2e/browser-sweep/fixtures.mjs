@@ -55,6 +55,7 @@ export async function ensureE2eData(page, routeIds) {
       listUrl: '/api/v3/manager/driver/list',
       addUrl: '/api/v3/manager/driver/add',
       deleteUrl: '/api/v3/manager/driver/delete',
+      versioned: true,
       nameField: 'driverName',
       body: {
         driverName: suffix,
@@ -73,6 +74,7 @@ export async function ensureE2eData(page, routeIds) {
       listUrl: '/api/v3/manager/profile/list',
       addUrl: '/api/v3/manager/profile/add',
       deleteUrl: '/api/v3/manager/profile/delete',
+      versioned: true,
       nameField: 'profileName',
       body: {
         profileName: suffix,
@@ -90,6 +92,7 @@ export async function ensureE2eData(page, routeIds) {
       listUrl: '/api/v3/manager/device/list',
       addUrl: '/api/v3/manager/device/add',
       deleteUrl: '/api/v3/manager/device/delete',
+      versioned: true,
       nameField: 'deviceName',
       body: {
         deviceName: suffix,
@@ -107,6 +110,7 @@ export async function ensureE2eData(page, routeIds) {
       listUrl: '/api/v3/manager/point/list',
       addUrl: '/api/v3/manager/point/add',
       deleteUrl: '/api/v3/manager/point/delete',
+      versioned: true,
       nameField: 'pointName',
       body: {
         pointName: suffix,

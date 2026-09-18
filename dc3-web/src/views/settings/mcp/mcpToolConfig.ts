@@ -15,11 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {listMcpTool} from '@/api/mcp';
 import {MCP_RISK_LEVEL_OPTIONS} from '@/config/constant/enums';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
 interface McpToolHandlers {
   onRefresh: () => void;
@@ -28,10 +26,8 @@ interface McpToolHandlers {
 
 const RISK_OPTIONS = MCP_RISK_LEVEL_OPTIONS.map((o) => ({label: o.label, value: o.value}));
 
-// Read-only tool catalog. Backend `tool/list` filters by keyword/riskLevel and
-// returns a flat array (no real paging); `list` wraps it into a single-page result
-// like the sibling MCP audit page.
-export const createMcpToolConfig = (t: ComposerTranslation, handlers: McpToolHandlers): EntityListConfig => ({
+// Read-only tool catalog. Backend `tool/list` uses offset/limit pagination.
+export const createMcpToolConfig = (t: Translator, handlers: McpToolHandlers): EntityListConfig => ({
   name: 'mcp-tool',
   title: t('nav.settingsMcpTool'),
   editable: false,
@@ -52,9 +48,8 @@ export const createMcpToolConfig = (t: ComposerTranslation, handlers: McpToolHan
   defaultForm: () => ({}),
   list: async (query) => {
     const p = query as Record<string, any>;
-    const res: any = await listMcpTool({keyword: p.keyword, riskLevel: p.riskLevel, limit: 500});
-    const records = Array.isArray(res?.data) ? res.data : [];
-    return {data: {records, total: records.length}} as R;
+    const res: any = await listMcpTool({keyword: p.keyword, riskLevel: p.riskLevel, offset: p.offset, limit: p.limit, sort: p.sort});
+    return res;
   },
   toolbarActions: [
     {

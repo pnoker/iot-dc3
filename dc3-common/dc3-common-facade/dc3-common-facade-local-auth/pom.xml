@@ -34,7 +34,7 @@
     <url>https://github.com/pnoker/iot-dc3</url>
     <description>
         Local (in-process) Facade implementations for the auth domain: Tenant / Token / User /
-        LocalCredential / ResourceRegistry. Activated when dc3.facade.mode=local. Depends only on
+        LocalCredential / ResourceRegistry. Activated when dc3.facade.auth.mode=local. Depends only on
         dc3-common-auth so consumers do not transitively pull in manager/rabbitmq.
     </description>
 
@@ -55,6 +55,12 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

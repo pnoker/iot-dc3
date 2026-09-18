@@ -37,6 +37,7 @@ export interface EventForm {
 
 export interface EventRecord extends EventForm {
   id: string;
+  version: number;
   tenantId?: string;
   createTime?: string;
   operateTime?: string;
@@ -58,6 +59,7 @@ export interface EventParamForm {
 
 export interface EventParamRecord extends EventParamForm {
   id: string;
+  version: number;
 }
 
 /**

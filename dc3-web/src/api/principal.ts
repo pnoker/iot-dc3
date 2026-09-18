@@ -21,15 +21,15 @@ import type {PageQuery, PageResult} from '@/config/types';
 import type {PrincipalRecord} from '@/config/types/auth';
 
 export const getPrincipalById = (id: string) =>
-  httpGet<R<PrincipalRecord>>(`${API_PRINCIPAL_BASE}/get_by_id`, {params: {id}});
+  httpGet<PrincipalRecord>(`${API_PRINCIPAL_BASE}/get_by_id`, {params: {id}});
 
-export const listPrincipal = <T = R<PageResult<PrincipalRecord>>>(query: PageQuery) =>
+export const listPrincipal = <T = PageResult<PrincipalRecord>>(query: PageQuery) =>
   httpPost<T>(`${API_PRINCIPAL_BASE}/list`, query);
 
 // Batch-resolve principals by id → used to render principalId references in other
 // lists as display names (settings family relations loader). Mirrors listDeviceByIds.
 export const listPrincipalByIds = (ids: string[]) =>
-  httpPost<R<PrincipalRecord[]>>(`${API_PRINCIPAL_BASE}/list_by_ids`, ids);
+  httpPost<PrincipalRecord[]>(`${API_PRINCIPAL_BASE}/list_by_ids`, ids);
 
 export const enablePrincipal = (id: string) => httpPost(`${API_PRINCIPAL_BASE}/enable`, undefined, {params: {id}});
 

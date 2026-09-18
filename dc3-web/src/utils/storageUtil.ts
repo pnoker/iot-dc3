@@ -15,41 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import {logger} from './log';
 import {isNull} from '@/utils/validationUtil';
-import {decode, encode} from 'js-base64';
-import Cookies from 'js-cookie';
-
-/**
- * Get cookie value by key
- *
- * @param key Cookie key
- * @returns Parsed cookie value
- */
-export const getCookies = (key: string) => {
-  const cookieString = Cookies.get(key) as string | '';
-  return JSON.parse(decode(cookieString));
-};
-
-/**
- * Set cookie value
- *
- * @param key Cookie key
- * @param value Value to store
- * @returns Cookie set result
- */
-export const setCookies = (key: string, value: unknown) => {
-  return Cookies.set(key, encode(JSON.stringify(value)));
-};
-
-/**
- * Remove cookie by key
- *
- * @param key Cookie key
- * @returns Cookie remove result
- */
-export const removeCookies = (key: string) => {
-  return Cookies.remove(key);
-};
 
 /**
  * Get storage value by key
@@ -66,7 +33,7 @@ export const getStorage = (key: string, isSession?: boolean): unknown => {
 
   let parsed: { dataType: string; content: unknown };
   try {
-    parsed = JSON.parse(decode(obj!));
+    parsed = JSON.parse(obj!);
   } catch {
     return obj;
   }
@@ -76,7 +43,7 @@ export const getStorage = (key: string, isSession?: boolean): unknown => {
   } else if (parsed.dataType === 'number') {
     return Number(parsed.content);
   } else if (parsed.dataType === 'boolean') {
-    return parsed.content === 'true';
+    return parsed.content === true || parsed.content === 'true';
   } else if (parsed.dataType === 'object') {
     return parsed.content;
   }
@@ -94,11 +61,15 @@ export const setStorage = (key: string, value: unknown, isSession?: boolean) => 
   const obj = {
     dataType: typeof value,
     content: value,
-    type: isSession,
     datetime: new Date().getTime(),
   };
-  if (isSession) window.sessionStorage.setItem(key, encode(JSON.stringify(obj)));
-  else window.localStorage.setItem(key, encode(JSON.stringify(obj)));
+  try {
+    if (isSession) window.sessionStorage.setItem(key, JSON.stringify(obj));
+    else window.localStorage.setItem(key, JSON.stringify(obj));
+  } catch (error) {
+    // Quota overflow / private mode — persist failure must not break the caller.
+    logger.warn('Failed to persist storage key', key, error);
+  }
 };
 
 /**
@@ -138,15 +109,3 @@ export const getAllStorage = (isSession?: boolean) => {
   return list;
 };
 
-/**
- * Clear all storage values
- *
- * @param isSession Whether to use Session Storage (default: Local Storage)
- */
-export const clearAllStorage = (isSession?: boolean) => {
-  if (isSession) {
-    window.sessionStorage.clear();
-  } else {
-    window.localStorage.clear();
-  }
-};

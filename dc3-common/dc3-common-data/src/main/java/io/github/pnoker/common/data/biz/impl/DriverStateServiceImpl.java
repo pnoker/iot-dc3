@@ -14,129 +14,100 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import io.github.pnoker.common.constant.driver.RabbitConstant;
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DriverAlarmService;
 import io.github.pnoker.common.data.biz.DriverStateService;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.data.mapper.EntityStateMapper;
+import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverStateDTO;
 import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
 import io.github.pnoker.common.enums.TimeoutSourceTypeEnum;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
+import io.github.pnoker.common.utils.JsonUtil;
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
-
-/**
- * Business service implementation for driver heartbeat and state processing.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
+/** Reactive driver heartbeat and lease service. */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DriverStateServiceImpl implements DriverStateService {
 
     private static final int STATUS_TIMEOUT_SECONDS = 45;
-
     private final DriverAlarmService driverAlarmService;
-
-    private final EntityStateMapper entityStateMapper;
-
-    private final RabbitTemplate rabbitTemplate;
-
-    /**
-     * Return whether the online/offline side changed between the previous state index
-     * and the current status code (ONLINE and MAINTAIN count as the online side).
-     *
-     * @param prevIndex   the previous state flag index
-     * @param currentCode the current status code
-     * @return true if the online/offline side flipped
-     */
-    private static boolean isFlip(byte prevIndex, String currentCode) {
-        return online(prevIndex) != online(currentCode);
-    }
-
-    /**
-     * Return whether a state index is on the online side (ONLINE or MAINTAIN).
-     *
-     * @param index the state flag index
-     * @return true if online or maintain
-     */
-    private static boolean online(byte index) {
-        return index == EntityStatusEnum.ONLINE.getIndex() || index == EntityStatusEnum.MAINTAIN.getIndex();
-    }
-
-    private static boolean online(String code) {
-        return EntityStatusEnum.ONLINE.getCode().equals(code) || EntityStatusEnum.MAINTAIN.getCode().equals(code);
-    }
+    private final ReactiveEntityStateStore stateStore;
+    private final ReactiveMessageSender messageSender;
 
     @Override
-    public void heartbeat(DriverStateDTO entityDTO) {
-        if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDriverId())
-                || Objects.isNull(entityDTO.getTenantId()) || Objects.isNull(entityDTO.getStatus())) {
-            return;
+    public Mono<Void> heartbeat(DriverStateDTO event) {
+        if (event == null || event.getDriverId() == null || event.getTenantId() == null || event.getStatus() == null) {
+            return Mono.empty();
         }
-
-        EntityStatusEnum statusEnum = EntityStatusEnum.ofCode(entityDTO.getStatus());
-        if (Objects.isNull(statusEnum)) {
-            statusEnum = EntityStatusEnum.OFFLINE;
-        }
-        String current = statusEnum.getCode();
-        LocalDateTime expireTime = LocalDateTime.now().plusSeconds(STATUS_TIMEOUT_SECONDS);
-        EntityStateDO stateDO = entityStateMapper.upsertEntityState(
-                IdWorker.getId(),
-                entityDTO.getTenantId(),
-                EntityTypeEnum.DRIVER.getIndex(),
-                entityDTO.getDriverId(),
-                0L,
-                statusEnum.getIndex(),
-                EntityStatusEnum.OFFLINE.getIndex(),
-                expireTime,
-                STATUS_TIMEOUT_SECONDS,
-                TimeoutSourceTypeEnum.SYSTEM.getIndex(),
-                "driver-heartbeat",
-                entityDTO.getStateDescription());
-        if (Objects.isNull(stateDO)) {
-            return;
-        }
-
-        // Publish timeout check message with current lease version
-        DriverTimeoutCheckDTO checkDTO = DriverTimeoutCheckDTO.builder()
-                .driverId(entityDTO.getDriverId())
-                .leaseVersion(stateDO.getLeaseVersion())
-                .tenantId(entityDTO.getTenantId())
-                .build();
-        rabbitTemplate.convertAndSend(RabbitConstant.TOPIC_EXCHANGE_STATE_TIMEOUT_DELAY,
-                RabbitConstant.ROUTING_DRIVER_TIMEOUT_DELAY, checkDTO);
-
-        byte lastIndex = stateDO.getLastStateFlag();
-        if (isFlip(lastIndex, current)) {
-            String message = String.format("Driver status changed: %s -> %s",
-                    EntityStatusEnum.ofIndex(lastIndex) != null ? EntityStatusEnum.ofIndex(lastIndex).getCode() : DataConstant.STATUS_UNKNOWN,
-                    current);
-            DriverAlarmDTO alarm = DriverAlarmDTO.builder()
-                    .tenantId(entityDTO.getTenantId())
-                    .driverId(entityDTO.getDriverId())
-                    .status(current)
-                    .statusName(EntityStatusEnum.ofCode(current) != null ? EntityStatusEnum.ofCode(current).name() : current)
-                    .message(message)
-                    .build();
-            driverAlarmService.alarm(alarm);
-        }
+        EntityStatusEnum current = EntityStatusEnum.ofCode(event.getStatus());
+        if (current == null) current = EntityStatusEnum.OFFLINE;
+        Map<String, Object> ext = new HashMap<>();
+        ext.put("type", "driver-heartbeat");
+        ext.put("content", event.getStateDescription() == null ? "" : event.getStateDescription());
+        ext.put("version", 1);
+        EntityStatusEnum status = current;
+        return stateStore
+                .upsert(
+                        null,
+                        event.getTenantId(),
+                        EntityTypeEnum.DRIVER,
+                        event.getDriverId(),
+                        0L,
+                        status.getIndex(),
+                        EntityStatusEnum.OFFLINE.getIndex(),
+                        Instant.now(),
+                        STATUS_TIMEOUT_SECONDS,
+                        TimeoutSourceTypeEnum.SYSTEM.getIndex(),
+                        JsonUtil.toJsonString(ext))
+                .flatMap(state -> messageSender
+                        .sendConfirmed(MqMessage.of(
+                                MqTopic.STATE_TIMEOUT,
+                                "",
+                                DriverTimeoutCheckDTO.builder()
+                                        .driverId(event.getDriverId())
+                                        .leaseVersion(state.leaseVersion())
+                                        .tenantId(event.getTenantId())
+                                        .build()))
+                        .then(alarmIfFlipped(event, state.lastStateFlag(), status)));
     }
 
+    private Mono<Void> alarmIfFlipped(DriverStateDTO event, byte previous, EntityStatusEnum current) {
+        if (online(previous) == online(current)) return Mono.empty();
+        DriverAlarmDTO alarm = DriverAlarmDTO.builder()
+                .tenantId(event.getTenantId())
+                .driverId(event.getDriverId())
+                .status(current.getCode())
+                .statusName(current.name())
+                .message(String.format("Driver status changed: %s -> %s", code(previous), current.getCode()))
+                .build();
+        return driverAlarmService.alarm(alarm);
+    }
+
+    private boolean online(byte value) {
+        return value == EntityStatusEnum.ONLINE.getIndex() || value == EntityStatusEnum.MAINTAIN.getIndex();
+    }
+
+    private boolean online(EntityStatusEnum value) {
+        return value == EntityStatusEnum.ONLINE || value == EntityStatusEnum.MAINTAIN;
+    }
+
+    private String code(byte value) {
+        EntityStatusEnum state = EntityStatusEnum.ofIndex(value);
+        return state == null ? DataConstant.STATUS_UNKNOWN : state.getCode();
+    }
 }

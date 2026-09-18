@@ -14,24 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.bo;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 /**
  * Tree-shaped variant of {@link MenuBO} — nested children mirror parent_menu_id.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter
@@ -44,6 +41,12 @@ public class MenuTreeBO extends MenuBO {
     @ToString.Exclude
     private List<MenuTreeBO> children = new ArrayList<>();
 
+    /**
+     * From business object.
+     *
+     * @param source source
+     * @return from business object result
+     */
     public static MenuTreeBO fromBO(MenuBO source) {
         MenuTreeBO node = new MenuTreeBO();
         node.setId(source.getId());
@@ -65,11 +68,15 @@ public class MenuTreeBO extends MenuBO {
         return node;
     }
 
+    /**
+     * Create child.
+     *
+     * @param child child
+     */
     public void addChild(MenuTreeBO child) {
         if (Objects.isNull(children)) {
             children = new ArrayList<>();
         }
         children.add(child);
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.bo;
 
 import lombok.AllArgsConstructor;
@@ -28,7 +27,6 @@ import lombok.ToString;
  * Counters summarizing a resource-registry sync run.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter
@@ -46,5 +44,4 @@ public class ResourceRegistrySyncResult {
     private int deleted;
 
     private int unchanged;
-
 }

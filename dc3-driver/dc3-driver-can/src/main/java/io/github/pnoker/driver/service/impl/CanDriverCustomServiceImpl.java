@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
@@ -31,10 +30,6 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -44,6 +39,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * CAN bus driver service implementation.
@@ -61,11 +59,10 @@ import java.util.concurrent.TimeUnit;
  *
  * <p>
  * <b>WARNING:</b> This driver is a work-in-progress skeleton. Protocol-level
- * I/O is not yet fully implemented — see TODO markers in method bodies.
+ * I/O is not yet fully implemented.
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -84,17 +81,20 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
 
     private Map<Long, Boolean> deviceMap;
 
+    /** can driver custom service impl. */
     public CanDriverCustomServiceImpl(DriverMetadata driverMetadata) {
         this.driverMetadata = driverMetadata;
     }
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -114,9 +114,9 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
             return DeviceHealthState.offline();
         }
         String interfaceName = getConfigValue(driverConfig, "interfaceName", "can0");
-            if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
-                throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
-            }
+        if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
+            throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
+        }
         try {
             Process process = new ProcessBuilder("ip", "link", "show", interfaceName)
                     .redirectErrorStream(true)
@@ -135,28 +135,42 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 deviceMap.remove(metadataEvent.getId());
-                log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                        driverCode, metadataEvent.getId(), operateType);
+                log.info(
+                        "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                        driverCode,
+                        metadataEvent.getId(),
+                        operateType);
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         String interfaceName = getConfigValue(driverConfig, "interfaceName", "can0");
-            if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
-                throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
-            }
+        if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
+            throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
+        }
         String canId = getConfigValue(pointConfig, "canId", "");
         String requestCanId = getConfigValue(pointConfig, "requestCanId", "");
         String requestData = getConfigValue(pointConfig, "requestData", "");
@@ -174,18 +188,27 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
         } catch (ReadPointException e) {
             throw e;
         } catch (Exception e) {
-            throw new ReadPointException("CAN read failed, protocol={}, interface={}, canId={}, message={}",
-                    driverCode, interfaceName, canId, e.getMessage(), e);
+            throw new ReadPointException(
+                    "CAN read failed, protocol={}, interface={}, canId={}, message={}",
+                    driverCode,
+                    interfaceName,
+                    canId,
+                    e.getMessage(),
+                    e);
         }
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         String interfaceName = getConfigValue(driverConfig, "interfaceName", "can0");
-            if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
-                throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
-            }
+        if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
+            throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
+        }
         String canId = getConfigValue(pointConfig, "canId", "");
         String data = getConfigValue(pointConfig, "data", "");
 
@@ -196,8 +219,13 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
             executeCommand(command);
             return true;
         } catch (Exception e) {
-            throw new WritePointException("CAN write failed, protocol={}, interface={}, canId={}, message={}",
-                    driverCode, interfaceName, canId, e.getMessage(), e);
+            throw new WritePointException(
+                    "CAN write failed, protocol={}, interface={}, canId={}, message={}",
+                    driverCode,
+                    interfaceName,
+                    canId,
+                    e.getMessage(),
+                    e);
         }
     }
 
@@ -214,13 +242,13 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
         if (!CAN_COMMAND_PATTERN.matcher(command).matches()) {
             throw new ReadPointException("Unsafe CAN command rejected, command={}", command);
         }
-        log.debug("Executing CAN command: {}", command);
+        log.debug("CAN command execution started, commandLength={}", command.length());
         Process process = new ProcessBuilder("sh", "-c", command)
                 .redirectErrorStream(true)
                 .start();
         StringBuilder output = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+        try (BufferedReader reader =
+                new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 output.append(line).append("\n");
@@ -261,7 +289,9 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -273,7 +303,8 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "interfaceName", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -284,7 +315,7 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "dataLength", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

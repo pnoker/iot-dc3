@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.test.contracts;
 
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 /**
  * Reusable contract for IoT DC3 domain enums.
@@ -44,12 +42,27 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
  */
 public abstract class EnumContractTest<E extends Enum<E>> {
 
+    /**
+     * Enum class.
+     *
+     * @return enum class result
+     */
     protected abstract Class<E> enumClass();
 
+    /**
+     * Index accessor.
+     *
+     * @return index accessor result
+     */
     protected String indexAccessor() {
         return "getIndex";
     }
 
+    /**
+     * Factory method.
+     *
+     * @return factory method result
+     */
     protected String factoryMethod() {
         return "ofIndex";
     }
@@ -58,21 +71,18 @@ public abstract class EnumContractTest<E extends Enum<E>> {
     final List<DynamicTest> indexContractIsHonoured() {
         List<DynamicTest> tests = new ArrayList<>();
         E[] constants = enumClass().getEnumConstants();
-        Method index = findIndexAccessor();
-        Method factory = findFactoryMethod(index.getReturnType());
+        Method index = getIndexAccessor();
+        Method factory = getFactoryMethod(index.getReturnType());
 
         List<Object> indices = new ArrayList<>();
         for (E constant : constants) {
+            tests.add(DynamicTest.dynamicTest("%s has non-null index".formatted(constant.name()), () -> {
+                Object value = index.invoke(constant);
+                assertThat(value).as("index of %s", constant.name()).isNotNull();
+                indices.add(value);
+            }));
             tests.add(DynamicTest.dynamicTest(
-                    "%s has non-null index".formatted(constant.name()),
-                    () -> {
-                        Object value = index.invoke(constant);
-                        assertThat(value).as("index of %s", constant.name()).isNotNull();
-                        indices.add(value);
-                    }));
-            tests.add(DynamicTest.dynamicTest(
-                    "%s round-trips through %s".formatted(constant.name(), factory.getName()),
-                    () -> {
+                    "%s round-trips through %s".formatted(constant.name(), factory.getName()), () -> {
                         Object value = index.invoke(constant);
                         Object resolved = factory.invoke(null, value);
                         assertThat(resolved).isEqualTo(constant);
@@ -86,30 +96,30 @@ public abstract class EnumContractTest<E extends Enum<E>> {
             assertThat(indices).doesNotHaveDuplicates();
         }));
 
-        tests.add(DynamicTest.dynamicTest("name stability", () ->
-                assertThatNoException().isThrownBy(() ->
-                        Arrays.stream(constants).forEach(Enum::name))));
+        tests.add(DynamicTest.dynamicTest(
+                "name stability",
+                () -> assertThatNoException()
+                        .isThrownBy(() -> Arrays.stream(constants).forEach(Enum::name))));
 
         return tests;
     }
 
-    private Method findIndexAccessor() {
+    private Method getIndexAccessor() {
         try {
             return enumClass().getMethod(indexAccessor());
         } catch (NoSuchMethodException e) {
             throw new AssertionError(
-                    "Enum %s does not expose %s()".formatted(enumClass().getName(), indexAccessor()),
-                    e);
+                    "Enum %s does not expose %s()".formatted(enumClass().getName(), indexAccessor()), e);
         }
     }
 
-    private Method findFactoryMethod(Class<?> indexType) {
+    private Method getFactoryMethod(Class<?> indexType) {
         try {
             return enumClass().getMethod(factoryMethod(), indexType);
         } catch (NoSuchMethodException e) {
             throw new AssertionError(
-                    "Enum %s does not expose %s(%s)".formatted(
-                            enumClass().getName(), factoryMethod(), indexType.getSimpleName()),
+                    "Enum %s does not expose %s(%s)"
+                            .formatted(enumClass().getName(), factoryMethod(), indexType.getSimpleName()),
                     e);
         }
     }

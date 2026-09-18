@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
@@ -36,7 +35,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * application embeds the SDK but wants its own profile model intact.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -49,12 +47,11 @@ public class ActiveDriverProfileConfig implements EnvironmentPostProcessor {
      */
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        if (Boolean.FALSE.equals(environment.getProperty(EnvironmentConstant.DRIVER_AUTO_PROFILE, Boolean.class,
-                Boolean.TRUE))) {
+        if (Boolean.FALSE.equals(
+                environment.getProperty(EnvironmentConstant.DRIVER_AUTO_PROFILE, Boolean.class, Boolean.TRUE))) {
             log.debug("Skipping driver profile activation, {}=false", EnvironmentConstant.DRIVER_AUTO_PROFILE);
             return;
         }
         environment.addActiveProfile(EnvironmentConstant.DRIVER_PROFILE);
     }
-
 }

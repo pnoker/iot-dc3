@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import com.serotonin.bacnet4j.LocalDevice;
@@ -47,15 +46,14 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 /**
  * BACnet IP driver service implementation.
@@ -66,7 +64,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -75,23 +72,27 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+
     @Value("${dc3.driver.code}")
     private String driverCode;
 
-    private Map<Long, LocalDevice> connectMap;
+    private Map<Long, LocalDevice> connectMap = new ConcurrentHashMap<>(16);
 
+    /** bacnet ip driver custom service impl. */
     public BacnetIpDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
     }
 
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
+    private static void checkRequired(
+            Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
         AttributeBO attr = config.get(code);
         if (attr == null || attr.getValue() == null) {
             issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
+                    .attributeCode(code)
+                    .level(ValidationReport.IssueLevel.ERROR)
+                    .message("Missing required attribute: " + code)
+                    .build());
         }
     }
 
@@ -115,9 +116,7 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
             if (Objects.isNull(localDevice)) {
                 return DeviceHealthState.offline();
             }
-            return localDevice.isInitialized()
-                    ? DeviceHealthState.online()
-                    : DeviceHealthState.offline();
+            return localDevice.isInitialized() ? DeviceHealthState.online() : DeviceHealthState.offline();
         } catch (Exception e) {
             log.warn("BACnet health check failed, protocol={}, deviceId={}", driverCode, device.getId(), e);
             return DeviceHealthState.offline();
@@ -129,27 +128,41 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 LocalDevice removed = connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     removed.terminate();
-                    log.info("Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode, metadataEvent.getId(), operateType);
+                    log.info(
+                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                            driverCode,
+                            metadataEvent.getId(),
+                            operateType);
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            log.info("Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode, metadataType, operateType, metadataEvent.getId());
+            log.info(
+                    "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
+                    driverCode,
+                    metadataType,
+                    operateType,
+                    metadataEvent.getId());
         }
     }
 
     @Override
-    public ReadPointValue read(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                               DeviceBO device, PointBO point) {
+    public ReadPointValue read(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point) {
         LocalDevice localDevice = getConnector(device.getId(), driverConfig);
         try {
             int remoteDeviceId = getConfigIntValue(pointConfig, "remoteDeviceId", 0);
@@ -162,22 +175,23 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
             PropertyIdentifier propertyId = resolvePropertyIdentifier(propertyIdStr);
 
             ObjectIdentifier oid = new ObjectIdentifier(objectType, objectInstance);
-            Encodable value = RequestUtils.readProperty(localDevice, remoteDevice, oid,
-                    propertyId, null);
+            Encodable value = RequestUtils.readProperty(localDevice, remoteDevice, oid, propertyId, null);
 
-            return new ReadPointValue(device, point,
-                    value != null ? value.toString() : null);
+            return new ReadPointValue(device, point, value != null ? value.toString() : null);
         } catch (ReadPointException e) {
             throw e;
         } catch (Exception e) {
-            throw new ReadPointException("BACnet read failed, protocol={}, message={}",
-                    driverCode, e.getMessage(), e);
+            throw new ReadPointException("BACnet read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
         }
     }
 
     @Override
-    public Boolean write(Map<String, AttributeBO> driverConfig, Map<String, AttributeBO> pointConfig,
-                         DeviceBO device, PointBO point, WritePointValue writePointValue) {
+    public Boolean write(
+            Map<String, AttributeBO> driverConfig,
+            Map<String, AttributeBO> pointConfig,
+            DeviceBO device,
+            PointBO point,
+            WritePointValue writePointValue) {
         LocalDevice localDevice = getConnector(device.getId(), driverConfig);
         try {
             int remoteDeviceId = getConfigIntValue(pointConfig, "remoteDeviceId", 0);
@@ -196,8 +210,8 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
 
             return true;
         } catch (Exception e) {
-            throw new WritePointException("BACnet write failed, protocol={}, message={}",
-                    driverCode, e.getMessage(), e);
+            throw new WritePointException(
+                    "BACnet write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
         }
     }
 
@@ -210,9 +224,7 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
     private Encodable createEncodable(ObjectType objectType, String value) {
         String upperName = objectType.toString().toUpperCase();
         if (upperName.startsWith("BINARY_")) {
-            boolean active = "true".equalsIgnoreCase(value)
-                    || "1".equals(value)
-                    || "active".equalsIgnoreCase(value);
+            boolean active = "true".equalsIgnoreCase(value) || "1".equals(value) || "active".equalsIgnoreCase(value);
             return active ? BinaryPV.active : BinaryPV.inactive;
         }
         if (upperName.startsWith("MULTI_STATE_") || upperName.startsWith("DEVICE")) {
@@ -242,8 +254,13 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
             String broadcastAddress = getConfigValue(driverConfig, "broadcastAddress", "255.255.255.255");
             int timeout = getConfigIntValue(driverConfig, "timeout", 6000);
 
-            log.debug("BACnet connection creating, protocol={}, deviceId={}, localDeviceId={}, bind={}:{}",
-                    driverCode, deviceId, localDeviceId, bindAddress, port);
+            log.debug(
+                    "BACnet connection creating, protocol={}, deviceId={}, localDeviceId={}, bind={}:{}",
+                    driverCode,
+                    deviceId,
+                    localDeviceId,
+                    bindAddress,
+                    port);
 
             IpNetwork network = new IpNetworkBuilder()
                     .withLocalBindAddress(bindAddress)
@@ -256,17 +273,27 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
             LocalDevice localDevice = new LocalDevice(localDeviceId, transport);
             try {
                 localDevice.initialize();
-                log.info("BACnet connection established, protocol={}, deviceId={}, localDeviceId={}",
-                        driverCode, deviceId, localDeviceId);
+                log.info(
+                        "BACnet connection established, protocol={}, deviceId={}, localDeviceId={}",
+                        driverCode,
+                        deviceId,
+                        localDeviceId);
             } catch (Exception e) {
                 try {
                     localDevice.terminate();
                 } catch (Exception e1) {
-                    log.warn("BACnet connection destroy failed after init error, protocol={}, deviceId={}",
-                            driverCode, deviceId, e1);
+                    log.warn(
+                            "BACnet connection destroy failed after init error, protocol={}, deviceId={}",
+                            driverCode,
+                            deviceId,
+                            e1);
                 }
-                throw new ConnectorException("BACnet connection failed, protocol={}, deviceId={}, message={}",
-                        driverCode, deviceId, e.getMessage(), e);
+                throw new ConnectorException(
+                        "BACnet connection failed, protocol={}, deviceId={}, message={}",
+                        driverCode,
+                        deviceId,
+                        e.getMessage(),
+                        e);
             }
             return localDevice;
         });
@@ -286,8 +313,7 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
                 Map.entry("MULTI_STATE_INPUT", ObjectType.multiStateInput),
                 Map.entry("MULTI_STATE_OUTPUT", ObjectType.multiStateOutput),
                 Map.entry("MULTI_STATE_VALUE", ObjectType.multiStateValue),
-                Map.entry("DEVICE", ObjectType.device)
-        );
+                Map.entry("DEVICE", ObjectType.device));
         ObjectType result = map.get(name.toUpperCase());
         if (Objects.isNull(result)) {
             return ObjectType.analogInput;
@@ -313,7 +339,9 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
 
     private String getRequiredConfig(Map<String, AttributeBO> config, String code) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             throw new ConnectorException("Required attribute '{}' is missing", code);
         }
         return attr.getValue(String.class);
@@ -321,7 +349,9 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {
         AttributeBO attr = config.get(code);
-        if (Objects.isNull(attr) || Objects.isNull(attr.getValue()) || attr.getValue().isEmpty()) {
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
             return defaultValue;
         }
         return attr.getValue(String.class);
@@ -343,7 +373,8 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(driverConfig, "port", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
 
     @Override
@@ -355,7 +386,7 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
         checkRequired(pointConfig, "propertyId", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
 }

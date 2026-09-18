@@ -14,23 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
-import io.github.pnoker.common.thread.entity.property.ThreadProperties;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.github.pnoker.common.thread.entity.property.ThreadProperties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class ThreadPoolConfigTest {
 
@@ -71,13 +69,15 @@ class ThreadPoolConfigTest {
         assertThat(pool.getQueue()).isInstanceOf(LinkedBlockingQueue.class);
         // Queue capacity is 2 * maximumPoolSize per the config — verify by adding tasks
         // that would otherwise exhaust the queue.
-        assertThat(((LinkedBlockingQueue<?>) pool.getQueue()).remainingCapacity()).isEqualTo(8);
+        assertThat(((LinkedBlockingQueue<?>) pool.getQueue()).remainingCapacity())
+                .isEqualTo(8);
     }
 
     @Test
     void threadPoolUsesPrefixedThreadNames() throws Exception {
         pool = config.threadPoolExecutor();
-        java.util.concurrent.atomic.AtomicReference<String> threadName = new java.util.concurrent.atomic.AtomicReference<>();
+        java.util.concurrent.atomic.AtomicReference<String> threadName =
+                new java.util.concurrent.atomic.AtomicReference<>();
         java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
         pool.submit(() -> {
             threadName.set(Thread.currentThread().getName());
@@ -88,9 +88,7 @@ class ThreadPoolConfigTest {
     }
 
     @Test
-    void blockingRejectedHandlerRunsInCallerThreadWhenQueueIsFull() throws Exception {
-        // Saturate the pool: 2 cores busy + 8 queued + 2 max = up to 12 simultaneous; 13th
-        // should be rejected and run in the caller thread.
+    void saturatedPoolRejectsInsteadOfBlockingCaller() throws Exception {
         pool = config.threadPoolExecutor();
         java.util.concurrent.CountDownLatch hold = new java.util.concurrent.CountDownLatch(1);
         java.util.concurrent.CountDownLatch ready = new java.util.concurrent.CountDownLatch(4);
@@ -104,13 +102,7 @@ class ThreadPoolConfigTest {
                 }
             });
         }
-        // 13th task: pool full + queue full -> rejected handler runs it on caller thread.
-        AtomicInteger ranOn = new AtomicInteger();
-        Thread caller = Thread.currentThread();
-        pool.execute(() -> ranOn.set(Thread.currentThread() == caller ? 1 : 0));
-        // Give the rejected handler time to run.
-        await().atMost(java.time.Duration.ofSeconds(2)).until(() -> ranOn.get() != 0);
-        assertThat(ranOn.get()).isEqualTo(1);
+        assertThatThrownBy(() -> pool.execute(() -> {})).isInstanceOf(RejectedExecutionException.class);
         hold.countDown();
     }
 
@@ -137,12 +129,16 @@ class ThreadPoolConfigTest {
     @Test
     void scheduledExecutorUsesPrefixedThreadNames() throws Exception {
         scheduled = config.scheduledThreadPoolExecutor();
-        java.util.concurrent.atomic.AtomicReference<String> threadName = new java.util.concurrent.atomic.AtomicReference<>();
+        java.util.concurrent.atomic.AtomicReference<String> threadName =
+                new java.util.concurrent.atomic.AtomicReference<>();
         java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
-        scheduled.schedule(() -> {
-            threadName.set(Thread.currentThread().getName());
-            latch.countDown();
-        }, 0, TimeUnit.MILLISECONDS);
+        scheduled.schedule(
+                () -> {
+                    threadName.set(Thread.currentThread().getName());
+                    latch.countDown();
+                },
+                0,
+                TimeUnit.MILLISECONDS);
         latch.await(2, TimeUnit.SECONDS);
         assertThat(threadName.get()).startsWith("[ST]test-thread-");
     }

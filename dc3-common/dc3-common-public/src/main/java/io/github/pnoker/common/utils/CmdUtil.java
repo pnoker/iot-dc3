@@ -14,22 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Process termination via stdin exit command.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -54,8 +51,7 @@ public class CmdUtil {
             }
             process.destroyForcibly();
         } catch (IOException e) {
-            log.error("Failed to destroy process with command: {}", cmd, e);
+            log.error("Process destruction failed, commandLength={}", StringUtils.length(cmd), e);
         }
     }
-
 }

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.metadata;
 
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
@@ -23,32 +22,29 @@ import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
 import io.github.pnoker.common.enums.EntityStatusEnum;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
-import org.springframework.stereotype.Component;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.springframework.stereotype.Component;
 
 /**
  * In-memory holder for driver registration state and shared metadata used across the
  * driver runtime.
  *
- * <p>The {@code deviceIds} set and the four attribute maps are mutated from multiple
- * threads at the same time — RabbitMQ consumer threads add/remove entries as
- * metadata events arrive while Quartz worker threads iterate the same collections
- * during read scans. Attribute maps are also mutated during driver metadata refresh.
+ * <p>The leased device set and the four attribute maps are read from multiple threads
+ * at the same time while Quartz worker threads iterate the current ownership snapshot.
+ * Attribute maps are also mutated during driver metadata refresh.
  * The fields therefore use thread-safe implementations and the setters copy contents
  * into the existing collection instead of swapping the reference, so callers that
  * already hold a reference (e.g. via
  * {@code getDeviceIds()}) continue to see the live state.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -62,37 +58,9 @@ public final class DriverMetadata {
     private final Set<Long> deviceIds = ConcurrentHashMap.newKeySet();
 
     /**
-     * Unmodifiable view of the device ids so callers cannot mutate the internal set
-     * through the getter. The underlying set is still live — reads observe the most
-     * recent state. Use {@link #addDeviceId(Long)} / {@link #removeDeviceId(Long)} to
-     * mutate, or {@link #setDeviceIds(Set)} to replace the contents in place.
-     *
-     * @return unmodifiable live view of the device ids
+     * Fencing tokens for devices currently owned by this runtime node.
      */
-    public Set<Long> getDeviceIds() {
-        return Collections.unmodifiableSet(deviceIds);
-    }
-
-    /**
-     * Add a device id to the live set.
-     *
-     * @param id device id to add
-     * @return {@code true} if the set did not already contain the id
-     */
-    public boolean addDeviceId(Long id) {
-        return deviceIds.add(id);
-    }
-
-    /**
-     * Remove a device id from the live set.
-     *
-     * @param id device id to remove
-     * @return {@code true} if the set contained the id
-     */
-    public boolean removeDeviceId(Long id) {
-        return deviceIds.remove(id);
-    }
-
+    private final Map<Long, Long> deviceFencingTokens = new ConcurrentHashMap<>();
     /**
      * Driver attributes keyed by attribute identifier.
      */
@@ -126,6 +94,14 @@ public final class DriverMetadata {
      */
     private final Map<String, EventAttributeDTO> eventAttributeNameMap = new ConcurrentHashMap<>();
     /**
+     * Manager-issued instance lease deadline.
+     */
+    private volatile long leaseUntilEpochMillis;
+    /**
+     * Manager assignment generation currently installed in this runtime.
+     */
+    private volatile long assignmentVersion;
+    /**
      * Current driver status.
      */
     @Setter
@@ -151,12 +127,76 @@ public final class DriverMetadata {
     }
 
     /**
-     * Replaces the contents of the device id set in place so existing references stay valid.
+     * Unmodifiable view of the device ids so callers cannot mutate the internal set
+     * through the getter. The underlying set is still live — reads observe the most
+     * recent state. Ownership can only be replaced with a Manager-issued lease snapshot.
      *
-     * @param deviceIds device identifiers to publish; {@code null} clears the set
+     * @return unmodifiable live view of the device ids
      */
-    public void setDeviceIds(Set<Long> deviceIds) {
-        replaceContents(this.deviceIds, deviceIds);
+    public Set<Long> getDeviceIds() {
+        return leaseValid() ? Collections.unmodifiableSet(deviceIds) : Collections.emptySet();
+    }
+
+    /**
+     * Atomically replace owned devices and publish the new lease deadline.
+     */
+    public synchronized void setDeviceLeases(
+            Map<Long, Long> leases, long leaseUntilEpochMillis, long assignmentVersion) {
+        deviceFencingTokens.clear();
+        deviceIds.clear();
+        if (Objects.nonNull(leases)) {
+            deviceFencingTokens.putAll(leases);
+            deviceIds.addAll(leases.keySet());
+        }
+        this.leaseUntilEpochMillis = leaseUntilEpochMillis;
+        this.assignmentVersion = assignmentVersion;
+    }
+
+    /**
+     * Extend the instance deadline without retransmitting an unchanged assignment.
+     */
+    public void renewLeaseDeadline(long leaseUntilEpochMillis) {
+        this.leaseUntilEpochMillis = leaseUntilEpochMillis;
+    }
+
+    /**
+     * Determine whether the current lease assigns a device to this driver instance.
+     *
+     * @param deviceId device identifier
+     * @return {@code true} when the lease is valid and a fencing token exists for the device
+     */
+    public boolean ownsDevice(Long deviceId) {
+        return leaseValid() && deviceFencingTokens.containsKey(deviceId);
+    }
+
+    /**
+     * Return fencing token.
+     *
+     * @param deviceId device identifier
+     * @return get fencing token result
+     */
+    public Long getFencingToken(Long deviceId) {
+        return ownsDevice(deviceId) ? deviceFencingTokens.get(deviceId) : null;
+    }
+
+    /**
+     * Determine whether the driver lease has not expired.
+     *
+     * @return {@code true} when the lease deadline is later than the current time
+     */
+    public boolean leaseValid() {
+        return System.currentTimeMillis() < leaseUntilEpochMillis;
+    }
+
+    /**
+     * Remove a device id from the live set.
+     *
+     * @param id device id to remove
+     * @return {@code true} if the set contained the id
+     */
+    public boolean deleteDeviceId(Long id) {
+        deviceFencingTokens.remove(id);
+        return deviceIds.remove(id);
     }
 
     /**
@@ -237,6 +277,9 @@ public final class DriverMetadata {
      */
     public void clear() {
         deviceIds.clear();
+        deviceFencingTokens.clear();
+        leaseUntilEpochMillis = 0;
+        assignmentVersion = 0;
         driverAttributeIdMap.clear();
         driverAttributeNameMap.clear();
         pointAttributeIdMap.clear();
@@ -248,5 +291,4 @@ public final class DriverMetadata {
         driver = null;
         driverStatus = EntityStatusEnum.OFFLINE;
     }
-
 }

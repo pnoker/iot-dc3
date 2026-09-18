@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
@@ -29,7 +28,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * Spring profile activation configuration for the data service.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -40,5 +38,4 @@ public class ActiveDataProfileConfig implements EnvironmentPostProcessor {
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         environment.addActiveProfile(EnvironmentConstant.DATA_PROFILE);
     }
-
 }

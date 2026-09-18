@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.data.biz.DeviceAlarmService;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.dal.EntityAlarmManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
+import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
 import io.github.pnoker.common.entity.dto.DeviceAlarmDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
@@ -29,16 +28,16 @@ import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
+import reactor.core.publisher.Mono;
 
 /**
  * Business service implementation for device alarm event persistence.
  *
- * <p>Backfills {@code tenantId} via {@link DeviceFacade#getById(Long)} when the
+ * <p>Backfills {@code driverId} via {@link DeviceFacade#getByIdReactive(Long, Long)} when the
  * incoming DTO did not carry it — without this, alarms with a missing tenant
  * would be persisted with {@code tenant_id = 0} and then silently dropped by
  * the rule trigger (which requires a valid tenant id), losing the user-visible
@@ -47,7 +46,6 @@ import java.util.Objects;
  * database.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -55,17 +53,20 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class DeviceAlarmServiceImpl implements DeviceAlarmService {
 
-    private final EntityAlarmManager entityAlarmManager;
+    private final ReactiveEntityAlarmStore entityAlarmStore;
 
     private final AlarmRuleTriggerService alarmRuleTriggerService;
 
     private final DeviceFacade deviceFacade;
 
     @Override
-    public void alarm(DeviceAlarmDTO entityDTO) {
+    public Mono<Void> alarm(DeviceAlarmDTO entityDTO) {
         if (Objects.isNull(entityDTO) || Objects.isNull(entityDTO.getDeviceId())) {
-            log.warn("Drop device alarm without deviceId: {}", entityDTO);
-            return;
+            log.warn(
+                    "Device alarm dropped, reason=missingDeviceId, tenantId={}, driverId={}",
+                    Objects.nonNull(entityDTO) ? entityDTO.getTenantId() : null,
+                    Objects.nonNull(entityDTO) ? entityDTO.getDriverId() : null);
+            return Mono.empty();
         }
 
         Long tenantId = entityDTO.getTenantId();
@@ -74,19 +75,28 @@ public class DeviceAlarmServiceImpl implements DeviceAlarmService {
             // check, state scan). The fail-closed tenant-line interceptor rejects unscoped
             // queries, so the tenant can no longer be reverse-resolved from the device — drop
             // instead of silently persisting with tenant_id=0.
-            log.warn("Drop device alarm because tenantId is missing, deviceId={}", entityDTO.getDeviceId());
-            return;
+            log.warn("Device alarm dropped, reason=missingTenantId, deviceId={}", entityDTO.getDeviceId());
+            return Mono.empty();
         }
         Long driverId = entityDTO.getDriverId();
-        FacadeDeviceBO device = null;
         if (Objects.isNull(driverId) || driverId <= 0) {
-            device = deviceFacade.getById(tenantId, entityDTO.getDeviceId());
-            if (Objects.isNull(device)) {
-                log.warn("Drop device alarm because device[{}] is not found in metadata", entityDTO.getDeviceId());
-                return;
-            }
-            driverId = device.getDriverId();
+            return deviceFacade
+                    .getByIdReactive(tenantId, entityDTO.getDeviceId())
+                    .switchIfEmpty(Mono.defer(() -> {
+                        log.warn(
+                                "Device alarm dropped, reason=deviceNotFound, tenantId={}, deviceId={}",
+                                tenantId,
+                                entityDTO.getDeviceId());
+                        return Mono.empty();
+                    }))
+                    .map(FacadeDeviceBO::getDriverId)
+                    .filter(id -> id != null && id > 0)
+                    .flatMap(id -> persist(entityDTO, tenantId, id));
         }
+        return persist(entityDTO, tenantId, driverId);
+    }
+
+    private Mono<Void> persist(DeviceAlarmDTO entityDTO, Long tenantId, Long driverId) {
         entityDTO.setTenantId(tenantId);
         entityDTO.setDriverId(Objects.requireNonNullElse(driverId, 0L));
 
@@ -103,14 +113,17 @@ public class DeviceAlarmServiceImpl implements DeviceAlarmService {
         // Device-reported alarms default to P2; rule-driven severity is set when
         // the rule pipeline writes a follow-up entity_alarm row.
         entity.setAlarmLevelFlag(AlarmMessageLevelEnum.P2.getIndex());
-        entity.setAlarmExt(JsonExt.builder().type("device-alarm").content(msg).version(1).build());
+        entity.setAlarmExt(
+                JsonExt.builder().type("device-alarm").content(msg).version(1).build());
         entity.setExpiredTime(0L);
         entity.setConfirmFlag((byte) 0);
         entity.setTenantId(tenantId);
-        entityAlarmManager.save(entity);
-
-        entityDTO.setAlarmId(entity.getId());
-        alarmRuleTriggerService.processDeviceAlarm(entityDTO);
+        return entityAlarmStore
+                .insert(entity)
+                .flatMap(saved -> {
+                    entityDTO.setAlarmId(saved.getId());
+                    return alarmRuleTriggerService.processDeviceAlarm(entityDTO);
+                })
+                .then();
     }
-
 }

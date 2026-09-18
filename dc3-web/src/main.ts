@@ -21,19 +21,48 @@ import i18n from '@/config/i18n';
 import plugins from '@/config/plugins/index';
 import router from '@/config/router';
 import {createApp} from 'vue';
+import {useAppStore} from '@/store/modules/app';
 import {logger} from '@/utils/log';
 
 import '@/styles/global.scss'; // config app
 
 // config app
 const app = createApp(App);
-app.use(router);
-app.use(createPinia());
-app.use(i18n);
-plugins(app);
+const pinia = createPinia();
 app.config.errorHandler = (err, _instance, info) => {
-  logger.error('Global error:', err, 'Info:', info);
+  logger.error('Global Vue error', info, err);
 };
-app.mount('#app');
+
+/**
+ * Static demo build: install a mock axios adapter before mounting so the app
+ * runs on fake data with no backend. Vite replaces import.meta.env.MODE with a
+ * build-time literal, so this branch (and the dynamically imported mock chunk)
+ * is dead-code eliminated from production builds.
+ */
+async function bootstrap(): Promise<void> {
+  // Runtime adapters must be ready before installing the router. Router
+  // installation starts the initial navigation, whose permission guard may
+  // fetch the menu tree immediately. Installing Mock later leaks that request
+  // into Vite's /api proxy and attempts to resolve the container-only
+  // dc3-gateway hostname on the host machine.
+  if (import.meta.env.MODE === 'mock') {
+    const {setupMock} = await import('@/mock');
+    setupMock();
+  }
+
+  // Pinia and i18n are guard dependencies, so install them before the router
+  // can begin its first navigation.
+  app.use(pinia);
+  app.use(i18n);
+  plugins(app);
+  // Apply the persisted theme before the router view mounts so there is no
+  // light-mode flash (A4 — feedback latency is the perceived product).
+  useAppStore(pinia).init();
+  app.use(router);
+  await router.isReady();
+  app.mount('#app');
+}
+
+void bootstrap();
 
 export default app;

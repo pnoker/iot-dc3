@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service;
 
 /**
@@ -25,7 +24,6 @@ package io.github.pnoker.common.driver.service;
  * convenience.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DriverLifecycle {
@@ -52,5 +50,4 @@ public interface DriverLifecycle {
      * overlapping fires with {@code @DisallowConcurrentExecution}.
      */
     void schedule();
-
 }

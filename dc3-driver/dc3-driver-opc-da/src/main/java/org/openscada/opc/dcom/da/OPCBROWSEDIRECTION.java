@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.dcom.da;
 
 /**
@@ -24,8 +23,10 @@ package org.openscada.opc.dcom.da;
  * @since 2016.10.1
  */
 public enum OPCBROWSEDIRECTION {
-
-    OPC_BROWSE_UP(1), OPC_BROWSE_DOWN(2), OPC_BROWSE_TO(3), OPC_BROWSE_UNKNOWN(0);
+    OPC_BROWSE_UP(1),
+    OPC_BROWSE_DOWN(2),
+    OPC_BROWSE_TO(3),
+    OPC_BROWSE_UNKNOWN(0);
 
     private int _id;
 
@@ -49,5 +50,4 @@ public enum OPCBROWSEDIRECTION {
     public int id() {
         return this._id;
     }
-
 }

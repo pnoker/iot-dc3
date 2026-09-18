@@ -14,28 +14,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.vo.McpToolVO;
 import io.github.pnoker.common.enums.McpRiskLevelEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.List;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-
 /**
  * MapStruct builder converting an MCP tool projection to its view object.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface McpToolBuilder {
 
     /**
@@ -45,8 +44,20 @@ public interface McpToolBuilder {
      * @return EntityVO
      */
     @Mapping(target = "riskLevel", ignore = true)
+    @Mapping(target = "creatorId", ignore = true)
+    @Mapping(target = "creatorName", ignore = true)
+    @Mapping(target = "createTime", ignore = true)
+    @Mapping(target = "operatorId", ignore = true)
+    @Mapping(target = "operatorName", ignore = true)
+    @Mapping(target = "operateTime", ignore = true)
     McpToolVO buildVOByRecord(McpToolRecord entityRecord);
 
+    /**
+     * After process.
+     *
+     * @param entityRecord entity record
+     * @param entityVO     view object
+     */
     @AfterMapping
     default void afterProcess(McpToolRecord entityRecord, @MappingTarget McpToolVO entityVO) {
         entityVO.setRiskLevel(McpRiskLevelEnum.ofValue(entityRecord.getRiskLevel()));
@@ -59,5 +70,4 @@ public interface McpToolBuilder {
      * @return EntityVO Array
      */
     List<McpToolVO> buildVOListByRecordList(List<McpToolRecord> entityRecordList);
-
 }

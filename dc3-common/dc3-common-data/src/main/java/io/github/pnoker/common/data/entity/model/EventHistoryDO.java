@@ -14,92 +14,64 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.model;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Persistence object for the dc3_event_history table.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Getter
 @Setter
 @ToString
-@TableName(value = "dc3_event_history")
 public class EventHistoryDO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
-    @TableField("record_id")
     private String recordId;
 
-    @TableField("tenant_id")
     private Long tenantId;
 
-    @TableField("device_id")
     private Long deviceId;
 
-    @TableField("event_id")
     private Long eventId;
 
-    @TableField("event_code")
     private String eventCode;
 
-    @TableField("event_type_flag")
     private Byte eventTypeFlag;
 
-    @TableField("event_level_flag")
     private Byte eventLevelFlag;
 
-    @TableField("param_values")
     private String paramValues;
 
-    @TableField("config_snapshot")
     private String configSnapshot;
 
-    @TableField("message")
     private String message;
 
-    @TableField("occur_time")
     private LocalDateTime occurTime;
 
-    @TableField("receive_time")
     private LocalDateTime receiveTime;
 
-    @TableField("acknowledge_flag")
     private Byte acknowledgeFlag;
 
-    @TableField("acknowledge_time")
     private LocalDateTime acknowledgeTime;
 
-    @TableField("acknowledge_user_id")
     private Long acknowledgeUserId;
 
-    @TableField("schema_version")
     private Short schemaVersion;
 
-    @TableField("create_time")
     private LocalDateTime createTime;
 
-    @TableField("operate_time")
     private LocalDateTime operateTime;
-
 }

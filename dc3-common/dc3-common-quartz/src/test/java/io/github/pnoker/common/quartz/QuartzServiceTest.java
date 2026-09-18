@@ -14,8 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.quartz;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,12 +39,6 @@ import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
 import org.quartz.Trigger;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class QuartzServiceTest {
@@ -87,11 +86,13 @@ class QuartzServiceTest {
 
     @Test
     void createJobWithIntervalRejectsInvalidInputs() {
-        assertThatThrownBy(() -> service.createJobWithInterval("g", "n", 0, DateBuilder.IntervalUnit.SECOND,
-                SampleJob.class)).isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() ->
+                        service.createJobWithInterval("g", "n", 0, DateBuilder.IntervalUnit.SECOND, SampleJob.class))
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Interval");
-        assertThatThrownBy(() -> service.createJobWithInterval("g", "n", 1, DateBuilder.IntervalUnit.MONTH,
-                SampleJob.class)).isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() ->
+                        service.createJobWithInterval("g", "n", 1, DateBuilder.IntervalUnit.MONTH, SampleJob.class))
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("variable length");
     }
 
@@ -173,7 +174,9 @@ class QuartzServiceTest {
     void startSchedulerPropagatesFailure() throws SchedulerException {
         when(scheduler.isShutdown()).thenReturn(false);
         when(scheduler.isStarted()).thenReturn(false);
-        org.mockito.Mockito.doThrow(new SchedulerException("boom")).when(scheduler).start();
+        org.mockito.Mockito.doThrow(new SchedulerException("boom"))
+                .when(scheduler)
+                .start();
         assertThatThrownBy(() -> service.startScheduler()).isInstanceOf(SchedulerException.class);
     }
 

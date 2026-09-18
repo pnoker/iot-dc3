@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
+import reactor.core.publisher.Mono;
 
 /**
  * Aggregates liveness probes for the home-page banner: center services (auth / data /
@@ -25,7 +25,6 @@ import io.github.pnoker.common.data.entity.vo.dashboard.SystemHealthVO;
  * online).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 public interface SystemHealthService {
@@ -39,6 +38,5 @@ public interface SystemHealthService {
      * facades; infra / center probes ignore it.
      * </p>
      */
-    SystemHealthVO snapshot(Long tenantId);
-
+    Mono<SystemHealthVO> snapshot(Long tenantId);
 }

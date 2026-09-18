@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bo.DriverBO;
@@ -23,10 +22,10 @@ import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.grpc.client.DriverClient;
 import io.github.pnoker.common.driver.service.DriverRegisterService;
 import io.github.pnoker.common.exception.ServiceException;
-import io.github.pnoker.common.utils.JsonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * Default {@link DriverRegisterService} implementation that builds the registration
@@ -34,7 +33,6 @@ import org.springframework.stereotype.Service;
  * and submits it to the manager center.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -42,10 +40,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DriverRegisterServiceImpl implements DriverRegisterService {
 
-    /** Driver configuration properties used to assemble the registration payload. */
+    /**
+     * Driver configuration properties used to assemble the registration payload.
+     */
     private final DriverProperties driverProperties;
 
-    /** gRPC client used to register the driver with the manager center. */
+    /**
+     * gRPC client used to register the driver with the manager center.
+     */
     private final DriverClient driverClient;
 
     /**
@@ -53,20 +55,19 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
      * properties.
      */
     @Override
-    public void initial() {
-        try {
-            // Build driver registration information from properties
-            RegisterBO entityBO = buildRegisterBOByProperty();
-            // Log driver metadata at debug level to avoid leaking sensitive config in production logs
-            if (log.isDebugEnabled()) {
-                log.debug("The driver information is: {}", JsonUtil.toJsonString(entityBO));
-            }
-            // Register driver with the driver client
-            driverClient.driverRegister(entityBO);
-        } catch (Exception e) {
-            log.error("Driver initialization failed", e);
-            throw new ServiceException("Driver initialization failed: {}", e.getMessage(), e);
-        }
+    public Mono<Void> initial() {
+        return Mono.defer(() -> {
+                    RegisterBO entityBO = buildRegisterBOByProperty();
+                    log.debug(
+                            "Driver registration prepared, serviceName={}, driverCode={}, tenantCode={}",
+                            entityBO.getDriver().getServiceName(),
+                            entityBO.getDriver().getDriverCode(),
+                            entityBO.getTenant());
+                    return driverClient.driverRegister(entityBO);
+                })
+                .onErrorMap(
+                        error -> !(error instanceof ServiceException),
+                        error -> new ServiceException("Driver initialization failed: {}", error.getMessage(), error));
     }
 
     /**
@@ -89,11 +90,12 @@ public class DriverRegisterServiceImpl implements DriverRegisterService {
         entityBO.setDriver(driverBO);
         entityBO.setTenant(driverProperties.getTenant());
         entityBO.setClient(driverProperties.getClient());
+        entityBO.setNode(driverProperties.getNode());
+        entityBO.setLeaseSeconds(driverProperties.getLease().getSeconds());
         entityBO.setDriverAttributes(driverProperties.getDriverAttribute());
         entityBO.setPointAttributes(driverProperties.getPointAttribute());
         entityBO.setCommandAttributes(driverProperties.getCommandAttribute());
         entityBO.setEventAttributes(driverProperties.getEventAttribute());
         return entityBO;
     }
-
 }

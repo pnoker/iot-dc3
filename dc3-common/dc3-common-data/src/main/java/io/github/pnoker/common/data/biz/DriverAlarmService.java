@@ -14,16 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
+import reactor.core.publisher.Mono;
 
 /**
  * Persists driver alarm events to {@code dc3_entity_alarm} and feeds the rule pipeline.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface DriverAlarmService {
@@ -33,6 +32,5 @@ public interface DriverAlarmService {
      *
      * @param entityDTO DriverAlarmDTO
      */
-    void alarm(DriverAlarmDTO entityDTO);
-
+    Mono<Void> alarm(DriverAlarmDTO entityDTO);
 }

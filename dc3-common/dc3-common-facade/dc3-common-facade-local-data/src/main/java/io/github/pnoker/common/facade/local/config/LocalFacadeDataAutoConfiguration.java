@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.config;
 
 import io.github.pnoker.common.facade.local.PointCommandLocalFacade;
@@ -28,22 +27,30 @@ import org.springframework.context.annotation.FilterType;
 
 /**
  * Auto-configuration for the data-domain local facade implementations. Active only when
- * {@code dc3.facade.mode=local}. Scans the facade-local package but restricts
+ * {@code dc3.facade.data.mode=local}. Scans the facade-local package but restricts
  * registration to the data-domain classes carried by this module so it remains
  * deterministic alongside the auth/manager-domain modules. MapStruct-generated
  * {@code *BuilderImpl} classes are picked up via their interfaces (AssignableTypeFilter
  * matches concrete implementations).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
+/** Auto-configuration wiring the data local facades. */
 @AutoConfiguration
-@ConditionalOnProperty(name = "dc3.facade.mode", havingValue = "local")
-@ComponentScan(basePackages = "io.github.pnoker.common.facade.local", useDefaultFilters = false,
-        includeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
-                PointValueLocalFacade.class, PointCommandLocalFacade.class, StatusHealthLocalFacade.class,
-                FacadePointValueBuilder.class,}))
+@ConditionalOnProperty(name = "dc3.facade.data.mode", havingValue = "local")
+@ComponentScan(
+        basePackages = "io.github.pnoker.common.facade.local",
+        useDefaultFilters = false,
+        includeFilters =
+                @ComponentScan.Filter(
+                        type = FilterType.ASSIGNABLE_TYPE,
+                        classes = {
+                            PointValueLocalFacade.class,
+                            PointCommandLocalFacade.class,
+                            StatusHealthLocalFacade.class,
+                            FacadePointValueBuilder.class,
+                        }))
 public class LocalFacadeDataAutoConfiguration {
 
     /**
@@ -52,5 +59,4 @@ public class LocalFacadeDataAutoConfiguration {
      */
     @SuppressWarnings("unused")
     private static final Class<?> CANARY = PointValueLocalFacade.class;
-
 }

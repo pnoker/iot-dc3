@@ -14,31 +14,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.buffer.PointValueIngestBuffer;
+import io.github.pnoker.common.constant.mq.ConsumptionProfile;
+import io.github.pnoker.common.constant.mq.DeliveryMode;
+import io.github.pnoker.common.constant.mq.MqTopic;
+import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.entity.bo.PointValueBO;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqPoisonException;
+import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
+import reactor.core.publisher.Mono;
 
 /**
- * RabbitMQ receiver for point value ingestion events.
- *
- * <p>Every valid message is handed to {@link PointValueIngestBuffer}; ack when accepted,
- * nack-requeue when the buffer is full so RabbitMQ back-pressures instead of the center
- * OOM-ing. Uses the high-throughput container factory (wider prefetch / concurrency).
+ * Point-value consumer. RabbitMQ itself is the durable buffer; the consumer receives
+ * broker batches, validates the schema-v1 envelope of every value, records a durable
+ * relational ingest receipt before writing history/latest projections, and acknowledges
+ * the batch only after the reactive write pipeline completes. A Quartz replay job drains
+ * receipts left by a process crash.
  *
  * @author pnoker
- * @version 2026.7.8
  * @since 2016.10.1
  */
 @Slf4j
@@ -46,41 +48,58 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class PointValueReceiver {
 
-    private final PointValueIngestBuffer pointValueIngestBuffer;
+    private static final int SUPPORTED_SCHEMA_VERSION = 1;
+
+    private final PointValueService pointValueService;
 
     /**
-     * Consume a point value message: validate, offer to the ingest buffer, ack on success or
-     * nack-requeue when the buffer is full (back-pressure). Invalid messages are rejected.
+     * Consume and durably persist one broker batch. A value violating the schema
+     * version poisons the whole batch (bounded retry, then dead-letter); the ack
+     * commits every delivery in the batch after the save pipeline completes.
      *
-     * @param channel      the RabbitMQ channel for manual ack
-     * @param message      the raw message carrying the delivery tag
-     * @param pointValueBO the deserialized point value
+     * @param messages raw batch in broker delivery order
+     * @param ack      batch-level acknowledgement handle
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{pointValueQueue.name}",
-            containerFactory = "highThroughputRabbitListenerContainerFactory")
-    public void pointValueReceive(Channel channel, Message message, PointValueBO pointValueBO) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
-        try {
-            if (Objects.isNull(pointValueBO) || Objects.isNull(pointValueBO.getDeviceId())) {
-                log.warn("Invalid point value, deviceId is null or pointValue is blank, deviceId={}",
-                        Objects.isNull(pointValueBO) ? null : pointValueBO.getDeviceId());
-                RabbitAckUtil.reject(channel, deliveryTag);
-                return;
-            }
-            if (pointValueIngestBuffer.offer(pointValueBO)) {
-                RabbitAckUtil.ack(channel, deliveryTag);
-            } else {
-                log.warn("Point value ingest buffer full, nack-requeue to back-pressure, deviceId={}, pointId={}",
-                        pointValueBO.getDeviceId(), pointValueBO.getPointId());
-                RabbitAckUtil.nack(channel, deliveryTag, true);
-            }
-        } catch (Exception e) {
-            log.error("Point value consume failed, deviceId={}, pointId={}, deliveryTag={}",
-                    Objects.nonNull(pointValueBO) ? pointValueBO.getDeviceId() : null,
-                    Objects.nonNull(pointValueBO) ? pointValueBO.getPointId() : null,
-                    deliveryTag, e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+    @Dc3Listener(topic = MqTopic.POINT_VALUE, profile = ConsumptionProfile.THROUGHPUT, delivery = DeliveryMode.BATCH)
+    public Mono<Void> pointValueReceive(List<MqReceived<PointValueBO>> messages, Acknowledgment ack) {
+        if (messages.isEmpty()) {
+            return Mono.empty();
         }
+
+        List<PointValueBO> values = new ArrayList<>(messages.size());
+        for (MqReceived<PointValueBO> message : messages) {
+            PointValueBO value = message.payload();
+            if (!valid(value)) {
+                log.error("Reject poison point-value batch, reason=invalidSchemaV1, batchSize={}", messages.size());
+                throw new MqPoisonException("Point-value payload violates schema version 1");
+            }
+            values.add(value);
+        }
+
+        return pointValueService
+                .save(values)
+                .doOnSuccess(ignored -> log.debug("Persisted point-value batch, size={}", values.size()));
+    }
+
+    private boolean valid(PointValueBO value) {
+        return Objects.nonNull(value)
+                && Objects.equals(value.getSchemaVersion(), SUPPORTED_SCHEMA_VERSION)
+                && Objects.nonNull(value.getMessageId())
+                && !value.getMessageId().isBlank()
+                && Objects.nonNull(value.getDriverNode())
+                && !value.getDriverNode().isBlank()
+                && positive(value.getSequence())
+                && positive(value.getFencingToken())
+                && positive(value.getTenantId())
+                && positive(value.getDriverId())
+                && positive(value.getDeviceId())
+                && positive(value.getPointId())
+                && Objects.nonNull(value.getRawValue())
+                && Objects.nonNull(value.getCalValue())
+                && Objects.nonNull(value.getCreateTime());
+    }
+
+    private boolean positive(Long value) {
+        return Objects.nonNull(value) && value > 0;
     }
 }

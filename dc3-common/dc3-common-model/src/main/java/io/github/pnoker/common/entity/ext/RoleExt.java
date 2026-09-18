@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,7 +28,6 @@ import lombok.Setter;
  * Extended information related to roles.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -44,9 +42,14 @@ public class RoleExt extends BaseExt {
      * <p>
      * The content can be distinguished by Type and Version.
      */
-    @Schema(description = "Role extension payload; its shape is distinguished by the Type and Version fields of the base extension")
+    @Schema(
+            description =
+                    "Role extension payload; its shape is distinguished by the Type and Version fields of the base extension")
     private Content content;
 
+    /**
+     * Reserved role extension slot.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -54,9 +57,9 @@ public class RoleExt extends BaseExt {
     @Schema(description = "Extended content payload for role configuration")
     public static class Content {
 
-        @Schema(description = "Reserved placeholder for future role extension content; currently unused", example = "null")
+        @Schema(
+                description = "Reserved placeholder for future role extension content; currently unused",
+                example = "null")
         private String keep;
-
     }
-
 }

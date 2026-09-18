@@ -14,21 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.entity.common.TreeNode;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Tree structure builder from flat lists.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -76,7 +73,7 @@ public final class TreeUtil {
         List<T> trees = new ArrayList<>(16);
         for (T treeNode : treeNodes) {
             if (root.equals(treeNode.getParentId())) {
-                trees.add(findChildren(treeNode, treeNodes));
+                trees.add(getChildren(treeNode, treeNodes));
             }
         }
         return trees;
@@ -90,16 +87,15 @@ public final class TreeUtil {
      * @param treeNodes List of all tree nodes
      * @return T Tree
      */
-    public static <T extends TreeNode> T findChildren(T treeNode, List<T> treeNodes) {
+    public static <T extends TreeNode> T getChildren(T treeNode, List<T> treeNodes) {
         for (T it : treeNodes) {
             if (treeNode.getId() == it.getParentId()) {
                 if (Objects.isNull(treeNode.getChildren())) {
                     treeNode.setChildren(new ArrayList<>(16));
                 }
-                treeNode.add(findChildren(it, treeNodes));
+                treeNode.add(getChildren(it, treeNodes));
             }
         }
         return treeNode;
     }
-
 }

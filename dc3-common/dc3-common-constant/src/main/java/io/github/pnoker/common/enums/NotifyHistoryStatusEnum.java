@@ -14,45 +14,61 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Notification delivery history status enumeration.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
 @AllArgsConstructor
 public enum NotifyHistoryStatusEnum {
 
+    /**
+     * Pending.
+     */
     PENDING((byte) 0, "pending", "Pending"),
 
+    /**
+     * Success.
+     */
     SUCCESS((byte) 1, "success", "Success"),
 
+    /**
+     * Failed.
+     */
     FAILED((byte) 2, "failed", "Failed"),
 
+    /**
+     * Retrying.
+     */
     RETRYING((byte) 3, "retrying", "Retrying"),
 
+    /**
+     * Skipped.
+     */
     SKIPPED((byte) 4, "skipped", "Skipped"),
     ;
 
-    @EnumValue
     private final Byte index;
 
     private final String code;
 
     private final String remark;
 
+    /**
+     * Resolve a notification-history status from its persisted numeric index.
+     *
+     * @param index persisted index
+     * @return matching status, or {@code null} when the index is unknown
+     */
     public static NotifyHistoryStatusEnum ofIndex(Byte index) {
         Optional<NotifyHistoryStatusEnum> any = Arrays.stream(NotifyHistoryStatusEnum.values())
                 .filter(type -> type.getIndex().equals(index))
@@ -60,6 +76,12 @@ public enum NotifyHistoryStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a notification-history status from its stable wire-format code.
+     *
+     * @param code wire-format code
+     * @return matching status, or {@code null} when the code is unknown
+     */
     public static NotifyHistoryStatusEnum ofCode(String code) {
         Optional<NotifyHistoryStatusEnum> any = Arrays.stream(NotifyHistoryStatusEnum.values())
                 .filter(type -> type.getCode().equals(code))
@@ -67,6 +89,12 @@ public enum NotifyHistoryStatusEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a notification-history status from its Java enum constant name.
+     *
+     * @param name enum constant name
+     * @return matching status, or {@code null} when the name is unknown
+     */
     public static NotifyHistoryStatusEnum ofName(String name) {
         try {
             return valueOf(name);
@@ -74,5 +102,4 @@ public enum NotifyHistoryStatusEnum {
             return null;
         }
     }
-
 }

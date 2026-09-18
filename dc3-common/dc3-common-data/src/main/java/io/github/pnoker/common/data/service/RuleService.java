@@ -14,20 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.service;
 
-import io.github.pnoker.common.base.service.BaseService;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.query.RuleQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import reactor.core.publisher.Mono;
 
-/**
- * Business service for alarm rule operations.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
-public interface RuleService extends BaseService<RuleBO, RuleQuery> {
+/** Reactive business service for tenant-scoped alarm rules. */
+public interface RuleService {
 
+    /** Add one rule. */
+    Mono<RuleBO> add(RuleBO entityBO);
+
+    /** Delete the rule, reporting whether a row was removed. */
+    Mono<Boolean> delete(Long tenantId, Long id);
+
+    /** Update one rule and emit the updated row. */
+    Mono<RuleBO> update(RuleBO entityBO);
+
+    /** Resolve the rule by its id. */
+    Mono<RuleBO> getById(Long tenantId, Long id);
+
+    /** Page rules matching the tenant-scoped filters. */
+    Mono<OffsetPage<RuleBO>> list(Long tenantId, RuleQuery entityQuery);
 }

@@ -18,9 +18,12 @@
 <template>
   <dashboard-card
     :badge="rows.length || null"
-    :empty="!loading && rows.length === 0"
+    :empty="status === 'success' && rows.length === 0"
     :empty-text="$t('home.alertList.empty')"
+    :error="status === 'error'"
+    :error-text="$t('common.loadFailed')"
     :loading="loading"
+    :retry-text="$t('common.retry')"
     :title="$t('home.alertList.title')"
     body-mode="scroll"
     class="alert-list"
@@ -35,13 +38,13 @@
           :key="row.id"
           :hollow="row.confirmFlag === 'CONFIRMED'"
           :timestamp="formatClock(row.createTime)"
-          :type="timelineColour(row.eventTypeFlag)"
+          :type="timelineColour(row.alarmTypeFlag)"
           placement="top"
         >
           <div class="alert-list__body">
             <div class="alert-list__tags">
-              <el-tag :type="tagType(row.eventTypeFlag)" size="small">
-                {{ levelLabel(row.eventTypeFlag) }}
+              <el-tag :type="tagType(row.alarmTypeFlag)" size="small">
+                {{ levelLabel(row.alarmTypeFlag) }}
               </el-tag>
               <el-tag :type="sourceTagType(row.source)" size="small">
                 {{ sourceLabel(row) }}
@@ -60,20 +63,21 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onMounted, reactive, ref} from 'vue';
+import {computed, onMounted, reactive, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 
 import {alertLatest, alertStats} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
 import type {AlertSource} from '@/config/types/dashboard';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 interface AlertRow {
-  id: number | string;
+  id: string;
   source: AlertSource;
-  sourceId: number | string;
-  pointId: number | string;
-  eventTypeFlag: number;
+  sourceId: string;
+  pointId: string;
+  alarmTypeFlag: number;
   confirmFlag: string;
   createTime: string;
   message?: string;
@@ -83,27 +87,29 @@ const props = defineProps({
   size: {type: Number, default: 10},
 });
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 
-const loading = ref(false);
+const {loading, run, status} = useAsyncLoader();
 const rows = ref<AlertRow[]>([]);
 const stats = reactive({total: 0, unconfirmed: 0});
 const {resolveBySource, nameBySource} = useEntityNames();
 
 const refresh = async () => {
-  loading.value = true;
-  try {
-    const [s, l]: any = await Promise.all([alertStats(), alertLatest(props.size)]);
-    stats.total = (s?.data?.driverAlerts ?? 0) + (s?.data?.deviceAlerts ?? 0);
-    stats.unconfirmed = (s?.data?.driverUnconfirmed ?? 0) + (s?.data?.deviceUnconfirmed ?? 0);
-    const data: AlertRow[] = l?.data ?? [];
-    rows.value = data;
-    await resolveBySource(data);
-  } catch {
-    // handled globally
-  } finally {
-    loading.value = false;
-  }
+  await run(
+    async () => {
+      const [summary, latest]: any = await Promise.all([alertStats(), alertLatest(props.size)]);
+      const data: AlertRow[] = Array.isArray(latest) ? latest : latest?.items ?? [];
+      await resolveBySource(data);
+      return {summary, data};
+    },
+    {
+      apply: ({summary, data}) => {
+        stats.total = (summary?.driverAlerts ?? 0) + (summary?.deviceAlerts ?? 0);
+        stats.unconfirmed = (summary?.driverUnconfirmed ?? 0) + (summary?.deviceUnconfirmed ?? 0);
+        rows.value = data;
+      },
+    }
+  );
 };
 
 // Group the flat row list by YYYY-MM-DD so the timeline has day headings.
@@ -111,7 +117,7 @@ const groupedRows = computed(() => {
   const byDate = new Map<string, AlertRow[]>();
   for (const row of rows.value) {
     const d = parseTime(row.createTime);
-    const key = d ? d.toLocaleDateString() : '-';
+    const key = d ? d.toLocaleDateString(locale.value === 'zh' ? 'zh-CN' : 'en-US') : '-';
     if (!byDate.has(key)) byDate.set(key, []);
     byDate.get(key)!.push(row);
   }
@@ -163,20 +169,21 @@ const parseTime = (v?: string): Date | null => {
 const formatClock = (v?: string) => {
   const d = parseTime(v);
   if (!d) return v || '';
-  return d.toLocaleTimeString('zh-CN', {hour12: false});
+  return d.toLocaleTimeString(locale.value === 'zh' ? 'zh-CN' : 'en-US', {hour12: false});
 };
 
 onMounted(refresh);
+watch(locale, refresh);
 defineExpose({refresh});
 </script>
 
 <style lang="scss" scoped>
 .alert-list {
   .alert-list__group {
-    padding: 10px 20px 0;
+    padding: var(--dc3-space-2) var(--dc3-space-4) 0;
 
     &:last-child {
-      padding-bottom: 10px;
+      padding-bottom: var(--dc3-space-2);
     }
   }
 
@@ -208,7 +215,7 @@ defineExpose({refresh});
   .alert-list__tags {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--dc3-space-2);
     flex-wrap: wrap;
   }
 

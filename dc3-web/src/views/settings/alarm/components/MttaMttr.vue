@@ -17,10 +17,13 @@
 
 <template>
   <dashboard-card
-    :empty="!loading && rows.length === 0"
+    :empty="status === 'success' && rows.length === 0"
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.mttaEmpty')"
+    :error="status === 'error'"
+    :error-text="t('common.loadFailed')"
     :loading="loading"
+    :retry-text="t('common.retry')"
     :subtitle="subtitleText"
     :title="t('settings.event.overview.mttaTitle')"
     body-mode="chart"
@@ -46,7 +49,7 @@ import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import {formatMs} from '@/utils/timeUtil';
 
 const {t} = useI18n();
-const {loading, run} = useAsyncLoader();
+const {loading, run, status} = useAsyncLoader();
 
 const daysOptions = [
   {label: '7d', value: '7'},
@@ -96,11 +99,17 @@ const render = () => {
 };
 
 const load = () =>
-  run(async () => {
-    const res: { data?: MttaTrend[] } = await alertMtta(Number(daysKey.value));
-    rows.value = res?.data ?? [];
-    await nextTick();
-    if (rows.value.length > 0) render();
+  run(() => alertMtta(Number(daysKey.value)) as Promise<MttaTrend[]>, {
+    apply: (result) => {
+      rows.value = result ?? [];
+      void nextTick().then(() => {
+        if (rows.value.length > 0) render();
+        else {
+          chart?.destroy();
+          chart = undefined;
+        }
+      });
+    },
   });
 
 watch(daysKey, load);

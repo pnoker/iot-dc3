@@ -14,40 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local;
 
-import io.github.pnoker.common.auth.entity.bo.LocalCredentialBO;
-import io.github.pnoker.common.auth.service.LocalCredentialService;
+import io.github.pnoker.common.auth.service.ReactiveLocalCredentialService;
 import io.github.pnoker.common.facade.api.LocalCredentialFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
 import io.github.pnoker.common.facade.local.builder.FacadeLocalCredentialBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
-/**
- * In-process {@link LocalCredentialFacade}.
- *
- * @author pnoker
- * @version 2026.6.12
- * @since 2026.6.12
- */
-@Slf4j
+/** In-process facade for local credential operations. */
 @Component
 @RequiredArgsConstructor
 public class LocalCredentialLocalFacade implements LocalCredentialFacade {
-
-    private final LocalCredentialService localCredentialService;
-
-    private final FacadeLocalCredentialBuilder facadeLocalCredentialBuilder;
+    private final ReactiveLocalCredentialService credentialService;
+    private final FacadeLocalCredentialBuilder builder;
 
     @Override
-    public FacadeLocalCredentialBO getByLoginName(String loginName) {
-        LocalCredentialBO bo = localCredentialService.getByLoginName(loginName, false);
-        return Objects.isNull(bo) ? null : facadeLocalCredentialBuilder.toFacadeBO(bo);
+    public Mono<FacadeLocalCredentialBO> getByLoginName(Long tenantId, String loginName) {
+        return credentialService.getByLoginName(tenantId, loginName).map(builder::toFacadeBO);
     }
-
 }

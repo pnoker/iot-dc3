@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.dto;
 
 import io.github.pnoker.common.entity.base.BaseDTO;
@@ -29,7 +28,6 @@ import lombok.Setter;
  * point.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -77,5 +75,4 @@ public class PointAttributeConfigDTO extends BaseDTO {
      * Data version.
      */
     private Integer version;
-
 }

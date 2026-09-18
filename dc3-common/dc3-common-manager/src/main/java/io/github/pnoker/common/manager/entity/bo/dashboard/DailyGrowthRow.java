@@ -14,20 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.bo.dashboard;
 
+import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDate;
 
 /**
  * One day's new-row count, used by the stat-card sparklines' growth series.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -38,5 +35,4 @@ public class DailyGrowthRow {
     private LocalDate day;
 
     private long count;
-
 }

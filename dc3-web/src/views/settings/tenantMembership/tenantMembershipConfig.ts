@@ -15,25 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {addTenantMembership, deleteTenantMembership, listTenantMembership} from '@/api/tenantMembership';
-import type {EntityListConfig} from '@/config/types/entityList';
+import {PRINCIPAL_TYPE_OPTIONS} from '@/config/constant/enums';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
 import {principalIdField, principalNameRelation} from '../relations';
 
-const PRINCIPAL_TYPE_OPTIONS = [
-  {label: 'USER', value: 'USER'},
-  {label: 'SERVICE_ACCOUNT', value: 'SERVICE_ACCOUNT'},
-  {label: 'SYSTEM', value: 'SYSTEM'},
-];
 const MEMBERSHIP_STATUS_OPTIONS = [
   {label: 'ACTIVE', value: 'ACTIVE'},
   {label: 'SUSPENDED', value: 'SUSPENDED'},
   {label: 'INVITED', value: 'INVITED'},
 ];
 
-export const createTenantMembershipConfig = (t: ComposerTranslation): EntityListConfig => ({
+export const createTenantMembershipConfig = (t: Translator): EntityListConfig => ({
   name: 'tenant-membership',
   title: t('nav.settingsTenantMembership'),
   editable: true,
@@ -86,6 +80,6 @@ export const createTenantMembershipConfig = (t: ComposerTranslation): EntityList
   list: listTenantMembership,
   add: addTenantMembership,
   remove: deleteTenantMembership,
-  confirmDeleteText: t('settings.tenantMembership.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityMember')}),
   emptyText: t('settings.tenantMembership.empty'),
 });

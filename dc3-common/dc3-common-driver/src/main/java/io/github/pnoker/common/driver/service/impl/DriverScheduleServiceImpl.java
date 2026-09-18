@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service.impl;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
@@ -23,34 +22,39 @@ import io.github.pnoker.common.driver.job.BufferRepublishScheduleJob;
 import io.github.pnoker.common.driver.job.DeviceHealthScheduleJob;
 import io.github.pnoker.common.driver.job.DriverCustomScheduleJob;
 import io.github.pnoker.common.driver.job.DriverHealthScheduleJob;
+import io.github.pnoker.common.driver.job.DriverLeaseRenewScheduleJob;
 import io.github.pnoker.common.driver.job.DriverReadScheduleJob;
 import io.github.pnoker.common.driver.service.DriverScheduleService;
 import io.github.pnoker.common.exception.CronException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.quartz.QuartzService;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.quartz.CronExpression;
 import org.quartz.SchedulerException;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 /**
  * Default {@link DriverScheduleService} implementation that validates cron settings and
  * registers the built-in Quartz jobs required by the driver runtime.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class DriverScheduleServiceImpl implements DriverScheduleService {
 
-    /** Driver configuration properties supplying the schedule definitions. */
+    /**
+     * Driver configuration properties supplying the schedule definitions.
+     */
     private final DriverProperties driverProperties;
 
-    /** Quartz service used to create and register the scheduled jobs. */
+    /**
+     * Quartz service used to create and register the scheduled jobs.
+     */
     private final QuartzService quartzService;
 
     /**
@@ -62,58 +66,79 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
         // Get schedule properties from driver configuration
         DriverProperties.ScheduleProperties property = driverProperties.getSchedule();
         if (Objects.isNull(property)) {
-            return;
+            throw new IllegalStateException("Driver schedule configuration is required");
         }
 
         try {
             // Create and schedule the driver health monitoring job
-            quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
-                    ScheduleConstant.DRIVER_HEALTH_SCHEDULE_JOB, ScheduleConstant.DRIVER_HEALTH_SCHEDULE_CRON,
+            quartzService.createJobWithCron(
+                    ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                    ScheduleConstant.DRIVER_HEALTH_SCHEDULE_JOB,
+                    ScheduleConstant.DRIVER_HEALTH_SCHEDULE_CRON,
                     DriverHealthScheduleJob.class);
 
+            if (!CronExpression.isValidExpression(driverProperties.getLease().getRenewCron())) {
+                throw new CronException("Driver lease renewal cron expression is invalid");
+            }
+            quartzService.createJobWithCron(
+                    ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                    ScheduleConstant.DRIVER_LEASE_RENEW_SCHEDULE_JOB,
+                    driverProperties.getLease().getRenewCron(),
+                    DriverLeaseRenewScheduleJob.class);
+
             // Create and schedule the device health job if enabled
-            DriverProperties.DeviceHealthProperties deviceHealth = driverProperties.getHealth().getDevice();
-            if (Objects.nonNull(deviceHealth) && Boolean.TRUE.equals(deviceHealth.getEnabled())) {
+            DriverProperties.DeviceHealthProperties deviceHealth =
+                    driverProperties.getHealth().getDevice();
+            if (Objects.nonNull(deviceHealth) && Boolean.TRUE.equals(deviceHealth.getEnable())) {
                 if (!CronExpression.isValidExpression(deviceHealth.getCron())) {
                     throw new CronException("Device health schedule cron expression is invalid");
                 }
-                quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
-                        ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB, deviceHealth.getCron(),
+                quartzService.createJobWithCron(
+                        ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                        ScheduleConstant.DEVICE_HEALTH_SCHEDULE_JOB,
+                        deviceHealth.getCron(),
                         DeviceHealthScheduleJob.class);
             }
 
             // Create and schedule the read job if enabled
-            if (Boolean.TRUE.equals(property.getRead().getEnabled())) {
+            if (Boolean.TRUE.equals(property.getRead().getEnable())) {
                 // Validate read job cron expression
                 if (!CronExpression.isValidExpression(property.getRead().getCron())) {
                     throw new CronException("Read schedule cron expression is invalid");
                 }
-                quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
-                        ScheduleConstant.DRIVER_READ_SCHEDULE_JOB, property.getRead().getCron(),
+                quartzService.createJobWithCron(
+                        ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                        ScheduleConstant.DRIVER_READ_SCHEDULE_JOB,
+                        property.getRead().getCron(),
                         DriverReadScheduleJob.class);
             }
 
             // Create and schedule the custom job if enabled
-            if (Boolean.TRUE.equals(property.getCustom().getEnabled())) {
+            if (Boolean.TRUE.equals(property.getCustom().getEnable())) {
                 // Validate custom job cron expression
                 if (!CronExpression.isValidExpression(property.getCustom().getCron())) {
                     throw new CronException("Custom schedule cron expression is invalid");
                 }
-                quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
-                        ScheduleConstant.DRIVER_CUSTOM_SCHEDULE_JOB, property.getCustom().getCron(),
+                quartzService.createJobWithCron(
+                        ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                        ScheduleConstant.DRIVER_CUSTOM_SCHEDULE_JOB,
+                        property.getCustom().getCron(),
                         DriverCustomScheduleJob.class);
             }
 
-            // Create and schedule the buffer republish job if enabled
+            // The durable outbox is mandatory, so its republish job is mandatory too.
             DriverProperties.BufferProperties buffer = driverProperties.getBuffer();
-            if (Objects.nonNull(buffer) && Boolean.TRUE.equals(buffer.getEnabled())) {
-                if (!CronExpression.isValidExpression(buffer.getRepublishCron())) {
-                    throw new CronException("Buffer republish schedule cron expression is invalid");
-                }
-                quartzService.createJobWithCron(ScheduleConstant.DRIVER_SCHEDULE_GROUP,
-                        ScheduleConstant.BUFFER_REPUBLISH_SCHEDULE_JOB, buffer.getRepublishCron(),
-                        BufferRepublishScheduleJob.class);
+            if (Objects.isNull(buffer)) {
+                throw new IllegalStateException("Driver point-value outbox configuration is required");
             }
+            if (!CronExpression.isValidExpression(buffer.getRepublishCron())) {
+                throw new CronException("Buffer republish schedule cron expression is invalid");
+            }
+            quartzService.createJobWithCron(
+                    ScheduleConstant.DRIVER_SCHEDULE_GROUP,
+                    ScheduleConstant.BUFFER_REPUBLISH_SCHEDULE_JOB,
+                    buffer.getRepublishCron(),
+                    BufferRepublishScheduleJob.class);
 
             // Start the scheduler after all jobs are configured
             quartzService.startScheduler();
@@ -121,5 +146,4 @@ public class DriverScheduleServiceImpl implements DriverScheduleService {
             throw new ServiceException("Failed to initialize driver scheduler", e);
         }
     }
-
 }

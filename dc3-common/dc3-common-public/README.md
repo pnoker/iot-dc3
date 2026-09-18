@@ -2,34 +2,25 @@
 
 ## Overview
 
-`dc3-common-public` is the foundational common utilities module of the IoT DC3 platform. It provides the universal
-response wrapper (`R<T>`), base entity classes, JWT key
-management, HTTP client configuration, and shared utility functions used across all platform modules.
+`dc3-common-public` is the foundational public contracts and utilities module of the IoT DC3 platform. It provides the
+shared `BaseService`, request/pagination/tree entities, tenant markers, and HTTP client
+configuration, HMAC signing, and framework-neutral utility functions.
+
+Java `public` visibility does not determine module ownership. Framework- or capability-specific public APIs and helpers
+remain in the narrowest owning module; platform-wide constants and shared top-level enums belong to
+`dc3-common-constant`.
 
 ## Module Information
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-public
-- **Version**: 2026.5.22
 
 ## Key Components
 
-### Response Wrapper
+### HTTP Responses
 
-`R<T>` is the standard REST response envelope used by all controllers:
-
-```java
-// Success with data
-return Mono.just(R.ok(entityVO));
-
-// Success with message
-return Mono.just(R.ok(SuccessCode.ADD));
-
-// Failure with message
-return Mono.just(R.fail(e.getMessage()));
-```
-
-Fields: `ok` (boolean), `code` (String), `message` (String), `data` (T)
+REST controllers return typed payloads directly. Errors use RFC 9457 `application/problem+json` problem details;
+there is no application-level success/error envelope.
 
 ### Common Entities
 
@@ -42,12 +33,14 @@ Fields: `ok` (boolean), `code` (String), `message` (String), `data` (T)
 
 ### Utilities
 
-| Utility               | Purpose                                                  |
-|-----------------------|----------------------------------------------------------|
-| `JsonUtil`            | Jackson JSON serialization/deserialization helpers       |
-| `PrincipalHeaderUtil` | Extracts `PrincipalHeader` from reactive WebFlux context |
-| `HostUtil`            | Resolves host/IP information                             |
-| `ResponseUtil`        | Writes HTTP responses in WebFlux context                 |
+| Utility          | Purpose                                              |
+|------------------|------------------------------------------------------|
+| `JsonUtil`       | Jackson JSON serialization/deserialization helpers   |
+| `HostUtil`       | Resolves host/IP information                         |
+| `PageUtil`       | Converts and normalizes pagination objects           |
+| `HmacAuthSigner` | Signs and verifies trusted gateway principal headers |
+
+WebFlux-specific `BaseController`, `PrincipalHeaderUtil`, and `ResponseUtil` belong to `dc3-common-web`.
 
 ### HTTP Client
 
@@ -79,15 +72,17 @@ Secret lookup order:
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-public -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-public -am test
 ```
 
 ## Related Modules
 
 Foundation for all `dc3-common-*`, `dc3-center-*`, and `dc3-driver-*` modules.
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

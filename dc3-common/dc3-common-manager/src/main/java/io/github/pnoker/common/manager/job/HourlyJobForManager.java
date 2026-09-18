@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.job;
 
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Component;
  * Scheduled job running hourly maintenance tasks for the manager module.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -43,7 +41,6 @@ public class HourlyJobForManager extends QuartzJobBean {
      */
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        log.info("hourlyJobHandler: {}", LocalDateTimeUtil.now());
+        log.debug("Manager hourly job started, executionTime={}", LocalDateTimeUtil.now());
     }
-
 }

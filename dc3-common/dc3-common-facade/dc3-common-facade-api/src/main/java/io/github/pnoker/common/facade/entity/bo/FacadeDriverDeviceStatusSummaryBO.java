@@ -14,26 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.entity.bo;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 /**
  * Device online/offline summary under one driver.
  *
  * @author pnoker
- * @version 2026.5.18
  * @since 2026.5.18
  */
 @Getter
@@ -47,19 +44,24 @@ public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
     public static final String TOTAL = "total";
     public static final String ONLINE = "ONLINE";
     public static final String OFFLINE = "OFFLINE";
+
     @Serial
     private static final long serialVersionUID = 1L;
-    private Long driverId;
 
+    private Long driverId;
 
     private int total;
 
-
     private int online;
-
 
     private int offline;
 
+    /**
+     * From map.
+     *
+     * @param source source
+     * @return from map result
+     */
     public static FacadeDriverDeviceStatusSummaryBO fromMap(Map<String, String> source) {
         if (Objects.isNull(source) || source.isEmpty()) {
             return null;
@@ -93,6 +95,11 @@ public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
         }
     }
 
+    /**
+     * To map.
+     *
+     * @return to map result
+     */
     public Map<String, String> toMap() {
         Map<String, String> target = new LinkedHashMap<>();
         target.put(DRIVER_ID, Objects.toString(driverId, ""));
@@ -101,5 +108,4 @@ public class FacadeDriverDeviceStatusSummaryBO implements Serializable {
         target.put(OFFLINE, String.valueOf(offline));
         return target;
     }
-
 }

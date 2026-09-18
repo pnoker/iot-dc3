@@ -20,6 +20,7 @@
     :model-value="modelValue"
     :options="options"
     :size="size"
+    :disabled="disabled"
     class="enable-flag-segmented"
     @update:model-value="onChange"
   />
@@ -49,6 +50,10 @@ const props = defineProps({
   size: {
     type: String as PropType<'' | 'default' | 'small' | 'large'>,
     default: 'default',
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -89,9 +94,20 @@ const onChange = (value: string | number | boolean) => {
 <style lang="scss" scoped>
 .enable-flag-segmented {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 
   :deep(.el-segmented__item) {
     flex: 1 1 0;
+    min-width: max-content;
+  }
+
+  :deep(.el-segmented__group) {
+    width: max-content;
+    min-width: 100%;
   }
 }
 </style>

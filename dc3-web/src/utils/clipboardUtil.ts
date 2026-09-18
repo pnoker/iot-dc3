@@ -17,6 +17,7 @@
 
 import {ElMessage} from 'element-plus';
 import i18n from '@/config/i18n';
+import {logger} from '@/utils/log';
 
 /**
  * Copy content to clipboard
@@ -36,7 +37,7 @@ export const setCopyContent = async (content: unknown, detail?: boolean, message
       showSuccessMessage(textContent, detail, message);
       return true;
     } catch (error) {
-      console.warn('Clipboard API failed, falling back to execCommand:', error);
+      logger.warn('Clipboard API failed, fallback=execCommand', error);
       // Fall through to fallback method
     }
   }

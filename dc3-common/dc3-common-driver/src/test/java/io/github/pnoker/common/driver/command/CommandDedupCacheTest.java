@@ -14,14 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.command;
-
-import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.Test;
+
 class CommandDedupCacheTest {
+
+    private record Result(String value) {}
 
     @Test
     void releaseAllowsRetryAfterFailedAttempt() {
@@ -33,5 +34,17 @@ class CommandDedupCacheTest {
         cache.release("cmd-1");
 
         assertThat(cache.tryAcquire("cmd-1")).isTrue();
+    }
+
+    @Test
+    void completedResultSurvivesDuplicateAcquisition() {
+        CommandDedupCache cache = new CommandDedupCache();
+        Result result = new Result("ok");
+
+        assertThat(cache.tryAcquire("cmd-1")).isTrue();
+        cache.complete("cmd-1", result);
+
+        assertThat(cache.tryAcquire("cmd-1")).isFalse();
+        assertThat(cache.result("cmd-1", Result.class)).contains(result);
     }
 }

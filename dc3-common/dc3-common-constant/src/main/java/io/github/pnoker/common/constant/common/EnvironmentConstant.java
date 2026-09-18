@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.common;
 
 /**
@@ -25,7 +24,6 @@ package io.github.pnoker.common.constant.common;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class EnvironmentConstant {
@@ -98,12 +96,42 @@ public class EnvironmentConstant {
     /**
      * PostgreSQL profile auto-activation configuration key: "dc3.postgres.auto-profile"
      */
+    public static final String JDBC_AUTO_PROFILE = "dc3.jdbc.auto-profile";
+
+    /**
+     * Configuration key selecting the relational dialect.
+     */
+    public static final String DB_TYPE = "dc3.db.type";
+
+    /**
+     * MySQL profile auto-activation configuration key.
+     */
+    public static final String MYSQL_AUTO_PROFILE = "dc3.mysql.auto-profile";
+
+    /**
+     * PostgreSQL profile auto-activation configuration key.
+     */
     public static final String POSTGRES_AUTO_PROFILE = "dc3.postgres.auto-profile";
 
     /**
      * Spring profile name for PostgreSQL-enabled applications: "postgres"
      */
+    public static final String JDBC_PROFILE = "jdbc";
+
+    /**
+     * Spring profile name for PostgreSQL-enabled applications.
+     */
     public static final String POSTGRES_PROFILE = "postgres";
+
+    /**
+     * Spring profile name for MySQL-enabled applications.
+     */
+    public static final String MYSQL_PROFILE = "mysql";
+
+    /**
+     * Spring profile name for MariaDB-enabled applications.
+     */
+    public static final String MARIADB_PROFILE = "mariadb";
 
     /**
      * PostgreSQL host environment variable: "POSTGRES_HOST"
@@ -258,5 +286,4 @@ public class EnvironmentConstant {
     private EnvironmentConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
-
 }

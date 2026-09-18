@@ -17,10 +17,13 @@
 
 <template>
   <dashboard-card
-    :empty="!loading && rows.length === 0"
+    :empty="status === 'success' && rows.length === 0"
     :empty-image-size="60"
     :empty-text="t('settings.event.overview.flappingEmpty')"
+    :error="status === 'error'"
+    :error-text="t('common.loadFailed')"
     :loading="loading"
+    :retry-text="t('common.retry')"
     :subtitle="t('settings.event.overview.flappingSubtitle', {hours: windowKey, min: minCount})"
     :title="t('settings.event.overview.flappingTitle')"
     body-mode="scroll"
@@ -33,18 +36,20 @@
     </template>
 
     <ul class="flapping-sources__list">
-      <li v-for="row in rows" :key="rowKey(row)" class="flapping-sources__item" @click="onJump(row)">
-        <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
-          {{ row.source === 'device' ? t('settings.event.device') : t('settings.event.driver') }}
-        </el-tag>
-        <span class="flapping-sources__name">{{ nameBySource(row.source, row.sourceId) }}</span>
-        <el-tag effect="plain" size="small" type="info">
-          {{ eventTypeLabel(row.eventTypeFlag) }}
-        </el-tag>
-        <span class="flapping-sources__count">
-          <el-icon><Warning/></el-icon>
-          {{ row.count }}
-        </span>
+      <li v-for="row in rows" :key="rowKey(row)">
+        <button class="flapping-sources__item" type="button" @click="onJump(row)">
+          <el-tag :type="row.source === 'device' ? 'primary' : 'warning'" size="small">
+            {{ row.source === 'device' ? t('settings.event.device') : t('settings.event.driver') }}
+          </el-tag>
+          <span class="flapping-sources__name">{{ nameBySource(row.source, row.sourceId) }}</span>
+          <el-tag effect="plain" size="small" type="info">
+            {{ eventTypeLabel(row.eventTypeFlag) }}
+          </el-tag>
+          <span class="flapping-sources__count">
+            <el-icon><Warning/></el-icon>
+            {{ row.count }}
+          </span>
+        </button>
       </li>
     </ul>
   </dashboard-card>
@@ -63,9 +68,9 @@ import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {jumpToSourceEvents} from '@/utils/jumpUtil';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const router = useRouter();
-const {loading, run} = useAsyncLoader();
+const {loading, run, status} = useAsyncLoader();
 const {resolveBySource, nameBySource} = useEntityNames();
 
 // Same window semantics + preset thresholds as Storm — operator learns
@@ -86,13 +91,18 @@ const minCount = computed(() => WINDOW_SPECS[windowKey.value].minCount);
 const rows = ref<FlappingSource[]>([]);
 
 const load = () =>
-  run(async () => {
-    const res: { data?: FlappingSource[] } = await alertFlapping(Number(windowKey.value), minCount.value, 30);
-    rows.value = res?.data ?? [];
-    await resolveBySource(rows.value);
-  });
+  run(
+    async () => {
+      const result: FlappingSource[] = await alertFlapping(Number(windowKey.value), minCount.value, 30);
+      const nextRows = result ?? [];
+      await resolveBySource(nextRows);
+      return nextRows;
+    },
+    {apply: (nextRows) => (rows.value = nextRows)}
+  );
 
 watch(windowKey, load);
+watch(locale, load);
 onMounted(load);
 
 const eventTypeLabel = (flag: number) => {
@@ -116,16 +126,30 @@ defineExpose({refresh: load});
   }
 
   .flapping-sources__item {
+    appearance: none;
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
+    width: 100%;
+    min-height: var(--dc3-touch-target);
+    gap: var(--dc3-space-2);
+    padding: var(--dc3-space-2) var(--dc3-space-4);
+    border: 0;
     border-bottom: 1px solid var(--el-border-color-lighter);
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
     cursor: pointer;
-    transition: background-color 0.12s ease;
+    transition: background-color var(--dc3-duration-fast) var(--dc3-ease-standard);
 
-    &:hover {
-      background: #fafafa;
+    &:hover,
+    &:focus-visible {
+      background: var(--dc3-bg-interactive);
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: inset var(--dc3-focus-ring);
     }
 
     &:last-child {
@@ -140,14 +164,14 @@ defineExpose({refresh: load});
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: 13px;
-    color: #303133;
+    color: var(--dc3-text-primary);
   }
 
   .flapping-sources__count {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    color: #f56c6c;
+    gap: var(--dc3-space-1);
+    color: var(--el-color-danger);
     font-weight: 600;
     font-size: 13px;
   }

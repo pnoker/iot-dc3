@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +26,6 @@ import lombok.Setter;
  * JSON extension object for command metadata.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Schema(title = "CommandExt", description = "JSON extension object for command metadata")
@@ -40,9 +38,14 @@ public class CommandExt extends BaseExt {
     /**
      * Extended content.
      */
-    @Schema(description = "Extended content payload of the command metadata; carries command-specific attributes such as the reserved keep field")
+    @Schema(
+            description =
+                    "Extended content payload of the command metadata; carries command-specific attributes such as the reserved keep field")
     private Content content;
 
+    /**
+     * Reserved command extension slot — driver/vendor-specific command metadata.
+     */
     @Schema(title = "CommandExt.Content", description = "Extended content payload for command metadata")
     @Getter
     @Setter
@@ -50,9 +53,10 @@ public class CommandExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Reserved content field for command extension; free-form text used to retain driver- or vendor-specific command metadata", example = "reserved")
+        @Schema(
+                description =
+                        "Reserved content field for command extension; free-form text used to retain driver- or vendor-specific command metadata",
+                example = "reserved")
         private String keep;
-
     }
-
 }

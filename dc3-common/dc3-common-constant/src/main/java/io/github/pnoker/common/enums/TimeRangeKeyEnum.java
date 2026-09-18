@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Time-range preset used by dashboard / alert / point-value list endpoints.
@@ -32,7 +30,6 @@ import java.util.Optional;
  * falls back to the legacy {@code rangeHours} integer.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.3
  */
 @Getter
@@ -67,6 +64,9 @@ public enum TimeRangeKeyEnum {
     /**
      * Resolve an enum instance by its wire-format code (e.g. {@code "today"}). Matching
      * is case-insensitive; {@code null} / blank input returns {@code null}.
+     *
+     * @param code wire-format code, e.g. {@code "today"}
+     * @return the matching instance, or {@code null} when unrecognized
      */
     public static TimeRangeKeyEnum ofCode(String code) {
         if (Objects.isNull(code) || code.isBlank()) {
@@ -78,5 +78,4 @@ public enum TimeRangeKeyEnum {
                 .findFirst();
         return any.orElse(null);
     }
-
 }

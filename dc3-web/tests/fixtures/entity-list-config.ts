@@ -99,17 +99,12 @@ export function makeEntityListConfig(): EntityListConfig {
     }),
 
     list: vi.fn(() =>
-      Promise.resolve({
-        ok: true,
-        code: 'ok',
-        message: 'ok',
-        data: {records: ENTITY_LIST_ROWS, total: ENTITY_LIST_ROWS.length},
-      })
+      Promise.resolve({items: ENTITY_LIST_ROWS, offset: 0, limit: ENTITY_LIST_ROWS.length, total: ENTITY_LIST_ROWS.length, hasNext: false})
     ),
 
-    add: vi.fn(() => Promise.resolve({ok: true, code: 'ok', message: 'ok', data: null})),
-    update: vi.fn(() => Promise.resolve({ok: true, code: 'ok', message: 'ok', data: null})),
-    remove: vi.fn(() => Promise.resolve({ok: true, code: 'ok', message: 'ok', data: null})),
+    add: vi.fn(() => Promise.resolve(null)),
+    update: vi.fn(() => Promise.resolve(null)),
+    remove: vi.fn(() => Promise.resolve(null)),
 
     emptyText: 'No records',
     confirmDeleteText: 'Confirm delete?',

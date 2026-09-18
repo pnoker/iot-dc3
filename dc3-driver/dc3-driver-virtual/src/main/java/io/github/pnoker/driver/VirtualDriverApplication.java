@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver;
 
 import org.springframework.boot.SpringApplication;
@@ -27,7 +26,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * and communication patterns.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @SpringBootApplication
@@ -42,5 +40,4 @@ public class VirtualDriverApplication {
     public static void main(String[] args) {
         SpringApplication.run(VirtualDriverApplication.class, args);
     }
-
 }

@@ -18,10 +18,26 @@
 <template>
   <div>
     <blank-card>
-      <el-tabs v-model="reactiveData.active">
-        <el-tab-pane :label="$t('nav.settingsAgenticDetail')" name="detail">
+      <el-alert
+        v-if="reactiveData.status === 'error'"
+        :closable="false"
+        :title="$t('common.loadFailed')"
+        class="entity-page-error"
+        show-icon
+        type="error"
+      >
+        <el-button :loading="reactiveData.loading" link type="danger" @click="load">
+          {{ $t('common.retry') }}
+        </el-button>
+      </el-alert>
+      <el-empty
+        v-if="reactiveData.status === 'error' && !reactiveData.data.id"
+        :description="$t('common.loadFailed')"
+      />
+      <el-tabs v-else v-model="reactiveData.active" v-loading="reactiveData.loading">
+        <el-tab-pane :label="$t('nav.settingsModelConfigDetail')" name="detail">
           <detail-card>
-            <el-descriptions :column="2" border>
+            <el-descriptions :column="isMobile ? 1 : 2" border>
               <el-descriptions-item :label="$t('settings.agentic.label')">
                 {{ reactiveData.data.label || '-' }}
               </el-descriptions-item>
@@ -34,7 +50,7 @@
               <el-descriptions-item :label="$t('settings.agentic.providerId')">
                 {{ reactiveData.data.providerId || '-' }}
               </el-descriptions-item>
-              <el-descriptions-item :label="$t('settings.agentic.capabilities')" :span="2">
+              <el-descriptions-item :label="$t('settings.agentic.capabilities')" :span="isMobile ? 1 : 2">
                 <div class="agentic-tags">
                   <el-tag :type="reactiveData.data.stream ? 'success' : 'info'" size="small">
                     {{ $t('agentic.capStream') }}
@@ -62,7 +78,7 @@
               <el-descriptions-item :label="$t('settings.agentic.maxTokens')">
                 {{ reactiveData.data.maxTokens ?? '-' }}
               </el-descriptions-item>
-              <el-descriptions-item :label="$t('common.remark')" :span="2">
+              <el-descriptions-item :label="$t('common.remark')" :span="isMobile ? 1 : 2">
                 {{ reactiveData.data.remark || '-' }}
               </el-descriptions-item>
               <el-descriptions-item :label="$t('common.createTime')">
@@ -80,7 +96,7 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, reactive} from 'vue';
+import {onBeforeUnmount, onMounted, reactive, watch} from 'vue';
 import {useRoute} from 'vue-router';
 
 import {listAgenticModelConfigs} from '@/api/agentic';
@@ -90,29 +106,63 @@ import DefaultTag from '@/components/tag/DefaultTag.vue';
 import EnableTag from '@/components/tag/EnableTag.vue';
 import type {AgenticModelConfig} from '@/config/types';
 import {timestampLabel} from '@/utils/dateUtil';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 
 const route = useRoute();
+const {isMobile} = useBreakpoint();
 
 const reactiveData = reactive({
   id: route.query.id as string,
   active: (route.query.active as string) || 'detail',
+  loading: true,
+  status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
   data: {} as AgenticModelConfig,
 });
+let requestId = 0;
 
 const load = () => {
-  if (!reactiveData.id) return;
+  const currentRequestId = ++requestId;
+  const modelId = String(reactiveData.id || '');
+  if (!modelId) {
+    reactiveData.status = 'error';
+    reactiveData.loading = false;
+    return;
+  }
+  reactiveData.loading = true;
+  reactiveData.status = 'loading';
+  reactiveData.data = {} as AgenticModelConfig;
   listAgenticModelConfigs()
     .then((res) => {
+      if (currentRequestId !== requestId || modelId !== String(reactiveData.id || '')) return;
       reactiveData.data =
-        (res.data || []).find((item) => String(item.id) === reactiveData.id) || ({} as AgenticModelConfig);
+        (res || []).find((item) => String(item.id) === modelId) || ({} as AgenticModelConfig);
+      reactiveData.status = reactiveData.data.id ? 'success' : 'error';
     })
     .catch(() => {
-      // handled globally
+      if (currentRequestId === requestId) reactiveData.status = 'error';
+    })
+    .finally(() => {
+      if (currentRequestId === requestId) reactiveData.loading = false;
     });
 };
 
+watch(
+  () => route.query.id,
+  (id) => {
+    const nextId = String(id || '');
+    if (nextId !== String(reactiveData.id || '')) {
+      reactiveData.id = nextId;
+      load();
+    }
+  },
+);
+
 onMounted(() => {
   load();
+});
+
+onBeforeUnmount(() => {
+  requestId += 1;
 });
 </script>
 

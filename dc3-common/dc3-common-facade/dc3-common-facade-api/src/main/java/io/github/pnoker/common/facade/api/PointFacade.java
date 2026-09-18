@@ -14,40 +14,29 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-import io.github.pnoker.common.facade.entity.query.FacadePointQuery;
-
+import io.github.pnoker.common.facade.entity.query.FacadePointOffsetQuery;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import java.util.Collection;
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral point facade. Mirrors the RPCs on
  * {@code api.center.manager.PointApi}. Single-record and bulk lookups are tenant-scoped.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface PointFacade {
+    /** Resolve the point by its id. */
+    Mono<FacadePointBO> getByIdReactive(Long tenantId, Long id);
 
-    /**
-     * Tenant-scoped single lookup. Returns {@code null} when the point is missing or
-     * belongs to another tenant.
-     */
-    FacadePointBO getById(Long tenantId, Long id);
+    /** List points matched by ids. */
+    Flux<FacadePointBO> listByIdsReactive(Long tenantId, Collection<Long> ids);
 
-    /**
-     * Tenant-scoped bulk lookup. Missing or cross-tenant points are omitted.
-     */
-    List<FacadePointBO> listByIds(Long tenantId, Collection<Long> ids);
-
-    /**
-     * @return a page of points (never {@code null}; empty page when nothing matches).
-     */
-    FacadePage<FacadePointBO> listByPage(FacadePointQuery query);
-
+    /** Page points matching the tenant-scoped filters. */
+    Mono<OffsetPage<FacadePointBO>> listReactive(FacadePointOffsetQuery query);
 }

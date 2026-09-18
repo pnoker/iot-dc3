@@ -18,9 +18,7 @@ package io.github.pnoker.common.agentic.utils;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-import io.github.pnoker.common.entity.common.Pages;
-import io.github.pnoker.common.facade.entity.common.FacadePage;
-
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +28,6 @@ import java.util.Objects;
  * Shared helpers for platform-bound agentic tools.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 public class AgenticToolUtil {
@@ -39,38 +36,57 @@ public class AgenticToolUtil {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
+    /**
+     * Normalize identifiers.
+     *
+     * @param ids ids
+     * @return normalize identifiers result
+     */
     public static List<Long> normalizeIds(List<Long> ids) {
         if (Objects.isNull(ids) || ids.isEmpty()) {
             return List.of();
         }
         return ids.stream()
-                .filter(Objects::nonNull)
+                .filter(id -> id != null && id > 0)
                 .distinct()
                 .limit(AgenticConstant.ToolLimit.MAX_IDS)
                 .toList();
     }
 
-    public static Pages page(int current, int size) {
-        Pages page = new Pages();
-        page.setCurrent(current);
-        page.setSize(size);
-        return page;
-    }
-
+    /**
+     * Clamp.
+     *
+     * @param value value
+     * @param min   min
+     * @param max   max
+     * @return clamp result
+     */
     public static int clamp(int value, int min, int max) {
         return Math.min(Math.max(value, min), max);
     }
 
+    /**
+     * Determine whether empty.
+     *
+     * @param values values
+     * @return {@code true} when the collection is {@code null} or empty
+     */
     public static boolean isEmpty(Collection<?> values) {
         return Objects.isNull(values) || values.isEmpty();
     }
 
+    /**
+     * Determine whether empty.
+     *
+     * @param values values
+     * @return {@code true} when the map is {@code null} or empty
+     */
     public static boolean isEmpty(Map<?, ?> values) {
         return Objects.isNull(values) || values.isEmpty();
     }
 
-    public static boolean hasRecords(FacadePage<?> page) {
-        return Objects.nonNull(page) && !isEmpty(page.getRecords());
+    /** Determine whether an offset page contains at least one item. */
+    public static boolean hasItems(OffsetPage<?> page) {
+        return Objects.nonNull(page) && !isEmpty(page.items());
     }
-
 }

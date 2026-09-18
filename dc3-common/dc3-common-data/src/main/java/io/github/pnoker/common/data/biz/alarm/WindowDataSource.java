@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.enums.WindowModeEnum;
-
 import java.math.BigDecimal;
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Pluggable backend for windowed alarm evaluation. Two production
@@ -29,14 +28,13 @@ import java.util.List;
  * <ul>
  *   <li>{@link LocalWindowDataSource} reads from {@link WindowSampleBuffer}
  *       — fast, but bounded by retention.</li>
- *   <li>{@link RepositoryWindowDataSource} pushes the aggregate to the
+ *   <li>{@link TsdbWindowDataSource} pushes the aggregate to the
  *       time-series store — durable, but with per-evaluation latency.</li>
  * </ul>
  *
  * <p>{@link HybridWindowDataSource} routes between them by window duration.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 public interface WindowDataSource {
@@ -47,13 +45,13 @@ public interface WindowDataSource {
      * the {@code minSamples} guard. Modes that do not reduce to a scalar
      * (LAST/ALL/ANY) should not be passed in.
      */
-    AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode);
+    Mono<AggregateOutcome> aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode);
 
     /**
      * Pull the raw samples in the rule's window, ordered oldest → newest.
      * Used by ALL/ANY where the rule condition runs sample-by-sample.
      */
-    List<WindowSample> samples(WindowSpec spec, RuleFact fact);
+    Flux<WindowSample> samples(WindowSpec spec, RuleFact fact);
 
     /**
      * Aggregate result + sample count. The value is null when the window had
@@ -61,10 +59,13 @@ public interface WindowDataSource {
      */
     record AggregateOutcome(BigDecimal value, long sampleCount) {
 
+        /**
+         * Empty.
+         *
+         * @return empty result
+         */
         public static AggregateOutcome empty() {
             return new AggregateOutcome(null, 0L);
         }
-
     }
-
 }

@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.bo;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Tree-shaped variant of {@link RoleBO} — adds a nested children collection so the role
@@ -33,7 +31,6 @@ import java.util.Objects;
  * (el-tree-select in RoleEditForm).
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter
@@ -68,11 +65,15 @@ public class RoleTreeBO extends RoleBO {
         return node;
     }
 
+    /**
+     * Create child.
+     *
+     * @param child child
+     */
     public void addChild(RoleTreeBO child) {
         if (Objects.isNull(children)) {
             children = new ArrayList<>();
         }
         children.add(child);
     }
-
 }

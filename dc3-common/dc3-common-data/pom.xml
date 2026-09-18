@@ -38,6 +38,15 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-r2dbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-core</artifactId>
+        </dependency>
+
         <!-- Utility Libraries -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
@@ -65,10 +74,6 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-dal</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-facade-api</artifactId>
         </dependency>
         <dependency>
@@ -81,19 +86,19 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-postgres</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-quartz</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-rabbitmq</artifactId>
+            <artifactId>dc3-mq-core</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-repository</artifactId>
+            <artifactId>dc3-mq-rabbitmq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-tsdb-core</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -123,7 +128,7 @@
         <!-- x-dc3-ai annotation gate (SP2 ratchet): scans this module's controllers in a unit test -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-resource-registrar</artifactId>
+            <artifactId>dc3-common-resource</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

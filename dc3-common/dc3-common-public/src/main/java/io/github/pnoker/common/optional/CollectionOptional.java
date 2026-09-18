@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.optional;
-
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collection;
 import java.util.function.Consumer;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Optional wrapper for {@link java.util.Collection} with null/empty checks.
  *
+ * @param <T> collection element type
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public final class CollectionOptional<T> {
@@ -37,16 +35,34 @@ public final class CollectionOptional<T> {
         this.value = value;
     }
 
+    /**
+     * Create a wrapper that treats {@code null} and empty collections as absent.
+     *
+     * @param value collection to wrap
+     * @param <T>   collection element type
+     * @return wrapper for the supplied collection
+     */
     public static <T> CollectionOptional<T> ofNullable(Collection<T> value) {
         return new CollectionOptional<>(value);
     }
 
+    /**
+     * Invoke the action when the wrapped collection is not empty.
+     *
+     * @param action action that consumes the present collection
+     */
     public void ifPresent(Consumer<Collection<T>> action) {
         if (CollectionUtils.isNotEmpty(value)) {
             action.accept(value);
         }
     }
 
+    /**
+     * Invoke exactly one branch according to whether the wrapped collection is empty.
+     *
+     * @param action      action that consumes a present collection
+     * @param emptyAction action to run for a {@code null} or empty collection
+     */
     public void ifPresentOrElse(Consumer<Collection<?>> action, Runnable emptyAction) {
         if (CollectionUtils.isNotEmpty(value)) {
             action.accept(value);
@@ -54,5 +70,4 @@ public final class CollectionOptional<T> {
             emptyAction.run();
         }
     }
-
 }

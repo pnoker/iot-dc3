@@ -14,26 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
-import java.util.List;
+import reactor.core.publisher.Flux;
 
-/**
- * Deterministic rule engine.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
+/** Reactive deterministic rule engine. */
 public interface RuleEngine {
-
-    /**
-     * Evaluate a normalized fact.
-     *
-     * @param fact normalized fact to evaluate against registered rules
-     * @return subset of rules whose conditions match the fact
-     */
-    List<RuleMatch> evaluate(RuleFact fact);
-
+    /** Evaluate the fact against enabled rules, emitting the matches. */
+    Flux<RuleMatch> evaluate(RuleFact fact);
 }

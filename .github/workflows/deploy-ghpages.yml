@@ -1,0 +1,76 @@
+name: Deploy Web Demo to GitHub Pages
+
+# Builds the static mock-demo variant of dc3-web (no backend) and publishes it
+# to GitHub Pages at the custom domain demo.dc3.site (public/CNAME). One-time
+# repo setup: Settings → Pages → Source = "GitHub Actions", Custom domain =
+# demo.dc3.site. DNS: point demo.dc3.site to the GitHub Pages servers
+# (CNAME → <user>.github.io, or A records for an apex domain).
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - dc3-web/**
+      - .github/workflows/deploy-ghpages.yml
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ghpages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: dc3-web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+
+      - name: Set pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86
+        with:
+          package_json_file: dc3-web/package.json
+
+      - name: Set Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: dc3-web/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (mock mode)
+        run: pnpm build:mock
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: dc3-web/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+        with:
+          # Tolerate transient Pages-backend queue stalls (the deployment
+          # occasionally lands in deployment_queued and needs extra polls).
+          error_count: 20
+          timeout: 900000

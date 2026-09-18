@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.auth.entity.bo.TenantBO;
@@ -27,12 +26,18 @@ import org.mapstruct.Mapper;
  * and therefore dropped by MapStruct.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface FacadeTenantBuilder {
 
+    /**
+     * To facade business object.
+     *
+     * @param authBO business object
+     * @return to facade business object result
+     */
     FacadeTenantBO toFacadeBO(TenantBO authBO);
-
 }

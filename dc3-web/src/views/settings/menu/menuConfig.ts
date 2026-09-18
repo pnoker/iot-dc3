@@ -15,15 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {addMenu, deleteMenu, listMenuTree, updateMenu} from '@/api/menu';
 import {MENU_LEVEL_OPTIONS, MENU_TYPE_OPTIONS} from '@/config/constant/enums';
 import {iconNames} from '@/config/constant/icons';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 import {authNameRules, remarkRules} from '@/utils/formRuleUtil';
 
-export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
+export const createMenuConfig = (t: Translator): EntityListConfig => ({
   name: 'menu',
   title: t('nav.settingsMenu'),
   mode: 'tree',
@@ -53,15 +51,15 @@ export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
     {prop: 'enableFlag', label: t('common.enableFlag'), kind: 'enableFlag', includeAll: true},
   ],
   columns: [
-    {prop: 'menuName', label: t('settings.menu.menuName'), minWidth: 220},
-    {prop: 'menuCode', label: t('settings.menu.menuCode'), kind: 'code', minWidth: 180},
-    {prop: 'menuTypeFlag', label: t('settings.menu.menuType'), minWidth: 100},
-    {prop: 'menuLevel', label: t('settings.menu.menuLevel'), minWidth: 90},
-    {prop: 'menuIndex', label: t('settings.menu.menuIndex'), minWidth: 80},
-    {prop: 'menuExt.content.url', label: t('settings.menu.menuUrl'), minWidth: 160},
-    {prop: 'menuExt.content.icon', label: t('settings.menu.menuIcon'), kind: 'icon', width: 90},
-    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90},
-    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165},
+    {prop: 'menuName', label: t('settings.menu.menuName'), minWidth: 220, mobile: 'primary'},
+    {prop: 'menuCode', label: t('settings.menu.menuCode'), kind: 'code', minWidth: 180, mobile: 'detail'},
+    {prop: 'menuTypeFlag', label: t('settings.menu.menuType'), minWidth: 100, mobile: 'detail'},
+    {prop: 'menuLevel', label: t('settings.menu.menuLevel'), minWidth: 90, mobile: 'detail'},
+    {prop: 'menuIndex', label: t('settings.menu.menuIndex'), minWidth: 80, mobile: 'hidden'},
+    {prop: 'menuExt.content.url', label: t('settings.menu.menuUrl'), minWidth: 160, mobile: 'detail'},
+    {prop: 'menuExt.content.icon', label: t('settings.menu.menuIcon'), kind: 'icon', width: 90, mobile: 'detail'},
+    {prop: 'enableFlag', label: t('common.enable'), kind: 'enable', width: 90, mobile: 'detail'},
+    {prop: 'createTime', label: t('common.createTime'), kind: 'time', width: 165, mobile: 'hidden'},
   ],
   fields: [
     {
@@ -70,8 +68,8 @@ export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
       kind: 'treeSelect',
       rules: [{required: true, message: t('settings.menu.parentMenuIdPlaceholder'), trigger: 'change'}],
       tree: {
-        load: () => listMenuTree().then((res) => res.data || []),
-        transform: (rows) => [{id: 0, menuName: 'Root', children: rows}],
+        load: () => listMenuTree().then((res) => res || []),
+        transform: (rows) => [{id: 0, menuName: t('settings.menu.root'), children: rows}],
         props: {label: 'menuName', children: 'children'},
         nodeKey: 'id',
       },
@@ -189,6 +187,6 @@ export const createMenuConfig = (t: ComposerTranslation): EntityListConfig => ({
   update: updateMenu as EntityListConfig['update'],
   remove: deleteMenu,
   detail: {routeName: 'settingsMenuDetail'},
-  confirmDeleteText: t('settings.menu.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityMenu')}),
   emptyText: t('settings.menu.empty'),
 });

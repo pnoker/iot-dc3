@@ -14,24 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.base;
-
-import io.github.pnoker.common.entity.R;
-import io.github.pnoker.common.entity.common.TenantOwned;
-import io.github.pnoker.common.exception.NotFoundException;
-import org.junit.jupiter.api.Test;
-import reactor.test.StepVerifier;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.github.pnoker.common.entity.common.TenantOwned;
+import io.github.pnoker.common.exception.NotFoundException;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
 class BaseControllerTest {
 
-    private final BaseController controller = new BaseController() {
-    };
+    private final BaseController controller = new BaseController() {};
 
     @Test
     void requireTenantPassesThroughOwnedEntity() {
@@ -48,8 +43,7 @@ class BaseControllerTest {
     @Test
     void requireTenantThrowsForCrossTenantEntity() {
         TenantEntity entity = new TenantEntity(2L);
-        assertThatThrownBy(() -> controller.requireTenant(1L, entity))
-                .isInstanceOf(NotFoundException.class);
+        assertThatThrownBy(() -> controller.requireTenant(1L, entity)).isInstanceOf(NotFoundException.class);
     }
 
     @Test
@@ -60,10 +54,7 @@ class BaseControllerTest {
 
     @Test
     void filterTenantKeepsOnlyMatchingEntities() {
-        List<TenantEntity> entities = List.of(
-                new TenantEntity(1L),
-                new TenantEntity(2L),
-                new TenantEntity(1L));
+        List<TenantEntity> entities = List.of(new TenantEntity(1L), new TenantEntity(2L), new TenantEntity(1L));
         assertThat(controller.filterTenant(1L, entities))
                 .extracting(TenantEntity::tenantId)
                 .containsExactly(1L, 1L);
@@ -76,26 +67,6 @@ class BaseControllerTest {
         entities.add(null);
         entities.add(new TenantEntity(1L));
         assertThat(controller.filterTenant(1L, entities)).hasSize(2);
-    }
-
-    @Test
-    void asyncWrapsSupplierIntoMono() {
-        StepVerifier.create(controller.async(() -> R.ok("hello")))
-                .assertNext(response -> {
-                    assertThat(response.isOk()).isTrue();
-                    assertThat(response.getMessage()).isEqualTo("hello");
-                })
-                .verifyComplete();
-    }
-
-    @Test
-    void asyncPropagatesSupplierExceptionAsMonoError() {
-        StepVerifier.create(controller.async(() -> {
-                    throw new IllegalStateException("supplier failed");
-                }))
-                .expectErrorMatches(throwable -> throwable instanceof IllegalStateException
-                        && "supplier failed".equals(throwable.getMessage()))
-                .verify();
     }
 
     private record TenantEntity(Long tenantId) implements TenantOwned {

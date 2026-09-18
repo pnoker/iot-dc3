@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.dto;
 
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,15 +27,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 /**
  * Driver alarm payload sent over RabbitMQ.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -82,10 +79,10 @@ public class DriverAlarmDTO implements Serializable {
      */
     private LocalDateTime createTime;
 
+    /** driver alarm DTO. */
     public DriverAlarmDTO(Long driverId, String message) {
         this.driverId = driverId;
         this.message = message;
         this.createTime = LocalDateTimeUtil.now();
     }
-
 }

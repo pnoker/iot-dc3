@@ -16,7 +16,18 @@
   -->
 
 <template>
-  <el-card :class="`stat-card--${tone}`" class="stat-card" shadow="hover" @click="emit('click')">
+  <el-card
+    :aria-label="title"
+    :aria-busy="loading"
+    :class="`stat-card--${tone}`"
+    class="stat-card"
+    role="button"
+    shadow="hover"
+    tabindex="0"
+    @click="emit('click')"
+    @keydown.enter="activateOnSelf"
+    @keydown.space.prevent="activateOnSelf"
+  >
     <div class="stat-card__row">
       <div class="stat-card__icon">
         <el-icon :size="28">
@@ -26,16 +37,18 @@
       <div class="stat-card__body">
         <div class="stat-card__title">{{ title }}</div>
         <div class="stat-card__value">
-          <span class="stat-card__value-text">{{ formattedValue }}</span>
-          <span v-if="trend" :class="['stat-card__trend', `stat-card__trend--${trend.direction}`]">
+          <span v-if="loading" aria-hidden="true" class="stat-card__value-skeleton" />
+          <span v-else class="stat-card__value-text">{{ error ? '—' : formattedValue }}</span>
+          <span v-if="!loading && !error && trend" :class="['stat-card__trend', `stat-card__trend--${trend.direction}`]">
             <el-icon><component :is="trendIcon"/></el-icon>
             {{ trend.label }}
           </span>
         </div>
-        <div v-if="subtitle" class="stat-card__subtitle">{{ subtitle }}</div>
+        <div v-if="!loading && !error && subtitle" class="stat-card__subtitle">{{ subtitle }}</div>
       </div>
       <el-button
         v-if="onRefresh"
+        :aria-label="refreshLabel"
         :icon="Refresh"
         :loading="refreshing"
         circle
@@ -63,6 +76,7 @@ import {computed, ref} from 'vue';
 import {CaretBottom, CaretTop, Minus, Refresh} from '@element-plus/icons-vue';
 
 import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
+import i18n from '@/config/i18n';
 
 interface Trend {
   direction: 'up' | 'down' | 'flat';
@@ -77,6 +91,8 @@ const props = defineProps({
   tone: {type: String as PropType<'blue' | 'green' | 'orange' | 'purple' | 'red'>, default: 'blue'},
   trend: {type: Object as PropType<Trend | null>, default: null},
   sparkline: {type: Array as PropType<number[]>, default: () => []},
+  loading: {type: Boolean, default: false},
+  error: {type: Boolean, default: false},
   /**
    * Optional refresh handler. When provided, a small text button appears
    * in the top-right of the card; clicking it invokes the handler without
@@ -87,6 +103,15 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{ (e: 'click'): void }>();
+const refreshLabel = computed(() => `${props.title} - ${i18n.global.t('common.refresh')}`);
+
+// keydown bubbles up from the nested refresh button; only activate the
+// card when the event originates from the card element itself (the click
+// path is already isolated by the button's @click.stop).
+const activateOnSelf = (event: KeyboardEvent) => {
+  if (event.target !== event.currentTarget) return;
+  emit('click');
+};
 
 const refreshing = ref(false);
 const doRefresh = async () => {
@@ -122,7 +147,7 @@ const TONE_ACCENT: Record<string, string> = {
   blue: 'var(--el-color-primary)',
   green: 'var(--el-color-success)',
   orange: 'var(--el-color-warning)',
-  purple: '#9059f6',
+  purple: 'var(--dc3-color-purple)',
   red: 'var(--el-color-danger)',
 };
 const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
@@ -132,12 +157,43 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
 .stat-card {
   --stat-card-accent: var(--el-color-primary);
   --stat-card-bg: var(--el-color-primary-light-9);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   cursor: pointer;
-  transition: transform 0.15s ease;
+  transition:
+    transform var(--dc3-duration-base) var(--dc3-ease-standard),
+    border-color var(--dc3-duration-base) var(--dc3-ease-standard),
+    box-shadow var(--dc3-duration-base) var(--dc3-ease-standard);
   height: 100%;
   min-height: 132px;
   display: flex;
   flex-direction: column;
+
+  &::before {
+    position: absolute;
+    z-index: -1;
+    top: -46px;
+    right: -42px;
+    width: 118px;
+    height: 118px;
+    border-radius: 50%;
+    background: var(--stat-card-bg);
+    content: '';
+    filter: blur(2px);
+  }
+
+  &::after {
+    position: absolute;
+    top: 0;
+    right: var(--dc3-space-4);
+    left: var(--dc3-space-4);
+    height: 2px;
+    border-radius: 0 0 var(--dc3-radius-full) var(--dc3-radius-full);
+    background: linear-gradient(90deg, transparent, var(--stat-card-accent), transparent);
+    opacity: 0.7;
+    content: '';
+  }
 
   :deep(.el-card__body) {
     flex: 1;
@@ -146,7 +202,8 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
   }
 
   &:hover {
-    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--stat-card-accent) 30%, transparent);
+    transform: translateY(-3px);
   }
 
   &--blue {
@@ -165,8 +222,8 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
   }
 
   &--purple {
-    --stat-card-accent: #9059f6;
-    --stat-card-bg: rgba(144, 89, 246, 0.1);
+    --stat-card-accent: var(--dc3-color-purple);
+    --stat-card-bg: var(--dc3-color-purple-soft);
   }
 
   &--red {
@@ -175,13 +232,13 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
   }
 
   :deep(.el-card__body) {
-    padding: 16px;
+    padding: var(--dc3-space-4);
   }
 
   .stat-card__row {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
+    gap: var(--dc3-space-3);
     position: relative;
   }
 
@@ -197,10 +254,18 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
     opacity: 1;
   }
 
+  @media (max-width: $breakpoint-xs-max), (pointer: coarse) {
+    .stat-card__refresh {
+      right: var(--dc3-floating-action-safe-space);
+      opacity: 1;
+    }
+  }
+
   .stat-card__icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 4px;
+    width: 44px;
+    height: 44px;
+    border: 1px solid color-mix(in srgb, var(--stat-card-accent) 18%, transparent);
+    border-radius: var(--dc3-radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -216,7 +281,7 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
 
   .stat-card__title {
     font-size: 13px;
-    color: var(--el-text-color-secondary);
+    color: var(--dc3-text-muted);
     margin-bottom: 2px;
   }
 
@@ -228,9 +293,25 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
   }
 
   .stat-card__value-text {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--el-text-color-primary);
+    font-size: 25px;
+    font-weight: 680;
+    color: var(--dc3-text-primary);
+    letter-spacing: -0.025em;
+  }
+
+  .stat-card__value-skeleton {
+    display: inline-block;
+    width: 78px;
+    height: 30px;
+    border-radius: var(--dc3-radius-sm);
+    background: linear-gradient(
+      90deg,
+      var(--el-fill-color-light) 25%,
+      var(--el-fill-color-lighter) 37%,
+      var(--el-fill-color-light) 63%
+    );
+    background-size: 400% 100%;
+    animation: stat-card-skeleton 1.4s ease infinite;
   }
 
   .stat-card__trend {
@@ -254,7 +335,7 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
 
   .stat-card__subtitle {
     font-size: 12px;
-    color: var(--el-text-color-secondary);
+    color: var(--dc3-text-muted);
     margin-top: 4px;
   }
 
@@ -262,6 +343,21 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
     height: 40px;
     margin-top: auto;
     padding-top: 8px;
+  }
+
+  @keyframes stat-card-skeleton {
+    0% {
+      background-position: 100% 0;
+    }
+    100% {
+      background-position: -100% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stat-card__value-skeleton {
+      animation: none;
+    }
   }
 }
 </style>

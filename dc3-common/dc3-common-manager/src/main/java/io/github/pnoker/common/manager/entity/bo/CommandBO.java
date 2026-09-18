@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
@@ -33,7 +32,6 @@ import lombok.ToString;
  * Business object for command operations.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -59,11 +57,9 @@ public class CommandBO extends BaseBO implements TenantOwned {
 
     private EnableFlagEnum enableFlag;
 
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private String signature;
 
     private Integer version;
-
 }

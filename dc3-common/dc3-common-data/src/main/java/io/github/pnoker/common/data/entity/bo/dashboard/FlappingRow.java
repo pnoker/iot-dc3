@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.bo.dashboard;
 
 import lombok.Getter;
@@ -25,7 +24,6 @@ import lombok.ToString;
  * (source, sourceId, alarmTypeFlag, count) — one flapping (source, type) pair.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -40,5 +38,4 @@ public class FlappingRow {
     private int alarmTypeFlag;
 
     private long count;
-
 }

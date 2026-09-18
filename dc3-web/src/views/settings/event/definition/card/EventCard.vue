@@ -24,6 +24,7 @@
           :icon="icon"
           :name="data.eventName"
           :status-title="$t('eventDefinition.card.level')"
+          :copy-label="$t('eventDefinition.card.eventId')"
           @copy-id="copy(data.id, 'Event ID')"
         >
           <el-tag v-if="!embedded" :type="eventLevelTag(data.eventLevelFlag)">
@@ -81,10 +82,11 @@
         </div>
         <things-card-actions
           v-if="!embedded"
-          :delete-title="$t('eventDefinition.card.confirmDelete')"
-          :disable-title="$t('eventDefinition.card.confirmDisable')"
-          :enable-title="$t('eventDefinition.card.confirmEnable')"
+          :delete-title="$t('common.confirmDelete', {name: $t('common.entityEvent')})"
+          :disable-title="$t('common.confirmDisable', {name: $t('common.entityEvent')})"
+          :enable-title="$t('common.confirmEnable', {name: $t('common.entityEvent')})"
           :enabled="enabled"
+          :busy="busy"
           @delete="emitDelete"
           @detail="$emit('detail-thing', data)"
           @disable="emitToggle('disable-thing')"
@@ -102,7 +104,6 @@ import {computed} from 'vue';
 import {Edit, List, Location, Sunset} from '@element-plus/icons-vue';
 import {copy} from '@/utils/commonUtil';
 import {timestamp} from '@/utils/dateUtil';
-import {successMessage} from '@/utils/notificationUtil';
 import {eventLevelLabel, eventLevelTag, eventTypeLabel, isEnabledFlag} from '@/utils/thingModelFormatUtil';
 import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
@@ -112,6 +113,7 @@ const props = defineProps({
   embedded: {type: Boolean, default: false},
   data: {type: Object as PropType<EventRecord>, default: () => ({})},
   icon: {type: String, default: 'images/common/event.png'},
+  busy: {type: Boolean, default: false},
 });
 
 const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing', 'edit-thing', 'detail-thing']);
@@ -119,11 +121,11 @@ const emit = defineEmits(['disable-thing', 'enable-thing', 'delete-thing', 'edit
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const emitToggle = (name: 'disable-thing' | 'enable-thing') => {
-  emit(name, props.data.id, props.data.profileId, () => successMessage());
+  emit(name, props.data);
 };
 
 const emitDelete = () => {
-  emit('delete-thing', props.data.id, () => successMessage());
+  emit('delete-thing', props.data);
 };
 </script>
 

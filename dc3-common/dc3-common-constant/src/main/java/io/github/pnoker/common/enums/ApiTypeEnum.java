@@ -14,21 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Enumeration of API type flags (e.g. REST, WebSocket).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -54,12 +50,16 @@ public enum ApiTypeEnum {
      * GET
      */
     GET((byte) 3, "get", "GET"),
+
+    /**
+     * PATCH
+     */
+    PATCH((byte) 4, "patch", "PATCH"),
     ;
 
     /**
      * Index
      */
-    @EnumValue
     private final Byte index;
 
     /**
@@ -111,5 +111,4 @@ public enum ApiTypeEnum {
             return null;
         }
     }
-
 }

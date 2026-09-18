@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.optional;
 
-import io.github.pnoker.common.enums.EnableFlagEnum;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.pnoker.common.enums.EnableFlagEnum;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class EnableOptionalTest {
 
@@ -51,8 +49,7 @@ class EnableOptionalTest {
     @Test
     void ifPresentOrElseFiresFallbackForUnknownIndex() {
         AtomicBoolean fallback = new AtomicBoolean(false);
-        EnableOptional.ofNullable((byte) 99).ifPresentOrElse(value -> {
-        }, () -> fallback.set(true));
+        EnableOptional.ofNullable((byte) 99).ifPresentOrElse(value -> {}, () -> fallback.set(true));
         assertThat(fallback).isTrue();
     }
 
@@ -60,8 +57,7 @@ class EnableOptionalTest {
     void ifPresentOrElseInvokesActionForKnownIndex() {
         AtomicReference<EnableFlagEnum> captured = new AtomicReference<>();
         AtomicBoolean fallback = new AtomicBoolean(false);
-        EnableOptional.ofNullable((byte) 0)
-                .ifPresentOrElse(captured::set, () -> fallback.set(true));
+        EnableOptional.ofNullable((byte) 0).ifPresentOrElse(captured::set, () -> fallback.set(true));
         assertThat(captured.get()).isEqualTo(EnableFlagEnum.ENABLE);
         assertThat(fallback).isFalse();
     }

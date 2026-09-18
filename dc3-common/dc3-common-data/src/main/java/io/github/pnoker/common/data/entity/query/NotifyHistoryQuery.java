@@ -14,14 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.query;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serializable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,16 +31,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-
-/**
- * Query parameters for notification delivery history listing and filtering.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
+/** Query filter for notify history records. */
 @Getter
 @Setter
 @Builder
@@ -46,40 +39,60 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-@Schema(description = "Notify History query parameters")
+@Schema(description = "Notify History offset query parameters")
 public class NotifyHistoryQuery implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+    @Schema(description = "Zero-based row offset", example = "0")
+    private Long offset;
 
-    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
-    private Pages page;
+    @Schema(description = "Maximum rows to return", example = "50")
+    @Builder.Default
+    private Integer limit = PageRequest.DEFAULT_LIMIT;
 
-    @Schema(description = "Tenant ID for multi-tenant isolation. Required for query scope.")
-    private Long tenantId;
+    @Schema(description = "Whitelisted notification history sort fields")
+    @Builder.Default
+    private List<SortSpec> sort = List.of();
 
-    @Schema(description = "Filter by alarm rule ID that triggered the notification. Exact match.", example = "1024")
+    /**
+     * Null-safe paging accessors: the runtime Jackson 3 mapper binds request bodies
+     * through the all-args constructor, leaving absent fields null. Boxed fields keep
+     * "unspecified" distinguishable from explicit (possibly invalid) values.
+     */
+    public long getOffset() {
+        return offset == null ? 0L : offset;
+    }
+
+    /** Return the requested page limit. */
+    public int getLimit() {
+        return limit == null ? PageRequest.DEFAULT_LIMIT : limit;
+    }
+
+    /** Return the requested sort. */
+    public List<SortSpec> getSort() {
+        return sort == null ? List.of() : sort;
+    }
+
+    @Schema(description = "Filter by alarm rule identifier")
     private Long ruleId;
 
-    @Schema(description = "Filter by notification definition ID. Exact match.", example = "2048")
+    @Schema(description = "Filter by notification policy identifier")
     private Long notifyId;
 
-    @Schema(description = "Filter by message template ID used for the notification. Exact match.", example = "4096")
+    @Schema(description = "Filter by message template identifier")
     private Long messageId;
 
-    @Schema(description = "Filter by delivery channel ID. Exact match.", example = "512")
+    @Schema(description = "Filter by delivery channel identifier")
     private Long channelId;
 
-    @Schema(description = "Filter by associated alarm ID. Exact match.", example = "256")
+    @Schema(description = "Filter by associated alarm identifier")
     private Long alarmId;
 
-    @Schema(description = "Filter by notification channel type (e.g. EMAIL, SMS, WEBHOOK). Exact match.", example = "EMAIL")
+    @Schema(description = "Filter by notification channel type")
     private NotifyChannelTypeEnum channelTypeFlag;
 
-    @Schema(description = "Notification target", example = "admin@example.com")
+    @Schema(description = "Filter by notification target text")
     private String target;
 
-    @Schema(description = "Filter by notification delivery status. Exact match.", example = "SUCCESS")
+    @Schema(description = "Filter by delivery status")
     private NotifyHistoryStatusEnum statusFlag;
-
 }

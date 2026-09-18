@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.auth.entity.bo.LocalCredentialBO;
@@ -26,12 +25,18 @@ import org.mapstruct.Mapper;
  * FacadeLocalCredential to auth LocalCredentialBO mapper.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface FacadeLocalCredentialBuilder {
 
+    /**
+     * To facade business object.
+     *
+     * @param authBO business object
+     * @return to facade business object result
+     */
     FacadeLocalCredentialBO toFacadeBO(LocalCredentialBO authBO);
-
 }

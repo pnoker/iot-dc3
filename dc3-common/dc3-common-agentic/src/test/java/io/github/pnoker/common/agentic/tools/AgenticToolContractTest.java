@@ -16,32 +16,32 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.tool.annotation.Tool;
-
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.tool.annotation.Tool;
+import reactor.core.publisher.Mono;
 
 class AgenticToolContractTest {
 
     private static Stream<Class<?>> toolTypes() {
         return List.of(
-                        TenantTool.class,
-                        UserTool.class,
-                        DeviceTool.class,
-                        DriverTool.class,
-                        ProfileTool.class,
-                        PointTool.class,
-                        PointValueTool.class,
-                        SystemTool.class)
+                TenantTool.class,
+                UserTool.class,
+                DeviceTool.class,
+                DriverTool.class,
+                ProfileTool.class,
+                PointTool.class,
+                PointValueTool.class,
+                SystemTool.class)
                 .stream();
     }
 
@@ -60,7 +60,9 @@ class AgenticToolContractTest {
     @ParameterizedTest
     @MethodSource("toolMethods")
     void platformToolsReturnStructuredResults(Method method) {
-        assertThat(method.getReturnType()).isEqualTo(AgenticToolResult.class);
+        assertThat(method.getReturnType())
+                .as("Tool method %s must return AgenticToolResult or Mono", method.getName())
+                .isIn(AgenticToolResult.class, Mono.class);
     }
 
     @ParameterizedTest
@@ -81,5 +83,4 @@ class AgenticToolContractTest {
                 .as("Tool method %s must expose trace metadata", method.getName())
                 .isNotNull();
     }
-
 }

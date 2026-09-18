@@ -14,19 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
-import io.github.pnoker.common.entity.R;
 import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.BusinessException;
 import io.github.pnoker.common.exception.PasswordChangeRequiredException;
 import io.github.pnoker.common.exception.TenantNotScopedException;
-import io.github.pnoker.common.utils.JsonUtil;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.validation.BindException;
@@ -38,162 +39,140 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
-
-/**
- * Global Exception Handler Configuration
- * <p>
- * Global exception handler for reactive web applications using @RestControllerAdvice.
- * Every {@link BusinessException} carries an {@link ErrorCode}; this handler reads that
- * code to align the response body code and the HTTP status, so the two never diverge.
- * Framework and validation exceptions are mapped to the closest {@link ErrorCode}.
- * </p>
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
+/** Global RFC 9457 error translation for reactive HTTP endpoints. */
 @AutoConfiguration
 @Slf4j
 @RestControllerAdvice
 public class ExceptionConfig {
 
-    /**
-     * Handle a password-change-required outcome. This is a routable login result, not a
-     * hard failure, so it stays on HTTP 200 while carrying a distinct {@link ErrorCode}
-     * ({@code R4031}/{@code R4032}) the client uses to open the password change flow.
-     *
-     * @param exception PasswordChangeRequiredException to handle
-     * @param request   ServerHttpRequest that triggered the exception
-     * @return Mono containing error response carrying a distinct response code
-     */
+    /** Translate password-change-required failures to RFC 9457 responses. */
     @ExceptionHandler(PasswordChangeRequiredException.class)
-    @ResponseStatus(HttpStatus.OK)
-    public Mono<R<String>> passwordChangeRequiredException(PasswordChangeRequiredException exception,
-                                                           ServerHttpRequest request) {
-        log.warn("Password change required, path={}, message={}", request.getURI().getRawPath(),
-                exception.getMessage());
-        return Mono.just(R.fail(exception.getErrorCode(), exception.getMessage()));
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Mono<ProblemDetailsResponse> passwordChangeRequiredException(
+            PasswordChangeRequiredException exception, ServerHttpRequest request, ServerHttpResponse response) {
+        return problem(response, request, exception.getErrorCode(), exception.getMessage());
     }
 
     /**
-     * Handle every {@link BusinessException}: read the carried {@link ErrorCode}, apply its
-     * HTTP status to the response and return an envelope whose body code matches that status.
-     *
-     * @param exception BusinessException to handle
-     * @param request   ServerHttpRequest that triggered the exception
-     * @param response  ServerHttpResponse to which the carried HTTP status is applied
-     * @return Mono containing error response
+     * Translate method-security denials to RFC 9457 responses. Method-level
+     * {@code @PreAuthorize} rejections surface here (not at the security filter
+     * chain's access-denied handler) because they are thrown from inside the
+     * handler invocation — without this mapping every permission denial would
+     * fall through to the generic handler and masquerade as a 500 server error.
      */
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Mono<ProblemDetailsResponse> accessDeniedException(
+            org.springframework.security.access.AccessDeniedException exception,
+            ServerHttpRequest request,
+            ServerHttpResponse response) {
+        return problem(response, request, ErrorCode.FORBIDDEN, exception.getMessage());
+    }
+
+    /** Translate business failures to RFC 9457 responses with their error code. */
     @ExceptionHandler(BusinessException.class)
-    public Mono<R<String>> businessException(BusinessException exception, ServerHttpRequest request,
-                                             ServerHttpResponse response) {
+    public Mono<ProblemDetailsResponse> businessException(
+            BusinessException exception, ServerHttpRequest request, ServerHttpResponse response) {
         ErrorCode errorCode = exception.getErrorCode();
         response.setStatusCode(HttpStatusCode.valueOf(errorCode.getHttpStatus()));
-
-        String path = request.getURI().getRawPath();
-        if (errorCode.getHttpStatus() >= 500) {
-            log.error("Business exception {} on {}: {}", errorCode.getCode(), path, exception.getMessage(), exception);
-        } else {
-            log.warn("Business exception {} on {}: {}", errorCode.getCode(), path, exception.getMessage());
-        }
-        return Mono.just(R.fail(errorCode, exception.getMessage()));
+        return problem(response, request, errorCode, exception.getMessage());
     }
 
-    /**
-     * Handle Spring's framework-level {@link ResponseStatusException} — e.g. 404 from the
-     * dispatcher when no handler matches a request. Preserves the original status on the
-     * response and maps it to the closest {@link ErrorCode} so the body code stays aligned.
-     *
-     * @param exception ResponseStatusException raised by the reactive dispatcher or an
-     *                  HTTP client
-     * @param request   ServerHttpRequest that triggered the exception
-     * @param response  ServerHttpResponse to which the original status is applied
-     * @return Mono containing error response
-     */
+    /** Translate framework status exceptions to RFC 9457 responses. */
     @ExceptionHandler(ResponseStatusException.class)
-    public Mono<R<String>> responseStatusException(ResponseStatusException exception, ServerHttpRequest request,
-                                                   ServerHttpResponse response) {
+    public Mono<ProblemDetailsResponse> responseStatusException(
+            ResponseStatusException exception, ServerHttpRequest request, ServerHttpResponse response) {
         HttpStatusCode status = exception.getStatusCode();
         response.setStatusCode(status);
-
-        String path = request.getURI().getRawPath();
-        if (status.is5xxServerError()) {
-            log.error("Response status exception {} on {}: {}", status.value(), path, exception.getMessage(),
-                    exception);
-        } else if (HttpStatus.NOT_FOUND.value() == status.value()) {
-            log.debug("Not found: {}", path);
-        } else {
-            log.warn("Response status exception {} on {}: {}", status.value(), path, exception.getMessage());
-        }
-
-        String reason = exception.getReason();
-        return Mono.just(R.fail(mapStatusToErrorCode(status.value()),
-                Objects.nonNull(reason) ? reason : status.toString()));
+        ErrorCode errorCode = mapStatusToErrorCode(status.value());
+        String detail = exception.getReason() == null ? status.toString() : exception.getReason();
+        return problem(response, request, errorCode, detail, Map.of(), status.value());
     }
 
-    /**
-     * Handle validation exceptions
-     *
-     * @param exception MethodArgumentNotValidException or BindException to handle
-     * @param request   ServerHttpRequest that triggered the exception
-     * @return Mono containing error response with field validation details
-     */
+    /** Translate request validation failures to RFC 9457 responses with field errors. */
     @ExceptionHandler({BindException.class, MethodArgumentNotValidException.class})
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_CONTENT)
-    public Mono<R<String>> methodArgumentNotValidException(MethodArgumentNotValidException exception,
-                                                           ServerHttpRequest request) {
-        HashMap<String, String> map = new HashMap<>(4);
-        List<FieldError> errorList = exception.getBindingResult().getFieldErrors();
-        errorList.forEach(error -> {
-            log.warn("Method argument validation failed, path={}, field={}, message={}", request.getURI().getRawPath(),
-                    error.getField(), error.getDefaultMessage());
-            map.put(error.getField(), error.getDefaultMessage());
-        });
-        return Mono.just(R.fail(ErrorCode.VALIDATION, JsonUtil.toJsonString(map)));
+    public Mono<ProblemDetailsResponse> methodArgumentNotValidException(
+            BindException exception, ServerHttpRequest request, ServerHttpResponse response) {
+        response.setStatusCode(HttpStatus.UNPROCESSABLE_CONTENT);
+        Map<String, List<String>> errors = new LinkedHashMap<>();
+        for (FieldError error : exception.getBindingResult().getFieldErrors()) {
+            errors.computeIfAbsent(error.getField(), ignored -> new java.util.ArrayList<>())
+                    .add(error.getDefaultMessage() == null ? "Invalid value" : error.getDefaultMessage());
+        }
+        return problem(response, request, ErrorCode.VALIDATION, "Request validation failed", errors);
     }
 
     /**
-     * Handle a {@link TenantNotScopedException}: a tenant-scoped query ran without a
-     * tenant bound to the thread and the ignore flag unset — a programming error that
-     * must surface as HTTP 500 rather than run unscoped.
-     *
-     * @param exception TenantNotScopedException to handle
-     * @param request   ServerHttpRequest that triggered the exception
-     * @return Mono containing error response carrying the failure code
+     * Input-contract violations thrown by shared paging/query validation (for example
+     * {@code PageRequest} range checks) are client errors, not server failures.
      */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public Mono<ProblemDetailsResponse> illegalArgumentException(
+            IllegalArgumentException exception, ServerHttpRequest request, ServerHttpResponse response) {
+        log.warn(
+                "Invalid request argument, path={}, message={}",
+                request.getURI().getRawPath(),
+                exception.getMessage());
+        return problem(response, request, ErrorCode.OUT_OF_RANGE, exception.getMessage());
+    }
+
+    /** Translate missing tenant scope to a 500 system error. */
     @ExceptionHandler(TenantNotScopedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Mono<R<String>> tenantNotScopedException(TenantNotScopedException exception, ServerHttpRequest request) {
-        log.error("Tenant-scoped query executed without tenant context, path={}, message={}",
-                request.getURI().getRawPath(), exception.getMessage(), exception);
-        return Mono.just(R.fail(ErrorCode.FAILURE, "System error: tenant scope missing"));
+    public Mono<ProblemDetailsResponse> tenantNotScopedException(
+            TenantNotScopedException exception, ServerHttpRequest request, ServerHttpResponse response) {
+        return problem(response, request, ErrorCode.FAILURE, "System error: tenant scope missing");
     }
 
-    /**
-     * Handle global exceptions
-     *
-     * @param exception Exception to handle
-     * @param request   ServerHttpRequest that triggered the exception
-     * @return Mono containing error response
-     */
+    /** Translate unhandled exceptions to a 500 system error without leaking details. */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Mono<R<String>> globalException(Exception exception, ServerHttpRequest request) {
-        log.error("Global exception, path={}, message={}", request.getURI().getRawPath(), exception.getMessage(),
+    public Mono<ProblemDetailsResponse> globalException(
+            Exception exception, ServerHttpRequest request, ServerHttpResponse response) {
+        log.error(
+                "Global exception, path={}, message={}",
+                request.getURI().getRawPath(),
+                exception.getMessage(),
                 exception);
-        return Mono.just(R.fail(ErrorCode.FAILURE, exception.getMessage()));
+        return problem(response, request, ErrorCode.FAILURE, "Internal server error");
     }
 
-    /**
-     * Map a raw HTTP status to the closest {@link ErrorCode} so framework-raised statuses
-     * still produce a meaningful, aligned body code.
-     *
-     * @param status HTTP status value
-     * @return matching {@link ErrorCode}
-     */
+    private Mono<ProblemDetailsResponse> problem(
+            ServerHttpResponse response, ServerHttpRequest request, ErrorCode code, String detail) {
+        return problem(response, request, code, detail, Map.of());
+    }
+
+    private Mono<ProblemDetailsResponse> problem(
+            ServerHttpResponse response,
+            ServerHttpRequest request,
+            ErrorCode code,
+            String detail,
+            Map<String, List<String>> errors) {
+        return problem(response, request, code, detail, errors, code.getHttpStatus());
+    }
+
+    private Mono<ProblemDetailsResponse> problem(
+            ServerHttpResponse response,
+            ServerHttpRequest request,
+            ErrorCode code,
+            String detail,
+            Map<String, List<String>> errors,
+            int status) {
+        response.getHeaders().setContentType(MediaType.APPLICATION_PROBLEM_JSON);
+        response.setStatusCode(HttpStatusCode.valueOf(status));
+        String title = code.name().toLowerCase(java.util.Locale.ROOT).replace('_', ' ');
+        String traceId = request.getHeaders().getFirst("X-Request-Id");
+        return Mono.just(new ProblemDetailsResponse(
+                "about:blank",
+                title,
+                status,
+                code.getCode(),
+                detail,
+                request.getURI().getPath(),
+                traceId,
+                errors));
+    }
+
     private ErrorCode mapStatusToErrorCode(int status) {
         return switch (status) {
             case 401 -> ErrorCode.UNAUTHORIZED;
@@ -203,5 +182,4 @@ public class ExceptionConfig {
             default -> ErrorCode.FAILURE;
         };
     }
-
 }

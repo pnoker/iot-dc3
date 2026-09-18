@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.bean;
 
 import lombok.Getter;
@@ -23,7 +22,6 @@ import lombok.Getter;
  * Simplified S7 point variable holding an S7 address string and type code.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2016.10.1
  */
 @Getter
@@ -33,6 +31,7 @@ public class PlcS7PointVariable {
 
     private final String type;
 
+    /** plc s7 point variable. */
     public PlcS7PointVariable(int dbNum, int byteOffset, int bitOffset, String type) {
         this.type = type;
         boolean isBitAccess = ("boolean".equals(type) || "bool".equals(type)) && bitOffset > 0;
@@ -42,5 +41,4 @@ public class PlcS7PointVariable {
             this.address = String.format("DB%d.%d", dbNum, byteOffset);
         }
     }
-
 }

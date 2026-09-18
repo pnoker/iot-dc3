@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.event.metadata;
 
 import io.github.pnoker.common.entity.event.MetadataEvent;
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Component;
  * metadata changes.
  *
  * @author zhangzi
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -36,7 +34,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MetadataEventPublisher {
 
-    /** Spring publisher used to broadcast metadata events within the application context. */
+    /**
+     * Spring publisher used to broadcast metadata events within the application context.
+     */
     private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
@@ -45,8 +45,10 @@ public class MetadataEventPublisher {
      * @param metadataEvent metadata event
      */
     public void publishEvent(MetadataEvent metadataEvent) {
-        log.debug("Metadata event publisher publishEvent: id={}, type={}", metadataEvent.getId(), metadataEvent.getMetadataType());
+        log.debug(
+                "Metadata event publisher publishEvent: id={}, type={}",
+                metadataEvent.getId(),
+                metadataEvent.getMetadataType());
         applicationEventPublisher.publishEvent(metadataEvent);
     }
-
 }

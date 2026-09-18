@@ -68,15 +68,15 @@ export default defineConfig({
         'src/config/types/**',
         'src/config/ambient/**',
       ],
-      // Thresholds sit a couple of points below measured coverage so the
-      // gate fails on regression, not on noise. Bump again after the next
-      // round of test additions. Currently measured (post-A1 fixtures):
-      // branches 67% / functions 77% / lines 81% / statements 82%.
+      // Whole-surface baseline measured on 2026-08-18 after validator boundary
+      // coverage: branches 67.37%, functions 76.51%, lines 81.72%, statements
+      // 80.93%. The small margin absorbs runtime noise without hiding material
+      // regression.
       thresholds: {
-        branches: 65,
-        functions: 75,
-        lines: 78,
-        statements: 78,
+        branches: 66,
+        functions: 76,
+        lines: 81,
+        statements: 80,
       },
     },
   },

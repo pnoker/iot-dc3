@@ -14,21 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.enums;
-
-import com.baomidou.mybatisplus.annotation.EnumValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Principal classification for authenticated and authorized callers.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 @Getter
@@ -54,7 +50,6 @@ public enum PrincipalTypeEnum {
     /**
      * Database value.
      */
-    @EnumValue
     private final String value;
 
     /**
@@ -67,6 +62,12 @@ public enum PrincipalTypeEnum {
      */
     private final String remark;
 
+    /**
+     * Resolve a principal type from its persisted wire value.
+     *
+     * @param value persisted principal-type value
+     * @return matching type, or {@code null} when the value is unknown
+     */
     public static PrincipalTypeEnum ofValue(String value) {
         Optional<PrincipalTypeEnum> any = Arrays.stream(values())
                 .filter(type -> type.getValue().equals(value))
@@ -74,11 +75,16 @@ public enum PrincipalTypeEnum {
         return any.orElse(null);
     }
 
+    /**
+     * Resolve a principal type from its stable code.
+     *
+     * @param code principal-type code
+     * @return matching type, or {@code null} when the code is unknown
+     */
     public static PrincipalTypeEnum ofCode(String code) {
         Optional<PrincipalTypeEnum> any = Arrays.stream(values())
                 .filter(type -> type.getCode().equals(code))
                 .findFirst();
         return any.orElse(null);
     }
-
 }

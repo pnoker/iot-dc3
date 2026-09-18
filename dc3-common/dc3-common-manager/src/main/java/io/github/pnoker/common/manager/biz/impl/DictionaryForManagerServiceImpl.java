@@ -14,146 +14,185 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.biz.impl;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
-import io.github.pnoker.common.entity.common.Pages;
+import io.github.pnoker.common.entity.base.BaseBO;
+import io.github.pnoker.common.entity.option.DictionaryOption;
+import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.manager.biz.DictionaryForManagerService;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
-import io.github.pnoker.common.manager.entity.builder.DictionaryForManagerBuilder;
-import io.github.pnoker.common.manager.entity.query.DeviceQuery;
-import io.github.pnoker.common.manager.entity.query.DictionaryQuery;
-import io.github.pnoker.common.manager.entity.query.DriverQuery;
-import io.github.pnoker.common.manager.entity.query.PointQuery;
-import io.github.pnoker.common.manager.entity.query.ProfileQuery;
-import io.github.pnoker.common.manager.service.DeviceService;
-import io.github.pnoker.common.manager.service.DriverService;
-import io.github.pnoker.common.manager.service.PointService;
-import io.github.pnoker.common.manager.service.ProfileService;
+import io.github.pnoker.common.manager.entity.query.DictionaryListRequest;
+import io.github.pnoker.common.manager.repository.DeviceFilter;
+import io.github.pnoker.common.manager.repository.DriverFilter;
+import io.github.pnoker.common.manager.repository.PointFilter;
+import io.github.pnoker.common.manager.repository.ProfileFilter;
+import io.github.pnoker.common.manager.service.ReactiveDeviceService;
+import io.github.pnoker.common.manager.service.ReactiveDriverService;
+import io.github.pnoker.common.manager.service.ReactivePointService;
+import io.github.pnoker.common.manager.service.ReactiveProfileService;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import java.util.List;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
-/**
- * Dictionary lookup service implementation for the manager module.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
-@Slf4j
+/** Default reactive option query service for manager entities. */
 @Service
 @RequiredArgsConstructor
 public class DictionaryForManagerServiceImpl implements DictionaryForManagerService {
 
-    private final DictionaryForManagerBuilder dictionaryBuilder;
+    private final ReactiveDriverService driverService;
 
-    private final DriverService driverService;
+    private final ReactiveProfileService profileService;
 
-    private final ProfileService profileService;
+    private final ReactiveDeviceService deviceService;
 
-    private final DeviceService deviceService;
-
-    private final PointService pointService;
+    private final ReactivePointService pointService;
 
     @Override
-    public Page<DictionaryBO> driverDictionary(DictionaryQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-
-        DriverQuery driverQuery = DriverQuery.builder()
-                .page(entityQuery.getPage())
-                .driverName(entityQuery.getLabel())
-                .tenantId(entityQuery.getTenantId())
-                .build();
-        Page<DriverBO> driverPageBO = driverService.list(driverQuery);
-        return dictionaryBuilder.buildVOPageByDriverBOPage(driverPageBO);
+    public Mono<OffsetPage<DictionaryOption>> listDriverOptions(Long tenantId, DictionaryListRequest request) {
+        return driverService
+                .list(new DriverFilter(
+                        tenantId,
+                        request.label(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        request.offset(),
+                        request.limit(),
+                        translateSort(request.sort(), "driverName")))
+                .map(page -> toOptions(page, DriverBO::getDriverName));
     }
 
     @Override
-    public Page<DictionaryBO> profileDictionary(DictionaryQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-
-        ProfileQuery profileQuery = ProfileQuery.builder()
-                .page(entityQuery.getPage())
-                .profileName(entityQuery.getLabel())
-                .tenantId(entityQuery.getTenantId())
-                .build();
-        Page<ProfileBO> profilePageBO = profileService.list(profileQuery);
-        return dictionaryBuilder.buildVOPageByProfileBOPage(profilePageBO);
+    public Mono<OffsetPage<DictionaryOption>> listProfileOptions(Long tenantId, DictionaryListRequest request) {
+        return profileService
+                .list(new ProfileFilter(
+                        tenantId,
+                        request.label(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        request.offset(),
+                        request.limit(),
+                        translateSort(request.sort(), "profileName")))
+                .map(page -> toOptions(page, ProfileBO::getProfileName));
     }
 
     @Override
-    public Page<DictionaryBO> pointDictionaryForProfile(DictionaryQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-
-        PointQuery pointQuery = PointQuery.builder()
-                .page(entityQuery.getPage())
-                .profileId(entityQuery.getParentId())
-                .pointName(entityQuery.getLabel())
-                .tenantId(entityQuery.getTenantId())
-                .build();
-        Page<PointBO> pointPageBO = pointService.list(pointQuery);
-        return dictionaryBuilder.buildVOPageByPointBOPage(pointPageBO);
+    public Mono<OffsetPage<DictionaryOption>> listProfilePointOptions(Long tenantId, DictionaryListRequest request) {
+        return requireParent(request)
+                .then(Mono.defer(() -> pointService.list(new PointFilter(
+                        tenantId,
+                        request.label(),
+                        null,
+                        null,
+                        null,
+                        request.parentId(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        request.offset(),
+                        request.limit(),
+                        translateSort(request.sort(), "pointName")))))
+                .map(page -> toOptions(page, PointBO::getPointName));
     }
 
     @Override
-    public Page<DictionaryBO> pointDictionaryForDevice(DictionaryQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-
-        PointQuery pointQuery = PointQuery.builder()
-                .page(entityQuery.getPage())
-                .deviceId(entityQuery.getParentId())
-                .pointName(entityQuery.getLabel())
-                .tenantId(entityQuery.getTenantId())
-                .build();
-        Page<PointBO> pointPageBO = pointService.list(pointQuery);
-        return dictionaryBuilder.buildVOPageByPointBOPage(pointPageBO);
+    public Mono<OffsetPage<DictionaryOption>> listDevicePointOptions(Long tenantId, DictionaryListRequest request) {
+        return requireParent(request)
+                .then(Mono.defer(() -> pointService.list(new PointFilter(
+                        tenantId,
+                        request.label(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        request.parentId(),
+                        request.offset(),
+                        request.limit(),
+                        translateSort(request.sort(), "pointName")))))
+                .map(page -> toOptions(page, PointBO::getPointName));
     }
 
     @Override
-    public Page<DictionaryBO> deviceDictionary(DictionaryQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-
-        DeviceQuery deviceQuery = DeviceQuery.builder()
-                .page(entityQuery.getPage())
-                .deviceName(entityQuery.getLabel())
-                .tenantId(entityQuery.getTenantId())
-                .build();
-        Page<DeviceBO> devicePageBO = deviceService.list(deviceQuery);
-        return dictionaryBuilder.buildVOPageByDeviceBOPage(devicePageBO);
+    public Mono<OffsetPage<DictionaryOption>> listDeviceOptions(Long tenantId, DictionaryListRequest request) {
+        return deviceService
+                .list(new DeviceFilter(
+                        tenantId,
+                        request.label(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        request.offset(),
+                        request.limit(),
+                        translateSort(request.sort(), "deviceName")))
+                .map(page -> toOptions(page, DeviceBO::getDeviceName));
     }
 
     @Override
-    public Page<DictionaryBO> deviceDictionaryForDriver(DictionaryQuery entityQuery) {
-        if (Objects.isNull(entityQuery.getPage())) {
-            entityQuery.setPage(new Pages());
-        }
-
-        DeviceQuery deviceQuery = DeviceQuery.builder()
-                .page(entityQuery.getPage())
-                .driverId(entityQuery.getParentId())
-                .deviceName(entityQuery.getLabel())
-                .tenantId(entityQuery.getTenantId())
-                .build();
-        Page<DeviceBO> devicePageBO = deviceService.list(deviceQuery);
-        return dictionaryBuilder.buildVOPageByDeviceBOPage(devicePageBO);
+    public Mono<OffsetPage<DictionaryOption>> listDriverDeviceOptions(Long tenantId, DictionaryListRequest request) {
+        return requireParent(request)
+                .then(Mono.defer(() -> deviceService.list(new DeviceFilter(
+                        tenantId,
+                        request.label(),
+                        null,
+                        request.parentId(),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        request.offset(),
+                        request.limit(),
+                        translateSort(request.sort(), "deviceName")))))
+                .map(page -> toOptions(page, DeviceBO::getDeviceName));
     }
 
+    private Mono<Void> requireParent(DictionaryListRequest request) {
+        if (request.parentId() == null || request.parentId() <= 0) {
+            return Mono.error(new RequestException("Parent ID is required"));
+        }
+        return Mono.empty();
+    }
+
+    private List<SortSpec> translateSort(List<SortSpec> sort, String labelField) {
+        return sort.stream()
+                .map(spec -> new SortSpec("label".equals(spec.field()) ? labelField : "id", spec.direction()))
+                .toList();
+    }
+
+    private <T extends BaseBO> OffsetPage<DictionaryOption> toOptions(
+            OffsetPage<T> page, Function<T, String> labelExtractor) {
+        List<DictionaryOption> options = page.items().stream()
+                .map(value -> DictionaryOption.leaf(
+                        labelExtractor.apply(value), value.getId().toString()))
+                .toList();
+        return OffsetPage.of(options, page.offset(), page.limit(), page.total());
+    }
 }

@@ -14,22 +14,20 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.constant.common.EnvironmentConstant;
 import io.github.pnoker.common.utils.HmacAuthSigner;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
-
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Auto-configuration for the shared {@link HmacAuthSigner} bean. Picked up by every
@@ -38,7 +36,6 @@ import java.util.stream.Collectors;
  * same secret-loading rules.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @AutoConfiguration
@@ -46,6 +43,9 @@ import java.util.stream.Collectors;
 public class HmacAuthConfig {
 
     private static final String WEAK_DEFAULT_SECRET = "io.github.pnoker.dc3";
+
+    /** Create the shared HMAC auto-configuration. */
+    public HmacAuthConfig() {}
 
     /**
      * Build the HMAC signer bean, resolving the secret from properties or the
@@ -58,8 +58,8 @@ public class HmacAuthConfig {
     @Bean
     @ConditionalOnMissingBean
     public HmacAuthSigner hmacAuthSigner(HmacAuthProperties properties, Environment environment) {
-        String secret = StringUtils.defaultIfBlank(properties.getSecret(),
-                environment.getProperty(EnvironmentConstant.AUTH_HMAC_SECRET_ENV, ""));
+        String secret = StringUtils.defaultIfBlank(
+                properties.getSecret(), environment.getProperty(EnvironmentConstant.AUTH_HMAC_SECRET_ENV, ""));
         validateSecret(secret, environment);
         return new HmacAuthSigner(secret);
     }
@@ -105,5 +105,4 @@ public class HmacAuthConfig {
         }
         return names.contains(EnvironmentConstant.ENV_PRE) || names.contains(EnvironmentConstant.ENV_PRO);
     }
-
 }

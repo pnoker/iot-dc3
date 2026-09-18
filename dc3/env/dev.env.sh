@@ -25,6 +25,13 @@ export POSTGRES_PORT=35432
 export POSTGRES_USERNAME=dc3
 export POSTGRES_PASSWORD=dc3dc3dc3
 export POSTGRES_DB=dc3
+export DC3_R2DBC_URL=r2dbc:postgresql://localhost:35432/dc3
+export DC3_SCHEMA_FINGERPRINT=713c2637af52d8e1e16d3d42ae8f85f48bc9e0f35d3f316509799f6a4490e136
+export DC3_SCHEMA_CONTRACT=r2dbc-flag-day-v1
+
+# Message broker selection (docs/mq-brokers.md); rabbitmq is the default
+export DC3_MQ_TYPE=rabbitmq
+
 
 # RabbitMQ
 export RABBITMQ_VIRTUAL_HOST=dc3
@@ -51,12 +58,21 @@ export CENTER_AGENTIC_HOST=localhost
 
 # Runtime
 export NODE_ENV=dev
-export DC3_FACADE_MODE=grpc
 export DC3_FACADE_GRPC_DEADLINE_MS=3000
-export DC3_SECURITY_KEY=dc3.security.key.2026.io.github.pnoker
-export AUTH_HMAC_SECRET=io.github.pnoker.dc3
-export POINT_BATCH_SPEED=100
-export POINT_BATCH_INTERVAL=5
+export DC3_SECURITY_KEY=dc3-dev-only-65d8aac255cffeb389f1c9d521ae9a1a  # local dev only; generate your own value for real deployments
+export AUTH_HMAC_SECRET=dc3-dev-only-f56ea45d339b35f8e409e55dc4eaf795  # local dev only; generate your own value for real deployments
+export POINT_BATCH_SIZE=500
+export POINT_BATCH_RECEIVE_TIMEOUT_MILLIS=100
+export POINT_CONCURRENT_CONSUMERS=4
+export POINT_MAX_CONCURRENT_CONSUMERS=16
+export POINT_PREFETCH_COUNT=1000
+export POINT_RETRY_MAX_RETRIES=3
+export POINT_RETRY_INITIAL_INTERVAL_MILLIS=1000
+export POINT_RETRY_MULTIPLIER=2
+export POINT_RETRY_MAX_INTERVAL_MILLIS=10000
+export DC3_DRIVER_LEASE_SECONDS=30
+export DC3_DRIVER_LEASE_RENEW_CRON='0/10 * * * * ?'
+export DC3_DRIVER_LEASE_QUEUE_EXPIRES_MILLIS=300000
 export MQTT_BATCH_SPEED=100
 export MQTT_BATCH_INTERVAL=5
 

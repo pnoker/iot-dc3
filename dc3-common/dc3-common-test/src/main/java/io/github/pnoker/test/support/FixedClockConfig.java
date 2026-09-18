@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.test.support;
-
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 /**
  * Test configuration that exposes a fixed {@link Clock} bean. Tests that depend on
@@ -35,6 +33,11 @@ public class FixedClockConfig {
 
     public static final Instant FIXED_INSTANT = Instant.parse("2026-01-01T00:00:00Z");
 
+    /**
+     * Create and configure the application-managed fixed clock.
+     *
+     * @return fixed clock result
+     */
     @Bean
     @Primary
     public Clock fixedClock() {

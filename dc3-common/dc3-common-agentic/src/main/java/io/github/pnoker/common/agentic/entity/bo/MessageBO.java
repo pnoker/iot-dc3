@@ -30,7 +30,6 @@ import lombok.ToString;
  * Business object for agentic conversation message operations.
  *
  * @author pnoker
- * @version 2026.5.11
  * @since 2026.5.11
  */
 @Getter
@@ -52,9 +51,7 @@ public class MessageBO extends BaseBO implements TenantOwned {
 
     private AgenticMessageStatusEnum status;
 
-    @Getter(onMethod_ = {@Override})
     private Long tenantId;
 
     private Long userId;
-
 }

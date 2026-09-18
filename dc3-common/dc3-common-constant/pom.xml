@@ -68,12 +68,6 @@
 
     <dependencies>
 
-        <!-- Mybatis Plus Annotation -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-annotation</artifactId>
-        </dependency>
-
         <!-- Jackson Annotation: @JsonValue keeps enum JSON on its db/wire value (e.g. grantType lowercase) -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

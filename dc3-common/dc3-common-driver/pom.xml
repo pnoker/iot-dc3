@@ -67,8 +67,12 @@
 
         <!-- gRPC Related -->
         <dependency>
-            <groupId>org.springframework.grpc</groupId>
-            <artifactId>spring-grpc-spring-boot-starter</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-grpc-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-grpc-client</artifactId>
         </dependency>
 
         <!-- Utility Libraries -->
@@ -91,16 +95,6 @@
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-api-driver</artifactId>
-        </dependency>
-
-        <!-- DC3 Facade Related -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-facade-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-facade-grpc</artifactId>
         </dependency>
 
         <!-- DC3 Common Related -->
@@ -130,11 +124,21 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-rabbitmq</artifactId>
+            <artifactId>dc3-mq-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-mq-rabbitmq</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-common-thread</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

@@ -21,16 +21,16 @@ import {describe, expect, it, vi} from 'vitest';
 import {mountListPage} from './_helpers';
 
 const userMocks = vi.hoisted(() => ({
-  addUser: vi.fn(() => Promise.resolve({data: true})),
-  deleteUser: vi.fn(() => Promise.resolve({data: true})),
-  listUser: vi.fn(() => Promise.resolve({data: {records: [{id: 'u-1', nickName: 'Alice'}], total: 1}})),
-  updateUser: vi.fn(() => Promise.resolve({data: true})),
+  addUser: vi.fn(() => Promise.resolve( true)),
+  deleteUser: vi.fn(() => Promise.resolve( true)),
+  listUser: vi.fn(() => Promise.resolve( {items: [{id: 'u-1', nickName: 'Alice'}], total: 1})),
+  updateUser: vi.fn(() => Promise.resolve( true)),
 }));
 
 vi.mock('@/api/user', () => userMocks);
 vi.mock('@/api/rolePrincipalBind', () => ({
-  addRolePrincipalBind: vi.fn(() => Promise.resolve({data: true})),
-  deleteRolePrincipalBind: vi.fn(() => Promise.resolve({data: true})),
+  addRolePrincipalBind: vi.fn(() => Promise.resolve( true)),
+  deleteRolePrincipalBind: vi.fn(() => Promise.resolve( true)),
 }));
 vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 

@@ -14,19 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.MessageBO;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
-
 import java.util.Map;
 
 /**
  * Renders structured message templates into channel payloads.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface MessageRenderService {
@@ -40,5 +37,4 @@ public interface MessageRenderService {
      * @return rendered payload
      */
     MessagePayload render(MessageBO message, NotifyChannelTypeEnum channelTypeFlag, Map<String, Object> variables);
-
 }

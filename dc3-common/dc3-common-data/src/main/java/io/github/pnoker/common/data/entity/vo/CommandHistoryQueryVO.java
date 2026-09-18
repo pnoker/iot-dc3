@@ -14,26 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.pnoker.common.entity.common.Pages;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
-import io.github.pnoker.common.utils.PageUtil;
+import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * VO for querying command records with pagination and filters.
  *
  * @author pnoker
- * @version 2026.5.23
  * @since 2026.5.23
  */
 @Getter
@@ -46,22 +43,30 @@ public class CommandHistoryQueryVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "Filter by device ID; the device must belong to the current tenant.", example = "1024")
-    private Long deviceId;
+    private String deviceId;
 
-    @Schema(description = "Filter by command definition ID; the command must belong to the current tenant.", example = "4096")
-    private Long commandId;
+    @Schema(
+            description = "Filter by command definition ID; the command must belong to the current tenant.",
+            example = "4096")
+    private String commandId;
 
-    @Schema(description = "Filter by exact command code, e.g. a driver-defined read/write opcode.", example = "READ_HOLDING_REG")
+    @Schema(
+            description = "Filter by exact command code, e.g. a driver-defined read/write opcode.",
+            example = "READ_HOLDING_REG")
     private String commandCode;
 
-    @Schema(description = "Filter by command lifecycle status (PENDING, SENT, SUCCESS, FAILED, TIMEOUT, EXPIRED, DEAD, DUPLICATE).", example = "SUCCESS")
+    @Schema(
+            description =
+                    "Filter by command lifecycle status (PENDING, SENT, SUCCESS, FAILED, TIMEOUT, EXPIRED, DEAD, DUPLICATE).",
+            example = "SUCCESS")
     private PointCommandStatusEnum status;
 
-    @Schema(description = "Pagination parameters (page number, page size).")
-    private Pages page;
+    @Schema(description = "Zero-based result offset.", example = "0")
+    private Long offset = 0L;
 
-    public <T> Page<T> toPage() {
-        return PageUtil.page(page);
-    }
+    @Schema(description = "Maximum number of records.", example = "50")
+    private Integer limit = PageRequest.DEFAULT_LIMIT;
 
+    @Schema(description = "Stable, whitelisted sort fields.")
+    private List<SortSpec> sort = List.of();
 }

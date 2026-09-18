@@ -1,7 +1,35 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
 server:
   port: ${DC3_AGENTIC_PORT:8600}
 
 spring:
+  autoconfigure:
+    # The gRPC OAuth2 resource-server autoconfiguration references servlet-OAuth2
+    # classes (JwtDecoder / OpaqueTokenIntrospector) that are intentionally absent
+    # here; loading it only produces TypeNotPresent introspection warnings at boot.
+    # NOTE: keep this list in each center, NOT in the shared application-web.yml —
+    # the web profile outranks dc3-gateway's own yml and would replace its
+    # security-autoconfiguration excludes.
+    exclude:
+      - org.springframework.boot.grpc.server.autoconfigure.security.GrpcServerOAuth2ResourceServerAutoConfiguration
+  config:
+    import: classpath:application-r2dbc.yml
   application:
     name: @project.artifactId@
   webflux:
@@ -12,7 +40,12 @@ spring:
 
 dc3:
   facade:
-    mode: ${DC3_FACADE_MODE:grpc}
+    auth:
+      mode: grpc
+    manager:
+      mode: grpc
+    data:
+      mode: grpc
 
 logging:
   file:

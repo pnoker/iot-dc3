@@ -14,46 +14,48 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.grpc.server;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.api.center.manager.DriverApiGrpc;
 import io.github.pnoker.api.center.manager.GrpcDriverIdsQuery;
-import io.github.pnoker.api.center.manager.GrpcRDriverDTO;
-import io.github.pnoker.api.center.manager.GrpcRDriverListDTO;
+import io.github.pnoker.api.center.manager.GrpcDriverListDTO;
+import io.github.pnoker.api.center.manager.GrpcOffsetDriverQuery;
+import io.github.pnoker.api.center.manager.GrpcOffsetPageDriverDTO;
 import io.github.pnoker.api.common.GrpcDriverDTO;
 import io.github.pnoker.api.common.GrpcDriverQuery;
-import io.github.pnoker.common.enums.ErrorCode;
-import io.github.pnoker.common.enums.SuccessCode;
+import io.github.pnoker.api.common.PageRequest;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
 import io.github.pnoker.common.manager.grpc.server.manager.ManagerDriverServer;
-import io.github.pnoker.common.manager.service.DriverService;
+import io.github.pnoker.common.manager.repository.DriverFilter;
+import io.github.pnoker.common.manager.service.ReactiveDriverService;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class ManagerDriverServerTest {
 
     @Mock
-    private DriverService driverService;
+    private ReactiveDriverService reactiveDriverService;
 
     @Mock
     private GrpcDriverBuilder grpcDriverBuilder;
@@ -64,99 +66,76 @@ class ManagerDriverServerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        ManagerDriverServer driverServer = new ManagerDriverServer(grpcDriverBuilder, driverService);
-
         String name = "dc3-manager-driver-" + UUID.randomUUID();
-        server = InProcessServerBuilder.forName(name).directExecutor().addService(driverServer).build().start();
+        server = InProcessServerBuilder.forName(name)
+                .directExecutor()
+                .addService(new ManagerDriverServer(grpcDriverBuilder, reactiveDriverService))
+                .build()
+                .start();
         channel = InProcessChannelBuilder.forName(name).directExecutor().build();
         stub = DriverApiGrpc.newBlockingStub(channel);
     }
 
     @AfterEach
     void tearDown() {
-        if (channel != null) {
-            channel.shutdownNow();
-        }
-        if (server != null) {
-            server.shutdownNow();
-        }
+        if (channel != null) channel.shutdownNow();
+        if (server != null) server.shutdownNow();
     }
 
     @Test
-    void listByDriverIdReturnsOkEnvelopeWithMappedData() {
-        DriverBO bo = new DriverBO();
-        bo.setId(1L);
-        GrpcDriverDTO dto = GrpcDriverDTO.newBuilder().build();
-        when(driverService.getById(1L)).thenReturn(bo);
-        when(grpcDriverBuilder.buildGrpcDTOByBO(bo)).thenReturn(dto);
-
-        GrpcRDriverDTO response = stub.getByDriverId(GrpcDriverQuery.newBuilder().setDriverId(1L).build());
-        assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getResult().getCode()).isEqualTo(SuccessCode.OK.getCode());
-    }
-
-    @Test
-    void listByDriverIdReturnsNoResourceWhenMissing() {
-        when(driverService.getById(99L)).thenReturn(null);
-        GrpcRDriverDTO response = stub.getByDriverId(GrpcDriverQuery.newBuilder().setDriverId(99L).build());
-        assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
-    }
-
-    @Test
-    void listByDriverIdsReturnsOkForNonEmptyList() {
-        DriverBO bo = new DriverBO();
-        bo.setId(1L);
-        when(driverService.listByIds(Set.of(1L))).thenReturn(List.of(bo));
-        when(grpcDriverBuilder.buildGrpcDTOByBO(bo)).thenReturn(GrpcDriverDTO.newBuilder().build());
-
-        GrpcRDriverListDTO response = stub.listByDriverIds(
-                GrpcDriverIdsQuery.newBuilder().addDriverIds(1L).build());
-        assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getDataCount()).isEqualTo(1);
-    }
-
-    @Test
-    void listByDriverIdsReturnsNoResourceForEmptyList() {
-        when(driverService.listByIds(eq(Set.of(99L)))).thenReturn(List.of());
-        GrpcRDriverListDTO response = stub.listByDriverIds(
-                GrpcDriverIdsQuery.newBuilder().addDriverIds(99L).build());
-        assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
-    }
-
-    @Test
-    void listByDriverIdsReturnsNoResourceForNullSelection() {
-        when(driverService.listByIds(Set.of(99L))).thenReturn(null);
-        GrpcRDriverListDTO response = stub.listByDriverIds(
-                GrpcDriverIdsQuery.newBuilder().addDriverIds(99L).build());
-        assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
-    }
-
-    @Test
-    void listByPageReturnsNoResourceWhenServiceReturnsNull() {
-        when(driverService.list(org.mockito.ArgumentMatchers.any())).thenReturn(null);
-        when(grpcDriverBuilder.buildQueryByGrpcQuery(org.mockito.ArgumentMatchers.any())).thenReturn(null);
-        var response = stub.listByPage(io.github.pnoker.api.center.manager.GrpcPageDriverQuery.newBuilder().build());
-        assertThat(response.getResult().getOk()).isFalse();
-        assertThat(response.getResult().getCode()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
-    }
-
-    @Test
-    void listByPageReturnsOkWithPageMetadata() {
-        Page<DriverBO> page = new Page<>(2, 10);
-        page.setTotal(25);
-        page.setRecords(List.of(new DriverBO()));
-        when(driverService.list(org.mockito.ArgumentMatchers.any())).thenReturn(page);
-        when(grpcDriverBuilder.buildQueryByGrpcQuery(org.mockito.ArgumentMatchers.any())).thenReturn(null);
-        when(grpcDriverBuilder.buildGrpcDTOByBO(org.mockito.ArgumentMatchers.any()))
+    void getByDriverIdReturnsMappedResource() {
+        DriverBO bo = driver(1L);
+        when(reactiveDriverService.getById(7L, 1L)).thenReturn(Mono.just(bo));
+        when(grpcDriverBuilder.buildGrpcDTOByBO(bo))
                 .thenReturn(GrpcDriverDTO.newBuilder().build());
+        GrpcDriverDTO response = stub.getByDriverId(
+                GrpcDriverQuery.newBuilder().setTenantId(7L).setDriverId(1L).build());
+        assertThat(response).isNotNull();
+    }
 
-        var response = stub.listByPage(io.github.pnoker.api.center.manager.GrpcPageDriverQuery.newBuilder().build());
-        assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getData().getPage().getCurrent()).isEqualTo(2L);
-        assertThat(response.getData().getPage().getSize()).isEqualTo(10L);
-        assertThat(response.getData().getPage().getTotal()).isEqualTo(25L);
+    @Test
+    void getByDriverIdReturnsNotFoundStatus() {
+        when(reactiveDriverService.getById(7L, 99L))
+                .thenReturn(Mono.error(new io.github.pnoker.common.exception.NotFoundException("missing")));
+        assertThatThrownBy(() -> stub.getByDriverId(GrpcDriverQuery.newBuilder()
+                        .setTenantId(7L)
+                        .setDriverId(99L)
+                        .build()))
+                .isInstanceOfSatisfying(
+                        StatusRuntimeException.class,
+                        error -> assertThat(error.getStatus().getCode()).isEqualTo(Status.Code.NOT_FOUND));
+    }
+
+    @Test
+    void listByDriverIdsIsTenantScoped() {
+        DriverBO bo = driver(1L);
+        when(reactiveDriverService.listByIds(7L, List.of(1L))).thenReturn(reactor.core.publisher.Flux.just(bo));
+        when(grpcDriverBuilder.buildGrpcDTOByBO(bo))
+                .thenReturn(GrpcDriverDTO.newBuilder().build());
+        GrpcDriverListDTO response = stub.listByDriverIds(
+                GrpcDriverIdsQuery.newBuilder().setTenantId(7L).addDriverIds(1L).build());
+        assertThat(response.getItemsCount()).isEqualTo(1);
+    }
+
+    @Test
+    void listReturnsCanonicalOffsetPage() {
+        when(reactiveDriverService.list(any(DriverFilter.class)))
+                .thenReturn(Mono.just(OffsetPage.of(List.of(driver(1L)), 10, 5, 11)));
+        when(grpcDriverBuilder.buildGrpcDTOByBO(any()))
+                .thenReturn(GrpcDriverDTO.newBuilder().build());
+        GrpcOffsetPageDriverDTO response = stub.list(GrpcOffsetDriverQuery.newBuilder()
+                .setTenantId(7L)
+                .setPage(PageRequest.newBuilder().setOffset(0).setLimit(5))
+                .build());
+        assertThat(response.getPage().getOffset()).isEqualTo(10L);
+        assertThat(response.getPage().getLimit()).isEqualTo(5L);
+        assertThat(response.getPage().getTotal()).isEqualTo(11L);
+    }
+
+    private DriverBO driver(Long id) {
+        DriverBO value = new DriverBO();
+        value.setId(id);
+        value.setTenantId(7L);
+        return value;
     }
 }

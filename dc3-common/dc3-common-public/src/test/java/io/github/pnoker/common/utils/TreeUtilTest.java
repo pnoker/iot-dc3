@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
-import io.github.pnoker.common.entity.common.TreeNode;
-import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import io.github.pnoker.common.entity.common.TreeNode;
+import java.util.List;
+import org.junit.jupiter.api.Test;
 
 class TreeUtilTest {
 
@@ -73,10 +71,10 @@ class TreeUtilTest {
     }
 
     @Test
-    void findChildrenAttachesChildrenAndReturnsTheRoot() {
+    void getChildrenAttachesChildrenAndReturnsTheRoot() {
         TreeNode root = node(1, 0);
         TreeNode child = node(2, 1);
-        TreeNode result = TreeUtil.findChildren(root, List.of(child));
+        TreeNode result = TreeUtil.getChildren(root, List.of(child));
         assertThat(result).isSameAs(root);
         assertThat(result.getChildren()).extracting(TreeNode::getId).contains(2);
     }

@@ -22,20 +22,19 @@ import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
-
-import java.util.Objects;
-import java.util.Optional;
+import reactor.core.publisher.Mono;
 
 /**
- * System-health tools exposed to the LLM via Spring AI @Tool.
+ * System-health tool exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
@@ -45,20 +44,27 @@ public class SystemTool {
 
     private final Optional<StatusHealthFacade> statusHealthFacade;
 
-    @Tool(description = "Get a system health snapshot: center services, infrastructure, driver fleet, and device fleet.")
+    /**
+     * Return system health.
+     *
+     * @param toolContext tool context
+     * @return get system health result
+     */
+    @Tool(
+            description =
+                    "Get a system health snapshot: center services, infrastructure, driver fleet, and device fleet.")
     @AgenticToolMetadata(domain = "system", title = "Get system health")
-    public AgenticToolResult<FacadeSystemHealthBO> getSystemHealth(ToolContext toolContext) {
+    public Mono<AgenticToolResult<FacadeSystemHealthBO>> getSystemHealth(ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getSystemHealth", tenantId);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
+            return Mono.just(AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE));
         }
-        FacadeSystemHealthBO health = facade.systemHealth(tenantId);
-        if (Objects.isNull(health)) {
-            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.SYSTEM_HEALTH_UNAVAILABLE);
-        }
-        return AgenticToolResult.ok("System health loaded", health);
+        return facade.systemHealthReactive(tenantId)
+                .map(health -> Objects.isNull(health)
+                        ? AgenticToolResult.<FacadeSystemHealthBO>unavailable(
+                                AgenticConstant.ToolMessage.SYSTEM_HEALTH_UNAVAILABLE)
+                        : AgenticToolResult.ok("System health loaded", health));
     }
-
 }

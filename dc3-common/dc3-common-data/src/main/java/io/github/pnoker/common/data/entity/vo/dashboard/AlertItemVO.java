@@ -14,27 +14,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.ConfirmFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * One row in the alert list panel on the home page. Source is either {@code device} (with
  * point_id) or {@code driver}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Getter
@@ -48,16 +45,16 @@ public class AlertItemVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "alert row ID", example = "1")
-    private Long id;
+    private String id;
 
     @Schema(description = "alert source: device or driver", example = "device")
     private String source;
 
     @Schema(description = "source entity ID (device ID or driver ID)", example = "1024")
-    private Long sourceId;
+    private String sourceId;
 
     @Schema(description = "point ID, present when source is device", example = "2048")
-    private Long pointId;
+    private String pointId;
 
     @Schema(description = "Alarm type enum", example = "OFFLINE")
     private AlarmTypeEnum alarmTypeFlag;
@@ -72,7 +69,8 @@ public class AlertItemVO implements Serializable {
      * Human-readable message extracted from alarm_ext->>'content'. Populated by the
      * paging / list endpoints; latest(size=N) leaves it null.
      */
-    @Schema(description = "human-readable alarm message", example = "Device Temperature Sensor A1 is offline for more than 5 minutes")
+    @Schema(
+            description = "human-readable alarm message",
+            example = "Device Temperature Sensor A1 is offline for more than 5 minutes")
     private String message;
-
 }

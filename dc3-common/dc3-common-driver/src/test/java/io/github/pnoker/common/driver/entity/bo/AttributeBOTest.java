@@ -16,12 +16,12 @@
  */
 package io.github.pnoker.common.driver.entity.bo;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.exception.TypeException;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Tests for driver and point attribute value conversion.
@@ -30,15 +30,20 @@ class AttributeBOTest {
 
     @Test
     void convertsConfiguredAttributeTypes() {
-        assertThat(attribute("driver-1", AttributeTypeEnum.STRING).getValue(String.class)).isEqualTo("driver-1");
-        assertThat(attribute("9400", AttributeTypeEnum.INT).getValue(Integer.class)).isEqualTo(9400);
-        assertThat(attribute("true", AttributeTypeEnum.BOOLEAN).getValue(Boolean.class)).isTrue();
+        assertThat(attribute("driver-1", AttributeTypeEnum.STRING).getValue(String.class))
+                .isEqualTo("driver-1");
+        assertThat(attribute("9400", AttributeTypeEnum.INT).getValue(Integer.class))
+                .isEqualTo(9400);
+        assertThat(attribute("true", AttributeTypeEnum.BOOLEAN).getValue(Boolean.class))
+                .isTrue();
     }
 
     @Test
     void acceptsPrimitiveTargetClasses() {
-        assertThat(attribute("9400", AttributeTypeEnum.INT).getValue(Integer.TYPE)).isEqualTo(9400);
-        assertThat(attribute("1", AttributeTypeEnum.BOOLEAN).getValue(Boolean.TYPE)).isEqualTo(true);
+        assertThat(attribute("9400", AttributeTypeEnum.INT).getValue(Integer.TYPE))
+                .isEqualTo(9400);
+        assertThat(attribute("1", AttributeTypeEnum.BOOLEAN).getValue(Boolean.TYPE))
+                .isEqualTo(true);
     }
 
     @Test
@@ -49,11 +54,11 @@ class AttributeBOTest {
 
     @Test
     void emptyStringAttributeIsAllowedForStringType() {
-        assertThat(attribute("", AttributeTypeEnum.STRING).getValue(String.class)).isEmpty();
+        assertThat(attribute("", AttributeTypeEnum.STRING).getValue(String.class))
+                .isEmpty();
     }
 
     private AttributeBO attribute(String value, AttributeTypeEnum type) {
         return AttributeBO.builder().value(value).type(type).build();
     }
-
 }

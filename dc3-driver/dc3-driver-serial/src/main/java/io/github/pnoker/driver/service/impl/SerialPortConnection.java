@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import com.fazecast.jSerialComm.SerialPort;
 import io.github.pnoker.common.exception.ConnectorException;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Wrapper for a jSerialComm serial port connection.
@@ -33,7 +31,6 @@ import java.util.Objects;
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -50,6 +47,7 @@ public class SerialPortConnection {
     private InputStream inputStream;
     private OutputStream outputStream;
 
+    /** serial port connection. */
     public SerialPortConnection(String portName, int baudRate, int dataBits, int stopBits, int parity, int timeout) {
         this.portName = portName;
         this.baudRate = baudRate;
@@ -82,8 +80,13 @@ public class SerialPortConnection {
 
         inputStream = serialPort.getInputStream();
         outputStream = serialPort.getOutputStream();
-        log.info("Serial port opened: {}, baudRate={}, dataBits={}, stopBits={}, parity={}",
-                portName, baudRate, dataBits, stopBits, parity);
+        log.info(
+                "Serial port opened, portName={}, baudRate={}, dataBits={}, stopBits={}, parity={}",
+                portName,
+                baudRate,
+                dataBits,
+                stopBits,
+                parity);
     }
 
     /**
@@ -141,18 +144,18 @@ public class SerialPortConnection {
                 inputStream.close();
             }
         } catch (IOException e) {
-            log.warn("Failed to close serial input stream: {}", portName, e);
+            log.warn("Serial input stream closure failed, portName={}", portName, e);
         }
         try {
             if (Objects.nonNull(outputStream)) {
                 outputStream.close();
             }
         } catch (IOException e) {
-            log.warn("Failed to close serial output stream: {}", portName, e);
+            log.warn("Serial output stream closure failed, portName={}", portName, e);
         }
         if (Objects.nonNull(serialPort) && serialPort.isOpen()) {
             serialPort.closePort();
-            log.info("Serial port closed: {}", portName);
+            log.info("Serial port closed, portName={}", portName);
         }
     }
 
@@ -165,6 +168,11 @@ public class SerialPortConnection {
         return Objects.nonNull(serialPort) && serialPort.isOpen();
     }
 
+    /**
+     * Return port name.
+     *
+     * @return get port name result
+     */
     public String getPortName() {
         return portName;
     }
@@ -227,5 +235,4 @@ public class SerialPortConnection {
         System.arraycopy(buffer, 0, result, 0, totalRead);
         return result;
     }
-
 }

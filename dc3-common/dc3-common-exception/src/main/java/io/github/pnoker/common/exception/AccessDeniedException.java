@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.exception;
 
 import io.github.pnoker.common.enums.ErrorCode;
@@ -23,15 +22,25 @@ import io.github.pnoker.common.enums.ErrorCode;
  * Thrown when an authenticated user lacks the required permission for an operation.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class AccessDeniedException extends ServiceException {
 
+    /**
+     * Exception with a plain failure detail.
+     *
+     * @param message failure detail
+     */
     public AccessDeniedException(String message) {
         super(message);
     }
 
+    /**
+     * Exception with a failure detail and cause.
+     *
+     * @param message failure detail or underlying failure
+     * @param cause   failure detail or underlying failure
+     */
     public AccessDeniedException(String message, Throwable cause) {
         super(message, cause);
     }

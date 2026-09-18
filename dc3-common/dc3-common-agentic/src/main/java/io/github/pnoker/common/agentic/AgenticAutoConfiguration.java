@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,13 +27,9 @@ import org.springframework.context.annotation.ComponentScan;
  * {@code io.github.pnoker.common.agentic}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @AutoConfiguration
 @ConditionalOnProperty(name = "dc3.agentic.enabled", havingValue = "true", matchIfMissing = true)
 @ComponentScan("io.github.pnoker.common.agentic")
-@MapperScan("io.github.pnoker.common.agentic.mapper")
-public class AgenticAutoConfiguration {
-
-}
+public class AgenticAutoConfiguration {}

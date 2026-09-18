@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da.browser;
 
 /**
@@ -24,8 +23,8 @@ package org.openscada.opc.lib.da.browser;
  * @since 2016.10.1
  */
 public enum Access {
-
-    READ(1), WRITE(2);
+    READ(1),
+    WRITE(2);
 
     private int _code = 0;
 
@@ -36,5 +35,4 @@ public enum Access {
     public int getCode() {
         return this._code;
     }
-
 }

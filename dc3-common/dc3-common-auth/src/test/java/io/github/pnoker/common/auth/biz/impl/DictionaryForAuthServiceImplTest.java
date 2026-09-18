@@ -14,56 +14,44 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.biz.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.github.pnoker.common.auth.dal.TenantManager;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.common.auth.entity.model.TenantDO;
-import io.github.pnoker.common.dal.entity.bo.DictionaryBO;
+import io.github.pnoker.common.auth.repository.ReactiveTenantDictionaryStore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import reactor.core.publisher.Flux;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class DictionaryForAuthServiceImplTest {
-
     @Mock
-    private TenantManager tenantManager;
+    private ReactiveTenantDictionaryStore tenantStore;
 
     @InjectMocks
     private DictionaryForAuthServiceImpl service;
 
     @Test
-    void tenantDictionaryReturnsEmptyWhenNoEnabledTenants() {
-        when(tenantManager.list(any(LambdaQueryWrapper.class))).thenReturn(List.of());
-        assertThat(service.tenantDictionary()).isEmpty();
-    }
-
-    @Test
-    void tenantDictionaryMapsTenantsToLabelValuePairs() {
+    void listTenantOptionsMapsEnabledTenantsReactively() {
         TenantDO first = new TenantDO();
         first.setId(1L);
         first.setTenantName("Acme");
         TenantDO second = new TenantDO();
         second.setId(2L);
         second.setTenantName("Globex");
-        when(tenantManager.list(any(LambdaQueryWrapper.class))).thenReturn(List.of(first, second));
+        when(tenantStore.listEnabled()).thenReturn(Flux.just(first, second));
 
-        List<DictionaryBO> result = service.tenantDictionary();
-
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0).getLabel()).isEqualTo("Acme");
-        assertThat(result.get(0).getValue()).isEqualTo("1");
-        assertThat(result.get(1).getLabel()).isEqualTo("Globex");
-        assertThat(result.get(1).getValue()).isEqualTo("2");
+        StepVerifier.create(service.listTenantOptions())
+                .assertNext(options -> {
+                    org.assertj.core.api.Assertions.assertThat(options)
+                            .extracting(option -> option.label() + ":" + option.value())
+                            .containsExactly("Acme:1", "Globex:2");
+                })
+                .verifyComplete();
     }
 }

@@ -17,21 +17,50 @@
 
 <template>
   <el-tooltip v-if="!visible" :content="t('agentic.tooltip')" placement="left">
-    <el-button circle class="agentic-launcher" type="primary" @click="agenticStore.toggle">
+    <el-button
+      :aria-label="t('agentic.tooltip')"
+      circle
+      class="agentic-launcher"
+      type="primary"
+      @click="handleLauncherClick"
+    >
       <el-icon>
         <ChatDotRound/>
       </el-icon>
     </el-button>
   </el-tooltip>
 
-  <aside v-if="visible" ref="panelRef" :style="panelStyle" class="agentic-panel">
-    <button :aria-label="t('agentic.resize')" class="agentic-resizer" type="button" @mousedown="handleResizeStart"/>
+  <aside
+    v-if="visible"
+    ref="panelRef"
+    :aria-label="t('agentic.title')"
+    :aria-modal="isMobile || undefined"
+    :role="isMobile ? 'dialog' : 'complementary'"
+    :style="panelStyle"
+    class="agentic-panel"
+    tabindex="-1"
+    @keydown="handlePanelKeydown"
+  >
+    <button
+      :aria-label="t('agentic.resize')"
+      :aria-valuemax="MAX_PANEL_WIDTH"
+      :aria-valuemin="MIN_PANEL_WIDTH"
+      :aria-valuenow="effectivePanelWidth"
+      :tabindex="isMobile ? -1 : 0"
+      aria-orientation="vertical"
+      class="agentic-resizer"
+      role="separator"
+      type="button"
+      @keydown.left.prevent="handleResizeKeydown(16)"
+      @keydown.right.prevent="handleResizeKeydown(-16)"
+      @mousedown="handleResizeStart"
+    />
     <section v-loading="loading" class="agentic-shell">
       <header class="agentic-header">
         <div class="agentic-header__top">
           <div class="agentic-title">
             <div class="agentic-mark">
-              <img alt="" src="/images/common/llm.svg"/>
+              <img :src="assetUrl('images/common/llm.svg')" alt=""/>
             </div>
             <div>
               <strong>{{ t('agentic.title') }}</strong>
@@ -41,14 +70,27 @@
 
           <div class="agentic-header__primary-actions">
             <el-tooltip :content="t('agentic.headerNew')">
-              <el-button circle size="small" type="success" @click="handleNewSession">
+              <el-button
+                :aria-label="t('agentic.headerNew')"
+                :disabled="loading || sessionsLoading || streaming"
+                circle
+                size="small"
+                type="success"
+                @click="handleNewSession"
+              >
                 <el-icon>
                   <Plus/>
                 </el-icon>
               </el-button>
             </el-tooltip>
             <el-tooltip :content="t('agentic.headerClose')">
-              <el-button circle size="small" type="danger" @click="agenticStore.close">
+              <el-button
+                :aria-label="t('agentic.headerClose')"
+                circle
+                size="small"
+                type="danger"
+                @click="agenticStore.close"
+              >
                 <el-icon>
                   <Close/>
                 </el-icon>
@@ -61,7 +103,9 @@
           <div class="agentic-header__actions-left">
             <el-select
               :model-value="selectedModel"
+              :aria-label="t('agentic.model')"
               class="agentic-model agentic-model--toolbar"
+              :disabled="loading || sessionsLoading || streaming"
               filterable
               size="small"
               @update:model-value="handleModelChange"
@@ -77,9 +121,11 @@
             <el-tooltip :content="t('agentic.reasoning')">
               <el-switch
                 v-model="reasoningEnabled"
+                :active-value="true"
                 :active-icon="Cpu"
                 :aria-label="t('agentic.reasoning')"
-                :disabled="!activeModel.reasoning"
+                :disabled="!activeModel.reasoning || loading || sessionsLoading || streaming"
+                :inactive-value="false"
                 :inactive-icon="Lightning"
                 class="agentic-reasoning-switch"
                 inline-prompt
@@ -90,9 +136,15 @@
           </div>
 
           <div class="agentic-header__actions-right">
-            <el-popover placement="bottom-end" trigger="click" width="300">
+            <el-popover :teleported="false" placement="bottom-end" trigger="click" width="300">
               <template #reference>
-                <el-button :title="t('agentic.headerSettings')" circle size="small">
+                <el-button
+                  :aria-label="t('agentic.headerSettings')"
+                  :disabled="loading || sessionsLoading || streaming"
+                  :title="t('agentic.headerSettings')"
+                  circle
+                  size="small"
+                >
                   <el-icon>
                     <Setting/>
                   </el-icon>
@@ -103,6 +155,7 @@
                   <span>{{ t('agentic.temperature') }}</span>
                   <el-slider
                     v-model="temperatureProxy"
+                    :disabled="loading || sessionsLoading || streaming"
                     :max="2"
                     :min="0"
                     :step="0.1"
@@ -114,6 +167,7 @@
                   <span>{{ t('agentic.maxTokens') }}</span>
                   <el-input-number
                     v-model="maxTokensProxy"
+                    :disabled="loading || sessionsLoading || streaming"
                     :min="1"
                     :step="256"
                     controls-position="right"
@@ -138,8 +192,20 @@
               </div>
             </el-popover>
 
-            <el-dropdown max-height="360" trigger="click" @command="handleHistoryCommand">
-              <el-button :title="t('agentic.headerHistory')" circle size="small">
+            <el-dropdown
+              :disabled="loading || sessionsLoading || streaming"
+              max-height="360"
+              :teleported="false"
+              trigger="click"
+              @command="handleHistoryCommand"
+            >
+              <el-button
+                :aria-label="t('agentic.headerHistory')"
+                :disabled="loading || sessionsLoading || streaming"
+                :title="t('agentic.headerHistory')"
+                circle
+                size="small"
+              >
                 <el-icon>
                   <Clock/>
                 </el-icon>
@@ -150,8 +216,15 @@
                     v-for="session in conversationItems"
                     :key="session.conversationId"
                     :command="`select:${session.conversationId}`"
+                    :disabled="Boolean(sessionActionLoading[session.conversationId])"
                   >
-                    <span class="agentic-history-item">{{ session.title }}</span>
+                    <span :class="`is-${session.sessionExt?.icon || 'monitor'}`" class="agentic-history-icon">
+                      <el-icon><component :is="sessionIcon(session.sessionExt?.icon)"/></el-icon>
+                    </span>
+                    <span class="agentic-history-item">
+                      <strong>{{ session.title }}</strong>
+                      <small v-if="session.summary">{{ session.summary }}</small>
+                    </span>
                   </el-dropdown-item>
                   <el-dropdown-item v-if="conversationItems.length === 0" disabled
                   >{{ t('agentic.headerNoHistory') }}
@@ -159,10 +232,23 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-            <el-popover v-model:visible="renamePopoverVisible" placement="bottom-end" trigger="click" width="280">
+            <el-popover
+              v-model:visible="renamePopoverVisible"
+              :teleported="false"
+              placement="bottom-end"
+              trigger="click"
+              width="280"
+            >
               <template #reference>
                 <el-button
-                  :disabled="!activeConversationId"
+                  :aria-label="t('agentic.headerRename')"
+                  :disabled="
+                    !activeConversationId ||
+                    loading ||
+                    sessionsLoading ||
+                    streaming ||
+                    Boolean(sessionActionLoading[activeConversationId])
+                  "
                   :title="t('agentic.headerRename')"
                   circle
                   size="small"
@@ -177,6 +263,7 @@
                 <span class="agentic-popover-title">{{ t('agentic.dialogConversationTitle') }}</span>
                 <el-input
                   v-model="renameTitle"
+                  :disabled="loading || sessionsLoading || streaming || Boolean(sessionActionLoading[activeConversationId])"
                   :maxlength="80"
                   :placeholder="t('agentic.dialogConversationTitle')"
                   clearable
@@ -187,14 +274,38 @@
                   <el-button size="small" @click="renamePopoverVisible = false">
                     {{ t('agentic.dialogCancel') }}
                   </el-button>
-                  <el-button :disabled="!renameTitle.trim()" size="small" type="primary" @click="handleRenameCurrent">
+                  <el-button
+                    :disabled="
+                      !renameTitle.trim() ||
+                      loading ||
+                      sessionsLoading ||
+                      streaming ||
+                      Boolean(sessionActionLoading[activeConversationId])
+                    "
+                    :loading="Boolean(sessionActionLoading[activeConversationId])"
+                    size="small"
+                    type="primary"
+                    @click="handleRenameCurrent"
+                  >
                     {{ t('agentic.dialogSave') }}
                   </el-button>
                 </div>
               </div>
             </el-popover>
             <el-tooltip :content="t('agentic.headerDelete')">
-              <el-button :disabled="!activeConversationId" circle size="small" @click="handleDeleteCurrent">
+              <el-button
+                :aria-label="t('agentic.headerDelete')"
+                :disabled="
+                  !activeConversationId ||
+                  loading ||
+                  sessionsLoading ||
+                  streaming ||
+                  Boolean(sessionActionLoading[activeConversationId])
+                "
+                circle
+                size="small"
+                @click="handleDeleteCurrent"
+              >
                 <el-icon>
                   <Delete/>
                 </el-icon>
@@ -204,12 +315,29 @@
         </div>
       </header>
 
+      <div v-if="sessionsError" class="agentic-session-error" role="alert">
+        <span>{{ t('agentic.failedSessions') }}</span>
+        <el-button :loading="sessionsLoading" link type="danger" @click="handleRetrySessions">
+          {{ t('common.retry') }}
+        </el-button>
+      </div>
+
+      <div v-if="currentMessagesError" class="agentic-data-error" role="alert">
+        <span>{{ t('agentic.failedMessages') }}</span>
+        <el-button :loading="currentMessagesLoading" link type="danger" @click="handleRetryMessages">
+          {{ t('common.retry') }}
+        </el-button>
+      </div>
+
       <main ref="bodyRef" class="agentic-body">
-        <div v-if="currentMessages.length === 0" class="agentic-empty">
+        <div v-if="currentMessagesLoading && currentMessages.length === 0" class="agentic-loading-state">
+          <el-skeleton :rows="4" animated />
+        </div>
+        <div v-else-if="currentMessages.length === 0" class="agentic-empty">
           <Welcome
             :description="t('agentic.welcomeDescription')"
+            :icon="assetUrl('images/logo/logo.svg')"
             :title="t('agentic.title')"
-            icon="/images/logo/logo.svg"
             variant="borderless"
           />
           <Prompts :items="promptItems" :wrap="true" @item-click="handlePromptClick"/>
@@ -260,7 +388,20 @@
                   :charts="message.contentExt?.charts || []"
                   :content="message.content"
                 />
-                <div v-else class="agentic-text">{{ message.content }}</div>
+                <div v-else class="agentic-user-content">
+                  <div v-if="userMessageParts(message.content).quote" class="agentic-user-quote">
+                    <div class="agentic-user-quote__header">
+                      <el-icon>
+                        <ChatLineSquare/>
+                      </el-icon>
+                      <span>{{ userMessageParts(message.content).label }}</span>
+                    </div>
+                    <p>{{ userMessageParts(message.content).quote }}</p>
+                  </div>
+                  <div v-if="userMessageParts(message.content).body" class="agentic-text">
+                    {{ userMessageParts(message.content).body }}
+                  </div>
+                </div>
                 <span
                   v-if="message.streaming && !message.content && !hasReasoningPanel(message)"
                   class="agentic-cursor"
@@ -359,14 +500,24 @@
               </div>
               <div v-if="canShowMessageToolbar(message)" class="agentic-message__toolbar">
                 <el-tooltip :content="t('agentic.actionCopy')" placement="top">
-                  <button class="agentic-message__action" type="button" @click="handleCopyMessage(message)">
+                  <button
+                    :aria-label="t('agentic.actionCopy')"
+                    class="agentic-message__action"
+                    type="button"
+                    @click="handleCopyMessage(message)"
+                  >
                     <el-icon>
                       <DocumentCopy/>
                     </el-icon>
                   </button>
                 </el-tooltip>
                 <el-tooltip :content="t('agentic.actionQuote')" placement="top">
-                  <button class="agentic-message__action" type="button" @click="handleQuoteMessage(message)">
+                  <button
+                    :aria-label="t('agentic.actionQuote')"
+                    class="agentic-message__action"
+                    type="button"
+                    @click="handleQuoteMessage(message)"
+                  >
                     <el-icon>
                       <ChatLineSquare/>
                     </el-icon>
@@ -381,35 +532,87 @@
       <footer class="agentic-composer">
         <div v-if="currentPendingActions.length" class="agentic-actions">
           <div v-for="action in currentPendingActions" :key="action.actionId" class="agentic-action">
+            <span class="agentic-action__icon">
+              <el-icon><component :is="actionIcon(action.actionType)"/></el-icon>
+            </span>
             <div class="agentic-action__content">
               <strong>{{ action.title }}</strong>
               <span>{{ action.description }}</span>
+              <span v-if="actionErrors[action.actionId]" class="agentic-action__error" role="alert">
+                {{ t('agentic.actionFailed') }}
+              </span>
             </div>
             <el-tag size="small" type="warning">{{ t('agentic.pending') }}</el-tag>
             <div class="agentic-action__buttons">
-              <el-button size="small" type="primary" @click="handleConfirmAction(action.actionId)">
+              <el-button
+                :disabled="interactionLocked || Boolean(actionLoading[action.actionId])"
+                :loading="Boolean(actionLoading[action.actionId])"
+                size="small"
+                type="primary"
+                @click="handleConfirmAction(action.actionId)"
+              >
                 <el-icon>
                   <Check/>
                 </el-icon>
-                Confirm
+                {{ t('agentic.confirm') }}
               </el-button>
-              <el-button size="small" @click="handleRejectAction(action.actionId)">
+              <el-button
+                :disabled="interactionLocked || Boolean(actionLoading[action.actionId])"
+                size="small"
+                @click="handleRejectAction(action.actionId)"
+              >
                 <el-icon>
                   <CircleClose/>
                 </el-icon>
-                Reject
+                {{ t('agentic.reject') }}
               </el-button>
             </div>
           </div>
         </div>
+        <div v-if="currentPendingActionsError" class="agentic-data-error" role="alert">
+          <span>{{ t('agentic.failedActions') }}</span>
+          <el-button :loading="currentPendingActionsLoading" link type="danger" @click="handleRetryPendingActions">
+            {{ t('common.retry') }}
+          </el-button>
+        </div>
 
         <div class="agentic-input-shell">
+          <div v-if="currentAttachmentsError" class="agentic-data-error" role="alert">
+            <span>{{ t('agentic.failedAttachments') }}</span>
+            <el-button :loading="currentAttachmentsLoading" link type="danger" @click="handleRetryAttachments">
+              {{ t('common.retry') }}
+            </el-button>
+          </div>
+          <div v-if="quotedMessage" class="agentic-quote-preview">
+            <span class="agentic-quote-preview__icon">
+              <el-icon><ChatLineSquare/></el-icon>
+            </span>
+            <div class="agentic-quote-preview__content">
+              <span class="agentic-quote-preview__meta">
+                {{ t('agentic.quotePreview') }}
+                <strong>{{ quoteLabel(quotedMessage.role) }}</strong>
+              </span>
+              <p>{{ quotePreview }}</p>
+            </div>
+            <button
+              :aria-label="t('agentic.quoteRemove')"
+              :title="t('agentic.quoteRemove')"
+              class="agentic-quote-preview__close"
+              type="button"
+              @click="quotedMessage = undefined"
+            >
+              <el-icon>
+                <Close/>
+              </el-icon>
+            </button>
+          </div>
+
           <div v-if="currentAttachments.length" class="agentic-attachments">
             <el-tag
               v-for="attachment in currentAttachments"
               :key="attachment.id"
               class="agentic-attachment"
-              closable
+              :closable="!interactionLocked"
               @close="agenticStore.removeLocalAttachment(attachment.id)"
             >
               <el-icon>
@@ -422,8 +625,9 @@
 
           <el-input
             v-model="draft"
+            :aria-label="t('agentic.composerPlaceholder')"
             :autosize="{minRows: 2, maxRows: 6}"
-            :disabled="streaming"
+            :disabled="loading || sessionsLoading || streaming"
             :placeholder="t('agentic.composerPlaceholder')"
             class="agentic-input"
             resize="none"
@@ -433,9 +637,22 @@
 
           <div class="agentic-composer__bar">
             <div class="agentic-composer__left">
-              <input ref="fileInputRef" class="agentic-file" multiple type="file" @change="handleFileChange"/>
+              <input
+                ref="fileInputRef"
+                :disabled="loading || sessionsLoading || streaming"
+                class="agentic-file"
+                multiple
+                type="file"
+                @change="handleFileChange"
+              />
               <el-tooltip :content="t('agentic.attachFile')">
-                <el-button :disabled="streaming" circle size="small" @click="handlePickFile">
+                <el-button
+                  :aria-label="t('agentic.attachFile')"
+                  :disabled="loading || sessionsLoading || streaming"
+                  circle
+                  size="small"
+                  @click="handlePickFile"
+                >
                   <el-icon>
                     <Paperclip/>
                   </el-icon>
@@ -443,14 +660,22 @@
               </el-tooltip>
             </div>
 
-            <el-button v-if="streaming" circle class="agentic-send" type="warning" @click="agenticStore.stopStreaming">
+            <el-button
+              v-if="streaming"
+              :aria-label="t('agentic.stop')"
+              circle
+              class="agentic-send"
+              type="warning"
+              @click="agenticStore.stopStreaming"
+            >
               <el-icon>
                 <VideoPause/>
               </el-icon>
             </el-button>
             <el-button
               v-else
-              :disabled="!draft.trim() && !currentAttachments.length"
+              :aria-label="t('agentic.send')"
+              :disabled="loading || sessionsLoading || (!draft.trim() && !currentAttachments.length)"
               circle
               class="agentic-send"
               type="primary"
@@ -479,28 +704,45 @@ import {
   CircleClose,
   Clock,
   Close,
+  Connection,
   Cpu,
+  DataAnalysis,
   Delete,
   Document,
   DocumentCopy,
   EditPen,
   Lightning,
   Loading,
+  Monitor,
+  Odometer,
+  Operation,
   Paperclip,
   Plus,
   Promotion,
   Setting,
+  Tools,
+  TrendCharts,
   VideoPause,
   Warning,
+  WarningFilled,
 } from '@element-plus/icons-vue';
 import {ElMessage, ElMessageBox} from 'element-plus';
 import {storeToRefs} from 'pinia';
 import {useI18n} from 'vue-i18n';
 import {computed, nextTick, onBeforeUnmount, ref, watch} from 'vue';
-import type {AgenticMessage, AgenticMessageContext, AgenticMessageTokens, AgenticTraceEvent} from '@/config/types';
+import {useBreakpoint} from '@/composables/useBreakpoint';
+import {useMediaQuery} from '@/composables/useMediaQuery';
+import type {
+  AgenticMessage,
+  AgenticMessageContext,
+  AgenticMessageTokens,
+  AgenticSessionExt,
+  AgenticTraceEvent,
+} from '@/config/types';
 import {useAgenticStore} from '@/store';
 import RenderedAssistantMessage from './RenderedAssistantMessage.vue';
 import {toPlainText} from './assistantContent';
+import {assetUrl} from '@/utils/assetUrl';
 
 interface AssistantPromptItem {
   key: string | number;
@@ -532,12 +774,22 @@ interface AssistantTokenItem {
   value: string;
 }
 
+interface UserMessageParts {
+  body: string;
+  label?: string;
+  quote?: string;
+}
+
 const agenticStore = useAgenticStore();
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
+const {isMobile} = useBreakpoint();
+const prefersReducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 const {
   visible,
   loading,
+  sessionsLoading,
+  sessionsError,
   streaming,
   sessions,
   models,
@@ -552,27 +804,47 @@ const {
   currentAttachments,
   currentPendingActions,
   currentTraceEvents,
+  currentMessagesLoading,
+  currentMessagesError,
+  currentAttachmentsLoading,
+  currentAttachmentsError,
+  currentPendingActionsLoading,
+  currentPendingActionsError,
+  sessionActionLoading,
+  actionLoading,
+  actionErrors,
 } = storeToRefs(agenticStore);
 
 const draft = ref('');
+const quotedMessage = ref<AgenticMessage>();
 const fileInputRef = ref<HTMLInputElement>();
 const bodyRef = ref<HTMLElement>();
 const panelRef = ref<HTMLElement>();
 const panelWidth = ref<number>();
 const resizeFrame = ref<number>();
+const obscuredElements = ref<Array<{element: HTMLElement; wasInert: boolean}>>([]);
+const lastFocusElement = ref<HTMLElement>();
 const renamePopoverVisible = ref(false);
 const renameTitle = ref('');
+let localeReloadToken = 0;
 const ASSISTANT_WIDTH_STORAGE_KEY = 'dc3-agentic-panel-width';
 const MIN_PANEL_WIDTH = 320;
 const MAX_PANEL_WIDTH = 520;
 
+const interactionLocked = computed(() => loading.value || sessionsLoading.value || streaming.value);
+
 const storedPanelWidth = Number(localStorage.getItem(ASSISTANT_WIDTH_STORAGE_KEY) || '');
 if (Number.isFinite(storedPanelWidth) && storedPanelWidth > 0) {
-  panelWidth.value = storedPanelWidth;
+  panelWidth.value = Math.min(Math.max(storedPanelWidth, MIN_PANEL_WIDTH), MAX_PANEL_WIDTH);
 }
 
+const effectivePanelWidth = computed(() => clamp(panelWidth.value || 340, MIN_PANEL_WIDTH, MAX_PANEL_WIDTH));
 const panelStyle = computed(() => ({
-  width: panelWidth.value ? `${panelWidth.value}px` : 'clamp(340px, 30vw, 520px)',
+  width: isMobile.value
+    ? '100%'
+    : panelWidth.value
+      ? `min(${effectivePanelWidth.value}px, 45vw)`
+      : 'clamp(340px, 30vw, 520px)',
 }));
 
 const promptItems = computed<AssistantPromptItem[]>(() => [
@@ -586,12 +858,47 @@ const promptItems = computed<AssistantPromptItem[]>(() => [
   },
 ]);
 
+const quoteExcerpt = (content: string) => {
+  return toPlainText(content)
+    .replace(/^\s{0,3}#{1,6}\s+/gm, '')
+    .replace(/^\s*(?:[-*+] |\d+\.\s+)/gm, '')
+    .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+    .replace(/[*_`~]+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+const quotePreview = computed(() => {
+  if (!quotedMessage.value) return '';
+  return quoteExcerpt(quotedMessage.value.content);
+});
+
 const conversationItems = computed(() => {
   return sessions.value.map((session) => ({
     ...session,
     title: session.title || t('agentic.newConversation'),
   }));
 });
+
+const sessionIcons = {
+  monitor: Monitor,
+  warning: WarningFilled,
+  trend: TrendCharts,
+  connection: Connection,
+  odometer: Odometer,
+  tools: Tools,
+  operation: Operation,
+  lightning: Lightning,
+} as const;
+
+const sessionIcon = (icon?: AgenticSessionExt['icon']) => sessionIcons[icon || 'monitor'] || Monitor;
+
+const actionIcon = (actionType: string) => {
+  if (actionType.includes('WRITE')) return Lightning;
+  if (actionType.includes('CONFIG')) return Setting;
+  if (actionType.includes('WORK_ORDER')) return Tools;
+  return DataAnalysis;
+};
 
 const temperatureProxy = computed({
   get: () => temperature.value ?? activeModel.value.temperature ?? 0.7,
@@ -619,10 +926,43 @@ watch(
   () => visible.value,
   (isVisible) => {
     if (isVisible) {
-      void nextTick(() => scrollToBottom('auto'));
+      if (!lastFocusElement.value || !document.contains(lastFocusElement.value)) {
+        const activeElement = document.activeElement;
+        lastFocusElement.value = activeElement instanceof HTMLElement ? activeElement : undefined;
+      }
+      void nextTick(() => {
+        scrollToBottom('auto');
+        if (isMobile.value) {
+          obscureBackground();
+          panelRef.value?.focus();
+        }
+      });
+    } else {
+      restoreMainContent();
+      void nextTick(() => {
+        const target = lastFocusElement.value || document.querySelector<HTMLElement>('.agentic-launcher');
+        if (target && document.contains(target)) target.focus();
+        lastFocusElement.value = undefined;
+      });
     }
   }
 );
+
+watch(isMobile, (mobile) => {
+  if (!visible.value) return;
+  if (mobile) {
+    void nextTick(() => {
+      obscureBackground();
+      panelRef.value?.focus();
+    });
+  } else {
+    restoreMainContent();
+  }
+});
+
+watch(activeConversationId, () => {
+  quotedMessage.value = undefined;
+});
 
 watch(
   () => activeConversationId.value,
@@ -637,19 +977,42 @@ watch(
   {flush: 'post'}
 );
 
+watch(
+  () => locale.value,
+  async () => {
+    if (!visible.value) return;
+    const token = ++localeReloadToken;
+    const conversationId = activeConversationId.value;
+    await agenticStore.loadSessions();
+    if (token !== localeReloadToken || conversationId !== activeConversationId.value) return;
+    if (conversationId) await agenticStore.selectSession(conversationId);
+  }
+);
+
 onBeforeUnmount(() => {
+  localeReloadToken += 1;
   if (resizeFrame.value) {
     cancelAnimationFrame(resizeFrame.value);
   }
   window.removeEventListener('mousemove', handleResizeMove);
   window.removeEventListener('mouseup', handleResizeEnd);
+  document.body.classList.remove('agentic-resizing');
+  restoreMainContent();
+  if (streaming.value) agenticStore.stopStreaming();
 });
 
 const handleNewSession = () => {
+  if (interactionLocked.value) return;
   agenticStore.newSession();
 };
 
+const handleRetrySessions = async () => {
+  if (interactionLocked.value) return;
+  await agenticStore.retrySessions();
+};
+
 const handleHistoryCommand = async (command: string) => {
+  if (interactionLocked.value) return;
   if (command.startsWith('select:')) {
     await agenticStore.selectSession(command.replace('select:', ''));
   }
@@ -660,46 +1023,77 @@ const prepareRenameTitle = () => {
 };
 
 const handleRenameCurrent = async () => {
+  if (interactionLocked.value) return;
   const conversationId = activeConversationId.value;
   const title = renameTitle.value.trim();
   if (!conversationId || !title) {
     return;
   }
-  await agenticStore.renameSession(conversationId, title);
-  renamePopoverVisible.value = false;
+  const updated = await agenticStore.renameSession(conversationId, title);
+  if (updated) renamePopoverVisible.value = false;
 };
 
 const handleDeleteCurrent = async () => {
+  if (interactionLocked.value) return;
   const conversationId = activeConversationId.value;
   if (!conversationId) {
     return;
   }
-  await ElMessageBox.confirm(t('agentic.dialogDeleteConfirm'), t('agentic.dialogDeleteTitle'), {
-    type: 'warning',
-    confirmButtonText: t('agentic.dialogDeleteTitle'),
-    cancelButtonText: t('agentic.dialogCancel'),
-  });
-  await agenticStore.deleteSession(conversationId);
+  try {
+    await ElMessageBox.confirm(t('agentic.dialogDeleteConfirm'), t('agentic.dialogDeleteTitle'), {
+      type: 'warning',
+      confirmButtonText: t('agentic.dialogDeleteTitle'),
+      cancelButtonText: t('agentic.dialogCancel'),
+    });
+    await agenticStore.deleteSession(conversationId);
+  } catch {
+    // User cancelled or the operation failed; the store keeps the session intact.
+  }
 };
 
 const handlePromptClick = (item: AssistantPromptItem) => {
+  if (interactionLocked.value) return;
   const description = item.description ? ` ${item.description}` : '';
   draft.value = `${item.label || ''}${description}`.trim();
 };
 
-const handleModelChange = (model: string | number) => {
+const handleModelChange = (model: string) => {
+  if (interactionLocked.value) return;
   void agenticStore.setSelectedModel(model);
 };
 
 const handlePrefsChange = () => {
+  if (interactionLocked.value) return;
   void agenticStore.persistCurrentSessionPrefs();
 };
 
+const handleRetryMessages = () => {
+  if (interactionLocked.value || !activeConversationId.value) return;
+  void agenticStore.loadMessages(activeConversationId.value);
+};
+
+const handleRetryAttachments = () => {
+  if (interactionLocked.value || !activeConversationId.value) return;
+  void agenticStore.loadAttachments(activeConversationId.value);
+};
+
+const handleRetryPendingActions = () => {
+  if (interactionLocked.value || !activeConversationId.value) return;
+  void agenticStore.loadPendingActions(activeConversationId.value);
+};
+
 const handleResizeStart = (event: MouseEvent) => {
+  if (isMobile.value) return;
   event.preventDefault();
   window.addEventListener('mousemove', handleResizeMove);
   window.addEventListener('mouseup', handleResizeEnd);
   document.body.classList.add('agentic-resizing');
+};
+
+const setPanelWidth = (width: number) => {
+  const containerWidth = panelRef.value?.parentElement?.getBoundingClientRect().width || window.innerWidth;
+  const maxWidth = Math.min(MAX_PANEL_WIDTH, Math.floor(containerWidth * 0.45));
+  panelWidth.value = clamp(width, MIN_PANEL_WIDTH, Math.max(MIN_PANEL_WIDTH, maxWidth));
 };
 
 const handleResizeMove = (event: MouseEvent) => {
@@ -708,12 +1102,13 @@ const handleResizeMove = (event: MouseEvent) => {
   if (!rect) {
     return;
   }
-  const maxWidth = Math.min(MAX_PANEL_WIDTH, Math.floor(rect.width * 0.45));
-  panelWidth.value = clamp(
-    Math.round(rect.right - event.clientX),
-    MIN_PANEL_WIDTH,
-    Math.max(MIN_PANEL_WIDTH, maxWidth)
-  );
+  setPanelWidth(Math.round(rect.right - event.clientX));
+};
+
+const handleResizeKeydown = (delta: number) => {
+  if (isMobile.value) return;
+  setPanelWidth(effectivePanelWidth.value + delta);
+  if (panelWidth.value) localStorage.setItem(ASSISTANT_WIDTH_STORAGE_KEY, String(panelWidth.value));
 };
 
 const handleResizeEnd = () => {
@@ -725,20 +1120,79 @@ const handleResizeEnd = () => {
   }
 };
 
-const handleSubmit = async () => {
-  const content = draft.value.trim() || (currentAttachments.value.length ? t('agentic.attachAnalyze') : '');
-  if (!content) {
+const handlePanelKeydown = (event: KeyboardEvent) => {
+  if (!isMobile.value) return;
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    agenticStore.close();
     return;
   }
-  draft.value = '';
-  await agenticStore.sendMessage(content);
+  if (event.key !== 'Tab') return;
+  const focusable = Array.from(
+    panelRef.value?.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    ) || []
+  ).filter((element) => element.getAttribute('aria-hidden') !== 'true');
+  if (focusable.length === 0) {
+    event.preventDefault();
+    panelRef.value?.focus();
+    return;
+  }
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  if (event.shiftKey && (document.activeElement === first || document.activeElement === panelRef.value)) {
+    event.preventDefault();
+    last?.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first?.focus();
+  }
+};
+
+function obscureBackground() {
+  restoreMainContent();
+  const elements = [
+    document.querySelector<HTMLElement>('.header'),
+    panelRef.value?.parentElement?.querySelector<HTMLElement>('.body-main'),
+  ].filter((element): element is HTMLElement => Boolean(element));
+  obscuredElements.value = elements.map((element) => ({element, wasInert: element.hasAttribute('inert')}));
+  for (const {element} of obscuredElements.value) element.setAttribute('inert', '');
+}
+
+function restoreMainContent() {
+  for (const {element, wasInert} of obscuredElements.value) {
+    if (!wasInert) element.removeAttribute('inert');
+  }
+  obscuredElements.value = [];
+}
+
+const handleLauncherClick = () => {
+  const activeElement = document.activeElement;
+  lastFocusElement.value = activeElement instanceof HTMLElement ? activeElement : undefined;
+  void agenticStore.toggle();
+};
+
+const handleSubmit = async () => {
+  if (loading.value || sessionsLoading.value || streaming.value) return;
+  const messageBody = draft.value.trim() || (currentAttachments.value.length ? t('agentic.attachAnalyze') : '');
+  if (!messageBody) {
+    return;
+  }
+  const content = quotedMessage.value ? formatQuotedMessage(quotedMessage.value, messageBody) : messageBody;
+  const sent = await agenticStore.sendMessage(content);
+  if (sent) {
+    draft.value = '';
+    quotedMessage.value = undefined;
+  }
 };
 
 const handlePickFile = () => {
+  if (interactionLocked.value) return;
   fileInputRef.value?.click();
 };
 
 const handleFileChange = async (event: Event) => {
+  if (interactionLocked.value) return;
   const input = event.target as HTMLInputElement;
   const files = Array.from(input.files || []);
   input.value = '';
@@ -752,18 +1206,26 @@ const handleFileChange = async (event: Event) => {
 };
 
 const handleConfirmAction = async (actionId: string) => {
-  await ElMessageBox.confirm(t('agentic.confirm'), t('agentic.confirmActionTitle'), {
-    type: 'warning',
-    confirmButtonText: t('agentic.confirm'),
-    cancelButtonText: t('agentic.dialogCancel'),
-  });
-  await agenticStore.confirmAction(actionId);
-  ElMessage.success(t('agentic.actionConfirmed'));
+  if (interactionLocked.value) return;
+  try {
+    await ElMessageBox.confirm(t('agentic.confirm'), t('agentic.confirmActionTitle'), {
+      type: 'warning',
+      confirmButtonText: t('agentic.confirm'),
+      cancelButtonText: t('agentic.dialogCancel'),
+    });
+    if (await agenticStore.confirmAction(actionId)) ElMessage.success(t('agentic.actionConfirmed'));
+  } catch {
+    // User cancelled or the request failed; keep the pending action visible.
+  }
 };
 
 const handleRejectAction = async (actionId: string) => {
-  await agenticStore.rejectAction(actionId);
-  ElMessage.success(t('agentic.actionRejected'));
+  if (interactionLocked.value) return;
+  try {
+    if (await agenticStore.rejectAction(actionId)) ElMessage.success(t('agentic.actionRejected'));
+  } catch {
+    // Keep the action visible so it can be retried.
+  }
 };
 
 const handleCopyMessage = async (message: AgenticMessage) => {
@@ -779,11 +1241,42 @@ const handleCopyMessage = async (message: AgenticMessage) => {
 const handleQuoteMessage = (message: AgenticMessage) => {
   const text = toPlainText(message.content);
   if (!text) return;
-  const quoted = text
+  quotedMessage.value = message;
+};
+
+const quoteLabel = (role: AgenticMessage['role']) => {
+  return role === 'assistant' ? t('agentic.quoteAssistant') : t('agentic.quoteUser');
+};
+
+const formatQuotedMessage = (message: AgenticMessage, body: string) => {
+  const quoted = toPlainText(message.content)
     .split('\n')
     .map((line) => `> ${line}`)
     .join('\n');
-  draft.value = `${quoted}\n\n${draft.value || ''}`.trim();
+  return `> **${quoteLabel(message.role)}**\n${quoted}\n\n${body}`;
+};
+
+const userMessageParts = (content: string): UserMessageParts => {
+  const lines = content.split('\n');
+  const labelMatch = lines[0]?.match(/^> \*\*(.+)\*\*$/);
+  if (!labelMatch) {
+    return {body: content};
+  }
+
+  const quoteLines: string[] = [];
+  let index = 1;
+  while (index < lines.length) {
+    const line = lines[index];
+    if (!line?.startsWith('>')) break;
+    quoteLines.push(line.replace(/^> ?/, ''));
+    index += 1;
+  }
+
+  return {
+    label: labelMatch[1],
+    quote: quoteExcerpt(quoteLines.join('\n')),
+    body: lines.slice(index).join('\n').trim(),
+  };
 };
 
 const canShowMessageToolbar = (message: AgenticMessage) => {
@@ -811,9 +1304,21 @@ const assistantStatus = (message: AgenticMessage) => {
   if (message.streaming) {
     return message.content ? t('agentic.statusStreaming') : t('agentic.statusThinking');
   }
+  if (message.status === 'CANCELLED') {
+    return t('agentic.statusCancelled');
+  }
+  if (message.status === 'FAILED') {
+    return t('agentic.statusFailed');
+  }
   const reason = message.finishReason?.toLowerCase();
+  if (reason === 'cancelled' || reason === 'canceled') {
+    return t('agentic.statusCancelled');
+  }
   if (reason === 'error' || reason === 'failed') {
     return t('agentic.statusFailed');
+  }
+  if (message.contentExt?.recovered) {
+    return t('agentic.statusDone');
   }
   if (assistantTraceEvents(message).some((event) => event.type === 'error' || event.status === 'failed')) {
     return t('agentic.statusFailed');
@@ -1108,7 +1613,7 @@ const scheduleScrollToBottom = () => {
     cancelAnimationFrame(resizeFrame.value);
   }
   resizeFrame.value = requestAnimationFrame(() => {
-    void nextTick(() => scrollToBottom('smooth'));
+    void nextTick(() => scrollToBottom(prefersReducedMotion.value ? 'auto' : 'smooth'));
   });
 };
 
@@ -1137,12 +1642,13 @@ const formatFileSize = (size = 0) => {
 <style lang="scss" scoped>
 .agentic-launcher {
   position: fixed;
-  right: 28px;
-  bottom: 96px;
-  z-index: 2100;
-  width: 46px;
-  height: 46px;
-  box-shadow: 0 10px 26px rgba(46, 64, 88, 0.24);
+  right: var(--dc3-space-4);
+  bottom: var(--dc3-space-4);
+  box-sizing: border-box;
+  z-index: var(--dc3-z-floating-action);
+  width: var(--dc3-touch-target);
+  height: var(--dc3-touch-target);
+  box-shadow: var(--dc3-shadow-md);
 }
 
 .agentic-panel {
@@ -1152,8 +1658,8 @@ const formatFileSize = (size = 0) => {
   max-width: 520px;
   height: 100%;
   min-height: 0;
-  border-left: 1px solid #dfe5ee;
-  background: #ffffff;
+  border-left: 1px solid var(--dc3-border-base);
+  background: var(--dc3-bg-elevated-strong);
 }
 
 .agentic-resizer {
@@ -1180,7 +1686,7 @@ const formatFileSize = (size = 0) => {
   }
 
   &:hover::after {
-    background: #2563eb;
+    background: var(--el-color-primary);
   }
 }
 
@@ -1189,7 +1695,7 @@ const formatFileSize = (size = 0) => {
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  background: #ffffff;
+  background: var(--dc3-bg-elevated-strong);
 }
 
 .agentic-header {
@@ -1200,8 +1706,31 @@ const formatFileSize = (size = 0) => {
   gap: 10px;
   min-height: 0;
   padding: 10px 10px 9px;
-  border-bottom: 1px solid #dfe5ee;
-  background: #ffffff;
+  border-bottom: 1px solid var(--dc3-border-base);
+  background: var(--dc3-bg-elevated-strong);
+}
+
+.agentic-session-error,
+.agentic-data-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dc3-space-2);
+  margin: var(--dc3-space-2) var(--dc3-space-3) 0;
+  padding: var(--dc3-space-2) var(--dc3-space-3);
+  border: 1px solid var(--el-color-danger-light-5);
+  border-radius: var(--dc3-radius-sm);
+  color: var(--el-color-danger-dark-2);
+  background: var(--el-color-danger-light-9);
+  font-size: var(--el-font-size-small);
+}
+
+.agentic-data-error {
+  flex: 0 0 auto;
+}
+
+.agentic-loading-state {
+  padding: var(--dc3-space-4);
 }
 
 .agentic-title,
@@ -1259,9 +1788,9 @@ const formatFileSize = (size = 0) => {
   width: 34px;
   height: 34px;
   padding: 5px;
-  border: 1px solid #dbe4f0;
+  border: 1px solid var(--dc3-border-base);
   border-radius: 8px;
-  background: #f8fafc;
+  background: var(--dc3-bg-muted);
 
   img {
     width: 100%;
@@ -1278,14 +1807,14 @@ const formatFileSize = (size = 0) => {
   }
 
   strong {
-    color: #1f2937;
+    color: var(--dc3-text-primary);
     font-size: 15px;
   }
 
   span {
     overflow: hidden;
     max-width: 100%;
-    color: #64748b;
+    color: var(--dc3-text-regular);
     font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1293,11 +1822,77 @@ const formatFileSize = (size = 0) => {
 }
 
 .agentic-history-item {
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: column;
   overflow: hidden;
-  max-width: 280px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  max-width: 300px;
+
+  strong,
+  small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  strong {
+    color: var(--el-text-color-primary);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  small {
+    margin-top: 2px;
+    color: var(--el-text-color-secondary);
+    font-size: 11px;
+  }
+}
+
+.agentic-history-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-right: 9px;
+  color: var(--el-color-primary);
+  background: var(--el-color-primary-light-9);
+  border-radius: 9px;
+
+  &.is-warning {
+    color: var(--el-color-danger);
+    background: var(--el-color-danger-light-9);
+  }
+
+  &.is-trend {
+    color: var(--el-color-success);
+    background: var(--el-color-success-light-9);
+  }
+
+  &.is-connection {
+    color: var(--dc3-color-purple);
+    background: var(--dc3-color-purple-soft);
+  }
+
+  &.is-odometer {
+    color: var(--dc3-text-brand);
+    background: var(--dc3-bg-interactive);
+  }
+
+  &.is-tools {
+    color: var(--el-color-warning-dark-2);
+    background: var(--el-color-warning-light-9);
+  }
+
+  &.is-operation {
+    color: var(--dc3-color-purple);
+    background: var(--dc3-color-purple-soft);
+  }
+
+  &.is-lightning {
+    color: var(--el-color-danger-dark-2);
+    background: var(--el-color-danger-light-9);
+  }
 }
 
 .agentic-body {
@@ -1307,7 +1902,7 @@ const formatFileSize = (size = 0) => {
   padding: 12px 4px;
   overflow-x: hidden;
   overflow-y: auto;
-  background: #ffffff;
+  background: var(--dc3-bg-elevated-strong);
 }
 
 .agentic-empty {
@@ -1345,7 +1940,7 @@ const formatFileSize = (size = 0) => {
   }
 
   .agentic-message__content {
-    color: #ffffff;
+    color: var(--el-color-white);
     background: var(--el-color-primary);
     border-color: var(--el-color-primary);
 
@@ -1400,17 +1995,65 @@ const formatFileSize = (size = 0) => {
   min-width: 0;
   max-width: 100%;
   padding: 10px 12px;
-  border: 1px solid #e7edf5;
+  border: 1px solid var(--dc3-border-base);
   border-radius: 8px;
-  color: #1f2937;
+  color: var(--dc3-text-primary);
   line-height: 1.58;
   overflow-wrap: anywhere;
-  background: #ffffff;
+  background: var(--dc3-bg-elevated-strong);
 }
 
 .agentic-text {
   overflow-wrap: anywhere;
   white-space: pre-wrap;
+}
+
+.agentic-user-content {
+  min-width: 0;
+}
+
+.agentic-user-quote {
+  position: relative;
+  max-width: 100%;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--el-color-white) 28%, transparent);
+  border-left: 3px solid color-mix(in srgb, var(--el-color-white) 82%, transparent);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--el-color-white) 13%, transparent);
+
+  &::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 18px;
+    pointer-events: none;
+    content: '';
+    background: linear-gradient(transparent, color-mix(in srgb, var(--el-color-primary) 88%, transparent));
+  }
+
+  p {
+    display: -webkit-box;
+    margin: 4px 0 0;
+    overflow: hidden;
+    color: color-mix(in srgb, var(--el-color-white) 88%, transparent);
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+}
+
+.agentic-user-quote__header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--el-color-white);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .agentic-message__warning {
@@ -1419,12 +2062,12 @@ const formatFileSize = (size = 0) => {
   gap: 6px;
   margin-top: 8px;
   padding: 6px 8px;
-  border: 1px solid #fcd34d;
+  border: 1px solid var(--el-color-warning-light-5);
   border-radius: 4px;
-  color: #92400e;
+  color: var(--el-color-warning-dark-2);
   font-size: 12px;
   line-height: 1.5;
-  background: #fffbeb;
+  background: var(--el-color-warning-light-9);
 }
 
 .agentic-message__toolbar {
@@ -1462,11 +2105,11 @@ const formatFileSize = (size = 0) => {
   width: 24px;
   height: 24px;
   padding: 0;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--dc3-border-base);
   border-radius: 4px;
-  color: #64748b;
+  color: var(--dc3-text-regular);
   font-size: 13px;
-  background: #ffffff;
+  background: var(--dc3-bg-elevated-strong);
   cursor: pointer;
   transition: all 0.16s ease;
 
@@ -1481,7 +2124,7 @@ const formatFileSize = (size = 0) => {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #64748b;
+  color: var(--dc3-text-regular);
   font-size: 12px;
 }
 
@@ -1490,9 +2133,9 @@ const formatFileSize = (size = 0) => {
   width: 100%;
   min-width: 0;
   margin-bottom: 8px;
-  border: 1px solid #dfe7f1;
+  border: 1px solid var(--dc3-border-base);
   border-radius: 6px;
-  background: #f8fafc;
+  background: var(--dc3-bg-muted);
 
   summary {
     display: flex;
@@ -1500,7 +2143,7 @@ const formatFileSize = (size = 0) => {
     gap: 7px;
     min-height: 30px;
     padding: 0 8px;
-    color: #334155;
+    color: var(--dc3-text-primary);
     font-size: 12px;
     font-weight: 700;
     cursor: pointer;
@@ -1515,15 +2158,15 @@ const formatFileSize = (size = 0) => {
       width: 6px;
       height: 6px;
       margin-left: auto;
-      border-right: 1px solid #94a3b8;
-      border-bottom: 1px solid #94a3b8;
+      border-right: 1px solid var(--dc3-text-muted);
+      border-bottom: 1px solid var(--dc3-text-muted);
       transform: rotate(45deg);
       transition: transform 0.16s ease;
     }
 
     small {
       overflow: hidden;
-      color: #64748b;
+      color: var(--dc3-text-regular);
       font-size: 11px;
       font-weight: 500;
       text-overflow: ellipsis;
@@ -1541,7 +2184,7 @@ const formatFileSize = (size = 0) => {
 }
 
 .agentic-reasoning-panel__text {
-  color: #475569;
+  color: var(--dc3-text-regular);
   font-size: 12px;
   line-height: 1.55;
   overflow-wrap: anywhere;
@@ -1552,13 +2195,13 @@ const formatFileSize = (size = 0) => {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #64748b;
+  color: var(--dc3-text-regular);
   font-size: 12px;
 }
 
 .agentic-thinking-pulse {
   font-size: 14px;
-  color: #94a3b8;
+  color: var(--dc3-text-muted);
   vertical-align: middle;
 
   &.is-active {
@@ -1586,9 +2229,9 @@ const formatFileSize = (size = 0) => {
         120deg,
         transparent 0%,
         transparent 25%,
-        rgba(255, 255, 255, 0.9) 45%,
-        #fff 50%,
-        rgba(255, 255, 255, 0.9) 55%,
+        var(--dc3-highlight-sheen) 45%,
+        var(--dc3-bg-elevated-strong) 50%,
+        var(--dc3-highlight-sheen) 55%,
         transparent 75%,
         transparent 100%
       );
@@ -1671,14 +2314,14 @@ const formatFileSize = (size = 0) => {
   max-width: 100%;
   min-width: 0;
   margin-top: 8px;
-  border-top: 1px solid #e5eaf2;
+  border-top: 1px solid var(--dc3-border-base);
 
   summary {
     display: flex;
     align-items: center;
     gap: 6px;
     min-height: 28px;
-    color: #64748b;
+    color: var(--dc3-text-regular);
     font-size: 12px;
     cursor: pointer;
     list-style: none;
@@ -1692,8 +2335,8 @@ const formatFileSize = (size = 0) => {
       width: 6px;
       height: 6px;
       margin-left: auto;
-      border-right: 1px solid #94a3b8;
-      border-bottom: 1px solid #94a3b8;
+      border-right: 1px solid var(--dc3-text-muted);
+      border-bottom: 1px solid var(--dc3-text-muted);
       transform: rotate(45deg);
       transition: transform 0.16s ease;
     }
@@ -1723,13 +2366,13 @@ const formatFileSize = (size = 0) => {
   gap: 2px;
   min-width: 0;
   padding: 6px 8px;
-  border: 1px solid #dfe7f1;
+  border: 1px solid var(--dc3-border-base);
   border-radius: 6px;
-  background: #f8fafc;
+  background: var(--dc3-bg-muted);
 
   span {
     overflow: hidden;
-    color: #64748b;
+    color: var(--dc3-text-regular);
     font-size: 11px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1737,7 +2380,7 @@ const formatFileSize = (size = 0) => {
 
   strong {
     overflow: hidden;
-    color: #1f2937;
+    color: var(--dc3-text-primary);
     font-size: 12px;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1750,9 +2393,9 @@ const formatFileSize = (size = 0) => {
   gap: 8px;
   min-width: 0;
   padding: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--dc3-border-base);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--dc3-bg-elevated-strong);
 }
 
 .agentic-trace-section__header {
@@ -1763,13 +2406,13 @@ const formatFileSize = (size = 0) => {
   min-width: 0;
 
   span {
-    color: #334155;
+    color: var(--dc3-text-primary);
     font-size: 12px;
     font-weight: 700;
   }
 
   strong {
-    color: #2563eb;
+    color: var(--el-color-primary);
     font-size: 12px;
     font-weight: 700;
   }
@@ -1791,16 +2434,16 @@ const formatFileSize = (size = 0) => {
   gap: 2px;
   min-width: 0;
   padding-left: 10px;
-  border-left: 2px solid #93c5fd;
+  border-left: 2px solid var(--el-color-primary-light-5);
 
   span {
-    color: #1f2937;
+    color: var(--dc3-text-primary);
     font-size: 12px;
     font-weight: 600;
   }
 
   small {
-    color: #64748b;
+    color: var(--dc3-text-regular);
     font-size: 11px;
     line-height: 1.45;
     overflow-wrap: anywhere;
@@ -1827,10 +2470,10 @@ const formatFileSize = (size = 0) => {
   width: 22px;
   height: 22px;
   border-radius: 999px;
-  color: #1d4ed8;
+  color: var(--el-color-primary-dark-2);
   font-size: 11px;
   font-weight: 700;
-  background: #dbeafe;
+  background: var(--el-color-primary-light-9);
 }
 
 .agentic-chain__content {
@@ -1846,18 +2489,18 @@ const formatFileSize = (size = 0) => {
   }
 
   strong {
-    color: #1f2937;
+    color: var(--dc3-text-primary);
     font-size: 12px;
   }
 
   small {
-    color: #475569;
+    color: var(--dc3-text-regular);
     font-size: 11px;
     line-height: 1.45;
   }
 
   em {
-    color: #64748b;
+    color: var(--dc3-text-regular);
     font-size: 11px;
     font-style: normal;
   }
@@ -1871,7 +2514,7 @@ const formatFileSize = (size = 0) => {
 
   > span {
     flex: 0 0 auto;
-    color: #64748b;
+    color: var(--dc3-text-regular);
     font-size: 11px;
     font-weight: 700;
     line-height: 22px;
@@ -1892,18 +2535,18 @@ const formatFileSize = (size = 0) => {
   min-width: 0;
   padding: 5px 7px;
   border-radius: 5px;
-  background: #f1f5f9;
+  background: var(--dc3-bg-muted);
 
   span {
     overflow: hidden;
-    color: #64748b;
+    color: var(--dc3-text-regular);
     font-size: 11px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   strong {
-    color: #334155;
+    color: var(--dc3-text-primary);
     font-size: 12px;
     font-weight: 700;
   }
@@ -1914,7 +2557,7 @@ const formatFileSize = (size = 0) => {
   align-items: flex-start;
   gap: 8px;
   min-width: 0;
-  color: #475569;
+  color: var(--dc3-text-regular);
   font-size: 12px;
 }
 
@@ -1924,7 +2567,7 @@ const formatFileSize = (size = 0) => {
 
 .agentic-details__label {
   flex: 0 0 58px;
-  color: #64748b;
+  color: var(--dc3-text-regular);
   font-weight: 600;
 }
 
@@ -1939,8 +2582,8 @@ const formatFileSize = (size = 0) => {
 .agentic-token-list span {
   padding: 2px 6px;
   border-radius: 4px;
-  color: #475569;
-  background: #f1f5f9;
+  color: var(--dc3-text-regular);
+  background: var(--dc3-bg-muted);
 }
 
 .agentic-contexts {
@@ -1960,18 +2603,18 @@ const formatFileSize = (size = 0) => {
     margin: 0;
     padding: 8px;
     overflow: auto;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--dc3-border-base);
     border-radius: 6px;
-    color: #334155;
+    color: var(--dc3-text-primary);
     white-space: pre-wrap;
-    background: #f8fafc;
+    background: var(--dc3-bg-muted);
   }
 }
 
 .agentic-composer {
   padding: 10px 4px 12px;
-  border-top: 1px solid #dfe5ee;
-  background: #ffffff;
+  border-top: 1px solid var(--dc3-border-base);
+  background: var(--dc3-bg-elevated-strong);
 }
 
 .agentic-actions {
@@ -1984,13 +2627,24 @@ const formatFileSize = (size = 0) => {
 
 .agentic-action {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   gap: 10px;
   align-items: center;
   padding: 10px 12px;
-  border: 1px solid #f3c96b;
+  border: 1px solid var(--el-color-warning-light-5);
   border-radius: 6px;
-  background: #fffaf0;
+  background: var(--el-color-warning-light-9);
+}
+
+.agentic-action__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: var(--el-color-warning-dark-2);
+  background: var(--el-color-warning-light-9);
+  border-radius: 9px;
 }
 
 .agentic-action__content {
@@ -2006,14 +2660,21 @@ const formatFileSize = (size = 0) => {
   }
 
   strong {
-    color: #1f2937;
+    color: var(--dc3-text-primary);
     font-size: 13px;
   }
 
   span {
-    color: #64748b;
+    color: var(--dc3-text-regular);
     font-size: 12px;
   }
+}
+
+.agentic-action__content .agentic-action__error {
+  color: var(--el-color-danger);
+  overflow-wrap: anywhere;
+  text-overflow: initial;
+  white-space: normal;
 }
 
 .agentic-action__buttons {
@@ -2026,9 +2687,94 @@ const formatFileSize = (size = 0) => {
   width: 100%;
   margin: 0;
   padding: 10px;
-  border: 1px solid #d6dde8;
+  border: 1px solid var(--dc3-border-strong);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--dc3-bg-elevated-strong);
+}
+
+.agentic-quote-preview {
+  position: relative;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 24px;
+  gap: 9px;
+  align-items: start;
+  min-width: 0;
+  margin-bottom: 9px;
+  padding: 9px 8px 9px 10px;
+  overflow: hidden;
+  border: 1px solid var(--el-color-primary-light-5);
+  border-radius: 8px;
+  background: var(--dc3-brand-gradient-soft);
+  box-shadow: inset 3px 0 0 var(--el-color-primary);
+}
+
+.agentic-quote-preview__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: var(--el-color-primary);
+  font-size: 15px;
+  background: var(--dc3-bg-elevated);
+  box-shadow: var(--dc3-shadow-sm);
+}
+
+.agentic-quote-preview__content {
+  min-width: 0;
+
+  p {
+    display: -webkit-box;
+    margin: 3px 0 0;
+    overflow: hidden;
+    color: var(--dc3-text-regular);
+    font-size: 12px;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
+
+.agentic-quote-preview__meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--dc3-text-regular);
+  font-size: 10px;
+  line-height: 1.3;
+
+  strong {
+    padding: 1px 5px;
+    border-radius: 999px;
+    color: var(--el-color-primary-dark-2);
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--el-color-primary-light-9);
+  }
+}
+
+.agentic-quote-preview__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  color: var(--dc3-text-regular);
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.16s ease, background 0.16s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--el-color-danger);
+    background: var(--el-color-danger-light-9);
+    outline: none;
+  }
 }
 
 .agentic-attachments {
@@ -2058,7 +2804,7 @@ const formatFileSize = (size = 0) => {
   }
 
   small {
-    color: #64748b;
+    color: var(--dc3-text-regular);
     font-size: 11px;
   }
 }
@@ -2114,7 +2860,7 @@ const formatFileSize = (size = 0) => {
 }
 
 .agentic-popover-title {
-  color: #334155;
+  color: var(--dc3-text-primary);
   font-size: 13px;
   font-weight: 600;
 }
@@ -2135,7 +2881,7 @@ const formatFileSize = (size = 0) => {
   gap: 6px;
 
   span {
-    color: #334155;
+    color: var(--dc3-text-primary);
     font-size: 13px;
     font-weight: 500;
   }
@@ -2173,15 +2919,30 @@ const formatFileSize = (size = 0) => {
   }
 
   blockquote {
+    position: relative;
     box-sizing: border-box;
     max-width: 100%;
     margin: 8px 0;
-    padding: 8px 10px 8px 12px;
+    padding: 10px 12px 10px 38px;
     overflow-wrap: anywhere;
+    border: 1px solid var(--el-color-primary-light-5);
     border-left: 3px solid var(--el-color-primary-light-3);
-    border-radius: 4px;
-    color: #334155;
-    background: #f8fafc;
+    border-radius: 7px;
+    color: var(--dc3-text-primary);
+    background: var(--dc3-brand-gradient-soft);
+    box-shadow: var(--dc3-shadow-sm);
+
+    &::before {
+      position: absolute;
+      top: 5px;
+      left: 11px;
+      color: var(--el-color-primary-light-3);
+      content: '\201C';
+      font-family: Georgia, serif;
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1;
+    }
 
     > :first-child {
       margin-top: 0;
@@ -2196,13 +2957,13 @@ const formatFileSize = (size = 0) => {
     height: 1px;
     margin: 10px 0;
     border: 0;
-    background: #dfe5ee;
+    background: var(--dc3-border-base);
   }
 
   code {
     padding: 2px 4px;
     border-radius: 4px;
-    background: #eef2f7;
+    background: var(--dc3-bg-muted);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 12px;
   }
@@ -2212,13 +2973,13 @@ const formatFileSize = (size = 0) => {
     max-width: 100%;
     overflow: auto;
     padding: 10px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--dc3-border-base);
     border-radius: 6px;
-    background: #f8fafc;
+    background: var(--dc3-bg-muted);
 
     code {
       padding: 0;
-      color: #334155;
+      color: var(--dc3-text-primary);
       background: transparent;
     }
   }
@@ -2234,13 +2995,13 @@ const formatFileSize = (size = 0) => {
   th,
   td {
     padding: 6px 8px;
-    border: 1px solid #dfe5ee;
+    border: 1px solid var(--dc3-border-base);
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: $breakpoint-sm-max) {
   .agentic-panel {
-    width: min(420px, 40vw) !important;
+    width: clamp(320px, 40vw, 420px) !important;
   }
 
   .agentic-header__actions,
@@ -2252,6 +3013,71 @@ const formatFileSize = (size = 0) => {
 
   .agentic-model {
     width: 112px;
+  }
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  .agentic-launcher {
+    right: var(--dc3-space-3);
+    bottom: calc(var(--dc3-space-4) + env(safe-area-inset-bottom));
+  }
+
+  .agentic-panel {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    width: 100% !important;
+    min-width: 0;
+    max-width: none;
+    border-left: 0;
+  }
+
+  .agentic-resizer {
+    display: none;
+  }
+
+  .agentic-header,
+  .agentic-composer {
+    padding-right: var(--dc3-space-2);
+    padding-left: var(--dc3-space-2);
+  }
+
+  .agentic-action {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+
+    .agentic-action__buttons {
+      grid-column: 1 / -1;
+      justify-content: flex-end;
+    }
+  }
+}
+
+@media (hover: none), (any-pointer: coarse) {
+  .agentic-message__toolbar {
+    height: 24px;
+    margin-top: 4px;
+    overflow: visible;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agentic-thinking-pulse.is-active,
+  .agentic-thinking-label.is-shimmer::after,
+  .agentic-thinking-dots i {
+    animation: none !important;
+  }
+
+  .agentic-message__toolbar,
+  .agentic-message__action,
+  .agentic-quote-preview__close,
+  .agentic-resizer::after,
+  .agentic-reasoning-panel summary::after,
+  .agentic-details summary::after {
+    transition: none;
   }
 }
 </style>

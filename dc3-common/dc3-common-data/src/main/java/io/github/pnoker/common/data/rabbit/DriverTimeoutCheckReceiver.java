@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
-import com.rabbitmq.client.Channel;
+import io.github.pnoker.common.constant.mq.MqTopic;
 import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.dal.EntityAlarmManager;
-import io.github.pnoker.common.data.dal.EntityStateManager;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
+import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
+import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
 import io.github.pnoker.common.entity.dto.DriverAlarmDTO;
 import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
 import io.github.pnoker.common.entity.ext.JsonExt;
@@ -32,16 +30,15 @@ import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
 import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
-import io.github.pnoker.common.utils.RabbitAckUtil;
+import io.github.pnoker.common.mq.annotation.Dc3Listener;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
-import java.util.Objects;
+import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Mono;
 
 /**
  * RabbitMQ receiver for driver timeout check messages.
@@ -52,7 +49,6 @@ import java.util.Objects;
  * confirm the driver has truly stopped sending heartbeats.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Slf4j
@@ -62,141 +58,102 @@ public class DriverTimeoutCheckReceiver {
 
     private static final int OFFLINE_RENEW_SECONDS = 300;
 
-    private final EntityStateManager entityStateManager;
-    private final EntityAlarmManager entityAlarmManager;
+    private final ReactiveEntityStateStore entityStateStore;
+    private final ReactiveEntityAlarmStore entityAlarmStore;
     private final AlarmRuleTriggerService alarmRuleTriggerService;
-
-    private static boolean statusIs(Byte stateFlag, EntityStatusEnum status) {
-        return Objects.equals(stateFlag, status.getIndex());
-    }
+    private final TransactionalOperator transactionalOperator;
 
     /**
      * Consume a driver timeout check and, after re-verifying the lease version and
      * expiry to avoid racing a newer heartbeat, marks an expired driver offline and
      * raises a driver alarm.
      *
-     * @param channel the RabbitMQ channel for manual ack
      * @param message the raw message carrying the delivery tag
-     * @param dto     the driver timeout check carrying tenant, driver id, and lease version
+     * @param ack     acknowledgment handle for the message
      */
-    @RabbitHandler
-    @RabbitListener(queues = "#{driverTimeoutCheckQueue.name}")
-    public void driverTimeoutCheck(Channel channel, Message message, DriverTimeoutCheckDTO dto) {
-        long deliveryTag = message.getMessageProperties().getDeliveryTag();
-        try {
-            if (Objects.isNull(dto) || Objects.isNull(dto.getDriverId()) || Objects.isNull(dto.getTenantId())
-                    || Objects.isNull(dto.getLeaseVersion())) {
-                RabbitAckUtil.reject(channel, deliveryTag);
-                return;
-            }
-
-            EntityStateDO state = entityStateManager.lambdaQuery()
-                    .eq(EntityStateDO::getTenantId, dto.getTenantId())
-                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
-                    .eq(EntityStateDO::getEntityId, dto.getDriverId())
-                    .one();
-
-            // State row gone — nothing to do
-            if (Objects.isNull(state)) {
-                RabbitAckUtil.ack(channel, deliveryTag);
-                return;
-            }
-
-            // lease_version mismatched means a newer heartbeat arrived
-            if (!Objects.equals(state.getLeaseVersion(), dto.getLeaseVersion())) {
-                RabbitAckUtil.ack(channel, deliveryTag);
-                return;
-            }
-
-            // Not expired yet
-            if (state.getExpireTime().isAfter(LocalDateTime.now())) {
-                RabbitAckUtil.ack(channel, deliveryTag);
-                return;
-            }
-
-            // Already offline
-            Byte offlineIndex = EntityStatusEnum.OFFLINE.getIndex();
-            if (Objects.equals(state.getStateFlag(), offlineIndex)) {
-                RabbitAckUtil.ack(channel, deliveryTag);
-                return;
-            }
-
-            // Heartbeat-renewed states should become OFFLINE once their lease expires.
-            boolean heartbeatRenewed = statusIs(state.getStateFlag(), EntityStatusEnum.ONLINE)
-                    || statusIs(state.getStateFlag(), EntityStatusEnum.MAINTAIN)
-                    || statusIs(state.getStateFlag(), EntityStatusEnum.FAULT);
-            if (!heartbeatRenewed) {
-                RabbitAckUtil.ack(channel, deliveryTag);
-                return;
-            }
-
-            // Claim: atomically update to OFFLINE
-            long newVersion = state.getLeaseVersion() + 1L;
-            boolean claimed = entityStateManager.lambdaUpdate()
-                    .eq(EntityStateDO::getTenantId, dto.getTenantId())
-                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
-                    .eq(EntityStateDO::getEntityId, dto.getDriverId())
-                    .eq(EntityStateDO::getLeaseVersion, state.getLeaseVersion())
-                    .set(EntityStateDO::getLeaseVersion, newVersion)
-                    .set(EntityStateDO::getStateFlag, offlineIndex)
-                    .set(EntityStateDO::getLastStateFlag, state.getStateFlag())
-                    .set(EntityStateDO::getExpireTime, LocalDateTime.now().plusSeconds(OFFLINE_RENEW_SECONDS))
-                    .update();
-
-            if (!claimed) {
-                RabbitAckUtil.ack(channel, deliveryTag);
-                return;
-            }
-
-            // Write alarm
-            EntityStatusEnum prevStatus = EntityStatusEnum.ofIndex(state.getStateFlag());
-            String prevCode = Objects.nonNull(prevStatus) ? prevStatus.getCode() : "unknown";
-            String alarmMessage = String.format("Driver heartbeat timed out (last=%s); marked OFFLINE", prevCode);
-
-            EntityAlarmDO alarm = new EntityAlarmDO();
-            alarm.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.DRIVER.getIndex());
-            alarm.setEntityId(dto.getDriverId());
-            alarm.setDriverId(dto.getDriverId());
-            alarm.setDeviceId(0L);
-            alarm.setPointId(0L);
-            alarm.setRuleId(0L);
-            alarm.setRuleStateId(0L);
-            alarm.setAlarmTypeFlag(AlarmTypeEnum.OFFLINE.getIndex());
-            alarm.setAlarmSourceFlag(AlarmSourceTypeEnum.STATE_TIMEOUT.getIndex());
-            alarm.setAlarmLevelFlag(AlarmMessageLevelEnum.P1.getIndex());
-            alarm.setAlarmExt(JsonExt.builder().type("driver-offline").content(alarmMessage).version(1).build());
-            alarm.setExpiredTime(0L);
-            alarm.setConfirmFlag((byte) 0);
-            alarm.setTenantId(dto.getTenantId());
-            entityAlarmManager.save(alarm);
-
-            // Update lastAlarmId on state row
-            entityStateManager.lambdaUpdate()
-                    .eq(EntityStateDO::getTenantId, dto.getTenantId())
-                    .eq(EntityStateDO::getEntityTypeFlag, EntityTypeEnum.DRIVER.getIndex())
-                    .eq(EntityStateDO::getEntityId, dto.getDriverId())
-                    .eq(EntityStateDO::getLeaseVersion, newVersion)
-                    .set(EntityStateDO::getLastAlarmId, alarm.getId())
-                    .update();
-
-            // Trigger alarm rule pipeline
-            DriverAlarmDTO driverAlarm = DriverAlarmDTO.builder()
-                    .tenantId(dto.getTenantId())
-                    .driverId(dto.getDriverId())
-                    .status(EntityStatusEnum.OFFLINE.getCode())
-                    .statusName(EntityStatusEnum.OFFLINE.name())
-                    .message(alarmMessage)
-                    .alarmId(alarm.getId())
-                    .build();
-            alarmRuleTriggerService.processDriverAlarm(driverAlarm);
-
-            log.info("Driver timeout check confirmed OFFLINE: driverId={}, tenantId={}, prevStatus={}",
-                    dto.getDriverId(), dto.getTenantId(), prevCode);
-
-            RabbitAckUtil.ack(channel, deliveryTag);
-        } catch (Exception e) {
-            log.error("Driver timeout check failed, deliveryTag={}", deliveryTag, e);
-            RabbitAckUtil.nack(channel, deliveryTag, true);
+    @Dc3Listener(topic = MqTopic.STATE_TIMEOUT)
+    public Mono<Void> driverTimeoutCheck(MqReceived<DriverTimeoutCheckDTO> message, Acknowledgment ack) {
+        DriverTimeoutCheckDTO dto = message.payload();
+        if (Objects.isNull(dto)
+                || Objects.isNull(dto.getDriverId())
+                || Objects.isNull(dto.getTenantId())
+                || Objects.isNull(dto.getLeaseVersion())) {
+            ack.reject(false);
+            return Mono.empty();
         }
+        return transactionalOperator
+                .transactional(entityStateStore
+                        .claimExpired(
+                                dto.getTenantId(),
+                                EntityTypeEnum.DRIVER,
+                                dto.getDriverId(),
+                                dto.getLeaseVersion(),
+                                OFFLINE_RENEW_SECONDS)
+                        .flatMap(this::persistOrResumeAlarm))
+                .flatMap(context -> alarmRuleTriggerService.processDriverAlarm(context.alarm()))
+                .doOnError(error -> log.error("Driver timeout check failed.", error))
+                .then();
     }
+
+    private Mono<DriverAlarmContext> persistOrResumeAlarm(ReactiveEntityStateStore.EntityStateLease state) {
+        String previous = statusCode(state.lastStateFlag());
+        String alarmMessage = String.format("Driver heartbeat timed out (last=%s); marked OFFLINE", previous);
+        Mono<Long> alarmId = state.lastAlarmId() != null && state.lastAlarmId() > 0
+                ? Mono.just(state.lastAlarmId())
+                : persistAlarm(state, alarmMessage);
+        return alarmId.map(id -> new DriverAlarmContext(DriverAlarmDTO.builder()
+                        .tenantId(state.tenantId())
+                        .driverId(state.entityId())
+                        .status(EntityStatusEnum.OFFLINE.getCode())
+                        .statusName(EntityStatusEnum.OFFLINE.name())
+                        .message(alarmMessage)
+                        .alarmId(id)
+                        .build()))
+                .doOnSuccess(ignored -> log.info(
+                        "Driver timeout check confirmed OFFLINE: driverId={}, tenantId={}, prevStatus={}",
+                        state.entityId(),
+                        state.tenantId(),
+                        previous));
+    }
+
+    private Mono<Long> persistAlarm(ReactiveEntityStateStore.EntityStateLease state, String alarmMessage) {
+        EntityAlarmDO alarm = new EntityAlarmDO();
+        alarm.setAlarmTargetTypeFlag(AlarmTargetTypeEnum.DRIVER.getIndex());
+        alarm.setEntityId(state.entityId());
+        alarm.setDriverId(state.entityId());
+        alarm.setDeviceId(0L);
+        alarm.setPointId(0L);
+        alarm.setRuleId(0L);
+        alarm.setRuleStateId(0L);
+        alarm.setAlarmTypeFlag(AlarmTypeEnum.OFFLINE.getIndex());
+        alarm.setAlarmSourceFlag(AlarmSourceTypeEnum.STATE_TIMEOUT.getIndex());
+        alarm.setAlarmLevelFlag(AlarmMessageLevelEnum.P1.getIndex());
+        alarm.setAlarmExt(JsonExt.builder()
+                .type("driver-offline")
+                .content(alarmMessage)
+                .version(1)
+                .build());
+        alarm.setExpiredTime(0L);
+        alarm.setConfirmFlag((byte) 0);
+        alarm.setTenantId(state.tenantId());
+        return entityAlarmStore
+                .insert(alarm)
+                .flatMap(saved -> entityStateStore
+                        .markAlarm(
+                                state.tenantId(),
+                                EntityTypeEnum.DRIVER,
+                                state.entityId(),
+                                state.leaseVersion(),
+                                saved.getId())
+                        .flatMap(updated -> updated
+                                ? Mono.just(saved.getId())
+                                : Mono.error(new IllegalStateException("driver timeout alarm lost lease ownership"))));
+    }
+
+    private String statusCode(byte flag) {
+        EntityStatusEnum status = EntityStatusEnum.ofIndex(flag);
+        return Objects.isNull(status) ? "unknown" : status.getCode();
+    }
+
+    private record DriverAlarmContext(DriverAlarmDTO alarm) {}
 }

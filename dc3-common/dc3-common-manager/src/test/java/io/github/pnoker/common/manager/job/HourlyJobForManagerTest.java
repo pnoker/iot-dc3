@@ -14,14 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.job;
+
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.quartz.JobExecutionContext;
-
-import static org.assertj.core.api.Assertions.assertThatNoException;
 
 class HourlyJobForManagerTest {
 

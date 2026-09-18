@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +26,6 @@ import lombok.Setter;
  * JSON extension object for event param metadata.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Schema(description = "JSON extension object for event param metadata")
@@ -43,6 +41,9 @@ public class EventParamExt extends BaseExt {
     @Schema(description = "Structured event param payload carrying the reserved keep field")
     private Content content;
 
+    /**
+     * Reserved event-param extension slot, currently a placeholder.
+     */
     @Schema(description = "Extended content payload of the event param")
     @Getter
     @Setter
@@ -50,9 +51,9 @@ public class EventParamExt extends BaseExt {
     @AllArgsConstructor
     public static class Content {
 
-        @Schema(description = "Reserved keep field retained for forward-compatible event param content", example = "reserved")
+        @Schema(
+                description = "Reserved keep field retained for forward-compatible event param content",
+                example = "reserved")
         private String keep;
-
     }
-
 }

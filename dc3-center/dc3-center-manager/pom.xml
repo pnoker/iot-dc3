@@ -35,6 +35,24 @@
 
     <dependencies>
 
+        <!-- Present only so Spring's annotation introspection of the (excluded)
+             gRPC OAuth2 resource-server autoconfiguration resolves cleanly instead
+             of logging TypeNotPresent warnings at boot; no beans are created. -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-runtime</artifactId>
+        </dependency><dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-postgres-manager</artifactId>
+        </dependency>
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -46,7 +64,7 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-resource-registrar</artifactId>
+            <artifactId>dc3-common-resource</artifactId>
         </dependency>
 
     </dependencies>

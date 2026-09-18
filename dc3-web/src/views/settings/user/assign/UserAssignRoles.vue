@@ -17,152 +17,160 @@
 
 <template>
   <el-dialog
-    v-model="reactiveData.visible"
+    v-model="state.visible"
+    :before-close="requestClose"
     :close-on-click-modal="false"
+    :close-on-press-escape="!state.submitting"
+    :show-close="!state.submitting"
     :title="t('settings.user.assignRolesTitle')"
+    class="things-dialog things-dialog--wide assign-dialog"
+    destroy-on-close
     width="960px"
   >
-    <div v-loading="reactiveData.loading" class="assign-body">
+    <el-alert
+      v-if="state.loadStatus === 'error'"
+      :closable="false"
+      :title="t('common.loadFailed')"
+      class="assign-alert"
+      show-icon
+      type="error"
+    >
+      <el-button :loading="state.loading" link type="danger" @click="load(true)">
+        {{ t('common.retry') }}
+      </el-button>
+    </el-alert>
+    <el-alert
+      v-if="state.saveError"
+      :closable="false"
+      :title="t('common.saveFailed')"
+      class="assign-alert"
+      show-icon
+      type="error"
+    />
+
+    <div v-loading="state.loading" :aria-busy="state.loading" class="assign-body">
       <div class="assign-target">
         <span class="assign-label">{{ t('settings.user.userName') }}:</span>
-        <span class="assign-value">{{ reactiveData.user.userName }}</span>
+        <span class="assign-value">{{ state.user.userName || '-' }}</span>
         <span class="assign-sep">/</span>
-        <span class="assign-value">{{ reactiveData.user.nickName }}</span>
+        <span class="assign-value">{{ state.user.nickName || '-' }}</span>
       </div>
 
       <div class="assign-dual">
-        <div class="assign-pane">
+        <section class="assign-pane" :aria-label="t('settings.user.rolesAvailable')">
           <div class="assign-pane__header">
             <span class="assign-pane__title">
               {{ t('settings.user.rolesAvailable') }}
               <span class="assign-pane__count">({{ filteredAvailable.length }})</span>
             </span>
             <el-input
-              v-model="reactiveData.leftFilter"
+              v-model="state.leftFilter"
+              :aria-label="t('settings.user.rolesAvailable')"
+              :disabled="state.loading || state.submitting"
               :placeholder="t('settings.user.rolesSearchPlaceholder')"
               clearable
               size="small"
             >
               <template #prefix>
-                <el-icon>
-                  <Search/>
-                </el-icon>
+                <el-icon><Search/></el-icon>
               </template>
             </el-input>
           </div>
-          <el-table
-            ref="leftTableRef"
-            :data="filteredAvailable"
-            class="assign-pane__table"
-            height="360"
+          <responsive-record-list
+            :columns="roleColumns"
+            :loading="state.loading"
+            :rows="filteredAvailable"
+            :selected-rows="state.leftSelection"
+            :selection-disabled="() => state.loading || state.submitting"
+            embedded
+            selectable
             row-key="id"
-            stripe
-            @selection-change="(rows: RoleRow[]) => (reactiveData.leftSelection = rows)"
+            class="assign-pane__list"
+            @selection-change="setLeftSelection"
+          />
+        </section>
+
+        <div class="assign-actions" :aria-label="t('settings.user.assignRolesTitle')">
+          <el-button
+            :disabled="state.leftSelection.length === 0 || state.loading || state.submitting"
+            class="assign-actions__button"
+            type="primary"
+            @click="moveRight"
           >
-            <el-table-column type="selection" width="42"/>
-            <el-table-column
-              :label="t('settings.role.roleName')"
-              min-width="140"
-              prop="roleName"
-              show-overflow-tooltip
-            />
-            <el-table-column
-              :label="t('settings.role.roleCode')"
-              min-width="140"
-              prop="roleCode"
-              show-overflow-tooltip
-            />
-            <el-table-column :label="t('common.remark')" min-width="160" prop="remark" show-overflow-tooltip/>
-            <template #empty>
-              <el-empty :description="t('settings.user.empty')" :image-size="60"/>
-            </template>
-          </el-table>
-        </div>
-
-        <div class="assign-actions">
-          <el-button :disabled="reactiveData.leftSelection.length === 0" size="small" type="primary" @click="moveRight">
-            {{ t('settings.user.rolesMoveRight') }}
-            <el-icon class="assign-actions__icon">
-              <ArrowRight/>
-            </el-icon>
+            <span>{{ t('settings.user.rolesMoveRight') }}</span>
+            <el-icon class="assign-actions__icon"><ArrowRight/></el-icon>
           </el-button>
-          <el-button :disabled="reactiveData.rightSelection.length === 0" size="small" @click="moveLeft">
-            <el-icon class="assign-actions__icon">
-              <ArrowLeft/>
-            </el-icon>
-            {{ t('settings.user.rolesMoveLeft') }}
+          <el-button
+            :disabled="state.rightSelection.length === 0 || state.loading || state.submitting"
+            class="assign-actions__button"
+            @click="moveLeft"
+          >
+            <el-icon class="assign-actions__icon"><ArrowLeft/></el-icon>
+            <span>{{ t('settings.user.rolesMoveLeft') }}</span>
           </el-button>
         </div>
 
-        <div class="assign-pane">
+        <section class="assign-pane" :aria-label="t('settings.user.rolesOfUser')">
           <div class="assign-pane__header">
             <span class="assign-pane__title">
               {{ t('settings.user.rolesOfUser') }}
               <span class="assign-pane__count">({{ filteredAssigned.length }})</span>
             </span>
             <el-input
-              v-model="reactiveData.rightFilter"
+              v-model="state.rightFilter"
+              :aria-label="t('settings.user.rolesOfUser')"
+              :disabled="state.loading || state.submitting"
               :placeholder="t('settings.user.rolesSearchPlaceholder')"
               clearable
               size="small"
             >
               <template #prefix>
-                <el-icon>
-                  <Search/>
-                </el-icon>
+                <el-icon><Search/></el-icon>
               </template>
             </el-input>
           </div>
-          <el-table
-            ref="rightTableRef"
-            :data="filteredAssigned"
-            class="assign-pane__table"
-            height="360"
+          <responsive-record-list
+            :columns="roleColumns"
+            :loading="state.loading"
+            :rows="filteredAssigned"
+            :selected-rows="state.rightSelection"
+            :selection-disabled="() => state.loading || state.submitting"
+            embedded
+            selectable
             row-key="id"
-            stripe
-            @selection-change="(rows: RoleRow[]) => (reactiveData.rightSelection = rows)"
-          >
-            <el-table-column type="selection" width="42"/>
-            <el-table-column
-              :label="t('settings.role.roleName')"
-              min-width="140"
-              prop="roleName"
-              show-overflow-tooltip
-            />
-            <el-table-column
-              :label="t('settings.role.roleCode')"
-              min-width="140"
-              prop="roleCode"
-              show-overflow-tooltip
-            />
-            <el-table-column :label="t('common.remark')" min-width="160" prop="remark" show-overflow-tooltip/>
-            <template #empty>
-              <el-empty :description="t('settings.user.empty')" :image-size="60"/>
-            </template>
-          </el-table>
-        </div>
+            class="assign-pane__list"
+            @selection-change="setRightSelection"
+          />
+        </section>
       </div>
     </div>
 
     <template #footer>
-      <el-button @click="reactiveData.visible = false">{{ t('common.cancel') }}</el-button>
-      <el-button :loading="reactiveData.submitting" type="primary" @click="submit">
-        {{ t('common.save') }}
-      </el-button>
+      <div class="things-dialog-footer">
+        <el-button :disabled="state.submitting" @click="requestClose()">{{ t('common.cancel') }}</el-button>
+        <el-button
+          :disabled="state.submitting || state.loading || state.loadStatus !== 'success'"
+          :loading="state.submitting"
+          type="primary"
+          @click="submit"
+        >{{ t('common.save') }}</el-button>
+      </div>
     </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import {computed, reactive, ref} from 'vue';
-import {useI18n} from 'vue-i18n';
+import {computed, onBeforeUnmount, reactive, watch} from 'vue';
 import {ArrowLeft, ArrowRight, Search} from '@element-plus/icons-vue';
-import type {TableInstance} from 'element-plus';
+import {ElMessageBox} from 'element-plus';
+import {useI18n} from 'vue-i18n';
 
 import {listRole} from '@/api/role';
 import {listRoleByPrincipalId, listRolePrincipalBind} from '@/api/rolePrincipalBind';
+import ResponsiveRecordList from '@/components/list/ResponsiveRecordList.vue';
+import type {ResponsiveListColumn} from '@/config/types';
 
-interface RoleRow {
+interface RoleRow extends Record<string, any> {
   id: string;
   roleName: string;
   roleCode: string;
@@ -171,18 +179,16 @@ interface RoleRow {
 
 const {t} = useI18n();
 const emit = defineEmits<{
-  (e: 'save', principalId: string, addIds: string[], removeBindIds: string[], done: () => void): void;
+  (event: 'save', principalId: string, addIds: string[], removeBindIds: string[], done: (successful?: boolean) => void): void;
 }>();
 
-const leftTableRef = ref<TableInstance>();
-const rightTableRef = ref<TableInstance>();
-
-const reactiveData = reactive({
+const state = reactive({
   visible: false,
   loading: false,
   submitting: false,
+  loadStatus: 'idle' as 'idle' | 'loading' | 'success' | 'error',
+  saveError: false,
   user: {} as any,
-  // bindId(RolePrincipalBind.id) -> roleId lookup; delete endpoint wants bindId
   bindIdByRoleId: new Map<string, string>(),
   originalRoleIds: [] as string[],
   available: [] as RoleRow[],
@@ -192,161 +198,228 @@ const reactiveData = reactive({
   leftFilter: '',
   rightFilter: '',
 });
+let loadSequence = 0;
+let saveSequence = 0;
 
-const matches = (r: RoleRow, kw: string) => {
-  if (!kw) return true;
-  const k = kw.toLowerCase();
-  return (
-    (r.roleName || '').toLowerCase().includes(k) ||
-    (r.roleCode || '').toLowerCase().includes(k) ||
-    (r.remark || '').toLowerCase().includes(k)
-  );
+const roleColumns = computed<ResponsiveListColumn<RoleRow>[]>(() => [
+  {key: 'roleName', label: t('settings.role.roleName'), minWidth: 140, mobile: 'primary'},
+  {key: 'roleCode', label: t('settings.role.roleCode'), minWidth: 140, kind: 'code', mobile: 'detail'},
+  {key: 'remark', label: t('common.remark'), minWidth: 160, mobile: 'detail'},
+]);
+
+const matches = (row: RoleRow, keyword: string) => {
+  const value = keyword.trim().toLowerCase();
+  if (!value) return true;
+  return [row.roleName, row.roleCode, row.remark].some((field) => String(field || '').toLowerCase().includes(value));
 };
-
-const filteredAvailable = computed(() => reactiveData.available.filter((r) => matches(r, reactiveData.leftFilter)));
-const filteredAssigned = computed(() => reactiveData.assigned.filter((r) => matches(r, reactiveData.rightFilter)));
-
-const toRow = (r: any): RoleRow => ({
-  id: String(r.id),
-  roleName: r.roleName || '',
-  roleCode: r.roleCode || '',
-  remark: r.remark || '',
+const filteredAvailable = computed(() => state.available.filter((row) => matches(row, state.leftFilter)));
+const filteredAssigned = computed(() => state.assigned.filter((row) => matches(row, state.rightFilter)));
+const isDirty = computed(() => {
+  const current = new Set(state.assigned.map((row) => row.id));
+  return current.size !== state.originalRoleIds.length || state.originalRoleIds.some((id) => !current.has(id));
 });
 
-const load = async () => {
-  reactiveData.loading = true;
+const toRow = (row: any): RoleRow => ({
+  id: String(row.id),
+  roleName: String(row.roleName || ''),
+  roleCode: String(row.roleCode || ''),
+  remark: String(row.remark || ''),
+});
+
+const load = async (force = false) => {
+  if (!state.user.principalId || (state.loadStatus === 'success' && !force)) return;
+  const sequence = ++loadSequence;
+  state.loading = true;
+  state.loadStatus = 'loading';
+  state.saveError = false;
   try {
-    const principalId = String(reactiveData.user.principalId || '');
-    const [allRes, ownRes, bindsRes] = await Promise.all([
-      listRole({page: {size: 1000, current: 1}}) as Promise<any>,
+    const principalId = String(state.user.principalId);
+    const [allResult, ownResult, bindsResult] = await Promise.all([
+      listRole({offset: 0, limit: 200}) as Promise<any>,
       listRoleByPrincipalId(principalId) as Promise<any>,
-      listRolePrincipalBind({page: {size: 1000, current: 1}, principalId}) as Promise<any>,
+      listRolePrincipalBind({offset: 0, limit: 200, principalId}) as Promise<any>,
     ]);
-
-    const allRoles: RoleRow[] = ((allRes.data?.records as any[]) || []).map(toRow);
-    const ownRoles: RoleRow[] = ((ownRes.data as any[]) || []).map(toRow);
-    const ownIds = new Set(ownRoles.map((r) => r.id));
-
-    reactiveData.assigned = ownRoles;
-    reactiveData.available = allRoles.filter((r) => !ownIds.has(r.id));
-    reactiveData.originalRoleIds = ownRoles.map((r) => r.id);
-
-    const bindMap = new Map<string, string>();
-    for (const bind of (bindsRes.data?.records as any[]) || []) {
-      bindMap.set(String(bind.roleId), String(bind.id));
-    }
-    reactiveData.bindIdByRoleId = bindMap;
+    if (sequence !== loadSequence) return;
+    const allRoles = ((allResult?.items as any[]) || []).map(toRow);
+    const ownRoles = ((ownResult as any[]) || []).map(toRow);
+    const ownIds = ownRoles.map((row) => row.id);
+    state.assigned = ownRoles;
+    state.available = allRoles.filter((row) => !ownIds.includes(row.id));
+    state.originalRoleIds = [...ownIds];
+    state.bindIdByRoleId = new Map(
+      ((bindsResult?.items as any[]) || []).map((bind: any) => [String(bind.roleId), String(bind.id)])
+    );
+    state.leftSelection = [];
+    state.rightSelection = [];
+    state.loadStatus = 'success';
   } catch {
-    // handled globally
+    if (sequence === loadSequence) state.loadStatus = 'error';
   } finally {
-    reactiveData.loading = false;
+    if (sequence === loadSequence) state.loading = false;
   }
 };
 
 const show = (user: any) => {
-  reactiveData.user = user;
-  reactiveData.available = [];
-  reactiveData.assigned = [];
-  reactiveData.leftSelection = [];
-  reactiveData.rightSelection = [];
-  reactiveData.leftFilter = '';
-  reactiveData.rightFilter = '';
-  reactiveData.originalRoleIds = [];
-  reactiveData.bindIdByRoleId = new Map();
-  reactiveData.visible = true;
-  load();
+  loadSequence += 1;
+  saveSequence += 1;
+  state.user = user || {};
+  state.available = [];
+  state.assigned = [];
+  state.leftSelection = [];
+  state.rightSelection = [];
+  state.leftFilter = '';
+  state.rightFilter = '';
+  state.originalRoleIds = [];
+  state.bindIdByRoleId = new Map();
+  state.loadStatus = 'idle';
+  state.saveError = false;
+  state.submitting = false;
+  state.visible = true;
+  void load();
 };
 
+const setLeftSelection = (rows: RoleRow[]) => {
+  if (state.loading || state.submitting) return;
+  state.leftSelection = rows;
+};
+const setRightSelection = (rows: RoleRow[]) => {
+  if (state.loading || state.submitting) return;
+  state.rightSelection = rows;
+};
 const moveRight = () => {
-  if (!reactiveData.leftSelection.length) return;
-  const movingIds = new Set(reactiveData.leftSelection.map((r) => r.id));
-  reactiveData.assigned = reactiveData.assigned.concat(reactiveData.leftSelection);
-  reactiveData.available = reactiveData.available.filter((r) => !movingIds.has(r.id));
-  leftTableRef.value?.clearSelection();
-  reactiveData.leftSelection = [];
+  if (state.loading || state.submitting || !state.leftSelection.length) return;
+  const ids = new Set(state.leftSelection.map((row) => row.id));
+  state.assigned = [...state.assigned, ...state.leftSelection];
+  state.available = state.available.filter((row) => !ids.has(row.id));
+  state.leftSelection = [];
+};
+const moveLeft = () => {
+  if (state.loading || state.submitting || !state.rightSelection.length) return;
+  const ids = new Set(state.rightSelection.map((row) => row.id));
+  state.available = [...state.available, ...state.rightSelection];
+  state.assigned = state.assigned.filter((row) => !ids.has(row.id));
+  state.rightSelection = [];
 };
 
-const moveLeft = () => {
-  if (!reactiveData.rightSelection.length) return;
-  const movingIds = new Set(reactiveData.rightSelection.map((r) => r.id));
-  reactiveData.available = reactiveData.available.concat(reactiveData.rightSelection);
-  reactiveData.assigned = reactiveData.assigned.filter((r) => !movingIds.has(r.id));
-  rightTableRef.value?.clearSelection();
-  reactiveData.rightSelection = [];
+const requestClose = async (done?: () => void) => {
+  if (state.submitting) return;
+  const sequence = loadSequence;
+  if (!isDirty.value) {
+    if (done) done();
+    else state.visible = false;
+    return;
+  }
+  try {
+    await ElMessageBox.confirm(t('common.discardConfirm'), t('common.confirm'), {
+      type: 'warning',
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+    });
+    if (sequence !== loadSequence || !state.visible) return;
+    if (done) done();
+    else state.visible = false;
+  } catch {
+    return;
+  }
 };
 
 const submit = () => {
-  const originalSet = new Set(reactiveData.originalRoleIds);
-  const currentSet = new Set(reactiveData.assigned.map((r) => r.id));
-
-  const addIds: string[] = [];
-  const removeBindIds: string[] = [];
-  for (const id of currentSet) {
-    if (!originalSet.has(id)) addIds.push(id);
-  }
-  for (const id of originalSet) {
-    if (!currentSet.has(id)) {
-      const bindId = reactiveData.bindIdByRoleId.get(id);
-      if (bindId) removeBindIds.push(bindId);
-    }
-  }
-
-  if (addIds.length === 0 && removeBindIds.length === 0) {
-    reactiveData.visible = false;
+  if (state.submitting || state.loading || state.loadStatus !== 'success') return;
+  if (!isDirty.value) {
+    state.visible = false;
     return;
   }
-
-  reactiveData.submitting = true;
-  emit('save', String(reactiveData.user.principalId), addIds, removeBindIds, () => {
-    reactiveData.submitting = false;
-    reactiveData.visible = false;
+  const original = new Set(state.originalRoleIds);
+  const current = new Set(state.assigned.map((row) => row.id));
+  const addIds = [...current].filter((id) => !original.has(id));
+  const removeBindIds = [...original]
+    .filter((id) => !current.has(id))
+    .map((id) => state.bindIdByRoleId.get(id))
+    .filter((id): id is string => Boolean(id));
+  state.submitting = true;
+  state.saveError = false;
+  const session = ++saveSequence;
+  emit('save', String(state.user.principalId), addIds, removeBindIds, (successful = true) => {
+    if (session !== saveSequence || !state.visible) return;
+    state.submitting = false;
+    if (successful) {
+      state.originalRoleIds = state.assigned.map((row) => row.id);
+      state.visible = false;
+    } else {
+      state.saveError = true;
+    }
   });
 };
 
 defineExpose({show});
+
+watch(
+  () => state.visible,
+  (visible) => {
+    if (visible) return;
+    loadSequence += 1;
+    saveSequence += 1;
+    state.loading = false;
+    state.leftSelection = [];
+    state.rightSelection = [];
+  }
+);
+
+onBeforeUnmount(() => {
+  loadSequence += 1;
+  saveSequence += 1;
+});
 </script>
 
 <style lang="scss" scoped>
 .assign-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--dc3-space-3);
+  min-width: 0;
+}
+
+.assign-alert {
+  margin-bottom: var(--dc3-space-3);
 }
 
 .assign-target {
-  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dc3-space-1);
   color: var(--el-text-color-regular);
 }
 
-.assign-label {
+.assign-label,
+.assign-sep {
   color: var(--el-text-color-secondary);
-  margin-right: 4px;
+}
+
+.assign-sep {
+  margin-inline: var(--dc3-space-2);
 }
 
 .assign-value {
   font-weight: 600;
 }
 
-.assign-sep {
-  margin: 0 6px;
-  color: var(--el-text-color-secondary);
-}
-
 .assign-dual {
   display: flex;
   align-items: stretch;
-  gap: 12px;
+  gap: var(--dc3-space-3);
+  min-width: 0;
 }
 
 .assign-pane {
-  flex: 1;
-  min-width: 0;
   display: flex;
+  flex: 1 1 0;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--dc3-space-2);
+  min-width: 0;
+  padding: var(--dc3-space-3);
   border: 1px solid var(--el-border-color-lighter);
-  border-radius: 4px;
-  padding: 10px;
+  border-radius: var(--dc3-radius-md);
   background: var(--el-bg-color);
 }
 
@@ -354,45 +427,94 @@ defineExpose({show});
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--dc3-space-2);
+  min-width: 0;
 }
 
 .assign-pane__title {
-  font-size: 13px;
-  font-weight: 600;
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
   color: var(--el-text-color-primary);
-  flex-shrink: 0;
+  font-size: var(--el-font-size-small);
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .assign-pane__count {
   color: var(--el-text-color-secondary);
   font-weight: 400;
-  margin-left: 4px;
 }
 
 .assign-pane__header .el-input {
-  max-width: 200px;
+  flex: 1 1 180px;
+  max-width: 220px;
+  min-width: 0;
 }
 
-.assign-pane__table {
-  flex: 1;
+.assign-pane__list {
+  max-height: min(360px, 42vh);
+  overflow: auto;
 }
 
 .assign-actions {
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
-  padding-top: 40px;
-  flex-shrink: 0;
+  gap: var(--dc3-space-2);
+  min-width: 96px;
+}
 
-  .el-button {
-    width: 96px;
-    margin-left: 0;
-  }
+.assign-actions__button {
+  min-height: var(--dc3-touch-target);
+  margin: 0;
 }
 
 .assign-actions__icon {
-  margin: 0 4px;
+  margin-inline: var(--dc3-space-1);
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  .assign-dual {
+    flex-direction: column;
+  }
+
+  .assign-pane__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .assign-pane__header .el-input {
+    max-width: none;
+  }
+
+  .assign-pane__list {
+    max-height: 32vh;
+  }
+
+  .assign-actions {
+    flex-direction: row;
+    min-width: 0;
+  }
+
+  .assign-actions__button {
+    flex: 1 1 0;
+  }
+}
+
+@media (min-width: $breakpoint-sm) and (max-width: $breakpoint-md-max) {
+  .assign-dual {
+    gap: var(--dc3-space-2);
+  }
+
+  .assign-actions {
+    min-width: 76px;
+  }
+
+  .assign-actions__button {
+    padding-inline: var(--dc3-space-2);
+  }
 }
 </style>

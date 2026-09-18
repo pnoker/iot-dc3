@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.data.entity.bo.NotifyChannelBindBO;
 import io.github.pnoker.common.data.entity.model.NotifyChannelBindDO;
 import io.github.pnoker.common.data.entity.vo.NotifyChannelBindVO;
@@ -26,36 +24,59 @@ import io.github.pnoker.common.entity.ext.NotifyChannelBindExt;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 /**
  * MapStruct builder converting between notification channel binding BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface NotifyChannelBindBuilder {
 
+    /**
+     * Convert vo to bo.
+     *
+     * @param entityVO view object
+     * @return converted value
+     */
     @Mapping(target = "tenantId", ignore = true)
     NotifyChannelBindBO buildBOByVO(NotifyChannelBindVO entityVO);
 
+    /**
+     * Convert vo list to bo list.
+     *
+     * @param entityVOList entity view object list
+     * @return converted value
+     */
     List<NotifyChannelBindBO> buildBOListByVOList(List<NotifyChannelBindVO> entityVOList);
 
+    /**
+     * Convert bo to do.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "bindExt", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     NotifyChannelBindDO buildDOByBO(NotifyChannelBindBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(NotifyChannelBindBO entityBO, @MappingTarget NotifyChannelBindDO entityDO) {
         NotifyChannelBindExt entityExt = entityBO.getBindExt();
@@ -72,12 +93,30 @@ public interface NotifyChannelBindBuilder {
         Optional.ofNullable(enableFlag).ifPresent(value -> entityDO.setEnableFlag(value.getIndex()));
     }
 
+    /**
+     * Convert bo list to do list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<NotifyChannelBindDO> buildDOListByBOList(List<NotifyChannelBindBO> entityBOList);
 
+    /**
+     * Convert do to bo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     @Mapping(target = "bindExt", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     NotifyChannelBindBO buildBOByDO(NotifyChannelBindDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(NotifyChannelBindDO entityDO, @MappingTarget NotifyChannelBindBO entityBO) {
         JsonExt entityExt = entityDO.getBindExt();
@@ -94,18 +133,40 @@ public interface NotifyChannelBindBuilder {
         entityBO.setEnableFlag(EnableFlagEnum.ofIndex(enableFlag));
     }
 
+    /**
+     * Convert do list to bo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<NotifyChannelBindBO> buildBOListByDOList(List<NotifyChannelBindDO> entityDOList);
 
+    /**
+     * Convert bo to vo.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     NotifyChannelBindVO buildVOByBO(NotifyChannelBindBO entityBO);
 
+    /**
+     * Convert bo list to vo list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<NotifyChannelBindVO> buildVOListByBOList(List<NotifyChannelBindBO> entityBOList);
 
-    default Page<NotifyChannelBindBO> buildBOPageByDOPage(Page<NotifyChannelBindDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    default Page<NotifyChannelBindVO> buildVOPageByBOPage(Page<NotifyChannelBindBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
+    /**
+     * Convert do page to bo page.
+     *
+     * @param entityPageDO persistence object
+     * @return converted value
+     */
+    /**
+     * Convert bo page to vo page.
+     *
+     * @param entityPageBO business object
+     * @return converted value
+     */
 }

@@ -14,31 +14,23 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.offset;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
 class ArithmeticUtilTest {
 
     @ParameterizedTest
-    @CsvSource({
-            "1.10, 2.20, 3.30",
-            "0,    0,    0",
-            "-1.5, 1.5,  0.0",
-            "0.1,  0.2,  0.3",
-            "1E10, 1E10, 2E10"
-    })
+    @CsvSource({"1.10, 2.20, 3.30", "0,    0,    0", "-1.5, 1.5,  0.0", "0.1,  0.2,  0.3", "1E10, 1E10, 2E10"})
     void shouldAddBigDecimalsWithoutFloatingPointDrift(String a, String b, String expected) {
         assertThat(ArithmeticUtil.add(a, b)).isEqualByComparingTo(new BigDecimal(expected));
     }
@@ -54,11 +46,7 @@ class ArithmeticUtilTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "5.5, 2.2, 3.3",
-            "0,   0,   0",
-            "1,   2,   -1"
-    })
+    @CsvSource({"5.5, 2.2, 3.3", "0,   0,   0", "1,   2,   -1"})
     void shouldSubtractBigDecimals(String a, String b, String expected) {
         assertThat(ArithmeticUtil.subtract(a, b)).isEqualByComparingTo(new BigDecimal(expected));
     }
@@ -109,17 +97,11 @@ class ArithmeticUtilTest {
 
     @Test
     void shouldRejectDivisionByZero() {
-        assertThatThrownBy(() -> ArithmeticUtil.divide("1", "0", 2))
-                .isInstanceOf(ArithmeticException.class);
+        assertThatThrownBy(() -> ArithmeticUtil.divide("1", "0", 2)).isInstanceOf(ArithmeticException.class);
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "1.235, 2, 1.24",
-            "1.234, 2, 1.23",
-            "1.5,   0, 2",
-            "-1.5,  0, -2"
-    })
+    @CsvSource({"1.235, 2, 1.24", "1.234, 2, 1.23", "1.5,   0, 2", "-1.5,  0, -2"})
     void shouldRoundBigDecimalsHalfUp(String value, int scale, String expected) {
         assertThat(ArithmeticUtil.round(value, scale)).isEqualByComparingTo(new BigDecimal(expected));
     }

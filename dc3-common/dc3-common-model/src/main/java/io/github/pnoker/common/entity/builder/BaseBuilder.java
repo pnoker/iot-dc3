@@ -14,25 +14,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.builder;
 
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.base.BaseDTO;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import org.mapstruct.Mapper;
-
 import java.util.List;
+import org.mapstruct.Mapper;
 
 /**
  * Base MapStruct builder providing shared conversion methods.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface BaseBuilder {
 
     /**
@@ -98,5 +97,4 @@ public interface BaseBuilder {
      * @return {@link BaseDTO} converted collection
      */
     List<BaseDTO> buildDTOListByBOList(List<BaseBO> entityBOList);
-
 }

@@ -29,24 +29,31 @@ import org.springframework.stereotype.Component;
  * User-context tools exposed to the LLM via Spring AI @Tool.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Slf4j
 @Component
 public class UserTool {
 
+    /**
+     * Return current user profile.
+     *
+     * @param toolContext tool context
+     * @return get current user profile result
+     */
     @Tool(description = "Get the current user profile. Returns only user ID, username, and nickname.")
     @AgenticToolMetadata(domain = "user", title = "Read current user profile")
     public AgenticToolResult<CurrentUserProfile> getCurrentUserProfile(ToolContext toolContext) {
         RequestHeader.PrincipalHeader header = AgenticToolContextUtil.requirePrincipalHeader(toolContext);
         Long userId = AgenticToolContextUtil.requireUserId(toolContext);
         log.debug("Agentic tool invoked, tool={}, userId={}", "getCurrentUserProfile", userId);
-        return AgenticToolResult.ok("Current user profile loaded",
+        return AgenticToolResult.ok(
+                "Current user profile loaded",
                 new CurrentUserProfile(userId, header.getUserName(), header.getNickName()));
     }
 
-    public record CurrentUserProfile(Long userId, String username, String nickname) {
-    }
-
+    /**
+     * The acting user resolved from the ToolContext identity.
+     */
+    public record CurrentUserProfile(Long userId, String username, String nickname) {}
 }

@@ -21,17 +21,15 @@ import {describe, expect, it, vi} from 'vitest';
 import {mountListPage} from './_helpers';
 
 const pointMocks = vi.hoisted(() => ({
-  listPointByIds: vi.fn(() => Promise.resolve({data: {}})),
-  listPointUnit: vi.fn(() => Promise.resolve({data: {}})),
-  getPointValueLatest: vi.fn(() => Promise.resolve({data: {}})),
-  listPointValue: vi.fn(() =>
-    Promise.resolve({data: {records: [{id: 'pv-1', deviceId: 'd-1', pointId: 'pt-1', value: '42'}], total: 1}})
-  ),
-  writePointValue: vi.fn(() => Promise.resolve({data: true})),
+  listPointByIds: vi.fn(() => Promise.resolve({})),
+  listPointUnit: vi.fn(() => Promise.resolve({})),
+  getPointValueLatest: vi.fn(() => Promise.resolve({})),
+  listPointValue: vi.fn(() => Promise.resolve({items: [{id: 'pv-1', deviceId: 'd-1', pointId: 'pt-1', value: '42'}], total: 1})),
+  writePointValue: vi.fn(() => Promise.resolve(true)),
 }));
 
 vi.mock('@/api/point', () => pointMocks);
-vi.mock('@/api/device', () => ({listDeviceByIds: vi.fn(() => Promise.resolve({data: {}}))}));
+vi.mock('@/api/device', () => ({listDeviceByIds: vi.fn(() => Promise.resolve({}))}));
 vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 vi.mock('@/views/point/value/tool/PointValueTool.vue', () => ({default: {template: '<div />'}}));
 vi.mock('@/views/point/value/card/PointValueCard.vue', () => ({default: {template: '<div />'}}));

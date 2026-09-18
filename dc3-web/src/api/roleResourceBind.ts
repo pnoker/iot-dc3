@@ -15,17 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {httpDelete, httpGet, httpPost} from '@/api/common';
 import {API_AUTH_BASE} from '@/config/constant/api';
-import type {PageQuery} from '@/config/types';
-import type {RoleResourceBindForm} from '@/config/types/auth';
+import type {PageQuery, PageResult} from '@/config/types';
+import type {RoleResourceBindForm, RoleResourceBindRecord} from '@/config/types/auth';
 
 export const addRoleResourceBind = (body: RoleResourceBindForm) => httpPost(`${API_AUTH_BASE}/role_resource/add`, body);
 
 export const deleteRoleResourceBind = (id: string) =>
-  httpPost(`${API_AUTH_BASE}/role_resource/delete`, undefined, {params: {id}});
+  httpDelete<void>(`${API_AUTH_BASE}/role_resource/delete`, {params: {id}});
 
-export const listRoleResourceBind = (query: PageQuery) => httpPost(`${API_AUTH_BASE}/role_resource/list`, query);
+export const listRoleResourceBind = (query: PageQuery) =>
+  httpPost<PageResult<RoleResourceBindRecord>, PageQuery>(`${API_AUTH_BASE}/role_resource/list`, query);
 
 export const listResourceByRoleId = (roleId: string) =>
   httpGet(`${API_AUTH_BASE}/role_resource/list_resource_by_role`, {params: {role_id: roleId}});

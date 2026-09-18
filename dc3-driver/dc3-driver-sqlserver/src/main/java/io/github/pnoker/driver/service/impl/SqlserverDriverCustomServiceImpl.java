@@ -14,54 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
-import io.github.pnoker.common.driver.entity.bo.PointBO;
-import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.sql.AbstractJdbcDriverCustomService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Service;
 
 /**
- * Custom driver service implementation for the SQL Server driver.
+ * Custom driver service implementation for the Sqlserver driver.
  * <p>
  * Extends the abstract JDBC driver service to provide SQL Server-specific
  * connection URL construction and driver class configuration.
  * </p>
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
-@Slf4j
 @Service
 public class SqlserverDriverCustomServiceImpl extends AbstractJdbcDriverCustomService {
-
-    /**
-     * Construct the service with the driver sender service.
-     *
-     * @param driverSenderService the driver sender service for SDK communication
-     */
-    public SqlserverDriverCustomServiceImpl(DriverSenderService driverSenderService) {
-        super(driverSenderService);
-    }
-
-    private static void checkRequired(Map<String, AttributeBO> config, String code,
-                                      List<ValidationReport.AttributeIssue> issues) {
-        AttributeBO attr = config.get(code);
-        if (attr == null || attr.getValue() == null) {
-            issues.add(ValidationReport.AttributeIssue.builder()
-                    .attributeCode(code).level(ValidationReport.IssueLevel.ERROR)
-                    .message("Missing required attribute: " + code).build());
-        }
-    }
 
     @Override
     protected String buildJdbcUrl(Map<String, AttributeBO> driverConfig) {
@@ -70,7 +44,8 @@ public class SqlserverDriverCustomServiceImpl extends AbstractJdbcDriverCustomSe
         String database = getRequiredConfig(driverConfig, "database");
         String encrypt = getConfigValue(driverConfig, "encrypt", "false");
         String trustServerCertificate = getConfigValue(driverConfig, "trustServerCertificate", "true");
-        return String.format("jdbc:sqlserver://%s:%d;databaseName=%s;encrypt=%s;trustServerCertificate=%s;",
+        return String.format(
+                "jdbc:sqlserver://%s:%d;databaseName=%s;encrypt=%s;trustServerCertificate=%s;",
                 host, port, database, encrypt, trustServerCertificate);
     }
 
@@ -94,16 +69,7 @@ public class SqlserverDriverCustomServiceImpl extends AbstractJdbcDriverCustomSe
         checkRequired(driverConfig, "password", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
+                .issues(issues)
+                .build();
     }
-
-    @Override
-    public ValidationReport validatePoint(Map<String, AttributeBO> pointConfig, PointBO point) {
-        List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
-        checkRequired(pointConfig, "readQuery", issues);
-        return ValidationReport.builder()
-                .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
-                .issues(issues).build();
-    }
-
 }

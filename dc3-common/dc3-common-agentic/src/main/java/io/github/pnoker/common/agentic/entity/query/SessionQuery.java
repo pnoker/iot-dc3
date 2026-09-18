@@ -16,8 +16,9 @@
  */
 package io.github.pnoker.common.agentic.entity.query;
 
-import io.github.pnoker.common.entity.common.Pages;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,14 +26,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 /**
  * Query parameters for session listing and filtering.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -47,16 +44,18 @@ public class SessionQuery implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Schema(description = "Pagination parameters including page number, page size, sort order, and time range.")
-    private Pages page;
+    @Schema(description = "Zero-based result offset.", minimum = "0", example = "0")
+    private Long offset;
 
-    @Schema(description = "Tenant identifier used to scope this query; only sessions belonging to the specified tenant are returned.", example = "1024")
-    private Long tenantId;
+    @Schema(description = "Maximum number of items, between 1 and 200.", minimum = "1", maximum = "200", example = "50")
+    private Integer limit;
 
-    @Schema(description = "Identifier of the user whose sessions are being queried; filters results to sessions owned by this user within the tenant.", example = "1024")
-    private Long userId;
+    @Schema(description = "Stable sort specification; fields are validated by the server.")
+    private java.util.List<io.github.pnoker.db.r2dbc.core.page.SortSpec> sort;
 
-    @Schema(description = "Unique identifier of the conversation to filter sessions by; returns only sessions associated with the specified conversation.", example = "conv-20240101-abc123")
+    @Schema(
+            description =
+                    "Unique identifier of the conversation to filter sessions by; returns only sessions associated with the specified conversation.",
+            example = "conv-20240101-abc123")
     private String conversationId;
-
 }

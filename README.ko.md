@@ -5,7 +5,7 @@
 > **AI 어시스턴트:** IoT DC3의 간결한 AI 친화적 개요를 보려면 먼저 [README.ai.md](./README.ai.md)를 읽어주세요.
 
 <p align="center">
-  <img src="docs/public/images/logo.png" width="240" alt="IoT DC3">
+  <img src="./.github/brand/png/banner.ko.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
 </p>
 
 <p align="center">
@@ -28,13 +28,13 @@
 
 <p align="center">
   <strong>
-    IoT DC3 — 멀티 프로토콜, AI 기반, 클라우드 네이티브 오픈소스 산업용 IoT 플랫폼<br>
-    클라우드 네이티브 마이크로서비스 · 멀티 프로토콜 연결 · AI 지원 운영 · 28개 즉시 사용 가능한 드라이버
+    IoT DC3 — 멀티 프로토콜, 클라우드 네이티브, 오픈소스 산업용 IoT 플랫폼<br>
+    AI 기반 — 디바이스 연결에서 산업 에이전트로
   </strong>
 </p>
 
 <p align="center">
-  <a href="https://docs.dc3.site">https://docs.dc3.site</a>
+  <a href="https://dc3.site">https://dc3.site</a>
 </p>
 
 <p align="center">
@@ -55,19 +55,19 @@
   </tr>
   <tr>
     <td align="center">
-      <img src="docs/public/images/screenshot-overview.png" alt="플랫폼 대시보드" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-overview.png" alt="플랫폼 대시보드" width="100%">
       <br>
       <strong>홈 / 대시보드</strong><br>
       <em>시스템 개요 · 디바이스 온라인 통계 · 데이터 트렌드 차트</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-device.png" alt="디바이스 관리 페이지" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-device.png" alt="디바이스 관리 페이지" width="100%">
       <br>
       <strong>디바이스 관리</strong><br>
       <em>디바이스 목록 · 온라인 상태 · 검색 및 필터링</em>
     </td>
     <td align="center">
-      <img src="docs/public/images/screenshot-ai.png" alt="AI 채팅 페이지" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI 채팅 페이지" width="100%">
       <br>
       <strong>AI 채팅</strong><br>
       <em>자연어 디바이스 쿼리 · 데이터 분석 · 지능형 지원</em>
@@ -79,10 +79,11 @@
 
 ### 아키텍처 한눈에 보기
 
-![IoT DC3 아키텍처 파노라마](docs/public/images/architecture-panorama-ko.png)
+![IoT DC3 아키텍처 파노라마](https://docs.dc3.site/images/architecture-panorama-ko.png)
 
-6계층 마이크로서비스 아키텍처: 클라이언트 → 게이트웨이 → 4개 센터 서비스 → 메시지 버스 → 28개 프로토콜 드라이버 → 현장 디바이스. PostgreSQL(TimescaleDB + pgvector + AGE)
-영속성 계층과 선택적 관찰 가능성 스택(ELK + Prometheus + Grafana)이 한눈에 보입니다.
+6계층 마이크로서비스 아키텍처: 클라이언트 → 게이트웨이 → 4개 센터 서비스 → 메시지 버스 → 36개 프로토콜 드라이버 → 현장 디바이스. PostgreSQL (TimescaleDB + pgvector +
+AGE)
+영속성 계층과 선택적 관찰 가능성 스택 (ELK + Prometheus + Grafana)이 한눈에 보입니다.
 
 🧱 **설계 원칙** — 서비스 간 호출은 항상 Facade 인터페이스를 통해 이루어집니다. DO/BO/VO 3계층 모델은 영속성, 비즈니스, API 형태를 엄격히 분리합니다. 테넌트 격리는 데이터베이스, 캐시,
 API 경로 전체에 걸쳐 적용됩니다. 서비스와 팀 전반에 걸쳐 확장 가능한 명확한 경계입니다.
@@ -93,15 +94,15 @@ API 경로 전체에 걸쳐 적용됩니다. 서비스와 팀 전반에 걸쳐 �
 
 ### 🔌 멀티 프로토콜 디바이스 연결
 
-IoT DC3는 산업 자동화, IoT 통신, 데이터 브리징, 기본 통신, 시뮬레이션/디버깅 시나리오를 위한 **28개의 접근 드라이버 모듈**을 포함하여 일반적인 디바이스와 데이터 소스의 연결 비용을 줄입니다:
+IoT DC3는 산업 자동화, IoT 통신, 데이터 브리징, 기본 통신, 시뮬레이션/디버깅 시나리오를 위한 **36개의 접근 드라이버 모듈**을 포함하여 일반적인 디바이스와 데이터 소스의 연결 비용을 줄입니다:
 
-| 카테고리                   | 드라이버 모듈                                                                                                                                            |
-|------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🏭 **산업 프로토콜**         | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · SL651 · DLMS |
-| 📡 **IoT 프로토콜**        | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee                                                                                                          |
-| 🗄️ **데이터 브리징**        | MySQL · PostgreSQL · Oracle · SQL Server                                                                                                           |
-| 🔧 **기본 통신 및 네트워크 관리** | TCP/UDP · Serial · SNMP · CAN                                                                                                                      |
-| 🧪 **시뮬레이션 및 디버깅**     | Virtual · Listening Virtual                                                                                                                        |
+| 카테고리                          | 드라이버 모듈                                                                                                                                                                                |
+|-----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🏭 **산업 프로토콜**              | Modbus TCP · Modbus RTU · OPC UA · OPC DA · Siemens S7 · BACnet/IP · EtherNet/IP · Omron FINS · Mitsubishi MELSEC · IEC 60870-5-104 · IEC 61850 · DNP3 · DLMS · DLT645 · KNX · M-Bus · SL651 |
+| 📡 **IoT 프로토콜**               | MQTT · CoAP · LwM2M · HTTP · BLE · Zigbee · LoRaWAN                                                                                                                                          |
+| 🗄️ **데이터 브리징**              | MySQL · PostgreSQL · Oracle · SQL Server · Redis                                                                                                                                             |
+| 🔧 **기본 통신 및 네트워크 관리** | TCP/UDP · Serial · SNMP · CAN · Kafka                                                                                                                                                        |
+| 🧪 **시뮬레이션 및 디버깅**       | Virtual · Listening Virtual                                                                                                                                                                  |
 
 **Driver SDK**를 통해 커스텀 프로토콜 드라이버를 빠르게 개발하고 실행 중인 플랫폼에 등록할 수 있습니다.
 
@@ -164,21 +165,21 @@ mvn -s .mvn/settings.xml clean package
 IoT DC3는 Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3, TypeScript, Vite
 기반으로 구축되었습니다.
 
-구성 요소 세부 정보와 사용 위치는 [기술 스택](https://docs.dc3.site/en/introduction/technology-stack)을 참조하세요.
+구성 요소 세부 정보와 사용 위치는 [기술 스택](https://docs.dc3.site/en/development/technology-stack)을 참조하세요.
 
 ## 📖 문서 및 커뮤니티
 
-| 리소스           | 링크                                                                         |
-|---------------|----------------------------------------------------------------------------|
-| 📚 온라인 문서     | [docs.dc3.site](https://docs.dc3.site/)                                    |
-| 🚀 퀵스타트       | [퀵스타트 가이드](https://docs.dc3.site/en/quickstart/)                           |
-| 🛠️ 기술 스택     | [Technology Stack](https://docs.dc3.site/en/introduction/technology-stack) |
-| 🏗️ 아키텍처      | [모듈 및 의존성](https://docs.dc3.site/en/architecture/modules)                  |
-| 🔧 드라이버 개발    | [드라이버 작성 가이드](https://docs.dc3.site/en/development/driver-authoring)       |
-| 🐛 문제 해결      | [문제 해결](https://docs.dc3.site/en/guide/troubleshooting)                    |
-| 📋 변경 로그      | [릴리스 변경 로그](https://docs.dc3.site/en/development/changelog)                |
-| 🐛 이슈 피드백     | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                  |
-| 🇨🇳 Gitee 미러 | [Gitee GVP 프로젝트](https://gitee.com/pnoker/iot-dc3)                         |
+| 리소스           | 링크                                                                          |
+|------------------|-------------------------------------------------------------------------------|
+| 📚 온라인 문서   | [docs.dc3.site](https://docs.dc3.site/)                                       |
+| 🚀 퀵스타트      | [퀵스타트 가이드](https://docs.dc3.site/en/quickstart/)                       |
+| 🛠️ 기술 스택     | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)     |
+| 🏗️ 아키텍처      | [모듈 및 의존성](https://docs.dc3.site/en/architecture/modules)               |
+| 🔧 드라이버 개발 | [드라이버 작성 가이드](https://docs.dc3.site/en/development/driver-authoring) |
+| 🐛 문제 해결     | [문제 해결](https://docs.dc3.site/en/guide/troubleshooting)                   |
+| 📋 변경 로그     | [릴리스 변경 로그](https://docs.dc3.site/en/development/changelog)            |
+| 🐛 이슈 피드백   | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                     |
+| 🇨🇳 Gitee 미러    | [Gitee GVP 프로젝트](https://gitee.com/pnoker/iot-dc3)                        |
 
 ## 🌍 사용 사례
 
@@ -209,8 +210,8 @@ IoT DC3는 Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, R
 
 모든 형태의 기여를 환영합니다. 다음 워크플로를 따라주세요:
 
-1. **Fork 및 브랜치** — `main`에서 브랜치를 만들고 `feature/your_name/feature_description` 형식으로 이름을 지정하세요
-   (예: `feature/pnoker/mqtt_driver`)
+1. **Fork 및 브랜치** — `main`에서 브랜치를 만들고 `feature/your_name/feature_description` 형식으로 이름을 지정하세요 (예:
+   `feature/pnoker/mqtt_driver`)
 2. **개발 및 커밋** — 새 브랜치에서 변경을 완료하고 [Conventional Commits](https://www.conventionalcommits.org/) 사양을 따르세요
 3. **PR 열기** — `develop` 브랜치에 Pull Request를 제출하여 관리자에게 리뷰와 머지를 받으세요
 
@@ -223,7 +224,3 @@ IoT DC3는 [AGPL 3.0](./LICENSE-AGPL.txt) 라이선스 하에 오픈소스로 �
 - ⚠️ **수정 사항을 오픈소스화하지 않고 제3자에게 상업 서비스로 제공하는 경우** — 상업 라이선스 필요
 
 상업 라이선스 세부 정보는 [LICENSE.txt](./LICENSE.txt)를 참조하세요.
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pnoker/iot-dc3&type=Date)](https://star-history.com/#pnoker/iot-dc3&Date)

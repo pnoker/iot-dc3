@@ -14,35 +14,38 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.manager.biz.ScheduleForManagerService;
 import lombok.RequiredArgsConstructor;
-import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * Manager Initialization Runner for DC3 IoT Platform. This class is responsible for
  * initializing manager-related components and services during application startup. It
- * configures component scanning for manager packages and sets up MyBatis mapper scanning.
+ * configures component scanning for manager packages.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @AutoConfiguration
 @EnableAsync
-@ComponentScan(basePackages = {"io.github.pnoker.common.manager"})
-@MapperScan(basePackages = {"io.github.pnoker.common.manager.mapper"})
+@ComponentScan(
+        basePackages = {"io.github.pnoker.common.manager"},
+        excludeFilters =
+                @ComponentScan.Filter(
+                        type = FilterType.REGEX,
+                        pattern = "io\\.github\\.pnoker\\.common\\.manager\\.dal\\..*"))
 @RequiredArgsConstructor
 public class ManagerInitRunner implements ApplicationRunner {
 
-    private final ScheduleForManagerService scheduleForManagerService;
+    private final ObjectProvider<ScheduleForManagerService> scheduleForManagerService;
 
     /**
      * Executes the initialization process when the application starts. This method
@@ -54,7 +57,9 @@ public class ManagerInitRunner implements ApplicationRunner {
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        scheduleForManagerService.initial();
+        ScheduleForManagerService scheduler = scheduleForManagerService.getIfAvailable();
+        if (scheduler != null) {
+            scheduler.initial();
+        }
     }
-
 }

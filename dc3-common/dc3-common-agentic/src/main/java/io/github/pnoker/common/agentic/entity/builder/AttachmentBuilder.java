@@ -16,52 +16,30 @@
  */
 package io.github.pnoker.common.agentic.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.AttachmentBO;
-import io.github.pnoker.common.agentic.entity.model.AttachmentDO;
 import io.github.pnoker.common.agentic.entity.vo.AttachmentVO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.List;
-
-/**
- * MapStruct builder converting between attachment BO, VO, and DO.
- *
- * @author pnoker
- * @version 2026.5.11
- * @since 2026.5.11
- */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+/** Maps reactive attachment projections to API resources. */
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface AttachmentBuilder {
 
+    /** Convert the value object into its business-object form. */
     @Mapping(target = "tenantId", ignore = true)
     @Mapping(target = "userId", ignore = true)
     AttachmentBO buildBOByVO(AttachmentVO entityVO);
 
+    /** Convert the value objects into their business-object forms. */
     List<AttachmentBO> buildBOListByVOList(List<AttachmentVO> entityVOList);
 
-    @Mapping(target = "deleted", ignore = true)
-    AttachmentDO buildDOByBO(AttachmentBO entityBO);
-
-    List<AttachmentDO> buildDOListByBOList(List<AttachmentBO> entityBOList);
-
-    AttachmentBO buildBOByDO(AttachmentDO entityDO);
-
-    List<AttachmentBO> buildBOListByDOList(List<AttachmentDO> entityDOList);
-
+    /** Convert the business object into its value-object form. */
     AttachmentVO buildVOByBO(AttachmentBO entityBO);
 
+    /** Convert the business objects into their value-object forms. */
     List<AttachmentVO> buildVOListByBOList(List<AttachmentBO> entityBOList);
-
-    default Page<AttachmentBO> buildBOPageByDOPage(Page<AttachmentDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    default Page<AttachmentVO> buildVOPageByBOPage(Page<AttachmentBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

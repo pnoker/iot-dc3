@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.thread.entity.property.ThreadProperties;
@@ -30,13 +29,17 @@ import org.springframework.context.annotation.ComponentScan;
  * thread-related components in the specified package.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @AutoConfiguration
 @ComponentScan(basePackages = {"io.github.pnoker.common.thread"})
 @EnableConfigurationProperties({ThreadProperties.class})
 public class ThreadInitRunner implements ApplicationRunner {
+
+    /**
+     * Creates the thread init runner.
+     */
+    public ThreadInitRunner() {}
 
     /**
      * Initialize thread components during application startup
@@ -48,5 +51,4 @@ public class ThreadInitRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         // nothing to do
     }
-
 }

@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package org.openscada.opc.lib.da;
-
-import lombok.extern.slf4j.Slf4j;
-import org.jinterop.dcom.common.JIException;
-import org.openscada.opc.dcom.common.impl.OPCCommon;
 
 import java.util.HashMap;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.jinterop.dcom.common.JIException;
+import org.openscada.opc.dcom.common.impl.OPCCommon;
 
 /**
  * An error message resolver that will lookup the error code using the server interface
@@ -59,9 +57,9 @@ public class ErrorMessageResolver {
         if (message == null) {
             try {
                 message = this._opcCommon.getErrorString(errorCode, this._localeId);
-                log.info(String.format("Resolved %08X to '%s'", errorCode, message));
+                log.info("OPC DA error resolved, errorCode={}, message={}", errorCode, message);
             } catch (JIException e) {
-                log.warn(String.format("Failed to resolve error code for %08X", errorCode), e);
+                log.warn("OPC DA error resolution failed, errorCode={}", errorCode, e);
             }
             if (message != null) {
                 this._messageCache.put(errorCode, message);
@@ -69,5 +67,4 @@ public class ErrorMessageResolver {
         }
         return message;
     }
-
 }

@@ -17,49 +17,59 @@
 
 import type {AxiosInstance} from 'axios';
 import axios, {type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig} from 'axios';
-import {ElNotification} from 'element-plus';
 
-import {AXIOS_CONFIG, AXIOS_ERROR_MESSAGES, PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
+import {AXIOS_CONFIG, PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
 import {AUTH_HEADERS} from '@/config/constant/common';
+import i18n from '@/config/i18n';
 import {failMessage, warnMessage} from '@/utils/notificationUtil';
 import {getStorage, removeStorage} from '@/utils/storageUtil';
 import {isNull} from '@/utils/validationUtil';
 import router from '@/config/router';
-import JSONBigInt from 'json-bigint';
-
-/**
- * JSONBigInt parser instance with storeAsString option
- */
-const JSONBigIntStr = JSONBigInt({storeAsString: true});
-
-/**
- * Transform response data using JSONBigInt to handle large integers
- *
- * @param data Raw response data
- * @returns Parsed data
- */
-function transformResponse(data: any): any {
-  if (typeof data !== 'string' || data === '') {
-    return data;
-  }
-  try {
-    return JSONBigIntStr.parse(data);
-  } catch {
-    return data;
-  }
-}
 
 /**
  * Custom Axios instance with default configuration
- * Handles large integers via JSONBigInt and includes authentication headers
+ * Includes authentication headers
  */
 const request: AxiosInstance = axios.create({
   timeout: AXIOS_CONFIG.TIMEOUT,
   withCredentials: true,
   headers: {Accept: AXIOS_CONFIG.HEADERS.ACCEPT, 'Content-Type': AXIOS_CONFIG.HEADERS.CONTENT_TYPE},
-  validateStatus: (status) => status >= AXIOS_CONFIG.MIN_STATUS && status <= AXIOS_CONFIG.MAX_STATUS,
-  transformResponse: [transformResponse],
+  validateStatus: (status) => status >= AXIOS_CONFIG.MIN_STATUS && status < 300,
 });
+
+type ProblemPayload = {
+  status?: number;
+  code?: string;
+  title?: string;
+  detail?: string;
+  [key: string]: unknown;
+};
+
+const normalizeProblem = (status: number, data: unknown, fallback?: string): ProblemPayload => {
+  if (data && typeof data === 'object') {
+    return data as ProblemPayload;
+  }
+  return {status, title: fallback ?? 'HTTP request failed', detail: fallback ?? 'HTTP request failed'};
+};
+
+const notifyProblem = (status: number, problem: ProblemPayload) => {
+  if (typeof problem.code === 'string' && PASSWORD_CHANGE_CODES.includes(problem.code as (typeof PASSWORD_CHANGE_CODES)[number])) {
+    return;
+  }
+  if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
+    warnMessage(i18n.global.t('common.axios.unauthorized'), i18n.global.t('common.axios.unauthorizedTitle'));
+    removeStorage(AUTH_HEADERS.TENANT);
+    removeStorage(AUTH_HEADERS.LOGIN);
+    removeStorage(AUTH_HEADERS.AUTHENTICATED, true);
+    router.push({name: 'login'}).catch(() => {});
+  } else if (status >= 500) {
+    failMessage(i18n.global.t('common.axios.serverErrorMessage', {status}), i18n.global.t('common.axios.serverError'));
+  } else if (status > 0) {
+    failMessage(i18n.global.t('common.axios.requestError'), problem.code ?? problem.title, problem);
+  } else {
+    failMessage(i18n.global.t('common.axios.networkErrorMessage'), i18n.global.t('common.axios.networkError'));
+  }
+};
 
 /**
  * Request interceptor to add authentication headers
@@ -81,10 +91,8 @@ request.interceptors.request.use(
       headers[AUTH_HEADERS.LOGIN] = login;
     }
 
-    const token = getStorage(AUTH_HEADERS.TOKEN);
-    if (!isNull(token)) {
-      headers[AUTH_HEADERS.TOKEN] = JSON.stringify(token);
-    }
+    // Token travels in an httpOnly cookie (withCredentials) — never inject it
+    // into a header the frontend can read.
 
     return config;
   },
@@ -98,8 +106,12 @@ request.interceptors.request.use(
  */
 request.interceptors.response.use(
   (response: AxiosResponse) => {
-    const ok = response.data?.ok || false;
-    const status = response.status || AXIOS_CONFIG.UNAUTHORIZED_STATUS;
+    if (response.status < AXIOS_CONFIG.MIN_STATUS || response.status >= 300) {
+      const problem = normalizeProblem(response.status, response.data);
+      notifyProblem(response.status, problem);
+      return Promise.reject(problem);
+    }
+
     const responseType = response.config.responseType;
 
     // Handle blob response type (e.g., file downloads)
@@ -107,49 +119,16 @@ request.interceptors.response.use(
       return response;
     }
 
-    // Return data if request was successful
-    if (ok) {
-      return response.data;
-    }
-
-    // Password change / expiry: a business outcome, not an error. Pass the payload
-    // through silently so the login flow can open the password change dialog.
-    if (PASSWORD_CHANGE_CODES.includes(response.data?.code)) {
-      return Promise.reject(response.data);
-    }
-
-    // Handle unauthorized access
-    if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
-      warnMessage(AXIOS_ERROR_MESSAGES.UNAUTHORIZED, AXIOS_ERROR_MESSAGES.UNAUTHORIZED_TITLE);
-      // Remove auth keys only — never nuke entire localStorage
-      removeStorage(AUTH_HEADERS.TENANT);
-      removeStorage(AUTH_HEADERS.LOGIN);
-      removeStorage(AUTH_HEADERS.TOKEN);
-      router.push({name: 'login'}).catch(() => {
-      });
-    } else if (status >= 500) {
-      ElNotification({
-        title: 'Server Error',
-        message: `The server encountered an error (${status}). Please try again later.`,
-        type: 'error',
-      });
-    } else {
-      failMessage(AXIOS_ERROR_MESSAGES.REQUEST_ERROR, response.data?.code, response.data);
-    }
-    // Reject with the server payload so callers can inspect code/message if needed.
-    // Existing no-op `.catch(() => {})` sites remain valid because they ignore the argument.
-    return Promise.reject(response.data ?? {status, message: 'Request failed'});
+    return response.data;
   },
   (error: AxiosError) => {
-    if (!error.response) {
-      // Network error — no response received
-      ElNotification({
-        title: 'Network Error',
-        message: 'Unable to reach the server. Please check your connection.',
-        type: 'error',
-      });
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
+    const status = error.response?.status ?? 0;
+    const problem = normalizeProblem(status, error.response?.data, error.message);
+    notifyProblem(status, problem);
+    return Promise.reject(problem);
   }
 );
 

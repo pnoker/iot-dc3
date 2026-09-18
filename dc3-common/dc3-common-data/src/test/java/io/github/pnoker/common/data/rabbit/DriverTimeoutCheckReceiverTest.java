@@ -14,72 +14,148 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.rabbit;
 
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
-import com.rabbitmq.client.Channel;
-import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
-import io.github.pnoker.common.data.dal.EntityAlarmManager;
-import io.github.pnoker.common.data.dal.EntityStateManager;
-import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
-import io.github.pnoker.common.data.entity.model.EntityStateDO;
-import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
-import io.github.pnoker.common.enums.EntityStatusEnum;
-import io.github.pnoker.common.enums.EntityTypeEnum;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
-
-import java.time.LocalDateTime;
-
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import io.github.pnoker.common.data.biz.alarm.AlarmRuleTriggerService;
+import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
+import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
+import io.github.pnoker.common.data.repository.ReactiveEntityStateStore;
+import io.github.pnoker.common.entity.dto.DriverTimeoutCheckDTO;
+import io.github.pnoker.common.enums.EntityStatusEnum;
+import io.github.pnoker.common.enums.EntityTypeEnum;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
+import java.time.Instant;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
 @ExtendWith(MockitoExtension.class)
 class DriverTimeoutCheckReceiverTest {
 
     @Mock
-    private EntityStateManager entityStateManager;
+    ReactiveEntityStateStore entityStateStore;
 
     @Mock
-    private EntityAlarmManager entityAlarmManager;
+    ReactiveEntityAlarmStore entityAlarmStore;
 
     @Mock
-    private AlarmRuleTriggerService alarmRuleTriggerService;
+    AlarmRuleTriggerService alarmRuleTriggerService;
 
     @Mock
-    private Channel channel;
+    TransactionalOperator transactionalOperator;
 
     @Mock
-    private LambdaQueryChainWrapper<EntityStateDO> queryWrapper;
-
-    @Mock
-    private LambdaUpdateChainWrapper<EntityStateDO> claimUpdateWrapper;
-
-    @Mock
-    private LambdaUpdateChainWrapper<EntityStateDO> alarmUpdateWrapper;
+    Acknowledgment acknowledgment;
 
     private DriverTimeoutCheckReceiver receiver;
 
     @BeforeEach
     void setUp() {
-        receiver = new DriverTimeoutCheckReceiver(entityStateManager, entityAlarmManager, alarmRuleTriggerService);
+        receiver = new DriverTimeoutCheckReceiver(
+                entityStateStore, entityAlarmStore, alarmRuleTriggerService, transactionalOperator);
     }
 
-    private Message mockMessage(long deliveryTag) {
-        MessageProperties props = new MessageProperties();
-        props.setDeliveryTag(deliveryTag);
-        return new Message(new byte[0], props);
+    @Test
+    void rejectsInvalidPayload() {
+        StepVerifier.create(receiver.driverTimeoutCheck(received(timeoutCheck(null, 100L, 1L)), acknowledgment))
+                .verifyComplete();
+
+        verify(acknowledgment).reject(false);
+        verifyNoInteractions(entityStateStore, entityAlarmStore, alarmRuleTriggerService, transactionalOperator);
+    }
+
+    @Test
+    void lostClaimCompletesWithoutAlarm() {
+        when(entityStateStore.claimExpired(100L, EntityTypeEnum.DRIVER, 7L, 4L, 300))
+                .thenReturn(Mono.empty());
+        when(transactionalOperator.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        StepVerifier.create(receiver.driverTimeoutCheck(received(timeoutCheck(7L, 100L, 4L)), acknowledgment))
+                .verifyComplete();
+
+        verifyNoInteractions(entityAlarmStore, alarmRuleTriggerService);
+    }
+
+    @Test
+    void claimedLeaseCommitsAlarmBeforeTriggeringRules() {
+        when(entityStateStore.claimExpired(100L, EntityTypeEnum.DRIVER, 7L, 4L, 300))
+                .thenReturn(Mono.just(lease(0L)));
+        when(entityAlarmStore.insert(any(EntityAlarmDO.class))).thenAnswer(invocation -> {
+            EntityAlarmDO alarm = invocation.getArgument(0);
+            alarm.setId(55L);
+            return Mono.just(alarm);
+        });
+        when(entityStateStore.markAlarm(100L, EntityTypeEnum.DRIVER, 7L, 5L, 55L))
+                .thenReturn(Mono.just(true));
+        when(transactionalOperator.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(alarmRuleTriggerService.processDriverAlarm(any())).thenReturn(Mono.empty());
+
+        StepVerifier.create(receiver.driverTimeoutCheck(received(timeoutCheck(7L, 100L, 4L)), acknowledgment))
+                .verifyComplete();
+
+        verify(entityAlarmStore).insert(any(EntityAlarmDO.class));
+        verify(entityStateStore).markAlarm(100L, EntityTypeEnum.DRIVER, 7L, 5L, 55L);
+        verify(alarmRuleTriggerService).processDriverAlarm(any());
+    }
+
+    @Test
+    void redeliveryResumesRulesFromPersistedAlarm() {
+        when(entityStateStore.claimExpired(100L, EntityTypeEnum.DRIVER, 7L, 4L, 300))
+                .thenReturn(Mono.just(lease(55L)));
+        when(transactionalOperator.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(alarmRuleTriggerService.processDriverAlarm(any())).thenReturn(Mono.empty());
+
+        StepVerifier.create(receiver.driverTimeoutCheck(received(timeoutCheck(7L, 100L, 4L)), acknowledgment))
+                .verifyComplete();
+
+        verify(entityAlarmStore, never()).insert(any());
+        verify(transactionalOperator).transactional(any(Mono.class));
+        verify(alarmRuleTriggerService).processDriverAlarm(any());
+    }
+
+    @Test
+    void persistenceFailurePropagatesForAdapterRequeue() {
+        when(entityStateStore.claimExpired(100L, EntityTypeEnum.DRIVER, 7L, 4L, 300))
+                .thenReturn(Mono.just(lease(0L)));
+        when(entityAlarmStore.insert(any())).thenReturn(Mono.error(new IllegalStateException("database unavailable")));
+        when(transactionalOperator.transactional(any(Mono.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        StepVerifier.create(receiver.driverTimeoutCheck(received(timeoutCheck(7L, 100L, 4L)), acknowledgment))
+                .expectErrorMessage("database unavailable")
+                .verify();
+
+        verify(alarmRuleTriggerService, never()).processDriverAlarm(any());
+    }
+
+    private ReactiveEntityStateStore.EntityStateLease lease(Long alarmId) {
+        return new ReactiveEntityStateStore.EntityStateLease(
+                9L,
+                100L,
+                EntityTypeEnum.DRIVER,
+                7L,
+                0L,
+                EntityStatusEnum.OFFLINE.getIndex(),
+                EntityStatusEnum.ONLINE.getIndex(),
+                5L,
+                Instant.now().plusSeconds(300),
+                45,
+                Instant.now(),
+                alarmId,
+                (byte) 0,
+                "{}");
     }
 
     private DriverTimeoutCheckDTO timeoutCheck(Long driverId, Long tenantId, Long leaseVersion) {
@@ -90,68 +166,7 @@ class DriverTimeoutCheckReceiverTest {
                 .build();
     }
 
-    private EntityStateDO driverState(byte statusFlag, long leaseVersion, LocalDateTime expireTime) {
-        EntityStateDO state = new EntityStateDO();
-        state.setId(9L);
-        state.setTenantId(100L);
-        state.setEntityTypeFlag((byte) EntityTypeEnum.DRIVER.getIndex());
-        state.setEntityId(7L);
-        state.setParentEntityId(0L);
-        state.setStateFlag(statusFlag);
-        state.setLeaseVersion(leaseVersion);
-        state.setExpireTime(expireTime);
-        return state;
+    private MqReceived<DriverTimeoutCheckDTO> received(DriverTimeoutCheckDTO value) {
+        return new MqReceived<>(value, Map.of(), false);
     }
-
-    private void stubQuery(EntityStateDO state) {
-        when(entityStateManager.lambdaQuery()).thenReturn(queryWrapper);
-        when(queryWrapper.eq(any(), any())).thenReturn(queryWrapper);
-        when(queryWrapper.one()).thenReturn(state);
-    }
-
-    private void stubUpdateChain() {
-        when(entityStateManager.lambdaUpdate()).thenReturn(claimUpdateWrapper, alarmUpdateWrapper);
-        when(claimUpdateWrapper.eq(any(), any())).thenReturn(claimUpdateWrapper);
-        when(claimUpdateWrapper.set(any(), any())).thenReturn(claimUpdateWrapper);
-        when(claimUpdateWrapper.update()).thenReturn(true);
-        when(alarmUpdateWrapper.eq(any(), any())).thenReturn(alarmUpdateWrapper);
-        when(alarmUpdateWrapper.set(any(), any())).thenReturn(alarmUpdateWrapper);
-        when(alarmUpdateWrapper.update()).thenReturn(true);
-    }
-
-    @Test
-    void rejectsInvalidPayload() throws Exception {
-        receiver.driverTimeoutCheck(channel, mockMessage(7L), timeoutCheck(null, 100L, 1L));
-
-        verifyNoInteractions(entityStateManager, entityAlarmManager, alarmRuleTriggerService);
-        verify(channel).basicReject(eq(7L), eq(false));
-    }
-
-    @Test
-    void leaseMismatchMeansNewerHeartbeatArrived() throws Exception {
-        stubQuery(driverState((byte) EntityStatusEnum.ONLINE.getIndex(), 3L,
-                LocalDateTime.now().minusSeconds(1)));
-
-        receiver.driverTimeoutCheck(channel, mockMessage(8L), timeoutCheck(7L, 100L, 2L));
-
-        verify(channel).basicAck(eq(8L), eq(false));
-        verify(entityStateManager, never()).lambdaUpdate();
-        verifyNoInteractions(entityAlarmManager, alarmRuleTriggerService);
-    }
-
-    @Test
-    void expiredFaultDriverIsClaimedOfflineAndTriggersAlarm() throws Exception {
-        stubQuery(driverState((byte) EntityStatusEnum.FAULT.getIndex(), 4L,
-                LocalDateTime.now().minusSeconds(1)));
-        stubUpdateChain();
-        when(entityAlarmManager.save(any(EntityAlarmDO.class))).thenReturn(true);
-
-        receiver.driverTimeoutCheck(channel, mockMessage(9L), timeoutCheck(7L, 100L, 4L));
-
-        verify(claimUpdateWrapper).set(any(), eq(EntityStatusEnum.OFFLINE.getIndex()));
-        verify(entityAlarmManager).save(any(EntityAlarmDO.class));
-        verify(alarmRuleTriggerService).processDriverAlarm(any());
-        verify(channel).basicAck(eq(9L), eq(false));
-    }
-
 }

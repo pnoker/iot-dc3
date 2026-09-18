@@ -14,16 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
+import reactor.core.publisher.Mono;
 
 /**
  * Deterministic evaluator for structured alarm rules.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface RuleEvaluator {
@@ -35,7 +34,7 @@ public interface RuleEvaluator {
      * @param fact fact
      * @return true if matched
      */
-    boolean matches(RuleBO rule, RuleFact fact);
+    Mono<Boolean> matches(RuleBO rule, RuleFact fact);
 
     /**
      * Whether the fact satisfies the recovery condition.
@@ -44,6 +43,5 @@ public interface RuleEvaluator {
      * @param fact fact
      * @return true if recovered
      */
-    boolean recovers(RuleBO rule, RuleFact fact);
-
+    Mono<Boolean> recovers(RuleBO rule, RuleFact fact);
 }

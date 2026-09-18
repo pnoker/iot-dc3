@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.exception;
 
 /**
@@ -25,6 +24,11 @@ package io.github.pnoker.common.exception;
  */
 public class TenantNotScopedException extends RuntimeException {
 
+    /**
+     * Signal a missing tenant scope with a failure detail.
+     *
+     * @param message failure detail
+     */
     public TenantNotScopedException(String message) {
         super(message);
     }

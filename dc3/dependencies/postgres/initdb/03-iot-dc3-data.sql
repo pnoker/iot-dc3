@@ -41,7 +41,7 @@ CREATE TABLE dc3_notify
     notify_code       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Notification code
     auto_confirm_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Auto-confirm flag
     notify_interval   BIGINT   DEFAULT 0 NOT NULL,                 -- Notification interval, milliseconds
-    notify_ext        JSON     DEFAULT '{}'::JSON        NOT NULL, -- Notification configuration
+    notify_ext        JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Notification configuration
     enable_flag       SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
     tenant_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
     remark            TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
@@ -65,40 +65,23 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_notify IS 'Notification table';
-COMMENT
-ON COLUMN dc3_notify.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_notify.notify_name IS 'Notification name';
-COMMENT
-ON COLUMN dc3_notify.notify_code IS 'Notification code';
-COMMENT
-ON COLUMN dc3_notify.auto_confirm_flag IS 'Auto-confirm flag';
-COMMENT
-ON COLUMN dc3_notify.notify_interval IS 'Notification interval, milliseconds';
-COMMENT
-ON COLUMN dc3_notify.notify_ext IS 'Notification configuration';
-COMMENT
-ON COLUMN dc3_notify.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT
-ON COLUMN dc3_notify.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_notify.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_notify.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_notify.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_notify.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_notify.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_notify.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_notify.operate_time IS 'Operation time';
-COMMENT
-ON COLUMN dc3_notify.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT ON TABLE dc3_notify IS 'Notification table';
+COMMENT ON COLUMN dc3_notify.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_notify.notify_name IS 'Notification name';
+COMMENT ON COLUMN dc3_notify.notify_code IS 'Notification code';
+COMMENT ON COLUMN dc3_notify.auto_confirm_flag IS 'Auto-confirm flag';
+COMMENT ON COLUMN dc3_notify.notify_interval IS 'Notification interval, milliseconds';
+COMMENT ON COLUMN dc3_notify.notify_ext IS 'Notification configuration';
+COMMENT ON COLUMN dc3_notify.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT ON COLUMN dc3_notify.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_notify.remark IS 'Description';
+COMMENT ON COLUMN dc3_notify.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_notify.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_notify.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_notify.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_notify.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_notify.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_notify.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_notify_channel
@@ -110,7 +93,7 @@ CREATE TABLE dc3_notify_channel
     channel_code      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Notification channel code
     channel_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Notification channel type flag
     credential_ref    TEXT     DEFAULT ''::TEXT          NOT NULL, -- Credential reference
-    channel_ext       JSON     DEFAULT '{}'::JSON        NOT NULL, -- Notification channel configuration
+    channel_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Notification channel configuration
     enable_flag       SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
     tenant_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
     remark            TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
@@ -134,40 +117,23 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_notify_channel IS 'Notification channel table';
-COMMENT
-ON COLUMN dc3_notify_channel.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_notify_channel.channel_name IS 'Notification channel name';
-COMMENT
-ON COLUMN dc3_notify_channel.channel_code IS 'Notification channel code';
-COMMENT
-ON COLUMN dc3_notify_channel.channel_type_flag IS 'Notification channel type flag';
-COMMENT
-ON COLUMN dc3_notify_channel.credential_ref IS 'Credential reference';
-COMMENT
-ON COLUMN dc3_notify_channel.channel_ext IS 'Notification channel configuration';
-COMMENT
-ON COLUMN dc3_notify_channel.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT
-ON COLUMN dc3_notify_channel.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_notify_channel.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_notify_channel.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_notify_channel.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_notify_channel.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_notify_channel.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_notify_channel.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_notify_channel.operate_time IS 'Operation time';
-COMMENT
-ON COLUMN dc3_notify_channel.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT ON TABLE dc3_notify_channel IS 'Notification channel table';
+COMMENT ON COLUMN dc3_notify_channel.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_notify_channel.channel_name IS 'Notification channel name';
+COMMENT ON COLUMN dc3_notify_channel.channel_code IS 'Notification channel code';
+COMMENT ON COLUMN dc3_notify_channel.channel_type_flag IS 'Notification channel type flag';
+COMMENT ON COLUMN dc3_notify_channel.credential_ref IS 'Credential reference';
+COMMENT ON COLUMN dc3_notify_channel.channel_ext IS 'Notification channel configuration';
+COMMENT ON COLUMN dc3_notify_channel.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT ON COLUMN dc3_notify_channel.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_notify_channel.remark IS 'Description';
+COMMENT ON COLUMN dc3_notify_channel.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_notify_channel.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_notify_channel.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_notify_channel.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_notify_channel.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_notify_channel.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_notify_channel.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_notify_channel_bind
@@ -177,7 +143,7 @@ CREATE TABLE dc3_notify_channel_bind
     id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
     notify_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Notification ID
     channel_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Notification channel ID
-    bind_ext      JSON     DEFAULT '{}'::JSON        NOT NULL,   -- Notification channel binding configuration
+    bind_ext      JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Notification channel binding configuration
     enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
     tenant_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Tenant ID
     remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
@@ -202,36 +168,21 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_notify_channel_bind IS 'Notification channel binding table';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.notify_id IS 'Notification ID';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.channel_id IS 'Notification channel ID';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.bind_ext IS 'Notification channel binding configuration';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.operate_time IS 'Operation time';
-COMMENT
-ON COLUMN dc3_notify_channel_bind.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT ON TABLE dc3_notify_channel_bind IS 'Notification channel binding table';
+COMMENT ON COLUMN dc3_notify_channel_bind.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_notify_channel_bind.notify_id IS 'Notification ID';
+COMMENT ON COLUMN dc3_notify_channel_bind.channel_id IS 'Notification channel ID';
+COMMENT ON COLUMN dc3_notify_channel_bind.bind_ext IS 'Notification channel binding configuration';
+COMMENT ON COLUMN dc3_notify_channel_bind.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT ON COLUMN dc3_notify_channel_bind.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_notify_channel_bind.remark IS 'Description';
+COMMENT ON COLUMN dc3_notify_channel_bind.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_notify_channel_bind.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_notify_channel_bind.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_notify_channel_bind.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_notify_channel_bind.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_notify_channel_bind.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_notify_channel_bind.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_message
@@ -242,7 +193,7 @@ CREATE TABLE dc3_message
     message_name  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Message name
     message_code  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Message code
     message_level SMALLINT DEFAULT 2 NOT NULL,                   -- Message level
-    message_ext   JSON     DEFAULT '{}'::JSON        NOT NULL,   -- Message configuration
+    message_ext   JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Message configuration
     enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
     tenant_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Tenant ID
     remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
@@ -266,38 +217,22 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_message IS 'Message table';
-COMMENT
-ON COLUMN dc3_message.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_message.message_name IS 'Message name';
-COMMENT
-ON COLUMN dc3_message.message_code IS 'Message code';
-COMMENT
-ON COLUMN dc3_message.message_level IS 'Message level';
-COMMENT
-ON COLUMN dc3_message.message_ext IS 'Message configuration';
-COMMENT
-ON COLUMN dc3_message.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT
-ON COLUMN dc3_message.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_message.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_message.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_message.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_message.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_message.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_message.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_message.operate_time IS 'Operation time';
-COMMENT
-ON COLUMN dc3_message.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT ON TABLE dc3_message IS 'Message table';
+COMMENT ON COLUMN dc3_message.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_message.message_name IS 'Message name';
+COMMENT ON COLUMN dc3_message.message_code IS 'Message code';
+COMMENT ON COLUMN dc3_message.message_level IS 'Message level';
+COMMENT ON COLUMN dc3_message.message_ext IS 'Message configuration';
+COMMENT ON COLUMN dc3_message.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT ON COLUMN dc3_message.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_message.remark IS 'Description';
+COMMENT ON COLUMN dc3_message.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_message.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_message.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_message.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_message.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_message.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_message.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_rule
@@ -311,7 +246,7 @@ CREATE TABLE dc3_rule
     entity_id              BIGINT   DEFAULT 0 NOT NULL,                 -- Entity ID
     notify_id              BIGINT   DEFAULT 0 NOT NULL,                 -- Notification ID
     message_id             BIGINT   DEFAULT 0 NOT NULL,                 -- Message ID
-    rule_ext               JSON     DEFAULT '{}'::JSON        NOT NULL, -- Rule configuration
+    rule_ext               JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Rule configuration
     enable_flag            SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
     tenant_id              BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
     remark                 TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
@@ -340,44 +275,25 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_rule IS 'Rule table';
-COMMENT
-ON COLUMN dc3_rule.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_rule.alarm_target_type_flag IS 'Alarm target type flag';
-COMMENT
-ON COLUMN dc3_rule.rule_name IS 'Rule name';
-COMMENT
-ON COLUMN dc3_rule.rule_code IS 'Rule code';
-COMMENT
-ON COLUMN dc3_rule.entity_id IS 'Entity ID';
-COMMENT
-ON COLUMN dc3_rule.notify_id IS 'Notification ID';
-COMMENT
-ON COLUMN dc3_rule.message_id IS 'Message ID';
-COMMENT
-ON COLUMN dc3_rule.rule_ext IS 'Rule configuration';
-COMMENT
-ON COLUMN dc3_rule.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
-COMMENT
-ON COLUMN dc3_rule.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_rule.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_rule.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_rule.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_rule.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_rule.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_rule.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_rule.operate_time IS 'Operation time';
-COMMENT
-ON COLUMN dc3_rule.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
+COMMENT ON TABLE dc3_rule IS 'Rule table';
+COMMENT ON COLUMN dc3_rule.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_rule.alarm_target_type_flag IS 'Alarm target type flag';
+COMMENT ON COLUMN dc3_rule.rule_name IS 'Rule name';
+COMMENT ON COLUMN dc3_rule.rule_code IS 'Rule code';
+COMMENT ON COLUMN dc3_rule.entity_id IS 'Entity ID';
+COMMENT ON COLUMN dc3_rule.notify_id IS 'Notification ID';
+COMMENT ON COLUMN dc3_rule.message_id IS 'Message ID';
+COMMENT ON COLUMN dc3_rule.rule_ext IS 'Rule configuration';
+COMMENT ON COLUMN dc3_rule.enable_flag IS 'Enable flag, 0: enabled, 1: disabled';
+COMMENT ON COLUMN dc3_rule.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_rule.remark IS 'Description';
+COMMENT ON COLUMN dc3_rule.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_rule.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_rule.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_rule.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_rule.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_rule.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_rule.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
 -- Table structure for dc3_rule_state
@@ -396,7 +312,7 @@ CREATE TABLE dc3_rule_state
     last_notify_time TIMESTAMPTZ,                                       -- Last notification time
     trigger_count          BIGINT   DEFAULT 0 NOT NULL,                 -- Trigger count
     alarm_id               BIGINT   DEFAULT 0 NOT NULL,                 -- Latest alarm ID (dc3_entity_alarm.id)
-    entity_state_ext       JSON     DEFAULT '{}'::JSON        NOT NULL, -- Rule state extension
+    entity_state_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Rule state extension
     tenant_id              BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
     remark                 TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
     creator_id             BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
@@ -419,50 +335,28 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_rule_state IS 'Rule runtime state table';
-COMMENT
-ON COLUMN dc3_rule_state.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_rule_state.rule_id IS 'Rule ID';
-COMMENT
-ON COLUMN dc3_rule_state.alarm_target_type_flag IS 'Alarm target type flag';
-COMMENT
-ON COLUMN dc3_rule_state.entity_id IS 'Entity ID';
-COMMENT
-ON COLUMN dc3_rule_state.fingerprint IS 'Rule state fingerprint';
-COMMENT
-ON COLUMN dc3_rule_state.entity_state_flag IS 'Rule state flag';
-COMMENT
-ON COLUMN dc3_rule_state.first_trigger_time IS 'First trigger time';
-COMMENT
-ON COLUMN dc3_rule_state.last_trigger_time IS 'Last trigger time';
-COMMENT
-ON COLUMN dc3_rule_state.last_recover_time IS 'Last recovery time';
-COMMENT
-ON COLUMN dc3_rule_state.last_notify_time IS 'Last notification time';
-COMMENT
-ON COLUMN dc3_rule_state.trigger_count IS 'Trigger count';
-COMMENT
-ON COLUMN dc3_rule_state.alarm_id IS 'Latest alarm ID (dc3_entity_alarm.id)';
-COMMENT
-ON COLUMN dc3_rule_state.entity_state_ext IS 'Rule state extension';
-COMMENT
-ON COLUMN dc3_rule_state.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_rule_state.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_rule_state.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_rule_state.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_rule_state.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_rule_state.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_rule_state.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_rule_state.operate_time IS 'Operation time';
+COMMENT ON TABLE dc3_rule_state IS 'Rule runtime state table';
+COMMENT ON COLUMN dc3_rule_state.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_rule_state.rule_id IS 'Rule ID';
+COMMENT ON COLUMN dc3_rule_state.alarm_target_type_flag IS 'Alarm target type flag';
+COMMENT ON COLUMN dc3_rule_state.entity_id IS 'Entity ID';
+COMMENT ON COLUMN dc3_rule_state.fingerprint IS 'Rule state fingerprint';
+COMMENT ON COLUMN dc3_rule_state.entity_state_flag IS 'Rule state flag';
+COMMENT ON COLUMN dc3_rule_state.first_trigger_time IS 'First trigger time';
+COMMENT ON COLUMN dc3_rule_state.last_trigger_time IS 'Last trigger time';
+COMMENT ON COLUMN dc3_rule_state.last_recover_time IS 'Last recovery time';
+COMMENT ON COLUMN dc3_rule_state.last_notify_time IS 'Last notification time';
+COMMENT ON COLUMN dc3_rule_state.trigger_count IS 'Trigger count';
+COMMENT ON COLUMN dc3_rule_state.alarm_id IS 'Latest alarm ID (dc3_entity_alarm.id)';
+COMMENT ON COLUMN dc3_rule_state.entity_state_ext IS 'Rule state extension';
+COMMENT ON COLUMN dc3_rule_state.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_rule_state.remark IS 'Description';
+COMMENT ON COLUMN dc3_rule_state.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_rule_state.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_rule_state.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_rule_state.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_rule_state.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_rule_state.operate_time IS 'Operation time';
 
 -- ----------------------------
 -- Table structure for dc3_notify_history
@@ -475,11 +369,12 @@ CREATE TABLE dc3_notify_history
     message_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Message ID
     channel_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Notification channel ID
     alarm_id          BIGINT   DEFAULT 0 NOT NULL,                 -- Alarm ID (dc3_entity_alarm.id)
+    dedupe_key        TEXT,
     channel_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Notification channel type flag
     target            TEXT     DEFAULT ''::TEXT          NOT NULL, -- Notification target
     status_flag       SMALLINT DEFAULT 0 NOT NULL,                 -- Notification history status flag
-    request_ext       JSON     DEFAULT '{}'::JSON        NOT NULL, -- Notification request
-    response_ext      JSON     DEFAULT '{}'::JSON        NOT NULL, -- Notification response
+    request_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Notification request
+    response_ext      JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Notification response
     error_message     TEXT     DEFAULT ''::TEXT          NOT NULL, -- Error message
     retry_count       INTEGER  DEFAULT 0 NOT NULL,                 -- Retry count
     tenant_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
@@ -500,6 +395,7 @@ CREATE INDEX idx_notify_history_alarm ON dc3_notify_history (tenant_id, alarm_id
 CREATE INDEX idx_notify_history_channel ON dc3_notify_history (tenant_id, channel_id, status_flag, create_time DESC);
 -- Pending-task scan index used by the NotifyWorker replay/reaper paths.
 CREATE INDEX idx_notify_history_pending ON dc3_notify_history (tenant_id, status_flag, create_time);
+CREATE UNIQUE INDEX uq_notify_history_dedupe ON dc3_notify_history (tenant_id, dedupe_key);
 
 CREATE TRIGGER update_operate_time_trigger
     BEFORE UPDATE
@@ -507,50 +403,29 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_notify_history IS 'Notification delivery history table';
-COMMENT
-ON COLUMN dc3_notify_history.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_notify_history.rule_id IS 'Rule ID';
-COMMENT
-ON COLUMN dc3_notify_history.notify_id IS 'Notification ID';
-COMMENT
-ON COLUMN dc3_notify_history.message_id IS 'Message ID';
-COMMENT
-ON COLUMN dc3_notify_history.channel_id IS 'Notification channel ID';
-COMMENT
-ON COLUMN dc3_notify_history.alarm_id IS 'Alarm ID (dc3_entity_alarm.id)';
-COMMENT
-ON COLUMN dc3_notify_history.channel_type_flag IS 'Notification channel type flag';
-COMMENT
-ON COLUMN dc3_notify_history.target IS 'Notification target';
-COMMENT
-ON COLUMN dc3_notify_history.status_flag IS 'Notification history status flag';
-COMMENT
-ON COLUMN dc3_notify_history.request_ext IS 'Notification request';
-COMMENT
-ON COLUMN dc3_notify_history.response_ext IS 'Notification response';
-COMMENT
-ON COLUMN dc3_notify_history.error_message IS 'Error message';
-COMMENT
-ON COLUMN dc3_notify_history.retry_count IS 'Retry count';
-COMMENT
-ON COLUMN dc3_notify_history.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_notify_history.remark IS 'Description';
-COMMENT
-ON COLUMN dc3_notify_history.creator_id IS 'Creator ID';
-COMMENT
-ON COLUMN dc3_notify_history.creator_name IS 'Creator name';
-COMMENT
-ON COLUMN dc3_notify_history.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_notify_history.operator_id IS 'Operator ID';
-COMMENT
-ON COLUMN dc3_notify_history.operator_name IS 'Operator name';
-COMMENT
-ON COLUMN dc3_notify_history.operate_time IS 'Operation time';
+COMMENT ON TABLE dc3_notify_history IS 'Notification delivery history table';
+COMMENT ON COLUMN dc3_notify_history.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_notify_history.rule_id IS 'Rule ID';
+COMMENT ON COLUMN dc3_notify_history.notify_id IS 'Notification ID';
+COMMENT ON COLUMN dc3_notify_history.message_id IS 'Message ID';
+COMMENT ON COLUMN dc3_notify_history.channel_id IS 'Notification channel ID';
+COMMENT ON COLUMN dc3_notify_history.alarm_id IS 'Alarm ID (dc3_entity_alarm.id)';
+COMMENT ON COLUMN dc3_notify_history.dedupe_key IS 'Tenant-scoped notification delivery idempotency key';
+COMMENT ON COLUMN dc3_notify_history.channel_type_flag IS 'Notification channel type flag';
+COMMENT ON COLUMN dc3_notify_history.target IS 'Notification target';
+COMMENT ON COLUMN dc3_notify_history.status_flag IS 'Notification history status flag';
+COMMENT ON COLUMN dc3_notify_history.request_ext IS 'Notification request';
+COMMENT ON COLUMN dc3_notify_history.response_ext IS 'Notification response';
+COMMENT ON COLUMN dc3_notify_history.error_message IS 'Error message';
+COMMENT ON COLUMN dc3_notify_history.retry_count IS 'Retry count';
+COMMENT ON COLUMN dc3_notify_history.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_notify_history.remark IS 'Description';
+COMMENT ON COLUMN dc3_notify_history.creator_id IS 'Creator ID';
+COMMENT ON COLUMN dc3_notify_history.creator_name IS 'Creator name';
+COMMENT ON COLUMN dc3_notify_history.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_notify_history.operator_id IS 'Operator ID';
+COMMENT ON COLUMN dc3_notify_history.operator_name IS 'Operator name';
+COMMENT ON COLUMN dc3_notify_history.operate_time IS 'Operation time';
 
 -- ----------------------------
 -- Table structure for dc3_entity_alarm
@@ -565,10 +440,11 @@ CREATE TABLE dc3_entity_alarm
     point_id               BIGINT   DEFAULT 0 NOT NULL,                 -- Point ID
     rule_id                BIGINT   DEFAULT 0 NOT NULL,                 -- Rule ID
     rule_state_id          BIGINT   DEFAULT 0 NOT NULL,                 -- Rule state ID
+    dedupe_key             VARCHAR(256),                                -- Source-derived idempotency key
     alarm_type_flag        SMALLINT DEFAULT 0 NOT NULL,                 -- Alarm type flag, 0: rule, 1: offline, 2: fault, 3: state flip, 4: report
     alarm_source_flag      SMALLINT DEFAULT 0 NOT NULL,                 -- Alarm source flag, 0: rule, 1: state timeout, 2: device report, 3: driver report, 4: system, 5: event report
     alarm_level_flag       SMALLINT DEFAULT 2 NOT NULL,                 -- Alarm level flag, 0: P0, 1: P1, 2: P2, 3: P3
-    alarm_ext              JSON     DEFAULT '{}'::JSON        NOT NULL, -- Alarm extension information
+    alarm_ext              JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Alarm extension information
     expired_time           BIGINT   DEFAULT 0 NOT NULL,                 -- Expiration duration, seconds
     confirm_flag           SMALLINT DEFAULT 0 NOT NULL,                 -- Confirmation flag, 0: unconfirmed, 1: confirmed
     tenant_id              BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
@@ -589,6 +465,7 @@ CREATE INDEX idx_entity_alarm_driver ON dc3_entity_alarm (tenant_id, driver_id, 
 CREATE INDEX idx_entity_alarm_device ON dc3_entity_alarm (tenant_id, device_id, create_time DESC);
 CREATE INDEX idx_entity_alarm_point ON dc3_entity_alarm (tenant_id, point_id, create_time DESC);
 CREATE INDEX idx_entity_alarm_rule ON dc3_entity_alarm (tenant_id, rule_id, create_time DESC);
+CREATE UNIQUE INDEX idx_entity_alarm_dedupe ON dc3_entity_alarm (tenant_id, dedupe_key);
 
 CREATE TRIGGER update_operate_time_trigger
     BEFORE UPDATE
@@ -596,42 +473,25 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_entity_alarm IS 'Entity alarm table';
-COMMENT
-ON COLUMN dc3_entity_alarm.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_entity_alarm.alarm_target_type_flag IS 'Alarm target type flag, 0: point, 1: device, 2: driver, 3: event';
-COMMENT
-ON COLUMN dc3_entity_alarm.entity_id IS 'Alarm target entity ID';
-COMMENT
-ON COLUMN dc3_entity_alarm.driver_id IS 'Driver ID';
-COMMENT
-ON COLUMN dc3_entity_alarm.device_id IS 'Device ID';
-COMMENT
-ON COLUMN dc3_entity_alarm.point_id IS 'Point ID';
-COMMENT
-ON COLUMN dc3_entity_alarm.rule_id IS 'Rule ID';
-COMMENT
-ON COLUMN dc3_entity_alarm.rule_state_id IS 'Rule state ID';
-COMMENT
-ON COLUMN dc3_entity_alarm.alarm_type_flag IS 'Alarm type flag, 0: rule, 1: offline, 2: fault, 3: state flip, 4: report';
-COMMENT
-ON COLUMN dc3_entity_alarm.alarm_source_flag IS 'Alarm source flag, 0: rule, 1: state timeout, 2: device report, 3: driver report, 4: system, 5: event report';
-COMMENT
-ON COLUMN dc3_entity_alarm.alarm_level_flag IS 'Alarm level flag, 0: P0, 1: P1, 2: P2, 3: P3';
-COMMENT
-ON COLUMN dc3_entity_alarm.alarm_ext IS 'Alarm extension information';
-COMMENT
-ON COLUMN dc3_entity_alarm.expired_time IS 'Expiration duration, seconds';
-COMMENT
-ON COLUMN dc3_entity_alarm.confirm_flag IS 'Confirmation flag, 0: unconfirmed, 1: confirmed';
-COMMENT
-ON COLUMN dc3_entity_alarm.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_entity_alarm.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_entity_alarm.operate_time IS 'Operation time';
+COMMENT ON TABLE dc3_entity_alarm IS 'Entity alarm table';
+COMMENT ON COLUMN dc3_entity_alarm.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_entity_alarm.alarm_target_type_flag IS 'Alarm target type flag, 0: point, 1: device, 2: driver, 3: event';
+COMMENT ON COLUMN dc3_entity_alarm.entity_id IS 'Alarm target entity ID';
+COMMENT ON COLUMN dc3_entity_alarm.driver_id IS 'Driver ID';
+COMMENT ON COLUMN dc3_entity_alarm.device_id IS 'Device ID';
+COMMENT ON COLUMN dc3_entity_alarm.point_id IS 'Point ID';
+COMMENT ON COLUMN dc3_entity_alarm.rule_id IS 'Rule ID';
+COMMENT ON COLUMN dc3_entity_alarm.rule_state_id IS 'Rule state ID';
+COMMENT ON COLUMN dc3_entity_alarm.dedupe_key IS 'Tenant-scoped source-derived idempotency key';
+COMMENT ON COLUMN dc3_entity_alarm.alarm_type_flag IS 'Alarm type flag, 0: rule, 1: offline, 2: fault, 3: state flip, 4: report';
+COMMENT ON COLUMN dc3_entity_alarm.alarm_source_flag IS 'Alarm source flag, 0: rule, 1: state timeout, 2: device report, 3: driver report, 4: system, 5: event report';
+COMMENT ON COLUMN dc3_entity_alarm.alarm_level_flag IS 'Alarm level flag, 0: P0, 1: P1, 2: P2, 3: P3';
+COMMENT ON COLUMN dc3_entity_alarm.alarm_ext IS 'Alarm extension information';
+COMMENT ON COLUMN dc3_entity_alarm.expired_time IS 'Expiration duration, seconds';
+COMMENT ON COLUMN dc3_entity_alarm.confirm_flag IS 'Confirmation flag, 0: unconfirmed, 1: confirmed';
+COMMENT ON COLUMN dc3_entity_alarm.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_entity_alarm.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_entity_alarm.operate_time IS 'Operation time';
 
 -- ----------------------------
 -- Table structure for dc3_entity_state
@@ -650,7 +510,7 @@ CREATE TABLE dc3_entity_state
     last_heartbeat_time TIMESTAMPTZ NOT NULL,                        -- Latest heartbeat time
     last_alarm_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Latest related alarm ID
     timeout_source_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Timeout source flag, 0: system, 1: driver, 2: device, 3: profile
-    entity_state_ext    JSON     DEFAULT '{}'::JSON        NOT NULL, -- State extension information
+    entity_state_ext    JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- State extension information
     tenant_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
     create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,      -- Creation time
     operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Operation time
@@ -675,40 +535,23 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_entity_state IS 'Entity state lease table';
-COMMENT
-ON COLUMN dc3_entity_state.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_entity_state.entity_type_flag IS 'Entity type flag (EntityTypeEnum: 3=driver, 6=device)';
-COMMENT
-ON COLUMN dc3_entity_state.entity_id IS 'Entity ID (driver ID or device ID)';
-COMMENT
-ON COLUMN dc3_entity_state.parent_entity_id IS 'Parent entity ID (for devices: owning driver; for drivers: 0)';
-COMMENT
-ON COLUMN dc3_entity_state.entity_state_flag IS 'Current status index (EntityStateStatus)';
-COMMENT
-ON COLUMN dc3_entity_state.last_state_flag IS 'Previous status index';
-COMMENT
-ON COLUMN dc3_entity_state.lease_version IS 'Monotonic version incremented on each heartbeat';
-COMMENT
-ON COLUMN dc3_entity_state.expire_time IS 'Absolute time when this lease expires';
-COMMENT
-ON COLUMN dc3_entity_state.timeout_seconds IS 'Timeout in seconds used for this entry';
-COMMENT
-ON COLUMN dc3_entity_state.last_heartbeat_time IS 'Latest heartbeat time';
-COMMENT
-ON COLUMN dc3_entity_state.last_alarm_id IS 'Latest related alarm ID';
-COMMENT
-ON COLUMN dc3_entity_state.timeout_source_flag IS 'Timeout source flag, 0: system, 1: driver, 2: device, 3: profile';
-COMMENT
-ON COLUMN dc3_entity_state.entity_state_ext IS 'State extension information';
-COMMENT
-ON COLUMN dc3_entity_state.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_entity_state.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_entity_state.operate_time IS 'Operation time';
+COMMENT ON TABLE dc3_entity_state IS 'Entity state lease table';
+COMMENT ON COLUMN dc3_entity_state.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_entity_state.entity_type_flag IS 'Entity type flag (EntityTypeEnum: 3=driver, 6=device)';
+COMMENT ON COLUMN dc3_entity_state.entity_id IS 'Entity ID (driver ID or device ID)';
+COMMENT ON COLUMN dc3_entity_state.parent_entity_id IS 'Parent entity ID (for devices: owning driver; for drivers: 0)';
+COMMENT ON COLUMN dc3_entity_state.entity_state_flag IS 'Current status index (EntityStateStatus)';
+COMMENT ON COLUMN dc3_entity_state.last_state_flag IS 'Previous status index';
+COMMENT ON COLUMN dc3_entity_state.lease_version IS 'Monotonic version incremented on each heartbeat';
+COMMENT ON COLUMN dc3_entity_state.expire_time IS 'Absolute time when this lease expires';
+COMMENT ON COLUMN dc3_entity_state.timeout_seconds IS 'Timeout in seconds used for this entry';
+COMMENT ON COLUMN dc3_entity_state.last_heartbeat_time IS 'Latest heartbeat time';
+COMMENT ON COLUMN dc3_entity_state.last_alarm_id IS 'Latest related alarm ID';
+COMMENT ON COLUMN dc3_entity_state.timeout_source_flag IS 'Timeout source flag, 0: system, 1: driver, 2: device, 3: profile';
+COMMENT ON COLUMN dc3_entity_state.entity_state_ext IS 'State extension information';
+COMMENT ON COLUMN dc3_entity_state.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_entity_state.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_entity_state.operate_time IS 'Operation time';
 
 -- ----------------------------
 -- Table structure for dc3_point_command_history
@@ -740,9 +583,9 @@ CREATE TABLE dc3_point_command_history
     CONSTRAINT chk_point_command_history_source CHECK (source BETWEEN 0 AND 3)
 );
 
--- command_id is the external correlation key used by HTTP and RabbitMQ callbacks.
+-- command_id is an external correlation key scoped to its tenant.
 CREATE UNIQUE INDEX idx_point_command_history_unique
-    ON dc3_point_command_history (command_id);
+    ON dc3_point_command_history (tenant_id, command_id);
 
 -- Tenant-scoped command history pages sort by occurrence time.
 CREATE INDEX idx_point_command_history_tenant_time
@@ -760,48 +603,27 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_point_command_history IS 'Point command execution history table';
-COMMENT
-ON COLUMN dc3_point_command_history.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_point_command_history.command_id IS 'Command UUID';
-COMMENT
-ON COLUMN dc3_point_command_history.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_point_command_history.type IS 'Command type flag, 0: read, 1: read-batch, 2: write, 3: write-batch, 4: config';
-COMMENT
-ON COLUMN dc3_point_command_history.device_id IS 'Device ID';
-COMMENT
-ON COLUMN dc3_point_command_history.point_id IS 'Point ID';
-COMMENT
-ON COLUMN dc3_point_command_history.request_value IS 'Request value';
-COMMENT
-ON COLUMN dc3_point_command_history.response_value IS 'Response value';
-COMMENT
-ON COLUMN dc3_point_command_history.status IS 'Command status flag, 0: pending, 1: sent, 2: success, 3: failed, 4: timeout, 5: expired, 6: dead, 7: duplicate';
-COMMENT
-ON COLUMN dc3_point_command_history.error_code IS 'Error code';
-COMMENT
-ON COLUMN dc3_point_command_history.error_message IS 'Error message';
-COMMENT
-ON COLUMN dc3_point_command_history.source IS 'Command source flag, 0: http, 1: grpc, 2: agentic, 3: scheduled';
-COMMENT
-ON COLUMN dc3_point_command_history.source_user_id IS 'Source user ID';
-COMMENT
-ON COLUMN dc3_point_command_history.occur_time IS 'Occurrence time';
-COMMENT
-ON COLUMN dc3_point_command_history.send_time IS 'Sent time';
-COMMENT
-ON COLUMN dc3_point_command_history.finish_time IS 'Finished time';
-COMMENT
-ON COLUMN dc3_point_command_history.expire_time IS 'Expiration time';
-COMMENT
-ON COLUMN dc3_point_command_history.schema_version IS 'Schema version';
-COMMENT
-ON COLUMN dc3_point_command_history.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_point_command_history.operate_time IS 'Operation time';
+COMMENT ON TABLE dc3_point_command_history IS 'Point command execution history table';
+COMMENT ON COLUMN dc3_point_command_history.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_point_command_history.command_id IS 'Command UUID';
+COMMENT ON COLUMN dc3_point_command_history.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_point_command_history.type IS 'Command type flag, 0: read, 1: read-batch, 2: write, 3: write-batch, 4: config';
+COMMENT ON COLUMN dc3_point_command_history.device_id IS 'Device ID';
+COMMENT ON COLUMN dc3_point_command_history.point_id IS 'Point ID';
+COMMENT ON COLUMN dc3_point_command_history.request_value IS 'Request value';
+COMMENT ON COLUMN dc3_point_command_history.response_value IS 'Response value';
+COMMENT ON COLUMN dc3_point_command_history.status IS 'Command status flag, 0: pending, 1: sent, 2: success, 3: failed, 4: timeout, 5: expired, 6: dead, 7: duplicate';
+COMMENT ON COLUMN dc3_point_command_history.error_code IS 'Error code';
+COMMENT ON COLUMN dc3_point_command_history.error_message IS 'Error message';
+COMMENT ON COLUMN dc3_point_command_history.source IS 'Command source flag, 0: http, 1: grpc, 2: agentic, 3: scheduled';
+COMMENT ON COLUMN dc3_point_command_history.source_user_id IS 'Source user ID';
+COMMENT ON COLUMN dc3_point_command_history.occur_time IS 'Occurrence time';
+COMMENT ON COLUMN dc3_point_command_history.send_time IS 'Sent time';
+COMMENT ON COLUMN dc3_point_command_history.finish_time IS 'Finished time';
+COMMENT ON COLUMN dc3_point_command_history.expire_time IS 'Expiration time';
+COMMENT ON COLUMN dc3_point_command_history.schema_version IS 'Schema version';
+COMMENT ON COLUMN dc3_point_command_history.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_point_command_history.operate_time IS 'Operation time';
 
 -- ----------------------------
 -- Table structure for dc3_command_history
@@ -853,50 +675,28 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_command_history IS 'Command execution history table';
-COMMENT
-ON COLUMN dc3_command_history.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_command_history.record_id IS 'Record UUID';
-COMMENT
-ON COLUMN dc3_command_history.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_command_history.device_id IS 'Device ID';
-COMMENT
-ON COLUMN dc3_command_history.command_id IS 'Command ID';
-COMMENT
-ON COLUMN dc3_command_history.command_code IS 'Command code';
-COMMENT
-ON COLUMN dc3_command_history.param_values IS 'Parameter values (JSONB)';
-COMMENT
-ON COLUMN dc3_command_history.result_values IS 'Result values (JSONB)';
-COMMENT
-ON COLUMN dc3_command_history.config_snapshot IS 'Command config snapshot (JSONB)';
-COMMENT
-ON COLUMN dc3_command_history.status IS 'Record status flag, 0: pending, 1: sent, 2: success, 3: failed, 4: timeout, 5: expired, 6: dead, 7: duplicate';
-COMMENT
-ON COLUMN dc3_command_history.error_code IS 'Error code';
-COMMENT
-ON COLUMN dc3_command_history.error_message IS 'Error message';
-COMMENT
-ON COLUMN dc3_command_history.source IS 'Command source flag, 0: http, 1: grpc, 2: agentic';
-COMMENT
-ON COLUMN dc3_command_history.source_user_id IS 'Source user ID';
-COMMENT
-ON COLUMN dc3_command_history.occur_time IS 'Occurrence time';
-COMMENT
-ON COLUMN dc3_command_history.send_time IS 'Sent time';
-COMMENT
-ON COLUMN dc3_command_history.finish_time IS 'Finished time';
-COMMENT
-ON COLUMN dc3_command_history.expire_time IS 'Expiration time';
-COMMENT
-ON COLUMN dc3_command_history.schema_version IS 'Schema version';
-COMMENT
-ON COLUMN dc3_command_history.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_command_history.operate_time IS 'Operation time';
+COMMENT ON TABLE dc3_command_history IS 'Command execution history table';
+COMMENT ON COLUMN dc3_command_history.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_command_history.record_id IS 'Record UUID';
+COMMENT ON COLUMN dc3_command_history.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_command_history.device_id IS 'Device ID';
+COMMENT ON COLUMN dc3_command_history.command_id IS 'Command ID';
+COMMENT ON COLUMN dc3_command_history.command_code IS 'Command code';
+COMMENT ON COLUMN dc3_command_history.param_values IS 'Parameter values (JSONB)';
+COMMENT ON COLUMN dc3_command_history.result_values IS 'Result values (JSONB)';
+COMMENT ON COLUMN dc3_command_history.config_snapshot IS 'Command config snapshot (JSONB)';
+COMMENT ON COLUMN dc3_command_history.status IS 'Record status flag, 0: pending, 1: sent, 2: success, 3: failed, 4: timeout, 5: expired, 6: dead, 7: duplicate';
+COMMENT ON COLUMN dc3_command_history.error_code IS 'Error code';
+COMMENT ON COLUMN dc3_command_history.error_message IS 'Error message';
+COMMENT ON COLUMN dc3_command_history.source IS 'Command source flag, 0: http, 1: grpc, 2: agentic';
+COMMENT ON COLUMN dc3_command_history.source_user_id IS 'Source user ID';
+COMMENT ON COLUMN dc3_command_history.occur_time IS 'Occurrence time';
+COMMENT ON COLUMN dc3_command_history.send_time IS 'Sent time';
+COMMENT ON COLUMN dc3_command_history.finish_time IS 'Finished time';
+COMMENT ON COLUMN dc3_command_history.expire_time IS 'Expiration time';
+COMMENT ON COLUMN dc3_command_history.schema_version IS 'Schema version';
+COMMENT ON COLUMN dc3_command_history.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_command_history.operate_time IS 'Operation time';
 
 -- ----------------------------
 -- Table structure for dc3_event_history
@@ -950,43 +750,23 @@ CREATE TRIGGER update_operate_time_trigger
     FOR EACH ROW
     EXECUTE FUNCTION update_operate_time();
 
-COMMENT
-ON TABLE dc3_event_history IS 'Event report history table';
-COMMENT
-ON COLUMN dc3_event_history.id IS 'Primary key ID';
-COMMENT
-ON COLUMN dc3_event_history.record_id IS 'Record UUID';
-COMMENT
-ON COLUMN dc3_event_history.tenant_id IS 'Tenant ID';
-COMMENT
-ON COLUMN dc3_event_history.device_id IS 'Device ID';
-COMMENT
-ON COLUMN dc3_event_history.event_id IS 'Event ID';
-COMMENT
-ON COLUMN dc3_event_history.event_code IS 'Event code';
-COMMENT
-ON COLUMN dc3_event_history.event_type_flag IS 'Event type flag';
-COMMENT
-ON COLUMN dc3_event_history.event_level_flag IS 'Event level flag';
-COMMENT
-ON COLUMN dc3_event_history.param_values IS 'Parameter values (JSONB)';
-COMMENT
-ON COLUMN dc3_event_history.config_snapshot IS 'Event config snapshot (JSONB)';
-COMMENT
-ON COLUMN dc3_event_history.message IS 'Event message';
-COMMENT
-ON COLUMN dc3_event_history.occur_time IS 'Occurrence time';
-COMMENT
-ON COLUMN dc3_event_history.receive_time IS 'Receive time';
-COMMENT
-ON COLUMN dc3_event_history.acknowledge_flag IS 'Acknowledge flag, 0: unacknowledged, 1: acknowledged';
-COMMENT
-ON COLUMN dc3_event_history.acknowledge_time IS 'Acknowledge time';
-COMMENT
-ON COLUMN dc3_event_history.acknowledge_user_id IS 'Acknowledge user ID';
-COMMENT
-ON COLUMN dc3_event_history.schema_version IS 'Schema version';
-COMMENT
-ON COLUMN dc3_event_history.create_time IS 'Creation time';
-COMMENT
-ON COLUMN dc3_event_history.operate_time IS 'Operation time';
+COMMENT ON TABLE dc3_event_history IS 'Event report history table';
+COMMENT ON COLUMN dc3_event_history.id IS 'Primary key ID';
+COMMENT ON COLUMN dc3_event_history.record_id IS 'Record UUID';
+COMMENT ON COLUMN dc3_event_history.tenant_id IS 'Tenant ID';
+COMMENT ON COLUMN dc3_event_history.device_id IS 'Device ID';
+COMMENT ON COLUMN dc3_event_history.event_id IS 'Event ID';
+COMMENT ON COLUMN dc3_event_history.event_code IS 'Event code';
+COMMENT ON COLUMN dc3_event_history.event_type_flag IS 'Event type flag';
+COMMENT ON COLUMN dc3_event_history.event_level_flag IS 'Event level flag';
+COMMENT ON COLUMN dc3_event_history.param_values IS 'Parameter values (JSONB)';
+COMMENT ON COLUMN dc3_event_history.config_snapshot IS 'Event config snapshot (JSONB)';
+COMMENT ON COLUMN dc3_event_history.message IS 'Event message';
+COMMENT ON COLUMN dc3_event_history.occur_time IS 'Occurrence time';
+COMMENT ON COLUMN dc3_event_history.receive_time IS 'Receive time';
+COMMENT ON COLUMN dc3_event_history.acknowledge_flag IS 'Acknowledge flag, 0: unacknowledged, 1: acknowledged';
+COMMENT ON COLUMN dc3_event_history.acknowledge_time IS 'Acknowledge time';
+COMMENT ON COLUMN dc3_event_history.acknowledge_user_id IS 'Acknowledge user ID';
+COMMENT ON COLUMN dc3_event_history.schema_version IS 'Schema version';
+COMMENT ON COLUMN dc3_event_history.create_time IS 'Creation time';
+COMMENT ON COLUMN dc3_event_history.operate_time IS 'Operation time';

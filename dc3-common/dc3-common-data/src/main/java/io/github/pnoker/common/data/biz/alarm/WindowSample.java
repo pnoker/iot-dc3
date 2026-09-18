@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import java.time.LocalDateTime;
@@ -26,13 +25,16 @@ import java.time.LocalDateTime;
  * rule's condition operator to {@code calValue} sample-by-sample.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 public record WindowSample(Double numValue, String calValue, LocalDateTime timestamp) {
 
+    /**
+     * Determine whether the sample contains a numeric value.
+     *
+     * @return {@code true} when {@code numValue} is present
+     */
     public boolean isNumeric() {
         return numValue != null;
     }
-
 }

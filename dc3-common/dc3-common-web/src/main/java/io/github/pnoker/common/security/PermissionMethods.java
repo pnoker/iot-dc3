@@ -14,9 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.security;
 
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -25,10 +27,6 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 /**
  * SpEL-accessible permission check methods for use in {@code @PreAuthorize}.
  * <p>
@@ -36,7 +34,7 @@ import java.util.stream.Collectors;
  * <pre>{@code
  *   @PreAuthorize("@perm.can('device', 'get')")
  *   @GetMapping("/{id}")
- *   public Mono<R<DeviceVO>> getById(@PathVariable Long id) { ... }
+ *   public Mono<DeviceVO> getById(@PathVariable Long id) { ... }
  * }</pre>
  * <p>
  * The bean composes the full {@code resource_code} as
@@ -44,7 +42,6 @@ import java.util.stream.Collectors;
  * caller's authority set loaded at authentication time.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -56,8 +53,10 @@ public class PermissionMethods {
      * the role-resource data returned by the active {@link PermissionProvider}.
      */
     public static final String WILDCARD = "*";
+
     private final String serviceName;
 
+    /** permission methods. */
     public PermissionMethods(@Value("${spring.application.name:unknown}") String serviceName) {
         this.serviceName = serviceName;
     }

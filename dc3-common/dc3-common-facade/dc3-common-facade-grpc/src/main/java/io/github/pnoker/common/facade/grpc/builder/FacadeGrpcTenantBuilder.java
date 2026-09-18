@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.builder;
 
 import io.github.pnoker.api.center.auth.GrpcTenantDTO;
@@ -22,21 +21,25 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
-import org.springframework.stereotype.Component;
-
 import java.util.Objects;
 import java.util.Optional;
+import org.springframework.stereotype.Component;
 
 /**
  * {@code GrpcTenantDTO} → {@link FacadeTenantBO}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Component
 public class FacadeGrpcTenantBuilder {
 
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadeTenantBO toFacadeBO(GrpcTenantDTO dto) {
         if (Objects.isNull(dto)) {
             return null;
@@ -51,5 +54,4 @@ public class FacadeGrpcTenantBuilder {
 
         return bo;
     }
-
 }

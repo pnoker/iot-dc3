@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.quartz.QuartzService;
@@ -29,11 +28,15 @@ import org.springframework.context.annotation.Bean;
  * Spring Boot auto-configuration for Quartz scheduled jobs.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.0
  */
 @AutoConfiguration(after = QuartzAutoConfiguration.class)
 public class QuartzConfig {
+
+    /**
+     * Creates the quartz configuration.
+     */
+    public QuartzConfig() {}
 
     /**
      * Quartz scheduler service.
@@ -47,5 +50,4 @@ public class QuartzConfig {
     public QuartzService quartzService(Scheduler scheduler) {
         return new QuartzService(scheduler);
     }
-
 }

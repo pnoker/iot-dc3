@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.entity.ext.DriverAttributeExt;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
@@ -27,24 +25,23 @@ import io.github.pnoker.common.manager.entity.model.DriverAttributeDO;
 import io.github.pnoker.common.manager.entity.vo.DriverAttributeVO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 /**
  * MapStruct builder converting between driver attribute BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface DriverAttributeBuilder {
 
     /**
@@ -76,6 +73,12 @@ public interface DriverAttributeBuilder {
     @Mapping(target = "deleted", ignore = true)
     DriverAttributeDO buildDOByBO(DriverAttributeBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(DriverAttributeBO entityBO, @MappingTarget DriverAttributeDO entityDO) {
         // Json Ext
@@ -117,6 +120,12 @@ public interface DriverAttributeBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     DriverAttributeBO buildBOByDO(DriverAttributeDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(DriverAttributeDO entityDO, @MappingTarget DriverAttributeBO entityBO) {
         // Json Ext
@@ -162,25 +171,4 @@ public interface DriverAttributeBuilder {
      * @return EntityVO Array
      */
     List<DriverAttributeVO> buildVOListByBOList(List<DriverAttributeBO> entityBOList);
-
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    default Page<DriverAttributeBO> buildBOPageByDOPage(Page<DriverAttributeDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<DriverAttributeVO> buildVOPageByBOPage(Page<DriverAttributeBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

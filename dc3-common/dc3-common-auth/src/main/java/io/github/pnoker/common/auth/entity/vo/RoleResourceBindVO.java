@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -33,7 +32,6 @@ import lombok.ToString;
  * View object for role-resource binding API responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -48,15 +46,24 @@ public class RoleResourceBindVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "Identifier of the role to bind; must belong to the current tenant.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Role id can't be empty", groups = {Add.class, Update.class})
-    private Long roleId;
+    @Schema(
+            description = "Identifier of the role to bind; must belong to the current tenant.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Role id can't be empty",
+            groups = {Add.class, Update.class})
+    private String roleId;
 
     /**
      * ID
      */
-    @Schema(description = "Identifier of the resource to bind to the role; must belong to the current tenant.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Resource id can't be empty", groups = {Add.class, Update.class})
-    private Long resourceId;
-
+    @Schema(
+            description = "Identifier of the resource to bind to the role; must belong to the current tenant.",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Resource id can't be empty",
+            groups = {Add.class, Update.class})
+    private String resourceId;
 }

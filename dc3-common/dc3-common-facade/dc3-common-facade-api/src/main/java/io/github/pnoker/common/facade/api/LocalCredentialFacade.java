@@ -14,16 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeLocalCredentialBO;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral local credential facade.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
 public interface LocalCredentialFacade {
@@ -31,6 +30,5 @@ public interface LocalCredentialFacade {
     /**
      * @return the local credential, or {@code null} when the login name does not exist.
      */
-    FacadeLocalCredentialBO getByLoginName(String loginName);
-
+    Mono<FacadeLocalCredentialBO> getByLoginName(Long tenantId, String loginName);
 }

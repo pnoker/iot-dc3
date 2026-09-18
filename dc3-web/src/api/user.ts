@@ -15,22 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {httpGet, httpPost} from '@/api/common';
+import {httpDelete, httpGet, httpPost} from '@/api/common';
 import {API_AUTH_BASE} from '@/config/constant/api';
 import type {PageQuery, PageResult} from '@/config/types';
 import type {UserForm, UserRecord} from '@/config/types/auth';
 
-export const addUser = (user: UserForm) => httpPost<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/add`, user);
-
-export const deleteUser = (id: string) => httpPost(`${API_AUTH_BASE}/user_profile/delete`, undefined, {params: {id}});
-
-export const updateUser = (user: UserForm) => httpPost<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/update`, user);
-
-export const getUserById = (id: string) =>
-  httpGet<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/get_by_id`, {params: {id}});
+const prefix = `${API_AUTH_BASE}/user_profile`;
+export const addUser = (form: UserForm) => httpPost<UserRecord>(`${prefix}/add`, form);
+export const deleteUser = (id: string) => httpDelete<void>(`${prefix}/delete`, {params: {id}});
+export const updateUser = (form: UserForm) => httpPost<UserRecord>(`${prefix}/update`, form);
+export const getUserById = (id: string) => httpGet<UserRecord>(`${prefix}/get_by_id`, {params: {id}});
 
 export const getUserByName = (name: string) =>
-  httpGet<R<UserRecord>>(`${API_AUTH_BASE}/user_profile/get_by_name`, {params: {name}});
+  httpGet<UserRecord>(`${API_AUTH_BASE}/user_profile/get_by_name`, {params: {name}});
 
-export const listUser = <T = R<PageResult<UserRecord>>>(query: PageQuery) =>
-  httpPost<T>(`${API_AUTH_BASE}/user_profile/list`, query);
+export const listUser = (query: PageQuery) => httpPost<PageResult<UserRecord>>(`${prefix}/list`, query);

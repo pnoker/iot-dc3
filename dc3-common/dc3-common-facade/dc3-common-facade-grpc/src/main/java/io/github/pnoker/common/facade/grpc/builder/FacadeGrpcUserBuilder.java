@@ -14,28 +14,31 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc.builder;
 
 import io.github.pnoker.api.center.auth.GrpcUserDTO;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
-import org.springframework.stereotype.Component;
-
 import java.util.Objects;
+import org.springframework.stereotype.Component;
 
 /**
  * {@code GrpcUserDTO} → {@link FacadeUserBO}. {@code socialExt}/{@code identityExt} stay
  * as opaque JSON strings — keeping the wire representation untouched.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Component
 public class FacadeGrpcUserBuilder {
 
+    /**
+     * To facade business object.
+     *
+     * @param dto dto
+     * @return to facade business object result
+     */
     public FacadeUserBO toFacadeBO(GrpcUserDTO dto) {
         if (Objects.isNull(dto)) {
             return null;
@@ -54,5 +57,4 @@ public class FacadeGrpcUserBuilder {
 
         return bo;
     }
-
 }

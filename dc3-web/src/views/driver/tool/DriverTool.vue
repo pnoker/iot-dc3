@@ -56,7 +56,7 @@
       </el-form-item>
     </template>
     <template #actions>
-      <el-button :icon="Plus" type="success" @click="$emit('show-add')">{{ $t('common.add') }}</el-button>
+      <el-button :disabled="!add" :icon="Plus" type="success" @click="$emit('show-add')">{{ $t('common.add') }}</el-button>
     </template>
   </tool-card>
 </template>

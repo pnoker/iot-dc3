@@ -14,18 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.bo.NotifyHistoryBO;
-
 import java.util.List;
+import reactor.core.publisher.Flux;
 
 /**
  * Alarm rule processing pipeline.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface AlarmRulePipelineService {
@@ -36,7 +34,7 @@ public interface AlarmRulePipelineService {
      * @param fact normalized fact
      * @return persisted notification records
      */
-    List<NotifyHistoryBO> process(RuleFact fact);
+    Flux<NotifyHistoryBO> process(RuleFact fact);
 
     /**
      * Batch-evaluate facts and execute notification side effects for all
@@ -48,6 +46,5 @@ public interface AlarmRulePipelineService {
      * @param facts normalized facts
      * @return persisted notification records
      */
-    List<NotifyHistoryBO> processBatch(List<RuleFact> facts);
-
+    Flux<NotifyHistoryBO> processBatch(List<RuleFact> facts);
 }

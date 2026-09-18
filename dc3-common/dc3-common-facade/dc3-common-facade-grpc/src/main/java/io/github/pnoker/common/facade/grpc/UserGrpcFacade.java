@@ -14,78 +14,44 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.grpc;
 
 import io.github.pnoker.api.center.auth.GrpcIdQuery;
-import io.github.pnoker.api.center.auth.GrpcRUserDTO;
+import io.github.pnoker.api.center.auth.GrpcUserDTO;
 import io.github.pnoker.api.center.auth.UserApiGrpc;
-import io.github.pnoker.api.common.GrpcR;
-import io.github.pnoker.common.enums.ErrorCode;
-import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.facade.api.UserFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcUserBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
-/**
- * gRPC {@link UserFacade}.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
-@Slf4j
+/** gRPC facade exposing user operations. */
 @Component
 @RequiredArgsConstructor
 public class UserGrpcFacade implements UserFacade {
-
-    private final UserApiGrpc.UserApiBlockingStub userApiBlockingStub;
-
-    private final FacadeGrpcUserBuilder facadeGrpcUserBuilder;
-
-    private final GrpcFacadeSupport grpcFacadeSupport;
+    private final UserApiGrpc.UserApiStub userApiStub;
+    private final FacadeGrpcUserBuilder builder;
+    private final GrpcFacadeSupport support;
 
     @Override
-    public FacadeUserBO getById(Long id) {
-        GrpcIdQuery request = GrpcIdQuery.newBuilder().setId(id).build();
-        GrpcRUserDTO response = grpcFacadeSupport.call("UserFacade.getById", userApiBlockingStub,
-                stub -> stub.getById(request));
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "getById");
-            return null;
-        }
-        return facadeGrpcUserBuilder.toFacadeBO(response.getData());
+    public Mono<FacadeUserBO> getById(Long tenantId, Long id) {
+        return call("getById", tenantId, id, false);
     }
 
     @Override
-    public FacadeUserBO getByPrincipalId(Long principalId) {
-        GrpcIdQuery request = GrpcIdQuery.newBuilder().setId(principalId).build();
-        GrpcRUserDTO response = grpcFacadeSupport.call("UserFacade.getByPrincipalId", userApiBlockingStub,
-                stub -> stub.getByPrincipalId(request));
-        if (!response.getResult().getOk()) {
-            guardOrThrow(response.getResult(), "getByPrincipalId");
-            return null;
-        }
-        return facadeGrpcUserBuilder.toFacadeBO(response.getData());
+    public Mono<FacadeUserBO> getByPrincipalId(Long tenantId, Long principalId) {
+        return call("getByPrincipalId", tenantId, principalId, true);
     }
 
-    /**
-     * Guard a gRPC result: NOT_FOUND is treated as a normal empty outcome, any other
-     * error code throws a service exception.
-     *
-     * @param result the gRPC result envelope
-     * @param op     the operation name, for error messages
-     */
-    private void guardOrThrow(GrpcR result, String op) {
-        String code = result.getCode();
-        if (ErrorCode.NOT_FOUND.getCode().equals(code)) {
-            log.debug("UserGrpcFacade.{} => no resource", op);
-            return;
-        }
-        throw new ServiceException("UserFacade." + op + " failed: [" + code + "] " + result.getMessage());
+    private Mono<FacadeUserBO> call(String operation, Long tenantId, Long id, boolean principal) {
+        GrpcIdQuery request =
+                GrpcIdQuery.newBuilder().setTenantId(tenantId).setId(id).build();
+        UserApiGrpc.UserApiStub stub = support.withDeadline(userApiStub);
+        return ReactiveGrpcClientSupport.<GrpcIdQuery, GrpcUserDTO>unary("UserFacade." + operation, observer -> {
+                    if (principal) stub.getByPrincipalId(request, observer);
+                    else stub.getById(request, observer);
+                })
+                .map(builder::toFacadeBO);
     }
-
 }

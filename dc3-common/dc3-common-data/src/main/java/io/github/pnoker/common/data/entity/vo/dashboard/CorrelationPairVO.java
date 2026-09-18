@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * Two events that fired within a small time window of each other, enough times to suggest
@@ -32,7 +30,6 @@ import java.io.Serializable;
  * weighted by coCount).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -49,7 +46,7 @@ public class CorrelationPairVO implements Serializable {
     private String aSource;
 
     @Schema(description = "source entity ID of event A", example = "1024")
-    private long aSourceId;
+    private String aSourceId;
 
     @Schema(description = "event type of event A", example = "1")
     private int aEventType;
@@ -58,12 +55,11 @@ public class CorrelationPairVO implements Serializable {
     private String bSource;
 
     @Schema(description = "source entity ID of event B", example = "512")
-    private long bSourceId;
+    private String bSourceId;
 
     @Schema(description = "event type of event B", example = "2")
     private int bEventType;
 
     @Schema(description = "number of times A and B co-occurred", example = "15")
     private long coCount;
-
 }

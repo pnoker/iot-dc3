@@ -16,74 +16,34 @@
  */
 package io.github.pnoker.common.agentic.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
-import io.github.pnoker.common.agentic.entity.query.SessionQuery;
-import io.github.pnoker.common.agentic.entity.vo.SessionVO;
+import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import reactor.core.publisher.Mono;
 
-/**
- * Service for managing agentic chat sessions with tenant-scoped lifecycle operations.
- *
- * @author pnoker
- * @version 2025.9.0
- * @since 2016.10.1
- */
+/** Reactive service for tenant-scoped agentic conversation sessions. */
 public interface SessionService {
 
-    /**
-     * Create a new session if one does not exist for the given conversation ID. If a
-     * session already exists, update its operate_time.
-     *
-     * @param conversationId conversation ID
-     * @param tenantId       tenant scope
-     * @param userId         user scope
-     * @return the session BO
-     */
-    SessionBO touch(String conversationId, Long tenantId, Long userId);
+    /** Create or refresh the session and emit the stored state. */
+    Mono<SessionBO> touch(String conversationId, RequestHeader.PrincipalHeader header, SessionExt sessionExt);
 
-    /**
-     * Create or update a session and merge session-level chat preferences.
-     *
-     * @param conversationId conversation ID
-     * @param tenantId       tenant scope
-     * @param userId         user scope
-     * @param sessionExt     session extension metadata and chat preferences
-     * @return the session BO
-     */
-    SessionBO touch(String conversationId, Long tenantId, Long userId, SessionExt sessionExt);
+    /** Load the session for the request. */
+    Mono<SessionBO> get(String conversationId, RequestHeader.PrincipalHeader header);
 
-    /**
-     * Get session by conversation ID.
-     *
-     * @param conversationId conversation ID
-     * @return session BO or null
-     */
-    SessionBO getByConversationId(String conversationId);
+    /** Page sessions matching the tenant-scoped filters. */
+    Mono<OffsetPage<SessionBO>> list(
+            long offset,
+            int limit,
+            String conversationId,
+            java.util.List<SortSpec> sort,
+            RequestHeader.PrincipalHeader header);
 
-    /**
-     * Delete session by conversation ID (logical delete) and clear associated chat
-     * memory.
-     *
-     * @param conversationId conversation ID
-     */
-    void deleteByConversationId(String conversationId);
+    /** Update one session and emit the updated row. */
+    Mono<SessionBO> update(
+            String conversationId, SessionExt sessionExt, String title, RequestHeader.PrincipalHeader header);
 
-    /**
-     * Update mutable session metadata.
-     *
-     * @param conversationId conversation ID
-     * @param request        mutable fields
-     * @return updated session BO or null if the session does not exist
-     */
-    SessionBO update(String conversationId, SessionVO request);
-
-    /**
-     * Query sessions with pagination.
-     *
-     * @param query query parameters
-     * @return paginated results
-     */
-    Page<SessionBO> listByPage(SessionQuery query);
-
+    /** Delete the session. */
+    Mono<Long> delete(String conversationId, RequestHeader.PrincipalHeader header);
 }

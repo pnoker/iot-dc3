@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.common;
 
 /**
  * Default value related constants.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class DefaultConstant {
@@ -43,8 +41,14 @@ public class DefaultConstant {
      */
     public static final long DEFAULT_ID = 0L;
 
+    /**
+     * Numeric zero convenience constant.
+     */
     public static final Integer ZERO = 0;
 
+    /**
+     * Numeric one convenience constant.
+     */
     public static final Integer ONE = 1;
 
     /**
@@ -70,5 +74,4 @@ public class DefaultConstant {
     private DefaultConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
-
 }

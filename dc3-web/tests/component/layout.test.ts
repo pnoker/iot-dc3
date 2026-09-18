@@ -21,7 +21,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 
 import i18n from '@/config/i18n';
-import {layoutStubs} from '../setup/stubs/element-plus';
+import {createElButtonStub, layoutStubs} from '../setup/stubs/element-plus';
 import {sampleMenuTree} from '../fixtures/menu';
 
 // Layout reaches through several stores and the router push singleton.
@@ -34,6 +34,11 @@ const layoutMocks = vi.hoisted(() => ({
 vi.mock('@/config/router', () => ({
   default: {push: layoutMocks.routerPush, currentRoute: {value: {path: '/home'}}},
 }));
+
+vi.mock('@/composables/useBreakpoint', async () => {
+  const {ref} = await import('vue');
+  return {useBreakpoint: () => ({isDesktop: ref(true), isMobile: ref(false), isTablet: ref(false)})};
+});
 
 vi.mock('@/components/agentic/AgenticAssistant.vue', () => ({
   default: {name: 'AgenticAssistant', template: '<div class="agentic-stub" />'},
@@ -73,6 +78,7 @@ async function mountLayout() {
       plugins: [i18n, router],
       stubs: {
         ...layoutStubs,
+        ElButton: createElButtonStub(),
         ElBacktop: {template: '<div class="el-backtop-stub" />'},
         RouterView: {template: '<div class="router-view-stub" />'},
       },
@@ -90,6 +96,26 @@ describe('Layout', () => {
     const wrapper = await mountLayout();
     await flushPromises();
 
+    // The fixed shell has exactly two glass capsules: brand on the left,
+    // menu + user controls on the right.
+    expect(wrapper.findAll('.header_brand_glass')).toHaveLength(1);
+    expect(wrapper.find('.brand-lockup__title').text()).toContain('IoT DC3');
+    expect(wrapper.find('.brand-lockup__agentic').text()).toBe('AGENTIC');
+    expect(wrapper.find('.brand-lockup__spark').exists()).toBe(true);
+    expect(wrapper.find('.brand-lockup__signal').text()).toBe('Sense · Reason · Act · Evolve');
+    expect(wrapper.findAll('.header_actions_glass')).toHaveLength(1);
+    expect(wrapper.find('.header_actions_glass .header_menu_wrap').exists()).toBe(true);
+    expect(wrapper.find('.header_actions_glass .app-preferences').exists()).toBe(true);
+    expect(wrapper.find('.header_actions_glass .app-preferences__theme').exists()).toBe(true);
+    expect(wrapper.find('.header_actions_glass .header_user').exists()).toBe(true);
+    expect(wrapper.find('.header_actions_glass .user_trigger').exists()).toBe(true);
+    // The trigger is a bare avatar; the name lives in the dropdown identity row.
+    const avatar = wrapper.find('.header_actions_glass .user_trigger .user_avatar');
+    expect(avatar.exists()).toBe(true);
+    expect(avatar.attributes('src')).toContain('images/common/avatar.png');
+    expect(wrapper.find('.user_trigger .user_name').exists()).toBe(false);
+    expect(wrapper.find('.user_dropdown_identity .user_dropdown_name').exists()).toBe(true);
+
     // Home item is always present.
     expect(wrapper.text()).toContain('Home');
     // First top-level node from sampleMenuTree renders via resolveMenuTitle.
@@ -97,5 +123,7 @@ describe('Layout', () => {
 
     // Router-view is mounted into the body shell.
     expect(wrapper.find('.router-view-stub').exists()).toBe(true);
+    expect(wrapper.get('.skip-link').attributes('href')).toBe('#main-content');
+    expect(wrapper.get('#main-content').attributes('tabindex')).toBe('-1');
   });
 });

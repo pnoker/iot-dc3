@@ -14,23 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeTenantBO;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral tenant facade. Mirrors {@code api.center.auth.TenantApi}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface TenantFacade {
 
-    /**
-     * @return the tenant, or {@code null} when no tenant carries the given code.
-     */
-    FacadeTenantBO getByCode(String code);
-
+    /** Resolve the tenant by its code. */
+    Mono<FacadeTenantBO> getByCode(String code);
 }

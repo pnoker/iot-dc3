@@ -14,8 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.netty;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
@@ -28,21 +32,15 @@ import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class NettyServerHandlerTest {
@@ -75,11 +73,25 @@ class NettyServerHandlerTest {
         DeviceBO device = new DeviceBO();
         device.setId(123L);
         when(deviceMetadata.getCache(123L)).thenReturn(device);
-        when(deviceMetadata.getPointConfig(123L)).thenReturn(Map.of(1L, Map.of(
-                "key", AttributeBO.builder().value("62").type(AttributeTypeEnum.STRING).build(),
-                "start", AttributeBO.builder().value("23").type(AttributeTypeEnum.INT).build(),
-                "end", AttributeBO.builder().value("28").type(AttributeTypeEnum.INT).build()
-        )));
+        when(deviceMetadata.getPointConfig(123L))
+                .thenReturn(Map.of(
+                        1L,
+                        Map.of(
+                                "key",
+                                        AttributeBO.builder()
+                                                .value("62")
+                                                .type(AttributeTypeEnum.STRING)
+                                                .build(),
+                                "start",
+                                        AttributeBO.builder()
+                                                .value("23")
+                                                .type(AttributeTypeEnum.INT)
+                                                .build(),
+                                "end",
+                                        AttributeBO.builder()
+                                                .value("28")
+                                                .type(AttributeTypeEnum.INT)
+                                                .build())));
         PointBO point = new PointBO();
         point.setId(1L);
         point.setPointName("coordinate");
@@ -106,10 +118,20 @@ class NettyServerHandlerTest {
         DeviceBO device = new DeviceBO();
         device.setId(123L);
         when(deviceMetadata.getCache(123L)).thenReturn(device);
-        when(deviceMetadata.getPointConfig(123L)).thenReturn(Map.of(1L, Map.of(
-                "key", AttributeBO.builder().value("62").type(AttributeTypeEnum.STRING).build(),
-                "start", AttributeBO.builder().value("23").type(AttributeTypeEnum.INT).build()
-        )));
+        when(deviceMetadata.getPointConfig(123L))
+                .thenReturn(Map.of(
+                        1L,
+                        Map.of(
+                                "key",
+                                        AttributeBO.builder()
+                                                .value("62")
+                                                .type(AttributeTypeEnum.STRING)
+                                                .build(),
+                                "start",
+                                        AttributeBO.builder()
+                                                .value("23")
+                                                .type(AttributeTypeEnum.INT)
+                                                .build())));
         PointBO point = new PointBO();
         point.setId(1L);
         point.setPointName("coordinate");

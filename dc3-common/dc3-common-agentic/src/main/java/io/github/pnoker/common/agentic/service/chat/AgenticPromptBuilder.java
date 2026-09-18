@@ -18,24 +18,22 @@ package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.config.ChatClientConfig;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
+import io.github.pnoker.common.constant.service.AgenticConstant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 /**
  * Builds Spring AI chat prompts from prepared request state.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Component
@@ -47,9 +45,11 @@ public class AgenticPromptBuilder {
 
     private final Advisor toolCallAdvisor;
 
-    public AgenticPromptBuilder(ChatClientFactory chatClientFactory,
-                                @Qualifier("agenticToolCallbackProvider") ToolCallbackProvider toolCallbackProvider,
-                                @Qualifier("agenticToolCallAdvisor") Advisor toolCallAdvisor) {
+    /** agentic prompt builder. */
+    public AgenticPromptBuilder(
+            ChatClientFactory chatClientFactory,
+            @Qualifier("agenticToolCallbackProvider") ToolCallbackProvider toolCallbackProvider,
+            @Qualifier("agenticToolCallAdvisor") Advisor toolCallAdvisor) {
         this.chatClientFactory = chatClientFactory;
         this.toolCallbackProvider = toolCallbackProvider;
         this.toolCallAdvisor = toolCallAdvisor;
@@ -63,33 +63,43 @@ public class AgenticPromptBuilder {
      * @return the assembled prompt spec
      */
     public ChatClient.ChatClientRequestSpec build(AgenticPreparedChatBO prepared) {
-        ChatClient chatClient = chatClientFactory.getOrCreate(prepared.model());
-        ChatClient.ChatClientRequestSpec promptSpec = chatClient.prompt()
-                .user(prepared.userMessage())
-                .toolContext(prepared.toolContext())
-                .advisors(advisor -> advisor.param(ChatMemory.CONVERSATION_ID, prepared.scopedConversationId()));
+        Long tenantId = tenantId(prepared);
+        ChatClient chatClient = chatClientFactory.getOrCreate(prepared.model(), tenantId);
+        ChatClient.ChatClientRequestSpec promptSpec =
+                chatClient.prompt().user(prepared.userMessage()).toolContext(prepared.toolContext());
 
         String systemPrompt = buildSystemPrompt(prepared);
         if (StringUtils.isNotBlank(systemPrompt)) {
             promptSpec = promptSpec.system(systemPrompt);
         }
         promptSpec = applyToolCallbacks(promptSpec, prepared);
-        promptSpec = applyRequestOptions(promptSpec, prepared.model(), prepared.temperature(), prepared.maxTokens());
+        promptSpec = applyRequestOptions(
+                promptSpec, prepared.model(), tenantId, prepared.temperature(), prepared.maxTokens());
         return promptSpec;
     }
 
-    private ChatClient.ChatClientRequestSpec applyToolCallbacks(ChatClient.ChatClientRequestSpec promptSpec,
-                                                                AgenticPreparedChatBO prepared) {
+    private ChatClient.ChatClientRequestSpec applyToolCallbacks(
+            ChatClient.ChatClientRequestSpec promptSpec, AgenticPreparedChatBO prepared) {
         if (!prepared.toolCallingEnabled()) {
             return promptSpec;
         }
         return promptSpec.tools(toolCallbackProvider).advisors(toolCallAdvisor);
     }
 
-    private ChatClient.ChatClientRequestSpec applyRequestOptions(ChatClient.ChatClientRequestSpec promptSpec,
-                                                                 String model, Double temperature, Integer maxTokens) {
-        ChatOptions.Builder<?> optionsBuilder = chatClientFactory.buildChatOptionsBuilder(model, temperature, maxTokens);
+    private ChatClient.ChatClientRequestSpec applyRequestOptions(
+            ChatClient.ChatClientRequestSpec promptSpec,
+            String model,
+            Long tenantId,
+            Double temperature,
+            Integer maxTokens) {
+        ChatOptions.Builder<?> optionsBuilder =
+                chatClientFactory.buildChatOptionsBuilder(model, tenantId, temperature, maxTokens);
         return Objects.nonNull(optionsBuilder) ? promptSpec.options(optionsBuilder) : promptSpec;
+    }
+
+    private Long tenantId(AgenticPreparedChatBO prepared) {
+        Object value = prepared.toolContext().get(AgenticConstant.ToolContextKey.TENANT_ID);
+        return value instanceof Number number ? number.longValue() : null;
     }
 
     /**
@@ -110,5 +120,4 @@ public class AgenticPromptBuilder {
         }
         return String.join("\n\n", sections);
     }
-
 }

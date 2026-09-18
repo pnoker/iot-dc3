@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.exception;
 
 import java.util.Objects;
@@ -24,13 +23,11 @@ import java.util.Objects;
  * by project exception call sites.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.9
  */
 final class ExceptionMessageFormatter {
 
-    private ExceptionMessageFormatter() {
-    }
+    private ExceptionMessageFormatter() {}
 
     static String format(String template, Object... params) {
         if (Objects.isNull(template) || Objects.isNull(params) || params.length == 0) {
@@ -64,5 +61,4 @@ final class ExceptionMessageFormatter {
     private static int formatParamLimit(Object... params) {
         return Objects.nonNull(cause(params)) ? params.length - 1 : params.length;
     }
-
 }

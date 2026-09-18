@@ -14,32 +14,30 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
-import io.github.pnoker.common.facade.entity.query.FacadeDeviceQuery;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
-import io.github.pnoker.common.manager.entity.query.DeviceQuery;
 import io.github.pnoker.common.utils.MapStructUtil;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 /**
  * Converts between the facade-api shapes and {@code dc3-common-manager} internals. Field
  * sets are aligned by design, so MapStruct auto-maps every property.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface FacadeDeviceBuilder {
 
-    @Mapping(target = "groupId", ignore = true)
-    @Mapping(target = "labelId", ignore = true)
-    DeviceQuery toManagerQuery(FacadeDeviceQuery facadeQuery);
-
+    /**
+     * To facade business object.
+     *
+     * @param managerBO business object
+     * @return to facade business object result
+     */
     FacadeDeviceBO toFacadeBO(DeviceBO managerBO);
-
 }

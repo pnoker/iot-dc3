@@ -1,0 +1,55 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+  {{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dc3-ingress
+  labels:
+    {{- include "dc3.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- if and .Values.ingress.tls .Values.ingress.tls.enabled }}
+tls:
+  - hosts:
+      - {{ .Values.ingress.host }}
+    secretName: {{ .Values.ingress.tls.secretName }}
+  {{- end }}
+rules:
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+        - path: /api/
+          pathType: Prefix
+          backend:
+            service:
+              name: dc3-gateway
+              port:
+                name: http
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: dc3-web
+              port:
+                name: http
+  {{- end }}

@@ -98,7 +98,6 @@ dc3:
         default-value: OCTET_STRING
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/snmp/buffer.db
 
 spring:

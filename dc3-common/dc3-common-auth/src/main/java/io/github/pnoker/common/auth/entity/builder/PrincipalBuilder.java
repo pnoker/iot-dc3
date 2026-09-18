@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.PrincipalBO;
 import io.github.pnoker.common.auth.entity.model.PrincipalDO;
 import io.github.pnoker.common.auth.entity.vo.PrincipalVO;
@@ -25,29 +23,46 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PrincipalSourceTypeEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
+import java.util.Objects;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-
 /**
  * MapStruct builder for principals.
  *
  * @author pnoker
- * @version 2026.6.12
  * @since 2026.6.12
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface PrincipalBuilder {
 
+    /**
+     * Convert vo to bo.
+     *
+     * @param entityVO view object
+     * @return converted value
+     */
     PrincipalBO buildBOByVO(PrincipalVO entityVO);
 
+    /**
+     * Convert bo to vo.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     PrincipalVO buildVOByBO(PrincipalBO entityBO);
 
+    /**
+     * Convert bo to do.
+     *
+     * @param entityBO business object
+     * @return converted value
+     */
     @Mapping(target = "principalType", ignore = true)
     @Mapping(target = "sourceType", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
@@ -55,6 +70,12 @@ public interface PrincipalBuilder {
     @Mapping(target = "deleted", ignore = true)
     PrincipalDO buildDOByBO(PrincipalBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(PrincipalBO entityBO, @MappingTarget PrincipalDO entityDO) {
         if (Objects.nonNull(entityBO.getPrincipalType())) {
@@ -71,12 +92,24 @@ public interface PrincipalBuilder {
         }
     }
 
+    /**
+     * Convert do to bo.
+     *
+     * @param entityDO persistence object
+     * @return converted value
+     */
     @Mapping(target = "principalType", ignore = true)
     @Mapping(target = "sourceType", ignore = true)
     @Mapping(target = "enableFlag", ignore = true)
     @Mapping(target = "lockedFlag", ignore = true)
     PrincipalBO buildBOByDO(PrincipalDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(PrincipalDO entityDO, @MappingTarget PrincipalBO entityBO) {
         entityBO.setPrincipalType(PrincipalTypeEnum.ofValue(entityDO.getPrincipalType()));
@@ -85,16 +118,19 @@ public interface PrincipalBuilder {
         entityBO.setLockedFlag(EnableFlagEnum.ofIndex(entityDO.getLockedFlag()));
     }
 
+    /**
+     * Convert do list to bo list.
+     *
+     * @param entityDOList entity persistence object list
+     * @return converted value
+     */
     List<PrincipalBO> buildBOListByDOList(List<PrincipalDO> entityDOList);
 
+    /**
+     * Convert bo list to vo list.
+     *
+     * @param entityBOList entity business object list
+     * @return converted value
+     */
     List<PrincipalVO> buildVOListByBOList(List<PrincipalBO> entityBOList);
-
-    default Page<PrincipalBO> buildBOPageByDOPage(Page<PrincipalDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    default Page<PrincipalVO> buildVOPageByBOPage(Page<PrincipalBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

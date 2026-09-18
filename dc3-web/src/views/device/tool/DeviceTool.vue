@@ -36,25 +36,39 @@
         />
       </el-form-item>
       <el-form-item v-if="embedded !== 'driver'" :label="$t('device.tool.driver')" prop="driverId">
-        <el-select
-          v-model="formData.driverId"
-          :loading="driverLoading"
-          :placeholder="$t('device.tool.driverPlaceholder')"
-          :remote-method="driverDictionary"
-          class="edit-form-special"
-          clearable
-          filterable
-          remote
-          reserve-keyword
-          @visible-change="driverDictionaryVisible"
-        >
-          <el-option
-            v-for="dictionary in driverDictionaries"
-            :key="dictionary.value"
-            :label="dictionary.label"
-            :value="dictionary.value"
-          />
-        </el-select>
+        <div class="tool-dictionary-field">
+          <el-select
+            v-model="formData.driverId"
+            :loading="driverLoading"
+            :placeholder="$t('device.tool.driverPlaceholder')"
+            :remote-method="driverDictionary"
+            class="edit-form-special"
+            clearable
+            filterable
+            remote
+            reserve-keyword
+            @visible-change="driverDictionaryVisible"
+          >
+            <el-option
+              v-for="dictionary in driverDictionaries"
+              :key="dictionary.value"
+              :label="dictionary.label"
+              :value="dictionary.value"
+            />
+          </el-select>
+          <el-alert
+            v-if="driverError"
+            :closable="false"
+            :title="$t('common.optionLoadFailed')"
+            class="tool-dictionary-error"
+            show-icon
+            type="error"
+          >
+            <el-button :loading="driverLoading" link type="danger" @click="driverDictionary('')">
+              {{ $t('common.retry') }}
+            </el-button>
+          </el-alert>
+        </div>
       </el-form-item>
       <el-form-item :label="$t('common.enableFlag')" prop="enableFlag">
         <enable-flag-segmented v-model="formData.enableFlag" include-all/>
@@ -72,7 +86,7 @@
 </template>
 
 <script lang="ts" setup>
-import {reactive, ref} from 'vue';
+import {onBeforeUnmount, reactive, ref} from 'vue';
 import {Plus, Upload} from '@element-plus/icons-vue';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
@@ -105,34 +119,69 @@ const emit = defineEmits([
 const formData = reactive<Record<string, any>>({enableFlag: ''});
 const driverDictionaries = ref<Dictionary[]>([]);
 const driverLoading = ref(false);
+const driverError = ref(false);
+let driverRequestId = 0;
 
 const onSearch = (data: Record<string, any>) => {
   emit('search', cleanSearchParams(data));
 };
 
 const onReset = () => {
+  driverRequestId += 1;
+  driverLoading.value = false;
+  driverError.value = false;
+  driverDictionaries.value = [];
   resetSearchForm(formData, {enableFlag: ''});
   emit('reset');
 };
 
 const driverDictionary = (query?: string) => {
+  const requestId = ++driverRequestId;
   driverLoading.value = true;
+  driverError.value = false;
   listDriverDictionary({
-    page: {size: 50, current: 1},
+    offset: 0, limit: 50,
     label: query || '',
   })
     .then((res) => {
-      driverDictionaries.value = res.data.records;
+      if (requestId !== driverRequestId) return;
+      driverDictionaries.value = res.items;
     })
     .catch(() => {
-      // nothing to do
+      if (requestId !== driverRequestId) return;
+      driverDictionaries.value = [];
+      driverError.value = true;
     })
     .finally(() => {
-      driverLoading.value = false;
+      if (requestId === driverRequestId) driverLoading.value = false;
     });
 };
 
 const driverDictionaryVisible = (visible: boolean) => {
   if (visible) driverDictionary('');
 };
+
+onBeforeUnmount(() => {
+  driverRequestId += 1;
+});
 </script>
+
+<style lang="scss" scoped>
+.tool-dictionary-field {
+  display: grid;
+  gap: var(--dc3-space-2);
+  width: 100%;
+  min-width: 0;
+}
+
+.tool-dictionary-error {
+  margin: 0;
+
+  :deep(.el-alert__content) {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--dc3-space-2);
+  }
+}
+</style>

@@ -16,67 +16,129 @@
   -->
 
 <template>
-  <div class="login-container">
-    <div class="login-wrapper-left animated bounce-in-down">
-      <div class="login-left">
-        <img class="img" src="/images/logo/logo-white.svg"/>
-      </div>
-    </div>
-    <Particles/>
-    <div class="login-wrapper-right animated bounce-in-down">
-      <div class="login-right">
-        <div class="login-main">
-          <h4 class="login-title">{{ t('login.title') }}</h4>
-          <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" class="login-form" status-icon>
-            <el-form-item prop="tenant">
-              <el-input
-                v-model="reactiveData.formData.tenant"
-                :placeholder="t('login.tenantPlaceholder')"
-                :prefix-icon="Box"
-                auto-complete="off"
-                @keyup.enter="handleLogin"
-              >
-              </el-input>
-            </el-form-item>
-            <el-form-item prop="name">
-              <el-input
-                v-model="reactiveData.formData.name"
-                :placeholder="t('login.usernamePlaceholder')"
-                :prefix-icon="User"
-                auto-complete="off"
-                @keyup.enter="handleLogin"
-              ></el-input>
-            </el-form-item>
-            <el-form-item prop="password">
-              <el-input
-                v-model="reactiveData.formData.password"
-                :placeholder="t('login.passwordPlaceholder')"
-                :prefix-icon="Lock"
-                :type="reactiveData.passwordType"
-                auto-complete="off"
-                @keyup.enter="handleLogin"
-              >
-                <template #append>
-                  <el-button :icon="reactiveData.isHide" @click="showPassword"/>
-                </template>
-              </el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button :loading="loading" class="login-submit" type="primary" @click.prevent="handleLogin">
-                {{ t('login.submit') }}
-              </el-button>
-            </el-form-item>
-          </el-form>
+  <main class="login-container">
+    <LoginAtmosphere/>
+    <div class="login-orb login-orb-primary" aria-hidden="true"/>
+    <div class="login-orb login-orb-accent" aria-hidden="true"/>
+
+    <section class="login-shell">
+      <app-preferences class="login-preferences" surface />
+
+      <div class="login-story">
+        <brand-lockup class="login-brand-pill" />
+
+        <div class="login-story-copy">
+          <span class="login-kicker">PHYSICAL AI RUNTIME</span>
+          <h1>{{ t('login.heroTitle') }}</h1>
+          <p>{{ t('login.heroDescription') }}</p>
+          <div class="login-capabilities" :aria-label="t('login.capabilities')">
+            <span>{{ t('login.capabilityConnect') }}</span>
+            <span>{{ t('login.capabilityGovern') }}</span>
+            <span>{{ t('login.capabilityAct') }}</span>
+          </div>
+        </div>
+
+        <div class="login-runtime-flow" aria-hidden="true">
+          <span>AI Agent</span>
+          <i>→</i>
+          <strong>IoT DC3</strong>
+          <i>→</i>
+          <span>{{ t('login.physicalWorld') }}</span>
         </div>
       </div>
-    </div>
 
-    <el-dialog v-model="changePasswordVisible" :title="t('login.changePasswordTitle')" width="420px">
+      <div class="login-card-wrap">
+        <div class="login-card">
+          <brand-lockup class="login-card-brand" />
+          <div class="login-main">
+            <span class="login-card-kicker">{{ t('login.console') }}</span>
+            <h2 class="login-title">{{ t('login.welcome') }}</h2>
+            <p class="login-subtitle">{{ t('login.subtitle') }}</p>
+            <el-form ref="formDataRef" :model="reactiveData.formData" :rules="formRule" class="login-form" status-icon>
+              <el-form-item prop="tenant">
+                <el-input
+                  v-model="reactiveData.formData.tenant"
+                  :disabled="loading"
+                  :placeholder="t('login.tenantPlaceholder')"
+                  :prefix-icon="Box"
+                  auto-complete="off"
+                  @keyup.enter="handleLogin"
+                />
+              </el-form-item>
+              <el-form-item prop="name">
+                <el-input
+                  v-model="reactiveData.formData.name"
+                  :disabled="loading"
+                  :placeholder="t('login.usernamePlaceholder')"
+                  :prefix-icon="User"
+                  auto-complete="off"
+                  @keyup.enter="handleLogin"
+                />
+              </el-form-item>
+              <el-form-item prop="password">
+                <el-input
+                  v-model="reactiveData.formData.password"
+                  :disabled="loading"
+                  :placeholder="t('login.passwordPlaceholder')"
+                  :prefix-icon="Lock"
+                  :type="reactiveData.passwordType"
+                  auto-complete="off"
+                  @keyup.enter="handleLogin"
+                >
+                  <template #append>
+                    <el-button
+                      :aria-label="t('login.togglePassword')"
+                      :disabled="loading"
+                      :icon="reactiveData.isHide"
+                      @click="showPassword"
+                    />
+                  </template>
+                </el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button :loading="loading" class="login-submit" type="primary" @click.prevent="handleLogin">
+                  {{ t('login.submit') }}
+                </el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="login-footer">
+      <span class="login-footer-main">
+        <a class="login-footer-brand" href="https://dc3.site" rel="noopener" target="_blank">IoT DC3</a>
+        <span aria-hidden="true">&nbsp;·&nbsp;</span>
+        <span class="login-footer-tagline">{{ t('login.tagline') }}</span>
+      </span>
+      <span class="login-footer-legal">{{ copyright }}</span>
+    </footer>
+
+    <el-dialog
+      v-model="changePasswordVisible"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      :title="t('login.changePasswordTitle')"
+      class="things-dialog"
+      destroy-on-close
+      width="420px"
+      @closed="resetChangePassword"
+    >
       <el-alert :closable="false" :title="changePasswordHint" class="mb-4" show-icon type="warning"/>
-      <el-form ref="changePasswordRef" :model="changePasswordData" :rules="changePasswordRule" label-width="0">
+      <el-form
+        ref="changePasswordRef"
+        v-loading="changePasswordLoading"
+        :aria-busy="changePasswordLoading"
+        :model="changePasswordData"
+        :rules="changePasswordRule"
+        label-width="0"
+      >
         <el-form-item prop="newPassword">
           <el-input
             v-model="changePasswordData.newPassword"
+            :disabled="changePasswordLoading"
             :placeholder="t('login.newPasswordPlaceholder')"
             show-password
             type="password"
@@ -85,6 +147,7 @@
         <el-form-item prop="confirmPassword">
           <el-input
             v-model="changePasswordData.confirmPassword"
+            :disabled="changePasswordLoading"
             :placeholder="t('login.confirmPasswordPlaceholder')"
             show-password
             type="password"
@@ -92,12 +155,15 @@
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button :loading="changePasswordLoading" type="primary" @click="handleChangePassword">
+        <el-button :disabled="changePasswordLoading" @click="changePasswordVisible = false">
+          {{ t('login.changePasswordBack') }}
+        </el-button>
+        <el-button :disabled="changePasswordLoading" :loading="changePasswordLoading" type="primary" @click="handleChangePassword">
           {{ t('login.changePasswordSubmit') }}
         </el-button>
       </template>
     </el-dialog>
-  </div>
+  </main>
 </template>
 
 <script lang="ts" setup>
@@ -108,9 +174,11 @@ import {useI18n} from 'vue-i18n';
 
 import {useAuthStore} from '@/store';
 import {PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
-import {failMessage, successMessage} from '@/utils/notificationUtil';
+import {successMessage} from '@/utils/notificationUtil';
 
-import Particles from '@/components/particles/Particles.vue';
+import AppPreferences from '@/components/layout/AppPreferences.vue';
+import BrandLockup from '@/components/brand/BrandLockup.vue';
+import LoginAtmosphere from '@/components/login-atmosphere/LoginAtmosphere.vue';
 
 interface LoginFormModel {
   tenant: string;
@@ -126,41 +194,43 @@ interface LoginViewState {
 
 const {t} = useI18n();
 const authStore = useAuthStore();
-// 定义表单引用
 const formDataRef = ref<FormInstance>();
 const loading = ref(false);
+// The range end tracks the current year at render time (2016–2026 today,
+// 2016–2027 next year), matching the family sites' footer contract.
+const copyright = computed(() => `AGPL-3.0 · © 2016–${new Date().getFullYear()}`);
 
-// 定义响应式数据
 const tenant = typeof authStore.getTenant === 'string' ? authStore.getTenant : 'default';
 const name = typeof authStore.getName === 'string' ? authStore.getName : 'dc3';
+// The mock build is a public, backend-free demo. Prefill its seeded password so
+// visitors can enter directly, while every real backend mode still starts empty.
+const password = import.meta.env.MODE === 'mock' ? 'dc3dc3dc3' : '';
 const reactiveData = reactive<LoginViewState>({
   isHide: 'View',
   passwordType: 'password',
   formData: {
     tenant,
     name,
-    password: '',
+    password,
   },
 });
 
-// 定义表单校验规则
-const formRule = reactive<FormRules>({
+const formRule = computed<FormRules>(() => ({
   tenant: [{required: true, message: t('login.tenantRequired'), trigger: 'blur'}],
   name: [{required: true, message: t('login.usernameRequired'), trigger: 'blur'}],
   password: [
     {required: true, message: t('login.passwordRequired'), trigger: 'blur'},
     {min: 6, message: t('login.passwordMin'), trigger: 'blur'},
   ],
-});
+}));
 
-// 显示, 隐藏密码
 const showPassword = () => {
   reactiveData.passwordType === '' ? (reactiveData.passwordType = 'password') : (reactiveData.passwordType = '');
   reactiveData.isHide === 'View' ? (reactiveData.isHide = 'Hide') : (reactiveData.isHide = 'View');
 };
 
-// 登录
 const handleLogin = async () => {
+  if (loading.value) return;
   const form = unref(formDataRef);
   if (!form) {
     return;
@@ -178,7 +248,7 @@ const handleLogin = async () => {
     await authStore.login(reactiveData.formData);
   } catch (error) {
     const code = (error as { code?: string })?.code;
-    if (code && PASSWORD_CHANGE_CODES.includes(code as never)) {
+    if (code && (PASSWORD_CHANGE_CODES as readonly string[]).includes(code)) {
       openChangePassword(code);
     }
     // other failures already surface failMessage inside authStore.login
@@ -198,7 +268,7 @@ const changePasswordHint = computed(() =>
   changePasswordCode.value === 'R4032' ? t('login.passwordExpired') : t('login.changePasswordRequired')
 );
 
-const changePasswordRule = reactive<FormRules>({
+const changePasswordRule = computed<FormRules>(() => ({
   newPassword: [
     {required: true, message: t('login.passwordRequired'), trigger: 'blur'},
     {min: 6, message: t('login.passwordMin'), trigger: 'blur'},
@@ -212,7 +282,7 @@ const changePasswordRule = reactive<FormRules>({
       trigger: 'blur',
     },
   ],
-});
+}));
 
 const openChangePassword = (code: string) => {
   changePasswordCode.value = code;
@@ -221,7 +291,15 @@ const openChangePassword = (code: string) => {
   changePasswordVisible.value = true;
 };
 
+const resetChangePassword = () => {
+  changePasswordLoading.value = false;
+  changePasswordData.newPassword = '';
+  changePasswordData.confirmPassword = '';
+  changePasswordRef.value?.clearValidate();
+};
+
 const handleChangePassword = async () => {
+  if (changePasswordLoading.value) return;
   const form = unref(changePasswordRef);
   if (!form) {
     return;
@@ -244,7 +322,8 @@ const handleChangePassword = async () => {
     reactiveData.formData.password = changePasswordData.newPassword;
     await handleLogin();
   } catch {
-    failMessage(t('login.changePasswordFailed'));
+    // Failure details are already reported by the axios response
+    // interceptor; a second toast here would duplicate it.
   } finally {
     changePasswordLoading.value = false;
   }

@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.tool;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import io.swagger.v3.core.util.AnnotationsUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
-import org.junit.jupiter.api.Test;
-
 import java.lang.reflect.Method;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 /**
  * Proves swagger-core's {@link AnnotationsUtils#getExtensions(Extension...)} correctly
@@ -40,13 +38,17 @@ class SpringdocExtensionEmissionTest {
      * Probe method: carries the annotation under test.
      * Accessed only via reflection — never called directly.
      */
-    @Operation(summary = "Probe", extensions = @Extension(name = "x-dc3-ai", properties = {
-            @ExtensionProperty(name = "riskLevel", value = "HIGH"),
-            @ExtensionProperty(name = "destructive", value = "true")
-    }))
+    @Operation(
+            summary = "Probe",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                                @ExtensionProperty(name = "destructive", value = "true")
+                            }))
     @SuppressWarnings("unused")
-    private void annotatedProbe() {
-    }
+    private void annotatedProbe() {}
 
     @Test
     void extensionAnnotationConvertsToXDc3AiMapWithRiskLevel() throws Exception {
@@ -58,7 +60,9 @@ class SpringdocExtensionEmissionTest {
         // AnnotationsUtils.getExtensions converts @Extension[] → Map<String, Object>.
         // This is the core annotation-processing call that springdoc uses internally.
         Map<String, Object> extensionsMap = AnnotationsUtils.getExtensions(operationAnnotation.extensions());
-        assertThat(extensionsMap).as("annotation must produce a non-null extensions map").isNotNull();
+        assertThat(extensionsMap)
+                .as("annotation must produce a non-null extensions map")
+                .isNotNull();
         assertThat(extensionsMap).containsKey("x-dc3-ai");
 
         // Verify the x-dc3-ai block carries the expected fields.

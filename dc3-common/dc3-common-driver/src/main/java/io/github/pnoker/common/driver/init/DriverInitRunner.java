@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.init;
 
 import io.github.pnoker.common.driver.buffer.BufferService;
@@ -22,6 +21,7 @@ import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverRegisterService;
 import io.github.pnoker.common.driver.service.DriverScheduleService;
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -29,8 +29,8 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
-
-import java.time.Duration;
+import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 /**
  * Application startup runner that completes the standard driver bootstrap sequence:
@@ -42,7 +42,6 @@ import java.time.Duration;
  * a transient outage cascades into a full driver CrashLoopBackOff.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -52,11 +51,17 @@ import java.time.Duration;
 @EnableConfigurationProperties({DriverProperties.class})
 public class DriverInitRunner implements ApplicationRunner {
 
-    /** Maximum number of driver registration attempts before giving up. */
+    /**
+     * Maximum number of driver registration attempts before giving up.
+     */
     private static final int REGISTER_MAX_ATTEMPTS = 30;
-    /** Initial backoff delay before the first registration retry. */
+    /**
+     * Initial backoff delay before the first registration retry.
+     */
     private static final Duration REGISTER_INITIAL_BACKOFF = Duration.ofSeconds(2);
-    /** Upper bound the doubling backoff delay is capped at. */
+    /**
+     * Upper bound the doubling backoff delay is capped at.
+     */
     private static final Duration REGISTER_MAX_BACKOFF = Duration.ofSeconds(30);
 
     private final DriverRegisterService driverRegisterService;
@@ -65,7 +70,9 @@ public class DriverInitRunner implements ApplicationRunner {
 
     private final DriverScheduleService driverScheduleService;
 
-    /** Local point-value buffer, initialized before registration so readings survive a manager outage. */
+    /**
+     * Local point-value buffer, initialized before registration so readings survive a manager outage.
+     */
     private final BufferService bufferService;
 
     /**
@@ -76,21 +83,14 @@ public class DriverInitRunner implements ApplicationRunner {
      * @throws Exception if registration ultimately fails or initialization errors out
      */
     @Override
-    public void run(ApplicationArguments args) throws Exception {
-        // Initialize the local point-value buffer before registration so collected
-        // readings can be persisted even if the manager center is unreachable.
-        bufferService.initialize();
-
-        // Initialize driver registration and synchronize basic information with the
-        // platform; tolerate manager center being temporarily unavailable.
-        registerWithRetry();
-
-        // Execute custom initialization functions specific to this driver module
-        driverCustomService.initial();
-
-        // Initialize driver tasks including status monitoring, reading operations and
-        // custom tasks
-        driverScheduleService.initialize();
+    public void run(ApplicationArguments args) {
+        Mono.fromRunnable(bufferService::initialize)
+                .then(registerWithRetry())
+                .then(Mono.fromRunnable(driverCustomService::initial))
+                .then(Mono.fromRunnable(driverScheduleService::initialize))
+                .doOnSuccess(ignored -> log.info("Driver runtime initialized"))
+                .doOnError(error -> log.error("Driver runtime initialization failed", error))
+                .subscribe();
     }
 
     /**
@@ -99,26 +99,20 @@ public class DriverInitRunner implements ApplicationRunner {
      *
      * @throws InterruptedException if the backoff sleep is interrupted
      */
-    private void registerWithRetry() throws InterruptedException {
-        long backoffMs = REGISTER_INITIAL_BACKOFF.toMillis();
-        for (int attempt = 1; attempt <= REGISTER_MAX_ATTEMPTS; attempt++) {
-            try {
-                driverRegisterService.initial();
-                if (attempt > 1) {
-                    log.info("Driver register succeeded on attempt {}", attempt);
-                }
-                return;
-            } catch (Exception e) {
-                if (attempt >= REGISTER_MAX_ATTEMPTS) {
-                    log.error("Driver register failed after {} attempts, giving up", attempt, e);
-                    throw e;
-                }
-                log.warn("Driver register failed on attempt {}/{}, retrying in {} ms: {}", attempt,
-                        REGISTER_MAX_ATTEMPTS, backoffMs, e.getMessage());
-                Thread.sleep(backoffMs);
-                backoffMs = Math.min(backoffMs * 2, REGISTER_MAX_BACKOFF.toMillis());
-            }
-        }
+    private Mono<Void> registerWithRetry() {
+        return driverRegisterService
+                .initial()
+                .retryWhen(Retry.backoff(REGISTER_MAX_ATTEMPTS - 1, REGISTER_INITIAL_BACKOFF)
+                        .maxBackoff(REGISTER_MAX_BACKOFF)
+                        .doBeforeRetry(signal -> log.warn(
+                                "Driver registration failed, attempt={}, maxAttempts={}, retryDelayMillis={}",
+                                signal.totalRetries() + 1,
+                                REGISTER_MAX_ATTEMPTS,
+                                Math.min(
+                                        REGISTER_INITIAL_BACKOFF.toMillis()
+                                                * (1L << Math.min(signal.totalRetries(), 30)),
+                                        REGISTER_MAX_BACKOFF.toMillis()),
+                                signal.failure()))
+                        .onRetryExhaustedThrow((spec, signal) -> signal.failure()));
     }
-
 }

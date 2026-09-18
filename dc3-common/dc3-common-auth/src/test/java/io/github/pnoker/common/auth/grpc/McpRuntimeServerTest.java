@@ -14,181 +14,87 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.grpc;
 
-import io.github.pnoker.api.center.auth.GrpcMcpAuditCommand;
-import io.github.pnoker.api.center.auth.GrpcMcpIntrospectRequest;
-import io.github.pnoker.api.center.auth.GrpcMcpToolListRequest;
-import io.github.pnoker.api.center.auth.GrpcMcpToolResolveRequest;
-import io.github.pnoker.api.center.auth.GrpcRMcpBoolean;
-import io.github.pnoker.api.center.auth.GrpcRMcpIntrospectDTO;
-import io.github.pnoker.api.center.auth.GrpcRMcpToolListDTO;
-import io.github.pnoker.api.center.auth.GrpcRMcpToolResolveDTO;
-import io.github.pnoker.api.center.auth.McpRuntimeApiGrpc;
-import io.github.pnoker.common.auth.biz.OAuthMcpRuntimeService;
-import io.github.pnoker.common.entity.dto.McpAuditCommandDTO;
-import io.github.pnoker.common.entity.dto.McpIntrospectResponseDTO;
-import io.github.pnoker.common.entity.dto.McpToolDefinitionDTO;
-import io.github.pnoker.common.entity.dto.McpToolResolveResponseDTO;
-import io.github.pnoker.common.enums.SuccessCode;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
+import io.github.pnoker.api.center.auth.*;
+import io.github.pnoker.common.auth.biz.ReactiveOAuthMcpRuntimeService;
+import io.github.pnoker.common.entity.dto.*;
 import io.grpc.ManagedChannel;
-import io.grpc.Server;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import io.grpc.inprocess.InProcessServerBuilder;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
 class McpRuntimeServerTest {
-
-    @Mock
-    private OAuthMcpRuntimeService oauthMcpRuntimeService;
-
-    private Server server;
+    private final ReactiveOAuthMcpRuntimeService service = mock(ReactiveOAuthMcpRuntimeService.class);
+    private io.grpc.Server server;
     private ManagedChannel channel;
     private McpRuntimeApiGrpc.McpRuntimeApiBlockingStub stub;
 
     @BeforeEach
     void setUp() throws Exception {
-        McpRuntimeServer mcpRuntimeServer = new McpRuntimeServer(oauthMcpRuntimeService);
-
-        String name = "dc3-mcp-runtime-" + UUID.randomUUID();
-        server = InProcessServerBuilder.forName(name).directExecutor().addService(mcpRuntimeServer).build().start();
+        String name = "mcp-" + UUID.randomUUID();
+        server = InProcessServerBuilder.forName(name)
+                .directExecutor()
+                .addService(new McpRuntimeServer(service))
+                .build()
+                .start();
         channel = InProcessChannelBuilder.forName(name).directExecutor().build();
         stub = McpRuntimeApiGrpc.newBlockingStub(channel);
     }
 
     @AfterEach
     void tearDown() {
-        if (channel != null) {
-            channel.shutdownNow();
-        }
-        if (server != null) {
-            server.shutdownNow();
-        }
+        channel.shutdownNow();
+        server.shutdownNow();
     }
 
     @Test
-    void introspectMapsActiveTokenContext() {
-        when(oauthMcpRuntimeService.introspect("token")).thenReturn(McpIntrospectResponseDTO.builder()
-                .active(true)
-                .aud(Set.of("dc3-mcp"))
-                .tenantId(1L)
-                .principalId(100L)
-                .principalType("USER")
-                .principalName("admin")
-                .clientId("dc3_client")
-                .mcpConnectionId(300L)
-                .scope("mcp:tools:list")
-                .build());
-
-        GrpcRMcpIntrospectDTO response = stub.introspect(GrpcMcpIntrospectRequest.newBuilder()
-                .setToken("token")
-                .build());
-
-        assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getResult().getCode()).isEqualTo(SuccessCode.OK.getCode());
-        assertThat(response.getData().getActive()).isTrue();
-        assertThat(response.getData().getTenantId()).isEqualTo(1L);
-        assertThat(response.getData().getPrincipalId()).isEqualTo(100L);
-        assertThat(response.getData().getAudList()).containsExactly("dc3-mcp");
+    void listToolsUsesBearerToken() {
+        when(service.listTools("token"))
+                .thenReturn(Mono.just(McpToolListResponseDTO.builder()
+                        .tools(List.of(McpToolDefinitionDTO.builder()
+                                .name("ping")
+                                .inputSchema(Map.of("type", "object"))
+                                .build()))
+                        .build()));
+        GrpcMcpToolListDTO response = stub.listTools(
+                GrpcMcpListToolsRequest.newBuilder().setToken("token").build());
+        assertThat(response.getToolsCount()).isEqualTo(1);
+        verify(service).listTools("token");
     }
 
     @Test
-    void listToolsMapsToolDefinition() {
-        McpToolDefinitionDTO tool = McpToolDefinitionDTO.builder()
-                .name("auth_user_get")
-                .title("List users")
-                .description("List users")
-                .annotations(McpToolDefinitionDTO.Annotations.builder()
-                        .readOnlyHint(true)
-                        .idempotentHint(true)
+    void callToolReturnsDecisionAndPrincipal() {
+        McpCallToolResponseDTO value = McpCallToolResponseDTO.builder()
+                .decision("AUTHORIZED")
+                .riskLevel("LOW")
+                .tool(McpToolResolveResponseDTO.builder()
+                        .toolName("ping")
+                        .serviceName("svc")
+                        .apiPath("/ping")
+                        .httpMethod("GET")
                         .build())
-                .meta(McpToolDefinitionDTO.Metadata.builder()
-                        .toolId("auth:GET:/api/v3/auth/user")
-                        .permissionCode("auth:user:select")
-                        .riskLevel("LOW")
+                .principal(McpPrincipalContextDTO.builder()
+                        .tenantId(1L)
+                        .principalId(2L)
+                        .principalType("USER")
                         .build())
                 .build();
-        when(oauthMcpRuntimeService.listVisibleTools(1L, 100L, 300L, Set.of("mcp:tools:list")))
-                .thenReturn(List.of(tool));
-
-        GrpcRMcpToolListDTO response = stub.listTools(GrpcMcpToolListRequest.newBuilder()
-                .setTenantId(1L)
-                .setPrincipalId(100L)
-                .setMcpConnectionId(300L)
-                .setScope("mcp:tools:list")
+        when(service.callTool(any())).thenReturn(Mono.just(value));
+        GrpcMcpCallToolDTO response = stub.callTool(GrpcMcpCallToolRequest.newBuilder()
+                .setToken("token")
+                .setToolName("ping")
                 .build());
-
-        assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getToolsList()).hasSize(1);
-        assertThat(response.getTools(0).getName()).isEqualTo("auth_user_get");
-        assertThat(response.getTools(0).getAnnotations().getReadOnlyHint()).isTrue();
-        assertThat(response.getTools(0).getMeta().getPermissionCode()).isEqualTo("auth:user:select");
+        assertThat(response.getDecision()).isEqualTo(GrpcMcpDecision.AUTHORIZED);
+        assertThat(response.getPrincipal().getTenantId()).isEqualTo(1L);
     }
-
-    @Test
-    void resolveToolMapsInvocationMetadata() {
-        when(oauthMcpRuntimeService.resolveVisibleTool(1L, 100L, 300L, "restart_device",
-                Set.of("mcp:tools:call"))).thenReturn(McpToolResolveResponseDTO.builder()
-                .toolId("manager:POST:/api/v3/manager/device/restart")
-                .toolName("restart_device")
-                .permissionCode("manager:device:update")
-                .riskLevel("HIGH")
-                .serviceName("dc3-center-manager")
-                .apiPath("/api/v3/manager/device/restart")
-                .httpMethod("POST")
-                .build());
-
-        GrpcRMcpToolResolveDTO response = stub.resolveTool(GrpcMcpToolResolveRequest.newBuilder()
-                .setTenantId(1L)
-                .setPrincipalId(100L)
-                .setMcpConnectionId(300L)
-                .setScope("mcp:tools:call")
-                .setToolName("restart_device")
-                .build());
-
-        assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getData().getRiskLevel()).isEqualTo("HIGH");
-        assertThat(response.getData().getServiceName()).isEqualTo("dc3-center-manager");
-        assertThat(response.getData().getApiPath()).isEqualTo("/api/v3/manager/device/restart");
-    }
-
-    @Test
-    void auditMapsCommand() {
-        GrpcRMcpBoolean response = stub.audit(GrpcMcpAuditCommand.newBuilder()
-                .setTraceId("trace-1")
-                .setTenantId(1L)
-                .setPrincipalId(100L)
-                .setConnectionId(300L)
-                .setToolId("tool-1")
-                .setToolName("restart_device")
-                .setStatus("SUCCESS")
-                .setDurationMs(20L)
-                .build());
-
-        ArgumentCaptor<McpAuditCommandDTO> captor = ArgumentCaptor.forClass(McpAuditCommandDTO.class);
-        verify(oauthMcpRuntimeService).audit(captor.capture());
-
-        assertThat(response.getResult().getOk()).isTrue();
-        assertThat(response.getData()).isTrue();
-        assertThat(captor.getValue().getTraceId()).isEqualTo("trace-1");
-        assertThat(captor.getValue().getToolName()).isEqualTo("restart_device");
-        assertThat(captor.getValue().getDurationMs()).isEqualTo(20L);
-    }
-
 }

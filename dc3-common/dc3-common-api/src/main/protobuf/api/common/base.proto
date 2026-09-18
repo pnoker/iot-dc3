@@ -39,7 +39,7 @@ message GrpcBase {
   // Creator name
   string creator_name = 4;
 
-  // Creation time
+  // Creation time, epoch milliseconds
   int64 create_time = 5;
 
   // Operator ID
@@ -48,6 +48,6 @@ message GrpcBase {
   // Operator name
   string operator_name = 7;
 
-  // Operation time
+  // Operation time, epoch milliseconds
   int64 operate_time = 8;
 }

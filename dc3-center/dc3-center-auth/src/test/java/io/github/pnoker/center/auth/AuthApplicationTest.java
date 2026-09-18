@@ -14,19 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.center.auth;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class AuthApplicationTest {
 
     @Test
     void applicationIsSpringBootEntryPoint() {
-        assertThat(AuthApplication.class.isAnnotationPresent(SpringBootApplication.class)).isTrue();
+        assertThat(AuthApplication.class.isAnnotationPresent(SpringBootApplication.class))
+                .isTrue();
     }
-
 }

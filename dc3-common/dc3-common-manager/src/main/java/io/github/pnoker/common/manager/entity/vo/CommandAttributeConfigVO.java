@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.manager.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -35,7 +34,6 @@ import lombok.ToString;
  * View object for command attribute configuration API responses.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -50,23 +48,36 @@ public class CommandAttributeConfigVO extends BaseVO {
     /**
      * ID
      */
-    @Schema(description = "ID of the command attribute whose value is being configured.", example = "1024", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Command attribute ID can't be empty", groups = {Add.class, Update.class})
-    private Long attributeId;
+    @Schema(
+            description = "ID of the command attribute whose value is being configured.",
+            example = "1024",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Command attribute ID can't be empty",
+            groups = {Add.class, Update.class})
+    private String attributeId;
 
     /**
      *
      */
-    @Schema(description = "The configured value overriding the attribute default for this specific device.", example = "0x03", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(
+            description = "The configured value overriding the attribute default for this specific device.",
+            example = "0x03",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull(message = "Command attribute config value can't be empty")
     private String configValue;
 
     /**
      * Device ID
      */
-    @Schema(description = "ID of the device this configuration applies to.", example = "2048", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Device ID can't be empty", groups = {Add.class, Update.class})
-    private Long deviceId;
+    @Schema(
+            description = "ID of the device this configuration applies to.",
+            example = "2048",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Device ID can't be empty",
+            groups = {Add.class, Update.class})
+    private String deviceId;
 
     /**
      *
@@ -77,9 +88,15 @@ public class CommandAttributeConfigVO extends BaseVO {
     /**
      * Command ID
      */
-    @Schema(description = "Identifier of the command this configuration is scoped to; must belong to the current tenant.", example = "4096", requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "Command ID can't be empty", groups = {Add.class, Update.class})
-    private Long commandId;
+    @Schema(
+            description =
+                    "Identifier of the command this configuration is scoped to; must belong to the current tenant.",
+            example = "4096",
+            requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotNull(
+            message = "Command ID can't be empty",
+            groups = {Add.class, Update.class})
+    private String commandId;
 
     /**
      * Enable flag
@@ -98,5 +115,4 @@ public class CommandAttributeConfigVO extends BaseVO {
      */
     @Schema(description = "Optimistic-lock version number for concurrent update control.", example = "1")
     private Integer version;
-
 }

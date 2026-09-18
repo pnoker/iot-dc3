@@ -14,21 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.security;
 
 import io.github.pnoker.common.facade.api.PermissionFacade;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
-import java.util.Set;
 
 /**
  * {@link PermissionProvider} backed by the active facade implementation.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @RequiredArgsConstructor
@@ -50,8 +46,6 @@ public class FacadePermissionProvider implements PermissionProvider {
         if (tenantId == null || principalId == null) {
             return Mono.just(Set.of());
         }
-        return Mono.fromCallable(() -> permissionFacade.listPermissionCodes(tenantId, principalId))
-                .subscribeOn(Schedulers.boundedElastic());
+        return permissionFacade.listPermissionCodes(tenantId, principalId);
     }
-
 }

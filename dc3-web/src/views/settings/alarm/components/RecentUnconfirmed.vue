@@ -18,10 +18,13 @@
 <template>
   <dashboard-card
     :badge="rows.length || null"
-    :empty="!loading && rows.length === 0"
+    :empty="status === 'success' && rows.length === 0"
     :empty-image-size="60"
     :empty-text="$t('settings.event.overview.noUnconfirmed')"
+    :error="status === 'error'"
+    :error-text="$t('common.loadFailed')"
     :loading="loading"
+    :retry-text="$t('common.retry')"
     :title="$t('settings.event.overview.unconfirmedTitle')"
     body-mode="scroll"
     class="recent-unconfirmed"
@@ -51,42 +54,33 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref} from 'vue';
+import {onMounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 
 import {alertPage} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
-import type {AlertSource} from '@/config/types/dashboard';
+import type {AlertEventRow, AlertSource} from '@/config/types/dashboard';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
-interface Row {
-  id: number | string;
-  source: AlertSource;
-  sourceId: number | string;
-  createTime: string;
-  message?: string;
-}
-
-const {t} = useI18n();
-const loading = ref(false);
-const rows = ref<Row[]>([]);
+const {t, locale} = useI18n();
+const {loading, run, status} = useAsyncLoader();
+const rows = ref<AlertEventRow[]>([]);
 const {resolveBySource, nameBySource} = useEntityNames();
 
 const load = async () => {
-  loading.value = true;
-  try {
-    const res: { data?: { records?: Row[] } } = await alertPage({confirmFlag: 0, current: 1, size: 5});
-    const data: Row[] = res?.data?.records ?? [];
-    rows.value = data;
-    await resolveBySource(data);
-  } catch {
-    // handled globally
-  } finally {
-    loading.value = false;
-  }
+  await run(
+    async () => {
+      const result: any = await alertPage({confirmFlag: 0, offset: 0, limit: 5});
+      const data: AlertEventRow[] = Array.isArray(result) ? result : result?.items ?? [];
+      await resolveBySource(data);
+      return data;
+    },
+    {apply: (data) => (rows.value = data)}
+  );
 };
 
-const nameFor = (r: Row) => nameBySource(r.source, r.sourceId);
+const nameFor = (r: AlertEventRow) => nameBySource(r.source, r.sourceId);
 
 const sourceTagType = (s: AlertSource) => (s === 'device' ? 'primary' : s === 'driver' ? 'warning' : 'success');
 const sourceColor = (s: AlertSource) => (s === 'device' ? '#409eff' : s === 'driver' ? '#e6a23c' : '#67c23a');
@@ -100,7 +94,7 @@ const formatTime = (v?: string) => {
   if (!v) return '';
   const d = new Date(v.replace(' ', 'T'));
   if (Number.isNaN(d.getTime())) return v;
-  return d.toLocaleString('zh-CN', {
+  return d.toLocaleString(locale.value === 'zh' ? 'zh-CN' : 'en-US', {
     month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
@@ -110,6 +104,7 @@ const formatTime = (v?: string) => {
 };
 
 onMounted(load);
+watch(locale, load);
 defineExpose({refresh: load});
 </script>
 

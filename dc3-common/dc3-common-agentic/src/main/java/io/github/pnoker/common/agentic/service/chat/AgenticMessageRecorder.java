@@ -18,38 +18,58 @@ package io.github.pnoker.common.agentic.service.chat;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
-import io.github.pnoker.common.agentic.service.MessageService;
+import io.github.pnoker.common.agentic.repository.ReactiveMessageStore;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
+import reactor.core.publisher.Mono;
 
 /**
  * Persists user and assistant messages for the agentic chat pipeline.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Component
 @RequiredArgsConstructor
 public class AgenticMessageRecorder {
 
-    private final MessageService messageService;
+    private final ReactiveMessageStore messageStore;
 
-    public void persistUserMessage(AgenticPreparedChatBO prepared, RequestHeader.PrincipalHeader userHeader) {
-        messageService.save(prepared.scopedConversationId(), "user", buildUserContent(prepared), prepared.model(),
-                userHeader);
+    /**
+     * Persist user message.
+     *
+     * @param prepared   prepared
+     * @param userHeader user header
+     */
+    public Mono<Void> persistUserMessage(AgenticPreparedChatBO prepared, RequestHeader.PrincipalHeader userHeader) {
+        return messageStore
+                .save(
+                        prepared.conversationId(),
+                        "user",
+                        buildUserContent(prepared),
+                        prepared.model(),
+                        AgenticMessageStatusEnum.COMPLETED,
+                        userHeader)
+                .then();
     }
 
-    public void persistAssistantMessage(AgenticPreparedChatBO prepared, String content,
-                                        RequestHeader.PrincipalHeader userHeader) {
-        persistAssistantMessage(prepared, content, null, userHeader);
+    /**
+     * Persist assistant message.
+     *
+     * @param prepared   prepared
+     * @param content    content
+     * @param userHeader user header
+     */
+    public Mono<Void> persistAssistantMessage(
+            AgenticPreparedChatBO prepared, String content, RequestHeader.PrincipalHeader userHeader) {
+        return persistAssistantMessage(prepared, content, null, AgenticMessageStatusEnum.COMPLETED, userHeader);
     }
 
     /**
@@ -62,15 +82,36 @@ public class AgenticMessageRecorder {
      * @param reasoningContent the reasoning trace, may be null
      * @param userHeader       authenticated caller principal and tenant
      */
-    public void persistAssistantMessage(AgenticPreparedChatBO prepared, String content, String reasoningContent,
-                                        RequestHeader.PrincipalHeader userHeader) {
-        AgenticMessageContent messageContent = buildAssistantContent(prepared, StringUtils.defaultString(content),
-                StringUtils.trimToNull(reasoningContent));
-        if (!hasPersistableAssistantContent(messageContent)) {
-            return;
+    public Mono<Void> persistAssistantMessage(
+            AgenticPreparedChatBO prepared,
+            String content,
+            String reasoningContent,
+            RequestHeader.PrincipalHeader userHeader) {
+        return persistAssistantMessage(
+                prepared, content, reasoningContent, AgenticMessageStatusEnum.COMPLETED, userHeader);
+    }
+
+    /** Persist the assistant reply and run bookkeeping for the exchange. */
+    public Mono<Void> persistAssistantMessage(
+            AgenticPreparedChatBO prepared,
+            String content,
+            String reasoningContent,
+            AgenticMessageStatusEnum status,
+            RequestHeader.PrincipalHeader userHeader) {
+        AgenticMessageContent messageContent = buildAssistantContent(
+                prepared, StringUtils.defaultString(content), StringUtils.trimToNull(reasoningContent));
+        if (status == AgenticMessageStatusEnum.COMPLETED && !hasPersistableAssistantContent(messageContent)) {
+            return Mono.empty();
         }
-        messageService.save(prepared.scopedConversationId(), AgenticConstant.Chat.ROLE_ASSISTANT, messageContent,
-                prepared.model(), userHeader);
+        return messageStore
+                .save(
+                        prepared.conversationId(),
+                        AgenticConstant.Chat.ROLE_ASSISTANT,
+                        messageContent,
+                        prepared.model(),
+                        status,
+                        userHeader)
+                .then();
     }
 
     private AgenticMessageContent buildUserContent(AgenticPreparedChatBO prepared) {
@@ -81,8 +122,8 @@ public class AgenticMessageRecorder {
         return content;
     }
 
-    private AgenticMessageContent buildAssistantContent(AgenticPreparedChatBO prepared, String text,
-                                                        String reasoningContent) {
+    private AgenticMessageContent buildAssistantContent(
+            AgenticPreparedChatBO prepared, String text, String reasoningContent) {
         List<AgenticRunEvent> runEvents = drainRunEvents(prepared);
         List<String> tools = runEvents.stream()
                 .filter(event -> AgenticConstant.RunEvent.TYPE_TOOL.equals(event.type()))
@@ -117,8 +158,8 @@ public class AgenticMessageRecorder {
         return values != null && !values.isEmpty();
     }
 
-    private List<AgenticMessageContent.Trace> buildTraceEvents(AgenticPreparedChatBO prepared,
-                                                               List<AgenticRunEvent> runEvents) {
+    private List<AgenticMessageContent.Trace> buildTraceEvents(
+            AgenticPreparedChatBO prepared, List<AgenticRunEvent> runEvents) {
         List<AgenticMessageContent.Trace> traces = new ArrayList<>();
         if (prepared.reasoning()) {
             traces.add(traceOf(AgenticRunEvent.reasoningRequested()));
@@ -130,8 +171,15 @@ public class AgenticMessageRecorder {
     }
 
     private AgenticMessageContent.Trace traceOf(AgenticRunEvent event) {
-        return AgenticMessageContent.Trace.of(event.type(), event.title(), event.detail(), event.name(),
-                event.timestamp() / 1000, event.phase(), event.status(), event.code());
+        return AgenticMessageContent.Trace.of(
+                event.type(),
+                event.title(),
+                event.detail(),
+                event.name(),
+                event.timestamp() / 1000,
+                event.phase(),
+                event.status(),
+                event.code());
     }
 
     private List<AgenticRunEvent> drainRunEvents(AgenticPreparedChatBO prepared) {
@@ -149,5 +197,4 @@ public class AgenticMessageRecorder {
         tokens.setMemory(inputTokens.getMemory());
         return tokens;
     }
-
 }

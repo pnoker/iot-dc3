@@ -20,9 +20,14 @@
     <div class="things-card-header-icon">
       <img :alt="name" :src="icon"/>
     </div>
-    <div class="things-card-header-name nowrap-name" @click.stop="$emit('copy-id')">
+    <button
+      :aria-label="`${name}: ${copyLabel}`"
+      class="things-card-header-name nowrap-name"
+      type="button"
+      @click.stop="$emit('copy-id')"
+    >
       {{ name }}
-    </div>
+    </button>
     <div :title="statusTitle" class="things-card-header-status">
       <slot/>
     </div>
@@ -35,6 +40,7 @@ defineProps({
   icon: {type: String, required: true},
   enabled: {type: Boolean, default: false},
   statusTitle: {type: String, default: ''},
+  copyLabel: {type: String, required: true},
 });
 
 defineEmits(['copy-id']);
@@ -60,6 +66,10 @@ defineEmits(['copy-id']);
   }
 
   .things-card-header-name {
+    appearance: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
     height: 48px;
     line-height: 48px;
     font-size: 14px;
@@ -70,10 +80,19 @@ defineEmits(['copy-id']);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    width: 200px;
+    width: 100%;
+    max-width: 200px;
+    text-align: left;
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       color: var(--el-color-primary);
+    }
+
+    &:focus-visible {
+      border-radius: var(--dc3-radius-sm);
+      outline: none;
+      box-shadow: var(--dc3-focus-ring);
     }
   }
 

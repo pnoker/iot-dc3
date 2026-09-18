@@ -14,8 +14,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.e2e;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
@@ -27,20 +29,16 @@ import io.github.pnoker.common.entity.dto.EventReportDTO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.e2e.harness.BaseE2eIT;
 import io.github.pnoker.e2e.harness.E2eStack;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 /**
  * Verifies the RabbitMQ event report contract: the event exchange routes
@@ -85,11 +83,9 @@ class EventReportE2eIT extends BaseE2eIT {
 
     @Test
     void eventExchangeRoutesMessageToBoundQueue() throws Exception {
-        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_EVENT,
-                BuiltinExchangeType.TOPIC, true, false, null);
+        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_EVENT, BuiltinExchangeType.TOPIC, true, false, null);
         channel.queueDeclare(queue, true, false, false, null);
-        channel.queueBind(queue, RabbitConstant.TOPIC_EXCHANGE_EVENT,
-                RabbitConstant.ROUTING_EVENT_PREFIX + service);
+        channel.queueBind(queue, RabbitConstant.TOPIC_EXCHANGE_EVENT, RabbitConstant.ROUTING_EVENT_PREFIX + service);
 
         EventReportDTO dto = EventReportDTO.builder()
                 .recordId(UUID.randomUUID().toString())
@@ -105,8 +101,8 @@ class EventReportE2eIT extends BaseE2eIT {
                 .build();
 
         byte[] body = JsonUtil.toJsonString(dto).getBytes(StandardCharsets.UTF_8);
-        channel.basicPublish(RabbitConstant.TOPIC_EXCHANGE_EVENT,
-                RabbitConstant.ROUTING_EVENT_PREFIX + service, null, body);
+        channel.basicPublish(
+                RabbitConstant.TOPIC_EXCHANGE_EVENT, RabbitConstant.ROUTING_EVENT_PREFIX + service, null, body);
         assertThat(channel.waitForConfirms(2_000L)).isTrue();
 
         await().atMost(Duration.ofSeconds(3))
@@ -126,11 +122,9 @@ class EventReportE2eIT extends BaseE2eIT {
 
     @Test
     void eventReportWithParamValuesRoundTrips() throws Exception {
-        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_EVENT,
-                BuiltinExchangeType.TOPIC, true, false, null);
+        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_EVENT, BuiltinExchangeType.TOPIC, true, false, null);
         channel.queueDeclare(queue, true, false, false, null);
-        channel.queueBind(queue, RabbitConstant.TOPIC_EXCHANGE_EVENT,
-                RabbitConstant.ROUTING_EVENT_PREFIX + service);
+        channel.queueBind(queue, RabbitConstant.TOPIC_EXCHANGE_EVENT, RabbitConstant.ROUTING_EVENT_PREFIX + service);
 
         Map<String, String> params = new HashMap<>();
         params.put("temperature", "42.5");
@@ -150,8 +144,8 @@ class EventReportE2eIT extends BaseE2eIT {
                 .build();
 
         byte[] body = JsonUtil.toJsonString(dto).getBytes(StandardCharsets.UTF_8);
-        channel.basicPublish(RabbitConstant.TOPIC_EXCHANGE_EVENT,
-                RabbitConstant.ROUTING_EVENT_PREFIX + service, null, body);
+        channel.basicPublish(
+                RabbitConstant.TOPIC_EXCHANGE_EVENT, RabbitConstant.ROUTING_EVENT_PREFIX + service, null, body);
         assertThat(channel.waitForConfirms(2_000L)).isTrue();
 
         await().atMost(Duration.ofSeconds(3))
@@ -159,16 +153,15 @@ class EventReportE2eIT extends BaseE2eIT {
                 .untilAsserted(() -> assertThat(channel.messageCount(queue)).isEqualTo(1));
 
         GetResponse response = channel.basicGet(queue, true);
-        EventReportDTO received = JsonUtil.parseObject(
-                new String(response.getBody(), StandardCharsets.UTF_8), EventReportDTO.class);
+        EventReportDTO received =
+                JsonUtil.parseObject(new String(response.getBody(), StandardCharsets.UTF_8), EventReportDTO.class);
         assertThat(received.paramValues()).containsEntry("temperature", "42.5");
         assertThat(received.paramValues()).containsEntry("humidity", "88");
     }
 
     @Test
     void eventRoutingKeyWildcardMatchesMultipleServices() throws Exception {
-        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_EVENT,
-                BuiltinExchangeType.TOPIC, true, false, null);
+        channel.exchangeDeclare(RabbitConstant.TOPIC_EXCHANGE_EVENT, BuiltinExchangeType.TOPIC, true, false, null);
 
         String serviceA = "svc-a-" + UUID.randomUUID().toString().substring(0, 6);
         String serviceB = "svc-b-" + UUID.randomUUID().toString().substring(0, 6);
@@ -177,10 +170,8 @@ class EventReportE2eIT extends BaseE2eIT {
 
         channel.queueDeclare(queueA, true, false, false, null);
         channel.queueDeclare(queueB, true, false, false, null);
-        channel.queueBind(queueA, RabbitConstant.TOPIC_EXCHANGE_EVENT,
-                RabbitConstant.ROUTING_EVENT_PREFIX + serviceA);
-        channel.queueBind(queueB, RabbitConstant.TOPIC_EXCHANGE_EVENT,
-                RabbitConstant.ROUTING_EVENT_PREFIX + serviceB);
+        channel.queueBind(queueA, RabbitConstant.TOPIC_EXCHANGE_EVENT, RabbitConstant.ROUTING_EVENT_PREFIX + serviceA);
+        channel.queueBind(queueB, RabbitConstant.TOPIC_EXCHANGE_EVENT, RabbitConstant.ROUTING_EVENT_PREFIX + serviceB);
 
         EventReportDTO dto = EventReportDTO.builder()
                 .recordId(UUID.randomUUID().toString())
@@ -196,8 +187,8 @@ class EventReportE2eIT extends BaseE2eIT {
         byte[] body = JsonUtil.toJsonString(dto).getBytes(StandardCharsets.UTF_8);
 
         // Only service A receives
-        channel.basicPublish(RabbitConstant.TOPIC_EXCHANGE_EVENT,
-                RabbitConstant.ROUTING_EVENT_PREFIX + serviceA, null, body);
+        channel.basicPublish(
+                RabbitConstant.TOPIC_EXCHANGE_EVENT, RabbitConstant.ROUTING_EVENT_PREFIX + serviceA, null, body);
         assertThat(channel.waitForConfirms(2_000L)).isTrue();
 
         await().atMost(Duration.ofSeconds(3))

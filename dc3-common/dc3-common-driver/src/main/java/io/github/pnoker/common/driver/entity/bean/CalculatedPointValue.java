@@ -14,22 +14,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.bean;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Immutable result of converting a raw device value into its final text value and
  * optional numeric projection.
  *
  * @author pnoker
- * @version 2026.5.15
  * @since 2016.10.1
  */
 @Getter
@@ -50,5 +47,4 @@ public class CalculatedPointValue implements Serializable {
      * {@code null}; booleans are represented as 1.0/0.0.
      */
     private final Double numericValue;
-
 }

@@ -15,10 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {addRole, deleteRole, listRole, listRoleTree, updateRole} from '@/api/role';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 import {authNameRules, remarkRules} from '@/utils/formRuleUtil';
 
 interface RoleHandlers {
@@ -31,7 +29,7 @@ const normalizeRolePayload = (p: Record<string, unknown>) => {
   return next;
 };
 
-export const createRoleConfig = (t: ComposerTranslation, handlers: RoleHandlers): EntityListConfig => ({
+export const createRoleConfig = (t: Translator, handlers: RoleHandlers): EntityListConfig => ({
   name: 'role',
   title: t('nav.settingsRole'),
   editable: true,
@@ -64,7 +62,7 @@ export const createRoleConfig = (t: ComposerTranslation, handlers: RoleHandlers)
       kind: 'treeSelect',
       rules: [{required: true, message: t('settings.role.parentRoleIdPlaceholder'), trigger: 'change'}],
       tree: {
-        load: () => listRoleTree().then((res: any) => (res.data as any[]) || []),
+        load: () => listRoleTree().then((res: any) => (res as any[]) || []),
         transform: (rows: any[]) => [{id: 0, roleName: t('settings.role.rootRole'), children: rows}],
         props: {label: 'roleName', children: 'children'},
         nodeKey: 'id',
@@ -107,6 +105,6 @@ export const createRoleConfig = (t: ComposerTranslation, handlers: RoleHandlers)
       onClick: handlers.onAssignResources,
     },
   ],
-  confirmDeleteText: t('settings.role.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityRole')}),
   emptyText: t('settings.role.empty'),
 });

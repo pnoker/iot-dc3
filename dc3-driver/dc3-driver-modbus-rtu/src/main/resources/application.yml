@@ -101,7 +101,6 @@ dc3:
         remark: Value template rendered with command params
 
     buffer:
-      enable: true
       db-path: dc3/data/driver/modbus-rtu/buffer.db
 
 spring:

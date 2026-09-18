@@ -17,28 +17,76 @@
 
 @use '@/styles/things-dialog.scss';
 @use '@/styles/things-card.scss';
+@use '@/styles/theme.scss';
+@use '@/styles/tokens.scss' as *;
 
-// 真正的全局样式,在 main.ts 里一次性 import。
-// 不能放到 element-variables.scss 里,因为后者是 Vite additionalData,
-// 会被预置到每个 scoped <style> 块,所有选择器都会被附加 scope hash,
-// 对 body、teleport(dropdown/popover/dialog 外层)等 scope-less 元素全部失效。
+// Imported once by main.ts. These rules cannot live in element-variables.scss because
+// Vite injects additionalData into every scoped style block and appends scope hashes,
+// which do not match body or teleported dropdown, popover, and dialog containers.
 
-// 品牌主色：把 Element Plus 默认蓝（#409eff）统一为品牌蓝 #1296db。
-// 完整引入预编译 CSS，故用 CSS 变量覆盖；light-N / dark-2 取自 Element Plus 官方混色算法结果。
-:root {
-  --el-color-primary: #1296db;
-  --el-color-primary-light-3: #59b6e6;
-  --el-color-primary-light-5: #89cbed;
-  --el-color-primary-light-7: #b8e0f4;
-  --el-color-primary-light-8: #d0eaf8;
-  --el-color-primary-light-9: #e7f5fb;
-  --el-color-primary-dark-2: #0e78af;
-}
-
+// Brand colors and dc3 design tokens live in theme.scss (single source).
+// The 1280px/768px desktop hard floor was removed: the shell must adapt to
+// any viewport width (docs/design/frontend-three-terminal-ux.md, A2).
 body {
   margin: 0;
-  min-width: 1280px;
-  min-height: 768px;
+  background: var(--dc3-bg-body);
+  color: var(--dc3-text-primary);
+}
+
+// The authenticated workspace shares one visual grammar: atmospheric canvas,
+// translucent functional surfaces, soft separators, and an explicit focus
+// state. This scopes Element Plus refinements to page content, leaving Login
+// and teleported overlays free to use their own presentation.
+.body-main,
+.settings-main {
+  .el-card {
+    border-color: var(--dc3-border-base);
+    border-radius: var(--dc3-radius-xl);
+    background: var(--dc3-bg-elevated);
+    box-shadow: var(--dc3-shadow-sm);
+    transition:
+      border-color var(--dc3-duration-base) var(--dc3-ease-standard),
+      box-shadow var(--dc3-duration-base) var(--dc3-ease-standard),
+      transform var(--dc3-duration-base) var(--dc3-ease-standard);
+  }
+
+  .el-card.is-hover-shadow:hover {
+    border-color: var(--dc3-border-strong);
+    box-shadow: var(--dc3-shadow-hover);
+  }
+
+  .el-card__header {
+    border-bottom-color: var(--dc3-border-base);
+  }
+
+  .el-input__wrapper,
+  .el-select__wrapper,
+  .el-textarea__inner,
+  .el-segmented {
+    border-radius: var(--dc3-radius-md);
+    box-shadow: inset 0 0 0 1px var(--dc3-border-base);
+    transition:
+      box-shadow var(--dc3-duration-fast) var(--dc3-ease-standard),
+      background-color var(--dc3-duration-fast) var(--dc3-ease-standard);
+  }
+
+  .el-input__wrapper.is-focus,
+  .el-select__wrapper.is-focused,
+  .el-textarea__inner:focus {
+    box-shadow: inset 0 0 0 1px var(--el-color-primary), var(--dc3-focus-ring);
+  }
+
+  .el-button:not(.is-circle) {
+    border-radius: var(--dc3-radius-md);
+  }
+
+  .el-table {
+    --el-table-border-color: var(--dc3-border-base);
+    --el-table-header-bg-color: var(--dc3-bg-muted);
+    --el-table-row-hover-bg-color: var(--dc3-bg-interactive);
+    border-radius: var(--dc3-radius-lg);
+    overflow: hidden;
+  }
 }
 
 // Form width helper classes are real CSS, so they live in the one-time global
@@ -67,8 +115,58 @@ body {
 }
 
 .settings-table {
-  margin-top: 1px;
-  border-radius: 4px;
+  margin-top: var(--dc3-space-2);
+  border-radius: var(--dc3-radius-lg);
+}
+
+.entity-page-error {
+  margin-bottom: var(--dc3-space-3);
+}
+
+// Element Plus treats any default-slot content as a long-form description:
+// it enlarges the icon/title and stacks the slot below the message. Our
+// load-error alerts use that slot only for a Retry link, so the default
+// presentation wastes vertical space and separates the action from its
+// message. Detect that exact structure and restore a compact action-row
+// contract; the link action keeps the shared control density on every
+// terminal (A3 v7 note).
+.el-alert:has(> .el-alert__content > .el-alert__description > .el-button.is-link:only-child) {
+  box-sizing: border-box;
+  min-height: var(--dc3-space-10);
+  padding-block: 2px;
+  border-radius: var(--dc3-radius-md);
+
+  > .el-alert__icon.is-big {
+    width: var(--dc3-space-5);
+    font-size: var(--dc3-space-5);
+    line-height: var(--dc3-space-5);
+  }
+
+  > .el-alert__content {
+    display: flex;
+    align-items: center;
+    flex: 1 1 auto;
+    flex-flow: row nowrap;
+    gap: var(--dc3-space-2);
+    min-width: 0;
+    padding: 0;
+  }
+
+  > .el-alert__content > .el-alert__title.with-description {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 14px;
+    line-height: var(--dc3-space-5);
+    overflow-wrap: anywhere;
+  }
+
+  > .el-alert__content > .el-alert__description {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    margin: 0;
+    line-height: 1;
+  }
 }
 
 .json-preview {
@@ -85,19 +183,15 @@ body {
   word-break: break-word;
 }
 
-// el-popconfirm 的 popper 也通过 teleport 挂到 body,作用域外样式必须放在全局。
-// Element Plus 默认 popconfirm 只按文字宽度撑开,文字 + 两个按钮常常挤在一行,
-// 视觉上又窄又紧。这里统一:
-//   1. 给 __main 设置最小宽度,保证标题有充足呼吸空间
-//   2. 标题与操作区之间留出垂直间距
-//   3. 操作区按钮之间补 gap,避免贴在一起
-//   4. 主危险按钮加粗,强调不可逆操作
+// Popconfirm is teleported to body, so its unscoped layout belongs here. Keep enough
+// width and vertical space for the title and actions, separate adjacent buttons, and
+// emphasize the irreversible primary danger action.
 .el-popover.el-popper.el-popconfirm {
-  --el-popover-padding: 14px 16px;
+  --el-popover-padding: var(--dc3-space-3) var(--dc3-space-4);
 
   .el-popconfirm__main {
     min-width: 240px;
-    padding: 2px 0 10px;
+    padding: 2px 0 var(--dc3-space-2);
     line-height: 1.5;
     align-items: flex-start;
 
@@ -111,13 +205,49 @@ body {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
+
+    .el-button {
+      min-width: 64px;
+      margin: 0;
+    }
+  }
+}
+
+// Element Plus keeps tab headers on one unbreakable row. On touch terminals
+// that row must own its horizontal scroll rather than being clipped by the
+// fixed workspace viewport; this preserves every tab without creating page-
+// level overflow and gives the active tab a predictable swipe target.
+@media (max-width: $breakpoint-sm-max) {
+  .body-main,
+  .settings-main {
+    .el-tabs {
+      min-width: 0;
+    }
+
+    .el-tabs__nav-wrap {
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .el-tabs__nav-wrap::-webkit-scrollbar {
+      display: none;
+    }
+
+    .el-tabs__nav {
+      min-width: max-content;
+    }
+
+    .el-tabs__item {
+      padding-inline: var(--dc3-space-3);
+    }
   }
 }
 
 .el-dropdown-menu {
-  // 让 emoji 国旗占一个和 el-icon 同尺寸的方格,与同级走 :icon 属性的
-  // 设置 / 关于 / 退出项在同一条基线上。em 单位跟随 dropdown-item 字号,
-  // 在高 DPI 下也保持稳定。
+  // Give emoji flags the same em-sized box as el-icon so language, settings,
+  // about, and sign-out items share a baseline at every display density.
   .lang-flag {
     display: inline-flex;
     align-items: center;
@@ -137,5 +267,66 @@ body {
   .lang-check {
     margin-left: auto;
     color: var(--el-color-primary);
+  }
+}
+
+// The account dropdown teleports to body, so its unscoped theme lives here.
+// It mirrors the workspace glass language — elevated translucent surface,
+// soft dc3 border and shadow — so light and dark themes both follow the
+// --dc3 tokens instead of Element defaults. Three class levels so the
+// surface wins the cascade against Element's later-injected .is-light.
+.el-popper.el-dropdown__popper.user-dropdown-popper {
+  overflow: hidden;
+  border: 1px solid var(--dc3-border-base);
+  border-radius: var(--dc3-radius-lg);
+  background: var(--dc3-bg-elevated);
+  box-shadow: var(--dc3-shadow-md);
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  backdrop-filter: blur(18px) saturate(1.32);
+  -webkit-backdrop-filter: blur(18px) saturate(1.32);
+
+  // The glass surface carries its own rounded edge; the default popper
+  // arrow would poke outside it.
+  .el-popper__arrow {
+    display: none;
+  }
+
+  .el-dropdown-menu {
+    min-width: 150px;
+    padding: var(--dc3-space-1);
+    background: transparent;
+  }
+
+  // Identity header: who is signed in, split from the actions by a rule.
+  .user_dropdown_identity {
+    padding: var(--dc3-space-2) var(--dc3-space-3) var(--dc3-space-3);
+    margin-bottom: var(--dc3-space-1);
+    border-bottom: 1px solid var(--dc3-border-base);
+
+    .user_dropdown_name {
+      display: block;
+      overflow: hidden;
+      color: var(--dc3-text-primary);
+      font-size: 13px;
+      font-weight: 650;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .el-dropdown-menu__item {
+    border-radius: 8px;
+    color: var(--dc3-text-regular);
+
+    &:not(.is-disabled):hover,
+    &:not(.is-disabled):focus {
+      background: var(--dc3-bg-interactive);
+      color: var(--dc3-text-brand);
+    }
+  }
+
+  // Element renders `divided` as a standalone separator <li>.
+  .el-dropdown-menu__item--divided {
+    border-top-color: var(--dc3-border-base);
   }
 }

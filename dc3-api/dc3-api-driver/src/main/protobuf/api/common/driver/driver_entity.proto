@@ -49,4 +49,27 @@ message GrpcDriverRegisterDTO {
 
   // List of event configuration parameters supported by the driver
   repeated GrpcEventAttributeDTO event_attributes = 7;
+
+  // Stable identity of this runtime process. Driver definitions are shared;
+  // runtime nodes are independently leased.
+  string node = 8;
+
+  // Requested instance lease duration in seconds.
+  int32 lease_seconds = 9;
+}
+
+message GrpcDeviceLeaseDTO {
+  int64 device_id = 1;
+  int64 fencing_token = 2;
+}
+
+message GrpcDriverLeaseRequest {
+  int64 tenant_id = 1;
+  int64 driver_id = 2;
+  string node = 3;
+  string client = 4;
+  string host = 5;
+  int32 lease_seconds = 6;
+  // Assignment version currently installed in this driver process.
+  int64 assignment_version = 7;
 }

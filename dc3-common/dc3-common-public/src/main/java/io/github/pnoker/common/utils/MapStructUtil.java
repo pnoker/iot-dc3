@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
@@ -26,7 +25,6 @@ import org.mapstruct.Condition;
  * MapStruct condition methods for null-safe mapping.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
@@ -36,11 +34,23 @@ public class MapStructUtil {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
     }
 
+    /**
+     * Allow MapStruct to map only non-empty strings.
+     *
+     * @param value candidate source value
+     * @return {@code true} when the string contains at least one character
+     */
     @Condition
     public static boolean isNotEmpty(String value) {
         return StringUtils.isNotEmpty(value);
     }
 
+    /**
+     * Allow MapStruct to map finite numbers while accepting all non-floating number types.
+     *
+     * @param value candidate source value
+     * @return {@code false} for {@code null}, NaN, or infinite floating-point values
+     */
     @Condition
     public static boolean isValidNumber(Number value) {
         return switch (value) {
@@ -50,5 +60,4 @@ public class MapStructUtil {
             default -> true;
         };
     }
-
 }

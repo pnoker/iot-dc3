@@ -21,17 +21,15 @@ import {describe, expect, it, vi} from 'vitest';
 import {mountListPage} from './_helpers';
 
 const pointMocks = vi.hoisted(() => ({
-  addPoint: vi.fn(() => Promise.resolve({data: true})),
-  deletePoint: vi.fn(() => Promise.resolve({data: true})),
-  listPoint: vi.fn(() =>
-    Promise.resolve({data: {records: [{id: 'pt-1', pointName: 'Temp', profileId: 'pf-1'}], total: 1}})
-  ),
-  updatePoint: vi.fn(() => Promise.resolve({data: true})),
+  addPoint: vi.fn(() => Promise.resolve(true)),
+  deletePoint: vi.fn(() => Promise.resolve(true)),
+  listPoint: vi.fn(() => Promise.resolve({items: [{id: 'pt-1', pointName: 'Temp', profileId: 'pf-1'}], total: 1})),
+  updatePoint: vi.fn(() => Promise.resolve(true)),
 }));
 
 vi.mock('@/api/point', () => pointMocks);
 vi.mock('@/api/profile', () => ({
-  listProfileByIds: vi.fn(() => Promise.resolve({data: {'pf-1': {profileName: 'Sensor'}}})),
+  listProfileByIds: vi.fn(() => Promise.resolve({'pf-1': {profileName: 'Sensor'}})),
 }));
 vi.mock('@/utils/notificationUtil', () => ({failMessage: vi.fn(), successMessage: vi.fn()}));
 

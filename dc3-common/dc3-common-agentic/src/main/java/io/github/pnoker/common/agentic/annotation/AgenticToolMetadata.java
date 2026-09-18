@@ -25,15 +25,15 @@ import java.lang.annotation.Target;
  * Runtime trace metadata for an agentic platform tool.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AgenticToolMetadata {
 
+    /** Tool domain grouping, e.g. point or device. */
     String domain();
 
+    /** Human-readable tool title. */
     String title();
-
 }

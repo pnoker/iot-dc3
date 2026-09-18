@@ -19,15 +19,13 @@ package io.github.pnoker.common.agentic.service;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
 import io.github.pnoker.common.agentic.entity.vo.ModelVO;
 import io.github.pnoker.common.entity.common.RequestHeader;
-
 import java.util.List;
-
+import reactor.core.publisher.Mono;
 
 /**
  * Service for managing LLM model configuration options.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface ModelConfigService {
@@ -36,15 +34,17 @@ public interface ModelConfigService {
      * List enabled model options for the picker, including a fallback default entry.
      *
      * @return the enabled model options
+     * @param header authenticated caller principal and tenant
      */
-    List<ModelVO> listOptions();
+    Mono<List<ModelVO>> listOptions(RequestHeader.PrincipalHeader header);
 
     /**
      * List all model configurations with their provider names.
      *
      * @return all model configurations
+     * @param header authenticated caller principal and tenant
      */
-    List<ModelConfigBO> listConfigs();
+    Mono<List<ModelConfigBO>> listConfigs(RequestHeader.PrincipalHeader header);
 
     /**
      * Add a model configuration, maintaining the single-default invariant.
@@ -53,7 +53,7 @@ public interface ModelConfigService {
      * @param header   authenticated caller principal and tenant
      * @return the added model configuration
      */
-    ModelConfigBO add(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header);
+    Mono<ModelConfigBO> add(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header);
 
     /**
      * Update a model configuration.
@@ -62,13 +62,13 @@ public interface ModelConfigService {
      * @param header   authenticated caller principal and tenant
      * @return the updated model configuration
      */
-    ModelConfigBO update(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header);
+    Mono<ModelConfigBO> update(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header);
 
     /**
      * Delete a model configuration by id.
      *
      * @param id the model configuration id
+     * @param header authenticated caller principal and tenant
      */
-    void delete(Long id);
-
+    Mono<Void> delete(Long id, RequestHeader.PrincipalHeader header);
 }

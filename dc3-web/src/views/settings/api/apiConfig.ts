@@ -15,12 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {listApi} from '@/api/api';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
-export const createApiConfig = (t: ComposerTranslation): EntityListConfig => ({
+export const createApiConfig = (t: Translator): EntityListConfig => ({
   name: 'api',
   title: t('nav.settingsApi'),
   editable: false,

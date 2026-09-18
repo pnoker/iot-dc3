@@ -17,8 +17,9 @@
 
 import {defineConfig, devices} from '@playwright/test';
 
-const baseURL = process.env.E2E_BASE_URL || 'http://localhost:8080';
+const baseURL = process.env.E2E_BASE_URL || 'http://127.0.0.1:4174';
 const startServer = process.env.E2E_START_SERVER !== '0';
+const serverCommand = process.env.E2E_SERVER_MODE === 'mock' ? 'pnpm run serve:e2e:mock' : 'pnpm run serve:e2e';
 const workers = Number(process.env.E2E_WORKERS || 1);
 
 export default defineConfig({
@@ -47,16 +48,48 @@ export default defineConfig({
   },
   webServer: startServer
     ? {
-      command: 'pnpm run serve:e2e',
+      command: serverCommand,
       url: baseURL,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: false,
       timeout: 120_000,
     }
     : undefined,
   projects: [
+    // Canonical desktop suite (existing).
     {
       name: 'chromium',
       use: {...devices['Desktop Chrome']},
+    },
+    // Three-terminal gate (docs/design/frontend-three-terminal-ux.md,
+    // A2/A3): the same specs must hold on desktop, tablet, and mobile.
+    // Gate specs live in tests/e2e/specs/responsive.spec.ts; the
+    // overflow + shell assertions run under all three viewports.
+    {
+      name: 'chromium-desktop',
+      use: {...devices['Desktop Chrome'], viewport: {width: 1440, height: 900}},
+    },
+    {
+      name: 'chromium-tablet',
+      // Explicitly chromium: the iPad device preset would switch to
+      // webkit. Touch semantics (hasTouch) still apply to match a real
+      // tablet primary pointer.
+      use: {
+        browserName: 'chromium',
+        viewport: {width: 834, height: 1112},
+        deviceScaleFactor: 2,
+        hasTouch: true,
+        isMobile: false,
+      },
+    },
+    {
+      name: 'chromium-mobile',
+      use: {
+        browserName: 'chromium',
+        viewport: {width: 393, height: 851},
+        deviceScaleFactor: 2.75,
+        hasTouch: true,
+        isMobile: true,
+      },
     },
   ],
   outputDir: 'test-results/e2e-artifacts',

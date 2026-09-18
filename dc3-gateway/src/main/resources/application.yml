@@ -33,6 +33,9 @@ spring:
       - org.springframework.boot.security.autoconfigure.ReactiveUserDetailsServiceAutoConfiguration
       - org.springframework.boot.security.autoconfigure.web.reactive.ReactiveWebSecurityAutoConfiguration
       - org.springframework.boot.security.autoconfigure.actuate.web.reactive.ReactiveManagementWebSecurityAutoConfiguration
+      # ReactiveLoadBalancer is intentionally absent; loading this autoconfiguration
+      # only produces a TypeNotPresent introspection warning at boot.
+      - org.springframework.cloud.gateway.config.GatewayNoLoadBalancerClientAutoConfiguration
   # Active profile configuration, defaults to 'dev' if NODE_ENV is not set
   profiles:
     active:
@@ -40,7 +43,12 @@ spring:
 
 dc3:
   facade:
-    mode: ${DC3_FACADE_MODE:grpc}
+    auth:
+      mode: grpc
+    manager:
+      mode: grpc
+    data:
+      mode: grpc
 
 # Aggregated Swagger UI. The gateway has no controllers of its own; it federates
 # the per-center API docs into a single UI with a service selector. Each entry's
@@ -48,7 +56,11 @@ dc3:
 # application-gateway.yml (which proxy to each center's /{svc}/v3/api-docs).
 # Disabled in production via the shared application-web.yml "pro" block.
 springdoc:
+  api-docs:
+    # Explicit true: unset properties trigger SpringDoc's boot reminder.
+    enabled: true
   swagger-ui:
+    enabled: true
     urls:
       - name: Auth Center
         url: /v3/api-docs/auth

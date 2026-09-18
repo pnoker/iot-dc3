@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package api.common;
+
+option java_package = "io.github.pnoker.api.common";
+option java_outer_classname = "ProblemProto";
+option java_multiple_files = true;
+
+message ProblemDetails {
+  string type = 1;
+  string title = 2;
+  int32 status = 3;
+  string code = 4;
+  string detail = 5;
+  string instance = 6;
+  string trace_id = 7;
+  repeated FieldError errors = 8;
+}
+
+message FieldError {
+  string field = 1;
+  repeated string messages = 2;
+}

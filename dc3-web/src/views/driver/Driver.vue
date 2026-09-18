@@ -28,6 +28,32 @@
     >
     </driver-tool>
 
+    <el-alert
+      v-if="reactiveData.status === 'error'"
+      :closable="false"
+      :title="$t('common.loadFailed')"
+      class="entity-page-error"
+      show-icon
+      type="error"
+    >
+      <el-button :loading="reactiveData.loading" link type="danger" @click="refresh">
+        {{ $t('common.retry') }}
+      </el-button>
+    </el-alert>
+
+    <el-alert
+      v-if="statusError"
+      :closable="false"
+      :title="$t('common.optionLoadFailed')"
+      class="entity-page-error"
+      show-icon
+      type="error"
+    >
+      <el-button :loading="statusLoading" link type="danger" @click="retryStatusLookup">
+        {{ $t('common.retry') }}
+      </el-button>
+    </el-alert>
+
     <blank-card>
       <el-row>
         <template v-if="reactiveData.loading">
@@ -36,11 +62,14 @@
           </el-col>
         </template>
         <template v-else>
-          <el-col v-if="reactiveData.listData.length < 1">
+          <el-col v-if="reactiveData.status === 'success' && reactiveData.listData.length < 1">
             <el-empty :description="$t('driver.empty')"/>
           </el-col>
+          <el-col v-else-if="reactiveData.status === 'error' && reactiveData.listData.length < 1">
+            <el-empty :description="$t('common.loadFailed')"/>
+          </el-col>
           <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-            <driver-card :data="data" :status-table="statusTable"/>
+            <driver-card :busy="isActionBusy(data)" :data="data" :status-table="statusTable" @delete="onDelete"/>
           </el-col>
         </template>
       </el-row>
@@ -49,12 +78,13 @@
 </template>
 
 <script lang="ts" setup>
-import {reactive, watch} from 'vue';
+import {onBeforeUnmount, reactive, ref, watch} from 'vue';
 
-import {listDriver, listDriverStatus} from '@/api/driver';
+import {deleteDriver, listDriver, listDriverStatus} from '@/api/driver';
 import {usePagedList} from '@/composables/usePagedList';
 
 import type {DriverRecord} from '@/config/types/manager';
+import {successMessage} from '@/utils/notificationUtil';
 
 import BlankCard from '@/components/card/blank/BlankCard.vue';
 import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
@@ -75,6 +105,12 @@ const {
 });
 
 const statusTable = reactive<Record<string, string>>({});
+let statusSequence = 0;
+let statusRequestId = 0;
+let disposed = false;
+const statusLoading = ref(false);
+const statusError = ref<unknown | null>(null);
+const actionBusy = reactive(new Set<string>());
 
 const search = (params: Record<string, unknown>) => {
   _search({type: 'driver', ...params});
@@ -86,22 +122,64 @@ const reset = () => {
 
 const refresh = () => load();
 
-const loadStatus = () => {
-  listDriverStatus({page: reactiveData.page, ...(reactiveData.query as Record<string, unknown>)})
+const isActionBusy = (driver: DriverRecord) => actionBusy.has(String(driver.id));
+
+const onDelete = async (driver: DriverRecord) => {
+  const id = String(driver.id);
+  if (actionBusy.has(id)) return;
+  actionBusy.add(id);
+  try {
+    await deleteDriver(driver.id, driver.version);
+    if (disposed) return;
+    successMessage();
+    await load();
+  } catch {
+    // handled globally
+  } finally {
+    actionBusy.delete(id);
+  }
+};
+
+const loadStatus = (sequence = statusSequence) => {
+  const requestId = ++statusRequestId;
+  statusLoading.value = true;
+  statusError.value = null;
+  const page = {...reactiveData.page, orders: [...reactiveData.page.orders]};
+  const query = {...(reactiveData.query as Record<string, unknown>)};
+  return listDriverStatus({page, ...query})
     .then((res) => {
-      Object.assign(statusTable, res.data as Record<string, string>);
+      if (sequence !== statusSequence || requestId !== statusRequestId) return;
+      Object.assign(statusTable, (res || {}) as Record<string, string>);
     })
-    .catch(() => {
-      // handled globally
+    .catch((error) => {
+      if (sequence !== statusSequence || requestId !== statusRequestId) return;
+      statusError.value = error;
+    })
+    .finally(() => {
+      if (sequence === statusSequence && requestId === statusRequestId) statusLoading.value = false;
     });
+};
+
+const retryStatusLookup = () => {
+  void loadStatus();
 };
 
 watch(
   () => reactiveData.listData,
   () => {
-    loadStatus();
+    const sequence = ++statusSequence;
+    for (const key of Object.keys(statusTable)) delete statusTable[key];
+    statusError.value = null;
+    void loadStatus(sequence);
   }
 );
+
+onBeforeUnmount(() => {
+  disposed = true;
+  statusSequence += 1;
+  statusRequestId += 1;
+  actionBusy.clear();
+});
 
 load();
 </script>

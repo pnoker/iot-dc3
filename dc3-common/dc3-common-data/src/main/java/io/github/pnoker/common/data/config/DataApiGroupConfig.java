@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.config;
 
 import org.springdoc.core.models.GroupedOpenApi;
@@ -31,12 +30,16 @@ import org.springframework.context.annotation.Configuration;
  * selectable groups.
  *
  * @author pnoker
- * @version 2026.6.0
  * @since 2016.10.1
  */
 @Configuration
 public class DataApiGroupConfig {
 
+    /**
+     * Create and configure the application-managed data api group.
+     *
+     * @return data api group result
+     */
     @Bean
     public GroupedOpenApi dataApiGroup() {
         return GroupedOpenApi.builder()

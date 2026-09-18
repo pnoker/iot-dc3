@@ -44,19 +44,10 @@ describe('useEntityNames', () => {
     // Reset the module so the in-module reactive cache is empty at the
     // start of each test — otherwise the cache leaks between tests.
     vi.resetModules();
-
-    apiMocks.listDeviceByIds.mockResolvedValue({
-      data: {'d-1': {deviceName: 'Boiler'}, 'd-2': {deviceName: 'Compressor'}},
-    });
-    apiMocks.listDriverByIds.mockResolvedValue({
-      data: {'drv-1': {driverName: 'Modbus'}},
-    });
-    apiMocks.listProfileByIds.mockResolvedValue({
-      data: {'p-1': {profileName: 'TempSensor'}},
-    });
-    apiMocks.listPointByIds.mockResolvedValue({
-      data: {'pt-1': {pointName: 'Inlet temperature'}},
-    });
+    apiMocks.listDeviceByIds.mockResolvedValue({'d-1': {deviceName: 'Boiler'}, 'd-2': {deviceName: 'Compressor'}});
+    apiMocks.listDriverByIds.mockResolvedValue({'drv-1': {driverName: 'Modbus'}});
+    apiMocks.listProfileByIds.mockResolvedValue({'p-1': {profileName: 'TempSensor'}});
+    apiMocks.listPointByIds.mockResolvedValue({'pt-1': {pointName: 'Inlet temperature'}});
   });
 
   it('falls back to the id when the cache is cold and resolves names after fetching', async () => {
@@ -85,7 +76,7 @@ describe('useEntityNames', () => {
   });
 
   it('coerces numeric ids to strings before lookup', async () => {
-    apiMocks.listDeviceByIds.mockResolvedValueOnce({data: {'42': {deviceName: 'Mixer'}}});
+    apiMocks.listDeviceByIds.mockResolvedValueOnce({'42': {deviceName: 'Mixer'}});
 
     const hook = await loadHook();
     await hook.resolveDevices([42]);
@@ -106,7 +97,7 @@ describe('useEntityNames', () => {
   });
 
   it('caches the id itself when the backend returns no name (deleted entity)', async () => {
-    apiMocks.listDriverByIds.mockResolvedValueOnce({data: {}});
+    apiMocks.listDriverByIds.mockResolvedValueOnce({});
 
     const hook = await loadHook();
     await hook.resolveDrivers(['drv-missing']);
@@ -144,11 +135,45 @@ describe('useEntityNames', () => {
     const first = hook.resolveDevices(['d-1']);
     const second = hook.resolveDevices(['d-1']);
 
-    resolveFetch({data: {'d-1': {deviceName: 'Boiler'}}});
+    resolveFetch({'d-1': {deviceName: 'Boiler'}});
     await Promise.all([first, second]);
 
     expect(apiMocks.listDeviceByIds).toHaveBeenCalledTimes(1);
     expect(hook.deviceName('d-1')).toBe('Boiler');
+  });
+
+  it('waits for the matching batch when disjoint requests overlap', async () => {
+    let resolveFirst!: (value: unknown) => void;
+    let resolveSecond!: (value: unknown) => void;
+    apiMocks.listDeviceByIds.mockImplementation((ids: string[]) => {
+      if (ids[0] === 'd-1') {
+        return new Promise((resolve) => {
+          resolveFirst = resolve;
+        });
+      }
+      return new Promise((resolve) => {
+        resolveSecond = resolve;
+      });
+    });
+
+    const hook = await loadHook();
+    const first = hook.resolveDevices(['d-1']);
+    const second = hook.resolveDevices(['d-2']);
+    let thirdSettled = false;
+    const third = hook.resolveDevices(['d-2']).then(() => {
+      thirdSettled = true;
+    });
+
+    await Promise.resolve();
+    expect(apiMocks.listDeviceByIds).toHaveBeenCalledTimes(2);
+    expect(thirdSettled).toBe(false);
+
+    resolveFirst({'d-1': {deviceName: 'Boiler'}});
+    resolveSecond({'d-2': {deviceName: 'Compressor'}});
+    await Promise.all([first, second, third]);
+
+    expect(thirdSettled).toBe(true);
+    expect(hook.deviceName('d-2')).toBe('Compressor');
   });
 
   it('resolveBySource splits device/driver ids into a single batched fetch each', async () => {

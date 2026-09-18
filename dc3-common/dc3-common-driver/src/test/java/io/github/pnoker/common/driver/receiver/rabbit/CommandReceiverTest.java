@@ -14,41 +14,47 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.receiver.rabbit;
 
-import com.rabbitmq.client.Channel;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
 import io.github.pnoker.common.driver.command.CommandDedupCache;
 import io.github.pnoker.common.driver.command.DeviceLockManager;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.bo.CommandRuntimeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
+import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.CommandCallDTO;
 import io.github.pnoker.common.entity.dto.CommandCallResultDTO;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
-import io.github.pnoker.common.facade.api.CommandFacade;
-import io.github.pnoker.common.facade.entity.bo.FacadeCommandBO;
+import io.github.pnoker.common.mq.listener.Acknowledgment;
+import io.github.pnoker.common.mq.listener.MqReceived;
+import java.time.Instant;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.core.MessageProperties;
-
-import java.time.Instant;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @ExtendWith(MockitoExtension.class)
 class CommandReceiverTest {
@@ -60,103 +66,131 @@ class CommandReceiverTest {
     private DriverSenderService driverSenderService;
 
     @Mock
-    private CommandFacade commandFacade;
-
-    @Mock
     private DeviceMetadata deviceMetadata;
 
-    @Mock
+    @Spy
     private CommandDedupCache dedupCache;
 
     @Mock
-    private Channel channel;
+    private DriverMetadata driverMetadata;
+
+    @Mock
+    private Acknowledgment ack;
 
     private CommandReceiver receiver;
-    private Message message;
+    private ThreadPoolExecutor commandExecutor;
 
     @BeforeEach
     void setUp() {
-        receiver = new CommandReceiver(driverCustomService, driverSenderService, commandFacade,
-                deviceMetadata, dedupCache, new DeviceLockManager());
+        DriverProperties properties = new DriverProperties();
+        properties.setNode("node-a");
+        commandExecutor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+        receiver = new CommandReceiver(
+                driverCustomService,
+                driverSenderService,
+                deviceMetadata,
+                dedupCache,
+                new DeviceLockManager(),
+                driverMetadata,
+                properties,
+                commandExecutor);
+        lenient().when(driverMetadata.getFencingToken(10L)).thenReturn(77L);
+        lenient().when(driverSenderService.commandResultSender(any())).thenReturn(Mono.empty());
+    }
 
-        MessageProperties props = new MessageProperties();
-        props.setDeliveryTag(9L);
-        message = new Message(new byte[0], props);
+    @AfterEach
+    void tearDown() {
+        commandExecutor.shutdownNow();
     }
 
     @Test
     void commandIsExecutedAndResultIsSent() throws Exception {
-        when(dedupCache.tryAcquire("record-1")).thenReturn(true);
         DeviceBO device = new DeviceBO();
         device.setId(10L);
+        CommandRuntimeBO command = commandRuntime();
+        device.setCommandRuntimeIdMap(Map.of(20L, command));
         when(deviceMetadata.getCache(10L)).thenReturn(device);
-        FacadeCommandBO command = new FacadeCommandBO();
-        command.setId(20L);
-        command.setTenantId(100L);
-        when(commandFacade.getById(100L, 20L)).thenReturn(command);
-        Map<String, AttributeBO> driverConfig = Map.of("host", AttributeBO.builder().value("127.0.0.1").build());
-        Map<String, AttributeBO> commandConfig = Map.of("address", AttributeBO.builder().value("A1").build());
+        Map<String, AttributeBO> driverConfig =
+                Map.of("host", AttributeBO.builder().value("127.0.0.1").build());
+        Map<String, AttributeBO> commandConfig =
+                Map.of("address", AttributeBO.builder().value("A1").build());
         when(deviceMetadata.getDriverConfig(10L)).thenReturn(driverConfig);
         when(deviceMetadata.getCommandConfig(10L, 20L)).thenReturn(commandConfig);
         when(driverCustomService.execute(eq(driverConfig), eq(commandConfig), eq(device), eq(command), any()))
                 .thenReturn(Map.of("result", "ok"));
 
-        receiver.commandReceive(channel, message, command("record-1"));
+        await(receiver.commandReceive(new MqReceived<>(command("record-1"), Map.of(), false), ack));
 
         ArgumentCaptor<CommandCallResultDTO> captor = ArgumentCaptor.forClass(CommandCallResultDTO.class);
         verify(driverSenderService).commandResultSender(captor.capture());
         assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.SUCCESS);
         assertThat(captor.getValue().resultValues()).containsEntry("result", "ok");
-        verify(channel).basicAck(eq(9L), eq(false));
+        verifyNoInteractions(ack);
     }
 
     @Test
     void failureBeforeRedeliveryReleasesDedupAndRequeues() throws Exception {
-        when(dedupCache.tryAcquire("record-2")).thenReturn(true);
         when(deviceMetadata.getCache(10L)).thenReturn(null);
 
-        receiver.commandReceive(channel, message, command("record-2"));
+        StepVerifier.create(receiver.commandReceive(new MqReceived<>(command("record-2"), Map.of(), false), ack))
+                .expectErrorMessage("Device not found in cache: 10")
+                .verify();
 
         // A first-time failure must NOT send a result — the command is requeued and will
         // be retried, so reporting FAILED here would double-report on the redelivery.
         verify(driverSenderService, never()).commandResultSender(any());
-        verify(dedupCache).release("record-2");
-        verify(channel).basicNack(eq(9L), eq(false), eq(true));
+        verify(dedupCache).release("command:record-2");
+        verifyNoInteractions(ack);
     }
 
     @Test
     void redeliveryFailureSendsFailedResultWithoutRelease() throws Exception {
-        when(dedupCache.tryAcquire("record-3")).thenReturn(true);
         when(deviceMetadata.getCache(10L)).thenReturn(null);
-        message.getMessageProperties().setRedelivered(true);
-
-        receiver.commandReceive(channel, message, command("record-3"));
+        await(receiver.commandReceive(new MqReceived<>(command("record-3"), Map.of(), true), ack));
 
         ArgumentCaptor<CommandCallResultDTO> captor = ArgumentCaptor.forClass(CommandCallResultDTO.class);
         verify(driverSenderService).commandResultSender(captor.capture());
         assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.FAILED);
-        verify(dedupCache, never()).release("record-3");
-        verify(channel).basicAck(eq(9L), eq(false));
+        verify(dedupCache, never()).release("command:record-3");
+        verifyNoInteractions(ack);
+    }
+
+    @Test
+    void missingCommandRuntimeMetadataReleasesDedupAndRequeues() throws Exception {
+        DeviceBO device = new DeviceBO();
+        device.setId(10L);
+        device.setCommandRuntimeIdMap(Map.of());
+        when(deviceMetadata.getCache(10L)).thenReturn(device);
+
+        StepVerifier.create(receiver.commandReceive(
+                        new MqReceived<>(command("record-missing-command"), Map.of(), false), ack))
+                .expectErrorMessage("Command not found in device metadata: 20")
+                .verify();
+
+        verifyNoInteractions(driverCustomService);
+        verify(driverSenderService, never()).commandResultSender(any());
+        verify(dedupCache).release("command:record-missing-command");
+        verifyNoInteractions(ack);
     }
 
     @Test
     void duplicateCommandSendsDuplicateResult() throws Exception {
-        when(dedupCache.tryAcquire("record-4")).thenReturn(false);
+        dedupCache.tryAcquire("command:record-4");
 
-        receiver.commandReceive(channel, message, command("record-4"));
+        await(receiver.commandReceive(new MqReceived<>(command("record-4"), Map.of(), false), ack));
 
         verifyNoInteractions(driverCustomService);
         ArgumentCaptor<CommandCallResultDTO> captor = ArgumentCaptor.forClass(CommandCallResultDTO.class);
         verify(driverSenderService).commandResultSender(captor.capture());
         assertThat(captor.getValue().status()).isEqualTo(PointCommandStatusEnum.DUPLICATE);
-        verify(channel).basicAck(eq(9L), eq(false));
+        verifyNoInteractions(ack);
     }
 
     @Test
     void invalidCommandIsRejected() throws Exception {
-        receiver.commandReceive(channel, message, null);
+        await(receiver.commandReceive(new MqReceived<>(null, Map.of(), false), ack));
 
-        verify(channel).basicReject(eq(9L), eq(false));
+        verify(ack).reject(false);
         verifyNoInteractions(driverCustomService, driverSenderService);
     }
 
@@ -172,16 +206,50 @@ class CommandReceiverTest {
                 .schemaVersion(1)
                 .build();
 
-        receiver.commandReceive(channel, message, dto);
+        await(receiver.commandReceive(new MqReceived<>(dto, Map.of(), false), ack));
 
-        verify(channel).basicReject(eq(9L), eq(false));
+        verify(ack).reject(false);
         verifyNoInteractions(driverCustomService, driverSenderService);
+    }
+
+    @Test
+    void receiptRetryDoesNotExecuteDeviceCommandTwice() throws Exception {
+        DeviceBO device = new DeviceBO();
+        device.setId(10L);
+        CommandRuntimeBO command = commandRuntime();
+        device.setCommandRuntimeIdMap(Map.of(20L, command));
+        when(deviceMetadata.getCache(10L)).thenReturn(device);
+        when(deviceMetadata.getDriverConfig(10L)).thenReturn(Map.of());
+        when(deviceMetadata.getCommandConfig(10L, 20L)).thenReturn(Map.of());
+        when(driverCustomService.execute(any(), any(), eq(device), eq(command), any()))
+                .thenReturn(Map.of("result", "ok"));
+        when(driverSenderService.commandResultSender(any()))
+                .thenReturn(Mono.error(new IllegalStateException("broker unavailable")))
+                .thenReturn(Mono.empty());
+
+        StepVerifier.create(receiver.commandReceive(new MqReceived<>(command("record-6"), Map.of(), false), ack))
+                .expectErrorMessage("broker unavailable")
+                .verify();
+        await(receiver.commandReceive(new MqReceived<>(command("record-6"), Map.of(), true), ack));
+
+        verify(driverCustomService).execute(any(), any(), eq(device), eq(command), any());
+        verify(driverSenderService, org.mockito.Mockito.times(2)).commandResultSender(any());
+        verifyNoInteractions(ack);
+        assertThat(dedupCache.result("command:record-6", CommandCallResultDTO.class))
+                .map(CommandCallResultDTO::status)
+                .contains(PointCommandStatusEnum.SUCCESS);
+    }
+
+    private void await(Mono<Void> completion) throws Exception {
+        completion.toFuture().get(2, TimeUnit.SECONDS);
     }
 
     private CommandCallDTO command(String recordId) {
         return CommandCallDTO.builder()
                 .recordId(recordId)
                 .tenantId(100L)
+                .ownerNode("node-a")
+                .fencingToken(77L)
                 .deviceId(10L)
                 .commandId(20L)
                 .paramValues(Map.of("setpoint", "42"))
@@ -189,5 +257,9 @@ class CommandReceiverTest {
                 .expireAt(Instant.now().plusSeconds(10))
                 .schemaVersion(1)
                 .build();
+    }
+
+    private CommandRuntimeBO commandRuntime() {
+        return new CommandRuntimeBO(20L, "Setpoint", "setpoint", null, null, 5, null, null, 1);
     }
 }

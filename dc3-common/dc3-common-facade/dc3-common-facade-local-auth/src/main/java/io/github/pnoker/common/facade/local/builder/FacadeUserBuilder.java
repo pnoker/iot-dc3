@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.local.builder;
 
 import io.github.pnoker.common.auth.entity.bo.UserBO;
@@ -23,12 +22,11 @@ import io.github.pnoker.common.entity.ext.UserSocialExt;
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
+import java.util.Objects;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-
-import java.util.Objects;
 
 /**
  * FacadeUser ↔ auth UserBO mapper.
@@ -38,16 +36,29 @@ import java.util.Objects;
  * these two fields need an explicit conversion.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface FacadeUserBuilder {
 
+    /**
+     * To facade business object.
+     *
+     * @param authBO business object
+     * @return to facade business object result
+     */
     @Mapping(target = "socialExt", ignore = true)
     @Mapping(target = "identityExt", ignore = true)
     FacadeUserBO toFacadeBO(UserBO authBO);
 
+    /**
+     * After process.
+     *
+     * @param authBO   business object
+     * @param facadeBO business object
+     */
     @AfterMapping
     default void afterProcess(UserBO authBO, @MappingTarget FacadeUserBO facadeBO) {
         UserSocialExt social = authBO.getSocialExt();
@@ -60,5 +71,4 @@ public interface FacadeUserBuilder {
             facadeBO.setIdentityExt(JsonUtil.toJsonString(identity));
         }
     }
-
 }

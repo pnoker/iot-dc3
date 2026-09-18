@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 /**
@@ -22,7 +21,6 @@ package io.github.pnoker.common.data.biz.alarm;
  * existing event overview and can be linked from notification records.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface RuleAlarmPersistenceService {
@@ -33,6 +31,5 @@ public interface RuleAlarmPersistenceService {
      *
      * @param match rule match
      */
-    void ensureAlarm(RuleMatch match);
-
+    reactor.core.publisher.Mono<RuleMatch> ensureAlarm(RuleMatch match);
 }

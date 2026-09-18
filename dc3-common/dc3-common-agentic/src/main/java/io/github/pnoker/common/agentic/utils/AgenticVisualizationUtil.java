@@ -19,7 +19,6 @@ package io.github.pnoker.common.agentic.utils;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.constant.common.BaseConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-
 import java.lang.reflect.RecordComponent;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -31,7 +30,6 @@ import java.util.Objects;
  * Builders for safe agentic visualization specs.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 public class AgenticVisualizationUtil {
@@ -46,6 +44,12 @@ public class AgenticVisualizationUtil {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
 
+    /**
+     * Numeric series from newest first.
+     *
+     * @param values values
+     * @return numeric series from newest first result
+     */
     public static NumericSeries numericSeriesFromNewestFirst(List<String> values) {
         if (Objects.isNull(values) || values.isEmpty()) {
             return new NumericSeries(List.of(), NumericSummary.empty(0));
@@ -66,29 +70,53 @@ public class AgenticVisualizationUtil {
         return new NumericSeries(List.copyOf(dataset), summarize(values.size(), numericValues));
     }
 
-    public static AgenticVisualizationSpec line(String id, String title, String description,
-                                                List<Map<String, Object>> dataset,
-                                                AgenticVisualizationSpec.Encode encode,
-                                                Map<String, Object> meta,
-                                                List<AgenticVisualizationSpec.Annotation> annotations) {
+    /**
+     * Line.
+     *
+     * @param id          id
+     * @param title       title
+     * @param description description
+     * @param dataset     dataset
+     * @param encode      encode
+     * @param meta        meta
+     * @param annotations annotations
+     * @return line result
+     */
+    public static AgenticVisualizationSpec line(
+            String id,
+            String title,
+            String description,
+            List<Map<String, Object>> dataset,
+            AgenticVisualizationSpec.Encode encode,
+            Map<String, Object> meta,
+            List<AgenticVisualizationSpec.Annotation> annotations) {
         AgenticVisualizationSpec spec = new AgenticVisualizationSpec();
         spec.setId(id);
         spec.setType(AgenticConstant.Visualization.Type.LINE);
         spec.setTitle(title);
         spec.setDescription(description);
         spec.setDataset(List.copyOf(Objects.requireNonNullElse(dataset, List.of())));
-        spec.setEncode(Objects.requireNonNullElseGet(encode,
-                () -> AgenticVisualizationSpec.Encode.xy(FIELD_INDEX, FIELD_VALUE)));
-        spec.setScale(mapFromRecord(new Scale(
-                AgenticConstant.Visualization.Scale.LINEAR,
-                AgenticConstant.Visualization.Scale.LINEAR)));
+        spec.setEncode(Objects.requireNonNullElseGet(
+                encode, () -> AgenticVisualizationSpec.Encode.xy(FIELD_INDEX, FIELD_VALUE)));
+        spec.setScale(mapFromRecord(
+                new Scale(AgenticConstant.Visualization.Scale.LINEAR, AgenticConstant.Visualization.Scale.LINEAR)));
         spec.setMeta(Map.copyOf(Objects.requireNonNullElse(meta, Map.of())));
         spec.setAnnotations(List.copyOf(Objects.requireNonNullElse(annotations, List.of())));
         return spec;
     }
 
-    public static AgenticVisualizationSpec stat(String id, String title, String description,
-                                                Map<String, Object> row, Map<String, Object> meta) {
+    /**
+     * Stat.
+     *
+     * @param id          id
+     * @param title       title
+     * @param description description
+     * @param row         row
+     * @param meta        meta
+     * @return stat result
+     */
+    public static AgenticVisualizationSpec stat(
+            String id, String title, String description, Map<String, Object> row, Map<String, Object> meta) {
         AgenticVisualizationSpec spec = new AgenticVisualizationSpec();
         spec.setId(id);
         spec.setType(AgenticConstant.Visualization.Type.STAT);
@@ -100,6 +128,13 @@ public class AgenticVisualizationUtil {
         return spec;
     }
 
+    /**
+     * Y annotation.
+     *
+     * @param value value
+     * @param label label
+     * @return y annotation result
+     */
     public static AgenticVisualizationSpec.Annotation yAnnotation(Double value, String label) {
         AgenticVisualizationSpec.Annotation annotation = new AgenticVisualizationSpec.Annotation();
         annotation.setType("y");
@@ -108,10 +143,24 @@ public class AgenticVisualizationUtil {
         return annotation;
     }
 
+    /**
+     * Point history meta.
+     *
+     * @param deviceId    device identifier
+     * @param pointId     point identifier
+     * @param valueSource value source
+     * @return point history meta result
+     */
     public static Map<String, Object> pointHistoryMeta(Long deviceId, Long pointId, String valueSource) {
         return mapFromRecord(new PointHistoryMeta(deviceId, pointId, valueSource));
     }
 
+    /**
+     * Stat row.
+     *
+     * @param summary summary
+     * @return stat row result
+     */
     public static Map<String, Object> statRow(NumericSummary summary) {
         if (Objects.isNull(summary) || summary.numericCount() < 1) {
             return Map.of();
@@ -165,8 +214,16 @@ public class AgenticVisualizationUtil {
         }
         double oldest = values.getFirst();
         double latest = values.getLast();
-        return new NumericSummary(totalCount, values.size(), totalCount - values.size(), oldest, latest,
-                latest - oldest, min, max, sum / values.size());
+        return new NumericSummary(
+                totalCount,
+                values.size(),
+                totalCount - values.size(),
+                oldest,
+                latest,
+                latest - oldest,
+                min,
+                max,
+                sum / values.size());
     }
 
     private static Map<String, Object> mapFromRecord(Record source) {
@@ -186,35 +243,51 @@ public class AgenticVisualizationUtil {
         }
     }
 
+    /** numeric series. */
     public record NumericSeries(List<Map<String, Object>> dataset, NumericSummary summary) {
 
+        /** Numeric series compact constructor: normalizes the record. */
         public NumericSeries {
             dataset = List.copyOf(Objects.requireNonNullElse(dataset, List.of()));
             summary = Objects.requireNonNullElseGet(summary, () -> NumericSummary.empty(0));
         }
-
     }
 
-    public record NumericSummary(int totalCount, int numericCount, int nonNumericCount, Double oldest, Double latest,
-                                 Double delta, Double min, Double max, Double average) {
+    /** numeric summary. */
+    public record NumericSummary(
+            int totalCount,
+            int numericCount,
+            int nonNumericCount,
+            Double oldest,
+            Double latest,
+            Double delta,
+            Double min,
+            Double max,
+            Double average) {
 
+        /**
+         * Empty.
+         *
+         * @param totalCount total count
+         * @return empty result
+         */
         public static NumericSummary empty(int totalCount) {
             return new NumericSummary(totalCount, 0, Math.max(totalCount, 0), null, null, null, null, null, null);
         }
-
     }
 
-    private record NumericPoint(int index, Double value, String series) {
-    }
+    private record NumericPoint(int index, Double value, String series) {}
 
-    private record Scale(String x, String y) {
-    }
+    private record Scale(String x, String y) {}
 
-    private record PointHistoryMeta(Long deviceId, Long pointId, String valueSource) {
-    }
+    private record PointHistoryMeta(Long deviceId, Long pointId, String valueSource) {}
 
-    private record NumericStat(Double latest, Double average, Double min, Double max, Double delta, int numericCount,
-                               int nonNumericCount) {
-    }
-
+    private record NumericStat(
+            Double latest,
+            Double average,
+            Double min,
+            Double max,
+            Double delta,
+            int numericCount,
+            int nonNumericCount) {}
 }

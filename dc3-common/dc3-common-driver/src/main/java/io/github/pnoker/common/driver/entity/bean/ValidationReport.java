@@ -14,9 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.bean;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,11 +28,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Validation report produced by {@code DriverValidator}.
  * <p>
@@ -37,7 +35,6 @@ import java.util.List;
  * issues for diagnostics. An empty issue list means the validation passed.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 @Getter
@@ -116,5 +113,4 @@ public class ValidationReport implements Serializable {
          */
         private String expected;
     }
-
 }

@@ -10,7 +10,6 @@ model uses to read and operate platform resources.
 
 - **Group ID**: io.github.pnoker
 - **Artifact ID**: dc3-common-agentic
-- **Version**: 2026.5.22
 
 ## Key Components
 
@@ -28,25 +27,27 @@ model uses to read and operate platform resources.
 - Bound from the `dc3.agentic` prefix (`AgenticProperties`).
 - An OpenAI-compatible fallback model is configured via the `AGENTIC_FALLBACK_OPENAI_*` environment variables (see
   `.env.example`).
-- Conversation memory uses the Spring AI JDBC chat-memory repository.
+- Conversation memory uses the module's reactive R2DBC stores.
 
 ## Dependencies
 
-- `spring-ai-starter-model-chat-memory-repository-jdbc` — Spring AI chat client + JDBC memory
+- `spring-boot-starter-data-r2dbc` — reactive conversation/session persistence
 
 ## Build Instructions
 
 ```bash
-mvn -s ../../.mvn/settings.xml clean package
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-agentic -am package
+```
+
+## Testing
+
+Run the module tests from the repository root:
+
+```bash
+mvn -s .mvn/settings.xml -pl dc3-common/dc3-common-agentic -am test
 ```
 
 ## Related Modules
 
 - `dc3-center-agentic` — the service shell that exposes this SDK over HTTP (`/api/v3/agentic/**`)
 - `dc3-common-facade-*` — facades the platform tools call to reach other services
-
-## License
-
-Copyright 2016-present the IoT DC3 original author or authors.
-
-Licensed under the GNU Affero General Public License v3.0 (AGPL 3.0)

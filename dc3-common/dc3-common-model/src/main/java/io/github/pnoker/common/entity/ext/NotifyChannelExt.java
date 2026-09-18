@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.entity.ext;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.Map;
 
 /**
  * Notify channel Ext.
@@ -31,10 +29,11 @@ import java.util.Map;
  * Non-sensitive channel configuration. Secrets are referenced by credentialRef.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Schema(description = "Notify channel extension object. Holds non-sensitive channel configuration; secrets are referenced by credentialRef.")
+@Schema(
+        description =
+                "Notify channel extension object. Holds non-sensitive channel configuration; secrets are referenced by credentialRef.")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -47,6 +46,9 @@ public class NotifyChannelExt extends BaseExt {
     @Schema(description = "Non-sensitive channel configuration payload; provider-specific options and toggle flags.")
     private Content content;
 
+    /**
+     * Channel-level extension slot (provider metadata for one channel).
+     */
     @Schema(description = "Extended content for a notify channel.")
     @Getter
     @Setter
@@ -63,7 +65,10 @@ public class NotifyChannelExt extends BaseExt {
         /**
          * Message card version used by card-capable channels.
          */
-        @Schema(description = "Message card template version for card-capable channels (e.g. DingTalk interactive cards).", example = "1.0")
+        @Schema(
+                description =
+                        "Message card template version for card-capable channels (e.g. DingTalk interactive cards).",
+                example = "1.0")
         private String cardVersion;
 
         /**
@@ -81,9 +86,9 @@ public class NotifyChannelExt extends BaseExt {
         /**
          * Provider-specific non-sensitive options.
          */
-        @Schema(description = "Provider-specific non-sensitive options; keys are provider-defined and values must never contain secrets (use credentialRef for secrets).")
+        @Schema(
+                description =
+                        "Provider-specific non-sensitive options; keys are provider-defined and values must never contain secrets (use credentialRef for secrets).")
         private Map<String, Object> options;
-
     }
-
 }

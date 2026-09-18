@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.entity.bo;
 
 import lombok.AllArgsConstructor;
@@ -32,7 +31,6 @@ import lombok.ToString;
  * transport-neutral (no LocalDateTime dependency).
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -72,5 +70,4 @@ public class FacadePointValueBO {
      * Storage timestamp (epoch seconds)
      */
     private long createTime;
-
 }

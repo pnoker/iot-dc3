@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.property;
 
 import jakarta.validation.Valid;
@@ -33,7 +32,6 @@ import org.springframework.validation.annotation.Validated;
  * a safety net for missed invalidations during a node restart.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Getter
@@ -48,6 +46,11 @@ public class AlarmCacheProperties {
     @Valid
     private CacheTuning notify = new CacheTuning(5_000L, 60L);
 
+    /**
+     * Per-cache sizing: Caffeine maximum entries plus entry TTL in seconds. The
+     * defaults favor correctness over memory (short TTLs) — rule/notify lookups
+     * are cheap to rebuild from the database.
+     */
     @Getter
     @Setter
     public static class CacheTuning {
@@ -58,15 +61,17 @@ public class AlarmCacheProperties {
         @Min(value = 1, message = "Cache ttl-seconds must be at least 1")
         private long ttlSeconds;
 
-        public CacheTuning() {
-            // Spring property binding requires a no-arg constructor.
-        }
+        /**
+         * Required by Spring property binding.
+         */
+        public CacheTuning() {}
 
+        /**
+         * All-args constructor for programmatic tuning.
+         */
         public CacheTuning(long maxSize, long ttlSeconds) {
             this.maxSize = maxSize;
             this.ttlSeconds = ttlSeconds;
         }
-
     }
-
 }

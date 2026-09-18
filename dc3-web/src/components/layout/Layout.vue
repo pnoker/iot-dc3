@@ -17,78 +17,94 @@
 
 <template>
   <div class="container">
-    <div class="header">
-      <el-col :span="4" class="header_item">
-        <img class="header_logo" src="/images/logo/logo.svg"/>
-      </el-col>
-      <el-col :span="16" class="header_item">
-        <el-menu :default-active="handleMenuEnter($route.path)" :router="true" class="header_menu" mode="horizontal">
-          <el-menu-item index="/home">
-            <el-icon>
-              <HomeFilled/>
-            </el-icon>
-            {{ t('nav.home') }}
-          </el-menu-item>
-          <template v-for="node in topLevelMenus" :key="`menu-${node.id}`">
-            <el-sub-menu v-if="node.children && node.children.length > 0" :index="`node-${node.id}`">
-              <template #title>
-                <el-icon v-if="node.menuExt?.content?.icon">
-                  <component :is="node.menuExt.content.icon"/>
-                </el-icon>
-                {{ resolveMenuTitle(node) }}
+    <a class="skip-link" href="#main-content">{{ t('layout.skipToContent') }}</a>
+    <header class="header">
+      <div class="header_brand_glass">
+        <!-- Thumb terminals get a hamburger instead of the horizontal menu
+             strip (A3: drawer navigation, docs/design/frontend-three-terminal-ux.md). -->
+        <el-button
+          :aria-label="t('layout.navigation')"
+          :icon="Menu"
+          circle
+          class="header_menu_toggle"
+          text
+          @click="navDrawerVisible = true"
+        />
+        <brand-lockup :compact="isMobile" />
+      </div>
+      <div class="header_actions_row">
+        <div class="header_actions_glass">
+          <div v-if="!isMobile" class="header_menu_wrap">
+            <nav-menu :compact="isTablet" mode="horizontal" />
+          </div>
+          <span v-if="!isMobile" class="header_actions_divider" aria-hidden="true" />
+          <div class="header_utilities">
+            <app-preferences compact />
+            <el-tooltip v-if="settingsEntryName" :content="t('layout.settings')" placement="bottom">
+              <el-button
+                :aria-label="t('layout.settings')"
+                :icon="Setting"
+                circle
+                class="header_settings_button"
+                text
+                @click="handleCommand('settings')"
+              />
+            </el-tooltip>
+          </div>
+          <span class="header_actions_divider" aria-hidden="true" />
+          <div class="header_user">
+            <el-dropdown
+              popper-class="user-dropdown-popper"
+              trigger="click"
+              :popper-options="{
+                modifiers: [{ name: 'preventOverflow', options: { padding: 8 } }],
+              }"
+              @command="handleCommand"
+            >
+              <button :aria-label="t('layout.account')" class="user_trigger" type="button">
+                <img :src="assetUrl('images/common/avatar.png')" alt="" class="user_avatar" />
+              </button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <li class="user_dropdown_identity" role="none">
+                    <span class="user_dropdown_name">{{ currentLogin }}</span>
+                  </li>
+                  <el-dropdown-item :icon="QuestionFilled" command="help">{{
+                    t("layout.about")
+                  }}</el-dropdown-item>
+                  <el-dropdown-item :icon="SwitchButton" command="logout" divided>{{
+                    t("layout.logout")
+                  }}</el-dropdown-item>
+                </el-dropdown-menu>
               </template>
-              <el-menu-item
-                v-for="child in node.children"
-                :key="`menu-child-${child.id}`"
-                :index="child.menuExt?.content?.url || `/${child.menuCode}`"
-              >
-                {{ resolveMenuTitle(child) }}
-              </el-menu-item>
-            </el-sub-menu>
-            <el-menu-item v-else :index="node.menuExt?.content?.url || `/${node.menuCode}`">
-              <el-icon v-if="node.menuExt?.content?.icon">
-                <component :is="node.menuExt.content.icon"/>
-              </el-icon>
-              {{ resolveMenuTitle(node) }}
-            </el-menu-item>
-          </template>
-        </el-menu>
-      </el-col>
-      <el-col :span="4" class="header_item header_user">
-        <el-dropdown trigger="click" @command="handleCommand">
-          <span class="user_avatar">
-            <el-avatar>
-              <img src="/images/common/avatar.png"/>
-            </el-avatar>
-            <span class="user_name">{{ t('layout.admin') }}</span>
-          </span>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <!-- Inline language switch. @click.stop keeps the dropdown
-                   open while the user toggles locales; the native
-                   <el-dropdown-item> variants would close the menu on
-                   every click. -->
-              <li class="user_lang_row" @click.stop>
-                <el-segmented v-model="langModel" :options="langOptions" class="user_lang_seg" size="small"/>
-              </li>
-              <el-dropdown-item v-if="settingsEntryName" :icon="Setting" command="settings" divided>
-                {{ t('layout.settings') }}
-              </el-dropdown-item>
-              <el-dropdown-item :icon="QuestionFilled" command="help">{{ t('layout.about') }}</el-dropdown-item>
-              <el-dropdown-item :icon="SwitchButton" command="logout">{{ t('layout.logout') }}</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </el-col>
-    </div>
+            </el-dropdown>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- Mobile navigation drawer: the same NavMenu component, vertical mode. -->
+    <el-drawer
+      v-model="navDrawerVisible"
+      :size="280"
+      :title="t('layout.navigation')"
+      :with-header="true"
+      class="nav-drawer"
+      direction="ltr"
+    >
+      <nav-menu mode="vertical" />
+    </el-drawer>
     <div class="body">
-      <div class="body-main">
+      <div id="main-content" class="body-main" tabindex="-1">
         <div v-if="breadcrumbItems.length > 1" class="breadcrumb">
           <el-breadcrumb separator="/">
-            <el-breadcrumb-item v-for="(item, index) in breadcrumbItems" :key="`${item.path}-${index}`" :to="item.path">
+            <el-breadcrumb-item
+              v-for="(item, index) in breadcrumbItems"
+              :key="`${item.path}-${index}`"
+              :to="item.path"
+            >
               <span class="breadcrumb__item">
                 <el-icon v-if="item.icon" class="breadcrumb__icon">
-                  <component :is="item.icon"/>
+                  <component :is="item.icon" />
                 </el-icon>
                 <span>{{ item.title }}</span>
               </span>
@@ -96,129 +112,148 @@
           </el-breadcrumb>
         </div>
         <el-scrollbar v-if="!isFixedLayout" ref="scrollbarRef">
-          <router-view/>
+          <router-view />
         </el-scrollbar>
         <div v-else class="fixed-viewport">
-          <router-view/>
+          <router-view />
         </div>
       </div>
-      <agentic-assistant/>
-      <el-backtop :bottom="40" :right="40" target=".body-main .el-scrollbar__wrap"/>
+      <agentic-assistant />
+      <!-- Backtop keeps clear of the assistant FAB and screen edges on
+           thumb terminals (A3). -->
+      <el-backtop
+        :bottom="isMobile ? 88 : 40"
+        :right="isMobile ? 16 : 40"
+        target=".body-main .el-scrollbar__wrap"
+      />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import AgenticAssistant from '@/components/agentic/AgenticAssistant.vue';
-import router from '@/config/router';
-import {HomeFilled, QuestionFilled, Setting, SwitchButton} from '@element-plus/icons-vue';
-import {computed, onMounted} from 'vue';
-import {useI18n} from 'vue-i18n';
-import {useRoute} from 'vue-router';
+import AgenticAssistant from "@/components/agentic/AgenticAssistant.vue";
+import BrandLockup from "@/components/brand/BrandLockup.vue";
+import NavMenu from "@/components/layout/NavMenu.vue";
+import { useBreakpoint } from "@/composables/useBreakpoint";
+import router from "@/config/router";
 import {
-  getSettingsLeafIconCode,
+  Menu,
+  QuestionFilled,
+  Setting,
+  SwitchButton,
+} from "@element-plus/icons-vue";
+import { computed, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
+import {
   getSettingsTitleKey,
   SETTINGS_BREADCRUMB_PARENTS,
   SETTINGS_FALLBACK_ICON,
-} from '@/config/settingsNav';
-import {useAgenticStore, useAuthStore, useMenuStore} from '@/store';
-import type {MenuNode} from '@/store/modules/menu';
-import {resolveMenuTitle} from '@/utils/menuUtil';
+} from "@/config/settingsNav";
+import { useAgenticStore, useAuthStore, useMenuStore } from "@/store";
+import type { MenuNode } from "@/store/modules/menu";
+import { assetUrl } from "@/utils/assetUrl";
 
-const {t, locale} = useI18n();
+import AppPreferences from "@/components/layout/AppPreferences.vue";
+
+const { t } = useI18n();
 const route = useRoute();
 const authStore = useAuthStore();
 const menuStore = useMenuStore();
 const agenticStore = useAgenticStore();
+const { isMobile, isTablet } = useBreakpoint();
+const navDrawerVisible = ref(false);
+const currentLogin = computed(() =>
+  String(authStore.getName || authStore.name || "dc3"),
+);
 
-const langOptions = [
-  {label: 'EN', value: 'en'},
-  {label: '中', value: 'zh'},
-];
-const langModel = computed({
-  get: () => locale.value,
-  set: (val: string) => {
-    locale.value = val;
-    localStorage.setItem('locale', val);
+// Close the mobile navigation drawer once navigation actually happens.
+watch(
+  () => route.fullPath,
+  () => {
+    navDrawerVisible.value = false;
   },
-});
+);
+
+// The AI assistant is shown in every build; in mock builds the fetch
+// interceptor (src/mock/fetch.ts) answers its chat completions.
 
 onMounted(() => {
   menuStore.fetchTree();
 });
 
 const nameMap: Record<string, string> = {
-  home: 'nav.home',
-  driver: 'nav.driver',
-  profile: 'nav.profile',
-  device: 'nav.device',
-  pointValue: 'nav.pointValue',
-  driverDetail: 'nav.driverDetail',
-  deviceDetail: 'nav.deviceDetail',
-  deviceEdit: 'nav.deviceEdit',
-  profileDetail: 'nav.profileDetail',
-  profileEdit: 'nav.profileEdit',
-  settings: 'nav.settings',
-  settingsIdentity: 'nav.settingsIdentity',
-  settingsAccess: 'nav.settingsAccess',
-  settingsEventCommand: 'nav.settingsEventCommand',
-  settingsAudit: 'nav.settingsAudit',
-  settingsIntegration: 'nav.settingsIntegration',
-  settingsSystem: 'nav.settingsSystem',
-  settingsUser: 'nav.settingsUser',
-  settingsPrincipal: 'nav.settingsPrincipal',
-  settingsTenantMembership: 'nav.settingsTenantMembership',
-  settingsLocalCredential: 'nav.settingsLocalCredential',
-  settingsIdentityAudit: 'nav.settingsIdentityAudit',
-  settingsRole: 'nav.settingsRole',
-  settingsRolePrincipalBind: 'nav.settingsRolePrincipalBind',
-  settingsResource: 'nav.settingsResource',
-  settingsApi: 'nav.settingsApi',
-  settingsMenu: 'nav.settingsMenu',
-  settingsGroup: 'nav.settingsGroup',
-  settingsLabel: 'nav.settingsLabel',
-  settingsAlarm: 'nav.settingsAlarm',
-  settingsAlarmRule: 'nav.settingsAlarmRule',
-  settingsAlarmNotify: 'nav.settingsAlarmNotify',
-  settingsAlarmMessage: 'nav.settingsAlarmMessage',
-  settingsAlarmChannel: 'nav.settingsAlarmChannel',
-  settingsAlarmBind: 'nav.settingsAlarmBind',
-  settingsAlarmState: 'nav.settingsAlarmState',
-  settingsAlarmHistory: 'nav.settingsAlarmHistory',
-  settingsModel: 'nav.settingsModel',
-  settingsModelConfig: 'nav.settingsModelConfig',
-  settingsModelProvider: 'nav.settingsModelProvider',
-  settingsEvent: 'nav.settingsEvent',
-  settingsAlarmOverview: 'nav.settingsAlarmOverview',
-  settingsDeviceAlarm: 'nav.settingsDeviceAlarm',
-  settingsDriverAlarm: 'nav.settingsDriverAlarm',
-  settingsPointAlarm: 'nav.settingsPointAlarm',
-  settingsAbout: 'nav.settingsAbout',
-  settingsUserDetail: 'nav.settingsUserDetail',
-  settingsRoleDetail: 'nav.settingsRoleDetail',
-  settingsResourceDetail: 'nav.settingsResourceDetail',
-  settingsApiDetail: 'nav.settingsApiDetail',
-  settingsMenuDetail: 'nav.settingsMenuDetail',
-  settingsGroupDetail: 'nav.settingsGroupDetail',
-  settingsLabelDetail: 'nav.settingsLabelDetail',
-  settingsAlarmRuleDetail: 'nav.settingsAlarmRuleDetail',
-  settingsAlarmNotifyDetail: 'nav.settingsAlarmNotifyDetail',
-  settingsAlarmMessageDetail: 'nav.settingsAlarmMessageDetail',
-  settingsAlarmChannelDetail: 'nav.settingsAlarmChannelDetail',
-  settingsAlarmBindDetail: 'nav.settingsAlarmBindDetail',
-  settingsAlarmStateDetail: 'nav.settingsAlarmStateDetail',
-  settingsAlarmHistoryDetail: 'nav.settingsAlarmHistoryDetail',
-  settingsModelConfigDetail: 'nav.settingsModelConfigDetail',
-  settingsModelProviderDetail: 'nav.settingsModelProviderDetail',
-  settingsCommand: 'nav.settingsCommand',
-  settingsCommandHistory: 'nav.settingsCommandHistory',
-  settingsEventHistory: 'nav.settingsEventHistory',
-  settingsServiceAccount: 'nav.settingsServiceAccount',
-  settingsMcpServer: 'nav.settingsMcpServer',
-  settingsMcpConnection: 'nav.settingsMcpConnection',
-  settingsMcpClient: 'nav.settingsMcpClient',
-  settingsMcpTool: 'nav.settingsMcpTool',
-  settingsMcpAudit: 'nav.settingsMcpAudit',
+  home: "nav.home",
+  driver: "nav.driver",
+  profile: "nav.profile",
+  device: "nav.device",
+  pointValue: "nav.pointValue",
+  driverDetail: "nav.driverDetail",
+  deviceDetail: "nav.deviceDetail",
+  deviceEdit: "nav.deviceEdit",
+  profileDetail: "nav.profileDetail",
+  profileEdit: "nav.profileEdit",
+  settings: "nav.settings",
+  settingsIdentity: "nav.settingsIdentity",
+  settingsAccess: "nav.settingsAccess",
+  settingsEventCommand: "nav.settingsEventCommand",
+  settingsAudit: "nav.settingsAudit",
+  settingsIntegration: "nav.settingsIntegration",
+  settingsSystem: "nav.settingsSystem",
+  settingsUser: "nav.settingsUser",
+  settingsPrincipal: "nav.settingsPrincipal",
+  settingsTenantMembership: "nav.settingsTenantMembership",
+  settingsLocalCredential: "nav.settingsLocalCredential",
+  settingsIdentityAudit: "nav.settingsIdentityAudit",
+  settingsRole: "nav.settingsRole",
+  settingsRolePrincipalBind: "nav.settingsRolePrincipalBind",
+  settingsResource: "nav.settingsResource",
+  settingsApi: "nav.settingsApi",
+  settingsMenu: "nav.settingsMenu",
+  settingsGroup: "nav.settingsGroup",
+  settingsLabel: "nav.settingsLabel",
+  settingsAlarm: "nav.settingsAlarm",
+  settingsAlarmRule: "nav.settingsAlarmRule",
+  settingsAlarmNotify: "nav.settingsAlarmNotify",
+  settingsAlarmMessage: "nav.settingsAlarmMessage",
+  settingsAlarmChannel: "nav.settingsAlarmChannel",
+  settingsAlarmBind: "nav.settingsAlarmBind",
+  settingsAlarmState: "nav.settingsAlarmState",
+  settingsAlarmHistory: "nav.settingsAlarmHistory",
+  settingsModel: "nav.settingsModel",
+  settingsModelConfig: "nav.settingsModelConfig",
+  settingsModelProvider: "nav.settingsModelProvider",
+  settingsEvent: "nav.settingsEvent",
+  settingsAlarmOverview: "nav.settingsAlarmOverview",
+  settingsDeviceAlarm: "nav.settingsDeviceAlarm",
+  settingsDriverAlarm: "nav.settingsDriverAlarm",
+  settingsPointAlarm: "nav.settingsPointAlarm",
+  settingsAbout: "nav.settingsAbout",
+  settingsUserDetail: "nav.settingsUserDetail",
+  settingsRoleDetail: "nav.settingsRoleDetail",
+  settingsResourceDetail: "nav.settingsResourceDetail",
+  settingsApiDetail: "nav.settingsApiDetail",
+  settingsMenuDetail: "nav.settingsMenuDetail",
+  settingsGroupDetail: "nav.settingsGroupDetail",
+  settingsLabelDetail: "nav.settingsLabelDetail",
+  settingsAlarmRuleDetail: "nav.settingsAlarmRuleDetail",
+  settingsAlarmNotifyDetail: "nav.settingsAlarmNotifyDetail",
+  settingsAlarmMessageDetail: "nav.settingsAlarmMessageDetail",
+  settingsAlarmChannelDetail: "nav.settingsAlarmChannelDetail",
+  settingsAlarmBindDetail: "nav.settingsAlarmBindDetail",
+  settingsAlarmStateDetail: "nav.settingsAlarmStateDetail",
+  settingsAlarmHistoryDetail: "nav.settingsAlarmHistoryDetail",
+  settingsModelConfigDetail: "nav.settingsModelConfigDetail",
+  settingsModelProviderDetail: "nav.settingsModelProviderDetail",
+  settingsCommand: "nav.settingsCommand",
+  settingsCommandHistory: "nav.settingsCommandHistory",
+  settingsEventHistory: "nav.settingsEventHistory",
+  settingsServiceAccount: "nav.settingsServiceAccount",
+  settingsMcpServer: "nav.settingsMcpServer",
+  settingsMcpConnection: "nav.settingsMcpConnection",
+  settingsMcpClient: "nav.settingsMcpClient",
+  settingsMcpTool: "nav.settingsMcpTool",
+  settingsMcpAudit: "nav.settingsMcpAudit",
 };
 
 // Static icon fallback for route names the backend menu tree does not yet
@@ -226,130 +261,154 @@ const nameMap: Record<string, string> = {
 // to `menuStore.findByCode(...).menuExt.content.icon` first; this map only
 // kicks in for crumbs the backend has no row for.
 const FALLBACK_ICON: Record<string, string> = {
-  home: 'HomeFilled',
-  driver: 'Promotion',
-  profile: 'List',
-  device: 'Management',
-  pointValue: 'TrendCharts',
-  settings: 'Setting',
-  settingsIdentity: 'User',
-  settingsAccess: 'Stamp',
-  settingsEventCommand: 'Operation',
-  settingsAudit: 'Files',
-  settingsIntegration: 'Share',
-  settingsSystem: 'Tools',
-  settingsUser: 'User',
-  settingsPrincipal: 'Avatar',
-  settingsTenantMembership: 'OfficeBuilding',
-  settingsLocalCredential: 'Lock',
-  settingsIdentityAudit: 'DocumentChecked',
-  settingsRole: 'UserFilled',
-  settingsRolePrincipalBind: 'Link',
-  settingsResource: 'Key',
-  settingsApi: 'Link',
-  settingsMenu: 'Menu',
-  settingsGroup: 'Grid',
-  settingsLabel: 'CollectionTag',
-  settingsAlarm: 'AlarmClock',
-  settingsAlarmRule: 'SetUp',
-  settingsAlarmNotify: 'Bell',
-  settingsAlarmMessage: 'Message',
-  settingsAlarmChannel: 'Connection',
-  settingsAlarmBind: 'Link',
-  settingsAlarmState: 'Monitor',
-  settingsAlarmHistory: 'DocumentChecked',
-  settingsModel: 'Cpu',
-  settingsModelConfig: 'ChatDotRound',
-  settingsModelProvider: 'ChatLineSquare',
-  settingsEvent: 'Bell',
-  settingsAlarmOverview: 'DataLine',
-  settingsDeviceAlarm: 'Management',
-  settingsDriverAlarm: 'Promotion',
-  settingsPointAlarm: 'TrendCharts',
-  settingsAbout: 'InfoFilled',
-  driverDetail: 'Promotion',
-  deviceDetail: 'Management',
-  deviceEdit: 'Management',
-  profileDetail: 'List',
-  profileEdit: 'List',
-  settingsUserDetail: 'User',
-  settingsRoleDetail: 'UserFilled',
-  settingsResourceDetail: 'Key',
-  settingsApiDetail: 'Link',
-  settingsMenuDetail: 'Menu',
-  settingsGroupDetail: 'Grid',
-  settingsLabelDetail: 'CollectionTag',
-  settingsAlarmRuleDetail: 'SetUp',
-  settingsAlarmNotifyDetail: 'Bell',
-  settingsAlarmMessageDetail: 'Message',
-  settingsAlarmChannelDetail: 'Connection',
-  settingsAlarmBindDetail: 'Link',
-  settingsAlarmStateDetail: 'Monitor',
-  settingsAlarmHistoryDetail: 'DocumentChecked',
-  settingsModelConfigDetail: 'ChatDotRound',
-  settingsModelProviderDetail: 'ChatLineSquare',
-  settingsCommand: 'Operation',
-  settingsCommandHistory: 'Document',
-  settingsEventHistory: 'Document',
-  settingsServiceAccount: 'Key',
-  settingsMcpServer: 'Connection',
-  settingsMcpConnection: 'Link',
-  settingsMcpClient: 'Ticket',
-  settingsMcpTool: 'Tools',
-  settingsMcpAudit: 'Document',
+  home: "HomeFilled",
+  driver: "Promotion",
+  profile: "List",
+  device: "Management",
+  pointValue: "TrendCharts",
+  settings: "Setting",
+  settingsIdentity: "User",
+  settingsAccess: "Stamp",
+  settingsEventCommand: "Operation",
+  settingsAudit: "Files",
+  settingsIntegration: "Share",
+  settingsSystem: "Tools",
+  settingsUser: "User",
+  settingsPrincipal: "Avatar",
+  settingsTenantMembership: "OfficeBuilding",
+  settingsLocalCredential: "Lock",
+  settingsIdentityAudit: "DocumentChecked",
+  settingsRole: "UserFilled",
+  settingsRolePrincipalBind: "Link",
+  settingsResource: "Key",
+  settingsApi: "Link",
+  settingsMenu: "Menu",
+  settingsGroup: "Grid",
+  settingsLabel: "CollectionTag",
+  settingsAlarm: "AlarmClock",
+  settingsAlarmRule: "SetUp",
+  settingsAlarmNotify: "Bell",
+  settingsAlarmMessage: "Message",
+  settingsAlarmChannel: "Connection",
+  settingsAlarmBind: "Link",
+  settingsAlarmState: "Monitor",
+  settingsAlarmHistory: "DocumentChecked",
+  settingsModel: "Cpu",
+  settingsModelConfig: "ChatDotRound",
+  settingsModelProvider: "ChatLineSquare",
+  settingsEvent: "Bell",
+  settingsAlarmOverview: "DataLine",
+  settingsDeviceAlarm: "Management",
+  settingsDriverAlarm: "Promotion",
+  settingsPointAlarm: "TrendCharts",
+  settingsAbout: "InfoFilled",
+  driverDetail: "Promotion",
+  deviceDetail: "Management",
+  deviceEdit: "Management",
+  profileDetail: "List",
+  profileEdit: "List",
+  settingsUserDetail: "User",
+  settingsRoleDetail: "UserFilled",
+  settingsResourceDetail: "Key",
+  settingsApiDetail: "Link",
+  settingsMenuDetail: "Menu",
+  settingsGroupDetail: "Grid",
+  settingsLabelDetail: "CollectionTag",
+  settingsAlarmRuleDetail: "SetUp",
+  settingsAlarmNotifyDetail: "Bell",
+  settingsAlarmMessageDetail: "Message",
+  settingsAlarmChannelDetail: "Connection",
+  settingsAlarmBindDetail: "Link",
+  settingsAlarmStateDetail: "Monitor",
+  settingsAlarmHistoryDetail: "DocumentChecked",
+  settingsModelConfigDetail: "ChatDotRound",
+  settingsModelProviderDetail: "ChatLineSquare",
+  settingsCommand: "Operation",
+  settingsCommandHistory: "Document",
+  settingsEventHistory: "Document",
+  settingsServiceAccount: "Key",
+  settingsMcpServer: "Connection",
+  settingsMcpConnection: "Link",
+  settingsMcpClient: "Ticket",
+  settingsMcpTool: "Tools",
+  settingsMcpAudit: "Document",
 };
 
 const iconForCode = (code: string): string | undefined => {
   const node = menuStore.findByCode(code);
-  return node?.menuExt?.content?.icon || SETTINGS_FALLBACK_ICON[code] || FALLBACK_ICON[code];
+  return (
+    node?.menuExt?.content?.icon ||
+    SETTINGS_FALLBACK_ICON[code] ||
+    FALLBACK_ICON[code]
+  );
 };
 
 const isFixedLayout = computed(() => {
   const name = route.name as string;
-  return !!name && name.startsWith('settings');
+  return !!name && name.startsWith("settings");
 });
 
 const breadcrumbItems = computed(() => {
   const items: { path: string; title: string; icon?: string }[] = [
-    {path: '/home', title: t('nav.home'), icon: iconForCode('home')},
+    { path: "/home", title: t("nav.home"), icon: iconForCode("home") },
   ];
   const name = route.name as string;
-  if (!name || name === 'home') return items;
+  if (!name || name === "home") return items;
 
-  const titleKey = name.startsWith('settings') ? getSettingsTitleKey(name) : nameMap[name];
+  const titleKey = name.startsWith("settings")
+    ? getSettingsTitleKey(name)
+    : nameMap[name];
   const title = titleKey ? t(titleKey) : name;
-  const leafCode = getSettingsLeafIconCode(name);
-  if (name.startsWith('driver')) {
-    items.push({path: '/driver', title: t('nav.driver'), icon: iconForCode('driver')});
-  } else if (name.startsWith('device')) {
-    items.push({path: '/device', title: t('nav.device'), icon: iconForCode('device')});
-  } else if (name.startsWith('profile')) {
-    items.push({path: '/profile', title: t('nav.profile'), icon: iconForCode('profile')});
-  } else if (name.startsWith('point')) {
-    items.push({path: '/profile', title: t('nav.profile'), icon: iconForCode('profile')});
-  } else if (name.startsWith('settings')) {
-    items.push({path: '/settings', title: t('nav.settings'), icon: iconForCode('settings')});
+  const leafCode = name;
+  if (name.startsWith("driver")) {
+    items.push({
+      path: "/driver",
+      title: t("nav.driver"),
+      icon: iconForCode("driver"),
+    });
+  } else if (name.startsWith("device")) {
+    items.push({
+      path: "/device",
+      title: t("nav.device"),
+      icon: iconForCode("device"),
+    });
+  } else if (name.startsWith("profile")) {
+    items.push({
+      path: "/profile",
+      title: t("nav.profile"),
+      icon: iconForCode("profile"),
+    });
+  } else if (name.startsWith("point")) {
+    items.push({
+      path: "/profile",
+      title: t("nav.profile"),
+      icon: iconForCode("profile"),
+    });
+  } else if (name.startsWith("settings")) {
+    items.push({
+      path: "/settings",
+      title: t("nav.settings"),
+      icon: iconForCode("settings"),
+    });
     (SETTINGS_BREADCRUMB_PARENTS[name] || []).forEach((mid) => {
-      items.push({path: mid.path, title: t(mid.titleKey), icon: iconForCode(mid.code)});
+      items.push({
+        path: mid.path,
+        title: t(mid.titleKey),
+        icon: iconForCode(mid.code),
+      });
     });
   }
-  if (!['home', 'driver', 'profile', 'device', 'pointValue', 'settings'].includes(name)) {
+  if (
+    !["home", "driver", "profile", "device", "pointValue", "settings"].includes(
+      name,
+    )
+  ) {
     const last = items[items.length - 1];
     if (!last || last.path !== route.path || last.title !== title) {
-      items.push({path: route.path, title, icon: iconForCode(leafCode)});
+      items.push({ path: route.path, title, icon: iconForCode(leafCode) });
     }
   }
   return items;
-});
-
-// Top-level menus come from the backend (dc3_menu). Home is rendered separately
-// as the leftmost entry with its own fixed icon; Settings is reached from the
-// avatar dropdown, not the header bar.
-const topLevelMenus = computed(() => {
-  return (menuStore.tree || [])
-    .filter((n) => n.menuCode !== 'home' && n.menuCode !== 'settings')
-    .slice()
-    .sort((a, b) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0));
 });
 
 const firstRouteableMenuName = (node?: MenuNode): string | undefined => {
@@ -362,24 +421,16 @@ const firstRouteableMenuName = (node?: MenuNode): string | undefined => {
   return undefined;
 };
 
-const settingsEntryName = computed(() => firstRouteableMenuName(menuStore.findByCode('settings')));
-
-const handleMenuEnter = (index: string) => {
-  if (index.indexOf('/') === 0) {
-    const split = index.split('/');
-    if (split.length > 2) {
-      return '/' + split[1];
-    }
-  }
-  return index;
-};
+const settingsEntryName = computed(() =>
+  firstRouteableMenuName(menuStore.findByCode("settings")),
+);
 
 const handleCommand = async (command: string) => {
-  if (command === 'settings') {
+  if (command === "settings") {
     if (settingsEntryName.value) {
-      await router.push({name: settingsEntryName.value});
+      await router.push({ name: settingsEntryName.value });
     }
-  } else if (command === 'logout') {
+  } else if (command === "logout") {
     try {
       await authStore.logout();
     } catch {
@@ -387,82 +438,262 @@ const handleCommand = async (command: string) => {
     }
     menuStore.reset();
     agenticStore.reset();
-    await router.push({name: 'login'});
-  } else if (command === 'help') {
-    const helpWindow = window.open('https://doc.dc3.site', '_blank', 'noopener,noreferrer');
+    await router.push({ name: "login" });
+  } else if (command === "help") {
+    const helpWindow = window.open(
+      "https://dc3.site",
+      "_blank",
+      "noopener,noreferrer",
+    );
     if (helpWindow) helpWindow.opener = null;
   }
 };
 </script>
 
 <style lang="scss" scoped>
+@use '@/styles/glass-capsule.scss' as *;
+
+.skip-link {
+  position: fixed;
+  z-index: 1000;
+  top: var(--dc3-space-2);
+  left: var(--dc3-space-2);
+  padding: var(--dc3-space-2) var(--dc3-space-3);
+  border-radius: var(--dc3-radius-md);
+  background: var(--el-color-primary);
+  color: var(--el-color-white);
+  box-shadow: var(--dc3-shadow-md);
+  transform: translateY(-200%);
+  transition: transform var(--dc3-duration-fast) var(--dc3-ease-standard);
+
+  &:focus {
+    transform: translateY(0);
+    outline: none;
+    box-shadow: var(--dc3-focus-ring), var(--dc3-shadow-md);
+  }
+}
+
 .container {
-  color: #2c3e50;
+  color: var(--dc3-text-primary);
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
 
   .header {
-    width: 100%;
-    height: 60px;
+    position: relative;
+    z-index: 10;
     display: flex;
-    border-bottom: 1px solid #dcdfe6;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--dc3-space-3);
+    box-sizing: border-box;
+    width: 100%;
+    height: var(--dc3-header-height);
+    padding: 9px clamp(10px, 2vw, 24px);
+    border-bottom: 1px solid var(--dc3-border-base);
+    background:
+      radial-gradient(circle at 12% -80%, var(--dc3-ambient-primary), transparent 36%),
+      color-mix(in srgb, var(--dc3-bg-body) 88%, transparent);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
 
-    .header_item {
+    .header_brand_glass,
+    .header_actions_row {
+      flex: 0 1 auto;
+      min-width: 0;
+      max-width: calc(100% - 228px);
+    }
+
+    .header_actions_glass {
+      @include glass-capsule(
+        $extra-bg: color-mix(in srgb, var(--dc3-bg-elevated) 82%, transparent)
+      );
+      transition:
+        border-color 260ms ease,
+        box-shadow 260ms ease;
+
+      &:hover {
+        border-color: var(--dc3-border-strong);
+        box-shadow:
+          var(--dc3-shadow-hover),
+          inset 0 1px 0 var(--dc3-highlight-sheen);
+      }
+    }
+
+    .header_brand_glass {
+      flex: 0 0 auto;
+      padding: 5px 14px 5px 6px;
+    }
+
+    .header_actions_glass {
+      min-width: 0;
+      padding: 3px 5px 3px 7px;
+    }
+
+    .header_menu_wrap {
+      flex: 1 1 auto;
+      min-width: 0;
       height: 100%;
+      overflow: hidden;
     }
 
-    .header_logo {
-      height: 60px;
-      margin-left: 10px;
-    }
-
-    .header_menu {
-      display: flex;
-      justify-content: center;
-      border-bottom: none !important;
-    }
-
-    .header_menu .el-menu-item {
-      font-size: 15px;
+    .header_menu_toggle {
+      display: none;
+      flex: 0 0 auto;
+      margin-right: 2px;
     }
 
     .header_user {
+      flex: 0 0 auto;
       display: flex;
-      justify-content: flex-end;
       align-items: center;
-      padding-right: 20px;
+    }
+
+    .header_utilities {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .header_settings_button {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--dc3-border-base);
+      background: var(--dc3-bg-interactive);
+      color: var(--dc3-text-regular);
+      font-size: 16px;
+      transition: color 180ms ease, background-color 180ms ease, transform 180ms ease;
+
+      &:hover,
+      &:focus-visible {
+        background: var(--dc3-bg-interactive-active);
+        color: var(--dc3-text-brand);
+        transform: rotate(18deg);
+      }
+    }
+
+    .user_trigger {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      min-height: 32px;
+      padding: 2px;
+      border: 0;
+      border-radius: 16px;
+      background: transparent;
+      cursor: pointer;
+      transition: background-color 180ms ease, box-shadow 180ms ease;
+
+      &:hover,
+      &:focus-visible {
+        outline: none;
+        background: var(--dc3-bg-interactive);
+        box-shadow: inset 0 0 0 1px var(--dc3-border-base);
+      }
 
       .user_avatar {
+        display: block;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        box-shadow:
+          0 5px 12px rgba(23, 130, 191, 0.2),
+          inset 0 1px 0 rgba(255, 255, 255, 0.34);
+        object-fit: cover;
+      }
+    }
+
+    .header_actions_divider {
+      flex: 0 0 1px;
+      width: 1px;
+      height: 22px;
+      margin: 0 3px;
+      background: var(--dc3-border-base);
+    }
+
+    // Tablet keeps navigation visible as accessible icon buttons. Language,
+    // settings, and account remain first-class actions in the same capsule.
+    @media (max-width: $breakpoint-sm-max) {
+      .header_actions_row {
+        max-width: calc(100% - 218px);
+      }
+    }
+
+    // Phone keeps exactly two capsules: menu + brand on the left, user on
+    // the right. The drawer remains the navigation surface.
+    @media (max-width: $breakpoint-xs-max) {
+      flex-wrap: wrap;
+      align-content: flex-start;
+      height: 120px;
+      gap: 4px 8px;
+      padding: 8px var(--dc3-space-2);
+
+      .header_brand_glass {
+        min-width: 0;
+        height: 44px;
+        padding: 0 var(--dc3-space-3) 0 4px;
+      }
+
+      .header_menu_toggle {
+        display: inline-flex;
+      }
+
+      .header_actions_row {
+        order: 2;
+        flex: 0 0 100%;
+        width: 100%;
+        max-width: none;
         display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
+        justify-content: center;
+      }
 
-        .el-avatar {
-          background: #ffffff;
-        }
+      .header_actions_glass {
+        flex: 0 0 auto;
+        height: 48px;
+        box-sizing: border-box;
+        max-width: none;
+        padding: 2px 5px;
+      }
 
-        .user_name {
-          color: #303133;
-          font-size: 14px;
-          font-weight: 500;
-        }
+      .header_brand_glass {
+        order: 1;
+        margin-right: auto;
+      }
+
+      .header_settings_button {
+        width: 30px;
+        height: 30px;
       }
     }
   }
 
+  @media (max-width: $breakpoint-xs-max) {
+    --dc3-header-height: 120px;
+  }
+
+  // Mobile navigation drawer content.
+  .nav-drawer {
+    :deep(.el-drawer__body) {
+      padding: var(--dc3-space-2);
+    }
+
+    :deep(.nav-menu) {
+      border-right: none;
+    }
+  }
+
   .body {
-    top: 60px;
+    top: var(--dc3-header-height);
     right: 0;
     left: 0;
     bottom: 0;
     display: flex;
-    min-width: 1280px;
-    padding: 1px 0 5px 0;
+    padding: var(--dc3-space-2);
     overflow: hidden;
     position: absolute;
-    background: #f6f7f9;
+    background: var(--dc3-bg-canvas);
 
     .body-main {
       display: flex;
@@ -474,6 +705,10 @@ const handleCommand = async (command: string) => {
       > .el-scrollbar {
         flex: 1;
         min-height: 0;
+
+        :deep(.el-scrollbar__view) {
+          min-height: 100%;
+        }
       }
 
       .fixed-viewport {
@@ -484,11 +719,14 @@ const handleCommand = async (command: string) => {
     }
 
     .breadcrumb {
-      padding: 12px 20px;
-      margin-bottom: 1px;
-      background: #fff;
-      border-radius: 4px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      padding: var(--dc3-space-2) var(--dc3-space-4);
+      margin-bottom: var(--dc3-space-2);
+      border: 1px solid var(--dc3-border-base);
+      background: var(--dc3-bg-elevated);
+      border-radius: var(--dc3-radius-lg);
+      box-shadow: var(--dc3-shadow-sm);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
 
       .breadcrumb__item {
         display: inline-flex;
@@ -500,26 +738,15 @@ const handleCommand = async (command: string) => {
         font-size: 14px;
       }
     }
-  }
-}
-</style>
 
-<!--
-  Element Plus teleports el-dropdown's popper to <body>, which puts it
-  outside this component's scoped-CSS boundary. The language-switch row
-  lives inside that popper, so its styles need to be non-scoped to
-  actually land on the rendered DOM.
--->
-<style lang="scss">
-.user_lang_row {
-  list-style: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 16px 8px;
+    @media (max-width: $breakpoint-xs-max) {
+      padding: var(--dc3-space-1);
 
-  .user_lang_seg {
-    width: 100%;
+      .breadcrumb {
+        padding: var(--dc3-space-2) var(--dc3-space-3);
+        margin-bottom: var(--dc3-space-1);
+      }
+    }
   }
 }
 </style>

@@ -14,21 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.bo.dashboard;
 
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
 
 /**
  * Hourly bucket from {@code date_trunc('hour', …)} — bucket is the top-of-hour timestamp,
  * count is the number of events in that hour.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -39,5 +36,4 @@ public class HourCountRow {
     private LocalDateTime bucket;
 
     private long count;
-
 }

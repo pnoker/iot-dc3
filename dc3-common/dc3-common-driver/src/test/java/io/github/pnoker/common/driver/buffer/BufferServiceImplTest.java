@@ -14,38 +14,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.buffer;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
+import io.github.pnoker.common.mq.message.MqMessage;
+import io.github.pnoker.common.mq.sender.MessageSender;
+import io.github.pnoker.common.mq.sender.MqPublishException;
+import io.github.pnoker.common.mq.sender.SendConfirmation;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.AmqpException;
-import org.springframework.amqp.rabbit.connection.CorrelationData;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
-import java.nio.file.Path;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.verify;
-
-/**
- * Verifies the buffer service offer/republish lifecycle with a mocked RabbitTemplate.
- *
- * @author pnoker
- * @version 2026.5.22
- * @since 2026.6.2
- */
 @ExtendWith(MockitoExtension.class)
 class BufferServiceImplTest {
 
@@ -53,69 +49,119 @@ class BufferServiceImplTest {
     Path tmp;
 
     @Mock
-    private RabbitTemplate rabbitTemplate;
+    private MessageSender messageSender;
 
-    private DriverProperties properties;
     private BufferServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        properties = new DriverProperties();
-        properties.getBuffer().setEnabled(true);
-        properties.getBuffer().setDbPath(tmp.resolve("buffer.db").toString());
+        DriverProperties properties = new DriverProperties();
+        properties.getBuffer().setDbPath(tmp.resolve("outbox.db").toString());
         properties.getBuffer().setBatchSize(10);
-        properties.getBuffer().setMaxRetry(3);
-        properties.getBuffer().setBackoffSeconds(0);
-        service = new BufferServiceImpl(properties, rabbitTemplate);
+        properties.getBuffer().setBackoffSeconds(1);
+        service = new BufferServiceImpl(properties, messageSender);
         service.initialize();
     }
 
-    @Test
-    void offerPersistsAndRepublishSendsThenDrains() {
-        service.offer(pointValue(), "rk", "id-1", 1);
-        assertThat(service.pendingCount()).as("offer should persist one record").isEqualTo(1);
-
-        service.republishBatch();
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), any(PointValue.class), any(CorrelationData.class));
-        assertThat(service.pendingCount()).as("republish should drain the buffer").isEqualTo(0);
-
-        reset(rabbitTemplate);
-        service.republishBatch();
-        verify(rabbitTemplate, never()).convertAndSend(anyString(), anyString(), any(PointValue.class), any(CorrelationData.class));
+    @AfterEach
+    void tearDown() {
+        service.destroy();
     }
 
     @Test
-    void republishRequeuesOnAmqpExceptionThenResends() {
-        service.offer(pointValue(), "rk", "id-1", 1);
+    void publishPersistsBeforeSendAndDeletesOnlyAfterRoutedConfirm() {
+        doAnswer(invocation -> {
+                    assertThat(service.pendingCount()).isEqualTo(1);
+                    SendConfirmation confirmation = invocation.getArgument(1);
+                    confirmation.onConfirm(invocation.getArgument(0), true, null);
+                    return null;
+                })
+                .when(messageSender)
+                .sendAsync(any(MqMessage.class), any(SendConfirmation.class));
 
-        doThrow(new AmqpException("broker down")).when(rabbitTemplate)
-                .convertAndSend(anyString(), anyString(), any(PointValue.class), any(CorrelationData.class));
-        service.republishBatch();
+        service.publish(pointValue("id-1"), "rk");
 
-        reset(rabbitTemplate);
-        service.republishBatch();
-        verify(rabbitTemplate).convertAndSend(anyString(), anyString(), any(PointValue.class), any(CorrelationData.class));
-
-        reset(rabbitTemplate);
-        service.republishBatch();
-        verify(rabbitTemplate, never()).convertAndSend(anyString(), anyString(), any(PointValue.class), any(CorrelationData.class));
+        assertThat(service.pendingCount()).isZero();
     }
 
     @Test
-    void disabledBufferIsNoOp() {
-        DriverProperties disabledProps = new DriverProperties();
-        disabledProps.getBuffer().setEnabled(false);
-        disabledProps.getBuffer().setDbPath(tmp.resolve("disabled.db").toString());
-        BufferServiceImpl disabled = new BufferServiceImpl(disabledProps, rabbitTemplate);
-        disabled.initialize();
+    void nackRetainsRecordForRetry() {
+        doAnswer(invocation -> {
+                    SendConfirmation confirmation = invocation.getArgument(1);
+                    confirmation.onConfirm(invocation.getArgument(0), false, new MqPublishException("broker nack"));
+                    return null;
+                })
+                .when(messageSender)
+                .sendAsync(any(MqMessage.class), any(SendConfirmation.class));
 
-        assertThat(disabled.isEnabled()).isFalse();
-        disabled.offer(pointValue(), "rk", "id-1", 1);
-        disabled.republishBatch();
-        verify(rabbitTemplate, never()).convertAndSend(anyString(), anyString(), any(PointValue.class), any(CorrelationData.class));
+        service.publish(pointValue("id-2"), "rk");
+
+        assertThat(service.pendingCount()).isEqualTo(1);
     }
 
-    private PointValue pointValue() {
-        return PointValue.builder().deviceId(1L).pointId(2L).rawValue("42").build();
+    @Test
+    void returnedMessageRetainsRecordDespiteAck() {
+        doAnswer(invocation -> {
+                    // routed=false covers the returned-message case: the outbox must retain the row
+                    SendConfirmation confirmation = invocation.getArgument(1);
+                    confirmation.onConfirm(invocation.getArgument(0), false, null);
+                    return null;
+                })
+                .when(messageSender)
+                .sendAsync(any(MqMessage.class), any(SendConfirmation.class));
+
+        service.publish(pointValue("id-3"), "rk");
+
+        assertThat(service.pendingCount()).isEqualTo(1);
+    }
+
+    @Test
+    void synchronousFailureRetainsRecord() {
+        doThrow(new MqPublishException("broker down"))
+                .when(messageSender)
+                .sendAsync(any(MqMessage.class), any(SendConfirmation.class));
+
+        service.publish(pointValue("id-4"), "rk");
+
+        assertThat(service.pendingCount()).isEqualTo(1);
+    }
+
+    @Test
+    void batchPersistsEverythingBeforeFirstPublish() {
+        AtomicInteger sends = new AtomicInteger();
+        doAnswer(invocation -> {
+                    if (sends.getAndIncrement() == 0) {
+                        assertThat(service.pendingCount()).isEqualTo(2);
+                    }
+                    SendConfirmation confirmation = invocation.getArgument(1);
+                    confirmation.onConfirm(invocation.getArgument(0), true, null);
+                    return null;
+                })
+                .when(messageSender)
+                .sendAsync(any(MqMessage.class), any(SendConfirmation.class));
+
+        service.publishBatch(List.of(pointValue("batch-1"), pointValue("batch-2")), "rk");
+
+        assertThat(service.pendingCount()).isZero();
+        verify(messageSender, times(2)).sendAsync(any(MqMessage.class), any(SendConfirmation.class));
+    }
+
+    @Test
+    void publishFailsClosedBeforeOutboxInitialization() {
+        BufferServiceImpl uninitialized = new BufferServiceImpl(new DriverProperties(), messageSender);
+
+        assertThatThrownBy(() -> uninitialized.publish(pointValue("id-5"), "rk"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("outbox is not initialized");
+        verifyNoInteractions(messageSender);
+    }
+
+    private PointValue pointValue(String messageId) {
+        return PointValue.builder()
+                .messageId(messageId)
+                .deviceId(1L)
+                .pointId(2L)
+                .rawValue("42")
+                .build();
     }
 }

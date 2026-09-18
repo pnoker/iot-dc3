@@ -15,8 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {defineComponent, reactive, ref, watch} from 'vue';
+import {computed, defineComponent, onBeforeUnmount, reactive, ref, watch} from 'vue';
 import type {FormInstance, FormRules} from 'element-plus';
+import {ElMessageBox} from 'element-plus';
 import {useI18n} from 'vue-i18n';
 
 import {listPrincipalByIds} from '@/api/principal';
@@ -60,29 +61,37 @@ export default defineComponent({
       visible: false,
       mode: 'add' as FormMode,
       submitting: false,
+      saveError: false,
       form: createEmptyForm(),
       originalForm: createEmptyForm(),
     });
 
     // Owner is fixed (the acting user); show its display name instead of the raw id.
     const ownerName = ref('');
+    let ownerRequestId = 0;
     watch(
       () => reactiveData.form.ownerPrincipalId,
       async (id) => {
+        const requestId = ++ownerRequestId;
         const key = String(id ?? '');
         if (!key || key === '0') {
-          ownerName.value = '';
+          if (requestId === ownerRequestId) ownerName.value = '';
           return;
         }
         try {
           const res: any = await listPrincipalByIds([key]);
-          const p = (res?.data || [])[0];
-          ownerName.value = p ? p.displayName || p.principalName || key : key;
+          const p = (res || [])[0];
+          if (requestId === ownerRequestId) ownerName.value = p ? p.displayName || p.principalName || key : key;
         } catch {
-          ownerName.value = key;
+          if (requestId === ownerRequestId) ownerName.value = key;
         }
       },
       {immediate: true}
+    );
+
+    let formSession = 0;
+    const formDirty = computed(
+      () => reactiveData.visible && JSON.stringify(reactiveData.form) !== JSON.stringify(reactiveData.originalForm)
     );
 
     const rules: FormRules = {
@@ -100,21 +109,24 @@ export default defineComponent({
 
     const reset = () => {
       reactiveData.form =
-        reactiveData.mode === 'edit'
-          ? {...reactiveData.originalForm}
-          : createEmptyForm(reactiveData.form.ownerPrincipalId);
+        {...reactiveData.originalForm};
       reactiveData.submitting = false;
+      reactiveData.saveError = false;
       formRef.value?.clearValidate();
     };
 
     const show = (ownerPrincipalId = '') => {
+      formSession += 1;
       reactiveData.mode = 'add';
       reactiveData.originalForm = createEmptyForm(ownerPrincipalId);
       reactiveData.form = createEmptyForm(ownerPrincipalId);
+      reactiveData.submitting = false;
+      reactiveData.saveError = false;
       reactiveData.visible = true;
     };
 
     const showEdit = (row: any) => {
+      formSession += 1;
       reactiveData.mode = 'edit';
       const initial = {
         ...createEmptyForm(),
@@ -123,22 +135,74 @@ export default defineComponent({
       };
       reactiveData.originalForm = {...initial};
       reactiveData.form = {...initial};
+      reactiveData.submitting = false;
+      reactiveData.saveError = false;
       reactiveData.visible = true;
     };
 
-    const done = () => {
+    const done = (close = true, session = formSession) => {
+      if (session !== formSession) return;
       reactiveData.submitting = false;
-      reactiveData.visible = false;
+      if (close) {
+        reactiveData.originalForm = {...reactiveData.form};
+        reactiveData.visible = false;
+      } else {
+        reactiveData.saveError = true;
+      }
+    };
+
+    const onClosed = () => {
+      formSession += 1;
+      reactiveData.submitting = false;
+      formRef.value?.clearValidate();
+    };
+
+    onBeforeUnmount(() => {
+      formSession += 1;
+      ownerRequestId += 1;
+    });
+
+    const requestClose = async (doneCallback?: () => void) => {
+      if (reactiveData.submitting) return;
+      const session = formSession;
+      if (!formDirty.value) {
+        if (doneCallback) doneCallback();
+        else reactiveData.visible = false;
+        return;
+      }
+      try {
+        await ElMessageBox.confirm(t('common.discardConfirm'), t('common.confirm'), {
+          type: 'warning',
+          confirmButtonText: t('common.confirm'),
+          cancelButtonText: t('common.cancel'),
+        });
+        if (session !== formSession || !reactiveData.visible) return;
+        if (doneCallback) doneCallback();
+        else reactiveData.visible = false;
+      } catch {
+        // Keep the draft open when the user cancels the confirmation.
+      }
     };
 
     const submit = async () => {
+      if (reactiveData.submitting) return;
+      const session = formSession;
+      if (!reactiveData.visible) return;
       const valid = await formRef.value?.validate().catch(() => false);
+      if (session !== formSession || !reactiveData.visible) return;
       if (!valid) return;
       reactiveData.submitting = true;
-      if (reactiveData.mode === 'add') {
-        emit('add-thing', submitPayload(reactiveData.form), done);
-      } else {
-        emit('update-thing', submitPayload(reactiveData.form), done);
+      reactiveData.saveError = false;
+      const finish = (close = true) => done(close, session);
+      try {
+        if (reactiveData.mode === 'add') {
+          emit('add-thing', submitPayload(reactiveData.form), finish);
+        } else {
+          emit('update-thing', submitPayload(reactiveData.form), finish);
+        }
+      } catch {
+        reactiveData.submitting = false;
+        reactiveData.saveError = true;
       }
     };
 
@@ -152,6 +216,8 @@ export default defineComponent({
       showEdit,
       submit,
       ownerName,
+      requestClose,
+      onClosed,
     };
   },
 });

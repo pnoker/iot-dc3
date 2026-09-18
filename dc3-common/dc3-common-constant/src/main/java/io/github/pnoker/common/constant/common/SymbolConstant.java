@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.common;
 
 /**
@@ -24,31 +23,56 @@ package io.github.pnoker.common.constant.common;
  * </p>
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class SymbolConstant {
 
+    /**
+     * dot constant.
+     */
     public static final String DOT = ".";
 
+    /**
+     * underscore constant.
+     */
     public static final String UNDERSCORE = "_";
 
+    /**
+     * hyphen constant.
+     */
     public static final String HYPHEN = "-";
 
+    /**
+     * asterisk constant.
+     */
     public static final String ASTERISK = "*";
 
+    /**
+     * hashtag constant.
+     */
     public static final String HASHTAG = "#";
 
+    /**
+     * colon constant.
+     */
     public static final String COLON = ":";
 
+    /**
+     * double colon constant.
+     */
     public static final String DOUBLE_COLON = "::";
 
+    /**
+     * slash constant.
+     */
     public static final String SLASH = "/";
 
+    /**
+     * double slash constant.
+     */
     public static final String DOUBLE_SLASH = "//";
 
     private SymbolConstant() {
         throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
     }
-
 }

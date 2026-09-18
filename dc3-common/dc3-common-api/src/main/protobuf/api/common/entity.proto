@@ -373,6 +373,20 @@ message GrpcCommandDTO {
   int64 tenant_id = 12;
 }
 
+// Immutable command projection installed in a driver together with a device.
+// Runtime command execution must not perform a manager lookup per invocation.
+message GrpcCommandRuntimeDTO {
+  string command_id = 1;
+  string command_name = 2;
+  string command_code = 3;
+  int32 command_type_flag = 4;
+  int32 call_type_flag = 5;
+  int32 timeout = 6;
+  string command_ext = 7;
+  int32 enable_flag = 8;
+  int32 version = 9;
+}
+
 // Command Param
 message GrpcCommandParamDTO {
   GrpcBase base = 1;
@@ -403,6 +417,18 @@ message GrpcEventDTO {
   string signature = 9;
   int32 version = 10;
   int64 tenant_id = 11;
+}
+
+// Immutable event projection installed in a driver together with a device.
+// Runtime consumers must not perform a manager lookup for every device message.
+message GrpcEventRuntimeDTO {
+  string event_id = 1;
+  string event_name = 2;
+  string event_code = 3;
+  int32 event_type_flag = 4;
+  int32 event_level_flag = 5;
+  int32 enable_flag = 6;
+  int32 version = 7;
 }
 
 // Event Param
@@ -511,4 +537,3 @@ message GrpcEventAttributeConfigDTO {
   // Tenant ID
   int64 tenant_id = 9;
 }
-

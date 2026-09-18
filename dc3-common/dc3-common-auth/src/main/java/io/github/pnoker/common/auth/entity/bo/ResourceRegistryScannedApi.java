@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.bo;
 
 import lombok.AllArgsConstructor;
@@ -28,7 +27,6 @@ import lombok.ToString;
  * A single HTTP endpoint discovered by the resource registrar scanner.
  *
  * @author pnoker
- * @version 2026.5.17
  * @since 2016.10.1
  */
 @Getter
@@ -40,7 +38,7 @@ import lombok.ToString;
 public class ResourceRegistryScannedApi {
 
     /**
-     * HTTP method: GET / POST / PUT / DELETE.
+     * HTTP method: GET / POST / PUT / PATCH / DELETE.
      */
     private String method;
 
@@ -71,5 +69,4 @@ public class ResourceRegistryScannedApi {
      * resource-tree node.
      */
     private String apiGroup;
-
 }

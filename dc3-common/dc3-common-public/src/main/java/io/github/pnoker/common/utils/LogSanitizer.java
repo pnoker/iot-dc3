@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.utils;
 
 /**
@@ -24,13 +23,11 @@ package io.github.pnoker.common.utils;
  * user-controlled strings.
  *
  * @author pnoker
- * @version 2026.7.0
  * @since 2026.7.0
  */
 public final class LogSanitizer {
 
-    private LogSanitizer() {
-    }
+    private LogSanitizer() {}
 
     /**
      * Replace CR and LF characters with their escaped representations.
@@ -42,8 +39,6 @@ public final class LogSanitizer {
         if (input == null) {
             return "null";
         }
-        return input.toString()
-                .replace("\r", "\\r")
-                .replace("\n", "\\n");
+        return input.toString().replace("\r", "\\r").replace("\n", "\\n");
     }
 }

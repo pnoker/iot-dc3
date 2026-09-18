@@ -14,16 +14,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.data.biz.ScheduleForDataService;
 import io.github.pnoker.common.data.entity.property.AlarmCacheProperties;
 import io.github.pnoker.common.data.entity.property.AlarmWindowProperties;
 import io.github.pnoker.common.data.entity.property.NotifyCredentialProperties;
-import io.github.pnoker.common.data.entity.property.PointBatchProperties;
 import lombok.RequiredArgsConstructor;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -32,18 +29,19 @@ import org.springframework.context.annotation.ComponentScan;
 
 /**
  * Data Initialization Runner for DC3 IoT Platform. This class handles data initialization
- * tasks during application startup, configuring component scanning for data-related
- * classes and MyBatis mappers.
+ * tasks during application startup and configuring component scanning for
+ * data-related classes.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @AutoConfiguration
 @ComponentScan(basePackages = {"io.github.pnoker.common.data"})
-@MapperScan(basePackages = {"io.github.pnoker.common.data.mapper"})
-@EnableConfigurationProperties({PointBatchProperties.class, NotifyCredentialProperties.class,
-        AlarmCacheProperties.class, AlarmWindowProperties.class})
+@EnableConfigurationProperties({
+    NotifyCredentialProperties.class,
+    AlarmCacheProperties.class,
+    AlarmWindowProperties.class
+})
 @RequiredArgsConstructor
 public class DataInitRunner implements ApplicationRunner {
 
@@ -59,5 +57,4 @@ public class DataInitRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         scheduleForDataService.initial();
     }
-
 }

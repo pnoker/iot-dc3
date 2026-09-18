@@ -14,18 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.constant.driver;
 
 import io.github.pnoker.common.constant.common.BaseConstant;
-
 import io.github.pnoker.common.constant.common.SymbolConstant;
 
 /**
  * Constants for driver strategy factory routing.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public class StrategyConstant {
@@ -38,29 +35,47 @@ public class StrategyConstant {
      * Storage strategy constant
      *
      * @author pnoker
-     * @version 2025.9.0
      * @since 2016.10.1
      */
     public static class Storage {
 
+        /**
+         * Prefix of repository.
+         */
         public static final String REPOSITORY_PREFIX = "repository" + SymbolConstant.COLON;
 
+        /**
+         * postgres constant.
+         */
         public static final String POSTGRES = "postgres";
 
+        /**
+         * influxdb constant.
+         */
         public static final String INFLUXDB = "influxdb";
 
+        /**
+         * tdengine constant.
+         */
         public static final String TDENGINE = "tdengine";
 
+        /**
+         * opentsdb constant.
+         */
         public static final String OPENTSDB = "opentsdb";
 
+        /**
+         * mongodb constant.
+         */
         public static final String MONGODB = "mongodb";
 
+        /**
+         * elasticsearch constant.
+         */
         public static final String ELASTICSEARCH = "elasticsearch";
 
         private Storage() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }
-
     }
-
 }

@@ -15,101 +15,409 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Standalone module loaded via @use: additionalData injection does not
+// reach module loads, so pull the L2 tokens in explicitly.
+@use '@/styles/tokens.scss' as *;
+@use '@/styles/glass-capsule.scss' as *;
+
+// Login spacing sits on the same 4/8/12/16/24/32 token scale as the rest
+// of the workspace, so gaps read as one system.
 .login-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
   width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, #ffffff, var(--el-color-primary));
-}
+  min-height: 100%;
+  padding: clamp(24px, 5vh, 56px) clamp(24px, 6vw, 88px);
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 16% 14%, var(--dc3-ambient-primary), transparent 34%),
+    radial-gradient(circle at 86% 10%, var(--dc3-ambient-secondary), transparent 30%),
+    var(--dc3-bg-canvas);
+  color: var(--dc3-text-primary);
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  transition: background var(--dc3-duration-slow) var(--dc3-ease-standard);
 
-.login-wrapper-left {
-  margin: 0 0 0 auto;
-  width: 500px;
-  border-radius: 4px;
-  box-shadow: -1px 5px 10px rgba(0, 0, 0, 0.4);
-}
-
-.login-wrapper-right {
-  margin: 0 auto 0 0;
-  width: 500px;
-  border-radius: 4px;
-  box-shadow: 1px 5px 10px rgba(0, 0, 0, 0.4);
-
-  .el-input-group__append {
-    border: none;
+  :deep(.waves) {
+    z-index: -2;
+    opacity: 0.18;
   }
 }
 
-.login-left,
-.login-right {
+.login-orb {
+  position: absolute;
+  z-index: -1;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  filter: blur(12px);
+  pointer-events: none;
+}
+
+.login-orb-primary {
+  left: -120px;
+  bottom: -140px;
+  background: var(--dc3-ambient-primary);
+}
+
+.login-orb-accent {
+  top: -160px;
+  right: -100px;
+  background: var(--dc3-ambient-secondary);
+}
+
+// Sits in the container's bottom padding strip on desktop and tablet; drops
+// into normal flow under the card on phones (see the xs block at EOF).
+.login-footer {
+  position: absolute;
+  z-index: 3;
+  inset-inline: 0;
+  bottom: 10px;
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--dc3-space-2) var(--dc3-space-4);
+  align-items: baseline;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--dc3-text-muted);
+
+  .login-footer-brand {
+    font-weight: 600;
+    color: var(--dc3-text-regular);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--dc3-text-brand);
+    }
+  }
+}
+
+.login-shell {
   position: relative;
-  min-height: 500px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.16fr) minmax(420px, 0.84fr);
+  width: min(1180px, 100%);
+  min-height: min(660px, calc(100vh - 72px));
+  overflow: hidden;
+  border: 1px solid var(--dc3-border-strong);
+  border-radius: var(--dc3-radius-2xl);
+  background: var(--dc3-login-shell-bg);
+  box-shadow:
+    var(--dc3-login-shell-shadow),
+    inset 0 1px 0 var(--dc3-highlight-sheen);
+  backdrop-filter: blur(22px) saturate(1.32);
+  -webkit-backdrop-filter: blur(22px) saturate(1.32);
+}
+
+.login-preferences {
+  position: absolute;
+  z-index: 4;
+  top: 16px;
+  right: 16px;
+}
+
+.login-story {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(32px, 4vw, 56px);
+  overflow: hidden;
+  border-right: 1px solid var(--dc3-border-base);
+  background: var(--dc3-login-story-bg);
+
+  &::after {
+    position: absolute;
+    right: -110px;
+    bottom: -145px;
+    width: 420px;
+    height: 420px;
+    border: 1px solid rgba(23, 150, 210, 0.14);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 42px rgba(23, 150, 210, 0.035),
+      0 0 0 92px rgba(88, 84, 202, 0.025);
+    content: '';
+  }
+}
+
+// Same glass-capsule family as the header brand capsule. The login pill is a
+// hero brand moment, so it stays slightly roomier horizontally.
+.login-brand-pill,
+.login-card-brand {
+  @include glass-capsule;
+  width: fit-content;
+}
+
+.login-brand-pill {
+  padding: 5px 16px 5px 7px;
+}
+
+.login-story-copy {
+  position: relative;
+  z-index: 1;
+  margin: auto 0;
+  max-width: 600px;
+
+  h1 {
+    max-width: 590px;
+    margin: var(--dc3-space-3) 0 var(--dc3-space-5);
+    background: var(--dc3-login-title-gradient);
+    background-clip: text;
+    color: transparent;
+    font-size: clamp(42px, 4vw, 66px);
+    font-weight: 790;
+    letter-spacing: -0.045em;
+    line-height: 1.06;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  p {
+    max-width: 540px;
+    margin: 0;
+    color: var(--dc3-text-regular);
+    font-size: 17px;
+    line-height: 1.8;
+  }
+}
+
+.login-kicker,
+.login-card-kicker {
+  color: var(--dc3-text-brand);
+  font-size: 12px;
+  font-weight: 750;
+  letter-spacing: 0.18em;
+}
+
+.login-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dc3-space-2);
+  margin-top: var(--dc3-space-6);
+
+  span {
+    padding: var(--dc3-space-2) var(--dc3-space-3);
+    border: 1px solid var(--dc3-border-base);
+    border-radius: 999px;
+    background: var(--dc3-login-chip-bg);
+    color: var(--dc3-text-regular);
+    font-size: 13px;
+    box-shadow: inset 0 1px 0 var(--dc3-highlight-sheen);
+  }
+}
+
+.login-runtime-flow {
+  position: relative;
+  z-index: 1;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: var(--dc3-space-3);
+  color: var(--dc3-text-muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+
+  strong {
+    color: var(--dc3-text-brand);
+  }
+
+  i {
+    color: var(--el-color-primary);
+    font-style: normal;
+  }
 }
 
-.login-left {
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
-  justify-content: center;
-  flex-direction: column;
-  background-color: var(--el-color-primary);
-  color: #ffffff;
-  float: left;
-  width: 100%;
-  position: relative;
+.login-card-wrap {
+  display: grid;
+  place-items: center;
+  padding: clamp(32px, 4vw, 56px);
+  background: var(--dc3-login-card-bg);
 }
 
-.login-left .img {
-  width: 350px;
+.login-card {
+  width: min(100%, 390px);
 }
 
-.login-right {
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  justify-content: center;
-  flex-direction: column;
-  background-color: #ffffff;
-  color: #ffffff;
-  float: left;
-  width: 100%;
-  position: relative;
+.login-card-brand {
+  display: none;
 }
 
 .login-main {
-  margin: 0 auto;
-  width: 65%;
+  width: 100%;
   box-sizing: border-box;
 }
 
 .login-title {
-  color: #333;
-  margin-bottom: 40px;
-  font-weight: 500;
-  font-size: 25px;
-  text-align: center;
-  letter-spacing: 4px;
+  margin: var(--dc3-space-2) 0;
+  color: var(--dc3-text-primary);
+  font-size: 32px;
+  font-weight: 760;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+.login-subtitle {
+  margin: 0 0 var(--dc3-space-6);
+  color: var(--dc3-text-muted);
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .login-submit {
   width: 100%;
-  height: 45px;
-  background: none;
-  font-size: 18px;
-  letter-spacing: 2px;
-  font-weight: 300;
-  color: var(--el-color-primary);
+  height: 48px;
+  border: none;
+  border-radius: var(--dc3-radius-xl);
+  background: linear-gradient(110deg, #0874bb, #18a6d9 58%, #5558c9);
+  box-shadow: 0 12px 26px rgba(20, 137, 194, 0.22);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
   cursor: pointer;
-  margin-top: 30px;
-  transition: 0.25s;
+  margin-top: var(--dc3-space-2);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+
+  &:hover,
+  &:focus-visible {
+    background: linear-gradient(110deg, #0868a9, #1396c6 58%, #4a4db7);
+    box-shadow: 0 15px 30px rgba(20, 137, 194, 0.28);
+    transform: translateY(-1px);
+  }
 }
 
 .login-form {
-  margin: 10px 0;
+  margin: 0;
 
   i {
     color: var(--el-color-primary);
+  }
+
+  :deep(.el-form-item) {
+    margin-bottom: var(--dc3-space-5);
+  }
+
+  :deep(.el-input__wrapper) {
+    min-height: 48px;
+    border-radius: var(--dc3-radius-lg);
+    background: var(--dc3-login-input-bg);
+    box-shadow: 0 0 0 1px var(--dc3-border-base) inset;
+    transition: box-shadow 220ms ease, background-color 220ms ease;
+
+    &.is-focus {
+      background: var(--dc3-login-input-focus-bg);
+      box-shadow:
+        0 0 0 1px rgba(18, 150, 219, 0.72) inset,
+        0 8px 22px rgba(18, 150, 219, 0.08);
+    }
+  }
+
+  // The generic wrapper radius above beats Element Plus' group default, so
+  // restore the square seam where the input meets its append button.
+  :deep(.el-input-group--append .el-input__wrapper) {
+    border-radius: var(--dc3-radius-lg) 0 0 var(--dc3-radius-lg);
+  }
+
+  :deep(.el-input-group__append) {
+    border: none;
+    border-radius: 0 var(--dc3-radius-lg) var(--dc3-radius-lg) 0;
+    background: var(--dc3-login-input-bg);
+    box-shadow: 0 0 0 1px var(--dc3-border-base) inset;
+  }
+}
+
+// Tablet: retain the story/form split while reducing visual density.
+@media (max-width: $breakpoint-md-max) {
+  .login-container {
+    padding: 24px;
+  }
+
+  .login-shell {
+    grid-template-columns: minmax(0, 0.88fr) minmax(390px, 1.12fr);
+    min-height: min(620px, calc(100vh - 56px));
+  }
+
+  .login-story {
+    padding: var(--dc3-space-6);
+  }
+
+  .login-story-copy h1 {
+    font-size: clamp(38px, 5vw, 52px);
+  }
+
+  .login-runtime-flow {
+    display: none;
+  }
+}
+
+// Phone: a compact brand introduction sits above the full-width form card.
+@media (max-width: $breakpoint-xs-max) {
+  .login-container {
+    display: block;
+    height: 100dvh;
+    min-height: 100dvh;
+    padding: var(--dc3-space-3);
+    overflow-y: auto;
+  }
+
+  .login-shell {
+    display: block;
+    width: 100%;
+    min-height: calc(100dvh - 48px);
+    border-radius: var(--dc3-radius-2xl);
+  }
+
+  .login-story {
+    // clear the floating preferences capsule pinned to the shell's top-right
+    padding: calc(var(--dc3-space-6) + 40px) var(--dc3-space-3) var(--dc3-space-4);
+    border-right: none;
+    border-bottom: 1px solid var(--dc3-border-base);
+  }
+
+  .login-brand-pill,
+  .login-story-copy p,
+  .login-capabilities,
+  .login-runtime-flow {
+    display: none;
+  }
+
+  .login-story-copy {
+    margin: auto 0 0;
+
+    h1 {
+      max-width: 330px;
+      margin: var(--dc3-space-2) 0 0;
+      font-size: clamp(32px, 10vw, 42px);
+    }
+  }
+
+  .login-card-wrap {
+    padding: var(--dc3-space-3) var(--dc3-space-3) var(--dc3-space-4);
+  }
+
+  .login-card-brand {
+    display: inline-flex;
+    // roomier than the hero pill so the lockup breathes on small screens
+    padding: 7px 24px 7px 10px;
+    margin-bottom: var(--dc3-space-5);
+  }
+
+  .login-title {
+    font-size: 28px;
+  }
+
+  .login-subtitle {
+    margin-bottom: var(--dc3-space-5);
+  }
+}
+
+// Phone: the footer flows under the full-width card instead of overlaying it.
+@media (max-width: $breakpoint-xs-max) {
+  .login-footer {
+    position: static;
+    // keep clear of the card's rounded bottom edge
+    padding: var(--dc3-space-4) var(--dc3-space-3) var(--dc3-space-3);
   }
 }

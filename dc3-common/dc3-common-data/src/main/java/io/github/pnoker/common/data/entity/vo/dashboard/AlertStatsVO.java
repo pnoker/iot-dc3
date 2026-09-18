@@ -14,24 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
-
 /**
  * Aggregate alert counters for the home page alert card.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2026.5.2
  */
 @Getter
@@ -84,6 +81,9 @@ public class AlertStatsVO implements Serializable {
     @Schema(description = "24-element hourly count series for the sparkline, oldest first, always length 24")
     private List<Long> sparkline24h;
 
+    /**
+     * Alert count for one alarm-type bucket of the byType distribution.
+     */
     @Getter
     @Setter
     @ToString
@@ -99,7 +99,5 @@ public class AlertStatsVO implements Serializable {
 
         @Schema(description = "alert count in this bucket", example = "42")
         private long count;
-
     }
-
 }

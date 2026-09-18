@@ -42,30 +42,24 @@
       </template>
     </tool-card>
 
-    <blank-card>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column :label="t('settings.principal.principalName')" min-width="200" prop="principalName"/>
-        <el-table-column :label="t('settings.principal.displayName')" min-width="160" prop="displayName"/>
-        <el-table-column :label="t('settings.principal.principalType')" min-width="150" prop="principalType"/>
-        <el-table-column :label="t('settings.principal.sourceType')" min-width="130" prop="sourceType"/>
-        <!-- @vue-generic {import('@/config/types').PrincipalRecord} -->
-        <el-table-column :label="t('common.enable')" width="90">
-          <template #default="{row}">
-            <el-switch :model-value="isEnabledFlag(row.enableFlag)" @change="() => toggleEnable(row)"/>
-          </template>
-        </el-table-column>
-        <el-table-column
-          :formatter="timestampColumn"
-          :label="t('settings.principal.lastLoginTime')"
-          prop="lastLoginTime"
-          width="165"
+    <responsive-record-list
+      :columns="columns"
+      :empty-text="t('settings.principal.empty')"
+      :loading="reactiveData.loading"
+      :rows="reactiveData.listData"
+      :status="reactiveData.status"
+      @retry="refresh"
+    >
+      <template #cell-enableFlag="{row}">
+        <el-switch
+          :aria-label="`${t('common.enable')}: ${row.principalName || row.id}`"
+          :disabled="isToggling(row)"
+          :loading="isToggling(row)"
+          :model-value="isEnabledFlag(row.enableFlag)"
+          @change="() => toggleEnable(row)"
         />
-        <el-table-column :formatter="timestampColumn" :label="t('common.createTime')" prop="createTime" width="165"/>
-        <template #empty>
-          <el-empty :description="t('settings.principal.empty')"/>
-        </template>
-      </el-table>
-    </blank-card>
+      </template>
+    </responsive-record-list>
   </div>
 </template>
 

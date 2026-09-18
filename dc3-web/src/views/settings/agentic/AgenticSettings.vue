@@ -29,70 +29,60 @@
       @current-change="currentChange"
     />
 
-    <blank-card>
-      <el-table v-loading="reactiveData.loading" :data="reactiveData.listData" class="settings-table" stripe>
-        <el-table-column :label="$t('settings.agentic.label')" min-width="160" prop="label" show-overflow-tooltip/>
-        <el-table-column :label="$t('settings.agentic.model')" min-width="180" prop="model" show-overflow-tooltip/>
-        <el-table-column
-          :label="$t('settings.agentic.provider')"
-          min-width="150"
-          prop="providerName"
-          show-overflow-tooltip
-        />
-        <el-table-column :label="$t('settings.agentic.capabilities')" min-width="210">
-          <template #default="{row}">
-            <div class="agentic-tags">
-              <el-tag :type="row.stream ? 'success' : 'info'" size="small">{{ $t('agentic.capStream') }}</el-tag>
-              <el-tag :type="row.toolCall ? 'success' : 'info'" size="small">{{ $t('agentic.capTools') }}</el-tag>
-              <el-tag :type="row.vision ? 'success' : 'info'" size="small">{{ $t('agentic.capVision') }}</el-tag>
-              <el-tag :type="row.reasoning ? 'success' : 'info'" size="small">{{ $t('agentic.capReasoning') }}</el-tag>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('settings.agentic.default')" width="100">
-          <template #default="{row}">
-            <default-tag :value="row.defaultFlag" size="small"/>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('common.enable')" width="100">
-          <template #default="{row}">
-            <enable-tag :value="row.enableFlag" size="small"/>
-          </template>
-        </el-table-column>
-        <el-table-column :label="$t('common.remark')" min-width="140" prop="remark" show-overflow-tooltip/>
-        <!-- @vue-generic {AgenticModelConfig} -->
-        <el-table-column :label="$t('common.operation')" fixed="right" width="210">
-          <template #default="{row}">
-            <el-button :disabled="!row.id" link type="primary" @click="openDetail(row)"
-            >{{ $t('common.detail') }}
+    <!-- @vue-generic {AgenticModelConfig} -->
+    <responsive-record-list
+      :columns="columns"
+      :loading="reactiveData.loading"
+      :rows="reactiveData.listData"
+      :status="reactiveData.status"
+      openable
+      operation-width="210"
+      @open="openDetail"
+      @retry="refresh"
+    >
+      <template #cell-capabilities="{row}">
+        <div class="agentic-tags">
+          <el-tag :type="row.stream ? 'success' : 'info'" size="small">{{ t('agentic.capStream') }}</el-tag>
+          <el-tag :type="row.toolCall ? 'success' : 'info'" size="small">{{ t('agentic.capTools') }}</el-tag>
+          <el-tag :type="row.vision ? 'success' : 'info'" size="small">{{ t('agentic.capVision') }}</el-tag>
+          <el-tag :type="row.reasoning ? 'success' : 'info'" size="small">{{ t('agentic.capReasoning') }}</el-tag>
+        </div>
+      </template>
+      <template #cell-defaultFlag="{row}">
+        <default-tag :value="row.defaultFlag" size="small"/>
+      </template>
+      <template #cell-enableFlag="{row}">
+        <enable-tag :value="row.enableFlag" size="small"/>
+      </template>
+      <template #actions="{row}">
+        <el-button :disabled="!row.id || isDeleting(row)" link type="primary" @click="openDetail(row)">
+          {{ t('common.detail') }}
+        </el-button>
+        <el-button :disabled="!row.id || isDeleting(row)" link type="primary" @click="openEdit(row)">
+          {{ t('common.edit') }}
+        </el-button>
+        <el-popconfirm
+          :cancel-button-text="t('common.cancel')"
+          :confirm-button-text="t('common.confirm')"
+          :title="t('settings.agentic.confirmDeleteModel', {name: row.model})"
+          @confirm="remove(row)"
+        >
+          <template #reference>
+            <el-button :disabled="!row.id" :loading="isDeleting(row)" link type="danger">
+              {{ t('common.delete') }}
             </el-button>
-            <el-button :disabled="!row.id" link type="primary" @click="openEdit(row)"
-            >{{ $t('common.edit') }}
-            </el-button>
-            <el-popconfirm
-              :cancel-button-text="$t('common.cancel')"
-              :confirm-button-text="$t('common.confirm')"
-              :title="$t('settings.agentic.confirmDeleteModel', {name: row.model})"
-              @confirm="remove(row)"
-            >
-              <template #reference>
-                <el-button :disabled="!row.id" link type="danger">{{ $t('common.delete') }}</el-button>
-              </template>
-            </el-popconfirm>
           </template>
-        </el-table-column>
-        <template #empty>
-          <el-empty :description="$t('common.empty')"/>
-        </template>
-      </el-table>
-    </blank-card>
+        </el-popconfirm>
+      </template>
+    </responsive-record-list>
 
     <model-config-edit-form ref="editRef" :providers="providers" @save="onSave"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
+import {computed, onBeforeUnmount, ref} from 'vue';
+import {useI18n} from 'vue-i18n';
 import {useRouter} from 'vue-router';
 
 import {
@@ -102,23 +92,42 @@ import {
   listAgenticProviders,
   updateAgenticModelConfig,
 } from '@/api/agentic';
-import BlankCard from '@/components/card/blank/BlankCard.vue';
+import ResponsiveRecordList from '@/components/list/ResponsiveRecordList.vue';
 import DefaultTag from '@/components/tag/DefaultTag.vue';
 import EnableTag from '@/components/tag/EnableTag.vue';
 import {usePagedList} from '@/composables/usePagedList';
-import type {AgenticModelConfig, AgenticProvider} from '@/config/types';
+import type {AgenticModelConfig, AgenticProvider, ResponsiveListColumn} from '@/config/types';
 import {successMessage} from '@/utils/notificationUtil';
 
 import modelConfigTool from './tool/ModelConfigTool.vue';
 import modelConfigEditForm from './edit/ModelConfigEditForm.vue';
 
 const router = useRouter();
+const {t} = useI18n();
 const editRef = ref<InstanceType<typeof modelConfigEditForm>>();
 const providers = ref<AgenticProvider[]>([]);
+const deletingIds = ref(new Set<string>());
+let disposed = false;
+
+const columns = computed<ResponsiveListColumn<AgenticModelConfig>[]>(() => [
+  {key: 'label', label: t('settings.agentic.label'), minWidth: 160, mobile: 'primary'},
+  {key: 'model', label: t('settings.agentic.model'), minWidth: 180, mobile: 'detail'},
+  {key: 'providerName', label: t('settings.agentic.provider'), minWidth: 150, mobile: 'detail'},
+  {
+    key: 'capabilities',
+    label: t('settings.agentic.capabilities'),
+    minWidth: 210,
+    kind: 'custom',
+    mobile: 'detail',
+  },
+  {key: 'defaultFlag', label: t('settings.agentic.default'), width: 100, kind: 'default', mobile: 'detail'},
+  {key: 'enableFlag', label: t('common.enable'), width: 100, kind: 'enable', mobile: 'detail'},
+  {key: 'remark', label: t('common.remark'), minWidth: 140, mobile: 'hidden'},
+]);
 
 interface ModelConfigQuery {
   model?: string;
-  providerId?: string | number;
+  providerId?: string;
   enableFlag?: string;
 }
 
@@ -130,13 +139,13 @@ const {
   sort,
   sizeChange,
   currentChange,
-  withLoading,
+  loadClientData,
 } = usePagedList<AgenticModelConfig, ModelConfigQuery>({
   filter: (rows, query) => {
     let filtered = rows;
     if (query.model) {
       const model = String(query.model).toLowerCase();
-      filtered = filtered.filter((row) => row.model.toLowerCase().includes(model));
+      filtered = filtered.filter((row) => String(row.model ?? '').toLowerCase().includes(model));
     }
     if (query.providerId) {
       filtered = filtered.filter((row) => String(row.providerId) === String(query.providerId));
@@ -150,11 +159,14 @@ const {
 });
 
 const load = () =>
-  withLoading(async () => {
-    const [configResponse, providerResponse] = await Promise.all([listAgenticModelConfigs(), listAgenticProviders()]);
-    providers.value = providerResponse.data || [];
-    setAllData(configResponse.data || []);
-  });
+  loadClientData(
+    () => Promise.all([listAgenticModelConfigs(), listAgenticProviders()]),
+    ([configResponse, providerResponse]) => {
+      if (disposed) return;
+      providers.value = providerResponse || [];
+      setAllData(configResponse || []);
+    }
+  );
 
 const refresh = () => load();
 
@@ -166,36 +178,52 @@ const openDetail = (row: AgenticModelConfig) => {
 };
 const openEdit = (row: AgenticModelConfig) => editRef.value?.showEdit(row);
 
-const onSave = (form: AgenticModelConfig, done: () => void) => {
+const onSave = (form: AgenticModelConfig, done: (close?: boolean) => void) => {
   const apiCall = form.id ? updateAgenticModelConfig(form) : addAgenticModelConfig(form);
   apiCall
     .then(() => {
+      if (disposed) return;
       successMessage();
-      load();
+      void load();
       done();
     })
     .catch(() => {
+      if (!disposed) done(false);
     });
 };
 
 const remove = (row: AgenticModelConfig) => {
-  if (!row.id) return;
+  const id = String(row.id || '');
+  if (!id || deletingIds.value.has(id)) return;
+  deletingIds.value.add(id);
   deleteAgenticModelConfig(String(row.id))
     .then(() => {
+      if (disposed) return;
       successMessage();
-      load();
+      void load();
     })
     .catch(() => {
+      // handled globally
+    })
+    .finally(() => {
+      deletingIds.value.delete(id);
     });
 };
 
-load();
+const isDeleting = (row: AgenticModelConfig) => deletingIds.value.has(String(row.id));
+
+onBeforeUnmount(() => {
+  disposed = true;
+  deletingIds.value.clear();
+});
+
+void load();
 </script>
 
 <style lang="scss" scoped>
 .agentic-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--dc3-space-2);
 }
 </style>

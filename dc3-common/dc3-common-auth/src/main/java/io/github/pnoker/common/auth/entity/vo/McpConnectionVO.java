@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,19 +21,17 @@ import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.OAuthGrantTypeEnum;
 import io.github.pnoker.common.enums.PrincipalTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-
 /**
  * View object for MCP connection API responses.
  *
  * @author pnoker
- * @version 2026.6.19
  * @since 2026.6.19
  */
 @Getter
@@ -53,13 +50,13 @@ public class McpConnectionVO extends BaseVO {
     private String clientId;
 
     @Schema(description = "Principal that owns the connection.", example = "1024")
-    private Long principalId;
+    private String principalId;
 
     @Schema(description = "Principal type: USER or SERVICE_ACCOUNT.", example = "USER")
     private PrincipalTypeEnum principalType;
 
     @Schema(description = "Tenant the connection belongs to.", example = "1")
-    private Long tenantId;
+    private String tenantId;
 
     @Schema(description = "Authorization grant type.", example = "authorization_code")
     private OAuthGrantTypeEnum grantType;
@@ -75,5 +72,4 @@ public class McpConnectionVO extends BaseVO {
 
     @Schema(description = "Timestamp when the connection was last used.", example = "2026-06-19 12:00:00")
     private LocalDateTime lastUsedTime;
-
 }

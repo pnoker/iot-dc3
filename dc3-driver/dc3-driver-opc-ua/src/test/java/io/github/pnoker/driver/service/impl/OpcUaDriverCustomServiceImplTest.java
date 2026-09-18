@@ -14,8 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.driver.service.impl;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
@@ -32,6 +39,19 @@ import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.driver.key.KeyLoader;
+import io.github.pnoker.driver.key.OpcUaKeyLoaderFactory;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.identity.AnonymousProvider;
 import org.eclipse.milo.opcua.sdk.client.api.identity.IdentityProvider;
@@ -49,26 +69,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verifyNoInteractions;
-
 @ExtendWith(MockitoExtension.class)
 class OpcUaDriverCustomServiceImplTest {
 
@@ -78,21 +78,42 @@ class OpcUaDriverCustomServiceImplTest {
     @Mock
     private DriverSenderService driverSenderService;
 
+    @Mock
+    private OpcUaKeyLoaderFactory keyLoaderFactory;
+
+    @Mock
+    private KeyLoader keyLoader;
+
     private OpcUaDriverCustomServiceImpl service;
 
     private static Map<String, AttributeBO> driverConfig(String host, int port, String path) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("host", AttributeBO.builder().value(host).type(AttributeTypeEnum.STRING).build());
-        m.put("port", AttributeBO.builder().value(String.valueOf(port)).type(AttributeTypeEnum.INT).build());
-        m.put("path", AttributeBO.builder().value(path).type(AttributeTypeEnum.STRING).build());
+        m.put(
+                "host",
+                AttributeBO.builder().value(host).type(AttributeTypeEnum.STRING).build());
+        m.put(
+                "port",
+                AttributeBO.builder()
+                        .value(String.valueOf(port))
+                        .type(AttributeTypeEnum.INT)
+                        .build());
+        m.put(
+                "path",
+                AttributeBO.builder().value(path).type(AttributeTypeEnum.STRING).build());
         return m;
     }
 
     private static Map<String, AttributeBO> pointConfig(int namespace, String tag) {
         Map<String, AttributeBO> m = new HashMap<>();
-        m.put("namespace",
-                AttributeBO.builder().value(String.valueOf(namespace)).type(AttributeTypeEnum.INT).build());
-        m.put("tag", AttributeBO.builder().value(tag).type(AttributeTypeEnum.STRING).build());
+        m.put(
+                "namespace",
+                AttributeBO.builder()
+                        .value(String.valueOf(namespace))
+                        .type(AttributeTypeEnum.INT)
+                        .build());
+        m.put(
+                "tag",
+                AttributeBO.builder().value(tag).type(AttributeTypeEnum.STRING).build());
         return m;
     }
 
@@ -129,8 +150,9 @@ class OpcUaDriverCustomServiceImplTest {
     }
 
     @BeforeEach
-    void setUp() {
-        service = new OpcUaDriverCustomServiceImpl(driverMetadata, driverSenderService);
+    void setUp() throws Exception {
+        Mockito.when(keyLoaderFactory.load()).thenReturn(keyLoader);
+        service = new OpcUaDriverCustomServiceImpl(driverMetadata, driverSenderService, keyLoaderFactory);
         service.initial();
     }
 
@@ -143,12 +165,6 @@ class OpcUaDriverCustomServiceImplTest {
 
     @Test
     void scheduleDoesNotReportDeviceStatus() {
-        assertThatNoException().isThrownBy(() -> service.schedule());
-        verifyNoInteractions(driverSenderService);
-    }
-
-    @Test
-    void scheduleIsSilentWhenNoDevicesRegistered() {
         assertThatNoException().isThrownBy(() -> service.schedule());
         verifyNoInteractions(driverSenderService);
     }
@@ -188,12 +204,16 @@ class OpcUaDriverCustomServiceImplTest {
     @Test
     void connectorFailureIsTranslatedToConnectorException() throws Exception {
         try (MockedStatic<OpcUaClient> staticMock = Mockito.mockStatic(OpcUaClient.class)) {
-            staticMock.when(() -> OpcUaClient.create(anyString(),
-                    any(Function.class),
-                    any(Function.class))).thenThrow(new UaException(0L, "endpoint refused"));
+            staticMock
+                    .when(() -> OpcUaClient.create(anyString(), any(Function.class), any(Function.class)))
+                    .thenThrow(new UaException(0L, "endpoint refused"));
 
-            assertThatThrownBy(() -> service.read(driverConfig("h", 4840, "/"), pointConfig(2, "tag.x"),
-                    device(1L), point(PointTypeEnum.STRING))).isInstanceOf(ConnectorException.class)
+            assertThatThrownBy(() -> service.read(
+                            driverConfig("h", 4840, "/"),
+                            pointConfig(2, "tag.x"),
+                            device(1L),
+                            point(PointTypeEnum.STRING)))
+                    .isInstanceOf(ConnectorException.class)
                     .hasMessageContaining("endpoint refused");
             assertThat(connectionMap()).doesNotContainKey(1L);
         }
@@ -203,18 +223,17 @@ class OpcUaDriverCustomServiceImplTest {
     void connectorIsCachedAcrossSubsequentInvocations() throws Exception {
         OpcUaClient client = Mockito.mock(OpcUaClient.class);
         try (MockedStatic<OpcUaClient> staticMock = Mockito.mockStatic(OpcUaClient.class)) {
-            staticMock.when(() -> OpcUaClient.create(anyString(),
-                    any(Function.class),
-                    any(Function.class))).thenReturn(client);
+            staticMock
+                    .when(() -> OpcUaClient.create(anyString(), any(Function.class), any(Function.class)))
+                    .thenReturn(client);
 
             // Trigger the connector twice with the same device id; static factory should
             // be invoked only once because the client is cached after the first hit.
             invokeGetConnector(1L, driverConfig("h", 4840, "/"));
             invokeGetConnector(1L, driverConfig("h", 4840, "/"));
 
-            staticMock.verify(() -> OpcUaClient.create(anyString(),
-                    any(Function.class),
-                    any(Function.class)), times(1));
+            staticMock.verify(
+                    () -> OpcUaClient.create(anyString(), any(Function.class), any(Function.class)), times(1));
             assertThat(connectionMap()).containsKey(1L);
         }
     }
@@ -229,7 +248,10 @@ class OpcUaDriverCustomServiceImplTest {
                 "writeNode", OpcUaClient.class, NodeId.class, WritePointValue.class);
         method.setAccessible(true);
 
-        Boolean ok = (Boolean) method.invoke(service, client, new NodeId(2, "tag.x"),
+        Boolean ok = (Boolean) method.invoke(
+                service,
+                client,
+                new NodeId(2, "tag.x"),
                 WritePointValue.builder().value("7").type(PointTypeEnum.INT).build());
 
         assertThat(ok).isTrue();
@@ -268,15 +290,15 @@ class OpcUaDriverCustomServiceImplTest {
     }
 
     private void invokeGetConnector(Long deviceId, Map<String, AttributeBO> driverConfig) throws Exception {
-        Method method =
-                OpcUaDriverCustomServiceImpl.class.getDeclaredMethod("getConnector", Long.class, Map.class);
+        Method method = OpcUaDriverCustomServiceImpl.class.getDeclaredMethod("getConnector", Long.class, Map.class);
         method.setAccessible(true);
         method.invoke(service, deviceId, driverConfig);
     }
 
     @Test
     void healthReportsDegradedModeWhenKeyLoaderFailed() throws Exception {
-        setCertificateDegraded(true);
+        Mockito.when(keyLoaderFactory.load()).thenThrow(new IOException("keystore unavailable"));
+        service.initial();
         OpcUaClient client = Mockito.mock(OpcUaClient.class);
         Mockito.when(client.connect()).thenReturn(CompletableFuture.completedFuture(client));
         connectionMap().put(1L, client);
@@ -289,7 +311,6 @@ class OpcUaDriverCustomServiceImplTest {
 
     @Test
     void healthReportsOnlineWhenNotDegraded() throws Exception {
-        setCertificateDegraded(false);
         OpcUaClient client = Mockito.mock(OpcUaClient.class);
         Mockito.when(client.connect()).thenReturn(CompletableFuture.completedFuture(client));
         connectionMap().put(2L, client);
@@ -309,9 +330,9 @@ class OpcUaDriverCustomServiceImplTest {
         // the thrown ConnectorException is wrapped by InvocationTargetException —
         // assert on the root cause.
         try (MockedStatic<OpcUaClient> staticMock = Mockito.mockStatic(OpcUaClient.class)) {
-            staticMock.when(() -> OpcUaClient.create(anyString(),
-                    any(Function.class),
-                    any(Function.class))).thenThrow(new UaException(0L, "endpoint refused"));
+            staticMock
+                    .when(() -> OpcUaClient.create(anyString(), any(Function.class), any(Function.class)))
+                    .thenThrow(new UaException(0L, "endpoint refused"));
 
             // Three failures accumulate into failureMap (threshold reached).
             for (int i = 0; i < 3; i++) {
@@ -330,9 +351,8 @@ class OpcUaDriverCustomServiceImplTest {
                     .hasMessageContaining("backoff");
 
             // Backoff path must NOT have touched OpcUaClient.create again (3 invocations, not 4).
-            staticMock.verify(() -> OpcUaClient.create(anyString(),
-                    any(Function.class),
-                    any(Function.class)), times(3));
+            staticMock.verify(
+                    () -> OpcUaClient.create(anyString(), any(Function.class), any(Function.class)), times(3));
         }
     }
 
@@ -354,12 +374,6 @@ class OpcUaDriverCustomServiceImplTest {
         Mockito.verify(badClient).disconnect();
     }
 
-    private void setCertificateDegraded(boolean value) throws Exception {
-        Field field = OpcUaDriverCustomServiceImpl.class.getDeclaredField("certificateDegraded");
-        field.setAccessible(true);
-        field.setBoolean(service, value);
-    }
-
     @SuppressWarnings("unchecked")
     private Map<Long, OpcUaClient> connectionMap() throws Exception {
         Field field = OpcUaDriverCustomServiceImpl.class.getDeclaredField("connectMap");
@@ -373,5 +387,4 @@ class OpcUaDriverCustomServiceImplTest {
         field.setAccessible(true);
         return (Map<Long, Object>) field.get(service);
     }
-
 }

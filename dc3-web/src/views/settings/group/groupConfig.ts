@@ -15,19 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import type {ComposerTranslation} from 'vue-i18n';
-
 import {addGroup, deleteGroup, listGroup, updateGroup} from '@/api/group';
 import {ENTITY_TYPE_OPTIONS} from '@/config/constant/enums';
 import type {GroupRecord} from '@/config/types/manager';
-import type {EntityListConfig} from '@/config/types/entityList';
+import type {EntityListConfig, Translator} from '@/config/types/entityList';
 import {nameRules, remarkRules} from '@/utils/formRuleUtil';
 
-const GROUP_PAGE_QUERY = {page: {current: 1, size: 5000, orders: [{column: 'group_index', asc: true}]}};
+const GROUP_PAGE_QUERY = {offset: 0, limit: 200, sort: [{field: 'group_index', direction: 'ASC' as const}]};
 
 const loadGroupRecords = async (): Promise<GroupRecord[]> => {
   const res = await listGroup(GROUP_PAGE_QUERY);
-  return (res.data?.records || []) as GroupRecord[];
+  return (res?.items || []) as GroupRecord[];
 };
 
 /** Build a sorted tree from flat GroupRecord rows. */
@@ -77,7 +75,7 @@ const normalizeGroupPayload = (payload: Record<string, unknown>) => {
   return next;
 };
 
-export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => ({
+export const createGroupConfig = (t: Translator): EntityListConfig => ({
   name: 'group',
   title: t('nav.settingsGroup'),
   editable: true,
@@ -178,6 +176,6 @@ export const createGroupConfig = (t: ComposerTranslation): EntityListConfig => (
   update: (payload) => updateGroup(normalizeGroupPayload(payload) as Parameters<typeof updateGroup>[0]),
   remove: deleteGroup,
   detail: {routeName: 'settingsGroupDetail'},
-  confirmDeleteText: t('settings.group.confirmDelete'),
+  confirmDeleteText: t('common.confirmDelete', {name: t('common.entityGroup')}),
   emptyText: t('settings.group.empty'),
 });

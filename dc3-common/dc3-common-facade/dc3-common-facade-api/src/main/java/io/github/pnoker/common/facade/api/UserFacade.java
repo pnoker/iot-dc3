@@ -14,16 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadeUserBO;
+import reactor.core.publisher.Mono;
 
 /**
  * Protocol-neutral user facade. Mirrors {@code api.center.auth.UserApi}.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 public interface UserFacade {
@@ -31,11 +30,10 @@ public interface UserFacade {
     /**
      * @return the user, or {@code null} when the id does not match any user.
      */
-    FacadeUserBO getById(Long id);
+    Mono<FacadeUserBO> getById(Long tenantId, Long id);
 
     /**
      * @return the user, or {@code null} when the principal id does not match any user.
      */
-    FacadeUserBO getByPrincipalId(Long principalId);
-
+    Mono<FacadeUserBO> getByPrincipalId(Long tenantId, Long principalId);
 }

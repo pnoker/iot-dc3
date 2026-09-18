@@ -17,9 +17,9 @@
 package io.github.pnoker.common.agentic.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,13 +27,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
 /**
  * OpenAI-compatible non-streaming chat completion response.
  *
  * @author pnoker
- * @version 2025.9.0
  * @see <a href="https://platform.openai.com/docs/api-reference/chat/object">OpenAI Chat
  * Object</a>
  * @since 2016.10.1
@@ -47,24 +44,35 @@ import java.util.List;
 @Schema(description = "OpenAI-compatible non-streaming chat completion response returned by the agentic service.")
 public class ChatCompletionResponseVO {
 
-    @Schema(description = "Unique identifier of this completion response, prefixed with 'chatcmpl-'.", example = "chatcmpl-abc123xyz")
+    @Schema(
+            description = "Unique identifier of this completion response, prefixed with 'chatcmpl-'.",
+            example = "chatcmpl-abc123xyz")
     private String id;
 
-    @Schema(description = "Object type discriminator; always 'chat.completion' for non-streaming responses.", example = "chat.completion")
+    @Schema(
+            description = "Object type discriminator; always 'chat.completion' for non-streaming responses.",
+            example = "chat.completion")
     private String object;
 
-    @Schema(description = "Unix timestamp (seconds since epoch) when the completion was created.", example = "1718700000")
+    @Schema(
+            description = "Unix timestamp (seconds since epoch) when the completion was created.",
+            example = "1718700000")
     private long created;
 
     @Schema(description = "Identifier of the model that generated the response.", example = "gpt-4o")
     private String model;
 
-    @Schema(description = "List of generated completion choices; contains one entry per requested choice (n parameter).")
+    @Schema(
+            description =
+                    "List of generated completion choices; contains one entry per requested choice (n parameter).")
     private List<Choice> choices;
 
     @Schema(description = "Token usage statistics for the request and response.")
     private Usage usage;
 
+    /**
+     * One completion choice: index + assistant message.
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -73,19 +81,21 @@ public class ChatCompletionResponseVO {
     public static class Choice {
 
         @Schema(description = "Zero-based index of this choice within the choices array.", example = "0")
-
         private int index;
 
         @Schema(description = "Generated assistant message containing role and content.")
-
         private Message message;
 
-        @Schema(description = "Reason the model stopped generating tokens; 'stop' means natural end, 'length' means token limit reached.", example = "stop")
-
+        @Schema(
+                description =
+                        "Reason the model stopped generating tokens; 'stop' means natural end, 'length' means token limit reached.",
+                example = "stop")
         private String finishReason;
-
     }
 
+    /**
+     * Generated assistant message (role + content).
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -93,21 +103,25 @@ public class ChatCompletionResponseVO {
     @ToString
     public static class Message {
 
-        @Schema(description = "Role of the message author; always 'assistant' for generated responses.", example = "assistant")
-
+        @Schema(
+                description = "Role of the message author; always 'assistant' for generated responses.",
+                example = "assistant")
         private String role;
 
-        @Schema(description = "Text content of the assistant's reply; null when content_ext carries structured content.", example = "The temperature sensor reads 23.5 °C.")
-
+        @Schema(
+                description = "Text content of the assistant's reply; null when contentExt carries structured content.",
+                example = "The temperature sensor reads 23.5 °C.")
         private String content;
 
-        @Schema(description = "Structured content extension carrying multi-part or tool-call message payloads; present when plain text content is insufficient.")
-
-        @JsonProperty("content_ext")
+        @Schema(
+                description =
+                        "Structured content extension carrying multi-part or tool-call message payloads; present when plain text content is insufficient.")
         private AgenticMessageContent contentExt;
-
     }
 
+    /**
+     * Token usage of the completion (prompt/completion/total).
+     */
     @Getter
     @Setter
     @NoArgsConstructor
@@ -116,17 +130,14 @@ public class ChatCompletionResponseVO {
     public static class Usage {
 
         @Schema(description = "Number of tokens consumed by the input prompt.", example = "42")
-
         private int promptTokens;
 
         @Schema(description = "Number of tokens generated in the completion response.", example = "128")
-
         private int completionTokens;
 
-        @Schema(description = "Total tokens used by the request; equals promptTokens + completionTokens.", example = "170")
-
+        @Schema(
+                description = "Total tokens used by the request; equals promptTokens + completionTokens.",
+                example = "170")
         private int totalTokens;
-
     }
-
 }

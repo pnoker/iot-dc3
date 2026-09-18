@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.entity.bo;
 
 import io.github.pnoker.common.driver.entity.dto.CommandAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.DriverAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.EventAttributeDTO;
 import io.github.pnoker.common.driver.entity.dto.PointAttributeDTO;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,16 +30,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
-
 /**
  * Registration payload used when a driver instance announces itself to the manager
  * center.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -60,6 +57,16 @@ public class RegisterBO implements Serializable {
      * Driver client identifier.
      */
     private String client;
+
+    /**
+     * Runtime node identity.
+     */
+    private String node;
+
+    /**
+     * Requested runtime lease duration in seconds.
+     */
+    private Integer leaseSeconds;
 
     /**
      * Driver definition to register.
@@ -85,5 +92,4 @@ public class RegisterBO implements Serializable {
      * Event-level attribute definitions.
      */
     private List<EventAttributeDTO> eventAttributes;
-
 }

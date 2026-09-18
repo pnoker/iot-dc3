@@ -14,24 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.entity.vo.dashboard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.Serial;
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.io.Serial;
-import java.io.Serializable;
 
 /**
  * A device whose alarm rate deviates sharply from its profile peers. The ratio field is
  * alarmCount / peerMedian; service filters to ratio &gt;= 3.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Getter
@@ -45,10 +42,10 @@ public class PeerDeviationVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "profile ID the device belongs to", example = "1024")
-    private long profileId;
+    private String profileId;
 
     @Schema(description = "device ID")
-    private long deviceId;
+    private String deviceId;
 
     @Schema(description = "alarm count for this device", example = "15")
     private long alarmCount;
@@ -61,5 +58,4 @@ public class PeerDeviationVO implements Serializable {
      */
     @Schema(description = "alarmCount divided by peerMedian; 0 means peerMedian was 0", example = "5.00")
     private double ratio;
-
 }

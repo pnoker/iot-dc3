@@ -29,18 +29,33 @@
          chip deep-links into the event-overview tab that owns the signal. -->
     <sla-badge/>
 
+    <el-alert
+      v-if="hasDataError"
+      :closable="false"
+      :title="$t('common.loadFailed')"
+      class="home__error"
+      show-icon
+      type="error"
+    >
+      <el-button :loading="loading" link type="danger" @click="refreshAll">
+        {{ $t('common.retry') }}
+      </el-button>
+    </el-alert>
+
     <!-- Row 1: 6 indicator cards, always 6-wide via CSS grid -->
     <div class="home__stats">
       <stat-card
         v-for="c in cards"
         :key="c.key"
         :icon="c.icon"
+        :loading="c.loading"
         :on-refresh="c.onRefresh"
         :sparkline="c.sparkline"
         :subtitle="c.subtitle"
         :title="c.title"
         :tone="c.tone"
         :trend="c.trend"
+        :error="c.error"
         :value="c.value"
         @click="c.onClick"
       />
@@ -103,7 +118,7 @@
 
 <script lang="ts" setup>
 import type {Component} from 'vue';
-import {computed, onMounted, reactive} from 'vue';
+import {computed, onBeforeUnmount, onMounted, reactive} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRouter} from 'vue-router';
 import {Bell, List, Management, Promotion, TrendCharts, Warning} from '@element-plus/icons-vue';
@@ -142,6 +157,8 @@ interface CardModel {
   tone: Tone;
   trend: { direction: 'up' | 'down' | 'flat'; label: string } | null;
   sparkline: number[];
+  loading: boolean;
+  error: boolean;
   onClick: () => void;
   onRefresh: () => Promise<void> | void;
 }
@@ -175,7 +192,7 @@ interface ListPageSummary {
   total?: number;
 }
 
-type ListPageResponse = R<ListPageSummary>;
+type ListPageResponse = ListPageSummary;
 
 const {t} = useI18n();
 const router = useRouter();
@@ -205,87 +222,111 @@ const state = reactive<HomeState>({
   alertSparkline: [],
 });
 
-const emptyPage = {current: 1, size: 1};
+type HomeSection = 'totals' | 'today' | 'sparkline' | 'alerts' | 'growth';
+const sectionStatus = reactive<Record<HomeSection, 'idle' | 'loading' | 'success' | 'error'>>({
+  totals: 'idle',
+  today: 'idle',
+  sparkline: 'idle',
+  alerts: 'idle',
+  growth: 'idle',
+});
+const loading = computed(() => Object.values(sectionStatus).some((value) => value === 'loading'));
+const hasDataError = computed(() => Object.values(sectionStatus).some((value) => value === 'error'));
+const sectionPending = (...sections: HomeSection[]) =>
+  sections.some((section) => sectionStatus[section] === 'idle' || sectionStatus[section] === 'loading');
+const sectionFailed = (...sections: HomeSection[]) => sections.some((section) => sectionStatus[section] === 'error');
+const cardState = (...sections: HomeSection[]) => {
+  const error = sectionFailed(...sections);
+  return {loading: !error && sectionPending(...sections), error};
+};
+let alive = true;
+const sectionTasks = new Map<HomeSection, Promise<void>>();
+
+const runSection = (section: HomeSection, task: () => Promise<void>) => {
+  if (sectionTasks.has(section)) return sectionTasks.get(section)!;
+  sectionStatus[section] = 'loading';
+  const request = task()
+    .then(() => {
+      if (alive) sectionStatus[section] = 'success';
+    })
+    .catch(() => {
+      if (alive) sectionStatus[section] = 'error';
+    })
+    .finally(() => {
+      sectionTasks.delete(section);
+    });
+  sectionTasks.set(section, request);
+  return request;
+};
+
+const emptyPage = {offset: 0, limit: 1};
 const toNumber = (value: number | string | null | undefined) => Number(value) || 0;
 const toNumberArray = (values: Array<number | string | null | undefined>) => values.map((value) => toNumber(value));
-const getSettledTotal = (result: PromiseSettledResult<ListPageResponse>) =>
-  result.status === 'fulfilled' ? toNumber(result.value.data.total) : 0;
 
 const loadTotals = async () => {
-  const [driverRes, deviceRes, pointRes, profileRes] = await Promise.allSettled([
-    listDriver<ListPageResponse>({page: emptyPage}),
-    listDevice<ListPageResponse>({page: emptyPage}),
-    listPoint<ListPageResponse>({page: emptyPage}),
-    listProfile<ListPageResponse>({page: emptyPage}),
+  const [driverRes, deviceRes, pointRes, profileRes] = await Promise.all([
+    listDriver<ListPageResponse>(emptyPage),
+    listDevice<ListPageResponse>(emptyPage),
+    listPoint<ListPageResponse>(emptyPage),
+    listProfile<ListPageResponse>(emptyPage),
   ]);
 
-  state.driverCount = getSettledTotal(driverRes);
-  state.deviceCount = getSettledTotal(deviceRes);
-  state.pointCount = getSettledTotal(pointRes);
-  state.profileCount = getSettledTotal(profileRes);
+  if (!alive) return;
+  state.driverCount = toNumber(driverRes.total);
+  state.deviceCount = toNumber(deviceRes.total);
+  state.pointCount = toNumber(pointRes.total);
+  state.profileCount = toNumber(profileRes.total);
 };
 
 const loadToday = async () => {
-  try {
-    const res = await statsToday();
-    const data: StatsTodaySummary = res.data;
-    state.todayCount = toNumber(data.today);
-    state.todayPercentChange = toNumber(data.percentChange);
-    state.totalCount = toNumber(data.total);
-  } catch {
-    // handled globally
-  }
+  const res = await statsToday();
+  if (!alive) return;
+  const data: StatsTodaySummary = res;
+  state.todayCount = toNumber(data.today);
+  state.todayPercentChange = toNumber(data.percentChange);
+  state.totalCount = toNumber(data.total);
 };
 
 const loadSparkline = async () => {
-  try {
-    const res = await statsTimeseries({granularity: 'hour', rangeKey: '24h'});
-    const buckets: StatsTimeBucket[] = res.data;
-    state.todaySparkline = buckets.map((bucket) => toNumber(bucket.count));
-  } catch {
-    // handled globally
-  }
+  const res = await statsTimeseries({granularity: 'hour', rangeKey: '24h'});
+  if (!alive) return;
+  const buckets: StatsTimeBucket[] = res;
+  state.todaySparkline = buckets.map((bucket) => toNumber(bucket.count));
 };
 
 const loadAlerts = async () => {
-  try {
-    const res = await alertStats();
-    const data: AlertStatsSummary = res.data;
-    state.alertCount = toNumber(data.total);
-    state.alertUnconfirmed = toNumber(data.unconfirmed);
-    state.deviceAlertCount = toNumber(data.deviceAlerts);
-    state.driverAlertCount = toNumber(data.driverAlerts);
-    state.deviceUnconfirmed = toNumber(data.deviceUnconfirmed);
-    state.driverUnconfirmed = toNumber(data.driverUnconfirmed);
-    state.todayDeviceAlarms = toNumber(data.todayDeviceAlarms);
-    state.todayDriverAlarms = toNumber(data.todayDriverAlarms);
-    state.todayDeviceUnconfirmed = toNumber(data.todayDeviceUnconfirmed);
-    state.todayDriverUnconfirmed = toNumber(data.todayDriverUnconfirmed);
-    state.alertSparkline = toNumberArray(data.sparkline24h ?? []);
-  } catch {
-    // handled globally
-  }
+  const res = await alertStats();
+  if (!alive) return;
+  const data: AlertStatsSummary = res;
+  state.alertCount = toNumber(data.total);
+  state.alertUnconfirmed = toNumber(data.unconfirmed);
+  state.deviceAlertCount = toNumber(data.deviceAlerts);
+  state.driverAlertCount = toNumber(data.driverAlerts);
+  state.deviceUnconfirmed = toNumber(data.deviceUnconfirmed);
+  state.driverUnconfirmed = toNumber(data.driverUnconfirmed);
+  state.todayDeviceAlarms = toNumber(data.todayDeviceAlarms);
+  state.todayDriverAlarms = toNumber(data.todayDriverAlarms);
+  state.todayDeviceUnconfirmed = toNumber(data.todayDeviceUnconfirmed);
+  state.todayDriverUnconfirmed = toNumber(data.todayDriverUnconfirmed);
+  state.alertSparkline = toNumberArray(data.sparkline24h ?? []);
 };
 
 const loadGrowth = async () => {
-  try {
-    const res = await dailyGrowth(7);
-    const data: DailyGrowthSummary = res.data;
-    state.driverSparkline = toNumberArray(data.driverDailyCounts ?? []);
-    state.deviceSparkline = toNumberArray(data.deviceDailyCounts ?? []);
-    state.pointSparkline = toNumberArray(data.pointDailyCounts ?? []);
-  } catch {
-    // handled globally
-  }
+  const res = await dailyGrowth(7);
+  if (!alive) return;
+  const data: DailyGrowthSummary = res;
+  state.driverSparkline = toNumberArray(data.driverDailyCounts ?? []);
+  state.deviceSparkline = toNumberArray(data.deviceDailyCounts ?? []);
+  state.pointSparkline = toNumberArray(data.pointDailyCounts ?? []);
 };
 
-onMounted(() => {
-  void loadTotals();
-  void loadToday();
-  void loadSparkline();
-  void loadAlerts();
-  void loadGrowth();
-});
+const refreshAll = () => Promise.all([
+  runSection('totals', loadTotals),
+  runSection('today', loadToday),
+  runSection('sparkline', loadSparkline),
+  runSection('alerts', loadAlerts),
+  runSection('growth', loadGrowth),
+]);
 
 const percentTrend = computed(() => {
   const percent = state.todayPercentChange;
@@ -299,14 +340,22 @@ const percentTrend = computed(() => {
 });
 
 const refreshDriver = async () => {
-  await Promise.all([loadTotals(), loadGrowth()]);
+  await Promise.all([runSection('totals', loadTotals), runSection('growth', loadGrowth)]);
 };
 const refreshDevice = refreshDriver;
 const refreshPoint = refreshDriver;
 const refreshData = async () => {
-  await Promise.all([loadToday(), loadSparkline()]);
+  await Promise.all([runSection('today', loadToday), runSection('sparkline', loadSparkline)]);
 };
-const refreshAlert = loadAlerts;
+const refreshAlert = () => runSection('alerts', loadAlerts);
+
+onMounted(() => {
+  void refreshAll();
+});
+
+onBeforeUnmount(() => {
+  alive = false;
+});
 
 const sparkTrend = (spark: number[]): { direction: 'up' | 'down' | 'flat'; label: string } | null => {
   if (spark.length < 2) {
@@ -330,11 +379,12 @@ const cards = computed<CardModel[]>(() => [
     key: 'driver',
     title: t('home.driverCount'),
     value: state.driverCount,
-    subtitle: t('home.entityAlarms', {n: state.driverAlertCount}),
+    subtitle: sectionStatus.alerts === 'success' ? t('home.entityAlarms', {n: state.driverAlertCount}) : '',
     icon: Promotion,
     tone: 'blue',
     trend: sparkTrend(state.driverSparkline),
     sparkline: state.driverSparkline,
+    ...cardState('totals'),
     onClick: () => router.push({name: 'driver'}),
     onRefresh: refreshDriver,
   },
@@ -342,11 +392,12 @@ const cards = computed<CardModel[]>(() => [
     key: 'device',
     title: t('home.deviceCount'),
     value: state.deviceCount,
-    subtitle: t('home.entityAlarms', {n: state.deviceAlertCount}),
+    subtitle: sectionStatus.alerts === 'success' ? t('home.entityAlarms', {n: state.deviceAlertCount}) : '',
     icon: Management,
     tone: 'purple',
     trend: sparkTrend(state.deviceSparkline),
     sparkline: state.deviceSparkline,
+    ...cardState('totals'),
     onClick: () => router.push({name: 'device'}),
     onRefresh: refreshDevice,
   },
@@ -359,6 +410,7 @@ const cards = computed<CardModel[]>(() => [
     tone: 'orange',
     trend: sparkTrend(state.pointSparkline),
     sparkline: state.pointSparkline,
+    ...cardState('totals'),
     onClick: () => router.push({name: 'profile'}),
     onRefresh: refreshPoint,
   },
@@ -366,11 +418,12 @@ const cards = computed<CardModel[]>(() => [
     key: 'data',
     title: t('home.todayData'),
     value: state.todayCount,
-    subtitle: state.totalCount > 0 ? t('home.todayTotal', {n: state.totalCount}) : '',
+    subtitle: sectionStatus.today === 'success' && state.totalCount > 0 ? t('home.todayTotal', {n: state.totalCount}) : '',
     icon: TrendCharts,
     tone: 'green',
     trend: percentTrend.value,
     sparkline: state.todaySparkline,
+    ...cardState('today'),
     onClick: () => router.push({name: 'pointValue'}),
     onRefresh: refreshData,
   },
@@ -383,6 +436,7 @@ const cards = computed<CardModel[]>(() => [
     tone: 'red',
     trend: sparkTrend(state.alertSparkline),
     sparkline: state.alertSparkline,
+    ...cardState('alerts'),
     onClick: () => router.push({name: 'settingsDriverAlarm'}),
     onRefresh: refreshAlert,
   },
@@ -395,6 +449,7 @@ const cards = computed<CardModel[]>(() => [
     tone: 'orange',
     trend: sparkTrend(state.alertSparkline),
     sparkline: state.alertSparkline,
+    ...cardState('alerts'),
     onClick: () => router.push({name: 'settingsDeviceAlarm'}),
     onRefresh: refreshAlert,
   },
@@ -402,27 +457,37 @@ const cards = computed<CardModel[]>(() => [
 </script>
 
 <style lang="scss" scoped>
+// One gutter everywhere: 8px (--dc3-space-2) horizontally (el-row gutter
+// and grid gap) and vertically (block rhythm). Header-to-content uses the
+// same 8px via .body padding, so every edge and every gap sits on the
+// same grid.
 .home {
-  padding: 0 4px;
+  padding: 0;
+
+  &__error {
+    margin-bottom: var(--dc3-space-2);
+  }
 
   .home__row {
-    margin-bottom: 8px;
+    margin-bottom: var(--dc3-space-2);
 
     &:last-child {
       margin-bottom: 0;
     }
   }
 
-  // el-row already carries the 8px vertical rhythm between rows. On wide
+  // el-row carries the horizontal gutter while the page token owns vertical
+  // rhythm. On wide
   // screens the cols sit side-by-side so they don't need a bottom margin
   // of their own — adding one stacked with .home__row margin-bottom,
   // blowing the gap out to 16px. Only the narrow-screen breakpoint where
-  // cols collapse into a single column actually needs the extra spacer.
+  // cols collapse into a single column (:md=24, i.e. tablet and below)
+  // actually needs the extra spacer.
   .home__col {
     margin-bottom: 0;
 
-    @media (max-width: 1024px) {
-      margin-bottom: 8px;
+    @media (max-width: $breakpoint-sm-max) {
+      margin-bottom: var(--dc3-space-2);
 
       &:last-child {
         margin-bottom: 0;
@@ -432,27 +497,27 @@ const cards = computed<CardModel[]>(() => [
 
   // SlaBadge is conditionally rendered between the banner row and the
   // stat grid. Neither neighbour sets a top margin, so by default the
-  // badge sits flush against the stats. Restore the page's 8px rhythm
+  // badge sits flush against the stats. Restore the page rhythm
   // so it reads as its own strip, not as a banner appendage.
   .sla-badge {
-    margin-bottom: 8px;
+    margin-bottom: var(--dc3-space-2);
   }
 
   // Stat indicators: always fit the strip on one line, regardless of how
-  // many cards the cards computed property ends up with. Below 1280px
-  // (tablet / mobile) fall back to 2 cols so cards don't squeeze below
-  // their minimum usable width.
+  // many cards the cards computed property ends up with. Below the lg
+  // tier (tablet / mobile) fall back to 3 cols, and to a single column on
+  // mobile, so cards don't squeeze below their minimum usable width.
   .home__stats {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: var(--dc3-space-2);
+    margin-bottom: var(--dc3-space-2);
 
-    @media (max-width: 1280px) {
+    @media (max-width: $breakpoint-md-max) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: $breakpoint-xs-max) {
       grid-template-columns: 1fr;
     }
   }

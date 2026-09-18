@@ -14,18 +14,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.data.biz.alarm;
 
 import io.github.pnoker.common.data.entity.property.AlarmWindowProperties;
 import io.github.pnoker.common.enums.WindowModeEnum;
+import java.time.Duration;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
-
-import java.time.Duration;
-import java.util.List;
-import java.util.Objects;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
  * Routes a window request to either the in-memory buffer (short windows) or
@@ -39,7 +38,6 @@ import java.util.Objects;
  * directly when they want to target one side.
  *
  * @author pnoker
- * @version 2026.5.21
  * @since 2026.5.21
  */
 @Component
@@ -49,17 +47,17 @@ public class HybridWindowDataSource implements WindowDataSource {
 
     private final LocalWindowDataSource localWindowDataSource;
 
-    private final RepositoryWindowDataSource repositoryWindowDataSource;
+    private final TsdbWindowDataSource tsdbWindowDataSource;
 
     private final AlarmWindowProperties properties;
 
     @Override
-    public AggregateOutcome aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode) {
+    public Mono<AggregateOutcome> aggregate(WindowSpec spec, RuleFact fact, WindowModeEnum mode) {
         return select(spec).aggregate(spec, fact, mode);
     }
 
     @Override
-    public List<WindowSample> samples(WindowSpec spec, RuleFact fact) {
+    public Flux<WindowSample> samples(WindowSpec spec, RuleFact fact) {
         return select(spec).samples(spec, fact);
     }
 
@@ -71,7 +69,6 @@ public class HybridWindowDataSource implements WindowDataSource {
         if (Objects.isNull(cutoff) || spec.duration().compareTo(cutoff) <= 0) {
             return localWindowDataSource;
         }
-        return repositoryWindowDataSource;
+        return tsdbWindowDataSource;
     }
-
 }

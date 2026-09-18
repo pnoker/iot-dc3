@@ -16,8 +16,30 @@
   -->
 
 <template>
-  <el-dialog v-model="visible" :title="t('settings.mcp.connectionInfo')" width="640px">
-    <el-descriptions :column="1" border>
+  <el-dialog
+    v-model="visible"
+    :aria-busy="loading"
+    :close-on-click-modal="!loading"
+    :close-on-press-escape="!loading"
+    :title="t('settings.mcp.connectionInfo')"
+    class="things-dialog"
+    destroy-on-close
+    :width="isMobile ? 'calc(100% - 16px)' : '640px'"
+    @closed="invalidateRequest"
+  >
+    <el-alert
+      v-if="loadError"
+      :closable="false"
+      :title="t('common.loadFailed')"
+      class="connection-info__alert"
+      show-icon
+      type="error"
+    >
+      <el-button :loading="loading" link type="danger" @click="loadMetadata">
+        {{ t('common.retry') }}
+      </el-button>
+    </el-alert>
+    <el-descriptions v-loading="loading" :column="1" border>
       <el-descriptions-item :label="t('settings.mcp.serverUrl')">{{ mcpServerUrl }}</el-descriptions-item>
       <el-descriptions-item :label="t('settings.mcp.clientId')">{{ clientId || '-' }}</el-descriptions-item>
       <el-descriptions-item :label="t('settings.mcp.issuer')">{{ metadata.issuer || '-' }}</el-descriptions-item>
@@ -28,31 +50,72 @@
         {{ metadata.token_endpoint || '-' }}
       </el-descriptions-item>
     </el-descriptions>
+    <template #footer>
+      <el-button :disabled="loading" @click="visible = false">{{ t('common.close') }}</el-button>
+    </template>
   </el-dialog>
 </template>
 
 <script lang="ts" setup>
-import {computed, ref} from 'vue';
+import {computed, onBeforeUnmount, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
 
 import {getMcpMetadata} from '@/api/mcp';
+import {useBreakpoint} from '@/composables/useBreakpoint';
 import {MCP_SERVER_PATH} from '@/config/constant/api';
-import type {McpConnectionRecord} from '@/config/types';
+import type {McpConnectionRecord, McpMetadata} from '@/config/types';
 
 const {t} = useI18n();
+const {isMobile} = useBreakpoint();
 
 const visible = ref(false);
+const loading = ref(false);
+const loadError = ref(false);
 const clientId = ref('');
-const metadata = ref<Record<string, any>>({});
+const metadata = ref<McpMetadata>({});
+let requestSequence = 0;
 
 const mcpServerUrl = computed(() => `${window.location.origin}${MCP_SERVER_PATH}`);
 
-const open = async (row: McpConnectionRecord) => {
-  clientId.value = row.clientId || '';
-  visible.value = true;
-  const res = await getMcpMetadata();
-  metadata.value = res.data || {};
+const invalidateRequest = () => {
+  requestSequence += 1;
+  loading.value = false;
 };
+
+const loadMetadata = async () => {
+  const requestId = ++requestSequence;
+  loading.value = true;
+  loadError.value = false;
+  try {
+    const res = await getMcpMetadata();
+    if (requestId !== requestSequence || !visible.value) return;
+    metadata.value = res || {};
+  } catch {
+    if (requestId !== requestSequence || !visible.value) return;
+    loadError.value = true;
+  } finally {
+    if (requestId === requestSequence) loading.value = false;
+  }
+};
+
+const open = (row: McpConnectionRecord) => {
+  invalidateRequest();
+  clientId.value = row.clientId || '';
+  metadata.value = {};
+  loadError.value = false;
+  visible.value = true;
+  void loadMetadata();
+};
+
+onBeforeUnmount(() => {
+  invalidateRequest();
+});
 
 defineExpose({open});
 </script>
+
+<style lang="scss" scoped>
+.connection-info__alert {
+  margin-bottom: var(--dc3-space-3);
+}
+</style>

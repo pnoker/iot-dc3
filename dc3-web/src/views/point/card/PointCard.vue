@@ -24,7 +24,8 @@
           :icon="icon"
           :name="data.pointName"
           :status-title="$t('common.name')"
-          @copy-id="copy(data.id, $t('point.card.profile'))"
+          :copy-label="$t('point.card.copyPointId')"
+          @copy-id="copy(data.id, $t('point.card.copyPointId'))"
         />
         <div class="things-card__body">
           <div class="things-card-body-content">
@@ -57,7 +58,7 @@
                 <span
                 ><el-icon><Edit/></el-icon> {{ $t('common.operationTime') }}:
                 </span>
-                {{ timestamp(data.operateTime) }}
+                {{ timestamp(data.operateTime || '') }}
               </li>
             </ul>
             <ul class="things-body-content-item-column-2">
@@ -65,7 +66,7 @@
                 <span
                 ><el-icon><Location/></el-icon> {{ $t('point.card.dataType') }}:
                 </span>
-                {{ $t(pointTypeKey(data.pointTypeFlag)) }}
+                {{ $t(pointTypeKey(data.pointTypeFlag || '')) }}
               </li>
               <li class="nowrap-item">
                 <span
@@ -83,13 +84,13 @@
                 <span
                 ><el-icon><Location/></el-icon> {{ $t('point.card.rw') }}:
                 </span>
-                {{ $t(rwFlagKey(data.rwFlag)) }}
+                {{ $t(rwFlagKey(data.rwFlag || '')) }}
               </li>
               <li class="nowrap-item">
                 <span
                 ><el-icon><Sunset/></el-icon> {{ $t('common.createTime') }}:
                 </span>
-                {{ timestamp(data.createTime) }}
+                {{ timestamp(data.createTime || '') }}
               </li>
             </ul>
           </div>
@@ -101,10 +102,11 @@
         </div>
         <things-card-actions
           v-if="!embedded"
-          :delete-title="$t('point.card.confirmDelete')"
-          :disable-title="$t('point.card.confirmDisable')"
-          :enable-title="$t('point.card.confirmEnable')"
+          :delete-title="$t('common.confirmDelete', {name: $t('common.entityPoint')})"
+          :disable-title="$t('common.confirmDisable', {name: $t('common.entityPoint')})"
+          :enable-title="$t('common.confirmEnable', {name: $t('common.entityPoint')})"
           :enabled="enabled"
+          :busy="busy"
           @delete="emitDelete"
           @detail="emit('detail', data)"
           @disable="emitToggle('disable')"
@@ -121,33 +123,34 @@ import {computed, type PropType} from 'vue';
 import {Edit, List, Location, Sunset} from '@element-plus/icons-vue';
 import {copy} from '@/utils/commonUtil';
 import {timestamp} from '@/utils/dateUtil';
-import {successMessage} from '@/utils/notificationUtil';
 import {pointTypeKey, rwFlagKey} from '@/utils/pointFormatUtil';
 import {isEnabledFlag} from '@/utils/thingModelFormatUtil';
 import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 import ThingsCardActions from '@/components/card/actions/ThingsCardActions.vue';
+import type {PointRecord} from '@/config/types/manager';
 
 const props = defineProps({
   embedded: {type: Boolean, default: false},
-  data: {type: Object as PropType<Record<string, any>>, default: () => ({})},
+  data: {type: Object as PropType<PointRecord>, required: true},
   profile: {type: Object as PropType<Record<string, any>>, default: () => ({})},
   icon: {type: String, default: 'images/common/point.png'},
+  busy: {type: Boolean, default: false},
 });
 
 const emit = defineEmits(['disable', 'enable', 'delete', 'edit', 'detail']);
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const emitToggle = (name: 'disable' | 'enable') => {
-  emit(name, props.data.id, props.data.profileId, () => successMessage());
+  emit(name, props.data);
 };
 
 const emitDelete = () => {
-  emit('delete', props.data.id, () => successMessage());
+  emit('delete', props.data);
 };
 </script>
 
 <style lang="scss" scoped>
-// PointCard 用双栏列表展示字段,200px 固定宽度是为了和卡片尺寸匹配。
+// A fixed 200px field width keeps PointCard's two-column list aligned with the card size.
 .things-body-content-item-column-2 {
   width: 200px;
 }

@@ -36,6 +36,24 @@
 
     <dependencies>
 
+        <!-- Present only so Spring's annotation introspection of the (excluded)
+             gRPC OAuth2 resource-server autoconfiguration resolves cleanly instead
+             of logging TypeNotPresent warnings at boot; no beans are created. -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-resource-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-runtime</artifactId>
+        </dependency><dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-postgres-agentic</artifactId>
+        </dependency>
         <!-- Agentic domain logic (controllers, tools, config) -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
@@ -53,7 +71,7 @@
         <!-- Resource registrar — syncs discovered endpoints to auth resource tables -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-resource-registrar</artifactId>
+            <artifactId>dc3-common-resource</artifactId>
             <version>${dc3.version}</version>
         </dependency>
 

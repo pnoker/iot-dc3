@@ -14,14 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.driver.service;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
-
 import java.util.Map;
 
 /**
@@ -43,7 +41,6 @@ import java.util.Map;
  * that are meaningful for their protocol.
  *
  * @author pnoker
- * @version 2026.5.22
  * @since 2026.5.22
  */
 public interface DriverValidator {
@@ -117,5 +114,4 @@ public interface DriverValidator {
             default -> "0";
         };
     }
-
 }

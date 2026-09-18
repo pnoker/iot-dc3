@@ -1,0 +1,6 @@
+# Patterns to ignore when building the chart package.
+*.tmpl
+.git
+.gitignore
+README.md
+values-production.yaml

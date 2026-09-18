@@ -14,17 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.optional;
 
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class CollectionOptionalTest {
 
@@ -46,8 +44,7 @@ class CollectionOptionalTest {
     @Test
     void ifPresentOrElseFiresFallbackForEmpty() {
         AtomicBoolean fallback = new AtomicBoolean(false);
-        CollectionOptional.<Integer>ofNullable(List.of()).ifPresentOrElse(values -> {
-        }, () -> fallback.set(true));
+        CollectionOptional.<Integer>ofNullable(List.of()).ifPresentOrElse(values -> {}, () -> fallback.set(true));
         assertThat(fallback).isTrue();
     }
 
@@ -55,8 +52,7 @@ class CollectionOptionalTest {
     void ifPresentOrElseInvokesActionForNonEmpty() {
         AtomicReference<Collection<?>> captured = new AtomicReference<>();
         AtomicBoolean fallback = new AtomicBoolean(false);
-        CollectionOptional.ofNullable(List.of(7))
-                .ifPresentOrElse(captured::set, () -> fallback.set(true));
+        CollectionOptional.ofNullable(List.of(7)).ifPresentOrElse(captured::set, () -> fallback.set(true));
         assertThat(captured.get()).hasSize(1).first().isEqualTo(7);
         assertThat(fallback).isFalse();
     }

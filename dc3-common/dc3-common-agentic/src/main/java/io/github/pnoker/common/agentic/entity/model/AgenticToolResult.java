@@ -18,7 +18,6 @@ package io.github.pnoker.common.agentic.entity.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.pnoker.common.constant.service.AgenticConstant;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -26,45 +25,96 @@ import java.util.Objects;
  * Structured return envelope for agentic tool calls.
  *
  * @author pnoker
- * @version 2026.5.16
  * @since 2016.10.1
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public record AgenticToolResult<T>(boolean success, String code, String message, T data,
-                                   List<AgenticVisualizationSpec> visualizations) {
+public record AgenticToolResult<T>(
+        boolean success, String code, String message, T data, List<AgenticVisualizationSpec> visualizations) {
 
+    /** Agentic tool result compact constructor: normalizes the record. */
     public AgenticToolResult {
         visualizations = List.copyOf(Objects.requireNonNullElse(visualizations, List.of()));
     }
 
+    /**
+     * Ok.
+     *
+     * @param <T>     generic type parameter
+     * @param message message
+     * @param data    data
+     * @return ok result
+     */
     public static <T> AgenticToolResult<T> ok(String message, T data) {
         return ok(message, data, List.of());
     }
 
-    public static <T> AgenticToolResult<T> ok(String message, T data,
-                                              List<AgenticVisualizationSpec> visualizations) {
+    /**
+     * Ok.
+     *
+     * @param <T>            generic type parameter
+     * @param message        message
+     * @param data           data
+     * @param visualizations visualizations
+     * @return ok result
+     */
+    public static <T> AgenticToolResult<T> ok(String message, T data, List<AgenticVisualizationSpec> visualizations) {
         return new AgenticToolResult<>(true, AgenticConstant.ToolResult.CODE_OK, message, data, visualizations);
     }
 
+    /**
+     * Empty.
+     *
+     * @param <T>     generic type parameter
+     * @param message message
+     * @param data    data
+     * @return empty result
+     */
     public static <T> AgenticToolResult<T> empty(String message, T data) {
         return new AgenticToolResult<>(true, AgenticConstant.ToolResult.CODE_EMPTY, message, data, List.of());
     }
 
+    /**
+     * Invalid.
+     *
+     * @param <T>     generic type parameter
+     * @param message message
+     * @return invalid result
+     */
     public static <T> AgenticToolResult<T> invalid(String message) {
-        return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_INVALID_ARGUMENT, message, null,
-                List.of());
+        return new AgenticToolResult<>(
+                false, AgenticConstant.ToolResult.CODE_INVALID_ARGUMENT, message, null, List.of());
     }
 
+    /**
+     * Not found.
+     *
+     * @param <T>     generic type parameter
+     * @param message message
+     * @return not found result
+     */
     public static <T> AgenticToolResult<T> notFound(String message) {
         return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_NOT_FOUND, message, null, List.of());
     }
 
+    /**
+     * Unavailable.
+     *
+     * @param <T>     generic type parameter
+     * @param message message
+     * @return unavailable result
+     */
     public static <T> AgenticToolResult<T> unavailable(String message) {
         return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_UNAVAILABLE, message, null, List.of());
     }
 
+    /**
+     * Error.
+     *
+     * @param <T>     generic type parameter
+     * @param message message
+     * @return error result
+     */
     public static <T> AgenticToolResult<T> error(String message) {
         return new AgenticToolResult<>(false, AgenticConstant.ToolResult.CODE_ERROR, message, null, List.of());
     }
-
 }

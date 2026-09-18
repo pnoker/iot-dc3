@@ -8,6 +8,8 @@
 
 ## Verification / 验证
 
+- [ ] `make check` 通过 / passes
+
 ### 后端 / Backend (Java / Maven)
 
 - [ ] `mvn -B -DskipTests compile` 通过 / passes
@@ -16,8 +18,8 @@
 
 ### 前端 / Frontend (dc3-web)
 
-- [ ] `pnpm lint-check && pnpm check && pnpm build` 通过 / passes
-- [ ] 大范围改动通过 `pnpm run test:ci` 覆盖门槛 / large changes meet the `pnpm run test:ci` coverage gate
+- [ ] `(cd dc3-web && corepack pnpm lint:check && corepack pnpm check && corepack pnpm build)` 通过 / passes
+- [ ] 大范围改动通过 `(cd dc3-web && corepack pnpm run test:ci)` 覆盖门槛 / large changes meet the coverage gate
 - [ ] E2E 数据动态创建并清理，无固定业务 ID / E2E data is created and cleaned up dynamically, no hard-coded business IDs
 - [ ] 文档已更新（如有 UI / 行为变更） / docs updated (if UI / behavior changed)
 

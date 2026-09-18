@@ -14,10 +14,8 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.auth.entity.builder;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.pnoker.common.auth.entity.bo.ApiBO;
 import io.github.pnoker.common.auth.entity.model.ApiDO;
 import io.github.pnoker.common.auth.entity.vo.ApiVO;
@@ -28,25 +26,24 @@ import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.CodeUtil;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.common.utils.PageUtil;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 /**
  * MapStruct builder converting between API BO, VO, and DO.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
-@Mapper(componentModel = "spring", uses = {MapStructUtil.class})
+@Mapper(
+        componentModel = "spring",
+        uses = {MapStructUtil.class})
 public interface ApiBuilder {
 
     /**
@@ -77,6 +74,12 @@ public interface ApiBuilder {
     @Mapping(target = "deleted", ignore = true)
     ApiDO buildDOByBO(ApiBO entityBO);
 
+    /**
+     * After process.
+     *
+     * @param entityBO business object
+     * @param entityDO persistence object
+     */
     @AfterMapping
     default void afterProcess(ApiBO entityBO, @MappingTarget ApiDO entityDO) {
         // Code
@@ -97,7 +100,6 @@ public interface ApiBuilder {
 
         // ApiType Flag
         ApiTypeEnum apiTypeFlag = entityBO.getApiTypeFlag();
-        entityDO.setApiTypeFlag(apiTypeFlag.getIndex());
         Optional.ofNullable(apiTypeFlag).ifPresent(value -> entityDO.setApiTypeFlag(value.getIndex()));
 
         // Enable Flag
@@ -124,6 +126,12 @@ public interface ApiBuilder {
     @Mapping(target = "enableFlag", ignore = true)
     ApiBO buildBOByDO(ApiDO entityDO);
 
+    /**
+     * After process.
+     *
+     * @param entityDO persistence object
+     * @param entityBO business object
+     */
     @AfterMapping
     default void afterProcess(ApiDO entityDO, @MappingTarget ApiBO entityBO) {
         // Json Ext
@@ -169,25 +177,4 @@ public interface ApiBuilder {
      * @return EntityVO Array
      */
     List<ApiVO> buildVOListByBOList(List<ApiBO> entityBOList);
-
-    /**
-     * DOPage to BOPage
-     *
-     * @param entityPageDO EntityDO Page
-     * @return EntityBO Page
-     */
-    default Page<ApiBO> buildBOPageByDOPage(Page<ApiDO> entityPageDO) {
-        return PageUtil.copyPage(entityPageDO, this::buildBOByDO);
-    }
-
-    /**
-     * BOPage to VOPage
-     *
-     * @param entityPageBO EntityBO Page
-     * @return EntityVO Page
-     */
-    default Page<ApiVO> buildVOPageByBOPage(Page<ApiBO> entityPageBO) {
-        return PageUtil.copyPage(entityPageBO, this::buildVOByBO);
-    }
-
 }

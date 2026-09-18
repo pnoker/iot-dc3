@@ -14,31 +14,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 package io.github.pnoker.common.init;
 
 import io.github.pnoker.common.auth.config.OAuthProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 
 /**
  * Authentication Initialization Runner for DC3 IoT Platform. This class handles
  * authentication initialization tasks during application startup, configuring component
- * scanning for authentication-related classes and MyBatis mappers.
+ * scanning for authentication-related classes.
  *
  * @author pnoker
- * @version 2025.9.0
  * @since 2016.10.1
  */
 @Slf4j
 @AutoConfiguration
-@ComponentScan(basePackages = {"io.github.pnoker.common.auth"})
-@MapperScan(basePackages = {"io.github.pnoker.common.auth.mapper"})
+@ComponentScan(
+        basePackages = {"io.github.pnoker.common.auth"},
+        excludeFilters =
+                @ComponentScan.Filter(
+                        type = FilterType.REGEX,
+                        pattern = "io\\.github\\.pnoker\\.common\\.auth\\.dal\\..*"))
 @EnableConfigurationProperties(OAuthProperties.class)
 public class AuthInitRunner implements ApplicationRunner {
 
@@ -47,5 +49,4 @@ public class AuthInitRunner implements ApplicationRunner {
         // Currently no initialization tasks are required
         // This method can be extended to add future authentication initialization logic
     }
-
 }
