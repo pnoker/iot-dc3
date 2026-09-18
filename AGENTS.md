@@ -120,8 +120,9 @@ Allowed types are `feat`, `fix`, `perf`, `refactor`, `docs`, `build`, `ci`, `tes
 `revert`. Use `!` for breaking changes and explain the impact in the body. Keep subjects specific enough for release
 notes; a changelog-only commit must use exactly `docs(release): update generated changelog`.
 
-The tracked `.husky/pre-commit` hook runs frontend `lint-staged`. Do not claim commit-message enforcement unless a
-tracked commit-msg validation hook is added.
+The tracked `.husky/pre-commit` hook runs frontend `lint-staged`. The tracked `.husky/commit-msg` hook enforces the
+subject line (type whitelist, optional scope, lowercase imperative english description of 10-100 chars); merges,
+reverts and fixups pass through.
 
 Release-workflow changes should update `CONTRIBUTING.md` and this file.
 
