@@ -137,27 +137,27 @@
         <instancio.version>5.6.0</instancio.version>
         <rest-assured.version>6.0.1</rest-assured.version>
         <wiremock.version>3.13.2</wiremock.version>
-        <surefire.version>3.5.6</surefire.version>
+        <surefire.version>3.6.0</surefire.version>
         <jacoco.version>0.8.15</jacoco.version>
 
         <!-- Build plugins -->
         <os.maven.plugin.version>1.7.1</os.maven.plugin.version>
         <protobuf.plugin.version>0.6.1</protobuf.plugin.version>
-        <graalvm.native.version>1.1.10</graalvm.native.version>
+        <graalvm.native.version>1.1.13</graalvm.native.version>
         <maven.gpg.plugin>3.2.8</maven.gpg.plugin>
         <maven.source.plugin>3.4.0</maven.source.plugin>
         <maven.javadoc.plugin>3.12.0</maven.javadoc.plugin>
-        <maven.compiler.plugin>3.15.0</maven.compiler.plugin>
+        <maven.compiler.plugin>3.16.0</maven.compiler.plugin>
         <maven.resource.plugin>3.5.0</maven.resource.plugin>
-        <maven.jar.plugin>3.5.0</maven.jar.plugin>
+        <maven.jar.plugin>3.5.1</maven.jar.plugin>
         <maven.dependency.plugin>3.11.0</maven.dependency.plugin>
-        <maven.version.plugin>2.21.0</maven.version.plugin>
+        <maven.version.plugin>2.22.0</maven.version.plugin>
         <maven.enforcer.plugin.version>3.6.3</maven.enforcer.plugin.version>
         <maven.central.plugin.version>0.11.0</maven.central.plugin.version>
-        <maven.antrun.plugin.version>3.1.0</maven.antrun.plugin.version>
+        <maven.antrun.plugin.version>3.2.0</maven.antrun.plugin.version>
         <maven.checkstyle.plugin.version>3.6.0</maven.checkstyle.plugin.version>
         <checkstyle.version>14.1.0</checkstyle.version>
-        <spotless.version>3.10.1</spotless.version>
+        <spotless.version>3.10.2</spotless.version>
         <palantir.java.format.version>2.97.0</palantir.java.format.version>
 
         <!-- DC3 version (self-reference for internal dependency management) -->
