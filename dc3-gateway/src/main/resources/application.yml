@@ -33,6 +33,9 @@ spring:
       - org.springframework.boot.security.autoconfigure.ReactiveUserDetailsServiceAutoConfiguration
       - org.springframework.boot.security.autoconfigure.web.reactive.ReactiveWebSecurityAutoConfiguration
       - org.springframework.boot.security.autoconfigure.actuate.web.reactive.ReactiveManagementWebSecurityAutoConfiguration
+      # ReactiveLoadBalancer is intentionally absent; loading this autoconfiguration
+      # only produces a TypeNotPresent introspection warning at boot.
+      - org.springframework.cloud.gateway.config.GatewayNoLoadBalancerClientAutoConfiguration
   # Active profile configuration, defaults to 'dev' if NODE_ENV is not set
   profiles:
     active:
