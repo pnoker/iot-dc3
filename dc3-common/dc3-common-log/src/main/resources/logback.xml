@@ -97,6 +97,13 @@
         <resetJUL>true</resetJUL>
     </contextListener>
 
+    <!-- Drops spring-cloud-gateway 4.3.0's HV000271 deprecation notice (its
+         GatewayProperties uses container-level @Valid on List fields). A turbo
+         filter is required because spring boot's logging re-init installs a
+         second LoggerContext that resets logger levels set here. Remove once
+         the upstream migrates to type-argument annotations. -->
+    <turboFilter class="io.github.pnoker.common.log.Hv000271TurboFilter"/>
+
     <!-- User configuration -->
     <logger name="io.github.pnoker.center.manager.receiver.rabbit" level="WARN"/>
 

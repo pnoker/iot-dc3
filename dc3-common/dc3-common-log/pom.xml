@@ -85,6 +85,13 @@
         </dependency>
 
         <!-- Logstash Logback -->
+        <!-- Provided by every service at runtime; needed at compile time for
+             the HV000271 turbo filter (logback.xml lives in this module). -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>

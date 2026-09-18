@@ -56,7 +56,11 @@ dc3:
 # application-gateway.yml (which proxy to each center's /{svc}/v3/api-docs).
 # Disabled in production via the shared application-web.yml "pro" block.
 springdoc:
+  api-docs:
+    # Explicit true: unset properties trigger SpringDoc's boot reminder.
+    enabled: true
   swagger-ui:
+    enabled: true
     urls:
       - name: Auth Center
         url: /v3/api-docs/auth

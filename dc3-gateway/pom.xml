@@ -69,6 +69,24 @@
 
     <dependencies>
 
+        <!-- macOS DNS resolver: without the native library netty logs an ERROR
+             on the first runtime DNS lookup on mac machines (and silently falls
+             back to system defaults). The no-classifier artifact resolves its
+             architecture via a build-machine profile, which picked the wrong
+             variant on apple-silicon, so pin BOTH mac classifiers explicitly;
+             the JVM loads only the one matching its own arch and the other stays
+             inert. Linux and Windows never load either. -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <classifier>osx-aarch_64</classifier>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <classifier>osx-x86_64</classifier>
+        </dependency>
+
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>
