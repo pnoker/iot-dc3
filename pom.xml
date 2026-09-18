@@ -73,16 +73,16 @@
         <!-- springdoc 3.x targets Spring Boot 4.0 / Spring Framework 7; the 2.8.x
              line is for Spring Boot 3.x and crashes the Swagger UI on SF7
              (UriComponentsBuilder.fromHttpRequest NoSuchMethodError). -->
-        <springdoc-openapi.version>3.1.0</springdoc-openapi.version>
+        <springdoc-openapi.version>3.1.1</springdoc-openapi.version>
         <!-- swagger-core version required by springdoc 3.0.3 (has Schema.$dynamicRef()).
              spring-ai-bom is imported before springdoc-openapi-bom and pulls an older
              swagger-core, which causes a NoSuchMethodError during OpenAPI generation on
              modules that include Spring AI (agentic). Pin it explicitly so it wins. -->
-        <swagger-core.version>2.2.54</swagger-core.version>
+        <swagger-core.version>2.2.55</swagger-core.version>
 
         <!-- RPC and messaging -->
-        <grpc.version>1.83.1</grpc.version>
-        <protobuf.version>4.36.0</protobuf.version>
+        <grpc.version>1.84.0</grpc.version>
+        <protobuf.version>4.36.2</protobuf.version>
         <okhttp.version>5.5.0</okhttp.version>
         <netty.version>4.2.17.Final</netty.version>
         <paho.mqttv3.version>1.2.5</paho.mqttv3.version>
@@ -98,7 +98,7 @@
         <jackson.version>2.22.2</jackson.version>
         <jackson.annotations.version>2.22</jackson.annotations.version>
         <jaxb.version>4.0.9</jaxb.version>
-        <snakeyaml.version>2.6</snakeyaml.version>
+        <snakeyaml.version>2.7</snakeyaml.version>
 
         <!-- Platform and core utilities -->
         <activation.version>2.1.4</activation.version>
@@ -106,21 +106,21 @@
         <apache.commons.compress.version>1.28.0</apache.commons.compress.version>
         <apache.commons.lang3.version>3.20.0</apache.commons.lang3.version>
         <apache.poi.version>5.5.1</apache.poi.version>
-        <freemarker.version>2.3.34</freemarker.version>
+        <freemarker.version>2.3.35</freemarker.version>
         <jna.version>5.19.1</jna.version>
-        <oshi.version>7.6.0</oshi.version>
+        <oshi.version>7.6.1</oshi.version>
         <jakarta.json.version>2.1.3</jakarta.json.version>
         <jakarta.annotation.version>3.0.0</jakarta.annotation.version>
         <jakarta.validation.version>3.1.1</jakarta.validation.version>
         <hibernate.validator.version>9.1.3.Final</hibernate.validator.version>
         <expressly.version>6.0.0</expressly.version>
-        <lombok.version>1.18.46</lombok.version>
+        <lombok.version>1.18.48</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
 
         <!-- Security and observability -->
         <jwt.version>0.13.0</jwt.version>
-        <bouncycastle.version>1.85</bouncycastle.version>
+        <bouncycastle.version>1.86</bouncycastle.version>
         <micrometer.version>1.17.1</micrometer.version>
         <opentelemetry.version>1.45.0</opentelemetry.version>
 
