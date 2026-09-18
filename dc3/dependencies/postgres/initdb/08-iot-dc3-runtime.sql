@@ -233,5 +233,5 @@ COMMENT ON COLUMN dc3_point_value_ingest_outbox.last_error IS 'Last processing e
 
 INSERT INTO dc3_schema_fingerprint
     (fingerprint_version, ddl_hash, schema_contract, id_format, time_format, json_format)
-VALUES (2, 'e81e356228d14b552ee42781893a748b2c5c3eae3ddda1ea3c32d58adb83107e', 'r2dbc-flag-day-v1', 'uuidv7-bigint', 'utc-micros', 'canonical-v1')
+VALUES (2, '713c2637af52d8e1e16d3d42ae8f85f48bc9e0f35d3f316509799f6a4490e136', 'r2dbc-flag-day-v1', 'uuidv7-bigint', 'utc-micros', 'canonical-v1')
 ON CONFLICT (fingerprint_version) DO NOTHING;

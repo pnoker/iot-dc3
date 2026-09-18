@@ -16,8 +16,6 @@
  */
 package io.github.pnoker.db.postgres.auth;
 
-import io.github.pnoker.common.auth.repository.ReactiveOAuthMcpStore;
-
 import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
 import io.github.pnoker.common.auth.entity.oauth.McpConnectionRecord;
 import io.github.pnoker.common.auth.entity.oauth.McpToolConfirmationRecord;
@@ -25,6 +23,7 @@ import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthAuthorizationRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthConsentRecord;
 import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
+import io.github.pnoker.common.auth.repository.ReactiveOAuthMcpStore;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import java.time.Instant;
@@ -116,7 +115,7 @@ public class R2dbcMcpRuntimeStore implements ReactiveOAuthMcpStore {
     @Override
     public Mono<Integer> insertAuthorization(OAuthAuthorizationRecord value) {
         value.setId(value.getId() == null ? UuidV7.nextLong() : value.getId());
-        DatabaseClient.GenericExecuteSpec statement = client.sql("INSERT INTO " + AUTH
+        DatabaseClient.GenericExecuteSpec spec = client.sql("INSERT INTO " + AUTH
                         + " (id,registered_client_id,client_id,principal_id,principal_type,tenant_id,mcp_connection_id,authorization_grant_type,authorized_scopes,state_hash,authorization_code_hash,authorization_code_issued,authorization_code_expires,token_metadata,deleted) VALUES (:id,:registered_client_id,:client_id,:principal_id,:principal_type,:tenant_id,:mcp_connection_id,:grant_type,:scopes,:state_hash,:code_hash,:code_issued,:code_expires,"
                         + dialect.jsonWriteExpression(":token_metadata") + ",0)")
                 .bind("id", value.getId())
@@ -127,13 +126,23 @@ public class R2dbcMcpRuntimeStore implements ReactiveOAuthMcpStore {
                 .bind("tenant_id", value.getTenantId())
                 .bind("mcp_connection_id", value.getMcpConnectionId())
                 .bind("grant_type", value.getAuthorizationGrantType())
-                .bind("scopes", value.getAuthorizedScopes())
-                .bind("state_hash", value.getStateHash())
-                .bind("code_hash", value.getAuthorizationCodeHash())
-                .bind("code_issued", dialect.bindInstant(toInstant(value.getAuthorizationCodeIssued())))
-                .bind("code_expires", dialect.bindInstant(toInstant(value.getAuthorizationCodeExpires())))
-                .bind("token_metadata", value.getTokenMetadata() == null ? "{}" : value.getTokenMetadata());
-        return statement.fetch().rowsUpdated().map(Long::intValue);
+                .bind("scopes", value.getAuthorizedScopes());
+        // state/code columns are set by the authorization_code grant; the
+        // client_credentials flow leaves them unset, so bind explicit NULLs.
+        spec = value.getStateHash() == null
+                ? spec.bindNull("state_hash", String.class)
+                : spec.bind("state_hash", value.getStateHash());
+        spec = value.getAuthorizationCodeHash() == null
+                ? spec.bindNull("code_hash", String.class)
+                : spec.bind("code_hash", value.getAuthorizationCodeHash());
+        spec = value.getAuthorizationCodeIssued() == null
+                ? spec.bindNull("code_issued", Instant.class)
+                : spec.bind("code_issued", dialect.bindInstant(toInstant(value.getAuthorizationCodeIssued())));
+        spec = value.getAuthorizationCodeExpires() == null
+                ? spec.bindNull("code_expires", Instant.class)
+                : spec.bind("code_expires", dialect.bindInstant(toInstant(value.getAuthorizationCodeExpires())));
+        spec = spec.bind("token_metadata", value.getTokenMetadata() == null ? "{}" : value.getTokenMetadata());
+        return spec.fetch().rowsUpdated().map(Long::intValue);
     }
 
     @Override

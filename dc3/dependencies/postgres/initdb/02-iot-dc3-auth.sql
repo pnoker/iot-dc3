@@ -914,15 +914,17 @@ CREATE TABLE dc3_oauth_authorization
     mcp_connection_id           BIGINT   DEFAULT 0 NOT NULL,            -- MCP connection ID
     authorization_grant_type    TEXT     DEFAULT ''::TEXT     NOT NULL, -- Authorization grant type
     authorized_scopes           TEXT     DEFAULT ''::TEXT     NOT NULL, -- Authorized scopes
-    state_hash                  TEXT     DEFAULT ''::TEXT     NOT NULL, -- OAuth state hash
-    authorization_code_hash     TEXT     DEFAULT ''::TEXT     NOT NULL, -- Authorization code hash
+    -- Nullable: only the authorization_code grant produces state/code values
+    state_hash                  TEXT, -- OAuth state hash
+    authorization_code_hash     TEXT, -- Authorization code hash
     authorization_code_issued TIMESTAMPTZ,                              -- Authorization code issued time
     authorization_code_expires TIMESTAMPTZ,                             -- Authorization code expiration time
     access_token_jti            TEXT     DEFAULT ''::TEXT     NOT NULL, -- Access token JWT ID
     access_token_issued TIMESTAMPTZ,                                    -- Access token issued time
     access_token_expires TIMESTAMPTZ,                                   -- Access token expiration time
-    refresh_token_hash          TEXT     DEFAULT ''::TEXT     NOT NULL, -- Refresh token hash
-    previous_refresh_token_hash TEXT     DEFAULT ''::TEXT     NOT NULL, -- Previous (rotated) refresh token hash, used to detect replay
+    -- Nullable: the client_credentials grant does not issue refresh tokens
+    refresh_token_hash          TEXT, -- Refresh token hash
+    previous_refresh_token_hash TEXT, -- Previous (rotated) refresh token hash, used to detect replay
     refresh_token_issued TIMESTAMPTZ,                                   -- Refresh token issued time
     refresh_token_expires TIMESTAMPTZ,                                  -- Refresh token expiration time
     token_claims                JSONB     DEFAULT '{}'::JSONB   NOT NULL, -- Token claims

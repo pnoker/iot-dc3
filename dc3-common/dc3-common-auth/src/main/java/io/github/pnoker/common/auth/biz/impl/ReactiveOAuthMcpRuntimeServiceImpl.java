@@ -625,6 +625,9 @@ public class ReactiveOAuthMcpRuntimeServiceImpl implements ReactiveOAuthMcpRunti
                                                     connection.getId(),
                                                     McpConstant.OAuth.GRANT_CLIENT_CREDENTIALS,
                                                     scopes);
+                                            // service-account principals drive this grant; the
+                                            // authorization_code path sets the same column
+                                            auth.setPrincipalType(PrincipalTypeEnum.SERVICE_ACCOUNT.getValue());
                                             return transactionalOperator.transactional(store.insertAuthorization(auth)
                                                     .then(issueTokens(auth, client, false, null, null)));
                                         })
