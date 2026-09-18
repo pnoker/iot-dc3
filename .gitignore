@@ -130,6 +130,9 @@ auto-imports.d.ts
 
 # ===== Database =====
 *.db
+*.db-shm
+*.db-wal
+*.db-journal
 *.sqlite
 *.sqlite3
 
@@ -141,6 +144,10 @@ src-tauri/target/
 src-tauri/Cargo.lock
 
 # ===== Project-local data =====
-dc3/data/
+# Services resolve the runtime dirs (dc3/data, dc3/logs) against the process
+# cwd, so a driver started from its module dir writes under dc3-driver/*/.
+# The anchored dc3/data/ pattern missed those; ** matches any depth (logs/
+# already works because an unanchored dir-name pattern matches everywhere).
+**/dc3/data/
 .claude/settings.local.json
 .claude/TODO.md
