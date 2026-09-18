@@ -61,7 +61,7 @@
     "dompurify": "^3.4.12",
     "element-plus": "^2.14.3",
     "highlight.js": "^11.11.1",
-    "js-base64": "^3.9.1",
+    "js-base64": "^3.9.2",
     "js-cookie": "^3.0.8",
     "json-bigint": "^1.0.0",
     "marked": "^18.0.6",
