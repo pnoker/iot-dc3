@@ -26,7 +26,7 @@ export POSTGRES_USERNAME=dc3
 export POSTGRES_PASSWORD=dc3dc3dc3
 export POSTGRES_DB=dc3
 export DC3_R2DBC_URL=r2dbc:postgresql://localhost:35432/dc3
-export DC3_SCHEMA_FINGERPRINT=e81e356228d14b552ee42781893a748b2c5c3eae3ddda1ea3c32d58adb83107e
+export DC3_SCHEMA_FINGERPRINT=713c2637af52d8e1e16d3d42ae8f85f48bc9e0f35d3f316509799f6a4490e136
 export DC3_SCHEMA_CONTRACT=r2dbc-flag-day-v1
 
 # Message broker selection (docs/mq-brokers.md); rabbitmq is the default
@@ -59,8 +59,8 @@ export CENTER_AGENTIC_HOST=localhost
 # Runtime
 export NODE_ENV=dev
 export DC3_FACADE_GRPC_DEADLINE_MS=3000
-export DC3_SECURITY_KEY=dc3.security.key.2026.io.github.pnoker
-export AUTH_HMAC_SECRET=io.github.pnoker.dc3
+export DC3_SECURITY_KEY=dc3-dev-only-65d8aac255cffeb389f1c9d521ae9a1a  # local dev only; generate your own value for real deployments
+export AUTH_HMAC_SECRET=dc3-dev-only-f56ea45d339b35f8e409e55dc4eaf795  # local dev only; generate your own value for real deployments
 export POINT_BATCH_SIZE=500
 export POINT_BATCH_RECEIVE_TIMEOUT_MILLIS=100
 export POINT_CONCURRENT_CONSUMERS=4

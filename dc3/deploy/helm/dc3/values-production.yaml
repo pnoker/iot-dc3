@@ -23,16 +23,20 @@
 # Or - recommended - provision your own Secret and point existingSecret at it.
 # =============================================================================
 secrets:
-  # Public weak placeholders - REPLACE. The pro profile fails startup on weak
-  # DC3_SECURITY_KEY / AUTH_HMAC_SECRET on purpose.
+  # REQUIRED for production: inject deployment-specific values via --set-string
+  # or the existingSecret override.
+  #   - AUTH_HMAC_SECRET: pre/pro startup REJECTS blank values and the historical
+  #     public default outright (HmacAuthConfig.validateSecret).
+  #   - DC3_SECURITY_KEY: blank fails at the first JWT sign/verify operation
+  #     (KeyUtil.getSecurityKey) — supply a strong random value.
   POSTGRES_USERNAME: dc3
   POSTGRES_PASSWORD: "*********"
   RABBITMQ_USERNAME: dc3
   RABBITMQ_PASSWORD: "*********"
   MQTT_USERNAME: dc3
   MQTT_PASSWORD: "*********"
-  DC3_SECURITY_KEY: dc3.security.key.2026.io.github.pnoker
-  AUTH_HMAC_SECRET: io.github.pnoker.dc3
+  DC3_SECURITY_KEY: ""
+  AUTH_HMAC_SECRET: ""
   AGENTIC_FALLBACK_OPENAI_API_KEY: ""
 
 services:
