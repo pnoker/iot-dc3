@@ -53,11 +53,14 @@ jobs:
       - name: Validate repository documentation
         run: python3 dc3/bin/check_documentation.py
 
-      - name: Validate Java formatting and copyright headers
-        run: mvn -B -DskipTests initialize spotless:check --no-transfer-progress
-
-      - name: Validate Java naming and Javadoc structure
-        run: mvn -B -DskipTests checkstyle:check --no-transfer-progress
+      - name: Validate Java formatting, headers and Javadoc structure
+        # spotless-check and checkstyle-check are bound to the verify phase; a plain
+        # lifecycle run keeps reactor dependency resolution working, unlike direct
+        # `initialize spotless:check` goal invocations that resolve module jars from
+        # the remote repositories and fail.
+        run: >
+          mvn -B -DskipTests -Dcoverage.check.skip=true -Dskip.integration.tests=true
+          -Dskip.unit.tests=true verify --no-transfer-progress
 
       - name: Compile
         run: |
