@@ -118,7 +118,7 @@ abstract class AbstractDbDialectContractTest {
     }
 
     private R2dbcPointValueLatestStore latestStore() {
-        return new R2dbcPointValueLatestStore(client(), dialect(), tx());
+        return new R2dbcPointValueLatestStore(client(), tx());
     }
 
     private R2dbcEntityStateStore stateStore() {

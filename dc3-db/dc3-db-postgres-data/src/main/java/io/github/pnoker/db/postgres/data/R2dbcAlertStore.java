@@ -18,7 +18,6 @@ package io.github.pnoker.db.postgres.data;
 
 import io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow;
 import io.github.pnoker.common.data.repository.ReactiveAlertStore;
-import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
@@ -29,7 +28,6 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -38,7 +36,7 @@ import reactor.core.publisher.Mono;
 
 /** Explicit SQL adapter for dashboard alert reads and confirmation updates. */
 @Repository
-@ConditionalOnClass({DatabaseClient.class, PageTransaction.class, R2dbcDialect.class})
+@ConditionalOnClass({DatabaseClient.class, PageTransaction.class})
 @RequiredArgsConstructor
 public class R2dbcAlertStore implements ReactiveAlertStore {
 
@@ -48,7 +46,6 @@ public class R2dbcAlertStore implements ReactiveAlertStore {
 
     private final DatabaseClient databaseClient;
     private final PageTransaction pageTransaction;
-    private final R2dbcDialect dialect;
 
     @Override
     public Mono<OffsetPage<AlertItemRow>> list(
@@ -167,10 +164,7 @@ public class R2dbcAlertStore implements ReactiveAlertStore {
     }
 
     private String messageExpression() {
-        return switch (dialect.name().toLowerCase(Locale.ROOT)) {
-            case "mysql", "mariadb" -> "COALESCE(JSON_UNQUOTE(JSON_EXTRACT(a.alarm_ext, '$.content')), '')";
-            default -> "COALESCE(a.alarm_ext ->> 'content', '')";
-        };
+        return "COALESCE(a.alarm_ext ->> 'content', '')";
     }
 
     private int sourceIndex(String source) {

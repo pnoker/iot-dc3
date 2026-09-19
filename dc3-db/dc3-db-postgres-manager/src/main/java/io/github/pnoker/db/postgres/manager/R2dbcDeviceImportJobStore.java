@@ -54,7 +54,7 @@ public class R2dbcDeviceImportJobStore implements ReactiveDeviceImportJobStore {
                 .sql("INSERT INTO " + TABLE + " (" + COLUMNS
                         + ", created_at) VALUES (:operation_id,:tenant_id,:driver_id,:profile_id,:operator_id,"
                         + ":operator_name,:file_name,:file_data,:claimed_by,:claimed_until,:attempts,:created_at)")
-                .bind("operation_id", uuid(job.operationId()))
+                .bind("operation_id", job.operationId())
                 .bind("tenant_id", job.tenantId())
                 .bind("driver_id", job.driverId())
                 .bind("profile_id", job.profileId())
@@ -83,7 +83,7 @@ public class R2dbcDeviceImportJobStore implements ReactiveDeviceImportJobStore {
                         + " WHERE operation_id=:operation_id AND (claimed_until IS NULL OR claimed_until<:now)")
                 .bind("worker_id", workerId)
                 .bind("claimed_until", dialect.bindInstant(claimedUntil))
-                .bind("operation_id", uuid(operationId))
+                .bind("operation_id", operationId)
                 .bind("now", dialect.bindInstant(now))
                 .fetch()
                 .rowsUpdated()
@@ -107,7 +107,7 @@ public class R2dbcDeviceImportJobStore implements ReactiveDeviceImportJobStore {
                 .sql("UPDATE " + TABLE + " SET claimed_until=:claimed_until"
                         + " WHERE operation_id=:operation_id AND claimed_by=:worker_id")
                 .bind("claimed_until", dialect.bindInstant(claimedUntil))
-                .bind("operation_id", uuid(operationId))
+                .bind("operation_id", operationId)
                 .bind("worker_id", workerId)
                 .fetch()
                 .rowsUpdated()
@@ -119,7 +119,7 @@ public class R2dbcDeviceImportJobStore implements ReactiveDeviceImportJobStore {
         if (operationId == null || tenantId == null) return Mono.empty();
         return databaseClient
                 .sql("DELETE FROM " + TABLE + " WHERE operation_id=:operation_id AND tenant_id=:tenant_id")
-                .bind("operation_id", uuid(operationId))
+                .bind("operation_id", operationId)
                 .bind("tenant_id", tenantId)
                 .fetch()
                 .rowsUpdated()
@@ -129,7 +129,7 @@ public class R2dbcDeviceImportJobStore implements ReactiveDeviceImportJobStore {
     private Mono<DeviceImportJob> get(UUID operationId) {
         return databaseClient
                 .sql("SELECT " + COLUMNS + " FROM " + TABLE + " WHERE operation_id=:operation_id")
-                .bind("operation_id", uuid(operationId))
+                .bind("operation_id", operationId)
                 .map((row, metadata) -> new DeviceImportJob(
                         readUuid(row.get("operation_id")),
                         row.get("tenant_id", Long.class),
@@ -145,31 +145,8 @@ public class R2dbcDeviceImportJobStore implements ReactiveDeviceImportJobStore {
                 .one();
     }
 
-    private Object uuid(UUID value) {
-        if (dialect.name().equals("postgres")) return value;
-        byte[] bytes = new byte[16];
-        long most = value.getMostSignificantBits();
-        long least = value.getLeastSignificantBits();
-        for (int index = 7; index >= 0; index--) {
-            bytes[index] = (byte) most;
-            most >>>= 8;
-            bytes[index + 8] = (byte) least;
-            least >>>= 8;
-        }
-        return bytes;
-    }
-
     private UUID readUuid(Object value) {
         if (value instanceof UUID uuid) return uuid;
-        if (value instanceof byte[] bytes && bytes.length == 16) {
-            long most = 0;
-            long least = 0;
-            for (int index = 0; index < 8; index++) {
-                most = (most << 8) | (bytes[index] & 0xffL);
-                least = (least << 8) | (bytes[index + 8] & 0xffL);
-            }
-            return new UUID(most, least);
-        }
         return UUID.fromString(Objects.toString(value));
     }
 

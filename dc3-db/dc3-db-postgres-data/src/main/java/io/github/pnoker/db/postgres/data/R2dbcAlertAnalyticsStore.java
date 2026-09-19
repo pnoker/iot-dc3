@@ -31,13 +31,11 @@ import io.github.pnoker.common.data.entity.bo.dashboard.RecentChangeRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow;
 import io.github.pnoker.common.data.repository.ReactiveAlertAnalyticsStore;
-import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -47,14 +45,13 @@ import reactor.core.publisher.Mono;
 
 /** Explicit SQL adapter for dashboard alert aggregates. */
 @Repository
-@ConditionalOnClass({DatabaseClient.class, R2dbcDialect.class})
+@ConditionalOnClass(DatabaseClient.class)
 @RequiredArgsConstructor
 public class R2dbcAlertAnalyticsStore implements ReactiveAlertAnalyticsStore {
 
     private static final String TABLE = "dc3_data.dc3_entity_alarm";
 
     private final DatabaseClient databaseClient;
-    private final R2dbcDialect dialect;
 
     @Override
     public Mono<AlertCountersRow> countAll(long tenantId) {
@@ -74,11 +71,7 @@ public class R2dbcAlertAnalyticsStore implements ReactiveAlertAnalyticsStore {
 
     @Override
     public Flux<BucketRow> countByType(long tenantId) {
-        String typeExpression =
-                switch (dialect.name().toLowerCase(Locale.ROOT)) {
-                    case "mysql", "mariadb" -> "CAST(alarm_type_flag AS CHAR)";
-                    default -> "CAST(alarm_type_flag AS TEXT)";
-                };
+        String typeExpression = "CAST(alarm_type_flag AS TEXT)";
         return databaseClient
                 .sql("SELECT " + typeExpression + " AS bucket_key, COUNT(*) AS count FROM " + TABLE
                         + " WHERE tenant_id=:tenant_id GROUP BY alarm_type_flag ORDER BY count DESC")
@@ -103,11 +96,7 @@ public class R2dbcAlertAnalyticsStore implements ReactiveAlertAnalyticsStore {
 
     @Override
     public Flux<HourCountRow> hourlyCounts(long tenantId, LocalDateTime from) {
-        String bucket =
-                switch (dialect.name().toLowerCase(Locale.ROOT)) {
-                    case "mysql", "mariadb" -> "DATE_FORMAT(create_time, '%Y-%m-%d %H:00:00')";
-                    default -> "date_trunc('hour', create_time)";
-                };
+        String bucket = "date_trunc('hour', create_time)";
         return databaseClient
                 .sql("SELECT " + bucket + " AS bucket, COUNT(*) AS count FROM " + TABLE
                         + " WHERE tenant_id=:tenant_id AND create_time>=:from_time GROUP BY " + bucket
@@ -136,11 +125,7 @@ public class R2dbcAlertAnalyticsStore implements ReactiveAlertAnalyticsStore {
 
     @Override
     public Flux<AlertTrendRow> dailyTrend(long tenantId, LocalDateTime from) {
-        String day =
-                switch (dialect.name().toLowerCase(Locale.ROOT)) {
-                    case "mysql", "mariadb" -> "DATE(create_time)";
-                    default -> "CAST(create_time AS DATE)";
-                };
+        String day = "CAST(create_time AS DATE)";
         return databaseClient
                 .sql("SELECT " + day + " AS day, "
                         + "COALESCE(SUM(CASE WHEN alarm_target_type_flag IN (0,1) THEN 1 ELSE 0 END),0) AS device_count, "
@@ -172,16 +157,8 @@ public class R2dbcAlertAnalyticsStore implements ReactiveAlertAnalyticsStore {
 
     @Override
     public Flux<ActivityCellRow> activityHeatmap(long tenantId, LocalDateTime from) {
-        String dow =
-                switch (dialect.name().toLowerCase(Locale.ROOT)) {
-                    case "mysql", "mariadb" -> "DAYOFWEEK(create_time)-1";
-                    default -> "EXTRACT(DOW FROM create_time)::int";
-                };
-        String hour =
-                switch (dialect.name().toLowerCase(Locale.ROOT)) {
-                    case "mysql", "mariadb" -> "HOUR(create_time)";
-                    default -> "EXTRACT(HOUR FROM create_time)::int";
-                };
+        String dow = "EXTRACT(DOW FROM create_time)::int";
+        String hour = "EXTRACT(HOUR FROM create_time)::int";
         return databaseClient
                 .sql("SELECT " + dow + " AS dow, " + hour + " AS hour, COUNT(*) AS count FROM " + TABLE
                         + " WHERE tenant_id=:tenant_id AND create_time>=:from_time GROUP BY " + dow + ", " + hour)
@@ -199,11 +176,7 @@ public class R2dbcAlertAnalyticsStore implements ReactiveAlertAnalyticsStore {
 
     @Override
     public Flux<BucketRow> typeDistribution(long tenantId, LocalDateTime from) {
-        String type =
-                switch (dialect.name().toLowerCase(Locale.ROOT)) {
-                    case "mysql", "mariadb" -> "JSON_UNQUOTE(JSON_EXTRACT(alarm_ext, '$.type'))";
-                    default -> "alarm_ext ->> 'type'";
-                };
+        String type = "alarm_ext ->> 'type'";
         return databaseClient
                 .sql("SELECT " + type + " AS bucket_key, COUNT(*) AS count FROM " + TABLE
                         + " WHERE tenant_id=:tenant_id AND create_time>=:from_time AND " + type + " IS NOT NULL"
@@ -255,12 +228,7 @@ public class R2dbcAlertAnalyticsStore implements ReactiveAlertAnalyticsStore {
 
     @Override
     public Flux<CorrelationPairRow> correlationPairs(long tenantId, LocalDateTime from, int windowSec, int limit) {
-        String distance =
-                switch (dialect.name().toLowerCase(Locale.ROOT)) {
-                    case "mysql", "mariadb" ->
-                        "ABS(TIMESTAMPDIFF(MICROSECOND, e2.create_time, e1.create_time)) <= :window_micros";
-                    default -> "ABS(EXTRACT(EPOCH FROM (e1.create_time-e2.create_time))) <= :window_seconds";
-                };
+        String distance = "ABS(EXTRACT(EPOCH FROM (e1.create_time-e2.create_time))) <= :window_seconds";
         String sql = "WITH ev AS (SELECT " + sourceExpression()
                 + " AS source, entity_id AS source_id, alarm_type_flag, create_time FROM " + TABLE
                 + " WHERE tenant_id=:tenant_id AND create_time>=:from_time) SELECT e1.source AS a_source, e1.source_id AS a_source_id,"
@@ -274,10 +242,8 @@ public class R2dbcAlertAnalyticsStore implements ReactiveAlertAnalyticsStore {
                 .sql(sql)
                 .bind("tenant_id", tenantId)
                 .bind("from_time", from)
-                .bind("limit", limit);
-        spec = "mysql".equalsIgnoreCase(dialect.name()) || "mariadb".equalsIgnoreCase(dialect.name())
-                ? spec.bind("window_micros", windowSec * 1_000_000L)
-                : spec.bind("window_seconds", windowSec);
+                .bind("limit", limit)
+                .bind("window_seconds", windowSec);
         return spec.map((row, metadata) -> {
                     CorrelationPairRow value = new CorrelationPairRow();
                     value.setASource(text(row.get("a_source")));
@@ -314,11 +280,7 @@ public class R2dbcAlertAnalyticsStore implements ReactiveAlertAnalyticsStore {
 
     @Override
     public Mono<AgingBucketRow> agingBuckets(long tenantId) {
-        String age =
-                switch (dialect.name().toLowerCase(Locale.ROOT)) {
-                    case "mysql", "mariadb" -> "TIMESTAMPDIFF(SECOND, create_time, CURRENT_TIMESTAMP)";
-                    default -> "EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP-create_time))";
-                };
+        String age = "EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP-create_time))";
         return databaseClient
                 .sql("SELECT COALESCE(SUM(CASE WHEN age<3600 THEN 1 ELSE 0 END),0) AS under_1h, "
                         + "COALESCE(SUM(CASE WHEN age>=3600 AND age<21600 THEN 1 ELSE 0 END),0) AS h1_to_6, "
@@ -342,16 +304,8 @@ public class R2dbcAlertAnalyticsStore implements ReactiveAlertAnalyticsStore {
 
     @Override
     public Flux<MttaTrendRow> mttaByDay(long tenantId, LocalDateTime from) {
-        String day =
-                switch (dialect.name().toLowerCase(Locale.ROOT)) {
-                    case "mysql", "mariadb" -> "DATE(create_time)";
-                    default -> "CAST(create_time AS DATE)";
-                };
-        String latency =
-                switch (dialect.name().toLowerCase(Locale.ROOT)) {
-                    case "mysql", "mariadb" -> "TIMESTAMPDIFF(MICROSECOND, create_time, operate_time)/1000.0";
-                    default -> "EXTRACT(EPOCH FROM (operate_time-create_time))*1000.0";
-                };
+        String day = "CAST(create_time AS DATE)";
+        String latency = "EXTRACT(EPOCH FROM (operate_time-create_time))*1000.0";
         String sql = "WITH ranked AS (SELECT " + day + " AS day, " + latency + " AS latency_ms, "
                 + "ROW_NUMBER() OVER (PARTITION BY " + day + " ORDER BY " + latency + ") AS rn, "
                 + "COUNT(*) OVER (PARTITION BY " + day + ") AS cnt FROM " + TABLE

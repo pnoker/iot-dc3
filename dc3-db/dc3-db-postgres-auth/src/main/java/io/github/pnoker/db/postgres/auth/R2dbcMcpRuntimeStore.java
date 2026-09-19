@@ -162,11 +162,8 @@ public class R2dbcMcpRuntimeStore implements ReactiveOAuthMcpStore {
         String base =
                 "INSERT INTO dc3_auth.dc3_oauth_authorization_consent (id,registered_client_id,client_id,principal_id,tenant_id,scopes,consent_ext,deleted) VALUES (:id,:registered_client_id,:client_id,:principal_id,:tenant_id,:scopes,"
                         + dialect.jsonWriteExpression(":consent_ext") + ",0) ";
-        String sql = "postgres".equalsIgnoreCase(dialect.name())
-                ? base
-                        + "ON CONFLICT (registered_client_id,principal_id,tenant_id) WHERE deleted=0 DO UPDATE SET client_id=EXCLUDED.client_id,scopes=EXCLUDED.scopes,consent_ext=EXCLUDED.consent_ext,deleted=0,operate_time=CURRENT_TIMESTAMP"
-                : base
-                        + "ON DUPLICATE KEY UPDATE client_id=VALUES(client_id),scopes=VALUES(scopes),consent_ext=VALUES(consent_ext),deleted=0,operate_time=CURRENT_TIMESTAMP";
+        String sql = base
+                + "ON CONFLICT (registered_client_id,principal_id,tenant_id) WHERE deleted=0 DO UPDATE SET client_id=EXCLUDED.client_id,scopes=EXCLUDED.scopes,consent_ext=EXCLUDED.consent_ext,deleted=0,operate_time=CURRENT_TIMESTAMP";
         return client.sql(sql)
                 .bind("id", value.getId())
                 .bind("registered_client_id", value.getRegisteredClientId())
@@ -549,24 +546,14 @@ public class R2dbcMcpRuntimeStore implements ReactiveOAuthMcpStore {
         String values =
                 " VALUES (:id,:tool_id,:tool_name,:tool_title,:tool_category,:service_name,:api_code,:permission_code,:http_method,:api_path,:schema_hash,:risk_level,:read_only_hint,:destructive_hint,:idempotent_hint,:open_world_hint,:enable_flag,:remark,"
                         + dialect.jsonWriteExpression(":tool_ext") + ",0) ";
-        String sql;
-        if ("postgres".equalsIgnoreCase(dialect.name())) {
-            sql = "INSERT INTO " + TOOL + columns + values
-                    + "ON CONFLICT (tool_id) WHERE deleted=0 AND tool_id<>'' DO UPDATE SET "
-                    + "tool_name=EXCLUDED.tool_name,tool_title=EXCLUDED.tool_title,tool_category=EXCLUDED.tool_category,"
-                    + "service_name=EXCLUDED.service_name,api_code=EXCLUDED.api_code,permission_code=EXCLUDED.permission_code,"
-                    + "http_method=EXCLUDED.http_method,api_path=EXCLUDED.api_path,schema_hash=EXCLUDED.schema_hash,"
-                    + "risk_level=EXCLUDED.risk_level,read_only_hint=EXCLUDED.read_only_hint,destructive_hint=EXCLUDED.destructive_hint,"
-                    + "idempotent_hint=EXCLUDED.idempotent_hint,open_world_hint=EXCLUDED.open_world_hint,enable_flag=EXCLUDED.enable_flag,"
-                    + "remark=EXCLUDED.remark,tool_ext=EXCLUDED.tool_ext,deleted=0,operate_time=CURRENT_TIMESTAMP";
-        } else {
-            sql = "INSERT INTO " + TOOL + columns + values
-                    + "ON DUPLICATE KEY UPDATE tool_name=VALUES(tool_name),tool_title=VALUES(tool_title),tool_category=VALUES(tool_category),"
-                    + "service_name=VALUES(service_name),api_code=VALUES(api_code),permission_code=VALUES(permission_code),"
-                    + "http_method=VALUES(http_method),api_path=VALUES(api_path),schema_hash=VALUES(schema_hash),risk_level=VALUES(risk_level),"
-                    + "read_only_hint=VALUES(read_only_hint),destructive_hint=VALUES(destructive_hint),idempotent_hint=VALUES(idempotent_hint),"
-                    + "open_world_hint=VALUES(open_world_hint),enable_flag=VALUES(enable_flag),remark=VALUES(remark),tool_ext=VALUES(tool_ext),deleted=0,operate_time=CURRENT_TIMESTAMP";
-        }
+        String sql = "INSERT INTO " + TOOL + columns + values
+                + "ON CONFLICT (tool_id) WHERE deleted=0 AND tool_id<>'' DO UPDATE SET "
+                + "tool_name=EXCLUDED.tool_name,tool_title=EXCLUDED.tool_title,tool_category=EXCLUDED.tool_category,"
+                + "service_name=EXCLUDED.service_name,api_code=EXCLUDED.api_code,permission_code=EXCLUDED.permission_code,"
+                + "http_method=EXCLUDED.http_method,api_path=EXCLUDED.api_path,schema_hash=EXCLUDED.schema_hash,"
+                + "risk_level=EXCLUDED.risk_level,read_only_hint=EXCLUDED.read_only_hint,destructive_hint=EXCLUDED.destructive_hint,"
+                + "idempotent_hint=EXCLUDED.idempotent_hint,open_world_hint=EXCLUDED.open_world_hint,enable_flag=EXCLUDED.enable_flag,"
+                + "remark=EXCLUDED.remark,tool_ext=EXCLUDED.tool_ext,deleted=0,operate_time=CURRENT_TIMESTAMP";
         return toolMutationStatement(sql, value).fetch().rowsUpdated().map(Long::intValue);
     }
 

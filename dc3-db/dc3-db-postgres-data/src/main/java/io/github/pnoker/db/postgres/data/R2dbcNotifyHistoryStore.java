@@ -182,11 +182,7 @@ public class R2dbcNotifyHistoryStore implements ReactiveNotifyHistoryStore {
                 + ",:error_message,:retry_count,:tenant_id,:remark,:creator_id,:creator_name,:create_time,:operator_id,:operator_name,:operate_time)";
         boolean deduplicated =
                 history.getDedupeKey() != null && !history.getDedupeKey().isBlank();
-        String sql = deduplicated
-                ? ("postgres".equals(dialect.name())
-                        ? baseSql + " ON CONFLICT (tenant_id,dedupe_key) DO NOTHING"
-                        : baseSql + " ON DUPLICATE KEY UPDATE id=id")
-                : baseSql;
+        String sql = deduplicated ? baseSql + " ON CONFLICT (tenant_id,dedupe_key) DO NOTHING" : baseSql;
         DatabaseClient.GenericExecuteSpec spec = insertSpec(history, sql);
         Mono<Long> affected = spec.fetch().rowsUpdated();
         if (!deduplicated) {
@@ -371,9 +367,7 @@ public class R2dbcNotifyHistoryStore implements ReactiveNotifyHistoryStore {
 
     private DatabaseClient.GenericExecuteSpec bindTime(
             DatabaseClient.GenericExecuteSpec spec, String name, LocalDateTime value) {
-        return "postgres".equals(dialect.name())
-                ? spec.bind(name, OffsetDateTime.of(value, ZoneOffset.UTC))
-                : spec.bind(name, value);
+        return spec.bind(name, OffsetDateTime.of(value, ZoneOffset.UTC));
     }
 
     private <T> DatabaseClient.GenericExecuteSpec bindNullable(

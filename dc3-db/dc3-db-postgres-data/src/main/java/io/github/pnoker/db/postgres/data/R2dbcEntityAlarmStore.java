@@ -70,9 +70,7 @@ public class R2dbcEntityAlarmStore implements ReactiveEntityAlarmStore {
                 + "(:id,:alarm_target_type_flag,:entity_id,:driver_id,:device_id,:point_id,:rule_id,:rule_state_id,:dedupe_key,"
                 + ":alarm_type_flag,:alarm_source_flag,:alarm_level_flag," + dialect.jsonWriteExpression(":alarm_ext")
                 + ",:expired_time,:confirm_flag,:tenant_id,:create_time,:operate_time)";
-        String sql = dialect.name().equalsIgnoreCase("postgres")
-                ? insert + " ON CONFLICT (tenant_id,dedupe_key) DO NOTHING"
-                : insert + " ON DUPLICATE KEY UPDATE id=id";
+        String sql = insert + " ON CONFLICT (tenant_id,dedupe_key) DO NOTHING";
         DatabaseClient.GenericExecuteSpec spec = databaseClient
                 .sql(sql)
                 .bind("id", alarm.getId())

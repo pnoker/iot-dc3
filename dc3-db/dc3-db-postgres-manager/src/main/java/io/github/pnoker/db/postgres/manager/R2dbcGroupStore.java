@@ -39,7 +39,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 
-/** R2DBC group repository shared by PostgreSQL, MySQL and MariaDB. */
+/** Explicit SQL adapter for tenant-scoped groups. */
 @Repository
 @RequiredArgsConstructor
 @ConditionalOnClass({DatabaseClient.class, R2dbcDialect.class, TransactionalOperator.class})

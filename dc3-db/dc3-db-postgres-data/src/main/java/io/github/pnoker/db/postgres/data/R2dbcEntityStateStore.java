@@ -134,30 +134,19 @@ public class R2dbcEntityStateStore implements ReactiveEntityStateStore {
                 + "timeout_source_flag,entity_state_ext,tenant_id,create_time,operate_time) VALUES "
                 + "(:id,:entity_type,:entity_id,:parent_entity,:state,:last_state,1,:expire,:timeout,:heartbeat,0,:timeout_source,"
                 + dialect.jsonWriteExpression(":state_ext") + ",:tenant_id,:create_time,:operate_time) ";
-        String stateExtensionUpdate = dialect.name().equals("postgres")
-                ? "CASE WHEN CAST(:state_ext AS JSONB)->>'content' <> '' THEN jsonb_build_object('type',"
-                        + TABLE
-                        + ".entity_state_ext->>'type','content',CAST(:state_ext AS JSONB)->>'content','version',"
-                        + "COALESCE((" + TABLE + ".entity_state_ext->>'version')::int,0)+1) ELSE " + TABLE
-                        + ".entity_state_ext END"
-                : "CASE WHEN JSON_UNQUOTE(JSON_EXTRACT(:state_ext,'$.content')) <> '' THEN JSON_OBJECT('type',"
-                        + "JSON_UNQUOTE(JSON_EXTRACT(entity_state_ext,'$.type')),'content',JSON_UNQUOTE(JSON_EXTRACT(:state_ext,'$.content')),'version',"
-                        + "COALESCE(CAST(JSON_UNQUOTE(JSON_EXTRACT(entity_state_ext,'$.version')) AS SIGNED),0)+1) ELSE entity_state_ext END";
-        String upsert = dialect.name().equals("postgres")
-                ? insert
-                        + "ON CONFLICT (tenant_id,entity_type_flag,entity_id) DO UPDATE SET parent_entity_id=EXCLUDED.parent_entity_id,"
-                        + "entity_state_flag=EXCLUDED.entity_state_flag,last_state_flag=" + TABLE
-                        + ".entity_state_flag,"
-                        + "lease_version=" + TABLE
-                        + ".lease_version+1,expire_time=EXCLUDED.expire_time,timeout_seconds=EXCLUDED.timeout_seconds,"
-                        + "last_heartbeat_time=EXCLUDED.last_heartbeat_time,timeout_source_flag=EXCLUDED.timeout_source_flag,"
-                        + "entity_state_ext=" + stateExtensionUpdate + ",operate_time=EXCLUDED.operate_time"
-                : insert
-                        + "ON DUPLICATE KEY UPDATE parent_entity_id=VALUES(parent_entity_id),last_state_flag=entity_state_flag,"
-                        + "entity_state_flag=VALUES(entity_state_flag),lease_version=lease_version+1,expire_time=VALUES(expire_time),"
-                        + "timeout_seconds=VALUES(timeout_seconds),last_heartbeat_time=VALUES(last_heartbeat_time),"
-                        + "timeout_source_flag=VALUES(timeout_source_flag),entity_state_ext=" + stateExtensionUpdate
-                        + ",operate_time=VALUES(operate_time)";
+        String stateExtensionUpdate = "CASE WHEN CAST(:state_ext AS JSONB)->>'content' <> '' THEN jsonb_build_object('type',"
+                + TABLE
+                + ".entity_state_ext->>'type','content',CAST(:state_ext AS JSONB)->>'content','version',"
+                + "COALESCE((" + TABLE + ".entity_state_ext->>'version')::int,0)+1) ELSE " + TABLE
+                + ".entity_state_ext END";
+        String upsert = insert
+                + "ON CONFLICT (tenant_id,entity_type_flag,entity_id) DO UPDATE SET parent_entity_id=EXCLUDED.parent_entity_id,"
+                + "entity_state_flag=EXCLUDED.entity_state_flag,last_state_flag=" + TABLE
+                + ".entity_state_flag,"
+                + "lease_version=" + TABLE
+                + ".lease_version+1,expire_time=EXCLUDED.expire_time,timeout_seconds=EXCLUDED.timeout_seconds,"
+                + "last_heartbeat_time=EXCLUDED.last_heartbeat_time,timeout_source_flag=EXCLUDED.timeout_source_flag,"
+                + "entity_state_ext=" + stateExtensionUpdate + ",operate_time=EXCLUDED.operate_time";
         DatabaseClient.GenericExecuteSpec spec = databaseClient
                 .sql(upsert)
                 .bind("id", stateId)
@@ -211,9 +200,7 @@ public class R2dbcEntityStateStore implements ReactiveEntityStateStore {
                 || renewSeconds < 1) {
             return Mono.empty();
         }
-        String renewExpression = "postgres".equals(dialect.name())
-                ? "CURRENT_TIMESTAMP + (:renew * INTERVAL '1 second')"
-                : "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL :renew SECOND)";
+        String renewExpression = "CURRENT_TIMESTAMP + (:renew * INTERVAL '1 second')";
         return transactionalOperator.transactional(databaseClient
                 .sql("UPDATE " + TABLE
                         + " SET last_state_flag=entity_state_flag,entity_state_flag=:offline,"
@@ -249,77 +236,27 @@ public class R2dbcEntityStateStore implements ReactiveEntityStateStore {
         byte maintain = EntityStatusEnum.MAINTAIN.getIndex();
         byte fault = EntityStatusEnum.FAULT.getIndex();
         byte offline = EntityStatusEnum.OFFLINE.getIndex();
-        if ("postgres".equals(dialect.name())) {
-            String sql = "WITH candidates AS (SELECT id FROM " + TABLE
-                    + " WHERE entity_type_flag=:entity_type AND entity_state_flag IN (:online,:maintain,:fault)"
-                    + " AND expire_time <= CURRENT_TIMESTAMP ORDER BY expire_time LIMIT :limit FOR UPDATE SKIP LOCKED)"
-                    + " UPDATE " + TABLE + " s SET last_state_flag=s.entity_state_flag,entity_state_flag=:offline,"
-                    + " lease_version=s.lease_version+1,expire_time=CURRENT_TIMESTAMP + (:renew * INTERVAL '1 second'),"
-                    + " operate_time=CURRENT_TIMESTAMP FROM candidates c WHERE s.id=c.id RETURNING "
-                    + "s.id,s.tenant_id,s.entity_type_flag,s.entity_id,s.parent_entity_id,s.entity_state_flag,s.last_state_flag,"
-                    + "s.lease_version,s.expire_time,s.timeout_seconds,s.last_heartbeat_time,s.last_alarm_id,s.timeout_source_flag,s.entity_state_ext";
-            return transactionalOperator
-                    .transactional(databaseClient
-                            .sql(sql)
-                            .bind("entity_type", type.getIndex())
-                            .bind("online", online)
-                            .bind("maintain", maintain)
-                            .bind("fault", fault)
-                            .bind("offline", offline)
-                            .bind("limit", limit)
-                            .bind("renew", renewSeconds)
-                            .map((row, metadata) -> lease(row, type))
-                            .all()
-                            .collectList())
-                    .flatMapMany(Flux::fromIterable);
-        }
-        String select =
-                "SELECT id,tenant_id,entity_type_flag,entity_id,parent_entity_id,entity_state_flag,last_state_flag,"
-                        + "lease_version,expire_time,timeout_seconds,last_heartbeat_time,last_alarm_id,timeout_source_flag,entity_state_ext"
-                        + " FROM " + TABLE
-                        + " WHERE entity_type_flag=:entity_type AND entity_state_flag IN (:online,:maintain,:fault)"
-                        + " AND expire_time <= CURRENT_TIMESTAMP ORDER BY expire_time LIMIT :limit FOR UPDATE SKIP LOCKED";
+        String sql = "WITH candidates AS (SELECT id FROM " + TABLE
+                + " WHERE entity_type_flag=:entity_type AND entity_state_flag IN (:online,:maintain,:fault)"
+                + " AND expire_time <= CURRENT_TIMESTAMP ORDER BY expire_time LIMIT :limit FOR UPDATE SKIP LOCKED)"
+                + " UPDATE " + TABLE + " s SET last_state_flag=s.entity_state_flag,entity_state_flag=:offline,"
+                + " lease_version=s.lease_version+1,expire_time=CURRENT_TIMESTAMP + (:renew * INTERVAL '1 second'),"
+                + " operate_time=CURRENT_TIMESTAMP FROM candidates c WHERE s.id=c.id RETURNING "
+                + "s.id,s.tenant_id,s.entity_type_flag,s.entity_id,s.parent_entity_id,s.entity_state_flag,s.last_state_flag,"
+                + "s.lease_version,s.expire_time,s.timeout_seconds,s.last_heartbeat_time,s.last_alarm_id,s.timeout_source_flag,s.entity_state_ext";
         return transactionalOperator
                 .transactional(databaseClient
-                        .sql(select)
+                        .sql(sql)
                         .bind("entity_type", type.getIndex())
                         .bind("online", online)
                         .bind("maintain", maintain)
                         .bind("fault", fault)
+                        .bind("offline", offline)
                         .bind("limit", limit)
+                        .bind("renew", renewSeconds)
                         .map((row, metadata) -> lease(row, type))
                         .all()
-                        .collectList()
-                        .flatMap(rows -> Flux.fromIterable(rows)
-                                .concatMap(row -> databaseClient
-                                        .sql("UPDATE " + TABLE
-                                                + " SET last_state_flag=entity_state_flag,entity_state_flag=:offline,lease_version=lease_version+1,"
-                                                + "expire_time=DATE_ADD(CURRENT_TIMESTAMP, INTERVAL :renew SECOND),operate_time=CURRENT_TIMESTAMP"
-                                                + " WHERE id=:id AND lease_version=:lease_version")
-                                        .bind("offline", offline)
-                                        .bind("renew", renewSeconds)
-                                        .bind("id", row.id())
-                                        .bind("lease_version", row.leaseVersion())
-                                        .fetch()
-                                        .rowsUpdated()
-                                        .filter(updated -> updated == 1)
-                                        .flatMapMany(ignored -> getLease(row.tenantId(), type, row.entityId()))
-                                        .map(lease -> new EntityStateLease(
-                                                lease.id(),
-                                                lease.tenantId(),
-                                                lease.type(),
-                                                lease.entityId(),
-                                                lease.parentEntityId(),
-                                                lease.stateFlag(),
-                                                row.stateFlag(),
-                                                lease.leaseVersion(),
-                                                lease.expireTime(),
-                                                lease.timeoutSeconds(),
-                                                lease.lastHeartbeatTime(),
-                                                lease.lastAlarmId(),
-                                                lease.timeoutSourceFlag(),
-                                                lease.stateExt())))
-                                .collectList()))
+                        .collectList())
                 .flatMapMany(Flux::fromIterable);
     }
 
@@ -384,8 +321,6 @@ public class R2dbcEntityStateStore implements ReactiveEntityStateStore {
 
     private DatabaseClient.GenericExecuteSpec bindTime(
             DatabaseClient.GenericExecuteSpec spec, String name, LocalDateTime value) {
-        return "postgres".equalsIgnoreCase(dialect.name())
-                ? spec.bind(name, value.atOffset(ZoneOffset.UTC))
-                : spec.bind(name, value);
+        return spec.bind(name, value.atOffset(ZoneOffset.UTC));
     }
 }

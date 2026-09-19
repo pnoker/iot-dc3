@@ -39,7 +39,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 
-/** R2DBC label repository shared by PostgreSQL, MySQL and MariaDB. */
+/** Explicit SQL adapter for tenant-scoped labels. */
 @Repository
 @RequiredArgsConstructor
 @ConditionalOnClass({DatabaseClient.class, R2dbcDialect.class, TransactionalOperator.class})

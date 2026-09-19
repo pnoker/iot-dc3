@@ -96,9 +96,7 @@ public class R2dbcPointValueIngestOutbox implements ReactivePointValueIngestOutb
                 + ",status,attempts,available_at,claimed_at,claimed_by) VALUES "
                 + "(:tenant_id,:message_id,:schema_version,:driver_node,:sequence,:fencing_token,:device_id,:point_id,"
                 + ":raw_value,:cal_value,:num_value,:driver_id,:create_time,:operate_time,'CLAIMED',1,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,:claimed_by) "
-                + (postgres()
-                        ? "ON CONFLICT (tenant_id,message_id) DO NOTHING"
-                        : "ON DUPLICATE KEY UPDATE message_id=message_id");
+                + "ON CONFLICT (tenant_id,message_id) DO NOTHING";
         DatabaseClient.GenericExecuteSpec spec = databaseClient
                 .sql(sql)
                 .bind("tenant_id", value.getTenantId())
@@ -135,13 +133,9 @@ public class R2dbcPointValueIngestOutbox implements ReactivePointValueIngestOutb
     public Flux<PointValueDO> claim(String owner, int limit) {
         if (owner == null || owner.isBlank() || limit < 1) return Flux.empty();
         int bounded = Math.min(limit, 500);
-        String expired = postgres()
-                ? "UPDATE " + table() + " SET status='PENDING',claimed_at=NULL,claimed_by=NULL "
-                        + "WHERE status='CLAIMED' AND claimed_at < CURRENT_TIMESTAMP - INTERVAL '30 seconds'"
-                : "UPDATE " + table() + " SET status='PENDING',claimed_at=NULL,claimed_by=NULL "
-                        + "WHERE status='CLAIMED' AND claimed_at < CURRENT_TIMESTAMP - INTERVAL 30 SECOND";
-        String persistedLeaseExpired =
-                postgres() ? "CURRENT_TIMESTAMP - INTERVAL '30 seconds'" : "CURRENT_TIMESTAMP - INTERVAL 30 SECOND";
+        String expired = "UPDATE " + table() + " SET status='PENDING',claimed_at=NULL,claimed_by=NULL "
+                + "WHERE status='CLAIMED' AND claimed_at < CURRENT_TIMESTAMP - INTERVAL '30 seconds'";
+        String persistedLeaseExpired = "CURRENT_TIMESTAMP - INTERVAL '30 seconds'";
         String select = "SELECT " + COLUMNS + " FROM " + table()
                 + " WHERE (status='PENDING' AND available_at<=CURRENT_TIMESTAMP)"
                 + " OR (status='PERSISTED' AND (claimed_at IS NULL OR claimed_at < " + persistedLeaseExpired + "))"
@@ -189,9 +183,7 @@ public class R2dbcPointValueIngestOutbox implements ReactivePointValueIngestOutb
     public Mono<Integer> markFailed(PointValueDO value, String owner, String error) {
         if (value == null || value.getTenantId() == null || value.getMessageId() == null) return Mono.just(0);
         if (owner == null || owner.isBlank()) return Mono.just(0);
-        String backoff = postgres()
-                ? "CURRENT_TIMESTAMP + (LEAST(300, POWER(2, attempts)) * INTERVAL '1 second')"
-                : "DATE_ADD(CURRENT_TIMESTAMP, INTERVAL LEAST(300, POW(2, attempts)) SECOND)";
+        String backoff = "CURRENT_TIMESTAMP + (LEAST(300, POWER(2, attempts)) * INTERVAL '1 second')";
         String sql = "UPDATE " + table() + " SET status=CASE WHEN attempts>=10 THEN 'FAILED' ELSE 'PENDING' END, "
                 + "available_at=" + backoff + ",claimed_at=NULL,claimed_by=NULL,last_error=:last_error "
                 + "WHERE tenant_id=:tenant_id AND message_id=:message_id AND status IN ('CLAIMED','PERSISTED') AND claimed_by=:owner";
@@ -223,10 +215,6 @@ public class R2dbcPointValueIngestOutbox implements ReactivePointValueIngestOutb
         value.setCreateTime(time(row.get("create_time")));
         value.setOperateTime(time(row.get("operate_time")));
         return value;
-    }
-
-    private boolean postgres() {
-        return "postgres".equalsIgnoreCase(dialect.name());
     }
 
     private void require(PointValueDO value) {
@@ -261,6 +249,6 @@ public class R2dbcPointValueIngestOutbox implements ReactivePointValueIngestOutb
 
     private DatabaseClient.GenericExecuteSpec bindTime(
             DatabaseClient.GenericExecuteSpec spec, String name, LocalDateTime value) {
-        return postgres() ? spec.bind(name, value.atOffset(ZoneOffset.UTC)) : spec.bind(name, value);
+        return spec.bind(name, value.atOffset(ZoneOffset.UTC));
     }
 }

@@ -18,7 +18,6 @@ package io.github.pnoker.db.postgres.data;
 
 import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.data.repository.ReactivePointValueLatestStore;
-import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -44,7 +43,6 @@ public class R2dbcPointValueLatestStore implements ReactivePointValueLatestStore
             + "sequence, fencing_token, raw_value, cal_value, num_value, driver_id, create_time, operate_time";
 
     private final DatabaseClient databaseClient;
-    private final R2dbcDialect dialect;
     private final TransactionalOperator transactionalOperator;
 
     @Override
@@ -105,7 +103,7 @@ public class R2dbcPointValueLatestStore implements ReactivePointValueLatestStore
 
     private Mono<Integer> upsert(PointValueDO value) {
         requireKey(value);
-        String sql = "postgres".equalsIgnoreCase(dialect.name()) ? postgresUpsert() : mysqlUpsert();
+        String sql = upsertSql();
         DatabaseClient.GenericExecuteSpec spec = databaseClient
                 .sql(sql)
                 .bind("tenant_id", value.getTenantId())
@@ -125,7 +123,7 @@ public class R2dbcPointValueLatestStore implements ReactivePointValueLatestStore
         return spec.fetch().rowsUpdated().map(Long::intValue);
     }
 
-    private String postgresUpsert() {
+    private String upsertSql() {
         return "INSERT INTO " + TABLE + " (" + COLUMNS + ") VALUES (:tenant_id,:device_id,:point_id,:message_id,"
                 + ":schema_version,:driver_node,:sequence,:fencing_token,:raw_value,:cal_value,:num_value,:driver_id,:create_time,:operate_time) "
                 + "ON CONFLICT (tenant_id,device_id,point_id) DO UPDATE SET message_id=EXCLUDED.message_id,"
@@ -134,23 +132,6 @@ public class R2dbcPointValueLatestStore implements ReactivePointValueLatestStore
                 + "num_value=EXCLUDED.num_value,driver_id=EXCLUDED.driver_id,create_time=EXCLUDED.create_time,operate_time=EXCLUDED.operate_time "
                 + "WHERE (EXCLUDED.fencing_token,EXCLUDED.create_time,EXCLUDED.sequence,EXCLUDED.message_id) > "
                 + "(dc3_point_latest.fencing_token,dc3_point_latest.create_time,dc3_point_latest.sequence,dc3_point_latest.message_id)";
-    }
-
-    private String mysqlUpsert() {
-        return "INSERT INTO " + TABLE + " (" + COLUMNS + ") VALUES (:tenant_id,:device_id,:point_id,:message_id,"
-                + ":schema_version,:driver_node,:sequence,:fencing_token,:raw_value,:cal_value,:num_value,:driver_id,:create_time,:operate_time) "
-                + "ON DUPLICATE KEY UPDATE message_id=IF((VALUES(fencing_token),VALUES(create_time),VALUES(sequence),VALUES(message_id)) > "
-                + "(fencing_token,create_time,sequence,message_id),VALUES(message_id),message_id), "
-                + "schema_version=IF(VALUES(message_id)=message_id,VALUES(schema_version),schema_version), "
-                + "driver_node=IF(VALUES(message_id)=message_id,VALUES(driver_node),driver_node), "
-                + "sequence=IF(VALUES(message_id)=message_id,VALUES(sequence),sequence), "
-                + "fencing_token=IF(VALUES(message_id)=message_id,VALUES(fencing_token),fencing_token), "
-                + "raw_value=IF(VALUES(message_id)=message_id,VALUES(raw_value),raw_value), "
-                + "cal_value=IF(VALUES(message_id)=message_id,VALUES(cal_value),cal_value), "
-                + "num_value=IF(VALUES(message_id)=message_id,VALUES(num_value),num_value), "
-                + "driver_id=IF(VALUES(message_id)=message_id,VALUES(driver_id),driver_id), "
-                + "create_time=IF(VALUES(message_id)=message_id,VALUES(create_time),create_time), "
-                + "operate_time=IF(VALUES(message_id)=message_id,VALUES(operate_time),operate_time)";
     }
 
     private PointValueDO map(io.r2dbc.spi.Row row, io.r2dbc.spi.RowMetadata metadata) {
@@ -200,9 +181,7 @@ public class R2dbcPointValueLatestStore implements ReactivePointValueLatestStore
 
     private DatabaseClient.GenericExecuteSpec bindTime(
             DatabaseClient.GenericExecuteSpec spec, String name, LocalDateTime value) {
-        return "postgres".equalsIgnoreCase(dialect.name())
-                ? spec.bind(name, value.atOffset(ZoneOffset.UTC))
-                : spec.bind(name, value);
+        return spec.bind(name, value.atOffset(ZoneOffset.UTC));
     }
 
     private boolean validKey(Long tenantId, Long deviceId) {
