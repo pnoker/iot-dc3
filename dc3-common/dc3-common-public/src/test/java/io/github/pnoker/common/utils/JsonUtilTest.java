@@ -45,14 +45,18 @@ class JsonUtilTest {
 
     @Test
     void parseObjectQuietlyKeepsEmptyTextNull() {
-        assertThat(JsonUtil.parseObjectQuietly(null, Sample.class, "dc3_test.ext")).isNull();
-        assertThat(JsonUtil.parseObjectQuietly("", Sample.class, "dc3_test.ext")).isNull();
+        assertThat(JsonUtil.parseObjectQuietly(null, Sample.class, "dc3_test.ext"))
+                .isNull();
+        assertThat(JsonUtil.parseObjectQuietly("", Sample.class, "dc3_test.ext"))
+                .isNull();
     }
 
     @Test
     void parseObjectQuietlyReturnsNullOnUndecodableText() {
-        assertThat(JsonUtil.parseObjectQuietly("not json", Sample.class, "dc3_test.ext")).isNull();
-        assertThat(JsonUtil.parseObjectQuietly("{\"name\":\"a\",\"age\":\"not-a-number\"}", Sample.class, "dc3_test.ext"))
+        assertThat(JsonUtil.parseObjectQuietly("not json", Sample.class, "dc3_test.ext"))
+                .isNull();
+        assertThat(JsonUtil.parseObjectQuietly(
+                        "{\"name\":\"a\",\"age\":\"not-a-number\"}", Sample.class, "dc3_test.ext"))
                 .isNull();
     }
 

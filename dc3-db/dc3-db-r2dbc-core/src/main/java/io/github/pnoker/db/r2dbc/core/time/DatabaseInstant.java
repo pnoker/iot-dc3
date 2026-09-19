@@ -44,6 +44,7 @@ public final class DatabaseInstant {
         if (raw instanceof OffsetDateTime value)
             return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
         if (raw instanceof Instant value) return LocalDateTime.ofInstant(value, ZoneOffset.UTC);
-        throw new IllegalStateException("unsupported timestamp type: " + raw.getClass().getName());
+        throw new IllegalStateException(
+                "unsupported timestamp type: " + raw.getClass().getName());
     }
 }

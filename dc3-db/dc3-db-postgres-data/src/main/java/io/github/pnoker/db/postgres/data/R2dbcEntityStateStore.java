@@ -134,11 +134,12 @@ public class R2dbcEntityStateStore implements ReactiveEntityStateStore {
                 + "timeout_source_flag,entity_state_ext,tenant_id,create_time,operate_time) VALUES "
                 + "(:id,:entity_type,:entity_id,:parent_entity,:state,:last_state,1,:expire,:timeout,:heartbeat,0,:timeout_source,"
                 + dialect.jsonWriteExpression(":state_ext") + ",:tenant_id,:create_time,:operate_time) ";
-        String stateExtensionUpdate = "CASE WHEN CAST(:state_ext AS JSONB)->>'content' <> '' THEN jsonb_build_object('type',"
-                + TABLE
-                + ".entity_state_ext->>'type','content',CAST(:state_ext AS JSONB)->>'content','version',"
-                + "COALESCE((" + TABLE + ".entity_state_ext->>'version')::int,0)+1) ELSE " + TABLE
-                + ".entity_state_ext END";
+        String stateExtensionUpdate =
+                "CASE WHEN CAST(:state_ext AS JSONB)->>'content' <> '' THEN jsonb_build_object('type',"
+                        + TABLE
+                        + ".entity_state_ext->>'type','content',CAST(:state_ext AS JSONB)->>'content','version',"
+                        + "COALESCE((" + TABLE + ".entity_state_ext->>'version')::int,0)+1) ELSE " + TABLE
+                        + ".entity_state_ext END";
         String upsert = insert
                 + "ON CONFLICT (tenant_id,entity_type_flag,entity_id) DO UPDATE SET parent_entity_id=EXCLUDED.parent_entity_id,"
                 + "entity_state_flag=EXCLUDED.entity_state_flag,last_state_flag=" + TABLE

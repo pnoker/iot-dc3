@@ -62,8 +62,7 @@ public class R2dbcRuntimeAutoConfiguration {
     Object dc3DialectCardinalityGuard(ObjectProvider<R2dbcDialect> dialects) {
         long count = dialects.stream().count();
         if (count != 1) {
-            throw new IllegalStateException(
-                    "exactly one R2DBC dialect adapter must be registered; found " + count);
+            throw new IllegalStateException("exactly one R2DBC dialect adapter must be registered; found " + count);
         }
         return new Object();
     }
