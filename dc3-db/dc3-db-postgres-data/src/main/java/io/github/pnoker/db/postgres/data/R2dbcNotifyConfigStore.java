@@ -120,7 +120,7 @@ public class R2dbcNotifyConfigStore implements ReactiveNotifyConfigStore {
         value.setNotifyCode(text(row.get("notify_code")));
         value.setAutoConfirmFlag(byteValue(row.get("auto_confirm_flag")));
         value.setNotifyInterval(number(row.get("notify_interval")));
-        value.setNotifyExt(json(row.get("notify_ext", String.class)));
+        value.setNotifyExt(json(row.get("notify_ext", String.class), "notify_ext"));
         value.setEnableFlag(byteValue(row.get("enable_flag")));
         value.setTenantId(number(row.get("tenant_id")));
         value.setRemark(text(row.get("remark")));
@@ -140,7 +140,7 @@ public class R2dbcNotifyConfigStore implements ReactiveNotifyConfigStore {
         value.setMessageName(text(row.get("message_name")));
         value.setMessageCode(text(row.get("message_code")));
         value.setMessageLevel(byteValue(row.get("message_level")));
-        value.setMessageExt(json(row.get("message_ext", String.class)));
+        value.setMessageExt(json(row.get("message_ext", String.class), "message_ext"));
         value.setEnableFlag(byteValue(row.get("enable_flag")));
         value.setTenantId(number(row.get("tenant_id")));
         value.setRemark(text(row.get("remark")));
@@ -161,7 +161,7 @@ public class R2dbcNotifyConfigStore implements ReactiveNotifyConfigStore {
         value.setChannelCode(text(row.get("channel_code")));
         value.setChannelTypeFlag(byteValue(row.get("channel_type_flag")));
         value.setCredentialRef(text(row.get("credential_ref")));
-        value.setChannelExt(json(row.get("channel_ext", String.class)));
+        value.setChannelExt(json(row.get("channel_ext", String.class), "channel_ext"));
         value.setEnableFlag(byteValue(row.get("enable_flag")));
         value.setTenantId(number(row.get("tenant_id")));
         value.setRemark(text(row.get("remark")));
@@ -180,7 +180,7 @@ public class R2dbcNotifyConfigStore implements ReactiveNotifyConfigStore {
         value.setId(number(row.get("id")));
         value.setNotifyId(number(row.get("notify_id")));
         value.setChannelId(number(row.get("channel_id")));
-        value.setBindExt(json(row.get("bind_ext", String.class)));
+        value.setBindExt(json(row.get("bind_ext", String.class), "bind_ext"));
         value.setEnableFlag(byteValue(row.get("enable_flag")));
         value.setTenantId(number(row.get("tenant_id")));
         value.setRemark(text(row.get("remark")));
@@ -194,9 +194,8 @@ public class R2dbcNotifyConfigStore implements ReactiveNotifyConfigStore {
         return value;
     }
 
-    private JsonExt json(String value) {
-        if (value == null) return null;
-        return JsonUtil.parseObject(value, JsonExt.class);
+    private JsonExt json(String value, String column) {
+        return JsonUtil.parseObjectQuietly(value, JsonExt.class, column);
     }
 
     private long number(Object value) {

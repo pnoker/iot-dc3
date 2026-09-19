@@ -72,7 +72,7 @@ public class R2dbcResourceLookupStore implements ReactiveResourceLookupStore {
         value.setResourceTypeFlag(number(row.get("resource_type_flag")));
         value.setResourceScopeFlag(number(row.get("resource_scope_flag")));
         value.setEntityId(row.get("entity_id", Long.class));
-        value.setResourceExt(json(row.get("resource_ext", String.class)));
+        value.setResourceExt(json(row.get("resource_ext", String.class), "resource_ext"));
         value.setEnableFlag(number(row.get("enable_flag")));
         value.setRemark(row.get("remark", String.class));
         value.setCreatorId(row.get("creator_id", Long.class));
@@ -89,13 +89,8 @@ public class R2dbcResourceLookupStore implements ReactiveResourceLookupStore {
         return raw instanceof Number value ? value.byteValue() : null;
     }
 
-    private JsonExt json(String raw) {
-        if (raw == null) return null;
-        try {
-            return JsonUtil.parseObject(raw, JsonExt.class);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    private JsonExt json(String raw, String column) {
+        return JsonUtil.parseObjectQuietly(raw, JsonExt.class, column);
     }
 
     private LocalDateTime time(Object raw) {

@@ -192,7 +192,7 @@ public class R2dbcPrincipalStore implements ReactivePrincipalStore {
         Number locked = row.get("locked_flag", Number.class);
         value.setLockedFlag(locked == null ? null : locked.byteValue());
         value.setLastLoginTime(time(row.get("last_login_time")));
-        value.setPrincipalExt(json(row.get("principal_ext", String.class)));
+        value.setPrincipalExt(json(row.get("principal_ext", String.class), "principal_ext"));
         value.setRemark(row.get("remark", String.class));
         value.setCreatorId(row.get("creator_id", Long.class));
         value.setCreatorName(row.get("creator_name", String.class));
@@ -205,13 +205,8 @@ public class R2dbcPrincipalStore implements ReactivePrincipalStore {
         return value;
     }
 
-    private JsonExt json(String raw) {
-        if (raw == null) return null;
-        try {
-            return JsonUtil.parseObject(raw, JsonExt.class);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    private JsonExt json(String raw, String column) {
+        return JsonUtil.parseObjectQuietly(raw, JsonExt.class, column);
     }
 
     private LocalDateTime time(Object raw) {

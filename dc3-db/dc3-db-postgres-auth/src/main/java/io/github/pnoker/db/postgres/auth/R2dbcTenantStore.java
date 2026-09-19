@@ -204,7 +204,7 @@ public class R2dbcTenantStore implements ReactiveTenantStore {
         value.setId(row.get("id", Long.class));
         value.setTenantName(row.get("tenant_name", String.class));
         value.setTenantCode(row.get("tenant_code", String.class));
-        value.setTenantExt(json(row.get("tenant_ext", String.class)));
+        value.setTenantExt(json(row.get("tenant_ext", String.class), "tenant_ext"));
         Number enable = row.get("enable_flag", Number.class);
         value.setEnableFlag(enable == null ? null : enable.byteValue());
         value.setRemark(row.get("remark", String.class));
@@ -219,13 +219,8 @@ public class R2dbcTenantStore implements ReactiveTenantStore {
         return value;
     }
 
-    private JsonExt json(String raw) {
-        if (raw == null) return null;
-        try {
-            return JsonUtil.parseObject(raw, JsonExt.class);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    private JsonExt json(String raw, String column) {
+        return JsonUtil.parseObjectQuietly(raw, JsonExt.class, column);
     }
 
     private LocalDateTime time(Object raw) {

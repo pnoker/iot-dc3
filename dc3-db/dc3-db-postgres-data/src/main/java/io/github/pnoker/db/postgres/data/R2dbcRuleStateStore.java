@@ -294,7 +294,7 @@ public class R2dbcRuleStateStore implements ReactiveRuleStateStore {
         value.setLastNotifyTime(time(row.get("last_notify_time")));
         value.setTriggerCount(row.get("trigger_count", Long.class));
         value.setAlarmId(row.get("alarm_id", Long.class));
-        value.setEntityStateExt(json(row.get("entity_state_ext", String.class)));
+        value.setEntityStateExt(json(row.get("entity_state_ext", String.class), "entity_state_ext"));
         value.setTenantId(row.get("tenant_id", Long.class));
         value.setRemark(row.get("remark", String.class));
         value.setCreatorId(row.get("creator_id", Long.class));
@@ -328,13 +328,8 @@ public class R2dbcRuleStateStore implements ReactiveRuleStateStore {
         return String.join(", ", clauses);
     }
 
-    private JsonExt json(String raw) {
-        if (raw == null) return null;
-        try {
-            return JsonUtil.parseObject(raw, JsonExt.class);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    private JsonExt json(String raw, String column) {
+        return JsonUtil.parseObjectQuietly(raw, JsonExt.class, column);
     }
 
     private LocalDateTime time(Object raw) {

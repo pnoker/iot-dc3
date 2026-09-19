@@ -147,8 +147,8 @@ public class R2dbcUserStore implements ReactiveUserStore {
         value.setNickName(row.get("nick_name", String.class));
         value.setPhone(row.get("phone", String.class));
         value.setEmail(row.get("email", String.class));
-        value.setSocialExt(json(row.get("social_ext", String.class)));
-        value.setIdentityExt(json(row.get("identity_ext", String.class)));
+        value.setSocialExt(json(row.get("social_ext", String.class), "social_ext"));
+        value.setIdentityExt(json(row.get("identity_ext", String.class), "identity_ext"));
         Number enable = row.get("enable_flag", Number.class);
         value.setEnableFlag(enable == null ? null : enable.byteValue());
         value.setRemark(row.get("remark", String.class));
@@ -163,13 +163,8 @@ public class R2dbcUserStore implements ReactiveUserStore {
         return value;
     }
 
-    private JsonExt json(String raw) {
-        if (raw == null) return null;
-        try {
-            return JsonUtil.parseObject(raw, JsonExt.class);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    private JsonExt json(String raw, String column) {
+        return JsonUtil.parseObjectQuietly(raw, JsonExt.class, column);
     }
 
     private LocalDateTime time(Object raw) {

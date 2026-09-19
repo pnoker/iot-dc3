@@ -308,7 +308,7 @@ public class R2dbcServiceAccountStore implements ReactiveServiceAccountStore {
         value.setPurpose(row.get("purpose", String.class));
         value.setExpireTime(time(row.get("expire_time")));
         value.setLastUsedTime(time(row.get("last_used_time")));
-        value.setCredentialPolicyExt(jsonObject(row.get("credential_policy_ext", String.class)));
+        value.setCredentialPolicyExt(jsonObject(row.get("credential_policy_ext", String.class), "credential_policy_ext"));
         Number flag = row.get("enable_flag", Number.class);
         value.setEnableFlag(flag == null ? null : flag.byteValue());
         value.setRemark(row.get("remark", String.class));
@@ -351,13 +351,8 @@ public class R2dbcServiceAccountStore implements ReactiveServiceAccountStore {
         return value == null ? spec.bindNull(name, LocalDateTime.class) : spec.bind(name, value);
     }
 
-    private JsonExt jsonObject(String raw) {
-        if (raw == null) return null;
-        try {
-            return JsonUtil.parseObject(raw, JsonExt.class);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    private JsonExt jsonObject(String raw, String column) {
+        return JsonUtil.parseObjectQuietly(raw, JsonExt.class, column);
     }
 
     private LocalDateTime time(Object raw) {
