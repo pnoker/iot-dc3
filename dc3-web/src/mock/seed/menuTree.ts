@@ -32,6 +32,9 @@ interface NodeOpts {
  * Build a menu node. Titles mirror the dc3_menu seed rows in
  * dependencies/postgres/initdb/02-iot-dc3-auth.sql (authoritative {zh,en} map) so the
  * static demo matches what the backend serves; resolveMenuTitle prefers content.titles.
+ * @param menuCode - menu code to locate the parent for
+ * @param opts - opts entries
+ * @returns the generated demo value
  */
 const mk = (menuCode: string, opts: NodeOpts = {}): MenuNode => ({
   id: String(++seq),

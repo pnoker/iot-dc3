@@ -106,11 +106,26 @@ import {Refresh} from '@element-plus/icons-vue';
 
 const {t} = useI18n();
 
+/**
+ *
+ */
 export type DashboardCardHeight = number | 'auto';
+/**
+ *
+ */
 export type DashboardCardBodyMode = 'plain' | 'chart' | 'scroll';
+/**
+ *
+ */
 export type DashboardCardLoadingTarget = 'body' | 'button' | 'none';
+/**
+ *
+ */
 export type DashboardCardVariant = 'default' | 'tabs';
 
+/**
+ *
+ */
 export interface AutoRefreshOption {
   label: string;
   value: number;

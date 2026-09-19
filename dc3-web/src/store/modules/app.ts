@@ -23,7 +23,13 @@ import {computed, ref, watch} from 'vue';
 
 import {getStorage, setStorage} from '@/utils/storageUtil';
 
+/**
+ * Theme mode union.
+ */
 export type ThemeMode = 'light' | 'dark' | 'auto';
+/**
+ * density type alias.
+ */
 export type Density = 'comfortable' | 'compact';
 
 const THEME_KEY = 'dc3.app.theme';

@@ -38,6 +38,12 @@ const includes = (value: unknown, keyword: string) =>
 // MCP OAuth connections. Backend `connection/list` returns a flat array with no
 // filters, so search is applied client-side before wrapping into a single-page
 // result. principalId → name resolves through the shared family relations loader.
+/**
+ * Create mcp connection config.
+ * @param t - i18n translator for localized messages
+ * @param handlers - handlers entries
+ * @returns the operation result
+ */
 export const createMcpConnectionConfig = (
   t: Translator,
   handlers: McpConnectionHandlers

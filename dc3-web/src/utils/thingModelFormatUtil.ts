@@ -81,7 +81,11 @@ function normalizeFormFlag(value: FlagValue, indexMap: Record<string, string>, f
   return normalized === '-' ? fallback : normalized;
 }
 
-/** Whether a backend enable flag (ENABLE/0/true forms) means enabled. */
+/**
+ * Whether a backend enable flag (ENABLE/0/true forms) means enabled.
+ * @param value - value to set
+ * @returns whether the condition holds
+ */
 export function isEnabledFlag(value: FlagValue): boolean {
   if (value === true) return true;
   if (value === false || value === null || value === undefined || value === '') return false;
@@ -90,62 +94,117 @@ export function isEnabledFlag(value: FlagValue): boolean {
   return normalized === 'ENABLE' || normalized === 'ENABLED' || normalized === 'TRUE' || normalized === '0';
 }
 
-/** Normalize an enable flag to the ENABLE/DISABLE wire token. */
+/**
+ * Normalize an enable flag to the ENABLE/DISABLE wire token.
+ * @param value - flag value to normalize
+ * @param fallback - value used when the primary lookup misses
+ * @returns the ENABLE or DISABLE wire token
+ */
 export function enableFlagValue(value: FlagValue, fallback = 'ENABLE'): string {
   return normalizeFormFlag(value, ENABLE_FLAG_BY_INDEX, fallback);
 }
 
-/** Display token for a command type flag, or dash when absent. */
+/**
+ * Display token for a command type flag, or dash when absent.
+ * @param value - value to set
+ * @returns the localized label
+ */
 export function commandTypeLabel(value: FlagValue): string {
   return normalizeFlag(value, COMMAND_TYPE_BY_INDEX);
 }
 
-/** Normalize a command type flag to its wire token. */
+/**
+ * Normalize a command type flag to its wire token.
+ * @param value - value to set
+ * @param fallback - value used when the primary lookup misses
+ * @returns the raw enum value
+ */
 export function commandTypeValue(value: FlagValue, fallback = 'CUSTOM'): string {
   return normalizeFormFlag(value, COMMAND_TYPE_BY_INDEX, fallback);
 }
 
-/** Display token for a call type flag, or dash when absent. */
+/**
+ * Display token for a call type flag, or dash when absent.
+ * @param value - value to set
+ * @returns the localized label
+ */
 export function callTypeLabel(value: FlagValue): string {
   return normalizeFlag(value, CALL_TYPE_BY_INDEX);
 }
 
-/** Normalize a call type flag to its wire token. */
+/**
+ * Normalize a call type flag to its wire token.
+ * @param value - value to set
+ * @param fallback - value used when the primary lookup misses
+ * @returns the raw enum value
+ */
 export function callTypeValue(value: FlagValue, fallback = 'SYNC'): string {
   return normalizeFormFlag(value, CALL_TYPE_BY_INDEX, fallback);
 }
 
-/** Normalize a param direction flag to its wire token. */
+/**
+ * Normalize a param direction flag to its wire token.
+ * @param value - value to set
+ * @param fallback - value used when the primary lookup misses
+ * @returns the raw enum value
+ */
 export function paramDirectionValue(value: FlagValue, fallback = 'INPUT'): string {
   return normalizeFormFlag(value, PARAM_DIRECTION_BY_INDEX, fallback);
 }
 
-/** Normalize a point type flag to its wire token. */
+/**
+ * Normalize a point type flag to its wire token.
+ * @param value - value to set
+ * @param fallback - value used when the primary lookup misses
+ * @returns the raw enum value
+ */
 export function pointTypeValue(value: FlagValue, fallback = 'STRING'): string {
   return normalizeFormFlag(value, POINT_TYPE_BY_INDEX, fallback);
 }
 
-/** Display token for an event type flag, or dash when absent. */
+/**
+ * Display token for an event type flag, or dash when absent.
+ * @param value - value to set
+ * @returns the localized label
+ */
 export function eventTypeLabel(value: FlagValue): string {
   return normalizeFlag(value, EVENT_TYPE_BY_INDEX);
 }
 
-/** Normalize an event type flag to its wire token. */
+/**
+ * Normalize an event type flag to its wire token.
+ * @param value - value to set
+ * @param fallback - value used when the primary lookup misses
+ * @returns the raw enum value
+ */
 export function eventTypeValue(value: FlagValue, fallback = 'INFO'): string {
   return normalizeFormFlag(value, EVENT_TYPE_BY_INDEX, fallback);
 }
 
-/** Display token for an event level flag, or dash when absent. */
+/**
+ * Display token for an event level flag, or dash when absent.
+ * @param value - value to set
+ * @returns the localized label
+ */
 export function eventLevelLabel(value: FlagValue): string {
   return normalizeFlag(value, EVENT_LEVEL_BY_INDEX);
 }
 
-/** Normalize an event level flag to its wire token. */
+/**
+ * Normalize an event level flag to its wire token.
+ * @param value - value to set
+ * @param fallback - value used when the primary lookup misses
+ * @returns the raw enum value
+ */
 export function eventLevelValue(value: FlagValue, fallback = 'LOW'): string {
   return normalizeFormFlag(value, EVENT_LEVEL_BY_INDEX, fallback);
 }
 
-/** Element Plus tag type for an event level. */
+/**
+ * Element Plus tag type for an event level.
+ * @param value - value to set
+ * @returns the tag type for the level
+ */
 export function eventLevelTag(value: FlagValue): 'success' | 'warning' | 'danger' | 'info' {
   const level = eventLevelLabel(value);
   if (level === 'CRITICAL') return 'danger';
@@ -154,7 +213,11 @@ export function eventLevelTag(value: FlagValue): 'success' | 'warning' | 'danger
   return 'info';
 }
 
-/** Normalize a command timeout to seconds, migrating legacy millisecond values. */
+/**
+ * Normalize a command timeout to seconds, migrating legacy millisecond values.
+ * @param value - value to set
+ * @returns the transformed value
+ */
 export function normalizeCommandTimeoutSeconds(value: TimeoutValue): number | undefined {
   if (value === null || value === undefined || value === '') {
     return undefined;
@@ -172,7 +235,11 @@ export function normalizeCommandTimeoutSeconds(value: TimeoutValue): number | un
   return timeout;
 }
 
-/** Human label for a command timeout, or dash when unset. */
+/**
+ * Human label for a command timeout, or dash when unset.
+ * @param value - timeout value to label
+ * @returns the human label, or dash when unset
+ */
 export function commandTimeoutLabel(value: TimeoutValue): string {
   return normalizeCommandTimeoutSeconds(value)?.toString() ?? '-';
 }
@@ -220,25 +287,41 @@ export const ALARM_TYPE_OPTIONS: ReadonlyArray<{ value: number; label: string }>
   {value: 4, label: 'REPORT'},
 ];
 
-/** Display token for an alarm type index. */
+/**
+ * Display token for an alarm type index.
+ * @param flag - alarm type index
+ * @returns the alarm type token
+ */
 export function alarmTypeLabel(flag: number | null | undefined): string {
   if (flag === null || flag === undefined) return '-';
   return ALARM_TYPE_LABEL_BY_INDEX[flag] ?? String(flag);
 }
 
-/** Element Plus tag type for an alarm type index. */
+/**
+ * Element Plus tag type for an alarm type index.
+ * @param flag - alarm type index
+ * @returns the tag type for the alarm type
+ */
 export function alarmTypeTag(flag: number | null | undefined): 'info' | 'warning' | 'danger' {
   if (flag === null || flag === undefined) return 'info';
   return ALARM_TYPE_TAG_BY_INDEX[flag] ?? 'info';
 }
 
-/** Priority label (P0..P3) for an alarm level index. */
+/**
+ * Priority label (P0..P3) for an alarm level index.
+ * @param flag - alarm level index
+ * @returns the priority label
+ */
 export function alarmLevelLabel(flag: number | null | undefined): string {
   if (flag === null || flag === undefined) return '—';
   return ALARM_LEVEL_LABEL_BY_INDEX[flag] ?? '—';
 }
 
-/** Element Plus tag type for an alarm level index. */
+/**
+ * Element Plus tag type for an alarm level index.
+ * @param flag - alarm level index
+ * @returns the tag type for the level
+ */
 export function alarmLevelTag(flag: number | null | undefined): 'info' | 'success' | 'warning' | 'danger' {
   if (flag === null || flag === undefined) return 'info';
   return ALARM_LEVEL_TAG_BY_INDEX[flag] ?? 'info';

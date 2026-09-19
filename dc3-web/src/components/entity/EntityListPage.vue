@@ -531,7 +531,11 @@ onBeforeUnmount(() => {
   runningActions.clear();
 });
 
-/** Returns tree options for a treeSelect field, applying transform with the live form model. */
+/**
+ * Returns tree options for a treeSelect field, applying transform with the live form model.
+ * @param field - treeSelect field descriptor
+ * @returns the transformed tree options
+ */
 const treeOptionsFor = (field: EntityFieldConfig) => {
   const raw = rawTreeData[field.prop] || [];
   return field.tree?.transform ? field.tree.transform(raw, formModel) : raw;

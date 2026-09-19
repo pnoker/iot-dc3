@@ -48,6 +48,9 @@ NProgress.configure(NPROGRESS_CONFIG);
 /**
  * Recursively search the menu tree for a node whose menu_code matches
  * the given route name, indicating the user has permission to access it.
+ * @param routeName - route name used for the lookup
+ * @param nodes - nodes entries
+ * @returns whether the condition holds
  */
 const isRouteInMenuTree = (routeName: string, nodes: MenuNode[]): boolean => {
   for (const node of nodes) {

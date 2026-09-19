@@ -19,6 +19,9 @@ import {getCurrentInstance, onUnmounted, reactive} from 'vue';
 
 import type {Order, PageQuery, PageResult, SortSpec} from '@/config/types';
 
+/**
+ * PagedListPage data contract.
+ */
 export interface PagedListPage {
   total: number;
   size: number;
@@ -26,6 +29,9 @@ export interface PagedListPage {
   orders: Order[];
 }
 
+/**
+ * Paged list state.
+ */
 export interface PagedListState<T, Q extends Record<string, any> = Record<string, any>> {
   loading: boolean;
   /** Last list request error. Kept separate from the global toast so pages can offer retry. */
@@ -41,6 +47,9 @@ export interface PagedListState<T, Q extends Record<string, any> = Record<string
   page: PagedListPage;
 }
 
+/**
+ * Use paged list options.
+ */
 export interface UsePagedListOptions<T, Q extends Record<string, any> = Record<string, any>> {
   pageSize?: number;
   sortColumn?: string;
@@ -54,6 +63,7 @@ export interface UsePagedListOptions<T, Q extends Record<string, any> = Record<s
  * through the configured request.
  *
  * @param options paging, sorting, request, and filter hooks
+ * @returns the composable handle
  */
 export const usePagedList = <T, Q extends Record<string, any> = Record<string, any>>(
   options: UsePagedListOptions<T, Q> = {}

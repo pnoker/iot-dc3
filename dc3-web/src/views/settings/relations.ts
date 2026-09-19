@@ -33,6 +33,9 @@ const collectIds = (rows: Record<string, any>[], prop: string): string[] => [
  * principalId → displayName || principalName. Reused by audit / tenant-membership /
  * local-credential / role-binding / service-account (ownerPrincipalId) / mcp lists.
  * Pass a different `prop`/`key` for non-default columns (e.g. ownerPrincipalId).
+ * @param prop - property key to read from the record
+ * @param key - lookup key
+ * @returns the relation descriptor
  */
 export const principalNameRelation = (prop = 'principalId', key = 'principalName'): EntityRelation => ({
   key,
@@ -48,7 +51,12 @@ export const principalNameRelation = (prop = 'principalId', key = 'principalName
   },
 });
 
-/** deviceId → deviceName. listDeviceByIds returns an {id: record} map (see EventTable). */
+/**
+ * deviceId → deviceName. listDeviceByIds returns an {id: record} map (see EventTable).
+ * @param prop - property key to read from the record
+ * @param key - lookup key
+ * @returns the relation descriptor
+ */
 export const deviceNameRelation = (prop = 'deviceId', key = 'deviceName'): EntityRelation => ({
   key,
   load: async (rows) => {
@@ -64,7 +72,12 @@ export const deviceNameRelation = (prop = 'deviceId', key = 'deviceName'): Entit
   },
 });
 
-/** roleId → roleName. Roles are few, so a single full-page list builds the map. */
+/**
+ * roleId → roleName. Roles are few, so a single full-page list builds the map.
+ * @param prop - property key to read from the record
+ * @param key - lookup key
+ * @returns the relation descriptor
+ */
 export const roleNameRelation = (prop = 'roleId', key = 'roleName'): EntityRelation => ({
   key,
   load: async (rows) => {
@@ -83,6 +96,9 @@ export const roleNameRelation = (prop = 'roleId', key = 'roleName'): EntityRelat
 /**
  * Add/edit form field for choosing a principal by name (dropdown) instead of typing a
  * raw id. Loads the principal roster and labels each option with displayName / principalName.
+ * @param label - display label
+ * @param prop - property key to read from the record
+ * @returns the form field descriptor
  */
 export const principalIdField = (label: string, prop = 'principalId'): EntityFieldConfig => ({
   prop,

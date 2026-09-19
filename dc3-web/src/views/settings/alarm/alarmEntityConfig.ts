@@ -44,15 +44,30 @@ import {listDriver} from '@/api/driver';
 import {listPoint} from '@/api/point';
 import type {AlarmEntity, PageQuery, PageResult, ResponsiveListMobileRole} from '@/config/types';
 
+/**
+ * alarm tab key type alias.
+ */
 export type AlarmTabKey = 'rule' | 'notify' | 'message' | 'channel' | 'bind' | 'state' | 'history';
+/**
+ * Alarm field kind union.
+ */
 export type AlarmFieldKind = 'input' | 'number' | 'select' | 'remoteSelect' | 'enableFlag' | 'textarea' | 'json';
+/**
+ * Alarm column kind union.
+ */
 export type AlarmColumnKind = 'text' | 'tag' | 'code' | 'time' | 'json';
 
+/**
+ * Alarm option.
+ */
 export interface AlarmOption {
   label: string;
   value: string;
 }
 
+/**
+ * Alarm field configuration.
+ */
 export interface AlarmFieldConfig {
   prop: string;
   label: string;
@@ -68,6 +83,9 @@ export interface AlarmFieldConfig {
   precision?: number;
 }
 
+/**
+ * Alarm column configuration.
+ */
 export interface AlarmColumnConfig {
   prop: string;
   label: string;
@@ -79,6 +97,9 @@ export interface AlarmColumnConfig {
   mobile?: ResponsiveListMobileRole;
 }
 
+/**
+ * Alarm entity configuration.
+ */
 export interface AlarmEntityConfig {
   key: AlarmTabKey;
   label: string;
@@ -209,6 +230,11 @@ const loadEntityOptions = async (form: Record<string, any>): Promise<AlarmOption
   return (res?.items || []).map((r: any) => ({label: r[nameKey] || String(r.id), value: String(r.id)}));
 };
 
+/**
+ * Create alarm entity configs.
+ * @param t - i18n translator for localized messages
+ * @returns the operation result
+ */
 export const createAlarmEntityConfigs = (t: Translate) => {
   const enableOptions: AlarmOption[] = [
     {label: t('common.enable'), value: 'ENABLE'},

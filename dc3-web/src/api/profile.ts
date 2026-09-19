@@ -20,22 +20,58 @@ import {API_MANAGER_BASE} from '@/config/constant/api';
 import type {PageQuery, PageResult} from '@/config/types';
 import type {ProfileForm, ProfileRecord} from '@/config/types/manager';
 
+/**
+ * Create profile.
+ * @param profile - profile record the operation targets
+ * @returns the operation result
+ */
 export const addProfile = (profile: ProfileForm) =>
   httpPost<ProfileRecord>(`${API_MANAGER_BASE}/profile/add`, profile);
 
+/**
+ * Delete profile.
+ * @param id - record id
+ * @param version - record version for optimistic locking
+ * @returns the operation result
+ */
 export const deleteProfile = (id: string, version: number) => versionedDelete(`${API_MANAGER_BASE}/profile`, id, version);
 
+/**
+ * Update profile.
+ * @param profile - profile record the operation targets
+ * @returns the operation result
+ */
 export const updateProfile = (profile: ProfileForm) =>
   httpPost<ProfileRecord>(`${API_MANAGER_BASE}/profile/update`, profile);
 
+/**
+ * Fetch profile by id.
+ * @param id - record id
+ * @returns the fetched profile by id
+ */
 export const getProfileById = (id: string) =>
   httpGet<ProfileRecord>(`${API_MANAGER_BASE}/profile/get_by_id`, {params: {id}});
 
+/**
+ * List profile by ids.
+ * @param profileIds - profile ids to scope the request
+ * @returns the listed profile by ids
+ */
 export const listProfileByIds = (profileIds: string[]) =>
   httpPost<Record<string, ProfileRecord>>(`${API_MANAGER_BASE}/profile/list_by_ids`, profileIds);
 
+/**
+ * List profile by device id.
+ * @param deviceId - device id to scope the request
+ * @returns the listed profile by device id
+ */
 export const listProfileByDeviceId = (deviceId: string) =>
   httpGet(`${API_MANAGER_BASE}/profile/list_by_device_id`, {params: {device_id: deviceId}});
 
+/**
+ * List profile.
+ * @param query - page query with filters and paging
+ * @returns the listed profile
+ */
 export const listProfile = <T = PageResult<ProfileRecord>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/profile/list`, query);

@@ -19,6 +19,9 @@ import type {AxiosResponse, InternalAxiosRequestConfig} from 'axios';
 
 import type {MockDb} from './db';
 
+/**
+ * MockCtx data contract.
+ */
 export interface MockCtx {
   /** Original axios config — needed to build the AxiosResponse. */
   config: InternalAxiosRequestConfig;
@@ -34,8 +37,14 @@ export interface MockCtx {
   db: MockDb;
 }
 
+/**
+ * handler type alias.
+ */
 export type Handler = (ctx: MockCtx) => AxiosResponse | Promise<AxiosResponse>;
 
+/**
+ * RouteRule data contract.
+ */
 export interface RouteRule {
   method?: string;
   pattern: RegExp;

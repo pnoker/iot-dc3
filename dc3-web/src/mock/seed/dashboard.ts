@@ -43,13 +43,23 @@ interface AlertRow {
   message?: string;
 }
 
-/** Deterministic wavy series so chart cards look alive without randomness. */
+/**
+ * Deterministic wavy series so chart cards look alive without randomness.
+ * @param base - API base path of the resource collection
+ * @param amp - amplitude of the generated wave
+ * @param n - number of samples to generate
+ * @returns the generated demo value
+ */
 const wave = (base: number, amp: number, n: number): number[] =>
   Array.from({length: n}, (_, i) => Math.max(0, Math.round(base + Math.sin(i / 2) * amp)));
 
 const pad = (value: number): string => String(value).padStart(2, '0');
 
-/** Match the backend LocalDateTime JSON shape while keeping the browser's local timezone. */
+/**
+ * Match the backend LocalDateTime JSON shape while keeping the browser's local timezone.
+ * @param value - value to set
+ * @returns the transformed value
+ */
 const formatDateTime = (value: Date): string =>
   `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())} ` +
   `${pad(value.getHours())}:${pad(value.getMinutes())}:${pad(value.getSeconds())}`;
@@ -83,6 +93,10 @@ export const dailyGrowth: DailyGrowthSummary = {
 /**
  * Build complete bucket/count rows for the requested window. The old mock only
  * returned count, collapsing every G2 point onto an undefined x-axis bucket.
+ * @param rangeKey - preset range key, e.g. 24h or 7d
+ * @param granularity - bucket granularity of the series
+ * @param now - reference time the generated series is anchored to
+ * @returns the generated demo value
  */
 export const statsTimeseries = (
   rangeKey = '24h',
@@ -181,6 +195,11 @@ export const topology: TopologyResponse = (() => {
   };
 })();
 
+/**
+ * Fetch the alert rows.
+ * @param now - reference time the generated series is anchored to
+ * @returns the generated demo value
+ */
 export const alertRows = (now = new Date()): AlertRow[] => [
   {
     id: '9001',
@@ -258,8 +277,13 @@ interface StreamRow {
 const driverNameOf = (id: unknown): string =>
   drivers.find((d) => String(d.id) === String(id))?.driverName ?? '';
 
-/** Deterministic per-unit telemetry value so the live feed looks like real
- *  sensor readings rather than flat placeholders. */
+/**
+ * Deterministic per-unit telemetry value so the live feed looks like real
+ * sensor readings rather than flat placeholders.
+ * @param unit - telemetry unit the value is generated for
+ * @param i - stream index driving the pseudo-random walk
+ * @returns the generated telemetry reading
+ */
 const streamValue = (unit: string, i: number): { valueType: string; rawValue: string } => {
   const r = (base: number, amp: number) => (base + Math.sin(i / 1.7) * amp + (i % 5) * 0.08).toFixed(2);
   switch (unit) {
@@ -292,6 +316,11 @@ const devicePointPairs = devices.flatMap((device) =>
     .map((point) => ({device, point})),
 );
 
+/**
+ * Stream latest.
+ * @param now - reference time the generated series is anchored to
+ * @returns the streamed response
+ */
 export const streamLatest = (now = new Date()): StreamRow[] => devicePointPairs.slice(0, 20).map(({
                                                                                                     device,
                                                                                                     point
@@ -360,6 +389,11 @@ const silentSource = (deviceIndex: number, pointIndex: number, silentSeconds: nu
   };
 };
 
+/**
+ * Fetch the silent sources.
+ * @param now - reference time the generated series is anchored to
+ * @returns the generated demo value
+ */
 export const silentSources = (now = new Date()): SilentSource[] => [
   silentSource(1, 0, 2074, now),
   silentSource(3, 0, 1536, now),
@@ -389,6 +423,12 @@ const activityCount = (dow: number, hour: number): number => {
   return Math.max(0, Math.round(base + Math.sin((hour + dow) / 2) * (peak ? 16 : 5)));
 };
 
+/**
+ * Fetch the stats activity.
+ * @param rangeKey - preset range key, e.g. 24h or 7d
+ * @param now - reference time the generated series is anchored to
+ * @returns the generated demo value
+ */
 export const statsActivity = (rangeKey = '7d', now = new Date()) => {
   const today = now.getDay();
   const previousDay = (today + 6) % 7;

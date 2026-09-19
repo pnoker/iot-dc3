@@ -33,5 +33,10 @@ export const getMenuById = crud.getById;
 
 export const listMenu = crud.list;
 
+/**
+ * List menu tree.
+ * @param query - page query with filters and paging
+ * @returns the listed menu tree
+ */
 export const listMenuTree = (query: PageQuery = {}) =>
   httpPost<MenuRecord[]>(`${API_AUTH_BASE}/menu/list_tree`, query);

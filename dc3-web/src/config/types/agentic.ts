@@ -15,6 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * AgenticModel data contract.
+ */
 export interface AgenticModel {
   model: string;
   label: string;
@@ -26,6 +29,9 @@ export interface AgenticModel {
   maxTokens?: number;
 }
 
+/**
+ * AgenticProvider data contract.
+ */
 export interface AgenticProvider {
   id?: string;
   name: string;
@@ -40,6 +46,9 @@ export interface AgenticProvider {
   [key: string]: unknown;
 }
 
+/**
+ * Agentic model configuration.
+ */
 export interface AgenticModelConfig {
   /** Inlined from AgenticModel. */
   model: string;
@@ -69,6 +78,9 @@ export interface AgenticModelConfig {
   [key: string]: unknown;
 }
 
+/**
+ * AgenticSession data contract.
+ */
 export interface AgenticSession {
   conversationId: string;
   title?: string;
@@ -80,6 +92,9 @@ export interface AgenticSession {
   [key: string]: unknown;
 }
 
+/**
+ * Agentic session extension fields.
+ */
 export interface AgenticSessionExt {
   model?: string;
   reasoningEnabled?: boolean;
@@ -90,9 +105,18 @@ export interface AgenticSessionExt {
   category?: string;
 }
 
+/**
+ * agentic message role type alias.
+ */
 export type AgenticMessageRole = 'user' | 'assistant' | 'system';
+/**
+ * Agentic message status union.
+ */
 export type AgenticMessageStatus = 'COMPLETED' | 'FAILED' | 'CANCELLED';
 
+/**
+ * AgenticMessage data contract.
+ */
 export interface AgenticMessage {
   id: string;
   role: AgenticMessageRole;
@@ -109,6 +133,9 @@ export interface AgenticMessage {
   [key: string]: unknown;
 }
 
+/**
+ * AgenticMessageContent data contract.
+ */
 export interface AgenticMessageContent {
   text?: string;
   format?: string;
@@ -124,9 +151,15 @@ export interface AgenticMessageContent {
   recovered?: boolean;
 }
 
+/**
+ * Agentic visualization type union.
+ */
 export type AgenticVisualizationType =
   'line' | 'area' | 'column' | 'bar' | 'pie' | 'donut' | 'heatmap' | 'scatter' | 'stat';
 
+/**
+ * Agentic visualization specification.
+ */
 export interface AgenticVisualizationSpec {
   id?: string;
   type: AgenticVisualizationType;
@@ -145,17 +178,26 @@ export interface AgenticVisualizationSpec {
   annotations?: AgenticVisualizationAnnotation[];
 }
 
+/**
+ * Agentic visualization annotation.
+ */
 export interface AgenticVisualizationAnnotation {
   type?: string;
   value?: unknown;
   label?: string;
 }
 
+/**
+ * Agentic message context.
+ */
 export interface AgenticMessageContext {
   type: 'attachment' | 'retrieval' | 'memory' | 'tool' | 'system';
   content: string;
 }
 
+/**
+ * AgenticMessageTokens data contract.
+ */
 export interface AgenticMessageTokens {
   input?: number;
   output?: number;
@@ -165,6 +207,9 @@ export interface AgenticMessageTokens {
   memory?: number;
 }
 
+/**
+ * AgenticAttachment data contract.
+ */
 export interface AgenticAttachment {
   id: string;
   conversationId: string;
@@ -177,6 +222,9 @@ export interface AgenticAttachment {
   [key: string]: unknown;
 }
 
+/**
+ * AgenticAction data contract.
+ */
 export interface AgenticAction {
   id?: string;
   actionId: string;
@@ -192,11 +240,17 @@ export interface AgenticAction {
   [key: string]: unknown;
 }
 
+/**
+ * AgenticChatMessage data contract.
+ */
 export interface AgenticChatMessage {
   role: AgenticMessageRole;
   content: string;
 }
 
+/**
+ * AgenticChatCompletionRequest data contract.
+ */
 export interface AgenticChatCompletionRequest {
   model?: string;
   messages: AgenticChatMessage[];
@@ -214,6 +268,9 @@ export interface AgenticChatCompletionRequest {
   reasoning?: boolean;
 }
 
+/**
+ * AgenticChatCompletionResponse data contract.
+ */
 export interface AgenticChatCompletionResponse {
   id?: string;
   object?: string;
@@ -242,6 +299,9 @@ export interface AgenticChatCompletionResponse {
   };
 }
 
+/**
+ * AgenticStreamCallbacks data contract.
+ */
 export interface AgenticStreamCallbacks {
   signal?: AbortSignal;
   onDelta?: (content: string) => void;
@@ -253,6 +313,9 @@ export interface AgenticStreamCallbacks {
   onError?: (error: Error) => void;
 }
 
+/**
+ * AgenticTraceEvent data contract.
+ */
 export interface AgenticTraceEvent {
   id?: string;
   type: 'tool' | 'reasoning' | 'error';

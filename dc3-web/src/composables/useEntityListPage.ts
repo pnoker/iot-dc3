@@ -35,6 +35,7 @@ import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
  * driven by an {@link EntityListConfig}.
  *
  * @param rawConfig column/search/dialog configuration of the page
+ * @returns the composable handle
  */
 export const useEntityListPage = (rawConfig: EntityListConfig) => {
   const {t} = useI18n();

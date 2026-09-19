@@ -38,6 +38,7 @@ export const logger = {
   /**
    * Debug-level output — suppressed in production. Use for high-frequency or
    * detailed diagnostic metadata. Never pass credentials or raw business payloads.
+   * @param {...any} args - args entries
    */
   debug(...args: LogArgs): void {
     if (isDev) {
@@ -48,6 +49,7 @@ export const logger = {
   /**
    * Info-level output — suppressed in production. Use for notable but non-error
    * events the dev needs to see while working.
+   * @param {...any} args - args entries
    */
   info(...args: LogArgs): void {
     if (isDev) {
@@ -58,6 +60,7 @@ export const logger = {
   /**
    * Warning — always emitted (including production). Use for recoverable
    * degradations or suspicious states worth surfacing.
+   * @param {...any} args - args entries
    */
   warn(...args: LogArgs): void {
     console.warn(...format(args));
@@ -66,6 +69,7 @@ export const logger = {
   /**
    * Error — always emitted (including production). Pass the Error object as the
    * last argument so the stack trace is preserved.
+   * @param {...any} args - args entries
    */
   error(...args: LogArgs): void {
     console.error(...format(args));

@@ -28,30 +28,97 @@ const endpoints = {
 
 // Command Definition CRUD
 
+/**
+ * Create command.
+ * @param payload - request payload
+ * @returns the operation result
+ */
 export const addCommand = (payload: Partial<CommandRecord>) => crudAdd<Partial<CommandRecord>, CommandRecord>(endpoints.command, payload);
+/**
+ * Update command.
+ * @param payload - request payload
+ * @returns the operation result
+ */
 export const updateCommand = (payload: Partial<CommandRecord>) => crudUpdate<Partial<CommandRecord>, CommandRecord>(endpoints.command, payload);
+/**
+ * Delete command.
+ * @param id - record id
+ * @param version - record version for optimistic locking
+ * @returns the operation result
+ */
 export const deleteCommand = (id: string, version: number) => versionedDelete(endpoints.command, id, version);
+/**
+ * Fetch command by id.
+ * @param id - record id
+ * @returns the fetched command by id
+ */
 export const getCommandById = (id: string) => crudGetById<CommandRecord>(endpoints.command, id);
+/**
+ * List command.
+ * @param query - page query with filters and paging
+ * @returns the listed command
+ */
 export const listCommand = (query: PageQuery) => crudList<CommandRecord>(endpoints.command, query);
+/**
+ * List command by profile id.
+ * @param profileId - profile id to scope the request
+ * @returns the listed command by profile id
+ */
 export const listCommandByProfileId = (profileId: string) =>
   httpGet<CommandRecord[]>(`${endpoints.command}/list_by_profile_id`, {params: {profile_id: profileId}});
 
 // Command Param CRUD
 
+/**
+ * Create command param.
+ * @param payload - request payload
+ * @returns the operation result
+ */
 export const addCommandParam = (payload: CommandParamForm) => crudAdd<CommandParamForm, CommandParamRecord>(endpoints.commandParam, payload);
+/**
+ * Update command param.
+ * @param payload - request payload
+ * @returns the operation result
+ */
 export const updateCommandParam = (payload: Partial<CommandParamRecord>) =>
   crudUpdate<Partial<CommandParamRecord>, CommandParamRecord>(endpoints.commandParam, payload);
+/**
+ * Delete command param.
+ * @param id - record id
+ * @param version - record version for optimistic locking
+ * @returns the operation result
+ */
 export const deleteCommandParam = (id: string, version: number) => versionedDelete(endpoints.commandParam, id, version);
+/**
+ * List command param by command id.
+ * @param commandId - command id to scope the request
+ * @returns the listed command param by command id
+ */
 export const listCommandParamByCommandId = (commandId: string) =>
   httpGet<CommandParamRecord[]>(`${endpoints.commandParam}/list_by_command_id`, {
     params: {command_id: commandId},
   });
+/**
+ * List command param.
+ * @param query - page query with filters and paging
+ * @returns the listed command param
+ */
 export const listCommandParam = (query: PageQuery) =>
   httpPost<PageResult<CommandParamRecord>, PageQuery>(`${endpoints.commandParam}/list`, query);
 
 // Command History Queries
 
+/**
+ * Fetch command history by record id.
+ * @param recordId - record id to scope the request
+ * @returns the fetched command history by record id
+ */
 export const getCommandHistoryByRecordId = (recordId: string) =>
   httpGet<CommandHistoryRecord>(`${endpoints.commandHistory}/get_by_record_id`, {params: {record_id: recordId}});
+/**
+ * List command history.
+ * @param query - page query with filters and paging
+ * @returns the listed command history
+ */
 export const listCommandHistory = (query: PageQuery) =>
   httpPost<PageResult<CommandHistoryRecord>>(`${endpoints.commandHistory}/list`, query);

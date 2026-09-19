@@ -32,6 +32,12 @@ const includes = (value: unknown, keyword: string) =>
 
 // OAuth clients. Backend `client/list` returns a flat array with no filters, so
 // search is applied client-side here before wrapping into a single-page result.
+/**
+ * Create mcp client config.
+ * @param t - i18n translator for localized messages
+ * @param handlers - handlers entries
+ * @returns the operation result
+ */
 export const createMcpClientConfig = (t: Translator, handlers: McpClientHandlers): EntityListConfig => ({
   name: 'mcp-client',
   title: t('nav.settingsMcpClient'),

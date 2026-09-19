@@ -36,12 +36,20 @@ const RW_FLAG_KEY: Record<string, string> = {
 };
 
 // Return the i18n key so $t(pointTypeKey(...)) remains reactive when the locale changes.
-/** i18n key for a point type flag, reactive to locale changes. */
+/**
+ * i18n key for a point type flag, reactive to locale changes.
+ * @param flag - read/write flag value
+ * @returns the i18n key for the point type
+ */
 export function pointTypeKey(flag?: string): string {
   return POINT_TYPE_KEY[flag ?? ''] ?? 'status.unknown';
 }
 
-/** i18n key for a read/write flag, reactive to locale changes. */
+/**
+ * i18n key for a read/write flag, reactive to locale changes.
+ * @param flag - toggle flag driving the branch
+ * @returns the i18n key for the read/write flag
+ */
 export function rwFlagKey(flag?: string): string {
   return RW_FLAG_KEY[String(flag ?? '').toUpperCase()] ?? 'status.unknown';
 }

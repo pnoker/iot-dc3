@@ -19,6 +19,9 @@
  * Event definition types (dc3_event / dc3_event_param).
  */
 
+/**
+ * EventForm data contract.
+ */
 export interface EventForm {
   id?: string;
   eventName?: string;
@@ -35,6 +38,9 @@ export interface EventForm {
   [key: string]: unknown;
 }
 
+/**
+ * Event record.
+ */
 export interface EventRecord extends EventForm {
   id: string;
   version: number;
@@ -43,6 +49,9 @@ export interface EventRecord extends EventForm {
   operateTime?: string;
 }
 
+/**
+ * EventParamForm data contract.
+ */
 export interface EventParamForm {
   id?: string;
   paramName?: string;
@@ -57,6 +66,9 @@ export interface EventParamForm {
   [key: string]: unknown;
 }
 
+/**
+ * Event param record.
+ */
 export interface EventParamRecord extends EventParamForm {
   id: string;
   version: number;

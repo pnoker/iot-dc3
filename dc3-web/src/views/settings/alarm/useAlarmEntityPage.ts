@@ -42,10 +42,18 @@ import {
   createAlarmEntityConfigs,
 } from './alarmEntityConfig';
 
+/**
+ * AlarmEntityPageProps data contract.
+ */
 export interface AlarmEntityPageProps {
   entity: AlarmTabKey;
 }
 
+/**
+ * Fetch the use alarm entity page.
+ * @param props - props entries
+ * @returns the composable handle
+ */
 export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
   const {t} = useI18n();
   const router = useRouter();

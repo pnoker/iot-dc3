@@ -19,6 +19,9 @@
  * Command definition types (dc3_command / dc3_command_param).
  */
 
+/**
+ * CommandForm data contract.
+ */
 export interface CommandForm {
   id?: string;
   commandName?: string;
@@ -36,6 +39,9 @@ export interface CommandForm {
   [key: string]: unknown;
 }
 
+/**
+ * Command record.
+ */
 export interface CommandRecord extends CommandForm {
   id: string;
   version: number;
@@ -44,6 +50,9 @@ export interface CommandRecord extends CommandForm {
   operateTime?: string;
 }
 
+/**
+ * CommandParamForm data contract.
+ */
 export interface CommandParamForm {
   id?: string;
   paramName?: string;
@@ -61,6 +70,9 @@ export interface CommandParamForm {
   [key: string]: unknown;
 }
 
+/**
+ * Command param record.
+ */
 export interface CommandParamRecord extends CommandParamForm {
   id: string;
   version: number;

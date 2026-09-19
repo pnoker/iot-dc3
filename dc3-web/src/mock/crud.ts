@@ -22,7 +22,10 @@ import type {MockDb} from './db';
 import {db} from './db';
 import type {MockCtx} from './types';
 
-/** Format the current time as `YYYY-MM-DD HH:mm:ss` so demo rows read naturally. */
+/**
+ * Format the current time as `YYYY-MM-DD HH:mm:ss` so demo rows read naturally.
+ * @returns the formatted timestamp string
+ */
 export const stamp = (): string => {
   const d = new Date();
   const p = (n: number) => String(n).padStart(2, '0');
@@ -31,8 +34,15 @@ export const stamp = (): string => {
 
 /** Monotonic id for rows created at runtime — starts above the seed id space. */
 let counter = 90001;
+/**
+ * Generate the next sequential mock id.
+ * @returns the next sequential mock id
+ */
 export const newId = (): string => String(counter++);
 
+/**
+ * Crud specification.
+ */
 export interface CrudSpec {
   /** Base URL without leading slash, e.g. `api/v3/auth/role`. */
   baseUrl: string;
@@ -52,6 +62,9 @@ export interface CrudSpec {
   verbs?: CrudVerb[];
 }
 
+/**
+ * crud verb type alias.
+ */
 export type CrudVerb = 'list' | 'get_by_id' | 'add' | 'update' | 'delete';
 
 const compileFilter =
@@ -74,6 +87,7 @@ const compileFilter =
  *
  * Out of scope (entity-specific shapes): /list_by_ids, /list_tree, join queries,
  * history — register those separately next to this call.
+ * @param spec - entity spec the id is generated for
  */
 export function registerCrud(spec: CrudSpec): void {
   const {baseUrl, collection, search = [], exact = ['enableFlag'], enable = false, verbs} = spec;

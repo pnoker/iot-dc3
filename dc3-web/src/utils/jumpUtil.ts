@@ -24,7 +24,7 @@ import type {Router} from 'vue-router';
  * handlers for device / profile / point cases. Consolidated here so the
  * URL shape + query convention stays consistent project-wide.
  *
- * <p>Point jumps land on {@code pointValue} (the data page) rather than a
+ * <p>Point jumps land on `pointValue` (the data page) rather than a
  * dedicated detail route — that's the existing project convention and
  * what operators expect when clicking a point id.</p>
  */
@@ -39,6 +39,9 @@ export type AlertSourceKind = 'point' | 'device' | 'driver';
  * Jump to the detail / value page for the given entity. No-op on invalid
  * kind. Router errors (e.g. aborted nav during transitions) are swallowed
  * so callers don't have to .catch() themselves.
+ * @param router - router instance used for navigation
+ * @param kind - kind discriminator
+ * @param id - record id
  */
 export const jumpToEntity = (router: Router, kind: JumpKind, id: string): void => {
   const idStr = String(id);
@@ -65,6 +68,9 @@ export const jumpToEntity = (router: Router, kind: JumpKind, id: string): void =
 
 /**
  * Jump to the per-source event list with the source id pre-filtered.
+ * @param router - router instance used for navigation
+ * @param source - alarm source filter
+ * @param sourceId - source id to scope the request
  */
 export const jumpToSourceEvents = (router: Router, source: AlertSourceKind, sourceId: string): void => {
   let name: string;

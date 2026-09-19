@@ -29,6 +29,8 @@ const UPDATED = '2026-08-01T14:20:00';
  * settings family) so those tables aren't blank. Field names stay broad
  * (id/name/enableFlag/createTime/operateTime/remark) to satisfy common columns;
  * entity-specific columns may render empty, which is fine for a demo.
+ * @param url - request url
+ * @returns the stub page envelope
  */
 const stubPage = (url: string) => {
   const entity = url.split('/').slice(-2, -1)[0] || 'entity';
@@ -48,6 +50,8 @@ const stubPage = (url: string) => {
  * endpoints (most of the settings family, dashboard insight cards) degrade
  * gracefully instead of surfacing server errors. Every business page wraps its
  * calls in try/catch, so empty payloads keep the UI intact.
+ * @param ctx - request context with tenant and principal
+ * @returns the fallback envelope
  */
 export const fallbackHandler: Handler = (ctx) => {
   const {url, params, body} = ctx;

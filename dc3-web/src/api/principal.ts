@@ -20,17 +20,42 @@ import {API_PRINCIPAL_BASE} from '@/config/constant/api';
 import type {PageQuery, PageResult} from '@/config/types';
 import type {PrincipalRecord} from '@/config/types/auth';
 
+/**
+ * Fetch principal by id.
+ * @param id - record id
+ * @returns the fetched principal by id
+ */
 export const getPrincipalById = (id: string) =>
   httpGet<PrincipalRecord>(`${API_PRINCIPAL_BASE}/get_by_id`, {params: {id}});
 
+/**
+ * List principal.
+ * @param query - page query with filters and paging
+ * @returns the listed principal
+ */
 export const listPrincipal = <T = PageResult<PrincipalRecord>>(query: PageQuery) =>
   httpPost<T>(`${API_PRINCIPAL_BASE}/list`, query);
 
 // Batch-resolve principals by id → used to render principalId references in other
 // lists as display names (settings family relations loader). Mirrors listDeviceByIds.
+/**
+ * List principal by ids.
+ * @param ids - ids entries
+ * @returns the listed principal by ids
+ */
 export const listPrincipalByIds = (ids: string[]) =>
   httpPost<PrincipalRecord[]>(`${API_PRINCIPAL_BASE}/list_by_ids`, ids);
 
+/**
+ * Enable a principal by id.
+ * @param id - record id
+ * @returns the operation result
+ */
 export const enablePrincipal = (id: string) => httpPost(`${API_PRINCIPAL_BASE}/enable`, undefined, {params: {id}});
 
+/**
+ * Disable a principal by id.
+ * @param id - record id
+ * @returns the operation result
+ */
 export const disablePrincipal = (id: string) => httpPost(`${API_PRINCIPAL_BASE}/disable`, undefined, {params: {id}});

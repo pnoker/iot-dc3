@@ -20,6 +20,11 @@ import {ENTITY_TYPE_OPTIONS} from '@/config/constant/enums';
 import type {EntityListConfig, Translator} from '@/config/types/entityList';
 import {nameRules, remarkRules} from '@/utils/formRuleUtil';
 
+/**
+ * Create label config.
+ * @param t - i18n translator for localized messages
+ * @returns the operation result
+ */
 export const createLabelConfig = (t: Translator): EntityListConfig => ({
   name: 'label',
   title: t('nav.settingsLabel'),

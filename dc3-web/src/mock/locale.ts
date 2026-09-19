@@ -20,6 +20,9 @@ import i18n from '@/config/i18n';
 
 import {devices, drivers, points, profiles} from './seed/entities';
 
+/**
+ * Mock entity kind union.
+ */
 export type MockEntityKind = 'driver' | 'device' | 'profile' | 'point';
 
 type MockRow = Record<string, any>;
@@ -110,6 +113,10 @@ const sourceRows: Record<MockEntityKind, Map<string, MockRow>> = {
   point: byId(points),
 };
 
+/**
+ * Resolve the locale the mock layer should serve.
+ * @returns the active mock locale
+ */
 export const currentMockLocale = (): 'en' | 'zh' =>
   String(i18n.global.locale.value).toLowerCase().startsWith('zh') ? 'zh' : 'en';
 
@@ -145,6 +152,12 @@ const localizeDevice = (row: MockRow, locale: 'en' | 'zh'): MockRow => {
   return {...row, deviceName: suffix ? `${profileName}-${suffix}` : profileName};
 };
 
+/**
+ * Fetch the localize entity.
+ * @param kind - kind discriminator
+ * @param row - table row record
+ * @returns the localized value
+ */
 export const localizeEntity = <T extends MockRow | undefined>(kind: MockEntityKind, row: T): T => {
   if (!row) return row;
   const locale = currentMockLocale();
@@ -159,6 +172,12 @@ export const localizeEntity = <T extends MockRow | undefined>(kind: MockEntityKi
   return localized as T;
 };
 
+/**
+ * Fetch the localize entities.
+ * @param kind - kind discriminator
+ * @param rows - table rows to transform
+ * @returns the localized value
+ */
 export const localizeEntities = <T extends MockRow>(kind: MockEntityKind, rows: T[]): T[] =>
   rows.map((row) => localizeEntity(kind, row));
 
@@ -169,6 +188,11 @@ const localizedName = (kind: MockEntityKind, id: string, fallback: string): stri
   return String(localized[`${kind}Name`] ?? fallback);
 };
 
+/**
+ * Fetch the localize alert rows.
+ * @param rows - table rows to transform
+ * @returns the localized value
+ */
 export const localizeAlertRows = <T extends { message?: string }>(rows: T[]): T[] => {
   if (currentMockLocale() === 'zh') return rows.map((row) => ({...row}));
   return rows.map((row) => ({
@@ -177,6 +201,11 @@ export const localizeAlertRows = <T extends { message?: string }>(rows: T[]): T[
   }));
 };
 
+/**
+ * Fetch the localize stream rows.
+ * @param rows - table rows to transform
+ * @returns the localized value
+ */
 export const localizeStreamRows = <T extends MockRow>(rows: T[]): T[] =>
   rows.map((row) => ({
     ...row,
@@ -185,6 +214,11 @@ export const localizeStreamRows = <T extends MockRow>(rows: T[]): T[] =>
     pointName: localizedName('point', String(row.pointId), String(row.pointName ?? '')),
   }));
 
+/**
+ * Fetch the localize topology.
+ * @param payload - request payload
+ * @returns the localized value
+ */
 export const localizeTopology = (payload: TopologyResponse): TopologyResponse => {
   const locale = currentMockLocale();
   return {

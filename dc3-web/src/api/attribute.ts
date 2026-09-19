@@ -19,22 +19,66 @@ import {httpGet, versionedDelete} from '@/api/common';
 import {API_MANAGER_BASE} from '@/config/constant/api';
 import type {Attribute} from '@/config/types';
 
+/**
+ * List driver attribute by driver id.
+ * @param id - record id
+ * @returns the listed driver attribute by driver id
+ */
 export const listDriverAttributeByDriverId = (id: string) =>
   httpGet<Attribute[]>(`${API_MANAGER_BASE}/driver_attribute/list_by_driver_id`, {params: {driver_id: id}});
 
+/**
+ * List point attribute by driver id.
+ * @param id - record id
+ * @returns the listed point attribute by driver id
+ */
 export const listPointAttributeByDriverId = (id: string) =>
   httpGet<Attribute[]>(`${API_MANAGER_BASE}/point_attribute/list_by_driver_id`, {params: {driver_id: id}});
 
+/**
+ * List command attribute by driver id.
+ * @param id - record id
+ * @returns the listed command attribute by driver id
+ */
 export const listCommandAttributeByDriverId = (id: string) =>
   httpGet<Attribute[]>(`${API_MANAGER_BASE}/command_attribute/list_by_driver_id`, {params: {driver_id: id}});
 
+/**
+ * List event attribute by driver id.
+ * @param id - record id
+ * @returns the listed event attribute by driver id
+ */
 export const listEventAttributeByDriverId = (id: string) =>
   httpGet<Attribute[]>(`${API_MANAGER_BASE}/event_attribute/list_by_driver_id`, {params: {driver_id: id}});
 
+/**
+ * Delete driver attribute.
+ * @param id - record id
+ * @param version - record version for optimistic locking
+ * @returns the operation result
+ */
 export const deleteDriverAttribute = (id: string, version: number) => versionedDelete(`${API_MANAGER_BASE}/driver_attribute`, id, version);
 
+/**
+ * Delete point attribute.
+ * @param id - record id
+ * @param version - record version for optimistic locking
+ * @returns the operation result
+ */
 export const deletePointAttribute = (id: string, version: number) => versionedDelete(`${API_MANAGER_BASE}/point_attribute`, id, version);
 
+/**
+ * Delete command attribute.
+ * @param id - record id
+ * @param version - record version for optimistic locking
+ * @returns the operation result
+ */
 export const deleteCommandAttribute = (id: string, version: number) => versionedDelete(`${API_MANAGER_BASE}/command_attribute`, id, version);
 
+/**
+ * Delete event attribute.
+ * @param id - record id
+ * @param version - record version for optimistic locking
+ * @returns the operation result
+ */
 export const deleteEventAttribute = (id: string, version: number) => versionedDelete(`${API_MANAGER_BASE}/event_attribute`, id, version);

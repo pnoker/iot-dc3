@@ -21,6 +21,11 @@ import {iconNames} from '@/config/constant/icons';
 import type {EntityListConfig, Translator} from '@/config/types/entityList';
 import {authNameRules, remarkRules} from '@/utils/formRuleUtil';
 
+/**
+ * Create menu config.
+ * @param t - i18n translator for localized messages
+ * @returns the operation result
+ */
 export const createMenuConfig = (t: Translator): EntityListConfig => ({
   name: 'menu',
   title: t('nav.settingsMenu'),

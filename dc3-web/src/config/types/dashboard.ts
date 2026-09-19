@@ -35,8 +35,8 @@ export type Granularity = 'hour' | 'day';
 
 /**
  * Shared query shape for any endpoint that takes a rolling time window.
- * Backend reads {@code rangeKey} in preference when both are present; the
- * legacy {@code rangeHours} integer is the older callers' escape hatch.
+ * Backend reads `rangeKey` in preference when both are present; the
+ * legacy `rangeHours` integer is the older callers' escape hatch.
  */
 export interface TimeRangeParams {
   rangeHours?: number;
@@ -46,6 +46,9 @@ export interface TimeRangeParams {
 /** Config-change subjects used by the Change Impact card. */
 export type ChangeKind = 'driver' | 'device' | 'profile';
 
+/**
+ * SystemHealth data contract.
+ */
 export interface SystemHealth {
   center: Record<string, 'up' | 'down'>;
   infra: Record<string, 'up' | 'down'>;
@@ -55,6 +58,9 @@ export interface SystemHealth {
 
 // ---- Alert list / pagination -----------------------------------------
 
+/**
+ * AlertPageQuery data contract.
+ */
 export interface AlertPageQuery {
   source?: AlertSource | null;
   alarmTypeFlag?: number | null;
@@ -71,15 +77,27 @@ export interface AlertPageQuery {
 
 // ---- Topology Sankey -------------------------------------------------
 
+/**
+ * Topology mode union.
+ */
 export type TopologyMode = 'cardinality' | 'volume';
+/**
+ * Topology node type union.
+ */
 export type TopologyNodeType = 'driver' | 'device' | 'profile' | 'point' | 'others';
 
+/**
+ * TopologyHiddenChild data contract.
+ */
 export interface TopologyHiddenChild {
   id: string;
   name: string;
   type: 'driver' | 'device' | 'point';
 }
 
+/**
+ * Topology node.
+ */
 export interface TopologyNode {
   id: string;
   name: string;
@@ -88,12 +106,18 @@ export interface TopologyNode {
   hiddenChildren?: TopologyHiddenChild[];
 }
 
+/**
+ * TopologyLink data contract.
+ */
 export interface TopologyLink {
   source: string;
   target: string;
   value: number;
 }
 
+/**
+ * TopologyStats data contract.
+ */
 export interface TopologyStats {
   driverCount: number;
   deviceCount: number;
@@ -103,6 +127,9 @@ export interface TopologyStats {
   rangeLabel?: string | null;
 }
 
+/**
+ * TopologyResponse data contract.
+ */
 export interface TopologyResponse {
   nodes: TopologyNode[];
   links: TopologyLink[];
@@ -111,6 +138,9 @@ export interface TopologyResponse {
 
 // ---- Phase-2 insight cards ------------------------------------------
 
+/**
+ * FlappingSource data contract.
+ */
 export interface FlappingSource {
   source: AlertSource;
   sourceId: string;
@@ -118,6 +148,9 @@ export interface FlappingSource {
   count: number;
 }
 
+/**
+ * CorrelationPair data contract.
+ */
 export interface CorrelationPair {
   aSource: AlertSource;
   aSourceId: string;
@@ -128,6 +161,9 @@ export interface CorrelationPair {
   coCount: number;
 }
 
+/**
+ * PeerDeviation data contract.
+ */
 export interface PeerDeviation {
   profileId: string;
   deviceId: string;
@@ -136,6 +172,9 @@ export interface PeerDeviation {
   ratio: number;
 }
 
+/**
+ * AgingBacklog data contract.
+ */
 export interface AgingBacklog {
   under1h: number;
   h1to6: number;
@@ -144,6 +183,9 @@ export interface AgingBacklog {
   total: number;
 }
 
+/**
+ * MttaTrend data contract.
+ */
 export interface MttaTrend {
   date: string;
   p50Ms: number;
@@ -151,6 +193,9 @@ export interface MttaTrend {
   confirmedCount: number;
 }
 
+/**
+ * ProtocolHealth data contract.
+ */
 export interface ProtocolHealth {
   serviceName: string;
   driverCount: number;
@@ -158,12 +203,18 @@ export interface ProtocolHealth {
   deviceCount: number;
 }
 
+/**
+ * ChangeImpact data contract.
+ */
 export interface ChangeImpact {
   kind: ChangeKind;
   entityId: string;
   operateTime: string;
 }
 
+/**
+ * SilentSource data contract.
+ */
 export interface SilentSource {
   deviceId: string;
   pointId: string;
@@ -171,11 +222,17 @@ export interface SilentSource {
   silentSeconds: number;
 }
 
+/**
+ * CoverageGapItem data contract.
+ */
 export interface CoverageGapItem {
   pointId: string;
   profileId: string;
 }
 
+/**
+ * CoverageGap data contract.
+ */
 export interface CoverageGap {
   totalPoints: number;
   missingPoints: number;
@@ -184,18 +241,27 @@ export interface CoverageGap {
 
 // ---- Home dashboard summaries ---------------------------------------
 
+/**
+ * StatsTodaySummary data contract.
+ */
 export interface StatsTodaySummary {
   today: number;
   percentChange: number;
   total: number;
 }
 
+/**
+ * StatsTimeBucket data contract.
+ */
 export interface StatsTimeBucket {
   /** Start of the bucket, matching backend TimeseriesPointVO.bucket. */
   bucket: string;
   count: number;
 }
 
+/**
+ * AlertStatsSummary data contract.
+ */
 export interface AlertStatsSummary {
   total: number;
   unconfirmed: number;
@@ -210,6 +276,9 @@ export interface AlertStatsSummary {
   sparkline24h: number[];
 }
 
+/**
+ * DailyGrowthSummary data contract.
+ */
 export interface DailyGrowthSummary {
   driverDailyCounts: number[];
   deviceDailyCounts: number[];
@@ -219,6 +288,9 @@ export interface DailyGrowthSummary {
 
 // ---- Alert overview cards (previously declared inline in components) ----
 
+/**
+ * AlertEventRow data contract.
+ */
 export interface AlertEventRow {
   id: string;
   source: AlertSource;
@@ -230,17 +302,26 @@ export interface AlertEventRow {
   message?: string;
 }
 
+/**
+ * AlertStormRow data contract.
+ */
 export interface AlertStormRow {
   source: AlertSource;
   sourceId: string;
   count: number;
 }
 
+/**
+ * AlertTypeRow data contract.
+ */
 export interface AlertTypeRow {
   type: string;
   count: number;
 }
 
+/**
+ * AlertActivityRow data contract.
+ */
 export interface AlertActivityRow {
   /** 0..6 = Sun..Sat, matching Postgres EXTRACT(DOW). */
   dow: number;
@@ -248,12 +329,18 @@ export interface AlertActivityRow {
   count: number;
 }
 
+/**
+ * AlertTrendRow data contract.
+ */
 export interface AlertTrendRow {
   date: string;
   source: string;
   count: number;
 }
 
+/**
+ * AlertTopSourceRow data contract.
+ */
 export interface AlertTopSourceRow {
   name: string;
   count: number;
@@ -267,6 +354,9 @@ export interface StatsCountBucket {
   count: number;
 }
 
+/**
+ * StreamRow data contract.
+ */
 export interface StreamRow {
   deviceId: string;
   pointId: string;
@@ -278,12 +368,18 @@ export interface StreamRow {
   pointName?: string;
 }
 
+/**
+ * DriverStats data contract.
+ */
 export interface DriverStats {
   byEnable: { key: string; count: number }[];
   byType: { key: string; count: number }[];
   byService: { key: string; count: number }[];
 }
 
+/**
+ * DeviceStats data contract.
+ */
 export interface DeviceStats {
   byEnable: { key: string; count: number }[];
   byProfile: { key: string; count: number }[];

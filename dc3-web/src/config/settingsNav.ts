@@ -15,6 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * Settings nav node.
+ */
 export interface SettingsNavNode {
   name: string;
   titleKey: string;
@@ -22,6 +25,9 @@ export interface SettingsNavNode {
   children?: SettingsNavNode[];
 }
 
+/**
+ * Settings breadcrumb parent reference.
+ */
 export interface SettingsBreadcrumbParent {
   path: string;
   titleKey: string;
@@ -326,15 +332,35 @@ export const SETTINGS_GROUP_OPENERS: Record<string, string> = {
   settingsLabel: 'settingsSystem',
 };
 
+/**
+ * Fetch settings route name.
+ * @param name - resource name
+ * @returns the fetched settings route name
+ */
 export const getSettingsRouteName = (name: string): string => SETTINGS_ACTIVE_ALIAS[name] || name;
 
+/**
+ * Fetch settings active name.
+ * @param name - resource name
+ * @returns the fetched settings active name
+ */
 export const getSettingsActiveName = (name: string): string => SETTINGS_ACTIVE_ALIAS[name] || name;
 
+/**
+ * Fetch settings default openeds.
+ * @param activeName - active name used for the lookup
+ * @returns the fetched settings default openeds
+ */
 export const getSettingsDefaultOpeneds = (activeName: string): string[] => {
   const opener = SETTINGS_GROUP_OPENERS[activeName];
   return opener ? [opener] : [];
 };
 
+/**
+ * Fetch settings title key.
+ * @param name - resource name
+ * @returns the fetched settings title key
+ */
 export const getSettingsTitleKey = (name: string): string | undefined => SETTINGS_TITLE_KEYS[name];
 
 const identityParent: SettingsBreadcrumbParent = {

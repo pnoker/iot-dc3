@@ -18,6 +18,13 @@
 import type {AxiosResponse, InternalAxiosRequestConfig} from 'axios';
 import type {PageResult} from '@/config/types';
 
+/**
+ * Build a mock response envelope with the given status.
+ * @param config - configuration object
+ * @param data - payload to send or render
+ * @param status - status entries
+ * @returns the mock envelope for the given status
+ */
 export const responseOf = (
   config: InternalAxiosRequestConfig,
   data: unknown,
@@ -31,6 +38,9 @@ export const responseOf = (
   request: {},
 });
 
+/**
+ * ProblemDetails data contract.
+ */
 export interface ProblemDetails {
   type: string;
   title: string;
@@ -39,8 +49,20 @@ export interface ProblemDetails {
   detail: string;
 }
 
+/**
+ * Build a mock success envelope.
+ * @param data - payload to send or render
+ * @returns a mock success envelope wrapping the payload
+ */
 export const ok = <T = unknown>(data: T): T => data;
 
+/**
+ * Build a mock failure envelope.
+ * @param code - business status code
+ * @param message - message text
+ * @param status - status entries
+ * @returns a mock failure envelope with the message
+ */
 export const fail = (code: string, message: string, status = 400): ProblemDetails => ({
   type: 'about:blank',
   title: message,
@@ -49,6 +71,14 @@ export const fail = (code: string, message: string, status = 400): ProblemDetail
   detail: message,
 });
 
+/**
+ * Build a mock success envelope for one page of rows.
+ * @param items - items to process
+ * @param total - total row count
+ * @param offset - page offset
+ * @param limit - maximum number of entries to return or generate
+ * @returns a mock success envelope with one page of rows
+ */
 export const okPage = <T>(items: T[], total = items.length, offset = 0, limit = items.length || 1): PageResult<T> => ({
   items,
   offset,
@@ -57,4 +87,9 @@ export const okPage = <T>(items: T[], total = items.length, offset = 0, limit = 
   hasNext: offset + items.length < total,
 });
 
+/**
+ * Build a mock success envelope wrapping an array.
+ * @param data - payload to send or render
+ * @returns a mock success envelope wrapping the array
+ */
 export const okArray = <T>(data: T[]): T[] => data;

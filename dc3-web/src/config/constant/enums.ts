@@ -20,6 +20,9 @@
  * Keep label/value in sync with the Java side so requests serialise cleanly.
  */
 
+/**
+ * Enum option.
+ */
 export interface EnumOption {
   label: string;
   value: string;

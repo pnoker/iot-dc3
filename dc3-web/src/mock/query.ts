@@ -20,13 +20,22 @@ interface PageInput {
   limit: number;
 }
 
-/** Read pagination from a PageQuery body, defaulting to the usePagedList norms. */
+/**
+ * Read pagination from a PageQuery body, defaulting to the usePagedList norms.
+ * @param body - request body payload
+ * @returns the parsed page descriptor
+ */
 export const readPage = (body: any): PageInput => ({
   offset: Math.max(0, Number(body?.offset ?? 0)),
   limit: Math.min(200, Math.max(1, Number(body?.limit ?? 12))),
 });
 
-/** Case-insensitive substring match, the common driver/device/profile/point search. */
+/**
+ * Case-insensitive substring match, the common driver/device/profile/point search.
+ * @param value - row value to test
+ * @param term - search term matched against text fields
+ * @returns whether the value matches the term
+ */
 export const matches = (value: unknown, term: unknown): boolean => {
   if (term === undefined || term === null || term === '') return true;
   return String(value ?? '')
@@ -37,6 +46,10 @@ export const matches = (value: unknown, term: unknown): boolean => {
 /**
  * Mimic server-side pagination + filtering. Returns the PageResult shape
  * ({items, offset, limit, total, hasNext}) that usePagedList reads from response.
+ * @param rows - table rows to transform
+ * @param body - request body payload
+ * @param filter - field predicates applied to each row
+ * @returns the page slice with total and hasNext
  */
 export const paginate = <T extends Record<string, any>>(
   rows: T[],

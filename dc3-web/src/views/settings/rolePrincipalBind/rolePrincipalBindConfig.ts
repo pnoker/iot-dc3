@@ -22,6 +22,11 @@ import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
 import {principalIdField, principalNameRelation, roleNameRelation} from '../relations';
 
+/**
+ * Create role principal bind config.
+ * @param t - i18n translator for localized messages
+ * @returns the operation result
+ */
 export const createRolePrincipalBindConfig = (t: Translator): EntityListConfig => ({
   name: 'role-principal-bind',
   title: t('nav.settingsRolePrincipalBind'),

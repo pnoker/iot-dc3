@@ -30,6 +30,9 @@ import {
 } from "@/config/constant/breakpoints";
 import { useMediaQuery } from "@/composables/useMediaQuery";
 
+/**
+ * Breakpoint state.
+ */
 export interface BreakpointState {
   /** Current tier — tiers are mutually exclusive (xs < sm < md < lg < xl). */
   current: ComputedRef<Breakpoint>;
@@ -49,6 +52,7 @@ export interface BreakpointState {
  * Tiers mirror Element Plus el-col: xs <768, sm 768-991, md 992-1199,
  * lg 1200-1919, xl >=1920. Terminal mapping: xs=mobile, sm/md=tablet,
  * lg/xl=desktop.
+ * @returns the composable handle
  */
 export const useBreakpoint = (): BreakpointState => {
   const isXs = useMediaQuery(downQuery("sm"));

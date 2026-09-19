@@ -21,7 +21,14 @@ import {fail, ok, responseOf} from '../response';
 import {newId, registerCrud, stamp} from '../crud';
 import {db} from '../db';
 
-/** Attribute-config rows scoped to one of the four owner kinds. */
+/**
+ * Attribute-config rows scoped to one of the four owner kinds.
+ * @param rows - table rows to transform
+ * @param deviceId - device id to scope the request
+ * @param owner - owning record the scope derives from
+ * @param ownerId - owner id to scope the request
+ * @returns the scoped rows
+ */
 const configScope = (
   rows: Record<string, unknown>[],
   deviceId: unknown,
@@ -41,6 +48,9 @@ const configScope = (
   });
 };
 
+/**
+ * Register the business-domain handlers on the mock dispatch table.
+ */
 export function registerBusinessHandlers(): void {
   const registerVersionedCrud = (
     baseUrl: string,

@@ -41,12 +41,19 @@ const byIdsMap = (rows: Record<string, unknown>[], ids: unknown[]): Record<strin
   return map;
 };
 
-/** Build an id→status map shaped like the real status/list response. */
+/**
+ * Build an id→status map shaped like the real status/list response.
+ * @param rows - table rows to transform
+ * @returns the id-to-status map
+ */
 const statusMap = (rows: Record<string, unknown>[]): Record<string, string> =>
   Object.fromEntries(
     rows.map((r, i) => [String(r.id), i % 5 === 0 ? 'OFFLINE' : i % 11 === 0 ? 'FAULT' : 'ONLINE']),
   );
 
+/**
+ * Register the core handlers on the mock dispatch table.
+ */
 export function registerCoreHandlers(): void {
   // ── driver ──
   on('post', 'api/v3/manager/driver/list', (ctx) => {

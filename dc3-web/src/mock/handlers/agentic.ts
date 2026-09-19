@@ -48,7 +48,11 @@ const localizeAgenticRow = (row: Record<string, unknown>): Record<string, unknow
   return localized;
 };
 
-/** add/update/delete for the mutable agentic config collections. */
+/**
+ * add/update/delete for the mutable agentic config collections.
+ * @param url - request url
+ * @param key - lookup key
+ */
 const cud = (url: string, key: 'agenticModelConfigs' | 'agenticProviders') => {
   on('post', `${url}/add`, (ctx) => {
     const row: Record<string, unknown> = {...ctx.body, id: newId(), createTime: stamp(), operateTime: stamp()};
@@ -69,6 +73,9 @@ const cud = (url: string, key: 'agenticModelConfigs' | 'agenticProviders') => {
   });
 };
 
+/**
+ * Register the agentic message handlers on the mock dispatch table.
+ */
 export function registerAgenticHandlers(): void {
   // ── agentic: model catalog & config ──
   on('get', 'api/v3/agentic/model/list', (ctx) => {

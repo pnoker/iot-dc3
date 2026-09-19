@@ -23,6 +23,9 @@
 
 import {onMounted, reactive, readonly} from 'vue';
 
+/**
+ * Pointer capability.
+ */
 export interface PointerCapability {
   /** Primary pointer is low-precision (touch). */
   coarse: boolean;
@@ -45,6 +48,7 @@ const DEFAULTS: PointerCapability = {
  * Reactive pointer/hover capability. Resolved once on mount — capability is
  * stable for the lifetime of a device session (peripheral hot-plug between
  * mounts is picked up by the next mount).
+ * @returns the composable handle
  */
 export const usePointerCapability = () => {
   const state = reactive<PointerCapability>({...DEFAULTS});

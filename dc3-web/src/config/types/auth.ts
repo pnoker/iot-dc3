@@ -21,6 +21,9 @@
 
 // ─── User ────────────────────────────────────────────────────────────
 
+/**
+ * UserForm data contract.
+ */
 export interface UserForm {
   id?: string;
   principalId?: string;
@@ -33,6 +36,9 @@ export interface UserForm {
   [key: string]: unknown;
 }
 
+/**
+ * User record.
+ */
 export interface UserRecord extends UserForm {
   id: string;
   createTime?: string;
@@ -41,6 +47,9 @@ export interface UserRecord extends UserForm {
 
 // ─── Role ────────────────────────────────────────────────────────────
 
+/**
+ * RoleForm data contract.
+ */
 export interface RoleForm {
   id?: string;
   parentRoleId?: string;
@@ -52,6 +61,9 @@ export interface RoleForm {
   [key: string]: unknown;
 }
 
+/**
+ * Role record.
+ */
 export interface RoleRecord extends RoleForm {
   id: string;
   createTime?: string;
@@ -61,6 +73,9 @@ export interface RoleRecord extends RoleForm {
 
 // ─── Menu ────────────────────────────────────────────────────────────
 
+/**
+ * MenuForm data contract.
+ */
 export interface MenuForm {
   id?: string;
   parentMenuId?: string;
@@ -82,6 +97,9 @@ export interface MenuForm {
   [key: string]: unknown;
 }
 
+/**
+ * Menu record.
+ */
 export interface MenuRecord extends MenuForm {
   id: string;
   createTime?: string;
@@ -91,6 +109,9 @@ export interface MenuRecord extends MenuForm {
 
 // ─── Resource ────────────────────────────────────────────────────────
 
+/**
+ * ResourceForm data contract.
+ */
 export interface ResourceForm {
   id?: string;
   parentResourceId?: string;
@@ -107,6 +128,9 @@ export interface ResourceForm {
   [key: string]: unknown;
 }
 
+/**
+ * Resource record.
+ */
 export interface ResourceRecord extends ResourceForm {
   id: string;
   createTime?: string;
@@ -116,6 +140,9 @@ export interface ResourceRecord extends ResourceForm {
 
 // ─── Api ─────────────────────────────────────────────────────────────
 
+/**
+ * ApiForm data contract.
+ */
 export interface ApiForm {
   id?: string;
   apiName?: string;
@@ -136,6 +163,9 @@ export interface ApiForm {
   [key: string]: unknown;
 }
 
+/**
+ * Api record.
+ */
 export interface ApiRecord extends ApiForm {
   id: string;
   createTime?: string;
@@ -146,6 +176,9 @@ export interface ApiRecord extends ApiForm {
 
 // ─── Local Credential ────────────────────────────────────────────────
 
+/**
+ * LocalCredentialForm data contract.
+ */
 export interface LocalCredentialForm {
   id?: string;
   principalId?: string;
@@ -156,6 +189,9 @@ export interface LocalCredentialForm {
   [key: string]: unknown;
 }
 
+/**
+ * Local credential record.
+ */
 export interface LocalCredentialRecord extends LocalCredentialForm {
   id: string;
   credentialType?: string;
@@ -168,6 +204,9 @@ export interface LocalCredentialRecord extends LocalCredentialForm {
 
 // ─── Tenant Membership ───────────────────────────────────────────────
 
+/**
+ * TenantMembershipForm data contract.
+ */
 export interface TenantMembershipForm {
   id?: string;
   tenantId?: string;
@@ -178,6 +217,9 @@ export interface TenantMembershipForm {
   [key: string]: unknown;
 }
 
+/**
+ * Tenant membership record.
+ */
 export interface TenantMembershipRecord extends TenantMembershipForm {
   id: string;
   joinedTime?: string;
@@ -187,6 +229,9 @@ export interface TenantMembershipRecord extends TenantMembershipForm {
 
 // ─── Principal ───────────────────────────────────────────────────────
 
+/**
+ * PrincipalForm data contract.
+ */
 export interface PrincipalForm {
   id?: string;
   principalType?: 'USER' | 'SERVICE_ACCOUNT' | 'SYSTEM' | string;
@@ -199,6 +244,9 @@ export interface PrincipalForm {
   [key: string]: unknown;
 }
 
+/**
+ * Principal record.
+ */
 export interface PrincipalRecord extends PrincipalForm {
   id: string;
   lastLoginTime?: string;
@@ -206,6 +254,9 @@ export interface PrincipalRecord extends PrincipalForm {
   operateTime?: string;
 }
 
+/**
+ * RolePrincipalBindForm data contract.
+ */
 export interface RolePrincipalBindForm {
   roleId?: string;
   principalId?: string;
@@ -214,12 +265,18 @@ export interface RolePrincipalBindForm {
   [key: string]: unknown;
 }
 
+/**
+ * Role principal bind record.
+ */
 export interface RolePrincipalBindRecord extends RolePrincipalBindForm {
   id: string;
   createTime?: string;
   operateTime?: string;
 }
 
+/**
+ * RoleResourceBindForm data contract.
+ */
 export interface RoleResourceBindForm {
   roleId?: string;
   resourceId?: string;
@@ -227,6 +284,9 @@ export interface RoleResourceBindForm {
   [key: string]: unknown;
 }
 
+/**
+ * Role resource bind record.
+ */
 export interface RoleResourceBindRecord extends RoleResourceBindForm {
   id: string;
   createTime?: string;
@@ -235,6 +295,9 @@ export interface RoleResourceBindRecord extends RoleResourceBindForm {
 
 // ─── Service Account ────────────────────────────────────────────────
 
+/**
+ * ServiceAccountForm data contract.
+ */
 export interface ServiceAccountForm {
   id?: string;
   principalId?: string;
@@ -247,6 +310,9 @@ export interface ServiceAccountForm {
   [key: string]: unknown;
 }
 
+/**
+ * Service account record.
+ */
 export interface ServiceAccountRecord extends ServiceAccountForm {
   id: string;
   tenantId?: string;
@@ -257,6 +323,9 @@ export interface ServiceAccountRecord extends ServiceAccountForm {
 
 // ─── MCP / OAuth ────────────────────────────────────────────────────
 
+/**
+ * McpClientRegistrationForm data contract.
+ */
 export interface McpClientRegistrationForm {
   client_name?: string;
   client_type?: 'PUBLIC' | 'CONFIDENTIAL' | string;
@@ -269,6 +338,9 @@ export interface McpClientRegistrationForm {
   [key: string]: unknown;
 }
 
+/**
+ * O auth client record.
+ */
 export interface OAuthClientRecord {
   id: string;
   clientId: string;
@@ -285,6 +357,9 @@ export interface OAuthClientRecord {
   [key: string]: unknown;
 }
 
+/**
+ * McpConnectionForm data contract.
+ */
 export interface McpConnectionForm {
   connectionName?: string;
   clientId?: string;
@@ -298,6 +373,9 @@ export interface McpConnectionForm {
   [key: string]: unknown;
 }
 
+/**
+ * Mcp connection record.
+ */
 export interface McpConnectionRecord extends McpConnectionForm {
   id: string;
   enableFlag?: string | number;
@@ -305,6 +383,9 @@ export interface McpConnectionRecord extends McpConnectionForm {
   lastUsedTime?: string;
 }
 
+/**
+ * McpMetadata data contract.
+ */
 export interface McpMetadata {
   issuer?: string;
   authorization_endpoint?: string;
@@ -320,6 +401,9 @@ export interface McpMetadata {
   [key: string]: unknown;
 }
 
+/**
+ * Mcp tool record.
+ */
 export interface McpToolRecord {
   id: string;
   toolId: string;
@@ -343,6 +427,9 @@ export interface McpToolRecord {
   [key: string]: unknown;
 }
 
+/**
+ * Mcp audit record.
+ */
 export interface McpAuditRecord {
   id: string;
   traceId?: string;
@@ -369,6 +456,9 @@ export interface McpAuditRecord {
   [key: string]: unknown;
 }
 
+/**
+ * Identity audit record.
+ */
 export interface IdentityAuditRecord {
   id: string;
   tenantId?: string;

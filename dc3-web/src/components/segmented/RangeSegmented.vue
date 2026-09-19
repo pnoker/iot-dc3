@@ -43,9 +43,9 @@ import {useI18n} from 'vue-i18n';
 import type {RangeKey} from '@/config/types/dashboard';
 
 /**
- * Presets the frontend sends as {@code rangeKey} — kept in sync with
+ * Presets the frontend sends as `rangeKey` — kept in sync with
  * backend {@link TimeRangeKeyEnum}. The empty-string sentinel is the
- * "no filter" choice, rendered only when {@code includeAll} is true.
+ * "no filter" choice, rendered only when `includeAll` is true.
  */
 export type {RangeKey};
 

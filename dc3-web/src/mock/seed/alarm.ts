@@ -28,6 +28,9 @@ import type {
 
 import {devices, drivers, points, profiles} from './entities';
 
+/**
+ * MockAlertRow data contract.
+ */
 export interface MockAlertRow {
   id: string;
   source: AlertSource;
@@ -40,6 +43,9 @@ export interface MockAlertRow {
   message: string;
 }
 
+/**
+ * AlertTrendRow data contract.
+ */
 export interface AlertTrendRow {
   date: string;
   deviceCount: number;
@@ -47,6 +53,9 @@ export interface AlertTrendRow {
   pointCount: number;
 }
 
+/**
+ * AlertTopSourceRow data contract.
+ */
 export interface AlertTopSourceRow {
   source: AlertSource;
   sourceId: string;
@@ -113,6 +122,8 @@ const buildSourceAlerts = (
  * One coherent alarm population backs totals, recent rows, filters and list
  * pages. Counts intentionally match alertStats in dashboard.ts:
  * 40 device / 16 driver, with 6 / 2 unconfirmed and 12 / 4 today.
+ * @param now - reference time the generated series is anchored to
+ * @returns the generated demo value
  */
 export const alertRecords = (now = new Date()): MockAlertRow[] =>
   [
@@ -124,6 +135,12 @@ export const alertRecords = (now = new Date()): MockAlertRow[] =>
 const waveCount = (index: number, base: number, amplitude: number, period: number): number =>
   Math.max(0, Math.round(base + Math.sin(index / period) * amplitude + (index % 4) * 0.7));
 
+/**
+ * Fetch the alert trend rows.
+ * @param days - days entries
+ * @param now - reference time the generated series is anchored to
+ * @returns the generated demo value
+ */
 export const alertTrendRows = (days = 30, now = new Date()): AlertTrendRow[] => {
   const size = Math.max(1, Math.min(90, Math.round(days)));
   const end = new Date(now);
@@ -140,6 +157,11 @@ export const alertTrendRows = (days = 30, now = new Date()): AlertTrendRow[] => 
   });
 };
 
+/**
+ * Fetch the alert top source rows.
+ * @param limit - maximum number of entries to return or generate
+ * @returns the generated demo value
+ */
 export const alertTopSourceRows = (limit = 10): AlertTopSourceRow[] => {
   const candidates: AlertTopSourceRow[] = [
     ...devices.slice(0, 5).map((row, index) => ({
@@ -157,6 +179,11 @@ export const alertTopSourceRows = (limit = 10): AlertTopSourceRow[] => {
   return candidates.sort((a, b) => b.count - a.count).slice(0, Math.max(1, limit));
 };
 
+/**
+ * Fetch the alert activity rows.
+ * @param days - days entries
+ * @returns the generated demo value
+ */
 export const alertActivityRows = (days = 7): Array<{ dow: number; hour: number; count: number }> => {
   const factor = Math.max(0.4, Math.min(4, days / 7));
   return Array.from({length: 7}, (_, dow) =>
@@ -170,6 +197,10 @@ export const alertActivityRows = (days = 7): Array<{ dow: number; hour: number; 
   ).flat();
 };
 
+/**
+ * Fetch the alert type rows.
+ * @returns the generated demo value
+ */
 export const alertTypeRows = () => [
   {type: 'device-offline', count: 168},
   {type: 'device-online', count: 121},
@@ -179,12 +210,24 @@ export const alertTypeRows = () => [
   {type: 'driver-state-flip', count: 31},
 ];
 
+/**
+ * Fetch the alert storm rows.
+ * @param minCount - min count
+ * @param limit - maximum number of entries to return or generate
+ * @returns the generated demo value
+ */
 export const alertStormRows = (minCount = 10, limit = 10): AlertTopSourceRow[] =>
   alertTopSourceRows(limit).map((row, index) => ({
     ...row,
     count: Math.max(row.count, minCount + (limit - index) * 7),
   }));
 
+/**
+ * Fetch the alert flapping rows.
+ * @param minCount - min count
+ * @param limit - maximum number of entries to return or generate
+ * @returns the generated demo value
+ */
 export const alertFlappingRows = (minCount = 5, limit = 20): FlappingSource[] => {
   const rows: FlappingSource[] = [
     ...devices.slice(0, 7).map((row, index) => ({
@@ -203,6 +246,12 @@ export const alertFlappingRows = (minCount = 5, limit = 20): FlappingSource[] =>
   return rows.sort((a, b) => b.count - a.count).slice(0, Math.max(1, limit));
 };
 
+/**
+ * Fetch the alert correlation rows.
+ * @param hours - hours entries
+ * @param limit - maximum number of entries to return or generate
+ * @returns the generated demo value
+ */
 export const alertCorrelationRows = (hours = 24, limit = 15): CorrelationPair[] => {
   const factor = Math.max(0.4, Math.min(4, hours / 24));
   const rows: CorrelationPair[] = Array.from({length: 15}, (_, index) => {
@@ -232,6 +281,11 @@ export const alertCorrelationRows = (hours = 24, limit = 15): CorrelationPair[] 
   return rows.slice(0, Math.max(1, limit));
 };
 
+/**
+ * Fetch the alert peer deviation rows.
+ * @param days - days entries
+ * @returns the generated demo value
+ */
 export const alertPeerDeviationRows = (days = 7): PeerDeviation[] =>
   devices.slice(0, 12).map((device, index) => {
     const factor = Math.max(0.5, Math.min(4, days / 7));
@@ -246,6 +300,12 @@ export const alertPeerDeviationRows = (days = 7): PeerDeviation[] =>
     };
   });
 
+/**
+ * Fetch the alert mtta rows.
+ * @param days - days entries
+ * @param now - reference time the generated series is anchored to
+ * @returns the generated demo value
+ */
 export const alertMttaRows = (days = 30, now = new Date()): MttaTrend[] => {
   const size = Math.max(7, Math.min(90, Math.round(days)));
   const end = new Date(now);
@@ -263,6 +323,13 @@ export const alertMttaRows = (days = 30, now = new Date()): MttaTrend[] => {
   });
 };
 
+/**
+ * Fetch the alert change impact rows.
+ * @param days - days entries
+ * @param limit - maximum number of entries to return or generate
+ * @param now - reference time the generated series is anchored to
+ * @returns the generated demo value
+ */
 export const alertChangeImpactRows = (days = 30, limit = 30, now = new Date()): ChangeImpact[] => {
   const rows: ChangeImpact[] = Array.from({length: 18}, (_, index) => {
     const kind = (['driver', 'device', 'profile'] as const)[index % 3]!;
@@ -280,6 +347,10 @@ export const alertChangeImpactRows = (days = 30, limit = 30, now = new Date()): 
     .slice(0, Math.max(1, limit));
 };
 
+/**
+ * Fetch the protocol health rows.
+ * @returns the generated demo value
+ */
 export const protocolHealthRows = (): ProtocolHealth[] =>
   drivers.slice(0, 12).map((driver) => ({
     serviceName: String(driver.serviceName),
@@ -288,6 +359,11 @@ export const protocolHealthRows = (): ProtocolHealth[] =>
     deviceCount: devices.filter((device) => String(device.driverId) === String(driver.id)).length,
   }));
 
+/**
+ * Fetch the coverage gap report.
+ * @param limit - maximum number of entries to return or generate
+ * @returns the generated demo value
+ */
 export const coverageGapReport = (limit = 100): CoverageGap => {
   const selected = [5, 8, 12, 17, 23, 31, 38, 44, 51, 57]
     .map((index) => points[index])

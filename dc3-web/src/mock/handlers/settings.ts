@@ -21,17 +21,30 @@ import {ok, responseOf} from '../response';
 import {registerCrud} from '../crud';
 import {db} from '../db';
 
-/** Find the first row whose `id` equals `id`, compared as strings. */
+/**
+ * Find the first row whose `id` equals `id`, compared as strings.
+ * @param collection - settings collection to wrap
+ * @param id - record id
+ * @returns the found entry, if any
+ */
 const findById = (collection: Record<string, unknown>[], id: unknown) =>
   collection.find((c) => String(c.id) === String(id));
 
-/** Drop undefined lookups so join results stay `Record`-typed. */
+/**
+ * Drop undefined lookups so join results stay `Record`-typed.
+ * @param row - table row record
+ * @returns the row with undefined values dropped
+ */
 const defined = <T>(row: T | undefined): row is T => Boolean(row);
 
 /**
  * Nest flat rows into a parent→children tree. Roots are rows whose
  * `parentIdField` is `0` (numeric or string); children are matched by
  * `parentIdField === node[idField]`, recursing depth-first.
+ * @param rows - table rows to transform
+ * @param idField - field holding the entity id
+ * @param parentIdField - field holding the parent id
+ * @returns the transformed value
  */
 const buildTree = (
   rows: Record<string, unknown>[],
@@ -51,6 +64,9 @@ const buildTree = (
  * Apply resource-list filters before rebuilding the tree. The API accepts
  * arrays for type/scope filters; matching ancestors are retained so a result
  * remains navigable instead of rendering orphaned children.
+ * @param rows - table rows to transform
+ * @param body - request body payload
+ * @returns the filtered resource rows
  */
 const filterResources = (rows: Record<string, unknown>[], body: Record<string, unknown> = {}) => {
   const values = (key: string): string[] => {
@@ -88,6 +104,9 @@ const filterResources = (rows: Record<string, unknown>[], body: Record<string, u
   return rows.filter((row) => included.has(String(row.id)));
 };
 
+/**
+ * Register the settings handlers on the mock dispatch table.
+ */
 export function registerSettingsHandlers(): void {
   // ── user ──
   registerCrud({

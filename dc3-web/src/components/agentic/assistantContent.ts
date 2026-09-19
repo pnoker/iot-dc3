@@ -21,11 +21,17 @@
  * model text.
  */
 
+/**
+ * Chart series.
+ */
 export interface ChartSeries {
   name?: string;
   data: Array<[number | string, number]>;
 }
 
+/**
+ * Chart specification.
+ */
 export interface ChartSpec {
   title?: string;
   unit?: string;
@@ -35,19 +41,31 @@ export interface ChartSpec {
   series: ChartSeries[];
 }
 
+/**
+ * Chart segment.
+ */
 export interface ChartSegment {
   type: 'chart';
   kind: 'line' | 'area' | 'column';
   spec: ChartSpec;
 }
 
+/**
+ * Markdown segment.
+ */
 export interface MarkdownSegment {
   type: 'markdown';
   text: string;
 }
 
+/**
+ * assistant segment type alias.
+ */
 export type AssistantSegment = MarkdownSegment | ChartSegment;
 
+/**
+ * ParsedAssistantContent data contract.
+ */
 export interface ParsedAssistantContent {
   segments: AssistantSegment[];
 }
@@ -58,6 +76,8 @@ const CHART_FENCE_RE = /```chart:(line|area|column)\s*\n([\s\S]*?)\n```/g;
  * Single entry-point for the assistant message renderer. Returns the visible
  * segments (markdown + chart) in source order. Empty/whitespace input yields
  * an empty result instead of throwing.
+ * @param content - text content to process
+ * @returns the transformed value
  */
 export const parseAssistantContent = (content: string | undefined | null): ParsedAssistantContent => {
   if (!content) {
@@ -116,6 +136,8 @@ const isChartSpec = (value: unknown): value is ChartSpec => {
  * Strip the assistant message content down to a copy-friendly plain-text
  * representation: the markdown segments are concatenated in order, and chart
  * fences are replaced with a one-liner placeholder.
+ * @param content - text content to process
+ * @returns the plain-text rendering
  */
 export const toPlainText = (content: string | undefined | null): string => {
   const parsed = parseAssistantContent(content);

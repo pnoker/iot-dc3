@@ -27,10 +27,17 @@
 
 import i18n from '@/config/i18n';
 
-/** Resolve the Intl locale tag from the active app locale. */
+/**
+ * Resolve the Intl locale tag from the active app locale.
+ * @returns the resolved Intl locale tag
+ */
 const LOCALE = (): string => (i18n.global.locale.value === 'zh' ? 'zh-CN' : 'en-US');
 
-/** Parse ISO / "yyyy-MM-dd HH:mm:ss" into a Date; returns null on failure. */
+/**
+ * Parse ISO / "yyyy-MM-dd HH:mm:ss" into a Date; returns null on failure.
+ * @param v - value to inspect
+ * @returns the transformed value
+ */
 export const parseDateSafe = (v: string | Date | undefined | null): Date | null => {
   if (v == null || v === '') return null;
   if (v instanceof Date) return Number.isNaN(v.getTime()) ? null : v;
@@ -43,6 +50,8 @@ export const parseDateSafe = (v: string | Date | undefined | null): Date | null 
 /**
  * Full date + clock — "2026/05/04 12:34:56". Used for audit-style timestamps
  * (alarm create_time, last_seen, operate_time).
+ * @param v - value to inspect
+ * @returns the transformed value
  */
 export const formatDateTime = (v: string | Date | undefined | null): string => {
   const d = parseDateSafe(v);
@@ -50,7 +59,11 @@ export const formatDateTime = (v: string | Date | undefined | null): string => {
   return d.toLocaleString(LOCALE(), {hour12: false});
 };
 
-/** Clock only — "12:34:56". Used by live feeds where the date context is already implicit. */
+/**
+ * Clock only — "12:34:56". Used by live feeds where the date context is already implicit.
+ * @param v - value to inspect
+ * @returns the transformed value
+ */
 export const formatClock = (v: string | Date | undefined | null): string => {
   const d = parseDateSafe(v);
   if (!d) return typeof v === 'string' ? v : '';
@@ -60,6 +73,8 @@ export const formatClock = (v: string | Date | undefined | null): string => {
 /**
  * Month/day + clock — "05/04 12:34". Used on the timeline recent-unconfirmed
  * cards where space is tight and the year adds no info.
+ * @param v - value to inspect
+ * @returns the transformed value
  */
 export const formatShortDateTime = (v: string | Date | undefined | null): string => {
   const d = parseDateSafe(v);
@@ -76,6 +91,8 @@ export const formatShortDateTime = (v: string | Date | undefined | null): string
 /**
  * Millisecond duration → concise human string: ms / s / m / h. Used for
  * MTTA display where values span 0-3600000+.
+ * @param ms - ms entries
+ * @returns the transformed value
  */
 export const formatMs = (ms: number | null | undefined): string => {
   if (!ms || ms <= 0) return '—';
@@ -87,7 +104,11 @@ export const formatMs = (ms: number | null | undefined): string => {
   return `${(m / 60).toFixed(1)}h`;
 };
 
-/** Seconds → compact duration: "42s" / "3m" / "2h" / "5d". */
+/**
+ * Seconds → compact duration: "42s" / "3m" / "2h" / "5d".
+ * @param seconds - duration in seconds
+ * @returns the compact duration string
+ */
 export const humanDuration = (seconds: number | null | undefined): string => {
   if (!seconds || seconds < 0) return '—';
   if (seconds < 60) return `${Math.floor(seconds)}s`;

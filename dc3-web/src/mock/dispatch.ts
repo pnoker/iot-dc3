@@ -26,6 +26,9 @@ const entryKey = (method: string, url: string) => `${method} ${url}`;
 /**
  * Register an exact URL match. Pass an array to bind multiple methods (e.g.
  * get+post) to one handler.
+ * @param method - HTTP method for the request
+ * @param url - request url
+ * @param handler - request handler invoked for matching calls
  */
 export function on(method: string | string[], url: string, handler: Handler): void {
   const methods = Array.isArray(method) ? method : [method];
@@ -34,17 +37,31 @@ export function on(method: string | string[], url: string, handler: Handler): vo
   }
 }
 
-/** Register a regex-based rule for URL families that share a handler. */
+/**
+ * Register a regex-based rule for URL families that share a handler.
+ * @param method - HTTP method for the request
+ * @param pattern - url pattern the handler matches
+ * @param handler - request handler invoked for matching calls
+ */
 export function onRe(method: string, pattern: RegExp, handler: Handler): void {
   rules.push({method: method.toLowerCase(), pattern, handler});
 }
 
-/** Register the last-resort handler used when no exact/regex rule matches. */
+/**
+ * Register the last-resort handler used when no exact/regex rule matches.
+ * @param handler - request handler invoked for matching calls
+ */
 export function setFallback(handler: Handler): void {
   fallback = handler;
 }
 
-/** Resolve the handler for a request context, or the fallback. */
+/**
+ * Resolve the handler for a request context, or the fallback.
+ * @param ctx - request context with tenant and principal
+ * @param ctx.method - HTTP method for the request
+ * @param ctx.url - request url
+ * @returns the matched handler, or the fallback
+ */
 export function resolve(ctx: { method: string; url: string }): Handler {
   const byMethod = exact.get(entryKey(ctx.method, ctx.url));
   if (byMethod) return byMethod;

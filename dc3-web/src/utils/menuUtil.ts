@@ -32,6 +32,8 @@ import type {MenuNode} from '@/store/modules/menu';
  *      when the key is not registered in locales.
  *   4. menuName — the English machine name stored on the row, so the UI
  *      never shows a blank label.
+ * @param node - menu node being visited
+ * @returns the resolved value
  */
 export function resolveMenuTitle(node: Partial<MenuNode> | null | undefined): string {
   if (!node) return '';

@@ -22,37 +22,98 @@ import type {PageQuery, PageResult} from '@/config/types';
 import type {DeviceForm, DeviceRecord} from '@/config/types/manager';
 import type {OperationAccepted, OperationView} from '@/config/types/operation';
 
+/**
+ * Create device.
+ * @param device - device record the operation targets
+ * @returns the operation result
+ */
 export const addDevice = (device: DeviceForm) => httpPost<DeviceRecord>(`${API_MANAGER_BASE}/device/add`, device);
 
+/**
+ * Delete device.
+ * @param id - record id
+ * @param version - record version for optimistic locking
+ * @returns the operation result
+ */
 export const deleteDevice = (id: string, version: number) => versionedDelete(`${API_MANAGER_BASE}/device`, id, version);
 
+/**
+ * Update device.
+ * @param device - device record the operation targets
+ * @returns the operation result
+ */
 export const updateDevice = (device: DeviceForm) =>
   httpPost<DeviceRecord>(`${API_MANAGER_BASE}/device/update`, device);
 
+/**
+ * Fetch device by id.
+ * @param id - record id
+ * @returns the fetched device by id
+ */
 export const getDeviceById = (id: string) =>
   httpGet<DeviceRecord>(`${API_MANAGER_BASE}/device/get_by_id`, {params: {id}});
 
+/**
+ * List device by ids.
+ * @param deviceIds - device ids to scope the request
+ * @returns the listed device by ids
+ */
 export const listDeviceByIds = (deviceIds: string[]) =>
   httpPost<Record<string, DeviceRecord>>(`${API_MANAGER_BASE}/device/list_by_ids`, deviceIds);
 
+/**
+ * Fetch device count by driver id.
+ * @param driverId - driver id to scope the request
+ * @returns the fetched device count by driver id
+ */
 export const getDeviceCountByDriverId = (driverId: string) =>
   httpGet(`${API_MANAGER_BASE}/device/get_count_by_driver_id`, {params: {driver_id: driverId}});
 
+/**
+ * List device by profile id.
+ * @param profileId - profile id to scope the request
+ * @returns the listed device by profile id
+ */
 export const listDeviceByProfileId = (profileId: string) =>
   httpGet(`${API_MANAGER_BASE}/device/list_by_profile_id`, {params: {profile_id: profileId}});
 
+/**
+ * List device.
+ * @param query - page query with filters and paging
+ * @returns the listed device
+ */
 export const listDevice = <T = PageResult<DeviceRecord>>(query: PageQuery) =>
   httpPost<T>(`${API_MANAGER_BASE}/device/list`, query);
 
+/**
+ * List device status.
+ * @param query - page query with filters and paging
+ * @returns the listed device status
+ */
 export const listDeviceStatus = (query: Record<string, unknown>) =>
   httpPost(`${API_DATA_BASE}/device/status/list`, query);
 
+/**
+ * List device status by driver id.
+ * @param driverId - driver id to scope the request
+ * @returns the listed device status by driver id
+ */
 export const listDeviceStatusByDriverId = (driverId: string) =>
   httpGet(`${API_DATA_BASE}/device/status/list_by_driver_id`, {params: {driver_id: driverId}});
 
+/**
+ * List device status by profile id.
+ * @param profileId - profile id to scope the request
+ * @returns the listed device status by profile id
+ */
 export const listDeviceStatusByProfileId = (profileId: string) =>
   httpGet(`${API_DATA_BASE}/device/status/list_by_profile_id`, {params: {profile_id: profileId}});
 
+/**
+ * Fetch device statistics by point id.
+ * @param pointId - point id to scope the request
+ * @returns the fetched device statistics by point id
+ */
 export const getDeviceStatisticsByPointId = (pointId: string) =>
   httpGet<
     {
@@ -63,9 +124,21 @@ export const getDeviceStatisticsByPointId = (pointId: string) =>
     params: {point_id: pointId},
   });
 
+/**
+ * Import device template.
+ * @param device - device record the operation targets
+ * @returns the operation result
+ */
 export const importDeviceTemplate = (device: Record<string, unknown>) =>
   httpPost<AxiosResponse<Blob>>(`${API_MANAGER_BASE}/device/export/import_template`, device, {responseType: 'blob'});
 
+/**
+ * Import device.
+ * @param form - form payload to submit
+ * @param file - uploaded file payload
+ * @param idempotencyKey - idempotency key guarding duplicate submissions
+ * @returns the operation result
+ */
 export const importDevice = (form: Record<string, unknown>, file: File, idempotencyKey: string) => {
   const data = new FormData();
   data.append(
@@ -81,6 +154,12 @@ export const importDevice = (form: Record<string, unknown>, file: File, idempote
   });
 };
 
+/**
+ * Fetch device import operation.
+ * @param statusUri - status endpoint address
+ * @param signal - abort signal
+ * @returns the fetched device import operation
+ */
 export const getDeviceImportOperation = (statusUri: string, signal?: AbortSignal) => {
   const [path = '', query = ''] = statusUri.split('?', 2);
   return httpGet<OperationView>(path.replace(/^\/+/, ''), {

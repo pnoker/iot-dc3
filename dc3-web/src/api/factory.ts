@@ -45,6 +45,13 @@ export type CrudApi<TForm, TRecord> = {
   list: <T = PageResult<TRecord>>(query: PageQuery) => Promise<T>;
 };
 
+/**
+ * Create a typed CRUD API bound to a manager base path.
+ * @param config - configuration object
+ * @param config.base - API base path of the resource collection
+ * @param config.entity - entity kind the config belongs to
+ * @returns the operation result
+ */
 export function createCrudApi<TForm, TRecord>(config: { base: string; entity?: string }): CrudApi<TForm, TRecord> {
   const prefix = config.entity ? `${config.base}/${config.entity}` : config.base;
   return {

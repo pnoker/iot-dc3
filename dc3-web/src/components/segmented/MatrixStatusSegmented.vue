@@ -26,6 +26,9 @@ import type {PropType} from 'vue';
 import {computed} from 'vue';
 import {useI18n} from 'vue-i18n';
 
+/**
+ *
+ */
 export type MatrixStatus = '' | 'missing' | 'configured' | 'dirty' | 'error';
 
 defineProps({

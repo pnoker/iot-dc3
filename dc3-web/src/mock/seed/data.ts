@@ -31,7 +31,13 @@ const CREATED = '2026-07-15T09:30:00';
 const UPDATED = '2026-08-01T14:20:00';
 const RECENT = '2026-08-05T10:15:00';
 
-/** Wraps a payload as a versioned StructuredExt, mirroring alarmEntityConfig defaults. */
+/**
+ * Wraps a payload as a versioned StructuredExt, mirroring alarmEntityConfig defaults.
+ * @param type - type discriminator
+ * @param content - text content to process
+ * @param version - record version for optimistic locking
+ * @returns the generated demo value
+ */
 const ext = (type: string, content: Record<string, unknown>, version = 1) => ({
   type,
   version,

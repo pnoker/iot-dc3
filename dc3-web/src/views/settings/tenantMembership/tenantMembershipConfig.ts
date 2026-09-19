@@ -27,6 +27,11 @@ const MEMBERSHIP_STATUS_OPTIONS = [
   {label: 'INVITED', value: 'INVITED'},
 ];
 
+/**
+ * Create tenant membership config.
+ * @param t - i18n translator for localized messages
+ * @returns the operation result
+ */
 export const createTenantMembershipConfig = (t: Translator): EntityListConfig => ({
   name: 'tenant-membership',
   title: t('nav.settingsTenantMembership'),

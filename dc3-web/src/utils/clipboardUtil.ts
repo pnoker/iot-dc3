@@ -48,6 +48,10 @@ export const setCopyContent = async (content: unknown, detail?: boolean, message
 
 /**
  * Fallback copy method using execCommand
+ * @param content - text content to process
+ * @param detail - error or status detail text
+ * @param message - message text
+ * @returns whether the copy succeeded
  */
 const fallbackCopy = (content: string, detail?: boolean, message?: string): boolean => {
   const input = document.createElement('input');
@@ -75,6 +79,9 @@ const fallbackCopy = (content: string, detail?: boolean, message?: string): bool
 
 /**
  * Show success message
+ * @param content - text content to process
+ * @param detail - error or status detail text
+ * @param message - message text
  */
 const showSuccessMessage = (content: string, detail?: boolean, message?: string): void => {
   let tip = i18n.global.t('common.clipboard.copied');

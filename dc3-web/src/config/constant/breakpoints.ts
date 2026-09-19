@@ -19,6 +19,9 @@
 // responsive props (docs/design/frontend-three-terminal-ux.md, A5).
 // Keep in lockstep with $breakpoint-* in src/styles/tokens.scss.
 
+/**
+ * breakpoint type alias.
+ */
 export type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 /** Lower bound of each tier in px, matching Element Plus el-col semantics. */
@@ -36,13 +39,22 @@ export const BREAKPOINT_ORDER: Breakpoint[] = ['xs', 'sm', 'md', 'lg', 'xl'];
 /** Device class derived from a breakpoint: mobile / tablet / desktop. */
 export type DeviceClass = 'mobile' | 'tablet' | 'desktop';
 
+/**
+ * Derive the device class list active at the given width.
+ * @param breakpoint - viewport breakpoint key
+ * @returns the device class for the breakpoint
+ */
 export const deviceClassOf = (breakpoint: Breakpoint): DeviceClass => {
   if (breakpoint === 'xs') return 'mobile';
   if (breakpoint === 'sm' || breakpoint === 'md') return 'tablet';
   return 'desktop';
 };
 
-/** media query string for "this tier and narrower" (max-width inclusive). */
+/**
+ * media query string for "this tier and narrower" (max-width inclusive).
+ * @param breakpoint - viewport breakpoint key
+ * @returns the max-width media query string
+ */
 export const downQuery = (breakpoint: Exclude<Breakpoint, 'xs'>): string => {
   const max = BREAKPOINTS[breakpoint] - 0.02;
   return `(max-width: ${max}px)`;

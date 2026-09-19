@@ -27,6 +27,12 @@ interface McpToolHandlers {
 const RISK_OPTIONS = MCP_RISK_LEVEL_OPTIONS.map((o) => ({label: o.label, value: o.value}));
 
 // Read-only tool catalog. Backend `tool/list` uses offset/limit pagination.
+/**
+ * Create mcp tool config.
+ * @param t - i18n translator for localized messages
+ * @param handlers - handlers entries
+ * @returns the operation result
+ */
 export const createMcpToolConfig = (t: Translator, handlers: McpToolHandlers): EntityListConfig => ({
   name: 'mcp-tool',
   title: t('nav.settingsMcpTool'),

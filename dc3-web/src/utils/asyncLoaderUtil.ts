@@ -33,7 +33,8 @@ import {getCurrentInstance, onUnmounted, ref} from 'vue';
  *
  * Errors are swallowed by default — the axios response interceptor already
  * surfaces toast / 401 redirect, so catching here again would double-report.
- * Pass {@code rethrow: true} if a caller genuinely needs to handle errors.
+ * Pass `rethrow: true` if a caller genuinely needs to handle errors.
+ * @returns the composable handle
  */
 export const useAsyncLoader = (): {
   loading: Ref<boolean>;

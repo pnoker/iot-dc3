@@ -40,6 +40,11 @@ export const iconMap: Record<string, Component> = Object.fromEntries(
  */
 export const iconNames: string[] = Object.keys(iconMap).sort((a, b) => a.localeCompare(b));
 
+/**
+ * Resolve the icon component for a menu entry.
+ * @param name - resource name
+ * @returns the resolved value
+ */
 export const resolveIcon = (name?: string): Component | undefined => {
   if (!name) return undefined;
   return iconMap[name];

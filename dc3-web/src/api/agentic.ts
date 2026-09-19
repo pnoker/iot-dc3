@@ -57,38 +57,96 @@ interface OpenAIChunk {
   }>;
 }
 
+/**
+ * List agentic models.
+ * @returns the listed agentic models
+ */
 export const listAgenticModels = () => httpGet<AgenticModel[]>(`${API_AGENTIC_BASE}/model/list`);
 
+/**
+ * List agentic model configs.
+ * @returns the listed agentic model configs
+ */
 export const listAgenticModelConfigs = () => httpGet<AgenticModelConfig[]>(`${API_AGENTIC_BASE}/model/config/list`);
 
+/**
+ * Create agentic model config.
+ * @param data - payload to send or render
+ * @returns the operation result
+ */
 export const addAgenticModelConfig = (data: AgenticModelConfig) =>
   httpPost<AgenticModelConfig>(`${API_AGENTIC_BASE}/model/config/add`, data);
 
+/**
+ * Update agentic model config.
+ * @param data - payload to send or render
+ * @returns the operation result
+ */
 export const updateAgenticModelConfig = (data: AgenticModelConfig) =>
   httpPost<AgenticModelConfig>(`${API_AGENTIC_BASE}/model/config/update`, data);
 
+/**
+ * Delete agentic model config.
+ * @param id - record id
+ * @returns the operation result
+ */
 export const deleteAgenticModelConfig = (id: string) =>
   httpDelete<void>(`${API_AGENTIC_BASE}/model/config/delete`, {params: {id}});
 
+/**
+ * List agentic providers.
+ * @returns the listed agentic providers
+ */
 export const listAgenticProviders = () => httpGet<AgenticProvider[]>(`${API_AGENTIC_BASE}/provider/list`);
 
+/**
+ * Create agentic provider.
+ * @param data - payload to send or render
+ * @returns the operation result
+ */
 export const addAgenticProvider = (data: AgenticProvider) =>
   httpPost<AgenticProvider>(`${API_AGENTIC_BASE}/provider/config/add`, data);
 
+/**
+ * Update agentic provider.
+ * @param data - payload to send or render
+ * @returns the operation result
+ */
 export const updateAgenticProvider = (data: AgenticProvider) =>
   httpPost<AgenticProvider>(`${API_AGENTIC_BASE}/provider/config/update`, data);
 
+/**
+ * Delete agentic provider.
+ * @param id - record id
+ * @returns the operation result
+ */
 export const deleteAgenticProvider = (id: string) =>
   httpDelete<void>(`${API_AGENTIC_BASE}/provider/config/delete`, {params: {id}});
 
+/**
+ * List agentic sessions.
+ * @param query - page query with filters and paging
+ * @returns the listed agentic sessions
+ */
 export const listAgenticSessions = (query?: PageQuery) =>
   httpPost<PageResult<AgenticSession>>(`${API_AGENTIC_BASE}/session/list`, query ?? {});
 
+/**
+ * Delete agentic session.
+ * @param conversationId - conversation id to scope the request
+ * @returns the operation result
+ */
 export const deleteAgenticSession = (conversationId: string) =>
   httpDelete<void>(`${API_AGENTIC_BASE}/session/delete`, {
     params: {conversation_id: conversationId},
   });
 
+/**
+ * Update agentic session.
+ * @param conversationId - conversation id to scope the request
+ * @param data - payload to send or render
+ * @returns the operation result
+ */
 export const updateAgenticSession = (
   conversationId: string,
   data: Partial<Pick<AgenticSession, 'title' | 'sessionExt'>>
@@ -97,9 +155,20 @@ export const updateAgenticSession = (
     params: {conversation_id: conversationId},
   });
 
+/**
+ * List agentic messages.
+ * @param conversationId - conversation id to scope the request
+ * @returns the listed agentic messages
+ */
 export const listAgenticMessages = (conversationId: string) =>
   httpGet<AgenticMessage[]>(`${API_AGENTIC_BASE}/message/list`, {params: {conversation_id: conversationId}});
 
+/**
+ * Upload agentic attachment.
+ * @param conversationId - conversation id to scope the request
+ * @param file - uploaded file payload
+ * @returns the operation result
+ */
 export const uploadAgenticAttachment = (conversationId: string, file: File) => {
   const data = new FormData();
   data.append('file', file);
@@ -110,22 +179,48 @@ export const uploadAgenticAttachment = (conversationId: string, file: File) => {
   });
 };
 
+/**
+ * List agentic attachments.
+ * @param conversationId - conversation id to scope the request
+ * @returns the listed agentic attachments
+ */
 export const listAgenticAttachments = (conversationId: string) =>
   httpGet<AgenticAttachment[]>(`${API_AGENTIC_BASE}/attachment/list`, {
     params: {conversation_id: conversationId},
   });
 
+/**
+ * List pending agentic actions.
+ * @param conversationId - conversation id to scope the request
+ * @param query - page query with filters and paging
+ * @returns the listed pending agentic actions
+ */
 export const listPendingAgenticActions = (conversationId: string, query?: Pick<PageQuery, 'offset' | 'limit'>) =>
   httpGet<PageResult<AgenticAction>>(`${API_AGENTIC_BASE}/action/pending`, {
     params: {conversation_id: conversationId, ...(query ?? {})},
   });
 
+/**
+ * Confirm agentic action.
+ * @param actionId - action id to scope the request
+ * @returns the agentic action response
+ */
 export const confirmAgenticAction = (actionId: string) =>
   httpPost<AgenticAction>(`${API_AGENTIC_BASE}/action/confirm`, undefined, {params: {action_id: actionId}});
 
+/**
+ * Reject agentic action.
+ * @param actionId - action id to scope the request
+ * @returns the agentic action response
+ */
 export const rejectAgenticAction = (actionId: string) =>
   httpPost<AgenticAction>(`${API_AGENTIC_BASE}/action/reject`, undefined, {params: {action_id: actionId}});
 
+/**
+ * Stream agentic chat completion.
+ * @param data - payload to send or render
+ * @param callbacks - callbacks entries
+ */
 export const streamAgenticChatCompletion = async (
   data: AgenticChatCompletionRequest,
   callbacks: AgenticStreamCallbacks = {}
@@ -170,6 +265,12 @@ export const streamAgenticChatCompletion = async (
   }
 };
 
+/**
+ * Complete agentic chat completion.
+ * @param data - payload to send or render
+ * @param signal - abort signal
+ * @returns the operation result
+ */
 export const completeAgenticChatCompletion = async (
   data: AgenticChatCompletionRequest,
   signal?: AbortSignal

@@ -15,9 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * Search form payload accepted by list pages.
+ */
 export type SearchFormData = Record<string, any>;
 
-/** Drop empty/null/blank entries so list requests stay clean. */
+/**
+ * Drop empty/null/blank entries so list requests stay clean.
+ * @param data - form data to clean
+ * @returns the cleaned search params
+ */
 export const cleanSearchParams = <T extends SearchFormData>(data: T): Partial<T> => {
   const params = {...data};
   Object.keys(params).forEach((key) => {
@@ -33,7 +40,11 @@ export const cleanSearchParams = <T extends SearchFormData>(data: T): Partial<T>
   return params;
 };
 
-/** Clear a search form and re-apply the given defaults. */
+/**
+ * Clear a search form and re-apply the given defaults.
+ * @param formData - form values to convert
+ * @param defaults - defaults entries
+ */
 export const resetSearchForm = (formData: SearchFormData, defaults: SearchFormData = {}) => {
   Object.keys(formData).forEach((key) => delete formData[key]);
   Object.assign(formData, defaults);

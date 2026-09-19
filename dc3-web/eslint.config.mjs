@@ -18,11 +18,59 @@
 import js from '@eslint/js';
 import pluginVue from 'eslint-plugin-vue';
 import tsparser from '@typescript-eslint/parser';
+import jsdoc from 'eslint-plugin-jsdoc';
 import {defineConfigWithVueTs, vueTsConfigs} from '@vue/eslint-config-typescript';
 import vueParser from 'vue-eslint-parser';
 import globals from 'globals';
 
 export default [
+  {
+    files: ['src/**/*.{ts,vue}', 'scripts/**/*.mjs'],
+    plugins: { jsdoc },
+    settings: { jsdoc: { mode: 'typescript' } },
+    rules: {
+// JSDoc gate - mirrors backend checkstyle: exported API must be documented,
+// param/returns tags must match signatures and carry descriptions.
+      // JSDoc gate - mirrors backend checkstyle: exported API must be documented,
+      // param/returns tags must match signatures and carry descriptions.
+      // `require.FunctionDeclaration: false` is required: the schema default
+      // (true) fires on every function independently of `contexts`.
+      'jsdoc/require-jsdoc': [
+        'error',
+        {
+          require: {
+            ArrowFunctionExpression: false,
+            ClassDeclaration: false,
+            ClassExpression: false,
+            FunctionDeclaration: false,
+            FunctionExpression: false,
+            MethodDefinition: false
+          },
+          contexts: [
+            'ExportNamedDeclaration > FunctionDeclaration',
+            'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > ArrowFunctionExpression',
+            'ExportNamedDeclaration > VariableDeclaration > VariableDeclarator > FunctionExpression',
+            'ExportNamedDeclaration > TSInterfaceDeclaration',
+            'ExportNamedDeclaration > TSTypeAliasDeclaration',
+            'ExportNamedDeclaration > ClassDeclaration',
+            'ExportDefaultDeclaration > FunctionDeclaration',
+            'ExportDefaultDeclaration > ClassDeclaration'
+          ],
+          enableFixer: true,
+          publicOnly: false
+        }
+      ],
+      'jsdoc/require-param': 'error',
+      'jsdoc/require-param-description': 'error',
+      'jsdoc/require-returns': 'error',
+      'jsdoc/require-returns-description': 'error',
+      'jsdoc/check-param-names': 'error',
+      'jsdoc/check-tag-names': 'error',
+      'jsdoc/no-multi-asterisks': 'error',
+      'jsdoc/empty-tags': 'error',
+    }
+  },
+
   {
     ignores: [
       'node_modules/**',

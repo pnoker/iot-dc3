@@ -14,13 +14,22 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+/**
+ * Operation status union.
+ */
 export type OperationStatus = 'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED' | 'EXPIRED';
 
+/**
+ * Operation acceptance envelope.
+ */
 export interface OperationAccepted {
   operationId: string;
   statusUri: string;
 }
 
+/**
+ * OperationView data contract.
+ */
 export interface OperationView {
   operationId: string;
   status: OperationStatus;
@@ -32,4 +41,7 @@ export interface OperationView {
   expiresAt: string | null;
 }
 
+/**
+ * Operation ui status union.
+ */
 export type OperationUiStatus = OperationStatus | 'REQUEST_ERROR';

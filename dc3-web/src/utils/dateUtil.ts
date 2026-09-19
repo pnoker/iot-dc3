@@ -29,15 +29,24 @@ export const timestamp = (timestamp: string): string => {
  * el-table-column formatter that renders a timestamp cell in the same
  * `yyyy-MM-dd hh:mm:ss` shape the rest of the app uses (driver card /
  * detail). Used as `:formatter="timestampColumn"` on a column whose
- * {@code prop} already points at the ISO string. Blank cells fall
+ * `prop` already points at the ISO string. Blank cells fall
  * through as empty strings so the table does not display "Invalid Date".
+ * @param _row - table row (unused)
+ * @param _col - column config (unused)
+ * @param cellValue - raw cell value to parse
+ * @returns the formatted timestamp string
  */
 export const timestampColumn = (_row: unknown, _col: unknown, cellValue: unknown): string => {
   if (cellValue == null || cellValue === '') return '';
   return timestamp(String(cellValue));
 };
 
-/** Format a timestamp cell value, falling back to the given placeholder. */
+/**
+ * Format a timestamp cell value, falling back to the given placeholder.
+ * @param value - value to set
+ * @param fallback - value used when the primary lookup misses
+ * @returns the formatted timestamp, or the fallback
+ */
 export const timestampLabel = (value: unknown, fallback = '-'): string => {
   if (value == null || value === '') return fallback;
   return timestamp(String(value)) || fallback;
@@ -80,6 +89,12 @@ interface DateDiff {
   seconds: number;
 }
 
+/**
+ * Diff two dates into a broken-down duration.
+ * @param date1 - first date of the diff
+ * @param date2 - second date of the diff
+ * @returns the broken-down duration
+ */
 export const calcDate = (date1: Date, date2: Date): DateDiff => {
   const date3 = date2.getTime() - date1.getTime();
 

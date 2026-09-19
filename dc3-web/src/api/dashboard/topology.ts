@@ -19,6 +19,13 @@ import {httpGet} from '@/api/common';
 import {API_MANAGER_BASE} from '@/config/constant/api';
 import type {TopologyMode, TopologyResponse} from '@/config/types/dashboard';
 
+/**
+ * Fetch the topology snapshot.
+ * @param params - query parameters for the request
+ * @param params.mode - rendering mode selector
+ * @param params.rangeKey - preset range key, e.g. 24h or 7d
+ * @returns the topology response response
+ */
 export const topology = (params: { mode?: TopologyMode; rangeKey?: string } = {}) =>
   httpGet<TopologyResponse>(`${API_MANAGER_BASE}/dashboard/topology`, {
     params: {

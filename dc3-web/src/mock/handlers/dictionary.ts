@@ -34,6 +34,9 @@ const toDict = (row: Record<string, unknown>, label: unknown, type: string): Dic
 const dictPage = (rows: Dictionary[], body: Record<string, unknown>) =>
   paginate(rows, body, (dictionary) => matches(dictionary.label, body.label));
 
+/**
+ * Register the dictionary handlers on the mock dispatch table.
+ */
 export function registerDictionaryHandlers(): void {
   on('get', 'api/v3/auth/dictionary/list_tenant', (ctx) =>
     responseOf(ctx.config, [

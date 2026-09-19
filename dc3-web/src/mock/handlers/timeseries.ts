@@ -22,14 +22,22 @@ import {db} from '../db';
 
 const dec = (p: Record<string, unknown>): number => Number(p.valueDecimal ?? 2);
 
-/** Deterministic pseudo-random in [0,1) from a string seed — stable across reloads. */
+/**
+ * Deterministic pseudo-random in [0,1) from a string seed — stable across reloads.
+ * @param s - s entries
+ * @returns whether the condition holds
+ */
 const hash = (s: string | number): number => {
   let h = 2166136261;
   for (const c of String(s)) h = (h ^ c.charCodeAt(0)) * 16777619;
   return (h >>> 0) / 4294967296;
 };
 
-/** Pick a base/amplitude for a realistic waveform from the point's unit/name. */
+/**
+ * Pick a base/amplitude for a realistic waveform from the point's unit/name.
+ * @param point - point record the operation targets
+ * @returns the waveform base and amplitude
+ */
 const range = (point: Record<string, unknown>): { base: number; amp: number } => {
   const u = String(point.unit ?? '');
   const n = String(point.pointName ?? '');
@@ -57,7 +65,12 @@ const stamp = (ms: number): string => {
   return `${t.getFullYear()}-${p(t.getMonth() + 1)}-${p(t.getDate())} ${p(t.getHours())}:${p(t.getMinutes())}:${p(t.getSeconds())}`;
 };
 
-/** Build the 24h hourly history (most-recent first) for one device×point pair. */
+/**
+ * Build the 24h hourly history (most-recent first) for one device×point pair.
+ * @param deviceId - device id to scope the request
+ * @param point - point record the operation targets
+ * @returns the hourly history rows
+ */
 const history = (deviceId: string, point: Record<string, unknown>): Record<string, unknown>[] => {
   const now = Date.now();
   return Array.from({length: 24}, (_, i) => {
@@ -77,14 +90,23 @@ const history = (deviceId: string, point: Record<string, unknown>): Record<strin
   });
 };
 
-/** Points belong to a device via the device's profile. */
+/**
+ * Points belong to a device via the device's profile.
+ * @param deviceId - device id to scope the request
+ * @returns the points bound to the device profile
+ */
 const pointsOf = (deviceId: string): Record<string, unknown>[] => {
   const device = db.devices.find((d) => String(d.id) === String(deviceId));
   if (!device) return [];
   return db.points.filter((p) => String(p.profileId) === String(device.profileId));
 };
 
-/** Flatten history across devices (and points), optionally narrowed. */
+/**
+ * Flatten history across devices (and points), optionally narrowed.
+ * @param deviceId - device id to scope the request
+ * @param pointId - point id to scope the request
+ * @returns the flattened telemetry rows
+ */
 const allRows = (deviceId?: string, pointId?: string): Record<string, unknown>[] => {
   const devices = deviceId ? db.devices.filter((d) => String(d.id) === String(deviceId)) : db.devices;
   const rows: Record<string, unknown>[] = [];

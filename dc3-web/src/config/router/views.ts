@@ -19,6 +19,7 @@ import type {RouteRecordRaw} from 'vue-router';
 
 /**
  * Lazy-loaded layout component
+ * @returns the lazy-loaded layout component
  */
 const Layout = () => import('@/components/layout/Layout.vue');
 

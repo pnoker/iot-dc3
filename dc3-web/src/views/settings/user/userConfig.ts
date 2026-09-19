@@ -23,6 +23,12 @@ interface UserHandlers {
   onAssignRoles: (row: Record<string, any>) => void;
 }
 
+/**
+ * Create user config.
+ * @param t - i18n translator for localized messages
+ * @param handlers - handlers entries
+ * @returns the operation result
+ */
 export const createUserConfig = (t: Translator, handlers: UserHandlers): EntityListConfig => ({
   name: 'user',
   title: t('nav.settingsUser'),

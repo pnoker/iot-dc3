@@ -21,12 +21,18 @@
 
 // ─── Device ──────────────────────────────────────────────────────────
 
+/**
+ * Device extension fields.
+ */
 export interface DeviceExt {
   content?: {
     keep?: string;
   };
 }
 
+/**
+ * DeviceForm data contract.
+ */
 export interface DeviceForm {
   id?: string;
   deviceName?: string;
@@ -42,6 +48,9 @@ export interface DeviceForm {
   [key: string]: unknown;
 }
 
+/**
+ * Device record.
+ */
 export interface DeviceRecord extends DeviceForm {
   id: string;
   version: number;
@@ -51,6 +60,9 @@ export interface DeviceRecord extends DeviceForm {
 
 // ─── Driver ──────────────────────────────────────────────────────────
 
+/**
+ * Driver record.
+ */
 export interface DriverRecord {
   id: string;
   version: number;
@@ -69,12 +81,18 @@ export interface DriverRecord {
 
 // ─── Profile ─────────────────────────────────────────────────────────
 
+/**
+ * Profile extension fields.
+ */
 export interface ProfileExt {
   content?: {
     keep?: string;
   };
 }
 
+/**
+ * ProfileForm data contract.
+ */
 export interface ProfileForm {
   id?: string;
   profileName?: string;
@@ -90,6 +108,9 @@ export interface ProfileForm {
   [key: string]: unknown;
 }
 
+/**
+ * Profile record.
+ */
 export interface ProfileRecord extends ProfileForm {
   id: string;
   version: number;
@@ -99,12 +120,18 @@ export interface ProfileRecord extends ProfileForm {
 
 // ─── Point ───────────────────────────────────────────────────────────
 
+/**
+ * Point extension fields.
+ */
 export interface PointExt {
   content?: {
     keep?: string;
   };
 }
 
+/**
+ * PointForm data contract.
+ */
 export interface PointForm {
   id?: string;
   pointName?: string;
@@ -125,6 +152,9 @@ export interface PointForm {
   [key: string]: unknown;
 }
 
+/**
+ * Point record.
+ */
 export interface PointRecord extends PointForm {
   id: string;
   version: number;
@@ -134,6 +164,9 @@ export interface PointRecord extends PointForm {
 
 // ─── Attribute Config ────────────────────────────────────────────────
 
+/**
+ * DriverInfoForm data contract.
+ */
 export interface DriverInfoForm {
   id?: string;
   version?: number;
@@ -144,6 +177,9 @@ export interface DriverInfoForm {
   [key: string]: unknown;
 }
 
+/**
+ * PointInfoForm data contract.
+ */
 export interface PointInfoForm {
   id?: string;
   version?: number;
@@ -155,6 +191,9 @@ export interface PointInfoForm {
   [key: string]: unknown;
 }
 
+/**
+ * CommandInfoForm data contract.
+ */
 export interface CommandInfoForm {
   id?: string;
   version?: number;
@@ -166,6 +205,9 @@ export interface CommandInfoForm {
   [key: string]: unknown;
 }
 
+/**
+ * EventInfoForm data contract.
+ */
 export interface EventInfoForm {
   id?: string;
   version?: number;
@@ -179,6 +221,9 @@ export interface EventInfoForm {
 
 // ─── Group / Label ──────────────────────────────────────────────────
 
+/**
+ * GroupForm data contract.
+ */
 export interface GroupForm {
   id?: string;
   parentGroupId?: string | null;
@@ -193,6 +238,9 @@ export interface GroupForm {
   [key: string]: unknown;
 }
 
+/**
+ * Group record.
+ */
 export interface GroupRecord extends GroupForm {
   id: string;
   createTime?: string;
@@ -200,6 +248,9 @@ export interface GroupRecord extends GroupForm {
   children?: GroupRecord[];
 }
 
+/**
+ * LabelForm data contract.
+ */
 export interface LabelForm {
   id?: string;
   labelName?: string;
@@ -212,6 +263,9 @@ export interface LabelForm {
   [key: string]: unknown;
 }
 
+/**
+ * Label record.
+ */
 export interface LabelRecord extends LabelForm {
   id: string;
   createTime?: string;

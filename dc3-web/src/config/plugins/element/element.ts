@@ -36,6 +36,7 @@ import 'element-plus/theme-chalk/dark/css-vars.css';
  * `menu_ext.content.icon` stores the icon name, work without any per-icon
  * allow-list. Adding a new icon to a seeded menu requires no code change
  * here.
+ * @param app - app instance to install on
  */
 export default function setupElementPlus(app: App): void {
   for (const [name, comp] of Object.entries(ElementIcons)) {

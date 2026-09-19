@@ -31,28 +31,71 @@ import type {
   TopDimension,
 } from '@/config/types/dashboard';
 
+/**
+ * Fetch today's stats summary.
+ * @returns the stats today summary response
+ */
 export const statsToday = () => httpGet<StatsTodaySummary>(`${API_DATA_BASE}/dashboard/stats/today`);
 
+/**
+ * Fetch the stats timeseries.
+ * @param params - query parameters for the request
+ * @returns the stats time bucket response
+ */
 export const statsTimeseries = (params: TimeRangeParams & { granularity?: Granularity } = {}) =>
   httpGet<StatsTimeBucket[]>(`${API_DATA_BASE}/dashboard/stats/timeseries`, {params: timeRangeParams(params)});
 
+/**
+ * Fetch the stats top.
+ * @param params - query parameters for the request
+ * @returns the stats count bucket response
+ */
 export const statsTop = (params: TimeRangeParams & { dimension?: TopDimension; limit?: number } = {}) =>
   httpGet<StatsCountBucket[]>(`${API_DATA_BASE}/dashboard/top`, {params: timeRangeParams(params)});
 
+/**
+ * Stream latest.
+ * @param limit - maximum number of entries to return or generate
+ * @returns the streamed response
+ */
 export const streamLatest = (limit = 20) =>
   httpGet<StreamRow[]>(`${API_DATA_BASE}/dashboard/stream`, {params: {limit}});
 
+/**
+ * Fetch the stats latency.
+ * @param params - query parameters for the request
+ * @returns the stats count bucket response
+ */
 export const statsLatency = (params: TimeRangeParams = {rangeKey: '24h'}) =>
   httpGet<StatsCountBucket[]>(`${API_DATA_BASE}/dashboard/stats/latency`, {params: timeRangeParams(params)});
 
+/**
+ * Fetch the stats activity.
+ * @param params - query parameters for the request
+ * @returns the alert activity row response
+ */
 export const statsActivity = (params: TimeRangeParams = {rangeKey: '7d'}) =>
   httpGet<AlertActivityRow[]>(`${API_DATA_BASE}/dashboard/stats/activity`, {params: timeRangeParams(params)});
 
+/**
+ * Fetch the daily growth series.
+ * @param days - days entries
+ * @returns the daily growth summary response
+ */
 export const dailyGrowth = (days = 7) =>
   httpGet<DailyGrowthSummary>(`${API_MANAGER_BASE}/dashboard/growth`, {params: {days}});
 
+/**
+ * Fetch the driver stats.
+ * @returns the driver stats response
+ */
 export const driverStats = () => httpGet<DriverStats>(`${API_MANAGER_BASE}/dashboard/driver/stats`);
 
+/**
+ * Fetch the device stats.
+ * @param topN - number of top entries to keep
+ * @returns the device stats response
+ */
 export const deviceStats = (topN = 10) =>
   httpGet<DeviceStats>(`${API_MANAGER_BASE}/dashboard/device/stats`, {params: {top_n: topN}});
 

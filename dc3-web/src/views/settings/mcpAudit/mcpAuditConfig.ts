@@ -32,6 +32,11 @@ const RISK_OPTIONS = [
 ];
 
 // Read-only audit log: offset pagination is provided by the backend; no add/edit/delete.
+/**
+ * Create mcp audit config.
+ * @param t - i18n translator for localized messages
+ * @returns the operation result
+ */
 export const createMcpAuditConfig = (t: Translator): EntityListConfig => ({
   name: 'mcp-audit',
   editable: false,

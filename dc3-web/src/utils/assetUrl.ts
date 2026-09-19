@@ -23,5 +23,7 @@
  * root and 404 under a project-page subpath (e.g. `<user>.github.io/iot-dc3/`).
  * Building the URL at runtime via `import.meta.env.BASE_URL` makes the same
  * markup work for root-domain and subpath deployments alike.
+ * @param path - verbatim public asset path
+ * @returns the deployment-aware asset url
  */
 export const assetUrl = (path: string): string => `${import.meta.env.BASE_URL}${path}`;

@@ -28,9 +28,20 @@ export const deleteLocalCredential = crud.delete;
 
 export const updateLocalCredential = crud.update;
 
+/**
+ * Reset local credential password.
+ * @param id - record id
+ * @param password - plaintext password
+ * @returns the local credential record response
+ */
 export const resetLocalCredentialPassword = (id: string, password: string) =>
   httpPost<LocalCredentialRecord>(`${API_LOCAL_CREDENTIAL_BASE}/reset_password`, undefined, {params: {id, password}});
 
+/**
+ * Check whether the login name is available.
+ * @param name - resource name
+ * @returns the boolean response
+ */
 export const checkLoginNameAvailable = (name: string) =>
   httpGet<boolean>(`${API_LOCAL_CREDENTIAL_BASE}/check`, {params: {name}});
 

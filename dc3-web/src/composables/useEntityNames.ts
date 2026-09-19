@@ -151,11 +151,15 @@ async function fetchMissing(kind: EntityKind, rawIds: Array<string>): Promise<vo
   }
 }
 
+/**
+ * Alert source kind union.
+ */
 export type AlertSourceKind = 'point' | 'device' | 'driver';
 
 /**
  * Cross-component reactive cache resolving entity ids to display names
  * (device / driver / profile / point), locale-aware and inflight-deduped.
+ * @returns the composable handle
  */
 export const useEntityNames = () => {
   const cachedName = (kind: EntityKind, id: string): string =>
@@ -175,7 +179,10 @@ export const useEntityNames = () => {
   const pointName = (id: string | undefined | null): string =>
     id == null ? '' : cachedName('point', id);
 
-  /** Resolve a mixed batch of (source, id) rows in one call. */
+  /**
+   * Resolve a mixed batch of (source, id) rows in one call.
+   * @param rows - table rows to transform
+   */
   const resolveBySource = async (
     rows: Array<{
       source: AlertSourceKind;

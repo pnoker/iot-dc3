@@ -29,12 +29,27 @@ export const deleteServiceAccount = crud.delete;
 
 export const updateServiceAccount = crud.update;
 
+/**
+ * Enable a service account by id.
+ * @param id - record id
+ * @returns the string response
+ */
 export const enableServiceAccount = (id: string) =>
   httpPost<string>(`${API_SERVICE_ACCOUNT_BASE}/enable`, undefined, {params: {id}});
 
+/**
+ * Disable a service account by id.
+ * @param id - record id
+ * @returns the string response
+ */
 export const disableServiceAccount = (id: string) =>
   httpPost<string>(`${API_SERVICE_ACCOUNT_BASE}/disable`, undefined, {params: {id}});
 
 export const getServiceAccountById = crud.getById;
 
+/**
+ * List service account.
+ * @param query - page query with filters and paging
+ * @returns the listed service account
+ */
 export const listServiceAccount = (query: PageQuery) => crud.list<PageResult<ServiceAccountRecord>>(query);

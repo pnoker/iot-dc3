@@ -33,5 +33,10 @@ export const getResourceById = crud.getById;
 
 export const listResource = crud.list;
 
+/**
+ * List resource tree.
+ * @param query - page query with filters and paging
+ * @returns the listed resource tree
+ */
 export const listResourceTree = (query: PageQuery = {}) =>
   httpPost<ResourceRecord[]>(`${API_AUTH_BASE}/resource/list_tree`, query);

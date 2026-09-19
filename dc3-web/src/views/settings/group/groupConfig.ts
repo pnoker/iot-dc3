@@ -28,7 +28,11 @@ const loadGroupRecords = async (): Promise<GroupRecord[]> => {
   return (res?.items || []) as GroupRecord[];
 };
 
-/** Build a sorted tree from flat GroupRecord rows. */
+/**
+ * Build a sorted tree from flat GroupRecord rows.
+ * @param rows - table rows to transform
+ * @returns the transformed value
+ */
 const buildTree = (rows: GroupRecord[]): GroupRecord[] => {
   const byId = new Map<string, GroupRecord & { children: GroupRecord[] }>();
   rows.forEach((row) => byId.set(String(row.id), {...row, children: []}));
@@ -51,7 +55,12 @@ const buildTree = (rows: GroupRecord[]): GroupRecord[] => {
   return roots;
 };
 
-/** Compute set of IDs to exclude: current node + all its descendants (anti-cycle). */
+/**
+ * Compute set of IDs to exclude: current node + all its descendants (anti-cycle).
+ * @param rows - group rows to walk
+ * @param currentId - current id to scope the request
+ * @returns the set of excluded ids
+ */
 const computeExcluded = (rows: GroupRecord[], currentId: string): Set<string> => {
   const ids = new Set<string>();
   if (!currentId) return ids;
@@ -75,6 +84,11 @@ const normalizeGroupPayload = (payload: Record<string, unknown>) => {
   return next;
 };
 
+/**
+ * Create group config.
+ * @param t - i18n translator for localized messages
+ * @returns the operation result
+ */
 export const createGroupConfig = (t: Translator): EntityListConfig => ({
   name: 'group',
   title: t('nav.settingsGroup'),

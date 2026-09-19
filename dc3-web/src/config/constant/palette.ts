@@ -41,11 +41,16 @@ export const DASHBOARD_PALETTE = {
   others: '#c0c4cc',
 } as const;
 
+/**
+ * Dashboard palette key.
+ */
 export type DashboardPaletteKey = keyof typeof DASHBOARD_PALETTE;
 
 /**
  * Sankey / graph nodes come in as strings; centralise the default→key
  * fallback so each consumer doesn't re-implement the same switch.
+ * @param type - type discriminator
+ * @returns the resolved value
  */
 export const resolveDashboardColour = (type: string | undefined | null): string => {
   if (!type) return DASHBOARD_PALETTE.others;
@@ -59,6 +64,9 @@ export const resolveDashboardColour = (type: string | undefined | null): string 
 /**
  * Hex → rgba conversion for tinted backgrounds (e.g. the SLA badge chip
  * backgrounds that use the same hue at 12% opacity). Hex must be `#rrggbb`.
+ * @param hex - hex color component
+ * @param alpha - alpha channel value
+ * @returns the rgba color string
  */
 export const hexToRgba = (hex: string, alpha: number): string => {
   const normalised = hex.replace('#', '');

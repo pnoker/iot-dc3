@@ -43,6 +43,11 @@ const ENTITY_ROUTE_MAP: Record<LinkableResourceType, string> = {
 };
 
 // Virtual grouping nodes registered by ResourceRegistrySync carry entity_id=0.
+/**
+ * Check whether the value is grouping node.
+ * @param row - table row record
+ * @returns whether the condition holds
+ */
 export const isGroupingNode = (row: Record<string, any>): boolean => {
   return !row.entityId || String(row.entityId) === '0';
 };
@@ -62,7 +67,11 @@ const formatEntityId = (row: Record<string, any>, ctx: EntityColumnContext): str
   return ctx.relations.entityNames?.[String(row.entityId)] || String(row.entityId);
 };
 
-/** Resolve the detail route for a linkable entity row. Exported for the shell. */
+/**
+ * Resolve the detail route for a linkable entity row. Exported for the shell.
+ * @param row - table row record
+ * @returns the resolved value
+ */
 export const resolveEntityRoute = (row: Record<string, any>): string | undefined => {
   const type = resourceType(row);
   if (!type) return undefined;
@@ -235,6 +244,12 @@ interface ResourceHandlers {
   onEntityClick: (row: Record<string, any>) => void;
 }
 
+/**
+ * Create resource config.
+ * @param t - i18n translator for localized messages
+ * @param handlers - handlers entries
+ * @returns the operation result
+ */
 export const createResourceConfig = (t: Translator, handlers: ResourceHandlers): EntityListConfig => ({
   name: 'resource',
   title: t('nav.settingsResource'),

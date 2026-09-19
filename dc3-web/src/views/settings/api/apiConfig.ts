@@ -18,6 +18,11 @@
 import {listApi} from '@/api/api';
 import type {EntityListConfig, Translator} from '@/config/types/entityList';
 
+/**
+ * Create api config.
+ * @param t - i18n translator for localized messages
+ * @returns the operation result
+ */
 export const createApiConfig = (t: Translator): EntityListConfig => ({
   name: 'api',
   title: t('nav.settingsApi'),

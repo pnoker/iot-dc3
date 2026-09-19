@@ -26,19 +26,43 @@ import type {PageQuery} from '@/config/types';
  */
 export type Translator = (key: string, params?: Record<string, unknown>) => string;
 
+/**
+ * Entity mode union.
+ */
 export type EntityMode = 'page' | 'tree';
+/**
+ * entity pagination type alias.
+ */
 export type EntityPagination = 'offset' | 'cursor';
+/**
+ * entity mobile role type alias.
+ */
 export type EntityMobileRole = 'primary' | 'detail' | 'hidden';
+/**
+ * Entity field kind union.
+ */
 export type EntityFieldKind =
   'input' | 'number' | 'select' | 'enableFlag' | 'textarea' | 'json' | 'color' | 'treeSelect';
+/**
+ * Entity column kind union.
+ */
 export type EntityColumnKind = 'text' | 'tag' | 'code' | 'time' | 'enable' | 'color' | 'icon' | 'link';
+/**
+ * Entity search kind union.
+ */
 export type EntitySearchKind = 'input' | 'select' | 'enableFlag';
 
+/**
+ * Entity option.
+ */
 export interface EntityOption {
   label: string;
   value: string | number;
 }
 
+/**
+ * EntityTreeSource data contract.
+ */
 export interface EntityTreeSource {
   load: () => Promise<unknown[]>;
   props?: { label?: string; value?: string; children?: string; disabled?: string };
@@ -49,6 +73,9 @@ export interface EntityTreeSource {
   nodeKey?: string;
 }
 
+/**
+ * Entity field configuration.
+ */
 export interface EntityFieldConfig {
   prop: string;
   label: string;
@@ -65,11 +92,17 @@ export interface EntityFieldConfig {
   disabledOnEdit?: boolean; // Disable immutable fields such as userName while editing.
 }
 
+/**
+ * Entity column context.
+ */
 export interface EntityColumnContext {
   t: (key: string) => string;
   relations: Record<string, Record<string, string>>;
 }
 
+/**
+ * Entity column configuration.
+ */
 export interface EntityColumnConfig {
   prop: string; // Supports paths such as 'menuExt.content.url'.
   label: string;
@@ -86,6 +119,9 @@ export interface EntityColumnConfig {
   mobile?: EntityMobileRole;
 }
 
+/**
+ * Entity search field configuration.
+ */
 export interface EntitySearchFieldConfig {
   prop: string;
   label: string;
@@ -96,6 +132,9 @@ export interface EntitySearchFieldConfig {
   includeAll?: boolean; // enableFlag segmented
 }
 
+/**
+ * EntityRowAction data contract.
+ */
 export interface EntityRowAction {
   key: string;
   label: string;
@@ -119,11 +158,17 @@ export interface EntityToolbarAction {
   onClick: () => void;
 }
 
+/**
+ * EntityRelation data contract.
+ */
 export interface EntityRelation {
   key: string; // ctx.relations[key]
   load: (rows: any[]) => Promise<Record<string, string>>;
 }
 
+/**
+ * Entity list configuration.
+ */
 export interface EntityListConfig {
   name: string; // Diagnostic and component name.
   title?: string; // Localized dialog entity name; falls back to name.

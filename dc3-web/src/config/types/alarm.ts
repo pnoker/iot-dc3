@@ -19,13 +19,34 @@
  * Alarm / notification data-domain types.
  */
 
+/**
+ * Alarm target type flag union.
+ */
 export type AlarmTargetTypeFlag = 'POINT' | 'DEVICE' | 'DRIVER';
+/**
+ * Notify channel type flag union.
+ */
 export type NotifyChannelTypeFlag = 'FEISHU_BOT' | 'WEBHOOK' | 'EMAIL';
+/**
+ * Rule state flag union.
+ */
 export type RuleStateFlag = 'NORMAL' | 'FIRING' | 'RECOVERED';
+/**
+ * Notify history status flag union.
+ */
 export type NotifyHistoryStatusFlag = 'PENDING' | 'SUCCESS' | 'FAILED' | 'RETRYING' | 'SKIPPED';
+/**
+ * Auto confirm flag union.
+ */
 export type AutoConfirmFlag = 'AUTO' | 'MANUAL';
+/**
+ * Enable flag union.
+ */
 export type EnableFlag = 'ENABLE' | 'DISABLE';
 
+/**
+ * Structured extension fields.
+ */
 export interface StructuredExt<T = Record<string, unknown>> {
   type?: string;
   version?: number;
@@ -33,6 +54,9 @@ export interface StructuredExt<T = Record<string, unknown>> {
   content?: T;
 }
 
+/**
+ * AlarmBase data contract.
+ */
 export interface AlarmBase {
   id: string;
   remark?: string;
@@ -44,6 +68,9 @@ export interface AlarmBase {
   [key: string]: unknown;
 }
 
+/**
+ * Rule record.
+ */
 export interface RuleRecord extends AlarmBase {
   alarmTargetTypeFlag?: AlarmTargetTypeFlag;
   ruleName?: string;
@@ -55,6 +82,9 @@ export interface RuleRecord extends AlarmBase {
   enableFlag?: EnableFlag;
 }
 
+/**
+ * Notify record.
+ */
 export interface NotifyRecord extends AlarmBase {
   notifyName?: string;
   notifyCode?: string;
@@ -64,6 +94,9 @@ export interface NotifyRecord extends AlarmBase {
   enableFlag?: EnableFlag;
 }
 
+/**
+ * Message record.
+ */
 export interface MessageRecord extends AlarmBase {
   messageName?: string;
   messageCode?: string;
@@ -72,6 +105,9 @@ export interface MessageRecord extends AlarmBase {
   enableFlag?: EnableFlag;
 }
 
+/**
+ * Notify channel record.
+ */
 export interface NotifyChannelRecord extends AlarmBase {
   channelName?: string;
   channelCode?: string;
@@ -81,6 +117,9 @@ export interface NotifyChannelRecord extends AlarmBase {
   enableFlag?: EnableFlag;
 }
 
+/**
+ * Notify channel bind record.
+ */
 export interface NotifyChannelBindRecord extends AlarmBase {
   notifyId?: string;
   channelId?: string;
@@ -88,6 +127,9 @@ export interface NotifyChannelBindRecord extends AlarmBase {
   enableFlag?: EnableFlag;
 }
 
+/**
+ * Rule state record.
+ */
 export interface RuleStateRecord extends AlarmBase {
   ruleId?: string;
   alarmTargetTypeFlag?: AlarmTargetTypeFlag;
@@ -103,6 +145,9 @@ export interface RuleStateRecord extends AlarmBase {
   entityStateExt?: StructuredExt;
 }
 
+/**
+ * Notify history record.
+ */
 export interface NotifyHistoryRecord extends AlarmBase {
   ruleId?: string;
   notifyId?: string;
@@ -118,6 +163,9 @@ export interface NotifyHistoryRecord extends AlarmBase {
   retryCount?: number | string;
 }
 
+/**
+ * alarm entity type alias.
+ */
 export type AlarmEntity =
   | RuleRecord
   | NotifyRecord

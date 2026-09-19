@@ -15,10 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * Responsive list cell kind union.
+ */
 export type ResponsiveListCellKind = 'text' | 'time' | 'tag' | 'enable' | 'default' | 'code' | 'custom';
+/**
+ * responsive list mobile role type alias.
+ */
 export type ResponsiveListMobileRole = 'primary' | 'detail' | 'hidden';
+/**
+ * Responsive list tag type union.
+ */
 export type ResponsiveListTagType = 'primary' | 'success' | 'info' | 'warning' | 'danger';
 
+/**
+ * ResponsiveListColumn data contract.
+ */
 export interface ResponsiveListColumn<T extends Record<string, any> = Record<string, any>> {
   key: string;
   label: string;

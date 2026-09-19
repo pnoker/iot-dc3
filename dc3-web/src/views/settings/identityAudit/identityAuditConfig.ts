@@ -33,6 +33,11 @@ const STATUS_OPTIONS = [
 ];
 
 // Read-only audit log: cursor pagination is required because audit history is unbounded.
+/**
+ * Create identity audit config.
+ * @param t - i18n translator for localized messages
+ * @returns the operation result
+ */
 export const createIdentityAuditConfig = (t: Translator): EntityListConfig => ({
   name: 'identity-audit',
   pagination: 'cursor',

@@ -35,6 +35,7 @@ const safeParse = (raw: unknown): any => {
  * Runs after the request interceptor (which injects auth headers) and feeds
  * its response back through the response interceptor, so the rest of the app
  * is unaware anything is mocked.
+ * @returns the operation result
  */
 export const createMockAdapter = (): AxiosAdapter => async (config: InternalAxiosRequestConfig) => {
   const ctx: MockCtx = {

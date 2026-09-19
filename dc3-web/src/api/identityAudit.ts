@@ -20,6 +20,18 @@ import {API_IDENTITY_AUDIT_BASE} from '@/config/constant/api';
 import type {CursorPageResult} from '@/config/types';
 import type {IdentityAuditRecord} from '@/config/types/auth';
 
+/**
+ * List identity audit.
+ * @param params - query parameters for the request
+ * @param params.principalId - principal id to scope the request
+ * @param params.action - action discriminator
+ * @param params.resourceType - resource type selector
+ * @param params.resourceId - resource id to scope the request
+ * @param params.status - status entries
+ * @param params.limit - maximum number of entries to return
+ * @param params.cursor - cursor marking the next page
+ * @returns the listed identity audit
+ */
 export const listIdentityAudit = (
   params: {
     principalId?: string;

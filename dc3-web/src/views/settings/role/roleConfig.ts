@@ -29,6 +29,12 @@ const normalizeRolePayload = (p: Record<string, unknown>) => {
   return next;
 };
 
+/**
+ * Create role config.
+ * @param t - i18n translator for localized messages
+ * @param handlers - handlers entries
+ * @returns the operation result
+ */
 export const createRoleConfig = (t: Translator, handlers: RoleHandlers): EntityListConfig => ({
   name: 'role',
   title: t('nav.settingsRole'),

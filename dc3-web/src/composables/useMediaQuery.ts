@@ -27,6 +27,7 @@ import {onBeforeUnmount, onMounted, ref, type Ref} from 'vue';
  *
  * @param query Media query string, e.g. '(max-width: 767.98px)'
  * @param initial Initial value before mount (SSR / no-window environments)
+ * @returns the composable handle
  */
 export const useMediaQuery = (query: string, initial = false): Ref<boolean> => {
   let mql: MediaQueryList | undefined;

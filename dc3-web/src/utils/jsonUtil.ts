@@ -15,7 +15,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** Pretty-print JSON-ish input; unparseable strings pass through unchanged. */
+/**
+ * Pretty-print JSON-ish input; unparseable strings pass through unchanged.
+ * @param value - value to set
+ * @param fallback - value used when the primary lookup misses
+ * @returns the pretty-printed string, or the fallback
+ */
 export const prettyJson = (value: unknown, fallback = '-'): string => {
   if (value == null || value === '') return fallback;
   if (typeof value === 'string') {

@@ -33,4 +33,9 @@ export const getRoleById = crud.getById;
 
 export const listRole = crud.list;
 
+/**
+ * List role tree.
+ * @param query - page query with filters and paging
+ * @returns the listed role tree
+ */
 export const listRoleTree = (query: PageQuery = {}) => httpPost(`${API_AUTH_BASE}/role/list_tree`, query);

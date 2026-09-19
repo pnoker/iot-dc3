@@ -19,6 +19,9 @@ import {defineStore} from 'pinia';
 
 import {listMenuTree} from '@/api/menu';
 
+/**
+ * Menu node.
+ */
 export interface MenuNode {
   id: string;
   parentMenuId: string;
@@ -55,7 +58,12 @@ interface MenuState {
 let inFlightFetch: Promise<void> | null = null;
 let fetchGeneration = 0;
 
-/** Recursively find the first node matching the predicate, depth-first. */
+/**
+ * Recursively find the first node matching the predicate, depth-first.
+ * @param nodes - tree nodes to walk
+ * @param predicate - match test applied to each node
+ * @returns the first matching node, or undefined
+ */
 const walk = (nodes: MenuNode[], predicate: (node: MenuNode) => boolean): MenuNode | undefined => {
   for (const node of nodes) {
     if (predicate(node)) return node;
@@ -78,6 +86,8 @@ export const useMenuStore = defineStore('menu', {
     /**
      * Locate a menu subtree by menuCode. Used by settings sidebar which only
      * wants the children of the "settings" branch.
+     * @param state - the menu store state
+     * @returns the subtree node, or undefined
      */
     findByCode:
       (state) =>
@@ -89,6 +99,8 @@ export const useMenuStore = defineStore('menu', {
      * Locate a menu by numeric id. Used by Resource list to resolve
      * entity-id→name for MENU-typed resources, and by MenuDetail to render
      * the parent-menu name instead of a raw id.
+     * @param state - the menu store state
+     * @returns the matching menu node, or undefined
      */
     findById:
       (state) =>

@@ -108,6 +108,9 @@ interface PointAttributeCell extends AttributeFormItem {
   error: string;
 }
 
+/**
+ * PointInfoMatrixRow data contract.
+ */
 export interface PointInfoMatrixRow {
   id: string;
   pointName: string;
@@ -121,6 +124,9 @@ export interface PointInfoMatrixRow {
 type CommandAttributeCell = PointAttributeCell;
 type EventAttributeCell = PointAttributeCell;
 
+/**
+ * CommandInfoMatrixRow data contract.
+ */
 export interface CommandInfoMatrixRow {
   id: string;
   commandName: string;
@@ -130,6 +136,9 @@ export interface CommandInfoMatrixRow {
   attributes: Record<string, CommandAttributeCell>;
 }
 
+/**
+ * EventInfoMatrixRow data contract.
+ */
 export interface EventInfoMatrixRow {
   id: string;
   eventName: string;

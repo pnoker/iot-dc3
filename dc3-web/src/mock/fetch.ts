@@ -353,6 +353,7 @@ const persistMockTurn = (db: MockDb, request: MockChatRequest, prompt: string): 
  * axios mock adapter. In mock builds this installs a fetch interceptor that
  * answers `/api/v3/agentic/chat/completions` with a scripted, chart-bearing,
  * keyword-aware reply so the AI assistant is fully demoable without a backend.
+ * @param db - mock database handle
  */
 export function installAgenticFetchMock(db: MockDb): void {
   const original = window.fetch.bind(window);
@@ -390,7 +391,11 @@ const readRequestBody = async (input: RequestInfo | URL, init?: RequestInit): Pr
   }
 };
 
-/** Mirror the axios adapter: repeated query keys arrive as arrays, not the last value only. */
+/**
+ * Mirror the axios adapter: repeated query keys arrive as arrays, not the last value only.
+ * @param searchParams - search params entries
+ * @returns the collected params object
+ */
 const collectParams = (searchParams: URLSearchParams): Record<string, unknown> => {
   const params: Record<string, unknown> = {};
   for (const [key, value] of searchParams.entries()) {
@@ -409,6 +414,7 @@ const collectParams = (searchParams: URLSearchParams): Record<string, unknown> =
 /**
  * Route native fetch calls used by browser-level fixtures through the same
  * mock handlers as Axios. The production build never imports this module.
+ * @param db - mock database handle
  */
 export function installApiFetchMock(db: MockDb): void {
   const previous = window.fetch.bind(window);

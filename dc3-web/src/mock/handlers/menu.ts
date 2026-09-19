@@ -28,7 +28,13 @@ type MenuRow = Omit<MenuNode, 'children'> & {
   remark?: string;
 };
 
-/** Flatten the seed tree while preserving the parent relationship. */
+/**
+ * Flatten the seed tree while preserving the parent relationship.
+ * @param nodes - nodes entries
+ * @param parentMenuId - parent menu id to scope the request
+ * @param level - current nesting level
+ * @returns the flattened menu rows
+ */
 const flattenMenu = (nodes: MenuNode[], parentMenuId = '0', level = 1): MenuRow[] => {
   const out: MenuRow[] = [];
   for (const node of nodes) {
@@ -49,7 +55,11 @@ const flattenMenu = (nodes: MenuNode[], parentMenuId = '0', level = 1): MenuRow[
 
 const rows: MenuRow[] = flattenMenu(menuTree);
 
-/** Rebuild the nested response expected by the router and tree selectors. */
+/**
+ * Rebuild the nested response expected by the router and tree selectors.
+ * @param source - alarm source filter
+ * @returns the transformed value
+ */
 const buildTree = (source: MenuRow[]): MenuNode[] => {
   const byParent = new Map<string, MenuRow[]>();
   for (const row of source) {
@@ -122,6 +132,9 @@ const filterMenuRows = (body: Record<string, unknown> = {}): MenuRow[] => {
   return rows.filter((row) => included.has(String(row.id)));
 };
 
+/**
+ * Register the menu handlers on the mock dispatch table.
+ */
 export function registerMenuHandlers(): void {
   // Drives the router guard + Layout top nav. menu store takes res when
   // it is an array, so we wrap the tree in an R envelope.
