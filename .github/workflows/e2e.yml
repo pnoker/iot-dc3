@@ -21,6 +21,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
+      - name: Fetch main baseline for spotless ratchet
+        # Shallow PR checkouts have no origin/main ref for ratchetFrom to diff against.
+        run: git fetch origin refs/heads/main:refs/remotes/origin/main --depth=1
+
       - name: Set up JDK 21
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
         with:
@@ -28,6 +32,22 @@ jobs:
           java-version: 21
           cache: maven
           cache-dependency-path: "**/pom.xml"
+
+      - name: Diagnose and refresh cached mockito jar
+        # The surefire/failsafe javaagent keeps failing to open the cached
+        # mockito-core 5.20.0 jar; -U will not replace an existing file, so dump
+        # what is actually on disk and remove the version directory to force a
+        # clean re-download.
+        run: |
+          f="$HOME/.m2/repository/org/mockito/mockito-core/5.20.0/mockito-core-5.20.0.jar"
+          if [ -e "$f" ]; then
+            ls -la "$f"
+            file "$f" || true
+            head -c 64 "$f" | od -c | head -3 || true
+          else
+            echo "mockito jar not yet present"
+          fi
+          rm -rf "$HOME/.m2/repository/org/mockito/mockito-core/5.20.0"
 
       - name: Verify docker availability
         run: |
