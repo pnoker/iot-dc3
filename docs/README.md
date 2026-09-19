@@ -32,10 +32,10 @@
 
 ### 1. [关系库选型指南](./db-dialects.md)
 
-- **回答的问题**:PostgreSQL / MySQL / MariaDB 三方言怎么选,差异到底在哪。
-- **关键结论**:PostgreSQL 默认;MySQL 硬门槛 ≥8.0(窗口函数、CTE、SKIP LOCKED);MariaDB ≥10.6。
-- **最有用的一张表**:"现状矩阵"——upsert 三种方言形态(`ON CONFLICT` / `AS new` 行别名 / `VALUES(col)`)、RETURNING 已弃用、
-  咨询锁(`pg_advisory_xact_lock` 事务级 vs `GET_LOCK` 会话级须 try/finally)、`operate_time` 触发器 vs 列属性、三方言契约套件 8/8。
+- **回答的问题**:为什么平台关系库只保留 PostgreSQL + R2DBC,单方言约束换来什么。
+- **关键结论**:PostgreSQL 18 是唯一支持的关系引擎(JSONB、CTE、RETURNING、TimescaleDB/pgvector 一站覆盖);方言选择器、
+  MySQL/MariaDB 驱动与跨引擎 URL 已删除,未知配置在启动校验阶段直接失败。
+- **最有用的约束**:schema 指纹启动闸门——DDL 哈希不匹配拒绝启动,不做隐式降级或兼容迁移。
 
 ### 2. [时序存储选型指南](./tsdb-stores.md)
 
