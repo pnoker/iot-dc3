@@ -3,7 +3,7 @@
   "version": "2026.5.22",
   "private": true,
   "author": "pnoker",
-  "description": "IoT DC3 Industrial AI IoT Platform frontend — Vue 3 + TypeScript + Element Plus",
+  "description": "IoT DC3 Industrial AI IoT Platform frontend \u2014 Vue 3 + TypeScript + Element Plus",
   "license": "AGPL-3.0-or-later",
   "homepage": "https://github.com/pnoker/iot-dc3",
   "repository": {
@@ -53,7 +53,9 @@
     "test:e2e:sweep:headed": "E2E_HEADLESS=false node tests/e2e/browser-sweep.mjs",
     "test:all": "pnpm run test && pnpm run test:e2e",
     "prepare": "cd .. && git config core.hooksPath .husky/_",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "headers": "find src -name '*.ts' -not -path '*ambient/*' -o -name '*.vue' | xargs node scripts/add-license-header.mjs",
+    "headers:check": "find src -name '*.ts' -not -path '*ambient/*' -o -name '*.vue' | xargs node scripts/add-license-header.mjs --check"
   },
   "dependencies": {
     "@antv/g2": "^5.4.8",

@@ -2,7 +2,7 @@
   "name": "dc3-cli",
   "version": "0.1.0",
   "packageManager": "pnpm@11.24.0",
-  "description": "IoT DC3 Platform CLI — AI-ready command-line interface for the DC3 IoT platform",
+  "description": "IoT DC3 Platform CLI \u2014 AI-ready command-line interface for the DC3 IoT platform",
   "keywords": [
     "iot",
     "dc3",
@@ -33,7 +33,9 @@
     "lint:check": "eslint src",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "headers": "find src -name '*.ts' | xargs node scripts/add-license-header.mjs",
+    "headers:check": "find src -name '*.ts' | xargs node scripts/add-license-header.mjs --check"
   },
   "dependencies": {
     "chalk": "^5.4.0",
