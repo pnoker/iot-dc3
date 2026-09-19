@@ -25,6 +25,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import tools.jackson.core.JsonParser;
 import tools.jackson.core.type.TypeReference;
@@ -40,6 +41,7 @@ import tools.jackson.databind.json.JsonMapper;
  * @author pnoker
  * @since 2016.10.1
  */
+@Slf4j
 public final class JsonUtil {
 
     private static final ObjectMapper OBJECT_MAPPER = getObjectMapper();
@@ -91,6 +93,30 @@ public final class JsonUtil {
             return OBJECT_MAPPER.readValue(text, valueType);
         } catch (Exception e) {
             throw new JsonException(e);
+        }
+    }
+
+    /**
+     * Deserialize a persisted JSON column without failing the read.
+     * Empty text stays null; a malformed or shape-mismatched value logs a warning
+     * carrying the column context and returns null, so a single corrupted row
+     * degrades to a missing extension instead of failing the whole query.
+     *
+     * @param text      JSON string from a persistence column
+     * @param valueType Java object type
+     * @param context   column identifier used in the warning, e.g. "dc3_user.identity_ext"
+     * @param <T>       Java object type
+     * @return Java object, or null when the text is empty or undecodable
+     */
+    public static <T> T parseObjectQuietly(String text, Class<T> valueType, String context) {
+        if (StringUtils.isEmpty(text)) {
+            return null;
+        }
+        try {
+            return OBJECT_MAPPER.readValue(text, valueType);
+        } catch (Exception e) {
+            log.warn("failed to decode {} as {}: {}", context, valueType.getSimpleName(), e.getMessage());
+            return null;
         }
     }
 

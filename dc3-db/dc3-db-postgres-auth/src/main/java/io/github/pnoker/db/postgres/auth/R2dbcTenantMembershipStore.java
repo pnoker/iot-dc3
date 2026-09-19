@@ -197,7 +197,7 @@ public class R2dbcTenantMembershipStore implements ReactiveTenantMembershipStore
         value.setPrincipalType(row.get("principal_type", String.class));
         value.setMembershipStatus(row.get("membership_status", String.class));
         value.setJoinedTime(time(row.get("joined_time")));
-        value.setMembershipExt(json(row.get("membership_ext", String.class)));
+        value.setMembershipExt(json(row.get("membership_ext", String.class), "membership_ext"));
         value.setRemark(row.get("remark", String.class));
         value.setCreatorId(row.get("creator_id", Long.class));
         value.setCreatorName(row.get("creator_name", String.class));
@@ -210,13 +210,8 @@ public class R2dbcTenantMembershipStore implements ReactiveTenantMembershipStore
         return value;
     }
 
-    private JsonExt json(String raw) {
-        if (raw == null) return null;
-        try {
-            return JsonUtil.parseObject(raw, JsonExt.class);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    private JsonExt json(String raw, String column) {
+        return JsonUtil.parseObjectQuietly(raw, JsonExt.class, column);
     }
 
     private LocalDateTime time(Object raw) {

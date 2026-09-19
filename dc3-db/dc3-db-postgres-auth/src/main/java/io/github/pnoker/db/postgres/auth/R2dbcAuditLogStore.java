@@ -165,7 +165,7 @@ public class R2dbcAuditLogStore implements ReactiveAuditLogStore, ReactiveAuditL
         value.setResourceName(row.get("resource_name", String.class));
         value.setStatus(row.get("status", String.class));
         value.setErrorCode(row.get("error_code", String.class));
-        value.setDetailExt(parseJson(row.get("detail_ext", String.class)));
+        value.setDetailExt(parseJson(row.get("detail_ext", String.class), "detail_ext"));
         value.setCreateTime(time(row.get("create_time")));
         Number deleted = row.get("deleted", Number.class);
         value.setDeleted(deleted == null ? null : deleted.byteValue());
@@ -176,13 +176,8 @@ public class R2dbcAuditLogStore implements ReactiveAuditLogStore, ReactiveAuditL
         return DatabaseInstant.toLocalDateTimeUtc(raw);
     }
 
-    private JsonExt parseJson(String raw) {
-        if (raw == null) return null;
-        try {
-            return JsonUtil.parseObject(raw, JsonExt.class);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    private JsonExt parseJson(String raw, String column) {
+        return JsonUtil.parseObjectQuietly(raw, JsonExt.class, column);
     }
 
     private String fingerprint(IdentityAuditLogFilter filter) {

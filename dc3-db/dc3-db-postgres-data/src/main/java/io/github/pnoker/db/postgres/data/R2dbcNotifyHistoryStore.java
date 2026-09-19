@@ -240,8 +240,8 @@ public class R2dbcNotifyHistoryStore implements ReactiveNotifyHistoryStore {
         value.setChannelTypeFlag(number(row.get("channel_type_flag", Number.class)));
         value.setTarget(row.get("target", String.class));
         value.setStatusFlag(number(row.get("status_flag", Number.class)));
-        value.setRequestExt(json(row.get("request_ext", String.class)));
-        value.setResponseExt(json(row.get("response_ext", String.class)));
+        value.setRequestExt(json(row.get("request_ext", String.class), "request_ext"));
+        value.setResponseExt(json(row.get("response_ext", String.class), "response_ext"));
         value.setErrorMessage(row.get("error_message", String.class));
         value.setRetryCount(row.get("retry_count", Integer.class));
         value.setTenantId(row.get("tenant_id", Long.class));
@@ -255,13 +255,8 @@ public class R2dbcNotifyHistoryStore implements ReactiveNotifyHistoryStore {
         return value;
     }
 
-    private JsonExt json(String raw) {
-        if (raw == null) return null;
-        try {
-            return JsonUtil.parseObject(raw, JsonExt.class);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    private JsonExt json(String raw, String column) {
+        return JsonUtil.parseObjectQuietly(raw, JsonExt.class, column);
     }
 
     private Byte number(Number value) {

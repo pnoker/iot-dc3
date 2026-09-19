@@ -38,6 +38,25 @@ class JsonUtilTest {
     }
 
     @Test
+    void parseObjectQuietlyDecodesValidText() {
+        Sample sample = JsonUtil.parseObjectQuietly("{\"name\":\"a\",\"age\":1}", Sample.class, "dc3_test.ext");
+        assertThat(sample).isEqualTo(new Sample("a", 1));
+    }
+
+    @Test
+    void parseObjectQuietlyKeepsEmptyTextNull() {
+        assertThat(JsonUtil.parseObjectQuietly(null, Sample.class, "dc3_test.ext")).isNull();
+        assertThat(JsonUtil.parseObjectQuietly("", Sample.class, "dc3_test.ext")).isNull();
+    }
+
+    @Test
+    void parseObjectQuietlyReturnsNullOnUndecodableText() {
+        assertThat(JsonUtil.parseObjectQuietly("not json", Sample.class, "dc3_test.ext")).isNull();
+        assertThat(JsonUtil.parseObjectQuietly("{\"name\":\"a\",\"age\":\"not-a-number\"}", Sample.class, "dc3_test.ext"))
+                .isNull();
+    }
+
+    @Test
     void parseObjectFromBytes() {
         byte[] bytes = "{\"name\":\"b\",\"age\":2}".getBytes(StandardCharsets.UTF_8);
         Sample sample = JsonUtil.parseObject(bytes, Sample.class);

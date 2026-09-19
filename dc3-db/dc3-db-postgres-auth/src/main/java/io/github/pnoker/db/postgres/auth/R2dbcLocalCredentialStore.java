@@ -152,7 +152,7 @@ public class R2dbcLocalCredentialStore implements ReactiveLocalCredentialStore {
         value.setCredentialType(row.get("credential_type", String.class));
         value.setPasswordHash(row.get("password_hash", String.class));
         value.setPasswordAlgorithm(row.get("password_algorithm", String.class));
-        value.setPasswordParams(json(row.get("password_params", String.class)));
+        value.setPasswordParams(json(row.get("password_params", String.class), "password_params"));
         value.setPasswordUpdatedTime(time(row.get("password_updated_time")));
         value.setPasswordExpireTime(time(row.get("password_expire_time")));
         Number failed = row.get("failed_attempts", Number.class);
@@ -162,7 +162,7 @@ public class R2dbcLocalCredentialStore implements ReactiveLocalCredentialStore {
         value.setRequirePasswordChange(requireChange == null ? null : requireChange.byteValue());
         Number enable = row.get("enable_flag", Number.class);
         value.setEnableFlag(enable == null ? null : enable.byteValue());
-        value.setCredentialExt(json(row.get("credential_ext", String.class)));
+        value.setCredentialExt(json(row.get("credential_ext", String.class), "credential_ext"));
         value.setRemark(row.get("remark", String.class));
         value.setCreatorId(row.get("creator_id", Long.class));
         value.setCreatorName(row.get("creator_name", String.class));
@@ -175,13 +175,8 @@ public class R2dbcLocalCredentialStore implements ReactiveLocalCredentialStore {
         return value;
     }
 
-    private JsonExt json(String raw) {
-        if (raw == null) return null;
-        try {
-            return JsonUtil.parseObject(raw, JsonExt.class);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    private JsonExt json(String raw, String column) {
+        return JsonUtil.parseObjectQuietly(raw, JsonExt.class, column);
     }
 
     private LocalDateTime time(Object raw) {

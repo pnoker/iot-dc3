@@ -339,7 +339,7 @@ public class R2dbcResourceRegistryStore implements ReactiveResourceRegistryStore
         api.setApiName(row.get("api_name", String.class));
         api.setApiCode(row.get("api_code", String.class));
         api.setApiGroup(row.get("api_group", String.class));
-        api.setApiExt(parseJson(row.get("api_ext", String.class)));
+        api.setApiExt(parseJson(row.get("api_ext", String.class), "api_ext"));
         api.setEnableFlag(number(row.get("enable_flag")));
         api.setRemark(row.get("remark", String.class));
         api.setCreatorId(row.get("creator_id", Long.class));
@@ -362,7 +362,7 @@ public class R2dbcResourceRegistryStore implements ReactiveResourceRegistryStore
         resource.setResourceTypeFlag(number(row.get("resource_type_flag")));
         resource.setResourceScopeFlag(number(row.get("resource_scope_flag")));
         resource.setEntityId(row.get("entity_id", Long.class));
-        resource.setResourceExt(parseJson(row.get("resource_ext", String.class)));
+        resource.setResourceExt(parseJson(row.get("resource_ext", String.class), "resource_ext"));
         resource.setEnableFlag(number(row.get("enable_flag")));
         resource.setRemark(row.get("remark", String.class));
         resource.setCreatorId(row.get("creator_id", Long.class));
@@ -375,13 +375,8 @@ public class R2dbcResourceRegistryStore implements ReactiveResourceRegistryStore
         return resource;
     }
 
-    private JsonExt parseJson(String value) {
-        if (value == null) return null;
-        try {
-            return JsonUtil.parseObject(value, JsonExt.class);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    private JsonExt parseJson(String value, String column) {
+        return JsonUtil.parseObjectQuietly(value, JsonExt.class, column);
     }
 
     private String json(Object value) {

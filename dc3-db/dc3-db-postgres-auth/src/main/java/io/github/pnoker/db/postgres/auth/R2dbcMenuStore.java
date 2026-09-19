@@ -273,7 +273,7 @@ public class R2dbcMenuStore implements ReactiveMenuStore {
         menu.setMenuCode(row.get("menu_code", String.class));
         menu.setMenuLevel(number(row.get("menu_level")));
         menu.setMenuIndex(number(row.get("menu_index")));
-        menu.setMenuExt(parseJson(row.get("menu_ext", String.class)));
+        menu.setMenuExt(parseJson(row.get("menu_ext", String.class), "menu_ext"));
         menu.setEnableFlag(number(row.get("enable_flag")));
         menu.setRemark(row.get("remark", String.class));
         menu.setCreatorId(row.get("creator_id", Long.class));
@@ -286,9 +286,8 @@ public class R2dbcMenuStore implements ReactiveMenuStore {
         return menu;
     }
 
-    private JsonExt parseJson(String value) {
-        if (value == null) return null;
-        return JsonUtil.parseObject(value, JsonExt.class);
+    private JsonExt parseJson(String value, String column) {
+        return JsonUtil.parseObjectQuietly(value, JsonExt.class, column);
     }
 
     private Byte number(Object value) {

@@ -338,7 +338,7 @@ public class R2dbcResourceStore implements ReactiveResourceStore {
         resource.setResourceTypeFlag(number(row.get("resource_type_flag")));
         resource.setResourceScopeFlag(number(row.get("resource_scope_flag")));
         resource.setEntityId(row.get("entity_id", Long.class));
-        resource.setResourceExt(parseJson(row.get("resource_ext", String.class)));
+        resource.setResourceExt(parseJson(row.get("resource_ext", String.class), "resource_ext"));
         resource.setEnableFlag(number(row.get("enable_flag")));
         resource.setRemark(row.get("remark", String.class));
         resource.setCreatorId(row.get("creator_id", Long.class));
@@ -351,13 +351,8 @@ public class R2dbcResourceStore implements ReactiveResourceStore {
         return resource;
     }
 
-    private JsonExt parseJson(String value) {
-        if (value == null) return null;
-        try {
-            return JsonUtil.parseObject(value, JsonExt.class);
-        } catch (RuntimeException ignored) {
-            return null;
-        }
+    private JsonExt parseJson(String value, String column) {
+        return JsonUtil.parseObjectQuietly(value, JsonExt.class, column);
     }
 
     private Byte number(Object value) {
