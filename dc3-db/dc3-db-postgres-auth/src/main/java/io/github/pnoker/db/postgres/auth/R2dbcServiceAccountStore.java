@@ -308,7 +308,8 @@ public class R2dbcServiceAccountStore implements ReactiveServiceAccountStore {
         value.setPurpose(row.get("purpose", String.class));
         value.setExpireTime(time(row.get("expire_time")));
         value.setLastUsedTime(time(row.get("last_used_time")));
-        value.setCredentialPolicyExt(jsonObject(row.get("credential_policy_ext", String.class), "credential_policy_ext"));
+        value.setCredentialPolicyExt(
+                jsonObject(row.get("credential_policy_ext", String.class), "credential_policy_ext"));
         Number flag = row.get("enable_flag", Number.class);
         value.setEnableFlag(flag == null ? null : flag.byteValue());
         value.setRemark(row.get("remark", String.class));
