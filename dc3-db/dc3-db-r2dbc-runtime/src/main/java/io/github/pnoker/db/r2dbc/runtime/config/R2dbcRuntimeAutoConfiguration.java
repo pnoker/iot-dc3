@@ -63,7 +63,7 @@ public class R2dbcRuntimeAutoConfiguration {
         long count = dialects.stream().count();
         if (count != 1) {
             throw new IllegalStateException(
-                    "dc3.db.type must select exactly one R2DBC dialect adapter; found " + count);
+                    "exactly one R2DBC dialect adapter must be registered; found " + count);
         }
         return new Object();
     }
@@ -106,7 +106,7 @@ public class R2dbcRuntimeAutoConfiguration {
             ObjectProvider<R2dbcDialect> dialects) {
         R2dbcDialect dialect = dialects.getIfUnique();
         if (dialect == null) {
-            throw new IllegalStateException("dc3.db.type must select exactly one R2DBC dialect adapter");
+            throw new IllegalStateException("exactly one R2DBC dialect adapter must be registered");
         }
         return new SchemaFingerprintVerifier(connectionFactory, properties, dialect);
     }

@@ -20,15 +20,10 @@ not supported runtime paths.
 
 ## Selection
 
-The only supported relational engine is PostgreSQL. The dialect is fixed to `postgres` in the
-runtime configuration; changing the database requires a deliberate architecture change, not a
-runtime compatibility switch.
-
-```yaml
-dc3:
-  db:
-    type: postgres
-```
+The only supported relational engine is PostgreSQL. The postgres dialect registers
+unconditionally; the runtime rejects startup unless exactly one `R2dbcDialect` bean is present.
+Changing the database requires a deliberate architecture change, not a runtime compatibility
+switch.
 
 ## Build and verify
 

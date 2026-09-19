@@ -1,9 +1,7 @@
 # Spring Boot owns the single R2DBC ConnectionFactory/pool. Centers must configure
 # spring.r2dbc.url and spring.r2dbc.pool.*; this module never wraps another pool.
+# PostgreSQL is the single supported relational engine.
 dc3:
-  db:
-    # PostgreSQL is the single supported relational engine.
-    type: postgres
   r2dbc:
     # A center must provide exactly one spring.r2dbc.url.
     schema-fingerprint: ${DC3_SCHEMA_FINGERPRINT:}

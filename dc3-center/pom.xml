@@ -80,6 +80,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- PostgreSQL is the single supported relational engine; its dialect ships unconditionally. -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-db-r2dbc-postgres</artifactId>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -91,24 +97,5 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>r2dbc-postgres</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-                <property>
-                    <name>dc3.db.type</name>
-                    <value>postgres</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>io.github.pnoker</groupId>
-                    <artifactId>dc3-db-r2dbc-postgres</artifactId>
-                    <scope>runtime</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 
 </project>
