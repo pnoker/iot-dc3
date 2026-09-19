@@ -414,8 +414,6 @@ DB-UPSTREAM 不能继续只加载裁剪版 history 后宣称生产初始化通�
 - `R2dbcPointCommandContext`
 - `R2dbcRuleStateLookup`
 - `R2dbcOperationRepository`
-- `R2dbcPageExecutor`
-- `R2dbcCursorExecutor`
 - `SchemaFingerprintVerifier` / startup validator
 - `SpringR2dbcPageTransaction`
 - DDL 中所有 lock、lease、operation、outbox runtime table 的真实 owner
