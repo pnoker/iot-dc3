@@ -17,6 +17,9 @@
 package io.github.pnoker.db.r2dbc.core.time;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
@@ -28,5 +31,19 @@ public final class DatabaseInstant {
     /** Normalize the instant to UTC microseconds. */
     public static Instant normalize(Instant instant) {
         return Objects.requireNonNull(instant, "instant must not be null").truncatedTo(ChronoUnit.MICROS);
+    }
+
+    /**
+     * Decode a driver timestamp column into a UTC {@link LocalDateTime}.
+     * Null stays null; any non-null value of an unexpected type fails fast instead of
+     * degrading to null, so a broken decode is observable at the call site.
+     */
+    public static LocalDateTime toLocalDateTimeUtc(Object raw) {
+        if (raw == null) return null;
+        if (raw instanceof LocalDateTime value) return value;
+        if (raw instanceof OffsetDateTime value)
+            return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+        if (raw instanceof Instant value) return LocalDateTime.ofInstant(value, ZoneOffset.UTC);
+        throw new IllegalStateException("unsupported timestamp type: " + raw.getClass().getName());
     }
 }

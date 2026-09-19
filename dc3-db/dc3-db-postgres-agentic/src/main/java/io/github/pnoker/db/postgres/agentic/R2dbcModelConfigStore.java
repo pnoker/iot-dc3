@@ -22,9 +22,8 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.UuidV7;
-import java.time.Instant;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -283,11 +282,7 @@ public class R2dbcModelConfigStore implements ReactiveModelConfigStore {
     }
 
     private LocalDateTime time(Object value) {
-        if (value instanceof LocalDateTime local) return local;
-        if (value instanceof Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        if (value instanceof OffsetDateTime offset)
-            return offset.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        return null;
+        return DatabaseInstant.toLocalDateTimeUtc(value);
     }
 
     private void validateHeader(RequestHeader.PrincipalHeader header) {

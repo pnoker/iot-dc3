@@ -26,6 +26,7 @@ import io.github.pnoker.common.auth.entity.oauth.OAuthRegisteredClientRecord;
 import io.github.pnoker.common.auth.repository.ReactiveOAuthMcpStore;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -905,11 +906,7 @@ public class R2dbcMcpRuntimeStore implements ReactiveOAuthMcpStore {
     }
 
     private LocalDateTime time(Object value) {
-        if (value instanceof LocalDateTime local) return local;
-        if (value instanceof java.time.OffsetDateTime offset)
-            return offset.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        if (value instanceof Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        return null;
+        return DatabaseInstant.toLocalDateTimeUtc(value);
     }
 
     private Instant toInstant(LocalDateTime value) {

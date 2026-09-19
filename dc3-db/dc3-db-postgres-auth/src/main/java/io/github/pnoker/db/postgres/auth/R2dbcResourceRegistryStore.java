@@ -23,9 +23,9 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -413,10 +413,6 @@ public class R2dbcResourceRegistryStore implements ReactiveResourceRegistryStore
     }
 
     private LocalDateTime time(Object value) {
-        if (value instanceof LocalDateTime local) return local;
-        if (value instanceof OffsetDateTime offset)
-            return offset.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        if (value instanceof Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        return null;
+        return DatabaseInstant.toLocalDateTimeUtc(value);
     }
 }

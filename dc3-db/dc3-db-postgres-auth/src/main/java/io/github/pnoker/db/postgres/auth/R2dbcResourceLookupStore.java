@@ -20,10 +20,8 @@ import io.github.pnoker.common.auth.entity.model.ResourceDO;
 import io.github.pnoker.common.auth.repository.ReactiveResourceLookupStore;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
-import java.time.Instant;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -101,10 +99,6 @@ public class R2dbcResourceLookupStore implements ReactiveResourceLookupStore {
     }
 
     private LocalDateTime time(Object raw) {
-        if (raw instanceof LocalDateTime value) return value;
-        if (raw instanceof OffsetDateTime value)
-            return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        if (raw instanceof Instant value) return LocalDateTime.ofInstant(value, ZoneOffset.UTC);
-        return null;
+        return DatabaseInstant.toLocalDateTimeUtc(raw);
     }
 }

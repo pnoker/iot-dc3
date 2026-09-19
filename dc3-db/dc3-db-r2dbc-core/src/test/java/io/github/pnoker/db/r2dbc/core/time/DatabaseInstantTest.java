@@ -17,8 +17,13 @@
 package io.github.pnoker.db.r2dbc.core.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import org.junit.jupiter.api.Test;
 
 class DatabaseInstantTest {
@@ -28,5 +33,36 @@ class DatabaseInstantTest {
         assertEquals(
                 Instant.parse("2026-08-28T01:02:03.123456Z"),
                 DatabaseInstant.normalize(Instant.parse("2026-08-28T01:02:03.123456789Z")));
+    }
+
+    @Test
+    void decodesLocalDateTimeAsIs() {
+        LocalDateTime value = LocalDateTime.of(2026, 9, 19, 12, 0);
+        assertEquals(value, DatabaseInstant.toLocalDateTimeUtc(value));
+    }
+
+    @Test
+    void decodesOffsetDateTimeToUtc() {
+        OffsetDateTime value = OffsetDateTime.of(2026, 9, 19, 14, 0, 0, 0, ZoneOffset.ofHours(2));
+        assertEquals(LocalDateTime.of(2026, 9, 19, 12, 0), DatabaseInstant.toLocalDateTimeUtc(value));
+    }
+
+    @Test
+    void decodesInstantToUtc() {
+        assertEquals(
+                LocalDateTime.of(2026, 9, 19, 12, 0),
+                DatabaseInstant.toLocalDateTimeUtc(Instant.parse("2026-09-19T12:00:00Z")));
+    }
+
+    @Test
+    void keepsNullAsNull() {
+        assertNull(DatabaseInstant.toLocalDateTimeUtc(null));
+    }
+
+    @Test
+    void failsFastOnUnsupportedTimestampType() {
+        IllegalStateException error =
+                assertThrows(IllegalStateException.class, () -> DatabaseInstant.toLocalDateTimeUtc("2026-09-19"));
+        assertEquals("unsupported timestamp type: java.lang.String", error.getMessage());
     }
 }

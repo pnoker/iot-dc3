@@ -18,8 +18,8 @@ package io.github.pnoker.db.postgres.data;
 
 import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.data.repository.ReactivePointValueLatestStore;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
@@ -154,11 +154,7 @@ public class R2dbcPointValueLatestStore implements ReactivePointValueLatestStore
     }
 
     private LocalDateTime time(Object value) {
-        if (value instanceof LocalDateTime local) return local;
-        if (value instanceof OffsetDateTime offset)
-            return offset.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        if (value instanceof java.time.Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        return null;
+        return DatabaseInstant.toLocalDateTimeUtc(value);
     }
 
     @SuppressWarnings("unchecked")
