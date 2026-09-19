@@ -81,8 +81,7 @@ Mono<Long> count(SeriesFilter filter, TimeWindow window, TsdbDeadline deadline);
 
 1. `samples` 不得为 `null`、空或含 `null`，数量不得超过 `capabilities.maxAppendBatch`。
 2. 每个样本的租户、设备、点、driver identity、fencing token 和时间都经过正数/范围校验。
-3. PostgreSQL 使用 `ON CONFLICT`，MySQL 方言使用 `ON DUPLICATE KEY UPDATE`；两者都绑定全部参数，
-   不拼接用户输入。
+3. Upsert 使用 `ON CONFLICT`，绑定全部参数，不拼接用户输入。
 4. 返回接受数量；任意行失败时整批失败，不返回部分成功。
 
 ### 读取不变量
