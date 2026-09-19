@@ -25,6 +25,10 @@ import {
 
 const EVENT_BASE = '/api/v3/manager/event';
 
+/**
+ * Register the `event` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerEventCommand(program: Command): void {
   const event = program.command('event').description('Event management (runtime data)');
 

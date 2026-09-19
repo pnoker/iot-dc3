@@ -14,17 +14,26 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+/**
+ * Sort field and direction applied to list queries.
+ */
 export interface SortSpec {
   field: string;
   direction: 'ASC' | 'DESC';
 }
 
+/**
+ * Offset-based paging request shared by list endpoints.
+ */
 export interface PageRequest {
   offset: number;
   limit: number;
   sort?: SortSpec[];
 }
 
+/**
+ * Offset-paged response wrapper over records.
+ */
 export interface OffsetPage<T> {
   items: T[];
   offset: number;
@@ -33,12 +42,18 @@ export interface OffsetPage<T> {
   hasNext: boolean;
 }
 
+/**
+ * Cursor-paged response wrapper for large history scans.
+ */
 export interface CursorPage<T> {
   items: T[];
   nextCursor: string | null;
   hasNext: boolean;
 }
 
+/**
+ * RFC 7807 problem details returned on gateway errors.
+ */
 export interface ProblemDetails {
   type: string;
   title: string;
@@ -50,14 +65,23 @@ export interface ProblemDetails {
   errors?: Record<string, string[]>;
 }
 
+/**
+ * HTTP 202 Accepted envelope for asynchronous operations.
+ */
 export interface OperationAccepted {
   operationId: string;
   statusUri: string;
 }
 
+/**
+ * Lifecycle status of an asynchronous operation.
+ */
 export type OperationStatus =
   'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'CANCELLED' | 'EXPIRED';
 
+/**
+ * Operation progress view polled from the status endpoint.
+ */
 export interface OperationView {
   operationId: string;
   status: OperationStatus;

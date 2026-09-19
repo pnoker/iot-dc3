@@ -22,6 +22,7 @@ import { detectFormat, printAndExit } from '../utils/format.js';
  * Session & action plane of the agentic center: conversation lifecycle plus the
  * high-risk tool-call approval loop (docs/design/token-unification-mcp-first-cli.md
  * Q2 — CLI TTY confirmation channel). All routes live under /api/v3/agentic.
+ * @param program - commander program to attach the command to
  */
 export function registerSessionCommand(program: Command): void {
   const session = program.command('session').description('Agentic conversation sessions');
@@ -99,6 +100,10 @@ export function registerSessionCommand(program: Command): void {
     });
 }
 
+/**
+ * Register the `action` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerActionCommand(program: Command): void {
   const action = program
     .command('action')

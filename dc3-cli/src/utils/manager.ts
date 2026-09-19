@@ -19,6 +19,11 @@ import { dc3Client } from '../core/client.js';
 
 type ManagerResource = Record<string, unknown>;
 
+/**
+ * Parse a CLI option as a non-negative integer.
+ * @param value - value to set
+ * @returns the transformed value
+ */
 export function parseNonNegativeInteger(value: string): number {
   const parsed = Number(value);
   if (!Number.isSafeInteger(parsed) || parsed < 0) {
@@ -27,6 +32,11 @@ export function parseNonNegativeInteger(value: string): number {
   return parsed;
 }
 
+/**
+ * Parse a CLI option as a positive integer.
+ * @param value - value to set
+ * @returns the transformed value
+ */
 export function parsePositiveInteger(value: string): number {
   const parsed = Number(value);
   if (!Number.isSafeInteger(parsed) || parsed < 1) {
@@ -35,6 +45,14 @@ export function parsePositiveInteger(value: string): number {
   return parsed;
 }
 
+/**
+ * Update a manager resource and report the result.
+ * @param basePath - manager resource base path (e.g. device)
+ * @param id - resource id to update
+ * @param expectedVersion - version for optimistic locking
+ * @param changes - fields to merge over the current record
+ * @returns the operation result
+ */
 export async function updateManagerResource<T = unknown>(
   basePath: string,
   id: string,
@@ -52,6 +70,12 @@ export async function updateManagerResource<T = unknown>(
   });
 }
 
+/**
+ * Delete a manager resource and report the result.
+ * @param basePath - manager resource base path (e.g. device)
+ * @param id - resource id to delete
+ * @param expectedVersion - version for optimistic locking
+ */
 export async function deleteManagerResource(
   basePath: string,
   id: string,

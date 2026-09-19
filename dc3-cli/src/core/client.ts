@@ -38,6 +38,12 @@ export class Dc3Client {
 
   /**
    * Main request method. Call this for every API operation.
+   * @param method - HTTP method for the request
+   * @param path - gateway-relative request path
+   * @param body - request body payload
+   * @param retryOn401 - whether to retry once after a silent token renewal
+   * @param extraHeaders - headers merged into the request
+   * @returns the decoded response body
    */
   async request<T = unknown>(
     method: string,
@@ -141,6 +147,10 @@ export class Dc3Client {
   /**
    * Renew the token: salt → generate → persist.
    * Returns true on success, false if password is unavailable.
+   * @param profileName - profile name used for the lookup
+   * @param tenant - tenant name sent with the salt request
+   * @param username - login username
+   * @returns true when the token was renewed
    */
   async renewToken(profileName: string, tenant: string, username: string): Promise<boolean> {
     const current = await tokenManager.getState(profileName);
@@ -208,6 +218,11 @@ export class Dc3Client {
    * client_credentials grant bound to a service account; tenant and principal come
    * from that registration. Stores an 'oauth'-type state whose requests travel as
    * Authorization: Bearer and are verified at the gateway via JWKS when enabled.
+   * @param clientId - client id to scope the request
+   * @param clientSecret - client secret issued with the registration
+   * @param scope - space-separated scope list to request
+   * @param profileName - profile name used for the lookup
+   * @returns the issued token with expiry and granted scope
    */
   async loginOAuth(
     clientId: string,
@@ -256,6 +271,11 @@ export class Dc3Client {
 
   /**
    * Perform the full login flow (salt → generate) and persist tokens.
+   * @param tenant - tenant name for the login
+   * @param username - login username
+   * @param password - login password
+   * @param profileName - profile name used for the lookup
+   * @returns the issued token with expiry
    */
   async login(
     tenant: string,
@@ -305,6 +325,7 @@ export class Dc3Client {
 
   /**
    * Logout: call cancel endpoint + clear local state.
+   * @param profileName - profile name used for the lookup
    */
   async logout(profileName: string): Promise<void> {
     const state = await tokenManager.getState(profileName);
@@ -357,6 +378,9 @@ export class Dc3Client {
   }
 }
 
+/**
+ * Error thrown when the gateway rejects authentication (HTTP 401).
+ */
 export class AuthError extends Error {
   constructor(message: string) {
     super(message);
@@ -364,6 +388,9 @@ export class AuthError extends Error {
   }
 }
 
+/**
+ * Error thrown for non-2xx gateway responses, carrying status and problem details.
+ */
 export class ApiError extends Error {
   public readonly statusCode: number;
 
@@ -374,7 +401,11 @@ export class ApiError extends Error {
   }
 }
 
-/** Validate the direct token resource returned by the auth endpoint. */
+/**
+ * Validate the direct token resource returned by the auth endpoint.
+ * @param value - value to set
+ * @returns the transformed value
+ */
 export function parseTokenResource(value: unknown): string {
   if (typeof value !== 'string' || !/^eyJ[\w-]*\.[\w-]*\.[\w-]*$/u.test(value)) {
     throw new Error('Token endpoint returned an invalid resource');
@@ -385,6 +416,9 @@ export function parseTokenResource(value: unknown): string {
 /**
  * Parse a scalar auth resource (salt, token). The auth endpoints answer as
  * text/plain with a bare value; a JSON-encoded string is tolerated as well.
+ * @param body - request body payload
+ * @param label - display label
+ * @returns the transformed value
  */
 export function parseScalarResource(body: string, label: string): string {
   const trimmed = body.trim();

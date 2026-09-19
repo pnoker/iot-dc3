@@ -24,6 +24,7 @@ import { detectFormat, printAndExit } from '../utils/format.js';
  *
  * First step of the Phase-3 direction (docs/design/token-unification-mcp-first-cli.md
  * §4): commands start reading the machine-readable catalog instead of hard-coded paths.
+ * @param program - commander program to attach the command to
  */
 export function registerToolCommand(program: Command): void {
   const tools = program

@@ -49,8 +49,17 @@ export const ConfigSchema = z.object({
   profiles: z.record(z.string(), ProfileConfigSchema),
 });
 
+/**
+ * Per-profile persisted settings (gateway url, credentials, output format).
+ */
 export type ProfileConfig = z.infer<typeof ProfileConfigSchema>;
+/**
+ * Application-wide settings derived from the active profile.
+ */
 export type AppSettings = z.infer<typeof AppSettingsSchema>;
+/**
+ * Root configuration shape persisted to the CLI config file.
+ */
 export type Config = z.infer<typeof ConfigSchema>;
 
 const CONFIG_DIR = join(homedir(), '.dc3');
@@ -118,6 +127,7 @@ export class ConfigManager {
 
   /**
    * Get the active profile, merging with defaults.
+   * @returns the active profile merged with defaults
    */
   async getActiveProfile(): Promise<ProfileConfig> {
     const config = await this.load();
@@ -131,6 +141,7 @@ export class ConfigManager {
 
   /**
    * Get settings from config.
+   * @returns the application-wide settings
    */
   async getSettings(): Promise<AppSettings> {
     const config = await this.load();
@@ -139,6 +150,7 @@ export class ConfigManager {
 
   /**
    * Get all profiles.
+   * @returns all profiles keyed by name
    */
   async getAllProfiles(): Promise<Record<string, ProfileConfig>> {
     const config = await this.load();
@@ -147,6 +159,8 @@ export class ConfigManager {
 
   /**
    * Set a profile value and save.
+   * @param profileName - profile name used for the lookup
+   * @param partial - profile fields to overwrite
    */
   async setProfile(profileName: string, partial: Partial<ProfileConfig>): Promise<void> {
     const config = await this.load();
@@ -163,6 +177,7 @@ export class ConfigManager {
 
   /**
    * Switch the active profile.
+   * @param name - resource name
    */
   async switchProfile(name: string): Promise<void> {
     const config = await this.load();
@@ -178,6 +193,7 @@ export class ConfigManager {
 
   /**
    * Delete a profile.
+   * @param name - resource name
    */
   async deleteProfile(name: string): Promise<void> {
     const config = await this.load();
@@ -194,6 +210,8 @@ export class ConfigManager {
 
   /**
    * Set a settings value.
+   * @param key - lookup key
+   * @param value - value to set
    */
   async setSetting<K extends keyof AppSettings>(key: K, value: AppSettings[K]): Promise<void> {
     const config = await this.load();

@@ -36,6 +36,9 @@ export interface TokenState {
   scope?: string[];
 }
 
+/**
+ * Token lifecycle states tracked by the token manager.
+ */
 export interface TokenStates {
   [profile: string]: TokenState;
 }
@@ -74,6 +77,8 @@ export class TokenManager {
 
   /**
    * Get token state for a profile. Returns null if not logged in.
+   * @param profile - profile name whose state to read
+   * @returns the stored token state, or null when not logged in
    */
   async getState(profile: string): Promise<TokenState | null> {
     await this.load();
@@ -82,6 +87,8 @@ export class TokenManager {
 
   /**
    * Save or update token state.
+   * @param state - token state to persist
+   * @param profile - profile name to save the state under
    */
   async saveState(state: TokenState, profile: string): Promise<void> {
     await this.load();
@@ -91,6 +98,7 @@ export class TokenManager {
 
   /**
    * Clear token state (logout).
+   * @param profile - profile name whose state to clear
    */
   async clearState(profile: string): Promise<void> {
     await this.load();
@@ -108,7 +116,9 @@ export class TokenManager {
 
   /**
    * Check if the token for a profile needs renewal.
+   * @param profile - profile name whose token to check
    * @param thresholdSec — renew if expiring within this many seconds
+   * @returns true when the token expires within the threshold
    */
   async needsRenewal(profile: string, thresholdSec: number): Promise<boolean> {
     const state = await this.getState(profile);
@@ -118,6 +128,8 @@ export class TokenManager {
 
   /**
    * Get remaining TTL in seconds. Negative if expired.
+   * @param profile - profile name whose token to inspect
+   * @returns remaining seconds, negative when already expired
    */
   async getTtl(profile: string): Promise<number | null> {
     const state = await this.getState(profile);
@@ -127,6 +139,8 @@ export class TokenManager {
 
   /**
    * Check if a profile has an active token.
+   * @param profile - profile name to check
+   * @returns true when the profile holds an unexpired token
    */
   async isAuthenticated(profile: string): Promise<boolean> {
     const state = await this.getState(profile);
@@ -136,6 +150,7 @@ export class TokenManager {
 
   /**
    * Load all states (for status display).
+   * @returns all persisted states keyed by profile
    */
   async getAllStates(): Promise<TokenStates> {
     await this.load();
@@ -144,6 +159,8 @@ export class TokenManager {
 
   /**
    * Build the X-Auth-* headers from token state.
+   * @param state - token state to derive headers from
+   * @returns auth headers for the next request
    */
   buildHeaders(state: TokenState): Record<string, string> {
     if (state.authType === 'oauth') {

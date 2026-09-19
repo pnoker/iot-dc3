@@ -22,6 +22,10 @@ import { savePasswordToStore, deletePasswordFromStore } from '../core/credential
 import { detectFormat, printAndExit } from '../utils/format.js';
 import { prompt, passwordPrompt } from '../utils/prompt.js';
 
+/**
+ * Register the `auth` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerAuthCommand(program: Command): void {
   const auth = program.command('auth').description('Authentication management');
 
@@ -99,6 +103,11 @@ export function registerAuthCommand(program: Command): void {
   /**
    * OAuth client_credentials flow (hidden behind --oauth until gateway-side RS256
    * verification is enabled in deployments; see token-unification-mcp-first-cli.md).
+   * @param options - command options
+   * @param options.clientId - client id to scope the request
+   * @param options.clientSecret - client secret issued with the registration
+   * @param options.scope - space-separated scope list to request
+   * @param format - output format for the rendered result
    */
   async function loginOAuthAction(
     options: { clientId?: string; clientSecret?: string; scope?: string },

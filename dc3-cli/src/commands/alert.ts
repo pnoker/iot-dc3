@@ -18,6 +18,10 @@ import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
+/**
+ * Register the `alert` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerAlertCommand(program: Command): void {
   const alert = program.command('alert').description('Alarm/alert management');
 

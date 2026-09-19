@@ -18,6 +18,10 @@ import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
+/**
+ * Register the `dashboard` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerDashboardCommand(program: Command): void {
   const dash = program.command('dashboard').description('Dashboard and monitoring');
 

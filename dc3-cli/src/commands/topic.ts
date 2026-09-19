@@ -18,6 +18,10 @@ import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
+/**
+ * Register the `topic` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerTopicCommand(program: Command): void {
   const topic = program.command('topic').description('MQTT topic management (read-only)');
 

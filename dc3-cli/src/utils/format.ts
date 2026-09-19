@@ -69,8 +69,17 @@ function formatTable(data: unknown): string {
   return String(data);
 }
 
+/**
+ * Supported output render formats (json, table, yaml).
+ */
 export type OutputFormat = 'json' | 'table' | 'yaml';
 
+/**
+ * Render a payload in the requested output format.
+ * @param data - payload to render or send
+ * @param format - output format for the rendered result
+ * @returns the transformed value
+ */
 export function formatOutput(data: unknown, format: OutputFormat = 'json'): string {
   if (data === undefined) return '';
   switch (format) {
@@ -98,6 +107,8 @@ export function formatOutput(data: unknown, format: OutputFormat = 'json'): stri
 
 /**
  * Detect the best output format: table for interactive TTY, json otherwise.
+ * @param explicit - format requested via --format, if any
+ * @returns the format to render with
  */
 export function detectFormat(explicit?: string): OutputFormat {
   if (explicit === 'json' || explicit === 'table' || explicit === 'yaml') {
@@ -108,6 +119,9 @@ export function detectFormat(explicit?: string): OutputFormat {
 
 /**
  * Print formatted output and exit. Used at the end of every command.
+ * @param data - payload to render or send
+ * @param format - output format for the rendered result
+ * @param exitCode - process exit code
  */
 export function printAndExit(data: unknown, format: OutputFormat = 'json', exitCode = 0): never {
   const output = formatOutput(data, format);

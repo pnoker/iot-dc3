@@ -21,6 +21,9 @@
  * Each backend is tried in order; first one that returns a password wins.
  */
 
+/**
+ * Storage contract for persisted credentials.
+ */
 export interface CredentialStore {
   /** Human-readable name for the store */
   readonly name: string;
@@ -75,6 +78,8 @@ function selectStore(storeType: string): CredentialStore {
 /**
  * Try to get the password from the configured store.
  * Returns null if not available or not found.
+ * @param identifier - username the password belongs to
+ * @returns the stored password, or null when unavailable
  */
 export async function resolvePassword(identifier: string): Promise<string | null> {
   try {
@@ -91,6 +96,8 @@ export async function resolvePassword(identifier: string): Promise<string | null
 
 /**
  * Save password to the configured store.
+ * @param identifier - username the password belongs to
+ * @param password - plaintext password to persist
  */
 export async function savePasswordToStore(identifier: string, password: string): Promise<void> {
   const profile = await configManager.getActiveProfile();
@@ -102,6 +109,7 @@ export async function savePasswordToStore(identifier: string, password: string):
 
 /**
  * Delete password from the configured store.
+ * @param identifier - username the password belongs to
  */
 export async function deletePasswordFromStore(identifier: string): Promise<void> {
   try {

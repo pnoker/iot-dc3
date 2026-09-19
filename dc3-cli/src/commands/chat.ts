@@ -18,6 +18,10 @@ import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
+/**
+ * Register the `chat` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerChatCommand(program: Command): void {
   const chat = program.command('chat').description('AI chat (agentic service)');
 

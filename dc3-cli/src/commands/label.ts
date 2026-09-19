@@ -18,6 +18,10 @@ import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
+/**
+ * Register the `label` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerLabelCommand(program: Command): void {
   const label = program.command('label').description('Label management');
 

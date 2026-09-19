@@ -47,6 +47,10 @@ async function waitForOperation(
   }
 }
 
+/**
+ * Register the `device` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerDeviceCommand(program: Command): void {
   const device = program.command('device').description('Device management');
 

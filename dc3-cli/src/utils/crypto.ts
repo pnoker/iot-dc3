@@ -18,6 +18,8 @@ import { createHash } from 'node:crypto';
 
 /**
  * SHA-256 hash, used for encrypted credential storage.
+ * @param input - value to hash
+ * @returns the hex-encoded digest
  */
 export function sha256(input: string): string {
   return createHash('sha256').update(input).digest('hex');
@@ -25,6 +27,8 @@ export function sha256(input: string): string {
 
 /**
  * Random bytes generator for IV/salt in credential encryption.
+ * @param size - byte count to generate
+ * @returns the random bytes
  */
 export function randomBytes(size: number): Buffer {
   const { randomBytes: rb } = require('node:crypto');

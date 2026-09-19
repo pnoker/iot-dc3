@@ -25,6 +25,10 @@ import {
 
 const DRIVER_BASE = '/api/v3/manager/driver';
 
+/**
+ * Register the `driver` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerDriverCommand(program: Command): void {
   const driver = program.command('driver').description('Driver management');
 

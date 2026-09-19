@@ -34,6 +34,7 @@ const OPS = [
  * Analytics command group — the nine coarse-grained statistical reads the backend
  * exposes for agents (docs/design/tsdb-abstraction.md S19 surface): each op posts a
  * single JSON body and returns one self-contained conclusion.
+ * @param program - commander program to attach the command to
  */
 export function registerAnalyticsCommand(program: Command): void {
   const analytics = program

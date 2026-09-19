@@ -25,6 +25,10 @@ import {
 
 const POINT_BASE = '/api/v3/manager/point';
 
+/**
+ * Register the `point` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerPointCommand(program: Command): void {
   const point = program.command('point').description('Point (datapoint) management');
 

@@ -71,6 +71,7 @@ export class McpClient {
 
   /**
    * List tools visible to this ticket's scopes.
+   * @returns the tools visible to this ticket's scopes
    */
   listTools(): Promise<{ tools?: Array<Record<string, unknown>> }> {
     return this.rpc('tools/list');
@@ -78,6 +79,9 @@ export class McpClient {
 
   /**
    * Invoke a tool; args become params.arguments per the MCP spec.
+   * @param toolName - tool name used for the lookup
+   * @param args - tool arguments forwarded as params.arguments
+   * @returns the raw tool result payload
    */
   callTool(toolName: string, args: Record<string, unknown>): Promise<unknown> {
     return this.rpc('tools/call', { name: toolName, arguments: args });

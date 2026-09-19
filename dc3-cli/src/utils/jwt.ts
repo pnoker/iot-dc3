@@ -26,6 +26,11 @@ export interface JwtPayload {
   exp: number;
 }
 
+/**
+ * Decode a JWT payload without verifying the signature.
+ * @param token - bearer token sent with the request
+ * @returns the transformed value
+ */
 export function decodeJwt(token: string): JwtPayload {
   const parts = token.split('.');
   if (parts.length !== 3) {
@@ -37,6 +42,9 @@ export function decodeJwt(token: string): JwtPayload {
 
 /**
  * Check if a JWT token is expired or will expire within the given threshold seconds.
+ * @param token - bearer token sent with the request
+ * @param thresholdSec - renewal window in seconds
+ * @returns whether the condition holds
  */
 export function isTokenExpired(token: string, thresholdSec = 0): boolean {
   const { exp } = decodeJwt(token);
@@ -46,6 +54,8 @@ export function isTokenExpired(token: string, thresholdSec = 0): boolean {
 /**
  * Get remaining seconds until token expiry.
  * Returns negative if already expired.
+ * @param token - bearer token sent with the request
+ * @returns remaining seconds until expiry
  */
 export function tokenTtl(token: string): number {
   const { exp } = decodeJwt(token);

@@ -46,6 +46,9 @@ function deriveKey(): Buffer {
   return scryptSync(material, 'dc3-cli-static-salt', 32);
 }
 
+/**
+ * Credential file store that encrypts payloads at rest.
+ */
 export class EncryptedFileStore implements CredentialStore {
   readonly name = 'encrypted';
 

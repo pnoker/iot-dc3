@@ -19,6 +19,8 @@ import { stdin, stdout } from 'node:process';
 
 /**
  * Interactively prompt the user for input.
+ * @param question - prompt text shown to the user
+ * @returns the collected user input
  */
 export async function prompt(question: string): Promise<string> {
   const rl = createInterface({ input: stdin, output: stdout });
@@ -32,6 +34,8 @@ export async function prompt(question: string): Promise<string> {
 
 /**
  * Interactively prompt for a password (input is hidden via stdout mutation).
+ * @param question - prompt text shown to the user
+ * @returns the collected user input
  */
 export async function passwordPrompt(question: string): Promise<string> {
   const rl = createInterface({ input: stdin, output: stdout });
@@ -51,6 +55,8 @@ export async function passwordPrompt(question: string): Promise<string> {
 
 /**
  * Confirm a yes/no action.
+ * @param question - prompt text shown to the user
+ * @returns the collected user input
  */
 export async function confirm(question: string): Promise<boolean> {
   const answer = await prompt(`${question} [y/N] `);

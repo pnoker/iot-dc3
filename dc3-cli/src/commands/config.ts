@@ -18,6 +18,10 @@ import { Command } from 'commander';
 import { configManager } from '../core/config-manager.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
+/**
+ * Register the `config` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerConfigCommand(program: Command): void {
   const config = program.command('config').description('Configuration management');
 

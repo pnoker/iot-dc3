@@ -25,6 +25,10 @@ import {
 
 const PROFILE_BASE = '/api/v3/manager/profile';
 
+/**
+ * Register the `profile` command tree on the CLI program.
+ * @param program - commander program to attach the command to
+ */
 export function registerProfileCommand(program: Command): void {
   const profile = program.command('profile').description('Profile (device template) management');
 
