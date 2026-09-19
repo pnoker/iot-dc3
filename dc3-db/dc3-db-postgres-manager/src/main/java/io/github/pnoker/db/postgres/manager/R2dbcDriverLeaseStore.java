@@ -19,7 +19,6 @@ package io.github.pnoker.db.postgres.manager;
 import io.github.pnoker.common.manager.entity.model.DeviceLeaseDO;
 import io.github.pnoker.common.manager.entity.model.DriverLeaseStateDO;
 import io.github.pnoker.common.manager.repository.ReactiveDriverLeaseStore;
-import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +26,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /** R2DBC implementation for driver leases and assignments. */
 @Repository
 @RequiredArgsConstructor
-@ConditionalOnClass({DatabaseClient.class, R2dbcDialect.class, TransactionalOperator.class})
+@ConditionalOnClass(DatabaseClient.class)
 public class R2dbcDriverLeaseStore implements ReactiveDriverLeaseStore {
     private static final String DRIVER_TABLE = "dc3_manager.dc3_driver";
     private static final String INSTANCE_TABLE = "dc3_manager.dc3_driver_instance";
@@ -44,8 +42,6 @@ public class R2dbcDriverLeaseStore implements ReactiveDriverLeaseStore {
     private static final String REVISION_TABLE = "dc3_manager.dc3_driver_device_revision";
 
     private final DatabaseClient databaseClient;
-    private final TransactionalOperator transactionalOperator;
-    private final R2dbcDialect dialect;
 
     @Override
     public Mono<Void> acquireDriverLock(Long tenantId, Long driverId) {
@@ -69,18 +65,12 @@ public class R2dbcDriverLeaseStore implements ReactiveDriverLeaseStore {
         if (!valid(tenantId) || !valid(driverId) || blank(node) || blank(client) || blank(host) || leaseUntil == null) {
             return Mono.error(new IllegalArgumentException("invalid driver instance lease"));
         }
-        String sql = postgres()
-                ? "INSERT INTO " + INSTANCE_TABLE
-                        + " (tenant_id, driver_id, node_id, client_id, service_host, started_at, last_heartbeat, lease_until) "
-                        + "VALUES (:tenant_id, :driver_id, :node_id, :client_id, :service_host, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :lease_until) "
-                        + "ON CONFLICT (tenant_id, driver_id, node_id) DO UPDATE SET "
-                        + "client_id = EXCLUDED.client_id, service_host = EXCLUDED.service_host, "
-                        + "last_heartbeat = CURRENT_TIMESTAMP, lease_until = EXCLUDED.lease_until"
-                : "INSERT INTO " + INSTANCE_TABLE
-                        + " (tenant_id, driver_id, node_id, client_id, service_host, started_at, last_heartbeat, lease_until) "
-                        + "VALUES (:tenant_id, :driver_id, :node_id, :client_id, :service_host, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :lease_until) "
-                        + "ON DUPLICATE KEY UPDATE client_id = VALUES(client_id), service_host = VALUES(service_host), "
-                        + "last_heartbeat = CURRENT_TIMESTAMP, lease_until = VALUES(lease_until)";
+        String sql = "INSERT INTO " + INSTANCE_TABLE
+                + " (tenant_id, driver_id, node_id, client_id, service_host, started_at, last_heartbeat, lease_until) "
+                + "VALUES (:tenant_id, :driver_id, :node_id, :client_id, :service_host, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, :lease_until) "
+                + "ON CONFLICT (tenant_id, driver_id, node_id) DO UPDATE SET "
+                + "client_id = EXCLUDED.client_id, service_host = EXCLUDED.service_host, "
+                + "last_heartbeat = CURRENT_TIMESTAMP, lease_until = EXCLUDED.lease_until";
         return databaseClient
                 .sql(sql)
                 .bind("tenant_id", tenantId)
@@ -164,34 +154,18 @@ public class R2dbcDriverLeaseStore implements ReactiveDriverLeaseStore {
         String sql = "INSERT INTO " + STATE_TABLE
                 + " (tenant_id, driver_id, membership_hash, device_revision, assignment_version, operate_time) "
                 + "VALUES (:tenant_id, :driver_id, :membership_hash, :device_revision, 1, CURRENT_TIMESTAMP) "
-                + (postgres()
-                        ? "ON CONFLICT (tenant_id, driver_id) DO UPDATE SET membership_hash=EXCLUDED.membership_hash,"
-                                + " device_revision=EXCLUDED.device_revision, assignment_version=" + STATE_TABLE
-                                + ".assignment_version + 1,"
-                                + " operate_time=CURRENT_TIMESTAMP RETURNING assignment_version"
-                        : "ON DUPLICATE KEY UPDATE membership_hash=VALUES(membership_hash), device_revision=VALUES(device_revision),"
-                                + " assignment_version=assignment_version + 1, operate_time=CURRENT_TIMESTAMP");
-        DatabaseClient.GenericExecuteSpec statement = databaseClient
+                + "ON CONFLICT (tenant_id, driver_id) DO UPDATE SET membership_hash=EXCLUDED.membership_hash,"
+                + " device_revision=EXCLUDED.device_revision, assignment_version=" + STATE_TABLE
+                + ".assignment_version + 1,"
+                + " operate_time=CURRENT_TIMESTAMP RETURNING assignment_version";
+        return databaseClient
                 .sql(sql)
                 .bind("tenant_id", tenantId)
                 .bind("driver_id", driverId)
                 .bind("membership_hash", membershipHash)
-                .bind("device_revision", deviceRevision);
-        if (postgres()) {
-            return statement
-                    .map((row, metadata) -> row.get("assignment_version", Long.class))
-                    .one();
-        }
-        return transactionalOperator.transactional(statement
-                .fetch()
-                .rowsUpdated()
-                .then(databaseClient
-                        .sql("SELECT assignment_version FROM " + STATE_TABLE
-                                + " WHERE tenant_id=:tenant_id AND driver_id=:driver_id LIMIT 1")
-                        .bind("tenant_id", tenantId)
-                        .bind("driver_id", driverId)
-                        .map((row, metadata) -> row.get("assignment_version", Long.class))
-                        .one()));
+                .bind("device_revision", deviceRevision)
+                .map((row, metadata) -> row.get("assignment_version", Long.class))
+                .one();
     }
 
     @Override
@@ -232,30 +206,23 @@ public class R2dbcDriverLeaseStore implements ReactiveDriverLeaseStore {
             values.add(lease.getDeviceId());
             values.add(lease.getOwnerNode());
         }
-        if (postgres()) {
-            sql.append(" ON CONFLICT (tenant_id, device_id) DO UPDATE SET ")
-                    .append("fencing_token = CASE WHEN ")
-                    .append(LEASE_TABLE)
-                    .append(".driver_id <> EXCLUDED.driver_id " + "OR ")
-                    .append(LEASE_TABLE)
-                    .append(".owner_node <> EXCLUDED.owner_node THEN ")
-                    .append(LEASE_TABLE)
-                    .append(".fencing_token + 1 ELSE ")
-                    .append(LEASE_TABLE)
-                    .append(".fencing_token END, ")
-                    .append("operate_time = CASE WHEN ")
-                    .append(LEASE_TABLE)
-                    .append(".driver_id <> EXCLUDED.driver_id " + "OR ")
-                    .append(LEASE_TABLE)
-                    .append(".owner_node <> EXCLUDED.owner_node THEN CURRENT_TIMESTAMP ELSE ")
-                    .append(LEASE_TABLE)
-                    .append(".operate_time END, driver_id=EXCLUDED.driver_id, owner_node=EXCLUDED.owner_node");
-        } else {
-            sql.append(
-                    " ON DUPLICATE KEY UPDATE fencing_token = IF(driver_id <> VALUES(driver_id) OR owner_node <> VALUES(owner_node),"
-                            + " fencing_token + 1, fencing_token), operate_time = IF(driver_id <> VALUES(driver_id) OR owner_node <> VALUES(owner_node),"
-                            + " CURRENT_TIMESTAMP, operate_time), driver_id=VALUES(driver_id), owner_node=VALUES(owner_node)");
-        }
+        sql.append(" ON CONFLICT (tenant_id, device_id) DO UPDATE SET ")
+                .append("fencing_token = CASE WHEN ")
+                .append(LEASE_TABLE)
+                .append(".driver_id <> EXCLUDED.driver_id " + "OR ")
+                .append(LEASE_TABLE)
+                .append(".owner_node <> EXCLUDED.owner_node THEN ")
+                .append(LEASE_TABLE)
+                .append(".fencing_token + 1 ELSE ")
+                .append(LEASE_TABLE)
+                .append(".fencing_token END, ")
+                .append("operate_time = CASE WHEN ")
+                .append(LEASE_TABLE)
+                .append(".driver_id <> EXCLUDED.driver_id " + "OR ")
+                .append(LEASE_TABLE)
+                .append(".owner_node <> EXCLUDED.owner_node THEN CURRENT_TIMESTAMP ELSE ")
+                .append(LEASE_TABLE)
+                .append(".operate_time END, driver_id=EXCLUDED.driver_id, owner_node=EXCLUDED.owner_node");
 
         DatabaseClient.GenericExecuteSpec spec = databaseClient.sql(sql.toString());
         for (int index = 0; index < leases.size(); index++) {
@@ -337,9 +304,5 @@ public class R2dbcDriverLeaseStore implements ReactiveDriverLeaseStore {
 
     private boolean blank(String value) {
         return value == null || value.isBlank();
-    }
-
-    private boolean postgres() {
-        return "postgres".equalsIgnoreCase(dialect.name());
     }
 }

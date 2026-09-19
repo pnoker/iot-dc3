@@ -281,9 +281,8 @@ public class R2dbcResourceRegistryStore implements ReactiveResourceRegistryStore
 
     @Override
     public Mono<Long> acquireLock(String lockName) {
-        String insert = dialect.name().toLowerCase().contains("postgres")
-                ? "INSERT INTO dc3_platform_lock(lock_name,fencing_token,expires_at) VALUES (:lock_name,0,:expires_at) ON CONFLICT (lock_name) DO NOTHING"
-                : "INSERT IGNORE INTO dc3_platform_lock(lock_name,fencing_token,expires_at) VALUES (:lock_name,0,:expires_at)";
+        String insert =
+                "INSERT INTO dc3_platform_lock(lock_name,fencing_token,expires_at) VALUES (:lock_name,0,:expires_at) ON CONFLICT (lock_name) DO NOTHING";
         Instant expires = Instant.now().plusSeconds(300);
         return databaseClient
                 .sql(insert)

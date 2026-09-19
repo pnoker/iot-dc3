@@ -144,13 +144,8 @@ public class R2dbcTsdbStore implements ReactiveTsdbStore {
                     .append(i)
                     .append(')');
         }
-        if (dialect.name().toLowerCase().contains("mysql")) {
-            sql.append(
-                    " ON DUPLICATE KEY UPDATE message_id=VALUES(message_id),schema_version=VALUES(schema_version),driver_node=VALUES(driver_node),sequence=VALUES(sequence),fencing_token=VALUES(fencing_token),raw_value=VALUES(raw_value),cal_value=VALUES(cal_value),num_value=VALUES(num_value),quality=VALUES(quality),driver_id=VALUES(driver_id),operate_time=VALUES(operate_time)");
-        } else {
-            sql.append(
-                    " ON CONFLICT (tenant_id,device_id,point_id,create_time) DO UPDATE SET message_id=EXCLUDED.message_id,schema_version=EXCLUDED.schema_version,driver_node=EXCLUDED.driver_node,sequence=EXCLUDED.sequence,fencing_token=EXCLUDED.fencing_token,raw_value=EXCLUDED.raw_value,cal_value=EXCLUDED.cal_value,num_value=EXCLUDED.num_value,quality=EXCLUDED.quality,driver_id=EXCLUDED.driver_id,operate_time=EXCLUDED.operate_time");
-        }
+        sql.append(
+                " ON CONFLICT (tenant_id,device_id,point_id,create_time) DO UPDATE SET message_id=EXCLUDED.message_id,schema_version=EXCLUDED.schema_version,driver_node=EXCLUDED.driver_node,sequence=EXCLUDED.sequence,fencing_token=EXCLUDED.fencing_token,raw_value=EXCLUDED.raw_value,cal_value=EXCLUDED.cal_value,num_value=EXCLUDED.num_value,quality=EXCLUDED.quality,driver_id=EXCLUDED.driver_id,operate_time=EXCLUDED.operate_time");
         DatabaseClient.GenericExecuteSpec spec = databaseClient.sql(sql.toString());
         for (int i = 0; i < rows.size(); i++) {
             PointValueSample row = rows.get(i);
