@@ -29,10 +29,9 @@ import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
@@ -352,11 +351,7 @@ public class R2dbcCommandStore implements ReactiveCommandStore {
     }
 
     private LocalDateTime time(Object value) {
-        if (value instanceof LocalDateTime local) return local;
-        if (value instanceof Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        if (value instanceof OffsetDateTime offset)
-            return offset.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        return null;
+        return DatabaseInstant.toLocalDateTimeUtc(value);
     }
 
     private boolean present(String value) {

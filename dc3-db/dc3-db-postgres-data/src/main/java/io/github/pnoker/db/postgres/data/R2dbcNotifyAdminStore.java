@@ -32,10 +32,9 @@ import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
@@ -813,11 +812,7 @@ public class R2dbcNotifyAdminStore implements ReactiveNotifyAdminStore {
     }
 
     private LocalDateTime time(Object value) {
-        if (value instanceof LocalDateTime v) return v;
-        if (value instanceof OffsetDateTime v)
-            return v.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        if (value instanceof Instant v) return LocalDateTime.ofInstant(v, ZoneOffset.UTC);
-        return null;
+        return DatabaseInstant.toLocalDateTimeUtc(value);
     }
 
     private void prepare(Object value) {

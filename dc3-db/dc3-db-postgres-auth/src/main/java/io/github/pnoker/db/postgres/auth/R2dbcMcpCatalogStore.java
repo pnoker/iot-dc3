@@ -21,10 +21,9 @@ import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
 import io.github.pnoker.common.auth.repository.ReactiveMcpCatalogStore;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -209,10 +208,6 @@ public class R2dbcMcpCatalogStore implements ReactiveMcpCatalogStore {
     }
 
     private LocalDateTime time(Object raw) {
-        if (raw instanceof LocalDateTime value) return value;
-        if (raw instanceof java.time.OffsetDateTime value)
-            return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        if (raw instanceof Instant value) return LocalDateTime.ofInstant(value, ZoneOffset.UTC);
-        return null;
+        return DatabaseInstant.toLocalDateTimeUtc(raw);
     }
 }

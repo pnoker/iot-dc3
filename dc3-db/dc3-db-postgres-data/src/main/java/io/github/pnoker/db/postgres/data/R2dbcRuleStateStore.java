@@ -25,9 +25,9 @@ import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.PageRequest;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
@@ -338,10 +338,7 @@ public class R2dbcRuleStateStore implements ReactiveRuleStateStore {
     }
 
     private LocalDateTime time(Object raw) {
-        if (raw instanceof LocalDateTime value) return value;
-        if (raw instanceof OffsetDateTime value)
-            return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        return raw instanceof java.time.Instant value ? LocalDateTime.ofInstant(value, ZoneOffset.UTC) : null;
+        return DatabaseInstant.toLocalDateTimeUtc(raw);
     }
 
     private Byte number(Number value) {

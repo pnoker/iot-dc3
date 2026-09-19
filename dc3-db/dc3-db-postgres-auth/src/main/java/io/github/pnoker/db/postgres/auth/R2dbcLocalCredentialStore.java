@@ -23,11 +23,9 @@ import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -187,11 +185,7 @@ public class R2dbcLocalCredentialStore implements ReactiveLocalCredentialStore {
     }
 
     private LocalDateTime time(Object raw) {
-        if (raw instanceof LocalDateTime value) return value;
-        if (raw instanceof OffsetDateTime value)
-            return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        if (raw instanceof Instant value) return LocalDateTime.ofInstant(value, ZoneOffset.UTC);
-        return null;
+        return DatabaseInstant.toLocalDateTimeUtc(raw);
     }
 
     private String orderBy(List<SortSpec> sort) {

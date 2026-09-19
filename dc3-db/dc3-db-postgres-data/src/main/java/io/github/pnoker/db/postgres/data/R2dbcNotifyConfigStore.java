@@ -31,10 +31,8 @@ import io.github.pnoker.common.data.entity.model.NotifyDO;
 import io.github.pnoker.common.data.repository.ReactiveNotifyConfigStore;
 import io.github.pnoker.common.entity.ext.JsonExt;
 import io.github.pnoker.common.utils.JsonUtil;
-import java.time.Instant;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -214,11 +212,7 @@ public class R2dbcNotifyConfigStore implements ReactiveNotifyConfigStore {
     }
 
     private LocalDateTime time(Object value) {
-        if (value instanceof LocalDateTime local) return local;
-        if (value instanceof Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        if (value instanceof OffsetDateTime offset)
-            return offset.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        return null;
+        return DatabaseInstant.toLocalDateTimeUtc(value);
     }
 
     private boolean valid(long value) {

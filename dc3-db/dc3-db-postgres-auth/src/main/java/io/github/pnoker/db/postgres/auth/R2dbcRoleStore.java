@@ -28,6 +28,7 @@ import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
 import java.time.*;
 import java.util.*;
@@ -223,11 +224,7 @@ public class R2dbcRoleStore implements ReactiveRoleStore {
     }
 
     private LocalDateTime time(Object x) {
-        if (x instanceof LocalDateTime v) return v;
-        if (x instanceof OffsetDateTime v)
-            return v.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        if (x instanceof Instant v) return LocalDateTime.ofInstant(v, ZoneOffset.UTC);
-        return null;
+        return DatabaseInstant.toLocalDateTimeUtc(x);
     }
 
     private JsonExt json(String x) {

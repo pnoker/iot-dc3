@@ -24,6 +24,7 @@ import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
 import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.r2dbc.core.time.DatabaseInstant;
 import io.github.pnoker.db.r2dbc.core.transaction.PageTransaction;
 import java.time.*;
 import java.util.*;
@@ -199,11 +200,7 @@ public class R2dbcGroupBindStore implements ReactiveGroupBindStore {
     }
 
     private LocalDateTime time(Object v) {
-        if (v instanceof LocalDateTime x) return x;
-        if (v instanceof OffsetDateTime x)
-            return x.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
-        if (v instanceof Instant x) return LocalDateTime.ofInstant(x, ZoneOffset.UTC);
-        return null;
+        return DatabaseInstant.toLocalDateTimeUtc(v);
     }
 
     private Number num(Object v) {
