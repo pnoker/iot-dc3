@@ -26,6 +26,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
+      - name: Fetch main baseline for spotless ratchet
+        # Shallow PR checkouts have no origin/main ref for ratchetFrom to diff against.
+        run: git fetch origin refs/heads/main:refs/remotes/origin/main --depth=1
+
       - name: Set up JDK 21
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
         with:
