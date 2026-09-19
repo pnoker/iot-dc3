@@ -30,8 +30,8 @@
     <artifactId>dc3-db</artifactId>
     <name>${project.artifactId}</name>
     <packaging>pom</packaging>
-    <description>Relational dialect family: one adapter per engine behind dc3.db.type — see
-        docs/design/storage-abstraction.md §3 and docs/tsdb-stores.md for the sibling families
+    <description>PostgreSQL-only R2DBC persistence family — see docs/design/relational-r2dbc.md
+        for the single-engine architecture and docs/tsdb-stores.md for the sibling family
     </description>
 
     <modules>

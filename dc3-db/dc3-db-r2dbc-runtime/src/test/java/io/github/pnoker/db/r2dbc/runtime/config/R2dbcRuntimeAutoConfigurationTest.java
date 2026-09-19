@@ -62,7 +62,7 @@ class R2dbcRuntimeAutoConfigurationTest {
         contextRunner.run(context -> assertThat(context)
                 .hasFailed()
                 .getFailure()
-                .hasMessageContaining("dc3.db.type must select exactly one R2DBC dialect adapter"));
+                .hasMessageContaining("exactly one R2DBC dialect adapter must be registered"));
     }
 
     @Test
@@ -79,7 +79,7 @@ class R2dbcRuntimeAutoConfigurationTest {
                 .run(context -> assertThat(context)
                         .hasFailed()
                         .getFailure()
-                        .hasMessageContaining("must select exactly one R2DBC dialect adapter"));
+                        .hasMessageContaining("exactly one R2DBC dialect adapter must be registered"));
     }
 
     @Test
