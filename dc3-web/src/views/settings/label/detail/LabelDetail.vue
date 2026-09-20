@@ -160,7 +160,7 @@ onBeforeUnmount(() => {
     width: 16px;
     height: 16px;
     border: 1px solid var(--el-border-color);
-    border-radius: 4px;
+    border-radius: var(--dc3-radius-sm);
   }
 }
 </style>

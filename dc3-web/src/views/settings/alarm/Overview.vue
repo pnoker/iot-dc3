@@ -482,21 +482,12 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-// Uniform 8px gap: vertical rhythm between sections, horizontal gap
-// inside every grid row. Matches the home page's 8px rhythm — with
-// el-card's 4px radius, a 12px gap looked too breathy.
-$overview-gap: 8px;
-
+// Vertical rhythm between sections and horizontal gap inside every grid
+// row follow the shared --dc3-gutter token from theme.scss.
 .event-overview {
   display: flex;
   flex-direction: column;
-  gap: $overview-gap;
-  // Dashboard-style page (like Home). Match the 4px left breathing
-  // room that .settings-container's gap gives between aside and main
-  // on the right, so the content reads symmetric like a board.
-  // Other settings sub-pages (User / Role / Api / ...) are form/table
-  // views and keep flush-right — only this overview needs the balance.
-  padding-right: 4px;
+  gap: var(--dc3-gutter);
 
   &__error {
     margin: 0;
@@ -516,10 +507,10 @@ $overview-gap: 8px;
   // instead of floating on the page background.
   .event-overview__tabs {
     :deep(.el-tabs__header) {
-      margin: 0 0 $overview-gap 0;
+      margin: 0 0 var(--dc3-gutter) 0;
       padding: 0 12px;
       background: var(--el-bg-color);
-      border-radius: 4px;
+      border-radius: var(--dc3-radius-lg);
     }
 
     :deep(.el-tabs__nav-wrap::after) {
@@ -532,7 +523,7 @@ $overview-gap: 8px;
     :deep(.el-tab-pane) {
       display: flex;
       flex-direction: column;
-      gap: $overview-gap;
+      gap: var(--dc3-gutter);
     }
   }
 
@@ -541,7 +532,7 @@ $overview-gap: 8px;
   .event-overview__grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: $overview-gap;
+    gap: var(--dc3-gutter);
     @media (max-width: $breakpoint-sm-max) {
       grid-template-columns: 1fr;
     }
@@ -550,7 +541,7 @@ $overview-gap: 8px;
   .event-overview__grid-1 {
     display: grid;
     grid-template-columns: 1fr;
-    gap: $overview-gap;
+    gap: var(--dc3-gutter);
   }
 
   .event-overview__quick {
@@ -573,7 +564,7 @@ $overview-gap: 8px;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: var(--dc3-gutter);
   }
 
   // Visual divider between the confirmation-state chips (All / Unconfirmed)
@@ -589,7 +580,7 @@ $overview-gap: 8px;
   .event-overview__cards {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: $overview-gap;
+    gap: var(--dc3-gutter);
 
     @media (max-width: $breakpoint-md-max) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -602,7 +593,7 @@ $overview-gap: 8px;
   .event-overview__charts {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: $overview-gap;
+    gap: var(--dc3-gutter);
 
     @media (max-width: $breakpoint-sm-max) {
       grid-template-columns: 1fr;
@@ -615,7 +606,7 @@ $overview-gap: 8px;
   .event-overview__diagnostic {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: $overview-gap;
+    gap: var(--dc3-gutter);
 
     @media (max-width: $breakpoint-sm-max) {
       grid-template-columns: 1fr;
@@ -632,7 +623,7 @@ $overview-gap: 8px;
     font-size: 12px;
     color: var(--el-text-color-secondary);
     background: var(--el-fill-color-light);
-    border-radius: 4px;
+    border-radius: var(--dc3-radius-md);
 
     &__label {
       font-weight: 500;

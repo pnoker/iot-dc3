@@ -516,7 +516,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--el-border-color-lighter);
-  border-radius: 4px;
+  border-radius: var(--dc3-radius-lg);
   padding: var(--dc3-space-3);
   background: var(--el-bg-color);
 }
@@ -557,7 +557,7 @@ onBeforeUnmount(() => {
   height: min(440px, 52vh);
   overflow: auto;
   border: 1px solid var(--el-border-color-extra-light);
-  border-radius: 4px;
+  border-radius: var(--dc3-radius-md);
   padding: 4px 6px;
   margin-top: 4px;
 }

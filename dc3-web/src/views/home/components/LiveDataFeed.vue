@@ -238,7 +238,7 @@ watch(locale, refresh);
     font-size: 10px;
     font-weight: 600;
     padding: 1px 5px;
-    border-radius: 4px;
+    border-radius: var(--dc3-radius-sm);
     white-space: nowrap;
 
     &--int,

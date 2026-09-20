@@ -354,7 +354,7 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 .alarm-detail__inline-code {
   padding: 2px 5px;
-  border-radius: 4px;
+  border-radius: var(--dc3-radius-sm);
   color: var(--el-text-color-regular);
   background: var(--el-fill-color-light);
   font-size: 12px;
@@ -367,7 +367,7 @@ onBeforeUnmount(() => {
   margin: 0;
   padding: 12px;
   border: 1px solid var(--el-border-color-lighter);
-  border-radius: 4px;
+  border-radius: var(--dc3-radius-md);
   color: var(--el-text-color-primary);
   background: var(--el-fill-color-lighter);
   font-size: 12px;

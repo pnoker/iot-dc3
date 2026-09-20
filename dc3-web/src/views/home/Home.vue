@@ -18,6 +18,8 @@
 <template>
   <div class="home">
     <!-- Row 0: greeting + clock + service status -->
+    <!-- Wall gutters below mirror --dc3-gutter (8px desktop); keep the
+         literal in sync with theme.scss (a JS prop cannot read CSS vars). -->
     <el-row :gutter="8" class="home__row">
       <el-col :span="24" class="home__col">
         <home-banner/>
@@ -465,34 +467,30 @@ const cards = computed<CardModel[]>(() => [
   padding: 0;
 
   &__error {
-    margin-bottom: var(--dc3-space-2);
+    margin-bottom: var(--dc3-gutter);
   }
 
   .home__row {
-    margin-bottom: var(--dc3-space-2);
+    margin-bottom: var(--dc3-gutter);
 
     &:last-child {
       margin-bottom: 0;
     }
+
+    // el-row is a wrapping flex row: gutter owns the horizontal seams,
+    // row-gap the vertical ones BETWEEN wrapped lines. Without row-gap,
+    // mid-width breakpoints (e.g. :md=12 stacking trend over live feed)
+    // collapse the wrapped seam to 0px and the cards visually fuse.
+    // row-gap never applies after the last line, so it cannot stack with
+    // the margin-bottom above.
+    row-gap: var(--dc3-gutter);
   }
 
-  // el-row carries the horizontal gutter while the page token owns vertical
-  // rhythm. On wide
-  // screens the cols sit side-by-side so they don't need a bottom margin
-  // of their own — adding one stacked with .home__row margin-bottom,
-  // blowing the gap out to 16px. Only the narrow-screen breakpoint where
-  // cols collapse into a single column (:md=24, i.e. tablet and below)
-  // actually needs the extra spacer.
+  // Cols carry no margins: the row's row-gap owns every vertical seam at
+  // every breakpoint, so wrapped lines keep the 8px rhythm (12px on
+  // phones via the responsive token).
   .home__col {
     margin-bottom: 0;
-
-    @media (max-width: $breakpoint-sm-max) {
-      margin-bottom: var(--dc3-space-2);
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
   }
 
   // SlaBadge is conditionally rendered between the banner row and the

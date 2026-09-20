@@ -41,6 +41,24 @@
   --el-color-primary-light-9: #e7f5fb;
   --el-color-primary-dark-2: #0e78af;
 
+  // Element Plus radius mapping (A5) — single source. The four base tokens
+  // are defined on :root in element-plus base.css, which the entry graph
+  // (App.vue / element.ts) always evaluates BEFORE global.scss, so these
+  // overrides win regardless of when unplugin injects per-component styles.
+  // Component-scoped EP radius vars (card/popover/tag/...) are redefined in
+  // global.scss because on-demand css defines them on the component
+  // selector, not :root.
+  --el-border-radius-base: var(--dc3-radius-md); // controls: button/input/select/textarea/segmented/message/alert (chained)
+  --el-border-radius-small: var(--dc3-radius-sm); // micro widgets: checkbox/color swatch (menu flyout has its own rule)
+  --el-border-radius-round: var(--dc3-radius-full); // is-round pills
+  --el-border-radius-circle: 100%;
+  // Every popper shell (tooltip/select/dropdown/menu flyout/date-picker
+  // panel) resolves radius through el-popper.css's single chain
+  // var(--el-popper-border-radius, var(--el-popover-border-radius, 4px)),
+  // so defining the source here on :root drives all floating layers via
+  // inheritance, injection order aside.
+  --el-popover-border-radius: var(--dc3-radius-lg);
+
   // Canvas -> surface -> emphasis. Pages should communicate hierarchy with
   // these layers instead of accumulating borders around every region.
   --dc3-bg-body: #f2f7fa;
@@ -95,6 +113,29 @@
   --dc3-space-6: 24px;
   --dc3-space-8: 32px;
   --dc3-space-10: 40px;
+
+  // Page-edge padding (A5). Three stepped tiers — deliberately NOT clamp():
+  // a fluid edge never lands on a tier value, so the header could never
+  // align with the body rhythm the tiers define. Tiers mirror the
+  // three-terminal breakpoint contract in tokens.scss.
+  --dc3-page-padding: var(--dc3-space-2); // <768 phone: 8px
+  @media (min-width: $breakpoint-sm) {
+    --dc3-page-padding: var(--dc3-space-3); // 768-1199 tablet: 12px
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    --dc3-page-padding: var(--dc3-space-4); // >=1200 desktop: 16px
+  }
+
+  // Card / section gutter (A5). 8px rhythm everywhere; phones override to
+  // 12px (A3 v7 density: controls stay 32px, card walls get touch room —
+  // matches EntityListPage mobile cards, the only existing 12px wall).
+  // el-row :gutter="8" walls mirror this token at its desktop value.
+  --dc3-gutter: var(--dc3-space-2);
+
+  @media (max-width: $breakpoint-xs-max) {
+    --dc3-gutter: var(--dc3-space-3);
+  }
 
   // Radii
   --dc3-radius-sm: 4px;

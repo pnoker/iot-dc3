@@ -346,7 +346,7 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 .detail-page-alert {
-  margin-bottom: var(--dc3-space-3);
+  margin-bottom: var(--dc3-gutter);
 
   :deep(.el-alert__content) {
     display: flex;

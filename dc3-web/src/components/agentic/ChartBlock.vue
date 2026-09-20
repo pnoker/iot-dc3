@@ -288,7 +288,7 @@ onBeforeUnmount(destroyChart);
   margin: 8px 0;
   padding: 10px;
   border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border-radius: var(--dc3-radius-md);
   background: #fbfdff;
 }
 
@@ -325,7 +325,7 @@ onBeforeUnmount(destroyChart);
   min-width: 0;
   padding: 8px;
   border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border-radius: var(--dc3-radius-md);
   background: #f8fafc;
 
   span,
@@ -361,7 +361,7 @@ onBeforeUnmount(destroyChart);
     max-width: 100%;
     padding: 3px 6px;
     border: 1px solid #e2e8f0;
-    border-radius: 4px;
+    border-radius: var(--dc3-radius-sm);
     background: #f8fafc;
     color: #64748b;
     font-size: 11px;

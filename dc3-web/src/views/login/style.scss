@@ -30,7 +30,7 @@
   box-sizing: border-box;
   width: 100%;
   min-height: 100%;
-  padding: clamp(24px, 5vh, 56px) clamp(24px, 6vw, 88px);
+  padding: clamp(24px, 5vh, 56px) clamp(24px, 6vw, 88px); // spacing-exempt: login fluid stage
   overflow: hidden;
   background:
     radial-gradient(circle at 16% 14%, var(--dc3-ambient-primary), transparent 34%),
@@ -122,7 +122,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: clamp(32px, 4vw, 56px);
+  padding: clamp(32px, 4vw, 56px); // spacing-exempt: login fluid stage
   overflow: hidden;
   border-right: 1px solid var(--dc3-border-base);
   background: var(--dc3-login-story-bg);
@@ -200,7 +200,7 @@
   span {
     padding: var(--dc3-space-2) var(--dc3-space-3);
     border: 1px solid var(--dc3-border-base);
-    border-radius: 999px;
+    border-radius: var(--dc3-radius-full);
     background: var(--dc3-login-chip-bg);
     color: var(--dc3-text-regular);
     font-size: 13px;
@@ -232,7 +232,7 @@
 .login-card-wrap {
   display: grid;
   place-items: center;
-  padding: clamp(32px, 4vw, 56px);
+  padding: clamp(32px, 4vw, 56px); // spacing-exempt: login fluid stage
   background: var(--dc3-login-card-bg);
 }
 

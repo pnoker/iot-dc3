@@ -121,6 +121,7 @@
         type="error"
       />
       <el-form :ref="setFormRef" :model="formModel" :rules="formRules" class="alarm-notify__form" label-position="top">
+        <!-- Form-column gutter mirrors --dc3-gutter (8px); keep in sync with theme.scss. -->
         <el-row :gutter="8">
           <el-col
             v-for="field in activeConfig.fields"

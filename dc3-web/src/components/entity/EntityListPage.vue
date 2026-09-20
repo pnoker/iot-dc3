@@ -302,6 +302,7 @@
         class="entity-list-page__form"
         label-position="top"
       >
+        <!-- Form-column gutter mirrors --dc3-gutter (8px); keep in sync with theme.scss. -->
         <el-row :gutter="8">
           <el-col
             v-for="field in config.fields"
@@ -598,7 +599,7 @@ defineExpose({reload: load});
   min-width: 0;
 
   &__error {
-    margin-bottom: var(--dc3-space-3);
+    margin-bottom: var(--dc3-gutter);
 
     :deep(.el-alert__content) {
       display: flex;
@@ -610,18 +611,18 @@ defineExpose({reload: load});
 
   &__table {
     margin-top: 1px;
-    border-radius: 4px;
+    border-radius: var(--dc3-radius-lg);
   }
 
   &__mobile-cards {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--dc3-space-3);
+    gap: var(--dc3-gutter);
   }
 
   &__mobile-loading {
     display: grid;
-    gap: var(--dc3-space-3);
+    gap: var(--dc3-gutter);
   }
 
   &__mobile-skeleton {
@@ -672,7 +673,7 @@ defineExpose({reload: load});
 
   &__inline-code {
     padding: 2px 5px;
-    border-radius: 4px;
+    border-radius: var(--dc3-radius-sm);
     color: var(--el-text-color-regular);
     background: var(--el-fill-color-light);
     font-size: 12px;
@@ -688,7 +689,7 @@ defineExpose({reload: load});
     display: inline-block;
     width: 16px;
     height: 16px;
-    border-radius: 4px;
+    border-radius: var(--dc3-radius-sm);
     flex-shrink: 0;
   }
 

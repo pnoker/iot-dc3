@@ -108,7 +108,9 @@ const setLocale = (value: 'en' | 'zh') => {
 .app-preferences {
   display: flex;
   align-items: center;
-  gap: 5px;
+  // Same shoulder width as the header capsule dividers so the internal
+  // language|theme separator breathes exactly like its neighbours.
+  gap: var(--dc3-space-2);
   box-sizing: border-box;
   height: 40px;
   padding: 4px 5px;

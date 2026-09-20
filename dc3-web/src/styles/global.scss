@@ -41,7 +41,6 @@ body {
 .settings-main {
   .el-card {
     border-color: var(--dc3-border-base);
-    border-radius: var(--dc3-radius-xl);
     background: var(--dc3-bg-elevated);
     box-shadow: var(--dc3-shadow-sm);
     transition:
@@ -63,7 +62,6 @@ body {
   .el-select__wrapper,
   .el-textarea__inner,
   .el-segmented {
-    border-radius: var(--dc3-radius-md);
     box-shadow: inset 0 0 0 1px var(--dc3-border-base);
     transition:
       box-shadow var(--dc3-duration-fast) var(--dc3-ease-standard),
@@ -74,10 +72,6 @@ body {
   .el-select__wrapper.is-focused,
   .el-textarea__inner:focus {
     box-shadow: inset 0 0 0 1px var(--el-color-primary), var(--dc3-focus-ring);
-  }
-
-  .el-button:not(.is-circle) {
-    border-radius: var(--dc3-radius-md);
   }
 
   .el-table {
@@ -174,7 +168,7 @@ body {
   margin: 0;
   padding: 8px;
   overflow: auto;
-  border-radius: 4px;
+  border-radius: var(--dc3-radius-md);
   background: var(--el-fill-color-light);
   color: var(--el-text-color-primary);
   font-size: 12px;
@@ -315,7 +309,7 @@ body {
   }
 
   .el-dropdown-menu__item {
-    border-radius: 8px;
+    border-radius: var(--dc3-radius-md);
     color: var(--dc3-text-regular);
 
     &:not(.is-disabled):hover,

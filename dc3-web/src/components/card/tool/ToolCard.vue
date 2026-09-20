@@ -187,7 +187,7 @@ defineExpose({search, reset});
 @use "@/styles/shared-form-widths.scss" as *;
 
 .tool-card {
-  margin: 0 0 4px;
+  margin: 0 0 var(--dc3-gutter);
 
   .tool-card__body {
     display: flex;
@@ -333,6 +333,11 @@ defineExpose({search, reset});
 
   :deep(.el-card) {
     border-color: var(--dc3-border-base);
+  }
+
+  // Match the CardShell family padding (Element Plus defaults to 20px).
+  :deep(.el-card__body) {
+    padding: var(--dc3-space-4);
   }
 }
 </style>

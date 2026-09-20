@@ -34,7 +34,7 @@
   overflow: hidden;
   border: 1px solid var(--dc3-border-strong);
   // 999px clamps to height/2, so the ends stay perfect semicircles.
-  border-radius: 999px;
+  border-radius: var(--dc3-radius-full);
   background:
     radial-gradient(circle at 18% 0%, var(--dc3-highlight-sheen), transparent 38%),
     var(--dc3-brand-gradient-soft),
@@ -52,7 +52,7 @@
     right: 12px;
     left: 12px;
     height: 42%;
-    border-radius: 999px;
+    border-radius: var(--dc3-radius-full);
     background: linear-gradient(180deg, var(--dc3-highlight-sheen), transparent);
     opacity: 0.72;
     pointer-events: none;
