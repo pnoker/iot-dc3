@@ -259,29 +259,58 @@ defineExpose({search, reset});
   .tool-card__footer {
     @include card-footer;
 
+    // The two footer clusters split space by content, not 50/50: the
+    // button row takes exactly what its buttons need and the pager cluster
+    // stretches over the rest. A fixed 1 1 280px basis on both sides
+    // starved wider button rows (Device = Add + Import + Search + Reset)
+    // and wrapped the last button even when the whole footer row had room.
     .tool-card-footer-button {
       display: flex;
       align-items: center;
-      flex: 1 1 280px;
+      flex: 0 1 auto;
       min-width: 0;
       max-width: 100%;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 8px;
+      // Never break buttons across rows — on a truly narrow viewport the
+      // row scrolls horizontally instead (same pattern as the segmented
+      // filters above).
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+
+      .tool-card-footer-divider,
+      :deep(.el-button) {
+        flex-shrink: 0;
+      }
     }
 
+    // Pagination + refresh/sort stay on one line at every tier: the pager
+    // shrinks and scrolls internally instead of pushing the icon tools onto
+    // a second row (a wrapped row wastes vertical space and reads badly on
+    // narrow terminals).
     .tool-card-footer-page {
       display: flex;
       align-items: center;
-      flex: 1 1 280px;
+      flex: 1 1 auto;
       min-width: 0;
       max-width: 100%;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       justify-content: flex-end;
       gap: 8px;
 
       :deep(.el-pagination) {
         min-width: 0;
         max-width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+      }
+
+      // The divider and the round icon tools never shrink away — only the
+      // pager yields.
+      .tool-card-footer-divider,
+      :deep(.el-button) {
+        flex-shrink: 0;
       }
     }
 
@@ -316,16 +345,16 @@ defineExpose({search, reset});
         justify-content: center;
       }
 
-      .tool-card-footer-button {
-        flex-wrap: wrap;
-      }
-
+      // Phone layout: the whole cluster (pager + divider + refresh/sort)
+      // centers as one group — same axis as the button row above, so the
+      // two footer rows read as one aligned block. Still one line: only
+      // the pager scrolls internally when the viewport cannot fit both at
+      // full size.
       .tool-card-footer-page {
         :deep(.el-pagination) {
-          flex: 1 1 100%;
-          width: 100%;
+          flex: 0 1 auto;
+          min-width: 0;
           overflow-x: auto;
-          justify-content: center;
         }
       }
     }
