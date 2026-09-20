@@ -146,11 +146,49 @@ body {
 // message. Detect that exact structure and restore a compact action-row
 // contract; the link action keeps the shared control density on every
 // terminal (A3 v7 note).
+// Tone-tinted icon tile shared by the record-card headers (mobile tables
+// rendered as cards) — same design language as ThingsCardHeader / StatCard
+// tiles, so every card family on the platform opens with the same glyph
+// block.
+.entity-icon-tile {
+  --entity-tile-accent: var(--el-color-primary);
+  --entity-tile-accent-soft: var(--el-color-primary-light-9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, var(--entity-tile-accent) 18%, transparent);
+  border-radius: var(--dc3-radius-lg);
+  background: var(--entity-tile-accent-soft);
+  color: var(--entity-tile-accent);
+
+  &.entity-icon-tile--green {
+    --entity-tile-accent: var(--el-color-success);
+    --entity-tile-accent-soft: var(--el-color-success-light-9);
+  }
+
+  &.entity-icon-tile--orange {
+    --entity-tile-accent: var(--el-color-warning);
+    --entity-tile-accent-soft: var(--el-color-warning-light-9);
+  }
+
+  &.entity-icon-tile--purple {
+    --entity-tile-accent: var(--dc3-color-purple);
+    --entity-tile-accent-soft: var(--dc3-color-purple-soft);
+  }
+
+  &.entity-icon-tile--red {
+    --entity-tile-accent: var(--el-color-danger);
+    --entity-tile-accent-soft: var(--el-color-danger-light-9);
+  }
+}
+
 .el-alert:has(> .el-alert__content > .el-alert__description > .el-button.is-link:only-child) {
   box-sizing: border-box;
   min-height: var(--dc3-space-10);
   padding-block: 2px;
-  border-radius: var(--dc3-radius-md);
 
   > .el-alert__icon.is-big {
     width: var(--dc3-space-5);

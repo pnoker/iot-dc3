@@ -28,7 +28,10 @@
           class="things-card__header"
         >
           <div class="things-card-header-icon">
-            <img :alt="data?.pointName || point?.pointName || ''" :src="icon"/>
+            <el-icon v-if="!isImageUrl" :size="24">
+              <component :is="icon"/>
+            </el-icon>
+            <img v-else :alt="data?.pointName || point?.pointName || ''" :src="icon"/>
           </div>
           <div
             class="things-card-header-name nowrap-name"
@@ -187,7 +190,7 @@ const props = defineProps({
   },
   icon: {
     type: String,
-    default: 'images/common/point.png',
+    default: 'TrendCharts',
   },
 });
 
@@ -205,6 +208,8 @@ const copyValue = (data: any) => {
 };
 
 const hasLatestValue = computed(() => props.data?.hasLatestValue !== false);
+// Element Plus icon name (default) vs legacy image URL — see the header tile.
+const isImageUrl = computed(() => props.icon.includes('/'));
 const delayOk = computed(() => {
   return hasLatestValue.value && typeof props.data?.interval === 'number' && props.data.interval < 200;
 });
@@ -302,12 +307,22 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 55px;
   display: flex;
+  align-items: center;
 
+  // Same tone-tinted tile family as ThingsCardHeader / StatCard; this
+  // card is the live-data tile, so it carries the success (data) accent.
   .things-card-header-icon {
-    width: 48px;
-    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
     margin-right: 12px;
-    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--el-color-success) 18%, transparent);
+    border-radius: var(--dc3-radius-lg);
+    background: var(--el-color-success-light-9);
+    color: var(--el-color-success);
     overflow: hidden;
 
     img {
@@ -431,7 +446,6 @@ onBeforeUnmount(() => {
 .things-card__footer {
   height: 35px;
   margin-top: 2px;
-  padding-inline-end: var(--dc3-floating-action-safe-space);
   box-sizing: border-box;
   display: flex;
   justify-content: flex-end;

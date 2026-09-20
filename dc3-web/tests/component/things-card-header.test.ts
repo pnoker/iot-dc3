@@ -17,6 +17,8 @@
 
 import {mount} from '@vue/test-utils';
 import {describe, expect, it} from 'vitest';
+import {ElIcon} from 'element-plus';
+import {Promotion} from '@element-plus/icons-vue';
 
 import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 
@@ -24,19 +26,35 @@ function mountHeader(props: Record<string, unknown>, slots: Record<string, strin
   return mount(ThingsCardHeader, {
     props: {icon: '/icons/driver.svg', copyLabel: 'Copy ID', ...props},
     slots,
+    global: {
+      // The app registers all Element Plus icons globally; mirror the two
+      // this component resolves dynamically.
+      components: {ElIcon, Promotion},
+    },
   });
 }
 
 describe('ThingsCardHeader', () => {
-  it('renders the name and icon, and emits copy-id on name click', async () => {
+  it('renders a legacy image when the icon is a URL, and emits copy-id on name click', async () => {
     const wrapper = mountHeader({name: 'Modbus', icon: '/icons/modbus.svg'});
 
     expect(wrapper.find('.things-card-header-name').text()).toBe('Modbus');
     expect(wrapper.find('img').attributes('src')).toBe('/icons/modbus.svg');
     expect(wrapper.find('img').attributes('alt')).toBe('Modbus');
+    expect(wrapper.findComponent(ElIcon).exists()).toBe(false);
 
     await wrapper.find('.things-card-header-name').trigger('click');
     expect(wrapper.emitted('copy-id')).toHaveLength(1);
+  });
+
+  it('renders an Element Plus icon tile when the icon is a component name', () => {
+    const wrapper = mountHeader({name: 'Driver', icon: 'Promotion', tone: 'blue'});
+
+    expect(wrapper.find('img').exists()).toBe(false);
+    expect(wrapper.findComponent(ElIcon).exists()).toBe(true);
+    expect(wrapper.findComponent(Promotion).exists()).toBe(true);
+    // Tone drives the tile palette via the header modifier class.
+    expect(wrapper.find('.things-card__header--blue').exists()).toBe(true);
   });
 
   it('toggles the enable/disable border class based on the enabled prop', () => {

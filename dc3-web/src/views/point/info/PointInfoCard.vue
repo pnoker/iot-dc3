@@ -28,8 +28,10 @@
     <el-card :shadow="data.shadow">
       <div class="things-card-content">
         <div :class="['things-card__header', isConfig ? 'header-enable' : 'header-disable']">
-          <div class="things-card-header-icon">
-            <img :alt="data.attributeName" :src="isSelect"/>
+          <div :class="['things-card-header-icon', {'is-inactive': !isSelected}]">
+            <el-icon :size="24">
+              <component :is="icon"/>
+            </el-icon>
           </div>
           <div class="things-card-header-name nowrap-name">{{ data.pointName }}</div>
         </div>
@@ -67,7 +69,7 @@ const props = defineProps({
   },
   icon: {
     type: String,
-    default: 'images/common/point-info-disable.png',
+    default: 'SetUp',
   },
 });
 
@@ -84,9 +86,9 @@ const isConfig = computed(() =>
   props.attributes.every((attr: any) => hasConfigValue(props.data[attr.attributeCode]?.configValue))
 );
 
-const isSelect = computed(() =>
-  props.data.shadow === 'always' ? 'images/common/point-info.png' : 'images/common/point-info-disable.png'
-);
+// Selected config tiles carry the brand accent; the rest stay neutral —
+// replaces the old selected/unselected PNG pair.
+const isSelected = computed(() => props.data.shadow === 'always');
 </script>
 
 <style lang="scss" scoped>
@@ -106,17 +108,26 @@ const isSelect = computed(() =>
   width: 100%;
   height: 55px;
   display: flex;
+  align-items: center;
 
+  // Same tile family as ThingsCardHeader; selection flips the accent.
   .things-card-header-icon {
-    width: 48px;
-    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
     margin-right: var(--dc3-space-3);
-    border-radius: var(--dc3-radius-sm);
-    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--el-color-primary) 18%, transparent);
+    border-radius: var(--dc3-radius-lg);
+    background: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
 
-    img {
-      width: 100%;
-      height: 100%;
+    &.is-inactive {
+      border-color: var(--el-border-color-lighter);
+      background: var(--el-fill-color-light);
+      color: var(--el-text-color-secondary);
     }
   }
 

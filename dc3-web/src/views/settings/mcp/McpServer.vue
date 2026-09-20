@@ -172,7 +172,6 @@ void loadMetadata();
   gap: var(--dc3-space-2);
   min-width: 0;
   max-width: 100%;
-  padding-inline-end: var(--dc3-floating-action-safe-space);
   box-sizing: border-box;
   flex-wrap: wrap;
 }
@@ -222,7 +221,6 @@ void loadMetadata();
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-inline-end: var(--dc3-floating-action-safe-space);
   box-sizing: border-box;
   margin-bottom: var(--dc3-space-1);
 }

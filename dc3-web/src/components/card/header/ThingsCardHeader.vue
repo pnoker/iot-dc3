@@ -16,9 +16,15 @@
   -->
 
 <template>
-  <div :class="['things-card__header', enabled ? 'header-enable' : 'header-disable']">
+  <div :class="['things-card__header', `things-card__header--${tone}`, enabled ? 'header-enable' : 'header-disable']">
     <div class="things-card-header-icon">
-      <img :alt="name" :src="icon"/>
+      <!-- Icon accepts an Element Plus icon name (the default for every
+           entity card — one line-art glyph on a tone-tinted tile, matching
+           the StatCard tiles on Home) or a legacy image URL. -->
+      <el-icon v-if="!isImageUrl" :size="24">
+        <component :is="icon"/>
+      </el-icon>
+      <img v-else :alt="name" :src="icon"/>
     </div>
     <button
       :aria-label="`${name}: ${copyLabel}`"
@@ -35,28 +41,73 @@
 </template>
 
 <script lang="ts" setup>
-defineProps({
+import {computed} from 'vue';
+
+const props = defineProps({
   name: {type: String, default: ''},
+  /** Element Plus icon name, or a legacy image URL (contains "/"). */
   icon: {type: String, required: true},
+  /** Tile accent — same palette family as StatCard on Home. */
+  tone: {
+    type: String as () => 'blue' | 'green' | 'orange' | 'purple' | 'red',
+    default: 'blue',
+  },
   enabled: {type: Boolean, default: false},
   statusTitle: {type: String, default: ''},
   copyLabel: {type: String, required: true},
 });
 
 defineEmits(['copy-id']);
+
+const isImageUrl = computed(() => props.icon.includes('/'));
 </script>
 
 <style lang="scss" scoped>
 .things-card__header {
+  --things-card-accent: var(--el-color-primary);
+  --things-card-accent-soft: var(--el-color-primary-light-9);
   width: 100%;
   height: 55px;
   display: flex;
+  align-items: center;
+
+  &--blue {
+    --things-card-accent: var(--el-color-primary);
+    --things-card-accent-soft: var(--el-color-primary-light-9);
+  }
+
+  &--green {
+    --things-card-accent: var(--el-color-success);
+    --things-card-accent-soft: var(--el-color-success-light-9);
+  }
+
+  &--orange {
+    --things-card-accent: var(--el-color-warning);
+    --things-card-accent-soft: var(--el-color-warning-light-9);
+  }
+
+  &--purple {
+    --things-card-accent: var(--dc3-color-purple);
+    --things-card-accent-soft: var(--dc3-color-purple-soft);
+  }
+
+  &--red {
+    --things-card-accent: var(--el-color-danger);
+    --things-card-accent-soft: var(--el-color-danger-light-9);
+  }
 
   .things-card-header-icon {
-    width: 48px;
-    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
     margin-right: 12px;
-    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--things-card-accent) 18%, transparent);
+    border-radius: var(--dc3-radius-lg);
+    background: var(--things-card-accent-soft);
+    color: var(--things-card-accent);
     overflow: hidden;
 
     img {

@@ -22,15 +22,16 @@
         <things-card-header
           :enabled="enabled"
           :icon="icon"
+          tone="purple"
           :name="data.deviceName"
           :status-title="$t('common.enableFlag')"
           :copy-label="$t('device.card.copyDeviceId')"
           @copy-id="copy(data.id, $t('device.card.copyDeviceId'))"
         >
-          <el-tag v-if="status === 'ONLINE'" effect="plain" type="success">{{ $t('status.online') }}</el-tag>
-          <el-tag v-else-if="status === 'MAINTAIN'" effect="plain" type="warning">{{ $t('status.maintain') }}</el-tag>
-          <el-tag v-else-if="status === 'FAULT'" effect="plain" type="danger">{{ $t('status.fault') }}</el-tag>
-          <el-tag v-else-if="status === 'DISABLE'" effect="plain" type="info">{{ $t('status.disable') }}</el-tag>
+          <el-tag v-if="statusTag === 'ONLINE'" effect="plain" type="success">{{ $t('status.online') }}</el-tag>
+          <el-tag v-else-if="statusTag === 'MAINTAIN'" effect="plain" type="warning">{{ $t('status.maintain') }}</el-tag>
+          <el-tag v-else-if="statusTag === 'FAULT'" effect="plain" type="danger">{{ $t('status.fault') }}</el-tag>
+          <el-tag v-else-if="statusTag === 'DISABLE'" effect="plain" type="info">{{ $t('status.disable') }}</el-tag>
           <el-tag v-else effect="plain" type="info">{{ $t('status.offline') }}</el-tag>
         </things-card-header>
         <div class="things-card__body">
@@ -96,11 +97,14 @@ const props = defineProps({
   status: {type: String, default: ''},
   data: {type: Object as PropType<DeviceRecord>, required: true},
   driver: {type: Object as PropType<Record<string, any>>, default: () => ({})},
-  icon: {type: String, default: 'images/common/device.png'},
+  icon: {type: String, default: 'Management'},
   busy: {type: Boolean, default: false},
 });
 
 const emit = defineEmits(['disable', 'enable', 'delete']);
+
+// The status map carries lowercase enum codes; normalize before comparing.
+const statusTag = computed(() => String(props.status ?? '').trim().toUpperCase());
 const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const emitToggle = (name: 'disable' | 'enable') => {

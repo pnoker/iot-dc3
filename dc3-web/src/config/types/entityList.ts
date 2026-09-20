@@ -200,6 +200,10 @@ export interface EntityListConfig {
   extraActions?: EntityRowAction[];
   toolbarActions?: EntityToolbarAction[]; // Custom toolbar actions.
   operationWidth?: number; // Override when automatic sizing cannot fit long labels.
+  /** Icon (Element Plus name) on the mobile record-card header tile; defaults to Tickets. */
+  mobileCardIcon?: string;
+  /** Tone of the mobile record-card header tile; defaults to blue. */
+  mobileCardTone?: 'blue' | 'green' | 'orange' | 'purple' | 'red';
   rowEditable?: (row: Record<string, any>) => boolean; // Controls editability for individual rows.
   rowDeletable?: (row: Record<string, any>) => boolean;
 

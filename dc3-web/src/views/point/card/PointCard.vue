@@ -22,6 +22,7 @@
         <things-card-header
           :enabled="enabled"
           :icon="icon"
+          tone="green"
           :name="data.pointName"
           :status-title="$t('common.name')"
           :copy-label="$t('point.card.copyPointId')"
@@ -133,7 +134,7 @@ const props = defineProps({
   embedded: {type: Boolean, default: false},
   data: {type: Object as PropType<PointRecord>, required: true},
   profile: {type: Object as PropType<Record<string, any>>, default: () => ({})},
-  icon: {type: String, default: 'images/common/point.png'},
+  icon: {type: String, default: 'List'},
   busy: {type: Boolean, default: false},
 });
 

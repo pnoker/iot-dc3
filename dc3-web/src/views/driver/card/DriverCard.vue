@@ -22,6 +22,7 @@
         <things-card-header
           :enabled="enabled"
           :icon="icon"
+          tone="blue"
           :name="data.driverName"
           :status-title="$t('common.name')"
           :copy-label="$t('driver.card.copyDriverId')"
@@ -99,7 +100,7 @@ import ThingsCardHeader from '@/components/card/header/ThingsCardHeader.vue';
 import type {DriverRecord} from '@/config/types/manager';
 
 const props = defineProps({
-  icon: {type: String, default: 'images/common/driver.png'},
+  icon: {type: String, default: 'Promotion'},
   statusTable: {type: Object as PropType<Record<string, string>>, default: () => ({})},
   data: {type: Object as PropType<DriverRecord>, required: true},
   footer: {type: Boolean, default: false},
@@ -111,7 +112,8 @@ const enabled = computed(() => isEnabledFlag(props.data.enableFlag));
 
 const status = computed(() => {
   const id = props.data.id;
-  return id && props.statusTable[id] ? String(props.statusTable[id]).trim() : 'OFFLINE';
+  // The status map carries lowercase enum codes; normalize before comparing.
+  return id && props.statusTable[id] ? String(props.statusTable[id]).trim().toUpperCase() : 'OFFLINE';
 });
 
 const statusTagType = computed(() => {
@@ -149,7 +151,6 @@ const detail = () => {
 .things-card__footer {
   height: 35px;
   margin-top: 2px;
-  padding-inline-end: var(--dc3-floating-action-safe-space);
   box-sizing: border-box;
   display: flex;
   justify-content: flex-end;

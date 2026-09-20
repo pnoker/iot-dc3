@@ -22,6 +22,7 @@
         <things-card-header
           :enabled="enabled"
           :icon="icon"
+          tone="orange"
           :name="data.profileName"
           :status-title="$t('common.name')"
           :copy-label="$t('profile.card.profileId')"
@@ -82,7 +83,7 @@ import type {ProfileRecord} from '@/config/types/manager';
 const props = defineProps({
   embedded: {type: Boolean, default: false},
   data: {type: Object as PropType<ProfileRecord>, required: true},
-  icon: {type: String, default: 'images/common/profile.png'},
+  icon: {type: String, default: 'Files'},
   busy: {type: Boolean, default: false},
 });
 

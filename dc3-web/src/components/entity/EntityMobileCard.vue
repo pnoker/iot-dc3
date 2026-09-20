@@ -24,6 +24,14 @@
   >
     <header class="entity-mobile-card__header">
       <span v-if="depth > 0" aria-hidden="true" class="entity-mobile-card__branch">↳</span>
+      <!-- Same tone-tile + title anatomy as the driver/device/point cards
+           (ThingsCardHeader family) so every card on the platform shares
+           one visual grammar. -->
+      <span :class="['entity-icon-tile', `entity-icon-tile--${cardTone}`]" aria-hidden="true">
+        <el-icon :size="22">
+          <component :is="cardIcon"/>
+        </el-icon>
+      </span>
       <el-button
         v-if="canOpenDetail"
         :aria-label="`${t('common.detail')}: ${primaryText}`"
@@ -179,6 +187,8 @@ const detailColumns = computed(() => mobileColumns.value.filter((column) => colu
 const primaryText = computed(() =>
   primaryColumn.value ? props.formatCell(props.row, primaryColumn.value) : t('common.empty')
 );
+const cardIcon = computed(() => props.config.mobileCardIcon || 'Tickets');
+const cardTone = computed(() => props.config.mobileCardTone || 'blue');
 const canOpenDetail = computed(() => Boolean(props.config.detail));
 const hasActions = computed(
   () =>
@@ -237,10 +247,13 @@ const colorValue = (column: EntityColumnConfig) =>
 
 .entity-mobile-card__header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  align-items: center;
   gap: var(--dc3-space-3);
   min-width: 0;
+  // Hairline under the tile header mirrors the ThingsCardHeader anatomy
+  // (its enable/disable border) with a neutral rule for generic records.
+  padding-bottom: var(--dc3-space-3);
+  border-bottom: 1px solid var(--dc3-border-base);
 }
 
 .entity-mobile-card__title {
@@ -251,6 +264,7 @@ const colorValue = (column: EntityColumnConfig) =>
   color: var(--dc3-text-primary);
   font-size: 15px;
   font-weight: 650;
+  text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -260,7 +274,6 @@ const colorValue = (column: EntityColumnConfig) =>
   flex: 1 1 auto;
   min-width: 0;
   min-height: var(--dc3-touch-target);
-  margin: calc(var(--dc3-space-2) * -1) 0;
   padding: 0;
   justify-content: flex-start;
   overflow: hidden;
@@ -341,19 +354,30 @@ const colorValue = (column: EntityColumnConfig) =>
   white-space: normal;
 }
 
+// Actions dock right like the entity-card footer (ThingsCardActions); on
+// phones the buttons stretch edge-to-edge for thumb targets, matching the
+// driver/device/point cards exactly.
 .entity-mobile-card__actions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: var(--dc3-space-2);
   margin-top: var(--dc3-space-4);
   padding-top: var(--dc3-space-3);
-  padding-inline-end: var(--dc3-floating-action-safe-space);
   box-sizing: border-box;
   border-top: 1px solid var(--dc3-border-base);
 
   :deep(.el-button) {
     min-height: var(--dc3-touch-target);
     margin: 0;
+  }
+
+  @media (max-width: $breakpoint-xs-max) {
+    justify-content: stretch;
+
+    :deep(.el-button) {
+      flex: 1 1 auto;
+    }
   }
 }
 </style>

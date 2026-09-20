@@ -18,6 +18,8 @@
 import {mount} from '@vue/test-utils';
 import {computed, defineComponent, h, inject, nextTick, provide, type Ref} from 'vue';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {ElIcon} from 'element-plus';
+import {Tickets} from '@element-plus/icons-vue';
 
 import ResponsiveRecordList from '@/components/list/ResponsiveRecordList.vue';
 import i18n from '@/config/i18n';
@@ -115,6 +117,9 @@ const mountList = (props: Record<string, unknown> = {}) =>
     global: {
       plugins: [i18n],
       directives: {loading: () => undefined},
+      // The app registers all Element Plus icons globally; mirror the ones
+      // the card header resolves dynamically (default tile: Tickets).
+      components: {ElIcon, Tickets},
       stubs: {
         BlankCard: {template: '<section class="blank-card-stub"><slot /></section>'},
         ElAlert: {

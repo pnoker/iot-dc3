@@ -22,6 +22,7 @@
         <things-card-header
           :enabled="enabled"
           :icon="icon"
+          tone="red"
           :name="data.eventName"
           :status-title="$t('eventDefinition.card.level')"
           :copy-label="$t('eventDefinition.card.eventId')"
@@ -112,7 +113,7 @@ import type {EventRecord} from '@/config/types';
 const props = defineProps({
   embedded: {type: Boolean, default: false},
   data: {type: Object as PropType<EventRecord>, default: () => ({})},
-  icon: {type: String, default: 'images/common/event.png'},
+  icon: {type: String, default: 'Bell'},
   busy: {type: Boolean, default: false},
 });
 

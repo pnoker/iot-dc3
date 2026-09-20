@@ -22,6 +22,7 @@
         <things-card-header
           :enabled="enabled"
           :icon="icon"
+          tone="blue"
           :name="data.commandName"
           :status-title="$t('common.enableFlag')"
           :copy-label="$t('command.card.commandId')"
@@ -112,7 +113,7 @@ import type {CommandRecord} from '@/config/types';
 const props = defineProps({
   embedded: {type: Boolean, default: false},
   data: {type: Object as PropType<CommandRecord>, default: () => ({})},
-  icon: {type: String, default: 'images/common/command.png'},
+  icon: {type: String, default: 'Operation'},
   busy: {type: Boolean, default: false},
 });
 
