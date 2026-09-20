@@ -69,7 +69,7 @@ CREATE INDEX idx_cagg_pv_1m_lookup
 
 -- Realtime aggregate: also read the raw tail not yet materialized.
 ALTER MATERIALIZED VIEW cagg_point_value_1m
-SET(timescaledb.materialized_only = false);
+SET (timescaledb.materialized_only = false);
 
 -- ----------------------------
 -- 1-hour continuous aggregate (hierarchical)
@@ -103,7 +103,7 @@ CREATE INDEX idx_cagg_pv_1h_lookup
     ON cagg_point_value_1h (tenant_id, device_id, point_id, bucket DESC);
 
 ALTER MATERIALIZED VIEW cagg_point_value_1h
-SET(timescaledb.materialized_only = false);
+SET (timescaledb.materialized_only = false);
 
 -- TimescaleDB exposes continuous aggregates as views in the PostgreSQL catalog.
 COMMENT ON VIEW cagg_point_value_1m IS 'One-minute point-value continuous aggregate';

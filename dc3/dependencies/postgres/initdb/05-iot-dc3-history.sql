@@ -35,21 +35,21 @@ SET search_path TO dc3_history, public;
 -- ----------------------------
 CREATE TABLE dc3_point_value
 (
-    message_id     TEXT              NOT NULL,                  -- Immutable event identity
-    schema_version INTEGER           NOT NULL,                  -- Point-value wire schema version
-    driver_node    TEXT              NOT NULL,                  -- Producing driver runtime node
-    sequence       BIGINT            NOT NULL,                  -- Monotonic sequence within driver_node
-    fencing_token  BIGINT            NOT NULL,                  -- Manager-issued ownership fence
-    device_id      BIGINT  DEFAULT 0 NOT NULL,                  -- Device ID
-    point_id       BIGINT  DEFAULT 0 NOT NULL,                  -- Point ID
-    raw_value      TEXT    DEFAULT ''::TEXT NOT NULL,           -- Raw value as captured from the device
-    cal_value      TEXT    DEFAULT ''::TEXT NOT NULL,           -- Calculated/transformed value
-    num_value      DOUBLE PRECISION,                            -- Best-effort numeric projection of cal_value (NULL for non-numeric payloads)
-    quality        INTEGER DEFAULT 0 NOT NULL,                  -- OPC-UA style quality code, 0 = GOOD (S17)
-    driver_id      BIGINT  DEFAULT 0 NOT NULL,                  -- Driver ID
-    tenant_id      BIGINT  DEFAULT 0 NOT NULL,                  -- Tenant ID
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL -- Operation time
+    message_id      TEXT              NOT NULL,                           -- Immutable event identity
+    schema_version  INTEGER           NOT NULL,                           -- Point-value wire schema version
+    driver_node     TEXT              NOT NULL,                           -- Producing driver runtime node
+    sequence        BIGINT            NOT NULL,                           -- Monotonic sequence within driver_node
+    fencing_token   BIGINT            NOT NULL,                           -- Manager-issued ownership fence
+    device_id       BIGINT            DEFAULT 0 NOT NULL,                 -- Device ID
+    point_id        BIGINT            DEFAULT 0 NOT NULL,                 -- Point ID
+    raw_value       TEXT              DEFAULT ''::TEXT NOT NULL,          -- Raw value as captured from the device
+    cal_value       TEXT              DEFAULT ''::TEXT NOT NULL,          -- Calculated/transformed value
+    num_value       DOUBLE PRECISION,                                     -- Best-effort numeric projection of cal_value (NULL for non-numeric payloads)
+    quality         INTEGER           DEFAULT 0 NOT NULL,                 -- OPC-UA style quality code, 0 = GOOD (S17)
+    driver_id       BIGINT            DEFAULT 0 NOT NULL,                 -- Driver ID
+    tenant_id       BIGINT            DEFAULT 0 NOT NULL,                 -- Tenant ID
+    create_time     TIMESTAMPTZ       DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operate_time    TIMESTAMPTZ       DEFAULT CURRENT_TIMESTAMP NOT NULL  -- Operation time
 );
 
 CREATE INDEX idx_point_value_device_point_time ON dc3_point_value (device_id, point_id, create_time DESC);
@@ -93,7 +93,7 @@ CREATE UNIQUE INDEX uk_point_value_series_time
     ON dc3_point_value (tenant_id, device_id, point_id, create_time);
 
 ALTER TABLE dc3_point_value
-SET(
+SET (
         timescaledb.compress,
         timescaledb.compress_segmentby = 'tenant_id,device_id,point_id',
         timescaledb.compress_orderby = 'create_time DESC'
@@ -112,20 +112,20 @@ SELECT public.add_retention_policy('dc3_point_value', INTERVAL '30 days');
 -- one transaction, and older/out-of-order readings cannot overwrite newer values.
 CREATE TABLE dc3_point_latest
 (
-    tenant_id      BIGINT           NOT NULL,        -- Tenant ID
-    device_id      BIGINT           NOT NULL,        -- Device ID
-    point_id       BIGINT           NOT NULL,        -- Point ID
-    message_id     TEXT             NOT NULL,        -- Immutable event identity
-    schema_version INTEGER          NOT NULL,        -- Point-value wire schema version
-    driver_node    TEXT             NOT NULL,        -- Producing driver runtime node
-    sequence       BIGINT           NOT NULL,        -- Monotonic sequence within driver_node
-    fencing_token  BIGINT           NOT NULL,        -- Manager-issued ownership fence
-    raw_value      TEXT   DEFAULT ''::TEXT NOT NULL, -- Raw value as captured from the device
-    cal_value      TEXT   DEFAULT ''::TEXT NOT NULL, -- Calculated/transformed value
-    num_value      DOUBLE PRECISION,                 -- Best-effort numeric projection of cal_value
-    driver_id      BIGINT DEFAULT 0 NOT NULL,        -- Driver ID
-    create_time TIMESTAMPTZ NOT NULL,                -- Device acquisition time
-    operate_time TIMESTAMPTZ NOT NULL,               -- Platform persistence time
+    tenant_id       BIGINT            NOT NULL,                  -- Tenant ID
+    device_id       BIGINT            NOT NULL,                  -- Device ID
+    point_id        BIGINT            NOT NULL,                  -- Point ID
+    message_id      TEXT              NOT NULL,                  -- Immutable event identity
+    schema_version  INTEGER           NOT NULL,                  -- Point-value wire schema version
+    driver_node     TEXT              NOT NULL,                  -- Producing driver runtime node
+    sequence        BIGINT            NOT NULL,                  -- Monotonic sequence within driver_node
+    fencing_token   BIGINT            NOT NULL,                  -- Manager-issued ownership fence
+    raw_value       TEXT              DEFAULT ''::TEXT NOT NULL, -- Raw value as captured from the device
+    cal_value       TEXT              DEFAULT ''::TEXT NOT NULL, -- Calculated/transformed value
+    num_value       DOUBLE PRECISION,                            -- Best-effort numeric projection of cal_value
+    driver_id       BIGINT            DEFAULT 0 NOT NULL,        -- Driver ID
+    create_time     TIMESTAMPTZ       NOT NULL,                  -- Device acquisition time
+    operate_time    TIMESTAMPTZ       NOT NULL,                  -- Platform persistence time
     PRIMARY KEY (tenant_id, device_id, point_id)
 );
 

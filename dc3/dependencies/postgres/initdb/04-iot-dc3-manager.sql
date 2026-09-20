@@ -36,21 +36,21 @@ LANGUAGE plpgsql;
 -- ----------------------------
 CREATE TABLE dc3_label
 (
-    id               BIGINT PRIMARY KEY         NOT NULL,         -- Primary key ID
-    label_name       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Label name
-    label_code       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Label code
-    label_color      TEXT     DEFAULT '#F4F4F5' NOT NULL,         -- Label color
-    entity_type_flag SMALLINT DEFAULT 0         NOT NULL,         -- Entity type flag
-    enable_flag      SMALLINT DEFAULT 0         NOT NULL,         -- Enable flag, 0: enabled, 1: disabled
-    tenant_id        BIGINT   DEFAULT 0         NOT NULL,         -- Tenant ID
-    remark           TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    creator_id       BIGINT   DEFAULT 0         NOT NULL,         -- Creator ID
-    creator_name     TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,   -- Creation time
-    operator_id      BIGINT   DEFAULT 0         NOT NULL,         -- Operator ID
-    operator_name    TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Operation time
-    deleted          SMALLINT DEFAULT 0         NOT NULL,         -- Logical delete flag, 0: not deleted, 1: deleted
+    id                BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    label_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Label name
+    label_code        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Label code
+    label_color       TEXT         DEFAULT '#F4F4F5' NOT NULL,         -- Label color
+    entity_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Entity type flag
+    enable_flag       SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted           SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_label_entity_type_flag CHECK (entity_type_flag BETWEEN 0 AND 8),
     CONSTRAINT chk_label_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_label_deleted CHECK (deleted IN (0, 1))
@@ -86,19 +86,19 @@ COMMENT ON COLUMN dc3_label.deleted IS 'Logical delete flag, 0: not deleted, 1: 
 -- ----------------------------
 CREATE TABLE dc3_label_bind
 (
-    id               BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    entity_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Entity type flag
-    label_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Label ID
-    entity_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Entity ID
-    tenant_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    remark           TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    creator_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name     TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,   -- Creation time
-    operator_id      BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name    TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Operation time
-    deleted          SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id                BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    entity_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Entity type flag
+    label_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Label ID
+    entity_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Entity ID
+    tenant_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted           SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_label_bind_entity_type_flag CHECK (entity_type_flag BETWEEN 0 AND 8),
     CONSTRAINT chk_label_bind_deleted CHECK (deleted IN (0, 1))
 );
@@ -134,23 +134,23 @@ COMMENT ON COLUMN dc3_label_bind.deleted IS 'Logical delete flag, 0: not deleted
 -- ----------------------------
 CREATE TABLE dc3_group
 (
-    id               BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    parent_group_id  BIGINT   DEFAULT 0 NOT NULL,                 -- Parent group ID
-    group_name       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Group name
-    group_code       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Group code
-    group_level      SMALLINT DEFAULT 0 NOT NULL,                 -- Group level
-    group_index      SMALLINT DEFAULT 0 NOT NULL,                 -- Group order
-    entity_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Entity type flag
-    enable_flag      SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
-    tenant_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    remark           TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    creator_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name     TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,   -- Creation time
-    operator_id      BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name    TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Operation time
-    deleted          SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id                BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    parent_group_id   BIGINT       DEFAULT 0 NOT NULL,                 -- Parent group ID
+    group_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Group name
+    group_code        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Group code
+    group_level       SMALLINT     DEFAULT 0 NOT NULL,                 -- Group level
+    group_index       SMALLINT     DEFAULT 0 NOT NULL,                 -- Group order
+    entity_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Entity type flag
+    enable_flag       SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted           SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_group_entity_type_flag CHECK (entity_type_flag BETWEEN 0 AND 8),
     CONSTRAINT chk_group_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_group_deleted CHECK (deleted IN (0, 1))
@@ -189,19 +189,19 @@ COMMENT ON COLUMN dc3_group.deleted IS 'Logical delete flag, 0: not deleted, 1: 
 -- ----------------------------
 CREATE TABLE dc3_group_bind
 (
-    id               BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    entity_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Entity type flag
-    group_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Group ID
-    entity_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Entity ID
-    tenant_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    remark           TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    creator_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name     TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,   -- Creation time
-    operator_id      BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name    TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Operation time
-    deleted          SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id                BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    entity_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Entity type flag
+    group_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Group ID
+    entity_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Entity ID
+    tenant_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted           SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_group_bind_entity_type_flag CHECK (entity_type_flag BETWEEN 0 AND 8),
     CONSTRAINT chk_group_bind_deleted CHECK (deleted IN (0, 1))
 );
@@ -235,25 +235,25 @@ COMMENT ON COLUMN dc3_group_bind.deleted IS 'Logical delete flag, 0: not deleted
 -- ----------------------------
 CREATE TABLE dc3_driver
 (
-    id               BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    driver_name      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Driver name
-    driver_code      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Driver code
-    service_name     TEXT     DEFAULT ''::TEXT          NOT NULL, -- Service name
-    service_host     TEXT     DEFAULT ''::TEXT          NOT NULL, -- Service host
-    driver_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Driver type flag
-    driver_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Driver extension information
-    enable_flag      SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
-    tenant_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    remark           TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    signature        TEXT     DEFAULT ''::TEXT          NOT NULL, -- Signature
-    version          INTEGER  DEFAULT 0 NOT NULL,                 -- Version
-    creator_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name     TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,   -- Creation time
-    operator_id      BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name    TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Operation time
-    deleted          SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id                BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    driver_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Driver name
+    driver_code       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Driver code
+    service_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Service name
+    service_host      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Service host
+    driver_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Driver type flag
+    driver_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Driver extension information
+    enable_flag       SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version           INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted           SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_driver_driver_type_flag CHECK (driver_type_flag BETWEEN 0 AND 3),
     CONSTRAINT chk_driver_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_driver_deleted CHECK (deleted IN (0, 1))
@@ -296,14 +296,14 @@ COMMENT ON COLUMN dc3_driver.deleted IS 'Logical delete flag, 0: not deleted, 1:
 -- separately so registering a second pod never overwrites the first pod's identity.
 CREATE TABLE dc3_driver_instance
 (
-    tenant_id    BIGINT NOT NULL,                                  -- Tenant ID
-    driver_id    BIGINT NOT NULL,                                  -- Logical driver ID
-    node_id      TEXT   NOT NULL,                                  -- Stable runtime node ID
-    client_id    TEXT   NOT NULL,                                  -- Unique messaging client ID
-    service_host TEXT   NOT NULL,                                  -- Runtime service host
-    started_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Runtime start time
-    last_heartbeat TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Last successful heartbeat time
-    lease_until TIMESTAMPTZ NOT NULL,                              -- Runtime lease expiration time
+    tenant_id       BIGINT       NOT NULL,                           -- Tenant ID
+    driver_id       BIGINT       NOT NULL,                           -- Logical driver ID
+    node_id         TEXT         NOT NULL,                           -- Stable runtime node ID
+    client_id       TEXT         NOT NULL,                           -- Unique messaging client ID
+    service_host    TEXT         NOT NULL,                           -- Runtime service host
+    started_at      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Runtime start time
+    last_heartbeat  TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Last successful heartbeat time
+    lease_until     TIMESTAMPTZ  NOT NULL,                           -- Runtime lease expiration time
     PRIMARY KEY (tenant_id, driver_id, node_id),
     UNIQUE (tenant_id, client_id)
 );
@@ -313,12 +313,12 @@ CREATE INDEX idx_driver_instance_active
 
 CREATE TABLE dc3_device_lease
 (
-    tenant_id     BIGINT           NOT NULL, -- Tenant ID
-    driver_id     BIGINT           NOT NULL, -- Logical driver ID
-    device_id     BIGINT           NOT NULL, -- Device ID
-    owner_node    TEXT             NOT NULL, -- Owning runtime node ID
-    fencing_token BIGINT DEFAULT 1 NOT NULL, -- Monotonic ownership fencing token (row-local increment)
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    tenant_id      BIGINT       NOT NULL,                           -- Tenant ID
+    driver_id      BIGINT       NOT NULL,                           -- Logical driver ID
+    device_id      BIGINT       NOT NULL,                           -- Device ID
+    owner_node     TEXT         NOT NULL,                           -- Owning runtime node ID
+    fencing_token  BIGINT       DEFAULT 1 NOT NULL,                 -- Monotonic ownership fencing token (row-local increment)
+    operate_time   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,
     PRIMARY KEY (tenant_id, device_id)
 );
 
@@ -329,20 +329,20 @@ CREATE INDEX idx_device_lease_owner
 
 CREATE TABLE dc3_driver_device_revision
 (
-    tenant_id BIGINT NOT NULL, -- Tenant ID
-    driver_id BIGINT NOT NULL, -- Logical driver ID
-    revision  BIGINT NOT NULL, -- Monotonic device-set revision
+    tenant_id  BIGINT  NOT NULL, -- Tenant ID
+    driver_id  BIGINT  NOT NULL, -- Logical driver ID
+    revision   BIGINT  NOT NULL, -- Monotonic device-set revision
     PRIMARY KEY (tenant_id, driver_id)
 );
 
 CREATE TABLE dc3_driver_lease_state
 (
-    tenant_id          BIGINT           NOT NULL,                -- Tenant ID
-    driver_id          BIGINT           NOT NULL,                -- Logical driver ID
-    membership_hash    VARCHAR(64)      NOT NULL,                -- SHA-256 hash of active runtime membership
-    device_revision    BIGINT           NOT NULL,                -- Last assigned device-set revision
-    assignment_version BIGINT DEFAULT 1 NOT NULL,                -- Monotonic assignment generation (row-local increment)
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    tenant_id           BIGINT       NOT NULL,                           -- Tenant ID
+    driver_id           BIGINT       NOT NULL,                           -- Logical driver ID
+    membership_hash     VARCHAR(64)  NOT NULL,                           -- SHA-256 hash of active runtime membership
+    device_revision     BIGINT       NOT NULL,                           -- Last assigned device-set revision
+    assignment_version  BIGINT       DEFAULT 1 NOT NULL,                 -- Monotonic assignment generation (row-local increment)
+    operate_time        TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
     PRIMARY KEY (tenant_id, driver_id)
 );
 
@@ -383,25 +383,25 @@ COMMENT ON COLUMN dc3_driver_lease_state.operate_time IS 'Operation time';
 -- ----------------------------
 CREATE TABLE dc3_driver_attribute
 (
-    id                  BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    attribute_name      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Attribute name
-    attribute_code      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Attribute code
-    attribute_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Attribute type flag
-    default_value       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Default value
-    driver_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Driver ID
-    attribute_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Driver attribute extension information
-    enable_flag         SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
-    tenant_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    remark              TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    signature           TEXT     DEFAULT ''::TEXT          NOT NULL, -- Signature
-    version             INTEGER  DEFAULT 0 NOT NULL,                 -- Version
-    creator_id          BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name        TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,      -- Creation time
-    operator_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Operation time
-    deleted             SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id                   BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    attribute_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Attribute name
+    attribute_code       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Attribute code
+    attribute_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Attribute type flag
+    default_value        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Default value
+    driver_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Driver ID
+    attribute_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Driver attribute extension information
+    enable_flag          SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark               TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version              INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id           BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time          TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time         TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted              SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_driver_attribute_attribute_type_flag CHECK (attribute_type_flag BETWEEN 0 AND 7),
     CONSTRAINT chk_driver_attribute_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_driver_attribute_deleted CHECK (deleted IN (0, 1))
@@ -442,25 +442,25 @@ COMMENT ON COLUMN dc3_driver_attribute.deleted IS 'Logical delete flag, 0: not d
 -- ----------------------------
 CREATE TABLE dc3_point_attribute
 (
-    id                  BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    attribute_name      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Attribute name
-    attribute_code      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Attribute code
-    attribute_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Attribute type flag
-    default_value       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Default value
-    driver_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Driver ID
-    attribute_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Point attribute extension information
-    enable_flag         SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
-    tenant_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    remark              TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    signature           TEXT     DEFAULT ''::TEXT          NOT NULL, -- Signature
-    version             INTEGER  DEFAULT 0 NOT NULL,                 -- Version
-    creator_id          BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name        TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,      -- Creation time
-    operator_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Operation time
-    deleted             SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id                   BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    attribute_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Attribute name
+    attribute_code       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Attribute code
+    attribute_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Attribute type flag
+    default_value        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Default value
+    driver_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Driver ID
+    attribute_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Point attribute extension information
+    enable_flag          SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark               TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version              INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id           BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time          TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time         TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted              SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_point_attribute_attribute_type_flag CHECK (attribute_type_flag BETWEEN 0 AND 7),
     CONSTRAINT chk_point_attribute_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_point_attribute_deleted CHECK (deleted IN (0, 1))
@@ -501,25 +501,25 @@ COMMENT ON COLUMN dc3_point_attribute.deleted IS 'Logical delete flag, 0: not de
 -- ----------------------------
 CREATE TABLE dc3_command_attribute
 (
-    id                  BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    attribute_name      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Attribute name
-    attribute_code      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Attribute code
-    attribute_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Attribute type flag
-    default_value       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Default value
-    driver_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Driver ID
-    attribute_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Command attribute extension information
-    enable_flag         SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
-    tenant_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    remark              TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    signature           TEXT     DEFAULT ''::TEXT          NOT NULL, -- Signature
-    version             INTEGER  DEFAULT 0 NOT NULL,                 -- Version
-    creator_id          BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name        TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,      -- Creation time
-    operator_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Operation time
-    deleted             SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id                   BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    attribute_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Attribute name
+    attribute_code       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Attribute code
+    attribute_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Attribute type flag
+    default_value        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Default value
+    driver_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Driver ID
+    attribute_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Command attribute extension information
+    enable_flag          SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark               TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version              INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id           BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time          TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time         TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted              SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_command_attribute_attribute_type_flag CHECK (attribute_type_flag BETWEEN 0 AND 7),
     CONSTRAINT chk_command_attribute_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_command_attribute_deleted CHECK (deleted IN (0, 1))
@@ -560,25 +560,25 @@ COMMENT ON COLUMN dc3_command_attribute.deleted IS 'Logical delete flag, 0: not 
 -- ----------------------------
 CREATE TABLE dc3_event_attribute
 (
-    id                  BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    attribute_name      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Attribute name
-    attribute_code      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Attribute code
-    attribute_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Attribute type flag
-    default_value       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Default value
-    driver_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Driver ID
-    attribute_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Event attribute extension information
-    enable_flag         SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
-    tenant_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    remark              TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    signature           TEXT     DEFAULT ''::TEXT          NOT NULL, -- Signature
-    version             INTEGER  DEFAULT 0 NOT NULL,                 -- Version
-    creator_id          BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name        TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,      -- Creation time
-    operator_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Operation time
-    deleted             SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id                   BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    attribute_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Attribute name
+    attribute_code       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Attribute code
+    attribute_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Attribute type flag
+    default_value        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Default value
+    driver_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Driver ID
+    attribute_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Event attribute extension information
+    enable_flag          SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark               TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version              INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id           BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time          TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time         TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted              SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_event_attribute_attribute_type_flag CHECK (attribute_type_flag BETWEEN 0 AND 7),
     CONSTRAINT chk_event_attribute_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_event_attribute_deleted CHECK (deleted IN (0, 1))
@@ -619,24 +619,24 @@ COMMENT ON COLUMN dc3_event_attribute.deleted IS 'Logical delete flag, 0: not de
 -- ----------------------------
 CREATE TABLE dc3_profile
 (
-    id                 BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    profile_name       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Profile name
-    profile_code       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Profile code
-    profile_share_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Profile sharing type flag
-    profile_type_flag  SMALLINT DEFAULT 2 NOT NULL,                 -- Profile type flag
-    profile_ext        JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Profile extension information
-    enable_flag        SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
-    tenant_id          BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    remark             TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    signature          TEXT     DEFAULT ''::TEXT          NOT NULL, -- Signature
-    version            INTEGER  DEFAULT 0 NOT NULL,                 -- Version
-    creator_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Creation time
-    operator_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,    -- Operation time
-    deleted            SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id                  BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    profile_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Profile name
+    profile_code        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Profile code
+    profile_share_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Profile sharing type flag
+    profile_type_flag   SMALLINT     DEFAULT 2 NOT NULL,                 -- Profile type flag
+    profile_ext         JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Profile extension information
+    enable_flag         SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id           BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark              TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature           TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version             INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time         TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time        TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted             SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_profile_profile_share_flag CHECK (profile_share_flag BETWEEN 0 AND 2),
     CONSTRAINT chk_profile_profile_type_flag CHECK (profile_type_flag BETWEEN 0 AND 2),
     CONSTRAINT chk_profile_enable_flag CHECK (enable_flag IN (0, 1)),
@@ -676,29 +676,29 @@ COMMENT ON COLUMN dc3_profile.deleted IS 'Logical delete flag, 0: not deleted, 1
 -- ----------------------------
 CREATE TABLE dc3_point
 (
-    id              BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    point_name      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Point name
-    point_code      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Point code
-    point_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Point type flag
-    rw_flag         SMALLINT DEFAULT 0 NOT NULL,                 -- Read/write flag
-    base_value      REAL     DEFAULT 0 NOT NULL,                 -- Base value
-    multiple        REAL     DEFAULT 1 NOT NULL,                 -- Multiplier
-    value_decimal   SMALLINT DEFAULT 6 NOT NULL,                 -- Value precision
-    unit            TEXT     DEFAULT ''::TEXT          NOT NULL, -- Unit
-    profile_id      BIGINT   DEFAULT 0 NOT NULL,                 -- Profile ID
-    point_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Point extension information
-    enable_flag     SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
-    tenant_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    remark          TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    signature       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Signature
-    version         INTEGER  DEFAULT 0 NOT NULL,                 -- Version
-    creator_id      BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name    TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id     BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name   TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted         SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id               BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    point_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Point name
+    point_code       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Point code
+    point_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Point type flag
+    rw_flag          SMALLINT     DEFAULT 0 NOT NULL,                 -- Read/write flag
+    base_value       REAL         DEFAULT 0 NOT NULL,                 -- Base value
+    multiple         REAL         DEFAULT 1 NOT NULL,                 -- Multiplier
+    value_decimal    SMALLINT     DEFAULT 6 NOT NULL,                 -- Value precision
+    unit             TEXT         DEFAULT ''::TEXT NOT NULL,          -- Unit
+    profile_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Profile ID
+    point_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Point extension information
+    enable_flag      SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark           TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version          INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name    TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time     TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted          SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_point_point_type_flag CHECK (point_type_flag BETWEEN 0 AND 7),
     CONSTRAINT chk_point_rw_flag CHECK (rw_flag BETWEEN 0 AND 2),
     CONSTRAINT chk_point_enable_flag CHECK (enable_flag IN (0, 1)),
@@ -746,24 +746,24 @@ COMMENT ON COLUMN dc3_point.deleted IS 'Logical delete flag, 0: not deleted, 1: 
 -- ----------------------------
 CREATE TABLE dc3_device
 (
-    id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
-    device_name   TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Device name
-    device_code   TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Device code
-    driver_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Driver ID
-    profile_id    BIGINT,                                        -- Profile ID (device belongs to single profile)
-    device_ext    JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Device extension information
-    enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
-    tenant_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Tenant ID
-    remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
-    signature     TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Signature
-    version       INTEGER  DEFAULT 0 NOT NULL,                   -- Version
-    creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
-    creator_name  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id   BIGINT   DEFAULT 0 NOT NULL,                   -- Operator ID
-    operator_name TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted       SMALLINT DEFAULT 0 NOT NULL,                   -- Logical delete flag, 0: not deleted, 1: deleted
+    id             BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    device_name    TEXT         DEFAULT ''::TEXT NOT NULL,          -- Device name
+    device_code    TEXT         DEFAULT ''::TEXT NOT NULL,          -- Device code
+    driver_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Driver ID
+    profile_id     BIGINT,                                          -- Profile ID (device belongs to single profile)
+    device_ext     JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Device extension information
+    enable_flag    SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version        INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted        SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_device_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_device_deleted CHECK (deleted IN (0, 1))
 );
@@ -869,23 +869,23 @@ COMMENT ON COLUMN dc3_device.deleted IS 'Logical delete flag, 0: not deleted, 1:
 -- ----------------------------
 CREATE TABLE dc3_driver_attribute_config
 (
-    id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
-    attribute_id  BIGINT   DEFAULT 0 NOT NULL,                   -- Driver attribute ID
-    config_value  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Driver configuration value
-    device_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Device ID
-    config_ext    JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Driver configuration information
-    enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
-    tenant_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Tenant ID
-    remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
-    signature     TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Signature
-    version       INTEGER  DEFAULT 0 NOT NULL,                   -- Version
-    creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
-    creator_name  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id   BIGINT   DEFAULT 0 NOT NULL,                   -- Operator ID
-    operator_name TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted       SMALLINT DEFAULT 0 NOT NULL,                   -- Logical delete flag, 0: not deleted, 1: deleted
+    id             BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    attribute_id   BIGINT       DEFAULT 0 NOT NULL,                 -- Driver attribute ID
+    config_value   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Driver configuration value
+    device_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Device ID
+    config_ext     JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Driver configuration information
+    enable_flag    SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version        INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted        SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_driver_attribute_config_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_driver_attribute_config_deleted CHECK (deleted IN (0, 1))
 );
@@ -926,24 +926,24 @@ COMMENT ON COLUMN dc3_driver_attribute_config.deleted IS 'Logical delete flag, 0
 -- ----------------------------
 CREATE TABLE dc3_point_attribute_config
 (
-    id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
-    attribute_id  BIGINT   DEFAULT 0 NOT NULL,                   -- Point attribute ID
-    config_value  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Point configuration value
-    device_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Device ID
-    config_ext    JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Point configuration information
-    point_id      BIGINT   DEFAULT 0 NOT NULL,                   -- Point ID
-    enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
-    tenant_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Tenant ID
-    remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
-    signature     TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Signature
-    version       INTEGER  DEFAULT 0 NOT NULL,                   -- Version
-    creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
-    creator_name  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id   BIGINT   DEFAULT 0 NOT NULL,                   -- Operator ID
-    operator_name TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted       SMALLINT DEFAULT 0 NOT NULL,                   -- Logical delete flag, 0: not deleted, 1: deleted
+    id             BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    attribute_id   BIGINT       DEFAULT 0 NOT NULL,                 -- Point attribute ID
+    config_value   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Point configuration value
+    device_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Device ID
+    config_ext     JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Point configuration information
+    point_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Point ID
+    enable_flag    SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version        INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted        SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_point_attribute_config_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_point_attribute_config_deleted CHECK (deleted IN (0, 1))
 );
@@ -984,24 +984,24 @@ COMMENT ON COLUMN dc3_point_attribute_config.deleted IS 'Logical delete flag, 0:
 -- ----------------------------
 CREATE TABLE dc3_command_attribute_config
 (
-    id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
-    attribute_id  BIGINT   DEFAULT 0 NOT NULL,                   -- Command attribute ID
-    config_value  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Command configuration value
-    device_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Device ID
-    config_ext    JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Command configuration information
-    command_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Command ID
-    enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
-    tenant_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Tenant ID
-    remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
-    signature     TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Signature
-    version       INTEGER  DEFAULT 0 NOT NULL,                   -- Version
-    creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
-    creator_name  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id   BIGINT   DEFAULT 0 NOT NULL,                   -- Operator ID
-    operator_name TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted       SMALLINT DEFAULT 0 NOT NULL,                   -- Logical delete flag, 0: not deleted, 1: deleted
+    id             BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    attribute_id   BIGINT       DEFAULT 0 NOT NULL,                 -- Command attribute ID
+    config_value   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Command configuration value
+    device_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Device ID
+    config_ext     JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Command configuration information
+    command_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Command ID
+    enable_flag    SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version        INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted        SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_command_attribute_config_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_command_attribute_config_deleted CHECK (deleted IN (0, 1))
 );
@@ -1041,24 +1041,24 @@ COMMENT ON COLUMN dc3_command_attribute_config.deleted IS 'Logical delete flag, 
 -- ----------------------------
 CREATE TABLE dc3_event_attribute_config
 (
-    id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
-    attribute_id  BIGINT   DEFAULT 0 NOT NULL,                   -- Event attribute ID
-    config_value  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Event configuration value
-    device_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Device ID
-    config_ext    JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Event configuration information
-    event_id      BIGINT   DEFAULT 0 NOT NULL,                   -- Event ID
-    enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
-    tenant_id     BIGINT   DEFAULT 0 NOT NULL,                   -- Tenant ID
-    remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
-    signature     TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Signature
-    version       INTEGER  DEFAULT 0 NOT NULL,                   -- Version
-    creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
-    creator_name  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id   BIGINT   DEFAULT 0 NOT NULL,                   -- Operator ID
-    operator_name TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted       SMALLINT DEFAULT 0 NOT NULL,                   -- Logical delete flag, 0: not deleted, 1: deleted
+    id             BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    attribute_id   BIGINT       DEFAULT 0 NOT NULL,                 -- Event attribute ID
+    config_value   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Event configuration value
+    device_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Device ID
+    config_ext     JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Event configuration information
+    event_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Event ID
+    enable_flag    SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version        INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted        SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_event_attribute_config_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_event_attribute_config_deleted CHECK (deleted IN (0, 1))
 );
@@ -1098,26 +1098,26 @@ COMMENT ON COLUMN dc3_event_attribute_config.deleted IS 'Logical delete flag, 0:
 -- ----------------------------
 CREATE TABLE dc3_command
 (
-    id                BIGINT PRIMARY KEY  NOT NULL,              -- Primary key ID
-    command_name      TEXT     DEFAULT ''::TEXT       NOT NULL,  -- Command name
-    command_code      TEXT     DEFAULT ''::TEXT       NOT NULL,  -- Command code
-    command_type_flag SMALLINT DEFAULT 0  NOT NULL,              -- Command type flag, 0: custom, 1: config, 2: action
-    call_type_flag    SMALLINT DEFAULT 0  NOT NULL,              -- Call type flag, 0: sync, 1: async
-    timeout           INTEGER  DEFAULT 30 NOT NULL,              -- Timeout in seconds
-    command_ext       JSONB     DEFAULT '{}'::JSONB     NOT NULL,  -- Command extension information
-    enable_flag       SMALLINT DEFAULT 0  NOT NULL,              -- Enable flag, 0: enabled, 1: disabled
-    tenant_id         BIGINT   DEFAULT 0  NOT NULL,              -- Tenant ID
-    profile_id        BIGINT   DEFAULT 0  NOT NULL,              -- Profile ID
-    remark            TEXT     DEFAULT ''::TEXT       NOT NULL,  -- Description
-    signature         TEXT     DEFAULT ''::TEXT       NOT NULL,  -- Signature
-    version           INTEGER  DEFAULT 0  NOT NULL,              -- Version
-    creator_id        BIGINT   DEFAULT 0  NOT NULL,              -- Creator ID
-    creator_name      TEXT     DEFAULT ''::TEXT       NOT NULL,  -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id       BIGINT   DEFAULT 0  NOT NULL,              -- Operator ID
-    operator_name     TEXT     DEFAULT ''::TEXT       NOT NULL,  -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted           SMALLINT DEFAULT 0  NOT NULL,              -- Logical delete flag, 0: not deleted, 1: deleted
+    id                 BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    command_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Command name
+    command_code       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Command code
+    command_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Command type flag, 0: custom, 1: config, 2: action
+    call_type_flag     SMALLINT     DEFAULT 0 NOT NULL,                 -- Call type flag, 0: sync, 1: async
+    timeout            INTEGER      DEFAULT 30 NOT NULL,                -- Timeout in seconds
+    command_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Command extension information
+    enable_flag        SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    profile_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Profile ID
+    remark             TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature          TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version            INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time        TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted            SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_command_command_type_flag CHECK (command_type_flag BETWEEN 0 AND 2),
     CONSTRAINT chk_command_call_type_flag CHECK (call_type_flag BETWEEN 0 AND 1),
     CONSTRAINT chk_command_enable_flag CHECK (enable_flag IN (0, 1)),
@@ -1161,27 +1161,27 @@ COMMENT ON COLUMN dc3_command.deleted IS 'Logical delete flag, 0: not deleted, 1
 -- ----------------------------
 CREATE TABLE dc3_command_param
 (
-    id                   BIGINT PRIMARY KEY NOT NULL,              -- Primary key ID
-    param_name           TEXT     DEFAULT ''::TEXT       NOT NULL, -- Param name
-    param_code           TEXT     DEFAULT ''::TEXT       NOT NULL, -- Param code
-    param_direction_flag SMALLINT DEFAULT 0 NOT NULL,              -- Param direction flag, 0: input, 1: output
-    param_type_flag      SMALLINT DEFAULT 0 NOT NULL,              -- Param type flag
-    required_flag        SMALLINT DEFAULT 0 NOT NULL,              -- Required flag, 0: no, 1: yes
-    default_value        TEXT     DEFAULT ''::TEXT       NOT NULL, -- Default value
-    param_ext            JSONB     DEFAULT '{}'::JSONB     NOT NULL, -- Param extension information
-    enable_flag          SMALLINT DEFAULT 0 NOT NULL,              -- Enable flag, 0: enabled, 1: disabled
-    tenant_id            BIGINT   DEFAULT 0 NOT NULL,              -- Tenant ID
-    command_id           BIGINT   DEFAULT 0 NOT NULL,              -- Command ID
-    remark               TEXT     DEFAULT ''::TEXT       NOT NULL, -- Description
-    signature            TEXT     DEFAULT ''::TEXT       NOT NULL, -- Signature
-    version              INTEGER  DEFAULT 0 NOT NULL,              -- Version
-    creator_id           BIGINT   DEFAULT 0 NOT NULL,              -- Creator ID
-    creator_name         TEXT     DEFAULT ''::TEXT       NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,    -- Creation time
-    operator_id          BIGINT   DEFAULT 0 NOT NULL,              -- Operator ID
-    operator_name        TEXT     DEFAULT ''::TEXT       NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,   -- Operation time
-    deleted              SMALLINT DEFAULT 0 NOT NULL,              -- Logical delete flag, 0: not deleted, 1: deleted
+    id                    BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    param_name            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Param name
+    param_code            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Param code
+    param_direction_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Param direction flag, 0: input, 1: output
+    param_type_flag       SMALLINT     DEFAULT 0 NOT NULL,                 -- Param type flag
+    required_flag         SMALLINT     DEFAULT 0 NOT NULL,                 -- Required flag, 0: no, 1: yes
+    default_value         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Default value
+    param_ext             JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Param extension information
+    enable_flag           SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id             BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    command_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Command ID
+    remark                TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature             TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version               INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name          TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time           TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id           BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time          TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted               SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_command_param_param_direction_flag CHECK (param_direction_flag BETWEEN 0 AND 1),
     CONSTRAINT chk_command_param_required_flag CHECK (required_flag BETWEEN 0 AND 1),
     CONSTRAINT chk_command_param_enable_flag CHECK (enable_flag IN (0, 1)),
@@ -1227,25 +1227,25 @@ COMMENT ON COLUMN dc3_command_param.deleted IS 'Logical delete flag, 0: not dele
 -- ----------------------------
 CREATE TABLE dc3_event
 (
-    id               BIGINT PRIMARY KEY NOT NULL,                -- Primary key ID
-    event_name       TEXT     DEFAULT ''::TEXT       NOT NULL,   -- Event name
-    event_code       TEXT     DEFAULT ''::TEXT       NOT NULL,   -- Event code
-    event_type_flag  SMALLINT DEFAULT 0 NOT NULL,                -- Event type flag, 0: info, 1: alert, 2: fault, 3: lifecycle
-    event_level_flag SMALLINT DEFAULT 0 NOT NULL,                -- Event level flag, 0: low, 1: medium, 2: high, 3: critical
-    event_ext        JSONB     DEFAULT '{}'::JSONB     NOT NULL,   -- Event extension information
-    enable_flag      SMALLINT DEFAULT 0 NOT NULL,                -- Enable flag, 0: enabled, 1: disabled
-    tenant_id        BIGINT   DEFAULT 0 NOT NULL,                -- Tenant ID
-    profile_id       BIGINT   DEFAULT 0 NOT NULL,                -- Profile ID
-    remark           TEXT     DEFAULT ''::TEXT       NOT NULL,   -- Description
-    signature        TEXT     DEFAULT ''::TEXT       NOT NULL,   -- Signature
-    version          INTEGER  DEFAULT 0 NOT NULL,                -- Version
-    creator_id       BIGINT   DEFAULT 0 NOT NULL,                -- Creator ID
-    creator_name     TEXT     DEFAULT ''::TEXT       NOT NULL,   -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id      BIGINT   DEFAULT 0 NOT NULL,                -- Operator ID
-    operator_name    TEXT     DEFAULT ''::TEXT       NOT NULL,   -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted          SMALLINT DEFAULT 0 NOT NULL,                -- Logical delete flag, 0: not deleted, 1: deleted
+    id                BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    event_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Event name
+    event_code        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Event code
+    event_type_flag   SMALLINT     DEFAULT 0 NOT NULL,                 -- Event type flag, 0: info, 1: alert, 2: fault, 3: lifecycle
+    event_level_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Event level flag, 0: low, 1: medium, 2: high, 3: critical
+    event_ext         JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Event extension information
+    enable_flag       SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    profile_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Profile ID
+    remark            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version           INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted           SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_event_event_type_flag CHECK (event_type_flag BETWEEN 0 AND 3),
     CONSTRAINT chk_event_event_level_flag CHECK (event_level_flag BETWEEN 0 AND 3),
     CONSTRAINT chk_event_enable_flag CHECK (enable_flag IN (0, 1)),
@@ -1288,24 +1288,24 @@ COMMENT ON COLUMN dc3_event.deleted IS 'Logical delete flag, 0: not deleted, 1: 
 -- ----------------------------
 CREATE TABLE dc3_event_param
 (
-    id              BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    param_name      TEXT     DEFAULT ''::TEXT       NOT NULL,    -- Param name
-    param_code      TEXT     DEFAULT ''::TEXT       NOT NULL,    -- Param code
-    param_type_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Param type flag
-    param_ext       JSONB     DEFAULT '{}'::JSONB     NOT NULL,    -- Param extension information
-    enable_flag     SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
-    tenant_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    event_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Event ID
-    remark          TEXT     DEFAULT ''::TEXT       NOT NULL,    -- Description
-    signature       TEXT     DEFAULT ''::TEXT       NOT NULL,    -- Signature
-    version         INTEGER  DEFAULT 0 NOT NULL,                 -- Version
-    creator_id      BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name    TEXT     DEFAULT ''::TEXT       NOT NULL,    -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id     BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name   TEXT     DEFAULT ''::TEXT       NOT NULL,    -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted         SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id               BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    param_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Param name
+    param_code       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Param code
+    param_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Param type flag
+    param_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Param extension information
+    enable_flag      SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    event_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Event ID
+    remark           TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    signature        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Signature
+    version          INTEGER      DEFAULT 0 NOT NULL,                 -- Version
+    creator_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name    TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time     TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted          SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_event_param_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_event_param_deleted CHECK (deleted IN (0, 1))
 );
