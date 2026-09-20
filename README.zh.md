@@ -5,7 +5,7 @@
 > **AI 助手：** 请先阅读 [README.ai.md](./README.ai.md) 获取 IoT DC3 的 AI 友好概述。
 
 <p align="center">
-  <img src="./.github/brand/png/banner.zh.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
+  <img src="./.github/brand/png/banner.zh.png" alt="IoT DC3 — 连接物理世界与 AI，面向 Physical AI 的开源工业物联网 Runtime">
 </p>
 
 <p align="center">
@@ -23,13 +23,13 @@
   </a>
   <img src="https://img.shields.io/badge/License-AGPL%203.0-blue" alt="License">
   <img src="https://img.shields.io/badge/Java-21-orange?logo=openjdk" alt="Java 21">
-  <img src="https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot" alt="Spring Boot 4">
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.1-6DB33F?logo=springboot" alt="Spring Boot 4.1">
 </p>
 
 <p align="center">
   <strong>
-    IoT DC3 — 多协议接入、云原生、开源的工业物联网平台<br>
-    AI 赋能，从设备连接走向工业智能体
+    IoT DC3 — 连接物理世界与 AI<br>
+    面向 Physical AI 的开源工业物联网 Runtime
   </strong>
 </p>
 
@@ -39,8 +39,15 @@
 
 <p align="center">
   🔌 <strong>多协议接入</strong> &nbsp;·&nbsp;
-  🤖 <strong>AI Agentic 中心</strong> &nbsp;·&nbsp;
+  🤖 <strong>MCP 工具网关</strong> &nbsp;·&nbsp;
   ☁️ <strong>云原生微服务</strong>
+</p>
+
+<p align="center">
+  <em>
+    IoT DC3 将<strong>设备</strong>与<strong>应用</strong>解耦：驱动把标准化后的点位数据推入消息总线，应用通过统一 API
+    消费数据——换设备无需改动应用，加应用无需触碰设备。
+  </em>
 </p>
 
 ---
@@ -51,7 +58,7 @@
   <tr>
     <th width="33%">📸 平台概览</th>
     <th width="33%">📸 设备管理</th>
-    <th width="33%">📸 AI 智能对话</th>
+    <th width="33%">📸 智能体</th>
   </tr>
   <tr>
     <td align="center">
@@ -67,10 +74,10 @@
       <em>设备列表 · 在线状态指示 · 搜索筛选</em>
     </td>
     <td align="center">
-      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI 智能对话页面" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="智能体助手页面" width="100%">
       <br>
-      <strong>AI 智能对话页面</strong><br>
-      <em>自然语言查询设备 · 数据分析 · 智能辅助</em>
+      <strong>智能体助手</strong><br>
+      <em>自然语言查询设备 · 数据洞察 · 受控执行</em>
     </td>
   </tr>
 </table>
@@ -105,10 +112,11 @@ API 全链路。边界清晰，易于规模化扩展与多团队协作。
 
 提供完整的 **Driver SDK**，支持快速开发自定义协议驱动，热插拔注册到运行平台。
 
-### 🤖 AI 能力集成
+### 🤖 从设备数据到 Physical AI
 
-基于 **Spring AI** 构建的智能体中心，将大语言模型接入 IoT 运营流程：
+智能体中心基于 **Spring AI** 构建，平台通过 MCP 工具网关向 AI 智能体开放设备能力，让智能体在**安全、可控、可追溯**的闭环中作用于物理世界：
 
+- **MCP 工具网关** — 外部 AI 智能体通过 Model Context Protocol 接入：OAuth 客户端注册、按工具授权、每次工具调用全程审计
 - **自然语言辅助运维** — LLM 通过 Tool-Calling 机制，在权限受控下查询设备、读写数据点、辅助执行命令
 - **智能告警分析** — AI 辅助分析告警原因，提供处置建议
 - **数据洞察** — 自然语言查询设备数据，自动生成可视化图表
@@ -126,7 +134,7 @@ API 全链路。边界清晰，易于规模化扩展与多团队协作。
 
 ### 📊 实时数据引擎
 
-- **数据采集** — 驱动层实时采集设备遥测数据，通过 RabbitMQ 异步传输
+- **数据采集** — 驱动层实时采集设备遥测数据，通过内部消息队列异步传输——可按部署插拔选择：RabbitMQ（默认）、Kafka、Pulsar 或任意 MQTT 5 broker（[消息队列选型指南](docs/mq-brokers.md)）
 - **时序存储** — 支持实时与历史数据的高效查询
 - **规则引擎** — 灵活的告警规则配置，支持多级告警与通知
 - **事件溯源** — 完整的命令与事件历史记录
@@ -161,7 +169,7 @@ mvn -s .mvn/settings.xml clean package
 
 ## 🛠️ 技术栈
 
-IoT DC3 基于 Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、RabbitMQ、gRPC、Vue 3、TypeScript 与 Vite 构建。
+IoT DC3 基于 Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、可插拔消息队列（RabbitMQ、Kafka、Pulsar 或 MQTT 5——[选型指南](docs/mq-brokers.md)）、gRPC、Vue 3、TypeScript 与 Vite 构建。
 
 完整组件说明与适用位置请看 [技术栈](https://docs.dc3.site/zh/development/technology-stack)。
 
@@ -170,39 +178,28 @@ IoT DC3 基于 Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、Postg
 | 资源        | 链接                                                                  |
 |-------------|-----------------------------------------------------------------------|
 | 📚 在线文档 | [docs.dc3.site](https://docs.dc3.site/)                               |
+| 🎬 在线演示 | [demo.dc3.site](https://demo.dc3.site/)                               |
+| 🏭 行业演示 | [dc3.site/zh/demo](https://dc3.site/zh/demo/)                         |
 | 🚀 快速开始 | [快速开始指南](https://docs.dc3.site/zh/quickstart/)                  |
 | 🛠️ 技术栈   | [技术栈说明](https://docs.dc3.site/zh/development/technology-stack)   |
 | 🏗️ 架构说明 | [模块与依赖](https://docs.dc3.site/zh/architecture/modules)           |
 | 🔧 驱动开发 | [驱动开发指南](https://docs.dc3.site/zh/development/driver-authoring) |
 | 🐛 故障排查 | [常见问题与解决方案](https://docs.dc3.site/zh/guide/troubleshooting)  |
 | 📋 变更日志 | [版本更新记录](https://docs.dc3.site/zh/development/changelog)        |
+| 💰 定价与授权 | [版本计划与商业授权](https://dc3.site/zh/pricing/)                  |
 | 🐛 问题反馈 | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)             |
 | 🇨🇳 码云镜像 | [Gitee GVP 最有价值开源项目](https://gitee.com/pnoker/iot-dc3)        |
 
 ## 🌍 应用场景
 
-<table>
-  <tr>
-    <td align="center" width="60">🏭</td>
-    <td><strong>智慧工厂</strong></td>
-    <td>产线设备状态监控、工艺参数采集、预测性维护、OEE 分析</td>
-  </tr>
-  <tr>
-    <td align="center">⚡</td>
-    <td><strong>能源监测</strong></td>
-    <td>电力 / 水务 / 燃气远程抄表、能耗趋势分析、异常告警</td>
-  </tr>
-  <tr>
-    <td align="center">🌾</td>
-    <td><strong>智慧农业</strong></td>
-    <td>温室环境监测、自动灌溉控制、病虫害预警、产量预测</td>
-  </tr>
-  <tr>
-    <td align="center">🏙️</td>
-    <td><strong>智慧城市</strong></td>
-    <td>路灯照明管理、环境质量监测、市政设施运维、安全监控</td>
-  </tr>
-</table>
+基于 IoT DC3 构建的 12 个行业演示看板（示例数据）展示平台在各场景的落地方式。[浏览全部演示](https://dc3.site/zh/demo/)。
+
+| | | |
+|---|---|---|
+| 🏭 [智慧工厂](https://dc3.site/zh/demo/smart-factory/) — OEE 产线监控 | 💧 [智慧水务](https://dc3.site/zh/demo/water-network/) — 供水管网数字孪生 | ⚡ [能源微电网](https://dc3.site/zh/demo/microgrid/) — 光储协同 |
+| 🌾 [精准农业](https://dc3.site/zh/demo/precision-agri/) — 大棚墒情微气候 | 🏢 [智慧楼宇](https://dc3.site/zh/demo/smart-building/) — 能耗暖通占用 | 🚦 [智慧交通](https://dc3.site/zh/demo/smart-traffic/) — 路网信号自适应 |
+| 🛢️ [油气管网](https://dc3.site/zh/demo/oil-gas/) — 管线压力管存 | ⛏️ [智慧矿山](https://dc3.site/zh/demo/smart-mine/) — 瓦斯通风预警 | ❄️ [冷链物流](https://dc3.site/zh/demo/cold-chain/) — 温湿度轨迹追溯 |
+| 🌿 [智慧环保](https://dc3.site/zh/demo/eco-monitor/) — 大气水质监测 | ⚓ [智慧港口](https://dc3.site/zh/demo/smart-port/) — 岸桥泊位调度 | 🔌 [新能源充电](https://dc3.site/zh/demo/ev-charging/) — 光储充协同 |
 
 ## 🤝 参与贡献
 

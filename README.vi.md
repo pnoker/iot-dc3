@@ -5,7 +5,7 @@
 > **Trợ lý AI:** Đọc [README.ai.md](./README.ai.md) trước để có tổng quan ngắn gọn về IoT DC3 dành cho AI.
 
 <p align="center">
-  <img src="./.github/brand/png/banner.vi.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
+  <img src="./.github/brand/png/banner.vi.png" alt="IoT DC3 — kết nối thế giới vật lý với AI, Industrial IoT Runtime mã nguồn mở cho Physical AI">
 </p>
 
 <p align="center">
@@ -23,13 +23,13 @@
   </a>
   <img src="https://img.shields.io/badge/License-AGPL%203.0-blue" alt="License">
   <img src="https://img.shields.io/badge/Java-21-orange?logo=openjdk" alt="Java 21">
-  <img src="https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot" alt="Spring Boot 4">
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.1-6DB33F?logo=springboot" alt="Spring Boot 4.1">
 </p>
 
 <p align="center">
   <strong>
-    IoT DC3 — nền tảng IoT công nghiệp đa giao thức, cloud-native, mã nguồn mở.<br>
-    Với AI — từ kết nối thiết bị đến agent công nghiệp
+    IoT DC3 — kết nối thế giới vật lý với AI<br>
+    Industrial IoT Runtime mã nguồn mở cho Physical AI
   </strong>
 </p>
 
@@ -39,8 +39,16 @@
 
 <p align="center">
   🔌 <strong>Kết nối đa giao thức</strong> &nbsp;·&nbsp;
-  🤖 <strong>AI Agentic Center</strong> &nbsp;·&nbsp;
+  🤖 <strong>Cổng công cụ MCP</strong> &nbsp;·&nbsp;
   ☁️ <strong>Microservice cloud-native</strong>
+</p>
+
+<p align="center">
+  <em>
+    IoT DC3 tách rời <strong>thiết bị</strong> khỏi <strong>ứng dụng</strong>: driver đẩy dữ liệu point đã chuẩn hóa vào
+    message bus, và ứng dụng tiêu thụ qua một API thống nhất — thêm hoặc thay thiết bị mà không cần sửa ứng dụng, xây
+    ứng dụng mới mà không cần động vào thiết bị.
+  </em>
 </p>
 
 ---
@@ -51,7 +59,7 @@
   <tr>
     <th width="33%">📸 Tổng quan nền tảng</th>
     <th width="33%">📸 Quản lý thiết bị</th>
-    <th width="33%">📸 Trò chuyện AI</th>
+    <th width="33%">📸 AI Agent</th>
   </tr>
   <tr>
     <td align="center">
@@ -67,10 +75,10 @@
       <em>Danh sách thiết bị · Trạng thái online · Tìm kiếm và lọc</em>
     </td>
     <td align="center">
-      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="Trang trò chuyện AI" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="Trang trợ lý AI Agent" width="100%">
       <br>
-      <strong>Trò chuyện AI</strong><br>
-      <em>Điều khiển thiết bị bằng ngôn ngữ tự nhiên · Truy vấn dữ liệu · Phân tích thông minh</em>
+      <strong>Trợ lý AI Agent</strong><br>
+      <em>Điều khiển thiết bị bằng ngôn ngữ tự nhiên · Thông tin chuyên sâu · Thực thi có kiểm soát</em>
     </td>
   </tr>
 </table>
@@ -108,10 +116,13 @@ truyền thông cơ bản, mô phỏng và gỡ lỗi, giúp giảm chi phí k�
 
 **Driver SDK** hỗ trợ phát triển nhanh driver giao thức tùy chỉnh và đăng ký vào nền tảng runtime.
 
-### 🤖 Tích hợp năng lực AI
+### 🤖 Từ dữ liệu thiết bị đến Physical AI
 
-Agentic Center được xây dựng trên **Spring AI**, đưa mô hình ngôn ngữ lớn vào quy trình vận hành IoT:
+Agentic Center được xây dựng trên **Spring AI**, và nền tảng mở cổng công cụ MCP để các AI agent có thể tác động lên
+thế giới vật lý trong một vòng lặp **an toàn, kiểm soát được, truy vết được**:
 
+- **Cổng công cụ MCP** — các AI agent bên ngoài kết nối qua Model Context Protocol: đăng ký OAuth client, cấp quyền
+  theo từng công cụ và audit trail đầy đủ cho mọi lượt gọi công cụ
 - **Vận hành hỗ trợ bằng ngôn ngữ tự nhiên** - thông qua Tool Calling và trong phạm vi kiểm soát quyền, LLM có thể truy
   vấn thiết bị, đọc/ghi point và hỗ trợ thực thi lệnh
 - **Phân tích cảnh báo thông minh** - AI hỗ trợ phân tích nguyên nhân và đề xuất cách xử lý
@@ -131,7 +142,7 @@ Kiến trúc microservice phân tán dựa trên **Spring Boot 4 + Spring Cloud 
 
 ### 📊 Engine dữ liệu thời gian thực
 
-- **Thu thập dữ liệu** - Driver thu thập telemetry thiết bị và truyền bất đồng bộ qua RabbitMQ
+- **Thu thập dữ liệu** - Driver thu thập telemetry thiết bị và truyền bất đồng bộ qua message broker nội bộ — chọn theo từng triển khai: RabbitMQ (mặc định), Kafka, Pulsar hoặc bất kỳ MQTT 5 broker nào ([hướng dẫn broker](docs/mq-brokers.md))
 - **Lưu trữ chuỗi thời gian** - Truy vấn hiệu quả dữ liệu thời gian thực và dữ liệu lịch sử
 - **Rule engine** - Cấu hình rule cảnh báo linh hoạt, hỗ trợ cảnh báo nhiều cấp và thông báo
 - **Truy vết sự kiện** - Lịch sử đầy đủ của lệnh và sự kiện
@@ -169,8 +180,8 @@ Nếu cần registry Alibaba Cloud cho Trung Quốc đại lục, dùng `make up
 
 ## 🛠️ Công nghệ sử dụng
 
-IoT DC3 được xây dựng trên Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, RabbitMQ, gRPC, Vue 3,
-TypeScript và Vite.
+IoT DC3 được xây dựng trên Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, message broker cắm được
+(RabbitMQ, Kafka, Pulsar hoặc MQTT 5 — [hướng dẫn chọn](docs/mq-brokers.md)), gRPC, Vue 3, TypeScript và Vite.
 
 Xem [Technology Stack](https://docs.dc3.site/en/development/technology-stack) để biết chi tiết từng thành phần và vị trí
 sử dụng.
@@ -180,39 +191,29 @@ sử dụng.
 | Tài nguyên           | Liên kết                                                                        |
 |----------------------|---------------------------------------------------------------------------------|
 | 📚 Tài liệu online   | [docs.dc3.site](https://docs.dc3.site/)                                         |
+| 🎬 Demo trực tuyến   | [demo.dc3.site](https://demo.dc3.site/)                                         |
+| 🏭 Demo ngành nghiệp | [dc3.site/en/demo](https://dc3.site/en/demo/)                                   |
 | 🚀 Quickstart        | [Quickstart Guide](https://docs.dc3.site/en/quickstart/)                        |
 | 🛠️ Công nghệ         | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)       |
 | 🏗️ Kiến trúc         | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
 | 🔧 Phát triển driver | [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring) |
 | 🐛 Khắc phục sự cố   | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)               |
 | 📋 Changelog         | [Release Changelog](https://docs.dc3.site/en/development/changelog)             |
+| 💰 Giá & giấy phép   | [Gói và giấy phép thương mại](https://dc3.site/en/pricing/)                     |
 | 🐛 Phản hồi issue    | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                       |
 | 🇨🇳 Gitee mirror      | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                           |
 
 ## 🌍 Trường hợp ứng dụng
 
-<table>
-  <tr>
-    <td align="center" width="60">🏭</td>
-    <td><strong>Nhà máy thông minh</strong></td>
-    <td>Giám sát trạng thái thiết bị dây chuyền, thu thập tham số quy trình, bảo trì dự đoán, phân tích OEE</td>
-  </tr>
-  <tr>
-    <td align="center">⚡</td>
-    <td><strong>Giám sát năng lượng</strong></td>
-    <td>Đọc công tơ điện/nước/gas từ xa, phân tích xu hướng năng lượng, cảnh báo bất thường</td>
-  </tr>
-  <tr>
-    <td align="center">🌾</td>
-    <td><strong>Nông nghiệp thông minh</strong></td>
-    <td>Giám sát môi trường nhà kính, điều khiển tưới tự động, cảnh báo sâu bệnh, dự báo sản lượng</td>
-  </tr>
-  <tr>
-    <td align="center">🏙️</td>
-    <td><strong>Thành phố thông minh</strong></td>
-    <td>Quản lý đèn đường, giám sát chất lượng môi trường, vận hành hạ tầng đô thị, giám sát an toàn</td>
-  </tr>
-</table>
+Mười hai dashboard demo ngành (dữ liệu mô phỏng) xây trên IoT DC3 cho thấy nền tảng vận hành trong từng tình huống.
+[Xem tất cả demo](https://dc3.site/en/demo/).
+
+| | | |
+|---|---|---|
+| 🏭 [Nhà máy thông minh](https://dc3.site/en/demo/smart-factory/) — giám sát OEE | 💧 [Mạng nước thông minh](https://dc3.site/en/demo/water-network/) — digital twin | ⚡ [Lưới điện vi mô](https://dc3.site/en/demo/microgrid/) — cân bằng quang-dự trữ |
+| 🌾 [Nông nghiệp chính xác](https://dc3.site/en/demo/precision-agri/) — vi khí hậu nhà kính | 🏢 [Tòa nhà thông minh](https://dc3.site/en/demo/smart-building/) — HVAC & mật độ sử dụng | 🚦 [Giao thông thông minh](https://dc3.site/en/demo/smart-traffic/) — tắc nghẽn & tín hiệu |
+| 🛢️ [Đường ống dầu khí](https://dc3.site/en/demo/oil-gas/) — áp lực đường ống | ⛏️ [Mỏ thông minh](https://dc3.site/en/demo/smart-mine/) — khí & thông gió | ❄️ [Chuỗi lạnh](https://dc3.site/en/demo/cold-chain/) — truy vết nhiệt độ |
+| 🌿 [Giám sát môi trường](https://dc3.site/en/demo/eco-monitor/) — khí & nước | ⚓ [Cảng thông minh](https://dc3.site/en/demo/smart-port/) — bến & bãi | 🔌 [Sạc xe điện](https://dc3.site/en/demo/ev-charging/) — phụ tải & tích trữ |
 
 ## 🤝 Đóng góp
 

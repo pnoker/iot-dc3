@@ -17,7 +17,7 @@
 
 <!-- DC3 brand banner template (V4 liquid-glass lockup):
      Edit only this file for design changes, then run gen-banners.mjs to regenerate every language's svg+png.
-     Placeholders: Đa giao thức · Cloud-native · Nền tảng IoT Công nghiệp Mã nguồn Mở tagline / 28+ DRIVER GIAO THỨC · EDGE-CLOUD · SENSE–DECIDE–ACT tech tags (per-language copy lives in the LANGS table of gen-banners.mjs).
+     Placeholders: Kết nối thế giới vật lý với AI · Industrial IoT Runtime mã nguồn mở cho Physical AI tagline / 36 DRIVER GIAO THỨC · CỔNG CÔNG CỤ MCP · AN TOÀN · KIỂM SOÁT · TRUY VẾT tech tags (per-language copy lives in the LANGS table of gen-banners.mjs).
      The brand title shares the Segoe UI Variable Display font stack with social-preview.svg. -->
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="420" viewBox="0 0 1600 420"
      font-family="'Segoe UI','PingFang SC','Hiragino Sans','Apple SD Gothic Neo','Microsoft YaHei',Roboto,Arial,sans-serif">
@@ -172,10 +172,10 @@
         </text>
     </g>
     <text x="800" y="316" data-min-x="80" data-max-x="1520" font-size="21" font-weight="500" letter-spacing="2"
-          text-anchor="middle" fill="#41628a">Đa giao thức · Cloud-native · Nền tảng IoT Công nghiệp Mã nguồn Mở
+          text-anchor="middle" fill="#41628a">Kết nối thế giới vật lý với AI · Industrial IoT Runtime mã nguồn mở cho Physical AI
     </text>
     <text x="800" y="350" data-min-x="80" data-max-x="1520" font-size="15" font-weight="650" letter-spacing="1.5"
-          text-anchor="middle" fill="#6b87a0">28+ DRIVER GIAO THỨC · EDGE-CLOUD · SENSE–DECIDE–ACT
+          text-anchor="middle" fill="#6b87a0">36 DRIVER GIAO THỨC · CỔNG CÔNG CỤ MCP · AN TOÀN · KIỂM SOÁT · TRUY VẾT
     </text>
 
 </svg>

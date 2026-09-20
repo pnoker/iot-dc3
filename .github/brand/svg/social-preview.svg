@@ -187,11 +187,10 @@
               font-size="82" font-weight="760" letter-spacing="-3" fill="url(#word)">IoT DC3
         </text>
         <text x="474" y="320" data-max-x="1006" textLength="520" lengthAdjust="spacingAndGlyphs" font-size="18"
-              font-weight="600" letter-spacing="0.2" fill="#255e83">Multi-protocol · Cloud-native · Open-source
-            Industrial IoT Platform
+              font-weight="600" letter-spacing="0.2" fill="#255e83">Connect the Physical World to AI · Open-source Industrial IoT Runtime
         </text>
         <text x="474" y="357" data-max-x="1006" textLength="520" lengthAdjust="spacingAndGlyphs" font-size="14"
-              font-weight="700" letter-spacing="2.2" fill="#4e76a2">28+ PROTOCOL DRIVERS · EDGE-CLOUD · SENSE–DECIDE–ACT
+              font-weight="700" letter-spacing="2.2" fill="#4e76a2">36 PROTOCOL DRIVERS · MCP TOOL GATEWAY · EDGE-CLOUD
         </text>
     </g>
     <g aria-label="Project website and license">

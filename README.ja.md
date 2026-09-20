@@ -5,7 +5,7 @@
 > **AI アシスタント：** IoT DC3 の簡潔な AI 向け概要については、最初に [README.ai.md](./README.ai.md) をお読みください。
 
 <p align="center">
-  <img src="./.github/brand/png/banner.ja.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
+  <img src="./.github/brand/png/banner.ja.png" alt="IoT DC3 — 物理世界と AI をつなぐ、Physical AI ためのオープンソース産業 IoT Runtime">
 </p>
 
 <p align="center">
@@ -23,13 +23,13 @@
   </a>
   <img src="https://img.shields.io/badge/License-AGPL%203.0-blue" alt="License">
   <img src="https://img.shields.io/badge/Java-21-orange?logo=openjdk" alt="Java 21">
-  <img src="https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot" alt="Spring Boot 4">
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.1-6DB33F?logo=springboot" alt="Spring Boot 4.1">
 </p>
 
 <p align="center">
   <strong>
-    IoT DC3 — マルチプロトコル接続・クラウドネイティブ・オープンソースの産業 IoT プラットフォーム<br>
-    AI 活用 — デバイス接続から産業エージェントへ
+    IoT DC3 — 物理世界と AI をつなぐ<br>
+    Physical AI ためのオープンソース産業 IoT Runtime
   </strong>
 </p>
 
@@ -39,8 +39,15 @@
 
 <p align="center">
   🔌 <strong>マルチプロトコル接続</strong> &nbsp;·&nbsp;
-  🤖 <strong>AI Agentic Center</strong> &nbsp;·&nbsp;
+  🤖 <strong>MCP ツールゲートウェイ</strong> &nbsp;·&nbsp;
   ☁️ <strong>クラウドネイティブマイクロサービス</strong>
+</p>
+
+<p align="center">
+  <em>
+    IoT DC3 は<strong>デバイス</strong>と<strong>アプリケーション</strong>を分離します。ドライバーが正規化したポイントデータを
+    メッセージバスへ送信し、アプリケーションは統一 API でそれを利用します。デバイスを追加・変更してもアプリケーションを変更する必要がなく、アプリケーションを追加してもデバイス側に触れる必要がありません。
+  </em>
 </p>
 
 ---
@@ -51,7 +58,7 @@
   <tr>
     <th width="33%">📸 プラットフォーム概要</th>
     <th width="33%">📸 デバイス管理</th>
-    <th width="33%">📸 AI チャット</th>
+    <th width="33%">📸 AI エージェント</th>
   </tr>
   <tr>
     <td align="center">
@@ -67,10 +74,10 @@
       <em>デバイス一覧 · オンライン状態 · 検索とフィルタ</em>
     </td>
     <td align="center">
-      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI チャットページ" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI エージェントアシスタントページ" width="100%">
       <br>
-      <strong>AI チャット</strong><br>
-      <em>自然言語によるデバイス照会 · データ分析 · インテリジェント支援</em>
+      <strong>AI エージェントアシスタント</strong><br>
+      <em>自然言語によるデバイス照会 · データインサイト · 制御された実行</em>
     </td>
   </tr>
 </table>
@@ -108,10 +115,11 @@ IoT DC3 は **36 個の接続ドライバーモジュール**を内蔵し、産�
 
 **Driver SDK** により、カスタムプロトコルドライバーをすばやく開発し、実行中のプラットフォームへ登録できます。
 
-### 🤖 AI 機能統合
+### 🤖 デバイスデータから Physical AI へ
 
-**Spring AI** ベースの Agentic Center により、大規模言語モデルを IoT 運用ワークフローへ接続します。
+Agentic Center は **Spring AI** ベースで構築され、プラットフォームは MCP ツールゲートウェイを通じて AI エージェントにデバイス能力を開放し、**安全・制御可能・追跡可能**なループで物理世界への作用を実現します。
 
+- **MCP ツールゲートウェイ** — 外部の AI エージェントは Model Context Protocol で接続します。OAuth クライアント登録、ツール単位の認可、すべてのツール呼び出しの完全な監査証跡を提供します
 - **自然言語による運用支援** - LLM が Tool Calling を通じて、権限管理のもとでデバイス照会、ポイント読み書き、コマンド実行を支援します
 - **インテリジェントなアラーム分析** - AI が原因分析と対応提案を支援します
 - **データインサイト** - 自然言語でデバイスデータを照会し、可視化チャートを生成します
@@ -129,7 +137,7 @@ IoT DC3 は **36 個の接続ドライバーモジュール**を内蔵し、産�
 
 ### 📊 リアルタイムデータエンジン
 
-- **データ収集** - ドライバー層がデバイステレメトリを収集し、RabbitMQ 経由で非同期に転送します
+- **データ収集** - ドライバー層がデバイステレメトリを収集し、内部メッセージブローカーで非同期転送します。デプロイごとに選択可能：RabbitMQ（デフォルト）、Kafka、Pulsar、任意の MQTT 5 ブローカー（[ブローカーガイド](docs/mq-brokers.md)）
 - **時系列ストレージ** - リアルタイムデータと履歴データを効率的にクエリできます
 - **ルールエンジン** - 柔軟なアラームルール、多段階アラーム、通知をサポートします
 - **イベント追跡** - コマンドとイベントの履歴を保持します
@@ -167,7 +175,7 @@ mvn -s .mvn/settings.xml clean package
 
 ## 🛠️ 技術スタック
 
-IoT DC3 は Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、RabbitMQ、gRPC、Vue 3、TypeScript、Vite
+IoT DC3 は Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、プラグ可能なメッセージブローカー（RabbitMQ、Kafka、Pulsar または MQTT 5 — [選定ガイド](docs/mq-brokers.md)）、gRPC、Vue 3、TypeScript、Vite
 を基盤に構築されています。
 
 各コンポーネントの役割と詳細は [Technology Stack](https://docs.dc3.site/en/development/technology-stack) を参照してください。
@@ -177,39 +185,28 @@ IoT DC3 は Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreS
 | リソース                  | リンク                                                                        |
 |---------------------------|-------------------------------------------------------------------------------|
 | 📚 オンラインドキュメント | [docs.dc3.site](https://docs.dc3.site/)                                       |
+| 🎬 ライブデモ             | [demo.dc3.site](https://demo.dc3.site/)                                       |
+| 🏭 業界デモ               | [dc3.site/en/demo](https://dc3.site/en/demo/)                                 |
 | 🚀 クイックスタート       | [クイックスタートガイド](https://docs.dc3.site/en/quickstart/)                |
 | 🛠️ 技術スタック           | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)     |
 | 🏗️ アーキテクチャ         | [モジュールと依存関係](https://docs.dc3.site/en/architecture/modules)         |
 | 🔧 ドライバー開発         | [ドライバー開発ガイド](https://docs.dc3.site/en/development/driver-authoring) |
 | 🐛 トラブルシューティング | [よくある問題と解決策](https://docs.dc3.site/en/guide/troubleshooting)        |
 | 📋 変更履歴               | [リリース変更履歴](https://docs.dc3.site/en/development/changelog)            |
+| 💰 価格とライセンス       | [プランと商用ライセンス](https://dc3.site/en/pricing/)                         |
 | 🐛 問題報告               | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                     |
 | 🇨🇳 Gitee ミラー           | [Gitee GVP プロジェクト](https://gitee.com/pnoker/iot-dc3)                    |
 
 ## 🌍 ユースケース
 
-<table>
-  <tr>
-    <td align="center" width="60">🏭</td>
-    <td><strong>スマートファクトリー</strong></td>
-    <td>生産ライン設備の状態監視、工程パラメータ収集、予知保全、OEE 分析</td>
-  </tr>
-  <tr>
-    <td align="center">⚡</td>
-    <td><strong>エネルギー監視</strong></td>
-    <td>電力 / 水道 / ガスの遠隔検針、エネルギー傾向分析、異常アラーム</td>
-  </tr>
-  <tr>
-    <td align="center">🌾</td>
-    <td><strong>スマート農業</strong></td>
-    <td>温室環境監視、自動灌漑制御、病害虫警告、収量予測</td>
-  </tr>
-  <tr>
-    <td align="center">🏙️</td>
-    <td><strong>スマートシティ</strong></td>
-    <td>街路灯管理、環境品質監視、公共施設運用、安全監視</td>
-  </tr>
-</table>
+IoT DC3 で構築された 12 の業界デモダッシュボード（モックデータ）が、各シナリオでのプラットフォームの活用方法を示します。[すべてのデモを見る](https://dc3.site/en/demo/)。
+
+| | | |
+|---|---|---|
+| 🏭 [スマートファクトリー](https://dc3.site/en/demo/smart-factory/) — OEE 監視 | 💧 [水道ネットワーク](https://dc3.site/en/demo/water-network/) — デジタルツイン | ⚡ [マイクログリッド](https://dc3.site/en/demo/microgrid/) — 光蓄連携 |
+| 🌾 [精密農業](https://dc3.site/en/demo/precision-agri/) — ハウス微気候 | 🏢 [スマートビル](https://dc3.site/en/demo/smart-building/) — 空調と在室管理 | 🚦 [スマート交通](https://dc3.site/en/demo/smart-traffic/) — 渋滞と信号 |
+| 🛢️ [油ガスパイプライン](https://dc3.site/en/demo/oil-gas/) — 管圧監視 | ⛏️ [スマートマイン](https://dc3.site/en/demo/smart-mine/) — ガス換気警報 | ❄️ [コールドチェーン](https://dc3.site/en/demo/cold-chain/) — 温度追跡 |
+| 🌿 [環境モニタリング](https://dc3.site/en/demo/eco-monitor/) — 大気水質 | ⚓ [スマートポート](https://dc3.site/en/demo/smart-port/) — バース配船 | 🔌 [EV 充電](https://dc3.site/en/demo/ev-charging/) — 負荷と蓄電連携 |
 
 ## 🤝 コントリビューション
 

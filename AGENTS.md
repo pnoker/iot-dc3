@@ -13,7 +13,8 @@ conventions live in `dc3/agents/*.md` and are read on demand.
 
 ## Project in one paragraph
 
-IoT DC3 is a multi-protocol, cloud-native, open-source industrial IoT platform evolving toward AI agents: a Spring Cloud
+IoT DC3 is a multi-protocol, cloud-native, open-source industrial IoT platform positioned as an open-source Industrial
+IoT Runtime for Physical AI (canonical slogan: Connect the Physical World to AI — see `dc3.site`): a Spring Cloud
 Gateway entrypoint, Auth/Manager/Data/Agentic centers, reactive R2DBC persistence, gRPC facades, protocol drivers on a
 shared SDK, a Vue web UI in `dc3-web/`, and a standalone TypeScript CLI in `dc3-cli/`. The backend is a Java 21 Maven
 multi-module Spring Boot/Spring Cloud project (verify versions in the root `pom.xml`). For the full project story and

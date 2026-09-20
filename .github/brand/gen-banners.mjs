@@ -33,35 +33,35 @@ const here = dirname(fileURLToPath(import.meta.url))
 const svgDir = join(here, 'svg')
 const pngDir = join(here, 'png')
 
-// 各语言文案(与仓库根各 README 的 hero 主标语保持同一译法;SENSE–DECIDE–ACT 为品牌术语,各语言保留原文)
+// 各语言文案(与仓库根各 README 的 hero 主标语保持同一译法;口号为 dc3.site 官网 canonical slogan)
 const LANGS = {
     zh: {
-        tagline: '多协议 · 云原生 · 开源工业物联网平台',
-        techtags: '28+ 协议驱动 · 边云协同 · SENSE–DECIDE–ACT'
+        tagline: '连接物理世界与 AI · 面向 Physical AI 的开源工业物联网 Runtime',
+        techtags: '36 协议驱动 · MCP 工具网关 · 安全 · 可控 · 可追溯'
     },
     en: {
-        tagline: 'Multi-protocol · Cloud-native · Open-source Industrial IoT Platform',
-        techtags: '28+ PROTOCOL DRIVERS · EDGE-CLOUD · SENSE–DECIDE–ACT'
+        tagline: 'Connect the Physical World to AI · Open-source Industrial IoT Runtime for Physical AI',
+        techtags: '36 PROTOCOL DRIVERS · MCP TOOL GATEWAY · SAFE · CONTROLLABLE · TRACEABLE'
     },
     ja: {
-        tagline: 'マルチプロトコル · クラウドネイティブ · オープンソース産業 IoT プラットフォーム',
-        techtags: '28+ プロトコルドライバー · エッジ・クラウド協働 · SENSE–DECIDE–ACT'
+        tagline: '物理世界と AI をつなぐ · Physical AI ためのオープンソース産業 IoT Runtime',
+        techtags: '36 プロトコルドライバー · MCP ツールゲートウェイ · 安全・制御可能・追跡可能'
     },
     ko: {
-        tagline: '멀티 프로토콜 · 클라우드 네이티브 · 오픈소스 산업용 IoT 플랫폼',
-        techtags: '28+ 프로토콜 드라이버 · 엣지-클라우드 · SENSE–DECIDE–ACT'
+        tagline: '물리 세계와 AI를 연결 · Physical AI를 위한 오픈소스 산업용 IoT Runtime',
+        techtags: '36 프로토콜 드라이버 · MCP 툴 게이트웨이 · 안전 · 통제 가능 · 추적 가능'
     },
     es: {
-        tagline: 'Multiprotocolo · Nativa de la nube · Plataforma de IoT Industrial de Código Abierto',
-        techtags: '28+ CONTROLADORES · BORDE-NUBE · SENSE–DECIDE–ACT'
+        tagline: 'Conecta el mundo físico con la IA · Industrial IoT Runtime de código abierto para Physical AI',
+        techtags: '36 CONTROLADORES · PUERTA DE ENLACE MCP · SEGURO · CONTROLABLE · TRAZABLE'
     },
     ru: {
-        tagline: 'Мультипротокольная · Облачно-нативная · Открытая платформа промышленного IoT',
-        techtags: '28+ ДРАЙВЕРОВ · EDGE-CLOUD · SENSE–DECIDE–ACT'
+        tagline: 'Соединяем физический мир с ИИ · Открытый Industrial IoT Runtime для Physical AI',
+        techtags: '36 ДРАЙВЕРОВ · MCP-ШЛЮЗ ИНСТРУМЕНТОВ · БЕЗОПАСНО · УПРАВЛЯЕМО · ПРОСЛЕЖИВАЕМО'
     },
     vi: {
-        tagline: 'Đa giao thức · Cloud-native · Nền tảng IoT Công nghiệp Mã nguồn Mở',
-        techtags: '28+ DRIVER GIAO THỨC · EDGE-CLOUD · SENSE–DECIDE–ACT'
+        tagline: 'Kết nối thế giới vật lý với AI · Industrial IoT Runtime mã nguồn mở cho Physical AI',
+        techtags: '36 DRIVER GIAO THỨC · CỔNG CÔNG CỤ MCP · AN TOÀN · KIỂM SOÁT · TRUY VẾT'
     }
 }
 

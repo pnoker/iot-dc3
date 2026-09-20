@@ -17,7 +17,7 @@
 
 <!-- DC3 brand banner template (V4 liquid-glass lockup):
      Edit only this file for design changes, then run gen-banners.mjs to regenerate every language's svg+png.
-     Placeholders: 멀티 프로토콜 · 클라우드 네이티브 · 오픈소스 산업용 IoT 플랫폼 tagline / 28+ 프로토콜 드라이버 · 엣지-클라우드 · SENSE–DECIDE–ACT tech tags (per-language copy lives in the LANGS table of gen-banners.mjs).
+     Placeholders: 물리 세계와 AI를 연결 · Physical AI를 위한 오픈소스 산업용 IoT Runtime tagline / 36 프로토콜 드라이버 · MCP 툴 게이트웨이 · 안전 · 통제 가능 · 추적 가능 tech tags (per-language copy lives in the LANGS table of gen-banners.mjs).
      The brand title shares the Segoe UI Variable Display font stack with social-preview.svg. -->
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="420" viewBox="0 0 1600 420"
      font-family="'Segoe UI','PingFang SC','Hiragino Sans','Apple SD Gothic Neo','Microsoft YaHei',Roboto,Arial,sans-serif">
@@ -172,10 +172,10 @@
         </text>
     </g>
     <text x="800" y="316" data-min-x="80" data-max-x="1520" font-size="21" font-weight="500" letter-spacing="2"
-          text-anchor="middle" fill="#41628a">멀티 프로토콜 · 클라우드 네이티브 · 오픈소스 산업용 IoT 플랫폼
+          text-anchor="middle" fill="#41628a">물리 세계와 AI를 연결 · Physical AI를 위한 오픈소스 산업용 IoT Runtime
     </text>
     <text x="800" y="350" data-min-x="80" data-max-x="1520" font-size="15" font-weight="650" letter-spacing="1.5"
-          text-anchor="middle" fill="#6b87a0">28+ 프로토콜 드라이버 · 엣지-클라우드 · SENSE–DECIDE–ACT
+          text-anchor="middle" fill="#6b87a0">36 프로토콜 드라이버 · MCP 툴 게이트웨이 · 안전 · 통제 가능 · 추적 가능
     </text>
 
 </svg>

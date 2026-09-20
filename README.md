@@ -5,7 +5,7 @@
 > **AI assistants:** Read [README.ai.md](./README.ai.md) first for a concise, AI-friendly overview of IoT DC3.
 
 <p align="center">
-  <img src="./.github/brand/png/banner.en.png" alt="IoT DC3 — 多协议接入、云原生、AI 赋能的开源工业物联网平台，面向智能体演进">
+  <img src="./.github/brand/png/banner.en.png" alt="IoT DC3 — Connect the Physical World to AI · Open-source Industrial IoT Runtime for Physical AI">
 </p>
 
 <p align="center">
@@ -23,13 +23,13 @@
   </a>
   <img src="https://img.shields.io/badge/License-AGPL%203.0-blue" alt="License">
   <img src="https://img.shields.io/badge/Java-21-orange?logo=openjdk" alt="Java 21">
-  <img src="https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot" alt="Spring Boot 4">
+  <img src="https://img.shields.io/badge/Spring%20Boot-4.1-6DB33F?logo=springboot" alt="Spring Boot 4.1">
 </p>
 
 <p align="center">
   <strong>
-    IoT DC3 — the multi-protocol, cloud-native, open-source industrial IoT platform.<br>
-    AI-powered — from device connectivity to industrial agents
+    IoT DC3 — Connect the Physical World to AI<br>
+    An open-source Industrial IoT Runtime for Physical AI
   </strong>
 </p>
 
@@ -39,8 +39,16 @@
 
 <p align="center">
   🔌 <strong>Multi-protocol connectivity</strong> &nbsp;·&nbsp;
-  🤖 <strong>AI Agentic Center</strong> &nbsp;·&nbsp;
+  🤖 <strong>MCP tool gateway</strong> &nbsp;·&nbsp;
   ☁️ <strong>Cloud-native microservices</strong>
+</p>
+
+<p align="center">
+  <em>
+    IoT DC3 decouples <strong>devices</strong> from <strong>applications</strong>: drivers push normalized point data
+    into a message bus, and applications consume it through one unified API — add or change devices without touching
+    applications, and build new applications without touching devices.
+  </em>
 </p>
 
 ---
@@ -51,7 +59,7 @@
   <tr>
     <th width="33%">📸 Platform Overview</th>
     <th width="33%">📸 Device Management</th>
-    <th width="33%">📸 AI Chat</th>
+    <th width="33%">📸 AI Agent</th>
   </tr>
   <tr>
     <td align="center">
@@ -67,10 +75,10 @@
       <em>Device list · Online status · Search and filtering</em>
     </td>
     <td align="center">
-      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI chat page" width="100%">
+      <img src="https://docs.dc3.site/images/screenshot-ai.png" alt="AI agent assistant page" width="100%">
       <br>
-      <strong>AI Chat</strong><br>
-      <em>Natural-language device queries · Data analysis · Intelligent assistance</em>
+      <strong>AI Agent Assistant</strong><br>
+      <em>Natural-language device queries · Data insights · Governed execution</em>
     </td>
   </tr>
 </table>
@@ -109,10 +117,13 @@ communication, and simulation/debugging scenarios, reducing the cost of connecti
 
 The **Driver SDK** supports fast development of custom protocol drivers and registration into the runtime platform.
 
-### 🤖 AI Capability Integration
+### 🤖 From Device Data to Physical AI
 
-The agentic center is built on **Spring AI** and connects large language models into IoT operations workflows:
+The Agentic Center is built on **Spring AI**, and the platform exposes an MCP tool gateway so AI agents can act on the
+physical world in one **safe, controllable, traceable loop**:
 
+- **MCP tool gateway** — external AI agents connect through the Model Context Protocol: OAuth client registration,
+  per-tool authorization, and a full audit trail for every tool call
 - **Natural-language assisted operations** - through Tool Calling and under access control, LLMs can query devices,
   read/write points, and assist with command execution
 - **Intelligent alarm analysis** - AI assists with root-cause analysis and response suggestions
@@ -185,39 +196,29 @@ technology is used.
 | Resource              | Link                                                                            |
 |-----------------------|---------------------------------------------------------------------------------|
 | 📚 Online docs        | [docs.dc3.site](https://docs.dc3.site/)                                         |
+| 🎬 Live demo          | [demo.dc3.site](https://demo.dc3.site/)                                         |
+| 🏭 Industry demos     | [dc3.site/en/demo](https://dc3.site/en/demo/)                                   |
 | 🚀 Quickstart         | [Quickstart Guide](https://docs.dc3.site/en/quickstart/)                        |
 | 🛠️ Technology stack   | [Technology Stack](https://docs.dc3.site/en/development/technology-stack)       |
 | 🏗️ Architecture       | [Modules and Dependencies](https://docs.dc3.site/en/architecture/modules)       |
 | 🔧 Driver development | [Driver Authoring Guide](https://docs.dc3.site/en/development/driver-authoring) |
 | 🐛 Troubleshooting    | [Troubleshooting](https://docs.dc3.site/en/guide/troubleshooting)               |
 | 📋 Changelog          | [Release Changelog](https://docs.dc3.site/en/development/changelog)             |
+| 💰 Pricing & licensing | [Plans and commercial license](https://dc3.site/en/pricing/)                  |
 | 🐛 Issue feedback     | [GitHub Issues](https://github.com/pnoker/iot-dc3/issues)                       |
 | 🇨🇳 Gitee mirror       | [Gitee GVP Project](https://gitee.com/pnoker/iot-dc3)                           |
 
 ## 🌍 Use Cases
 
-<table>
-  <tr>
-    <td align="center" width="60">🏭</td>
-    <td><strong>Smart Factory</strong></td>
-    <td>Production-line device monitoring, process parameter collection, predictive maintenance, and OEE analysis</td>
-  </tr>
-  <tr>
-    <td align="center">⚡</td>
-    <td><strong>Energy Monitoring</strong></td>
-    <td>Remote metering for power, water, and gas; energy trend analysis; anomaly alarms</td>
-  </tr>
-  <tr>
-    <td align="center">🌾</td>
-    <td><strong>Smart Agriculture</strong></td>
-    <td>Greenhouse monitoring, automatic irrigation control, pest and disease warnings, yield forecasting</td>
-  </tr>
-  <tr>
-    <td align="center">🏙️</td>
-    <td><strong>Smart City</strong></td>
-    <td>Streetlight management, environmental monitoring, municipal facility operations, safety monitoring</td>
-  </tr>
-</table>
+Twelve illustrative industry dashboards — built on IoT DC3 with mock data — show how the platform lands in each
+scenario. [Browse all demos](https://dc3.site/en/demo/).
+
+|                    |                                                              |                                                        |
+|--------------------|--------------------------------------------------------------|--------------------------------------------------------|
+| 🏭 [Smart Factory](https://dc3.site/en/demo/smart-factory/) — OEE monitoring | 💧 [Water Network](https://dc3.site/en/demo/water-network/) — digital twin | ⚡ [Microgrid](https://dc3.site/en/demo/microgrid/) — solar-storage balance |
+| 🌾 [Precision Agriculture](https://dc3.site/en/demo/precision-agri/) — greenhouse climate | 🏢 [Smart Building](https://dc3.site/en/demo/smart-building/) — HVAC and occupancy | 🚦 [Smart Traffic](https://dc3.site/en/demo/smart-traffic/) — congestion and signals |
+| 🛢️ [Oil & Gas Pipeline](https://dc3.site/en/demo/oil-gas/) — line pressure | ⛏️ [Smart Mine](https://dc3.site/en/demo/smart-mine/) — gas and ventilation | ❄️ [Cold Chain](https://dc3.site/en/demo/cold-chain/) — temperature traceability |
+| 🌿 [Environmental Monitoring](https://dc3.site/en/demo/eco-monitor/) — air and water quality | ⚓ [Smart Port](https://dc3.site/en/demo/smart-port/) — berth and yard scheduling | 🔌 [EV Charging](https://dc3.site/en/demo/ev-charging/) — load and storage synergy |
 
 ## 🤝 Contributing
 
