@@ -241,6 +241,48 @@ const buildParentTreeOptions = (t: Translator, treeData: any[]) => {
   return [{id: 0, resourceName: t('settings.resource.rootResource')}, ...groups];
 };
 
+// ---- stale-while-revalidate tree cache -----------------------------------
+// The backend list_tree runs a ~1s full scan whenever its server cache
+// misses, and the resource tree only changes when the registry sync or an
+// explicit edit touches it — far rarer than page visits. Serve the cached
+// tree instantly and refresh in the background (stale-while-revalidate),
+// so revisits open in ~0ms instead of re-paying the query. Mutations
+// through this config invalidate the cache. At a few thousand nodes the
+// right next step is lazy loading (list_tree already filters by
+// parentResourceId), not more caching.
+const TREE_FRESH_MS = 60_000;
+const treeCache = new Map<string, {fetchedAt: number; data: any[]; promise?: Promise<any[]>}>();
+
+const refreshTree = (key: string, query: Record<string, any>): Promise<any[]> => {
+  const entry = treeCache.get(key);
+  if (entry?.promise) return entry.promise;
+  const promise = listResourceTree(query)
+    .then((res) => {
+      const data = (res as any[]) || [];
+      treeCache.set(key, {fetchedAt: Date.now(), data});
+      return data;
+    })
+    .finally(() => {
+      const pending = treeCache.get(key);
+      if (pending) delete pending.promise;
+    });
+  const base = entry ?? {fetchedAt: 0, data: []};
+  base.promise = promise;
+  treeCache.set(key, base);
+  return promise;
+};
+
+const listResourceTreeCached = (query: Record<string, any> = {}): Promise<any[]> => {
+  const key = JSON.stringify(query ?? {});
+  const entry = treeCache.get(key);
+  if (!entry) return refreshTree(key, query);
+  if (Date.now() - entry.fetchedAt < TREE_FRESH_MS) return Promise.resolve(entry.data);
+  void refreshTree(key, query); // stale — revalidate silently, keep showing
+  return Promise.resolve(entry.data);
+};
+
+const invalidateTreeCache = () => treeCache.clear();
+
 interface ResourceHandlers {
   onEntityClick: (row: Record<string, any>) => void;
 }
@@ -387,10 +429,19 @@ export const createResourceConfig = (t: Translator, handlers: ResourceHandlers):
   }),
   rowEditable: (row) => !isGroupingNode(row),
   rowDeletable: (row) => !isGroupingNode(row),
-  list: listResourceTree,
-  add: addResource as EntityListConfig['add'],
-  update: updateResource as EntityListConfig['update'],
-  remove: deleteResource,
+  list: (query) => listResourceTreeCached(query),
+  add: async (payload) => {
+    await addResource(payload as Parameters<typeof addResource>[0]);
+    invalidateTreeCache();
+  },
+  update: async (payload) => {
+    await updateResource(payload as Parameters<typeof updateResource>[0]);
+    invalidateTreeCache();
+  },
+  remove: async (id) => {
+    await deleteResource(id);
+    invalidateTreeCache();
+  },
   detail: {routeName: 'settingsResourceDetail'},
   confirmDeleteText: t('common.confirmDelete', {name: t('common.entityResource')}),
   emptyText: t('settings.resource.empty'),
