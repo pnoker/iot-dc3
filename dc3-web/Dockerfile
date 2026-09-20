@@ -27,7 +27,10 @@ WORKDIR /build
 
 COPY dc3-web/ ./
 
-RUN corepack enable && corepack prepare pnpm@12.3.4 --activate
+# pnpm 12 dropped bin/pnpm.cjs while the corepack shim bundled with Node 22
+# still expects it, so corepack prepare fails at first pnpm invocation; install
+# pnpm directly so the bin entry resolves.
+RUN npm install -g pnpm@12.3.4
 RUN apk add --no-cache git
 RUN pnpm install --frozen-lockfile --ignore-scripts
 RUN pnpm build

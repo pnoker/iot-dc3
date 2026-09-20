@@ -67,8 +67,11 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 COPY . .
 # settings-container.xml goes straight to Maven Central (no Aliyun mirror), so
 # brand-new releases are visible immediately even when the mirror lags behind.
+# The noop sync factory avoids resolver file-lock failures on BuildKit cache
+# mounts (overlay-backed filesystems); only one Maven process runs per build.
 RUN --mount=type=cache,target=/root/.m2/repository \
-    mvn -U -B -e -T 1C -s .mvn/settings-container.xml clean package -DskipTests -P ${PROFILE}
+    mvn -U -B -e -T 1C -s .mvn/settings-container.xml clean package -DskipTests \
+        -Daether.syncContext.named.factory=noop -P ${PROFILE}
 
 
 # -----------------------------------------------------------------------------
