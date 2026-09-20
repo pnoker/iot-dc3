@@ -30,18 +30,20 @@
     </el-button>
   </el-tooltip>
 
+  <transition name="agentic-panel">
   <aside
     v-if="visible"
     ref="panelRef"
     :aria-label="t('agentic.title')"
     :aria-modal="isMobile || undefined"
+    :class="['agentic-panel', {'agentic-panel--expanded': expanded}]"
     :role="isMobile ? 'dialog' : 'complementary'"
-    :style="panelStyle"
-    class="agentic-panel"
+    :style="expanded ? undefined : panelStyle"
     tabindex="-1"
     @keydown="handlePanelKeydown"
   >
     <button
+      v-if="!expanded"
       :aria-label="t('agentic.resize')"
       :aria-valuemax="MAX_PANEL_WIDTH"
       :aria-valuemin="MIN_PANEL_WIDTH"
@@ -55,12 +57,125 @@
       @keydown.right.prevent="handleResizeKeydown(-16)"
       @mousedown="handleResizeStart"
     />
-    <section v-loading="loading" class="agentic-shell">
+    <div class="agentic-workspace">
+      <!-- Workbench sessions rail — visible only in expanded (full-screen)
+           mode. The same list the history dropdown shows, laid out as a
+           permanent column so switching conversations is one tap. -->
+      <nav v-if="expanded" :aria-label="t('agentic.sessionsTitle')" class="agentic-sessions">
+        <div class="agentic-sessions__header">
+          <span>{{ t('agentic.sessionsTitle') }}</span>
+          <div class="agentic-sessions__header-actions">
+            <el-popover
+              v-model:visible="renamePopoverVisible"
+              :teleported="false"
+              :width="280"
+              placement="right-start"
+              trigger="click"
+            >
+              <template #reference>
+                <el-button
+                  :aria-label="t('agentic.headerRename')"
+                  :disabled="!activeConversationId || interactionLocked || Boolean(sessionActionLoading[activeConversationId])"
+                  :title="t('agentic.headerRename')"
+                  circle
+                  class="agentic-tool"
+                  size="small"
+                  @click="prepareRenameTitle"
+                >
+                  <el-icon>
+                    <EditPen/>
+                  </el-icon>
+                </el-button>
+              </template>
+              <div class="agentic-rename-form">
+                <span class="agentic-popover-title">{{ t('agentic.dialogConversationTitle') }}</span>
+                <el-input
+                  v-model="renameTitle"
+                  :disabled="interactionLocked || Boolean(sessionActionLoading[activeConversationId])"
+                  :maxlength="80"
+                  :placeholder="t('agentic.dialogConversationTitle')"
+                  clearable
+                  size="small"
+                  @keydown.enter.prevent="handleRenameCurrent"
+                />
+                <div class="agentic-popover-actions">
+                  <el-button size="small" @click="renamePopoverVisible = false">
+                    {{ t('agentic.dialogCancel') }}
+                  </el-button>
+                  <el-button
+                    :disabled="!renameTitle.trim() || interactionLocked || Boolean(sessionActionLoading[activeConversationId])"
+                    :loading="Boolean(sessionActionLoading[activeConversationId])"
+                    size="small"
+                    type="primary"
+                    @click="handleRenameCurrent"
+                  >
+                    {{ t('agentic.dialogSave') }}
+                  </el-button>
+                </div>
+              </div>
+            </el-popover>
+            <el-tooltip :content="t('agentic.headerDelete')" placement="left">
+              <el-button
+                :aria-label="t('agentic.headerDelete')"
+                :disabled="!activeConversationId || interactionLocked || Boolean(sessionActionLoading[activeConversationId])"
+                circle
+                class="agentic-tool"
+                size="small"
+                @click="handleDeleteCurrent"
+              >
+                <el-icon>
+                  <Delete/>
+                </el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip :content="t('agentic.headerNew')" placement="left">
+              <el-button
+                :aria-label="t('agentic.headerNew')"
+                :disabled="interactionLocked"
+                circle
+                class="agentic-tool"
+                size="small"
+                @click="handleNewSession"
+              >
+                <el-icon>
+                  <Plus/>
+                </el-icon>
+              </el-button>
+            </el-tooltip>
+          </div>
+        </div>
+        <el-scrollbar class="agentic-sessions__list">
+          <button
+            v-for="session in conversationItems"
+            :key="session.conversationId"
+            :class="{'is-active': session.conversationId === activeConversationId}"
+            :disabled="Boolean(sessionActionLoading[session.conversationId])"
+            class="agentic-sessions__item"
+            type="button"
+            @click="handleHistoryCommand(`select:${session.conversationId}`)"
+          >
+            <el-icon class="agentic-sessions__item-icon">
+              <component :is="sessionIcon(session.sessionExt?.icon)"/>
+            </el-icon>
+            <span class="agentic-sessions__item-text">
+              <strong>{{ session.title }}</strong>
+              <small v-if="session.summary">{{ session.summary }}</small>
+            </span>
+          </button>
+          <div v-if="conversationItems.length === 0" class="agentic-sessions__empty">
+            {{ t('agentic.headerNoHistory') }}
+          </div>
+        </el-scrollbar>
+      </nav>
+
+      <section v-loading="loading" class="agentic-shell">
       <header class="agentic-header">
         <div class="agentic-header__top">
           <div class="agentic-title">
-            <div class="agentic-mark">
-              <img :src="assetUrl('images/common/llm.svg')" alt=""/>
+            <div class="agentic-mark entity-icon-tile">
+              <el-icon :size="19">
+                <MagicStick/>
+              </el-icon>
             </div>
             <div>
               <strong>{{ t('agentic.title') }}</strong>
@@ -69,13 +184,13 @@
           </div>
 
           <div class="agentic-header__primary-actions">
-            <el-tooltip :content="t('agentic.headerNew')">
+            <el-tooltip v-if="!expanded" :content="t('agentic.headerNew')">
               <el-button
                 :aria-label="t('agentic.headerNew')"
                 :disabled="loading || sessionsLoading || streaming"
                 circle
+                class="agentic-tool"
                 size="small"
-                type="success"
                 @click="handleNewSession"
               >
                 <el-icon>
@@ -83,13 +198,30 @@
                 </el-icon>
               </el-button>
             </el-tooltip>
+            <el-tooltip
+              v-if="!isMobile"
+              :content="expanded ? t('agentic.headerCollapse') : t('agentic.headerExpand')"
+            >
+              <el-button
+                :aria-label="expanded ? t('agentic.headerCollapse') : t('agentic.headerExpand')"
+                circle
+                class="agentic-tool"
+                size="small"
+                @click="toggleExpanded"
+              >
+                <el-icon>
+                  <Aim v-if="expanded"/>
+                  <FullScreen v-else/>
+                </el-icon>
+              </el-button>
+            </el-tooltip>
             <el-tooltip :content="t('agentic.headerClose')">
               <el-button
                 :aria-label="t('agentic.headerClose')"
                 circle
+                class="agentic-tool"
                 size="small"
-                type="danger"
-                @click="agenticStore.close"
+                @click="handleClosePanel"
               >
                 <el-icon>
                   <Close/>
@@ -99,99 +231,11 @@
           </div>
         </div>
 
-        <div class="agentic-header__actions">
-          <div class="agentic-header__actions-left">
-            <el-select
-              :model-value="selectedModel"
-              :aria-label="t('agentic.model')"
-              class="agentic-model agentic-model--toolbar"
-              :disabled="loading || sessionsLoading || streaming"
-              filterable
-              size="small"
-              @update:model-value="handleModelChange"
-            >
-              <el-option
-                v-for="model in models"
-                :key="model.model"
-                :label="model.label || model.model"
-                :value="model.model"
-              />
-            </el-select>
-
-            <el-tooltip :content="t('agentic.reasoning')">
-              <el-switch
-                v-model="reasoningEnabled"
-                :active-value="true"
-                :active-icon="Cpu"
-                :aria-label="t('agentic.reasoning')"
-                :disabled="!activeModel.reasoning || loading || sessionsLoading || streaming"
-                :inactive-value="false"
-                :inactive-icon="Lightning"
-                class="agentic-reasoning-switch"
-                inline-prompt
-                size="small"
-                @change="handlePrefsChange"
-              />
-            </el-tooltip>
-          </div>
-
+        <!-- Docked toolbar: history/rename/delete live here only while
+             docked — in workbench mode they move to the sessions rail, and
+             model/reasoning/settings always live in the composer. -->
+        <div v-if="!expanded" class="agentic-header__actions">
           <div class="agentic-header__actions-right">
-            <el-popover :teleported="false" placement="bottom-end" trigger="click" width="300">
-              <template #reference>
-                <el-button
-                  :aria-label="t('agentic.headerSettings')"
-                  :disabled="loading || sessionsLoading || streaming"
-                  :title="t('agentic.headerSettings')"
-                  circle
-                  size="small"
-                >
-                  <el-icon>
-                    <Setting/>
-                  </el-icon>
-                </el-button>
-              </template>
-              <div class="agentic-settings">
-                <div class="agentic-setting">
-                  <span>{{ t('agentic.temperature') }}</span>
-                  <el-slider
-                    v-model="temperatureProxy"
-                    :disabled="loading || sessionsLoading || streaming"
-                    :max="2"
-                    :min="0"
-                    :step="0.1"
-                    size="small"
-                    @change="handlePrefsChange"
-                  />
-                </div>
-                <div class="agentic-setting">
-                  <span>{{ t('agentic.maxTokens') }}</span>
-                  <el-input-number
-                    v-model="maxTokensProxy"
-                    :disabled="loading || sessionsLoading || streaming"
-                    :min="1"
-                    :step="256"
-                    controls-position="right"
-                    size="small"
-                    @change="handlePrefsChange"
-                  />
-                </div>
-                <div class="agentic-capabilities">
-                  <el-tag :type="activeModel.stream ? 'success' : 'info'" size="small"
-                  >{{ t('agentic.capStream') }}
-                  </el-tag>
-                  <el-tag :type="activeModel.toolCall ? 'success' : 'info'" size="small"
-                  >{{ t('agentic.capTools') }}
-                  </el-tag>
-                  <el-tag :type="activeModel.vision ? 'success' : 'info'" size="small"
-                  >{{ t('agentic.capVision') }}
-                  </el-tag>
-                  <el-tag :type="activeModel.reasoning ? 'success' : 'info'" size="small"
-                  >{{ t('agentic.capReasoning') }}
-                  </el-tag>
-                </div>
-              </div>
-            </el-popover>
-
             <el-dropdown
               :disabled="loading || sessionsLoading || streaming"
               max-height="360"
@@ -658,6 +702,110 @@
                   </el-icon>
                 </el-button>
               </el-tooltip>
+
+              <!-- Model chip: model + reasoning + sampling settings live
+                   here (Codex-style) in BOTH docked and workbench modes,
+                   keeping the header free of controls. -->
+              <el-popover
+                :teleported="false"
+                :width="312"
+                placement="top-start"
+                popper-class="agentic-model-popover"
+                trigger="click"
+              >
+                <template #reference>
+                  <button
+                    :aria-label="t('agentic.model')"
+                    class="agentic-model-pill"
+                    type="button"
+                  >
+                    <el-icon class="agentic-model-pill__icon">
+                      <MagicStick/>
+                    </el-icon>
+                    <span class="agentic-model-pill__name">{{ activeModel.label || selectedModel }}</span>
+                    <el-icon class="agentic-model-pill__caret">
+                      <CaretBottom/>
+                    </el-icon>
+                  </button>
+                </template>
+                <div class="agentic-model-settings">
+                  <span class="agentic-model-settings__label">{{ t('agentic.model') }}</span>
+                  <el-select
+                    :model-value="selectedModel"
+                    :aria-label="t('agentic.model')"
+                    :disabled="loading || sessionsLoading || streaming"
+                    class="agentic-model-settings__select"
+                    filterable
+                    size="small"
+                    @update:model-value="handleModelChange"
+                  >
+                    <el-option
+                      v-for="model in models"
+                      :key="model.model"
+                      :label="model.label || model.model"
+                      :value="model.model"
+                    />
+                  </el-select>
+
+                  <div class="agentic-model-settings__row">
+                    <span class="agentic-model-settings__label">{{ t('agentic.reasoning') }}</span>
+                    <el-switch
+                      v-model="reasoningEnabled"
+                      :active-icon="Cpu"
+                      :active-value="true"
+                      :aria-label="t('agentic.reasoning')"
+                      :disabled="!activeModel.reasoning || loading || sessionsLoading || streaming"
+                      :inactive-icon="Lightning"
+                      :inactive-value="false"
+                      inline-prompt
+                      size="small"
+                      @change="handlePrefsChange"
+                    />
+                  </div>
+
+                  <div class="agentic-model-settings__row">
+                    <span class="agentic-model-settings__label">{{ t('agentic.temperature') }}</span>
+                    <el-slider
+                      v-model="temperatureProxy"
+                      :disabled="loading || sessionsLoading || streaming"
+                      :max="2"
+                      :min="0"
+                      :step="0.1"
+                      class="agentic-model-settings__slider"
+                      size="small"
+                      @change="handlePrefsChange"
+                    />
+                  </div>
+
+                  <div class="agentic-model-settings__row">
+                    <span class="agentic-model-settings__label">{{ t('agentic.maxTokens') }}</span>
+                    <el-input-number
+                      v-model="maxTokensProxy"
+                      :disabled="loading || sessionsLoading || streaming"
+                      :min="1"
+                      :step="256"
+                      controls-position="right"
+                      size="small"
+                      @change="handlePrefsChange"
+                    />
+                  </div>
+
+                  <div class="agentic-capabilities">
+                    <el-tag :type="activeModel.stream ? 'success' : 'info'" size="small"
+                    >{{ t('agentic.capStream') }}
+                    </el-tag>
+                    <el-tag :type="activeModel.toolCall ? 'success' : 'info'" size="small"
+                    >{{ t('agentic.capTools') }}
+                    </el-tag>
+                    <el-tag :type="activeModel.vision ? 'success' : 'info'" size="small"
+                    >{{ t('agentic.capVision') }}
+                    </el-tag>
+                    <el-tag :type="activeModel.reasoning ? 'success' : 'info'" size="small"
+                    >{{ t('agentic.capReasoning') }}
+                    </el-tag>
+                  </div>
+                </div>
+              </el-popover>
             </div>
 
             <el-button
@@ -689,7 +837,9 @@
         </div>
       </footer>
     </section>
+    </div>
   </aside>
+  </transition>
 </template>
 
 <script lang="ts" setup>
@@ -697,6 +847,8 @@ import 'vue-element-plus-x/styles/index.css';
 
 import {Prompts, Welcome} from 'vue-element-plus-x';
 import {
+  Aim,
+  CaretBottom,
   ChatDotRound,
   ChatLineSquare,
   Check,
@@ -711,8 +863,10 @@ import {
   Document,
   DocumentCopy,
   EditPen,
+  FullScreen,
   Lightning,
   Loading,
+  MagicStick,
   Monitor,
   Odometer,
   Operation,
@@ -1006,6 +1160,23 @@ const handleNewSession = () => {
   agenticStore.newSession();
 };
 
+// ---- expanded (workbench) mode -------------------------------------------
+// Full-screen takes over the region below the header and splits into a
+// sessions rail + chat column; the docked side panel stays as-is.
+const expanded = ref(false);
+const toggleExpanded = () => {
+  expanded.value = !expanded.value;
+};
+const handleClosePanel = () => {
+  expanded.value = false;
+  agenticStore.close();
+};
+// Whatever path hid the panel (close, logout, route guard), the workbench
+// mode must not leak into the next open.
+watch(visible, (next) => {
+  if (!next) expanded.value = false;
+});
+
 const handleRetrySessions = async () => {
   if (interactionLocked.value) return;
   await agenticStore.retrySessions();
@@ -1124,6 +1295,7 @@ const handlePanelKeydown = (event: KeyboardEvent) => {
   if (!isMobile.value) return;
   if (event.key === 'Escape') {
     event.preventDefault();
+    expanded.value = false;
     agenticStore.close();
     return;
   }
@@ -1651,15 +1823,254 @@ const formatFileSize = (size = 0) => {
   box-shadow: var(--dc3-shadow-md);
 }
 
+// The panel lives in ONE coordinate system for both modes: fixed under
+// the header, anchored right. Docked width comes from panelStyle; the
+// workbench just widens to 100% — because both states are fixed, the
+// width transition animates continuously instead of snapping between
+// layout flow and fixed positioning (the old "slide projector" cut).
 .agentic-panel {
-  position: relative;
-  flex: 0 0 auto;
+  position: fixed;
+  top: var(--dc3-header-height);
+  right: 0;
+  bottom: 0;
+  display: flex;
+  z-index: calc(var(--dc3-z-floating-action) - 1);
   min-width: 320px;
   max-width: 520px;
-  height: 100%;
   min-height: 0;
   border-left: 1px solid var(--dc3-border-base);
   background: var(--dc3-bg-elevated-strong);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.12);
+  transition: width 320ms var(--dc3-ease-standard);
+
+  &.agentic-panel--expanded {
+    left: 0;
+    min-width: 0;
+    max-width: none;
+    width: 100%;
+    border-left: none;
+    box-shadow: var(--dc3-shadow-md);
+  }
+}
+
+// Width tracking must stay 1:1 with the pointer during a drag.
+body.agentic-resizing .agentic-panel {
+  transition: none;
+}
+
+// Open / close: slide in from the right edge with a soft fade.
+.agentic-panel-enter-active {
+  transition:
+    transform 320ms var(--dc3-ease-standard),
+    opacity 280ms ease-out;
+}
+
+.agentic-panel-leave-active {
+  transition:
+    transform 240ms ease-in,
+    opacity 200ms ease-in;
+}
+
+.agentic-panel-enter-from,
+.agentic-panel-leave-to {
+  opacity: 0;
+  transform: translateX(48px);
+}
+
+// Sessions rail (expanded mode only) — same list as the history dropdown,
+// laid out as a permanent column.
+.agentic-sessions {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 264px;
+  min-width: 0;
+  border-right: 1px solid var(--dc3-border-base);
+  background: var(--dc3-bg-canvas);
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--dc3-space-3) var(--dc3-space-3) var(--dc3-space-2);
+    color: var(--dc3-text-muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  &__list {
+    flex: 1;
+    min-height: 0;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: var(--dc3-space-2);
+    width: 100%;
+    padding: var(--dc3-space-2) var(--dc3-space-3);
+    border: 0;
+    border-radius: var(--dc3-radius-md);
+    background: transparent;
+    color: var(--dc3-text-regular);
+    cursor: pointer;
+    text-align: left;
+
+    &:hover {
+      background: var(--dc3-bg-interactive);
+      color: var(--el-color-primary);
+    }
+
+    &.is-active {
+      background: var(--dc3-brand-gradient-soft);
+      box-shadow: inset 0 0 0 1px var(--dc3-border-strong);
+      color: var(--el-color-primary);
+
+      strong {
+        color: inherit;
+      }
+    }
+  }
+
+  &__item-icon {
+    flex-shrink: 0;
+    color: var(--el-color-primary);
+    font-size: 16px;
+  }
+
+  &__item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+
+    strong {
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    small {
+      overflow: hidden;
+      color: var(--dc3-text-muted);
+      font-size: 11px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__empty {
+    padding: var(--dc3-space-3);
+    color: var(--dc3-text-muted);
+    font-size: 12px;
+  }
+}
+
+.agentic-workspace {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+// Neutral tool chip for the header actions (new / expand / close) — the
+// old success/danger circles fought the theme; this matches the utility
+// buttons used across the app header.
+.agentic-tool {
+  border: 1px solid var(--dc3-border-base);
+  background: var(--dc3-bg-interactive);
+  color: var(--dc3-text-regular);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--dc3-bg-interactive-active);
+    color: var(--dc3-text-brand);
+  }
+}
+
+// Sessions rail header actions (rename / delete / new for the active
+// conversation) — grouped so the rail owns all conversation management in
+// workbench mode.
+.agentic-sessions__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+// Model chip in the composer bar (Codex-style): the current model rides
+// with the input, and its popover carries model + reasoning + sampling
+// settings so the header stays free of controls in every mode.
+.agentic-model-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 220px;
+  padding: 0 10px;
+  height: 28px;
+  border: 1px solid var(--dc3-border-base);
+  border-radius: var(--dc3-radius-full);
+  background: var(--dc3-bg-interactive);
+  color: var(--dc3-text-regular);
+  font-size: 12px;
+  cursor: pointer;
+  transition:
+    color var(--dc3-duration-fast) var(--dc3-ease-standard),
+    background-color var(--dc3-duration-fast) var(--dc3-ease-standard);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--dc3-bg-interactive-active);
+    color: var(--dc3-text-brand);
+    outline: none;
+  }
+
+  &__icon {
+    color: var(--el-color-primary);
+    font-size: 14px;
+  }
+
+  &__name {
+    overflow: hidden;
+    min-width: 0;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__caret {
+    flex-shrink: 0;
+    color: var(--dc3-text-muted);
+    font-size: 10px;
+  }
+}
+
+.agentic-model-settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dc3-space-3);
+
+  &__label {
+    color: var(--dc3-text-muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  &__select {
+    width: 100%;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--dc3-space-3);
+  }
+
+  &__slider {
+    flex: 1;
+    min-width: 0;
+  }
 }
 
 .agentic-resizer {
@@ -1693,8 +2104,10 @@ const formatFileSize = (size = 0) => {
 .agentic-shell {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   height: 100%;
   min-height: 0;
+  min-width: 0;
   background: var(--dc3-bg-elevated-strong);
 }
 
@@ -1780,23 +2193,12 @@ const formatFileSize = (size = 0) => {
   }
 }
 
-.agentic-mark {
-  display: flex;
-  flex: 0 0 34px;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  padding: 5px;
-  border: 1px solid var(--dc3-border-base);
-  border-radius: 8px;
-  background: var(--dc3-bg-muted);
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
+// Brand tile on the header — the shared entity-icon-tile family (see
+// global.scss), sized down to fit the compact header.
+.agentic-mark.entity-icon-tile {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
 }
 
 .agentic-title {
@@ -1857,7 +2259,7 @@ const formatFileSize = (size = 0) => {
   margin-right: 9px;
   color: var(--el-color-primary);
   background: var(--el-color-primary-light-9);
-  border-radius: 9px;
+  border-radius: var(--dc3-radius-md);
 
   &.is-warning {
     color: var(--el-color-danger);
@@ -1996,7 +2398,7 @@ const formatFileSize = (size = 0) => {
   max-width: 100%;
   padding: 10px 12px;
   border: 1px solid var(--dc3-border-base);
-  border-radius: 8px;
+  border-radius: var(--dc3-radius-md);
   color: var(--dc3-text-primary);
   line-height: 1.58;
   overflow-wrap: anywhere;
@@ -2020,7 +2422,7 @@ const formatFileSize = (size = 0) => {
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--el-color-white) 28%, transparent);
   border-left: 3px solid color-mix(in srgb, var(--el-color-white) 82%, transparent);
-  border-radius: 6px;
+  border-radius: var(--dc3-radius-md);
   background: color-mix(in srgb, var(--el-color-white) 13%, transparent);
 
   &::after {
@@ -2063,7 +2465,7 @@ const formatFileSize = (size = 0) => {
   margin-top: 8px;
   padding: 6px 8px;
   border: 1px solid var(--el-color-warning-light-5);
-  border-radius: 4px;
+  border-radius: var(--dc3-radius-md);
   color: var(--el-color-warning-dark-2);
   font-size: 12px;
   line-height: 1.5;
@@ -2106,7 +2508,7 @@ const formatFileSize = (size = 0) => {
   height: 24px;
   padding: 0;
   border: 1px solid var(--dc3-border-base);
-  border-radius: 4px;
+  border-radius: var(--dc3-radius-md);
   color: var(--dc3-text-regular);
   font-size: 13px;
   background: var(--dc3-bg-elevated-strong);
@@ -2134,7 +2536,7 @@ const formatFileSize = (size = 0) => {
   min-width: 0;
   margin-bottom: 8px;
   border: 1px solid var(--dc3-border-base);
-  border-radius: 6px;
+  border-radius: var(--dc3-radius-md);
   background: var(--dc3-bg-muted);
 
   summary {
@@ -2249,7 +2651,7 @@ const formatFileSize = (size = 0) => {
     display: block;
     width: 4px;
     height: 4px;
-    border-radius: 999px;
+    border-radius: var(--dc3-radius-full);
     background: currentcolor;
     opacity: 0.35;
     animation: agentic-dot 1s ease-in-out infinite;
@@ -2367,7 +2769,7 @@ const formatFileSize = (size = 0) => {
   min-width: 0;
   padding: 6px 8px;
   border: 1px solid var(--dc3-border-base);
-  border-radius: 6px;
+  border-radius: var(--dc3-radius-md);
   background: var(--dc3-bg-muted);
 
   span {
@@ -2394,7 +2796,7 @@ const formatFileSize = (size = 0) => {
   min-width: 0;
   padding: 8px;
   border: 1px solid var(--dc3-border-base);
-  border-radius: 6px;
+  border-radius: var(--dc3-radius-md);
   background: var(--dc3-bg-elevated-strong);
 }
 
@@ -2469,7 +2871,7 @@ const formatFileSize = (size = 0) => {
   justify-content: center;
   width: 22px;
   height: 22px;
-  border-radius: 999px;
+  border-radius: var(--dc3-radius-full);
   color: var(--el-color-primary-dark-2);
   font-size: 11px;
   font-weight: 700;
@@ -2534,7 +2936,7 @@ const formatFileSize = (size = 0) => {
   gap: 8px;
   min-width: 0;
   padding: 5px 7px;
-  border-radius: 5px;
+  border-radius: var(--dc3-radius-md);
   background: var(--dc3-bg-muted);
 
   span {
@@ -2581,7 +2983,7 @@ const formatFileSize = (size = 0) => {
 
 .agentic-token-list span {
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--dc3-radius-sm);
   color: var(--dc3-text-regular);
   background: var(--dc3-bg-muted);
 }
@@ -2604,7 +3006,7 @@ const formatFileSize = (size = 0) => {
     padding: 8px;
     overflow: auto;
     border: 1px solid var(--dc3-border-base);
-    border-radius: 6px;
+    border-radius: var(--dc3-radius-md);
     color: var(--dc3-text-primary);
     white-space: pre-wrap;
     background: var(--dc3-bg-muted);
@@ -2632,7 +3034,7 @@ const formatFileSize = (size = 0) => {
   align-items: center;
   padding: 10px 12px;
   border: 1px solid var(--el-color-warning-light-5);
-  border-radius: 6px;
+  border-radius: var(--dc3-radius-md);
   background: var(--el-color-warning-light-9);
 }
 
@@ -2644,7 +3046,7 @@ const formatFileSize = (size = 0) => {
   height: 30px;
   color: var(--el-color-warning-dark-2);
   background: var(--el-color-warning-light-9);
-  border-radius: 9px;
+  border-radius: var(--dc3-radius-md);
 }
 
 .agentic-action__content {
@@ -2688,7 +3090,7 @@ const formatFileSize = (size = 0) => {
   margin: 0;
   padding: 10px;
   border: 1px solid var(--dc3-border-strong);
-  border-radius: 8px;
+  border-radius: var(--dc3-radius-md);
   background: var(--dc3-bg-elevated-strong);
 }
 
@@ -2703,7 +3105,7 @@ const formatFileSize = (size = 0) => {
   padding: 9px 8px 9px 10px;
   overflow: hidden;
   border: 1px solid var(--el-color-primary-light-5);
-  border-radius: 8px;
+  border-radius: var(--dc3-radius-md);
   background: var(--dc3-brand-gradient-soft);
   box-shadow: inset 3px 0 0 var(--el-color-primary);
 }
@@ -2714,7 +3116,7 @@ const formatFileSize = (size = 0) => {
   justify-content: center;
   width: 30px;
   height: 30px;
-  border-radius: 8px;
+  border-radius: var(--dc3-radius-md);
   color: var(--el-color-primary);
   font-size: 15px;
   background: var(--dc3-bg-elevated);
@@ -2747,7 +3149,7 @@ const formatFileSize = (size = 0) => {
 
   strong {
     padding: 1px 5px;
-    border-radius: 999px;
+    border-radius: var(--dc3-radius-full);
     color: var(--el-color-primary-dark-2);
     font-size: 10px;
     font-weight: 700;
@@ -2763,7 +3165,7 @@ const formatFileSize = (size = 0) => {
   height: 24px;
   padding: 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--dc3-radius-md);
   color: var(--dc3-text-regular);
   background: transparent;
   cursor: pointer;
@@ -2927,7 +3329,7 @@ const formatFileSize = (size = 0) => {
     overflow-wrap: anywhere;
     border: 1px solid var(--el-color-primary-light-5);
     border-left: 3px solid var(--el-color-primary-light-3);
-    border-radius: 7px;
+    border-radius: var(--dc3-radius-md);
     color: var(--dc3-text-primary);
     background: var(--dc3-brand-gradient-soft);
     box-shadow: var(--dc3-shadow-sm);
@@ -2962,7 +3364,7 @@ const formatFileSize = (size = 0) => {
 
   code {
     padding: 2px 4px;
-    border-radius: 4px;
+    border-radius: var(--dc3-radius-sm);
     background: var(--dc3-bg-muted);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 12px;
@@ -2974,7 +3376,7 @@ const formatFileSize = (size = 0) => {
     overflow: auto;
     padding: 10px;
     border: 1px solid var(--dc3-border-base);
-    border-radius: 6px;
+    border-radius: var(--dc3-radius-md);
     background: var(--dc3-bg-muted);
 
     code {
