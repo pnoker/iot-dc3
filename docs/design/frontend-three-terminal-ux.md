@@ -134,6 +134,13 @@ md-max、1 列映射到 xs-max。tests/guardrails/breakpoint-contract.test.ts �
 L4 模板推广到其余约 100 个视图（移动端摘要卡片列表受阻于 L1 摘要 schema 决策）、CI 中的 Lighthouse 预算 + axe-core、
 token lint。
 
+2026-09：v8 —— 间距体系统一。(1) 新语义令牌 --dc3-page-padding（16/12/8 三档阶跃，拒绝 clamp：流体边缘永不对齐
+固定节奏）与 --dc3-gutter（8px，手机 12px 触控节奏）落地 theme.scss；页头/正文边缘、卡墙缝隙、错误条全部令牌化。
+(2) 实体页卡墙去 BlankCard 壳改 el-row gutter，消灭 28px 边缘与机制分裂；末行归零统一为容器负 margin 模式；骨架墙
+与真卡同几何，加载前后零跳变。(3) 验收标准的 token lint 闸门以「关键容器白名单」形态首批落地
+（tests/guardrails/spacing-contract.test.ts：白名单强检 + clamp/gutter 反模式禁令 + spacing-exempt 豁免语法）；
+控件微间距（约 200 处）与颜色 lint 仍开放。
+
 2026-09：v7 —— 三端统一控制尺寸（产品决策）。(1) 删除基于宽度/指针的 44px 触控放大（global.scss、NavMenu、
 SlaBadge、AppPreferences、AgenticAssistant）：同一控件在三端保持同一密度——输入框/按钮/分页 32px、导航项 36px，
 图标字形与字号跨端恒定。(2) ToolCard 分页统一 default 尺寸，pager-count 修正为合法奇数（移动端 5 / 其余 7），消除

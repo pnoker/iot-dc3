@@ -31,6 +31,15 @@ Key rules:
 - Global Element Plus variables are injected by Vite; do not duplicate their `@use` directives in components.
 - Menu changes may require synchronized backend seed data, `settingsNav.ts`, router definitions, i18n locales,
   `Layout.vue`, and `Settings.vue` changes.
+- Border radius comes from the `--dc3-radius-*` scale in `src/styles/theme.scss` (A5): surfaces and floating layers
+  `lg`, controls and nested panels `md`, micro widgets `sm`, pills/circles `full`/`50%`. The Element Plus radius
+  mapping lives in the same `:root` block plus the `body .el-*` override section of `global.scss`; never hard-code px
+  radii — `tests/guardrails/radius-contract.test.ts` enforces it.
+- Spacing comes from the `--dc3-space-*` scale in `src/styles/theme.scss` (A5), plus two semantic tokens:
+  `--dc3-page-padding` (responsive page edge: 16/12/8 at lg/sm/xs tiers) and `--dc3-gutter` (card/section rhythm:
+  8px, 12px on phones). Page shells and card walls read those vars — never hand-rolled px or `clamp()` for macro
+  spacing; `el-row :gutter` stays the literal `8` (a JS prop cannot read CSS vars) with an anchor comment.
+  `tests/guardrails/spacing-contract.test.ts` enforces the key containers.
 
 Checks, run from `dc3-web/`:
 
