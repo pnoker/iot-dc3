@@ -66,8 +66,8 @@
             @current-change="onCurrentChange"
           />
           <template v-else-if="cursorMode">
-            <el-button :disabled="!cursorPrevious" @click="emit('cursor-previous')">{{ t('common.previous') }}</el-button>
-            <el-button :disabled="!cursorNext" type="primary" @click="emit('cursor-next')">{{ t('common.next') }}</el-button>
+            <el-button :disabled="!cursorPrevious" @click="emit('cursor-previous')">{{ t('common.prevPage') }}</el-button>
+            <el-button :disabled="!cursorNext" type="primary" @click="emit('cursor-next')">{{ t('common.nextPage') }}</el-button>
           </template>
           <span aria-hidden="true" class="tool-card-footer-divider"/>
           <!-- Icon-only buttons need explicit accessible names (A7): the

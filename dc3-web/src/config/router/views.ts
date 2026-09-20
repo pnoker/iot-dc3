@@ -113,6 +113,14 @@ const routes: RouteRecordRaw = {
       component: () => import('@/views/point/value/PointValue.vue'),
     },
     {
+      name: 'pointValueDetail',
+      path: 'point_value/detail',
+      meta: {
+        title: 'nav.pointValueDetail',
+      },
+      component: () => import('@/views/point/value/detail/PointValueDetail.vue'),
+    },
+    {
       name: 'pointDetail',
       path: 'point/detail',
       meta: {

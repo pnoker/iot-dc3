@@ -77,6 +77,9 @@ export default {
     return: '返回',
     next: '下一步',
     previous: '上一步',
+    // Cursor-paged views (point value history) walk pages, not wizard steps.
+    nextPage: '下一页',
+    prevPage: '上一页',
     import: '导入',
     count: '{count} 个',
     description: '描述',
@@ -141,6 +144,7 @@ export default {
     deviceEdit: '设备配置',
     profileDetail: '模板详情',
     profileEdit: '模板编辑',
+    pointValueDetail: '数据详情',
     pointDetail: '位号详情',
     pointEdit: '位号编辑',
     settings: '设置',

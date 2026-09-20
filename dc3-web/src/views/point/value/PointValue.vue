@@ -118,13 +118,12 @@
 import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
 import {getPointValueLatest, listPointByIds, listPointUnit, listPointValue, writePointValue} from '@/api/point';
 import {listDeviceByIds} from '@/api/device';
+import router from '@/config/router';
 
-import blankCard from '@/components/card/blank/BlankCard.vue';
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 import pointValueTool from './tool/PointValueTool.vue';
 import pointValueCard from './card/PointValueCard.vue';
 import pointValueEditForm from './edit/PointValueEditForm.vue';
-import pointValueDetail from './detail/PointValueDetail.vue';
 
 import {isNull} from '@/utils/validationUtil';
 import {successMessage} from '@/utils/notificationUtil';
@@ -159,7 +158,6 @@ const reactiveData = reactive({
   unitLookupLoading: false,
   unitLookupError: null as unknown | null,
   listData: [] as any[],
-  detailData: {} as Record<string, unknown>,
   query: {},
   page: {
     total: 0,
@@ -185,7 +183,6 @@ let unitLookupRequestId = 0;
 let disposed = false;
 
 const editRef = ref<InstanceType<typeof pointValueEditForm>>();
-const detailRef = ref<InstanceType<typeof pointValueDetail>>();
 
 const hasData = computed(() => {
   return reactiveData.status === 'success' && !reactiveData.loading && reactiveData.listData.length === 0;
@@ -415,15 +412,15 @@ const writeValue = (formData: Record<string, unknown>, done: (successful?: boole
 };
 
 const openDetail = (row: Record<string, unknown>) => {
-  const deviceId = String(row.deviceId || '');
-  const pointId = String(row.pointId || '');
-  reactiveData.detailData = {
-    ...row,
-    device: reactiveData.deviceTable[deviceId],
-    point: reactiveData.pointTable[pointId],
-    unit: reactiveData.unitTable[pointId],
-  };
-  detailRef.value?.show();
+  // Route detail page, on the same contract as every other entity detail
+  // (device/driver/profile/point): navigable, shareable, breadcrumb-backed.
+  void router.push({
+    name: 'pointValueDetail',
+    query: {
+      deviceId: String(row.deviceId || ''),
+      pointId: String(row.pointId || ''),
+    },
+  });
 };
 
 const sizeChange = (size: number) => {

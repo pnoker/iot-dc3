@@ -77,6 +77,9 @@ export default {
     return: 'Return',
     next: 'Next',
     previous: 'Previous',
+    // Cursor-paged views (point value history) walk pages, not wizard steps.
+    nextPage: 'Next page',
+    prevPage: 'Previous page',
     import: 'Import',
     count: '{count}',
     description: 'Description',
@@ -143,6 +146,7 @@ export default {
     deviceEdit: 'Device Config',
     profileDetail: 'Profile Detail',
     profileEdit: 'Profile Edit',
+    pointValueDetail: 'Data Detail',
     pointDetail: 'Point Detail',
     pointEdit: 'Point Edit',
     settings: 'Settings',

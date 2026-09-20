@@ -75,6 +75,7 @@ const ROUTE_MENU_ALIASES: Record<string, string> = {
   profileDetail: 'profile',
   profileEdit: 'profile',
   pointDetail: 'pointValue',
+  pointValueDetail: 'pointValue',
 };
 
 /**
