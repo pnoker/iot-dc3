@@ -16,8 +16,17 @@
   -->
 
 <template>
+  <!-- Card action order is a system-wide contract: detail (browse) → edit →
+       enable/disable (state) → delete (destructive last, popconfirm-guarded).
+       Keep every card footer on this ladder; see DriverCard/PointValueCard. -->
   <div :aria-busy="busy" class="things-card__footer">
     <div class="things-card-footer-operation">
+      <el-button :disabled="busy || detailDisabled" link type="primary" @click="$emit('detail')">
+        {{ t('common.detail') }}
+      </el-button>
+      <el-button :disabled="busy" link type="primary" @click="$emit('edit')">
+        {{ t('common.edit') }}
+      </el-button>
       <el-popconfirm
         :icon="SwitchButton"
         :disabled="busy || !enabled"
@@ -58,12 +67,6 @@
           <el-button :disabled="busy" :loading="busy" link type="primary">{{ t('common.delete') }}</el-button>
         </template>
       </el-popconfirm>
-      <el-button :disabled="busy" link type="primary" @click="$emit('edit')">
-        {{ t('common.edit') }}
-      </el-button>
-      <el-button :disabled="busy || detailDisabled" link type="primary" @click="$emit('detail')">
-        {{ t('common.detail') }}
-      </el-button>
     </div>
   </div>
 </template>
@@ -90,7 +93,6 @@ const {t} = useI18n();
 .things-card__footer {
   min-height: var(--dc3-touch-target);
   margin-top: 2px;
-  padding-inline-end: var(--dc3-floating-action-safe-space);
   box-sizing: border-box;
   display: flex;
   justify-content: flex-end;

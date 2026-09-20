@@ -132,13 +132,15 @@
             <div v-else class="point-value-empty-chart">{{ $t('pointValue.card.noHistory') }}</div>
           </div>
         </div>
+        <!-- Action order follows the system-wide card footer contract:
+             detail (browse) → write (modify). -->
         <div v-if="embedded == ''" class="things-card__footer">
           <div class="things-card-footer-operation">
-            <el-button :disabled="writeDisabled" link type="primary" @click="$emit('write-thing', data)">
-              {{ $t('pointValue.card.write') }}
-            </el-button>
             <el-button link type="primary" @click="$emit('detail-thing', data)">
               {{ $t('common.detail') }}
+            </el-button>
+            <el-button :disabled="writeDisabled" link type="primary" @click="$emit('write-thing', data)">
+              {{ $t('pointValue.card.write') }}
             </el-button>
           </div>
         </div>

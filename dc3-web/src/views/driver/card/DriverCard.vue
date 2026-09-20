@@ -65,8 +65,13 @@
             </p>
           </div>
         </div>
+        <!-- Action order follows the system-wide card footer contract:
+             detail (browse) → delete (destructive last). -->
         <div v-if="!footer" :aria-busy="busy" class="things-card__footer">
           <div class="things-card-footer-operation">
+            <el-button :disabled="busy" link type="primary" @click.stop="detail">
+              {{ $t('common.detail') }}
+            </el-button>
             <el-popconfirm
               :disabled="busy"
               :title="$t('common.confirmDelete', {name: $t('common.entityDriver')})"
@@ -78,9 +83,6 @@
                 </el-button>
               </template>
             </el-popconfirm>
-            <el-button :disabled="busy" link type="primary" @click.stop="detail">
-              {{ $t('common.detail') }}
-            </el-button>
           </div>
         </div>
       </div>

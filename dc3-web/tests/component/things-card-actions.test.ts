@@ -78,9 +78,10 @@ describe('ThingsCardActions', () => {
     const wrapper = mountActions();
     const directButtons = wrapper.findAll('button.el-button-stub').filter((btn) => !btn.attributes('disabled'));
 
-    // The last two non-popconfirm buttons in the cluster: Edit, then Detail.
-    const edit = directButtons[directButtons.length - 2];
-    const detail = directButtons[directButtons.length - 1];
+    // Direct buttons lead the cluster (action-order contract: browse →
+    // edit → state → delete): detail first, then edit.
+    const detail = directButtons[0];
+    const edit = directButtons[1];
 
     await edit.trigger('click');
     await detail.trigger('click');
@@ -92,20 +93,20 @@ describe('ThingsCardActions', () => {
   it('disables the detail button when detailDisabled is true', () => {
     const wrapper = mountActions({detailDisabled: true});
     const buttons = wrapper.findAll('button.el-button-stub');
-    const detail = buttons[buttons.length - 1];
+    const detail = buttons[0];
     expect(detail.attributes('disabled')).toBeDefined();
   });
 
   it('disables disable when already disabled, and enable when already enabled', () => {
     const enabled = mountActions({enabled: true});
     const enabledButtons = enabled.findAll('button.el-button-stub');
-    // Buttons in template order: disable(0), enable(1), delete(2), edit(3), detail(4)
-    expect(enabledButtons[0].attributes('disabled')).toBeUndefined();
-    expect(enabledButtons[1].attributes('disabled')).toBeDefined();
+    // Buttons in template order: detail(0), edit(1), disable(2), enable(3), delete(4)
+    expect(enabledButtons[2].attributes('disabled')).toBeUndefined();
+    expect(enabledButtons[3].attributes('disabled')).toBeDefined();
 
     const disabled = mountActions({enabled: false});
     const disabledButtons = disabled.findAll('button.el-button-stub');
-    expect(disabledButtons[0].attributes('disabled')).toBeDefined();
-    expect(disabledButtons[1].attributes('disabled')).toBeUndefined();
+    expect(disabledButtons[2].attributes('disabled')).toBeDefined();
+    expect(disabledButtons[3].attributes('disabled')).toBeUndefined();
   });
 });
