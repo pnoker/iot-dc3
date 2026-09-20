@@ -29,6 +29,9 @@ import {sampleMenuTree} from '../fixtures/menu';
 const layoutMocks = vi.hoisted(() => ({
   routerPush: vi.fn(() => Promise.resolve()),
   logout: vi.fn(() => Promise.resolve()),
+  // Plain {value} object read once at mount time — tests flip it before
+  // mountLayout() to exercise the phone tier.
+  mobile: {value: false},
 }));
 
 vi.mock('@/config/router', () => ({
@@ -36,8 +39,14 @@ vi.mock('@/config/router', () => ({
 }));
 
 vi.mock('@/composables/useBreakpoint', async () => {
-  const {ref} = await import('vue');
-  return {useBreakpoint: () => ({isDesktop: ref(true), isMobile: ref(false), isTablet: ref(false)})};
+  const {computed} = await import('vue');
+  return {
+    useBreakpoint: () => ({
+      isDesktop: computed(() => !layoutMocks.mobile.value),
+      isMobile: computed(() => layoutMocks.mobile.value),
+      isTablet: computed(() => false),
+    }),
+  };
 });
 
 vi.mock('@/components/agentic/AgenticAssistant.vue', () => ({
@@ -90,6 +99,7 @@ describe('Layout', () => {
   beforeEach(() => {
     layoutMocks.routerPush.mockClear();
     layoutMocks.logout.mockClear();
+    layoutMocks.mobile.value = false;
   });
 
   it('renders the top nav with the home menu and the menu store tree', async () => {
@@ -125,5 +135,29 @@ describe('Layout', () => {
     expect(wrapper.find('.router-view-stub').exists()).toBe(true);
     expect(wrapper.get('.skip-link').attributes('href')).toBe('#main-content');
     expect(wrapper.get('#main-content').attributes('tabindex')).toBe('-1');
+  });
+
+  it('keeps the primary menu in the capsule and folds preferences on phone', async () => {
+    layoutMocks.mobile.value = true;
+    const wrapper = await mountLayout();
+    await flushPromises();
+
+    // No hamburger, no drawer — the icon-compact menu strip stays in the
+    // capsule on the phone tier, primary navigation never leaves the header.
+    expect(wrapper.find('.header_menu_toggle').exists()).toBe(false);
+    expect(wrapper.find('.nav-drawer').exists()).toBe(false);
+    expect(wrapper.find('.header_actions_glass .header_menu_wrap').exists()).toBe(true);
+    expect(wrapper.find('.nav-menu--compact').exists()).toBe(true);
+
+    // Language/theme switching folds behind the "…" chip instead of
+    // sitting flat in the utilities row. (The button stub drops classes,
+    // so the chip is located by its icon.)
+    expect(wrapper.find('.header_utilities > .app-preferences').exists()).toBe(false);
+    expect(wrapper.find('.header_utilities button[data-icon="MoreFilled"]').exists()).toBe(true);
+    expect(wrapper.find('.el-popover-stub .app-preferences').exists()).toBe(true);
+
+    // The account stays a first-class capsule action. (The settings button
+    // is gated on a routeable settings node, which this fixture lacks.)
+    expect(wrapper.find('.user_trigger').exists()).toBe(true);
   });
 });

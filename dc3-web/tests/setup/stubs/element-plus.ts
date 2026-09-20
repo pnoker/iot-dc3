@@ -178,7 +178,10 @@ export const layoutStubs: Record<string, ComponentOptions> = {
   ElCheckboxGroup: passthrough('div', 'el-checkbox-group-stub'),
   ElTransfer: passthrough('div', 'el-transfer-stub'),
   ElUpload: passthrough('div', 'el-upload-stub'),
-  ElPopover: passthrough('div', 'el-popover-stub'),
+  // ElPopover keeps its trigger in a named `reference` slot (the real
+  // component teleports the popper). Render both slots so popover triggers
+  // stay discoverable in tests.
+  ElPopover: {template: '<div class="el-popover-stub"><slot name="reference" /><slot /></div>'},
   ElImage: {template: '<img class="el-image-stub" />'},
   ElProgress: passthrough('div', 'el-progress-stub'),
   ElSlider: {template: '<input type="range" class="el-slider-stub" />'},

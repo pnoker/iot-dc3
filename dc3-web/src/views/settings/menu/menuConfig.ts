@@ -18,8 +18,20 @@
 import {addMenu, deleteMenu, listMenuTree, updateMenu} from '@/api/menu';
 import {MENU_LEVEL_OPTIONS, MENU_TYPE_OPTIONS} from '@/config/constant/enums';
 import {iconNames} from '@/config/constant/icons';
+import {useMenuStore} from '@/store';
 import type {EntityListConfig, Translator} from '@/config/types/entityList';
 import {authNameRules, remarkRules} from '@/utils/formRuleUtil';
+
+// Menu edits must refresh every surface that renders the tree (top nav,
+// settings sidebar, pickers). The sidebar no longer force-refetches on
+// every settings visit (that cost a duplicate ~1.5s list_tree per entry),
+// so mutations invalidate the pinia cache here instead — reset marks it
+// unloaded and the next consumer refetches.
+const invalidateMenuCache = () => {
+  const menuStore = useMenuStore();
+  menuStore.reset();
+  void menuStore.fetchTree();
+};
 
 /**
  * Create menu config.
@@ -188,9 +200,18 @@ export const createMenuConfig = (t: Translator): EntityListConfig => ({
     };
   },
   list: listMenuTree,
-  add: addMenu as EntityListConfig['add'],
-  update: updateMenu as EntityListConfig['update'],
-  remove: deleteMenu,
+  add: async (payload) => {
+    await addMenu(payload as Parameters<typeof addMenu>[0]);
+    invalidateMenuCache();
+  },
+  update: async (payload) => {
+    await updateMenu(payload as Parameters<typeof updateMenu>[0]);
+    invalidateMenuCache();
+  },
+  remove: async (id) => {
+    await deleteMenu(id);
+    invalidateMenuCache();
+  },
   detail: {routeName: 'settingsMenuDetail'},
   confirmDeleteText: t('common.confirmDelete', {name: t('common.entityMenu')}),
   emptyText: t('settings.menu.empty'),

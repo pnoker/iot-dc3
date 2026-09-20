@@ -18,8 +18,10 @@
 <!--
   Settings sidebar menu — one component, three physical hosts (A2):
   desktop aside (expanded), tablet aside (collapsed icon rail), and the
-  mobile navigation drawer. The menu tree comes from the backend
-  (dc3_menu via menuStore) with the frontend fallback from settingsNav.
+  mobile nav popover (expand-all: every group is unfolded so the whole
+  tree is scannable in the bubble without extra taps). The menu tree
+  comes from the backend (dc3_menu via menuStore) with the frontend
+  fallback from settingsNav.
 -->
 
 <template>
@@ -58,22 +60,24 @@
 
 <script lang="ts" setup>
 import {computed, onMounted} from 'vue';
-import {useI18n} from 'vue-i18n';
 import {useRoute, useRouter} from 'vue-router';
 
 import {
   getSettingsActiveName,
   getSettingsDefaultOpeneds,
   getSettingsRouteName,
-  SETTINGS_FALLBACK_SIDEBAR,
-  SETTINGS_TITLE_KEYS,
-  type SettingsNavNode,
 } from '@/config/settingsNav';
 import {useMenuStore} from '@/store';
-import {resolveMenuTitle} from '@/utils/menuUtil';
 
-defineProps({
+import {useSettingsSidebarItems} from '@/views/settings/composables/useSettingsSidebarItems';
+
+const props = defineProps({
   collapsed: {
+    type: Boolean,
+    default: false,
+  },
+  /** Unfold every group on mount — the mobile popover shows the full tree. */
+  expandAll: {
     type: Boolean,
     default: false,
   },
@@ -83,66 +87,19 @@ const emit = defineEmits<{
   (e: 'select'): void;
 }>();
 
-const {t} = useI18n();
 const route = useRoute();
 const router = useRouter();
 const menuStore = useMenuStore();
 
 onMounted(() => {
-  // Force a refetch so the sidebar always reflects the latest menu tree
-  // when entering Settings (the Layout-level fetch is cached once loaded).
-  menuStore.fetchTree(true);
+  // Reuse the cached tree — menu edits invalidate the pinia cache from
+  // menuConfig, so force-refetching on every settings visit only re-paid
+  // a ~1.5s list_tree for data that is already in memory.
+  void menuStore.fetchTree();
 });
 
-interface SidebarItem {
-  name: string;
-  title: string;
-  icon?: string;
-  children?: SidebarItem[];
-}
-
-const toSidebarItem = (node: SettingsNavNode): SidebarItem => ({
-  name: node.name,
-  title: t(node.titleKey),
-  icon: node.icon,
-  children: node.children?.map(toSidebarItem),
-});
-
-// Static fallback shown when the menu API is unreachable or still loading.
-// `icon` holds the globally-registered element-plus icon component name.
-const fallbackItems = (): SidebarItem[] => SETTINGS_FALLBACK_SIDEBAR.map(toSidebarItem);
-
-const menuTitle = (node: any) => {
-  const titleKey = SETTINGS_TITLE_KEYS[node.menuCode];
-  return titleKey ? t(titleKey) : resolveMenuTitle(node);
-};
-
-const mapMenuNode = (node: any): SidebarItem => ({
-  name: node.menuCode,
-  title: menuTitle(node),
-  icon: node.menuExt?.content?.icon,
-  children: node.children?.length
-    ? node.children
-      .slice()
-      .sort((a: any, b: any) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0))
-      .map(mapMenuNode)
-    : undefined,
-});
-
-const sidebarItems = computed<SidebarItem[]>(() => {
-  const settings = menuStore.findByCode('settings');
-  const children = settings?.children || [];
-  if (menuStore.loaded) {
-    // The menu API is authoritative once loaded; the DB already encodes the group tree.
-    return children.length
-      ? children
-        .slice()
-        .sort((a, b) => (a.menuIndex ?? 0) - (b.menuIndex ?? 0))
-        .map(mapMenuNode)
-      : [];
-  }
-  return fallbackItems();
-});
+// Shared with the toolbar search so both read one item source.
+const {sidebarItems} = useSettingsSidebarItems();
 
 const activeMenu = computed(() => {
   const name = String(route.name || 'settingsUser');
@@ -150,6 +107,11 @@ const activeMenu = computed(() => {
 });
 
 const defaultOpeneds = computed(() => {
+  // The mobile popover remounts on every open (persistent=false), so the
+  // full-tree openeds reapply each time — no group starts folded.
+  if (props.expandAll) {
+    return sidebarItems.value.filter((item) => item.children?.length).map((item) => item.name);
+  }
   return getSettingsDefaultOpeneds(activeMenu.value);
 });
 
@@ -213,12 +175,17 @@ const onSelect = (name: string) => {
   }
 
   &.el-menu--collapse {
+    box-sizing: border-box;
+    width: 100%;
     padding: var(--dc3-space-2) var(--dc3-space-1);
 
     :deep(.el-menu-item),
     :deep(.el-sub-menu__title) {
       justify-content: center;
       padding: 0;
+      // The collapsed title span collapses to zero width but the flex gap
+      // still takes space, nudging the icon off the rail centerline.
+      gap: 0;
     }
   }
 }

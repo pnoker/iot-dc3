@@ -220,29 +220,37 @@ test.describe("three-terminal gate", () => {
 
     await expect(page.locator('.header_brand_glass')).toHaveCount(1);
     await expect(page.locator('.header_actions_glass')).toHaveCount(1);
-    await expect(page.locator('.header_actions_glass .app-preferences')).toBeVisible();
-    await expect(page.locator('.header_actions_glass .app-preferences__theme')).toBeVisible();
     await expect(page.locator('.header_settings_button')).toBeVisible();
     await expect(page.locator('.user_trigger')).toBeVisible();
 
     if (mobile) {
-      // Hamburger replaces the horizontal menu strip.
-      await expect(page.locator(".header_menu_toggle")).toBeVisible();
-      await expect(page.locator(".header_menu_wrap")).toHaveCount(0);
+      // The primary menu stays in the capsule as an icon-compact strip —
+      // no hamburger, no drawer. Language/theme fold behind the "…" chip.
+      await expect(page.locator(".header_menu_toggle")).toHaveCount(0);
+      await expect(page.locator(".nav-drawer")).toHaveCount(0);
+      await expect(page.locator(".header_menu_wrap")).toBeVisible();
+      await expect(page.locator(".nav-menu--compact")).toHaveCount(1);
 
-      // Drawer opens and carries the navigation tree.
-      await page.locator(".header_menu_toggle").click();
-      await expect(page.locator(".nav-drawer")).toBeVisible();
-      await expect(page.locator(".nav-drawer")).toContainText("Home");
+      // Preferences live in the popover, not flat in the capsule.
+      await expect(
+        page.locator(".header_actions_glass > * .app-preferences"),
+      ).toHaveCount(0);
+      await page.locator(".header_more_button").click();
+      await expect(page.locator(".app-preferences")).toBeVisible();
       await page.keyboard.press("Escape");
 
-      // Settings: floating toggle + drawer replace the fixed aside.
+      // Settings: the HEADER settings button bubbles up an arrowed popover
+      // with the fully-expanded menu (no aside, no floating corner toggle,
+      // no drawer).
       await page.goto("/#/settings/user", { waitUntil: "domcontentloaded" });
       await waitForAppSettled(page);
       await expect(page.locator(".settings-aside")).toHaveCount(0);
-      await expect(page.locator(".settings-aside-toggle")).toBeVisible();
-      await page.locator(".settings-aside-toggle").click();
-      await expect(page.locator(".settings-drawer")).toBeVisible();
+      await expect(page.locator(".settings-aside-toggle")).toHaveCount(0);
+      await page.locator(".header_settings_button").click();
+      await expect(page.locator(".settings-nav-popover")).toBeVisible();
+      // Every group arrives unfolded — a child item is visible without
+      // any intermediate tap.
+      await expect(page.locator(".settings-nav-popover .el-menu-item")).toBeVisible();
     } else {
       // Desktop keeps labels; tablet uses icon-compact navigation. Neither
       // mode falls back to Element Plus's three-dot overflow item.
@@ -251,6 +259,8 @@ test.describe("three-terminal gate", () => {
       await expect(page.locator('.nav-menu--compact')).toHaveCount(
         isTabletViewport(page) ? 1 : 0,
       );
+      await expect(page.locator('.header_actions_glass .app-preferences')).toBeVisible();
+      await expect(page.locator('.header_actions_glass .app-preferences__theme')).toBeVisible();
 
       await page.goto("/#/settings/user", { waitUntil: "domcontentloaded" });
       await waitForAppSettled(page);

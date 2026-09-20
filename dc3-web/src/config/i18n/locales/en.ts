@@ -893,6 +893,10 @@ export default {
     },
   },
   settings: {
+    search: {
+      placeholder: 'Search settings…',
+      empty: 'No matching settings page',
+    },
     common: {
       entityType: 'Entity Type',
       entityTypePlaceholder: 'Select entity type',

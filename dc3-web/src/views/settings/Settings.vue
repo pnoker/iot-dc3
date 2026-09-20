@@ -19,7 +19,9 @@
   Settings shell — three physical forms (A2):
   - desktop: fixed 220px aside (user-collapsible, persisted);
   - tablet: 64px icon rail aside;
-  - mobile: drawer opened from a floating toggle (drawer navigation, A3).
+  - mobile: no aside at all — the header's settings button bubbles up the
+    fully-expanded nav popover (users never think to hunt for a floating
+    corner toggle, so the shell reuses the button they can already see).
   The menu itself is SettingsSidebarMenu, shared by all three hosts.
 -->
 
@@ -27,15 +29,22 @@
   <el-container class="settings-container">
     <el-aside v-if="!isMobile" :width="asideWidth" class="settings-aside">
       <el-card class="settings-aside-card" shadow="never">
-        <div class="settings-aside-toolbar">
+        <!-- Toolbar: quick search fills the free width beside the collapse
+             toggle. Collapsed, the search degrades to an equal-sized icon
+             whose popover never expands the rail. -->
+        <div class="settings-aside-toolbar" :class="{'is-collapsed': sidebarCollapsed}">
+          <settings-menu-search :collapsed="sidebarCollapsed" />
           <el-button
-            v-if="!isTablet"
             :aria-label="asideCollapseLabel"
-            :icon="appStore.settingsCollapsed ? Expand : Fold"
             circle
             text
-            @click="appStore.toggleSettingsCollapsed()"
-          />
+            @click="toggleAside()"
+          >
+            <!-- 18px matches the el-menu icon size so the toggle and the menu
+                 glyphs sit on one visual scale (buttons otherwise inherit the
+                 14px control font size). -->
+            <el-icon :size="18"><component :is="sidebarCollapsed ? Expand : Fold" /></el-icon>
+          </el-button>
         </div>
         <el-scrollbar>
           <settings-sidebar-menu :collapsed="sidebarCollapsed" />
@@ -43,26 +52,7 @@
       </el-card>
     </el-aside>
 
-    <el-drawer
-      v-model="asideDrawerVisible"
-      :size="280"
-      :title="t('layout.settings')"
-      :with-header="true"
-      class="settings-drawer"
-      direction="ltr"
-    >
-      <settings-sidebar-menu @select="asideDrawerVisible = false" />
-    </el-drawer>
-
     <el-main class="settings-main">
-      <el-button
-        v-if="isMobile"
-        :aria-label="t('layout.settings')"
-        :icon="Setting"
-        circle
-        class="settings-aside-toggle"
-        @click="asideDrawerVisible = true"
-      />
       <el-scrollbar>
         <router-view />
       </el-scrollbar>
@@ -71,32 +61,36 @@
 </template>
 
 <script lang="ts" setup>
-import { Expand, Fold, Setting } from "@element-plus/icons-vue";
-import { computed, ref } from "vue";
+import { Expand, Fold } from "@element-plus/icons-vue";
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 import { useBreakpoint } from "@/composables/useBreakpoint";
 import { useAppStore } from "@/store";
+import SettingsMenuSearch from "@/views/settings/components/SettingsMenuSearch.vue";
 import SettingsSidebarMenu from "@/views/settings/components/SettingsSidebarMenu.vue";
 
 const { t } = useI18n();
 const { isMobile, isTablet } = useBreakpoint();
 const appStore = useAppStore();
 
-const asideDrawerVisible = ref(false);
-
-// Tablet is an icon rail by contract; only desktop honours the persisted
-// collapse preference. This keeps the content canvas usable at 768–1199px
-// without making the preference unexpectedly alter the tablet information
-// hierarchy.
-const sidebarCollapsed = computed(() => isTablet.value || appStore.settingsCollapsed);
+// Tablet defaults to the icon rail so the content canvas stays usable at
+// 768–1199px; the rail stays expandable via a persisted override, mirroring
+// the desktop collapse preference (both survive reloads like theme/density).
+const sidebarCollapsed = computed(() => (isTablet.value ? !appStore.settingsRailExpanded : appStore.settingsCollapsed));
 const asideWidth = computed(() => (sidebarCollapsed.value ? "64px" : "220px"));
+
+const toggleAside = () => {
+  if (isTablet.value) {
+    appStore.toggleSettingsRailExpanded();
+    return;
+  }
+  appStore.toggleSettingsCollapsed();
+};
 
 const asideCollapseLabel = computed(() =>
   t(
-    appStore.settingsCollapsed
-      ? "layout.expandSettings"
-      : "layout.collapseSettings",
+    sidebarCollapsed.value ? "layout.expandSettings" : "layout.collapseSettings",
   ),
 );
 </script>
@@ -110,6 +104,10 @@ const asideCollapseLabel = computed(() =>
 }
 
 .settings-aside {
+  // el-aside defaults to overflow: auto; the inner el-scrollbar owns scrolling,
+  // so a fractional-zoom 1px card overflow must not surface a second scrollbar.
+  overflow: hidden;
+
   .settings-aside-card {
     height: 100%;
     border: 1px solid var(--dc3-border-base);
@@ -137,8 +135,28 @@ const asideCollapseLabel = computed(() =>
 
   .settings-aside-toolbar {
     display: flex;
-    justify-content: flex-end;
-    padding: var(--dc3-space-2) var(--dc3-space-2) 0;
+    align-items: center;
+    gap: var(--dc3-space-1);
+    padding: var(--dc3-space-2) var(--dc3-space-2);
+    // A hairline separates the toolbar (search + collapse) from the menu
+    // tree so the strip reads as its own row rather than the menu's first.
+    border-bottom: 1px solid var(--dc3-border-base);
+
+    // In the icon rail (64px) two side-by-side 32px buttons would overflow
+    // the rail edges. Stack them instead — collapse on top, search below —
+    // each centered on the rail centerline like the menu icons. Kill the
+    // Element Plus sibling margin (.el-button + .el-button): it exists for
+    // horizontal rows and would push the stacked button off-center.
+    &.is-collapsed {
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--dc3-space-2);
+      padding: var(--dc3-space-2) 0;
+
+      :deep(.el-button + .el-button) {
+        margin-left: 0;
+      }
+    }
   }
 }
 
@@ -154,31 +172,6 @@ const asideCollapseLabel = computed(() =>
     :deep(.el-scrollbar__view) {
       min-height: 100%;
     }
-  }
-
-  // Floating menu trigger for thumb terminals: keeps the content area
-  // free of a permanent bar (A3 thumb-zone ergonomics).
-  .settings-aside-toggle {
-    position: fixed;
-    bottom: var(--dc3-space-5);
-    left: var(--dc3-space-3);
-    z-index: 10;
-    border-color: var(--dc3-border-strong);
-    background: var(--dc3-bg-elevated-strong);
-    box-shadow: var(--dc3-shadow-md);
-  }
-
-  @media (max-width: $breakpoint-xs-max) {
-    .settings-aside-toggle {
-      left: var(--dc3-space-2);
-      bottom: var(--dc3-space-4);
-    }
-  }
-}
-
-.settings-drawer {
-  :deep(.el-drawer__body) {
-    padding: var(--dc3-space-2);
   }
 }
 </style>

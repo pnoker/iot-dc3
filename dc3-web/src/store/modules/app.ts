@@ -35,6 +35,11 @@ export type Density = 'comfortable' | 'compact';
 const THEME_KEY = 'dc3.app.theme';
 const DENSITY_KEY = 'dc3.app.density';
 const SETTINGS_COLLAPSED_KEY = 'dc3.app.settingsCollapsed';
+// Tablet rail: the icon rail is collapsed by DESIGN on tablet widths; this
+// stores the user's "keep it expanded" override so a reload keeps their
+// choice, mirroring theme/density persistence (the session-local ref used
+// before reset on every refresh).
+const SETTINGS_RAIL_EXPANDED_KEY = 'dc3.app.settingsRailExpanded';
 
 const THEME_MODES: ThemeMode[] = ['light', 'dark', 'auto'];
 
@@ -53,6 +58,7 @@ export const useAppStore = defineStore('app', () => {
   const themeMode = ref<ThemeMode>(readTheme());
   const density = ref<Density>(readDensity());
   const settingsCollapsed = ref(getStorage(SETTINGS_COLLAPSED_KEY) === true);
+  const settingsRailExpanded = ref(getStorage(SETTINGS_RAIL_EXPANDED_KEY) === true);
   const systemDark = ref(false);
 
   let systemMedia: MediaQueryList | undefined;
@@ -98,6 +104,11 @@ export const useAppStore = defineStore('app', () => {
     setStorage(SETTINGS_COLLAPSED_KEY, settingsCollapsed.value);
   };
 
+  const toggleSettingsRailExpanded = () => {
+    settingsRailExpanded.value = !settingsRailExpanded.value;
+    setStorage(SETTINGS_RAIL_EXPANDED_KEY, settingsRailExpanded.value);
+  };
+
   watch([resolvedTheme, density], () => {
     applyTheme();
   });
@@ -107,6 +118,7 @@ export const useAppStore = defineStore('app', () => {
     themeMode,
     density,
     settingsCollapsed,
+    settingsRailExpanded,
     systemDark,
     // Getters
     resolvedTheme,
@@ -117,5 +129,6 @@ export const useAppStore = defineStore('app', () => {
     setTheme,
     setDensity,
     toggleSettingsCollapsed,
+    toggleSettingsRailExpanded,
   };
 });

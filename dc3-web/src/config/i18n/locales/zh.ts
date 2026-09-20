@@ -887,6 +887,10 @@ export default {
     },
   },
   settings: {
+    search: {
+      placeholder: '搜索设置…',
+      empty: '未找到匹配的设置页',
+    },
     common: {
       entityType: '实体类型',
       entityTypePlaceholder: '请选择实体类型',

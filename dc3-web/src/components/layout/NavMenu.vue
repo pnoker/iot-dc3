@@ -181,6 +181,11 @@ const activeIndex = computed(() => {
       width: 36px;
       padding: 0;
       justify-content: center;
+      // Icon-only chips are circles — the capsule's round utility buttons
+      // (refresh/settings/avatar) sit right beside them, and a square
+      // active chip next to round neighbours reads mismatched. Labelled
+      // (non-compact) menus keep the pill radius.
+      border-radius: 50%;
     }
 
     :deep(> .el-menu-item .el-icon),
