@@ -87,7 +87,7 @@ export const menuTree: MenuNode[] = [
       mk('settingsIdentity', {
         menuName: 'Accounts & Identity',
         titles: {zh: '账户与身份', en: 'Accounts & Identity'},
-        icon: 'User',
+        icon: 'UserFilled',
         menuIndex: 1,
         children: [
           mk('settingsUser', {
@@ -136,21 +136,21 @@ export const menuTree: MenuNode[] = [
           mk('settingsRole', {
             menuName: 'Role',
             titles: {zh: '角色管理', en: 'Role'},
-            icon: 'Lock',
+            icon: 'Medal',
             url: '/settings/role',
             menuIndex: 1
           }),
           mk('settingsRolePrincipalBind', {
             menuName: 'Role Assignments',
             titles: {zh: '角色分配', en: 'Role Assignments'},
-            icon: 'Link',
+            icon: 'Paperclip',
             url: '/settings/role_principal_bind',
             menuIndex: 2
           }),
           mk('settingsResource', {
             menuName: 'Resource',
             titles: {zh: '资源管理', en: 'Resource'},
-            icon: 'Tickets',
+            icon: 'Box',
             url: '/settings/resource',
             menuIndex: 3
           }),
@@ -164,7 +164,7 @@ export const menuTree: MenuNode[] = [
           mk('settingsMenu', {
             menuName: 'Menu',
             titles: {zh: '菜单管理', en: 'Menu'},
-            icon: 'Discount',
+            icon: 'Menu',
             url: '/settings/menu',
             menuIndex: 5
           })
@@ -193,14 +193,14 @@ export const menuTree: MenuNode[] = [
           mk('settingsModelProvider', {
             menuName: 'Model Providers',
             titles: {zh: '模型供应商', en: 'Model Providers'},
-            icon: 'ChatLineSquare',
+            icon: 'Shop',
             url: '/settings/model/provider',
             menuIndex: 1
           }),
           mk('settingsModelConfig', {
             menuName: 'Model Config',
             titles: {zh: '模型配置', en: 'Model Config'},
-            icon: 'ChatDotRound',
+            icon: 'MagicStick',
             url: '/settings/model/config',
             menuIndex: 2
           })
@@ -215,7 +215,7 @@ export const menuTree: MenuNode[] = [
           mk('settingsMcpServer', {
             menuName: 'MCP Service',
             titles: {zh: 'MCP 服务', en: 'MCP Service'},
-            icon: 'Connection',
+            icon: 'Platform',
             url: '/settings/mcp',
             menuIndex: 1
           }),
@@ -272,7 +272,7 @@ export const menuTree: MenuNode[] = [
           mk('settingsAlarmChannel', {
             menuName: 'Alarm Channels',
             titles: {zh: '告警通知渠道', en: 'Alarm Channels'},
-            icon: 'Connection',
+            icon: 'Postcard',
             url: '/settings/alarm/channel',
             menuIndex: 4
           }),
@@ -336,14 +336,14 @@ export const menuTree: MenuNode[] = [
           mk('settingsEventHistory', {
             menuName: 'Event History',
             titles: {zh: '事件历史', en: 'Event History'},
-            icon: 'Document',
+            icon: 'Lightning',
             url: '/settings/event/history',
             menuIndex: 7
           }),
           mk('settingsCommandHistory', {
             menuName: 'Command History',
             titles: {zh: '指令历史', en: 'Command History'},
-            icon: 'Document',
+            icon: 'Position',
             url: '/settings/command/history',
             menuIndex: 8
           })
@@ -354,7 +354,7 @@ export const menuTree: MenuNode[] = [
           mk('settingsIdentityAudit', {
             menuName: 'Identity Audit',
             titles: {zh: '身份审计', en: 'Identity Audit'},
-            icon: 'DocumentChecked',
+            icon: 'Memo',
             url: '/settings/identity_audit',
             menuIndex: 1
           }),

@@ -36,19 +36,19 @@ LANGUAGE plpgsql;
 -- ----------------------------
 CREATE TABLE dc3_tenant
 (
-    id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
-    tenant_name   TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Tenant name
-    tenant_code   TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Tenant code
-    tenant_ext    JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Tenant extension information
-    enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
-    remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
-    creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
-    creator_name  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id   BIGINT   DEFAULT 0 NOT NULL,                   -- Operator ID
-    operator_name TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted       SMALLINT DEFAULT 0 NOT NULL,                   -- Logical delete flag, 0: not deleted, 1: deleted
+    id             BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    tenant_name    TEXT         DEFAULT ''::TEXT NOT NULL,          -- Tenant name
+    tenant_code    TEXT         DEFAULT ''::TEXT NOT NULL,          -- Tenant code
+    tenant_ext     JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Tenant extension information
+    enable_flag    SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    remark         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted        SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_tenant_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_tenant_deleted CHECK (deleted IN (0, 1))
 );
@@ -81,23 +81,23 @@ COMMENT ON COLUMN dc3_tenant.deleted IS 'Logical delete flag, 0: not deleted, 1:
 -- ----------------------------
 CREATE TABLE dc3_principal
 (
-    id             BIGINT PRIMARY KEY NOT NULL,                  -- Primary key ID
-    principal_type TEXT     DEFAULT 'USER'::TEXT   NOT NULL,     -- Principal type, USER: user, SERVICE_ACCOUNT: service account, SYSTEM: system principal
-    principal_name TEXT     DEFAULT ''::TEXT       NOT NULL,     -- Principal name
-    display_name   TEXT     DEFAULT ''::TEXT       NOT NULL,     -- Principal display name
-    source_type    TEXT     DEFAULT 'LOCAL'::TEXT  NOT NULL,     -- Principal source type, LOCAL: local, EXTERNAL: external, SYSTEM: system
-    enable_flag    SMALLINT DEFAULT 0 NOT NULL,                  -- Enable flag, 0: enabled, 1: disabled
-    locked_flag    SMALLINT DEFAULT 0 NOT NULL,                  -- Locked flag, 0: unlocked, 1: locked
-    last_login_time TIMESTAMPTZ,                                 -- Last login time
-    principal_ext  JSONB     DEFAULT '{}'::JSONB     NOT NULL,     -- Principal extension information
-    remark         TEXT     DEFAULT ''::TEXT       NOT NULL,     -- Description
-    creator_id     BIGINT   DEFAULT 0 NOT NULL,                  -- Creator ID
-    creator_name   TEXT     DEFAULT ''::TEXT       NOT NULL,     -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id    BIGINT   DEFAULT 0 NOT NULL,                  -- Operator ID
-    operator_name  TEXT     DEFAULT ''::TEXT       NOT NULL,     -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted        SMALLINT DEFAULT 0 NOT NULL,                  -- Logical delete flag, 0: not deleted, 1: deleted
+    id               BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    principal_type   TEXT         DEFAULT 'USER'::TEXT NOT NULL,      -- Principal type, USER: user, SERVICE_ACCOUNT: service account, SYSTEM: system principal
+    principal_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Principal name
+    display_name     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Principal display name
+    source_type      TEXT         DEFAULT 'LOCAL'::TEXT NOT NULL,     -- Principal source type, LOCAL: local, EXTERNAL: external, SYSTEM: system
+    enable_flag      SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    locked_flag      SMALLINT     DEFAULT 0 NOT NULL,                 -- Locked flag, 0: unlocked, 1: locked
+    last_login_time  TIMESTAMPTZ,                                     -- Last login time
+    principal_ext    JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Principal extension information
+    remark           TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name    TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time     TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted          SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_principal_type CHECK (principal_type IN ('USER', 'SERVICE_ACCOUNT', 'SYSTEM')),
     CONSTRAINT chk_principal_source_type CHECK (source_type IN ('LOCAL', 'EXTERNAL', 'SYSTEM')),
     CONSTRAINT chk_principal_enable_flag CHECK (enable_flag IN (0, 1)),
@@ -139,23 +139,23 @@ COMMENT ON COLUMN dc3_principal.deleted IS 'Logical delete flag, 0: not deleted,
 -- ----------------------------
 CREATE TABLE dc3_user
 (
-    id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
-    principal_id  BIGINT   DEFAULT 0 NOT NULL,                   -- Principal ID
-    user_name     TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Username
-    nick_name     TEXT     DEFAULT ''::TEXT          NOT NULL,   -- User nickname
-    phone         TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Phone number
-    email         TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Email
-    social_ext    JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Social extension information
-    identity_ext  JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- Identity extension information
-    enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
-    remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
-    creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
-    creator_name  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id   BIGINT   DEFAULT 0 NOT NULL,                   -- Operator ID
-    operator_name TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted       SMALLINT DEFAULT 0 NOT NULL,                   -- Logical delete flag, 0: not deleted, 1: deleted
+    id             BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    principal_id   BIGINT       DEFAULT 0 NOT NULL,                 -- Principal ID
+    user_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Username
+    nick_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- User nickname
+    phone          TEXT         DEFAULT ''::TEXT NOT NULL,          -- Phone number
+    email          TEXT         DEFAULT ''::TEXT NOT NULL,          -- Email
+    social_ext     JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Social extension information
+    identity_ext   JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Identity extension information
+    enable_flag    SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    remark         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted        SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_user_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_user_deleted CHECK (deleted IN (0, 1))
 );
@@ -196,29 +196,29 @@ COMMENT ON COLUMN dc3_user.deleted IS 'Logical delete flag, 0: not deleted, 1: d
 -- ----------------------------
 CREATE TABLE dc3_local_credential
 (
-    id                      BIGINT PRIMARY KEY NOT NULL,                -- Primary key ID
-    principal_id            BIGINT   DEFAULT 0 NOT NULL,                -- Principal ID
-    login_name              TEXT     DEFAULT ''::TEXT         NOT NULL, -- Login name
-    login_name_normalized   TEXT     DEFAULT ''::TEXT         NOT NULL, -- Normalized login name
-    credential_type         TEXT     DEFAULT 'PASSWORD'::TEXT NOT NULL, -- Credential type
-    password_hash           TEXT     DEFAULT ''::TEXT         NOT NULL, -- Password hash
-    password_algorithm      TEXT     DEFAULT 'ARGON2ID'::TEXT NOT NULL, -- Password hash algorithm
-    password_params         JSONB     DEFAULT '{}'::JSONB       NOT NULL, -- Password hash parameters
-    password_updated_time TIMESTAMPTZ,                                  -- Password update time
-    password_expire_time TIMESTAMPTZ,                                   -- Password expiration time
-    failed_attempts         INTEGER  DEFAULT 0 NOT NULL,                -- Failed login attempts
-    locked_until TIMESTAMPTZ,                                           -- Credential locked until time
-    require_password_change SMALLINT DEFAULT 1 NOT NULL,                -- Require password change flag, 0: no, 1: yes
-    enable_flag             SMALLINT DEFAULT 0 NOT NULL,                -- Enable flag, 0: enabled, 1: disabled
-    credential_ext          JSONB     DEFAULT '{}'::JSONB       NOT NULL, -- Credential extension information
-    remark                  TEXT     DEFAULT ''::TEXT         NOT NULL, -- Description
-    creator_id              BIGINT   DEFAULT 0 NOT NULL,                -- Creator ID
-    creator_name            TEXT     DEFAULT ''::TEXT         NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,         -- Creation time
-    operator_id             BIGINT   DEFAULT 0 NOT NULL,                -- Operator ID
-    operator_name           TEXT     DEFAULT ''::TEXT         NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,        -- Operation time
-    deleted                 SMALLINT DEFAULT 0 NOT NULL,                -- Logical delete flag, 0: not deleted, 1: deleted
+    id                       BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    principal_id             BIGINT       DEFAULT 0 NOT NULL,                 -- Principal ID
+    login_name               TEXT         DEFAULT ''::TEXT NOT NULL,          -- Login name
+    login_name_normalized    TEXT         DEFAULT ''::TEXT NOT NULL,          -- Normalized login name
+    credential_type          TEXT         DEFAULT 'PASSWORD'::TEXT NOT NULL,  -- Credential type
+    password_hash            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Password hash
+    password_algorithm       TEXT         DEFAULT 'ARGON2ID'::TEXT NOT NULL,  -- Password hash algorithm
+    password_params          JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Password hash parameters
+    password_updated_time    TIMESTAMPTZ,                                     -- Password update time
+    password_expire_time     TIMESTAMPTZ,                                     -- Password expiration time
+    failed_attempts          INTEGER      DEFAULT 0 NOT NULL,                 -- Failed login attempts
+    locked_until             TIMESTAMPTZ,                                     -- Credential locked until time
+    require_password_change  SMALLINT     DEFAULT 1 NOT NULL,                 -- Require password change flag, 0: no, 1: yes
+    enable_flag              SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    credential_ext           JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Credential extension information
+    remark                   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id               BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name             TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time              TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id              BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time             TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted                  SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_local_credential_type CHECK (credential_type IN ('PASSWORD')),
     CONSTRAINT chk_local_credential_password_algorithm CHECK (password_algorithm IN ('ARGON2ID', 'BCRYPT')),
     CONSTRAINT chk_local_credential_require_change CHECK (require_password_change IN (0, 1)),
@@ -267,21 +267,21 @@ COMMENT ON COLUMN dc3_local_credential.deleted IS 'Logical delete flag, 0: not d
 -- ----------------------------
 CREATE TABLE dc3_tenant_membership
 (
-    id                BIGINT PRIMARY KEY NOT NULL,               -- Primary key ID
-    tenant_id         BIGINT   DEFAULT 0 NOT NULL,               -- Tenant ID
-    principal_id      BIGINT   DEFAULT 0 NOT NULL,               -- Principal ID
-    principal_type    TEXT     DEFAULT 'USER'::TEXT   NOT NULL,  -- Principal type
-    membership_status TEXT     DEFAULT 'ACTIVE'::TEXT NOT NULL,  -- Membership status
-    joined_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Joined time
-    membership_ext    JSONB     DEFAULT '{}'::JSONB     NOT NULL,  -- Membership extension information
-    remark            TEXT     DEFAULT ''::TEXT       NOT NULL,  -- Description
-    creator_id        BIGINT   DEFAULT 0 NOT NULL,               -- Creator ID
-    creator_name      TEXT     DEFAULT ''::TEXT       NOT NULL,  -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id       BIGINT   DEFAULT 0 NOT NULL,               -- Operator ID
-    operator_name     TEXT     DEFAULT ''::TEXT       NOT NULL,  -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted           SMALLINT DEFAULT 0 NOT NULL,               -- Logical delete flag, 0: not deleted, 1: deleted
+    id                 BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    tenant_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    principal_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Principal ID
+    principal_type     TEXT         DEFAULT 'USER'::TEXT NOT NULL,      -- Principal type
+    membership_status  TEXT         DEFAULT 'ACTIVE'::TEXT NOT NULL,    -- Membership status
+    joined_time        TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Joined time
+    membership_ext     JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Membership extension information
+    remark             TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time        TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted            SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_tenant_membership_principal_type CHECK (principal_type IN ('USER', 'SERVICE_ACCOUNT', 'SYSTEM')),
     CONSTRAINT chk_tenant_membership_status CHECK (membership_status IN ('ACTIVE', 'SUSPENDED', 'INVITED')),
     CONSTRAINT chk_tenant_membership_deleted CHECK (deleted IN (0, 1))
@@ -320,24 +320,24 @@ COMMENT ON COLUMN dc3_tenant_membership.deleted IS 'Logical delete flag, 0: not 
 -- ----------------------------
 CREATE TABLE dc3_service_account
 (
-    id                    BIGINT PRIMARY KEY NOT NULL,           -- Primary key ID
-    principal_id          BIGINT   DEFAULT 0 NOT NULL,           -- Principal ID
-    tenant_id             BIGINT   DEFAULT 0 NOT NULL,           -- Tenant ID
-    service_account_name  TEXT     DEFAULT ''::TEXT NOT NULL,    -- Service account name
-    owner_principal_id    BIGINT   DEFAULT 0 NOT NULL,           -- Owner principal ID
-    purpose               TEXT     DEFAULT ''::TEXT NOT NULL,    -- Service account purpose
-    expire_time TIMESTAMPTZ,                                     -- Expiration time
-    last_used_time TIMESTAMPTZ,                                  -- Last used time
-    credential_policy_ext JSONB     DEFAULT '{}'::JSONB NOT NULL,  -- Credential policy extension information
-    enable_flag           SMALLINT DEFAULT 0 NOT NULL,           -- Enable flag, 0: enabled, 1: disabled
-    remark                TEXT     DEFAULT ''::TEXT NOT NULL,    -- Description
-    creator_id            BIGINT   DEFAULT 0 NOT NULL,           -- Creator ID
-    creator_name          TEXT     DEFAULT ''::TEXT NOT NULL,    -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id           BIGINT   DEFAULT 0 NOT NULL,           -- Operator ID
-    operator_name         TEXT     DEFAULT ''::TEXT NOT NULL,    -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted               SMALLINT DEFAULT 0 NOT NULL,           -- Logical delete flag, 0: not deleted, 1: deleted
+    id                     BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    principal_id           BIGINT       DEFAULT 0 NOT NULL,                 -- Principal ID
+    tenant_id              BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    service_account_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Service account name
+    owner_principal_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Owner principal ID
+    purpose                TEXT         DEFAULT ''::TEXT NOT NULL,          -- Service account purpose
+    expire_time            TIMESTAMPTZ,                                     -- Expiration time
+    last_used_time         TIMESTAMPTZ,                                     -- Last used time
+    credential_policy_ext  JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Credential policy extension information
+    enable_flag            SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    remark                 TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id             BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name           TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time            TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name          TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time           TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted                SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_service_account_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_service_account_deleted CHECK (deleted IN (0, 1))
 );
@@ -378,36 +378,36 @@ COMMENT ON COLUMN dc3_service_account.deleted IS 'Logical delete flag, 0: not de
 -- ----------------------------
 CREATE TABLE dc3_identity_provider
 (
-    id                BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    tenant_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    provider_code     TEXT     DEFAULT ''::TEXT          NOT NULL, -- Identity provider code
-    provider_name     TEXT     DEFAULT ''::TEXT          NOT NULL, -- Identity provider name
-    provider_type     TEXT     DEFAULT 'OIDC'::TEXT      NOT NULL, -- Identity provider type
-    issuer            TEXT     DEFAULT ''::TEXT          NOT NULL, -- Issuer
-    discovery_url     TEXT     DEFAULT ''::TEXT          NOT NULL, -- OIDC discovery URL
-    authorization_uri TEXT     DEFAULT ''::TEXT          NOT NULL, -- Authorization URI
-    token_uri         TEXT     DEFAULT ''::TEXT          NOT NULL, -- Token URI
-    user_info_uri     TEXT     DEFAULT ''::TEXT          NOT NULL, -- User info URI
-    jwks_uri          TEXT     DEFAULT ''::TEXT          NOT NULL, -- JWKS URI
-    client_id         TEXT     DEFAULT ''::TEXT          NOT NULL, -- OAuth client ID
-    client_secret_ref TEXT     DEFAULT ''::TEXT          NOT NULL, -- OAuth client secret reference
-    scopes            TEXT     DEFAULT ''::TEXT          NOT NULL, -- Requested scopes
-    redirect_uri      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Redirect URI
-    subject_claim     TEXT     DEFAULT 'sub'::TEXT       NOT NULL, -- Subject claim name
-    username_claim    TEXT     DEFAULT ''::TEXT          NOT NULL, -- Username claim name
-    email_claim       TEXT     DEFAULT 'email'::TEXT     NOT NULL, -- Email claim name
-    attribute_mapping JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Attribute mapping
-    provisioning_mode TEXT     DEFAULT 'LINK_ONLY'::TEXT NOT NULL, -- Provisioning mode
-    enable_flag       SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
-    provider_ext      JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Provider extension information
-    remark            TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    creator_id        BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name      TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,    -- Creation time
-    operator_id       BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name     TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,   -- Operation time
-    deleted           SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id                 BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    tenant_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    provider_code      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Identity provider code
+    provider_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Identity provider name
+    provider_type      TEXT         DEFAULT 'OIDC'::TEXT NOT NULL,      -- Identity provider type
+    issuer             TEXT         DEFAULT ''::TEXT NOT NULL,          -- Issuer
+    discovery_url      TEXT         DEFAULT ''::TEXT NOT NULL,          -- OIDC discovery URL
+    authorization_uri  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Authorization URI
+    token_uri          TEXT         DEFAULT ''::TEXT NOT NULL,          -- Token URI
+    user_info_uri      TEXT         DEFAULT ''::TEXT NOT NULL,          -- User info URI
+    jwks_uri           TEXT         DEFAULT ''::TEXT NOT NULL,          -- JWKS URI
+    client_id          TEXT         DEFAULT ''::TEXT NOT NULL,          -- OAuth client ID
+    client_secret_ref  TEXT         DEFAULT ''::TEXT NOT NULL,          -- OAuth client secret reference
+    scopes             TEXT         DEFAULT ''::TEXT NOT NULL,          -- Requested scopes
+    redirect_uri       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Redirect URI
+    subject_claim      TEXT         DEFAULT 'sub'::TEXT NOT NULL,       -- Subject claim name
+    username_claim     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Username claim name
+    email_claim        TEXT         DEFAULT 'email'::TEXT NOT NULL,     -- Email claim name
+    attribute_mapping  JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Attribute mapping
+    provisioning_mode  TEXT         DEFAULT 'LINK_ONLY'::TEXT NOT NULL, -- Provisioning mode
+    enable_flag        SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    provider_ext       JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Provider extension information
+    remark             TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time        TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted            SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_identity_provider_type CHECK (provider_type IN ('GOOGLE', 'GITHUB', 'OIDC', 'SAML')),
     CONSTRAINT chk_identity_provider_provisioning CHECK (provisioning_mode IN ('LINK_ONLY', 'JIT')),
     CONSTRAINT chk_identity_provider_enable_flag CHECK (enable_flag IN (0, 1)),
@@ -460,26 +460,26 @@ COMMENT ON COLUMN dc3_identity_provider.deleted IS 'Logical delete flag, 0: not 
 -- ----------------------------
 CREATE TABLE dc3_external_identity
 (
-    id                 BIGINT PRIMARY KEY NOT NULL,              -- Primary key ID
-    provider_id        BIGINT   DEFAULT 0 NOT NULL,              -- Identity provider ID
-    principal_id       BIGINT   DEFAULT 0 NOT NULL,              -- Principal ID
-    external_subject   TEXT     DEFAULT ''::TEXT NOT NULL,       -- External identity subject
-    external_username  TEXT     DEFAULT ''::TEXT NOT NULL,       -- External username
-    external_email     TEXT     DEFAULT ''::TEXT NOT NULL,       -- External email
-    email_verified     SMALLINT DEFAULT 0 NOT NULL,              -- Email verified flag, 0: no, 1: yes
-    first_login_time TIMESTAMPTZ,                                -- First login time
-    last_login_time TIMESTAMPTZ,                                 -- Last login time
-    last_claims_digest TEXT     DEFAULT ''::TEXT NOT NULL,       -- Last claims digest
-    identity_ext       JSONB     DEFAULT '{}'::JSONB NOT NULL,     -- External identity extension information
-    enable_flag        SMALLINT DEFAULT 0 NOT NULL,              -- Enable flag, 0: enabled, 1: disabled
-    remark             TEXT     DEFAULT ''::TEXT NOT NULL,       -- Description
-    creator_id         BIGINT   DEFAULT 0 NOT NULL,              -- Creator ID
-    creator_name       TEXT     DEFAULT ''::TEXT NOT NULL,       -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id        BIGINT   DEFAULT 0 NOT NULL,              -- Operator ID
-    operator_name      TEXT     DEFAULT ''::TEXT NOT NULL,       -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted            SMALLINT DEFAULT 0 NOT NULL,              -- Logical delete flag, 0: not deleted, 1: deleted
+    id                  BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    provider_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Identity provider ID
+    principal_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Principal ID
+    external_subject    TEXT         DEFAULT ''::TEXT NOT NULL,          -- External identity subject
+    external_username   TEXT         DEFAULT ''::TEXT NOT NULL,          -- External username
+    external_email      TEXT         DEFAULT ''::TEXT NOT NULL,          -- External email
+    email_verified      SMALLINT     DEFAULT 0 NOT NULL,                 -- Email verified flag, 0: no, 1: yes
+    first_login_time    TIMESTAMPTZ,                                     -- First login time
+    last_login_time     TIMESTAMPTZ,                                     -- Last login time
+    last_claims_digest  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Last claims digest
+    identity_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- External identity extension information
+    enable_flag         SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    remark              TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time         TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time        TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted             SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_external_identity_email_verified CHECK (email_verified IN (0, 1)),
     CONSTRAINT chk_external_identity_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_external_identity_deleted CHECK (deleted IN (0, 1))
@@ -523,21 +523,21 @@ COMMENT ON COLUMN dc3_external_identity.deleted IS 'Logical delete flag, 0: not 
 -- ----------------------------
 CREATE TABLE dc3_role
 (
-    id             BIGINT PRIMARY KEY NOT NULL,                  -- Primary key ID
-    parent_role_id BIGINT   DEFAULT 0 NOT NULL,                  -- Parent role ID
-    role_name      TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Role name
-    role_code      TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Role code
-    role_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL,  -- Role extension information
-    enable_flag    SMALLINT DEFAULT 0 NOT NULL,                  -- Enable flag, 0: enabled, 1: disabled
-    tenant_id      BIGINT   DEFAULT 0 NOT NULL,                  -- Tenant ID
-    remark         TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Description
-    creator_id     BIGINT   DEFAULT 0 NOT NULL,                  -- Creator ID
-    creator_name   TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id    BIGINT   DEFAULT 0 NOT NULL,                  -- Operator ID
-    operator_name  TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted        SMALLINT DEFAULT 0 NOT NULL,                  -- Logical delete flag, 0: not deleted, 1: deleted
+    id              BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    parent_role_id  BIGINT       DEFAULT 0 NOT NULL,                 -- Parent role ID
+    role_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Role name
+    role_code       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Role code
+    role_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Role extension information
+    enable_flag     SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark          TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name    TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time     TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted         SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_role_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_role_deleted CHECK (deleted IN (0, 1))
 );
@@ -573,24 +573,24 @@ COMMENT ON COLUMN dc3_role.deleted IS 'Logical delete flag, 0: not deleted, 1: d
 -- ----------------------------
 CREATE TABLE dc3_resource
 (
-    id                  BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    parent_resource_id  BIGINT   DEFAULT 0 NOT NULL,                 -- Parent resource ID
-    resource_name       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Resource name
-    resource_code       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Resource code
-    service_name        TEXT     DEFAULT ''::TEXT          NOT NULL, -- Service name
-    resource_type_flag  SMALLINT DEFAULT 0 NOT NULL,                 -- Resource type flag
-    resource_scope_flag SMALLINT DEFAULT 0 NOT NULL,                 -- Resource scope flag
-    entity_id           BIGINT   DEFAULT 0 NOT NULL,                 -- Resource entity ID
-    resource_ext        JSONB     DEFAULT '{}'::JSONB        NOT NULL, -- Resource extension information
-    enable_flag         SMALLINT DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
-    remark              TEXT     DEFAULT ''::TEXT          NOT NULL, -- Description
-    creator_id          BIGINT   DEFAULT 0 NOT NULL,                 -- Creator ID
-    creator_name        TEXT     DEFAULT ''::TEXT          NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,      -- Creation time
-    operator_id         BIGINT   DEFAULT 0 NOT NULL,                 -- Operator ID
-    operator_name       TEXT     DEFAULT ''::TEXT          NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Operation time
-    deleted             SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id                   BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    parent_resource_id   BIGINT       DEFAULT 0 NOT NULL,                 -- Parent resource ID
+    resource_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Resource name
+    resource_code        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Resource code
+    service_name         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Service name
+    resource_type_flag   SMALLINT     DEFAULT 0 NOT NULL,                 -- Resource type flag
+    resource_scope_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Resource scope flag
+    entity_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Resource entity ID
+    resource_ext         JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Resource extension information
+    enable_flag          SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    remark               TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id           BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time          TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time         TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted              SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_resource_resource_type_flag CHECK (resource_type_flag BETWEEN 0 AND 6),
     CONSTRAINT chk_resource_resource_scope_flag CHECK (resource_scope_flag BETWEEN 0 AND 4),
     CONSTRAINT chk_resource_enable_flag CHECK (enable_flag IN (0, 1)),
@@ -632,19 +632,19 @@ COMMENT ON COLUMN dc3_resource.deleted IS 'Logical delete flag, 0: not deleted, 
 -- ----------------------------
 CREATE TABLE dc3_role_principal_bind
 (
-    id             BIGINT PRIMARY KEY NOT NULL,                  -- Primary key ID
-    tenant_id      BIGINT   DEFAULT 0 NOT NULL,                  -- Tenant ID
-    role_id        BIGINT   DEFAULT 0 NOT NULL,                  -- Role ID
-    principal_id   BIGINT   DEFAULT 0 NOT NULL,                  -- Principal ID
-    principal_type TEXT     DEFAULT 'USER'::TEXT NOT NULL,       -- Principal type
-    remark         TEXT     DEFAULT ''::TEXT     NOT NULL,       -- Description
-    creator_id     BIGINT   DEFAULT 0 NOT NULL,                  -- Creator ID
-    creator_name   TEXT     DEFAULT ''::TEXT     NOT NULL,       -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id    BIGINT   DEFAULT 0 NOT NULL,                  -- Operator ID
-    operator_name  TEXT     DEFAULT ''::TEXT     NOT NULL,       -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted        SMALLINT DEFAULT 0 NOT NULL,                  -- Logical delete flag, 0: not deleted, 1: deleted
+    id              BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    tenant_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    role_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Role ID
+    principal_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Principal ID
+    principal_type  TEXT         DEFAULT 'USER'::TEXT NOT NULL,      -- Principal type
+    remark          TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name    TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time     TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted         SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_role_principal_bind_type CHECK (principal_type IN ('USER', 'SERVICE_ACCOUNT', 'SYSTEM')),
     CONSTRAINT chk_role_principal_bind_deleted CHECK (deleted IN (0, 1))
 );
@@ -680,17 +680,17 @@ COMMENT ON COLUMN dc3_role_principal_bind.deleted IS 'Logical delete flag, 0: no
 -- ----------------------------
 CREATE TABLE dc3_role_resource_bind
 (
-    id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
-    role_id       BIGINT   DEFAULT 0 NOT NULL,                   -- Role ID
-    resource_id   BIGINT   DEFAULT 0 NOT NULL,                   -- Resource ID
-    remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
-    creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
-    creator_name  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id   BIGINT   DEFAULT 0 NOT NULL,                   -- Operator ID
-    operator_name TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted       SMALLINT DEFAULT 0 NOT NULL,                   -- Logical delete flag, 0: not deleted, 1: deleted
+    id             BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    role_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Role ID
+    resource_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Resource ID
+    remark         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted        SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_role_resource_bind_deleted CHECK (deleted IN (0, 1))
 );
 
@@ -721,22 +721,22 @@ COMMENT ON COLUMN dc3_role_resource_bind.deleted IS 'Logical delete flag, 0: not
 -- ----------------------------
 CREATE TABLE dc3_driver_token
 (
-    id             BIGINT PRIMARY KEY NOT NULL,                  -- Primary key ID
-    driver_code    TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Driver code
-    driver_app_id  TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Driver App ID
-    driver_app_key TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Driver App Key
-    expire_flag    SMALLINT DEFAULT 0 NOT NULL,                  -- Expiration flag
-    expire_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Expiration time
-    enable_flag    SMALLINT DEFAULT 0 NOT NULL,                  -- Enable flag, 0: enabled, 1: disabled
-    tenant_id      BIGINT   DEFAULT 0 NOT NULL,                  -- Tenant ID
-    remark         TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Description
-    creator_id     BIGINT   DEFAULT 0 NOT NULL,                  -- Creator ID
-    creator_name   TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id    BIGINT   DEFAULT 0 NOT NULL,                  -- Operator ID
-    operator_name  TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted        SMALLINT DEFAULT 0 NOT NULL,                  -- Logical delete flag, 0: not deleted, 1: deleted
+    id              BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    driver_code     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Driver code
+    driver_app_id   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Driver App ID
+    driver_app_key  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Driver App Key
+    expire_flag     SMALLINT     DEFAULT 0 NOT NULL,                 -- Expiration flag
+    expire_time     TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Expiration time
+    enable_flag     SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tenant_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    remark          TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name    TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time     TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted         SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_driver_token_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_driver_token_deleted CHECK (deleted IN (0, 1))
 );
@@ -773,22 +773,22 @@ COMMENT ON COLUMN dc3_driver_token.deleted IS 'Logical delete flag, 0: not delet
 -- ----------------------------
 CREATE TABLE dc3_api
 (
-    id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
-    service_name  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Owning service name, populated by resource registrar
-    api_type_flag SMALLINT DEFAULT 0 NOT NULL,                   -- API type flag
-    api_name      TEXT     DEFAULT ''::TEXT          NOT NULL,   -- API name
-    api_code      TEXT     DEFAULT ''::TEXT          NOT NULL,   -- API code
-    api_group     TEXT     DEFAULT ''::TEXT          NOT NULL,   -- API grouping (controller simple name)
-    api_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL,   -- API extension information
-    enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
-    remark        TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Description
-    creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
-    creator_name  TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id   BIGINT   DEFAULT 0 NOT NULL,                   -- Operator ID
-    operator_name TEXT     DEFAULT ''::TEXT          NOT NULL,   -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted       SMALLINT DEFAULT 0 NOT NULL,                   -- Logical delete flag, 0: not deleted, 1: deleted
+    id             BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    service_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Owning service name, populated by resource registrar
+    api_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- API type flag
+    api_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- API name
+    api_code       TEXT         DEFAULT ''::TEXT NOT NULL,          -- API code
+    api_group      TEXT         DEFAULT ''::TEXT NOT NULL,          -- API grouping (controller simple name)
+    api_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- API extension information
+    enable_flag    SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    remark         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted        SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_api_api_type_flag CHECK (api_type_flag BETWEEN 0 AND 4),
     CONSTRAINT chk_api_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_api_deleted CHECK (deleted IN (0, 1))
@@ -826,34 +826,34 @@ COMMENT ON COLUMN dc3_api.deleted IS 'Logical delete flag, 0: not deleted, 1: de
 -- ----------------------------
 CREATE TABLE dc3_oauth_registered_client
 (
-    id                           BIGINT PRIMARY KEY NOT NULL,              -- Primary key ID
-    client_id                    TEXT     DEFAULT ''::TEXT       NOT NULL, -- OAuth client ID
-    client_name                  TEXT     DEFAULT ''::TEXT       NOT NULL, -- OAuth client name
-    client_type                  TEXT     DEFAULT 'PUBLIC'::TEXT NOT NULL, -- OAuth client type, PUBLIC: public client, CONFIDENTIAL: confidential client
-    owner_principal_id           BIGINT   DEFAULT 0 NOT NULL,              -- Owner principal ID
-    service_account_principal_id BIGINT   DEFAULT 0 NOT NULL,              -- Service account principal ID
-    tenant_id                    BIGINT   DEFAULT 0 NOT NULL,              -- Tenant ID
-    client_secret_hash           TEXT     DEFAULT ''::TEXT       NOT NULL, -- Client secret hash
-    client_secret_expires_at TIMESTAMPTZ,                                  -- Client secret expiration time
-    client_auth_methods          TEXT     DEFAULT ''::TEXT       NOT NULL, -- Client authentication methods
-    authorization_grant_types    TEXT     DEFAULT ''::TEXT       NOT NULL, -- Authorization grant types
-    redirect_uris                TEXT     DEFAULT ''::TEXT       NOT NULL, -- Redirect URIs
-    scopes                       TEXT     DEFAULT ''::TEXT       NOT NULL, -- OAuth scopes
-    jwks_uri                     TEXT     DEFAULT ''::TEXT       NOT NULL, -- Client JWKS URI
-    jwk_set                      JSONB     DEFAULT '{}'::JSONB     NOT NULL, -- Client JWK set
-    require_pkce                 SMALLINT DEFAULT 1 NOT NULL,              -- Require PKCE flag, 0: no, 1: yes
-    require_consent              SMALLINT DEFAULT 1 NOT NULL,              -- Require consent flag, 0: no, 1: yes
-    enable_flag                  SMALLINT DEFAULT 0 NOT NULL,              -- Enable flag, 0: enabled, 1: disabled
-    client_settings              JSONB     DEFAULT '{}'::JSONB     NOT NULL, -- Client settings
-    token_settings               JSONB     DEFAULT '{}'::JSONB     NOT NULL, -- Token settings
-    remark                       TEXT     DEFAULT ''::TEXT       NOT NULL, -- Description
-    creator_id                   BIGINT   DEFAULT 0 NOT NULL,              -- Creator ID
-    creator_name                 TEXT     DEFAULT ''::TEXT       NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,            -- Creation time
-    operator_id                  BIGINT   DEFAULT 0 NOT NULL,              -- Operator ID
-    operator_name                TEXT     DEFAULT ''::TEXT       NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,           -- Operation time
-    deleted                      SMALLINT DEFAULT 0 NOT NULL,              -- Logical delete flag, 0: not deleted, 1: deleted
+    id                            BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    client_id                     TEXT         DEFAULT ''::TEXT NOT NULL,          -- OAuth client ID
+    client_name                   TEXT         DEFAULT ''::TEXT NOT NULL,          -- OAuth client name
+    client_type                   TEXT         DEFAULT 'PUBLIC'::TEXT NOT NULL,    -- OAuth client type, PUBLIC: public client, CONFIDENTIAL: confidential client
+    owner_principal_id            BIGINT       DEFAULT 0 NOT NULL,                 -- Owner principal ID
+    service_account_principal_id  BIGINT       DEFAULT 0 NOT NULL,                 -- Service account principal ID
+    tenant_id                     BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    client_secret_hash            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Client secret hash
+    client_secret_expires_at      TIMESTAMPTZ,                                     -- Client secret expiration time
+    client_auth_methods           TEXT         DEFAULT ''::TEXT NOT NULL,          -- Client authentication methods
+    authorization_grant_types     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Authorization grant types
+    redirect_uris                 TEXT         DEFAULT ''::TEXT NOT NULL,          -- Redirect URIs
+    scopes                        TEXT         DEFAULT ''::TEXT NOT NULL,          -- OAuth scopes
+    jwks_uri                      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Client JWKS URI
+    jwk_set                       JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Client JWK set
+    require_pkce                  SMALLINT     DEFAULT 1 NOT NULL,                 -- Require PKCE flag, 0: no, 1: yes
+    require_consent               SMALLINT     DEFAULT 1 NOT NULL,                 -- Require consent flag, 0: no, 1: yes
+    enable_flag                   SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    client_settings               JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Client settings
+    token_settings                JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Token settings
+    remark                        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id                    BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name                  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time                   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id                   BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name                 TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time                  TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted                       SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_oauth_client_type CHECK (client_type IN ('PUBLIC', 'CONFIDENTIAL')),
     CONSTRAINT chk_oauth_client_require_pkce CHECK (require_pkce IN (0, 1)),
     CONSTRAINT chk_oauth_client_require_consent CHECK (require_consent IN (0, 1)),
@@ -905,35 +905,35 @@ COMMENT ON COLUMN dc3_oauth_registered_client.deleted IS 'Logical delete flag, 0
 -- ----------------------------
 CREATE TABLE dc3_oauth_authorization
 (
-    id                          BIGINT PRIMARY KEY NOT NULL,            -- Primary key ID
-    registered_client_id        BIGINT   DEFAULT 0 NOT NULL,            -- Registered client ID
-    client_id                   TEXT     DEFAULT ''::TEXT     NOT NULL, -- OAuth client ID
-    principal_id                BIGINT   DEFAULT 0 NOT NULL,            -- Principal ID
-    principal_type              TEXT     DEFAULT 'USER'::TEXT NOT NULL, -- Principal type
-    tenant_id                   BIGINT   DEFAULT 0 NOT NULL,            -- Tenant ID
-    mcp_connection_id           BIGINT   DEFAULT 0 NOT NULL,            -- MCP connection ID
-    authorization_grant_type    TEXT     DEFAULT ''::TEXT     NOT NULL, -- Authorization grant type
-    authorized_scopes           TEXT     DEFAULT ''::TEXT     NOT NULL, -- Authorized scopes
+    id                           BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    registered_client_id         BIGINT       DEFAULT 0 NOT NULL,                 -- Registered client ID
+    client_id                    TEXT         DEFAULT ''::TEXT NOT NULL,          -- OAuth client ID
+    principal_id                 BIGINT       DEFAULT 0 NOT NULL,                 -- Principal ID
+    principal_type               TEXT         DEFAULT 'USER'::TEXT NOT NULL,      -- Principal type
+    tenant_id                    BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    mcp_connection_id            BIGINT       DEFAULT 0 NOT NULL,                 -- MCP connection ID
+    authorization_grant_type     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Authorization grant type
+    authorized_scopes            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Authorized scopes
     -- Nullable: only the authorization_code grant produces state/code values
-    state_hash                  TEXT, -- OAuth state hash
-    authorization_code_hash     TEXT, -- Authorization code hash
-    authorization_code_issued TIMESTAMPTZ,                              -- Authorization code issued time
-    authorization_code_expires TIMESTAMPTZ,                             -- Authorization code expiration time
-    access_token_jti            TEXT     DEFAULT ''::TEXT     NOT NULL, -- Access token JWT ID
-    access_token_issued TIMESTAMPTZ,                                    -- Access token issued time
-    access_token_expires TIMESTAMPTZ,                                   -- Access token expiration time
+    state_hash                   TEXT,                                            -- OAuth state hash
+    authorization_code_hash      TEXT,                                            -- Authorization code hash
+    authorization_code_issued    TIMESTAMPTZ,                                     -- Authorization code issued time
+    authorization_code_expires   TIMESTAMPTZ,                                     -- Authorization code expiration time
+    access_token_jti             TEXT         DEFAULT ''::TEXT NOT NULL,          -- Access token JWT ID
+    access_token_issued          TIMESTAMPTZ,                                     -- Access token issued time
+    access_token_expires         TIMESTAMPTZ,                                     -- Access token expiration time
     -- Nullable: the client_credentials grant does not issue refresh tokens
-    refresh_token_hash          TEXT, -- Refresh token hash
-    previous_refresh_token_hash TEXT, -- Previous (rotated) refresh token hash, used to detect replay
-    refresh_token_issued TIMESTAMPTZ,                                   -- Refresh token issued time
-    refresh_token_expires TIMESTAMPTZ,                                  -- Refresh token expiration time
-    token_claims                JSONB     DEFAULT '{}'::JSONB   NOT NULL, -- Token claims
-    token_metadata              JSONB     DEFAULT '{}'::JSONB   NOT NULL, -- Token metadata
-    revoked_time TIMESTAMPTZ,                                           -- Revoked time
-    revoke_reason               TEXT     DEFAULT ''::TEXT     NOT NULL, -- Revoke reason
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,         -- Creation time
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,        -- Operation time
-    deleted                     SMALLINT DEFAULT 0 NOT NULL,            -- Logical delete flag, 0: not deleted, 1: deleted
+    refresh_token_hash           TEXT,                                            -- Refresh token hash
+    previous_refresh_token_hash  TEXT,                                            -- Previous (rotated) refresh token hash, used to detect replay
+    refresh_token_issued         TIMESTAMPTZ,                                     -- Refresh token issued time
+    refresh_token_expires        TIMESTAMPTZ,                                     -- Refresh token expiration time
+    token_claims                 JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Token claims
+    token_metadata               JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Token metadata
+    revoked_time                 TIMESTAMPTZ,                                     -- Revoked time
+    revoke_reason                TEXT         DEFAULT ''::TEXT NOT NULL,          -- Revoke reason
+    create_time                  TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operate_time                 TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted                      SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_oauth_authorization_principal_type CHECK (principal_type IN ('USER', 'SERVICE_ACCOUNT')),
     CONSTRAINT chk_oauth_authorization_deleted CHECK (deleted IN (0, 1))
 );
@@ -989,16 +989,16 @@ COMMENT ON COLUMN dc3_oauth_authorization.deleted IS 'Logical delete flag, 0: no
 -- ----------------------------
 CREATE TABLE dc3_oauth_authorization_consent
 (
-    id                   BIGINT PRIMARY KEY NOT NULL,            -- Primary key ID
-    registered_client_id BIGINT   DEFAULT 0 NOT NULL,            -- Registered client ID
-    client_id            TEXT     DEFAULT ''::TEXT   NOT NULL,   -- OAuth client ID
-    principal_id         BIGINT   DEFAULT 0 NOT NULL,            -- Principal ID
-    tenant_id            BIGINT   DEFAULT 0 NOT NULL,            -- Tenant ID
-    scopes               TEXT     DEFAULT ''::TEXT   NOT NULL,   -- Consented scopes
-    consent_ext          JSONB     DEFAULT '{}'::JSONB NOT NULL,   -- Consent extension information
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted              SMALLINT DEFAULT 0 NOT NULL,            -- Logical delete flag, 0: not deleted, 1: deleted
+    id                    BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    registered_client_id  BIGINT       DEFAULT 0 NOT NULL,                 -- Registered client ID
+    client_id             TEXT         DEFAULT ''::TEXT NOT NULL,          -- OAuth client ID
+    principal_id          BIGINT       DEFAULT 0 NOT NULL,                 -- Principal ID
+    tenant_id             BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    scopes                TEXT         DEFAULT ''::TEXT NOT NULL,          -- Consented scopes
+    consent_ext           JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Consent extension information
+    create_time           TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operate_time          TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted               SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_oauth_consent_deleted CHECK (deleted IN (0, 1))
 );
 
@@ -1028,26 +1028,26 @@ COMMENT ON COLUMN dc3_oauth_authorization_consent.deleted IS 'Logical delete fla
 -- ----------------------------
 CREATE TABLE dc3_mcp_connection
 (
-    id              BIGINT PRIMARY KEY NOT NULL,                            -- Primary key ID
-    connection_name TEXT     DEFAULT ''::TEXT                     NOT NULL, -- MCP connection name
-    client_id       TEXT     DEFAULT ''::TEXT                     NOT NULL, -- OAuth client ID
-    principal_id    BIGINT   DEFAULT 0 NOT NULL,                            -- Principal ID
-    principal_type  TEXT     DEFAULT 'USER'::TEXT                 NOT NULL, -- Principal type
-    tenant_id       BIGINT   DEFAULT 0 NOT NULL,                            -- Tenant ID
-    grant_type      TEXT     DEFAULT 'authorization_code'::TEXT   NOT NULL, -- OAuth grant type
-    enable_flag     SMALLINT DEFAULT 0 NOT NULL,                            -- Enable flag, 0: enabled, 1: disabled
-    expire_time TIMESTAMPTZ,                                                -- Expiration time
-    revoke_time TIMESTAMPTZ,                                                -- Revoke time
-    last_used_time TIMESTAMPTZ,                                             -- Last used time
-    connection_ext  JSONB     DEFAULT '{}'::JSONB                   NOT NULL, -- Connection extension information
-    remark          TEXT     DEFAULT ''::TEXT                     NOT NULL, -- Description
-    creator_id      BIGINT   DEFAULT 0 NOT NULL,                            -- Creator ID
-    creator_name    TEXT     DEFAULT ''::TEXT                     NOT NULL, -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,             -- Creation time
-    operator_id     BIGINT   DEFAULT 0 NOT NULL,                            -- Operator ID
-    operator_name   TEXT     DEFAULT ''::TEXT                     NOT NULL, -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,            -- Operation time
-    deleted         SMALLINT DEFAULT 0 NOT NULL,                            -- Logical delete flag, 0: not deleted, 1: deleted
+    id               BIGINT       PRIMARY KEY NOT NULL,                        -- Primary key ID
+    connection_name  TEXT         DEFAULT ''::TEXT NOT NULL,                   -- MCP connection name
+    client_id        TEXT         DEFAULT ''::TEXT NOT NULL,                   -- OAuth client ID
+    principal_id     BIGINT       DEFAULT 0 NOT NULL,                          -- Principal ID
+    principal_type   TEXT         DEFAULT 'USER'::TEXT NOT NULL,               -- Principal type
+    tenant_id        BIGINT       DEFAULT 0 NOT NULL,                          -- Tenant ID
+    grant_type       TEXT         DEFAULT 'authorization_code'::TEXT NOT NULL, -- OAuth grant type
+    enable_flag      SMALLINT     DEFAULT 0 NOT NULL,                          -- Enable flag, 0: enabled, 1: disabled
+    expire_time      TIMESTAMPTZ,                                              -- Expiration time
+    revoke_time      TIMESTAMPTZ,                                              -- Revoke time
+    last_used_time   TIMESTAMPTZ,                                              -- Last used time
+    connection_ext   JSONB        DEFAULT '{}'::JSONB NOT NULL,                -- Connection extension information
+    remark           TEXT         DEFAULT ''::TEXT NOT NULL,                   -- Description
+    creator_id       BIGINT       DEFAULT 0 NOT NULL,                          -- Creator ID
+    creator_name     TEXT         DEFAULT ''::TEXT NOT NULL,                   -- Creator name
+    create_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,          -- Creation time
+    operator_id      BIGINT       DEFAULT 0 NOT NULL,                          -- Operator ID
+    operator_name    TEXT         DEFAULT ''::TEXT NOT NULL,                   -- Operator name
+    operate_time     TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,          -- Operation time
+    deleted          SMALLINT     DEFAULT 0 NOT NULL,                          -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_mcp_connection_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_mcp_connection_principal_type CHECK (principal_type IN ('USER', 'SERVICE_ACCOUNT')),
     CONSTRAINT chk_mcp_connection_grant_type CHECK (grant_type IN ('authorization_code', 'client_credentials')),
@@ -1093,32 +1093,32 @@ COMMENT ON COLUMN dc3_mcp_connection.deleted IS 'Logical delete flag, 0: not del
 -- ----------------------------
 CREATE TABLE dc3_mcp_tool_catalog
 (
-    id               BIGINT PRIMARY KEY NOT NULL,                -- Primary key ID
-    tool_id          TEXT     DEFAULT ''::TEXT    NOT NULL,      -- MCP tool ID
-    tool_name        TEXT     DEFAULT ''::TEXT    NOT NULL,      -- MCP tool name
-    tool_title       TEXT     DEFAULT ''::TEXT    NOT NULL,      -- MCP tool title
-    tool_category    TEXT     DEFAULT ''::TEXT    NOT NULL,      -- MCP tool category
-    service_name     TEXT     DEFAULT ''::TEXT    NOT NULL,      -- Service name
-    api_code         TEXT     DEFAULT ''::TEXT    NOT NULL,      -- API resource code
-    permission_code  TEXT     DEFAULT ''::TEXT    NOT NULL,      -- Permission resource code
-    http_method      TEXT     DEFAULT ''::TEXT    NOT NULL,      -- HTTP method
-    api_path         TEXT     DEFAULT ''::TEXT    NOT NULL,      -- API path
-    schema_hash      TEXT     DEFAULT ''::TEXT    NOT NULL,      -- Tool schema hash
-    risk_level       TEXT     DEFAULT 'LOW'::TEXT NOT NULL,      -- Risk level, LOW: low, MEDIUM: medium, HIGH: high
-    read_only_hint   SMALLINT DEFAULT 0 NOT NULL,                -- Read-only hint, 0: false, 1: true
-    destructive_hint SMALLINT DEFAULT 0 NOT NULL,                -- Destructive hint, 0: false, 1: true
-    idempotent_hint  SMALLINT DEFAULT 0 NOT NULL,                -- Idempotent hint, 0: false, 1: true
-    open_world_hint  SMALLINT DEFAULT 0 NOT NULL,                -- Open-world hint, 0: false, 1: true
-    enable_flag      SMALLINT DEFAULT 0 NOT NULL,                -- Enable flag, 0: enabled, 1: disabled
-    tool_ext         JSONB     DEFAULT '{}'::JSONB  NOT NULL,      -- Tool extension information
-    remark           TEXT     DEFAULT ''::TEXT    NOT NULL,      -- Description
-    creator_id       BIGINT   DEFAULT 0 NOT NULL,                -- Creator ID
-    creator_name     TEXT     DEFAULT ''::TEXT    NOT NULL,      -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id      BIGINT   DEFAULT 0 NOT NULL,                -- Operator ID
-    operator_name    TEXT     DEFAULT ''::TEXT    NOT NULL,      -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted          SMALLINT DEFAULT 0 NOT NULL,                -- Logical delete flag, 0: not deleted, 1: deleted
+    id                BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    tool_id           TEXT         DEFAULT ''::TEXT NOT NULL,          -- MCP tool ID
+    tool_name         TEXT         DEFAULT ''::TEXT NOT NULL,          -- MCP tool name
+    tool_title        TEXT         DEFAULT ''::TEXT NOT NULL,          -- MCP tool title
+    tool_category     TEXT         DEFAULT ''::TEXT NOT NULL,          -- MCP tool category
+    service_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Service name
+    api_code          TEXT         DEFAULT ''::TEXT NOT NULL,          -- API resource code
+    permission_code   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Permission resource code
+    http_method       TEXT         DEFAULT ''::TEXT NOT NULL,          -- HTTP method
+    api_path          TEXT         DEFAULT ''::TEXT NOT NULL,          -- API path
+    schema_hash       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Tool schema hash
+    risk_level        TEXT         DEFAULT 'LOW'::TEXT NOT NULL,       -- Risk level, LOW: low, MEDIUM: medium, HIGH: high
+    read_only_hint    SMALLINT     DEFAULT 0 NOT NULL,                 -- Read-only hint, 0: false, 1: true
+    destructive_hint  SMALLINT     DEFAULT 0 NOT NULL,                 -- Destructive hint, 0: false, 1: true
+    idempotent_hint   SMALLINT     DEFAULT 0 NOT NULL,                 -- Idempotent hint, 0: false, 1: true
+    open_world_hint   SMALLINT     DEFAULT 0 NOT NULL,                 -- Open-world hint, 0: false, 1: true
+    enable_flag       SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    tool_ext          JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Tool extension information
+    remark            TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name     TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted           SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_mcp_tool_catalog_risk_level CHECK (risk_level IN ('LOW', 'MEDIUM', 'HIGH')),
     CONSTRAINT chk_mcp_tool_catalog_read_only_hint CHECK (read_only_hint IN (0, 1)),
     CONSTRAINT chk_mcp_tool_catalog_destructive_hint CHECK (destructive_hint IN (0, 1)),
@@ -1174,18 +1174,18 @@ COMMENT ON COLUMN dc3_mcp_tool_catalog.deleted IS 'Logical delete flag, 0: not d
 -- ----------------------------
 CREATE TABLE dc3_mcp_connection_tool
 (
-    id            BIGINT PRIMARY KEY NOT NULL,                   -- Primary key ID
-    connection_id BIGINT   DEFAULT 0 NOT NULL,                   -- MCP connection ID
-    tool_id       TEXT     DEFAULT ''::TEXT NOT NULL,            -- MCP tool ID
-    enable_flag   SMALLINT DEFAULT 0 NOT NULL,                   -- Enable flag, 0: enabled, 1: disabled
-    remark        TEXT     DEFAULT ''::TEXT NOT NULL,            -- Description
-    creator_id    BIGINT   DEFAULT 0 NOT NULL,                   -- Creator ID
-    creator_name  TEXT     DEFAULT ''::TEXT NOT NULL,            -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id   BIGINT   DEFAULT 0 NOT NULL,                   -- Operator ID
-    operator_name TEXT     DEFAULT ''::TEXT NOT NULL,            -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted       SMALLINT DEFAULT 0 NOT NULL,                   -- Logical delete flag, 0: not deleted, 1: deleted
+    id             BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    connection_id  BIGINT       DEFAULT 0 NOT NULL,                 -- MCP connection ID
+    tool_id        TEXT         DEFAULT ''::TEXT NOT NULL,          -- MCP tool ID
+    enable_flag    SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    remark         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted        SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_mcp_connection_tool_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_mcp_connection_tool_deleted CHECK (deleted IN (0, 1))
 );
@@ -1220,29 +1220,29 @@ COMMENT ON COLUMN dc3_mcp_connection_tool.deleted IS 'Logical delete flag, 0: no
 -- ----------------------------
 CREATE TABLE dc3_mcp_audit_log
 (
-    id              BIGINT PRIMARY KEY NOT NULL,                -- Primary key ID
-    trace_id        TEXT     DEFAULT ''::TEXT     NOT NULL,     -- Trace ID
-    tenant_id       BIGINT   DEFAULT 0 NOT NULL,                -- Tenant ID
-    principal_id    BIGINT   DEFAULT 0 NOT NULL,                -- Principal ID
-    principal_type  TEXT     DEFAULT 'USER'::TEXT NOT NULL,     -- Principal type
-    client_id       TEXT     DEFAULT ''::TEXT     NOT NULL,     -- OAuth client ID
-    connection_id   BIGINT   DEFAULT 0 NOT NULL,                -- MCP connection ID
-    tool_id         TEXT     DEFAULT ''::TEXT     NOT NULL,     -- MCP tool ID
-    tool_name       TEXT     DEFAULT ''::TEXT     NOT NULL,     -- MCP tool name
-    permission_code TEXT     DEFAULT ''::TEXT     NOT NULL,     -- Permission resource code
-    risk_level      TEXT     DEFAULT 'LOW'::TEXT  NOT NULL,     -- Risk level
-    confirm_id      TEXT     DEFAULT ''::TEXT     NOT NULL,     -- Confirmation ID
-    idempotency_key TEXT     DEFAULT ''::TEXT     NOT NULL,     -- Idempotency key
-    argument_digest TEXT     DEFAULT ''::TEXT     NOT NULL,     -- Argument digest
-    status          TEXT     DEFAULT ''::TEXT     NOT NULL,     -- Tool call status
-    error_code      TEXT     DEFAULT ''::TEXT     NOT NULL,     -- Error code
-    duration_ms     BIGINT   DEFAULT 0 NOT NULL,                -- Duration in milliseconds
-    client_name     TEXT     DEFAULT ''::TEXT     NOT NULL,     -- MCP client name
-    client_version  TEXT     DEFAULT ''::TEXT     NOT NULL,     -- MCP client version
-    remote_ip       TEXT     DEFAULT ''::TEXT     NOT NULL,     -- Remote IP address
-    audit_ext       JSONB     DEFAULT '{}'::JSONB   NOT NULL,     -- Audit extension information
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
-    deleted         SMALLINT DEFAULT 0 NOT NULL,                -- Logical delete flag, 0: not deleted, 1: deleted
+    id               BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    trace_id         TEXT         DEFAULT ''::TEXT NOT NULL,          -- Trace ID
+    tenant_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    principal_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Principal ID
+    principal_type   TEXT         DEFAULT 'USER'::TEXT NOT NULL,      -- Principal type
+    client_id        TEXT         DEFAULT ''::TEXT NOT NULL,          -- OAuth client ID
+    connection_id    BIGINT       DEFAULT 0 NOT NULL,                 -- MCP connection ID
+    tool_id          TEXT         DEFAULT ''::TEXT NOT NULL,          -- MCP tool ID
+    tool_name        TEXT         DEFAULT ''::TEXT NOT NULL,          -- MCP tool name
+    permission_code  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Permission resource code
+    risk_level       TEXT         DEFAULT 'LOW'::TEXT NOT NULL,       -- Risk level
+    confirm_id       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Confirmation ID
+    idempotency_key  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Idempotency key
+    argument_digest  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Argument digest
+    status           TEXT         DEFAULT ''::TEXT NOT NULL,          -- Tool call status
+    error_code       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Error code
+    duration_ms      BIGINT       DEFAULT 0 NOT NULL,                 -- Duration in milliseconds
+    client_name      TEXT         DEFAULT ''::TEXT NOT NULL,          -- MCP client name
+    client_version   TEXT         DEFAULT ''::TEXT NOT NULL,          -- MCP client version
+    remote_ip        TEXT         DEFAULT ''::TEXT NOT NULL,          -- Remote IP address
+    audit_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Audit extension information
+    create_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    deleted          SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_mcp_audit_log_principal_type CHECK (principal_type IN ('USER', 'SERVICE_ACCOUNT')),
     CONSTRAINT chk_mcp_audit_log_risk_level CHECK (risk_level IN ('LOW', 'MEDIUM', 'HIGH')),
     CONSTRAINT chk_mcp_audit_log_deleted CHECK (deleted IN (0, 1))
@@ -1287,20 +1287,20 @@ COMMENT ON COLUMN dc3_mcp_audit_log.deleted IS 'Logical delete flag, 0: not dele
 -- ----------------------------
 CREATE TABLE dc3_mcp_tool_confirmation
 (
-    id              BIGINT PRIMARY KEY NOT NULL,                -- Primary key ID
-    confirm_id      TEXT     DEFAULT ''::TEXT     NOT NULL,     -- Confirmation ticket ID
-    tenant_id       BIGINT   DEFAULT 0 NOT NULL,                -- Tenant ID
-    principal_id    BIGINT   DEFAULT 0 NOT NULL,                -- Principal ID
-    connection_id   BIGINT   DEFAULT 0 NOT NULL,                -- MCP connection ID
-    tool_id         TEXT     DEFAULT ''::TEXT     NOT NULL,     -- MCP tool ID
-    argument_digest TEXT     DEFAULT ''::TEXT     NOT NULL,     -- Argument digest bound to the ticket
-    idempotency_key TEXT     DEFAULT ''::TEXT     NOT NULL,     -- Idempotency key
-    risk_level      TEXT     DEFAULT 'HIGH'::TEXT NOT NULL,     -- Risk level
-    status          TEXT     DEFAULT 'PENDING'::TEXT NOT NULL,  -- Ticket status, PENDING/CONSUMED
-    expire_time TIMESTAMPTZ,                                    -- Expiration time
-    consumed_time TIMESTAMPTZ,                                  -- Consumed time
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
-    deleted         SMALLINT DEFAULT 0 NOT NULL,                -- Logical delete flag, 0: not deleted, 1: deleted
+    id               BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    confirm_id       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Confirmation ticket ID
+    tenant_id        BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    principal_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Principal ID
+    connection_id    BIGINT       DEFAULT 0 NOT NULL,                 -- MCP connection ID
+    tool_id          TEXT         DEFAULT ''::TEXT NOT NULL,          -- MCP tool ID
+    argument_digest  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Argument digest bound to the ticket
+    idempotency_key  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Idempotency key
+    risk_level       TEXT         DEFAULT 'HIGH'::TEXT NOT NULL,      -- Risk level
+    status           TEXT         DEFAULT 'PENDING'::TEXT NOT NULL,   -- Ticket status, PENDING/CONSUMED
+    expire_time      TIMESTAMPTZ,                                     -- Expiration time
+    consumed_time    TIMESTAMPTZ,                                     -- Consumed time
+    create_time      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    deleted          SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_mcp_tool_confirmation_risk_level CHECK (risk_level IN ('LOW', 'MEDIUM', 'HIGH')),
     CONSTRAINT chk_mcp_tool_confirmation_status CHECK (status IN ('PENDING', 'CONSUMED')),
     CONSTRAINT chk_mcp_tool_confirmation_deleted CHECK (deleted IN (0, 1))
@@ -1334,23 +1334,23 @@ COMMENT ON COLUMN dc3_mcp_tool_confirmation.deleted IS 'Logical delete flag, 0: 
 -- ----------------------------
 CREATE TABLE dc3_menu
 (
-    id             BIGINT PRIMARY KEY NOT NULL,                  -- Primary key ID
-    parent_menu_id BIGINT   DEFAULT 0 NOT NULL,                  -- Parent menu ID
-    menu_type_flag SMALLINT DEFAULT 0 NOT NULL,                  -- Menu type flag
-    menu_name      TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Menu name
-    menu_code      TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Menu code
-    menu_level     SMALLINT DEFAULT 0 NOT NULL,                  -- Menu level
-    menu_index     SMALLINT DEFAULT 0 NOT NULL,                  -- Menu order
-    menu_ext       JSONB     DEFAULT '{}'::JSONB        NOT NULL,  -- Menu extension information
-    enable_flag    SMALLINT DEFAULT 0 NOT NULL,                  -- Enable flag, 0: enabled, 1: disabled
-    remark         TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Description
-    creator_id     BIGINT   DEFAULT 0 NOT NULL,                  -- Creator ID
-    creator_name   TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Creator name
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Creation time
-    operator_id    BIGINT   DEFAULT 0 NOT NULL,                  -- Operator ID
-    operator_name  TEXT     DEFAULT ''::TEXT          NOT NULL,  -- Operator name
-    operate_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
-    deleted        SMALLINT DEFAULT 0 NOT NULL,                  -- Logical delete flag, 0: not deleted, 1: deleted
+    id              BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    parent_menu_id  BIGINT       DEFAULT 0 NOT NULL,                 -- Parent menu ID
+    menu_type_flag  SMALLINT     DEFAULT 0 NOT NULL,                 -- Menu type flag
+    menu_name       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Menu name
+    menu_code       TEXT         DEFAULT ''::TEXT NOT NULL,          -- Menu code
+    menu_level      SMALLINT     DEFAULT 0 NOT NULL,                 -- Menu level
+    menu_index      SMALLINT     DEFAULT 0 NOT NULL,                 -- Menu order
+    menu_ext        JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Menu extension information
+    enable_flag     SMALLINT     DEFAULT 0 NOT NULL,                 -- Enable flag, 0: enabled, 1: disabled
+    remark          TEXT         DEFAULT ''::TEXT NOT NULL,          -- Description
+    creator_id      BIGINT       DEFAULT 0 NOT NULL,                 -- Creator ID
+    creator_name    TEXT         DEFAULT ''::TEXT NOT NULL,          -- Creator name
+    create_time     TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    operator_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
+    operator_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
+    operate_time    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    deleted         SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_menu_menu_type_flag CHECK (menu_type_flag BETWEEN 0 AND 1),
     CONSTRAINT chk_menu_enable_flag CHECK (enable_flag IN (0, 1)),
     CONSTRAINT chk_menu_deleted CHECK (deleted IN (0, 1))
@@ -1389,19 +1389,19 @@ COMMENT ON COLUMN dc3_menu.deleted IS 'Logical delete flag, 0: not deleted, 1: d
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS dc3_identity_audit_log
 (
-    id             BIGINT PRIMARY KEY NOT NULL,                 -- Primary key ID
-    tenant_id      BIGINT   DEFAULT 0 NOT NULL,                 -- Tenant ID
-    principal_id   BIGINT   DEFAULT 0 NOT NULL,                 -- Principal ID
-    principal_type TEXT     DEFAULT 'USER'::TEXT NOT NULL,      -- Principal type
-    action         TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Audited action
-    resource_type  TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Audited resource type
-    resource_id    BIGINT   DEFAULT 0 NOT NULL,                 -- Audited resource ID
-    resource_name  TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Audited resource name
-    status         TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Result status
-    error_code     TEXT     DEFAULT ''::TEXT     NOT NULL,      -- Stable error code
-    detail_ext     JSONB     DEFAULT '{}'::JSONB   NOT NULL,      -- Structured audit details
-    create_time TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
-    deleted        SMALLINT DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
+    id              BIGINT       PRIMARY KEY NOT NULL,               -- Primary key ID
+    tenant_id       BIGINT       DEFAULT 0 NOT NULL,                 -- Tenant ID
+    principal_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Principal ID
+    principal_type  TEXT         DEFAULT 'USER'::TEXT NOT NULL,      -- Principal type
+    action          TEXT         DEFAULT ''::TEXT NOT NULL,          -- Audited action
+    resource_type   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Audited resource type
+    resource_id     BIGINT       DEFAULT 0 NOT NULL,                 -- Audited resource ID
+    resource_name   TEXT         DEFAULT ''::TEXT NOT NULL,          -- Audited resource name
+    status          TEXT         DEFAULT ''::TEXT NOT NULL,          -- Result status
+    error_code      TEXT         DEFAULT ''::TEXT NOT NULL,          -- Stable error code
+    detail_ext      JSONB        DEFAULT '{}'::JSONB NOT NULL,       -- Structured audit details
+    create_time     TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Creation time
+    deleted         SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_identity_audit_deleted CHECK (deleted IN (0, 1))
 );
 
@@ -1506,7 +1506,7 @@ VALUES (1, 1, 1, 1, 'USER', 'Default administrator role principal binding', 1, '
 -- menu_ext:       JsonExt wrapper with content holding {titles: {zh, en, ...}, icon, url, remark}.
 --                 titles is the authoritative, locale-keyed display-name map. The UI picks
 --                 titles[currentLocale] with fallback to titles.en. Legacy `title` i18n keys
---                 (e.g. "nav.home") have been removed from seed data; see migrations/ for
+--                 (e.g. "nav.home") have been removed from seed data; see ../migrations/01-menu-icon-backfill.sql
 --                 the backfill script that upgrades existing databases.
 -- ----------------------------
 INSERT INTO dc3_menu (id, parent_menu_id, menu_type_flag, menu_name, menu_code, menu_level, menu_index, menu_ext,
@@ -1531,7 +1531,7 @@ VALUES (10001, 0, 1, 'Home', 'home', 1, 1,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"设置\",\"en\":\"Settings\"},\"icon\":\"Setting\",\"url\":\"\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10050, 10006, 0, 'Accounts & Identity', 'settingsIdentity', 2, 1,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"账户与身份\",\"en\":\"Accounts & Identity\"},\"icon\":\"User\",\"url\":\"\"}"}',
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"账户与身份\",\"en\":\"Accounts & Identity\"},\"icon\":\"UserFilled\",\"url\":\"\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10007, 10050, 1, 'User', 'settingsUser', 3, 1,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"用户管理\",\"en\":\"User\"},\"icon\":\"User\",\"url\":\"/settings/user\"}"}',
@@ -1552,28 +1552,28 @@ VALUES (10001, 0, 1, 'Home', 'home', 1, 1,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"角色与权限\",\"en\":\"Roles & Permissions\"},\"icon\":\"Stamp\",\"url\":\"\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10008, 10051, 1, 'Role', 'settingsRole', 3, 1,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"角色管理\",\"en\":\"Role\"},\"icon\":\"Lock\",\"url\":\"/settings/role\"}"}',
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"角色管理\",\"en\":\"Role\"},\"icon\":\"Medal\",\"url\":\"/settings/role\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10039, 10051, 1, 'Role Assignments', 'settingsRolePrincipalBind', 3, 2,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"角色分配\",\"en\":\"Role Assignments\"},\"icon\":\"Link\",\"url\":\"/settings/role_principal_bind\"}"}',
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"角色分配\",\"en\":\"Role Assignments\"},\"icon\":\"Paperclip\",\"url\":\"/settings/role_principal_bind\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10009, 10051, 1, 'Resource', 'settingsResource', 3, 3,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"资源管理\",\"en\":\"Resource\"},\"icon\":\"Tickets\",\"url\":\"/settings/resource\"}"}',
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"资源管理\",\"en\":\"Resource\"},\"icon\":\"Box\",\"url\":\"/settings/resource\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10010, 10051, 1, 'API', 'settingsApi', 3, 4,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"API 接口\",\"en\":\"API\"},\"icon\":\"Connection\",\"url\":\"/settings/api\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10011, 10051, 1, 'Menu', 'settingsMenu', 3, 5,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"菜单管理\",\"en\":\"Menu\"},\"icon\":\"Discount\",\"url\":\"/settings/menu\"}"}',
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"菜单管理\",\"en\":\"Menu\"},\"icon\":\"Menu\",\"url\":\"/settings/menu\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10013, 10006, 0, 'AI Models', 'settingsModel', 2, 4,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"AI 模型\",\"en\":\"AI Models\"},\"icon\":\"Cpu\",\"url\":\"\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10020, 10013, 1, 'Model Config', 'settingsModelConfig', 3, 2,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"模型配置\",\"en\":\"Model Config\"},\"icon\":\"ChatDotRound\",\"url\":\"/settings/model/config\"}"}',
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"模型配置\",\"en\":\"Model Config\"},\"icon\":\"MagicStick\",\"url\":\"/settings/model/config\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10021, 10013, 1, 'Model Providers', 'settingsModelProvider', 3, 1,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"模型供应商\",\"en\":\"Model Providers\"},\"icon\":\"ChatLineSquare\",\"url\":\"/settings/model/provider\"}"}',
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"模型供应商\",\"en\":\"Model Providers\"},\"icon\":\"Shop\",\"url\":\"/settings/model/provider\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10022, 10006, 0, 'Alarm Configuration', 'settingsAlarm', 2, 6,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"告警配置\",\"en\":\"Alarm Configuration\"},\"icon\":\"AlarmClock\",\"url\":\"\"}"}',
@@ -1588,7 +1588,7 @@ VALUES (10001, 0, 1, 'Home', 'home', 1, 1,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"告警消息模板\",\"en\":\"Message Templates\"},\"icon\":\"Message\",\"url\":\"/settings/alarm/message\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10026, 10022, 1, 'Alarm Channels', 'settingsAlarmChannel', 3, 4,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"告警通知渠道\",\"en\":\"Alarm Channels\"},\"icon\":\"Connection\",\"url\":\"/settings/alarm/channel\"}"}',
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"告警通知渠道\",\"en\":\"Alarm Channels\"},\"icon\":\"Postcard\",\"url\":\"/settings/alarm/channel\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10027, 10022, 1, 'Alarm Bindings', 'settingsAlarmBind', 3, 5,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"告警渠道绑定\",\"en\":\"Alarm Bindings\"},\"icon\":\"Link\",\"url\":\"/settings/alarm/bind\"}"}',
@@ -1615,16 +1615,16 @@ VALUES (10001, 0, 1, 'Home', 'home', 1, 1,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"运行与历史\",\"en\":\"Operations & History\"},\"icon\":\"Operation\",\"url\":\"\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10035, 10052, 1, 'Event History', 'settingsEventHistory', 3, 7,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"事件历史\",\"en\":\"Event History\"},\"icon\":\"Document\",\"url\":\"/settings/event/history\"}"}',
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"事件历史\",\"en\":\"Event History\"},\"icon\":\"Lightning\",\"url\":\"/settings/event/history\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10032, 10052, 1, 'Command History', 'settingsCommandHistory', 3, 8,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"指令历史\",\"en\":\"Command History\"},\"icon\":\"Document\",\"url\":\"/settings/command/history\"}"}',
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"指令历史\",\"en\":\"Command History\"},\"icon\":\"Position\",\"url\":\"/settings/command/history\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10053, 10006, 0, 'Audit', 'settingsAudit', 2, 8,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"审计\",\"en\":\"Audit\"},\"icon\":\"Files\",\"url\":\"\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10044, 10053, 1, 'Identity Audit', 'settingsIdentityAudit', 3, 1,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"身份审计\",\"en\":\"Identity Audit\"},\"icon\":\"DocumentChecked\",\"url\":\"/settings/identity_audit\"}"}',
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"身份审计\",\"en\":\"Identity Audit\"},\"icon\":\"Memo\",\"url\":\"/settings/identity_audit\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10043, 10053, 1, 'MCP Audit', 'settingsMcpAudit', 3, 2,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"MCP 审计\",\"en\":\"MCP Audit\"},\"icon\":\"Document\",\"url\":\"/settings/mcp_audit\"}"}',
@@ -1633,7 +1633,7 @@ VALUES (10001, 0, 1, 'Home', 'home', 1, 1,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"MCP 集成\",\"en\":\"MCP Integration\"},\"icon\":\"Share\",\"url\":\"\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10037, 10054, 1, 'MCP Service', 'settingsMcpServer', 3, 1,
-        '{"version":1,"content":"{\"titles\":{\"zh\":\"MCP 服务\",\"en\":\"MCP Service\"},\"icon\":\"Connection\",\"url\":\"/settings/mcp\"}"}',
+        '{"version":1,"content":"{\"titles\":{\"zh\":\"MCP 服务\",\"en\":\"MCP Service\"},\"icon\":\"Platform\",\"url\":\"/settings/mcp\"}"}',
         0, '', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
        (10056, 10054, 1, 'MCP Connection', 'settingsMcpConnection', 3, 3,
         '{"version":1,"content":"{\"titles\":{\"zh\":\"MCP 连接\",\"en\":\"MCP Connection\"},\"icon\":\"Link\",\"url\":\"/settings/mcp/connection\"}"}',

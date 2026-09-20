@@ -44,7 +44,6 @@ const routes: RouteRecordRaw = {
       name: 'driver',
       path: 'driver',
       meta: {
-        icon: 'Promotion',
         title: 'nav.driver',
       },
       component: () => import('@/views/driver/Driver.vue'),
@@ -61,7 +60,6 @@ const routes: RouteRecordRaw = {
       name: 'profile',
       path: 'profile',
       meta: {
-        icon: 'List',
         title: 'nav.profile',
       },
       component: () => import('@/views/profile/Profile.vue'),
@@ -86,7 +84,6 @@ const routes: RouteRecordRaw = {
       name: 'device',
       path: 'device',
       meta: {
-        icon: 'Management',
         title: 'nav.device',
       },
       component: () => import('@/views/device/Device.vue'),
@@ -111,7 +108,6 @@ const routes: RouteRecordRaw = {
       name: 'pointValue',
       path: 'point_value',
       meta: {
-        icon: 'Histogram',
         title: 'page.pointValue',
       },
       component: () => import('@/views/point/value/PointValue.vue'),

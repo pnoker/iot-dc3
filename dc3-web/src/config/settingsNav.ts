@@ -108,7 +108,7 @@ export const SETTINGS_TITLE_KEYS: Record<string, string> = {
 export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settings: 'Setting',
   // group containers
-  settingsIdentity: 'User',
+  settingsIdentity: 'UserFilled',
   settingsAccess: 'Stamp',
   settingsModel: 'Cpu',
   settingsAlarm: 'AlarmClock',
@@ -123,19 +123,19 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsLocalCredential: 'Lock',
   settingsServiceAccount: 'Key',
   // access control
-  settingsRole: 'Lock',
-  settingsRolePrincipalBind: 'Link',
-  settingsResource: 'Tickets',
+  settingsRole: 'Medal',
+  settingsRolePrincipalBind: 'Paperclip',
+  settingsResource: 'Box',
   settingsApi: 'Connection',
-  settingsMenu: 'Discount',
+  settingsMenu: 'Menu',
   // model
-  settingsModelConfig: 'ChatDotRound',
-  settingsModelProvider: 'ChatLineSquare',
+  settingsModelConfig: 'MagicStick',
+  settingsModelProvider: 'Shop',
   // alarm
   settingsAlarmRule: 'SetUp',
   settingsAlarmNotify: 'Bell',
   settingsAlarmMessage: 'Message',
-  settingsAlarmChannel: 'Connection',
+  settingsAlarmChannel: 'Postcard',
   settingsAlarmBind: 'Link',
   settingsAlarmOverview: 'DataAnalysis',
   settingsAlarmState: 'Monitor',
@@ -144,13 +144,13 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsDeviceAlarm: 'Management',
   settingsPointAlarm: 'TrendCharts',
   // event & command
-  settingsEventHistory: 'Document',
-  settingsCommandHistory: 'Document',
+  settingsEventHistory: 'Lightning',
+  settingsCommandHistory: 'Position',
   // audit
-  settingsIdentityAudit: 'DocumentChecked',
+  settingsIdentityAudit: 'Memo',
   settingsMcpAudit: 'Document',
   // integration
-  settingsMcpServer: 'Connection',
+  settingsMcpServer: 'Platform',
   settingsMcpConnection: 'Link',
   settingsMcpClient: 'Ticket',
   settingsMcpTool: 'Tools',
@@ -160,21 +160,21 @@ export const SETTINGS_FALLBACK_ICON: Record<string, string> = {
   settingsAbout: 'InfoFilled',
   // detail pages
   settingsUserDetail: 'User',
-  settingsRoleDetail: 'UserFilled',
-  settingsResourceDetail: 'Key',
-  settingsApiDetail: 'Link',
+  settingsRoleDetail: 'Medal',
+  settingsResourceDetail: 'Box',
+  settingsApiDetail: 'Connection',
   settingsMenuDetail: 'Menu',
   settingsGroupDetail: 'Grid',
   settingsLabelDetail: 'CollectionTag',
   settingsAlarmRuleDetail: 'SetUp',
   settingsAlarmNotifyDetail: 'Bell',
   settingsAlarmMessageDetail: 'Message',
-  settingsAlarmChannelDetail: 'Connection',
+  settingsAlarmChannelDetail: 'Postcard',
   settingsAlarmBindDetail: 'Link',
   settingsAlarmStateDetail: 'Monitor',
   settingsAlarmHistoryDetail: 'DocumentChecked',
-  settingsModelConfigDetail: 'ChatDotRound',
-  settingsModelProviderDetail: 'ChatLineSquare',
+  settingsModelConfigDetail: 'MagicStick',
+  settingsModelProviderDetail: 'Shop',
 };
 
 export const SETTINGS_IDENTITY_CHILDREN: SettingsNavNode[] = [
@@ -186,23 +186,23 @@ export const SETTINGS_IDENTITY_CHILDREN: SettingsNavNode[] = [
 ];
 
 export const SETTINGS_ACCESS_CHILDREN: SettingsNavNode[] = [
-  {name: 'settingsRole', titleKey: 'nav.settingsRole', icon: 'Lock'},
-  {name: 'settingsRolePrincipalBind', titleKey: 'nav.settingsRolePrincipalBind', icon: 'Link'},
-  {name: 'settingsResource', titleKey: 'nav.settingsResource', icon: 'Tickets'},
+  {name: 'settingsRole', titleKey: 'nav.settingsRole', icon: 'Medal'},
+  {name: 'settingsRolePrincipalBind', titleKey: 'nav.settingsRolePrincipalBind', icon: 'Paperclip'},
+  {name: 'settingsResource', titleKey: 'nav.settingsResource', icon: 'Box'},
   {name: 'settingsApi', titleKey: 'nav.settingsApi', icon: 'Connection'},
-  {name: 'settingsMenu', titleKey: 'nav.settingsMenu', icon: 'Discount'},
+  {name: 'settingsMenu', titleKey: 'nav.settingsMenu', icon: 'Menu'},
 ];
 
 export const SETTINGS_MODEL_CHILDREN: SettingsNavNode[] = [
-  {name: 'settingsModelProvider', titleKey: 'nav.settingsModelProvider', icon: 'ChatLineSquare'},
-  {name: 'settingsModelConfig', titleKey: 'nav.settingsModelConfig', icon: 'ChatDotRound'},
+  {name: 'settingsModelProvider', titleKey: 'nav.settingsModelProvider', icon: 'Shop'},
+  {name: 'settingsModelConfig', titleKey: 'nav.settingsModelConfig', icon: 'MagicStick'},
 ];
 
 export const SETTINGS_ALARM_CHILDREN: SettingsNavNode[] = [
   {name: 'settingsAlarmRule', titleKey: 'nav.settingsAlarmRule', icon: 'SetUp'},
   {name: 'settingsAlarmNotify', titleKey: 'nav.settingsAlarmNotify', icon: 'Bell'},
   {name: 'settingsAlarmMessage', titleKey: 'nav.settingsAlarmMessage', icon: 'Message'},
-  {name: 'settingsAlarmChannel', titleKey: 'nav.settingsAlarmChannel', icon: 'Connection'},
+  {name: 'settingsAlarmChannel', titleKey: 'nav.settingsAlarmChannel', icon: 'Postcard'},
   {name: 'settingsAlarmBind', titleKey: 'nav.settingsAlarmBind', icon: 'Link'},
 ];
 
@@ -213,17 +213,17 @@ export const SETTINGS_EVENT_COMMAND_CHILDREN: SettingsNavNode[] = [
   {name: 'settingsDriverAlarm', titleKey: 'nav.settingsDriverAlarm', icon: 'Promotion'},
   {name: 'settingsDeviceAlarm', titleKey: 'nav.settingsDeviceAlarm', icon: 'Management'},
   {name: 'settingsPointAlarm', titleKey: 'nav.settingsPointAlarm', icon: 'TrendCharts'},
-  {name: 'settingsEventHistory', titleKey: 'nav.settingsEventHistory', icon: 'Document'},
-  {name: 'settingsCommandHistory', titleKey: 'nav.settingsCommandHistory', icon: 'Document'},
+  {name: 'settingsEventHistory', titleKey: 'nav.settingsEventHistory', icon: 'Lightning'},
+  {name: 'settingsCommandHistory', titleKey: 'nav.settingsCommandHistory', icon: 'Position'},
 ];
 
 export const SETTINGS_AUDIT_CHILDREN: SettingsNavNode[] = [
-  {name: 'settingsIdentityAudit', titleKey: 'nav.settingsIdentityAudit', icon: 'DocumentChecked'},
+  {name: 'settingsIdentityAudit', titleKey: 'nav.settingsIdentityAudit', icon: 'Memo'},
   {name: 'settingsMcpAudit', titleKey: 'nav.settingsMcpAudit', icon: 'Document'},
 ];
 
 export const SETTINGS_INTEGRATION_CHILDREN: SettingsNavNode[] = [
-  {name: 'settingsMcpServer', titleKey: 'nav.settingsMcpServer', icon: 'Connection'},
+  {name: 'settingsMcpServer', titleKey: 'nav.settingsMcpServer', icon: 'Platform'},
   {name: 'settingsMcpClient', titleKey: 'nav.settingsMcpClient', icon: 'Ticket'},
   {name: 'settingsMcpConnection', titleKey: 'nav.settingsMcpConnection', icon: 'Link'},
   {name: 'settingsMcpTool', titleKey: 'nav.settingsMcpTool', icon: 'Tools'},
@@ -235,7 +235,7 @@ export const SETTINGS_SYSTEM_CHILDREN: SettingsNavNode[] = [
 ];
 
 export const SETTINGS_FALLBACK_SIDEBAR: SettingsNavNode[] = [
-  {name: 'settingsIdentity', titleKey: 'nav.settingsIdentity', icon: 'User', children: SETTINGS_IDENTITY_CHILDREN},
+  {name: 'settingsIdentity', titleKey: 'nav.settingsIdentity', icon: 'UserFilled', children: SETTINGS_IDENTITY_CHILDREN},
   {name: 'settingsAccess', titleKey: 'nav.settingsAccess', icon: 'Stamp', children: SETTINGS_ACCESS_CHILDREN},
   {name: 'settingsSystem', titleKey: 'nav.settingsSystem', icon: 'Collection', children: SETTINGS_SYSTEM_CHILDREN},
   {name: 'settingsModel', titleKey: 'nav.settingsModel', icon: 'Cpu', children: SETTINGS_MODEL_CHILDREN},

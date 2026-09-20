@@ -18,9 +18,10 @@
 import {readFileSync} from 'node:fs';
 import {basename, resolve} from 'node:path';
 
+import * as ElementIcons from '@element-plus/icons-vue';
 import {describe, expect, it} from 'vitest';
 
-import {SETTINGS_FALLBACK_SIDEBAR} from '@/config/settingsNav';
+import {SETTINGS_FALLBACK_ICON, SETTINGS_FALLBACK_SIDEBAR} from '@/config/settingsNav';
 import {menuTree} from '@/mock/seed/menuTree';
 
 // The settings sidebar is authoritatively driven by the backend dc3_menu seed,
@@ -37,6 +38,7 @@ interface MenuRow {
   code: string;
   level: number;
   index: number;
+  icon?: string;
 }
 
 interface MenuResourceRow {
@@ -49,12 +51,22 @@ interface MenuResourceRow {
 function parseSeedMenu(sql: string): MenuRow[] {
   // menu tuple: (id, parent, type, 'name', 'code', level, index, ...) — three
   // leading integers distinguish it from resource tuples (id, parent, 'name').
-  const re = /\((\d+),\s*(\d+),\s*\d+,\s*'[^']*',\s*'([^']*)',\s*(\d+),\s*(\d+),/g;
+  // The optional 7th capture is the menu_ext JSON string (no single quotes
+  // inside — its inner JSON escapes double quotes only), carried on the next
+  // line after menu_index.
+  const re = /\((\d+),\s*(\d+),\s*\d+,\s*'[^']*',\s*'([^']*)',\s*(\d+),\s*(\d+),\s*'(\{[^']*\})'/g;
   const rows: MenuRow[] = [];
   for (let m; (m = re.exec(sql));) {
     const id = Number(m[1]);
     if (id < 10001 || id > 10099) continue; // menu id band
-    rows.push({id, parent: Number(m[2]), code: m[3], level: Number(m[4]), index: Number(m[5])});
+    let icon: string | undefined;
+    try {
+      // menu_ext.content is itself a stringified JSON doc: {titles, icon, url}.
+      icon = JSON.parse(JSON.parse(m[6]).content).icon;
+    } catch {
+      icon = undefined;
+    }
+    rows.push({id, parent: Number(m[2]), code: m[3], level: Number(m[4]), index: Number(m[5]), icon});
   }
   return rows;
 }
@@ -135,5 +147,84 @@ describe('settings menu — backend seed ↔ frontend nav', () => {
     }));
 
     expect(mockTree).toEqual(navTree);
+  });
+
+  // Icon contract (A5 single source of truth, applied to the seed SQL,
+  // settingsNav fallback and the static mock). The icon mapping lives in
+  // exactly one table: docs/design + this test enforce that all three
+  // copies stay identical, that every icon exists in the registered
+  // Element Plus icon pool, and that the mapping stays semantically
+  // legible: unique per group, no parent/child duplication. Deliberately
+  // tolerated exceptions (cross-domain mirrors): alarm leaves mirror
+  // their source entity icons (Promotion/Management/TrendCharts), and
+  // "bind/connect" leaves may share Link.
+  it('keeps settings icons identical across seed SQL, settingsNav and mock, and semantically unique per group', () => {
+    const sql = readFileSync(SEED, 'utf8');
+    const rows = parseSeedMenu(sql);
+    const settingsRoot = rows.find((r) => r.code === 'settings');
+    expect(settingsRoot, 'settings root menu present in seed').toBeDefined();
+
+    // 1. Every settings menu row carries a parsable icon that exists in the
+    //    registered Element Plus pool (a bad name renders as nothing).
+    const settingsIds = new Set<number>([settingsRoot!.id]);
+    let previousSize = -1;
+    while (settingsIds.size !== previousSize) {
+      previousSize = settingsIds.size;
+      rows.filter((row) => settingsIds.has(row.parent)).forEach((row) => settingsIds.add(row.id));
+    }
+    const iconRows = rows.filter((row) => settingsIds.has(row.id));
+    for (const row of iconRows) {
+      expect(row.icon, `${row.code} has a parsable icon in seed SQL`).toBeDefined();
+      expect(
+        row.icon! in ElementIcons,
+        `${row.code} icon "${row.icon}" is an exported @element-plus/icons-vue component`,
+      ).toBe(true);
+    }
+
+    // 2. Seed ↔ settingsNav fallback equality for every settings code.
+    for (const row of iconRows) {
+      expect(
+        SETTINGS_FALLBACK_ICON[row.code],
+        `${row.code} present in SETTINGS_FALLBACK_ICON`,
+      ).toBeDefined();
+      expect(SETTINGS_FALLBACK_ICON[row.code], `${row.code} seed ↔ settingsNav icon equality`).toBe(row.icon);
+    }
+
+    // 3. Seed ↔ static mock equality (mock renders the same wall).
+    const mockSettings = menuTree.find((row) => row.menuCode === 'settings');
+    const mockRows = [mockSettings!, ...(mockSettings!.children ?? []).flatMap((group) => [group, ...(group.children ?? [])])];
+    for (const mock of mockRows) {
+      const seed = rows.find((row) => row.code === mock.menuCode);
+      expect(seed, `${mock.menuCode} present in seed`).toBeDefined();
+      expect(mock.menuExt?.content?.icon, `${mock.menuCode} mock ↔ seed icon equality`).toBe(seed!.icon);
+    }
+
+    // 4. Semantic legibility: leaves unique per group; group icon differs
+    //    from every leaf icon in that group (exact names — a filled variant
+    //    like UserFilled next to leaf User is a deliberate distinct glyph).
+    const groups = iconRows.filter((row) => row.parent === settingsRoot!.id);
+    for (const group of groups) {
+      const leaves = iconRows.filter((row) => row.parent === group.id);
+      const leafIcons = leaves.map((leaf) => leaf.icon!);
+      expect(
+        new Set(leafIcons).size,
+        `${group.code} leaves have unique icons (got ${leafIcons.join(', ')})`,
+      ).toBe(leafIcons.length);
+      expect(
+        leaves.every((leaf) => leaf.icon !== group.icon),
+        `${group.code} group icon "${group.icon}" differs from its leaves`,
+      ).toBe(true);
+    }
+    const groupIcons = groups.map((group) => group.icon!);
+    expect(new Set(groupIcons).size, 'settings group icons are distinct').toBe(groupIcons.length);
+
+    // 5. Detail-page fallback keys mirror their list sibling exactly.
+    for (const code of Object.keys(SETTINGS_FALLBACK_ICON)) {
+      if (!code.endsWith('Detail')) continue;
+      const sibling = code.replace(/Detail$/, '');
+      if (SETTINGS_FALLBACK_ICON[sibling]) {
+        expect(SETTINGS_FALLBACK_ICON[code], `${code} mirrors ${sibling}`).toBe(SETTINGS_FALLBACK_ICON[sibling]);
+      }
+    }
   });
 });
