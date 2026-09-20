@@ -384,3 +384,138 @@ body {
     border-top-color: var(--dc3-border-base);
   }
 }
+
+// ---------------------------------------------------------------------------
+// Native scrollbar grooming. The app shell scrolls through Element Plus
+// `el-scrollbar` (overlay-style bars); every other overflow container (card
+// bodies, tables, textareas, asides) still renders the raw browser bar. Give
+// those one slim, quiet, theme-aware look so stray native scrollbars never
+// dominate the layout. `el-scrollbar__wrap--hidden-default` keeps its own
+// hiding rules (higher specificity), so custom bars are unaffected.
+// ---------------------------------------------------------------------------
+* {
+  // Firefox
+  scrollbar-width: thin;
+  scrollbar-color: var(--dc3-border-strong, rgba(144, 147, 153, 0.45)) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: var(--dc3-radius-full);
+  background: var(--dc3-border-strong, rgba(144, 147, 153, 0.45));
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--dc3-text-secondary, rgba(144, 147, 153, 0.7));
+}
+
+// The workspace scroll columns are vertical by design. Gutter rows pull
+// negative margins that can read as a few px of horizontal slack (and
+// fractional zoom rounds card heights past their container) — never let
+// either surface a horizontal scrollbar on the shell itself.
+// The app shell is a vertically scrolling document — horizontal overflow
+// is never meaningful here. Root cause chain: el-row card walls use the
+// Element Plus gutter, whose negative margins (-4px per side) make the row
+// 8px wider than its parent; the right-hand overhang lands in the scroll
+// area's overflow report (scrollWidth = clientWidth + 4). Element Plus's
+// el-scrollbar renders its horizontal bar from that signal alone, so every
+// card-wall page showed a bar that fades in on hover and drags those 4px.
+//
+// The fix must clip at the VIEW level: overflow-x on the wrap (hidden OR
+// clip — Chromium serializes clip back to hidden there) still reports the
+// 4px, but clipping the view drops the overhang from the report entirely
+// so the bar never renders. The overhang itself is empty gutter padding,
+// so clipping it is visually lossless.
+.body-main,
+.settings-main {
+  .el-scrollbar__view {
+    overflow-x: clip;
+  }
+
+  .el-scrollbar__wrap {
+    overflow-x: clip;
+  }
+
+  // Belt and suspenders: even if some future widget reintroduces sub-pixel
+  // overflow, the shell's horizontal bar stays gone.
+  > .el-scrollbar > .el-scrollbar__bar.is-horizontal {
+    display: none;
+  }
+}
+
+// All floating-layer shells get the surface radius from the variable-level
+// mapping in theme.scss (--el-popover-border-radius drives every popper via
+// el-popper.css's inheritance chain). Two things variables alone cannot fix:
+//
+// 1. Collapsed el-menu flyouts (settings tablet rail, NavMenu) paint their
+//    own surface: ul.el-menu--popup carries the .el-menu background +
+//    var(--el-border-radius-small) + box-shadow and exactly fills the
+//    .is-pure popper shell, so rounding the shell alone is invisible.
+//    (0,2,0) beats el-menu.css's .el-menu--popup (0,1,0) regardless of
+//    on-demand injection order.
+.el-popper .el-menu--popup {
+  border-radius: var(--dc3-radius-lg);
+}
+
+// 2. EP components whose radius var is defined on the component selector in
+//    on-demand css — :root cannot beat those, and a plain .el-xxx here would
+//    tie (0,1,0) with styles injected later by route chunks. The body prefix
+//    (0,1,1) wins both, and body is an ancestor of every teleport target.
+body {
+  .el-card {
+    --el-card-border-radius: var(--dc3-radius-lg);
+  }
+
+  .el-popover {
+    --el-popover-border-radius: var(--dc3-radius-lg);
+  }
+
+  .el-dialog {
+    --el-dialog-border-radius: var(--dc3-radius-lg);
+  }
+
+  .el-message-box {
+    --el-messagebox-border-radius: var(--dc3-radius-lg);
+  }
+
+  .el-tag {
+    --el-tag-border-radius: var(--dc3-radius-md);
+    --el-tag-border-radius-rounded: var(--dc3-radius-full);
+  }
+
+  .el-pagination {
+    --el-pagination-border-radius: var(--dc3-radius-md);
+  }
+
+  .el-badge {
+    --el-badge-radius: var(--dc3-radius-full);
+  }
+
+  .el-slider {
+    --el-slider-border-radius: var(--dc3-radius-full);
+  }
+
+  .el-tour {
+    --el-tour-border-radius: var(--dc3-radius-lg);
+  }
+
+  // Source hard-codes 2px with no var to map.
+  .el-time-panel {
+    border-radius: var(--dc3-radius-lg);
+  }
+
+  // Source hard-codes 100px with no var to map.
+  .el-progress-bar__outer,
+  .el-progress-bar__inner {
+    border-radius: var(--dc3-radius-full);
+  }
+}
