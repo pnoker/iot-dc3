@@ -68,6 +68,13 @@
                 class="responsive-record-list__selection"
                 @change="toggleSelection(row)"
               />
+              <!-- Tone tile + title mirrors the ThingsCardHeader anatomy so
+                   table cards and entity cards share one grammar. -->
+              <span :class="['entity-icon-tile', `entity-icon-tile--${cardTone}`]" aria-hidden="true">
+                <el-icon :size="22">
+                  <component :is="cardIcon"/>
+                </el-icon>
+              </span>
               <el-button
                 v-if="openable"
                 :aria-label="`${t('common.detail')}: ${formattedValue(row, primaryColumn)}`"
@@ -280,6 +287,10 @@ const props = withDefaults(
     selectedRows?: T[];
     selectionDisabled?: (row: T) => boolean;
     selectionLabel?: string;
+    /** Icon (Element Plus name) on the record-card header tile. */
+    cardIcon?: string;
+    /** Tone of the record-card header tile. */
+    cardTone?: 'blue' | 'green' | 'orange' | 'purple' | 'red';
   }>(),
   {
     loading: false,
@@ -294,6 +305,8 @@ const props = withDefaults(
     selectedRows: () => [],
     selectionDisabled: undefined,
     selectionLabel: '',
+    cardIcon: 'Tickets',
+    cardTone: 'blue',
   }
 );
 
@@ -414,9 +427,12 @@ watch(
 
 .responsive-record-list__card-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--dc3-space-2);
   min-width: 0;
+  // Hairline under the tile header — same anatomy as ThingsCardHeader.
+  padding-bottom: var(--dc3-space-3);
+  border-bottom: 1px solid var(--dc3-border-base);
 }
 
 .responsive-record-list__selection {
@@ -451,8 +467,9 @@ watch(
   max-width: 100%;
   overflow: hidden;
   color: var(--dc3-text-primary);
-  font-size: var(--el-font-size-base);
-  font-weight: var(--el-font-weight-primary);
+  font-size: 15px;
+  font-weight: 650;
+  text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -501,19 +518,29 @@ watch(
   font-family: var(--el-font-family);
 }
 
+// Actions dock right like the entity-card footer (ThingsCardActions); on
+// phones the buttons stretch edge-to-edge, matching those cards exactly.
 .responsive-record-list__actions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: var(--dc3-space-2);
   margin-top: var(--dc3-space-4);
   padding-top: var(--dc3-space-3);
-  padding-inline-end: var(--dc3-floating-action-safe-space);
   box-sizing: border-box;
   border-top: 1px solid var(--dc3-border-base);
 
   :deep(.el-button) {
     min-height: var(--dc3-touch-target);
     margin: 0;
+  }
+
+  @media (max-width: $breakpoint-xs-max) {
+    justify-content: stretch;
+
+    :deep(.el-button) {
+      flex: 1 1 auto;
+    }
   }
 }
 

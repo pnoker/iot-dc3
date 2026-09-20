@@ -33,6 +33,10 @@ export const createUserConfig = (t: Translator, handlers: UserHandlers): EntityL
   name: 'user',
   title: t('nav.settingsUser'),
   editable: true,
+  // Mobile record-card header tile — keeps table cards in the entity-card
+  // visual family (same tone-tile grammar as driver/device/point cards).
+  mobileCardIcon: 'User',
+  mobileCardTone: 'blue',
   searchFields: [
     {
       prop: 'nickName',
