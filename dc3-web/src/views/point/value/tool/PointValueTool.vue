@@ -71,8 +71,9 @@
         <div class="tool-dictionary-field">
           <el-select
             v-model="formData.pointId"
+            :disabled="!formData.deviceId"
             :loading="pointLoading"
-            :placeholder="$t('pointValue.tool.pointPlaceholder')"
+            :placeholder="formData.deviceId ? $t('pointValue.tool.pointPlaceholder') : $t('pointValue.tool.pointDisabledPlaceholder')"
             :remote-method="pointDictionary"
             class="edit-form-special"
             clearable
@@ -114,7 +115,7 @@
         <enable-flag-segmented v-model="formData.enableFlag" include-all/>
       </el-form-item>
       <el-form-item :label="$t('settings.event.timeRange')" prop="rangeKey">
-        <range-segmented v-model="formData.rangeKey" include-all select/>
+        <range-segmented v-model="formData.rangeKey" include-all/>
       </el-form-item>
     </template>
     <template #actions>
@@ -201,6 +202,16 @@ const deviceDictionary = (query?: string) => {
 };
 
 const pointDictionary = (query?: string) => {
+  // The backend dictionary contract requires a parent device
+  // (requireParent → "Parent ID is required"); asking for points without
+  // one is a guaranteed 4xx. The select is disabled until a device is
+  // picked — this guard keeps the promise even for programmatic triggers.
+  if (!formData.deviceId) {
+    pointDictionaries.value = [];
+    pointLoading.value = false;
+    pointError.value = false;
+    return;
+  }
   const requestId = ++pointRequestId;
   const parentId = formData.deviceId || undefined;
   pointLoading.value = true;

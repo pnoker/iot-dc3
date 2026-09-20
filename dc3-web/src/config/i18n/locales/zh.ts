@@ -858,6 +858,7 @@ export default {
       pointName: '位号名称',
       devicePlaceholder: '请选择设备',
       pointPlaceholder: '请选择位号',
+      pointDisabledPlaceholder: '请先选择设备',
       pointNamePlaceholder: '请输入位号名称',
     },
     card: {

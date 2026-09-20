@@ -864,6 +864,7 @@ export default {
       pointName: 'Point Name',
       devicePlaceholder: 'Select device',
       pointPlaceholder: 'Select point',
+      pointDisabledPlaceholder: 'Select a device first',
       pointNamePlaceholder: 'Enter point name',
     },
     card: {
