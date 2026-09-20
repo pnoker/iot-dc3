@@ -27,7 +27,7 @@ import io.github.pnoker.common.manager.repository.LabelFilter;
 import io.github.pnoker.common.manager.repository.ReactiveLabelStore;
 import io.github.pnoker.common.manager.service.ReactiveLabelService;
 import io.github.pnoker.common.utils.CodeUtil;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;

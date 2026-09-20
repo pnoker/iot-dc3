@@ -23,7 +23,7 @@ import io.github.pnoker.common.facade.entity.query.FacadeDeviceOffsetQuery;
 import io.github.pnoker.common.facade.local.builder.FacadeDeviceBuilder;
 import io.github.pnoker.common.manager.repository.DeviceFilter;
 import io.github.pnoker.common.manager.repository.ReactiveDriverLeaseStore;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;

@@ -25,7 +25,7 @@ import io.github.pnoker.common.manager.repository.CommandFilter;
 import io.github.pnoker.common.manager.repository.ReactiveCommandParamStore;
 import io.github.pnoker.common.manager.repository.ReactiveCommandStore;
 import io.github.pnoker.common.manager.repository.ReactiveProfileStore;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

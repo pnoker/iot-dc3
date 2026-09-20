@@ -28,7 +28,7 @@ import io.github.pnoker.common.manager.entity.query.DriverListRequest;
 import io.github.pnoker.common.manager.entity.vo.DriverVO;
 import io.github.pnoker.common.manager.service.ReactiveDriverService;
 import io.github.pnoker.common.security.GatewayAuthenticationToken;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;

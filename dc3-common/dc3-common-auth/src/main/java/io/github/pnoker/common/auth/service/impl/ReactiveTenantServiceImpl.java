@@ -26,7 +26,7 @@ import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.utils.CodeUtil;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;

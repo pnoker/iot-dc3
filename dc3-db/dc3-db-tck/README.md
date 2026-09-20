@@ -24,5 +24,5 @@ mvn -s .mvn/settings.xml -pl dc3-db/dc3-db-tck -am verify
 
 ## Related Modules
 
-- `dc3-db-r2dbc-core` / `dc3-db-r2dbc-runtime` — reactive contracts and runtime
-- `dc3-db-r2dbc-postgres` — the only supported relational adapter
+- `dc3-db-core` / `dc3-db-runtime` — reactive contracts and runtime (runtime also ships the single PostgreSQL dialect adapter)
+

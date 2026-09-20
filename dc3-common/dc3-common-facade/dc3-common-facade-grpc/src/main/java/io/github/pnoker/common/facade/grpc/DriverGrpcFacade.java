@@ -27,7 +27,7 @@ import io.github.pnoker.common.facade.api.DriverFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.query.FacadeDriverOffsetQuery;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcDriverBuilder;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;

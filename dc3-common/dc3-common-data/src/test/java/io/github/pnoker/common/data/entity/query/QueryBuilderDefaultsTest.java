@@ -19,7 +19,7 @@ package io.github.pnoker.common.data.entity.query;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.entity.query.PointValueQuery;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.PageRequest;
 import org.junit.jupiter.api.Test;
 
 class QueryBuilderDefaultsTest {

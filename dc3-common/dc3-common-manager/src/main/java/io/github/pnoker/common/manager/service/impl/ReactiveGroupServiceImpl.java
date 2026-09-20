@@ -27,7 +27,7 @@ import io.github.pnoker.common.manager.repository.GroupFilter;
 import io.github.pnoker.common.manager.repository.ReactiveGroupStore;
 import io.github.pnoker.common.manager.service.ReactiveGroupService;
 import io.github.pnoker.common.utils.CodeUtil;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;

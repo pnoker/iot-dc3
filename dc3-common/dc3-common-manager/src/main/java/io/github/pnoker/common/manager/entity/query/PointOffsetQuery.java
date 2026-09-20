@@ -19,7 +19,7 @@ package io.github.pnoker.common.manager.entity.query;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
 import io.github.pnoker.common.enums.RwTypeEnum;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Set;

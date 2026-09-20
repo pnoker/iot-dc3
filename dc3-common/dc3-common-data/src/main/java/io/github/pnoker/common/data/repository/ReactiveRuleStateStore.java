@@ -17,8 +17,8 @@
 package io.github.pnoker.common.data.repository;
 
 import io.github.pnoker.common.data.entity.model.RuleStateDO;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.PageRequest;
 import java.time.LocalDateTime;
 import reactor.core.publisher.Mono;
 

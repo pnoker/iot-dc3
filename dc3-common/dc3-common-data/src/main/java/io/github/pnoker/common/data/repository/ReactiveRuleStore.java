@@ -19,8 +19,8 @@ package io.github.pnoker.common.data.repository;
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.model.RuleDO;
 import io.github.pnoker.common.enums.AlarmTargetTypeEnum;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.PageRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

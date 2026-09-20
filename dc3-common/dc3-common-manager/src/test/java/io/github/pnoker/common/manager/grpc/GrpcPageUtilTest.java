@@ -53,7 +53,7 @@ class GrpcPageUtilTest {
         assertEquals(8, converted.limit());
         assertEquals("name", converted.sort().getFirst().field());
         assertEquals(
-                io.github.pnoker.db.r2dbc.core.page.SortSpec.Direction.DESC,
+                io.github.pnoker.db.core.page.SortSpec.Direction.DESC,
                 converted.sort().getFirst().direction());
         assertThrows(
                 IllegalArgumentException.class,

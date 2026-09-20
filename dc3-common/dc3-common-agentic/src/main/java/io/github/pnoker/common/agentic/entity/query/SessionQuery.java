@@ -51,7 +51,7 @@ public class SessionQuery implements Serializable {
     private Integer limit;
 
     @Schema(description = "Stable sort specification; fields are validated by the server.")
-    private java.util.List<io.github.pnoker.db.r2dbc.core.page.SortSpec> sort;
+    private java.util.List<io.github.pnoker.db.core.page.SortSpec> sort;
 
     @Schema(
             description =

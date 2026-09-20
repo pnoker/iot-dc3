@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.repository.ReactiveSessionStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

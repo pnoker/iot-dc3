@@ -18,8 +18,8 @@ package io.github.pnoker.common.auth.entity.query;
 
 import io.github.pnoker.common.enums.ApiTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.PageRequest;
+import io.github.pnoker.db.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 

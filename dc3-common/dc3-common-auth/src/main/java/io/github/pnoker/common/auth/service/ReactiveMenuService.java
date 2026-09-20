@@ -19,7 +19,7 @@ package io.github.pnoker.common.auth.service;
 import io.github.pnoker.common.auth.entity.bo.MenuBO;
 import io.github.pnoker.common.auth.entity.bo.MenuTreeBO;
 import io.github.pnoker.common.auth.repository.MenuFilter;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

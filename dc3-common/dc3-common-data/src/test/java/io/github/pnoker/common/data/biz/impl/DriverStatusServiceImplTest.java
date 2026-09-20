@@ -55,7 +55,7 @@ class DriverStatusServiceImplTest {
         FacadeDriverBO driver = new FacadeDriverBO();
         driver.setId(7L);
         when(driverFacade.listReactive(any(FacadeDriverOffsetQuery.class)))
-                .thenReturn(Mono.just(io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(List.of(driver), 0, 50, 1)));
+                .thenReturn(Mono.just(io.github.pnoker.db.core.page.OffsetPage.of(List.of(driver), 0, 50, 1)));
         when(stateStore.listStateFlags(100L, EntityTypeEnum.DRIVER, List.of(7L)))
                 .thenReturn(Mono.just(Map.of(7L, (byte) EntityStatusEnum.ONLINE.getIndex())));
 

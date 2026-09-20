@@ -42,6 +42,9 @@
 
 ARG DC3_JDK_IMAGE=docker.io/pnoker/dc3-jdk:21
 ARG DC3_JRE_IMAGE=docker.io/pnoker/dc3-jre:21
+# Native toolchain / runtime images for the *-native targets below.
+ARG DC3_JDK_NATIVE_IMAGE=docker.io/pnoker/dc3-jdk-native:25
+ARG DC3_NATIVE_IMAGE=docker.io/pnoker/dc3-native:12
 
 
 # -----------------------------------------------------------------------------
@@ -75,6 +78,61 @@ RUN --mount=type=cache,target=/root/.m2/repository \
 
 
 # -----------------------------------------------------------------------------
+# Stage 1N: native-builder — GraalVM native-image compilation for the DC3
+# native service set (dc3-center/* + dc3-gateway).
+#
+# NOTE: this stage deliberately does NOT pin --platform=$BUILDPLATFORM. Native
+# executables are platform-specific, so every target platform needs its own
+# native-image run. Under multi-arch buildx the arm64 pass runs emulated and
+# is SLOW — prefer per-arch runners, or build single-platform:
+#     docker buildx build --platform linux/amd64 --target dc3-gateway-native ...
+#
+# The reactor is `install`ed ONCE into the BuildKit-cached ~/.m2/repository;
+# each service then compiles its own executable in a separate RUN layer, so a
+# change to one service only re-runs that service's native-image step.
+# -----------------------------------------------------------------------------
+FROM ${DC3_JDK_NATIVE_IMAGE} AS native-builder
+LABEL dc3.author=pnoker
+LABEL dc3.author.email=pnokers.icloud.com
+
+ARG PROFILE=dev
+ARG MAVEN_OPTS_EXTRA=""
+ENV MAVEN_OPTS="${MAVEN_OPTS_EXTRA}"
+
+WORKDIR /build
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+COPY . .
+RUN --mount=type=cache,target=/root/.m2/repository \
+    mvn -U -B -e -T 1C -s .mvn/settings-container.xml clean install -DskipTests \
+        -Daether.syncContext.named.factory=noop -P ${PROFILE}
+
+RUN --mount=type=cache,target=/root/.m2/repository \
+    mvn -B -e -s .mvn/settings-container.xml -DskipTests \
+        -Daether.syncContext.named.factory=noop -P ${PROFILE},native native:compile -pl dc3-gateway
+
+RUN --mount=type=cache,target=/root/.m2/repository \
+    mvn -B -e -s .mvn/settings-container.xml -DskipTests \
+        -Daether.syncContext.named.factory=noop -P ${PROFILE},native native:compile -pl dc3-center/dc3-center-auth
+
+RUN --mount=type=cache,target=/root/.m2/repository \
+    mvn -B -e -s .mvn/settings-container.xml -DskipTests \
+        -Daether.syncContext.named.factory=noop -P ${PROFILE},native native:compile -pl dc3-center/dc3-center-manager
+
+RUN --mount=type=cache,target=/root/.m2/repository \
+    mvn -B -e -s .mvn/settings-container.xml -DskipTests \
+        -Daether.syncContext.named.factory=noop -P ${PROFILE},native native:compile -pl dc3-center/dc3-center-data
+
+RUN --mount=type=cache,target=/root/.m2/repository \
+    mvn -B -e -s .mvn/settings-container.xml -DskipTests \
+        -Daether.syncContext.named.factory=noop -P ${PROFILE},native native:compile -pl dc3-center/dc3-center-agentic
+
+RUN --mount=type=cache,target=/root/.m2/repository \
+    mvn -B -e -s .mvn/settings-container.xml -DskipTests \
+        -Daether.syncContext.named.factory=noop -P ${PROFILE},native native:compile -pl dc3-center/dc3-center-single
+
+
+# -----------------------------------------------------------------------------
 # Stage 2: runtime base — the only place where JRE image, timezone and common
 # environment defaults are declared. Every service target builds on top of it.
 # -----------------------------------------------------------------------------
@@ -89,6 +147,19 @@ ENV APM_AGENT_ENABLE=false
 ENV APM_SERVICE=http://dc3-apm:8200
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+
+# -----------------------------------------------------------------------------
+# Stage 2N: native runtime base — minimal glibc runtime for native executables.
+# No JVM flags and no -javaagent here: Elastic APM injection is impossible on
+# native executables (observe via OpenTelemetry instead). Application params
+# are still passed through the PARAMS env by entrypoint-native.sh.
+# -----------------------------------------------------------------------------
+FROM ${DC3_NATIVE_IMAGE} AS native-runtime-base
+LABEL dc3.author=pnoker
+LABEL dc3.author.email=pnokers.icloud.com
+
+ENV PARAMS=''
 
 
 # =============================================================================
@@ -752,4 +823,93 @@ RUN mkdir -p /dc3-driver/dc3-driver-redis/dc3/data/driver/redis
 VOLUME /dc3-driver/dc3-driver-redis/dc3/data
 ENTRYPOINT ["./entrypoint.sh"]
 CMD ["dc3-driver-redis.jar"]
+
+
+# =============================================================================
+# Native service targets — GraalVM native executables for dc3-center/* and
+# dc3-gateway. Built on native-runtime-base; the executable is COPYed from the
+# native-builder stage. Driver services stay on the JVM: their protocol SDKs
+# are reflection/JNI heavy and are not part of the native set.
+# =============================================================================
+
+
+# ---------- dc3-gateway-native ----------
+FROM native-runtime-base AS dc3-gateway-native
+ENV DC3_GATEWAY_PORT=8000
+ENV SERVER_NAME=dc3-gateway
+ENV APP_BIN=./dc3-gateway
+WORKDIR /dc3-gateway
+RUN mkdir -p /dc3-gateway/dc3/logs/gateway
+COPY --from=native-builder /build/dc3-gateway/target/dc3-gateway ./
+EXPOSE ${DC3_GATEWAY_PORT}
+VOLUME /dc3-gateway/dc3/logs
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-center-auth-native ----------
+FROM native-runtime-base AS dc3-center-auth-native
+ENV DC3_AUTH_PORT=8300
+ENV DC3_AUTH_GRPC_PORT=9300
+ENV SERVER_NAME=dc3-center-auth
+ENV APP_BIN=./dc3-center-auth
+WORKDIR /dc3-center/dc3-center-auth
+RUN mkdir -p /dc3-center/dc3-center-auth/dc3/logs/center/auth
+COPY --from=native-builder /build/dc3-center/dc3-center-auth/target/dc3-center-auth ./
+EXPOSE ${DC3_AUTH_PORT}
+EXPOSE ${DC3_AUTH_GRPC_PORT}
+VOLUME /dc3-center/dc3-center-auth/dc3/logs
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-center-manager-native ----------
+FROM native-runtime-base AS dc3-center-manager-native
+ENV DC3_MANAGER_PORT=8400
+ENV DC3_MANAGER_GRPC_PORT=9400
+ENV SERVER_NAME=dc3-center-manager
+ENV APP_BIN=./dc3-center-manager
+WORKDIR /dc3-center/dc3-center-manager
+RUN mkdir -p /dc3-center/dc3-center-manager/dc3/logs/center/manager
+COPY --from=native-builder /build/dc3-center/dc3-center-manager/target/dc3-center-manager ./
+EXPOSE ${DC3_MANAGER_PORT}
+EXPOSE ${DC3_MANAGER_GRPC_PORT}
+VOLUME /dc3-center/dc3-center-manager/dc3/logs
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-center-data-native ----------
+FROM native-runtime-base AS dc3-center-data-native
+ENV DC3_DATA_PORT=8500
+ENV DC3_DATA_GRPC_PORT=9500
+ENV SERVER_NAME=dc3-center-data
+ENV APP_BIN=./dc3-center-data
+WORKDIR /dc3-center/dc3-center-data
+RUN mkdir -p /dc3-center/dc3-center-data/dc3/logs/center/data
+COPY --from=native-builder /build/dc3-center/dc3-center-data/target/dc3-center-data ./
+EXPOSE ${DC3_DATA_PORT}
+EXPOSE ${DC3_DATA_GRPC_PORT}
+VOLUME /dc3-center/dc3-center-data/dc3/logs
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-center-agentic-native ----------
+FROM native-runtime-base AS dc3-center-agentic-native
+ENV DC3_AGENTIC_PORT=8600
+ENV SERVER_NAME=dc3-center-agentic
+ENV APP_BIN=./dc3-center-agentic
+WORKDIR /dc3-center/dc3-center-agentic
+RUN mkdir -p /dc3-center/dc3-center-agentic/dc3/logs/center/agentic
+COPY --from=native-builder /build/dc3-center/dc3-center-agentic/target/dc3-center-agentic ./
+EXPOSE ${DC3_AGENTIC_PORT}
+VOLUME /dc3-center/dc3-center-agentic/dc3/logs
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-center-single-native ----------
+FROM native-runtime-base AS dc3-center-single-native
+ENV DC3_SINGLE_PORT=8100
+ENV DC3_SINGLE_GRPC_PORT=9100
+ENV SERVER_NAME=dc3-center-single
+ENV APP_BIN=./dc3-center-single
+WORKDIR /dc3-center/dc3-center-single
+RUN mkdir -p /dc3-center/dc3-center-single/dc3/logs/center/single
+COPY --from=native-builder /build/dc3-center/dc3-center-single/target/dc3-center-single ./
+EXPOSE ${DC3_SINGLE_PORT}
+EXPOSE ${DC3_SINGLE_GRPC_PORT}
+VOLUME /dc3-center/dc3-center-single/dc3/logs
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
 

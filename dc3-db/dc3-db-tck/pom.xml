@@ -35,31 +35,27 @@
     <dependencies>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-r2dbc-core</artifactId>
+            <artifactId>dc3-db-core</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-r2dbc-runtime</artifactId>
+            <artifactId>dc3-db-runtime</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-r2dbc-postgres</artifactId>
+            <artifactId>dc3-db-agentic</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-postgres-agentic</artifactId>
+            <artifactId>dc3-db-auth</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-postgres-auth</artifactId>
+            <artifactId>dc3-db-data</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-postgres-data</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-postgres-manager</artifactId>
+            <artifactId>dc3-db-manager</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>

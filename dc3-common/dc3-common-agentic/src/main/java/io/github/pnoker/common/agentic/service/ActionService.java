@@ -18,7 +18,7 @@ package io.github.pnoker.common.agentic.service;
 
 import io.github.pnoker.common.agentic.entity.bo.ActionBO;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
 
 /**

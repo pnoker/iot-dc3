@@ -1,0 +1,94 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package io.github.pnoker.db.runtime.config;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import io.github.pnoker.db.core.dialect.R2dbcDialect;
+import io.github.pnoker.db.core.dialect.StandardR2dbcDialect;
+import io.github.pnoker.db.core.transaction.PageTransaction;
+import io.github.pnoker.db.runtime.schema.SchemaFingerprintStartupValidator;
+import io.github.pnoker.db.runtime.schema.SchemaFingerprintVerifier;
+import io.r2dbc.spi.ConnectionFactory;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.transaction.ReactiveTransactionManager;
+import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Mono;
+
+class R2dbcRuntimeAutoConfigurationTest {
+
+    private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(R2dbcRuntimeAutoConfiguration.class))
+            .withBean(ConnectionFactory.class, () -> mock(ConnectionFactory.class));
+
+    @Test
+    void configuresTransactionsAndMandatoryStartupValidation() {
+        SchemaFingerprintVerifier verifier = mock(SchemaFingerprintVerifier.class);
+        when(verifier.verify()).thenReturn(Mono.empty());
+
+        contextRunner
+                .withBean(
+                        R2dbcDialect.class, () -> new StandardR2dbcDialect("postgres", "public.dc3_schema_fingerprint"))
+                .withBean(SchemaFingerprintVerifier.class, () -> verifier)
+                .run(context -> {
+                    assertThat(context).hasSingleBean(ReactiveTransactionManager.class);
+                    assertThat(context).hasSingleBean(TransactionalOperator.class);
+                    assertThat(context).hasSingleBean(PageTransaction.class);
+                    assertThat(context).hasSingleBean(SchemaFingerprintStartupValidator.class);
+                    assertThat(context).hasNotFailed();
+                });
+    }
+
+    @Test
+    void refusesToStartWithoutADialect() {
+        contextRunner.run(context -> assertThat(context)
+                .hasFailed()
+                .getFailure()
+                .hasMessageContaining("exactly one R2DBC dialect adapter must be registered"));
+    }
+
+    @Test
+    void refusesToStartWithMultipleDialectAdapters() {
+        contextRunner
+                .withBean(
+                        "postgresDialect",
+                        R2dbcDialect.class,
+                        () -> new StandardR2dbcDialect("postgres", "public.dc3_schema_fingerprint"))
+                .withBean(
+                        "secondDialect",
+                        R2dbcDialect.class,
+                        () -> new StandardR2dbcDialect("postgres-legacy", "public.dc3_schema_fingerprint"))
+                .run(context -> assertThat(context)
+                        .hasFailed()
+                        .getFailure()
+                        .hasMessageContaining("exactly one R2DBC dialect adapter must be registered"));
+    }
+
+    @Test
+    void refusesToStartWithoutAR2dbcConnectionFactory() {
+        new ApplicationContextRunner()
+                .withConfiguration(AutoConfigurations.of(R2dbcRuntimeAutoConfiguration.class))
+                .run(context -> assertThat(context)
+                        .hasFailed()
+                        .getFailure()
+                        .hasMessageContaining("spring.r2dbc.url must be configured"));
+    }
+}

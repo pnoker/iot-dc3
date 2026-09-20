@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.biz.PointCommandHistoryService;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryQueryVO;
 import io.github.pnoker.common.data.entity.vo.PointCommandHistoryVO;
 import io.github.pnoker.common.exception.NotFoundException;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;

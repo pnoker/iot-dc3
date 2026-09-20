@@ -21,7 +21,7 @@ import io.github.pnoker.common.constant.service.ManagerConstant;
 import io.github.pnoker.common.manager.entity.query.TopicOffsetQuery;
 import io.github.pnoker.common.manager.entity.vo.TopicVO;
 import io.github.pnoker.common.manager.service.ReactiveTopicService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;

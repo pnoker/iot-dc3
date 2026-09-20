@@ -75,11 +75,11 @@ public class FacadeGrpcPointBuilder {
         return builder.build();
     }
 
-    private SortSpec toGrpcSort(io.github.pnoker.db.r2dbc.core.page.SortSpec sort) {
+    private SortSpec toGrpcSort(io.github.pnoker.db.core.page.SortSpec sort) {
         return SortSpec.newBuilder()
                 .setField(sort.field())
                 .setDirection(
-                        sort.direction() == io.github.pnoker.db.r2dbc.core.page.SortSpec.Direction.ASC
+                        sort.direction() == io.github.pnoker.db.core.page.SortSpec.Direction.ASC
                                 ? SortDirection.SORT_DIRECTION_ASC
                                 : SortDirection.SORT_DIRECTION_DESC)
                 .build();

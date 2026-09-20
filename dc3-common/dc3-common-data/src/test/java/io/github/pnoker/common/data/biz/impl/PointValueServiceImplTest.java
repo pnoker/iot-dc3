@@ -48,7 +48,7 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesCount;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -290,7 +290,7 @@ class PointValueServiceImplTest {
                 .thenReturn(Mono.just(new CursorPage<>(List.of(newest, older), null)));
 
         PointValueQuery query = PointValueQuery.builder().tenantId(1L).build();
-        io.github.pnoker.db.r2dbc.core.page.CursorPage<PointValueBO> page =
+        io.github.pnoker.db.core.page.CursorPage<PointValueBO> page =
                 service.page(query).block();
 
         ArgumentCaptor<SeriesFilter> filter = ArgumentCaptor.forClass(SeriesFilter.class);
@@ -316,7 +316,7 @@ class PointValueServiceImplTest {
                         at("2026-08-20T10:00:01"), "m-previous", series));
         PointValueQuery query =
                 PointValueQuery.builder().tenantId(1L).limit(20).cursor(cursor).build();
-        io.github.pnoker.db.r2dbc.core.page.CursorPage<PointValueBO> page =
+        io.github.pnoker.db.core.page.CursorPage<PointValueBO> page =
                 service.page(query).block();
 
         assertThat(page.items()).hasSize(1);

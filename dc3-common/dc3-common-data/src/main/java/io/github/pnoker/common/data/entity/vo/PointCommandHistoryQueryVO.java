@@ -18,8 +18,8 @@ package io.github.pnoker.common.data.entity.vo;
 
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.enums.PointCommandTypeEnum;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.PageRequest;
+import io.github.pnoker.db.core.page.SortSpec;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serial;
 import java.io.Serializable;

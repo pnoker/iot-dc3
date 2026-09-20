@@ -29,7 +29,7 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -324,7 +324,7 @@ public class ServiceAccountController implements BaseController {
                                 query.serviceAccountName(),
                                 query.ownerPrincipalId(),
                                 query.enableFlag(),
-                                new io.github.pnoker.db.r2dbc.core.page.PageRequest(
+                                new io.github.pnoker.db.core.page.PageRequest(
                                         query.offset(), query.limit(), query.sort())))
                         .map(page -> ResponseEntity.ok(OffsetPage.of(
                                 page.items().stream()

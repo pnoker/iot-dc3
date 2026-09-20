@@ -25,7 +25,7 @@ import io.github.pnoker.common.facade.local.builder.FacadeProfileBuilder;
 import io.github.pnoker.common.manager.entity.bo.ProfileBO;
 import io.github.pnoker.common.manager.repository.ProfileFilter;
 import io.github.pnoker.common.manager.service.ReactiveProfileService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

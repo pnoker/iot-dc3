@@ -33,7 +33,7 @@ import io.github.pnoker.common.exception.UpdateException;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.common.utils.PasswordUtil;
 import io.github.pnoker.common.utils.UuidV7;
-import io.github.pnoker.db.r2dbc.core.dialect.R2dbcDialect;
+import io.github.pnoker.db.core.dialect.R2dbcDialect;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;

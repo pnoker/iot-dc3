@@ -139,9 +139,9 @@ class DataAnalyticsServiceImplTest {
         point.setId(20L);
         point.setPointName("temp");
         when(deviceFacade.listReactive(any()))
-                .thenReturn(Mono.just(io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(List.of(device), 0, 50, 1)));
+                .thenReturn(Mono.just(io.github.pnoker.db.core.page.OffsetPage.of(List.of(device), 0, 50, 1)));
         when(pointFacade.listReactive(any()))
-                .thenReturn(Mono.just(io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(List.of(point), 0, 50, 1)));
+                .thenReturn(Mono.just(io.github.pnoker.db.core.page.OffsetPage.of(List.of(point), 0, 50, 1)));
         when(tsdbStore.history(any(), any(), isNull(), any(Integer.class), any()))
                 .thenReturn(Mono.just(new TsdbModel.CursorPage<>(List.of(), null)));
         AnalyticsModel.HistoryResponse response = service.getHistory(

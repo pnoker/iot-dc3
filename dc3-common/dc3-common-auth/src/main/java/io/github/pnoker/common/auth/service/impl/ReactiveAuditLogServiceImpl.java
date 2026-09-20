@@ -23,7 +23,7 @@ import io.github.pnoker.common.auth.repository.IdentityAuditLogFilter;
 import io.github.pnoker.common.auth.repository.ReactiveAuditLogQueryStore;
 import io.github.pnoker.common.auth.repository.ReactiveAuditLogStore;
 import io.github.pnoker.common.auth.service.ReactiveAuditLogService;
-import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import io.github.pnoker.db.core.page.CursorPage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;

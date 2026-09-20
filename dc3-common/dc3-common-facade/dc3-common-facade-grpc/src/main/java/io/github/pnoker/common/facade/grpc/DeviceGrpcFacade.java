@@ -89,7 +89,7 @@ public class DeviceGrpcFacade implements DeviceFacade {
     }
 
     @Override
-    public Mono<io.github.pnoker.db.r2dbc.core.page.OffsetPage<FacadeDeviceBO>> listReactive(
+    public Mono<io.github.pnoker.db.core.page.OffsetPage<FacadeDeviceBO>> listReactive(
             FacadeDeviceOffsetQuery query) {
         if (query == null) return Mono.error(new IllegalArgumentException("query is required"));
         GrpcOffsetDeviceQuery request = facadeGrpcDeviceBuilder.toGrpcOffsetQuery(query);
@@ -102,7 +102,7 @@ public class DeviceGrpcFacade implements DeviceFacade {
                     List<FacadeDeviceBO> items = response.getItemsList().stream()
                             .map(facadeGrpcDeviceBuilder::toFacadeBO)
                             .toList();
-                    return io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(
+                    return io.github.pnoker.db.core.page.OffsetPage.of(
                             items, page.getOffset(), page.getLimit(), page.getTotal());
                 });
     }

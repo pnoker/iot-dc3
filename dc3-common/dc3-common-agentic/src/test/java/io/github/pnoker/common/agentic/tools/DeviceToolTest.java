@@ -27,7 +27,7 @@ import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;

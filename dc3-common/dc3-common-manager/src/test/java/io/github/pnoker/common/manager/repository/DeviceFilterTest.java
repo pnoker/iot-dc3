@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.SortSpec;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

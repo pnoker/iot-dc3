@@ -19,8 +19,8 @@ package io.github.pnoker.common.agentic.service;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.SortSpec;
 import reactor.core.publisher.Mono;
 
 /** Reactive service for tenant-scoped agentic conversation sessions. */

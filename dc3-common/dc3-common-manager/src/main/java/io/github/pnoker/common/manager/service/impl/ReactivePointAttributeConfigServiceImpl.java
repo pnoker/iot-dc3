@@ -34,7 +34,7 @@ import io.github.pnoker.common.manager.service.ReactiveDeviceService;
 import io.github.pnoker.common.manager.service.ReactivePointAttributeConfigService;
 import io.github.pnoker.common.manager.service.ReactivePointAttributeService;
 import io.github.pnoker.common.manager.service.ReactivePointService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;

@@ -48,9 +48,9 @@ public class ReactiveLocalCredentialServiceImpl implements ReactiveLocalCredenti
     }
 
     @Override
-    public Mono<io.github.pnoker.db.r2dbc.core.page.OffsetPage<LocalCredentialBO>> list(LocalCredentialFilter filter) {
+    public Mono<io.github.pnoker.db.core.page.OffsetPage<LocalCredentialBO>> list(LocalCredentialFilter filter) {
         return store.list(filter)
-                .map(page -> io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(
+                .map(page -> io.github.pnoker.db.core.page.OffsetPage.of(
                         page.items().stream().map(builder::buildBOByDO).toList(),
                         page.offset(),
                         page.limit(),

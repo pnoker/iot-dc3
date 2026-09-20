@@ -56,10 +56,9 @@ Agentic 记忆直接写入 `dc3_message`，不再引入 JDBC Chat Memory 或第�
 
 ## 6. 构件与配置
 
-- `dc3-db-r2dbc-core`：分页、游标、租户、操作状态和方言接口。
-- `dc3-db-r2dbc-runtime`：R2DBC 池、事务和 schema fingerprint 启动闸门。
-- `dc3-db-r2dbc-postgres`：唯一 PostgreSQL 方言适配器。
-- `dc3-common-*/repository/R2dbc*Store`：各域显式 SQL repository。
+- `dc3-db-core`：分页、游标、租户、操作状态和方言接口。
+- `dc3-db-runtime`：R2DBC 池、事务、唯一 PostgreSQL 方言适配器和 schema fingerprint 启动闸门。
+- `dc3-db-{auth,manager,data,agentic}`：各域显式 SQL repository（`R2dbc*Store` 适配器，实现 `dc3-common-*/repository` 声明的 `Reactive*Store` 端口）。
 - `dc3-tsdb-core` + `R2dbcTsdbStore`：TimescaleDB 历史 Port。
 
 `DC3_DB_TYPE`、`DC3_TSDB_TYPE`、MySQL/MariaDB/外置 TSDB compose 服务和对应种子已删除；改变数据库必须重新进行架构评审，不通过兼容开关绕过。

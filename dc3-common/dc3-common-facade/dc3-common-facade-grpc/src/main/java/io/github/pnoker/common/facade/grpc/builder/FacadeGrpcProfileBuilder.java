@@ -31,7 +31,7 @@ import io.github.pnoker.common.optional.LongOptional;
 import io.github.pnoker.common.optional.StringOptional;
 import io.github.pnoker.common.utils.GrpcBuilderUtil;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.SortSpec;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Component;

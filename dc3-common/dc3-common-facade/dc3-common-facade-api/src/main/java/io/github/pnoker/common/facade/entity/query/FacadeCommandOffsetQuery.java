@@ -19,8 +19,8 @@ package io.github.pnoker.common.facade.entity.query;
 import io.github.pnoker.common.enums.CallTypeEnum;
 import io.github.pnoker.common.enums.CommandTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.PageRequest;
+import io.github.pnoker.db.core.page.SortSpec;
 import java.util.List;
 
 /** Canonical offset query for command facade calls. */

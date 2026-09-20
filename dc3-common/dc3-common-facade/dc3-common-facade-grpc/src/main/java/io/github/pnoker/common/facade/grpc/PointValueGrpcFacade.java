@@ -27,7 +27,7 @@ import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointVolumeBO;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcPointValueBuilder;
-import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import io.github.pnoker.db.core.page.CursorPage;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;

@@ -18,7 +18,7 @@ package io.github.pnoker.common.auth.service;
 
 import io.github.pnoker.common.auth.entity.bo.ApiBO;
 import io.github.pnoker.common.auth.repository.ApiFilter;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
 
 /** Business service covering api use cases. */

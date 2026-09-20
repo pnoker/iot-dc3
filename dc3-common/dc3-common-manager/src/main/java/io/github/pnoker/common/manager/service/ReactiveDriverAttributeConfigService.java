@@ -18,7 +18,7 @@ package io.github.pnoker.common.manager.service;
 
 import io.github.pnoker.common.manager.entity.bo.DriverAttributeConfigBO;
 import io.github.pnoker.common.manager.repository.DriverAttributeConfigFilter;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

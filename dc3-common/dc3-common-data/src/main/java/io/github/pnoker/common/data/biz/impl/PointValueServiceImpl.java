@@ -40,8 +40,8 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
 import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
 import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.github.pnoker.common.utils.TimeRangeUtil;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.PageRequest;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -131,7 +131,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public Mono<io.github.pnoker.db.r2dbc.core.page.CursorPage<PointValueBO>> history(
+    public Mono<io.github.pnoker.db.core.page.CursorPage<PointValueBO>> history(
             Long tenantId, Long deviceId, Long pointId, String cursor, int limit) {
         if (!isValidId(tenantId) || !isValidId(deviceId) || !isValidId(pointId)) {
             return Mono.error(new IllegalArgumentException("tenantId, deviceId and pointId must be positive"));
@@ -165,7 +165,7 @@ public class PointValueServiceImpl implements PointValueService {
                                                 deviceId,
                                                 pointId,
                                                 page.nextCursor().withWindow(window));
-                        return io.github.pnoker.db.r2dbc.core.page.CursorPage.of(items, nextCursor);
+                        return io.github.pnoker.db.core.page.CursorPage.of(items, nextCursor);
                     });
         });
     }
@@ -224,7 +224,7 @@ public class PointValueServiceImpl implements PointValueService {
     }
 
     @Override
-    public Mono<io.github.pnoker.db.r2dbc.core.page.CursorPage<PointValueBO>> page(PointValueQuery entityQuery) {
+    public Mono<io.github.pnoker.db.core.page.CursorPage<PointValueBO>> page(PointValueQuery entityQuery) {
         PointValueQuery query = entityQuery == null ? new PointValueQuery() : entityQuery;
         return Mono.defer(() -> {
                     if (!isValidId(query.getTenantId())) {
@@ -255,7 +255,7 @@ public class PointValueServiceImpl implements PointValueService {
                 })
                 .flatMap(prepared -> {
                     if (prepared.filter() == null) {
-                        return Mono.just(io.github.pnoker.db.r2dbc.core.page.CursorPage.of(List.of(), null));
+                        return Mono.just(io.github.pnoker.db.core.page.CursorPage.of(List.of(), null));
                     }
                     io.github.pnoker.common.tsdb.model.TsdbModel.Cursor internalCursor = prepared.cursor() == null
                                     || prepared.cursor().isBlank()
@@ -276,7 +276,7 @@ public class PointValueServiceImpl implements PointValueService {
                                                         prepared.filter().tenantId(),
                                                         prepared.fingerprint(),
                                                         page.nextCursor().withWindow(window));
-                                return io.github.pnoker.db.r2dbc.core.page.CursorPage.of(records, nextCursor);
+                                return io.github.pnoker.db.core.page.CursorPage.of(records, nextCursor);
                             });
                 });
     }

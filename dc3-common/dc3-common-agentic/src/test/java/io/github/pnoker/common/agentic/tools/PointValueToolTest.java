@@ -95,7 +95,7 @@ class PointValueToolTest {
     @Test
     void getPointValueHistoryReturnsRawValuesAndChartData() {
         when(pointValueFacade.history(1L, 10L, 20L, null, 5))
-                .thenReturn(reactor.core.publisher.Mono.just(io.github.pnoker.db.r2dbc.core.page.CursorPage.of(
+                .thenReturn(reactor.core.publisher.Mono.just(io.github.pnoker.db.core.page.CursorPage.of(
                         List.of(
                                 FacadePointValueBO.builder().value("24.0").build(),
                                 FacadePointValueBO.builder().value("23.8").build(),

@@ -19,7 +19,7 @@ package io.github.pnoker.common.facade.api;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceOwnerBO;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceOffsetQuery;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.Collection;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

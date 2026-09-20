@@ -18,7 +18,7 @@ package io.github.pnoker.common.auth.service;
 
 import io.github.pnoker.common.auth.entity.bo.LocalCredentialBO;
 import io.github.pnoker.common.auth.repository.LocalCredentialFilter;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
 
 /** Non-blocking local credential queries and authentication primitives. */

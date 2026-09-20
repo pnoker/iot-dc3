@@ -33,7 +33,7 @@ import io.github.pnoker.common.manager.grpc.GrpcPageUtil;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDeviceBuilder;
 import io.github.pnoker.common.manager.repository.DeviceFilter;
 import io.github.pnoker.common.manager.service.ReactiveDeviceService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.grpc.stub.StreamObserver;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

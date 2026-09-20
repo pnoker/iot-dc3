@@ -49,7 +49,7 @@ class DeviceStatusServiceImplTest {
         DeviceStatusServiceImpl service = new DeviceStatusServiceImpl(deviceFacade, stateStore);
         FacadeDeviceBO device = device(10L);
         when(deviceFacade.listReactive(any(FacadeDeviceOffsetQuery.class)))
-                .thenReturn(Mono.just(io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(List.of(device), 0, 50, 1)));
+                .thenReturn(Mono.just(io.github.pnoker.db.core.page.OffsetPage.of(List.of(device), 0, 50, 1)));
         when(stateStore.listStateFlags(100L, EntityTypeEnum.DEVICE, List.of(10L)))
                 .thenReturn(Mono.just(Map.of(10L, (byte) EntityStatusEnum.ONLINE.getIndex())));
 
@@ -64,7 +64,7 @@ class DeviceStatusServiceImplTest {
         DeviceStatusServiceImpl service = new DeviceStatusServiceImpl(deviceFacade, stateStore);
         when(deviceFacade.listReactive(any(FacadeDeviceOffsetQuery.class)))
                 .thenReturn(
-                        Mono.just(io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(List.of(device(10L)), 0, 50, 1)));
+                        Mono.just(io.github.pnoker.db.core.page.OffsetPage.of(List.of(device(10L)), 0, 50, 1)));
         when(stateStore.listStateFlags(any(), any(), any())).thenReturn(Mono.just(Map.of()));
 
         StepVerifier.create(service.list(request(100L)))

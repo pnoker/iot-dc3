@@ -19,8 +19,8 @@ package io.github.pnoker.common.facade.entity.query;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.ProfileShareTypeEnum;
 import io.github.pnoker.common.enums.ProfileTypeEnum;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.PageRequest;
+import io.github.pnoker.db.core.page.SortSpec;
 import java.util.List;
 import java.util.Set;
 

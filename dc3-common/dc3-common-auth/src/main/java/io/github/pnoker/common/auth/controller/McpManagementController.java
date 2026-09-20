@@ -34,8 +34,8 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.PageRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -434,7 +434,7 @@ public class McpManagementController implements BaseController {
                 : value.stream().filter(StringUtils::isNotBlank).toList();
     }
 
-    private PageRequest page(Long offset, Integer limit, List<io.github.pnoker.db.r2dbc.core.page.SortSpec> sort) {
+    private PageRequest page(Long offset, Integer limit, List<io.github.pnoker.db.core.page.SortSpec> sort) {
         return new PageRequest(offset == null ? 0 : offset, limit == null ? PageRequest.DEFAULT_LIMIT : limit, sort);
     }
 }

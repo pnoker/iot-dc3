@@ -46,7 +46,7 @@ import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.message.MqMessage;
 import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
 import io.github.pnoker.common.utils.UuidV7;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;

@@ -34,7 +34,7 @@ import io.github.pnoker.common.manager.grpc.builder.GrpcDriverBuilder;
 import io.github.pnoker.common.manager.grpc.server.manager.ManagerDriverServer;
 import io.github.pnoker.common.manager.repository.DriverFilter;
 import io.github.pnoker.common.manager.service.ReactiveDriverService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.Status;

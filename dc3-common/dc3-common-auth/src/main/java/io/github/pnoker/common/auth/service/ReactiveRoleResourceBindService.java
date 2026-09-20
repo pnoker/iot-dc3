@@ -20,7 +20,7 @@ import io.github.pnoker.common.auth.entity.bo.ResourceBO;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.bo.RoleResourceBindBO;
 import io.github.pnoker.common.auth.repository.RoleResourceBindFilter;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

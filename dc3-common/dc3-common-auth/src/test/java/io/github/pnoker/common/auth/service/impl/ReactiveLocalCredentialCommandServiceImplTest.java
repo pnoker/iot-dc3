@@ -21,7 +21,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import io.github.pnoker.common.auth.entity.bo.LocalCredentialBO;
 import io.github.pnoker.common.auth.entity.builder.LocalCredentialBuilder;
 import io.github.pnoker.common.auth.service.ReactiveLocalCredentialService;
-import io.github.pnoker.db.r2dbc.core.dialect.StandardR2dbcDialect;
+import io.github.pnoker.db.core.dialect.StandardR2dbcDialect;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

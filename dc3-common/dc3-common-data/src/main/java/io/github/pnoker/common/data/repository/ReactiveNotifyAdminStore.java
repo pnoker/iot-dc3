@@ -24,8 +24,8 @@ import io.github.pnoker.common.enums.AlarmMessageLevelEnum;
 import io.github.pnoker.common.enums.AutoConfirmFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.PageRequest;
 import reactor.core.publisher.Mono;
 
 /** Reactive persistence port for notification configuration administration. */

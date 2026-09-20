@@ -18,7 +18,7 @@ package io.github.pnoker.common.facade.api;
 
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointVolumeBO;
-import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import io.github.pnoker.db.core.page.CursorPage;
 import java.util.List;
 import reactor.core.publisher.Mono;
 

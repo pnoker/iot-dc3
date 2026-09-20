@@ -20,7 +20,7 @@ import io.github.pnoker.common.auth.entity.bo.IdentityAuditLogBO;
 import io.github.pnoker.common.auth.entity.vo.IdentityAuditLogVO;
 import io.github.pnoker.common.auth.repository.IdentityAuditLogFilter;
 import io.github.pnoker.common.entity.common.RequestHeader;
-import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import io.github.pnoker.db.core.page.CursorPage;
 import reactor.core.publisher.Mono;
 
 /** Non-blocking identity and authorization audit service. */

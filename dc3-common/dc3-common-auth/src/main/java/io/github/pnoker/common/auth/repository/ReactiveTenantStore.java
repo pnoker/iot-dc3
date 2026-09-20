@@ -17,7 +17,7 @@
 package io.github.pnoker.common.auth.repository;
 
 import io.github.pnoker.common.auth.entity.model.TenantDO;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
 
 /** Persistence port for the global tenant catalog. */

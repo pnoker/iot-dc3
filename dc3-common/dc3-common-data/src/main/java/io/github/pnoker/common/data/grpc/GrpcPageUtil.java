@@ -18,7 +18,7 @@ package io.github.pnoker.common.data.grpc;
 
 import io.github.pnoker.api.common.PageRequest;
 import io.github.pnoker.api.common.SortDirection;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.SortSpec;
 
 /** Converts the history wire page contract without silently repairing input. */
 public final class GrpcPageUtil {
@@ -26,11 +26,11 @@ public final class GrpcPageUtil {
     private GrpcPageUtil() {}
 
     /** Require a page request, defaulting and bounding it. */
-    public static io.github.pnoker.db.r2dbc.core.page.PageRequest require(PageRequest page) {
+    public static io.github.pnoker.db.core.page.PageRequest require(PageRequest page) {
         if (page == null) {
             throw new IllegalArgumentException("page is required");
         }
-        return new io.github.pnoker.db.r2dbc.core.page.PageRequest(
+        return new io.github.pnoker.db.core.page.PageRequest(
                 page.getOffset(),
                 page.getLimit(),
                 page.getSortList().stream()

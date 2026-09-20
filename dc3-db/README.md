@@ -7,21 +7,21 @@ not supported runtime paths.
 
 ## Modules
 
-| Module                  | Role                                                                                 |
-|-------------------------|--------------------------------------------------------------------------------------|
-| dc3-db-r2dbc-core       | Framework-neutral `PageRequest`/`OffsetPage`/`CursorPage`, tenant and operation contracts |
-| dc3-db-r2dbc-runtime    | Spring Boot R2DBC pool, reactive transactions and schema-fingerprint startup gate   |
-| dc3-db-r2dbc-postgres   | PostgreSQL R2DBC dialect and JSONB/identifier conventions                           |
-| dc3-db-postgres-auth    | PostgreSQL R2DBC stores for the auth domain ports                                   |
-| dc3-db-postgres-manager | PostgreSQL R2DBC stores for the manager domain ports                                |
-| dc3-db-postgres-data    | PostgreSQL R2DBC stores for the data domain ports                                   |
-| dc3-db-postgres-agentic | PostgreSQL R2DBC stores for the agentic domain ports                                |
-| dc3-db-tck              | PostgreSQL Testcontainers contract suite                                             |
+| Module          | Role                                                                                 |
+|-----------------|--------------------------------------------------------------------------------------|
+| dc3-db-core     | Framework-neutral `PageRequest`/`OffsetPage`/`CursorPage`, tenant and operation contracts |
+| dc3-db-runtime  | Spring Boot R2DBC pool, reactive transactions, the single PostgreSQL dialect adapter and the schema-fingerprint startup gate |
+| dc3-db-auth     | PostgreSQL R2DBC stores for the auth domain ports                                    |
+| dc3-db-manager  | PostgreSQL R2DBC stores for the manager domain ports                                 |
+| dc3-db-data     | PostgreSQL R2DBC stores for the data domain ports                                    |
+| dc3-db-agentic  | PostgreSQL R2DBC stores for the agentic domain ports                                 |
+| dc3-db-tck      | PostgreSQL Testcontainers contract suite                                             |
 
 ## Selection
 
 The only supported relational engine is PostgreSQL. The postgres dialect registers
-unconditionally; the runtime rejects startup unless exactly one `R2dbcDialect` bean is present.
+unconditionally from `dc3-db-runtime`; the runtime rejects startup unless exactly one
+`R2dbcDialect` bean is present.
 Changing the database requires a deliberate architecture change, not a runtime compatibility
 switch.
 

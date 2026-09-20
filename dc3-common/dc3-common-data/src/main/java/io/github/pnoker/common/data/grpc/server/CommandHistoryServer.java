@@ -90,7 +90,7 @@ public class CommandHistoryServer extends CommandHistoryApiGrpc.CommandHistoryAp
                     .asRuntimeException());
             return;
         }
-        io.github.pnoker.db.r2dbc.core.page.PageRequest requestPage;
+        io.github.pnoker.db.core.page.PageRequest requestPage;
         try {
             requestPage = GrpcPageUtil.require(request.getPage());
         } catch (IllegalArgumentException error) {

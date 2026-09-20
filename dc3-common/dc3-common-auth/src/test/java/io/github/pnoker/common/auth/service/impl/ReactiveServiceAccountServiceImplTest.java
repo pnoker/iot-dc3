@@ -27,7 +27,7 @@ import io.github.pnoker.common.auth.entity.model.ServiceAccountDO;
 import io.github.pnoker.common.auth.repository.ReactiveServiceAccountStore;
 import io.github.pnoker.common.auth.repository.ServiceAccountFilter;
 import io.github.pnoker.common.auth.service.ReactiveTenantMembershipService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -60,7 +60,7 @@ class ReactiveServiceAccountServiceImplTest {
                                 null,
                                 null,
                                 null,
-                                new io.github.pnoker.db.r2dbc.core.page.PageRequest(20, 10, java.util.List.of()))))
+                                new io.github.pnoker.db.core.page.PageRequest(20, 10, java.util.List.of()))))
                 .assertNext(page -> {
                     assertThat(page.items()).containsExactly(bo);
                     assertThat(page.offset()).isEqualTo(20);

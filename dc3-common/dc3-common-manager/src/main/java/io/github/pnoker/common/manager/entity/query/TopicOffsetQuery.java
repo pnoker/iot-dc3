@@ -16,7 +16,7 @@
  */
 package io.github.pnoker.common.manager.entity.query;
 
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.PageRequest;
 
 /** Canonical offset query for topic projections. */
 public record TopicOffsetQuery(Long tenantId, String topic, String deviceName, long offset, int limit) {

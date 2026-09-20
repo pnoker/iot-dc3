@@ -16,7 +16,7 @@
  */
 package io.github.pnoker.common.auth.entity.query;
 
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.PageRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /** Canonical identity-audit request using signed cursor pagination. */

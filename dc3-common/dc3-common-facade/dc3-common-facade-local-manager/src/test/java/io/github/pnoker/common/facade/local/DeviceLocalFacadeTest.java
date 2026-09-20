@@ -25,7 +25,7 @@ import io.github.pnoker.common.facade.local.builder.FacadeDeviceBuilder;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.repository.DeviceFilter;
 import io.github.pnoker.common.manager.service.ReactiveDeviceService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

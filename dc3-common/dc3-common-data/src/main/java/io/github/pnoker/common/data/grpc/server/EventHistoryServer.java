@@ -30,7 +30,7 @@ import io.github.pnoker.common.data.entity.vo.EventHistoryVO;
 import io.github.pnoker.common.data.grpc.GrpcPageUtil;
 import io.github.pnoker.common.enums.EventTypeFlagEnum;
 import io.github.pnoker.common.utils.JsonUtil;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.grpc.stub.StreamObserver;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -82,7 +82,7 @@ public class EventHistoryServer extends EventHistoryApiGrpc.EventHistoryApiImplB
                     .asRuntimeException());
             return;
         }
-        io.github.pnoker.db.r2dbc.core.page.PageRequest page;
+        io.github.pnoker.db.core.page.PageRequest page;
         try {
             page = GrpcPageUtil.require(request.getPage());
         } catch (IllegalArgumentException error) {

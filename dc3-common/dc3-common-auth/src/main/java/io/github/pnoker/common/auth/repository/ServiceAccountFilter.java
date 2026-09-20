@@ -17,7 +17,7 @@
 package io.github.pnoker.common.auth.repository;
 
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.PageRequest;
 
 /** Tenant-scoped service-account filters using offset pagination. */
 public record ServiceAccountFilter(

@@ -24,7 +24,7 @@ import io.github.pnoker.common.enums.ProfileTypeEnum;
 import io.github.pnoker.common.facade.api.ProfileFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeProfileBO;
 import io.github.pnoker.common.facade.entity.query.FacadeProfileOffsetQuery;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

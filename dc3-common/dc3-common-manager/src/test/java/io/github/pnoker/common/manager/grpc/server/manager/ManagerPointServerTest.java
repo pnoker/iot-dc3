@@ -27,7 +27,7 @@ import io.github.pnoker.api.common.PageRequest;
 import io.github.pnoker.common.manager.entity.bo.PointBO;
 import io.github.pnoker.common.manager.grpc.builder.GrpcPointBuilder;
 import io.github.pnoker.common.manager.service.ReactivePointService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.grpc.stub.StreamObserver;
 import org.junit.jupiter.api.Test;
 

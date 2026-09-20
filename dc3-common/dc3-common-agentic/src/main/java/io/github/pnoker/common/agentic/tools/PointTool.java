@@ -22,7 +22,7 @@ import io.github.pnoker.common.agentic.utils.AgenticToolUtil;
 import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
 import io.github.pnoker.common.facade.entity.query.FacadePointOffsetQuery;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.model.ToolContext;

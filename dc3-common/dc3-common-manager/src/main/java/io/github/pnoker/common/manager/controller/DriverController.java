@@ -239,7 +239,7 @@ public class DriverController implements BaseController {
                                         @ExtensionProperty(name = "openWorld", value = "false")
                             }))
     @PostMapping("/list")
-    public Mono<io.github.pnoker.db.r2dbc.core.page.OffsetPage<DriverVO>> list(
+    public Mono<io.github.pnoker.db.core.page.OffsetPage<DriverVO>> list(
             @RequestBody(required = false) DriverListRequest request) {
         DriverListRequest query = request == null ? new DriverListRequest() : request;
         return getTenantId()
@@ -258,7 +258,7 @@ public class DriverController implements BaseController {
                                 query.offset(),
                                 query.limit(),
                                 query.sort()))
-                        .map(page -> new io.github.pnoker.db.r2dbc.core.page.OffsetPage<>(
+                        .map(page -> new io.github.pnoker.db.core.page.OffsetPage<>(
                                 page.items().stream()
                                         .map(driverBuilder::buildVOByBO)
                                         .toList(),

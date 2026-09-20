@@ -26,7 +26,7 @@ import io.github.pnoker.common.manager.event.metadata.MetadataEventPublisher;
 import io.github.pnoker.common.manager.repository.EventAttributeFilter;
 import io.github.pnoker.common.manager.repository.ReactiveEventAttributeStore;
 import io.github.pnoker.common.manager.service.ReactiveDriverService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

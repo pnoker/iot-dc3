@@ -17,7 +17,7 @@
 package io.github.pnoker.common.auth.repository;
 
 import io.github.pnoker.common.auth.entity.model.UserDO;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
 
 /** Persistence port for users; every tenant-scoped operation carries tenantId explicitly. */

@@ -97,9 +97,9 @@ class EventHistoryServiceImplTest {
 
         when(deviceFacade.getByIdReactive(tenantId, deviceId)).thenReturn(Mono.just(device));
         when(eventFacade.list(any()))
-                .thenReturn(Mono.just(new io.github.pnoker.db.r2dbc.core.page.OffsetPage<>(List.of(), 0, 1, 0, false)));
+                .thenReturn(Mono.just(new io.github.pnoker.db.core.page.OffsetPage<>(List.of(), 0, 1, 0, false)));
         when(eventFacade.list(any()))
-                .thenReturn(Mono.just(io.github.pnoker.db.r2dbc.core.page.OffsetPage.of(List.of(event), 0, 1, 1)));
+                .thenReturn(Mono.just(io.github.pnoker.db.core.page.OffsetPage.of(List.of(event), 0, 1, 1)));
         when(eventHistoryStore.insert(any(EventHistoryDO.class))).thenAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         String recordId = service.report(tenantId, report).block();

@@ -19,7 +19,7 @@ package io.github.pnoker.common.manager.entity.query;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.SortSpec;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

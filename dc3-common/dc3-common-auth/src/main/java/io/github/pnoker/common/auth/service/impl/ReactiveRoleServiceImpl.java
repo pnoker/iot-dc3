@@ -25,7 +25,7 @@ import io.github.pnoker.common.auth.security.PermissionCacheInvalidator;
 import io.github.pnoker.common.auth.service.ReactiveRoleService;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

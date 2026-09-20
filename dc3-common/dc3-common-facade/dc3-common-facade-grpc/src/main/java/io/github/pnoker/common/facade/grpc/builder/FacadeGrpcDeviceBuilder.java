@@ -54,7 +54,7 @@ public class FacadeGrpcDeviceBuilder {
                 .forEach(spec -> page.addSort(io.github.pnoker.api.common.SortSpec.newBuilder()
                         .setField(spec.field())
                         .setDirection(
-                                spec.direction() == io.github.pnoker.db.r2dbc.core.page.SortSpec.Direction.DESC
+                                spec.direction() == io.github.pnoker.db.core.page.SortSpec.Direction.DESC
                                         ? io.github.pnoker.api.common.SortDirection.SORT_DIRECTION_DESC
                                         : io.github.pnoker.api.common.SortDirection.SORT_DIRECTION_ASC)
                         .build()));

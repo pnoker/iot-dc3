@@ -17,8 +17,8 @@
 package io.github.pnoker.common.data.repository;
 
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.SortSpec;
 import java.util.List;
 import reactor.core.publisher.Mono;
 

@@ -343,7 +343,7 @@ public class DeviceController implements BaseController {
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
     @PostMapping("/list")
-    public Mono<io.github.pnoker.db.r2dbc.core.page.OffsetPage<DeviceVO>> list(
+    public Mono<io.github.pnoker.db.core.page.OffsetPage<DeviceVO>> list(
             @RequestBody(required = false) DeviceListRequest request) {
         DeviceListRequest query = request == null ? new DeviceListRequest() : request;
         return getTenantId()
@@ -361,7 +361,7 @@ public class DeviceController implements BaseController {
                                 query.offset(),
                                 query.limit(),
                                 query.sort()))
-                        .map(page -> new io.github.pnoker.db.r2dbc.core.page.OffsetPage<>(
+                        .map(page -> new io.github.pnoker.db.core.page.OffsetPage<>(
                                 page.items().stream()
                                         .map(deviceBuilder::buildVOByBO)
                                         .toList(),
@@ -403,7 +403,7 @@ public class DeviceController implements BaseController {
                             schema =
                                     @Schema(
                                             implementation =
-                                                    io.github.pnoker.db.r2dbc.core.operation.OperationAccepted.class)),
+                                                    io.github.pnoker.db.core.operation.OperationAccepted.class)),
             headers =
                     @Header(
                             name = HttpHeaders.LOCATION,
@@ -412,7 +412,7 @@ public class DeviceController implements BaseController {
             value = "/import",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<io.github.pnoker.db.r2dbc.core.operation.OperationAccepted>> importDevice(
+    public Mono<ResponseEntity<io.github.pnoker.db.core.operation.OperationAccepted>> importDevice(
             @Valid @RequestPart("request") DeviceImportRequest request,
             @RequestPart("file") Mono<FilePart> filePart,
             @RequestHeader(RequestConstant.Header.IDEMPOTENCY_KEY) String idempotencyKey) {

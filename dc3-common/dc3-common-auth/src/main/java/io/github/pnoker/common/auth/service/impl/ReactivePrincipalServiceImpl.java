@@ -24,7 +24,7 @@ import io.github.pnoker.common.auth.service.ReactivePrincipalService;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.builder.NotifyHistoryBuilder;
 import io.github.pnoker.common.data.entity.query.NotifyHistoryQuery;
 import io.github.pnoker.common.data.entity.vo.NotifyHistoryVO;
 import io.github.pnoker.common.data.service.NotifyHistoryService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;

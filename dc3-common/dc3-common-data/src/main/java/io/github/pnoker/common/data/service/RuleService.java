@@ -18,7 +18,7 @@ package io.github.pnoker.common.data.service;
 
 import io.github.pnoker.common.data.entity.bo.RuleBO;
 import io.github.pnoker.common.data.entity.query.RuleQuery;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import reactor.core.publisher.Mono;
 
 /** Reactive business service for tenant-scoped alarm rules. */

@@ -27,7 +27,7 @@ import io.github.pnoker.common.facade.api.EventFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeEventBO;
 import io.github.pnoker.common.facade.entity.query.FacadeEventOffsetQuery;
 import io.github.pnoker.common.facade.grpc.builder.FacadeGrpcEventBuilder;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;

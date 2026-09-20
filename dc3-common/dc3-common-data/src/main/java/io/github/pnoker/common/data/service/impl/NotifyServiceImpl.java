@@ -29,8 +29,8 @@ import io.github.pnoker.common.exception.DeleteException;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.UpdateException;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.PageRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -138,7 +138,7 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     private PageRequest page(
-            long offset, int limit, java.util.List<io.github.pnoker.db.r2dbc.core.page.SortSpec> sort) {
+            long offset, int limit, java.util.List<io.github.pnoker.db.core.page.SortSpec> sort) {
         return new PageRequest(offset, limit, sort);
     }
 

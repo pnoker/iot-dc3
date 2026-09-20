@@ -22,7 +22,7 @@ import io.github.pnoker.common.auth.repository.IdentityAuditLogFilter;
 import io.github.pnoker.common.auth.service.ReactiveAuditLogService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
-import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import io.github.pnoker.db.core.page.CursorPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;

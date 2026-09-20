@@ -25,7 +25,7 @@ import io.github.pnoker.common.auth.entity.builder.RoleBuilder;
 import io.github.pnoker.common.auth.entity.model.RoleDO;
 import io.github.pnoker.common.auth.repository.ReactiveRoleStore;
 import io.github.pnoker.common.auth.repository.RoleFilter;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,7 +54,7 @@ class ReactiveRoleServiceImplTest {
                                 null,
                                 null,
                                 null,
-                                new io.github.pnoker.db.r2dbc.core.page.PageRequest(10, 5, List.of()))))
+                                new io.github.pnoker.db.core.page.PageRequest(10, 5, List.of()))))
                 .assertNext(p -> {
                     assertThat(p.items()).containsExactly(bo);
                     assertThat(p.offset()).isEqualTo(10);

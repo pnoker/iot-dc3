@@ -28,7 +28,7 @@ import io.github.pnoker.common.manager.biz.DriverLeaseService;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.grpc.builder.GrpcDeviceBuilder;
 import io.github.pnoker.common.manager.service.ReactiveDeviceService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.grpc.ManagedChannel;
 import io.grpc.Server;
 import io.grpc.Status;

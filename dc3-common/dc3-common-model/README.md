@@ -46,7 +46,7 @@ Used with `@Validated(...)` in controllers:
 - Domain-specific `*Ext` classes — JSON extension-column shapes
 
 `RequestHeader`, `PageRequest`, `OffsetPage`, `CursorPage`, `TreeNode`, and `TenantOwned` belong to `dc3-common-public` or
-`dc3-db-r2dbc-core`, not this module. Shared
+`dc3-db-core`, not this module. Shared
 top-level enums belong to `dc3-common-constant` and are referenced by model fields where appropriate.
 
 ## Usage Example

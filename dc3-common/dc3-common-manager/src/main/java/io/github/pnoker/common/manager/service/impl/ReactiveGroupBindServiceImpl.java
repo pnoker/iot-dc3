@@ -24,7 +24,7 @@ import io.github.pnoker.common.manager.repository.BindingFilter;
 import io.github.pnoker.common.manager.repository.ReactiveGroupBindStore;
 import io.github.pnoker.common.manager.repository.ReactiveGroupStore;
 import io.github.pnoker.common.manager.service.ReactiveGroupBindService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;

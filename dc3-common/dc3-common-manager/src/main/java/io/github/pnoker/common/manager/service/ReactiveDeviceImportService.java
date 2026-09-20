@@ -18,7 +18,7 @@ package io.github.pnoker.common.manager.service;
 
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.operation.OperationView;
-import io.github.pnoker.db.r2dbc.core.operation.OperationAccepted;
+import io.github.pnoker.db.core.operation.OperationAccepted;
 import java.util.UUID;
 import reactor.core.publisher.Mono;
 

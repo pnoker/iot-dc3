@@ -16,8 +16,8 @@
  */
 package io.github.pnoker.common.auth.support;
 
-import io.github.pnoker.db.r2dbc.core.cursor.CursorState;
-import io.github.pnoker.db.r2dbc.core.cursor.SignedCursorCodec;
+import io.github.pnoker.db.core.cursor.CursorState;
+import io.github.pnoker.db.core.cursor.SignedCursorCodec;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;

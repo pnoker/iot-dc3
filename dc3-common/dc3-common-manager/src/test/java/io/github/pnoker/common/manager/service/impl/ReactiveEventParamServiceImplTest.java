@@ -28,7 +28,7 @@ import io.github.pnoker.common.manager.repository.ReactiveEventParamStore;
 import io.github.pnoker.common.manager.service.ReactiveDeviceService;
 import io.github.pnoker.common.manager.service.ReactiveDriverService;
 import io.github.pnoker.common.manager.service.ReactiveEventService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

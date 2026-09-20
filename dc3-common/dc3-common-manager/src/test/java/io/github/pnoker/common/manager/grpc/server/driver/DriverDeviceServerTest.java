@@ -49,7 +49,7 @@ import io.github.pnoker.common.manager.service.ReactiveEventAttributeConfigServi
 import io.github.pnoker.common.manager.service.ReactiveEventService;
 import io.github.pnoker.common.manager.service.ReactivePointAttributeConfigService;
 import io.github.pnoker.common.manager.service.ReactivePointService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.grpc.stub.StreamObserver;
 import java.util.List;
 import org.junit.jupiter.api.Test;

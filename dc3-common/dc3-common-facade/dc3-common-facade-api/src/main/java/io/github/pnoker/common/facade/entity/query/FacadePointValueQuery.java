@@ -16,8 +16,8 @@
  */
 package io.github.pnoker.common.facade.entity.query;
 
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.PageRequest;
+import io.github.pnoker.db.core.page.SortSpec;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;

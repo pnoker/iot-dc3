@@ -27,7 +27,7 @@ import io.github.pnoker.common.auth.entity.bo.UserBO;
 import io.github.pnoker.common.auth.entity.builder.UserBuilder;
 import io.github.pnoker.common.auth.entity.model.UserDO;
 import io.github.pnoker.common.auth.service.ReactiveUserService;
-import io.github.pnoker.db.r2dbc.core.dialect.StandardR2dbcDialect;
+import io.github.pnoker.db.core.dialect.StandardR2dbcDialect;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -139,7 +139,7 @@ class ReactiveUserCommandServiceImplTest {
         return new ReactiveUserCommandServiceImpl(
                 databaseClient,
                 transactionalOperator,
-                new io.github.pnoker.db.r2dbc.core.dialect.StandardR2dbcDialect("postgres", "public.fingerprint"),
+                new io.github.pnoker.db.core.dialect.StandardR2dbcDialect("postgres", "public.fingerprint"),
                 reactiveUserService,
                 userBuilder);
     }

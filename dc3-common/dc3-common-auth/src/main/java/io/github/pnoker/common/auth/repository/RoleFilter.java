@@ -17,7 +17,7 @@
 package io.github.pnoker.common.auth.repository;
 
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.PageRequest;
 
 /** Tenant-scoped role filters with offset pagination. */
 public record RoleFilter(Long tenantId, String roleName, String roleCode, EnableFlagEnum enableFlag, PageRequest page) {

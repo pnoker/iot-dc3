@@ -49,10 +49,10 @@
         </dependency>
         <dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-r2dbc-runtime</artifactId>
+            <artifactId>dc3-db-runtime</artifactId>
         </dependency><dependency>
             <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-postgres-agentic</artifactId>
+            <artifactId>dc3-db-agentic</artifactId>
         </dependency>
         <!-- Agentic domain logic (controllers, tools, config) -->
         <dependency>

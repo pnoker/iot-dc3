@@ -26,7 +26,7 @@ import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.facade.api.PointCommandFacade;
 import io.github.pnoker.common.utils.UuidV7;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;

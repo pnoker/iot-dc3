@@ -31,7 +31,7 @@ import io.github.pnoker.common.auth.repository.ReactiveMenuStore;
 import io.github.pnoker.common.auth.repository.ReactiveResourceStore;
 import io.github.pnoker.common.exception.DuplicateException;
 import io.github.pnoker.common.exception.RequestException;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.PageRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

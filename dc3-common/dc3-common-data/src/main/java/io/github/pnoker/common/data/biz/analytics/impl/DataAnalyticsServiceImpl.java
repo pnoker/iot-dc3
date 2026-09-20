@@ -41,7 +41,7 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesLastSeen;
 import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
 import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
 import io.github.pnoker.common.tsdb.model.TsdbModel.WindowAggregate;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;

@@ -26,7 +26,7 @@ import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AuthConstant;
 import io.github.pnoker.common.valid.Add;
 import io.github.pnoker.common.valid.Update;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -199,7 +199,7 @@ public class RoleController implements BaseController {
                                 q.roleName(),
                                 q.roleCode(),
                                 q.enableFlag(),
-                                new io.github.pnoker.db.r2dbc.core.page.PageRequest(q.offset(), q.limit(), q.sort())))
+                                new io.github.pnoker.db.core.page.PageRequest(q.offset(), q.limit(), q.sort())))
                         .map(page -> ResponseEntity.ok(OffsetPage.of(
                                 page.items().stream()
                                         .map(roleBuilder::buildVOByBO)
@@ -233,7 +233,7 @@ public class RoleController implements BaseController {
                                 q.roleName(),
                                 q.roleCode(),
                                 q.enableFlag(),
-                                new io.github.pnoker.db.r2dbc.core.page.PageRequest(0, 200, q.sort())))
+                                new io.github.pnoker.db.core.page.PageRequest(0, 200, q.sort())))
                         .map(roleBuilder::buildTreeVOByBO)
                         .collectList()
                         .map(ResponseEntity::ok));

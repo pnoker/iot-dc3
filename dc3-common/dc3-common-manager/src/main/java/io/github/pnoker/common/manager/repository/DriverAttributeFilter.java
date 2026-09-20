@@ -18,7 +18,7 @@ package io.github.pnoker.common.manager.repository;
 
 import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
-import io.github.pnoker.db.r2dbc.core.page.SortSpec;
+import io.github.pnoker.db.core.page.SortSpec;
 import java.util.List;
 import java.util.Set;
 

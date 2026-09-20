@@ -19,7 +19,7 @@ package io.github.pnoker.common.agentic.repository;
 import io.github.pnoker.common.agentic.entity.bo.ActionBO;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticActionStatusEnum;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.time.Instant;
 import reactor.core.publisher.Mono;
 

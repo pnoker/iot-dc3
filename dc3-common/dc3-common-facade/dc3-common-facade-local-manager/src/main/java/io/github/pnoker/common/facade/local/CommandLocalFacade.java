@@ -23,7 +23,7 @@ import io.github.pnoker.common.facade.entity.query.FacadeCommandOffsetQuery;
 import io.github.pnoker.common.facade.local.builder.FacadeCommandBuilder;
 import io.github.pnoker.common.manager.repository.CommandFilter;
 import io.github.pnoker.common.manager.service.ReactiveCommandService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;

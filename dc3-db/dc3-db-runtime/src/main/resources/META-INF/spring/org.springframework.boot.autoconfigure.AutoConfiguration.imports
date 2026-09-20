@@ -1,0 +1,2 @@
+io.github.pnoker.db.runtime.config.R2dbcRuntimeAutoConfiguration
+io.github.pnoker.db.runtime.dialect.PostgresR2dbcDialectConfiguration

@@ -17,8 +17,8 @@
 package io.github.pnoker.common.data.biz;
 
 import io.github.pnoker.common.data.entity.vo.dashboard.*;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.PageRequest;
 import java.util.List;
 import reactor.core.publisher.Mono;
 

@@ -80,12 +80,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- PostgreSQL is the single supported relational engine; its dialect ships unconditionally. -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-db-r2dbc-postgres</artifactId>
-            <scope>runtime</scope>
-        </dependency>
     </dependencies>
 
     <build>

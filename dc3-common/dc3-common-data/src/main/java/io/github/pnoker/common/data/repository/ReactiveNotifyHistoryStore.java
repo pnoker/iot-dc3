@@ -19,8 +19,8 @@ package io.github.pnoker.common.data.repository;
 import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 import io.github.pnoker.common.enums.NotifyChannelTypeEnum;
 import io.github.pnoker.common.enums.NotifyHistoryStatusEnum;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.PageRequest;
 import reactor.core.publisher.Mono;
 
 /** Reactive tenant-scoped persistence for notification delivery history. */

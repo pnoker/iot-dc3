@@ -22,7 +22,7 @@ import io.github.pnoker.common.data.entity.builder.RuleStateBuilder;
 import io.github.pnoker.common.data.entity.query.RuleStateQuery;
 import io.github.pnoker.common.data.entity.vo.RuleStateVO;
 import io.github.pnoker.common.data.service.RuleStateService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;

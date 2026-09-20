@@ -18,8 +18,8 @@ package io.github.pnoker.common.auth.repository;
 
 import io.github.pnoker.common.auth.entity.oauth.McpAuditCommand;
 import io.github.pnoker.common.auth.entity.oauth.McpToolRecord;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
-import io.github.pnoker.db.r2dbc.core.page.PageRequest;
+import io.github.pnoker.db.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.PageRequest;
 import reactor.core.publisher.Mono;
 
 /** Reactive query port for MCP administration projections. */

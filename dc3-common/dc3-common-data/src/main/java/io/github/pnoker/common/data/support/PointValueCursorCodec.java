@@ -18,8 +18,8 @@ package io.github.pnoker.common.data.support;
 
 import io.github.pnoker.common.tsdb.model.TsdbModel.Cursor;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
-import io.github.pnoker.db.r2dbc.core.cursor.CursorState;
-import io.github.pnoker.db.r2dbc.core.cursor.SignedCursorCodec;
+import io.github.pnoker.db.core.cursor.CursorState;
+import io.github.pnoker.db.core.cursor.SignedCursorCodec;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;

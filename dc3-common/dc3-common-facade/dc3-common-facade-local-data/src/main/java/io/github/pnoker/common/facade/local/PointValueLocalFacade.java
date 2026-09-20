@@ -22,7 +22,7 @@ import io.github.pnoker.common.facade.api.PointValueFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadePointValueBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointVolumeBO;
 import io.github.pnoker.common.facade.local.builder.FacadePointValueBuilder;
-import io.github.pnoker.db.r2dbc.core.page.CursorPage;
+import io.github.pnoker.db.core.page.CursorPage;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

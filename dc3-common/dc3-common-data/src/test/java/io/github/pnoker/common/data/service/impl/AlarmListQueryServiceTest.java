@@ -31,7 +31,7 @@ import io.github.pnoker.common.data.entity.query.NotifyQuery;
 import io.github.pnoker.common.data.entity.query.RuleQuery;
 import io.github.pnoker.common.data.repository.ReactiveNotifyAdminStore;
 import io.github.pnoker.common.data.repository.ReactiveRuleStore;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -85,7 +85,7 @@ class AlarmListQueryServiceTest {
     @Test
     void alarmListQueriesAllowMissingOptionalFilters() {
         Mockito.when(ruleStore.list(
-                        1L, null, null, null, null, null, new io.github.pnoker.db.r2dbc.core.page.PageRequest(0, 50)))
+                        1L, null, null, null, null, null, new io.github.pnoker.db.core.page.PageRequest(0, 50)))
                 .thenReturn(Mono.just(OffsetPage.of(java.util.List.of(), 0, 50, 0)));
         OffsetPage<?> empty = OffsetPage.of(java.util.List.of(), 0, 50, 0);
         Mockito.lenient()

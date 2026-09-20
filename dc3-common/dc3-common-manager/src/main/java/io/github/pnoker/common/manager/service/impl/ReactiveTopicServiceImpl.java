@@ -25,7 +25,7 @@ import io.github.pnoker.common.manager.repository.DeviceFilter;
 import io.github.pnoker.common.manager.service.ReactiveDeviceService;
 import io.github.pnoker.common.manager.service.ReactivePointService;
 import io.github.pnoker.common.manager.service.ReactiveTopicService;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

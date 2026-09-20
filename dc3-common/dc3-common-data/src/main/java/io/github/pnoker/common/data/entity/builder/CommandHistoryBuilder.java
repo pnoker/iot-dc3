@@ -21,7 +21,7 @@ import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.data.entity.vo.CommandCallVO;
 import io.github.pnoker.common.data.entity.vo.CommandHistoryVO;
 import io.github.pnoker.common.utils.MapStructUtil;
-import io.github.pnoker.db.r2dbc.core.page.OffsetPage;
+import io.github.pnoker.db.core.page.OffsetPage;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
