@@ -43,8 +43,11 @@
 
     <div ref="chartRef" class="topology-sankey__canvas"></div>
 
-    <template #footer>
-      <span>{{
+    <!-- Footer follows the family contract: refresh stamp on the left
+         (auto-recorded by DashboardCard), explanatory cluster on the
+         right — entity digest plus the volume-mode window chip. -->
+    <template #footer-meta>
+      <span class="topology-sankey__summary">{{
         $t("home.topology.summary", {
           driver: stats.driverCount,
           device: stats.deviceCount,
@@ -52,17 +55,11 @@
           point: stats.pointCount,
         })
       }}</span>
-      <span class="topology-sankey__footer-right">
-        <span
-          v-if="mode === 'volume' && stats.rangeLabel"
-          class="topology-sankey__range"
-        >
-          {{ $t("home.topology.volumeWindow", { range: stats.rangeLabel }) }}
-        </span>
-        <span v-if="updatedLabel">{{
-          $t("home.liveFeed.updatedAt", { time: updatedLabel })
-        }}</span>
-        <span v-else>-</span>
+      <span
+        v-if="mode === 'volume' && stats.rangeLabel"
+        class="topology-sankey__range"
+      >
+        {{ $t("home.topology.volumeWindow", { range: stats.rangeLabel }) }}
       </span>
     </template>
   </dashboard-card>
@@ -124,7 +121,6 @@ const router = useRouter();
 
 const chartRef = ref<HTMLElement>();
 const data = shallowRef<TopologyResponse | null>(null);
-const lastRefreshed = ref<string>("");
 
 // Cardinality = "who is wired to what" (structural count).
 // Volume = "how much data flowed" (point_value samples over rangeKey).
@@ -174,14 +170,6 @@ const stats = computed<TopologyStats>(
       profileCount: 0,
       pointCount: 0,
     },
-);
-const updatedLabel = computed(() =>
-  lastRefreshed.value
-    ? new Date(lastRefreshed.value).toLocaleTimeString(
-        locale.value === "zh" ? "zh-CN" : "en-US",
-        { hour12: false },
-      )
-    : "",
 );
 
 // Per-layer colour matching the LiveDataFeed driver/device/point palette
@@ -397,7 +385,6 @@ const load = async () => {
     apply: (result) => {
       const next = result ?? emptyPayload();
       data.value = next;
-      lastRefreshed.value = new Date().toISOString();
       if (next.nodes.length === 0) destroyChart();
     },
   });
@@ -491,24 +478,27 @@ onUnmounted(destroyChart);
     overflow: hidden;
   }
 
-  // Footer right cluster — "Volume: 7d" chip + "Updated at ..." time.
-  // Grouped into a flex span so the three-item footer (counts left,
-  // chip+time right) still obeys DashboardCard's space-between layout.
-  .topology-sankey__footer-right {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--dc3-space-2);
+  // Footer meta cluster — entity digest + "Volume: 7d" chip on the right
+  // side of the standard footer. The digest ellipsizes so a long tenant
+  // name list can't push the chip (or the left-side time stamp) away.
+  .topology-sankey__summary {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .topology-sankey__range {
     display: inline-flex;
     align-items: center;
+    flex-shrink: 0;
     padding: 1px 8px;
-    border-radius: 10px;
+    border-radius: var(--dc3-radius-full);
     background: rgba(230, 162, 60, 0.12); // profile-column orange tint
     color: #e6a23c;
     font-weight: 500;
     font-size: 11px;
+    white-space: nowrap;
   }
 }
 </style>

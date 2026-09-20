@@ -23,6 +23,13 @@
   state, badge, autoRefresh interval picker), so individual cards stay
   focused on their body markup and business logic.
 
+  The footer is part of the family contract, not an opt-in: left side is
+  the data freshness stamp ("Updated at HH:mm:ss"), recorded automatically
+  every time `loading` settles without `error`; right side carries an
+  explanatory line (`footerMeta` prop or the `footer-meta` slot — ranking
+  rules, window hints, count digests). Pass `:footer="false"` to drop the
+  strip entirely, or fill the legacy `footer` slot to replace both sides.
+
   Height is fixed 440 by default — the value the comments in TrendChart /
   LatencyChart call out as the "family baseline". Fixed-over-flexible is
   deliberate: el-row's align-items:stretch lets a tall LiveFeed content
@@ -93,18 +100,23 @@
       </div>
     </div>
 
-    <div v-if="hasFooter" class="dashboard-card__footer">
-      <slot name="footer"/>
+    <div v-if="showFooter" class="dashboard-card__footer">
+      <slot name="footer">
+        <span class="dashboard-card__footer-time">{{ footerTimeLabel }}</span>
+        <span class="dashboard-card__footer-meta">
+          <slot name="footer-meta">{{ footerMeta }}</slot>
+        </span>
+      </slot>
     </div>
   </el-card>
 </template>
 
 <script lang="ts" setup>
-import {computed, onUnmounted, useSlots, watch} from 'vue';
+import {computed, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Refresh} from '@element-plus/icons-vue';
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 
 /**
  *
@@ -166,6 +178,10 @@ const props = withDefaults(
     autoRefresh?: AutoRefreshOption[];
     /** v-model target for the autoRefresh segmented (ms; 0 = off). */
     interval?: number;
+    /** Right-aligned explanatory line in the standard footer (ranking rule, window hint, digest). */
+    footerMeta?: string;
+    /** Master switch for the standard footer. Only the legacy `footer` slot can fully replace it. */
+    footer?: boolean;
   }>(),
   {
     title: '',
@@ -183,6 +199,8 @@ const props = withDefaults(
     refreshable: true,
     autoRefresh: undefined,
     interval: 0,
+    footerMeta: '',
+    footer: true,
   }
 );
 
@@ -191,9 +209,31 @@ const emit = defineEmits<{
   (e: 'update:interval', value: number): void;
 }>();
 
+const showFooter = computed(() => props.footer !== false);
 
-const slots = useSlots();
-const hasFooter = computed(() => !!slots.footer);
+// ---- footer freshness stamp --------------------------------------------
+// Recorded whenever a load settles successfully (loading true → false with
+// no error). Consumers don't track their own "lastRefreshed" — manual
+// refreshes, autoRefresh polls and tab/range reloads all funnel through
+// the same `loading` cycle, so the stamp stays correct for every trigger.
+// A failed load keeps the previous stamp: the body still shows the last
+// good data, so the time it arrived is still the honest label.
+const lastRefreshed = ref<number | null>(null);
+watch(
+  () => props.loading,
+  (next, prev) => {
+    if (prev && !next && !props.error) lastRefreshed.value = Date.now();
+  }
+);
+
+const footerTimeLabel = computed(() => {
+  if (lastRefreshed.value === null) return '—';
+  const time = new Date(lastRefreshed.value).toLocaleTimeString(
+    locale.value === 'zh' ? 'zh-CN' : 'en-US',
+    {hour12: false}
+  );
+  return t('common.updatedAt', {time});
+});
 
 const rootStyle = computed(() => {
   if (props.height === 'auto') {
@@ -396,10 +436,9 @@ defineExpose({
   }
 
   // ---- footer ----------------------------------------------------------
-  // Opt-in bar beneath the body. Matches LiveFeed's "updated at + rows"
-  // look: 8/16 padding, secondary text, light top border and subtle bg.
-  // Consumers lay out content with a pair of <span>s — flex space-between
-  // handles the rest.
+  // Standard strip beneath the body: time on the left (auto-recorded
+  // freshness stamp), explanatory meta on the right. 8/16 padding,
+  // secondary text, light top border and subtle bg.
   .dashboard-card__footer {
     display: flex;
     justify-content: space-between;
@@ -411,6 +450,24 @@ defineExpose({
     border-top: 1px solid var(--dc3-border-base);
     background: var(--dc3-bg-muted);
     flex-shrink: 0;
+  }
+
+  .dashboard-card__footer-time {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  // Right cluster hosts either the footerMeta prop text or a caller-filled
+  // footer-meta slot (TopologySankey stacks a digest + a window chip), so
+  // it lays out as a right-aligned inline flex that can ellipsize.
+  .dashboard-card__footer-meta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--dc3-space-2);
+    min-width: 0;
+    overflow: hidden;
+    text-align: right;
   }
 
   // ---- variant: tabs ---------------------------------------------------

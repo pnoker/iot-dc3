@@ -21,6 +21,7 @@
     :empty-text="$t('home.latency.empty')"
     :error="status === 'error'"
     :error-text="$t('common.loadFailed')"
+    :footer-meta="$t('home.latency.footer')"
     :loading="loading"
     :retry-text="$t('common.retry')"
     :title="$t('home.latency.title')"

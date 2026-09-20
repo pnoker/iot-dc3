@@ -22,6 +22,9 @@
     :empty-text="$t('home.alertList.empty')"
     :error="status === 'error'"
     :error-text="$t('common.loadFailed')"
+    :footer-meta="
+      status === 'success' ? $t('home.alertList.footer', {total: stats.total, n: stats.unconfirmed}) : ''
+    "
     :loading="loading"
     :retry-text="$t('common.retry')"
     :title="$t('home.alertList.title')"

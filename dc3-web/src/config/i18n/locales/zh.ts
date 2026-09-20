@@ -70,6 +70,7 @@ export default {
     refresh: '刷新',
     autoRefresh: '自动刷新',
     lastRefreshTime: '上次刷新',
+    updatedAt: '更新于 {time}',
     sort: '排序',
     enable: '启用',
     disable: '停用',
@@ -298,11 +299,11 @@ export default {
     vsYesterday: '较昨日',
     trendTitle: '数据采集趋势',
     trendEmpty: '该时间范围暂无采集数据',
+    trendFooter: '按所选时间范围聚合的位号采集数据量',
     liveFeed: {
       title: '实时位号数据流',
       intervalOff: '关闭',
       empty: '暂无数据',
-      updatedAt: '更新于 {time}',
       rows: '显示 {n} 条',
     },
     tabs: {
@@ -339,6 +340,7 @@ export default {
       title: '最新告警',
       viewAll: '查看全部',
       empty: '暂无告警',
+      footer: '共 {total} 条 · 未确认 {n} 条',
       sourceDevice: '设备',
       sourceDriver: '驱动',
       sourcePoint: '点位',
@@ -346,6 +348,7 @@ export default {
     latency: {
       title: '数据延迟分布',
       empty: '该时间范围暂无延迟样本',
+      footer: '位号数据入库延迟按区间分桶统计',
       bin: {
         under100ms: '<100ms',
         '100to500ms': '100-500ms',
@@ -358,6 +361,7 @@ export default {
     activity: {
       title: '小时数据活跃度',
       empty: '该时间范围暂无活跃数据',
+      footer: '按星期 × 小时统计的采集活跃度',
       count: '数据条数',
       dow: {sun: '周日', mon: '周一', tue: '周二', wed: '周三', thu: '周四', fri: '周五', sat: '周六'},
     },

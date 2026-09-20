@@ -39,13 +39,17 @@
       <range-segmented v-if="isTopTab" v-model="rangeKey" size="small"/>
     </template>
 
-    <!-- Caption line — spells out the ranking rule and (for top-N tabs) the
-         active time range, so the chart is never ambiguous about what it's
-         measuring or how it's sorted. -->
-    <div class="analytics-tabs__caption">{{ caption }}</div>
     <div class="analytics-tabs__chart-wrap">
       <div ref="chartRef" class="analytics-tabs__chart"></div>
     </div>
+
+    <!-- Caption line — spells out the ranking rule and (for top-N tabs) the
+         active time range, so the chart is never ambiguous about what it's
+         measuring or how it's sorted. Lives in the footer's meta side per
+         the family-wide "time left, explanation right" contract. -->
+    <template #footer-meta>
+      <span class="analytics-tabs__caption">{{ caption }}</span>
+    </template>
   </dashboard-card>
 </template>
 
@@ -335,13 +339,13 @@ onUnmounted(() => disposeChart());
     min-width: 0;
   }
 
-  // Caption lives between the tab bar and the chart — tight vertical
-  // rhythm (8px below tabs, 4px above chart) so it feels attached to the
-  // tab rather than floating in the card body.
+  // Caption lives in the footer's meta slot; the footer is a one-line
+  // strip, so a long caption must ellipsize instead of wrapping.
   .analytics-tabs__caption {
-    font-size: 12px;
-    color: #909399;
-    padding: var(--dc3-space-2) var(--dc3-space-4) var(--dc3-space-1);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .analytics-tabs__chart-wrap {

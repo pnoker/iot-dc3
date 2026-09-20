@@ -67,12 +67,16 @@
     <div class="stat-card__spark">
       <mini-area-chart :color="accentColor" :data="sparkline" :height="40"/>
     </div>
+    <!-- Freshness stamp, revealed on hover exactly like the refresh button
+         (opacity swap, always-reserved height so the card never jumps).
+         Repeats the same left-time convention as DashboardCard's footer. -->
+    <div class="stat-card__footer">{{ refreshedLabel }}</div>
   </el-card>
 </template>
 
 <script lang="ts" setup>
 import type {Component, PropType} from 'vue';
-import {computed, ref} from 'vue';
+import {computed, ref, watch} from 'vue';
 import {CaretBottom, CaretTop, Minus, Refresh} from '@element-plus/icons-vue';
 
 import MiniAreaChart from '@/components/chart/MiniAreaChart.vue';
@@ -123,6 +127,28 @@ const doRefresh = async () => {
     refreshing.value = false;
   }
 };
+
+// Freshness stamp for the hover footer. The parent drives both the initial
+// load and card-level refreshes through the same loading/error props, so
+// watching them here covers every trigger (initial mount, manual refresh
+// button) without per-card plumbing. A failed load keeps the previous
+// stamp — the value shown is still the last good one.
+const refreshedAt = ref<number | null>(null);
+watch(
+  () => props.loading,
+  (next, prev) => {
+    if (prev && !next && !props.error) refreshedAt.value = Date.now();
+  }
+);
+
+const refreshedLabel = computed(() => {
+  if (refreshedAt.value === null) return '—';
+  const time = new Date(refreshedAt.value).toLocaleTimeString(
+    i18n.global.locale.value === 'zh' ? 'zh-CN' : 'en-US',
+    {hour12: false}
+  );
+  return i18n.global.t('common.updatedAt', {time});
+});
 
 const formattedValue = computed(() => {
   const v = Number(props.value);
@@ -343,6 +369,33 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
     height: 40px;
     margin-top: auto;
     padding-top: 8px;
+  }
+
+  // Hover-revealed freshness line — same reveal contract as the refresh
+  // button above: hidden until the card is hovered, always visible where
+  // hover doesn't exist (touch) or space is scarce (xs). Height is always
+  // reserved so hovering never changes the card's layout.
+  .stat-card__footer {
+    height: 16px;
+    margin-top: 2px;
+    font-size: 11px;
+    line-height: 16px;
+    color: var(--dc3-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+
+  &:hover .stat-card__footer {
+    opacity: 1;
+  }
+
+  @media (max-width: $breakpoint-xs-max), (pointer: coarse) {
+    .stat-card__footer {
+      opacity: 1;
+    }
   }
 
   @keyframes stat-card-skeleton {

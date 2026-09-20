@@ -127,11 +127,48 @@ describe('DashboardCard', () => {
     expect(wrapper.emitted('refresh')).toHaveLength(2);
   });
 
-  it('hides the footer wrapper when no footer slot is provided, and shows it when present', () => {
-    const noFooter = mountDashboard({title: 'X'});
-    expect(noFooter.find('.dashboard-card__footer').exists()).toBe(false);
+  it('renders the standard footer by default, and drops it only when footer=false', () => {
+    const wrapper = mountDashboard({title: 'X'});
+    expect(wrapper.find('.dashboard-card__footer').exists()).toBe(true);
+    // No load has settled yet → the time side shows the empty marker.
+    expect(wrapper.get('.dashboard-card__footer-time').text()).toBe('—');
 
-    const withFooter = mountDashboard({title: 'X'}, {footer: '<span class="ftr">last sync 5s ago</span>'});
-    expect(withFooter.find('.dashboard-card__footer .ftr').exists()).toBe(true);
+    const hidden = mountDashboard({title: 'X', footer: false});
+    expect(hidden.find('.dashboard-card__footer').exists()).toBe(false);
+  });
+
+  it('lets the legacy footer slot take over both footer sides', () => {
+    const wrapper = mountDashboard({title: 'X'}, {footer: '<span class="ftr">last sync 5s ago</span>'});
+    expect(wrapper.find('.dashboard-card__footer .ftr').exists()).toBe(true);
+    expect(wrapper.find('.dashboard-card__footer-time').exists()).toBe(false);
+  });
+
+  it('stamps the footer time when loading settles without error, and keeps it on a failed load', async () => {
+    const wrapper = mountDashboard({title: 'X'});
+    const stampAt = () => {
+      const localeValue = i18n.global.locale.value;
+      const time = new Date(Date.now()).toLocaleTimeString(localeValue === 'zh' ? 'zh-CN' : 'en-US', {
+        hour12: false,
+      });
+      return i18n.global.t('common.updatedAt', {time});
+    };
+
+    await wrapper.setProps({loading: true});
+    vi.setSystemTime(new Date('2026-01-01T08:30:00'));
+    await wrapper.setProps({loading: false});
+    const goodStamp = stampAt();
+    expect(wrapper.get('.dashboard-card__footer-time').text()).toBe(goodStamp);
+
+    // A load that fails must not move the stamp — the body still shows the
+    // last good data, so the previous time remains the honest label.
+    await wrapper.setProps({loading: true});
+    vi.setSystemTime(new Date('2026-01-01T09:45:00'));
+    await wrapper.setProps({loading: false, error: true});
+    expect(wrapper.get('.dashboard-card__footer-time').text()).toBe(goodStamp);
+  });
+
+  it('renders footerMeta on the meta side of the standard footer', () => {
+    const wrapper = mountDashboard({title: 'X', footerMeta: 'ranked by write volume'});
+    expect(wrapper.get('.dashboard-card__footer-meta').text()).toBe('ranked by write volume');
   });
 });

@@ -21,6 +21,7 @@
     :empty-text="$t('home.trendEmpty')"
     :error="status === 'error'"
     :error-text="$t('common.loadFailed')"
+    :footer-meta="$t('home.trendFooter')"
     :loading="loading"
     :retry-text="$t('common.retry')"
     :title="$t('home.trendTitle')"

@@ -70,6 +70,7 @@ export default {
     refresh: 'Refresh',
     autoRefresh: 'Auto-refresh',
     lastRefreshTime: 'Last refresh',
+    updatedAt: 'Updated at {time}',
     sort: 'Sort',
     enable: 'Enable',
     disable: 'Disable',
@@ -303,11 +304,11 @@ export default {
     vsYesterday: 'vs yesterday',
     trendTitle: 'Data Ingestion Trend',
     trendEmpty: 'No ingestion data for this range',
+    trendFooter: 'Point value ingestion aggregated over the selected range',
     liveFeed: {
       title: 'Live Point Value Feed',
       intervalOff: 'Off',
       empty: 'No data yet',
-      updatedAt: 'Updated at {time}',
       rows: '{n} rows',
     },
     tabs: {
@@ -345,6 +346,7 @@ export default {
       title: 'Recent Alarms',
       viewAll: 'View all',
       empty: 'No alarms',
+      footer: '{total} total · {n} unconfirmed',
       sourceDevice: 'Device',
       sourceDriver: 'Driver',
       sourcePoint: 'Point',
@@ -352,6 +354,7 @@ export default {
     latency: {
       title: 'Data Latency Distribution',
       empty: 'No latency samples for this range',
+      footer: 'Ingestion latency bucketed by delay interval',
       bin: {
         under100ms: '<100ms',
         '100to500ms': '100-500ms',
@@ -364,6 +367,7 @@ export default {
     activity: {
       title: 'Hourly Data Activity',
       empty: 'No activity data for this range',
+      footer: 'Ingestion activity by weekday × hour',
       count: 'Records',
       dow: {sun: 'Sun', mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat'},
     },

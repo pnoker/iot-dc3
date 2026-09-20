@@ -57,9 +57,7 @@
       </el-timeline-item>
     </el-timeline>
 
-    <template #footer>
-      <span v-if="lastRefreshed">{{ $t('home.liveFeed.updatedAt', {time: formatTime(lastRefreshed)}) }}</span>
-      <span v-else>-</span>
+    <template #footer-meta>
       <span>{{ $t('home.liveFeed.rows', {n: rows.length}) }}</span>
     </template>
   </dashboard-card>
@@ -97,7 +95,6 @@ const {t, locale} = useI18n();
 
 const {loading, run, status} = useAsyncLoader();
 const rows = ref<Row[]>([]);
-const lastRefreshed = ref<string>('');
 const intervalMs = ref(0);
 
 const intervalOptions = computed(() => [
@@ -114,7 +111,6 @@ const refresh = async () => {
   await run(() => streamLatest(props.size), {
     apply: (res) => {
       rows.value = Array.isArray(res) ? res : [];
-      lastRefreshed.value = new Date().toISOString();
     },
   });
 };

@@ -19,6 +19,7 @@ import {flushPromises, mount} from '@vue/test-utils';
 import {describe, expect, it, vi} from 'vitest';
 
 import StatCard from '@/components/card/stat/StatCard.vue';
+import i18n from '@/config/i18n';
 
 import {createElButtonStub, layoutStubs} from '../setup/stubs/element-plus'; // MiniAreaChart drags @antv/g2 in. We stub it because the StatCard
 
@@ -109,5 +110,34 @@ describe('StatCard', () => {
     const chart = wrapper.find('.mini-chart-stub');
     expect(chart.attributes('data-color')).toBe('var(--el-color-success)');
     expect(chart.attributes('data-points')).toBe(JSON.stringify([1, 2, 3]));
+  });
+
+  it('stamps the hover footer when a load settles, and keeps the stamp when it fails', async () => {
+    vi.useFakeTimers();
+    try {
+      const wrapper = mountStat({loading: true, value: 3});
+      // Reserved footer line exists before any load settles — shows the
+      // empty marker so the card height never jumps when it fills in.
+      expect(wrapper.find('.stat-card__footer').exists()).toBe(true);
+      expect(wrapper.get('.stat-card__footer').text()).toBe('—');
+
+      vi.setSystemTime(new Date('2026-01-01T08:30:00'));
+      await wrapper.setProps({loading: false});
+      const localeValue = i18n.global.locale.value;
+      const time = new Date(Date.now()).toLocaleTimeString(localeValue === 'zh' ? 'zh-CN' : 'en-US', {
+        hour12: false,
+      });
+      const goodStamp = i18n.global.t('common.updatedAt', {time});
+      expect(wrapper.get('.stat-card__footer').text()).toBe(goodStamp);
+
+      // A failed refresh keeps the previous stamp — same rule as
+      // DashboardCard's footer.
+      vi.setSystemTime(new Date('2026-01-01T09:45:00'));
+      await wrapper.setProps({loading: true});
+      await wrapper.setProps({loading: false, error: true});
+      expect(wrapper.get('.stat-card__footer').text()).toBe(goodStamp);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
