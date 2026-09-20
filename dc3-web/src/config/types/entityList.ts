@@ -178,7 +178,7 @@ export interface EntityListConfig {
   rowKey?: string; // Required in tree mode; defaults to 'id'.
   defaultExpandAll?: boolean; // tree
   pageSize?: number; // Page mode size; defaults to 12.
-  defaultOrderColumn?: string; // Page sort column; defaults to 'create_time'.
+  defaultOrderColumn?: string; // Page sort column; defaults to 'createTime'.
 
   searchFields: EntitySearchFieldConfig[];
   columns: EntityColumnConfig[];

@@ -21,7 +21,7 @@ import type {GroupRecord} from '@/config/types/manager';
 import type {EntityListConfig, Translator} from '@/config/types/entityList';
 import {nameRules, remarkRules} from '@/utils/formRuleUtil';
 
-const GROUP_PAGE_QUERY = {offset: 0, limit: 200, sort: [{field: 'group_index', direction: 'ASC' as const}]};
+const GROUP_PAGE_QUERY = {offset: 0, limit: 200, sort: [{field: 'groupIndex', direction: 'ASC' as const}]};
 
 const loadGroupRecords = async (): Promise<GroupRecord[]> => {
   const res = await listGroup(GROUP_PAGE_QUERY);

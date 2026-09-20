@@ -204,7 +204,7 @@ export const usePagedList = <T, Q extends Record<string, any> = Record<string, a
 
   const sort = () => {
     state.sortAsc = !state.sortAsc;
-    state.page.orders = [{column: options.sortColumn ?? 'create_time', asc: state.sortAsc}];
+    state.page.orders = [{column: options.sortColumn ?? 'createTime', asc: state.sortAsc}];
 
     if (options.request) {
       void load();

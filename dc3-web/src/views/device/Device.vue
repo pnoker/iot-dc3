@@ -159,7 +159,7 @@ const {
   currentChange,
 } = usePagedList<DeviceRecord>({
   pageSize: 12,
-  sortColumn: 'create_time',
+  sortColumn: 'createTime',
   request: (query) => listDevice(query),
 });
 
@@ -344,9 +344,12 @@ const loadStatus = (generation = lookupSequence) => {
   const requestId = ++statusRequestId;
   reactiveData.statusLoading = true;
   reactiveData.statusError = null;
-  const page = {...reactiveData.page, orders: [...reactiveData.page.orders]};
   const query = {...(reactiveData.query as Record<string, unknown>)};
-  return listDeviceStatus({page, ...query})
+  return listDeviceStatus({
+    offset: (reactiveData.page.current - 1) * reactiveData.page.size,
+    limit: reactiveData.page.size,
+    ...query,
+  })
     .then((res) => {
       if (generation !== lookupSequence || requestId !== statusRequestId) return;
       reactiveData.statusTable = (res || {}) as Record<string, string>;

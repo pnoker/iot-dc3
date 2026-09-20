@@ -27,6 +27,8 @@ export const createApiConfig = (t: Translator): EntityListConfig => ({
   name: 'api',
   title: t('nav.settingsApi'),
   editable: false,
+  // The API store does not support createTime sorting; id keeps the default order stable.
+  defaultOrderColumn: 'id',
   searchFields: [
     {
       prop: 'apiName',

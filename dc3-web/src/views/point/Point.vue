@@ -196,7 +196,7 @@ const {
   currentChange,
 } = usePagedList<PointRecord>({
   pageSize: 12,
-  sortColumn: "create_time",
+  sortColumn: "createTime",
   request: (query) => listPoint(query),
 });
 

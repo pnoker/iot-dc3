@@ -79,7 +79,7 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
       size: config.value.pageSize || 12,
       current: 1,
       hasNext: false,
-      orders: [{column: config.value.defaultOrderColumn || 'create_time', asc: false}] as Order[],
+      orders: [{column: config.value.defaultOrderColumn || 'createTime', asc: false}] as Order[],
     },
   });
   let latestLoadId = 0;
@@ -245,7 +245,7 @@ export const useEntityListPage = (rawConfig: EntityListConfig) => {
   const sort = () => {
     const currentOrder = state.page.orders[0];
     const asc = currentOrder ? !currentOrder.asc : true;
-    state.page.orders = [{column: config.value.defaultOrderColumn || 'create_time', asc}];
+    state.page.orders = [{column: config.value.defaultOrderColumn || 'createTime', asc}];
     cursorStack.splice(0, cursorStack.length, undefined);
     state.page.current = 1;
     load();

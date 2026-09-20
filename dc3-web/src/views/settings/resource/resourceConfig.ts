@@ -150,10 +150,11 @@ const resolveEntityNames = async (records: Record<string, any>[]): Promise<Recor
     );
   // APIs have no bulk-lookup endpoint; pull the whole list (capped at 1000,
   // already 10x the realistic API count on a single tenant) and resolve from
-  // that map.
+  // that map. Limit is capped at the backend PageRequest.MAX_LIMIT (200); the
+  // name lookup stays complete for deployments with up to 200 API definitions.
   if (apiIds.length)
     promises.push(
-      listApi({offset: 0, limit: 1000})
+      listApi({offset: 0, limit: 200})
         .then((r) => {
           const apiRecords = r.items;
           const byId = new Map(apiRecords.map((a) => [String(a.id), a.apiName]));

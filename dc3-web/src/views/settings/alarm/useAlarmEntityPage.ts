@@ -86,7 +86,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
       total: 0,
       size: 12,
       current: 1,
-      orders: [{column: 'create_time', asc: false}] as Order[],
+      orders: [{column: 'createTime', asc: false}] as Order[],
     },
   });
   let latestLoadId = 0;
@@ -192,7 +192,7 @@ export const useAlarmEntityPage = (props: AlarmEntityPageProps) => {
   const sort = () => {
     const currentOrder = state.page.orders[0];
     const asc = currentOrder ? !currentOrder.asc : true;
-    state.page.orders = [{column: 'create_time', asc}];
+    state.page.orders = [{column: 'createTime', asc}];
     load();
   };
 

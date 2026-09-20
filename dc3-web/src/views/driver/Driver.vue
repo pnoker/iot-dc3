@@ -97,7 +97,7 @@ const {
   currentChange,
 } = usePagedList<DriverRecord>({
   pageSize: 12,
-  sortColumn: 'create_time',
+  sortColumn: 'createTime',
   request: (query) => listDriver(query),
 });
 
@@ -141,9 +141,12 @@ const loadStatus = (sequence = statusSequence) => {
   const requestId = ++statusRequestId;
   statusLoading.value = true;
   statusError.value = null;
-  const page = {...reactiveData.page, orders: [...reactiveData.page.orders]};
   const query = {...(reactiveData.query as Record<string, unknown>)};
-  return listDriverStatus({page, ...query})
+  return listDriverStatus({
+    offset: (reactiveData.page.current - 1) * reactiveData.page.size,
+    limit: reactiveData.page.size,
+    ...query,
+  })
     .then((res) => {
       if (sequence !== statusSequence || requestId !== statusRequestId) return;
       Object.assign(statusTable, (res || {}) as Record<string, string>);

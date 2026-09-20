@@ -262,7 +262,7 @@ const loadServiceAccounts = async () => {
   loadingServiceAccounts.value = true;
   serviceAccountError.value = false;
   try {
-    const res = await listServiceAccount({offset: 0, limit: 1000});
+    const res = await listServiceAccount({offset: 0, limit: 200});
     if (requestId === serviceAccountRequest && visible.value) {
       serviceAccounts.value = (res?.items || []).filter((sa) => isEnabledFlag(sa.enableFlag));
     }
