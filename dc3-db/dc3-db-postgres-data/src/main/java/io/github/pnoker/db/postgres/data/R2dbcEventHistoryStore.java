@@ -124,28 +124,22 @@ public class R2dbcEventHistoryStore implements ReactiveEventHistoryStore {
         if (tenantId == null || tenantId <= 0) return Mono.error(new IllegalArgumentException("tenantId is required"));
         if (offset < 0 || limit < 1 || limit > PageRequest.MAX_LIMIT)
             return Mono.error(new IllegalArgumentException("invalid page bounds"));
+        // Filters are folded into the shared predicate below; never build an
+        // empty-SQL spec here — DatabaseClient.sql("") fails eagerly.
         StringBuilder predicate = new StringBuilder(" WHERE tenant_id=:tenant_id");
-        DatabaseClient.GenericExecuteSpec base = databaseClient.sql("").bind("tenant_id", tenantId);
-        if (deviceId != null) {
-            predicate.append(" AND device_id=:device_id");
-            base = base.bind("device_id", deviceId);
-        }
-        if (eventId != null) {
-            predicate.append(" AND event_id=:event_id");
-            base = base.bind("event_id", eventId);
-        }
-        if (eventCode != null && !eventCode.isBlank()) {
-            predicate.append(" AND event_code=:event_code");
-            base = base.bind("event_code", eventCode);
-        }
-        if (eventTypeFlag != null) {
-            predicate.append(" AND event_type_flag=:event_type_flag");
-            base = base.bind("event_type_flag", eventTypeFlag);
-        }
+        if (deviceId != null) predicate.append(" AND device_id=:device_id");
+        if (eventId != null) predicate.append(" AND event_id=:event_id");
+        if (eventCode != null && !eventCode.isBlank()) predicate.append(" AND event_code=:event_code");
+        if (eventTypeFlag != null) predicate.append(" AND event_type_flag=:event_type_flag");
         String order = orderBy(sort);
-        Mono<Long> total = databaseClient
+        DatabaseClient.GenericExecuteSpec totalSpec = databaseClient
                 .sql("SELECT COUNT(*) AS total FROM " + TABLE + predicate)
-                .bind("tenant_id", tenantId)
+                .bind("tenant_id", tenantId);
+        if (deviceId != null) totalSpec = totalSpec.bind("device_id", deviceId);
+        if (eventId != null) totalSpec = totalSpec.bind("event_id", eventId);
+        if (eventCode != null && !eventCode.isBlank()) totalSpec = totalSpec.bind("event_code", eventCode);
+        if (eventTypeFlag != null) totalSpec = totalSpec.bind("event_type_flag", eventTypeFlag);
+        Mono<Long> total = totalSpec
                 .map((row, metadata) -> row.get("total", Number.class).longValue())
                 .one();
         String query = "SELECT " + COLUMNS + " FROM " + TABLE + predicate + " ORDER BY " + order
