@@ -99,9 +99,11 @@ FROM cagg_point_value_1m
 GROUP BY 1, tenant_id, driver_id, device_id, point_id
 WITH NO DATA;
 
+-- Drill-down index mirrors the dashboard filter shape.
 CREATE INDEX idx_cagg_pv_1h_lookup
     ON cagg_point_value_1h (tenant_id, device_id, point_id, bucket DESC);
 
+-- Realtime aggregate: also read the minute tail not yet materialized.
 ALTER MATERIALIZED VIEW cagg_point_value_1h
 SET (timescaledb.materialized_only = false);
 

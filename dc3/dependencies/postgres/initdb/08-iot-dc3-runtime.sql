@@ -15,18 +15,34 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-/* Runtime coordination tables shared by all reactive centers. */
+-- Runtime coordination tables shared by all reactive centers:
+--   * dc3_schema_fingerprint — clean-DDL fingerprint every center validates
+--     at startup (dc3/bin/schema_fingerprint.py is the canonical authority;
+--     the hash covers these initdb files verbatim, comments included).
+--   * dc3_operation / dc3_idempotency — long-running operation state and
+--     tenant-scoped idempotent request deduplication.
+--   * dc3_manager.dc3_device_import_job — durable XLSX device-import payloads
+--     claimed by Data Center replicas.
+--   * dc3_outbox / dc3_point_value_ingest_outbox — transactional outboxes for
+--     durable event publication and point-value ingest replay.
+--   * dc3_platform_lock — cross-center row locks with fencing tokens.
+--
+-- The compose default role owns the database; deployments with a dedicated
+-- runtime role can grant these tables explicitly during provisioning.
 SET search_path TO public;
 
+-- ----------------------------
+-- Table structure for dc3_schema_fingerprint
+-- ----------------------------
 CREATE TABLE IF NOT EXISTS dc3_schema_fingerprint
 (
-    fingerprint_version  SMALLINT     PRIMARY KEY,
-    ddl_hash             TEXT         NOT NULL,
-    schema_contract      TEXT         NOT NULL,
-    id_format            TEXT         NOT NULL,
-    time_format          TEXT         NOT NULL,
-    json_format          TEXT         NOT NULL,
-    generated_at         TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL
+    fingerprint_version  SMALLINT     PRIMARY KEY,                         -- Fingerprint schema version
+    ddl_hash             TEXT         NOT NULL,                            -- SHA-256 hash of canonical initialization SQL
+    schema_contract      TEXT         NOT NULL,                            -- Flag-day architecture contract identifier
+    id_format            TEXT         NOT NULL,                            -- Identifier encoding contract
+    time_format          TEXT         NOT NULL,                            -- Timestamp precision and timezone contract
+    json_format          TEXT         NOT NULL,                            -- Canonical JSON encoding contract
+    generated_at         TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL   -- Fingerprint generation timestamp in UTC
 );
 COMMENT ON TABLE dc3_schema_fingerprint IS 'Canonical clean-DDL fingerprint used for startup validation';
 COMMENT ON COLUMN dc3_schema_fingerprint.fingerprint_version IS 'Fingerprint schema version';
@@ -37,19 +53,22 @@ COMMENT ON COLUMN dc3_schema_fingerprint.time_format IS 'Timestamp precision and
 COMMENT ON COLUMN dc3_schema_fingerprint.json_format IS 'Canonical JSON encoding contract';
 COMMENT ON COLUMN dc3_schema_fingerprint.generated_at IS 'Fingerprint generation timestamp in UTC';
 
+-- ----------------------------
+-- Table structure for dc3_operation
+-- ----------------------------
 CREATE TABLE IF NOT EXISTS dc3_operation
 (
-    operation_id     UUID         PRIMARY KEY,
-    tenant_id        BIGINT       NOT NULL,
-    idempotency_key  TEXT         NOT NULL,
-    request_hash     CHAR(64)     NOT NULL,
-    status           TEXT         NOT NULL,
-    progress         SMALLINT     DEFAULT 0 NOT NULL,
-    result           JSONB,
-    error            JSONB,
-    created_at       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    expires_at       TIMESTAMPTZ,
+    operation_id     UUID         PRIMARY KEY,                            -- UUIDv7 operation identifier
+    tenant_id        BIGINT       NOT NULL,                               -- Owning tenant identifier
+    idempotency_key  TEXT         NOT NULL,                               -- Client idempotency key; unique within tenant
+    request_hash     CHAR(64)     NOT NULL,                               -- Canonical request SHA-256
+    status           TEXT         NOT NULL,                               -- Operation lifecycle status
+    progress         SMALLINT     DEFAULT 0 NOT NULL,                     -- Completion percentage from 0 to 100
+    result           JSONB,                                               -- Successful operation result JSON
+    error            JSONB,                                               -- Failure Problem Details JSON
+    created_at       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Creation timestamp in UTC
+    updated_at       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Last update timestamp in UTC
+    expires_at       TIMESTAMPTZ,                                         -- Optional expiration timestamp in UTC
     CONSTRAINT chk_dc3_operation_idempotency_key CHECK (length(btrim(idempotency_key)) BETWEEN 1 AND 191),
     CONSTRAINT chk_dc3_operation_progress CHECK (progress BETWEEN 0 AND 100),
     CONSTRAINT chk_dc3_operation_request_hash CHECK (request_hash ~ '^[0-9a-fA-F]{64}$'),
@@ -69,51 +88,62 @@ COMMENT ON COLUMN dc3_operation.created_at IS 'Creation timestamp in UTC';
 COMMENT ON COLUMN dc3_operation.updated_at IS 'Last update timestamp in UTC';
 COMMENT ON COLUMN dc3_operation.expires_at IS 'Optional expiration timestamp in UTC';
 
+-- Operation dashboards scan a tenant's in-flight and recent operations.
 CREATE INDEX IF NOT EXISTS idx_dc3_operation_tenant_status ON dc3_operation (tenant_id, status, created_at DESC);
+-- Idempotency replay resolves the operation by (tenant, operation_id) directly.
 CREATE UNIQUE INDEX IF NOT EXISTS idx_dc3_operation_tenant_id ON dc3_operation (tenant_id, operation_id);
 
+-- ----------------------------
+-- Table structure for dc3_manager.dc3_device_import_job
+-- ----------------------------
 CREATE TABLE IF NOT EXISTS dc3_manager.dc3_device_import_job
 (
-    operation_id   UUID         PRIMARY KEY,
-    tenant_id      BIGINT       NOT NULL,
-    driver_id      BIGINT       NOT NULL,
-    profile_id     BIGINT       NOT NULL,
-    operator_id    BIGINT       DEFAULT 0 NOT NULL,
-    operator_name  TEXT         DEFAULT '' NOT NULL,
-    file_name      TEXT         NOT NULL,
-    file_data      BYTEA        NOT NULL,
-    claimed_by     TEXT         DEFAULT '' NOT NULL,
-    claimed_until  TIMESTAMPTZ,
-    attempts       INTEGER      DEFAULT 0 NOT NULL,
-    created_at     TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    operation_id   UUID         PRIMARY KEY,                              -- UUIDv7 operation identifier
+    tenant_id      BIGINT       NOT NULL,                                 -- Owning tenant identifier
+    driver_id      BIGINT       NOT NULL,                                 -- Driver the imported devices attach to
+    profile_id     BIGINT       NOT NULL,                                 -- Profile shared by the imported devices
+    operator_id    BIGINT       DEFAULT 0 NOT NULL,                       -- Operator ID
+    operator_name  TEXT         DEFAULT '' NOT NULL,                      -- Operator name
+    file_name      TEXT         NOT NULL,                                 -- Uploaded XLSX file name
+    file_data      BYTEA        NOT NULL,                                 -- Uploaded XLSX file payload
+    claimed_by     TEXT         DEFAULT '' NOT NULL,                      -- Data Center replica currently processing the job
+    claimed_until  TIMESTAMPTZ,                                           -- Lease deadline for the current claim
+    attempts       INTEGER      DEFAULT 0 NOT NULL,                       -- Claim attempt count
+    created_at     TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,       -- Creation timestamp in UTC
     CONSTRAINT fk_device_import_job_operation FOREIGN KEY (tenant_id, operation_id)
         REFERENCES dc3_operation (tenant_id, operation_id) ON DELETE CASCADE,
     CONSTRAINT chk_device_import_job_attempts CHECK (attempts >= 0),
     CONSTRAINT chk_device_import_job_file_size CHECK (octet_length(file_data) BETWEEN 1 AND 20971520)
 );
+-- Claim scan: expired leases and fresh jobs, oldest first.
 CREATE INDEX IF NOT EXISTS idx_device_import_job_claim
     ON dc3_manager.dc3_device_import_job (claimed_until, created_at);
 COMMENT ON TABLE dc3_manager.dc3_device_import_job IS 'Durable XLSX device-import job payload';
 
+-- ----------------------------
+-- Table structure for dc3_outbox
+-- ----------------------------
 CREATE TABLE IF NOT EXISTS dc3_outbox
 (
-    event_id        UUID         PRIMARY KEY,
-    tenant_id       BIGINT       NOT NULL,
-    aggregate_type  TEXT         NOT NULL,
-    aggregate_id    UUID,
-    event_type      TEXT         NOT NULL,
-    payload         JSONB        NOT NULL,
-    status          TEXT         DEFAULT 'PENDING' NOT NULL,
-    attempts        INTEGER      DEFAULT 0 NOT NULL,
-    available_at    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    claimed_at      TIMESTAMPTZ,
-    published_at    TIMESTAMPTZ,
-    last_error      TEXT,
-    created_at      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    event_id        UUID         PRIMARY KEY,                             -- UUIDv7 event identifier
+    tenant_id       BIGINT       NOT NULL,                                -- Owning tenant identifier
+    aggregate_type  TEXT         NOT NULL,                                -- Aggregate type
+    aggregate_id    UUID,                                                 -- Aggregate UUID
+    event_type      TEXT         NOT NULL,                                -- Event type
+    payload         JSONB        NOT NULL,                                -- Canonical event JSON payload
+    status          TEXT         DEFAULT 'PENDING' NOT NULL,              -- Publication lifecycle status
+    attempts        INTEGER      DEFAULT 0 NOT NULL,                      -- Publication attempt count
+    available_at    TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,      -- Earliest retry publication time
+    claimed_at      TIMESTAMPTZ,                                          -- Claim timestamp
+    published_at    TIMESTAMPTZ,                                          -- Successful publication timestamp
+    last_error      TEXT,                                                  -- Last publication failure
+    created_at      TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,      -- Creation timestamp in UTC
     CONSTRAINT chk_dc3_outbox_status CHECK (status IN ('PENDING', 'CLAIMED', 'PUBLISHED', 'FAILED')),
     CONSTRAINT chk_dc3_outbox_attempts CHECK (attempts >= 0)
 );
+-- Publisher claim scan: due pending rows, oldest first.
 CREATE INDEX IF NOT EXISTS idx_dc3_outbox_claim ON dc3_outbox (status, available_at, created_at);
+-- Per-tenant event timelines for audit views.
 CREATE INDEX IF NOT EXISTS idx_dc3_outbox_tenant ON dc3_outbox (tenant_id, created_at DESC);
 COMMENT ON TABLE dc3_outbox IS 'Transactional outbox for durable event publication';
 COMMENT ON COLUMN dc3_outbox.event_id IS 'UUIDv7 event identifier';
@@ -130,16 +160,19 @@ COMMENT ON COLUMN dc3_outbox.published_at IS 'Successful publication timestamp';
 COMMENT ON COLUMN dc3_outbox.last_error IS 'Last publication failure';
 COMMENT ON COLUMN dc3_outbox.created_at IS 'Creation timestamp in UTC';
 
+-- ----------------------------
+-- Table structure for dc3_idempotency
+-- ----------------------------
 CREATE TABLE IF NOT EXISTS dc3_idempotency
 (
-    tenant_id        BIGINT       NOT NULL,
-    idempotency_key  TEXT         NOT NULL,
-    request_hash     TEXT         NOT NULL,
-    operation_id     UUID         NOT NULL,
-    status           TEXT         NOT NULL,
-    response         JSONB,
-    created_at       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    expires_at       TIMESTAMPTZ  NOT NULL,
+    tenant_id        BIGINT       NOT NULL,                               -- Owning tenant identifier
+    idempotency_key  TEXT         NOT NULL,                               -- Client supplied idempotency key
+    request_hash     TEXT         NOT NULL,                               -- Canonical request SHA-256
+    operation_id     UUID         NOT NULL,                               -- Associated operation UUID
+    status           TEXT         NOT NULL,                               -- Idempotency lifecycle status
+    response         JSONB,                                               -- Canonical response JSON
+    created_at       TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL,     -- Creation timestamp in UTC
+    expires_at       TIMESTAMPTZ  NOT NULL,                               -- Expiry timestamp in UTC
     PRIMARY KEY (tenant_id, idempotency_key),
     CONSTRAINT chk_dc3_idempotency_key CHECK (length(btrim(idempotency_key)) BETWEEN 1 AND 191),
     CONSTRAINT chk_dc3_idempotency_request_hash CHECK (request_hash ~ '^[0-9a-fA-F]{64}$'),
@@ -147,6 +180,7 @@ CREATE TABLE IF NOT EXISTS dc3_idempotency
     CONSTRAINT fk_dc3_idempotency_operation FOREIGN KEY (tenant_id, operation_id)
         REFERENCES dc3_operation (tenant_id, operation_id)
 );
+-- Sweeper: rows eligible for cleanup ordered by expiry.
 CREATE INDEX IF NOT EXISTS idx_dc3_idempotency_expiry ON dc3_idempotency (expires_at);
 COMMENT ON TABLE dc3_idempotency IS 'Tenant-scoped idempotency keys and operation results';
 COMMENT ON COLUMN dc3_idempotency.tenant_id IS 'Owning tenant identifier';
@@ -158,12 +192,15 @@ COMMENT ON COLUMN dc3_idempotency.response IS 'Canonical response JSON';
 COMMENT ON COLUMN dc3_idempotency.created_at IS 'Creation timestamp in UTC';
 COMMENT ON COLUMN dc3_idempotency.expires_at IS 'Expiry timestamp in UTC';
 
+-- ----------------------------
+-- Table structure for dc3_platform_lock
+-- ----------------------------
 CREATE TABLE IF NOT EXISTS dc3_platform_lock
 (
-    lock_name      TEXT         PRIMARY KEY,
-    fencing_token  BIGINT       NOT NULL,
-    holder         UUID,
-    expires_at     TIMESTAMPTZ  NOT NULL
+    lock_name      TEXT         PRIMARY KEY,                               -- Logical lock name
+    fencing_token  BIGINT       NOT NULL,                                  -- Monotonically increasing fencing token
+    holder         UUID,                                                   -- Current holder UUID
+    expires_at     TIMESTAMPTZ  NOT NULL                                   -- Lease expiration timestamp in UTC
 );
 COMMENT ON TABLE dc3_platform_lock IS 'Database row locks with fencing tokens';
 COMMENT ON COLUMN dc3_platform_lock.lock_name IS 'Logical lock name';
@@ -171,41 +208,43 @@ COMMENT ON COLUMN dc3_platform_lock.fencing_token IS 'Monotonically increasing f
 COMMENT ON COLUMN dc3_platform_lock.holder IS 'Current holder UUID';
 COMMENT ON COLUMN dc3_platform_lock.expires_at IS 'Lease expiration timestamp in UTC';
 
--- The compose default role owns the database; deployments with a dedicated
--- runtime role can grant these tables explicitly during provisioning.
-
+-- ----------------------------
+-- Table structure for dc3_point_value_ingest_outbox
+-- ----------------------------
 -- Durable point-value ingest receipt. A row is created before TSDB/latest writes;
 -- CLAIMED leases make crash recovery deterministic and tenant-scoped message IDs
 -- provide the idempotency boundary across Data Center replicas.
 CREATE TABLE IF NOT EXISTS dc3_point_value_ingest_outbox
 (
-    tenant_id       BIGINT            NOT NULL,
-    message_id      TEXT              NOT NULL,
-    schema_version  INTEGER           NOT NULL,
-    driver_node     TEXT              NOT NULL,
-    sequence        BIGINT            NOT NULL,
-    fencing_token   BIGINT            NOT NULL,
-    device_id       BIGINT            NOT NULL,
-    point_id        BIGINT            NOT NULL,
-    raw_value       TEXT              NOT NULL,
-    cal_value       TEXT              NOT NULL,
-    num_value       DOUBLE PRECISION,
-    driver_id       BIGINT            NOT NULL,
-    create_time     TIMESTAMPTZ       NOT NULL,
-    operate_time    TIMESTAMPTZ       NOT NULL,
-    status          TEXT              DEFAULT 'PENDING' NOT NULL,
-    attempts        INTEGER           DEFAULT 0 NOT NULL,
-    available_at    TIMESTAMPTZ       DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    claimed_at      TIMESTAMPTZ,
-    claimed_by      TEXT,
-    processed_at    TIMESTAMPTZ,
-    last_error      TEXT,
+    tenant_id       BIGINT            NOT NULL,                            -- Owning tenant ID
+    message_id      TEXT              NOT NULL,                            -- Source message idempotency key
+    schema_version  INTEGER           NOT NULL,                            -- Payload schema version
+    driver_node     TEXT              NOT NULL,                            -- Source driver node
+    sequence        BIGINT            NOT NULL,                            -- Source sequence number
+    fencing_token   BIGINT            NOT NULL,                            -- Lease fencing token
+    device_id       BIGINT            NOT NULL,                            -- Device ID
+    point_id        BIGINT            NOT NULL,                            -- Point ID
+    raw_value       TEXT              NOT NULL,                            -- Raw value
+    cal_value       TEXT              NOT NULL,                            -- Calibrated value
+    num_value       DOUBLE PRECISION,                                      -- Numeric value
+    driver_id       BIGINT            NOT NULL,                            -- Driver ID
+    create_time     TIMESTAMPTZ       NOT NULL,                            -- Source creation time in UTC
+    operate_time    TIMESTAMPTZ       NOT NULL,                            -- Source operation time in UTC
+    status          TEXT              DEFAULT 'PENDING' NOT NULL,          -- Ingest lifecycle status
+    attempts        INTEGER           DEFAULT 0 NOT NULL,                  -- Claim attempt count
+    available_at    TIMESTAMPTZ       DEFAULT CURRENT_TIMESTAMP NOT NULL,  -- Earliest replay time
+    claimed_at      TIMESTAMPTZ,                                          -- Current claim timestamp
+    claimed_by      TEXT,                                                  -- Current claim owner
+    processed_at    TIMESTAMPTZ,                                          -- Alert processing completion time
+    last_error      TEXT,                                                  -- Last processing error
     PRIMARY KEY (tenant_id, message_id),
     CONSTRAINT chk_point_value_outbox_status CHECK (status IN ('PENDING', 'CLAIMED', 'PERSISTED', 'PROCESSED', 'FAILED')),
     CONSTRAINT chk_point_value_outbox_attempts CHECK (attempts >= 0)
 );
+-- Replay claim scan: due pending rows with their current lease.
 CREATE INDEX IF NOT EXISTS idx_point_value_outbox_claim
     ON dc3_point_value_ingest_outbox (status, available_at, claimed_at);
+-- Per-series replay inspection mirrors the hypertable lookup shape.
 CREATE INDEX IF NOT EXISTS idx_point_value_outbox_series
     ON dc3_point_value_ingest_outbox (tenant_id, device_id, point_id, create_time DESC);
 COMMENT ON TABLE dc3_point_value_ingest_outbox IS 'Durable point-value ingest receipt and replay state';
@@ -231,7 +270,12 @@ COMMENT ON COLUMN dc3_point_value_ingest_outbox.claimed_by IS 'Current claim own
 COMMENT ON COLUMN dc3_point_value_ingest_outbox.processed_at IS 'Alert processing completion time';
 COMMENT ON COLUMN dc3_point_value_ingest_outbox.last_error IS 'Last processing error';
 
+-- ----------------------------
+-- Records of fingerprint
+-- ----------------------------
+-- The ddl_hash covers these initdb files verbatim (comments included); the
+-- canonical authority and distribution points live in dc3/bin/schema_fingerprint.py.
 INSERT INTO dc3_schema_fingerprint
     (fingerprint_version, ddl_hash, schema_contract, id_format, time_format, json_format)
-VALUES (2, '8297d4b51aa58ac0a5546ca5e7d494deb530bb8b125d0039f74fb0e18208f4ab', 'r2dbc-flag-day-v1', 'uuidv7-bigint', 'utc-micros', 'canonical-v1')
+VALUES (2, '5146811645192cebabe055c434a2f278c92174d600581f993e69adc7a3893226', 'r2dbc-flag-day-v1', 'uuidv7-bigint', 'utc-micros', 'canonical-v1')
 ON CONFLICT (fingerprint_version) DO NOTHING;
