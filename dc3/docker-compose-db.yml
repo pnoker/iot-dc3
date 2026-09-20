@@ -28,7 +28,7 @@ services:
       dockerfile: Dockerfile
       args:
         DC3_BASE_REGISTRY: ${DC3_IMAGE_REGISTRY:-pnoker}
-        DC3_BASE_TAG: ${DC3_IMAGE_TAG:-2026.6}
+        DC3_BASE_TAG: ${DC3_IMAGE_TAG:-2026.10}
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-postgres:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     ports:
@@ -59,7 +59,7 @@ services:
       dockerfile: Dockerfile
       args:
         DC3_BASE_REGISTRY: ${DC3_IMAGE_REGISTRY:-pnoker}
-        DC3_BASE_TAG: ${DC3_IMAGE_TAG:-2026.6}
+        DC3_BASE_TAG: ${DC3_IMAGE_TAG:-2026.10}
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-rabbitmq:${DC3_IMAGE_TAG:-2026.6}
     restart: always
     ports:

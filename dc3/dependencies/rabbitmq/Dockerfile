@@ -19,7 +19,7 @@
 # RabbitMQ + plugins, built in dc3-docker). The base registry/tag are passed in
 # by docker-compose-db.yml so this image follows the same release line.
 ARG DC3_BASE_REGISTRY=pnoker
-ARG DC3_BASE_TAG=2026.5
+ARG DC3_BASE_TAG=2026.10
 
 FROM ${DC3_BASE_REGISTRY}/dc3-rabbitmq-base:${DC3_BASE_TAG}
 
