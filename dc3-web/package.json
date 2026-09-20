@@ -70,7 +70,7 @@
     "pinia": "^4.0.3",
     "vue": "^3.5.42",
     "vue-element-plus-x": "^2.0.3",
-    "vue-i18n": "^11.4.10",
+    "vue-i18n": "^11.4.12",
     "vue-router": "^5.3.1"
   },
   "devDependencies": {
