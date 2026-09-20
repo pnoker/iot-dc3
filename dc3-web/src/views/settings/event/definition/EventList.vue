@@ -46,40 +46,32 @@
       </el-button>
     </el-alert>
 
-    <blank-card>
-      <el-row>
-        <template v-if="reactiveData.loading">
-          <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-            <skeleton-card :footer="canManage" :loading="true"></skeleton-card>
-          </el-col>
-        </template>
-        <template v-else-if="hasData">
-          <el-col>
-            <el-empty :description="$t('eventDefinition.empty')"/>
-          </el-col>
-        </template>
-        <template v-else-if="reactiveData.status === 'error' && reactiveData.listData.length === 0">
-          <el-col>
-            <el-empty :description="$t('common.loadFailed')"/>
-          </el-col>
-        </template>
-        <template v-else>
-          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-            <event-card
-              :data="data"
-              :embedded="embedded !== '' && embedded !== 'edit'"
-              :busy="isActionBusy(data)"
-              icon="images/common/event.png"
-              @delete-thing="remove"
-              @detail-thing="openDetail"
-              @disable-thing="disableThing"
-              @edit-thing="openEdit"
-              @enable-thing="enableThing"
-            ></event-card>
-          </el-col>
-        </template>
-      </el-row>
-    </blank-card>
+    <!-- Fluid grid wall — see .entity-card-wall in global.scss. -->
+    <div class="entity-card-wall">
+      <template v-if="reactiveData.loading">
+        <skeleton-card v-for="data in 12" :key="data" :footer="canManage" :loading="true"></skeleton-card>
+      </template>
+      <template v-else-if="hasData">
+        <el-empty :description="$t('eventDefinition.empty')"/>
+      </template>
+      <template v-else-if="reactiveData.status === 'error' && reactiveData.listData.length === 0">
+        <el-empty :description="$t('common.loadFailed')"/>
+      </template>
+      <template v-else>
+        <event-card
+          v-for="data in reactiveData.listData"
+          :key="data.id"
+          :data="data"
+          :embedded="embedded !== '' && embedded !== 'edit'"
+          :busy="isActionBusy(data)"
+          @delete-thing="remove"
+          @detail-thing="openDetail"
+          @disable-thing="disableThing"
+          @edit-thing="openEdit"
+          @enable-thing="enableThing"
+        ></event-card>
+      </template>
+    </div>
 
     <event-edit-form ref="editRef" @add-thing="onAdd" @update-thing="onUpdate"/>
 
@@ -147,7 +139,6 @@ import {failMessage, successMessage} from '@/utils/notificationUtil';
 import {eventLevelLabel, eventTypeLabel} from '@/utils/thingModelFormatUtil';
 import {isNull} from '@/utils/validationUtil';
 import type {EventForm, EventParamRecord, EventRecord} from '@/config/types';
-import BlankCard from '@/components/card/blank/BlankCard.vue';
 import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 import EnableTag from '@/components/tag/EnableTag.vue';
 import EventCard from './card/EventCard.vue';

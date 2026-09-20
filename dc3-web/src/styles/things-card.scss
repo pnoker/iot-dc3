@@ -26,12 +26,12 @@
 }
 
 .things-card {
-  // Each card sits inside an el-col grid cell; the margin paints the
-  // visual spacing between cards. 4px on each side collapses with its
-  // neighbour to the 8px page gutter (--dc3-space-2), so the horizontal
-  // and vertical gaps between cards are the same 8px rhythm used by the
-  // home grid and the el-row gutters.
-  margin: 0 var(--dc3-space-1) var(--dc3-space-2);
+  // Each card is a direct child of the fluid grid wall (.entity-card-wall
+  // in global.scss); spacing comes from the wall's gap in both axes, and
+  // grid stretch makes every card in a row equal height. Cards carry no
+  // margins, so the last row ends flush at the page bottom padding
+  // (--dc3-page-padding).
+  margin: 0;
   box-sizing: border-box;
 
   .things-card-content {

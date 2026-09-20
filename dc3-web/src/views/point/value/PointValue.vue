@@ -82,43 +82,35 @@
       </el-button>
     </el-alert>
 
-    <blank-card>
-      <el-row>
-        <template v-if="reactiveData.loading">
-          <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-            <skeleton-card :footer="true" :loading="true"></skeleton-card>
-          </el-col>
-        </template>
-        <template v-else-if="hasData">
-          <el-col>
-          <el-empty
-            :description="embedded == 'device' ? $t('pointValue.empty.noDevice') : $t('pointValue.empty.noData')"
-          ></el-empty>
-          </el-col>
-        </template>
-        <template v-else-if="reactiveData.status === 'error' && reactiveData.listData.length === 0">
-          <el-col>
-            <el-empty :description="$t('common.loadFailed')"></el-empty>
-          </el-col>
-        </template>
-        <template v-else>
-          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-            <point-value-card
-              :data="data"
-              :device="reactiveData.deviceTable[data.deviceId]"
-              :embedded="embedded"
-              :point="reactiveData.pointTable[data.pointId]"
-              :unit="reactiveData.unitTable[data.pointId]"
-              @detail-thing="openDetail"
-              @write-thing="openWrite"
-            ></point-value-card>
-          </el-col>
-        </template>
-      </el-row>
-    </blank-card>
+    <!-- Fluid grid wall — see .entity-card-wall in global.scss. -->
+    <div class="entity-card-wall">
+      <template v-if="reactiveData.loading">
+        <skeleton-card v-for="data in 12" :key="data" :footer="true" :loading="true"></skeleton-card>
+      </template>
+      <template v-else-if="hasData">
+        <el-empty
+          :description="embedded == 'device' ? $t('pointValue.empty.noDevice') : $t('pointValue.empty.noData')"
+        ></el-empty>
+      </template>
+      <template v-else-if="reactiveData.status === 'error' && reactiveData.listData.length === 0">
+        <el-empty :description="$t('common.loadFailed')"></el-empty>
+      </template>
+      <template v-else>
+        <point-value-card
+          v-for="data in reactiveData.listData"
+          :key="data.id"
+          :data="data"
+          :device="reactiveData.deviceTable[data.deviceId]"
+          :embedded="embedded"
+          :point="reactiveData.pointTable[data.pointId]"
+          :unit="reactiveData.unitTable[data.pointId]"
+          @detail-thing="openDetail"
+          @write-thing="openWrite"
+        ></point-value-card>
+      </template>
+    </div>
 
     <point-value-edit-form ref="editRef" @update-thing="writeValue"/>
-    <point-value-detail ref="detailRef" :detail-data="reactiveData.detailData"/>
   </div>
 </template>
 

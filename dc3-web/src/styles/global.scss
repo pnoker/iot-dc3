@@ -114,7 +114,29 @@ body {
 }
 
 .entity-page-error {
-  margin-bottom: var(--dc3-space-3);
+  margin-bottom: var(--dc3-gutter);
+}
+
+// Entity card walls (device/driver/profile/point/point-value/command/event
+// lists). Cards always FILL their track — one column spans the wall, two
+// halve it, three take a third each — never pinning to a centred max
+// width, so edge margins and gutters stay identical everywhere. Column
+// count derives from the 380px floor via auto-fill: the viewport earns a
+// new column only once every card can still be at least 380px wide (the
+// band where card content stays readable — the old lg/xl 4-up rungs made
+// ~470px look right at 1920, and the min keeps multi-up cards from ever
+// sinking back to the cramped 280px slivers). Columns therefore step
+// continuously (1→2→3→4→…) as the viewport widens instead of snapping
+// rungs. min(380px, 100%) keeps the floor from overflowing phones.
+.entity-card-wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
+  gap: var(--dc3-gutter);
+
+  // Status blocks (empty / load-failed) span the whole wall, not one cell.
+  > .el-empty {
+    grid-column: 1 / -1;
+  }
 }
 
 // Element Plus treats any default-slot content as a long-form description:

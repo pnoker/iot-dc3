@@ -54,26 +54,24 @@
       </el-button>
     </el-alert>
 
-    <blank-card>
-      <el-row>
-        <template v-if="reactiveData.loading">
-          <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-            <skeleton-card :footer="true" :loading="true"/>
-          </el-col>
-        </template>
-        <template v-else>
-          <el-col v-if="reactiveData.status === 'success' && reactiveData.listData.length < 1">
-            <el-empty :description="$t('driver.empty')"/>
-          </el-col>
-          <el-col v-else-if="reactiveData.status === 'error' && reactiveData.listData.length < 1">
-            <el-empty :description="$t('common.loadFailed')"/>
-          </el-col>
-          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-            <driver-card :busy="isActionBusy(data)" :data="data" :status-table="statusTable" @delete="onDelete"/>
-          </el-col>
-        </template>
-      </el-row>
-    </blank-card>
+    <!-- Fluid grid wall — see .entity-card-wall in global.scss. -->
+    <div class="entity-card-wall">
+      <template v-if="reactiveData.loading">
+        <skeleton-card v-for="data in 12" :key="data" :footer="true" :loading="true"/>
+      </template>
+      <template v-else>
+        <el-empty v-if="reactiveData.status === 'success' && reactiveData.listData.length < 1" :description="$t('driver.empty')"/>
+        <el-empty v-else-if="reactiveData.status === 'error' && reactiveData.listData.length < 1" :description="$t('common.loadFailed')"/>
+        <driver-card
+          v-for="data in reactiveData.listData"
+          :key="data.id"
+          :busy="isActionBusy(data)"
+          :data="data"
+          :status-table="statusTable"
+          @delete="onDelete"
+        />
+      </template>
+    </div>
   </div>
 </template>
 
@@ -86,7 +84,6 @@ import {usePagedList} from '@/composables/usePagedList';
 import type {DriverRecord} from '@/config/types/manager';
 import {successMessage} from '@/utils/notificationUtil';
 
-import BlankCard from '@/components/card/blank/BlankCard.vue';
 import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 import DriverCard from './card/DriverCard.vue';
 import DriverTool from './tool/DriverTool.vue';

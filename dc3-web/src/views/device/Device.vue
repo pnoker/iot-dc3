@@ -69,35 +69,28 @@
       </el-button>
     </el-alert>
 
-    <blank-card>
-      <el-row>
-        <template v-if="reactiveData.loading">
-          <el-col v-for="data in 12" :key="data" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-            <skeleton-card :footer="true" :loading="true"/>
-          </el-col>
-        </template>
-        <template v-else>
-          <el-col v-if="reactiveData.status === 'success' && reactiveData.listData.length < 1">
-            <el-empty :description="$t('device.empty')"/>
-          </el-col>
-          <el-col v-else-if="reactiveData.status === 'error' && reactiveData.listData.length < 1">
-            <el-empty :description="$t('common.loadFailed')"/>
-          </el-col>
-          <el-col v-for="data in reactiveData.listData" :key="data.id" :lg="6" :md="12" :sm="12" :xl="6" :xs="24">
-            <device-card
-              :data="data"
-              :driver="reactiveData.driverTable[data.driverId ?? '']"
-              :embedded="embedded != ''"
-              :busy="isActionBusy(data)"
-              :status="reactiveData.statusTable[data.id]"
-              @delete="onDelete"
-              @disable="onDisable"
-              @enable="onEnable"
-            />
-          </el-col>
-        </template>
-      </el-row>
-    </blank-card>
+    <!-- Fluid grid wall — see .entity-card-wall in global.scss. -->
+    <div class="entity-card-wall">
+      <template v-if="reactiveData.loading">
+        <skeleton-card v-for="data in 12" :key="data" :footer="true" :loading="true"/>
+      </template>
+      <template v-else>
+        <el-empty v-if="reactiveData.status === 'success' && reactiveData.listData.length < 1" :description="$t('device.empty')"/>
+        <el-empty v-else-if="reactiveData.status === 'error' && reactiveData.listData.length < 1" :description="$t('common.loadFailed')"/>
+        <device-card
+          v-for="data in reactiveData.listData"
+          :key="data.id"
+          :data="data"
+          :driver="reactiveData.driverTable[data.driverId ?? '']"
+          :embedded="embedded != ''"
+          :busy="isActionBusy(data)"
+          :status="reactiveData.statusTable[data.id]"
+          @delete="onDelete"
+          @disable="onDisable"
+          @enable="onEnable"
+        />
+      </template>
+    </div>
 
     <device-add-form ref="deviceAddFormRef" @add="onAdd"/>
     <device-import-form ref="deviceImportFormRef" @import="onImport" @import-template="importTemplate"/>
@@ -126,7 +119,6 @@ import {isNull} from '@/utils/validationUtil';
 import type {DeviceRecord} from '@/config/types/manager';
 import type {OperationUiStatus, OperationView} from '@/config/types/operation';
 
-import BlankCard from '@/components/card/blank/BlankCard.vue';
 import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 import DeviceAddForm from './add/DeviceAddForm.vue';
 import DeviceCard from './card/DeviceCard.vue';

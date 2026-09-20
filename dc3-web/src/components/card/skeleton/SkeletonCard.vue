@@ -80,9 +80,11 @@ const props = defineProps({
 
 <style lang="scss" scoped>
 .skeleton-card {
-  border-radius: 4px;
+  border-radius: var(--dc3-radius-lg);
   box-sizing: border-box;
-  margin: 0 3px 6px;
+  // Mirrors .things-card (margin-free): the wall's gutter + row-gap own
+  // all spacing, so loading→content swaps keep identical geometry.
+  margin: 0;
 }
 
 .skeleton-card__container {
@@ -103,7 +105,7 @@ const props = defineProps({
   width: 55px;
   height: 48px;
   margin-right: 12px;
-  border-radius: 4px;
+  border-radius: var(--dc3-radius-md);
   overflow: hidden;
 
   img {
