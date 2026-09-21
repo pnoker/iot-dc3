@@ -42,9 +42,10 @@
 
 ARG DC3_JDK_IMAGE=docker.io/pnoker/dc3-jdk:21
 ARG DC3_JRE_IMAGE=docker.io/pnoker/dc3-jre:21
-# Native toolchain / runtime images for the *-native targets below.
-ARG DC3_JDK_NATIVE_IMAGE=docker.io/pnoker/dc3-jdk-native:25
-ARG DC3_NATIVE_IMAGE=docker.io/pnoker/dc3-native:12
+# Native toolchain / runtime images for the *-native targets below. Same
+# image families as the jar targets (dc3-jdk / dc3-jre), native in the tag.
+ARG DC3_JDK_NATIVE_IMAGE=docker.io/pnoker/dc3-jdk:25-native
+ARG DC3_NATIVE_IMAGE=docker.io/pnoker/dc3-jre:12-native
 
 
 # -----------------------------------------------------------------------------
