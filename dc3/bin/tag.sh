@@ -52,6 +52,12 @@ if [ "$local_head" != "$remote_head" ]; then
 fi
 
 version=$(awk -F'[<>]' '/<parent>/,/<\/parent>/{if($2=="version"){print $3; exit}}' pom.xml)
+if [[ -z "$version" ]]; then
+    # Root pom without a <parent> block: its first <version> element is the
+    # project's own coordinates (groupId/artifactId/version precede everything
+    # else), which is the release identity changelog.py resolves the same way.
+    version=$(awk -F'[<>]' '/<version>/{print $3; exit}' pom.xml)
+fi
 if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     echo "Invalid project version in pom.xml: '$version' (expected YYYY.M.P)." >&2
     exit 1

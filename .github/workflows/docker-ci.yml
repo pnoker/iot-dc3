@@ -38,6 +38,11 @@ jobs:
           set -euo pipefail
 
           VERSION=$(awk -F'[<>]' '/<parent>/,/<\/parent>/{if($2=="version") print $3}' pom.xml | head -1)
+          if [[ -z "$VERSION" ]]; then
+            # Root pom without a <parent> block: the first <version> element is
+            # the project's own coordinates — the release identity.
+            VERSION=$(awk -F'[<>]' '/<version>/{print $3; exit}' pom.xml)
+          fi
           if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Invalid project version in pom.xml: $VERSION" >&2
             exit 1
