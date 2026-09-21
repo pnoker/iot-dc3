@@ -43,6 +43,8 @@ export interface SettingsSidebarItem {
 /**
  * Build the settings sidebar tree from the menu API, falling back to the
  * static {@link SETTINGS_FALLBACK_SIDEBAR} layout while it loads.
+ *
+ * @returns the reactive settings sidebar item tree
  */
 export const useSettingsSidebarItems = () => {
   const {t} = useI18n();

@@ -192,7 +192,10 @@ class DashboardAlertReactiveTest {
     @Test
     void alertTrendReturnsZeroFilledCalendarDays() {
         AlertTrendRow row = new AlertTrendRow();
-        String today = java.time.LocalDate.now().toString();
+        // The service buckets "today" in the platform timezone; derive the
+        // expectation from the same zone so the test stays deterministic on
+        // UTC runners during the Asia/Shanghai rollover window.
+        String today = java.time.LocalDate.now(io.github.pnoker.common.constant.common.TimeConstant.DEFAULT_ZONEID).toString();
         row.setDate(today);
         row.setDeviceCount(5);
         row.setDriverCount(2);
