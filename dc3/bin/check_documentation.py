@@ -170,8 +170,11 @@ def validate_web_metadata(errors: DocumentationErrors) -> None:
     errors.require(bool(match), "dc3-web/package.json: packageManager must pin pnpm")
     if match:
         dockerfile = read("dc3-web/Dockerfile")
+        # corepack cannot activate pnpm 12 (bin/pnpm.cjs removed) so the
+        # Dockerfile installs it globally; either pin form satisfies the check.
         errors.require(
-            f"corepack prepare pnpm@{match.group(1)} --activate" in dockerfile,
+            f"corepack prepare pnpm@{match.group(1)} --activate" in dockerfile
+            or f"npm install -g pnpm@{match.group(1)}" in dockerfile,
             "dc3-web/Dockerfile: pnpm pin must match package.json packageManager",
         )
 
