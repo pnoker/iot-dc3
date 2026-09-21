@@ -32,6 +32,7 @@ import {
 import {useMenuStore} from '@/store';
 import {resolveMenuTitle} from '@/utils/menuUtil';
 
+/** One node of the settings sidebar tree; mirrors the menu API shape. */
 export interface SettingsSidebarItem {
   name: string;
   title: string;
@@ -39,6 +40,10 @@ export interface SettingsSidebarItem {
   children?: SettingsSidebarItem[];
 }
 
+/**
+ * Build the settings sidebar tree from the menu API, falling back to the
+ * static {@link SETTINGS_FALLBACK_SIDEBAR} layout while it loads.
+ */
 export const useSettingsSidebarItems = () => {
   const {t} = useI18n();
   const menuStore = useMenuStore();
