@@ -36,10 +36,25 @@ jobs:
           cache: maven
           cache-dependency-path: "**/pom.xml"
 
+      - name: Verify mockito agent jar integrity
+        run: |
+          set -euo pipefail
+          d="$HOME/.m2/repository/org/mockito/mockito-core/5.20.0"
+          f="$d/mockito-core-5.20.0.jar"
+          want=a32f446f38acf636363c5693db6498047731b9e0
+          ok() { [ -f "$f" ] && echo "$want  $f" | sha1sum -c - >/dev/null 2>&1; }
+          if ! ok; then
+            echo "mockito jar missing or corrupt; refetching from Central"
+            mkdir -p "$d"
+            curl -fsSL -o "$f" https://repo.maven.apache.org/maven2/org/mockito/mockito-core/5.20.0/mockito-core-5.20.0.jar
+          fi
+          ok || { echo "mockito jar still corrupt after refetch"; exit 1; }
+          echo "mockito agent jar verified"
+
       - name: Run unit tests
         run: |
           set -euo pipefail
-          mvn -U -e -B -Dskip.integration.tests=true -Dcoverage.check.skip=true test --no-transfer-progress
+          mvn -T 1 -U -e -B -Dskip.integration.tests=true -Dcoverage.check.skip=true test --no-transfer-progress
 
       - name: Upload surefire reports
         if: always()
@@ -84,12 +99,27 @@ jobs:
           docker version
           docker info
 
+      - name: Verify mockito agent jar integrity
+        run: |
+          set -euo pipefail
+          d="$HOME/.m2/repository/org/mockito/mockito-core/5.20.0"
+          f="$d/mockito-core-5.20.0.jar"
+          want=a32f446f38acf636363c5693db6498047731b9e0
+          ok() { [ -f "$f" ] && echo "$want  $f" | sha1sum -c - >/dev/null 2>&1; }
+          if ! ok; then
+            echo "mockito jar missing or corrupt; refetching from Central"
+            mkdir -p "$d"
+            curl -fsSL -o "$f" https://repo.maven.apache.org/maven2/org/mockito/mockito-core/5.20.0/mockito-core-5.20.0.jar
+          fi
+          ok || { echo "mockito jar still corrupt after refetch"; exit 1; }
+          echo "mockito agent jar verified"
+
       - name: Run integration tests
         env:
           TESTCONTAINERS_REUSE_ENABLE: "true"
         run: |
           set -euo pipefail
-          mvn -U -e -B -Dskip.unit.tests=true -Dcoverage.check.skip=true verify --no-transfer-progress
+          mvn -T 1 -U -e -B -Dskip.unit.tests=true -Dcoverage.check.skip=true verify --no-transfer-progress
 
       - name: Upload failsafe reports
         if: always()
