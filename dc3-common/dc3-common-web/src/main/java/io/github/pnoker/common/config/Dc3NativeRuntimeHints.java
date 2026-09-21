@@ -16,15 +16,19 @@
  */
 package io.github.pnoker.common.config;
 
+import ch.qos.logback.classic.spi.LogbackServiceProvider;
+import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
+import org.springframework.aot.hint.TypeReference;
 
 /**
  * GraalVM native-image hints shared by every DC3 service. Bean wiring is
  * covered by Spring Boot AOT processing and third-party runtime reflection by
  * the GraalVM reachability metadata repository; what neither covers are the
- * classpath resources that live inside DC3's own library jars — native images
- * only embed resources matched by an explicit pattern.
+ * classpath resources that live inside DC3's own library jars and the
+ * ServiceLoader descriptors third-party stacks discover at runtime — native
+ * images only embed resources matched by an explicit pattern.
  *
  * @author pnoker
  */
@@ -40,6 +44,32 @@ public class Dc3NativeRuntimeHints implements RuntimeHintsRegistrar {
         // Logging configuration shipped in dc3-common-log; without this pattern
         // native services silently fall back to the logback default config.
         hints.resources().registerPattern("logback.xml");
+
+        // SLF4J -> logback binding: logback-classic registers its provider via
+        // a META-INF/services descriptor and ships no native-image config of
+        // its own. Dropped from the image, the binding degrades to NOP and
+        // org.slf4j.MarkerFactory's static initializer kills the whole
+        // commons-logging -> log4j-api -> log4j-to-slf4j bridge at startup.
+        hints.resources().registerPattern("META-INF/services/org.slf4j.spi.SLF4JServiceProvider");
+        hints.reflection().registerType(LogbackServiceProvider.class, MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
+
+        // R2DBC connection factories resolve their driver through the SPI's
+        // ServiceLoader descriptor — same gap as SLF4J above. The PostgreSQL
+        // provider lives in dc3-db modules, outside this module's classpath,
+        // hence the TypeReference instead of a class literal.
+        hints.resources().registerPattern("META-INF/services/io.r2dbc.spi.ConnectionFactoryProvider");
+        hints.reflection().registerType(TypeReference.of("io.r2dbc.postgresql.PostgresqlConnectionFactoryProvider"),
+                MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
+
+        // gRPC resolves name resolvers (dns:// etc.) through ServiceLoader.
+        hints.resources().registerPattern("META-INF/services/io.grpc.NameResolverProvider");
+
+        // grpc-java's ReflectionLongAdderCounter instantiates LongAdder
+        // reflectively when a server/channel tracer boots; without the
+        // constructor registration gRPC server startup dies with
+        // MissingReflectionRegistrationError in a native image.
+        hints.reflection().registerType(java.util.concurrent.atomic.LongAdder.class,
+                MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
 
         // springdoc / swagger-ui assets served from inside the starter jars.
         hints.resources().registerPattern("META-INF/resources/webjars/swagger-ui/**");

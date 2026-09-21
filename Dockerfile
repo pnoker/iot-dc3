@@ -103,9 +103,18 @@ WORKDIR /build
 RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 COPY . .
+# Install ONLY the native service set and its upstream (-am): driver/mq/e2e
+# modules stay out (dc3-e2e produces no installable artifact, the TCK/e2e
+# modules need Docker, and drivers are not part of the native set). `install`
+# runs the full lifecycle through verify, which the package-only jar builder
+# never sees — skip the verify-phase style gates (spotless ratchetFrom /
+# checkstyle need a .git checkout the context excludes; ci-backend.yml owns
+# them) and all test compilation.
 RUN --mount=type=cache,target=/root/.m2/repository \
-    mvn -U -B -e -T 1C -s .mvn/settings-container.xml clean install -DskipTests \
-        -Daether.syncContext.named.factory=noop -P ${PROFILE}
+    mvn -U -B -e -T 1C -s .mvn/settings-container.xml clean install \
+        -Dmaven.test.skip=true -Dspotless.skip=true -Dcheckstyle.skip=true \
+        -Daether.syncContext.named.factory=noop -P ${PROFILE} \
+        -pl dc3-gateway,dc3-center/dc3-center-auth,dc3-center/dc3-center-manager,dc3-center/dc3-center-data,dc3-center/dc3-center-agentic,dc3-center/dc3-center-single -am
 
 RUN --mount=type=cache,target=/root/.m2/repository \
     mvn -B -e -s .mvn/settings-container.xml -DskipTests \
