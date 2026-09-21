@@ -74,7 +74,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-gateway
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       auth:
@@ -113,7 +113,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-auth
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AUTH_PORT:-8300}:8300"
@@ -141,7 +141,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-manager
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       auth:
@@ -172,7 +172,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-data
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       auth:
@@ -205,7 +205,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-agentic
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       auth:
@@ -249,7 +249,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-listening-virtual
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -275,7 +275,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-modbus-tcp
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -298,7 +298,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-modbus-rtu
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -321,7 +321,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-mqtt
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -344,7 +344,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-bacnet-ip
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-bacnet-ip:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-bacnet-ip:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -367,7 +367,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-ble
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ble:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ble:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -390,7 +390,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-can
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-can:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-can:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -413,7 +413,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-coap
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-coap:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-coap:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -436,7 +436,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-dlms
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlms:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlms:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -459,7 +459,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-ethernet-ip
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ethernet-ip:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ethernet-ip:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -482,7 +482,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-fins
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-fins:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-fins:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -505,7 +505,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-http
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-http:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-http:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -528,7 +528,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-iec104
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec104:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec104:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -551,7 +551,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-lwm2m
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lwm2m:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lwm2m:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -574,7 +574,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-melsec
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-melsec:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-melsec:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -597,7 +597,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-mysql
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mysql:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mysql:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -620,7 +620,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-oracle
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-oracle:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-oracle:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -643,7 +643,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-postgresql
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-postgresql:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-postgresql:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -666,7 +666,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-serial
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-serial:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-serial:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -688,7 +688,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-dlt645
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlt645:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlt645:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -711,7 +711,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-dnp3
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dnp3:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dnp3:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -734,7 +734,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-iec61850
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec61850:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec61850:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -757,7 +757,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-kafka
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-kafka:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-kafka:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -780,7 +780,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-knx
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-knx:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-knx:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -803,7 +803,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-lorawan
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lorawan:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lorawan:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -826,7 +826,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-mbus
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mbus:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mbus:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -849,7 +849,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-redis
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-redis:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-redis:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -871,7 +871,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-sl651
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sl651:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sl651:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -894,7 +894,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-snmp
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-snmp:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-snmp:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -917,7 +917,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-sqlserver
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sqlserver:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sqlserver:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -940,7 +940,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-tcp-udp
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-tcp-udp:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-tcp-udp:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -963,7 +963,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dc3-driver-zigbee
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-zigbee:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-zigbee:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -986,7 +986,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-opc-da
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -1009,7 +1009,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-opc-ua
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -1032,7 +1032,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-plcs7
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -1055,7 +1055,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-driver-virtual
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:

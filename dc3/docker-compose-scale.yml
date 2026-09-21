@@ -119,7 +119,7 @@ services:
           - dc3-web
 
   gateway:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       auth:
@@ -155,7 +155,7 @@ services:
           - dc3-gateway
 
   auth:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     environment:
       <<: *app-runtime-env
@@ -182,7 +182,7 @@ services:
           - dc3-center-auth
 
   manager:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       auth:
@@ -212,7 +212,7 @@ services:
           - dc3-center-manager
 
   data:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       auth:
@@ -244,7 +244,7 @@ services:
           - dc3-center-data
 
   agentic:
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       auth:
@@ -291,7 +291,7 @@ services:
   listening-virtual:
     # Device ingress (TCP/UDP). Keep replicas at 1: an established device
     # connection is pinned to one container.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -321,7 +321,7 @@ services:
   modbus-tcp:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -348,7 +348,7 @@ services:
   modbus-rtu:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -375,7 +375,7 @@ services:
   mqtt:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -402,7 +402,7 @@ services:
   opc-da:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -429,7 +429,7 @@ services:
   opc-ua:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -456,7 +456,7 @@ services:
   plcs7:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -483,7 +483,7 @@ services:
   virtual:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -510,7 +510,7 @@ services:
   bacnet-ip:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-bacnet-ip:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-bacnet-ip:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -537,7 +537,7 @@ services:
   fins:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-fins:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-fins:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -564,7 +564,7 @@ services:
   melsec:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-melsec:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-melsec:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -591,7 +591,7 @@ services:
   ethernet-ip:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ethernet-ip:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ethernet-ip:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -618,7 +618,7 @@ services:
   iec104:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec104:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec104:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -645,7 +645,7 @@ services:
   sl651:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sl651:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sl651:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -672,7 +672,7 @@ services:
   snmp:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-snmp:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-snmp:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -699,7 +699,7 @@ services:
   dlms:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlms:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlms:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -726,7 +726,7 @@ services:
   coap:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-coap:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-coap:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -753,7 +753,7 @@ services:
   lwm2m:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lwm2m:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lwm2m:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -780,7 +780,7 @@ services:
   http:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-http:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-http:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -807,7 +807,7 @@ services:
   serial:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-serial:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-serial:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -834,7 +834,7 @@ services:
   tcp-udp:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-tcp-udp:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-tcp-udp:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -861,7 +861,7 @@ services:
   mysql:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mysql:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mysql:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -888,7 +888,7 @@ services:
   postgresql:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-postgresql:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-postgresql:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -915,7 +915,7 @@ services:
   oracle:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-oracle:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-oracle:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -942,7 +942,7 @@ services:
   sqlserver:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sqlserver:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sqlserver:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -969,7 +969,7 @@ services:
   ble:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ble:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ble:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -996,7 +996,7 @@ services:
   can:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-can:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-can:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -1023,7 +1023,7 @@ services:
   dlt645:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlt645:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlt645:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -1050,7 +1050,7 @@ services:
   dnp3:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dnp3:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dnp3:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -1077,7 +1077,7 @@ services:
   iec61850:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec61850:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec61850:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -1104,7 +1104,7 @@ services:
   kafka:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-kafka:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-kafka:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -1131,7 +1131,7 @@ services:
   knx:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-knx:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-knx:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -1158,7 +1158,7 @@ services:
   lorawan:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lorawan:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lorawan:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -1185,7 +1185,7 @@ services:
   mbus:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mbus:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mbus:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -1212,7 +1212,7 @@ services:
   redis:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-redis:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-redis:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:
@@ -1239,7 +1239,7 @@ services:
   zigbee:
     # Protocol adapter. Keep replicas at 1: every replica mounts the same
     # driver_data volume and would open the same SQLite outbox file.
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-zigbee:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-zigbee:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     depends_on:
       manager:

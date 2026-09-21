@@ -29,7 +29,7 @@ services:
       args:
         DC3_BASE_REGISTRY: ${DC3_IMAGE_REGISTRY:-pnoker}
         DC3_BASE_TAG: ${DC3_IMAGE_TAG:-2026.10}
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-postgres:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-postgres:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_POSTGRES_PORT:-35432}:5432"
@@ -60,7 +60,7 @@ services:
       args:
         DC3_BASE_REGISTRY: ${DC3_IMAGE_REGISTRY:-pnoker}
         DC3_BASE_TAG: ${DC3_IMAGE_TAG:-2026.10}
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-rabbitmq:${DC3_IMAGE_TAG:-2026.6}
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-rabbitmq:${DC3_IMAGE_TAG:-2026.9}
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_RABBITMQ_TLS_PORT:-35671}:5671"

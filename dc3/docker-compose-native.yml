@@ -89,7 +89,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-gateway-native
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.6}-native
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.9}-native
     restart: always
     depends_on:
       auth:
@@ -128,7 +128,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-auth-native
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.6}-native
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-auth:${DC3_IMAGE_TAG:-2026.9}-native
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_AUTH_PORT:-8300}:8300"
@@ -156,7 +156,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-manager-native
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.6}-native
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-manager:${DC3_IMAGE_TAG:-2026.9}-native
     restart: always
     depends_on:
       auth:
@@ -187,7 +187,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-data-native
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.6}-native
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-data:${DC3_IMAGE_TAG:-2026.9}-native
     restart: always
     depends_on:
       auth:
@@ -220,7 +220,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-agentic-native
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.6}-native
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-agentic:${DC3_IMAGE_TAG:-2026.9}-native
     restart: always
     depends_on:
       auth:
