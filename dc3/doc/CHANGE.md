@@ -1,5 +1,252 @@
 # ✨ What's Changed
 
+### 📌 2026.9.22
+
+_Generated on 2026-09-22._
+
+#### Summary
+- Generated from `v2026.8.19` to `HEAD`.
+- Included 210 commits across 12 categories: Breaking Changes 5, Security 1, Features 47, Bug Fixes 39, Performance 2, Refactoring 17, Documentation 46, Build 18, CI 5, Tests 7, Chores 22, Other 1.
+- Most active scopes: web(48), db(24), design(19), mq(10), auth(7), cli(7).
+- Highlights: db: unify dc3-db module naming around role names; common: drop dead database profile constants; db: remove dc3.db.type selector; db: drop mysql/mariadb dialect branches from postgres stores; storage: unify platform persistence on reactive postgresql.
+
+#### Breaking Changes
+- **db**: unify dc3-db module naming around role names (`4cb3fd644`)
+- **common**: drop dead database profile constants (`d6b7cc23c`)
+- **db**: remove dc3.db.type selector (`683d50e03`)
+- **db**: drop mysql/mariadb dialect branches from postgres stores (`0f6a4bfa1`)
+- **storage**: unify platform persistence on reactive postgresql (`eae86b58f`)
+
+#### Security
+- **auth**: surface method security denials as 403 and tighten actuator (`6ef14a972`)
+
+#### Features
+- **native**: tag-based image naming and a native compose stack (`48915ef1b`)
+- **native**: make the six native services boot end to end (`30202721b`)
+- **web**: extend the record-card tile grammar to ResponsiveRecordList (`5c35565d3`)
+- **web**: route the point-value detail page, label cursor paging (`8daa35974`)
+- **web**: agentic assistant full-screen workbench with sessions rail (`bee5b1f87`)
+- **web**: settings quick search and a drawer-free three-terminal nav (`0370a42e6`)
+- **web**: one icon-tile grammar for every card on the platform (`56c4ed4ca`)
+- **web**: make the dashboard-card footer a family contract (`5877f8244`)
+- **menu**: re-map settings menu icons to their semantic domains (`9dba8bd07`)
+- **common**: warn on malformed ext json decode (`e81366f3b`)
+- **web**: unify three-terminal control density and close audit defects (`3fb43c423`)
+- **web**: adopt family login atmosphere and copyright footer (`031deb445`)
+- **db**: add mariadb and mysql dependency modules (`ba6406bd6`)
+- **web**: unify brand lockup, capsules, and account menu (`86a9ae139`)
+- **cli**: agentic session lifecycle and action approval commands (`436c979fe`)
+- **cli**: analytics group and alert deep-analysis surface (`1b6903cdf`)
+- **gateway**: expose oauth flag via compose; keep legacy header ctor (`865e6352f`)
+- **cli**: dual-transport tools command group over /mcp (`cff9af876`)
+- **auth**: derive oauth scopes from rbac and lengthen read-only ttl (`d1ccd51cb`)
+- **cli**: add hidden oauth client_credentials login (`fe251825f`)
+- **gateway**: accept oauth rs256 tickets alongside login tickets (`270dfb911`)
+- **web**: add cli onboarding card to mcp service page (`65729c4ef`)
+- **cli**: adopt dc3-cli into the repository as a standalone module (`b828719d3`)
+- **auth**: page mcp tool catalog and audit queries (`df35851f3`)
+- **web**: add theme and language preferences to console and login (`fe9384864`)
+- **web**: unify responsive console experience (`ec2310fa9`)
+- **web**: fit dialogs to viewport below mobile breakpoint (`a1d9e2a86`)
+- **deploy**: ship all 36 drivers and isolate their SQLite outboxes (`3c19f3165`)
+- **db**: add the mariadb adapter — third engine certified, 24/24 across the family (`de656d293`)
+- **web**: adapt app shell to desktop, tablet, and mobile (`c128efa86`)
+- **web**: add persisted theme and density preferences (`ca2cb780c`)
+- **web**: add design tokens and reactive breakpoint system (`802f53879`)
+- **db**: add the mysql seed — dual-engine initdb, row-level revision triggers (`76ae89370`)
+- **db**: add the mysql dialect — dc3-db-mysql, statement forks, portability rewrites (`9f91984c0`)
+- **tsdb**: complete the store lineup — influxdb 3 and iotdb adapters, published capability matrix (`d83ead1f6`)
+- **tsdb**: land s16 tiered retention and rollup — transparent tier reads on the shared caggs (`284c8187b`)
+- **data**: add the s19 ai analytics facet — nine conclusion-shaped tools over the tsdb port (`8163aefde`)
+- **tsdb**: add the tdengine adapter — second store certified against the contract suite (`20ae3fbf3`)
+- **tsdb**: rewire the data center onto the tsdb port and retire the repository module (`edadfa0a0`)
+- **tsdb**: add the time-series store family — port, timescale adapter, contract suite (`daea5de87`)
+- **mq**: add pulsar adapter, completing broker coverage (`cc655699f`)
+- **mq**: certify the rocketmq adapter on the contract suite (`fb703f5b6`)
+- **mq**: add mqtt 5 adapter passing the contract suite (`0250f9ede`)
+- **mq**: add activemq adapter passing the contract suite (`65aa6d595`)
+- **mq**: add kafka adapter and broker-neutral contract suite (`b8aee2cf6`)
+- **mq**: add broker-neutral messaging port and rabbitmq adapter (`f0c6e9bf2`)
+- **release**: add release backfill tool and docs-linked release footer (`b26c0000b`)
+
+#### Bug Fixes
+- **db**: qualify dc3_api with its schema in the MCP tool catalog refresh (`e41487662`)
+- **web**: split ToolCard footer space by content, not 50/50 (`1cda1b959`)
+- **web**: align page-sort and dictionary queries with the backend contract (`0010bb931`)
+- **web**: guard the point dictionary until a device is picked (`04779a70c`)
+- **db**: build event-history page specs without an empty base SQL (`ed81f9032`)
+- **gateway**: exclude load-balancer autoconfiguration noise (`83fe17bd2`)
+- **deploy**: repair helm templates broken by the repo reformat (`f3a0d9565`)
+- **deploy**: require deployment-specific secrets everywhere (`2d565f4a2`)
+- **driver**: repair boot, scheduling and registration regressions (`dc2164f46`)
+- **mcp**: complete the client credentials token issuance chain (`f970ebc4e`)
+- **gateway**: route only pre-auth token endpoints publicly (`febb4d8a9`)
+- **auth**: restrict token cancel to the owning principal (`2438c281d`)
+- **auth**: block privilege escalation through bind grants (`f9622a694`)
+- **auth**: count change-password failures toward credential lockout (`7a8e09ca1`)
+- **api**: drop parse-time tenant check from facade offset queries (`23bf6d339`)
+- **api**: expose read-only tenantId on command and event vos (`98055d3a7`)
+- **api**: accept snake_case params on history lookup endpoints (`e4523f993`)
+- **ci**: skip multiline annotation arguments when validating type Javadoc (`5aa0caeed`)
+- **db**: point dc3-db-tck at the per-domain postgres stores (`b0a4c01e9`)
+- **web**: drop https termination from nginx (`2246b73f6`)
+- **web**: normalize spacing and radii to the dc3 token scale (`50fb953aa`)
+- **web**: align card and block spacing on the 8px grid (`d4d98ad8a`)
+- **cli**: restore login against cookie-based token contract (`31e278c00`)
+- **auth**: fold mcp catalog optional filters into dynamic predicates (`6bc8b6784`)
+- **data**: widen history datasource search path to public (`d33863cee`)
+- **manager**: drop invalid affectData attribute from mapper inserts (`5bcd40b3a`)
+- **gateway**: answer 503 when the routed backend is unreachable (`e35a2a301`)
+- **mq**: correct the environment post-processor key for spring boot 4 (`4e4d62b65`)
+- **data**: restore transaction management with the tsdb datasource (`c18077d7e`)
+- **web**: initialize mock before router navigation (`01ff3a0b3`)
+- **web**: replace hand-rolled media breakpoints with token contract (`c581d6aa4`)
+- **tsdb**: capability and consistency fixes across store adapters (`d90021ce5`)
+- **db**: harden mysql/mariadb dialects and seed conversion (`7610b8dad`)
+- **mq**: centralize key routing and harden broker adapters (`dc0282c3d`)
+- **web**: localize interceptor, agentic store and route titles (`fd11add2d`)
+- **web**: scope stream 401 handling to auth keys (`b27efd2c9`)
+- **web**: reset dialog submitting on agentic save failure (`0c288789d`)
+- **web**: repair device import upload and detail timestamps (`5555b2651`)
+- **release**: pin backfill releases to not claim latest pointer (`4f4736198`)
+
+#### Performance
+- **web**: cache the resource tree stale-while-revalidate (`e00017f9e`)
+- **web**: drop dead dependencies and split agentic vendor (`6133a7c5d`)
+
+#### Refactoring
+- **web**: fix the card action order contract — browse, edit, state, delete (`e93b600fe`)
+- **web**: replace BlankCard shells with a fluid entity card wall (`807556fbc`)
+- **web**: land the A5 spacing and radius token system (`734bd1ed6`)
+- **db**: fail fast on unknown timestamp decode (`ed9f21d73`)
+- **db**: remove unused r2dbc page and cursor executors (`d69bb57e9`)
+- **driver**: collapse duplicated hex and checksum helpers into codecutil (`21e0bae93`)
+- **core**: rename find/query/fetch methods to get per crud law (`372d75b0c`)
+- **db**: move r2dbc store adapters into per-domain postgres modules (`7fde11134`)
+- **common**: rename resource registrar module (`51edc7c19`)
+- **sql**: align jdbc driver base with documented semantics (`4371650a6`)
+- **build**: move the relational core into the db family as dc3-db-core (`5a89b39ec`)
+- **web**: decouple entity configs from vue-i18n via Translator (`3c3c33a0c`)
+- **web**: polish naming, storage and date utilities (`03492ab5e`)
+- **web**: enforce typed response envelopes and domain unions (`40ed14593`)
+- **db**: split relational infra into a neutral jdbc module and a postgres dialect family (`c6509762a`)
+- **build**: extract the mq family into a top-level dc3-mq aggregator (`d003291f8`)
+- **mq**: migrate business modules onto the messaging port (`28efa5c8f`)
+
+#### Documentation
+- **db**: document the runtime and observability initdb SQL (`fe041c34b`)
+- **brand**: reposition IoT DC3 — Connect the Physical World to AI (`41350a73d`)
+- **db**: align dialect documentation with postgres-only runtime (`4f40fc684`)
+- **agents**: document the commit-msg hook now that it exists (`b6726f7dc`)
+- **agents**: split task-area conventions into dc3/agents guides (`11a8a8f77`)
+- **javadoc**: backfill public API Javadoc (`b984580d4`)
+- **db**: document the per-domain postgres modules (`ea635f12f`)
+- **cli**: document analytics and alert deep-analysis commands (`d9c7730da`)
+- **design**: close /mcp verification debt; greenlight oauth gateway flag (`16733c806`)
+- **design**: record live regression results for token unification (`81d4fe2c3`)
+- **design**: note first phase-3 slice in cli dual transport (`0cc4635f2`)
+- **design**: record phase 2 partial landing (projection + ttl ladder) (`61db55da6`)
+- **design**: mark phase 1 of token unification implemented (`2d2654ddd`)
+- **design**: fix scope projection and consistency gaps in token unification (`6c16dfd5f`)
+- **design**: plan console cli onboarding; restore dc3-cli package name (`35e625de9`)
+- **design**: record phase-0 decisions on token unification (`d5e993bdd`)
+- **design**: propose token unification and mcp-first cli rebuild (`3d65e0949`)
+- **deployment**: correct factual errors in DEPLOYMENT.md and USAGE.md (`987c96d50`)
+- translate design and selection documents to Chinese (`843ee444c`)
+- **design**: add relational R2DBC access layer design (`8be0bbc73`)
+- **design**: record three-terminal v5 revision (`56169842e`)
+- **headers**: add the missing agpl headers to deploy and config files (`c71b42024`)
+- **brand**: translate the svg and generator comments to english (`8594ad849`)
+- **web**: document composables, stores, and utils exports (`f5fc82682`)
+- **backend**: complete the Javadoc and comment sweep (`0ec9a636b`)
+- **storage**: document the dc3-mq, dc3-tsdb, and dc3-db child modules (`60dc2b4f1`)
+- **web**: drop the stale JSONBigInt claim from the web readme (`9e30b7965`)
+- **center**: drop the stale WebSocket mention from the data-center pom (`7aa464297`)
+- **comments**: remove orphaned and duplicated javadoc blocks (`ee44de854`)
+- **comments**: fill the real comment gaps across the repository (`1fa2d6f0c`)
+- **web**: document three-terminal UX architecture and SDK design (`20c97709f`)
+- **design**: add mcp runtime overhaul proposal — cohesive authorization contract (`f64dccfc7`)
+- **analysis**: add competitor and thing-model review notes (`79362fd3e`)
+- **agents**: refresh the repo map for the mq and tsdb family layout (`66acf91ef`)
+- **design**: add ai analytics query facet s19 to the tsdb design (`eba91ad2e`)
+- **design**: add beyond-parity tsdb capabilities s14-s18 (`1d5e6120e`)
+- **design**: harden tsdb abstraction after gap review (`d6ad519f2`)
+- **design**: translate tsdb abstraction design to chinese (`7d06f4e1b`)
+- **design**: add tsdb abstraction design superseding the storage t-track (`7bf80cfb8`)
+- **readme**: surface the pluggable message broker in feature and stack blurbs (`8d6a49a27`)
+- **mq**: publish broker selection guide and wire dc3.mq.type through deploy config (`1ece8d673`)
+- **readme**: remove broken star history charts from all readmes (`ca5b97344`)
+- **design**: record adapter certification status in the capability matrix (`cdfdff00d`)
+- **design**: add mq abstraction design with mqtt boundary (`eeffe6fa5`)
+- **release**: link quick start footer to docs site quickstart (`9cd4f90a6`)
+- **release**: update release title tagline to current platform positioning (`b39d34620`)
+
+#### Build
+- **docker**: bump dependency base images to the 2026.10 line (`bc404d228`)
+- **docker**: unbreak container builds (Maven resolver locks, pnpm 12) (`129d78386`)
+- **deps**: bump dc3-cli js-yaml to 4.3.2 (`33741fb33`)
+- **deps**: bump dc3-cli vitest to 4.1.11 (`9482cf0be`)
+- **deps**: bump seven build plugins to latest (`014f66ac1`)
+- **deps**: bump nine runtime dependencies to latest patch (`5b74de8b6`)
+- **quality**: enforce unused imports, missing javadoc and crud verbs (`38204bf7d`)
+- **dependabot**: target main for update PRs (`77b32e30d`)
+- **ci**: inline codeql paths-ignore in workflow (`52260f7bd`)
+- standardize repository tooling and quality gates (`66aab58f2`)
+- eliminate Maven package warnings (`0c10f7195`)
+- declare mybatis-plus-spring and add cli ci workflow (`d4302a541`)
+- **web**: refresh frontend dependencies (`691f6c879`)
+- **wrapper**: bump maven wrapper to 3.9.16 (`5c08be18a`)
+- **deps**: bump spring boot to 4.1.1 and refresh dependency stack (`fb9727469`)
+- deploy dc3-db artifacts and document store selection env (`11640cf6a`)
+- **coverage**: follow the dc3-db-core rename in the aggregated modules (`31779ee51`)
+- **db**: manage the dc3-db-mariadb artifact in the root pom (`1bbc60ffa`)
+
+#### CI
+- **native**: publish the native service set from docker-ci (`f78bc5496`)
+- drop one-off mockito diagnostic step (`4428b1ceb`)
+- fix e2e ratchet baseline and purge corrupted cached jars (`4a9a65e25`)
+- run spotless and checkstyle through the verify lifecycle (`a5fe1549d`)
+- fetch main baseline for the spotless ratchet in shallow checkouts (`5009ee744`)
+
+#### Tests
+- **web**: enforce the A5 radius and spacing contracts in CI (`7621869fc`)
+- run broker and database contracts as integration tests (`6591982b8`)
+- **gateway**: cover oauth bearer ticket resolution in auth filter (`39ab556f6`)
+- **web**: extend three-terminal gate and add breakpoint guardrail (`0727708f2`)
+- **web**: add three-viewport e2e gate and align playwright (`6ee897440`)
+- **db**: add the dual-dialect contract suite — postgres and mysql, 16/16 (`0ddb60f31`)
+- **e2e**: lock device-access mqtt vendor neutrality (`95431e097`)
+
+#### Chores
+- **release**: bump project version to 2026.9.22 (`cfb8ef5aa`)
+- **web**: groom native scrollbars into one slim theme-aware look (`000c964bb`)
+- **web**: drop unreferenced home style.scss (`914212c6c`)
+- **db**: refresh R2DBC schema fingerprint after seed normalization (`3b2edfef1`)
+- **db**: normalize initdb SQL whitespace and alignment (`1ba35acc3`)
+- apply palantir format to cleanup branch sources (`ac4bd7aa4`)
+- **build**: remove orphan mysql and mariadb docker scaffolds (`7302014c5`)
+- **dc3-web**: enforce eslint jsdoc gate and backfill api comments (`c840fbe85`)
+- **dc3-cli**: enforce eslint jsdoc gate and backfill api comments (`184782941`)
+- **repo**: complete license header coverage for typescript sources (`5ca2cf67c`)
+- **repo**: normalize line endings for cross-platform clones (`c04d541bf`)
+- **repo**: clear the remaining third-party boot warnings (`12dded222`)
+- **repo**: enforce the conventional-commit subject line in husky (`cc1ac2886`)
+- **repo**: ignore runtime data dirs and sqlite wal files anywhere (`4eb9b48be`)
+- **db**: remove postgres demo seed (`613e1726d`)
+- **db**: normalize initdb formatting and order ddl before seeds (`72e315ea9`)
+- **web**: add dev:mock script for static demo mode (`d43a6c4d0`)
+- **web**: ignore local claude settings (`2085bd17d`)
+- **repo**: reformat java, xml, yaml, markdown and frontend sources (`a7ca489b9`)
+- apply repository-wide formatting (`769d1cb97`)
+- **web**: drop dead stores, seeds and centralize constants (`2b727bca1`)
+- **env**: mirror dc3 mq type into the shell env script (`411f55f0c`)
+
+#### Other Changes
+- Revert "feat(web): add cli onboarding card to mcp service page" (`df42cb9e4`)
+
+<details>
+<summary>📝 Historical Version Description, Click to Expand</summary>
+
 ### 📌 2026.8.19
 
 _Generated on 2026-08-19._
@@ -2750,9 +2997,6 @@ _Generated on 2026-05-10._
 #### Chores
 
 - **java**: sort imports and remove unused imports across modules (`ca45788d5`)
-
-<details>
-<summary>📝 Historical Version Description, Click to Expand</summary>
 
 ### 📌 2025.10.5
 
