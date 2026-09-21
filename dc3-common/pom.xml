@@ -25,7 +25,7 @@
     <parent>
         <groupId>io.github.pnoker</groupId>
         <artifactId>iot-dc3</artifactId>
-        <version>2026.5.22</version>
+        <version>2026.9.22</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

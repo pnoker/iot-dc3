@@ -21,7 +21,7 @@
 
     <groupId>io.github.pnoker</groupId>
     <artifactId>iot-dc3</artifactId>
-    <version>2026.5.22</version>
+    <version>2026.9.22</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
@@ -161,7 +161,7 @@
         <palantir.java.format.version>2.97.0</palantir.java.format.version>
 
         <!-- DC3 version (self-reference for internal dependency management) -->
-        <dc3.version>2026.5.22</dc3.version>
+        <dc3.version>2026.9.22</dc3.version>
 
         <!-- Deployment -->
         <maven.deploy.skip>true</maven.deploy.skip>
