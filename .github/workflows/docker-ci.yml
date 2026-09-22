@@ -177,6 +177,7 @@ jobs:
             # subsequent CI invocations only rebuild what actually changed.
             docker buildx build \
               --platform linux/arm64,linux/amd64 \
+              --provenance=false \
               --file Dockerfile \
               --target "$name" \
               --build-arg PROFILE="$PROFILE" \
@@ -269,6 +270,7 @@ jobs:
             # target image, so each loop iteration only tags the final stage.
             docker buildx build \
               --platform linux/amd64 \
+              --provenance=false \
               --file Dockerfile \
               --target "$name-native" \
               --build-arg PROFILE="$PROFILE" \
@@ -332,6 +334,10 @@ jobs:
           context: .
           file: dc3-web/Dockerfile
           push: ${{ needs.validate.outputs.publish == 'true' }}
+          # Aliyun ACR rejects the SLSA provenance attestations buildx
+          # attaches by default (unknown manifest class for
+          # application/vnd.oci.empty.v1+json).
+          provenance: false
           platforms: linux/arm64,linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
