@@ -110,5 +110,12 @@ public class Dc3NativeRuntimeHints implements RuntimeHintsRegistrar {
                 MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
                 MemberCategory.INVOKE_PUBLIC_METHODS,
                 MemberCategory.INVOKE_DECLARED_METHODS);
+
+        // springdoc's schema extraction walks Java records reflectively
+        // (RecordComponent.getAccessor); the JDK class is not registered
+        // for reflection in a native image by default.
+        hints.reflection().registerType(
+                java.lang.reflect.RecordComponent.class,
+                MemberCategory.INVOKE_PUBLIC_METHODS);
     }
 }

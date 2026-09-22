@@ -1416,6 +1416,14 @@ ${dc3.copyright.body}
                         <configuration>
                             <classesDirectory>${project.build.outputDirectory}</classesDirectory>
                             <requiredVersion>22.3</requiredVersion>
+                            <!-- Cap the native-image builder heap. Unbounded it sizes
+                                 itself to 80% of detected RAM (~12.5GB on a 16GB CI
+                                 runner) and the analysis phase OOM-kills the whole
+                                 runner mid-build (logs stop at step [1/8], no exit
+                                 code). 10g leaves the runner's own processes ~6GB. -->
+                            <buildArgs>
+                                <arg>-J-Xmx10g</arg>
+                            </buildArgs>
                             <!-- process-aot writes the Spring AOT hints (RuntimeHintsRegistrar
                                  output) into spring-aot/main/resources/META-INF/native-image;
                                  the plugin only passes the third-party metadata repository
