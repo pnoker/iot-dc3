@@ -1416,6 +1416,16 @@ ${dc3.copyright.body}
                         <configuration>
                             <classesDirectory>${project.build.outputDirectory}</classesDirectory>
                             <requiredVersion>22.3</requiredVersion>
+                            <!-- process-aot writes the Spring AOT hints (RuntimeHintsRegistrar
+                                 output) into spring-aot/main/resources/META-INF/native-image;
+                                 the plugin only passes the third-party metadata repository
+                                 to native-image, so surface the AOT metadata explicitly.
+                                 Without this every project-local reflection registration
+                                 (quartz, caffeine, gRPC epoll, principal header) is dropped
+                                 from the native image. -->
+                            <configFiles>
+                                <configFile>${project.build.directory}/spring-aot/main/resources/META-INF/native-image/io.github.pnoker/${project.artifactId}</configFile>
+                            </configFiles>
                         </configuration>
                         <executions>
                             <execution>

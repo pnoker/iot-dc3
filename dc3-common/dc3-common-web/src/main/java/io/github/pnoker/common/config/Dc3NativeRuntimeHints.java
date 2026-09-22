@@ -17,6 +17,7 @@
 package io.github.pnoker.common.config;
 
 import ch.qos.logback.classic.spi.LogbackServiceProvider;
+import io.github.pnoker.common.security.PermissionMethods;
 import org.springframework.aot.hint.MemberCategory;
 import org.springframework.aot.hint.RuntimeHints;
 import org.springframework.aot.hint.RuntimeHintsRegistrar;
@@ -73,5 +74,41 @@ public class Dc3NativeRuntimeHints implements RuntimeHintsRegistrar {
 
         // springdoc / swagger-ui assets served from inside the starter jars.
         hints.resources().registerPattern("META-INF/resources/webjars/swagger-ui/**");
+
+        // gRPC-netty's Utils.getEpollChannelOption reflectively reads static
+        // final ChannelOption fields (e.g. TCP_USER_TIMEOUT) from the epoll
+        // option class via Class.forName + getField. Every center and the
+        // gateway runs a gRPC channel, so this hint is shared.
+        hints.reflection().registerType(
+                TypeReference.of("io.netty.channel.epoll.EpollChannelOption"),
+                MemberCategory.PUBLIC_FIELDS,
+                MemberCategory.DECLARED_FIELDS);
+        hints.reflection().registerType(
+                TypeReference.of("jdk.net.ExtendedSocketOptions"),
+                MemberCategory.PUBLIC_FIELDS,
+                MemberCategory.DECLARED_FIELDS);
+
+        // GatewayJwtConverter deserializes the gateway-injected principal
+        // header with Jackson; without constructor + field access every
+        // authenticated request dies with malformedPrincipalHeader.
+        hints.reflection().registerType(
+                TypeReference.of("io.github.pnoker.common.entity.common.RequestHeader$PrincipalHeader"),
+                MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS,
+                MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
+                MemberCategory.PUBLIC_FIELDS,
+                MemberCategory.DECLARED_FIELDS,
+                MemberCategory.INVOKE_PUBLIC_METHODS,
+                MemberCategory.INVOKE_DECLARED_METHODS);
+
+        // Every @PreAuthorize("@perm.can(...)") guard resolves through
+        // Spring Security's SpEL engine, which invokes the bean methods
+        // reflectively. The expression's bean reference is not covered by
+        // Spring AOT security processing, so register the whole bean.
+        hints.reflection().registerType(
+                PermissionMethods.class,
+                MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS,
+                MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
+                MemberCategory.INVOKE_PUBLIC_METHODS,
+                MemberCategory.INVOKE_DECLARED_METHODS);
     }
 }
