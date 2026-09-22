@@ -1,0 +1,91 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# Single-center topology (activate with NODE_ENV=single): the gateway
+# proxies every api/v3 route to the aggregated dc3-center-single service.
+# This profile file replaces the distributed route list from
+# application-gateway.yml wholesale (a profile-specific file has higher
+# precedence than the lower-indexed "gateway" profile file).
+# StripPrefix=3 removes api/v3/{svc}; PrefixPath=/single targets the single
+# service's shared base path. The Authentic filter still injects the
+# HMAC-signed principal header, which single verifies the same way as the
+# distributed centers.
+spring:
+  grpc:
+    client:
+      channel:
+        dc3-center-auth:
+          target: 'static://${CENTER_SINGLE_HOST:dc3-center-single}:9100'
+  cloud:
+    gateway:
+      routes:
+        # OAuth discovery and public token endpoints for MCP clients
+        - id: oauth_metadata_route
+          uri: ${GATEWAY_ROUTE_AUTH_URI:http://${CENTER_SINGLE_HOST:dc3-center-single}:8100}
+          predicates:
+            - Path=/.well-known/oauth-authorization-server,/oauth2/jwks,/oauth2/token,/oauth2/revoke,/oauth2/register
+          filters:
+            - PrefixPath=/single
+        # OAuth authorization endpoint requires an existing DC3 login context
+        - id: oauth_authorize_route
+          uri: ${GATEWAY_ROUTE_AUTH_URI:http://${CENTER_SINGLE_HOST:dc3-center-single}:8100}
+          predicates:
+            - Path=/oauth2/authorize
+          filters:
+            - PrefixPath=/single
+            - Authentic
+        # Pre-authentication token endpoints MUST stay before auth_route - the
+        # same ordering contract as the distributed routes.
+        - id: auth_route_token
+          uri: ${GATEWAY_ROUTE_AUTH_TOKEN_URI:http://${CENTER_SINGLE_HOST:dc3-center-single}:8100}
+          predicates:
+            - Path=/api/v3/auth/token/salt,/api/v3/auth/token/generate,/api/v3/auth/token/change_password
+          filters:
+            - StripPrefix=3
+            - PrefixPath=/single
+        - id: auth_route
+          uri: ${GATEWAY_ROUTE_AUTH_URI:http://${CENTER_SINGLE_HOST:dc3-center-single}:8100}
+          predicates:
+            - Path=/api/v3/auth/**
+          filters:
+            - StripPrefix=3
+            - PrefixPath=/single
+            - Authentic
+        - id: manager_route
+          uri: ${GATEWAY_ROUTE_MANAGER_URI:http://${CENTER_SINGLE_HOST:dc3-center-single}:8100}
+          predicates:
+            - Path=/api/v3/manager/**
+          filters:
+            - StripPrefix=3
+            - PrefixPath=/single
+            - Authentic
+        - id: data_route
+          uri: ${GATEWAY_ROUTE_DATA_URI:http://${CENTER_SINGLE_HOST:dc3-center-single}:8100}
+          predicates:
+            - Path=/api/v3/data/**
+          filters:
+            - StripPrefix=3
+            - PrefixPath=/single
+            - Authentic
+        - id: agentic_route
+          uri: ${GATEWAY_ROUTE_AGENTIC_URI:http://${CENTER_SINGLE_HOST:dc3-center-single}:8100}
+          predicates:
+            - Path=/api/v3/agentic/**
+          filters:
+            - StripPrefix=3
+            - PrefixPath=/single
+            - Authentic

@@ -14,12 +14,13 @@ flagged for review.
 """
 
 import json
+import os
 import re
 import sys
 import urllib.error
 import urllib.request
 
-GATEWAY = "http://127.0.0.1:8000"
+GATEWAY = os.environ.get("DC3_PROBE_GATEWAY", "http://127.0.0.1:8000")
 CENTERS = [
     ("auth", "http://127.0.0.1:8300/auth"),
     ("manager", "http://127.0.0.1:8400/manager"),

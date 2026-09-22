@@ -28,7 +28,7 @@ spring:
     client:
       channel:
         dc3-center-auth:
-          target: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:9300'
+          target: 'static://${CENTER_AUTH_HOST:dc3-center-auth}:${CENTER_AUTH_GRPC_PORT:9300}'
           keepalive:
             time: 5m
             timeout: 20s
