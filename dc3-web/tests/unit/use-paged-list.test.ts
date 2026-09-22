@@ -103,12 +103,12 @@ describe('usePagedList', () => {
     expect(state.listData[0].name).toBe('Row 25');
   });
 
-  it('uses default sortColumn=create_time when not provided', () => {
+  it('uses default sortColumn=createTime when not provided', () => {
     const {state, setAllData, sort} = usePagedList<Row>();
     setAllData(sampleRows);
 
     sort();
-    expect(state.page.orders).toEqual([{column: 'create_time', asc: true}]);
+    expect(state.page.orders).toEqual([{column: 'createTime', asc: true}]);
   });
 
   it('sizeChange resets page to 1 and re-slices', () => {
@@ -203,7 +203,7 @@ describe('usePagedList', () => {
 
     sort();
     await Promise.resolve();
-    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({sort: [{field: 'create_time', direction: 'ASC'}]}));
+    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({sort: [{field: 'createTime', direction: 'ASC'}]}));
 
     sizeChange(24);
     await Promise.resolve();

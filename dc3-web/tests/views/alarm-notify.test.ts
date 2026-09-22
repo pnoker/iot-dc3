@@ -285,7 +285,7 @@ describe('AlarmNotify view', () => {
         enableFlag: 'ENABLE',
         offset: 0,
         limit: 12,
-        sort: [{field: 'create_time', direction: 'DESC'}],
+        sort: [{field: 'createTime', direction: 'DESC'}],
       })
     );
   });
