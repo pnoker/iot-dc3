@@ -193,10 +193,11 @@ jobs:
       - validate
       - verify-backend
     runs-on: ubuntu-latest
-    # First uncached run: reactor install + six native-image compilations
-    # (~60-90 min). Cached runs reuse the install layer and only recompile
-    # the service that changed.
-    timeout-minutes: 120
+    # First uncached run: reactor install + six native-image compilations.
+    # The 4-core hosted runner compiles ~20 min per service (~138 min for
+    # six), so keep generous headroom; cached runs only recompile what
+    # changed and finish far earlier.
+    timeout-minutes: 240
     environment: release
     permissions:
       contents: read
