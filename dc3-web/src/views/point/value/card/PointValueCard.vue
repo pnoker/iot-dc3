@@ -49,13 +49,17 @@
         <div class="things-card__body">
           <div class="things-card-body-content">
             <div class="things-card-body-content-column">
-              <div class="things-card-body-content-value">
+              <div
+                :class="[
+                  'things-card-body-content-value',
+                  {
+                    'value-panel-fresh': delayOk,
+                    'value-panel-stale': delaySlow,
+                    'value-panel-missing': !hasLatestValue,
+                  },
+                ]"
+              >
                 <span
-                  :class="{
-                    'value-fresh': delayOk,
-                    'value-missing': !hasLatestValue,
-                    'value-stale': delaySlow,
-                  }"
                   :aria-label="$t('pointValue.card.processedValue')"
                   :title="$t('pointValue.card.processedValue')"
                   class="nowrap-item value"
@@ -64,8 +68,11 @@
                   @click="copyValue(data)"
                   @keydown.enter="copyValue(data)"
                   @keydown.space.prevent="copyValue(data)"
-                >{{ data?.calValue ?? '--' }} {{ hasLatestValue ? unit : '' }}</span
                 >
+                  <span class="value-number">{{ data?.calValue ?? '--' }}</span>
+                  <span v-if="hasLatestValue && unit" class="value-unit">{{ unit }}</span>
+                </span>
+                <span class="value-caption">{{ $t('pointValue.card.processedValue') }}</span>
               </div>
               <ul>
                 <li class="nowrap-item">
@@ -127,7 +134,7 @@
               :height="80"
               :tooltip-unit="unit"
               animate
-              color="var(--el-color-primary)"
+              color="var(--el-color-success)"
             />
             <div v-else class="point-value-empty-chart">{{ $t('pointValue.card.noHistory') }}</div>
           </div>
@@ -356,8 +363,34 @@ onBeforeUnmount(() => {
     align-items: center;
     gap: var(--dc3-space-2);
 
+    // Soft tone chips: light-9 wash + hairline ring instead of the
+    // default tag fill, so the status never shouts over the tile.
     :deep(.el-tag) {
       vertical-align: middle;
+      height: 20px;
+      padding: 0 8px;
+      border-radius: var(--dc3-radius-full);
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 18px;
+
+      &.el-tag--success {
+        --el-tag-bg-color: var(--el-color-success-light-9);
+        --el-tag-border-color: color-mix(in srgb, var(--el-color-success) 26%, transparent);
+        --el-tag-text-color: var(--el-color-success);
+      }
+
+      &.el-tag--warning {
+        --el-tag-bg-color: var(--el-color-warning-light-9);
+        --el-tag-border-color: color-mix(in srgb, var(--el-color-warning) 26%, transparent);
+        --el-tag-text-color: var(--el-color-warning);
+      }
+
+      &.el-tag--info {
+        --el-tag-bg-color: var(--el-fill-color-light);
+        --el-tag-border-color: var(--dc3-border-base);
+        --el-tag-text-color: var(--dc3-text-secondary);
+      }
     }
   }
 }
@@ -398,32 +431,114 @@ onBeforeUnmount(() => {
   .things-card-body-content-column {
     display: flex;
     flex-direction: column;
+
+    // Info rows: icon + label + value with a quiet hover wash, so the
+    // metadata list reads as a scannable stack instead of a bare dump.
+    ul {
+      display: flex;
+      flex-direction: column;
+      gap: var(--dc3-space-1);
+      list-style: none;
+      padding: var(--dc3-space-3) var(--dc3-space-1) 0;
+      margin: 0;
+      font-size: 12px;
+
+      li {
+        display: flex;
+        align-items: center;
+        gap: var(--dc3-space-2);
+        padding: var(--dc3-space-1) var(--dc3-space-2);
+        border-radius: var(--dc3-radius-md);
+        color: var(--dc3-text-regular);
+        transition: background-color 120ms ease;
+
+        &:hover {
+          background: var(--dc3-bg-interactive);
+        }
+
+        .el-icon {
+          flex-shrink: 0;
+          color: var(--dc3-text-secondary);
+        }
+      }
+    }
   }
 
+  // The processed-value block is the card's hero: a soft-tinted panel
+  // (tone light-9 wash + hairline) holding the big number, a unit chip and
+  // a muted caption — the same tone grammar as the header tile.
   .things-card-body-content-value {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    gap: var(--dc3-space-2);
     list-style: none;
     text-align: center;
-    margin-top: 20px;
+    margin-top: var(--dc3-space-4);
+    padding: var(--dc3-space-4) var(--dc3-space-3);
+    border: 1px solid color-mix(in srgb, var(--value-tone, var(--el-border-color)) 16%, transparent);
+    border-radius: var(--dc3-radius-lg);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--value-tone, var(--el-color-primary)) 8%, transparent),
+      transparent 70%
+    );
 
     .value {
-      font-weight: bold;
-      font-size: 28px;
+      display: inline-flex;
+      align-items: baseline;
+      gap: var(--dc3-space-2);
+      max-width: 100%;
+      font-weight: 700;
       font-variant-numeric: tabular-nums;
-      color: var(--value-tone, var(--el-text-color-primary));
       cursor: pointer;
     }
 
-    .value-fresh {
+    .value-number {
+      overflow: hidden;
+      font-size: 30px;
+      line-height: 1.1;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      background: linear-gradient(
+        180deg,
+        var(--value-tone, var(--el-text-color-primary)),
+        color-mix(in srgb, var(--value-tone, var(--el-text-color-primary)) 72%, var(--el-text-color-primary))
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .value-unit {
+      flex-shrink: 0;
+      padding: 1px 6px;
+      border: 1px solid color-mix(in srgb, var(--value-tone, var(--el-color-primary)) 26%, transparent);
+      border-radius: var(--dc3-radius-full);
+      background: color-mix(in srgb, var(--value-tone, var(--el-color-primary)) 10%, transparent);
+      color: var(--value-tone, var(--el-color-primary));
+      font-size: 11px;
+      font-weight: 650;
+      line-height: 16px;
+    }
+
+    .value-caption {
+      color: var(--dc3-text-muted);
+      font-size: 11px;
+      letter-spacing: 0.02em;
+    }
+
+    // Tone per freshness state; the panel wash, hairline and number
+    // gradient all resolve through this one variable.
+    &.value-panel-fresh {
       --value-tone: var(--el-color-success);
     }
 
-    .value-stale {
+    &.value-panel-stale {
       --value-tone: var(--el-color-warning);
     }
 
-    .value-missing {
+    &.value-panel-missing {
       --value-tone: var(--el-text-color-secondary);
     }
 
