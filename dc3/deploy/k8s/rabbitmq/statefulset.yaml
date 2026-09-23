@@ -41,7 +41,7 @@ spec:
         - name: dc3-rabbitmq
           # Built locally from dc3/dependencies/rabbitmq (see scripts/push-images.sh);
           # layers rabbitmq.conf / definitions.json / TLS keys on dc3-rabbitmq-base.
-          image: pnoker/dc3-rabbitmq:2026.6
+          image: pnoker/dc3-rabbitmq:2026.9
           imagePullPolicy: IfNotPresent
           env:
             - name: RABBITMQ_DEFAULT_VHOST

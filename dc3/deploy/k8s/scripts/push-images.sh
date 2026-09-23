@@ -22,13 +22,13 @@
 # reachable by every node.
 #
 # Usage:
-#   DC3_IMAGE_REGISTRY=my.registry/dc3 DC3_IMAGE_TAG=2026.6 ./scripts/push-images.sh
+#   DC3_IMAGE_REGISTRY=my.registry/dc3 DC3_IMAGE_TAG=2026.9 ./scripts/push-images.sh
 #   # single-node clusters (kind/k3s/docker-desktop): load into the node instead:
-#   kind load docker-image pnoker/dc3-postgres:2026.6 pnoker/dc3-rabbitmq:2026.6
+#   kind load docker-image pnoker/dc3-postgres:2026.9 pnoker/dc3-rabbitmq:2026.9
 #
 set -euo pipefail
 REGISTRY="${DC3_IMAGE_REGISTRY:-pnoker}"
-TAG="${DC3_IMAGE_TAG:-2026.6}"
+TAG="${DC3_IMAGE_TAG:-2026.9}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)"
 
 for image in dc3-postgres dc3-rabbitmq; do

@@ -50,7 +50,7 @@ DC3_IMAGE_REGISTRY=my.registry/dc3 ./dc3/deploy/k8s/scripts/push-images.sh
 ```
 
 Tag layout differs per image family: the backend images (gateway, centers, drivers) are published as `latest`, the
-series tag (`2026.6`), and the full version (`2026.6.0`), while
+series tag (`2026.9`), and the full version (`2026.9.22`), while
 `dc3-web` is published only as `latest` and full release versions (no series tag). The deployment configs already
 account for this - web pins `latest` with a documented override (`services.web.tag` in Helm, the `images:` block in
 kustomize); pin a full release version for `dc3-web` when you need reproducible rollouts.

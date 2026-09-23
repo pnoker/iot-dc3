@@ -1,6 +1,6 @@
 {
   "name": "iot-dc3-web",
-  "version": "2026.5.22",
+  "version": "2026.9.22",
   "private": true,
   "author": "pnoker",
   "description": "IoT DC3 Industrial AI IoT Platform frontend — Vue 3 + TypeScript + Element Plus",

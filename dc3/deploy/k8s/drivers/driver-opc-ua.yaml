@@ -36,7 +36,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: dc3-driver-opc-ua
-          image: pnoker/dc3-driver-opc-ua:2026.6
+          image: pnoker/dc3-driver-opc-ua:2026.9
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:

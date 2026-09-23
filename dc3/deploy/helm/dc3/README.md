@@ -13,7 +13,7 @@ cd dc3/deploy/helm/dc3
 
 # dependency images (dc3-postgres / dc3-rabbitmq) are not published by the
 # release CI - build and push them first, then point the chart at your registry
-helm upgrade --install dc3 .   --set image.registry=my.registry/dc3   --set image.tag=2026.6   --set-string secrets.DC3_SECURITY_KEY=<random>   --set-string secrets.AUTH_HMAC_SECRET=<random>   --set secrets.POSTGRES_PASSWORD=<strong>   --set secrets.RABBITMQ_PASSWORD=<strong>   --set ingress.host=dc3.example.com
+helm upgrade --install dc3 .   --set image.registry=my.registry/dc3   --set image.tag=2026.9   --set-string secrets.DC3_SECURITY_KEY=<random>   --set-string secrets.AUTH_HMAC_SECRET=<random>   --set secrets.POSTGRES_PASSWORD=<strong>   --set secrets.RABBITMQ_PASSWORD=<strong>   --set ingress.host=dc3.example.com
 ```
 
 Production presets (replicas, resources, autoscaling, TLS):
@@ -39,7 +39,7 @@ helm upgrade --install dc3 . -f values-production.yaml   --set image.registry=my
 
 | Value                          | Default              | Meaning                                                                                |
 |--------------------------------|----------------------|----------------------------------------------------------------------------------------|
-| `image.registry` / `image.tag` | `pnoker` / `2026.6`  | image source for every component (`services.web.tag` overrides: web has no series tag) |
+| `image.registry` / `image.tag` | `pnoker` / `2026.9`  | image source for every component (`services.web.tag` overrides: web has no series tag) |
 | `secrets.*`                    | weak public defaults | **replace before production**                                                          |
 | `existingSecret`               | `""`                 | use your own Secret instead of the chart-owned one                                     |
 | `services.<name>.replicas`     | per service          | replica count per stateless service                                                    |

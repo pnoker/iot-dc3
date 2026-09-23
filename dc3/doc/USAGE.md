@@ -129,7 +129,7 @@ Facts that hold in every mode:
   (`DC3_IMAGE_REGISTRY=my.registry/dc3 ./dc3/deploy/k8s/scripts/push-images.sh`) or point the stack at managed services
   instead.
 - **`dc3-web` is tagged `latest` and full release versions only** - it has no series tag like
-  `2026.6`. Backend images (gateway, centers, drivers) carry `latest`, the series tag, and the full version. The
+  `2026.9`. Backend images (gateway, centers, drivers) carry `latest`, the series tag, and the full version. The
   deployment configs account for this; pin a full release version for
   `dc3-web` when you need reproducible rollouts.
 - **DNS names are the contract.** Keep the default service names (`dc3-postgres`,

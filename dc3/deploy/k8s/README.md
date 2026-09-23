@@ -63,7 +63,7 @@ kubectl -n dc3 get svc,ingress
 ```
 
 > Tip: change the image tag or registry in one place with
-> `kustomize edit set image pnoker/dc3-gateway=my.registry/dc3/dc3-gateway:2026.7`
+> `kustomize edit set image pnoker/dc3-gateway=my.registry/dc3/dc3-gateway:2026.9`
 > (repeat per image, or edit the `images:` block in `kustomization.yaml`).
 
 ## Access
@@ -100,7 +100,7 @@ Scaling semantics (see `dc3/doc/DEPLOYMENT.md`; the compose-scale/swarm stacks d
 
 ```bash
 # bump the tag centrally, then re-apply (Deployments roll with maxUnavailable: 0)
-kustomize edit set image pnoker/dc3-gateway=pnoker/dc3-gateway:2026.7   # per image
+kustomize edit set image pnoker/dc3-gateway=pnoker/dc3-gateway:2026.9   # per image
 kubectl apply -k dc3/deploy/k8s
 kubectl -n dc3 rollout status deployment/dc3-gateway
 ```

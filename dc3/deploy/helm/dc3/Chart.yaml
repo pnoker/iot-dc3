@@ -23,7 +23,7 @@ description: >-
   RabbitMQ as stateful dependencies.
 type: application
 version: 0.1.0
-appVersion: "2026.6"
+appVersion: "2026.9"
 home: https://github.com/pnoker/iot-dc3
 sources:
   - https://github.com/pnoker/iot-dc3

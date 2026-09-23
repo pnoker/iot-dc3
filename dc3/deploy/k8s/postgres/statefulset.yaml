@@ -41,7 +41,7 @@ spec:
         - name: dc3-postgres
           # Built locally from dc3/dependencies/postgres (see scripts/push-images.sh);
           # pulls the dc3-postgres-base image and layers the initdb seed SQL.
-          image: pnoker/dc3-postgres:2026.6
+          image: pnoker/dc3-postgres:2026.9
           imagePullPolicy: IfNotPresent
           env:
             - name: POSTGRES_DB
