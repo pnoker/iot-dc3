@@ -15,16 +15,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# Single-center topology: the aggregated dc3-center-single (native) replaces
-# the four distributed centers. The gateway runs with NODE_ENV=single, which
-# activates application-single.yml - every api/v3 route proxies to the single
-# service with StripPrefix=3 + PrefixPath=/single, so the web frontend keeps
-# its unchanged protocol. Drivers stay on the JVM and connect through the
-# shared message broker exactly as in the distributed stack.
+# Single-center topology: the aggregated dc3-center-single (native) replaces the four
+# distributed centers. The gateway runs with DC3_GATEWAY_TOPOLOGY=single, which activates
+# the route post-processor in SingleGatewayRouteConfig - every api/v3 route proxies to the
+# single service with StripPrefix=3 + PrefixPath=/single, so the web frontend keeps its
+# unchanged protocol. Drivers stay on the JVM and depend on the single service's health.
 #
-# Dependency services (postgres, rabbitmq) come from docker-compose-db.yml,
-# the same as docker-compose-dev.yml.
-
+# Dependency services (postgres, rabbitmq) come from docker-compose-db.yml, the same as
+# docker-compose-dev.yml.
+#
 x-logging: &default-logging
   driver: json-file
   options:
@@ -33,9 +32,17 @@ x-logging: &default-logging
 
 x-app-runtime-env: &app-runtime-env
   NODE_ENV: test
-  DC3_SECURITY_KEY: ${DC3_SECURITY_KEY:-dc3.security.key.2026.io.github.pnoker}
+  APM_AGENT_ENABLE: ${APM_AGENT_ENABLE:-false}
+  DC3_SECURITY_KEY: ${DC3_SECURITY_KEY:-dc3.security.key.2026.io.github.pnoker}  # dev-only default; never reuse in pre/pro
+  # Internal async-plane broker selection (docs/mq-brokers.md); rabbitmq is the default
   DC3_MQ_TYPE: "${DC3_MQ_TYPE:-rabbitmq}"
-  AUTH_HMAC_SECRET: ${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+  # Relational dialect selection (docs/db-dialects.md); postgres is the default
+  # Non-rabbitmq adapter connection settings (only used when DC3_MQ_TYPE matches)
+  DC3_MQ_KAFKA_BOOTSTRAP: "${DC3_MQ_KAFKA_BOOTSTRAP:-kafka:9092}"
+  DC3_MQ_PULSAR_URL: "${DC3_MQ_PULSAR_URL:-pulsar://pulsar:6650}"
+  DC3_MQ_MQTT_HOST: "${DC3_MQ_MQTT_HOST:-dc3-rabbitmq}"
+  DC3_MQ_MQTT_PORT: "${DC3_MQ_MQTT_PORT:-1883}"
+  AUTH_HMAC_SECRET: ${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}  # dev-only default; never reuse in pre/pro
   POSTGRES_HOST: dc3-postgres
   POSTGRES_PORT: "5432"
   POSTGRES_USERNAME: ${POSTGRES_USERNAME:-dc3}
@@ -49,6 +56,10 @@ x-app-runtime-env: &app-runtime-env
   RABBITMQ_PORT: "${RABBITMQ_CONTAINER_PORT:-5672}"
   RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-dc3}
   RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-dc3dc3dc3}
+  RABBITMQ_SSL_ENABLED: "${RABBITMQ_SSL_ENABLED:-false}"
+  RABBITMQ_SSL_ALGORITHM: "${RABBITMQ_SSL_ALGORITHM:-TLS}"
+  RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE: "${RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE:-false}"
+  RABBITMQ_SSL_VERIFY_HOSTNAME: "${RABBITMQ_SSL_VERIFY_HOSTNAME:-false}"
   MQTT_BROKER_HOST: dc3-rabbitmq
   MQTT_BROKER_PORT: "1883"
   MQTT_USERNAME: ${MQTT_USERNAME:-dc3}
@@ -72,7 +83,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-gateway-native
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.6}-native
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.9}-native
     restart: always
     depends_on:
       single:
@@ -81,13 +92,14 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GATEWAY_PORT:-8000}:8000"
     environment:
       <<: *app-runtime-env
-      # Single topology: DC3_GATEWAY_TOPOLOGY=single activates the
-      # route-replacing post-processor; the Authentic filter's permission
-      # gRPC channel re-points at single:9100.
+      # RS256 ticket verification on API routes (token-unification-mcp-first-cli.md)
+      DC3_GATEWAY_OAUTH_ENABLED: ${DC3_GATEWAY_OAUTH_ENABLED:-false}
+      # Single topology: the gateway's route post-processor rewrites every
+      # api/v3 route to the aggregated single service; the Authentic filter's
+      # permission gRPC channel re-points at single:9100.
       DC3_GATEWAY_TOPOLOGY: single
       CENTER_AUTH_HOST: dc3-center-single
       CENTER_AUTH_GRPC_PORT: "9100"
-      DC3_GATEWAY_OAUTH_ENABLED: ${DC3_GATEWAY_OAUTH_ENABLED:-false}
       DC3_GATEWAY_OAUTH_JWKS_URL: ${DC3_GATEWAY_OAUTH_JWKS_URL:-http://dc3-center-single:8100/single/oauth2/jwks}
     container_name: dc3-gateway
     hostname: dc3-gateway
@@ -98,7 +110,7 @@ services:
       interval: 15s
       timeout: 5s
       retries: 10
-      start_period: 10s
+      start_period: 30s
     logging: *default-logging
     networks:
       dc3net:
@@ -110,7 +122,7 @@ services:
       context: ..
       dockerfile: Dockerfile
       target: dc3-center-single-native
-    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-single:${DC3_IMAGE_TAG:-2026.6}-native
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-single:${DC3_IMAGE_TAG:-2026.9}-native
     restart: always
     ports:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_SINGLE_PORT:-8100}:8100"
@@ -140,15 +152,19 @@ services:
       target: dc3-driver-listening-virtual
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.9}
     restart: always
+    depends_on:
+      single:
+        condition: service_healthy
     ports:
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_TCP_PORT:-6270}:6270"
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_UDP_PORT:-6271}:6271"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_TCP_PORT:-6270}:6270"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_LISTENING_VIRTUAL_UDP_PORT:-6271}:6271"
     environment:
       <<: *app-runtime-env
     container_name: dc3-driver-listening-virtual
     hostname: dc3-driver-listening-virtual
     volumes:
       - logs:/dc3-driver/dc3-driver-listening-virtual/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-listening-virtual/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -162,14 +178,16 @@ services:
       target: dc3-driver-modbus-tcp
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.9}
     restart: always
-    ports:
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_MODBUS_TCP_PORT:-6502}:6502"
+    depends_on:
+      single:
+        condition: service_healthy
     environment:
       <<: *app-runtime-env
     container_name: dc3-driver-modbus-tcp
     hostname: dc3-driver-modbus-tcp
     volumes:
       - logs:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-modbus-tcp/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -183,14 +201,16 @@ services:
       target: dc3-driver-modbus-rtu
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.9}
     restart: always
-    ports:
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_MODBUS_RTU_PORT:-6503}:6503"
+    depends_on:
+      single:
+        condition: service_healthy
     environment:
       <<: *app-runtime-env
     container_name: dc3-driver-modbus-rtu
     hostname: dc3-driver-modbus-rtu
     volumes:
       - logs:/dc3-driver/dc3-driver-modbus-rtu/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-modbus-rtu/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -204,19 +224,663 @@ services:
       target: dc3-driver-mqtt
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.9}
     restart: always
-    ports:
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_MQTT_PORT:-6288}:6288"
+    depends_on:
+      single:
+        condition: service_healthy
     environment:
       <<: *app-runtime-env
     container_name: dc3-driver-mqtt
     hostname: dc3-driver-mqtt
     volumes:
       - logs:/dc3-driver/dc3-driver-mqtt/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-mqtt/dc3/data
     logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-driver-mqtt
+
+  dc3-driver-bacnet-ip:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-bacnet-ip
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-bacnet-ip:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-bacnet-ip
+    hostname: dc3-driver-bacnet-ip
+    volumes:
+      - logs:/dc3-driver/dc3-driver-bacnet-ip/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-bacnet-ip/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-bacnet-ip
+
+  dc3-driver-ble:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-ble
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ble:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-ble
+    hostname: dc3-driver-ble
+    volumes:
+      - logs:/dc3-driver/dc3-driver-ble/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-ble/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-ble
+
+  dc3-driver-can:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-can
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-can:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-can
+    hostname: dc3-driver-can
+    volumes:
+      - logs:/dc3-driver/dc3-driver-can/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-can/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-can
+
+  dc3-driver-coap:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-coap
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-coap:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-coap
+    hostname: dc3-driver-coap
+    volumes:
+      - logs:/dc3-driver/dc3-driver-coap/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-coap/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-coap
+
+  dc3-driver-dlms:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-dlms
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlms:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-dlms
+    hostname: dc3-driver-dlms
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dlms/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-dlms/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-dlms
+
+  dc3-driver-ethernet-ip:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-ethernet-ip
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ethernet-ip:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-ethernet-ip
+    hostname: dc3-driver-ethernet-ip
+    volumes:
+      - logs:/dc3-driver/dc3-driver-ethernet-ip/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-ethernet-ip/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-ethernet-ip
+
+  dc3-driver-fins:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-fins
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-fins:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-fins
+    hostname: dc3-driver-fins
+    volumes:
+      - logs:/dc3-driver/dc3-driver-fins/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-fins/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-fins
+
+  dc3-driver-http:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-http
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-http:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-http
+    hostname: dc3-driver-http
+    volumes:
+      - logs:/dc3-driver/dc3-driver-http/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-http/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-http
+
+  dc3-driver-iec104:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-iec104
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec104:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-iec104
+    hostname: dc3-driver-iec104
+    volumes:
+      - logs:/dc3-driver/dc3-driver-iec104/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-iec104/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-iec104
+
+  dc3-driver-lwm2m:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-lwm2m
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lwm2m:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-lwm2m
+    hostname: dc3-driver-lwm2m
+    volumes:
+      - logs:/dc3-driver/dc3-driver-lwm2m/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-lwm2m/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-lwm2m
+
+  dc3-driver-melsec:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-melsec
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-melsec:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-melsec
+    hostname: dc3-driver-melsec
+    volumes:
+      - logs:/dc3-driver/dc3-driver-melsec/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-melsec/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-melsec
+
+  dc3-driver-mysql:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-mysql
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mysql:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-mysql
+    hostname: dc3-driver-mysql
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mysql/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-mysql/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mysql
+
+  dc3-driver-oracle:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-oracle
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-oracle:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-oracle
+    hostname: dc3-driver-oracle
+    volumes:
+      - logs:/dc3-driver/dc3-driver-oracle/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-oracle/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-oracle
+
+  dc3-driver-postgresql:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-postgresql
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-postgresql:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-postgresql
+    hostname: dc3-driver-postgresql
+    volumes:
+      - logs:/dc3-driver/dc3-driver-postgresql/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-postgresql/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-postgresql
+
+  dc3-driver-serial:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-serial
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-serial:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-serial
+    hostname: dc3-driver-serial
+    volumes:
+      - logs:/dc3-driver/dc3-driver-serial/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-serial/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-serial
+  dc3-driver-dlt645:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-dlt645
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlt645:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-dlt645
+    hostname: dc3-driver-dlt645
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dlt645/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-dlt645/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-dlt645
+
+  dc3-driver-dnp3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-dnp3
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dnp3:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-dnp3
+    hostname: dc3-driver-dnp3
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dnp3/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-dnp3/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-dnp3
+
+  dc3-driver-iec61850:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-iec61850
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec61850:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-iec61850
+    hostname: dc3-driver-iec61850
+    volumes:
+      - logs:/dc3-driver/dc3-driver-iec61850/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-iec61850/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-iec61850
+
+  dc3-driver-kafka:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-kafka
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-kafka:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-kafka
+    hostname: dc3-driver-kafka
+    volumes:
+      - logs:/dc3-driver/dc3-driver-kafka/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-kafka/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-kafka
+
+  dc3-driver-knx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-knx
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-knx:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-knx
+    hostname: dc3-driver-knx
+    volumes:
+      - logs:/dc3-driver/dc3-driver-knx/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-knx/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-knx
+
+  dc3-driver-lorawan:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-lorawan
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lorawan:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-lorawan
+    hostname: dc3-driver-lorawan
+    volumes:
+      - logs:/dc3-driver/dc3-driver-lorawan/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-lorawan/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-lorawan
+
+  dc3-driver-mbus:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-mbus
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mbus:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-mbus
+    hostname: dc3-driver-mbus
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mbus/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-mbus/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mbus
+
+  dc3-driver-redis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-redis
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-redis:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-redis
+    hostname: dc3-driver-redis
+    volumes:
+      - logs:/dc3-driver/dc3-driver-redis/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-redis/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-redis
+  dc3-driver-sl651:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-sl651
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sl651:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-sl651
+    hostname: dc3-driver-sl651
+    volumes:
+      - logs:/dc3-driver/dc3-driver-sl651/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-sl651/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-sl651
+
+  dc3-driver-snmp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-snmp
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-snmp:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-snmp
+    hostname: dc3-driver-snmp
+    volumes:
+      - logs:/dc3-driver/dc3-driver-snmp/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-snmp/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-snmp
+
+  dc3-driver-sqlserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-sqlserver
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sqlserver:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-sqlserver
+    hostname: dc3-driver-sqlserver
+    volumes:
+      - logs:/dc3-driver/dc3-driver-sqlserver/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-sqlserver/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-sqlserver
+
+  dc3-driver-tcp-udp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-tcp-udp
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-tcp-udp:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-tcp-udp
+    hostname: dc3-driver-tcp-udp
+    volumes:
+      - logs:/dc3-driver/dc3-driver-tcp-udp/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-tcp-udp/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-tcp-udp
+
+  dc3-driver-zigbee:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dc3-driver-zigbee
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-zigbee:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-zigbee
+    hostname: dc3-driver-zigbee
+    volumes:
+      - logs:/dc3-driver/dc3-driver-zigbee/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-zigbee/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-zigbee
 
   opc-da:
     build:
@@ -225,14 +889,16 @@ services:
       target: dc3-driver-opc-da
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.9}
     restart: always
-    ports:
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_OPC_DA_PORT:-6266}:6266"
+    depends_on:
+      single:
+        condition: service_healthy
     environment:
       <<: *app-runtime-env
     container_name: dc3-driver-opc-da
     hostname: dc3-driver-opc-da
     volumes:
       - logs:/dc3-driver/dc3-driver-opc-da/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-opc-da/dc3/data
     logging: *default-logging
     networks:
       dc3net:
@@ -246,22 +912,71 @@ services:
       target: dc3-driver-opc-ua
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.9}
     restart: always
-    ports:
-      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_OPC_UA_PORT:-6279}:6279"
+    depends_on:
+      single:
+        condition: service_healthy
     environment:
       <<: *app-runtime-env
     container_name: dc3-driver-opc-ua
     hostname: dc3-driver-opc-ua
     volumes:
       - logs:/dc3-driver/dc3-driver-opc-ua/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-opc-ua/dc3/data
     logging: *default-logging
     networks:
       dc3net:
         aliases:
           - dc3-driver-opc-ua
 
+  plcs7:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-plcs7
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-plcs7:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-plcs7
+    hostname: dc3-driver-plcs7
+    volumes:
+      - logs:/dc3-driver/dc3-driver-plcs7/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-plcs7/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-plcs7
+
+  virtual:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-virtual
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-virtual
+    hostname: dc3-driver-virtual
+    volumes:
+      - logs:/dc3-driver/dc3-driver-virtual/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-virtual/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-virtual
+
 volumes:
   logs:
+  driver_data:
 networks:
   dc3net:
     driver: bridge
