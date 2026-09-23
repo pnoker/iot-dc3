@@ -40,10 +40,13 @@ import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {Chart} from '@antv/g2';
 
 import {statsTimeseries} from '@/api/dashboard';
+import {deviceTimeseries} from '@/api/dashboard/device';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+
+const props = defineProps<{deviceId?: string}>();
 
 const rangeKey = ref<RangeKey>('24h');
 const {error, loading, run, status} = useAsyncLoader();
@@ -97,10 +100,15 @@ const load = async () => {
   const requestRange = rangeKey.value;
   await run(
     () =>
-      statsTimeseries({
-        granularity: granularityFor(requestRange),
-        rangeKey: requestRange,
-      }),
+      props.deviceId
+        ? deviceTimeseries(props.deviceId, {
+            granularity: granularityFor(requestRange),
+            rangeKey: requestRange,
+          })
+        : statsTimeseries({
+            granularity: granularityFor(requestRange),
+            rangeKey: requestRange,
+          }),
     {
       apply: (res) => {
         const payload = Array.isArray(res) ? res : [];
@@ -120,6 +128,7 @@ const load = async () => {
 
 onMounted(load);
 watch(rangeKey, load);
+watch(() => props.deviceId, load);
 watch(error, (value) => {
   if (value) {
     chart?.destroy();

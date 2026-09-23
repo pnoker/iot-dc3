@@ -41,6 +41,124 @@
         v-loading="reactiveData.loading"
         @tab-click="changeActive"
       >
+        <el-tab-pane :label="$t('device.detail.dashboard')" name="dashboard">
+          <div class="device-dashboard">
+            <!-- Status strip: online lease summary from the device-status API. -->
+            <div class="device-dashboard__status">
+              <span class="device-dashboard__status-dot" :style="{background: statusDotColor}"></span>
+              <div class="device-dashboard__status-main">
+                <span class="device-dashboard__status-label">{{ statusLabel }}</span>
+                <span class="device-dashboard__status-meta">
+                  {{ $t('device.detail.heartbeatTime') }}: {{ heartbeatLabel }}
+                </span>
+                <span class="device-dashboard__status-meta">
+                  {{ $t('device.detail.timeoutConfig') }}: {{ timeoutLabel }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Stat cards: point count, data quality, missing points, last update. -->
+            <div class="device-dashboard__stats">
+              <stat-card
+                :icon="ListIcon"
+                :loading="coverageLoading"
+                :title="$t('device.detail.totalPoints')"
+                :value="totalPointsLabel"
+                tone="blue"
+              />
+              <stat-card
+                :error="qualityError"
+                :icon="OdometerIcon"
+                :loading="qualityLoading"
+                :on-refresh="loadQuality"
+                :subtitle="$t('device.detail.qualitySubtitle')"
+                :title="$t('device.detail.dataQuality')"
+                :value="qualityRatioLabel"
+                tone="green"
+              />
+              <stat-card
+                :error="coverageError"
+                :icon="WarningIcon"
+                :loading="coverageLoading"
+                :on-refresh="loadCoverage"
+                :title="$t('device.detail.missingPoints')"
+                :value="missingPointCount"
+                tone="red"
+              />
+              <stat-card
+                :error="qualityError"
+                :icon="ClockIcon"
+                :loading="qualityLoading"
+                :on-refresh="loadQuality"
+                :title="$t('device.detail.latestUpdate')"
+                :value="latestUpdateLabel"
+                tone="purple"
+              />
+            </div>
+
+            <!-- Trend + weekly activity heatmap. -->
+            <el-row :gutter="8" class="device-dashboard__row">
+              <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="device-dashboard__col">
+                <trend-chart :device-id="reactiveData.id"/>
+              </el-col>
+              <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="device-dashboard__col">
+                <activity-heatmap :device-id="reactiveData.id"/>
+              </el-col>
+            </el-row>
+
+            <!-- Latency histogram + quality ring + availability timeline. -->
+            <el-row :gutter="8" class="device-dashboard__row">
+              <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="device-dashboard__col">
+                <latency-chart :device-id="reactiveData.id"/>
+              </el-col>
+              <el-col :lg="6" :md="24" :sm="24" :xl="6" :xs="24" class="device-dashboard__col">
+                <dashboard-card
+                  :error="qualityError"
+                  :error-text="$t('common.loadFailed')"
+                  :footer-meta="$t('device.detail.qualityFooter')"
+                  :loading="qualityLoading"
+                  :retry-text="$t('common.retry')"
+                  :title="$t('device.detail.dataQuality')"
+                  body-mode="plain"
+                  @refresh="loadQuality"
+                >
+                  <div class="device-dashboard__ring">
+                    <quality-ring :quality="qualityData"/>
+                  </div>
+                </dashboard-card>
+              </el-col>
+              <el-col :lg="6" :md="24" :sm="24" :xl="6" :xs="24" class="device-dashboard__col">
+                <dashboard-card
+                  :error="availabilityError"
+                  :error-text="$t('common.loadFailed')"
+                  :footer-meta="$t('device.detail.availabilityFooter')"
+                  :loading="availabilityLoading"
+                  :retry-text="$t('common.retry')"
+                  :title="$t('device.detail.availabilityTitle')"
+                  body-mode="plain"
+                  @refresh="loadAvailability"
+                >
+                  <availability-timeline
+                    :missing-items="coverageData.items"
+                    :missing-points="coverageData.missingPoints"
+                    :silent-sources="silentData"
+                    :total-points="coverageData.totalPoints"
+                  />
+                </dashboard-card>
+              </el-col>
+            </el-row>
+
+            <!-- Live data feed + device-scoped alert list. -->
+            <el-row :gutter="8" class="device-dashboard__row">
+              <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="device-dashboard__col">
+                <live-data-feed :device-id="reactiveData.id" :size="20"/>
+              </el-col>
+              <el-col :lg="12" :md="24" :sm="24" :xl="12" :xs="24" class="device-dashboard__col">
+                <alert-list :device-id="reactiveData.id" :size="10"/>
+              </el-col>
+            </el-row>
+          </div>
+        </el-tab-pane>
         <el-tab-pane :label="$t('device.detail.deviceInfo')" name="detail">
           <detail-card>
             <el-descriptions :column="isMobile ? 1 : 2" border>
@@ -108,6 +226,8 @@
 
 <script lang="ts" setup>
 import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
+import {useI18n} from 'vue-i18n';
+import {Clock as ClockIcon, List as ListIcon, Odometer as OdometerIcon, Warning as WarningIcon} from '@element-plus/icons-vue';
 
 import {useRoute} from 'vue-router';
 import router from '@/config/router';
@@ -115,18 +235,31 @@ import router from '@/config/router';
 import {getDriverById} from '@/api/driver';
 import {getProfileById} from '@/api/profile';
 import {getDeviceById} from '@/api/device';
+import {deviceCoverageGap, deviceQuality, deviceSilentSources, deviceStatusDetail} from '@/api/dashboard/device';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
 import detailCard from '@/components/card/detail/DetailCard.vue';
+import StatCard from '@/components/card/stat/StatCard.vue';
+import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
+import QualityRing from '@/components/chart/QualityRing.vue';
+import AvailabilityTimeline from '@/components/chart/AvailabilityTimeline.vue';
 import point from '@/views/point/Point.vue';
 import pointValue from '@/views/point/value/PointValue.vue';
 import CommandList from '@/views/settings/command/CommandList.vue';
 import EventList from '@/views/settings/event/definition/EventList.vue';
+import TrendChart from '@/views/home/components/TrendChart.vue';
+import ActivityHeatmap from '@/views/home/components/ActivityHeatmap.vue';
+import LatencyChart from '@/views/home/components/LatencyChart.vue';
+import LiveDataFeed from '@/views/home/components/LiveDataFeed.vue';
+import AlertList from '@/views/home/components/AlertList.vue';
 import {timestamp} from '@/utils/dateUtil';
+import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import type {DeviceRecord, DriverRecord, PointRecord, ProfileRecord} from '@/config/types/manager';
+import type {DeviceCoverageGap, DeviceQuality, DeviceSilentSource, DeviceStatusDetail} from '@/config/types/dashboard';
 import {useBreakpoint} from '@/composables/useBreakpoint';
 
 const route = useRoute();
+const {t} = useI18n();
 const {isMobile} = useBreakpoint();
 const pointViewRef = ref<InstanceType<typeof point>>();
 const commandViewRef = ref<InstanceType<typeof CommandList>>();
@@ -135,7 +268,7 @@ const pointValueViewRef = ref<InstanceType<typeof pointValue>>();
 
 const reactiveData = reactive({
   id: String(route.query.id ?? ''),
-  active: (route.query.active as string) || 'detail',
+  active: (route.query.active as string) || 'dashboard',
   loading: true,
   status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
   data: {} as Partial<DeviceRecord>,
@@ -160,11 +293,89 @@ let requestId = 0;
 let driverRequestId = 0;
 let profileRequestId = 0;
 
+// ---- Device dashboard data (lazy-loaded when the dashboard tab activates) ----
+const statusDetail = ref<Partial<DeviceStatusDetail>>({});
+const qualityData = ref<DeviceQuality | null>(null);
+const coverageData = ref<DeviceCoverageGap>({totalPoints: 0, missingPoints: 0, items: []});
+const silentData = ref<DeviceSilentSource[]>([]);
+
+const statusLoader = useAsyncLoader();
+const qualityLoader = useAsyncLoader();
+const coverageLoader = useAsyncLoader();
+const silentLoader = useAsyncLoader();
+
+const loadStatus = async () => {
+  const deviceId = String(reactiveData.id || '');
+  if (!deviceId) return;
+  await statusLoader.run(() => deviceStatusDetail(deviceId), {
+    apply: (res) => {
+      if (deviceId !== String(reactiveData.id || '')) return;
+      statusDetail.value = res || {};
+    },
+  });
+};
+
+const loadQuality = async () => {
+  const deviceId = String(reactiveData.id || '');
+  if (!deviceId) return;
+  await qualityLoader.run(() => deviceQuality(deviceId), {
+    apply: (res) => {
+      if (deviceId !== String(reactiveData.id || '')) return;
+      qualityData.value = res || null;
+    },
+  });
+};
+
+const loadCoverage = async () => {
+  const deviceId = String(reactiveData.id || '');
+  if (!deviceId) return;
+  await coverageLoader.run(() => deviceCoverageGap(deviceId), {
+    apply: (res) => {
+      if (deviceId !== String(reactiveData.id || '')) return;
+      coverageData.value = res || {totalPoints: 0, missingPoints: 0, items: []};
+    },
+  });
+};
+
+const loadSilent = async () => {
+  const deviceId = String(reactiveData.id || '');
+  if (!deviceId) return;
+  await silentLoader.run(() => deviceSilentSources(deviceId, {limit: 10}), {
+    apply: (res) => {
+      if (deviceId !== String(reactiveData.id || '')) return;
+      silentData.value = Array.isArray(res) ? res : [];
+    },
+  });
+};
+
+const loadAvailability = () => {
+  void loadCoverage();
+  void loadSilent();
+};
+
+const loadDashboard = () => {
+  void loadStatus();
+  void loadQuality();
+  void loadAvailability();
+};
+
+const qualityLoading = computed(() => qualityLoader.loading.value);
+const qualityError = computed(() => !!qualityLoader.error.value);
+const coverageLoading = computed(() => coverageLoader.loading.value);
+const coverageError = computed(() => !!coverageLoader.error.value);
+const availabilityLoading = computed(() => coverageLoader.loading.value || silentLoader.loading.value);
+const availabilityError = computed(() => !!coverageLoader.error.value || !!silentLoader.error.value);
+
 const profileId = computed(() => String(reactiveData.data.profileId || ''));
 
 const pointLength = computed(() => {
   return pointViewRef.value?.reactiveData?.page?.total || 0;
 });
+
+// The dashboard's point count prefers the declared-point total from the
+// coverage endpoint (the point tab is lazy, so pointLength is 0 until the
+// user opens it); fall back to the lazy tab once it has loaded.
+const totalPointsLabel = computed(() => coverageData.value?.totalPoints || pointLength.value);
 
 const commandLength = computed(() => {
   return commandViewRef.value?.reactiveData?.page?.total || 0;
@@ -172,6 +383,61 @@ const commandLength = computed(() => {
 
 const eventLength = computed(() => {
   return eventViewRef.value?.reactiveData?.page?.total || 0;
+});
+
+const statusCode = computed(() => String(statusDetail.value.status || '').toLowerCase());
+
+const statusLabel = computed(() => {
+  switch (statusCode.value) {
+    case 'online':
+      return t('status.online');
+    case 'offline':
+      return t('status.offline');
+    case 'maintain':
+      return t('status.maintain');
+    case 'fault':
+      return t('status.fault');
+    default:
+      return t('status.unknown');
+  }
+});
+
+const statusDotColor = computed(() => {
+  switch (statusCode.value) {
+    case 'online':
+      return 'var(--el-color-success)';
+    case 'maintain':
+      return 'var(--el-color-warning)';
+    case 'fault':
+      return 'var(--el-color-danger)';
+    case 'offline':
+      return 'var(--el-color-info)';
+    default:
+      return 'var(--el-color-info)';
+  }
+});
+
+const heartbeatLabel = computed(() => {
+  const heartbeat = statusDetail.value.lastHeartbeatTime;
+  return heartbeat ? timestamp(String(heartbeat)) : '-';
+});
+
+const timeoutLabel = computed(() => {
+  const seconds = statusDetail.value.timeoutSeconds;
+  return seconds != null ? `${seconds}s` : '-';
+});
+
+const qualityRatioLabel = computed(() => {
+  const ratio = qualityData.value?.numericRatio;
+  if (ratio == null || !Number.isFinite(ratio)) return '—';
+  return `${Number.isInteger(ratio) ? ratio : ratio.toFixed(1)}%`;
+});
+
+const missingPointCount = computed(() => coverageData.value?.missingPoints ?? 0);
+
+const latestUpdateLabel = computed(() => {
+  const latest = qualityData.value?.latestSeen;
+  return latest ? timestamp(String(latest)) : '—';
 });
 
 const loadDriver = (deviceRequestId: number, deviceId: string, driverId: string) => {
@@ -290,6 +556,9 @@ const changeActive = (tab: any) => {
   });
 
   switch (tab.props.name) {
+    case 'dashboard':
+      loadDashboard();
+      break;
     case 'point':
       pointViewRef.value?.refresh();
       break;
@@ -327,20 +596,30 @@ watch(
       reactiveData.listPointValueData = [];
       reactiveData.listPointValueHistoryData = {};
       reactiveData.pointValueDetailData = {};
+      statusDetail.value = {};
+      qualityData.value = null;
+      coverageData.value = {totalPoints: 0, missingPoints: 0, items: []};
+      silentData.value = [];
       device();
+      if (((active as string) || 'dashboard') === 'dashboard') loadDashboard();
     }
-    reactiveData.active = (active as string) || 'detail';
+    reactiveData.active = (active as string) || 'dashboard';
   }
 );
 
 onMounted(() => {
   device();
+  if (reactiveData.active === 'dashboard') loadDashboard();
 });
 
 onBeforeUnmount(() => {
   requestId += 1;
   driverRequestId += 1;
   profileRequestId += 1;
+  statusLoader.invalidate();
+  qualityLoader.invalidate();
+  coverageLoader.invalidate();
+  silentLoader.invalidate();
 });
 </script>
 
@@ -358,5 +637,83 @@ onBeforeUnmount(() => {
 
 .detail-inline-error {
   color: var(--el-color-danger);
+}
+
+// Device dashboard tab — mirrors the Home page's el-row/gutter rhythm so
+// the reused chart/feed cards sit on the same 8px (12px mobile) grid.
+.device-dashboard {
+  // Online-status banner strip.
+  &__status {
+    display: flex;
+    align-items: center;
+    gap: var(--dc3-space-3);
+    padding: var(--dc3-space-3) var(--dc3-space-4);
+    border: 1px solid var(--dc3-border-base);
+    border-radius: var(--dc3-radius-lg);
+    background: var(--dc3-bg-muted);
+    margin-bottom: var(--dc3-gutter);
+  }
+
+  &__status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__status-main {
+    display: flex;
+    align-items: baseline;
+    gap: var(--dc3-space-4);
+    flex-wrap: wrap;
+  }
+
+  &__status-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--dc3-text-primary);
+  }
+
+  &__status-meta {
+    font-size: 12px;
+    color: var(--dc3-text-muted);
+  }
+
+  // Stat-card strip: 4 across on desktop, 2 on tablet, 1 on mobile.
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--dc3-space-2);
+    margin-bottom: var(--dc3-gutter);
+
+    @media (max-width: $breakpoint-md-max) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: $breakpoint-xs-max) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__row {
+    margin-bottom: var(--dc3-gutter);
+    row-gap: var(--dc3-gutter);
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__col {
+    margin-bottom: 0;
+  }
+
+  // Center the quality ring vertically inside its (taller) dashboard card.
+  &__ring {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 </style>

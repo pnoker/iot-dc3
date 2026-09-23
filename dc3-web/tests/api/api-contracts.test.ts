@@ -28,6 +28,7 @@ import * as alertApi from '@/api/dashboard/alert';
 import * as statsApi from '@/api/dashboard/stats';
 import * as systemApi from '@/api/dashboard/system';
 import * as topologyApi from '@/api/dashboard/topology';
+import * as deviceDashboardApi from '@/api/dashboard/device';
 import * as commandApi from '@/api/command';
 import * as deviceApi from '@/api/device';
 import * as dictionaryApi from '@/api/dictionary';
@@ -104,6 +105,7 @@ const modules: Record<string, ApiModule> = {
   stats: statsApi,
   system: systemApi,
   topology: topologyApi,
+  deviceDashboard: deviceDashboardApi,
   command: commandApi,
   device: deviceApi,
   dictionary: dictionaryApi,
@@ -139,6 +141,7 @@ const coveredApiSourceFiles = new Set([
   'dashboard/stats',
   'dashboard/system',
   'dashboard/topology',
+  'dashboard/device',
   'device',
   'dictionary',
   'driver',
@@ -235,6 +238,19 @@ const sampleArgsRegistry: Record<string, unknown[]> = {
   ],
   resetLocalCredentialPassword: ['id-1', 'secret-1'],
   checkLoginNameAvailable: ['login-1'],
+  // Device-scoped dashboard wrappers: first arg is a deviceId string
+  // (numeric in the sample so the path segment stays within the URL contract).
+  deviceTimeseries: ['1001', {rangeKey: '24h'}],
+  deviceLatency: ['1001', {rangeKey: '24h'}],
+  deviceActivity: ['1001', {rangeKey: '7d'}],
+  deviceQuality: ['1001', {rangeHours: 24}],
+  deviceStream: ['1001', 20],
+  deviceTopPoints: ['1001', {rangeHours: 24, limit: 10}],
+  deviceCoverageGap: ['1001'],
+  deviceSilentSources: ['1001', {limit: 10}],
+  deviceAlertTrend: ['1001', 30],
+  deviceStatusDetail: ['1001'],
+  deviceAlertPage: [{source: 'device', sourceId: '1001', limit: 10}],
   enablePrincipal: ['id-1'],
   disablePrincipal: ['id-1'],
   enableServiceAccount: ['id-1'],

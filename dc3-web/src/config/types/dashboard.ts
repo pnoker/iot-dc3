@@ -63,6 +63,8 @@ export interface SystemHealth {
  */
 export interface AlertPageQuery {
   source?: AlertSource | null;
+  /** Device id when `source` is 'device' (device-scoped alert listing). */
+  sourceId?: string | null;
   alarmTypeFlag?: number | null;
   confirmFlag?: number | null;
   /**
@@ -384,4 +386,108 @@ export interface DeviceStats {
   byEnable: { key: string; count: number }[];
   byProfile: { key: string; count: number }[];
   byDriver: { key: string; count: number }[];
+}
+
+// ---- Device-scoped dashboard ------------------------------------------
+
+/**
+ * DeviceTimeseriesPoint data contract.
+ * `bucket` is a server-rendered LocalDateTime string.
+ */
+export interface DeviceTimeseriesPoint {
+  bucket: string;
+  count: number;
+}
+
+/**
+ * DeviceLatencyBucket data contract.
+ * One of six fixed latency bins (0..5).
+ */
+export interface DeviceLatencyBucket {
+  bin: number;
+  count: number;
+}
+
+/**
+ * DeviceActivityCell data contract.
+ * One of 168 weekly cells; `dow` 0 = Sunday.
+ */
+export interface DeviceActivityCell {
+  dow: number;
+  hour: number;
+  count: number;
+}
+
+/**
+ * DeviceQuality data contract.
+ */
+export interface DeviceQuality {
+  totalSamples: number;
+  numericSamples: number;
+  nonNumericSamples: number;
+  numericRatio: number;
+  latestSeen: string | null;
+}
+
+/**
+ * DeviceStreamRow data contract.
+ */
+export interface DeviceStreamRow {
+  deviceId: string;
+  pointId: string;
+  driverId: string;
+  deviceName: string;
+  pointName: string;
+  driverName: string;
+  rawValue: string;
+  calValue: string;
+  valueType: string;
+  createTime: string;
+}
+
+/**
+ * DeviceTopPoint data contract.
+ */
+export interface DeviceTopPoint {
+  entityId: string;
+  count: number;
+}
+
+/**
+ * DeviceCoverageGap data contract.
+ */
+export interface DeviceCoverageGap {
+  totalPoints: number;
+  missingPoints: number;
+  items: CoverageGapItem[];
+}
+
+/**
+ * DeviceSilentSource data contract.
+ */
+export interface DeviceSilentSource {
+  deviceId: string;
+  pointId: string;
+  lastSeen: string;
+  silentSeconds: number;
+}
+
+/**
+ * DeviceAlertTrendPoint data contract.
+ */
+export interface DeviceAlertTrendPoint {
+  date: string;
+  deviceCount: number;
+  driverCount: number;
+}
+
+/**
+ * DeviceStatusDetail data contract.
+ */
+export interface DeviceStatusDetail {
+  deviceId: string;
+  status: string;
+  lastHeartbeatTime: string | null;
+  timeoutSeconds: number | null;
+  expireTime: string | null;
 }

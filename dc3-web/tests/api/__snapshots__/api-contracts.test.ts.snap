@@ -1649,6 +1649,167 @@ exports[`API wrapper contracts > device > updateDevice maps to its transport con
 }
 `;
 
+exports[`API wrapper contracts > deviceDashboard > deviceActivity maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/device/1001/stats/activity",
+    {
+      "params": {
+        "range_key": "7d",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > deviceDashboard > deviceAlertPage maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/page",
+    {
+      "limit": 10,
+      "source": "device",
+      "sourceId": "1001",
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > deviceDashboard > deviceAlertTrend maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/device/1001/alert/trend",
+    {
+      "params": {
+        "days": 30,
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > deviceDashboard > deviceCoverageGap maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/device/1001/coverage/gap",
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > deviceDashboard > deviceLatency maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/device/1001/stats/latency",
+    {
+      "params": {
+        "range_key": "24h",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > deviceDashboard > deviceQuality maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/device/1001/stats/quality",
+    {
+      "params": {
+        "range_hours": 24,
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > deviceDashboard > deviceSilentSources maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/device/1001/silent/sources",
+    {
+      "params": {
+        "limit": 10,
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > deviceDashboard > deviceStatusDetail maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/device/status/1001",
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > deviceDashboard > deviceStream maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/device/1001/stream",
+    {
+      "params": {
+        "limit": 20,
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > deviceDashboard > deviceTimeseries maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/device/1001/stats/timeseries",
+    {
+      "params": {
+        "range_key": "24h",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > deviceDashboard > deviceTopPoints maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/device/1001/top/points",
+    {
+      "params": {
+        "limit": 10,
+        "range_hours": 24,
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > deviceDashboard > has every export covered by the contract matrix 1`] = `
+[
+  "deviceActivity",
+  "deviceAlertPage",
+  "deviceAlertTrend",
+  "deviceCoverageGap",
+  "deviceLatency",
+  "deviceQuality",
+  "deviceSilentSources",
+  "deviceStatusDetail",
+  "deviceStream",
+  "deviceTimeseries",
+  "deviceTopPoints",
+]
+`;
+
 exports[`API wrapper contracts > dictionary > has every export covered by the contract matrix 1`] = `
 [
   "listDeviceDictionary",

@@ -41,6 +41,7 @@ import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
 import {statsActivity} from '@/api/dashboard';
+import {deviceActivity} from '@/api/dashboard/device';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
@@ -49,6 +50,8 @@ import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 const {t} = useI18n();
 // A weekday/hour heatmap is most informative over a full week. The previous
 // 24h default correctly populated only two day rows, which looked incomplete.
+const props = defineProps<{deviceId?: string}>();
+
 const rangeKey = ref<RangeKey>('7d');
 const {error, loading, run, status} = useAsyncLoader();
 const chartRef = ref<HTMLElement>();
@@ -102,7 +105,12 @@ const render = (rows: { dow: number; hour: number; count: number }[]) => {
 };
 
 const load = async () => {
-  await run(() => statsActivity({rangeKey: rangeKey.value}), {
+  await run(
+    () =>
+      props.deviceId
+        ? deviceActivity(props.deviceId, {rangeKey: rangeKey.value})
+        : statsActivity({rangeKey: rangeKey.value}),
+    {
     apply: (res) => {
       const payload = Array.isArray(res) ? res : [];
       rows.value = payload.map((row) => ({
@@ -124,6 +132,7 @@ const load = async () => {
 
 onMounted(load);
 watch(rangeKey, load);
+watch(() => props.deviceId, load);
 watch(error, (value) => {
   if (value) {
     chart?.destroy();

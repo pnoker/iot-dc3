@@ -70,6 +70,7 @@ import {computed, onMounted, reactive, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 
 import {alertLatest, alertStats} from '@/api/dashboard';
+import {deviceAlertPage} from '@/api/dashboard/device';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
 import type {AlertSource} from '@/config/types/dashboard';
@@ -88,6 +89,7 @@ interface AlertRow {
 
 const props = defineProps({
   size: {type: Number, default: 10},
+  deviceId: {type: String, default: undefined},
 });
 
 const {t, locale} = useI18n();
@@ -98,6 +100,33 @@ const stats = reactive({total: 0, unconfirmed: 0});
 const {resolveBySource, nameBySource} = useEntityNames();
 
 const refresh = async () => {
+  if (props.deviceId) {
+    const deviceId = props.deviceId;
+    await run(
+      async () => {
+        const page = await deviceAlertPage({
+          source: 'device',
+          sourceId: deviceId,
+          limit: props.size,
+          sort: [{field: 'createTime', direction: 'DESC'}],
+        });
+        const data: AlertRow[] = (Array.isArray(page?.items) ? page.items : []) as AlertRow[];
+        await resolveBySource(data);
+        return {total: page?.total ?? data.length, data};
+      },
+      {
+        apply: ({total, data}) => {
+          // No device-scoped unconfirmed-summary endpoint exists, so the
+          // count is derived from the fetched page (what the card renders).
+          stats.total = total;
+          stats.unconfirmed = data.filter((r) => r.confirmFlag !== 'CONFIRMED').length;
+          rows.value = data;
+        },
+      }
+    );
+    return;
+  }
+
   await run(
     async () => {
       const [summary, latest]: any = await Promise.all([alertStats(), alertLatest(props.size)]);
@@ -177,6 +206,7 @@ const formatClock = (v?: string) => {
 
 onMounted(refresh);
 watch(locale, refresh);
+watch(() => props.deviceId, refresh);
 defineExpose({refresh});
 </script>
 

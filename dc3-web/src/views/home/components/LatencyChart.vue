@@ -41,12 +41,15 @@ import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
 import {statsLatency} from '@/api/dashboard';
+import {deviceLatency} from '@/api/dashboard/device';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 const {t} = useI18n();
+const props = defineProps<{deviceId?: string}>();
+
 const rangeKey = ref<RangeKey>('24h');
 const {error, loading, run, status} = useAsyncLoader();
 const chartRef = ref<HTMLElement>();
@@ -88,7 +91,12 @@ const render = (rows: { bin: number; count: number }[]) => {
 };
 
 const load = async () => {
-  await run(() => statsLatency({rangeKey: rangeKey.value}), {
+  await run(
+    () =>
+      props.deviceId
+        ? deviceLatency(props.deviceId, {rangeKey: rangeKey.value})
+        : statsLatency({rangeKey: rangeKey.value}),
+    {
     apply: (res) => {
       const payload = Array.isArray(res) ? res : [];
       rows.value = payload.map((row) => ({bin: Number(row.bin), count: Number(row.count) || 0}));
@@ -106,6 +114,7 @@ const load = async () => {
 
 onMounted(load);
 watch(rangeKey, load);
+watch(() => props.deviceId, load);
 watch(error, (value) => {
   if (value) {
     chart?.destroy();

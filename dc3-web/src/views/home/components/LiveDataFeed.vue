@@ -68,6 +68,7 @@ import {computed, onMounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 
 import {streamLatest} from '@/api/dashboard';
+import {deviceStream} from '@/api/dashboard/device';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
@@ -89,6 +90,7 @@ interface Row {
 
 const props = defineProps({
   size: {type: Number, default: 20},
+  deviceId: {type: String, default: undefined},
 });
 
 const {t, locale} = useI18n();
@@ -108,7 +110,9 @@ const refresh = async () => {
   // Auto-refresh must never stack requests; a manual refresh can still be
   // initiated after the current request settles via the shared card button.
   if (loading.value) return;
-  await run(() => streamLatest(props.size), {
+  await run(
+    () => (props.deviceId ? deviceStream(props.deviceId, props.size) : streamLatest(props.size)),
+    {
     apply: (res) => {
       rows.value = Array.isArray(res) ? res : [];
     },
@@ -144,6 +148,7 @@ const typeColor = (vt?: string) => {
 
 onMounted(refresh);
 watch(locale, refresh);
+watch(() => props.deviceId, refresh);
 </script>
 
 <style lang="scss" scoped>

@@ -19,3 +19,4 @@ export * from './stats';
 export * from './alert';
 export * from './system';
 export * from './topology';
+export * from './device';
