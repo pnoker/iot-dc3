@@ -78,6 +78,40 @@ x-app-runtime-env: &app-runtime-env
   DC3_DRIVER_LEASE_QUEUE_EXPIRES_MILLIS: "${DC3_DRIVER_LEASE_QUEUE_EXPIRES_MILLIS:-300000}"
 
 services:
+  web:
+    # Frontend follows the same DC3_IMAGE_REGISTRY switch as backend services
+    # (so `make app REGISTRY=cn` retags everything together), and shares
+    # the unified DC3_VERSION for the whole monorepo. nginx proxies /api to
+    # the gateway, so the built app works against both topologies unchanged.
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-web:${DC3_VERSION:-latest}
+    build:
+      context: ..
+      dockerfile: dc3-web/Dockerfile
+    restart: always
+    depends_on:
+      gateway:
+        condition: service_healthy
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_WEB_HTTP_PORT:-8080}:80"
+    environment:
+      - APP_API_HOST=${APP_API_HOST:-dc3-gateway}
+      - APP_API_PORT=${APP_API_PORT:-8000}
+    container_name: dc3-web
+    hostname: dc3-web
+    volumes:
+      - nginx:/var/log/nginx
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1/ >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-web
+
   gateway:
     build:
       context: ..
@@ -977,6 +1011,7 @@ services:
 volumes:
   logs:
   driver_data:
+  nginx:
 networks:
   dc3net:
     driver: bridge
