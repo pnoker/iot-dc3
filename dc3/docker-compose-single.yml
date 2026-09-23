@@ -1,0 +1,267 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# Single-center topology: the aggregated dc3-center-single (native) replaces
+# the four distributed centers. The gateway runs with NODE_ENV=single, which
+# activates application-single.yml - every api/v3 route proxies to the single
+# service with StripPrefix=3 + PrefixPath=/single, so the web frontend keeps
+# its unchanged protocol. Drivers stay on the JVM and connect through the
+# shared message broker exactly as in the distributed stack.
+#
+# Dependency services (postgres, rabbitmq) come from docker-compose-db.yml,
+# the same as docker-compose-dev.yml.
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: ${DC3_LOG_MAX_SIZE:-10M}
+    max-file: "${DC3_LOG_MAX_FILE:-20}"
+
+x-app-runtime-env: &app-runtime-env
+  NODE_ENV: test
+  DC3_SECURITY_KEY: ${DC3_SECURITY_KEY:-dc3.security.key.2026.io.github.pnoker}
+  DC3_MQ_TYPE: "${DC3_MQ_TYPE:-rabbitmq}"
+  AUTH_HMAC_SECRET: ${AUTH_HMAC_SECRET:-io.github.pnoker.dc3}
+  POSTGRES_HOST: dc3-postgres
+  POSTGRES_PORT: "5432"
+  POSTGRES_USERNAME: ${POSTGRES_USERNAME:-dc3}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dc3dc3dc3}
+  POSTGRES_DB: ${POSTGRES_DB:-dc3}
+  DC3_R2DBC_URL: "${DC3_R2DBC_URL:-r2dbc:postgresql://dc3-postgres:5432/dc3}"
+  DC3_SCHEMA_FINGERPRINT: "${DC3_SCHEMA_FINGERPRINT:-5146811645192cebabe055c434a2f278c92174d600581f993e69adc7a3893226}"
+  DC3_SCHEMA_CONTRACT: "${DC3_SCHEMA_CONTRACT:-r2dbc-flag-day-v1}"
+  RABBITMQ_VIRTUAL_HOST: ${RABBITMQ_VIRTUAL_HOST:-dc3}
+  RABBITMQ_HOST: dc3-rabbitmq
+  RABBITMQ_PORT: "${RABBITMQ_CONTAINER_PORT:-5672}"
+  RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-dc3}
+  RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-dc3dc3dc3}
+  MQTT_BROKER_HOST: dc3-rabbitmq
+  MQTT_BROKER_PORT: "1883"
+  MQTT_USERNAME: ${MQTT_USERNAME:-dc3}
+  MQTT_PASSWORD: ${MQTT_PASSWORD:-dc3dc3dc3}
+  POINT_BATCH_SIZE: "${POINT_BATCH_SIZE:-500}"
+  POINT_BATCH_RECEIVE_TIMEOUT_MILLIS: "${POINT_BATCH_RECEIVE_TIMEOUT_MILLIS:-100}"
+  POINT_CONCURRENT_CONSUMERS: "${POINT_CONCURRENT_CONSUMERS:-4}"
+  POINT_MAX_CONCURRENT_CONSUMERS: "${POINT_MAX_CONCURRENT_CONSUMERS:-16}"
+  POINT_PREFETCH_COUNT: "${POINT_PREFETCH_COUNT:-1000}"
+  POINT_RETRY_MAX_RETRIES: "${POINT_RETRY_MAX_RETRIES:-3}"
+  POINT_RETRY_INITIAL_INTERVAL_MILLIS: "${POINT_RETRY_INITIAL_INTERVAL_MILLIS:-1000}"
+  POINT_RETRY_MULTIPLIER: "${POINT_RETRY_MULTIPLIER:-2}"
+  POINT_RETRY_MAX_INTERVAL_MILLIS: "${POINT_RETRY_MAX_INTERVAL_MILLIS:-10000}"
+  DC3_DRIVER_LEASE_SECONDS: "${DC3_DRIVER_LEASE_SECONDS:-30}"
+  DC3_DRIVER_LEASE_RENEW_CRON: "${DC3_DRIVER_LEASE_RENEW_CRON:-0/10 * * * * ?}"
+  DC3_DRIVER_LEASE_QUEUE_EXPIRES_MILLIS: "${DC3_DRIVER_LEASE_QUEUE_EXPIRES_MILLIS:-300000}"
+
+services:
+  gateway:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-gateway-native
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.6}-native
+    restart: always
+    depends_on:
+      single:
+        condition: service_healthy
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GATEWAY_PORT:-8000}:8000"
+    environment:
+      <<: *app-runtime-env
+      # Single topology: DC3_GATEWAY_TOPOLOGY=single activates the
+      # route-replacing post-processor; the Authentic filter's permission
+      # gRPC channel re-points at single:9100.
+      DC3_GATEWAY_TOPOLOGY: single
+      CENTER_AUTH_HOST: dc3-center-single
+      CENTER_AUTH_GRPC_PORT: "9100"
+      DC3_GATEWAY_OAUTH_ENABLED: ${DC3_GATEWAY_OAUTH_ENABLED:-false}
+      DC3_GATEWAY_OAUTH_JWKS_URL: ${DC3_GATEWAY_OAUTH_JWKS_URL:-http://dc3-center-single:8100/single/oauth2/jwks}
+    container_name: dc3-gateway
+    hostname: dc3-gateway
+    volumes:
+      - logs:/dc3-gateway/dc3/logs
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8000/actuator/health/readiness >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-gateway
+
+  single:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-center-single-native
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-center-single:${DC3_IMAGE_TAG:-2026.6}-native
+    restart: always
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_SINGLE_PORT:-8100}:8100"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_SINGLE_GRPC_PORT:-9100}:9100"
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-center-single
+    hostname: dc3-center-single
+    volumes:
+      - logs:/dc3-center/dc3-center-single/dc3/logs
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8100/single/actuator/health/readiness >/dev/null || exit 1" ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-center-single
+
+  listening-virtual:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-listening-virtual
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_TCP_PORT:-6270}:6270"
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_UDP_PORT:-6271}:6271"
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-listening-virtual
+    hostname: dc3-driver-listening-virtual
+    volumes:
+      - logs:/dc3-driver/dc3-driver-listening-virtual/dc3/logs
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-listening-virtual
+
+  modbus-tcp:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-modbus-tcp
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_MODBUS_TCP_PORT:-6502}:6502"
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-modbus-tcp
+    hostname: dc3-driver-modbus-tcp
+    volumes:
+      - logs:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-modbus-tcp
+
+  modbus-rtu:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-modbus-rtu
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_MODBUS_RTU_PORT:-6503}:6503"
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-modbus-rtu
+    hostname: dc3-driver-modbus-rtu
+    volumes:
+      - logs:/dc3-driver/dc3-driver-modbus-rtu/dc3/logs
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-modbus-rtu
+
+  mqtt:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-mqtt
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_MQTT_PORT:-6288}:6288"
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-mqtt
+    hostname: dc3-driver-mqtt
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mqtt/dc3/logs
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mqtt
+
+  opc-da:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-opc-da
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-da:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_OPC_DA_PORT:-6266}:6266"
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-opc-da
+    hostname: dc3-driver-opc-da
+    volumes:
+      - logs:/dc3-driver/dc3-driver-opc-da/dc3/logs
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-opc-da
+
+  opc-ua:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-opc-ua
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-opc-ua:${DC3_IMAGE_TAG:-2026.9}
+    restart: always
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_DRIVER_OPC_UA_PORT:-6279}:6279"
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-opc-ua
+    hostname: dc3-driver-opc-ua
+    volumes:
+      - logs:/dc3-driver/dc3-driver-opc-ua/dc3/logs
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-opc-ua
+
+volumes:
+  logs:
+networks:
+  dc3net:
+    driver: bridge
