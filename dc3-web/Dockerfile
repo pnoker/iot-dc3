@@ -17,7 +17,12 @@
 # builder
 # Build context is the repository root so that dc3/dependencies/ (nginx
 # configs) is reachable at runtime.
-FROM pnoker/dc3-node:2025.9 AS builder
+# --platform=$BUILDPLATFORM keeps the vite build on the host arch: vite 8's
+# rolldown native binary dies silently under QEMU arm64 emulation
+# ("transforming..." then exit 1 with no error). The dist/ output is
+# platform-agnostic static files, so only the nginx runtime stage is ever
+# emulated.
+FROM --platform=$BUILDPLATFORM pnoker/dc3-node:2025.9 AS builder
 LABEL dc3.author=pnokers
 LABEL dc3.author.email=pnokers.icloud.com
 
