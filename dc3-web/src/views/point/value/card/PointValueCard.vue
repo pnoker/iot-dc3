@@ -72,7 +72,6 @@
                   <span class="value-number">{{ data?.calValue ?? '--' }}</span>
                   <span v-if="hasLatestValue && unit" class="value-unit">{{ unit }}</span>
                 </span>
-                <span class="value-caption">{{ $t('pointValue.card.processedValue') }}</span>
               </div>
               <ul>
                 <li class="nowrap-item">
@@ -464,27 +463,16 @@ onBeforeUnmount(() => {
     }
   }
 
-  // The processed value sits on a deep navy display panel — a dark,
-  // high-contrast "screen" that reads as the card's data hero in both
-  // light and dark themes. Freshness shows through the unit chip tone
-  // (success / warning / muted) instead of colouring the number itself.
+  // The processed value stays a bare hero row — a plain dark number with
+  // a small pill unit chip. No nested panel: the card is already the
+  // surface, stacking another one inside reads as card-on-card. Freshness
+  // shows through the unit chip tone only.
   .things-card-body-content-value {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--dc3-space-2);
+    justify-content: center;
     list-style: none;
     text-align: center;
     margin-top: var(--dc3-space-4);
-    padding: var(--dc3-space-4) var(--dc3-space-3);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: var(--dc3-radius-lg);
-    background:
-      radial-gradient(circle at 22% 0%, rgba(56, 130, 246, 0.22), transparent 46%),
-      linear-gradient(165deg, #14283c 0%, #0b1a2a 72%, #081420 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      0 8px 18px rgba(4, 12, 22, 0.28);
 
     .value {
       display: inline-flex;
@@ -502,43 +490,36 @@ onBeforeUnmount(() => {
       line-height: 1.1;
       text-overflow: ellipsis;
       white-space: nowrap;
-      background: linear-gradient(180deg, #ffffff 18%, #b8d4f0 88%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      filter: drop-shadow(0 2px 6px rgba(96, 165, 250, 0.35));
+      color: var(--el-text-color-primary);
     }
 
     .value-unit {
       flex-shrink: 0;
       padding: 1px 6px;
-      border: 1px solid color-mix(in srgb, var(--value-tone-soft, #7fb2e5) 40%, transparent);
+      border: 1px solid color-mix(in srgb, var(--value-tone-soft, var(--el-color-primary)) 30%, transparent);
       border-radius: var(--dc3-radius-full);
-      background: color-mix(in srgb, var(--value-tone-soft, #7fb2e5) 16%, transparent);
-      color: var(--value-tone-soft, #b8d4f0);
+      background: color-mix(in srgb, var(--value-tone-soft, var(--el-color-primary)) 9%, transparent);
+      color: var(--value-tone, var(--el-color-primary));
       font-size: 11px;
       font-weight: 650;
       line-height: 16px;
     }
 
-    .value-caption {
-      color: rgba(255, 255, 255, 0.46);
-      font-size: 11px;
-      letter-spacing: 0.02em;
-    }
-
-    // Freshness tones, light variants so they stay legible on the dark
-    // panel; the chip is the only tone carrier.
+    // Freshness tones: the unit chip is the only tone carrier, so the
+    // number itself can stay a plain dark hero.
     &.value-panel-fresh {
-      --value-tone-soft: var(--el-color-success-light-3);
+      --value-tone: var(--el-color-success);
+      --value-tone-soft: var(--el-color-success);
     }
 
     &.value-panel-stale {
-      --value-tone-soft: var(--el-color-warning-light-3);
+      --value-tone: var(--el-color-warning);
+      --value-tone-soft: var(--el-color-warning);
     }
 
     &.value-panel-missing {
-      --value-tone-soft: rgba(255, 255, 255, 0.55);
+      --value-tone: var(--el-text-color-secondary);
+      --value-tone-soft: var(--el-text-color-secondary);
     }
 
     .value-point {
