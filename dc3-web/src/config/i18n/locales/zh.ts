@@ -412,6 +412,7 @@ export default {
     pending: '待开发',
     settings: '设置',
     account: '账户菜单',
+    tenantLabel: '租户',
     preferences: '显示偏好设置',
     language: '语言',
     theme: '主题',

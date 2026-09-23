@@ -418,6 +418,7 @@ export default {
     pending: 'Coming soon',
     settings: 'Settings',
     account: 'Account menu',
+    tenantLabel: 'Tenant',
     preferences: 'Display preferences',
     language: 'Language',
     theme: 'Theme',

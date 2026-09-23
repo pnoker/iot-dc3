@@ -90,12 +90,18 @@
               @command="handleCommand"
             >
               <button :aria-label="t('layout.account')" class="user_trigger" type="button">
-                <img :src="assetUrl('images/common/avatar.png')" alt="" class="user_avatar" />
+                <el-icon class="user_trigger__icon" :size="16"><UserFilled/></el-icon>
               </button>
               <template #dropdown>
                 <el-dropdown-menu>
                   <li class="user_dropdown_identity" role="none">
-                    <span class="user_dropdown_name">{{ currentLogin }}</span>
+                    <span class="user_dropdown_avatar" aria-hidden="true">
+                      <el-icon :size="18"><UserFilled/></el-icon>
+                    </span>
+                    <span class="user_dropdown_meta">
+                      <span class="user_dropdown_name">{{ currentLogin }}</span>
+                      <span class="user_dropdown_tenant">{{ t("layout.tenantLabel") }} · {{ currentTenant }}</span>
+                    </span>
                   </li>
                   <el-dropdown-item :icon="QuestionFilled" command="help">{{
                     t("layout.about")
@@ -200,6 +206,7 @@ import {
   CaretBottom,
   MoreFilled,
   QuestionFilled,
+  UserFilled,
   Setting,
   SwitchButton,
 } from "@element-plus/icons-vue";
@@ -231,6 +238,9 @@ const agenticStore = useAgenticStore();
 const { isMobile, isTablet } = useBreakpoint();
 const currentLogin = computed(() =>
   String(authStore.getName || authStore.name || "dc3"),
+);
+const currentTenant = computed(() =>
+  String(authStore.getTenant || "default"),
 );
 const settingsMenuVisible = ref(false);
 
@@ -677,35 +687,39 @@ const handleCommand = async (command: string) => {
       transform: rotate(18deg);
     }
 
+    // Account tile follows the platform's tone-tile grammar (the same
+    // accent-tinted glyph block family as ThingsCardHeader / StatCard):
+    // brand-tinted disc, hairline accent ring, glyph in the accent colour.
     .user_trigger {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       min-width: 32px;
       min-height: 32px;
-      padding: 2px;
-      border: 0;
-      border-radius: 50%;
-      background: transparent;
+      padding: 0;
+      border: 1px solid color-mix(in srgb, var(--el-color-primary) 26%, transparent);
+      border-radius: var(--dc3-radius-full);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.5), transparent 52%),
+        var(--el-color-primary-light-9);
+      color: var(--el-color-primary);
       cursor: pointer;
-      transition: background-color 180ms ease, box-shadow 180ms ease;
+      transition:
+        background-color 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease;
 
       &:hover,
       &:focus-visible {
         outline: none;
-        background: var(--dc3-bg-interactive);
-        box-shadow: inset 0 0 0 1px var(--dc3-border-base);
+        background-color: var(--el-color-primary-light-8);
+        box-shadow:
+          0 2px 8px color-mix(in srgb, var(--el-color-primary) 26%, transparent),
+          inset 0 0 0 1px color-mix(in srgb, var(--el-color-primary) 34%, transparent);
       }
 
-      .user_avatar {
-        display: block;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        box-shadow:
-          0 5px 12px rgba(23, 130, 191, 0.2),
-          inset 0 1px 0 rgba(255, 255, 255, 0.34);
-        object-fit: cover;
+      &:active {
+        transform: scale(0.96);
       }
     }
 

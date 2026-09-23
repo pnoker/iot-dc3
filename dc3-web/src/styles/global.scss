@@ -346,19 +346,44 @@ body {
   }
 
   .el-dropdown-menu {
-    min-width: 150px;
-    padding: var(--dc3-space-1);
+    min-width: 224px;
+    padding: var(--dc3-space-2);
     background: transparent;
   }
 
-  // Identity header: who is signed in, split from the actions by a rule.
+  // Identity header: tone-tile avatar + name + tenant line, split from the
+  // actions by a hairline — the same anatomy as the mobile record cards.
   .user_dropdown_identity {
-    padding: var(--dc3-space-2) var(--dc3-space-3) var(--dc3-space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--dc3-space-3);
+    padding: var(--dc3-space-2) var(--dc3-space-2) var(--dc3-space-3);
     margin-bottom: var(--dc3-space-1);
     border-bottom: 1px solid var(--dc3-border-base);
 
+    .user_dropdown_avatar {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      border: 1px solid color-mix(in srgb, var(--el-color-primary) 26%, transparent);
+      border-radius: var(--dc3-radius-full);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.5), transparent 52%),
+        var(--el-color-primary-light-9);
+      color: var(--el-color-primary);
+    }
+
+    .user_dropdown_meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
     .user_dropdown_name {
-      display: block;
       overflow: hidden;
       color: var(--dc3-text-primary);
       font-size: 13px;
@@ -366,16 +391,31 @@ body {
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+
+    .user_dropdown_tenant {
+      overflow: hidden;
+      color: var(--dc3-text-muted);
+      font-size: 11px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
 
   .el-dropdown-menu__item {
+    gap: var(--dc3-space-2);
+    padding: var(--dc3-space-2) var(--dc3-space-3);
     border-radius: var(--dc3-radius-md);
     color: var(--dc3-text-regular);
+    font-size: 13px;
+
+    .el-icon {
+      font-size: 16px;
+    }
 
     &:not(.is-disabled):hover,
     &:not(.is-disabled):focus {
-      background: var(--dc3-bg-interactive);
-      color: var(--dc3-text-brand);
+      background: var(--el-color-primary-light-9);
+      color: var(--el-color-primary);
     }
   }
 

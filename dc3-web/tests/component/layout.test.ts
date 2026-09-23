@@ -119,10 +119,10 @@ describe('Layout', () => {
     expect(wrapper.find('.header_actions_glass .app-preferences__theme').exists()).toBe(true);
     expect(wrapper.find('.header_actions_glass .header_user').exists()).toBe(true);
     expect(wrapper.find('.header_actions_glass .user_trigger').exists()).toBe(true);
-    // The trigger is a bare avatar; the name lives in the dropdown identity row.
-    const avatar = wrapper.find('.header_actions_glass .user_trigger .user_avatar');
+    // The trigger is a tone-tiled UserFilled glyph; the name and tenant
+    // live in the dropdown identity row.
+    const avatar = wrapper.find('.header_actions_glass .user_trigger .user_trigger__icon');
     expect(avatar.exists()).toBe(true);
-    expect(avatar.attributes('src')).toContain('images/common/avatar.png');
     expect(wrapper.find('.user_trigger .user_name').exists()).toBe(false);
     expect(wrapper.find('.user_dropdown_identity .user_dropdown_name').exists()).toBe(true);
 
