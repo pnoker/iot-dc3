@@ -37,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,6 +59,8 @@ import reactor.core.publisher.Mono;
  * <li>{@code /stream?limit=20} — most recent rows (user-triggered refresh)</li>
  * <li>{@code /alert/stats} — total + unconfirmed + by-type breakdown</li>
  * <li>{@code /alert/latest?limit=10} — most recent alerts</li>
+ * <li>{@code /device/{deviceId}/stats/timeseries} — device-scoped trend chart</li>
+ * <li>{@code /device/{deviceId}/stream?limit=20} — device-scoped live feed</li>
  * </ul>
  *
  * @author pnoker
@@ -421,7 +424,7 @@ public class DashboardController implements BaseController {
             LocalDateTime from = TimeRangeUtil.resolveFrom(q.getRangeKey(), null);
             PageRequest page = new PageRequest(q.getOffset(), q.getLimit(), q.getSort());
             return dashboardService.alertPage(
-                    tenantId, q.getSource(), q.getAlarmTypeFlag(), q.getConfirmFlag(), from, page);
+                    tenantId, q.getSource(), q.getSourceId(), q.getAlarmTypeFlag(), q.getConfirmFlag(), from, page);
         });
     }
 
@@ -1036,5 +1039,369 @@ public class DashboardController implements BaseController {
                     @RequestParam(value = "limit", defaultValue = "100")
                     int limit) {
         return getTenantId().flatMap(tenantId -> dashboardService.coverageGap(tenantId, limit));
+    }
+
+    // ===== Device-scoped dashboard =============================================
+
+    /**
+     * Bucket one device's point-value row counts into hour or day buckets over a rolling
+     * window for the current tenant.
+     *
+     * @param deviceId    identifier of the device; must belong to the current tenant
+     * @param granularity time bucket granularity for the trend chart (hour or day)
+     * @param rangeHours  rolling time window length in hours; used only when range_key is omitted
+     * @param rangeKey    preset time range key overriding range_hours; one of today, 24h, 7d, or 30d
+     * @return a list of time-bucketed counts for the device
+     */
+    @PreAuthorize("@perm.can('dashboard', 'get')")
+    @Operation(
+            summary = "Get Device Time Series",
+            description =
+                    "Bucket one device's point-value row counts into hour or day buckets over a rolling window (range_key or range_hours) for the current tenant. Use to render the device detail trend chart.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/device/{deviceId}/stats/timeseries")
+    public Mono<List<TimeseriesPointVO>> deviceTimeseries(
+            @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
+                    @PathVariable
+                    Long deviceId,
+            @Parameter(
+                            description =
+                                    "Time bucket granularity for the trend chart; hour groups by hour-of-day, day groups by calendar date",
+                            example = "hour")
+                    @RequestParam(value = "granularity", defaultValue = "hour")
+                    String granularity,
+            @Parameter(
+                            description = "Rolling time window length in hours; used only when range_key is omitted",
+                            example = "24")
+                    @RequestParam(value = "range_hours", defaultValue = "24")
+                    int rangeHours,
+            @Parameter(
+                            description = "Preset time range key overriding range_hours; one of today, 24h, 7d, or 30d",
+                            example = "24h")
+                    @RequestParam(value = "range_key", required = false)
+                    String rangeKey) {
+        int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
+        return getTenantId()
+                .flatMap(
+                        tenantId -> dashboardService.deviceTimeseries(tenantId, deviceId, granularity, effectiveHours));
+    }
+
+    /**
+     * Bucket one device's point-value collection latencies over a rolling window into
+     * histogram bands to assess how fresh the ingested readings are.
+     *
+     * @param deviceId   identifier of the device; must belong to the current tenant
+     * @param rangeHours rolling time window length in hours; used only when range_key is omitted
+     * @param rangeKey   preset time range key overriding range_hours; one of today, 24h, 7d, or 30d
+     * @return latency histogram bands describing ingestion freshness for the device
+     */
+    @PreAuthorize("@perm.can('dashboard', 'get')")
+    @Operation(
+            summary = "Get Device Latency Histogram",
+            description =
+                    "Bucket one device's point-value collection latencies over a rolling window (range_key or range_hours) into histogram bands. Use to assess how fresh the device's ingested readings are.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/device/{deviceId}/stats/latency")
+    public Mono<List<LatencyBucketVO>> deviceLatencyHistogram(
+            @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
+                    @PathVariable
+                    Long deviceId,
+            @Parameter(
+                            description = "Rolling time window length in hours; used only when range_key is omitted",
+                            example = "24")
+                    @RequestParam(value = "range_hours", defaultValue = "24")
+                    int rangeHours,
+            @Parameter(
+                            description = "Preset time range key overriding range_hours; one of today, 24h, 7d, or 30d",
+                            example = "24h")
+                    @RequestParam(value = "range_key", required = false)
+                    String rangeKey) {
+        int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
+        return getTenantId()
+                .flatMap(tenantId -> dashboardService.deviceLatencyHistogram(tenantId, deviceId, effectiveHours));
+    }
+
+    /**
+     * Aggregate one device's data-collection activity into hour-of-day cells over a
+     * rolling window (default 168 hours / one week) to render the activity heatmap.
+     *
+     * @param deviceId   identifier of the device; must belong to the current tenant
+     * @param rangeHours rolling time window length in hours (default 168); used only when range_key is omitted
+     * @param rangeKey   preset time range key overriding range_hours; one of today, 24h, 7d, or 30d
+     * @return hour-of-day activity cells for the device
+     */
+    @PreAuthorize("@perm.can('dashboard', 'get')")
+    @Operation(
+            summary = "Get Device Hourly Activity",
+            description =
+                    "Aggregate one device's data-collection activity into hour-of-day cells over a rolling window (default 168 hours / one week). Use to render the device activity heatmap.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/device/{deviceId}/stats/activity")
+    public Mono<List<ActivityCellVO>> deviceHourlyActivity(
+            @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
+                    @PathVariable
+                    Long deviceId,
+            @Parameter(
+                            description =
+                                    "Rolling time window length in hours; default 168 (one week). Used only when range_key is omitted",
+                            example = "168")
+                    @RequestParam(value = "range_hours", defaultValue = "168")
+                    int rangeHours,
+            @Parameter(
+                            description = "Preset time range key overriding range_hours; one of today, 24h, 7d, or 30d",
+                            example = "7d")
+                    @RequestParam(value = "range_key", required = false)
+                    String rangeKey) {
+        int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
+        return getTenantId()
+                .flatMap(tenantId -> dashboardService.deviceHourlyActivity(tenantId, deviceId, effectiveHours));
+    }
+
+    /**
+     * Return one device's data-quality snapshot over a rolling window: numeric versus
+     * non-numeric sample split plus the newest sample time across its points.
+     *
+     * @param deviceId   identifier of the device; must belong to the current tenant
+     * @param rangeHours rolling time window length in hours
+     * @return the device's data-quality snapshot for the window
+     */
+    @PreAuthorize("@perm.can('dashboard', 'get')")
+    @Operation(
+            summary = "Get Device Data Quality",
+            description =
+                    "Return one device's data-quality snapshot over a rolling window: numeric versus non-numeric sample split plus the newest sample time across its points. Use to render the device quality indicator.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/device/{deviceId}/stats/quality")
+    public Mono<DeviceQualityVO> deviceQuality(
+            @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
+                    @PathVariable
+                    Long deviceId,
+            @Parameter(description = "Rolling time window length in hours", example = "24")
+                    @RequestParam(value = "range_hours", defaultValue = "24")
+                    int rangeHours) {
+        return getTenantId().flatMap(tenantId -> dashboardService.deviceQuality(tenantId, deviceId, rangeHours));
+    }
+
+    /**
+     * Return the N most recent point-value readings of one device, newest first.
+     *
+     * @param deviceId identifier of the device; must belong to the current tenant
+     * @param limit    maximum number of recent readings to return, newest first
+     * @return the most recent point-value readings of the device
+     */
+    @PreAuthorize("@perm.can('dashboard', 'get')")
+    @Operation(
+            summary = "Get Device Live Stream",
+            description =
+                    "Return the N most recent point-value readings of one device, newest first. Use to populate the device detail live feed panel on a user-triggered refresh.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/device/{deviceId}/stream")
+    public Mono<List<LatestPointValueVO>> deviceStream(
+            @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
+                    @PathVariable
+                    Long deviceId,
+            @Parameter(description = "Maximum number of recent readings to return, newest first", example = "20")
+                    @RequestParam(value = "limit", defaultValue = "20")
+                    int limit) {
+        return getTenantId().flatMap(tenantId -> dashboardService.deviceLatestStream(tenantId, deviceId, limit));
+    }
+
+    /**
+     * Rank one device's points by activity over a rolling window, returning the top N
+     * points for the device.
+     *
+     * @param deviceId   identifier of the device; must belong to the current tenant
+     * @param rangeHours rolling time window length in hours; used only when range_key is omitted
+     * @param rangeKey   preset time range key overriding range_hours; one of today, 24h, 7d, or 30d
+     * @param limit      maximum number of ranked points to return
+     * @return the top N busiest points of the device within the window
+     */
+    @PreAuthorize("@perm.can('dashboard', 'get')")
+    @Operation(
+            summary = "Get Device Top Points",
+            description =
+                    "Rank one device's points by activity over a rolling window (range_key or range_hours), returning the top N points. Use to surface the device's busiest points.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/device/{deviceId}/top/points")
+    public Mono<List<TopEntityVO>> deviceTopPoints(
+            @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
+                    @PathVariable
+                    Long deviceId,
+            @Parameter(
+                            description = "Rolling time window length in hours; used only when range_key is omitted",
+                            example = "24")
+                    @RequestParam(value = "range_hours", defaultValue = "24")
+                    int rangeHours,
+            @Parameter(
+                            description = "Preset time range key overriding range_hours; one of today, 24h, 7d, or 30d",
+                            example = "7d")
+                    @RequestParam(value = "range_key", required = false)
+                    String rangeKey,
+            @Parameter(description = "Maximum number of ranked points to return", example = "10")
+                    @RequestParam(value = "limit", defaultValue = "10")
+                    int limit) {
+        int effectiveHours = resolveEffectiveHours(rangeKey, rangeHours);
+        return getTenantId()
+                .flatMap(tenantId -> dashboardService.deviceTopPoints(tenantId, deviceId, effectiveHours, limit));
+    }
+
+    /**
+     * Summarize one device's data-coverage gaps, listing its declared points that never
+     * produced a reading.
+     *
+     * @param deviceId identifier of the device; must belong to the current tenant
+     * @return a summary of collection blind spots among the device's points
+     */
+    @PreAuthorize("@perm.can('dashboard', 'get')")
+    @Operation(
+            summary = "Get Device Coverage Gap",
+            description =
+                    "Summarize one device's data-coverage gaps, listing its declared points that never produced a reading. Use to find blind spots in the device's collection coverage.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/device/{deviceId}/coverage/gap")
+    public Mono<CoverageGapVO> deviceCoverageGap(
+            @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
+                    @PathVariable
+                    Long deviceId) {
+        return getTenantId().flatMap(tenantId -> dashboardService.deviceCoverageGap(tenantId, deviceId));
+    }
+
+    /**
+     * Detect the points of one device that have produced no new data beyond a silence
+     * threshold, compared against a baseline day range.
+     *
+     * @param deviceId      identifier of the device; must belong to the current tenant
+     * @param baselineDays  baseline rolling day range used to learn the device's expected reporting cadence
+     * @param silentMinutes silence threshold in minutes; a point with no reading for this long is flagged silent
+     * @param limit         maximum number of silent points to return
+     * @return points of the device that have stopped reporting relative to their learned cadence
+     */
+    @PreAuthorize("@perm.can('dashboard', 'get')")
+    @Operation(
+            summary = "Get Device Silent Sources",
+            description =
+                    "Detect the points of one device that have produced no new data beyond a silence threshold, compared against a baseline day range. Use to catch sensors that have stopped reporting.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/device/{deviceId}/silent/sources")
+    public Mono<List<SilentSourceVO>> deviceSilentSources(
+            @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
+                    @PathVariable
+                    Long deviceId,
+            @Parameter(
+                            description =
+                                    "Baseline rolling day range used to learn the device's expected reporting cadence",
+                            example = "7")
+                    @RequestParam(value = "baseline_days", defaultValue = "7")
+                    int baselineDays,
+            @Parameter(
+                            description =
+                                    "Silence threshold in minutes; a point with no reading for this long is flagged silent",
+                            example = "15")
+                    @RequestParam(value = "silent_minutes", defaultValue = "15")
+                    int silentMinutes,
+            @Parameter(description = "Maximum number of silent points to return", example = "50")
+                    @RequestParam(value = "limit", defaultValue = "50")
+                    int limit) {
+        return getTenantId()
+                .flatMap(tenantId ->
+                        dashboardService.deviceSilentSources(tenantId, deviceId, baselineDays, silentMinutes, limit));
+    }
+
+    /**
+     * Return one device's daily alert counts over a rolling day range for the current
+     * tenant, to visualize whether the device's alert volume is rising or falling.
+     *
+     * @param deviceId identifier of the device; must belong to the current tenant
+     * @param days     rolling day range for the trend; one point per day is returned
+     * @return one alert-count data point per day in the range
+     */
+    @PreAuthorize("@perm.can('dashboard', 'get')")
+    @Operation(
+            summary = "Get Device Alert Trend",
+            description =
+                    "Return one device's daily alert counts over a rolling day range for the current tenant. "
+                            + "Use to visualize whether the device's alert volume is rising or falling; each item is one day's count.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/device/{deviceId}/alert/trend")
+    public Mono<List<AlertTrendVO>> deviceAlertTrend(
+            @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
+                    @PathVariable
+                    Long deviceId,
+            @Parameter(description = "Rolling day range for the trend; one point per day is returned", example = "30")
+                    @RequestParam(value = "days", defaultValue = "30")
+                    int days) {
+        return getTenantId().flatMap(tenantId -> dashboardService.deviceAlertTrend(tenantId, deviceId, days));
     }
 }

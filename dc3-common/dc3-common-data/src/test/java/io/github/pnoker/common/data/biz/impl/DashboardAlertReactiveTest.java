@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -117,10 +118,10 @@ class DashboardAlertReactiveTest {
         row.setConfirmFlag(0);
         row.setMessage("offline");
         PageRequest request = new PageRequest(20, 10);
-        when(alertStore.list(eq(9L), eq("device"), eq(1), eq(0), any(), eq(request)))
+        when(alertStore.list(eq(9L), eq("device"), isNull(), eq(1), eq(0), any(), eq(request)))
                 .thenReturn(Mono.just(OffsetPage.of(List.of(row), 20, 10, 21)));
 
-        var result = service.alertPage(9L, "device", 1, 0, java.time.LocalDateTime.now(), request)
+        var result = service.alertPage(9L, "device", null, 1, 0, java.time.LocalDateTime.now(), request)
                 .block();
 
         assertEquals(20, result.offset());
@@ -133,7 +134,7 @@ class DashboardAlertReactiveTest {
     void invalidSourceIsRejectedInsteadOfExpandingScope() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> service.alertPage(9L, "invalid", null, null, null, PageRequest.firstPage()));
+                () -> service.alertPage(9L, "invalid", null, null, null, null, PageRequest.firstPage()));
     }
 
     @Test
@@ -195,7 +196,8 @@ class DashboardAlertReactiveTest {
         // The service buckets "today" in the platform timezone; derive the
         // expectation from the same zone so the test stays deterministic on
         // UTC runners during the Asia/Shanghai rollover window.
-        String today = java.time.LocalDate.now(io.github.pnoker.common.constant.common.TimeConstant.DEFAULT_ZONEID).toString();
+        String today = java.time.LocalDate.now(io.github.pnoker.common.constant.common.TimeConstant.DEFAULT_ZONEID)
+                .toString();
         row.setDate(today);
         row.setDeviceCount(5);
         row.setDriverCount(2);

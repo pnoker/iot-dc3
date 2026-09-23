@@ -33,6 +33,9 @@ public interface ReactivePointValueLatestStore {
     /** Stream the latest point values as a continuous feed. */
     Flux<PointValueDO> listLatestStream(Long tenantId, int limit);
 
+    /** Stream the latest point values of one device as a continuous feed. */
+    Flux<PointValueDO> listLatestStreamForDevice(Long tenantId, Long deviceId, int limit);
+
     /** Save the batch, inserting or updating as needed. */
     Mono<Integer> upsertBatch(List<PointValueDO> values);
 }

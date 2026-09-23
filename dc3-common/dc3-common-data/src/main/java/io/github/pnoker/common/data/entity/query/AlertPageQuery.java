@@ -50,6 +50,13 @@ public class AlertPageQuery implements Serializable {
     @Schema(description = "Source identifier", example = "device")
     private String source;
 
+    /**
+     * Entity id within the source (e.g. the device id when {@code source} is
+     * {@code "device"}), null = no filter.
+     */
+    @Schema(description = "Entity id within the source; null means no filter", example = "1024")
+    private Long sourceId;
+
     @Schema(description = "Alarm type enum", example = "1")
     private Integer alarmTypeFlag;
 

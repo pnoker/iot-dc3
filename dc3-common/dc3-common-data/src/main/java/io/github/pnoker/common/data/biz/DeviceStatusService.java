@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.data.biz;
 
+import io.github.pnoker.common.data.entity.vo.DeviceStatusDetailVO;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceOffsetQuery;
 import java.util.Map;
 import reactor.core.publisher.Mono;
@@ -28,4 +29,7 @@ public interface DeviceStatusService {
 
     /** List device status matched by profile id. */
     Mono<Map<String, String>> listByProfileId(Long tenantId, Long profileId);
+
+    /** Read the current status lease detail of one tenant-owned device. */
+    Mono<DeviceStatusDetailVO> detail(Long tenantId, Long deviceId);
 }

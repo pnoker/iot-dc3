@@ -17,6 +17,7 @@
 package io.github.pnoker.db.data;
 
 import io.github.pnoker.common.data.repository.ReactiveTsdbStore;
+import io.github.pnoker.common.tsdb.model.NumValueQuality;
 import io.github.pnoker.common.tsdb.model.TsdbModel.AggregateFunction;
 import io.github.pnoker.common.tsdb.model.TsdbModel.BucketAggregate;
 import io.github.pnoker.common.tsdb.model.TsdbModel.CorrelationResult;
@@ -452,6 +453,169 @@ public class R2dbcTsdbStore implements ReactiveTsdbStore {
                     }
                     return result;
                 })
+                .timeout(deadline.maxWait());
+    }
+
+    @Override
+    public Mono<List<BucketAggregate>> bucketedCountForDevice(
+            long tenantId, long deviceId, TimeWindow window, Duration bucketWidth, TsdbDeadline deadline) {
+        if (tenantId <= 0) return Mono.error(new IllegalArgumentException("tenantId must be positive"));
+        if (deviceId <= 0) return Mono.error(new IllegalArgumentException("deviceId must be positive"));
+        if (bucketWidth == null || bucketWidth.isZero() || bucketWidth.isNegative()) {
+            return Mono.error(new IllegalArgumentException("bucketWidth must be positive"));
+        }
+        String sql = "SELECT time_bucket(CAST(:bucket_width AS interval),create_time) AS bucket,COUNT(*) AS value FROM "
+                + table()
+                + " WHERE tenant_id=:tenant_id AND device_id=:device_id"
+                + " AND create_time>=:from_time AND create_time<:to_time"
+                + " GROUP BY bucket ORDER BY bucket ASC";
+        return databaseClient
+                .sql(sql)
+                .bind("tenant_id", tenantId)
+                .bind("device_id", deviceId)
+                .bind("from_time", dialect.bindInstant(window.from()))
+                .bind("to_time", dialect.bindInstant(window.toExclusive()))
+                .bind("bucket_width", bucketWidth.toMillis() + " milliseconds")
+                .map((row, metadata) -> new BucketAggregate(
+                        instant(row.get("bucket")), (double) number(row.get("value")), number(row.get("value"))))
+                .all()
+                .collectList()
+                .timeout(deadline.maxWait());
+    }
+
+    @Override
+    public Mono<List<DimensionCount>> countByDimensionForDevice(
+            long tenantId,
+            long deviceId,
+            TimeWindow window,
+            GroupDimension dimension,
+            int limit,
+            TsdbDeadline deadline) {
+        if (tenantId <= 0) return Mono.error(new IllegalArgumentException("tenantId must be positive"));
+        if (deviceId <= 0) return Mono.error(new IllegalArgumentException("deviceId must be positive"));
+        if (limit < 1 || limit > MAX_DIMENSION_LIMIT) {
+            return Mono.error(new IllegalArgumentException("limit must be between 1 and " + MAX_DIMENSION_LIMIT));
+        }
+        String column =
+                switch (dimension) {
+                    case DEVICE -> "device_id";
+                    case POINT -> "point_id";
+                    case DRIVER -> "driver_id";
+                };
+        String nullGuard = dimension == GroupDimension.DRIVER ? " AND driver_id IS NOT NULL" : "";
+        String sql = "SELECT " + column + " AS entity_id,COUNT(*) AS value FROM " + table()
+                + " WHERE tenant_id=:tenant_id AND device_id=:device_id"
+                + " AND create_time>=:from_time AND create_time<:to_time" + nullGuard
+                + " GROUP BY " + column + " ORDER BY value DESC LIMIT :limit";
+        return databaseClient
+                .sql(sql)
+                .bind("tenant_id", tenantId)
+                .bind("device_id", deviceId)
+                .bind("from_time", dialect.bindInstant(window.from()))
+                .bind("to_time", dialect.bindInstant(window.toExclusive()))
+                .bind("limit", limit)
+                .map((row, metadata) ->
+                        new DimensionCount(dimension, number(row.get("entity_id")), number(row.get("value"))))
+                .all()
+                .collectList()
+                .timeout(deadline.maxWait());
+    }
+
+    @Override
+    public Mono<List<SeriesLastSeen>> lastSeenPerSeriesForDevice(
+            long tenantId, long deviceId, TimeWindow window, TsdbDeadline deadline) {
+        if (tenantId <= 0) return Mono.error(new IllegalArgumentException("tenantId must be positive"));
+        if (deviceId <= 0) return Mono.error(new IllegalArgumentException("deviceId must be positive"));
+        String sql = "SELECT tenant_id,device_id,point_id,MAX(create_time) AS last_seen FROM " + table()
+                + " WHERE tenant_id=:tenant_id AND device_id=:device_id"
+                + " AND create_time>=:from_time AND create_time<:to_time"
+                + " GROUP BY tenant_id,device_id,point_id ORDER BY device_id,point_id";
+        return databaseClient
+                .sql(sql)
+                .bind("tenant_id", tenantId)
+                .bind("device_id", deviceId)
+                .bind("from_time", dialect.bindInstant(window.from()))
+                .bind("to_time", dialect.bindInstant(window.toExclusive()))
+                .map((row, metadata) -> new SeriesLastSeen(
+                        new SeriesKey(
+                                number(row.get("tenant_id")),
+                                number(row.get("device_id")),
+                                number(row.get("point_id"))),
+                        instant(row.get("last_seen"))))
+                .all()
+                .collectList()
+                .timeout(deadline.maxWait());
+    }
+
+    @Override
+    public Mono<List<LatencyBin>> latencyHistogramForDevice(
+            long tenantId, long deviceId, TimeWindow window, List<Long> binEdgesMs, TsdbDeadline deadline) {
+        if (tenantId <= 0) return Mono.error(new IllegalArgumentException("tenantId must be positive"));
+        if (deviceId <= 0) return Mono.error(new IllegalArgumentException("deviceId must be positive"));
+        if (binEdgesMs == null
+                || binEdgesMs.isEmpty()
+                || binEdgesMs.stream().anyMatch(Objects::isNull)
+                || !isStrictlyAscending(binEdgesMs)) {
+            return Mono.error(new IllegalArgumentException("binEdgesMs must be strictly ascending and non-empty"));
+        }
+        StringBuilder sql = new StringBuilder("SELECT receive_latency_bin,COUNT(*) AS value FROM (SELECT CASE ");
+        for (int i = 0; i < binEdgesMs.size(); i++) {
+            sql.append("WHEN EXTRACT(EPOCH FROM (operate_time-create_time))*1000 < :edge")
+                    .append(i)
+                    .append(" THEN ")
+                    .append(i)
+                    .append(' ');
+        }
+        sql.append("ELSE ")
+                .append(binEdgesMs.size())
+                .append(" END AS receive_latency_bin FROM ")
+                .append(table())
+                .append(" WHERE tenant_id=:tenant_id AND device_id=:device_id")
+                .append(" AND create_time>=:from_time AND create_time<:to_time) grouped")
+                .append(" GROUP BY receive_latency_bin ORDER BY receive_latency_bin");
+        DatabaseClient.GenericExecuteSpec spec = databaseClient
+                .sql(sql.toString())
+                .bind("tenant_id", tenantId)
+                .bind("device_id", deviceId)
+                .bind("from_time", dialect.bindInstant(window.from()))
+                .bind("to_time", dialect.bindInstant(window.toExclusive()));
+        for (int i = 0; i < binEdgesMs.size(); i++) spec = spec.bind("edge" + i, binEdgesMs.get(i));
+        return spec.map((row, metadata) -> Map.entry(integer(row.get("receive_latency_bin")), number(row.get("value"))))
+                .all()
+                .collectMap(Map.Entry::getKey, Map.Entry::getValue)
+                .map(counts -> {
+                    List<LatencyBin> result = new ArrayList<>();
+                    long lower = Long.MIN_VALUE;
+                    for (int i = 0; i <= binEdgesMs.size(); i++) {
+                        long upper = i < binEdgesMs.size() ? binEdgesMs.get(i) : Long.MAX_VALUE;
+                        result.add(new LatencyBin(lower, upper, counts.getOrDefault(i, 0L)));
+                        lower = upper;
+                    }
+                    return result;
+                })
+                .timeout(deadline.maxWait());
+    }
+
+    @Override
+    public Mono<NumValueQuality> numValueQualityForDevice(
+            long tenantId, long deviceId, TimeWindow window, TsdbDeadline deadline) {
+        if (tenantId <= 0) return Mono.error(new IllegalArgumentException("tenantId must be positive"));
+        if (deviceId <= 0) return Mono.error(new IllegalArgumentException("deviceId must be positive"));
+        String sql = "SELECT COUNT(*) AS total, COUNT(num_value) AS numeric FROM " + table()
+                + " WHERE tenant_id=:tenant_id AND device_id=:device_id"
+                + " AND create_time>=:from_time AND create_time<:to_time";
+        return databaseClient
+                .sql(sql)
+                .bind("tenant_id", tenantId)
+                .bind("device_id", deviceId)
+                .bind("from_time", dialect.bindInstant(window.from()))
+                .bind("to_time", dialect.bindInstant(window.toExclusive()))
+                .map((row, metadata) -> {
+                    long total = number(row.get("total"));
+                    long numeric = number(row.get("numeric"));
+                    return new NumValueQuality(total, numeric, total - numeric);
+                })
+                .one()
                 .timeout(deadline.maxWait());
     }
 

@@ -48,4 +48,9 @@ public class PointValueLatestServiceImpl implements PointValueLatestService {
     public Flux<PointValueBO> listLatestStream(Long tenantId, int limit) {
         return store.listLatestStream(tenantId, limit).map(pointValueBuilder::buildBOByDO);
     }
+
+    @Override
+    public Flux<PointValueBO> listLatestStreamForDevice(Long tenantId, Long deviceId, int limit) {
+        return store.listLatestStreamForDevice(tenantId, deviceId, limit).map(pointValueBuilder::buildBOByDO);
+    }
 }

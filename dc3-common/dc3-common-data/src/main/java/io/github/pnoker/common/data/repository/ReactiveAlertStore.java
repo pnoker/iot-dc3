@@ -29,6 +29,7 @@ public interface ReactiveAlertStore {
     Mono<OffsetPage<AlertItemRow>> list(
             Long tenantId,
             String source,
+            Long sourceId,
             Integer alarmTypeFlag,
             Integer confirmFlag,
             LocalDateTime from,

@@ -55,6 +55,9 @@ public interface ReactiveAlertAnalyticsStore {
     /** Emit the daily alert trend since the given time. */
     Flux<AlertTrendRow> dailyTrend(long tenantId, LocalDateTime from);
 
+    /** Emit the daily alert trend of one device since the given time. */
+    Flux<AlertTrendRow> dailyTrendForDevice(long tenantId, long deviceId, LocalDateTime from);
+
     /** Emit the noisiest alert sources since the given time. */
     Flux<SourceCountRow> topSources(long tenantId, LocalDateTime from, int limit);
 

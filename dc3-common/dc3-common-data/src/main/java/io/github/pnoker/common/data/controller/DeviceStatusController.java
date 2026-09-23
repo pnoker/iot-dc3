@@ -19,6 +19,7 @@ package io.github.pnoker.common.data.controller;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.DeviceStatusService;
+import io.github.pnoker.common.data.entity.vo.DeviceStatusDetailVO;
 import io.github.pnoker.common.facade.entity.query.FacadeDeviceOffsetQuery;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -147,6 +149,36 @@ public class DeviceStatusController implements BaseController {
                     @RequestParam(value = "profile_id")
                     Long profileId) {
         return getTenantId().flatMap(tenantId -> deviceStatusService.listByProfileId(tenantId, profileId));
+    }
+
+    /**
+     * Query the detailed status lease of a single device: current status (ONLINE, OFFLINE,
+     * MAINTAIN, FAULT) plus the heartbeat and lease-expiry times the status was derived
+     * from.
+     *
+     * @param deviceId identifier of the device; must belong to the current tenant
+     * @return the device's status lease detail
+     */
+    @PreAuthorize("@perm.can('device_status', 'get')")
+    @Operation(
+            summary = "Get Device Status Detail",
+            description =
+                    "Return the detailed status lease of one device: current status (ONLINE, OFFLINE, MAINTAIN, FAULT) plus the heartbeat and lease-expiry times the status was derived from. Use to render the device detail status banner.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/{deviceId}")
+    public Mono<DeviceStatusDetailVO> deviceStatusDetail(
+            @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
+                    @PathVariable
+                    Long deviceId) {
+        return getTenantId().flatMap(tenantId -> deviceStatusService.detail(tenantId, deviceId));
     }
 
     private FacadeDeviceOffsetQuery withTenant(FacadeDeviceOffsetQuery query, Long tenantId) {

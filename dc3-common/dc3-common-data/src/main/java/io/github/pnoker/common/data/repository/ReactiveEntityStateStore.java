@@ -28,6 +28,9 @@ public interface ReactiveEntityStateStore {
     /** Emit the current state flags for the entity ids. */
     Mono<Map<Long, Byte>> listStateFlags(Long tenantId, EntityTypeEnum type, Collection<Long> entityIds);
 
+    /** Read the current lease row for one entity; empty when no row exists. */
+    Mono<EntityStateLease> getLease(Long tenantId, EntityTypeEnum type, Long entityId);
+
     /** Count online entities of the type within the tenant. */
     Mono<Long> countOnline(Long tenantId, EntityTypeEnum type);
 

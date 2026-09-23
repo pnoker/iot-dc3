@@ -49,6 +49,7 @@ public class R2dbcAlertStore implements ReactiveAlertStore {
     public Mono<OffsetPage<AlertItemRow>> list(
             Long tenantId,
             String source,
+            Long sourceId,
             Integer alarmTypeFlag,
             Integer confirmFlag,
             LocalDateTime from,
@@ -61,6 +62,10 @@ public class R2dbcAlertStore implements ReactiveAlertStore {
         if (source != null && !source.isBlank()) {
             where.append(" AND a.alarm_target_type_flag=:target_type");
             bindNames.add("target_type");
+        }
+        if (sourceId != null && sourceId > 0) {
+            where.append(" AND a.entity_id=:source_id");
+            bindNames.add("source_id");
         }
         if (alarmTypeFlag != null) {
             where.append(" AND a.alarm_type_flag=:alarm_type");
@@ -90,6 +95,7 @@ public class R2dbcAlertStore implements ReactiveAlertStore {
             Object value =
                     switch (name) {
                         case "target_type" -> sourceIndex(source);
+                        case "source_id" -> sourceId;
                         case "alarm_type" -> alarmTypeFlag;
                         case "confirm_flag" -> confirmFlag;
                         case "from_time" -> from;

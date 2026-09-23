@@ -32,4 +32,7 @@ public interface PointValueLatestService {
 
     /** Stream the latest point values as a continuous feed. */
     Flux<PointValueBO> listLatestStream(Long tenantId, int limit);
+
+    /** Stream the latest point values of one device as a continuous feed. */
+    Flux<PointValueBO> listLatestStreamForDevice(Long tenantId, Long deviceId, int limit);
 }

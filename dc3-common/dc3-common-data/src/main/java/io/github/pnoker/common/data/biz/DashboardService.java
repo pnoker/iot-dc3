@@ -105,6 +105,7 @@ public interface DashboardService {
     Mono<OffsetPage<AlertItemVO>> alertPage(
             Long tenantId,
             String source,
+            Long sourceId,
             Integer alarmTypeFlag,
             Integer confirmFlag,
             java.time.LocalDateTime from,
@@ -210,4 +211,57 @@ public interface DashboardService {
      * Points declared but never reported — config-vs-reality gap.
      */
     Mono<CoverageGapVO> coverageGap(Long tenantId, int limit);
+
+    // ===== Device-scoped dashboard =============================================
+
+    /**
+     * Device-scoped time-bucketed series of point-value row counts. Mirrors
+     * {@link #timeseries} constrained to one device.
+     */
+    Mono<List<TimeseriesPointVO>> deviceTimeseries(Long tenantId, Long deviceId, String granularity, int rangeHours);
+
+    /**
+     * Device-scoped acquisition-to-storage latency histogram. Mirrors
+     * {@link #latencyHistogram} constrained to one device.
+     */
+    Mono<List<LatencyBucketVO>> deviceLatencyHistogram(Long tenantId, Long deviceId, int rangeHours);
+
+    /**
+     * Device-scoped day-of-week × hour-of-day activity heatmap (7 × 24 = 168 cells,
+     * zero-padded). Mirrors {@link #hourlyActivity} constrained to one device.
+     */
+    Mono<List<ActivityCellVO>> deviceHourlyActivity(Long tenantId, Long deviceId, int rangeHours);
+
+    /**
+     * Device-scoped data-quality snapshot: numeric versus non-numeric sample split
+     * inside the window plus the newest sample time across the device's points.
+     */
+    Mono<DeviceQualityVO> deviceQuality(Long tenantId, Long deviceId, int rangeHours);
+
+    /**
+     * Most recent N point-value rows of one device — drives the device detail
+     * dashboard's live feed panel. {@code limit} clamped 1..100.
+     */
+    Mono<List<LatestPointValueVO>> deviceLatestStream(Long tenantId, Long deviceId, int limit);
+
+    /**
+     * Top-N points of one device by point-value count over the lookback window.
+     */
+    Mono<List<TopEntityVO>> deviceTopPoints(Long tenantId, Long deviceId, int rangeHours, int limit);
+
+    /**
+     * Config-vs-reality coverage gap for the points declared under one device.
+     */
+    Mono<CoverageGapVO> deviceCoverageGap(Long tenantId, Long deviceId);
+
+    /**
+     * Points of one device that have data in the baseline window but have gone silent.
+     */
+    Mono<List<SilentSourceVO>> deviceSilentSources(
+            Long tenantId, Long deviceId, int baselineDays, int silentMinutes, int limit);
+
+    /**
+     * Daily alert trend for one device over the last {@code days} days.
+     */
+    Mono<List<AlertTrendVO>> deviceAlertTrend(Long tenantId, Long deviceId, int days);
 }

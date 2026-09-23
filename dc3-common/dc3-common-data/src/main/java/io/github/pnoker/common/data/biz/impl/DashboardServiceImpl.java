@@ -27,6 +27,7 @@ import io.github.pnoker.common.data.entity.vo.dashboard.*;
 import io.github.pnoker.common.data.repository.ReactiveAlertAnalyticsStore;
 import io.github.pnoker.common.data.repository.ReactiveAlertStore;
 import io.github.pnoker.common.data.repository.ReactiveTsdbStore;
+import io.github.pnoker.common.entity.bo.PointValueBO;
 import io.github.pnoker.common.enums.AlarmTypeEnum;
 import io.github.pnoker.common.enums.ConfirmFlagEnum;
 import io.github.pnoker.common.facade.api.DeviceFacade;
@@ -35,6 +36,7 @@ import io.github.pnoker.common.facade.api.PointFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDeviceBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverBO;
 import io.github.pnoker.common.facade.entity.bo.FacadePointBO;
+import io.github.pnoker.common.tsdb.model.NumValueQuality;
 import io.github.pnoker.common.tsdb.model.TsdbModel.BucketAggregate;
 import io.github.pnoker.common.tsdb.model.TsdbModel.GroupDimension;
 import io.github.pnoker.common.tsdb.model.TsdbModel.LatencyBin;
@@ -308,13 +310,14 @@ public class DashboardServiceImpl implements DashboardService {
     public Mono<OffsetPage<AlertItemVO>> alertPage(
             Long tenantId,
             String source,
+            Long sourceId,
             Integer alarmTypeFlag,
             Integer confirmFlag,
             LocalDateTime from,
             PageRequest page) {
         String src = normalizeSource(source);
         return alertStore
-                .list(tenantId, src, alarmTypeFlag, confirmFlag, from, page)
+                .list(tenantId, src, sourceId, alarmTypeFlag, confirmFlag, from, page)
                 .map(result -> OffsetPage.of(
                         result.items().stream().map(this::toAlertVO).toList(),
                         result.offset(),
@@ -395,52 +398,53 @@ public class DashboardServiceImpl implements DashboardService {
         return pointValueLatestService
                 .listLatestStream(tenantId, clamped)
                 .collectList()
-                .flatMap(rows -> {
-                    List<LatestPointValueVO> out = new ArrayList<>(rows.size());
-                    Set<Long> deviceIds = new HashSet<>();
-                    Set<Long> pointIds = new HashSet<>();
-                    Set<Long> driverIds = new HashSet<>();
-                    for (var row : rows) {
-                        LatestPointValueVO vo = new LatestPointValueVO();
-                        vo.setDeviceId(String.valueOf(row.getDeviceId()));
-                        vo.setPointId(String.valueOf(row.getPointId()));
-                        vo.setDriverId(String.valueOf(row.getDriverId()));
-                        vo.setRawValue(row.getRawValue());
-                        vo.setCalValue(row.getCalValue());
-                        vo.setValueType(Objects.nonNull(row.getNumValue()) ? "NUMERIC" : "STRING");
-                        vo.setCreateTime(row.getCreateTime());
-                        out.add(vo);
-                        if (row.getDeviceId() != null && row.getDeviceId() > 0) deviceIds.add(row.getDeviceId());
-                        if (row.getPointId() != null && row.getPointId() > 0) pointIds.add(row.getPointId());
-                        if (row.getDriverId() != null && row.getDriverId() > 0) driverIds.add(row.getDriverId());
-                    }
-                    return Mono.zip(
-                                    deviceFacade
-                                            .listByIdsReactive(tenantId, deviceIds)
-                                            .collectList(),
-                                    pointFacade
-                                            .listByIdsReactive(tenantId, pointIds)
-                                            .collectList(),
-                                    driverFacade
-                                            .listByIdsReactive(tenantId, driverIds)
-                                            .collectList())
-                            .map(tuple -> {
-                                Map<Long, String> deviceNames = tuple.getT1().stream()
-                                        .collect(java.util.stream.Collectors.toMap(
-                                                FacadeDeviceBO::getId, FacadeDeviceBO::getDeviceName, (a, b) -> a));
-                                Map<Long, String> pointNames = tuple.getT2().stream()
-                                        .collect(java.util.stream.Collectors.toMap(
-                                                FacadePointBO::getId, FacadePointBO::getPointName, (a, b) -> a));
-                                Map<Long, String> driverNames = tuple.getT3().stream()
-                                        .collect(java.util.stream.Collectors.toMap(
-                                                FacadeDriverBO::getId, FacadeDriverBO::getDriverName, (a, b) -> a));
-                                out.forEach(vo -> {
-                                    vo.setDeviceName(deviceNames.get(Long.valueOf(vo.getDeviceId())));
-                                    vo.setPointName(pointNames.get(Long.valueOf(vo.getPointId())));
-                                    vo.setDriverName(driverNames.get(Long.valueOf(vo.getDriverId())));
-                                });
-                                return out;
-                            });
+                .flatMap(rows -> buildAndEnrich(tenantId, rows));
+    }
+
+    /**
+     * Shared shape of {@link #latestStream} and {@link #deviceLatestStream}: map the raw
+     * latest rows to VOs, then bulk-resolve device/point/driver display names through the
+     * facades.
+     */
+    private Mono<List<LatestPointValueVO>> buildAndEnrich(Long tenantId, List<PointValueBO> rows) {
+        List<LatestPointValueVO> out = new ArrayList<>(rows.size());
+        Set<Long> deviceIds = new HashSet<>();
+        Set<Long> pointIds = new HashSet<>();
+        Set<Long> driverIds = new HashSet<>();
+        for (var row : rows) {
+            LatestPointValueVO vo = new LatestPointValueVO();
+            vo.setDeviceId(String.valueOf(row.getDeviceId()));
+            vo.setPointId(String.valueOf(row.getPointId()));
+            vo.setDriverId(String.valueOf(row.getDriverId()));
+            vo.setRawValue(row.getRawValue());
+            vo.setCalValue(row.getCalValue());
+            vo.setValueType(Objects.nonNull(row.getNumValue()) ? "NUMERIC" : "STRING");
+            vo.setCreateTime(row.getCreateTime());
+            out.add(vo);
+            if (row.getDeviceId() != null && row.getDeviceId() > 0) deviceIds.add(row.getDeviceId());
+            if (row.getPointId() != null && row.getPointId() > 0) pointIds.add(row.getPointId());
+            if (row.getDriverId() != null && row.getDriverId() > 0) driverIds.add(row.getDriverId());
+        }
+        return Mono.zip(
+                        deviceFacade.listByIdsReactive(tenantId, deviceIds).collectList(),
+                        pointFacade.listByIdsReactive(tenantId, pointIds).collectList(),
+                        driverFacade.listByIdsReactive(tenantId, driverIds).collectList())
+                .map(tuple -> {
+                    Map<Long, String> deviceNames = tuple.getT1().stream()
+                            .collect(java.util.stream.Collectors.toMap(
+                                    FacadeDeviceBO::getId, FacadeDeviceBO::getDeviceName, (a, b) -> a));
+                    Map<Long, String> pointNames = tuple.getT2().stream()
+                            .collect(java.util.stream.Collectors.toMap(
+                                    FacadePointBO::getId, FacadePointBO::getPointName, (a, b) -> a));
+                    Map<Long, String> driverNames = tuple.getT3().stream()
+                            .collect(java.util.stream.Collectors.toMap(
+                                    FacadeDriverBO::getId, FacadeDriverBO::getDriverName, (a, b) -> a));
+                    out.forEach(vo -> {
+                        vo.setDeviceName(deviceNames.get(Long.valueOf(vo.getDeviceId())));
+                        vo.setPointName(pointNames.get(Long.valueOf(vo.getPointId())));
+                        vo.setDriverName(driverNames.get(Long.valueOf(vo.getDriverId())));
+                    });
+                    return out;
                 });
     }
 
@@ -517,7 +521,7 @@ public class DashboardServiceImpl implements DashboardService {
     public Mono<List<AlertItemVO>> alertLatest(Long tenantId, int limit) {
         int clamped = Math.clamp(limit, 1, MAX_LIMIT);
         return alertStore
-                .list(tenantId, null, null, null, null, new PageRequest(0, clamped))
+                .list(tenantId, null, null, null, null, null, new PageRequest(0, clamped))
                 .map(page -> page.items().stream().map(this::toAlertVO).toList());
     }
 
@@ -778,5 +782,268 @@ public class DashboardServiceImpl implements DashboardService {
                     return vo;
                 })
                 .collectList();
+    }
+
+    // ================================================================
+    // Device-scoped dashboard
+    // ================================================================
+
+    private static boolean invalidDeviceScope(Long tenantId, Long deviceId) {
+        return tenantId == null || tenantId <= 0 || deviceId == null || deviceId <= 0;
+    }
+
+    @Override
+    public Mono<List<TimeseriesPointVO>> deviceTimeseries(
+            Long tenantId, Long deviceId, String granularity, int rangeHours) {
+        if (invalidDeviceScope(tenantId, deviceId)) {
+            return Mono.error(new IllegalArgumentException("tenantId and deviceId must be positive"));
+        }
+        String g = GRANULARITY.contains(granularity) ? granularity : "hour";
+        int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
+        LocalDateTime from = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).minusHours(hours);
+        return tsdbStore
+                .bucketedCountForDevice(
+                        tenantId,
+                        deviceId,
+                        windowSince(from),
+                        "day".equals(g) ? Duration.ofDays(1) : Duration.ofHours(1),
+                        DEADLINE)
+                .map(buckets -> buckets.stream()
+                        .map(bucket -> {
+                            TimeseriesPointVO vo = new TimeseriesPointVO();
+                            vo.setBucket(converter.toWallClock(bucket.bucketStart()));
+                            vo.setCount(bucket.sampleCount());
+                            return vo;
+                        })
+                        .toList());
+    }
+
+    @Override
+    public Mono<List<LatencyBucketVO>> deviceLatencyHistogram(Long tenantId, Long deviceId, int rangeHours) {
+        if (invalidDeviceScope(tenantId, deviceId)) {
+            return Mono.error(new IllegalArgumentException("tenantId and deviceId must be positive"));
+        }
+        int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
+        LocalDateTime to = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
+        LocalDateTime from = to.minusHours(hours);
+        Mono<List<LatencyBin>> bins = tsdbStore.capabilities().latencyHistogram()
+                ? tsdbStore.latencyHistogramForDevice(tenantId, deviceId, windowSince(from), LATENCY_EDGES_MS, DEADLINE)
+                : Mono.just(List.of());
+        return bins.map(values -> {
+            List<LatencyBucketVO> out = new ArrayList<>(LATENCY_EDGES_MS.size() + 1);
+            for (int i = 0; i <= LATENCY_EDGES_MS.size(); i++) {
+                LatencyBucketVO vo = new LatencyBucketVO();
+                vo.setBin(i);
+                vo.setCount(i < values.size() ? values.get(i).count() : 0L);
+                out.add(vo);
+            }
+            return out;
+        });
+    }
+
+    @Override
+    public Mono<List<ActivityCellVO>> deviceHourlyActivity(Long tenantId, Long deviceId, int rangeHours) {
+        if (invalidDeviceScope(tenantId, deviceId)) {
+            return Mono.error(new IllegalArgumentException("tenantId and deviceId must be positive"));
+        }
+        int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
+        LocalDateTime to = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
+        LocalDateTime from = to.minusHours(hours);
+        return tsdbStore
+                .bucketedCountForDevice(tenantId, deviceId, windowSince(from), Duration.ofHours(1), DEADLINE)
+                .map(buckets -> {
+                    long[][] grid = new long[7][24];
+                    for (BucketAggregate bucket : buckets) {
+                        LocalDateTime wallClock = converter.toWallClock(bucket.bucketStart());
+                        if (wallClock != null)
+                            grid[wallClock.getDayOfWeek().getValue() % 7][wallClock.getHour()] = bucket.sampleCount();
+                    }
+                    List<ActivityCellVO> out = new ArrayList<>(7 * 24);
+                    for (int d = 0; d < 7; d++)
+                        for (int h = 0; h < 24; h++) {
+                            ActivityCellVO vo = new ActivityCellVO();
+                            vo.setDow(d);
+                            vo.setHour(h);
+                            vo.setCount(grid[d][h]);
+                            out.add(vo);
+                        }
+                    return out;
+                });
+    }
+
+    @Override
+    public Mono<DeviceQualityVO> deviceQuality(Long tenantId, Long deviceId, int rangeHours) {
+        if (invalidDeviceScope(tenantId, deviceId)) {
+            return Mono.error(new IllegalArgumentException("tenantId and deviceId must be positive"));
+        }
+        int hours = Math.clamp(rangeHours, 1, MAX_HOURS_90D);
+        LocalDateTime from = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).minusHours(hours);
+        return Mono.zip(
+                        tsdbStore.numValueQualityForDevice(tenantId, deviceId, windowSince(from), DEADLINE),
+                        tsdbStore.lastSeenPerSeriesForDevice(
+                                tenantId, deviceId, new TimeWindow(Instant.EPOCH, Instant.now()), DEADLINE))
+                .map(tuple -> {
+                    NumValueQuality quality = tuple.getT1();
+                    DeviceQualityVO vo = new DeviceQualityVO();
+                    vo.setTotalSamples(quality.total());
+                    vo.setNumericSamples(quality.numeric());
+                    vo.setNonNumericSamples(quality.nonNumeric());
+                    vo.setNumericRatio(
+                            quality.total() == 0
+                                    ? 0.0
+                                    : Math.round((double) quality.numeric() / quality.total() * 100.0) / 100.0);
+                    Instant latest = tuple.getT2().stream()
+                            .map(SeriesLastSeen::lastSeen)
+                            .filter(Objects::nonNull)
+                            .max(Comparator.naturalOrder())
+                            .orElse(null);
+                    vo.setLatestSeen(latest == null ? null : converter.toWallClock(latest));
+                    return vo;
+                });
+    }
+
+    @Override
+    public Mono<List<LatestPointValueVO>> deviceLatestStream(Long tenantId, Long deviceId, int limit) {
+        if (invalidDeviceScope(tenantId, deviceId)) {
+            return Mono.error(new IllegalArgumentException("tenantId and deviceId must be positive"));
+        }
+        int clamped = Math.clamp(limit, 1, MAX_LIVE_SIZE);
+        return pointValueLatestService
+                .listLatestStreamForDevice(tenantId, deviceId, clamped)
+                .collectList()
+                .flatMap(rows -> buildAndEnrich(tenantId, rows));
+    }
+
+    @Override
+    public Mono<List<TopEntityVO>> deviceTopPoints(Long tenantId, Long deviceId, int rangeHours, int limit) {
+        if (invalidDeviceScope(tenantId, deviceId)) {
+            return Mono.error(new IllegalArgumentException("tenantId and deviceId must be positive"));
+        }
+        LocalDateTime from =
+                LocalDateTime.now(TimeConstant.DEFAULT_ZONEID).minusHours(Math.clamp(rangeHours, 1, MAX_HOURS_90D));
+        return tsdbStore
+                .countByDimensionForDevice(
+                        tenantId,
+                        deviceId,
+                        windowSince(from),
+                        GroupDimension.POINT,
+                        Math.clamp(limit, 1, MAX_LIMIT),
+                        DEADLINE)
+                .map(rows -> rows.stream()
+                        .map(row -> {
+                            TopEntityVO vo = new TopEntityVO();
+                            vo.setEntityId(String.valueOf(row.entityId()));
+                            vo.setCount(row.count());
+                            return vo;
+                        })
+                        .toList());
+    }
+
+    @Override
+    public Mono<CoverageGapVO> deviceCoverageGap(Long tenantId, Long deviceId) {
+        if (invalidDeviceScope(tenantId, deviceId)) {
+            return Mono.error(new IllegalArgumentException("tenantId and deviceId must be positive"));
+        }
+        return listDevicePoints(tenantId, deviceId)
+                .zipWith(tsdbStore.lastSeenPerSeriesForDevice(
+                        tenantId, deviceId, new TimeWindow(Instant.EPOCH, Instant.now()), DEADLINE))
+                .map(tuple -> {
+                    List<FacadePointBO> points = tuple.getT1();
+                    Set<Long> reported = tuple.getT2().stream()
+                            .map(row -> row.series().pointId())
+                            .collect(java.util.stream.Collectors.toSet());
+                    CoverageGapVO vo = new CoverageGapVO();
+                    vo.setTotalPoints(points.size());
+                    points.stream()
+                            .filter(point -> !reported.contains(point.getId()))
+                            .limit(MAX_COVERAGE_GAP_LIMIT)
+                            .forEach(point -> {
+                                CoverageGapVO.Item item = new CoverageGapVO.Item();
+                                item.setPointId(String.valueOf(point.getId()));
+                                item.setProfileId(String.valueOf(point.getProfileId()));
+                                vo.addItem(item);
+                            });
+                    vo.setMissingPoints(Math.max(0, points.size() - reported.size()));
+                    return vo;
+                });
+    }
+
+    private Mono<List<FacadePointBO>> listDevicePoints(Long tenantId, Long deviceId) {
+        return listDevicePoints(tenantId, deviceId, 0, new ArrayList<>());
+    }
+
+    private Mono<List<FacadePointBO>> listDevicePoints(
+            Long tenantId, Long deviceId, long offset, List<FacadePointBO> collected) {
+        return pointFacade
+                .listReactive(new io.github.pnoker.common.facade.entity.query.FacadePointOffsetQuery(
+                        tenantId, null, null, null, null, null, null, null, null, null, deviceId, offset, 200,
+                        List.of()))
+                .flatMap(page -> {
+                    collected.addAll(page.items());
+                    return page.hasNext()
+                            ? listDevicePoints(
+                                    tenantId, deviceId, offset + page.items().size(), collected)
+                            : Mono.just(List.copyOf(collected));
+                });
+    }
+
+    @Override
+    public Mono<List<SilentSourceVO>> deviceSilentSources(
+            Long tenantId, Long deviceId, int baselineDays, int silentMinutes, int limit) {
+        if (invalidDeviceScope(tenantId, deviceId)) {
+            return Mono.error(new IllegalArgumentException("tenantId and deviceId must be positive"));
+        }
+        LocalDateTime now = LocalDateTime.now(TimeConstant.DEFAULT_ZONEID);
+        LocalDateTime from = now.minusDays(Math.clamp(baselineDays, 1, MAX_BASELINE_DAYS));
+        Instant threshold = converter.toInstant(now.minusMinutes(Math.clamp(silentMinutes, 5, 60 * 24)));
+        return tsdbStore
+                .lastSeenPerSeriesForDevice(tenantId, deviceId, windowSince(from), DEADLINE)
+                .map(seen -> seen.stream()
+                        .filter(row -> row.lastSeen() != null && row.lastSeen().isBefore(threshold))
+                        .sorted(Comparator.comparing(SeriesLastSeen::lastSeen).reversed())
+                        .limit(Math.clamp(limit, 1, MAX_COVERAGE_GAP_LIMIT))
+                        .map(row -> {
+                            SilentSourceVO vo = new SilentSourceVO();
+                            vo.setDeviceId(String.valueOf(row.series().deviceId()));
+                            vo.setPointId(String.valueOf(row.series().pointId()));
+                            vo.setLastSeen(converter.toWallClock(row.lastSeen()));
+                            vo.setSilentSeconds(
+                                    Duration.between(vo.getLastSeen(), now).getSeconds());
+                            return vo;
+                        })
+                        .toList());
+    }
+
+    @Override
+    public Mono<List<AlertTrendVO>> deviceAlertTrend(Long tenantId, Long deviceId, int days) {
+        if (invalidDeviceScope(tenantId, deviceId)) {
+            return Mono.error(new IllegalArgumentException("tenantId and deviceId must be positive"));
+        }
+        int clamped = Math.clamp(days, 1, MAX_DAYS);
+        LocalDateTime from =
+                LocalDate.now(TimeConstant.DEFAULT_ZONEID).minusDays(clamped).atTime(LocalTime.MIN);
+        return alertAnalyticsStore
+                .dailyTrendForDevice(tenantId, deviceId, from)
+                .collectList()
+                .map(rows -> {
+                    Map<String, io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow> byDate = rows.stream()
+                            .collect(java.util.stream.Collectors.toMap(
+                                    io.github.pnoker.common.data.entity.bo.dashboard.AlertTrendRow::getDate,
+                                    row -> row,
+                                    (left, right) -> left));
+                    List<AlertTrendVO> out = new ArrayList<>(clamped + 1);
+                    for (int index = 0; index <= clamped; index++) {
+                        String date = LocalDate.now(TimeConstant.DEFAULT_ZONEID)
+                                .minusDays(clamped - index)
+                                .toString();
+                        var row = byDate.get(date);
+                        AlertTrendVO vo = new AlertTrendVO();
+                        vo.setDate(date);
+                        vo.setDeviceCount(row == null ? 0 : row.getDeviceCount());
+                        vo.setDriverCount(row == null ? 0 : row.getDriverCount());
+                        out.add(vo);
+                    }
+                    return out;
+                });
     }
 }

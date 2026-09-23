@@ -144,6 +144,29 @@ public class R2dbcAlertAnalyticsStore implements ReactiveAlertAnalyticsStore {
     }
 
     @Override
+    public Flux<AlertTrendRow> dailyTrendForDevice(long tenantId, long deviceId, LocalDateTime from) {
+        if (tenantId <= 0) return Flux.error(new IllegalArgumentException("tenantId must be positive"));
+        if (deviceId <= 0) return Flux.error(new IllegalArgumentException("deviceId must be positive"));
+        String day = "CAST(create_time AS DATE)";
+        return databaseClient
+                .sql("SELECT " + day + " AS day, COUNT(*) AS device_count "
+                        + "FROM " + TABLE + " WHERE tenant_id=:tenant_id AND alarm_target_type_flag=1"
+                        + " AND entity_id=:device_id AND create_time>=:from_time "
+                        + "GROUP BY " + day + " ORDER BY day ASC")
+                .bind("tenant_id", tenantId)
+                .bind("device_id", deviceId)
+                .bind("from_time", from)
+                .map((row, metadata) -> {
+                    AlertTrendRow value = new AlertTrendRow();
+                    value.setDate(date(row.get("day")));
+                    value.setDeviceCount(number(row.get("device_count")));
+                    value.setDriverCount(0L);
+                    return value;
+                })
+                .all();
+    }
+
+    @Override
     public Flux<SourceCountRow> topSources(long tenantId, LocalDateTime from, int limit) {
         return sourceCount(
                 "SELECT " + sourceExpression() + " AS source, entity_id AS source_id, COUNT(*) AS count FROM " + TABLE

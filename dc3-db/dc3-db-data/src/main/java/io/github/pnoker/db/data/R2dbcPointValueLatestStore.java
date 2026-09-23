@@ -92,6 +92,21 @@ public class R2dbcPointValueLatestStore implements ReactivePointValueLatestStore
     }
 
     @Override
+    public Flux<PointValueDO> listLatestStreamForDevice(Long tenantId, Long deviceId, int limit) {
+        if (!validKey(tenantId, deviceId) || limit < 1) return Flux.empty();
+        int bounded = Math.min(limit, 500);
+        return databaseClient
+                .sql("SELECT " + COLUMNS + " FROM " + TABLE
+                        + " WHERE tenant_id=:tenant_id AND device_id=:device_id"
+                        + " ORDER BY create_time DESC, point_id ASC LIMIT :limit")
+                .bind("tenant_id", tenantId)
+                .bind("device_id", deviceId)
+                .bind("limit", bounded)
+                .map(this::map)
+                .all();
+    }
+
+    @Override
     public Mono<Integer> upsertBatch(List<PointValueDO> values) {
         List<PointValueDO> rows = values == null
                 ? List.of()

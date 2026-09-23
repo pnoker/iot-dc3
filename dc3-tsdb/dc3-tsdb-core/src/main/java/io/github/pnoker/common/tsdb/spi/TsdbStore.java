@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.tsdb.spi;
 
+import io.github.pnoker.common.tsdb.model.NumValueQuality;
 import io.github.pnoker.common.tsdb.model.TsdbModel.*;
 import java.time.Duration;
 import java.util.List;
@@ -226,6 +227,84 @@ public interface TsdbStore {
      */
     Mono<List<LatencyBin>> latencyHistogram(
             long tenantId, TimeWindow window, List<Long> binEdgesMs, TsdbDeadline deadline);
+
+    // ===== device-scoped analytics (tenant + device scoped S13 variants) =====
+
+    /**
+     * Device-scoped variant of {@link #bucketedCount}: time-bucketed COUNT for a single
+     * device, single stream, buckets ascending. Tenant and device scope are both
+     * enforced — the device id must be positive.
+     *
+     * @param tenantId    tenant scope
+     * @param deviceId    device scope
+     * @param window      half-open time window
+     * @param bucketWidth bucket width
+     * @param deadline    read deadline
+     * @return time-bucketed counts for the device, buckets ascending
+     */
+    Mono<List<BucketAggregate>> bucketedCountForDevice(
+            long tenantId, long deviceId, TimeWindow window, Duration bucketWidth, TsdbDeadline deadline);
+
+    /**
+     * Device-scoped variant of {@link #countByDimension}: grouped counts for a single
+     * device, descending, top {@code limit}.
+     *
+     * @param tenantId  tenant scope
+     * @param deviceId  device scope
+     * @param window    half-open time window
+     * @param dimension grouping dimension
+     * @param limit     top-N
+     * @param deadline  read deadline
+     * @return grouped counts for the device, descending
+     */
+    Mono<List<DimensionCount>> countByDimensionForDevice(
+            long tenantId,
+            long deviceId,
+            TimeWindow window,
+            GroupDimension dimension,
+            int limit,
+            TsdbDeadline deadline);
+
+    /**
+     * Device-scoped variant of {@link #lastSeenPerSeries}: every series of the device
+     * with samples in the window plus its newest sample time.
+     *
+     * @param tenantId tenant scope
+     * @param deviceId device scope
+     * @param window   half-open time window
+     * @param deadline read deadline
+     * @return one row per series of the device with samples in the window
+     */
+    Mono<List<SeriesLastSeen>> lastSeenPerSeriesForDevice(
+            long tenantId, long deviceId, TimeWindow window, TsdbDeadline deadline);
+
+    /**
+     * Device-scoped variant of {@link #latencyHistogram}: receive-latency histogram over
+     * {@code receiveTime − deviceTime} milliseconds using the caller's bin edges
+     * (capability {@code latencyHistogram}).
+     *
+     * @param tenantId   tenant scope
+     * @param deviceId   device scope
+     * @param window     half-open time window
+     * @param binEdgesMs caller-supplied bin edges in milliseconds
+     * @param deadline   read deadline
+     * @return latency histogram bins for the device
+     */
+    Mono<List<LatencyBin>> latencyHistogramForDevice(
+            long tenantId, long deviceId, TimeWindow window, List<Long> binEdgesMs, TsdbDeadline deadline);
+
+    /**
+     * Device-scoped sample-quality split inside the window: total rows, rows with a
+     * numeric projection and rows without one.
+     *
+     * @param tenantId tenant scope
+     * @param deviceId device scope
+     * @param window   half-open time window
+     * @param deadline read deadline
+     * @return numeric versus non-numeric sample split for the device
+     */
+    Mono<NumValueQuality> numValueQualityForDevice(
+            long tenantId, long deviceId, TimeWindow window, TsdbDeadline deadline);
 
     // ===== operations =====
 

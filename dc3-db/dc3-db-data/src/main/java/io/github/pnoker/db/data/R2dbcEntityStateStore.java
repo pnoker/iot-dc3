@@ -261,7 +261,11 @@ public class R2dbcEntityStateStore implements ReactiveEntityStateStore {
                 .flatMapMany(Flux::fromIterable);
     }
 
-    private Mono<EntityStateLease> getLease(Long tenantId, EntityTypeEnum type, Long entityId) {
+    @Override
+    public Mono<EntityStateLease> getLease(Long tenantId, EntityTypeEnum type, Long entityId) {
+        if (tenantId == null || tenantId <= 0 || type == null || entityId == null || entityId <= 0) {
+            return Mono.empty();
+        }
         return databaseClient
                 .sql("SELECT id,tenant_id,entity_type_flag,entity_id,parent_entity_id,entity_state_flag,"
                         + "last_state_flag,lease_version,expire_time,timeout_seconds,last_heartbeat_time,last_alarm_id,"
