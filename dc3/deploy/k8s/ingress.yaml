@@ -31,10 +31,17 @@ metadata:
     # cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: nginx
-  tls:
-    - hosts:
-        - dc3.example.com
-      secretName: dc3-tls
+  # TLS is OFF by default: the dc3-tls secret must be provisioned first
+  # (cert-manager + ClusterIssuer, or your CA), otherwise nginx-ingress
+  # rejects the HTTPS host. To enable:
+  #   1. kubectl create secret tls dc3-tls --cert=... --key=...
+  #      (or install cert-manager, uncomment the annotation above and
+  #       create an Issuer/ClusterIssuer)
+  #   2. uncomment the tls block below
+  # tls:
+  #   - hosts:
+  #       - dc3.example.com
+  #     secretName: dc3-tls
   rules:
     - host: dc3.example.com
       http:

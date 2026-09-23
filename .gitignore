@@ -151,3 +151,4 @@ src-tauri/Cargo.lock
 **/dc3/data/
 .claude/settings.local.json
 .claude/TODO.md
+dc3/deploy/k8s/secret.env

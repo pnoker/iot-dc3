@@ -26,7 +26,6 @@ data:
   # Runtime profile / feature flags
   NODE_ENV: "test"
   APM_AGENT_ENABLE: "false"
-  DC3_FACADE_GRPC_DEADLINE_MS: "3000"
 
   # Center-to-center service discovery (k8s Service DNS names).
   # Keep these aligned with the Service names in this directory.
@@ -35,10 +34,17 @@ data:
   CENTER_DATA_HOST: dc3-center-data
   CENTER_AGENTIC_HOST: dc3-center-agentic
 
-  # PostgreSQL (StatefulSet dc3-postgres)
+  # PostgreSQL (StatefulSet dc3-postgres). DC3_R2DBC_URL is mandatory: every
+  # center profile defaults spring.r2dbc.url to the empty env placeholder and
+  # startup fails with "URL does not start with the r2dbc scheme" without it.
   POSTGRES_HOST: dc3-postgres
   POSTGRES_PORT: "5432"
   POSTGRES_DB: dc3
+  DC3_R2DBC_URL: "r2dbc:postgresql://dc3-postgres:5432/dc3"
+  # Schema contract enforced at startup (docs/db-dialects.md); keep the
+  # fingerprint in sync with the seed SQL shipped in dc3/dependencies/postgres.
+  DC3_SCHEMA_FINGERPRINT: "5146811645192cebabe055c434a2f278c92174d600581f993e69adc7a3893226"
+  DC3_SCHEMA_CONTRACT: "r2dbc-flag-day-v1"
 
   # RabbitMQ (StatefulSet dc3-rabbitmq); AMQP + embedded MQTT plugin
   RABBITMQ_VIRTUAL_HOST: dc3
@@ -63,8 +69,25 @@ data:
   AGENTIC_MEMORY_MAX_MESSAGES: "50"
   AGENTIC_ATTACHMENT_STORAGE_PATH: dc3/data/agentic/attachments
 
-  # Point processing / MQTT batching
-  POINT_BATCH_SPEED: "100"
-  POINT_BATCH_INTERVAL: "5"
+  # Point pipeline (dc3-center-data contract, see dc3/docker-compose-dev.yml)
+  POINT_BATCH_SIZE: "500"
+  POINT_BATCH_RECEIVE_TIMEOUT_MILLIS: "100"
+  POINT_CONCURRENT_CONSUMERS: "4"
+  POINT_MAX_CONCURRENT_CONSUMERS: "16"
+  POINT_PREFETCH_COUNT: "1000"
+  POINT_RETRY_MAX_RETRIES: "3"
+  POINT_RETRY_INITIAL_INTERVAL_MILLIS: "1000"
+  POINT_RETRY_MULTIPLIER: "2"
+  POINT_RETRY_MAX_INTERVAL_MILLIS: "10000"
+
+  # MQTT batching (dc3-common-mqtt contract)
   MQTT_BATCH_SPEED: "100"
   MQTT_BATCH_INTERVAL: "5"
+
+  # Driver lease fencing (docs/storage-abstraction.md)
+  DC3_DRIVER_LEASE_SECONDS: "30"
+  DC3_DRIVER_LEASE_RENEW_CRON: "0/10 * * * * ?"
+  DC3_DRIVER_LEASE_QUEUE_EXPIRES_MILLIS: "300000"
+
+  # Internal async-plane broker selection (docs/mq-brokers.md)
+  DC3_MQ_TYPE: "rabbitmq"

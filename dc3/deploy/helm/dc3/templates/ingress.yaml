@@ -26,6 +26,11 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
+  {{- if and .Values.ingress.tls .Values.ingress.tls.enabled .Values.ingress.tls.clusterIssuer }}
+    # cert-manager issues the TLS secret referenced below; without this
+    # annotation the clusterIssuer value is inert and HTTPS never works.
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.tls.clusterIssuer }}
+  {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   {{- if and .Values.ingress.tls .Values.ingress.tls.enabled }}

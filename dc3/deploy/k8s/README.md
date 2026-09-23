@@ -1,7 +1,8 @@
 # IoT DC3 on Kubernetes
 
 Production-oriented Kubernetes manifests for the IoT DC3 platform: gateway, the four centers (auth / manager / data /
-agentic), the web console, 36 protocol drivers, and the PostgreSQL + RabbitMQ stateful dependencies.
+agentic), the web console, the 28 published protocol drivers, and the PostgreSQL + RabbitMQ stateful
+dependencies.
 
 | What           | Where                                                 |
 |----------------|-------------------------------------------------------|
@@ -35,7 +36,10 @@ dc3/deploy/k8s/
 - Kubernetes >= 1.25, an ingress controller (the bundled `ingress.yaml` targets
   [ingress-nginx](https://kubernetes.github.io/ingress-nginx/)), and a StorageClass that provisions volumes (the default
   class is used by the PVCs).
-- The release CI publishes all `pnoker/dc3-*` **app** images to Docker Hub and Aliyun. The **dependency** images
+- The release CI publishes the **app** images to Docker Hub and Aliyun — the upstream 28-driver set plus the
+  centers, gateway and web. Eight drivers have no published images yet (`dlt645 dnp3 iec61850 kafka knx lorawan mbus
+  redis`) and are intentionally absent from `kustomization.yaml`; add them back once they ship. The **dependency**
+  images
   `pnoker/dc3-postgres` and `pnoker/dc3-rabbitmq` are *not*
   published - build and push them once (see next step).
 
@@ -89,7 +93,10 @@ Scaling semantics (see `dc3/doc/DEPLOYMENT.md`; the compose-scale/swarm stacks d
 - **centers**: safe for HA/rollouts. Traffic from the gateway is balanced by Spring Cloud Gateway over HTTP;
   center-to-center gRPC uses static DNS targets, so a scaled center serves as failover rather than request-level
   balancing.
-- **drivers**: safe to scale here - each pod gets its own `emptyDir` outbox, so replicas never share a SQLite file
+- **drivers**: safe to scale here - each pod gets its own `emptyDir` outbox, so replicas never share a SQLite file.
+  Hardware-bound drivers (`serial`, `ble`, `can`, `opc-da`) need host device access (hostPath / device plugins /
+  node affinity to edge nodes) that these manifests deliberately do not configure - the k8s set is intended for
+  IP-based protocol drivers
   (unlike compose-scale/swarm, where drivers must stay at 1 replica). Exception: `listening-virtual` pins inbound device
   sockets, keep
   `replicas: 1`.
@@ -120,6 +127,13 @@ kubectl -n dc3 exec dc3-postgres-0 -- pg_dumpall -U dc3 > backup.sql
 - Drivers mount `emptyDir` for protocol-local cache; promote to a PVC per driver if a driver needs durable state.
 - On multi-node clusters make sure the default StorageClass is replicated (or use a CSI driver with snapshots). Back up
   PostgreSQL regularly (pg_dump/pgBackRest).
+
+## Native image line
+
+Since 2026.9 the centers and the gateway also ship GraalVM native images (same image names, `-native` tag suffix, e.g.
+`pnoker/dc3-center-auth:2026.9-native`, amd64 only). Switch a workload by pointing its image at the `-native` tag;
+startup drops to under a second and memory limits can be tightened. The `dc3/docker-compose-native.yml` stack is the
+compose counterpart.
 
 ## Security hardening (before production)
 

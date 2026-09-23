@@ -71,12 +71,12 @@ spec:
               memory: 2048Mi
           readinessProbe:
             exec:
+              # Probes resolve the env-injected credentials, so overriding
+              # POSTGRES_USERNAME / POSTGRES_DB never breaks readiness.
               command:
-                - pg_isready
-                - -U
-                - dc3
-                - -d
-                - dc3
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 5
@@ -84,11 +84,9 @@ spec:
           livenessProbe:
             exec:
               command:
-                - pg_isready
-                - -U
-                - dc3
-                - -d
-                - dc3
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
             initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 5

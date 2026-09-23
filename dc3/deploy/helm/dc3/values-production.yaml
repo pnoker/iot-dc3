@@ -47,6 +47,10 @@ services:
       limits: { cpu: "2", memory: 2048Mi }
   web:
     replicas: 2
+    # dc3-web has no series tag - pin the full release version (and
+    # IfNotPresent then behaves as a reproducible pin; `latest` + IfNotPresent
+    # would keep serving stale bundles forever).
+    tag: "2026.9.22"
   auth:
     replicas: 2
   manager:

@@ -24,7 +24,8 @@ metadata:
     app.kubernetes.io/name: dc3-gateway
     app.kubernetes.io/part-of: iot-dc3
 spec:
-  replicas: 1
+  # Matches the HPA minimum (hpa.yaml) so the first apply does not rescale.
+  replicas: 2
   selector:
     matchLabels:
       app: dc3-gateway

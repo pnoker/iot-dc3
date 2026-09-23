@@ -22,7 +22,7 @@ description: >-
   agentic centers, protocol drivers, and the Vue web console, with PostgreSQL and
   RabbitMQ as stateful dependencies.
 type: application
-version: 0.1.0
+version: 0.2.0
 appVersion: "2026.9"
 home: https://github.com/pnoker/iot-dc3
 sources:

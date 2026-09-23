@@ -1,7 +1,7 @@
 # IoT DC3 Helm Chart
 
 Helm chart for deploying the IoT DC3 platform: HTTP gateway, the four centers (auth / manager / data / agentic), the Vue
-web console, 36 protocol drivers, and the PostgreSQL + RabbitMQ stateful dependencies.
+web console, the 28 published protocol drivers, and the PostgreSQL + RabbitMQ stateful dependencies.
 
 > Kubernetes manifests (kustomize) live in `../../k8s`; the compose stacks live in
 > `dc3/docker-compose*.yml`. See `dc3/doc/DEPLOYMENT.md` for the full deployment guide.
@@ -63,3 +63,17 @@ Scaling semantics match the kustomize manifests: gateway/web/centers/drivers are
 own `emptyDir` outbox; `listening-virtual` also pins inbound device sockets and must stay at 1 replica);
 postgres/rabbitmq are singletons. The compose-scale/swarm stacks differ for drivers: there every replica would open the
 same SQLite outbox file, so drivers stay at 1 replica.
+
+## Driver coverage
+
+The chart ships the upstream 28-driver set. Eight drivers have no published images yet (`dlt645 dnp3 iec61850 kafka
+knx lorawan mbus redis`) and default to `enabled: false` in `values.yaml`; enable them once their images ship.
+
+Hardware-bound drivers (`serial`, `ble`, `can`, `opc-da`) require host device access that the chart does not configure;
+run them on edge nodes with hostPath / device plugins instead of the default cluster deployment.
+
+## Native image line
+
+Since 2026.9 the centers and the gateway also ship GraalVM native images (same image names, `-native` tag suffix, e.g.
+`pnoker/dc3-center-auth:2026.9-native`, amd64 only). Point a service's image tag at the `-native` variant (e.g.
+`--set services.auth.tag=2026.9-native`) for sub-second startup and tighter memory limits.

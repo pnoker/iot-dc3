@@ -41,9 +41,11 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: dc3-web
-          # dc3-web has no series tag - latest or a full release version only
+          # dc3-web has no series tag - latest or a full release version only.
+          # Always re-pulls so image updates are picked up; pin a full release
+          # version (e.g. 2026.9.22) for reproducible production rollouts.
           image: pnoker/dc3-web:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           env:
             - name: APP_API_HOST
               value: "dc3-gateway"

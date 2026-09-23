@@ -63,14 +63,17 @@ spec:
             {{- toYaml .Values.postgres.resources | nindent 12 }}
           readinessProbe:
             exec:
-              command: [ "pg_isready", "-U", "dc3", "-d", "dc3" ]
+              # Probes resolve the env-injected credentials, so overriding
+              # secrets.POSTGRES_USERNAME / config.POSTGRES_DB never breaks
+              # readiness.
+              command: [ "sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\"" ]
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 10
           livenessProbe:
             exec:
-              command: [ "pg_isready", "-U", "dc3", "-d", "dc3" ]
+              command: [ "sh", "-c", "pg_isready -U \"$POSTGRES_USER\" -d \"$POSTGRES_DB\"" ]
             initialDelaySeconds: 60
             periodSeconds: 30
             timeoutSeconds: 5
