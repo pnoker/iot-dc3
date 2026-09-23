@@ -371,12 +371,20 @@ jobs:
         run: |
           set -euo pipefail
 
+          # The body carries the CURRENT version's changelog block only (the
+          # backfill tool does the same): pasting the whole CHANGE.md blew the
+          # 128KB per-env-var limit (MAX_ARG_STRLEN) once the file passed
+          # ~200KB, and the runner died with "Argument list too long" while
+          # spawning node for the release action.
           {
             echo "release_notes<<RELEASE_NOTES_EOF"
             echo ""
             perl -pe 's/\$\{SERVICE_VERSION\}/$ENV{SERVICE_VERSION}/g' "$SERVICE_WORKSPACE/dc3/doc/TITLE.md"
             echo ""
-            perl -pe 's/\$\{SERVICE_VERSION\}/$ENV{SERVICE_VERSION}/g' "$SERVICE_WORKSPACE/dc3/doc/CHANGE.md"
+            awk -v ver="$SERVICE_VERSION" '
+              /^### / { keep = index($0, ver) > 0 }
+              keep { print }
+            ' "$SERVICE_WORKSPACE/dc3/doc/CHANGE.md"
             echo ""
             perl -pe 's/\$\{SERVICE_VERSION\}/$ENV{SERVICE_VERSION}/g' "$SERVICE_WORKSPACE/dc3/doc/RELEASE-FOOTER.md"
             echo "RELEASE_NOTES_EOF"
