@@ -23,7 +23,7 @@ spring:
     client:
       channel:
         dc3-center-manager:
-          target: 'static://${CENTER_MANAGER_HOST:dc3-center-manager}:9400'
+          target: 'static://${CENTER_MANAGER_HOST:dc3-center-manager}:${CENTER_MANAGER_GRPC_PORT:9400}'
           keepalive:
             time: 5m
             timeout: 20s

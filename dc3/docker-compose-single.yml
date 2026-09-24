@@ -32,6 +32,11 @@ x-logging: &default-logging
 
 x-app-runtime-env: &app-runtime-env
   NODE_ENV: test
+  # Align the MQ group tag with the center (dev + user.name): the driver
+  # and center must publish/consume on the same exchange or point values
+  # pile up unread on a group-less queue.
+  SPRING_ENV: dev
+  SPRING_GROUP: root
   APM_AGENT_ENABLE: ${APM_AGENT_ENABLE:-false}
   DC3_SECURITY_KEY: ${DC3_SECURITY_KEY:-dc3.security.key.2026.io.github.pnoker}  # dev-only default; never reuse in pre/pro
   # Internal async-plane broker selection (docs/mq-brokers.md); rabbitmq is the default
@@ -52,6 +57,10 @@ x-app-runtime-env: &app-runtime-env
   DC3_SCHEMA_FINGERPRINT: "${DC3_SCHEMA_FINGERPRINT:-5146811645192cebabe055c434a2f278c92174d600581f993e69adc7a3893226}"
   DC3_SCHEMA_CONTRACT: "${DC3_SCHEMA_CONTRACT:-r2dbc-flag-day-v1}"
   RABBITMQ_VIRTUAL_HOST: ${RABBITMQ_VIRTUAL_HOST:-dc3}
+  # Drivers register with the manager center over gRPC; in the single
+  # topology the manager lives inside dc3-center-single:9100.
+  CENTER_MANAGER_HOST: dc3-center-single
+  CENTER_MANAGER_GRPC_PORT: "9100"
   RABBITMQ_HOST: dc3-rabbitmq
   RABBITMQ_PORT: "${RABBITMQ_CONTAINER_PORT:-5672}"
   RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-dc3}
