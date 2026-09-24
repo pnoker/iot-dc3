@@ -122,7 +122,7 @@ const edit = () => {
 };
 
 const detail = () => {
-  router.push({name: 'deviceDetail', query: {id: props.data.id, active: 'detail'}}).catch(() => {
+  router.push({name: 'deviceDetail', query: {id: props.data.id}}).catch(() => {
     // nothing to do
   });
 };

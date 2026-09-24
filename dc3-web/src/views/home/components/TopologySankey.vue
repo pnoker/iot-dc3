@@ -424,7 +424,7 @@ const routeTo = (type: string, id: string) => {
       .catch(() => {});
   } else if (type === "device") {
     router
-      .push({ name: "deviceDetail", query: { id, active: "detail" } })
+      .push({ name: "deviceDetail", query: { id } })
       .catch(() => {});
   } else if (type === "profile") {
     router
