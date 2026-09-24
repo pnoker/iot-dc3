@@ -43,16 +43,34 @@
       >
         <el-tab-pane :label="$t('device.detail.dashboard')" name="dashboard">
           <div class="device-dashboard">
-            <!-- Status strip: online lease summary from the device-status API. -->
-            <div class="device-dashboard__status">
-              <span class="device-dashboard__status-dot" :style="{background: statusDotColor}"></span>
-              <div class="device-dashboard__status-main">
-                <span class="device-dashboard__status-label">{{ statusLabel }}</span>
-                <span class="device-dashboard__status-meta">
+            <!-- Identity + status banner: the merged device-info header, so
+                 the dashboard is self-sufficient — who is it, is it healthy. -->
+            <div class="device-dashboard__banner">
+              <div class="device-dashboard__identity">
+                <span class="device-dashboard__name">{{ reactiveData.data.deviceName || '-' }}</span>
+                <span v-if="reactiveData.data.deviceCode" class="device-dashboard__code">
+                  {{ reactiveData.data.deviceCode }}
+                </span>
+                <span class="device-dashboard__status">
+                  <span class="device-dashboard__status-dot" :style="{background: statusDotColor}"></span>
+                  {{ statusLabel }}
+                </span>
+              </div>
+              <div class="device-dashboard__meta">
+                <span class="device-dashboard__meta-item">
+                  {{ reactiveData.driver.driverName || '-' }} · {{ reactiveData.profile.profileName || '-' }}
+                </span>
+                <span class="device-dashboard__meta-item">
                   {{ $t('device.detail.heartbeatTime') }}: {{ heartbeatLabel }}
                 </span>
-                <span class="device-dashboard__status-meta">
+                <span class="device-dashboard__meta-item">
                   {{ $t('device.detail.timeoutConfig') }}: {{ timeoutLabel }}
+                </span>
+                <span class="device-dashboard__meta-item device-dashboard__meta-item--muted">
+                  {{ $t('common.createTime') }}: {{ timestamp(reactiveData.data.createTime || '') }}
+                </span>
+                <span class="device-dashboard__meta-item device-dashboard__meta-item--muted">
+                  {{ $t('common.operationTime') }}: {{ timestamp(reactiveData.data.operateTime || '') }}
                 </span>
               </div>
             </div>
@@ -159,47 +177,6 @@
             </el-row>
           </div>
         </el-tab-pane>
-        <el-tab-pane :label="$t('device.detail.deviceInfo')" name="detail">
-          <detail-card>
-            <el-descriptions :column="isMobile ? 1 : 2" border>
-              <el-descriptions-item :label="$t('device.detail.deviceName')"
-              >{{ reactiveData.data.deviceName }}
-              </el-descriptions-item>
-              <el-descriptions-item :label="$t('device.detail.driverName')"
-              >
-                <span v-if="reactiveData.driverLoadError" class="detail-inline-error">
-                  {{ $t('common.loadFailed') }}
-                  <el-button :loading="reactiveData.driverLoading" link size="small" type="danger" @click="retryDriver">
-                    {{ $t('common.retry') }}
-                  </el-button>
-                </span>
-                <span v-else>{{ reactiveData.driver.driverName || '-' }}</span>
-              </el-descriptions-item>
-              <el-descriptions-item :label="$t('device.detail.profileName')"
-              >
-                <span v-if="reactiveData.profileLoadError" class="detail-inline-error">
-                  {{ $t('common.loadFailed') }}
-                  <el-button :loading="reactiveData.profileLoading" link size="small" type="danger" @click="retryProfile">
-                    {{ $t('common.retry') }}
-                  </el-button>
-                </span>
-                <span v-else>{{ reactiveData.profile.profileName || '-' }}</span>
-              </el-descriptions-item>
-              <el-descriptions-item :label="$t('device.detail.profileCode')"
-              >{{ reactiveData.profile.profileCode || '-' }}
-              </el-descriptions-item>
-              <el-descriptions-item :label="$t('device.detail.pointCount')">{{ pointLength }}</el-descriptions-item>
-              <el-descriptions-item :label="$t('device.detail.commandCount')">{{ commandLength }}</el-descriptions-item>
-              <el-descriptions-item :label="$t('device.detail.eventCount')">{{ eventLength }}</el-descriptions-item>
-              <el-descriptions-item :label="$t('common.operationTime')"
-              >{{ timestamp(reactiveData.data.operateTime || '') }}
-              </el-descriptions-item>
-              <el-descriptions-item :label="$t('common.createTime')"
-              >{{ timestamp(reactiveData.data.createTime || '') }}
-              </el-descriptions-item>
-            </el-descriptions>
-          </detail-card>
-        </el-tab-pane>
         <el-tab-pane :label="$t('device.detail.relatedPoints')" lazy name="point">
           <point ref="pointViewRef" :device-id="reactiveData.id" :embedded="'device'"></point>
         </el-tab-pane>
@@ -268,7 +245,7 @@ const pointValueViewRef = ref<InstanceType<typeof pointValue>>();
 
 const reactiveData = reactive({
   id: String(route.query.id ?? ''),
-  active: (route.query.active as string) || 'dashboard',
+  active: normalizeActive(route.query.active as string),
   loading: true,
   status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
   data: {} as Partial<DeviceRecord>,
@@ -384,6 +361,11 @@ const commandLength = computed(() => {
 const eventLength = computed(() => {
   return eventViewRef.value?.reactiveData?.page?.total || 0;
 });
+
+// The old device-info tab was merged into the dashboard; legacy deep links
+// still target active=detail, so map it forward instead of landing on a
+// missing tab.
+const normalizeActive = (active?: string) => (active === 'detail' ? 'dashboard' : active || 'dashboard');
 
 const statusCode = computed(() => String(statusDetail.value.status || '').toLowerCase());
 
@@ -603,7 +585,7 @@ watch(
       device();
       if (((active as string) || 'dashboard') === 'dashboard') loadDashboard();
     }
-    reactiveData.active = (active as string) || 'dashboard';
+    reactiveData.active = normalizeActive(active as string);
   }
 );
 
@@ -642,16 +624,48 @@ onBeforeUnmount(() => {
 // Device dashboard tab — mirrors the Home page's el-row/gutter rhythm so
 // the reused chart/feed cards sit on the same 8px (12px mobile) grid.
 .device-dashboard {
-  // Online-status banner strip.
-  &__status {
-    display: flex;
-    align-items: center;
-    gap: var(--dc3-space-3);
+  // Identity + status banner: the merged device-info header. One strip
+  // answers "who is it, is it healthy" without a separate tab.
+  &__banner {
     padding: var(--dc3-space-3) var(--dc3-space-4);
     border: 1px solid var(--dc3-border-base);
     border-radius: var(--dc3-radius-lg);
     background: var(--dc3-bg-muted);
     margin-bottom: var(--dc3-gutter);
+  }
+
+  &__identity {
+    display: flex;
+    align-items: center;
+    gap: var(--dc3-space-2);
+    flex-wrap: wrap;
+  }
+
+  &__name {
+    font-size: 16px;
+    font-weight: 650;
+    color: var(--dc3-text-primary);
+  }
+
+  &__code {
+    padding: 0 8px;
+    border: 1px solid var(--dc3-border-base);
+    border-radius: var(--dc3-radius-full);
+    background: var(--dc3-bg-elevated);
+    color: var(--dc3-text-secondary);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    line-height: 20px;
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dc3-space-2);
+    margin-left: auto;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--dc3-text-primary);
   }
 
   &__status-dot {
@@ -661,22 +675,22 @@ onBeforeUnmount(() => {
     flex-shrink: 0;
   }
 
-  &__status-main {
+  &__meta {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: var(--dc3-space-4);
     flex-wrap: wrap;
-  }
-
-  &__status-label {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--dc3-text-primary);
-  }
-
-  &__status-meta {
+    margin-top: var(--dc3-space-2);
     font-size: 12px;
-    color: var(--dc3-text-muted);
+    color: var(--dc3-text-regular);
+  }
+
+  &__meta-item {
+    white-space: nowrap;
+
+    &--muted {
+      color: var(--dc3-text-muted);
+    }
   }
 
   // Stat-card strip: 4 across on desktop, 2 on tablet, 1 on mobile.
