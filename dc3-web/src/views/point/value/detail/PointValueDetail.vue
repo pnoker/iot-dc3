@@ -45,7 +45,15 @@
         :description="$t('pointValue.card.noLatestValue')"
       />
       <el-tabs v-else v-model="reactiveData.active" v-loading="reactiveData.loading" @tab-click="changeActive">
-        <el-tab-pane :label="$t('pointValue.detail.title')" name="detail">
+        <el-tab-pane :label="$t('pointValue.dashboard.title')" name="dashboard">
+          <point-dashboard
+            :device-id="String(route.query.deviceId || '')"
+            :latest="reactiveData.data"
+            :point-id="String(route.query.pointId || '')"
+            :unit="reactiveData.unit"
+          ></point-dashboard>
+        </el-tab-pane>
+        <el-tab-pane :label="$t('pointValue.detail.title')" lazy name="detail">
           <detail-card>
             <el-descriptions :column="isMobile ? 1 : 2" border>
               <el-descriptions-item :label="$t('pointValue.tool.pointName')">
@@ -91,6 +99,7 @@ import {useBreakpoint} from '@/composables/useBreakpoint';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
 import detailCard from '@/components/card/detail/DetailCard.vue';
+import pointDashboard from './dashboard/PointDashboard.vue';
 import {listDeviceByIds} from '@/api/device';
 import {getPointValueLatest, listPointByIds, listPointUnit} from '@/api/point';
 import {timestampLabel} from '@/utils/dateUtil';
@@ -102,7 +111,7 @@ const {isMobile} = useBreakpoint();
 const reactiveData = reactive({
   loading: false,
   status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
-  active: (route.query.active as string) || 'detail',
+  active: (route.query.active as string) || 'dashboard',
   data: {} as Record<string, any>,
   device: null as Record<string, any> | null,
   point: null as Record<string, any> | null,
@@ -162,6 +171,12 @@ const changeActive = (tab: TabsPaneContext) => {
 
 onMounted(() => void load());
 watch(() => [route.query.deviceId, route.query.pointId], () => void load());
+// Keep the tab in lock-step with the shareable `active` query param so
+// back/forward navigation lands on the same tab (same contract as
+// DeviceDetail).
+watch(() => route.query.active, (active) => {
+  reactiveData.active = (active as string) || 'dashboard';
+});
 </script>
 
 <style lang="scss" scoped>

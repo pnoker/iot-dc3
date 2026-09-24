@@ -224,7 +224,6 @@ import {
 } from "@/config/settingsNav";
 import { useAgenticStore, useAuthStore, useMenuStore } from "@/store";
 import type { MenuNode } from "@/store/modules/menu";
-import { assetUrl } from "@/utils/assetUrl";
 import { resolveMenuTitle } from "@/utils/menuUtil";
 
 import AppPreferences from "@/components/layout/AppPreferences.vue";

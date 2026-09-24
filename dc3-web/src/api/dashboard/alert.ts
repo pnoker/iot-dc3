@@ -33,6 +33,7 @@ import type {
   FlappingSource,
   MttaTrend,
   PeerDeviation,
+  PointAlertProfile,
 } from "@/config/types/dashboard";
 
 /**
@@ -91,6 +92,22 @@ export const alertBulkConfirm = (
 export const alertTrend = (days = 30) =>
   httpGet<AlertTrendRow[]>(`${API_DATA_BASE}/dashboard/alert/trend`, {
     params: { days },
+  });
+
+/**
+ * Fetch the alarm profile of a single point: alarm-type distribution and
+ * daily counts inside a rolling day range. The recent-alert list is served
+ * separately by {@link alertPage} with source=point.
+ * @param pointId - point id whose alarm profile is being queried
+ * @param days - rolling day range, defaults to 30
+ * @param rangeKey - preset time range key overriding days
+ * @returns the point alarm profile response
+ */
+export const getPointAlertProfile = (pointId: string, days = 30, rangeKey?: string) =>
+  httpGet<PointAlertProfile>(`${API_DATA_BASE}/dashboard/alert/point_profile`, {
+    params: rangeKey
+      ? { point_id: pointId, days, range_key: rangeKey }
+      : { point_id: pointId, days },
   });
 
 /**

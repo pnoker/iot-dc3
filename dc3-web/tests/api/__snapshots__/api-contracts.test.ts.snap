@@ -967,6 +967,22 @@ exports[`API wrapper contracts > alert > alertUnconfirm maps to its transport co
 }
 `;
 
+exports[`API wrapper contracts > alert > getPointAlertProfile maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/point_profile",
+    {
+      "params": {
+        "days": 30,
+        "point_id": "2002",
+        "range_key": "30d",
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
 exports[`API wrapper contracts > alert > has every export covered by the contract matrix 1`] = `
 [
   "alertActivity",
@@ -984,6 +1000,7 @@ exports[`API wrapper contracts > alert > has every export covered by the contrac
   "alertTrend",
   "alertTypeDistribution",
   "alertUnconfirm",
+  "getPointAlertProfile",
 ]
 `;
 
@@ -3125,6 +3142,22 @@ exports[`API wrapper contracts > point > getPointById maps to its transport cont
 }
 `;
 
+exports[`API wrapper contracts > point > getPointValueDashboard maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/point_value/dashboard",
+    {
+      "params": {
+        "device_id": "1001",
+        "point_id": "2002",
+        "range_hours": 24,
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
 exports[`API wrapper contracts > point > getPointValueLatest maps to its transport contract 1`] = `
 {
   "args": [
@@ -3140,6 +3173,7 @@ exports[`API wrapper contracts > point > has every export covered by the contrac
   "addPoint",
   "deletePoint",
   "getPointById",
+  "getPointValueDashboard",
   "getPointValueLatest",
   "listPoint",
   "listPointByDeviceId",

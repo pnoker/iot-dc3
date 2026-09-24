@@ -219,7 +219,6 @@ import {getDeviceById} from '@/api/device';
 import {deviceCoverageGap, deviceQuality, deviceSilentSources, deviceStatusDetail} from '@/api/dashboard/device';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
-import detailCard from '@/components/card/detail/DetailCard.vue';
 import StatCard from '@/components/card/stat/StatCard.vue';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import QualityRing from '@/components/chart/QualityRing.vue';
@@ -238,11 +237,9 @@ import {copy} from '@/utils/commonUtil';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import type {DeviceRecord, DriverRecord, PointRecord, ProfileRecord} from '@/config/types/manager';
 import type {DeviceCoverageGap, DeviceQuality, DeviceSilentSource, DeviceStatusDetail} from '@/config/types/dashboard';
-import {useBreakpoint} from '@/composables/useBreakpoint';
 
 const route = useRoute();
 const {t} = useI18n();
-const {isMobile} = useBreakpoint();
 const pointViewRef = ref<InstanceType<typeof point>>();
 const commandViewRef = ref<InstanceType<typeof CommandList>>();
 const eventViewRef = ref<InstanceType<typeof EventList>>();
@@ -359,14 +356,6 @@ const pointLength = computed(() => {
 // user opens it); fall back to the lazy tab once it has loaded.
 const totalPointsLabel = computed(() => coverageData.value?.totalPoints || pointLength.value);
 
-const commandLength = computed(() => {
-  return commandViewRef.value?.reactiveData?.page?.total || 0;
-});
-
-const eventLength = computed(() => {
-  return eventViewRef.value?.reactiveData?.page?.total || 0;
-});
-
 const statusCode = computed(() => String(statusDetail.value.status || '').toLowerCase());
 
 const copyCode = () => copy(String(reactiveData.data.deviceCode || ''), t('device.detail.copyCode'));
@@ -383,21 +372,6 @@ const statusLabel = computed(() => {
       return t('status.fault');
     default:
       return t('status.unknown');
-  }
-});
-
-const statusDotColor = computed(() => {
-  switch (statusCode.value) {
-    case 'online':
-      return 'var(--el-color-success)';
-    case 'maintain':
-      return 'var(--el-color-warning)';
-    case 'fault':
-      return 'var(--el-color-danger)';
-    case 'offline':
-      return 'var(--el-color-info)';
-    default:
-      return 'var(--el-color-info)';
   }
 });
 
@@ -478,16 +452,6 @@ const loadProfile = (deviceRequestId: number, deviceId: string, profileIdValue: 
     .finally(() => {
       if (deviceRequestId === requestId && relationRequestId === profileRequestId) reactiveData.profileLoading = false;
     });
-};
-
-const retryDriver = () => {
-  const driverId = String(reactiveData.data.driverId || '');
-  if (driverId && reactiveData.data.id) loadDriver(requestId, String(reactiveData.data.id), driverId);
-};
-
-const retryProfile = () => {
-  const profileIdValue = String(reactiveData.data.profileId || '');
-  if (profileIdValue && reactiveData.data.id) loadProfile(requestId, String(reactiveData.data.id), profileIdValue);
 };
 
 const device = () => {

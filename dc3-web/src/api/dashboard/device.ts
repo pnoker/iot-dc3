@@ -78,6 +78,7 @@ export const deviceActivity = (deviceId: string, params: TimeRangeParams = {}) =
  * Fetch the device stats quality.
  * @param deviceId - device id to scope the request
  * @param params - query parameters for the request
+ * @param params.rangeHours - lookback window in hours
  * @returns the device quality response
  */
 export const deviceQuality = (deviceId: string, params: {rangeHours?: number} = {}) =>
@@ -102,6 +103,8 @@ export const deviceStream = (deviceId: string, limit = 20) =>
  * Fetch the device top points.
  * @param deviceId - device id to scope the request
  * @param params - query parameters for the request
+ * @param params.rangeHours - lookback window in hours
+ * @param params.limit - maximum number of entries to return or generate
  * @returns the device top point response
  */
 export const deviceTopPoints = (
@@ -127,6 +130,9 @@ export const deviceCoverageGap = (deviceId: string) =>
  * Fetch the device silent sources.
  * @param deviceId - device id to scope the request
  * @param params - query parameters for the request
+ * @param params.baselineDays - baseline window in days for the silence rule
+ * @param params.silentMinutes - silence threshold in minutes
+ * @param params.limit - maximum number of entries to return or generate
  * @returns the device silent source response
  */
 export const deviceSilentSources = (

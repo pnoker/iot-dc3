@@ -491,3 +491,113 @@ export interface DeviceStatusDetail {
   timeoutSeconds: number | null;
   expireTime: string | null;
 }
+
+// ---- Point-scoped dashboard (位号看板) ---------------------------------
+// Payload shapes of the point data dashboard, mirroring the backend
+// PointValueDashboardVO / PointAlertProfileVO contracts.
+
+/**
+ * PointDashboardTrendBucket data contract.
+ * One bucket of the value trend band; `from` is an ISO instant string.
+ */
+export interface PointDashboardTrendBucket {
+  from: string;
+  min: number | null;
+  max: number | null;
+  avg: number | null;
+  sampleCount: number;
+}
+
+/**
+ * PointDashboardHourVolume data contract.
+ * Sample volume of one hour; `hourStart` is an ISO instant string.
+ */
+export interface PointDashboardHourVolume {
+  hourStart: string;
+  count: number;
+}
+
+/**
+ * PointDashboardValueBin data contract.
+ * One bin of the numeric value histogram; `to` is null for the open-ended top bin.
+ */
+export interface PointDashboardValueBin {
+  from: number | null;
+  to: number | null;
+  count: number;
+}
+
+/**
+ * PointDashboardIntervalBin data contract.
+ * One bin of the sampling-interval histogram; `toMs` is null for the open-ended top bin.
+ */
+export interface PointDashboardIntervalBin {
+  fromMs: number;
+  toMs: number | null;
+  count: number;
+}
+
+/**
+ * PointDashboardGap data contract.
+ * One collection gap between consecutive samples; `from`/`to` are ISO instant strings.
+ */
+export interface PointDashboardGap {
+  from: string;
+  to: string;
+  durationMs: number;
+}
+
+/**
+ * PointDashboardHourAverage data contract.
+ * One hour of the typical day curve (hourOfDay 0 through 23).
+ */
+export interface PointDashboardHourAverage {
+  hourOfDay: number;
+  avg: number | null;
+}
+
+/**
+ * PointDashboardStats data contract.
+ * Window-level stats of the raw sample walk.
+ */
+export interface PointDashboardStats {
+  sampleCount: number;
+  min: number | null;
+  max: number | null;
+  avg: number | null;
+  medianIntervalMs: number | null;
+  /** True when the walk hit the raw-cap before exhausting the window. */
+  truncated: boolean;
+}
+
+/**
+ * PointValueDashboard data contract.
+ * Everything the point detail dashboard renders in one payload.
+ */
+export interface PointValueDashboard {
+  trend: PointDashboardTrendBucket[];
+  hourlyVolume: PointDashboardHourVolume[];
+  valueHistogram: PointDashboardValueBin[];
+  intervalHistogram: PointDashboardIntervalBin[];
+  gaps: PointDashboardGap[];
+  typicalDay: PointDashboardHourAverage[];
+  stats: PointDashboardStats | null;
+}
+
+/**
+ * PointAlertDaily data contract.
+ * One day of the point-scoped alarm trend.
+ */
+export interface PointAlertDaily {
+  date: string;
+  count: number;
+}
+
+/**
+ * PointAlertProfile data contract.
+ * Alarm profile of a single point: type distribution and daily counts.
+ */
+export interface PointAlertProfile {
+  typeDistribution: AlertTypeRow[];
+  dailyTrend: PointAlertDaily[];
+}

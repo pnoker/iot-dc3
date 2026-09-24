@@ -19,6 +19,7 @@ import {httpGet, httpPost, versionedDelete} from '@/api/common';
 import {createCrudApi} from '@/api/factory';
 import {API_DATA_BASE, API_MANAGER_BASE} from '@/config/constant/api';
 import type {CursorPageResult, PageQuery, PageResult} from '@/config/types';
+import type {PointValueDashboard} from '@/config/types/dashboard';
 import type {PointForm, PointRecord} from '@/config/types/manager';
 
 /**
@@ -112,6 +113,20 @@ export const listPointValue = (pointValue: Record<string, unknown>) =>
 export const listPointValueHistory = (deviceId: string, pointId: string, cursor?: string, limit = 100) =>
   httpGet<CursorPageResult<Record<string, unknown>>>(`${API_DATA_BASE}/point_value/history`, {
     params: {device_id: deviceId, point_id: pointId, cursor, limit}
+  });
+
+/**
+ * Fetch the data-dashboard payload of a single point: trend band, hourly
+ * volume, value histogram, sampling-interval histogram, gaps, typical-day
+ * curve and window stats — everything in one round trip.
+ * @param deviceId - device id whose point is being queried
+ * @param pointId - point id whose dashboard is being queried
+ * @param rangeHours - lookback window in hours from 1 through 168; defaults to 24
+ * @returns the point dashboard payload
+ */
+export const getPointValueDashboard = (deviceId: string, pointId: string, rangeHours = 24) =>
+  httpGet<PointValueDashboard>(`${API_DATA_BASE}/point_value/dashboard`, {
+    params: {device_id: deviceId, point_id: pointId, range_hours: rangeHours}
   });
 
 /**
