@@ -19,15 +19,24 @@ package io.github.pnoker.common.data.job;
 import io.github.pnoker.common.data.biz.store.PointValueIngestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
 
-/** Replays durable point-value receipts left by a crashed Data Center instance. */
+/**
+ * Replays durable point-value receipts left by a crashed Data Center instance.
+ *
+ * <p>Concurrency is explicitly disallowed: overlapping runs hold claim locks
+ * on the outbox while the next run's lease-expiry UPDATE blocks behind them,
+ * starving the R2DBC pool with stuck transactions (each blocked UPDATE pins a
+ * connection forever).</p>
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@DisallowConcurrentExecution
 public class PointValueIngestReplayJob extends QuartzJobBean {
 
     private final PointValueIngestService ingestService;

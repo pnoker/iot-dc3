@@ -133,8 +133,13 @@ public class R2dbcPointValueIngestOutbox implements ReactivePointValueIngestOutb
     public Flux<PointValueDO> claim(String owner, int limit) {
         if (owner == null || owner.isBlank() || limit < 1) return Flux.empty();
         int bounded = Math.min(limit, 500);
-        String expired = "UPDATE " + table() + " SET status='PENDING',claimed_at=NULL,claimed_by=NULL "
-                + "WHERE status='CLAIMED' AND claimed_at < CURRENT_TIMESTAMP - INTERVAL '30 seconds'";
+        // Release only the rows this claim can lock (SKIP LOCKED via ctid):
+        // a plain WHERE update blocks behind any in-flight claim's row locks
+        // and turns into a stuck transaction that pins a pool connection.
+        String expired = "UPDATE " + table() + " SET status='PENDING',claimed_at=NULL,claimed_by=NULL WHERE ctid IN ("
+                + "SELECT ctid FROM " + table()
+                + " WHERE status='CLAIMED' AND claimed_at < CURRENT_TIMESTAMP - INTERVAL '30 seconds'"
+                + " FOR UPDATE SKIP LOCKED)";
         String persistedLeaseExpired = "CURRENT_TIMESTAMP - INTERVAL '30 seconds'";
         String select = "SELECT " + COLUMNS + " FROM " + table()
                 + " WHERE (status='PENDING' AND available_at<=CURRENT_TIMESTAMP)"
