@@ -481,6 +481,7 @@ export default {
       availabilityFooter: 'Point coverage and silence detection',
       heartbeatTime: 'Heartbeat',
       timeoutConfig: 'Timeout',
+      copyCode: 'Device code copied',
       qualityNumeric: 'numeric',
       samples: 'samples',
       nonNumeric: 'non-numeric',

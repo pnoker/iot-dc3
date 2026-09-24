@@ -43,34 +43,38 @@
       >
         <el-tab-pane :label="$t('device.detail.dashboard')" name="dashboard">
           <div class="device-dashboard">
-            <!-- Identity + status banner: the merged device-info header, so
-                 the dashboard is self-sufficient — who is it, is it healthy. -->
+            <!-- Device 名片: tone-tile hero (name + attachment + status chip)
+                 with the machine code and live meta demoted to a quiet footer. -->
             <div class="device-dashboard__banner">
-              <div class="device-dashboard__identity">
-                <span class="device-dashboard__name">{{ reactiveData.data.deviceName || '-' }}</span>
-                <span v-if="reactiveData.data.deviceCode" class="device-dashboard__code">
-                  {{ reactiveData.data.deviceCode }}
+              <div class="device-dashboard__hero">
+                <span class="device-dashboard__tile" aria-hidden="true">
+                  <el-icon :size="26"><Management/></el-icon>
                 </span>
-                <span class="device-dashboard__status">
-                  <span class="device-dashboard__status-dot" :style="{background: statusDotColor}"></span>
+                <div class="device-dashboard__title">
+                  <span class="device-dashboard__name">{{ reactiveData.data.deviceName || '-' }}</span>
+                  <span class="device-dashboard__attach">
+                    {{ reactiveData.driver.driverName || '-' }} · {{ reactiveData.profile.profileName || '-' }}
+                  </span>
+                </div>
+                <span class="device-dashboard__status-chip" :class="`is-${statusCode}`">
+                  <span class="device-dashboard__status-dot"></span>
                   {{ statusLabel }}
                 </span>
               </div>
-              <div class="device-dashboard__meta">
-                <span class="device-dashboard__meta-item">
-                  {{ reactiveData.driver.driverName || '-' }} · {{ reactiveData.profile.profileName || '-' }}
-                </span>
-                <span class="device-dashboard__meta-item">
-                  {{ $t('device.detail.heartbeatTime') }}: {{ heartbeatLabel }}
-                </span>
-                <span class="device-dashboard__meta-item">
-                  {{ $t('device.detail.timeoutConfig') }}: {{ timeoutLabel }}
-                </span>
-                <span class="device-dashboard__meta-item device-dashboard__meta-item--muted">
-                  {{ $t('common.createTime') }}: {{ timestamp(reactiveData.data.createTime || '') }}
-                </span>
-                <span class="device-dashboard__meta-item device-dashboard__meta-item--muted">
-                  {{ $t('common.operationTime') }}: {{ timestamp(reactiveData.data.operateTime || '') }}
+              <div class="device-dashboard__footer">
+                <button
+                  v-if="reactiveData.data.deviceCode"
+                  class="device-dashboard__code"
+                  :title="reactiveData.data.deviceCode"
+                  type="button"
+                  @click="copyCode"
+                >
+                  {{ reactiveData.data.deviceCode }}
+                </button>
+                <span class="device-dashboard__live-meta">
+                  {{ $t('device.detail.heartbeatTime') }} {{ heartbeatLabel }}
+                  <span aria-hidden="true">·</span>
+                  {{ $t('device.detail.timeoutConfig') }} {{ timeoutLabel }}
                 </span>
               </div>
             </div>
@@ -204,7 +208,7 @@
 <script lang="ts" setup>
 import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
-import {Clock as ClockIcon, List as ListIcon, Odometer as OdometerIcon, Warning as WarningIcon} from '@element-plus/icons-vue';
+import {Clock as ClockIcon, List as ListIcon, Management, Odometer as OdometerIcon, Warning as WarningIcon} from '@element-plus/icons-vue';
 
 import {useRoute} from 'vue-router';
 import router from '@/config/router';
@@ -230,6 +234,7 @@ import LatencyChart from '@/views/home/components/LatencyChart.vue';
 import LiveDataFeed from '@/views/home/components/LiveDataFeed.vue';
 import AlertList from '@/views/home/components/AlertList.vue';
 import {timestamp} from '@/utils/dateUtil';
+import {copy} from '@/utils/commonUtil';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import type {DeviceRecord, DriverRecord, PointRecord, ProfileRecord} from '@/config/types/manager';
 import type {DeviceCoverageGap, DeviceQuality, DeviceSilentSource, DeviceStatusDetail} from '@/config/types/dashboard';
@@ -363,6 +368,8 @@ const eventLength = computed(() => {
 });
 
 const statusCode = computed(() => String(statusDetail.value.status || '').toLowerCase());
+
+const copyCode = () => copy(String(reactiveData.data.deviceCode || ''), t('device.detail.copyCode'));
 
 const statusLabel = computed(() => {
   switch (statusCode.value) {
@@ -619,73 +626,148 @@ onBeforeUnmount(() => {
 // Device dashboard tab — mirrors the Home page's el-row/gutter rhythm so
 // the reused chart/feed cards sit on the same 8px (12px mobile) grid.
 .device-dashboard {
-  // Identity + status banner: the merged device-info header. One strip
-  // answers "who is it, is it healthy" without a separate tab.
+  // Device 名片: the device-card header anatomy (tone tile + name + attach)
+  // scaled up, with the status as a soft chip and the machine code + live
+  // meta demoted to a quiet footer.
   &__banner {
-    padding: var(--dc3-space-3) var(--dc3-space-4);
+    padding: var(--dc3-space-4);
     border: 1px solid var(--dc3-border-base);
     border-radius: var(--dc3-radius-lg);
-    background: var(--dc3-bg-muted);
+    background: var(--dc3-bg-elevated);
     margin-bottom: var(--dc3-gutter);
   }
 
-  &__identity {
+  &__hero {
     display: flex;
     align-items: center;
-    gap: var(--dc3-space-2);
-    flex-wrap: wrap;
+    gap: var(--dc3-space-3);
+  }
+
+  &__tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border: 1px solid color-mix(in srgb, var(--dc3-color-purple) 20%, transparent);
+    border-radius: var(--dc3-radius-lg);
+    background: var(--dc3-color-purple-soft);
+    color: var(--dc3-color-purple);
+  }
+
+  &__title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
   }
 
   &__name {
+    overflow: hidden;
     font-size: 16px;
     font-weight: 650;
     color: var(--dc3-text-primary);
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  &__code {
-    padding: 0 8px;
-    border: 1px solid var(--dc3-border-base);
-    border-radius: var(--dc3-radius-full);
-    background: var(--dc3-bg-elevated);
-    color: var(--dc3-text-secondary);
+  &__attach {
+    overflow: hidden;
     font-size: 12px;
-    font-variant-numeric: tabular-nums;
-    line-height: 20px;
+    color: var(--dc3-text-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  &__status {
+  // Soft tone chip — the same language as the point-value status chips.
+  &__status-chip {
     display: inline-flex;
     align-items: center;
-    gap: var(--dc3-space-2);
+    gap: 6px;
+    flex-shrink: 0;
+    height: 24px;
+    padding: 0 10px;
     margin-left: auto;
-    font-size: 13px;
+    border: 1px solid var(--dc3-border-base);
+    border-radius: var(--dc3-radius-full);
+    background: var(--el-fill-color-light);
+    color: var(--dc3-text-secondary);
+    font-size: 12px;
     font-weight: 600;
-    color: var(--dc3-text-primary);
+
+    &.is-online {
+      border-color: color-mix(in srgb, var(--el-color-success) 30%, transparent);
+      background: var(--el-color-success-light-9);
+      color: var(--el-color-success);
+    }
+
+    &.is-maintain {
+      border-color: color-mix(in srgb, var(--el-color-warning) 30%, transparent);
+      background: var(--el-color-warning-light-9);
+      color: var(--el-color-warning);
+    }
+
+    &.is-fault {
+      border-color: color-mix(in srgb, var(--el-color-danger) 30%, transparent);
+      background: var(--el-color-danger-light-9);
+      color: var(--el-color-danger);
+    }
+
+    &.is-offline {
+      border-color: var(--dc3-border-base);
+      background: var(--el-fill-color-light);
+      color: var(--dc3-text-secondary);
+    }
   }
 
   &__status-dot {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
+    background: currentColor;
     flex-shrink: 0;
   }
 
-  &__meta {
+  &__footer {
     display: flex;
     align-items: center;
-    gap: var(--dc3-space-4);
-    flex-wrap: wrap;
-    margin-top: var(--dc3-space-2);
-    font-size: 12px;
-    color: var(--dc3-text-regular);
+    gap: var(--dc3-space-3);
+    margin-top: var(--dc3-space-3);
+    padding-top: var(--dc3-space-3);
+    border-top: 1px solid var(--dc3-border-base);
   }
 
-  &__meta-item {
+  // Machine code: copyable, monospace, ellipsized — a UUID is for copying,
+  // not reading.
+  &__code {
+    overflow: hidden;
+    max-width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--dc3-text-muted);
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    text-overflow: ellipsis;
     white-space: nowrap;
 
-    &--muted {
-      color: var(--dc3-text-muted);
+    &:hover {
+      color: var(--dc3-text-brand);
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
+  }
+
+  &__live-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dc3-space-2);
+    flex-shrink: 0;
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--dc3-text-secondary);
   }
 
   // Stat-card strip: 4 across on desktop, 2 on tablet, 1 on mobile.

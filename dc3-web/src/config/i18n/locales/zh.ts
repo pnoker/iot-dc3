@@ -475,6 +475,7 @@ export default {
       availabilityFooter: '位号覆盖与静默检测',
       heartbeatTime: '心跳时间',
       timeoutConfig: '超时配置',
+      copyCode: '设备编码已复制',
       qualityNumeric: '数值',
       samples: '样本',
       nonNumeric: '非数值',
