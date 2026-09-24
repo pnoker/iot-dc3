@@ -897,11 +897,10 @@ export default {
       descriptionPlaceholder: '请输入操作描述',
       valueRequired: '请输入位号值',
     },
-    detail: {
-      title: '数据信息',
-    },
     dashboard: {
-      title: '位号看板',
+      banner: {
+        copyId: '位号 ID 已复制',
+      },
       window: {
         h1: '1h',
         h6: '6h',

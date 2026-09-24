@@ -15,58 +15,103 @@
   - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<!-- Point dashboard (位号看板): read-only data board of one point. KPI strip,
-     trend band with the shared window selector, collection health trio, value
+<!-- Point dashboard (位号看板): read-only data board of one point, aligned
+     with the device detail page's design language — identity banner (tone
+     tile + name + device link + rw chip + footer), StatCard strip, trend
+     band with the shared window selector, collection health trio, value
      profile, alarm profile and the peer snapshot. All data flows in through
      the usePointDashboard composable; switching the window re-fetches the
      dashboard payload and every window-scoped chart at once. -->
 
 <template>
   <div class="point-dashboard">
-    <!-- KPI strip — current value, median interval, window samples, window
-         range, gap count. -->
-    <div class="point-dashboard__kpi">
-      <div class="point-dashboard__kpi-cell point-dashboard__kpi-cell--primary">
-        <div class="point-dashboard__kpi-label">{{ $t('pointValue.dashboard.kpi.current') }}</div>
-        <div class="point-dashboard__kpi-value">
-          {{ latestValueLabel }}
-          <span v-if="unit" class="point-dashboard__kpi-unit">{{ unit }}</span>
+    <!-- Identity banner — the same tone-tile hero anatomy as the device
+         detail page: tile + name + attachment + status chip, with the
+         point id and collect time demoted to a quiet footer. -->
+    <div class="point-dashboard__banner">
+      <div class="point-dashboard__hero">
+        <span class="point-dashboard__tile" aria-hidden="true">
+          <el-icon :size="26"><Cpu/></el-icon>
+        </span>
+        <div class="point-dashboard__title">
+          <span class="point-dashboard__name">{{ pointName || '-' }}</span>
+          <span class="point-dashboard__attach">
+            <button
+              v-if="deviceId"
+              class="point-dashboard__attach-link"
+              :title="deviceName || deviceId"
+              type="button"
+              @click="openDevice"
+            >
+              {{ deviceName || deviceId }}
+            </button>
+            <template v-if="unit"> · {{ unit }}</template>
+          </span>
         </div>
+        <span v-if="rwFlag" class="point-dashboard__status-chip" :class="rwChipClass">
+          <span class="point-dashboard__status-dot"></span>
+          {{ rwLabel }}
+        </span>
       </div>
-      <div class="point-dashboard__kpi-cell">
-        <div class="point-dashboard__kpi-label">{{ $t('pointValue.dashboard.kpi.medianInterval') }}</div>
-        <div class="point-dashboard__kpi-value">{{ stats ? formatMs(stats.medianIntervalMs) : '--' }}</div>
-        <div class="point-dashboard__kpi-sub">{{ $t('pointValue.dashboard.kpi.medianIntervalSub') }}</div>
+      <div class="point-dashboard__footer">
+        <button
+          v-if="pointId"
+          class="point-dashboard__code"
+          :title="pointId"
+          type="button"
+          @click="copyPointId"
+        >
+          {{ pointId }}
+        </button>
+        <span class="point-dashboard__live-meta">
+          {{ $t('pointValue.card.collectTime') }} {{ collectTimeLabel }}
+        </span>
       </div>
-      <div class="point-dashboard__kpi-cell">
-        <div class="point-dashboard__kpi-label">{{ $t('pointValue.dashboard.kpi.samples') }}</div>
-        <div class="point-dashboard__kpi-value">
-          {{ stats ? formatSampleCount(stats.sampleCount, stats.truncated) : '--' }}
-          <el-tooltip
-            v-if="stats && stats.truncated"
-            :content="$t('pointValue.dashboard.kpi.samplesTruncated')"
-            placement="top"
-          >
-            <el-icon class="point-dashboard__kpi-warn"><WarningFilled/></el-icon>
-          </el-tooltip>
-        </div>
-        <div class="point-dashboard__kpi-sub">{{ rangeHoursLabel }}</div>
-      </div>
-      <div class="point-dashboard__kpi-cell">
-        <div class="point-dashboard__kpi-label">{{ $t('pointValue.dashboard.kpi.windowRange') }}</div>
-        <div class="point-dashboard__kpi-value">
-          {{ stats ? `${formatValue(stats.min)} ~ ${formatValue(stats.max)}` : '--' }}
-          <span v-if="unit && stats" class="point-dashboard__kpi-unit">{{ unit }}</span>
-        </div>
-        <div class="point-dashboard__kpi-sub">{{ $t('pointValue.dashboard.kpi.windowRangeSub') }}</div>
-      </div>
-      <div class="point-dashboard__kpi-cell">
-        <div class="point-dashboard__kpi-label">{{ $t('pointValue.dashboard.kpi.gaps') }}</div>
-        <div class="point-dashboard__kpi-value" :class="{'is-danger': gapCount > 0, 'is-success': gapCount === 0}">
-          {{ gapCount }}
-        </div>
-        <div class="point-dashboard__kpi-sub">{{ $t('pointValue.dashboard.kpi.gapsSub') }}</div>
-      </div>
+    </div>
+
+    <!-- Stat strip — mirrors the device page's __stats grid: 4 across on
+         desktop, 2 on tablet, 1 on mobile. -->
+    <div class="point-dashboard__stats">
+      <stat-card
+        :icon="OdometerIcon"
+        :loading="dashboard.loading.value"
+        :subtitle="unit || '—'"
+        :title="$t('pointValue.dashboard.kpi.current')"
+        :value="currentValueCard"
+        tone="blue"
+      />
+      <stat-card
+        :icon="TimerIcon"
+        :loading="dashboard.loading.value"
+        :subtitle="$t('pointValue.dashboard.kpi.medianIntervalSub')"
+        :title="$t('pointValue.dashboard.kpi.medianInterval')"
+        :value="stats ? formatMs(stats.medianIntervalMs) : '—'"
+        tone="green"
+      />
+      <stat-card
+        :icon="CollectionIcon"
+        :loading="dashboard.loading.value"
+        :subtitle="samplesSubtitle"
+        :title="$t('pointValue.dashboard.kpi.samples')"
+        :value="stats ? formatSampleCount(stats.sampleCount, stats.truncated) : '--'"
+        tone="purple"
+      />
+      <stat-card
+        :icon="DataLineIcon"
+        :loading="dashboard.loading.value"
+        :subtitle="$t('pointValue.dashboard.kpi.windowRangeSub')"
+        :title="$t('pointValue.dashboard.kpi.windowRange')"
+        :value="stats ? `${formatValue(stats.min)} ~ ${formatValue(stats.max)}` : '--'"
+        tone="orange"
+      />
+      <stat-card
+        :icon="WarningIcon"
+        :loading="dashboard.loading.value"
+        :subtitle="$t('pointValue.dashboard.kpi.gapsSub')"
+        :title="$t('pointValue.dashboard.kpi.gaps')"
+        :value="gapCount"
+        tone="red"
+      />
     </div>
 
     <!-- Trend band — hosts the shared 1h/6h/24h/7d window selector. -->
@@ -143,8 +188,21 @@
 import type {PropType} from 'vue';
 import {computed, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
-import {WarningFilled} from '@element-plus/icons-vue';
+import {
+  Collection as CollectionIcon,
+  Cpu,
+  DataLine as DataLineIcon,
+  Odometer as OdometerIcon,
+  Timer as TimerIcon,
+  Warning as WarningIcon,
+} from '@element-plus/icons-vue';
 
+import StatCard from '@/components/card/stat/StatCard.vue';
+import router from '@/config/router';
+import {copy} from '@/utils/commonUtil';
+import {timestampLabel} from '@/utils/dateUtil';
+import {rwFlagKey} from '@/utils/pointFormatUtil';
+import {formatMs} from '@/utils/timeUtil';
 import AlertProfileCard from './AlertProfileCard.vue';
 import CollectionHealthCard from './CollectionHealthCard.vue';
 import PeerSnapshotCard from './PeerSnapshotCard.vue';
@@ -152,7 +210,6 @@ import TrendBandCard from './TrendBandCard.vue';
 import ValueProfileCard from './ValueProfileCard.vue';
 import {usePointDashboard} from './usePointDashboard';
 import {formatSampleCount, formatValue} from './util';
-import {formatMs} from '@/utils/timeUtil';
 
 const props = defineProps({
   /** Device id of the point being boarded. */
@@ -160,8 +217,18 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  /** Device name of the point being boarded, resolved by the detail page. */
+  deviceName: {
+    type: String,
+    default: '',
+  },
   /** Point id of the point being boarded. */
   pointId: {
+    type: String,
+    default: '',
+  },
+  /** Point name of the point being boarded, resolved by the detail page. */
+  pointName: {
     type: String,
     default: '',
   },
@@ -185,6 +252,7 @@ const {dashboard, alertProfile, recentAlerts, peers, loadDashboard, loadAlertPro
 
 const deviceId = computed(() => String(props.deviceId || ''));
 const pointId = computed(() => String(props.pointId || ''));
+const unit = computed(() => props.unit);
 
 const stats = computed(() => dashboard.data.value?.stats ?? null);
 const gapCount = computed(() => dashboard.data.value?.gaps?.length ?? 0);
@@ -222,7 +290,33 @@ watch(
   {immediate: true}
 );
 
-// ---- KPI labels --------------------------------------------------------
+// ---- banner ------------------------------------------------------------
+
+// Read/write chip: the same tone language as the device status chip —
+// read-write = success, read-only = warning, write-only = default.
+const rwFlag = computed(() => String(props.latest?.rwFlag || '').toUpperCase());
+const isReadOnly = computed(() => ['R', 'READ_ONLY'].includes(rwFlag.value));
+const isReadWrite = computed(() => ['RW', 'READ_WRITE'].includes(rwFlag.value));
+const rwChipClass = computed(() => {
+  if (isReadWrite.value) return 'is-rw';
+  if (isReadOnly.value) return 'is-ro';
+  return 'is-wo';
+});
+const rwLabel = computed(() => t(rwFlagKey(String(props.latest?.rwFlag || ''))));
+
+// Device attachment routes to the device detail page — same contract as
+// jumpUtil's device jump ({name: 'deviceDetail', query: {id}}).
+const openDevice = () => {
+  void router.push({name: 'deviceDetail', query: {id: deviceId.value}}).catch(() => {
+    // Navigation duplicated — the board stays where it is.
+  });
+};
+
+const copyPointId = () => copy(pointId.value, t('pointValue.dashboard.banner.copyId'));
+
+const collectTimeLabel = computed(() => timestampLabel(props.latest?.createTime));
+
+// ---- stat strip labels -------------------------------------------------
 
 // The latest value may be a numeric string ("42.5") or a non-numeric payload
 // of string-typed points — numeric ones format with precision, others pass
@@ -232,6 +326,17 @@ const latestValueLabel = computed(() => {
   if (raw == null || raw === '') return t('pointValue.dashboard.kpi.noValue');
   const num = Number(raw);
   return String(raw).trim() !== '' && Number.isFinite(num) ? formatValue(num) : String(raw);
+});
+
+const currentValueCard = computed(() => {
+  const label = latestValueLabel.value;
+  if (label === t('pointValue.dashboard.kpi.noValue') || !unit.value) return label;
+  return `${label} ${unit.value}`;
+});
+
+const samplesSubtitle = computed(() => {
+  if (stats.value?.truncated) return t('pointValue.dashboard.kpi.samplesTruncated');
+  return rangeHoursLabel.value;
 });
 
 const rangeHoursLabel = computed(() => {
@@ -247,77 +352,174 @@ const rangeHoursLabel = computed(() => {
 
 <style lang="scss" scoped>
 .point-dashboard {
-  &__kpi {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: var(--dc3-space-2);
-    margin-bottom: var(--dc3-gutter);
-  }
-
-  &__kpi-cell {
-    padding: var(--dc3-space-3) var(--dc3-space-4);
+  // Identity banner — the point-card header anatomy (tone tile + name +
+  // attach) scaled up, with the rw flag as a soft chip and the point id +
+  // collect time demoted to a quiet footer.
+  &__banner {
+    padding: var(--dc3-space-4);
     border: 1px solid var(--dc3-border-base);
     border-radius: var(--dc3-radius-lg);
     background: var(--dc3-bg-elevated);
-    min-width: 0;
-
-    &--primary {
-      background: linear-gradient(135deg, var(--dc3-bg-elevated-strong), var(--dc3-bg-elevated));
-      border-color: color-mix(in srgb, var(--el-color-primary) 25%, transparent);
-    }
+    margin-bottom: var(--dc3-gutter);
   }
 
-  &__kpi-label {
+  &__hero {
+    display: flex;
+    align-items: center;
+    gap: var(--dc3-space-3);
+  }
+
+  &__tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border: 1px solid color-mix(in srgb, var(--el-color-success) 20%, transparent);
+    border-radius: var(--dc3-radius-lg);
+    background: var(--el-color-success-light-9);
+    color: var(--el-color-success);
+  }
+
+  &__title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__name {
+    overflow: hidden;
+    font-size: 16px;
+    font-weight: 650;
+    color: var(--dc3-text-primary);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__attach {
+    overflow: hidden;
     font-size: 12px;
     color: var(--dc3-text-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  &__kpi-value {
-    display: flex;
-    align-items: baseline;
-    gap: var(--dc3-space-2);
-    margin-top: var(--dc3-space-1);
-    font-size: 24px;
-    font-weight: 680;
-    color: var(--dc3-text-primary);
-    letter-spacing: -0.025em;
-    line-height: 1.2;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  // Device name doubles as a quiet link to the device detail page.
+  &__attach-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--dc3-text-secondary);
+    font-size: inherit;
+    cursor: pointer;
 
-    .point-dashboard__kpi-cell--primary & {
-      font-size: 28px;
+    &:hover {
+      color: var(--dc3-text-brand);
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
+  }
 
-    &.is-danger {
-      color: var(--el-color-danger);
-    }
+  // Soft tone chip — the same language as the device status chip.
+  &__status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    height: 24px;
+    padding: 0 10px;
+    margin-left: auto;
+    border: 1px solid var(--dc3-border-base);
+    border-radius: var(--dc3-radius-full);
+    background: var(--el-fill-color-light);
+    color: var(--dc3-text-secondary);
+    font-size: 12px;
+    font-weight: 600;
 
-    &.is-success {
+    &.is-rw {
+      border-color: color-mix(in srgb, var(--el-color-success) 30%, transparent);
+      background: var(--el-color-success-light-9);
       color: var(--el-color-success);
     }
+
+    &.is-ro {
+      border-color: color-mix(in srgb, var(--el-color-warning) 30%, transparent);
+      background: var(--el-color-warning-light-9);
+      color: var(--el-color-warning);
+    }
+
+    &.is-wo {
+      border-color: var(--dc3-border-base);
+      background: var(--el-fill-color-light);
+      color: var(--dc3-text-secondary);
+    }
   }
 
-  &__kpi-unit {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--dc3-text-muted);
-  }
-
-  &__kpi-warn {
-    font-size: 16px;
-    color: var(--el-color-warning);
+  &__status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
     flex-shrink: 0;
   }
 
-  &__kpi-sub {
-    margin-top: var(--dc3-space-1);
-    font-size: 11px;
-    color: var(--dc3-text-muted);
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: var(--dc3-space-3);
+    margin-top: var(--dc3-space-3);
+    padding-top: var(--dc3-space-3);
+    border-top: 1px solid var(--dc3-border-base);
+  }
+
+  // Point id: copyable, monospace, ellipsized — a UUID is for copying,
+  // not reading.
+  &__code {
     overflow: hidden;
+    max-width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--dc3-text-muted);
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    &:hover {
+      color: var(--dc3-text-brand);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  &__live-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dc3-space-2);
+    flex-shrink: 0;
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--dc3-text-secondary);
+  }
+
+  // Stat-card strip: 4 across on desktop, 2 on tablet, 1 on mobile.
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--dc3-space-2);
+    margin-bottom: var(--dc3-gutter);
+
+    @media (max-width: $breakpoint-md-max) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: $breakpoint-xs-max) {
+      grid-template-columns: 1fr;
+    }
   }
 
   &__row {

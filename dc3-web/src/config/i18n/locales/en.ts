@@ -903,11 +903,10 @@ export default {
       descriptionPlaceholder: 'Enter description',
       valueRequired: 'Please enter point value',
     },
-    detail: {
-      title: 'Data Info',
-    },
     dashboard: {
-      title: 'Point Dashboard',
+      banner: {
+        copyId: 'Point ID copied',
+      },
       window: {
         h1: '1h',
         h6: '6h',

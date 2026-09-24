@@ -7,7 +7,7 @@
   - License, or (at your option) any later version.
   -
   - This program is distributed in the hope that it will be useful,
-  - but WITHOUT ANY WARRANTY; without even implied warranty of
+  - but WITHOUT ANY WARRANTY; without even the implied warranty of
   - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   - GNU Affero General Public License for more details.
   -
@@ -16,9 +16,10 @@
   -->
 
 <!-- Route detail page, on the same contract as every other detail view
-     (DeviceDetail/DriverDetail/PointDetail/…): base-card shell, error and
-     skeleton states, structured el-descriptions fields. The old drawer +
-     raw-JSON presentation was the system's only outlier. -->
+     (DeviceDetail/DriverDetail/ProfileDetail/…): base-card shell, error and
+     skeleton states, then the point dashboard — a single read-only board
+     with the identity banner, stat strip and the six data modules. The old
+     tabbed detail/descriptions presentation was absorbed by the banner. -->
 
 <template>
   <div>
@@ -44,49 +45,15 @@
         v-else-if="!hasRecord"
         :description="$t('pointValue.card.noLatestValue')"
       />
-      <el-tabs v-else v-model="reactiveData.active" v-loading="reactiveData.loading" @tab-click="changeActive">
-        <el-tab-pane :label="$t('pointValue.dashboard.title')" name="dashboard">
-          <point-dashboard
-            :device-id="String(route.query.deviceId || '')"
-            :latest="reactiveData.data"
-            :point-id="String(route.query.pointId || '')"
-            :unit="reactiveData.unit"
-          ></point-dashboard>
-        </el-tab-pane>
-        <el-tab-pane :label="$t('pointValue.detail.title')" lazy name="detail">
-          <detail-card>
-            <el-descriptions :column="isMobile ? 1 : 2" border>
-              <el-descriptions-item :label="$t('pointValue.tool.pointName')">
-                {{ reactiveData.point?.pointName || reactiveData.data.pointName || '-' }}
-              </el-descriptions-item>
-              <el-descriptions-item :label="$t('pointValue.card.device')">
-                {{ reactiveData.device?.deviceName || '-' }}
-              </el-descriptions-item>
-              <el-descriptions-item :label="$t('pointValue.card.rwType')">
-                <el-tag v-if="isReadOnly" effect="plain" type="warning">{{ $t('status.readOnly') }}</el-tag>
-                <el-tag v-else-if="isWriteOnly" effect="plain" type="info">{{ $t('status.writeOnly') }}</el-tag>
-                <el-tag v-else-if="isReadWrite" effect="plain" type="success">{{ $t('status.readWrite') }}</el-tag>
-                <span v-else>-</span>
-              </el-descriptions-item>
-              <el-descriptions-item :label="$t('pointValue.card.processedValue')">
-                {{ reactiveData.data.calValue ?? '--' }} {{ hasRecord ? unit : '' }}
-              </el-descriptions-item>
-              <el-descriptions-item :label="$t('pointValue.card.rawValue')">
-                {{ reactiveData.data.rawValue ?? '--' }}
-              </el-descriptions-item>
-              <el-descriptions-item :label="$t('pointValue.card.delay')">
-                {{ typeof reactiveData.data.interval === 'number' ? `${reactiveData.data.interval} ms` : '--' }}
-              </el-descriptions-item>
-              <el-descriptions-item :label="$t('pointValue.card.collectTime')">
-                {{ timestampLabel(reactiveData.data.createTime) }}
-              </el-descriptions-item>
-              <el-descriptions-item :label="$t('pointValue.card.saveTime')">
-                {{ timestampLabel(reactiveData.data.operateTime) }}
-              </el-descriptions-item>
-            </el-descriptions>
-          </detail-card>
-        </el-tab-pane>
-      </el-tabs>
+      <point-dashboard
+        v-else
+        :device-id="String(route.query.deviceId || '')"
+        :device-name="deviceName"
+        :latest="reactiveData.data"
+        :point-id="String(route.query.pointId || '')"
+        :point-name="pointName"
+        :unit="reactiveData.unit"
+      ></point-dashboard>
     </base-card>
   </div>
 </template>
@@ -94,35 +61,25 @@
 <script lang="ts" setup>
 import {computed, onMounted, reactive, watch} from 'vue';
 import {useRoute} from 'vue-router';
-import router from '@/config/router';
-import {useBreakpoint} from '@/composables/useBreakpoint';
 
 import baseCard from '@/components/card/base/BaseCard.vue';
-import detailCard from '@/components/card/detail/DetailCard.vue';
 import pointDashboard from './dashboard/PointDashboard.vue';
 import {listDeviceByIds} from '@/api/device';
 import {getPointValueLatest, listPointByIds, listPointUnit} from '@/api/point';
-import {timestampLabel} from '@/utils/dateUtil';
-import type {TabsPaneContext} from 'element-plus';
 
 const route = useRoute();
-const {isMobile} = useBreakpoint();
 
 const reactiveData = reactive({
   loading: false,
   status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
-  active: (route.query.active as string) || 'dashboard',
   data: {} as Record<string, any>,
   device: null as Record<string, any> | null,
   point: null as Record<string, any> | null,
   unit: '' as string,
 });
 
-const rwFlag = computed(() => String(reactiveData.data?.rwFlag || '').toUpperCase());
-const isReadOnly = computed(() => ['R', 'READ_ONLY'].includes(rwFlag.value));
-const isWriteOnly = computed(() => ['W', 'WRITE_ONLY'].includes(rwFlag.value));
-const isReadWrite = computed(() => ['RW', 'READ_WRITE'].includes(rwFlag.value));
-const unit = computed(() => reactiveData.unit);
+const deviceName = computed(() => String(reactiveData.device?.deviceName || ''));
+const pointName = computed(() => String(reactiveData.point?.pointName || reactiveData.data.pointName || ''));
 // Time-series latest-value records carry no record id — presence is "the
 // endpoint returned an item", not "item.id is truthy".
 const hasRecord = computed(() => !!reactiveData.data.deviceId || reactiveData.data.calValue !== undefined);
@@ -136,7 +93,7 @@ const load = async () => {
   reactiveData.status = 'loading';
   try {
     // Lookup helpers enrich the record with names/units; failures here are
-    // non-fatal — the descriptions degrade to '-'.
+    // non-fatal — the banner degrades to '-'.
     const [latest, devices, points, units] = await Promise.all([
       getPointValueLatest({deviceId, pointId, offset: 0, limit: 1}),
       deviceId ? listDeviceByIds([deviceId]).catch(() => []) : Promise.resolve([]),
@@ -162,21 +119,8 @@ const load = async () => {
 
 const reload = () => void load();
 
-const changeActive = (tab: TabsPaneContext) => {
-  const query = route.query;
-  router.push({query: {...query, active: String(tab.props.name)}}).catch(() => {
-    // Navigation duplicated — the tab state is already correct.
-  });
-};
-
 onMounted(() => void load());
 watch(() => [route.query.deviceId, route.query.pointId], () => void load());
-// Keep the tab in lock-step with the shareable `active` query param so
-// back/forward navigation lands on the same tab (same contract as
-// DeviceDetail).
-watch(() => route.query.active, (active) => {
-  reactiveData.active = (active as string) || 'dashboard';
-});
 </script>
 
 <style lang="scss" scoped>
