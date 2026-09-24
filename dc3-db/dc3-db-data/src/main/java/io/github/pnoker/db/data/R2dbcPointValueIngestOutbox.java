@@ -141,15 +141,22 @@ public class R2dbcPointValueIngestOutbox implements ReactivePointValueIngestOutb
                 + " WHERE status='CLAIMED' AND claimed_at < CURRENT_TIMESTAMP - INTERVAL '30 seconds'"
                 + " FOR UPDATE SKIP LOCKED)";
         String persistedLeaseExpired = "CURRENT_TIMESTAMP - INTERVAL '30 seconds'";
+        // Deliberately transaction-free: the SELECT is a plain read and each
+        // per-row claim is an atomic conditional UPDATE, so no transaction can
+        // be abandoned mid-flight. The previous FOR-UPDATE-inside-a-transaction
+        // design left zombie idle-in-transaction sessions behind whenever the
+        // reactive chain was cancelled between the SELECT and the per-row
+        // updates, and every later run then blocked on those row locks until
+        // the R2DBC pool starved.
         String select = "SELECT " + COLUMNS + " FROM " + table()
                 + " WHERE (status='PENDING' AND available_at<=CURRENT_TIMESTAMP)"
                 + " OR (status='PERSISTED' AND (claimed_at IS NULL OR claimed_at < " + persistedLeaseExpired + "))"
-                + " ORDER BY available_at,tenant_id,message_id LIMIT :limit FOR UPDATE SKIP LOCKED";
-        Mono<List<PointValueDO>> claimed = databaseClient
+                + " ORDER BY available_at,tenant_id,message_id LIMIT :limit";
+        return databaseClient
                 .sql(expired)
                 .fetch()
                 .rowsUpdated()
-                .then(databaseClient
+                .thenMany(databaseClient
                         .sql(select)
                         .bind("limit", bounded)
                         .map(this::map)
@@ -165,9 +172,7 @@ public class R2dbcPointValueIngestOutbox implements ReactivePointValueIngestOutb
                                 .fetch()
                                 .rowsUpdated()
                                 .filter(rows -> rows == 1)
-                                .thenReturn(value))
-                        .collectList());
-        return transactionalOperator.transactional(claimed).flatMapMany(Flux::fromIterable);
+                                .thenReturn(value)));
     }
 
     @Override
