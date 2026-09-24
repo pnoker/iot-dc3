@@ -27,6 +27,7 @@ import io.github.pnoker.common.data.entity.bo.dashboard.HourCountRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.PeerAlarmRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.ProtocolHealthRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.PointAlertDailyRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.RecentChangeRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.SourceStatsRow;
@@ -208,6 +209,45 @@ public class R2dbcAlertAnalyticsStore implements ReactiveAlertAnalyticsStore {
                 .map((row, metadata) -> {
                     BucketRow value = new BucketRow();
                     value.setBucketKey(row.get("bucket_key"));
+                    value.setCount(number(row.get("count")));
+                    return value;
+                })
+                .all();
+    }
+
+    @Override
+    public Flux<BucketRow> typeDistributionForPoint(long tenantId, long pointId, LocalDateTime from) {
+        String type = "alarm_ext ->> 'type'";
+        return databaseClient
+                .sql("SELECT " + type + " AS bucket_key, COUNT(*) AS count FROM " + TABLE
+                        + " WHERE tenant_id=:tenant_id AND alarm_target_type_flag=0 AND entity_id=:point_id"
+                        + " AND create_time>=:from_time AND " + type + " IS NOT NULL"
+                        + " GROUP BY " + type + " ORDER BY count DESC")
+                .bind("tenant_id", tenantId)
+                .bind("point_id", pointId)
+                .bind("from_time", from)
+                .map((row, metadata) -> {
+                    BucketRow value = new BucketRow();
+                    value.setBucketKey(row.get("bucket_key"));
+                    value.setCount(number(row.get("count")));
+                    return value;
+                })
+                .all();
+    }
+
+    @Override
+    public Flux<PointAlertDailyRow> dailyTrendForPoint(long tenantId, long pointId, LocalDateTime from) {
+        String day = "CAST(create_time AS DATE)";
+        return databaseClient
+                .sql("SELECT " + day + " AS day, COUNT(*) AS count FROM " + TABLE
+                        + " WHERE tenant_id=:tenant_id AND alarm_target_type_flag=0 AND entity_id=:point_id"
+                        + " AND create_time>=:from_time GROUP BY " + day + " ORDER BY day ASC")
+                .bind("tenant_id", tenantId)
+                .bind("point_id", pointId)
+                .bind("from_time", from)
+                .map((row, metadata) -> {
+                    PointAlertDailyRow value = new PointAlertDailyRow();
+                    value.setDate(date(row.get("day")));
                     value.setCount(number(row.get("count")));
                     return value;
                 })

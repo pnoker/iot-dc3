@@ -264,4 +264,16 @@ public interface DashboardService {
      * Daily alert trend for one device over the last {@code days} days.
      */
     Mono<List<AlertTrendVO>> deviceAlertTrend(Long tenantId, Long deviceId, int days);
+
+    /**
+     * Alarm profile of a single point: type distribution and daily counts
+     * inside the window. The recent-alert list is served by {@code alertPage}
+     * with {@code source=point}.
+     *
+     * @param tenantId tenant scope, must be positive
+     * @param pointId  point scope (alarm_target_type_flag=0 rows only)
+     * @param from     inclusive lower bound of the window
+     * @return the point alarm profile
+     */
+    Mono<PointAlertProfileVO> pointAlertProfile(Long tenantId, Long pointId, java.time.LocalDateTime from);
 }

@@ -23,6 +23,8 @@ import io.github.pnoker.common.data.biz.DashboardService;
 import io.github.pnoker.common.data.biz.store.PointValueLatestService;
 import io.github.pnoker.common.data.biz.store.PointValueSampleConverter;
 import io.github.pnoker.common.data.entity.bo.dashboard.AlertItemRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.BucketRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.PointAlertDailyRow;
 import io.github.pnoker.common.data.entity.vo.dashboard.*;
 import io.github.pnoker.common.data.repository.ReactiveAlertAnalyticsStore;
 import io.github.pnoker.common.data.repository.ReactiveAlertStore;
@@ -1045,5 +1047,39 @@ public class DashboardServiceImpl implements DashboardService {
                     }
                     return out;
                 });
+    }
+
+    @Override
+    public Mono<PointAlertProfileVO> pointAlertProfile(Long tenantId, Long pointId, java.time.LocalDateTime from) {
+        if (tenantId == null || tenantId <= 0 || pointId == null || pointId <= 0) {
+            return Mono.error(new IllegalArgumentException("tenantId and pointId must be positive"));
+        }
+        java.time.LocalDateTime windowFrom = from == null
+                ? java.time.LocalDateTime.now().minusDays(30)
+                : from;
+        Mono<List<BucketRow>> typeRows =
+                alertAnalyticsStore.typeDistributionForPoint(tenantId, pointId, windowFrom).collectList();
+        Mono<List<PointAlertDailyRow>> dailyRows =
+                alertAnalyticsStore.dailyTrendForPoint(tenantId, pointId, windowFrom).collectList();
+        return Mono.zip(typeRows, dailyRows).map(tuple -> {
+            PointAlertProfileVO profile = new PointAlertProfileVO();
+            profile.setTypeDistribution(tuple.getT1().stream()
+                    .map(row -> {
+                        AlertTypeBucketVO bucket = new AlertTypeBucketVO();
+                        bucket.setType(asString(row.getBucketKey()));
+                        bucket.setCount(row.getCount());
+                        return bucket;
+                    })
+                    .toList());
+            profile.setDailyTrend(tuple.getT2().stream()
+                    .map(row -> {
+                        PointAlertProfileVO.AlertDaily daily = new PointAlertProfileVO.AlertDaily();
+                        daily.setDate(row.getDate());
+                        daily.setCount(row.getCount());
+                        return daily;
+                    })
+                    .toList());
+            return profile;
+        });
     }
 }

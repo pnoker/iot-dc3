@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -238,25 +237,5 @@ public class PointValueDashboardVO implements Serializable {
 
         @Schema(description = "True when the walk hit the raw-cap before exhausting the window")
         private boolean truncated;
-    }
-
-    /**
-     * One day of the point-scoped alarm trend.
-     */
-    @Getter
-    @Setter
-    @ToString
-    @NoArgsConstructor
-    @Schema(description = "One day of the point-scoped alarm trend")
-    public static class AlertDaily implements Serializable {
-
-        @Serial
-        private static final long serialVersionUID = 1L;
-
-        @Schema(description = "Calendar day")
-        private LocalDate date;
-
-        @Schema(description = "Alarm count on that day")
-        private long count;
     }
 }

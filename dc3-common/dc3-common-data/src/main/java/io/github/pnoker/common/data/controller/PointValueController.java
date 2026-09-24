@@ -18,9 +18,11 @@ package io.github.pnoker.common.data.controller;
 
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
+import io.github.pnoker.common.data.biz.PointValueDashboardService;
 import io.github.pnoker.common.data.biz.PointValueService;
 import io.github.pnoker.common.data.entity.builder.PointValueBuilder;
 import io.github.pnoker.common.data.entity.vo.PointValueVO;
+import io.github.pnoker.common.data.entity.vo.dashboard.PointValueDashboardVO;
 import io.github.pnoker.common.entity.query.PointValueQuery;
 import io.github.pnoker.db.core.page.CursorPage;
 import io.github.pnoker.db.core.page.OffsetPage;
@@ -61,6 +63,8 @@ public class PointValueController implements BaseController {
     private final PointValueBuilder pointValueBuilder;
 
     private final PointValueService pointValueService;
+
+    private final PointValueDashboardService pointValueDashboardService;
 
     /**
      * Return the most recent reading for each point under a device.
@@ -133,6 +137,49 @@ public class PointValueController implements BaseController {
                                     .toList(),
                             page.nextCursor()));
         });
+    }
+
+    /**
+     * Return the data-dashboard payload of a single point: trend band, hourly
+     * volume, value distribution, sampling health, gaps and the typical day
+     * curve, derived from the TSDB window only.
+     *
+     * @param deviceId   id of the device whose point is being queried
+     * @param pointId    id of the point whose dashboard is being queried
+     * @param rangeHours lookback window in hours from 1 through 168; defaults to 24 when omitted
+     * @return the point dashboard payload
+     */
+    @PreAuthorize("@perm.can('point_value', 'list')")
+    @Operation(
+            summary = "Get Point Value Dashboard",
+            description =
+                    "Return the data-dashboard payload of one point for the current tenant: per-bucket trend band "
+                            + "(min/max/avg), hourly sample volume, numeric value histogram, sampling-interval histogram, "
+                            + "collection gaps, typical-day curve and window stats. Everything derives from the point's own "
+                            + "time series inside the lookback window; no platform-wide aggregates are involved.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/dashboard")
+    public Mono<PointValueDashboardVO> dashboard(
+            @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
+                    @NotNull
+                    @RequestParam(name = "device_id")
+                    Long deviceId,
+            @Parameter(description = "Identifier of the point; must belong to the device profile", example = "2048")
+                    @NotNull
+                    @RequestParam(name = "point_id")
+                    Long pointId,
+            @Parameter(description = "Lookback window in hours from 1 through 168", example = "24")
+                    @RequestParam(name = "range_hours", required = false, defaultValue = "24")
+                    Integer rangeHours) {
+        return getTenantId().flatMap(tenantId -> pointValueDashboardService.dashboard(tenantId, deviceId, pointId, rangeHours));
     }
 
     /**

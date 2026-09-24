@@ -32,6 +32,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -622,6 +623,52 @@ public class DashboardController implements BaseController {
     private int resolveEffectiveDays(String rangeKey, int days) {
         Integer resolved = TimeRangeUtil.resolveDays(rangeKey, days);
         return Objects.nonNull(resolved) ? resolved : days;
+    }
+
+    /**
+     * Return the alarm profile of a single point: alarm-type distribution and
+     * daily counts inside a rolling day range. The recent-alert list is served
+     * by the alert page endpoint with source=point.
+     *
+     * @param pointId  id of the point whose alarm profile is being queried
+     * @param days     rolling day range, defaults to 30
+     * @param rangeKey preset time range key overriding days; one of today, 24h, 7d, or 30d
+     * @return the point alarm profile
+     */
+    @PreAuthorize("@perm.can('dashboard', 'list')")
+    @Operation(
+            summary = "Get Point Alarm Profile",
+            description =
+                    "Return the alarm profile of one point for the current tenant: alarm-type distribution "
+                            + "and daily alarm counts inside the rolling window. Use to render the alarm panel "
+                            + "of the point data dashboard.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/alert/point_profile")
+    public Mono<PointAlertProfileVO> pointAlertProfile(
+            @Parameter(description = "Identifier of the point; must belong to the current tenant", example = "2048")
+                    @NotNull
+                    @RequestParam(name = "point_id")
+                    Long pointId,
+            @Parameter(description = "Rolling day range for the profile", example = "30")
+                    @RequestParam(value = "days", defaultValue = "30")
+                    int days,
+            @Parameter(
+                            description = "Preset time range key overriding days; one of today, 24h, 7d, or 30d",
+                            example = "30d")
+                    @RequestParam(value = "range_key", required = false)
+                    String rangeKey) {
+        int effectiveDays = resolveEffectiveDays(rangeKey, days);
+        java.time.LocalDateTime from =
+                java.time.LocalDate.now().minusDays(effectiveDays).atTime(java.time.LocalTime.MIN);
+        return getTenantId().flatMap(tenantId -> dashboardService.pointAlertProfile(tenantId, pointId, from));
     }
 
     /**

@@ -26,6 +26,7 @@ import io.github.pnoker.common.data.entity.bo.dashboard.FlappingRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.HourCountRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.MttaTrendRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.PeerAlarmRow;
+import io.github.pnoker.common.data.entity.bo.dashboard.PointAlertDailyRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.ProtocolHealthRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.RecentChangeRow;
 import io.github.pnoker.common.data.entity.bo.dashboard.SourceCountRow;
@@ -39,6 +40,27 @@ public interface ReactiveAlertAnalyticsStore {
 
     /** Emit the tenant's headline alert counters. */
     Mono<AlertCountersRow> countAll(long tenantId);
+
+    /**
+     * Point-scoped variant of {@link #typeDistribution(long, LocalDateTime)}:
+     * alarm-type buckets of one point, counts descending.
+     *
+     * @param tenantId tenant scope
+     * @param pointId  point scope (alarm_target_type_flag=0 rows only)
+     * @param from     inclusive lower bound of the window
+     * @return alarm-type buckets for the point
+     */
+    Flux<BucketRow> typeDistributionForPoint(long tenantId, long pointId, LocalDateTime from);
+
+    /**
+     * Point-scoped daily alarm counts, days ascending.
+     *
+     * @param tenantId tenant scope
+     * @param pointId  point scope (alarm_target_type_flag=0 rows only)
+     * @param from     inclusive lower bound of the window
+     * @return one row per day with alarms
+     */
+    Flux<PointAlertDailyRow> dailyTrendForPoint(long tenantId, long pointId, LocalDateTime from);
 
     /** Emit alert counts grouped by type. */
     Flux<BucketRow> countByType(long tenantId);
