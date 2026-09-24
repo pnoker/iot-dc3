@@ -247,7 +247,7 @@ describe('utils (services)', () => {
       jumpToSourceEvents(router as Router, 'point', 7);
 
       expect(router.push).toHaveBeenCalledWith({name: 'driverDetail', query: {id: '1', active: 'detail'}});
-      expect(router.push).toHaveBeenCalledWith({name: 'deviceDetail', query: {id: '2', active: 'detail'}});
+      expect(router.push).toHaveBeenCalledWith({name: 'deviceDetail', query: {id: '2'}});
       expect(router.push).toHaveBeenCalledWith({name: 'profileDetail', query: {id: '3', active: 'detail'}});
       expect(router.push).toHaveBeenCalledWith({name: 'pointValue', query: {pointId: '4'}});
       expect(router.push).toHaveBeenCalledWith({name: 'settingsDeviceAlarm', query: {sourceId: '5'}});

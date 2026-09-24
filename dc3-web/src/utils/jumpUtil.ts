@@ -52,7 +52,7 @@ export const jumpToEntity = (router: Router, kind: JumpKind, id: string): void =
       });
       break;
     case 'device':
-      router.push({name: 'deviceDetail', query: {id: idStr, active: 'detail'}}).catch(() => {
+      router.push({name: 'deviceDetail', query: {id: idStr}}).catch(() => {
       });
       break;
     case 'profile':

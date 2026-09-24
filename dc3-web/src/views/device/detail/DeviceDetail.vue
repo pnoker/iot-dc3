@@ -245,7 +245,7 @@ const pointValueViewRef = ref<InstanceType<typeof pointValue>>();
 
 const reactiveData = reactive({
   id: String(route.query.id ?? ''),
-  active: normalizeActive(route.query.active as string),
+  active: (route.query.active as string) || 'dashboard',
   loading: true,
   status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
   data: {} as Partial<DeviceRecord>,
@@ -361,11 +361,6 @@ const commandLength = computed(() => {
 const eventLength = computed(() => {
   return eventViewRef.value?.reactiveData?.page?.total || 0;
 });
-
-// The old device-info tab was merged into the dashboard; legacy deep links
-// still target active=detail, so map it forward instead of landing on a
-// missing tab.
-const normalizeActive = (active?: string) => (active === 'detail' ? 'dashboard' : active || 'dashboard');
 
 const statusCode = computed(() => String(statusDetail.value.status || '').toLowerCase());
 
@@ -585,7 +580,7 @@ watch(
       device();
       if (((active as string) || 'dashboard') === 'dashboard') loadDashboard();
     }
-    reactiveData.active = normalizeActive(active as string);
+    reactiveData.active = (active as string) || 'dashboard';
   }
 );
 

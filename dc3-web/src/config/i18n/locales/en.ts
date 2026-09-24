@@ -455,7 +455,6 @@ export default {
   },
   device: {
     tool: {
-      deviceName: 'Device Name',
       driver: 'Driver',
       deviceNamePlaceholder: 'Enter device name',
       driverPlaceholder: 'Select driver',
@@ -466,18 +465,11 @@ export default {
       copyDeviceId: 'Device ID',
     },
     detail: {
-      deviceInfo: 'Device Info',
       relatedPoints: 'Related Points',
       relatedCommands: 'Related Commands',
       relatedEvents: 'Related Events',
       deviceData: 'Device Data',
       deviceName: 'Device Name',
-      profileName: 'Profile',
-      profileCode: 'Profile Code',
-      pointCount: 'Related Points',
-      commandCount: 'Related Commands',
-      eventCount: 'Related Events',
-      driverName: 'Driver',
       dashboard: 'Dashboard',
       totalPoints: 'Total Points',
       dataQuality: 'Data Quality',

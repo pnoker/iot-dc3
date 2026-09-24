@@ -449,7 +449,6 @@ export default {
   },
   device: {
     tool: {
-      deviceName: '设备名称',
       driver: '所属驱动',
       deviceNamePlaceholder: '请输入设备名称',
       driverPlaceholder: '请选择所属驱动',
@@ -460,18 +459,11 @@ export default {
       copyDeviceId: '设备 ID',
     },
     detail: {
-      deviceInfo: '设备信息',
       relatedPoints: '关联位号',
       relatedCommands: '关联指令',
       relatedEvents: '关联事件',
       deviceData: '设备数据',
       deviceName: '设备名称',
-      profileName: '所属模板',
-      profileCode: '模板编号',
-      pointCount: '关联位号',
-      commandCount: '关联指令',
-      eventCount: '关联事件',
-      driverName: '所属驱动',
       dashboard: '仪表盘',
       totalPoints: '位号总数',
       dataQuality: '数据质量',
