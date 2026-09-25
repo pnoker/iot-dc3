@@ -82,7 +82,9 @@ public class PointValueDashboardServiceImpl implements PointValueDashboardServic
     /**
      * Interval histogram edges in milliseconds; the final bin is open-ended.
      */
-    private static final long[] INTERVAL_EDGES_MS = {0, 500, 1_000, 2_000, 5_000, 10_000, 30_000, 60_000, 300_000, 1_800_000};
+    private static final long[] INTERVAL_EDGES_MS = {
+        0, 500, 1_000, 2_000, 5_000, 10_000, 30_000, 60_000, 300_000, 1_800_000
+    };
 
     /**
      * Gaps are reported when a sampling interval exceeds max(5x median, this floor).
@@ -100,6 +102,15 @@ public class PointValueDashboardServiceImpl implements PointValueDashboardServic
 
     private final ReactiveTsdbStore reactiveTsdbStore;
 
+    /**
+     * Create the dashboard service.
+     *
+     * @param rawCap maximum raw samples the window walk reads per point, from
+     *     {@code dc3.data.dashboard.raw-cap}
+     * @param deviceFacade device metadata access, tenant-scoped
+     * @param pointFacade point metadata access, tenant-scoped
+     * @param reactiveTsdbStore time-series store supplying samples and buckets
+     */
     public PointValueDashboardServiceImpl(
             @Value("${dc3.data.dashboard.raw-cap:8000}") int rawCap,
             DeviceFacade deviceFacade,
@@ -141,12 +152,7 @@ public class PointValueDashboardServiceImpl implements PointValueDashboardServic
         return validateMetadataScope(tenantId, deviceId, pointId)
                 .then(Mono.zip(avgBuckets, minBuckets, maxBuckets, hourlyCounts, typicalDayBuckets, rawProfile))
                 .map(tuple -> build(
-                        tuple.getT1(),
-                        tuple.getT2(),
-                        tuple.getT3(),
-                        tuple.getT4(),
-                        tuple.getT5(),
-                        tuple.getT6()));
+                        tuple.getT1(), tuple.getT2(), tuple.getT3(), tuple.getT4(), tuple.getT5(), tuple.getT6()));
     }
 
     /**
@@ -203,7 +209,8 @@ public class PointValueDashboardServiceImpl implements PointValueDashboardServic
         byHour.forEach((hour, values) -> {
             PointValueDashboardVO.HourAverage row = new PointValueDashboardVO.HourAverage();
             row.setHourOfDay(hour);
-            row.setAvg(values.stream().mapToDouble(Double::doubleValue).average().orElse(0d));
+            row.setAvg(
+                    values.stream().mapToDouble(Double::doubleValue).average().orElse(0d));
             vo.getTypicalDay().add(row);
         });
 
@@ -266,7 +273,8 @@ public class PointValueDashboardServiceImpl implements PointValueDashboardServic
                     if (device.isEmpty() || point.isEmpty()) {
                         return Mono.error(new NotFoundException("Device or point does not exist"));
                     }
-                    return Objects.equals(device.get().getProfileId(), point.get().getProfileId())
+                    return Objects.equals(
+                                    device.get().getProfileId(), point.get().getProfileId())
                             ? Mono.empty()
                             : Mono.error(new NotFoundException("Point does not exist"));
                 });
@@ -334,9 +342,8 @@ public class PointValueDashboardServiceImpl implements PointValueDashboardServic
             PointValueSample previous = samples.get(samples.size() - 1);
             // Walk is newest first: |Δt| between the previous (newer) and the
             // current (older) sample is the forward sampling interval.
-            intervalsMs.add(Math.abs(Duration.between(
-                            previous.deviceTime(), sample.deviceTime())
-                    .toMillis()));
+            intervalsMs.add(Math.abs(
+                    Duration.between(previous.deviceTime(), sample.deviceTime()).toMillis()));
             samples.add(sample);
             remember(sample);
         }
@@ -358,7 +365,10 @@ public class PointValueDashboardServiceImpl implements PointValueDashboardServic
             if (!numericValues.isEmpty()) {
                 stats.setMin(Collections.min(numericValues));
                 stats.setMax(Collections.max(numericValues));
-                stats.setAvg(numericValues.stream().mapToDouble(Double::doubleValue).average().orElse(0d));
+                stats.setAvg(numericValues.stream()
+                        .mapToDouble(Double::doubleValue)
+                        .average()
+                        .orElse(0d));
             }
             if (!intervalsMs.isEmpty()) {
                 List<Long> sorted = new ArrayList<>(intervalsMs);

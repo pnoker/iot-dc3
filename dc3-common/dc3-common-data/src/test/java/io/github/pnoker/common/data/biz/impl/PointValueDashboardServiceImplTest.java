@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.lenient;
@@ -41,10 +40,7 @@ import io.github.pnoker.common.tsdb.model.TsdbModel.BucketAggregate;
 import io.github.pnoker.common.tsdb.model.TsdbModel.Cursor;
 import io.github.pnoker.common.tsdb.model.TsdbModel.CursorPage;
 import io.github.pnoker.common.tsdb.model.TsdbModel.PointValueSample;
-import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesFilter;
 import io.github.pnoker.common.tsdb.model.TsdbModel.SeriesKey;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TimeWindow;
-import io.github.pnoker.common.tsdb.model.TsdbModel.TsdbDeadline;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -100,14 +96,23 @@ class PointValueDashboardServiceImplTest {
     void dashboardMergesBucketAggregatesAndDerivesRawProfile() {
         // trend aggregates at the 15m bucket: aligned avg/min/max rows
         when(tsdbStore.bucketedAggregate(any(), eq(AggregateFunction.AVG), any(), eq(TREND_BUCKET), isNull(), any()))
-                .thenReturn(Mono.just(Map.of(SERIES, List.of(
-                        new BucketAggregate(T0, 42.0d, 4L), new BucketAggregate(T0.plus(TREND_BUCKET), 44.0d, 4L)))));
+                .thenReturn(Mono.just(Map.of(
+                        SERIES,
+                        List.of(
+                                new BucketAggregate(T0, 42.0d, 4L),
+                                new BucketAggregate(T0.plus(TREND_BUCKET), 44.0d, 4L)))));
         when(tsdbStore.bucketedAggregate(any(), eq(AggregateFunction.MIN), any(), eq(TREND_BUCKET), isNull(), any()))
-                .thenReturn(Mono.just(Map.of(SERIES, List.of(
-                        new BucketAggregate(T0, 40.0d, 4L), new BucketAggregate(T0.plus(TREND_BUCKET), 41.0d, 4L)))));
+                .thenReturn(Mono.just(Map.of(
+                        SERIES,
+                        List.of(
+                                new BucketAggregate(T0, 40.0d, 4L),
+                                new BucketAggregate(T0.plus(TREND_BUCKET), 41.0d, 4L)))));
         when(tsdbStore.bucketedAggregate(any(), eq(AggregateFunction.MAX), any(), eq(TREND_BUCKET), isNull(), any()))
-                .thenReturn(Mono.just(Map.of(SERIES, List.of(
-                        new BucketAggregate(T0, 45.0d, 4L), new BucketAggregate(T0.plus(TREND_BUCKET), 46.0d, 4L)))));
+                .thenReturn(Mono.just(Map.of(
+                        SERIES,
+                        List.of(
+                                new BucketAggregate(T0, 45.0d, 4L),
+                                new BucketAggregate(T0.plus(TREND_BUCKET), 46.0d, 4L)))));
         // hourly volume + typical-day (1h AVG over 7 days)
         when(tsdbStore.bucketedAggregate(any(), eq(AggregateFunction.COUNT), any(), eq(HOUR), isNull(), any()))
                 .thenReturn(Mono.just(Map.of(SERIES, List.of(new BucketAggregate(T0, null, 120L)))));
@@ -136,7 +141,9 @@ class PointValueDashboardServiceImplTest {
         assertEquals(120L, vo.getHourlyVolume().getFirst().getCount());
         assertEquals(1, vo.getTypicalDay().size());
         assertEquals(42.0d, vo.getTypicalDay().getFirst().getAvg());
-        assertEquals(T0.atZone(java.time.ZoneId.systemDefault()).getHour(), vo.getTypicalDay().getFirst().getHourOfDay());
+        assertEquals(
+                T0.atZone(java.time.ZoneId.systemDefault()).getHour(),
+                vo.getTypicalDay().getFirst().getHourOfDay());
         // stats: 4 samples, median interval 1s, one gap of ~598s
         assertEquals(4L, vo.getStats().getSampleCount());
         assertEquals(41.0d, vo.getStats().getMin());
@@ -146,11 +153,15 @@ class PointValueDashboardServiceImplTest {
         assertTrue(vo.getGaps().getFirst().getDurationMs() >= 590_000L);
         // value histogram: 4 numeric samples spread over 4 adaptive bins
         assertEquals(4, vo.getValueHistogram().size());
-        assertEquals(4L, vo.getValueHistogram().stream().mapToLong(bin -> bin.getCount()).sum());
+        assertEquals(
+                4L,
+                vo.getValueHistogram().stream().mapToLong(bin -> bin.getCount()).sum());
         // interval histogram: 2x ~1s intervals and 1x ~598s interval (3 deltas)
-        assertEquals(3L, vo.getIntervalHistogram().stream()
-                .mapToLong(bin -> bin.getCount())
-                .sum());
+        assertEquals(
+                3L,
+                vo.getIntervalHistogram().stream()
+                        .mapToLong(bin -> bin.getCount())
+                        .sum());
     }
 
     @Test
