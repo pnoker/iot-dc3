@@ -1,2 +1,8 @@
 allowBuilds:
   esbuild: true
+
+overrides:
+  # Dependabot #232: esbuild below 0.28.1 lets the dev server read arbitrary
+  # files on Windows. Vite's own range already admits 0.28.x — pin the floor
+  # so the lockfile can never resolve back into the vulnerable window.
+  esbuild: '>=0.28.1'
