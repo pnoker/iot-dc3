@@ -915,6 +915,8 @@ export default {
       },
       kpi: {
         current: 'Current Value',
+        average: 'Window Average',
+        averageSub: 'Mean of samples in window',
         medianInterval: 'Median Interval',
         medianIntervalSub: 'Median gap between adjacent samples',
         samples: 'Window Samples',
@@ -966,7 +968,8 @@ export default {
         title: 'Peer Snapshot',
         empty: 'No other points on this device',
         noValue: 'No latest value',
-        footer: 'Click a card to open that point',
+        footer: "Latest value and collect time of the device's other points",
+        tooltip: 'Click to open detail',
       },
     },
     empty: {

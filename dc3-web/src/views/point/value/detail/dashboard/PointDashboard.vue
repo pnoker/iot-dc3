@@ -69,44 +69,60 @@
       </div>
     </div>
 
-    <!-- Stat strip — mirrors the device page's __stats grid: 4 across on
-         desktop, 2 on tablet, 1 on mobile. -->
+    <!-- Stat strip — 6 tiles on a 3-wide grid so every row stays full:
+         2 rows of 3 on desktop, 3 rows of 2 on tablet, 6 stacked on
+         mobile. Six (not five) is what makes the row math close at the
+         3/2/1 column tiers. -->
     <div class="point-dashboard__stats">
       <stat-card
         :icon="OdometerIcon"
         :loading="dashboard.loading.value"
+        :on-refresh="reloadDashboard"
         :subtitle="unit || '—'"
         :title="$t('pointValue.dashboard.kpi.current')"
         :value="currentValueCard"
         tone="blue"
       />
       <stat-card
-        :icon="TimerIcon"
+        :icon="DataLineIcon"
         :loading="dashboard.loading.value"
-        :subtitle="$t('pointValue.dashboard.kpi.medianIntervalSub')"
-        :title="$t('pointValue.dashboard.kpi.medianInterval')"
-        :value="stats ? formatMs(stats.medianIntervalMs) : '—'"
+        :on-refresh="reloadDashboard"
+        :subtitle="$t('pointValue.dashboard.kpi.averageSub')"
+        :title="$t('pointValue.dashboard.kpi.average')"
+        :value="averageValueCard"
         tone="green"
       />
       <stat-card
-        :icon="CollectionIcon"
+        :icon="TrendChartsIcon"
         :loading="dashboard.loading.value"
-        :subtitle="samplesSubtitle"
-        :title="$t('pointValue.dashboard.kpi.samples')"
-        :value="stats ? formatSampleCount(stats.sampleCount, stats.truncated) : '--'"
-        tone="purple"
-      />
-      <stat-card
-        :icon="DataLineIcon"
-        :loading="dashboard.loading.value"
+        :on-refresh="reloadDashboard"
         :subtitle="$t('pointValue.dashboard.kpi.windowRangeSub')"
         :title="$t('pointValue.dashboard.kpi.windowRange')"
         :value="stats ? `${formatValue(stats.min)} ~ ${formatValue(stats.max)}` : '--'"
         tone="orange"
       />
       <stat-card
+        :icon="TimerIcon"
+        :loading="dashboard.loading.value"
+        :on-refresh="reloadDashboard"
+        :subtitle="$t('pointValue.dashboard.kpi.medianIntervalSub')"
+        :title="$t('pointValue.dashboard.kpi.medianInterval')"
+        :value="stats ? formatMs(stats.medianIntervalMs) : '—'"
+        tone="purple"
+      />
+      <stat-card
+        :icon="CollectionIcon"
+        :loading="dashboard.loading.value"
+        :on-refresh="reloadDashboard"
+        :subtitle="samplesSubtitle"
+        :title="$t('pointValue.dashboard.kpi.samples')"
+        :value="stats ? formatSampleCount(stats.sampleCount, stats.truncated) : '--'"
+        tone="blue"
+      />
+      <stat-card
         :icon="WarningIcon"
         :loading="dashboard.loading.value"
+        :on-refresh="reloadDashboard"
         :subtitle="$t('pointValue.dashboard.kpi.gapsSub')"
         :title="$t('pointValue.dashboard.kpi.gaps')"
         :value="gapCount"
@@ -194,6 +210,7 @@ import {
   DataLine as DataLineIcon,
   Odometer as OdometerIcon,
   Timer as TimerIcon,
+  TrendCharts as TrendChartsIcon,
   Warning as WarningIcon,
 } from '@element-plus/icons-vue';
 
@@ -332,6 +349,14 @@ const currentValueCard = computed(() => {
   const label = latestValueLabel.value;
   if (label === t('pointValue.dashboard.kpi.noValue') || !unit.value) return label;
   return `${label} ${unit.value}`;
+});
+
+// Window average shares the current value's unit treatment so the two value
+// tiles read as one family.
+const averageValueCard = computed(() => {
+  if (!stats.value || stats.value.avg == null || !Number.isFinite(stats.value.avg)) return '--';
+  const label = formatValue(Number(stats.value.avg));
+  return unit.value ? `${label} ${unit.value}` : label;
 });
 
 const samplesSubtitle = computed(() => {
@@ -506,10 +531,11 @@ const rangeHoursLabel = computed(() => {
     color: var(--dc3-text-secondary);
   }
 
-  // Stat-card strip: 4 across on desktop, 2 on tablet, 1 on mobile.
+  // Stat-card strip: 3 across on desktop, 2 on tablet, 1 on mobile —
+  // six tiles close every tier with no half-empty row.
   &__stats {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--dc3-space-2);
     margin-bottom: var(--dc3-gutter);
 

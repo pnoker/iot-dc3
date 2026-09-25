@@ -70,7 +70,11 @@ const props = withDefaults(
     }
   }
 
-  :deep(.el-card) {
+  // Anchored to the shell's own card (.card-shell__body) on purpose: plain
+  // `:deep(.el-card*)` descendant selectors leaked into every nested el-card
+  // on the page (each DashboardCard), where the 16px body padding overrode
+  // the cards' own paddings and swallowed their footer strips into the body.
+  :deep(.card-shell__body.el-card) {
     width: 100%;
     box-sizing: border-box;
     min-width: 0;
@@ -81,11 +85,11 @@ const props = withDefaults(
     border: 0;
   }
 
-  :deep(.el-card__header) {
+  :deep(.card-shell__body > .el-card__header) {
     padding: var(--dc3-space-3) var(--dc3-space-4);
   }
 
-  :deep(.el-card__body) {
+  :deep(.card-shell__body > .el-card__body) {
     padding: var(--dc3-space-4);
   }
 

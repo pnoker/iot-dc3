@@ -883,7 +883,7 @@ export default {
       rawValue: '原始值',
       device: '所属设备',
       delay: '数据延时',
-      collectTime: '采集日期',
+      collectTime: '采集时间',
       saveTime: '保存日期',
       noLatestValue: '暂无值',
       noHistory: '暂无历史',
@@ -909,6 +909,8 @@ export default {
       },
       kpi: {
         current: '当前值',
+        average: '窗口均值',
+        averageSub: '窗口内样本平均值',
         medianInterval: '采集间隔中位数',
         medianIntervalSub: '相邻样本时间差的中位数',
         samples: '窗口样本数',
@@ -960,7 +962,8 @@ export default {
         title: '邻位快照',
         empty: '该设备暂无其他位号',
         noValue: '暂无最新值',
-        footer: '点击卡片跳转到对应位号详情',
+        footer: '同设备其余位号的最新值与采集时间',
+        tooltip: '点击查看详情',
       },
     },
     empty: {

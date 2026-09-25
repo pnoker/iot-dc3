@@ -84,6 +84,7 @@
               <stat-card
                 :icon="ListIcon"
                 :loading="coverageLoading"
+                :on-refresh="loadCoverage"
                 :title="$t('device.detail.totalPoints')"
                 :value="totalPointsLabel"
                 tone="blue"
@@ -386,9 +387,11 @@ const timeoutLabel = computed(() => {
 });
 
 const qualityRatioLabel = computed(() => {
+  // numericRatio arrives as a 0..1 ratio — present it as a percentage.
   const ratio = qualityData.value?.numericRatio;
   if (ratio == null || !Number.isFinite(ratio)) return '—';
-  return `${Number.isInteger(ratio) ? ratio : ratio.toFixed(1)}%`;
+  const percent = ratio * 100;
+  return `${Number.isInteger(percent) ? percent : percent.toFixed(1)}%`;
 });
 
 const missingPointCount = computed(() => coverageData.value?.missingPoints ?? 0);

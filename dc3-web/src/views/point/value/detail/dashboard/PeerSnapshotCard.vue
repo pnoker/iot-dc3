@@ -38,6 +38,7 @@
         v-for="item in items"
         :key="item.pointId"
         :aria-label="item.pointName"
+        :title="$t('pointValue.dashboard.peer.tooltip')"
         class="peer-snapshot__card"
         role="button"
         shadow="hover"
@@ -45,15 +46,21 @@
         @click="openPeer(item.pointId)"
         @keydown.enter="openPeer(item.pointId)"
       >
-        <div class="peer-snapshot__name">{{ item.pointName || item.pointId }}</div>
-        <div class="peer-snapshot__value">
-          <template v-if="item.value !== null">
-            <span class="peer-snapshot__value-text">{{ displayValue(item.value) }}</span>
-            <span v-if="item.unit" class="peer-snapshot__unit">{{ item.unit }}</span>
-          </template>
-          <span v-else class="peer-snapshot__no-value">{{ $t('pointValue.dashboard.peer.noValue') }}</span>
+        <div class="peer-snapshot__body">
+          <span class="peer-snapshot__name">{{ item.pointName || item.pointId }}</span>
+          <span class="peer-snapshot__value">
+            <template v-if="item.value !== null">
+              <span class="peer-snapshot__value-text">{{ displayValue(item.value) }}</span>
+              <span v-if="item.unit" class="peer-snapshot__unit">{{ item.unit }}</span>
+            </template>
+            <span v-else class="peer-snapshot__no-value">{{ $t('pointValue.dashboard.peer.noValue') }}</span>
+          </span>
         </div>
-        <div class="peer-snapshot__time">{{ item.createTime ? formatDateTime(item.createTime) : '' }}</div>
+        <!-- Family footer form: a full-width strip under the body instead of
+             another body row — the collect time is metadata, not content. -->
+        <div class="peer-snapshot__foot">
+          <span class="peer-snapshot__time">{{ item.createTime ? formatDateTime(item.createTime) : '' }}</span>
+        </div>
       </el-card>
     </div>
   </dashboard-card>
@@ -115,13 +122,22 @@ const openPeer = (pointId: string) => {
 </script>
 
 <style lang="scss" scoped>
+// auto-fit (not auto-fill) collapses the unused tracks: a 2-peer device fills
+// the row with 2 wide tiles instead of leaving 5 of 7 columns empty, which is
+// the same "half-empty row" disease the stat strip used to have. Tiles stretch
+// to the body height so the fixed card height carries no dead space.
 .peer-snapshot__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  flex: 1;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--dc3-space-2);
+  min-height: 0;
 }
 
 .peer-snapshot__card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   cursor: pointer;
   border-color: var(--dc3-border-base);
   transition: border-color var(--dc3-duration-base) var(--dc3-ease-standard);
@@ -132,8 +148,23 @@ const openPeer = (pointId: string) => {
   }
 
   :deep(.el-card__body) {
-    padding: var(--dc3-space-3) var(--dc3-space-4);
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 0;
   }
+}
+
+// Name left, value right on one baseline row — the row fills the tile width
+// whatever the tile ends up being, so nothing hugs the left with dead space
+// beside it.
+.peer-snapshot__body {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dc3-space-3);
+  padding: var(--dc3-space-3) var(--dc3-space-4);
 }
 
 .peer-snapshot__name {
@@ -149,7 +180,7 @@ const openPeer = (pointId: string) => {
   display: flex;
   align-items: baseline;
   gap: var(--dc3-space-2);
-  margin-top: var(--dc3-space-1);
+  margin-left: auto;
 }
 
 .peer-snapshot__value-text {
@@ -169,9 +200,17 @@ const openPeer = (pointId: string) => {
   color: var(--dc3-text-muted);
 }
 
+// Same footer strip language as DashboardCard: muted band under a hairline
+// border, metadata left.
+.peer-snapshot__foot {
+  padding: var(--dc3-space-2) var(--dc3-space-4);
+  border-top: 1px solid var(--dc3-border-base);
+  background: var(--dc3-bg-muted);
+  flex-shrink: 0;
+}
+
 .peer-snapshot__time {
-  margin-top: var(--dc3-space-1);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--dc3-text-muted);
 }
 </style>

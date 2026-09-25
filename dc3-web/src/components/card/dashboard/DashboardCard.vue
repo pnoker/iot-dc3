@@ -400,27 +400,40 @@ defineExpose({
   }
 
   // ---- bodyMode variants ----------------------------------------------
-  // plain — Element default body padding, no special overflow treatment.
+  // plain — content keeps the classic body padding, but the padding lives on
+  // the content wrapper rather than the el-card body so the footer stays a
+  // full-bleed band (border-top edge to edge) exactly like the chart/scroll
+  // modes. Padding the card body used to swallow the footer into the content
+  // area — it read as another body row instead of a footer.
   &--plain {
     :deep(.el-card__body) {
+      padding: 0;
+    }
+
+    .dashboard-card__content {
       padding: 16px;
     }
 
-    .dashboard-card__body {
-      // Padding was already applied at card-body level; content fills.
+    .dashboard-card__error {
+      padding: 16px;
     }
   }
 
   // chart — the content slot is expected to host a G2 canvas that reads
   // its size from the container (autoFit). We give it full-bleed room so
   // the chart extends to the card edges; consumers typically pass a div
-  // with `width: 100%; height: 100%;` inside.
+  // with `width: 100%; height: 100%;` inside. Overflow is clipped: G2
+  // falls back to a 640x480 canvas when it measures the container before
+  // layout settles (see g2ChartUtil), and that oversized canvas used to
+  // surface both scrollbars on the card — the same cascade TopologySankey
+  // documents locally.
   &--chart {
     .dashboard-card__content {
       box-sizing: border-box;
       width: 100%;
       height: 100%;
       padding: 8px 16px 16px;
+      overflow: hidden;
     }
   }
 
